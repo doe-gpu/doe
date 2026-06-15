@@ -1,1 +1,0 @@
-cmd_Release/obj.target/doe_napi.node := g++ -o Release/obj.target/doe_napi.node -shared -pthread -rdynamic -m64  -Wl,-soname=doe_napi.node -Wl,--start-group Release/obj.target/doe_napi/native/doe_napi.o -Wl,--end-group -lnode

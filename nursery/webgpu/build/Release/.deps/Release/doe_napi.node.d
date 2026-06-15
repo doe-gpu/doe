@@ -1,1 +1,0 @@
-cmd_Release/doe_napi.node := ln -f "Release/obj.target/doe_napi.node" "Release/doe_napi.node" 2>/dev/null || (rm -rf "Release/doe_napi.node" && cp -af "Release/obj.target/doe_napi.node" "Release/doe_napi.node")

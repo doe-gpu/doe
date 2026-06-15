@@ -25,6 +25,7 @@ runtime/zig/zig-out/
 runtime/zig/*.o
 runtime/zig/wgsl_probe.*.zig
 packages/doe-gpu/build/
+packages/doe-gpu/src/vendor/build/
 packages/doe-gpu/prebuilds/
 packages/doe-gpu-*/bin/
 
@@ -50,6 +51,7 @@ bench/out/**
 !bench/out/README.local.md
 nursery/webgpu/out/node-smoke.meta.json
 nursery/webgpu/out/node-smoke.ndjson
+nursery/webgpu/build/
 
 # Generated Lean proof artifacts
 lean/artifacts/
@@ -147,6 +149,7 @@ runtime/zig/examples/simulator/**/compile/**/simfab_traces/
 runtime/zig/examples/simulator/**/compile/**/corefile.cs1
 runtime/bridge/onnxruntime-ep/artifacts/
 runtime/zig/bench/out/
+runtime/zig/src/bench/out/
 
 # Streaming executor hand-written CSL kernel sources — these are source
 # code, not generated artifacts, and are required by the runners in
