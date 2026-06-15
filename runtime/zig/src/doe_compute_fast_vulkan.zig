@@ -154,7 +154,7 @@ fn recordOrExecuteCopy(
     if (copy_end_src > scb.size or copy_end_dst > dcb.size) return;
     const src_has_pending_compute_write =
         rt.has_pending_compute_writes and
-        (!rt.current_compute_binding_tracking_complete or rt.pending_compute_write_buffers.contains(src_buf.vk_id));
+        rt.has_pending_compute_write_for_buffer(src_buf.vk_id);
     if (rt.replay_recording_active and (scb.mapped == null or src_has_pending_compute_write)) {
         vk_upload.record_replay_buffer_copy(
             rt,
@@ -269,6 +269,7 @@ pub fn dispatchBatchCopyFlush(
     copy_dst: ?*anyopaque,
     copy_dst_off: u64,
     copy_size: u64,
+    collect_timings: bool,
 ) DispatchBatchCopyFlushTimings {
     var timings = DispatchBatchCopyFlushTimings{};
     if (dispatch_count == 0) return timings;
@@ -277,13 +278,14 @@ pub fn dispatchBatchCopyFlush(
     rt.recorded_submit_replay_active = true;
     defer rt.recorded_submit_replay_active = previous_replay_state;
 
-    const replay_started_ns = monotonicNowNs();
+    const replay_started_ns = if (collect_timings) monotonicNowNs() else 0;
     var executed_any_dispatch = false;
     var prepared_pipe: ?*DoeComputePipeline = null;
     var prepared_bind_groups: BindGroupArray = [_]?*DoeBindGroup{null} ** MAX_COMPUTE_BIND_GROUPS;
     var prepared_bg_count: u32 = 0;
     var prepared_cache: [BATCH_PREPARED_CACHE_CAPACITY]PreparedDispatchCacheEntry = undefined;
     var prepared_cache_count: usize = 0;
+    var replay_command_buffer = rt.replay_command_buffer;
     for (0..dispatch_count) |index| {
         const pipe = native_helpers.cast(DoeComputePipeline, pipe_ptrs[index]) orelse continue;
         const bg_offset = index * MAX_COMPUTE_BIND_GROUPS;
@@ -296,7 +298,7 @@ pub fn dispatchBatchCopyFlush(
             dispatch_dims[dim_offset + 1],
             dispatch_dims[dim_offset + 2],
         ) orelse continue;
-        const prepare_started_ns = monotonicNowNs();
+        const prepare_started_ns = if (collect_timings) monotonicNowNs() else 0;
         const bg_count = @min(bg_counts[index], MAX_COMPUTE_BIND_GROUPS);
         if (!samePreparedDispatch(prepared_pipe, &prepared_bind_groups, prepared_bg_count, pipe, &bind_groups, bg_count)) {
             prepared_pipe = null;
@@ -340,25 +342,37 @@ pub fn dispatchBatchCopyFlush(
                 };
             }
             if (!prepared) {
-                timings.command_replay_prepare_ns += monotonicNowNs() - prepare_started_ns;
+                if (collect_timings) timings.command_replay_prepare_ns += monotonicNowNs() - prepare_started_ns;
                 continue;
             }
             prepared_pipe = pipe;
             prepared_bind_groups = bind_groups;
             prepared_bg_count = bg_count;
         }
-        timings.command_replay_prepare_ns += monotonicNowNs() - prepare_started_ns;
-        const record_started_ns = monotonicNowNs();
-        vulkan_compute.vulkan_run_prepared_dispatch(rt, .{
-            .x = dispatch_dims[dim_offset],
-            .y = dispatch_dims[dim_offset + 1],
-            .z = dispatch_dims[dim_offset + 2],
-        });
-        timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
+        if (collect_timings) timings.command_replay_prepare_ns += monotonicNowNs() - prepare_started_ns;
+        const record_started_ns = if (collect_timings) monotonicNowNs() else 0;
+        if (replay_command_buffer == null) {
+            replay_command_buffer = rt.begin_prepared_dispatch_replay_batch() catch |err| {
+                std.log.err("doe_compute_fast_vulkan: begin prepared replay batch failed: {s}", .{@errorName(err)});
+                if (collect_timings) timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
+                continue;
+            };
+        }
+        rt.record_prepared_dispatch_replay_on(
+            replay_command_buffer,
+            dispatch_dims[dim_offset],
+            dispatch_dims[dim_offset + 1],
+            dispatch_dims[dim_offset + 2],
+        ) catch |err| {
+            std.log.err("doe_compute_fast_vulkan: record prepared dispatch failed: {s}", .{@errorName(err)});
+            if (collect_timings) timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
+            continue;
+        };
+        if (collect_timings) timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
         executed_any_dispatch = true;
     }
 
-    const copy_started_ns = monotonicNowNs();
+    const copy_started_ns = if (collect_timings) monotonicNowNs() else 0;
     recordOrExecuteCopy(
         rt,
         q,
@@ -369,19 +383,27 @@ pub fn dispatchBatchCopyFlush(
         copy_size,
         &executed_any_dispatch,
     );
-    timings.command_replay_copy_ns = monotonicNowNs() - copy_started_ns;
-    timings.command_replay_ns = monotonicNowNs() - replay_started_ns;
+    if (collect_timings) {
+        timings.command_replay_copy_ns = monotonicNowNs() - copy_started_ns;
+        timings.command_replay_ns = monotonicNowNs() - replay_started_ns;
+    }
     if (executed_any_dispatch) {
-        const submit_started_ns = monotonicNowNs();
-        const submit_timings = rt.submit_recorded_replay_timed() catch |err| {
-            std.log.err("doe_compute_fast_vulkan: submit recorded replay failed: {s}", .{@errorName(err)});
-            timings.queue_submit_ns = monotonicNowNs() - submit_started_ns;
-            return timings;
-        };
-        timings.queue_submit_ns = submit_timings.total();
-        timings.queue_submit_command_buffer_end_ns = submit_timings.command_buffer_end_ns;
-        timings.queue_submit_sync_prepare_ns = submit_timings.sync_prepare_ns;
-        timings.queue_submit_driver_submit_ns = submit_timings.driver_submit_ns;
+        if (collect_timings) {
+            const submit_started_ns = monotonicNowNs();
+            const submit_timings = rt.submit_recorded_replay_timed() catch |err| {
+                std.log.err("doe_compute_fast_vulkan: submit recorded replay failed: {s}", .{@errorName(err)});
+                timings.queue_submit_ns = monotonicNowNs() - submit_started_ns;
+                return timings;
+            };
+            timings.queue_submit_ns = submit_timings.total();
+            timings.queue_submit_command_buffer_end_ns = submit_timings.command_buffer_end_ns;
+            timings.queue_submit_sync_prepare_ns = submit_timings.sync_prepare_ns;
+            timings.queue_submit_driver_submit_ns = submit_timings.driver_submit_ns;
+        } else {
+            rt.submit_recorded_replay() catch |err| {
+                std.log.err("doe_compute_fast_vulkan: submit recorded replay failed: {s}", .{@errorName(err)});
+            };
+        }
     }
     return timings;
 }

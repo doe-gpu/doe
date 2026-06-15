@@ -1,9 +1,0 @@
-{
-  "artifact": "zig-out/lib/libdoe_webgpu.dylib",
-  "error": "missing required symbol list: config/dropin_abi.symbols.txt",
-  "generatedAtUtc": "2026-03-05T15:34:56.625048Z",
-  "outputTimestamp": "20260305T153456Z",
-  "pass": false,
-  "schemaVersion": 1,
-  "symbolsPath": "config/dropin_abi.symbols.txt"
-}

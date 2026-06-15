@@ -718,6 +718,7 @@ fn computeDispatchBatchCopyFlushDirect(
             copy_dst,
             copy_dst_off,
             copy_size,
+            breakdown != null,
         );
         addDirectDispatchFlushField(
             breakdown,

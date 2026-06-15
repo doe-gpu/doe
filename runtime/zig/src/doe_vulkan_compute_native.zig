@@ -834,14 +834,7 @@ pub fn vulkan_prepare_recorded_dispatch(rt: *NativeVulkanRuntime, dispatch: anyt
 
 pub fn vulkan_run_prepared_dispatch(rt: *NativeVulkanRuntime, dispatch: anytype) void {
     if (comptime !has_vulkan) return;
-    _ = rt.run_dispatch(
-        dispatch.x,
-        dispatch.y,
-        dispatch.z,
-        webgpu.QueueSyncMode.deferred,
-        webgpu.QueueWaitMode.process_events,
-        webgpu.GpuTimestampMode.off,
-    ) catch |err| {
+    rt.record_prepared_dispatch_replay(dispatch.x, dispatch.y, dispatch.z) catch |err| {
         std.log.err("doe_vulkan_compute: recorded run_dispatch({},{},{}) failed: {s}", .{
             dispatch.x,
             dispatch.y,

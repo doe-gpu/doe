@@ -1,11 +1,17 @@
 Local bench output mirror
 
-Most of this directory is intentionally ignored by git.
-Tracked stable mirrors live under `bench/out/cube/latest/` and
-`bench/out/visualization/latest/`.
-Small compare/release/smoke summary JSONs and HTML reports under `bench/out/`
-can also be committed; bulky NDJSON workspaces and large harvested benchmark
-JSON corpora stay ignored unless promoted deliberately.
+Most of this directory is intentionally ignored by git. Local A/B runs,
+timestamped workspaces, bulky NDJSON, and harvested benchmark corpora should
+stay local unless they are deliberately promoted.
+
+Promoted evidence should have a clear source command and a durability reason
+such as a release, claim, reproducibility contract, or small fixture needed by
+tests. Prefer curated reports or manifests over committing entire timestamped
+workspaces.
+
+Tracked stable mirrors have historically lived under `bench/out/cube/latest/`
+and `bench/out/visualization/latest/`. Treat any new tracked `bench/out/`
+content as an explicit exception, not the default.
 
 Layout
 

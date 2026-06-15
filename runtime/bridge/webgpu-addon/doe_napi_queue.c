@@ -9,6 +9,8 @@
 #define BATCH_STACK_DISPATCHES 64
 #define QUEUE_WRITE_BATCH_STACK_MAX 64u
 
+static int submit_breakdown_enabled(void);
+
 static uint32_t read_bind_group_value(napi_env env, napi_value value, void** bind_groups, uint32_t max_count) {
     if (!value || max_count == 0) {
         return 0;
@@ -42,8 +44,20 @@ static uint32_t read_bind_group_value(napi_env env, napi_value value, void** bin
 }
 
 static uint32_t read_command_bind_groups(napi_env env, napi_value cmd, void** bind_groups, uint32_t max_count) {
-    if (has_prop(env, cmd, "b")) {
-        return read_bind_group_value(env, get_prop(env, cmd, "b"), bind_groups, max_count);
+    napi_value compact_bind_groups = get_prop(env, cmd, "b");
+    napi_valuetype compact_type;
+    if (napi_typeof(env, compact_bind_groups, &compact_type) == napi_ok &&
+        compact_type != napi_undefined &&
+        compact_type != napi_null) {
+        bool compact_is_array = false;
+        napi_is_array(env, compact_bind_groups, &compact_is_array);
+        if (!compact_is_array) {
+            void* bg = unwrap_ptr(env, compact_bind_groups);
+            if (!bg || max_count == 0) return 0;
+            bind_groups[0] = bg;
+            return 1;
+        }
+        return read_bind_group_value(env, compact_bind_groups, bind_groups, max_count);
     }
     return read_bind_group_value(env, get_prop(env, cmd, "bg"), bind_groups, max_count);
 }
@@ -617,6 +631,13 @@ static napi_value make_submit_breakdown_full(
     uint64_t command_replay_record_ns,
     uint64_t command_replay_copy_ns
 );
+static napi_value make_submit_completion_hint(
+    napi_env env,
+    uint64_t flush_ns,
+    uint64_t wait_completed_ns,
+    uint64_t deferred_copy_ns,
+    uint64_t deferred_resolve_ns
+);
 
 static napi_value make_submit_breakdown(
     napi_env env,
@@ -624,7 +645,34 @@ static napi_value make_submit_breakdown(
     uint64_t queue_submit_ns,
     uint64_t flush_ns
 ) {
+    if (!submit_breakdown_enabled()) return make_submit_completion_hint(env, flush_ns, 0, 0, 0);
     return make_submit_breakdown_full(env, command_replay_ns, queue_submit_ns, flush_ns, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+}
+
+static void maybe_set_submit_breakdown_u64(napi_env env, napi_value result, const char* name, uint64_t value) {
+    if (value == 0) return;
+    napi_value js_value;
+    napi_create_double(env, (double)value, &js_value);
+    napi_set_named_property(env, result, name, js_value);
+}
+
+static napi_value make_submit_completion_hint(
+    napi_env env,
+    uint64_t flush_ns,
+    uint64_t wait_completed_ns,
+    uint64_t deferred_copy_ns,
+    uint64_t deferred_resolve_ns
+) {
+    if (flush_ns == 0 && wait_completed_ns == 0 && deferred_copy_ns == 0 && deferred_resolve_ns == 0) {
+        return NULL;
+    }
+    napi_value result;
+    napi_create_object(env, &result);
+    maybe_set_submit_breakdown_u64(env, result, "flushNs", flush_ns);
+    maybe_set_submit_breakdown_u64(env, result, "waitCompletedNs", wait_completed_ns);
+    maybe_set_submit_breakdown_u64(env, result, "deferredCopyNs", deferred_copy_ns);
+    maybe_set_submit_breakdown_u64(env, result, "deferredResolveNs", deferred_resolve_ns);
+    return result;
 }
 
 static napi_value make_submit_breakdown_full(
@@ -711,11 +759,13 @@ static uint64_t flush_queue_after_submit(
 }
 
 static int submit_breakdown_enabled(void) {
+    static int cached = -1;
+    if (cached >= 0) return cached;
     const char* value = getenv("DOE_WEBGPU_SUBMIT_BREAKDOWN");
-    if (!value || value[0] == '\0') return 0;
-    if (strcmp(value, "0") == 0) return 0;
-    if (strcmp(value, "false") == 0 || strcmp(value, "False") == 0 || strcmp(value, "FALSE") == 0) return 0;
-    return 1;
+    if (!value || value[0] == '\0') return cached = 0;
+    if (strcmp(value, "0") == 0) return cached = 0;
+    if (strcmp(value, "false") == 0 || strcmp(value, "False") == 0 || strcmp(value, "FALSE") == 0) return cached = 0;
+    return cached = 1;
 }
 
 #define DOE_QUEUE_SYNC_INFO_BACKEND_VULKAN 1u
@@ -936,19 +986,20 @@ napi_value doe_queue_submit(napi_env env, napi_callback_info info) {
     if (!queue) NAPI_THROW(env, "Invalid queue");
     uint32_t cmd_count = 0;
     napi_get_array_length(env, _args[1], &cmd_count);
+    const int wants_submit_breakdown = submit_breakdown_enabled();
     if (cmd_count == 0) {
-        return make_submit_breakdown(env, 0, 0, 0);
+        return wants_submit_breakdown ? make_submit_breakdown(env, 0, 0, 0) : NULL;
     }
-    const uint64_t command_replay_started_ns = monotonic_now_ns();
+    const uint64_t command_replay_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
     if (cmd_count == 1) {
         napi_value elem;
         napi_get_element(env, _args[1], 0, &elem);
         WGPUCommandBuffer cmd = unwrap_ptr(env, elem);
-        const uint64_t command_replay_ns = monotonic_now_ns() - command_replay_started_ns;
-        const uint64_t queue_submit_started_ns = monotonic_now_ns();
+        const uint64_t command_replay_ns = wants_submit_breakdown ? monotonic_now_ns() - command_replay_started_ns : 0;
+        const uint64_t queue_submit_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
         pfn_wgpuQueueSubmit(queue, 1, &cmd);
-        const uint64_t queue_submit_ns = monotonic_now_ns() - queue_submit_started_ns;
-        return make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0);
+        const uint64_t queue_submit_ns = wants_submit_breakdown ? monotonic_now_ns() - queue_submit_started_ns : 0;
+        return wants_submit_breakdown ? make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0) : NULL;
     }
     WGPUCommandBuffer* cmds = (WGPUCommandBuffer*)calloc(cmd_count, sizeof(WGPUCommandBuffer));
     for (uint32_t i = 0; i < cmd_count; i++) {
@@ -956,12 +1007,12 @@ napi_value doe_queue_submit(napi_env env, napi_callback_info info) {
         napi_get_element(env, _args[1], i, &elem);
         cmds[i] = unwrap_ptr(env, elem);
     }
-    const uint64_t command_replay_ns = monotonic_now_ns() - command_replay_started_ns;
-    const uint64_t queue_submit_started_ns = monotonic_now_ns();
+    const uint64_t command_replay_ns = wants_submit_breakdown ? monotonic_now_ns() - command_replay_started_ns : 0;
+    const uint64_t queue_submit_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
     pfn_wgpuQueueSubmit(queue, cmd_count, cmds);
-    const uint64_t queue_submit_ns = monotonic_now_ns() - queue_submit_started_ns;
+    const uint64_t queue_submit_ns = wants_submit_breakdown ? monotonic_now_ns() - queue_submit_started_ns : 0;
     free(cmds);
-    return make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0);
+    return wants_submit_breakdown ? make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0) : NULL;
 }
 
 napi_value doe_queue_submit_one(napi_env env, napi_callback_info info) {
@@ -970,10 +1021,11 @@ napi_value doe_queue_submit_one(napi_env env, napi_callback_info info) {
     WGPUQueue queue = unwrap_ptr(env, _args[0]);
     WGPUCommandBuffer cmd = unwrap_ptr(env, _args[1]);
     if (!queue || !cmd) NAPI_THROW(env, "queueSubmitOne requires queue and command buffer");
-    const uint64_t queue_submit_started_ns = monotonic_now_ns();
+    const int wants_submit_breakdown = submit_breakdown_enabled();
+    const uint64_t queue_submit_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
     pfn_wgpuQueueSubmit(queue, 1, &cmd);
-    const uint64_t queue_submit_ns = monotonic_now_ns() - queue_submit_started_ns;
-    return make_submit_breakdown(env, 0, queue_submit_ns, 0);
+    const uint64_t queue_submit_ns = wants_submit_breakdown ? monotonic_now_ns() - queue_submit_started_ns : 0;
+    return wants_submit_breakdown ? make_submit_breakdown(env, 0, queue_submit_ns, 0) : NULL;
 }
 
 /* queueWriteBuffer(queue, buffer, offset, typedArray) */
@@ -1505,31 +1557,24 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
                     breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_COPY]
                 );
             }
-            const uint64_t queue_submit_started_ns = monotonic_now_ns();
+            if (wants_submit_breakdown) {
+                const uint64_t queue_submit_started_ns = monotonic_now_ns();
+                pfn_doeNativeComputeDispatchFlush(queue, pipeline, (void**)bg_ptrs, bg_count,
+                    dx, dy, dz, copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size);
+                const uint64_t queue_submit_ns = monotonic_now_ns() - queue_submit_started_ns;
+                return make_submit_breakdown(env, 0, queue_submit_ns, 0);
+            }
             pfn_doeNativeComputeDispatchFlush(queue, pipeline, (void**)bg_ptrs, bg_count,
                 dx, dy, dz, copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size);
-            const uint64_t queue_submit_ns = monotonic_now_ns() - queue_submit_started_ns;
-            return make_submit_breakdown(env, 0, queue_submit_ns, 0);
+            return NULL;
         }
     }
 #endif
 
     if (pfn_doeNativeComputeDispatchBatchCopyFlush && cmd_count >= 2) {
-        int dispatch_then_copy = 1;
-        for (uint32_t i = 0; i + 1 < cmd_count; i++) {
-            napi_value cmd;
-            napi_get_element(env, commands, i, &cmd);
-            if (get_command_type(env, cmd) != 0) {
-                dispatch_then_copy = 0;
-                break;
-            }
-        }
         napi_value copy_cmd;
         napi_get_element(env, commands, cmd_count - 1, &copy_cmd);
-        if (get_command_type(env, copy_cmd) != 1) {
-            dispatch_then_copy = 0;
-        }
-        if (dispatch_then_copy) {
+        if (get_command_type(env, copy_cmd) == 1) {
             const size_t dispatch_count = (size_t)(cmd_count - 1);
             const size_t bind_group_slots = dispatch_count * BATCH_MAX_BIND_GROUPS;
             const size_t dispatch_dims_count = dispatch_count * 3;
@@ -1538,10 +1583,10 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
             void* stack_bind_groups[BATCH_STACK_DISPATCHES * BATCH_MAX_BIND_GROUPS];
             uint32_t stack_bg_counts[BATCH_STACK_DISPATCHES];
             uint32_t stack_dispatch_dims[BATCH_STACK_DISPATCHES * 3];
-            void** pipelines = use_stack_batch ? stack_pipelines : (void**)calloc(dispatch_count, sizeof(void*));
-            void** bind_groups = use_stack_batch ? stack_bind_groups : (void**)calloc(bind_group_slots, sizeof(void*));
-            uint32_t* bg_counts = use_stack_batch ? stack_bg_counts : (uint32_t*)calloc(dispatch_count, sizeof(uint32_t));
-            uint32_t* dispatch_dims = use_stack_batch ? stack_dispatch_dims : (uint32_t*)calloc(dispatch_dims_count, sizeof(uint32_t));
+            void** pipelines = use_stack_batch ? stack_pipelines : (void**)malloc(dispatch_count * sizeof(void*));
+            void** bind_groups = use_stack_batch ? stack_bind_groups : (void**)malloc(bind_group_slots * sizeof(void*));
+            uint32_t* bg_counts = use_stack_batch ? stack_bg_counts : (uint32_t*)malloc(dispatch_count * sizeof(uint32_t));
+            uint32_t* dispatch_dims = use_stack_batch ? stack_dispatch_dims : (uint32_t*)malloc(dispatch_dims_count * sizeof(uint32_t));
             if (!pipelines || !bind_groups || !bg_counts || !dispatch_dims) {
                 if (!use_stack_batch) {
                     free(pipelines);
@@ -1551,16 +1596,15 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
                 }
                 NAPI_THROW(env, "submitBatched: out of memory while packing dispatch-copy batch");
             }
-            if (use_stack_batch) {
-                memset(pipelines, 0, dispatch_count * sizeof(void*));
-                memset(bind_groups, 0, bind_group_slots * sizeof(void*));
-                memset(bg_counts, 0, dispatch_count * sizeof(uint32_t));
-                memset(dispatch_dims, 0, dispatch_dims_count * sizeof(uint32_t));
-            }
-            const uint64_t command_replay_started_ns = monotonic_now_ns();
+            int dispatch_then_copy = 1;
+            const uint64_t command_replay_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
             for (uint32_t i = 0; i < dispatch_count; i++) {
                 napi_value cmd;
                 napi_get_element(env, commands, i, &cmd);
+                if (get_command_type(env, cmd) != 0) {
+                    dispatch_then_copy = 0;
+                    break;
+                }
                 pipelines[i] = get_command_ptr(env, cmd, "p", 1);
                 void* bg_ptrs[BATCH_MAX_BIND_GROUPS] = {NULL};
                 uint32_t bg_count = read_command_bind_groups(env, cmd, bg_ptrs, BATCH_MAX_BIND_GROUPS);
@@ -1572,46 +1616,58 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
                 dispatch_dims[(i * 3) + 1] = get_command_u32(env, cmd, "y", 4);
                 dispatch_dims[(i * 3) + 2] = get_command_u32(env, cmd, "z", 5);
             }
-            void* copy_src = get_command_ptr(env, copy_cmd, "s", 1);
-            void* copy_dst = get_command_ptr(env, copy_cmd, "d", 3);
-            const uint64_t copy_src_off = (uint64_t)get_command_i64(env, copy_cmd, "so", 2);
-            const uint64_t copy_dst_off = (uint64_t)get_command_i64(env, copy_cmd, "do", 4);
-            const uint64_t copy_size = (uint64_t)get_command_i64(env, copy_cmd, "sz", 5);
-            const uint64_t command_replay_ns = monotonic_now_ns() - command_replay_started_ns;
-            const uint64_t queue_submit_started_ns = monotonic_now_ns();
-            uint64_t breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_FIELD_COUNT] = {0};
-            if (wants_submit_breakdown && pfn_doeNativeComputeDispatchBatchCopyFlushBreakdown) {
-                pfn_doeNativeComputeDispatchBatchCopyFlushBreakdown(queue, dispatch_count, pipelines, bind_groups, bg_counts, dispatch_dims,
-                    copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size, breakdown);
+            if (!dispatch_then_copy) {
+                if (!use_stack_batch) {
+                    free(pipelines);
+                    free(bind_groups);
+                    free(bg_counts);
+                    free(dispatch_dims);
+                }
             } else {
-                pfn_doeNativeComputeDispatchBatchCopyFlush(queue, dispatch_count, pipelines, bind_groups, bg_counts, dispatch_dims,
-                    copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size);
+                void* copy_src = get_command_ptr(env, copy_cmd, "s", 1);
+                void* copy_dst = get_command_ptr(env, copy_cmd, "d", 3);
+                const uint64_t copy_src_off = (uint64_t)get_command_i64(env, copy_cmd, "so", 2);
+                const uint64_t copy_dst_off = (uint64_t)get_command_i64(env, copy_cmd, "do", 4);
+                const uint64_t copy_size = (uint64_t)get_command_i64(env, copy_cmd, "sz", 5);
+                const uint64_t command_replay_ns = wants_submit_breakdown ? monotonic_now_ns() - command_replay_started_ns : 0;
+                const uint64_t queue_submit_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
+                uint64_t breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_FIELD_COUNT] = {0};
+                if (wants_submit_breakdown && pfn_doeNativeComputeDispatchBatchCopyFlushBreakdown) {
+                    pfn_doeNativeComputeDispatchBatchCopyFlushBreakdown(queue, dispatch_count, pipelines, bind_groups, bg_counts, dispatch_dims,
+                        copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size, breakdown);
+                } else {
+                    pfn_doeNativeComputeDispatchBatchCopyFlush(queue, dispatch_count, pipelines, bind_groups, bg_counts, dispatch_dims,
+                        copy_src, copy_src_off, copy_dst, copy_dst_off, copy_size);
+                }
+                const uint64_t queue_submit_ns = wants_submit_breakdown ? monotonic_now_ns() - queue_submit_started_ns : 0;
+                if (!use_stack_batch) {
+                    free(pipelines);
+                    free(bind_groups);
+                    free(bg_counts);
+                    free(dispatch_dims);
+                }
+                if (wants_submit_breakdown && pfn_doeNativeComputeDispatchBatchCopyFlushBreakdown) {
+                    return make_submit_breakdown_full(
+                        env,
+                        command_replay_ns + breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY],
+                        breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_QUEUE_SUBMIT],
+                        0,
+                        0,
+                        0,
+                        0,
+                        breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_BUFFER_END],
+                        breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_SYNC_PREPARE],
+                        breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_DRIVER_SUBMIT],
+                        breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_PREPARE],
+                        breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_RECORD],
+                        breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_COPY]
+                    );
+                }
+                if (wants_submit_breakdown) {
+                    return make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0);
+                }
+                return NULL;
             }
-            const uint64_t queue_submit_ns = monotonic_now_ns() - queue_submit_started_ns;
-            if (!use_stack_batch) {
-                free(pipelines);
-                free(bind_groups);
-                free(bg_counts);
-                free(dispatch_dims);
-            }
-            if (wants_submit_breakdown && pfn_doeNativeComputeDispatchBatchCopyFlushBreakdown) {
-                return make_submit_breakdown_full(
-                    env,
-                    command_replay_ns + breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY],
-                    breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_QUEUE_SUBMIT],
-                    0,
-                    0,
-                    0,
-                    0,
-                    breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_BUFFER_END],
-                    breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_SYNC_PREPARE],
-                    breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_DRIVER_SUBMIT],
-                    breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_PREPARE],
-                    breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_RECORD],
-                    breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_COPY]
-                );
-            }
-            return make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0);
         }
     }
 
@@ -1634,10 +1690,10 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
             void* stack_bind_groups[BATCH_STACK_DISPATCHES * BATCH_MAX_BIND_GROUPS];
             uint32_t stack_bg_counts[BATCH_STACK_DISPATCHES];
             uint32_t stack_dispatch_dims[BATCH_STACK_DISPATCHES * 3];
-            void** pipelines = use_stack_batch ? stack_pipelines : (void**)calloc(dispatch_count, sizeof(void*));
-            void** bind_groups = use_stack_batch ? stack_bind_groups : (void**)calloc(bind_group_slots, sizeof(void*));
-            uint32_t* bg_counts = use_stack_batch ? stack_bg_counts : (uint32_t*)calloc(dispatch_count, sizeof(uint32_t));
-            uint32_t* dispatch_dims = use_stack_batch ? stack_dispatch_dims : (uint32_t*)calloc(dispatch_dims_count, sizeof(uint32_t));
+            void** pipelines = use_stack_batch ? stack_pipelines : (void**)malloc(dispatch_count * sizeof(void*));
+            void** bind_groups = use_stack_batch ? stack_bind_groups : (void**)malloc(bind_group_slots * sizeof(void*));
+            uint32_t* bg_counts = use_stack_batch ? stack_bg_counts : (uint32_t*)malloc(dispatch_count * sizeof(uint32_t));
+            uint32_t* dispatch_dims = use_stack_batch ? stack_dispatch_dims : (uint32_t*)malloc(dispatch_dims_count * sizeof(uint32_t));
             if (!pipelines || !bind_groups || !bg_counts || !dispatch_dims) {
                 if (!use_stack_batch) {
                     free(pipelines);
@@ -1647,13 +1703,7 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
                 }
                 NAPI_THROW(env, "submitBatched: out of memory while packing dispatch batch");
             }
-            if (use_stack_batch) {
-                memset(pipelines, 0, dispatch_count * sizeof(void*));
-                memset(bind_groups, 0, bind_group_slots * sizeof(void*));
-                memset(bg_counts, 0, dispatch_count * sizeof(uint32_t));
-                memset(dispatch_dims, 0, dispatch_dims_count * sizeof(uint32_t));
-            }
-            const uint64_t command_replay_started_ns = monotonic_now_ns();
+            const uint64_t command_replay_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
             for (uint32_t i = 0; i < cmd_count; i++) {
                 napi_value cmd;
                 napi_get_element(env, commands, i, &cmd);
@@ -1668,8 +1718,8 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
                 dispatch_dims[(i * 3) + 1] = get_command_u32(env, cmd, "y", 4);
                 dispatch_dims[(i * 3) + 2] = get_command_u32(env, cmd, "z", 5);
             }
-            const uint64_t command_replay_ns = monotonic_now_ns() - command_replay_started_ns;
-            const uint64_t queue_submit_started_ns = monotonic_now_ns();
+            const uint64_t command_replay_ns = wants_submit_breakdown ? monotonic_now_ns() - command_replay_started_ns : 0;
+            const uint64_t queue_submit_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
             uint64_t breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_FIELD_COUNT] = {0};
             if (wants_submit_breakdown && pfn_doeNativeComputeDispatchBatchCopyFlushBreakdown) {
                 pfn_doeNativeComputeDispatchBatchCopyFlushBreakdown(queue, dispatch_count, pipelines, bind_groups, bg_counts, dispatch_dims,
@@ -1677,7 +1727,7 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
             } else {
                 pfn_doeNativeComputeDispatchBatchFlush(queue, dispatch_count, pipelines, bind_groups, bg_counts, dispatch_dims);
             }
-            const uint64_t queue_submit_ns = monotonic_now_ns() - queue_submit_started_ns;
+            const uint64_t queue_submit_ns = wants_submit_breakdown ? monotonic_now_ns() - queue_submit_started_ns : 0;
             if (!use_stack_batch) {
                 free(pipelines);
                 free(bind_groups);
@@ -1701,7 +1751,10 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
                     breakdown[DOE_DISPATCH_FLUSH_BREAKDOWN_COMMAND_REPLAY_COPY]
                 );
             }
-            return make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0);
+            if (wants_submit_breakdown) {
+                return make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0);
+            }
+            return NULL;
         }
     }
 
@@ -1713,7 +1766,7 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
         if (get_command_type(env, cmd0) == 0 && get_command_type(env, cmd1) == 1)
             flush_after_submit = 1;
     }
-    const uint64_t command_replay_started_ns = monotonic_now_ns();
+    const uint64_t command_replay_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
     WGPUCommandEncoder encoder = pfn_wgpuDeviceCreateCommandEncoder(device, NULL);
     WGPUComputePassEncoder pass = NULL;
     void* current_pipeline = NULL;
@@ -1770,10 +1823,10 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
         pfn_wgpuComputePassEncoderRelease(pass);
     }
     WGPUCommandBuffer cmd_buf = pfn_wgpuCommandEncoderFinish(encoder, NULL);
-    const uint64_t command_replay_ns = monotonic_now_ns() - command_replay_started_ns;
-    const uint64_t queue_submit_started_ns = monotonic_now_ns();
+    const uint64_t command_replay_ns = wants_submit_breakdown ? monotonic_now_ns() - command_replay_started_ns : 0;
+    const uint64_t queue_submit_started_ns = wants_submit_breakdown ? monotonic_now_ns() : 0;
     pfn_wgpuQueueSubmit(queue, 1, &cmd_buf);
-    const uint64_t queue_submit_ns = monotonic_now_ns() - queue_submit_started_ns;
+    const uint64_t queue_submit_ns = wants_submit_breakdown ? monotonic_now_ns() - queue_submit_started_ns : 0;
     uint64_t flush_ns = 0;
     uint64_t wait_completed_ns = 0;
     uint64_t deferred_copy_ns = 0;
@@ -1783,6 +1836,9 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
     }
     pfn_wgpuCommandBufferRelease(cmd_buf);
     pfn_wgpuCommandEncoderRelease(encoder);
+    if (!wants_submit_breakdown) {
+        return make_submit_completion_hint(env, flush_ns, wait_completed_ns, deferred_copy_ns, deferred_resolve_ns);
+    }
     return make_submit_breakdown_full(env, command_replay_ns, queue_submit_ns, flush_ns, wait_completed_ns, deferred_copy_ns, deferred_resolve_ns, 0, 0, 0, 0, 0, 0);
 }
 

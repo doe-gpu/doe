@@ -66,7 +66,7 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                     if (copy_end_src > scb.size or copy_end_dst > dcb.size) continue;
                     const src_has_pending_compute_write =
                         rt.has_pending_compute_writes and
-                        (!rt.current_compute_binding_tracking_complete or rt.pending_compute_write_buffers.contains(src_buf.vk_id));
+                        rt.has_pending_compute_write_for_buffer(src_buf.vk_id);
                     if (rt.replay_recording_active and (scb.mapped == null or src_has_pending_compute_write)) {
                         vk_upload.record_replay_buffer_copy(
                             rt,

@@ -65,6 +65,16 @@ function validateWriteBufferInput(data, dataOffset, size, path) {
   return byteSource.subarray(start, end);
 }
 
+function fastDefaultWriteBufferView(data, dataOffset, size) {
+  if (dataOffset !== 0 || size !== undefined || !ArrayBuffer.isView(data)) {
+    return null;
+  }
+  if (typeof data.BYTES_PER_ELEMENT !== 'number') {
+    return null;
+  }
+  return data;
+}
+
 function normalizeWriteBufferBatchEntry(entry, index) {
   const path = `GPUQueue.__doeWriteBufferBatch.entries[${index}]`;
   const object = assertObject(entry, path, 'entry');
@@ -679,7 +689,8 @@ function createFullSurfaceClasses({
       const native = assertLiveResource(this, 'GPUQueue.writeBuffer', 'GPUQueue');
       const bufferNative = assertLiveResource(buffer, 'GPUQueue.writeBuffer', 'GPUBuffer');
       assertIntegerInRange(bufferOffset, 'GPUQueue.writeBuffer', 'bufferOffset', { min: 0 });
-      const view = validateWriteBufferInput(data, dataOffset, size, 'GPUQueue.writeBuffer');
+      const view = fastDefaultWriteBufferView(data, dataOffset, size)
+        ?? validateWriteBufferInput(data, dataOffset, size, 'GPUQueue.writeBuffer');
       return backend.queueWriteBuffer(this, native, bufferNative, bufferOffset, view);
     }
 

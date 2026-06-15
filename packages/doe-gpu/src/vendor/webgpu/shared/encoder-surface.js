@@ -486,7 +486,7 @@ function createEncoderClasses(backend) {
   class DoeGPUCommandBuffer {
     constructor(state, owner) {
       this._batched = state?._batched === true;
-      this._commands = this._batched ? [...(state?._commands ?? [])] : [];
+      this._commands = this._batched ? (state?._commands ?? []) : [];
       this._native = this._batched ? null : (state?._native ?? null);
       this._submitted = false;
       this._finalizerToken = null;

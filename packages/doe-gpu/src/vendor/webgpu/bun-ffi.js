@@ -188,6 +188,10 @@ function hotU64(value) {
     if (value === null || value === undefined || value === 0 || value === 0n) {
         return 0n;
     }
+    if (value === 1) return 1n;
+    if (value === 4) return 4n;
+    if (value === 16) return 16n;
+    if (value === 18) return 18n;
     if (typeof value === "bigint") {
         return value;
     }
@@ -831,7 +835,14 @@ function copyNativeErrorMeta(symbolName) {
 }
 
 const fastPathStats = { dispatchFlush: 0, flushAndMap: 0, commandBufferBuild: 0 };
-
+const ZERO_READBACK_BREAKDOWN_NS = Object.freeze({
+    readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: 0,
+    readbackMapReadCopyUnmapDeferredCopyTotalNs: 0,
+    readbackMapReadCopyUnmapDeferredResolveTotalNs: 0,
+    readbackMapReadCopyUnmapMapTotalNs: 0,
+    readbackMapReadCopyUnmapCopyTotalNs: 0,
+    readbackMapReadCopyUnmapUnmapTotalNs: 0,
+});
 const QUEUE_SYNC_INFO_BACKEND_VULKAN = 1;
 const QUEUE_SYNC_INFO_TIMELINE_SEMAPHORE = 2;
 const QUEUE_SYNC_INFO_FENCE_POOL = 4;
@@ -1016,6 +1027,10 @@ function elapsedNsSince(startedAtMs) {
     return Math.max(0, Math.round((performance.now() - startedAtMs) * NS_PER_MS));
 }
 
+function submitTimingStart() {
+    return DOE_WEBGPU_SUBMIT_BREAKDOWN ? performance.now() : 0;
+}
+
 function zeroQueueSubmitBreakdown() {
     return {
         submitCommandPrepTotalNs: 0,
@@ -1039,6 +1054,7 @@ function zeroQueueSubmitBreakdown() {
 }
 
 function accumulateQueueSubmitBreakdown(queue, field, startedAtMs) {
+    if (!startedAtMs) return;
     queue._submitBreakdownNs[field] += elapsedNsSince(startedAtMs);
 }
 
@@ -1243,6 +1259,36 @@ function ensureDispatchBatchScratch(queue, dispatchCount) {
         scratch.dispatchDims = new Uint32Array(dispatchCount * 3);
     }
     return scratch;
+}
+
+function fillBunDispatchBatchScratch(scratch, commands, dispatchCount) {
+    const { pipelines, bindGroups, bindGroupCounts, dispatchDims } = scratch;
+    for (let i = 0; i < dispatchCount; i += 1) {
+        const cmd = commands[i];
+        if (!cmd || cmd.t !== 0 || (cmd.immediates !== undefined && cmd.immediates.length !== 0)) {
+            return false;
+        }
+        pipelines[i] = hotU64(cmd.p);
+        const bindGroupOffset = i * MAX_COMPUTE_BIND_GROUPS;
+        const compactBindGroup = cmd.b;
+        if (compactBindGroup) {
+            bindGroupCounts[i] = 1;
+            bindGroups[bindGroupOffset] = hotU64(compactBindGroup);
+        } else {
+            const commandBindGroups = cmd.bg;
+            const bgCount = Array.isArray(commandBindGroups)
+                ? Math.min(commandBindGroups.length, MAX_COMPUTE_BIND_GROUPS)
+                : 0;
+            bindGroupCounts[i] = bgCount;
+            for (let j = 0; j < bgCount; j += 1) {
+                bindGroups[bindGroupOffset + j] = hotU64(commandBindGroups[j]);
+            }
+        }
+        dispatchDims[(i * 3)] = cmd.x;
+        dispatchDims[(i * 3) + 1] = cmd.y;
+        dispatchDims[(i * 3) + 2] = cmd.z;
+    }
+    return true;
 }
 
 function ensureQueueWriteBatchScratch(queue, count, byteLength) {
@@ -3582,7 +3628,9 @@ const bunEncoderBackend = {
             encoder._native = null;
             return { _native: cmd, _batched: false };
         }
-        return { _commands: encoder._commands, _batched: true };
+        const commands = encoder._commands;
+        encoder._commands = [];
+        return { _commands: commands, _batched: true };
     },
     commandBufferDestroy(native) {
         wgpu.symbols.wgpuCommandBufferRelease(native);
@@ -3624,23 +3672,15 @@ const fullSurfaceBackend = {
         if (mode !== 0x0001) {
             failValidation("GPUBuffer._mapReadCopyUnmap", "only MAP_READ mode is supported");
         }
-        const readbackBreakdownNs = {
-            readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: 0,
-            readbackMapReadCopyUnmapDeferredCopyTotalNs: 0,
-            readbackMapReadCopyUnmapDeferredResolveTotalNs: 0,
-            readbackMapReadCopyUnmapMapTotalNs: 0,
-            readbackMapReadCopyUnmapCopyTotalNs: 0,
-            readbackMapReadCopyUnmapUnmapTotalNs: 0,
-        };
         if (typeof wgpu.symbols.doeBufferMapReadCopyUnmapFlat === "function") {
             const queue = wrapper._queue ?? null;
             const shouldFlush = queue?.hasPendingSubmissions() ? 1 : 0;
             const queueNative = shouldFlush
                 ? assertLiveResource(queue, "GPUBuffer._mapReadCopyUnmap", "GPUQueue")
                 : null;
-            const breakdown = queue
-                ? queueMapReadCopyUnmapScratch(queue)
-                : new BigUint64Array(READBACK_BREAKDOWN_FIELD_COUNT);
+            const breakdown = DOE_WEBGPU_SUBMIT_BREAKDOWN
+                ? (queue ? queueMapReadCopyUnmapScratch(queue) : new BigUint64Array(READBACK_BREAKDOWN_FIELD_COUNT))
+                : null;
             const copy = new ArrayBuffer(Number(size));
             const status = wgpu.symbols.doeBufferMapReadCopyUnmapFlat(
                 queueNative,
@@ -3659,26 +3699,42 @@ const fullSurfaceBackend = {
                 queue.markSubmittedWorkDone();
                 fastPathStats.flushAndMap += 1;
             }
-            readbackBreakdownNs.readbackMapReadCopyUnmapQueueWaitCompletedTotalNs = Number(
-                breakdown[READBACK_BREAKDOWN_WAIT_COMPLETED],
-            );
-            readbackBreakdownNs.readbackMapReadCopyUnmapDeferredCopyTotalNs = Number(
-                breakdown[READBACK_BREAKDOWN_DEFERRED_COPY],
-            );
-            readbackBreakdownNs.readbackMapReadCopyUnmapDeferredResolveTotalNs = Number(
-                breakdown[READBACK_BREAKDOWN_DEFERRED_RESOLVE],
-            );
-            readbackBreakdownNs.readbackMapReadCopyUnmapMapTotalNs = Number(breakdown[READBACK_BREAKDOWN_MAP]);
-            readbackBreakdownNs.readbackMapReadCopyUnmapCopyTotalNs = Number(breakdown[READBACK_BREAKDOWN_COPY]);
-            readbackBreakdownNs.readbackMapReadCopyUnmapUnmapTotalNs = Number(breakdown[READBACK_BREAKDOWN_UNMAP]);
+            if (!DOE_WEBGPU_SUBMIT_BREAKDOWN) {
+                wrapper.__doe_readback_breakdown_ns = ZERO_READBACK_BREAKDOWN_NS;
+                wrapper._mapMode = 0;
+                wrapper._mappedWriteRanges = [];
+                return copy;
+            }
+            const readbackBreakdownNs = {
+                readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: Number(
+                    breakdown[READBACK_BREAKDOWN_WAIT_COMPLETED],
+                ),
+                readbackMapReadCopyUnmapDeferredCopyTotalNs: Number(
+                    breakdown[READBACK_BREAKDOWN_DEFERRED_COPY],
+                ),
+                readbackMapReadCopyUnmapDeferredResolveTotalNs: Number(
+                    breakdown[READBACK_BREAKDOWN_DEFERRED_RESOLVE],
+                ),
+                readbackMapReadCopyUnmapMapTotalNs: Number(breakdown[READBACK_BREAKDOWN_MAP]),
+                readbackMapReadCopyUnmapCopyTotalNs: Number(breakdown[READBACK_BREAKDOWN_COPY]),
+                readbackMapReadCopyUnmapUnmapTotalNs: Number(breakdown[READBACK_BREAKDOWN_UNMAP]),
+            };
             wrapper.__doe_readback_breakdown_ns = readbackBreakdownNs;
             wrapper._mapMode = 0;
             wrapper._mappedWriteRanges = [];
             return copy;
         }
+        const readbackBreakdownNs = {
+            readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: 0,
+            readbackMapReadCopyUnmapDeferredCopyTotalNs: 0,
+            readbackMapReadCopyUnmapDeferredResolveTotalNs: 0,
+            readbackMapReadCopyUnmapMapTotalNs: 0,
+            readbackMapReadCopyUnmapCopyTotalNs: 0,
+            readbackMapReadCopyUnmapUnmapTotalNs: 0,
+        };
         if (wrapper._queue?.hasPendingSubmissions()) {
             const queueNative = assertLiveResource(wrapper._queue, "GPUBuffer._mapReadCopyUnmap", "GPUQueue");
-            if (typeof wgpu.symbols.doeNativeQueueFlushBreakdown === "function") {
+            if (DOE_WEBGPU_SUBMIT_BREAKDOWN && typeof wgpu.symbols.doeNativeQueueFlushBreakdown === "function") {
                 queueFlushBreakdownScratch(wrapper._queue);
                 const waitCompletedNs = wrapper._queue._flushWaitCompletedNs;
                 const deferredCopyNs = wrapper._queue._flushDeferredCopyNs;
@@ -3802,16 +3858,24 @@ const fullSurfaceBackend = {
         if (dispatchFlush && buffers.length === 1 && buffers[0]?._batched) {
             const cmds = buffers[0]._commands;
             if (cmds.length >= 1 && cmds.length <= 2 && cmds[0]?.t === 0 && !(cmds[0]?.immediates?.length) && (cmds.length === 1 || cmds[1]?.t === 1)) {
-                const prepStartedAt = performance.now();
+                const prepStartedAt = submitTimingStart();
                 const cmd0 = cmds[0];
-                const bgCount = bunCommandBindGroupCount(cmd0);
-                const bgPtrs = ensureBindGroupPtrScratch(queue, bgCount);
-                for (let i = 0; i < bgCount; i += 1) {
-                    bgPtrs[i] = hotU64(bunCommandBindGroupAt(cmd0, i));
-                }
                 const cmd1 = cmds.length === 2 ? cmds[1] : null;
+                const compactBindGroup = cmd0.b ?? null;
+                const commandBindGroups = compactBindGroup ? null : cmd0.bg;
+                const bgCount = compactBindGroup
+                    ? 1
+                    : (Array.isArray(commandBindGroups) ? Math.min(commandBindGroups.length, MAX_COMPUTE_BIND_GROUPS) : 0);
+                const bgPtrs = ensureBindGroupPtrScratch(queue, bgCount);
+                if (compactBindGroup) {
+                    bgPtrs[0] = hotU64(compactBindGroup);
+                } else {
+                    for (let i = 0; i < bgCount; i += 1) {
+                        bgPtrs[i] = hotU64(commandBindGroups[i]);
+                    }
+                }
                 accumulateQueueSubmitBreakdown(queue, "submitCommandPrepTotalNs", prepStartedAt);
-                const addonStartedAt = performance.now();
+                const addonStartedAt = submitTimingStart();
                 if (dispatchFlushBreakdown) {
                     const breakdown = queueDispatchFlushBreakdownScratch(queue);
                     dispatchFlushBreakdown(
@@ -3832,7 +3896,7 @@ const fullSurfaceBackend = {
                     accumulateQueueSubmitBreakdown(queue, "submitAddonCallTotalNs", addonStartedAt);
                 }
                 fastPathStats.dispatchFlush += 1;
-                const bookkeepingStartedAt = performance.now();
+                const bookkeepingStartedAt = submitTimingStart();
                 for (const commandBuffer of buffers) {
                     commandBuffer._submitted = true;
                     commandBuffer.destroy?.();
@@ -3841,122 +3905,105 @@ const fullSurfaceBackend = {
                 return;
             }
         }
-        if (buffers.every((cb) => cb?._batched && Array.isArray(cb._commands))) {
-            const allCommands = buffers.length === 1 ? buffers[0]._commands : [];
-            if (buffers.length !== 1) {
-                for (const cb of buffers) allCommands.push(...cb._commands);
+        let batchedCommands = null;
+        if (buffers.length === 1) {
+            const commandBuffer = buffers[0];
+            if (commandBuffer?._batched && Array.isArray(commandBuffer._commands)) {
+                batchedCommands = commandBuffer._commands;
             }
+        } else {
+            const commands = [];
+            let allBatched = true;
+            for (const commandBuffer of buffers) {
+                if (!commandBuffer?._batched || !Array.isArray(commandBuffer._commands)) {
+                    allBatched = false;
+                    break;
+                }
+                commands.push(...commandBuffer._commands);
+            }
+            if (allBatched) batchedCommands = commands;
+        }
+        if (batchedCommands !== null) {
+            const allCommands = batchedCommands;
             const dispatchBatchCopyFlushBreakdown = DOE_WEBGPU_SUBMIT_BREAKDOWN
                 ? wgpu.symbols.doeNativeComputeDispatchBatchCopyFlushBreakdown
                 : null;
             const dispatchBatchCopyFlush = dispatchBatchCopyFlushBreakdown
                 ?? wgpu.symbols.doeNativeComputeDispatchBatchCopyFlush;
             if (dispatchBatchCopyFlush && allCommands.length >= 2) {
-                let dispatchThenCopy = allCommands[allCommands.length - 1]?.t === 1;
-                for (let i = 0; dispatchThenCopy && i + 1 < allCommands.length; i += 1) {
-                    const cmd = allCommands[i];
-                    if (cmd?.t !== 0 || (cmd.immediates?.length ?? 0) !== 0) {
-                        dispatchThenCopy = false;
-                    }
-                }
-                if (dispatchThenCopy) {
-                    const prepStartedAt = performance.now();
+                const copyCmd = allCommands[allCommands.length - 1];
+                if (copyCmd?.t === 1) {
+                    const prepStartedAt = submitTimingStart();
                     const dispatchCount = allCommands.length - 1;
                     const scratch = ensureDispatchBatchScratch(queue, dispatchCount);
                     const { pipelines, bindGroups, bindGroupCounts, dispatchDims } = scratch;
-                    for (let i = 0; i < dispatchCount; i += 1) {
-                        const cmd = allCommands[i];
-                        pipelines[i] = hotU64(cmd.p);
-                        const bgCount = bunCommandBindGroupCount(cmd);
-                        bindGroupCounts[i] = bgCount;
-                        for (let j = 0; j < bgCount; j += 1) {
-                            bindGroups[(i * MAX_COMPUTE_BIND_GROUPS) + j] = hotU64(bunCommandBindGroupAt(cmd, j));
+                    const dispatchThenCopy = fillBunDispatchBatchScratch(scratch, allCommands, dispatchCount);
+                    if (dispatchThenCopy) {
+                        accumulateQueueSubmitBreakdown(queue, "submitCommandPrepTotalNs", prepStartedAt);
+                        const addonStartedAt = submitTimingStart();
+                        const dispatchCountU64 = hotU64(dispatchCount);
+                        if (dispatchBatchCopyFlushBreakdown) {
+                            const breakdown = queueDispatchFlushBreakdownScratch(queue);
+                            dispatchBatchCopyFlushBreakdown(
+                                queueNative,
+                                dispatchCountU64,
+                                pipelines,
+                                bindGroups,
+                                bindGroupCounts,
+                                dispatchDims,
+                                copyCmd.s,
+                                hotU64(copyCmd.so),
+                                copyCmd.d,
+                                hotU64(copyCmd.do),
+                                hotU64(copyCmd.sz),
+                                breakdown,
+                            );
+                            accumulateQueueSubmitBreakdown(queue, "submitAddonCallTotalNs", addonStartedAt);
+                            accumulateDispatchFlushBreakdown(queue, breakdown);
+                        } else {
+                            dispatchBatchCopyFlush(
+                                queueNative,
+                                dispatchCountU64,
+                                pipelines,
+                                bindGroups,
+                                bindGroupCounts,
+                                dispatchDims,
+                                copyCmd.s,
+                                hotU64(copyCmd.so),
+                                copyCmd.d,
+                                hotU64(copyCmd.do),
+                                hotU64(copyCmd.sz),
+                            );
+                            accumulateQueueSubmitBreakdown(queue, "submitAddonCallTotalNs", addonStartedAt);
                         }
-                        dispatchDims[(i * 3)] = cmd.x;
-                        dispatchDims[(i * 3) + 1] = cmd.y;
-                        dispatchDims[(i * 3) + 2] = cmd.z;
+                        const bookkeepingStartedAt = submitTimingStart();
+                        fastPathStats.dispatchFlush += 1;
+                        for (const commandBuffer of buffers) {
+                            commandBuffer._submitted = true;
+                            commandBuffer.destroy?.();
+                        }
+                        accumulateQueueSubmitBreakdown(queue, "submitPostSubmitBookkeepingTotalNs", bookkeepingStartedAt);
+                        return;
                     }
-                    const copyCmd = allCommands[allCommands.length - 1];
-                    accumulateQueueSubmitBreakdown(queue, "submitCommandPrepTotalNs", prepStartedAt);
-                    const addonStartedAt = performance.now();
-                    if (dispatchBatchCopyFlushBreakdown) {
-                        const breakdown = queueDispatchFlushBreakdownScratch(queue);
-                        dispatchBatchCopyFlushBreakdown(
-                            queueNative,
-                            hotU64(dispatchCount),
-                            pipelines,
-                            bindGroups,
-                            bindGroupCounts,
-                            dispatchDims,
-                            copyCmd.s,
-                            hotU64(copyCmd.so),
-                            copyCmd.d,
-                            hotU64(copyCmd.do),
-                            hotU64(copyCmd.sz),
-                            breakdown,
-                        );
-                        accumulateQueueSubmitBreakdown(queue, "submitAddonCallTotalNs", addonStartedAt);
-                        accumulateDispatchFlushBreakdown(queue, breakdown);
-                    } else {
-                        dispatchBatchCopyFlush(
-                            queueNative,
-                            hotU64(dispatchCount),
-                            pipelines,
-                            bindGroups,
-                            bindGroupCounts,
-                            dispatchDims,
-                            copyCmd.s,
-                            hotU64(copyCmd.so),
-                            copyCmd.d,
-                            hotU64(copyCmd.do),
-                            hotU64(copyCmd.sz),
-                        );
-                        accumulateQueueSubmitBreakdown(queue, "submitAddonCallTotalNs", addonStartedAt);
-                    }
-                    const bookkeepingStartedAt = performance.now();
-                    fastPathStats.dispatchFlush += 1;
-                    for (const commandBuffer of buffers) {
-                        commandBuffer._submitted = true;
-                        commandBuffer.destroy?.();
-                    }
-                    accumulateQueueSubmitBreakdown(queue, "submitPostSubmitBookkeepingTotalNs", bookkeepingStartedAt);
-                    return;
                 }
             }
             const dispatchBatchFlush = wgpu.symbols.doeNativeComputeDispatchBatchFlush
                 ?? dispatchBatchCopyFlushBreakdown;
             if (dispatchBatchFlush && allCommands.length > 0) {
-                let allDispatch = true;
-                for (const cmd of allCommands) {
-                    if (cmd?.t !== 0 || (cmd.immediates?.length ?? 0) !== 0) {
-                        allDispatch = false;
-                        break;
-                    }
-                }
+                const prepStartedAt = submitTimingStart();
+                const dispatchCount = allCommands.length;
+                const scratch = ensureDispatchBatchScratch(queue, dispatchCount);
+                const { pipelines, bindGroups, bindGroupCounts, dispatchDims } = scratch;
+                const allDispatch = fillBunDispatchBatchScratch(scratch, allCommands, dispatchCount);
                 if (allDispatch) {
-                    const prepStartedAt = performance.now();
-                    const dispatchCount = allCommands.length;
-                    const scratch = ensureDispatchBatchScratch(queue, dispatchCount);
-                    const { pipelines, bindGroups, bindGroupCounts, dispatchDims } = scratch;
-                    for (let i = 0; i < dispatchCount; i += 1) {
-                        const cmd = allCommands[i];
-                        pipelines[i] = hotU64(cmd.p);
-                        const bgCount = bunCommandBindGroupCount(cmd);
-                        bindGroupCounts[i] = bgCount;
-                        for (let j = 0; j < bgCount; j += 1) {
-                            bindGroups[(i * MAX_COMPUTE_BIND_GROUPS) + j] = hotU64(bunCommandBindGroupAt(cmd, j));
-                        }
-                        dispatchDims[(i * 3)] = cmd.x;
-                        dispatchDims[(i * 3) + 1] = cmd.y;
-                        dispatchDims[(i * 3) + 2] = cmd.z;
-                    }
                     accumulateQueueSubmitBreakdown(queue, "submitCommandPrepTotalNs", prepStartedAt);
-                    const addonStartedAt = performance.now();
+                    const addonStartedAt = submitTimingStart();
+                    const dispatchCountU64 = hotU64(dispatchCount);
                     if (dispatchBatchCopyFlushBreakdown) {
                         const breakdown = queueDispatchFlushBreakdownScratch(queue);
                         dispatchBatchCopyFlushBreakdown(
                             queueNative,
-                            hotU64(dispatchCount),
+                            dispatchCountU64,
                             pipelines,
                             bindGroups,
                             bindGroupCounts,
@@ -3973,7 +4020,7 @@ const fullSurfaceBackend = {
                     } else {
                         dispatchBatchFlush(
                             queueNative,
-                            hotU64(dispatchCount),
+                            dispatchCountU64,
                             pipelines,
                             bindGroups,
                             bindGroupCounts,
@@ -3981,7 +4028,7 @@ const fullSurfaceBackend = {
                         );
                         accumulateQueueSubmitBreakdown(queue, "submitAddonCallTotalNs", addonStartedAt);
                     }
-                    const bookkeepingStartedAt = performance.now();
+                    const bookkeepingStartedAt = submitTimingStart();
                     fastPathStats.dispatchFlush += 1;
                     for (const commandBuffer of buffers) {
                         commandBuffer._submitted = true;
@@ -4036,26 +4083,26 @@ const fullSurfaceBackend = {
             && typeof wgpu.symbols.doeQueueSubmitOneAndRelease === "function"
         ) {
             const commandBuffer = buffers[0];
-            const submitStartedAt = performance.now();
+            const submitStartedAt = submitTimingStart();
             wgpu.symbols.doeQueueSubmitOneAndRelease(queueNative, commandBuffer._native);
             commandBuffer._native = null;
             accumulateQueueSubmitBreakdown(queue, "submitAddonQueueSubmitTotalNs", submitStartedAt);
-            const bookkeepingStartedAt = performance.now();
+            const bookkeepingStartedAt = submitTimingStart();
             commandBuffer._submitted = true;
             commandBuffer.destroy?.();
             accumulateQueueSubmitBreakdown(queue, "submitPostSubmitBookkeepingTotalNs", bookkeepingStartedAt);
             return;
         }
-        const prepStartedAt = performance.now();
+        const prepStartedAt = submitTimingStart();
         const ptrs = ensureSubmitPtrScratch(queue, buffers.length);
         for (let index = 0; index < buffers.length; index += 1) {
             ptrs[index] = hotU64(assertLiveResource(buffers[index], "GPUQueue.submit", "GPUCommandBuffer"));
         }
         accumulateQueueSubmitBreakdown(queue, "submitCommandPrepTotalNs", prepStartedAt);
-        const submitStartedAt = performance.now();
+        const submitStartedAt = submitTimingStart();
         wgpu.symbols.wgpuQueueSubmit(queueNative, hotU64(buffers.length), ptrs);
         accumulateQueueSubmitBreakdown(queue, "submitAddonQueueSubmitTotalNs", submitStartedAt);
-        const bookkeepingStartedAt = performance.now();
+        const bookkeepingStartedAt = submitTimingStart();
         for (const commandBuffer of buffers) {
             commandBuffer._submitted = true;
             commandBuffer.destroy?.();
@@ -4104,10 +4151,10 @@ const fullSurfaceBackend = {
             writeBatchDataPtrs(
                 native,
                 hotU64(entries.length),
-                scratch.buffers.subarray(0, entries.length),
-                scratch.offsets.subarray(0, entries.length),
-                scratch.sizes.subarray(0, entries.length),
-                scratch.dataPtrs.subarray(0, entries.length),
+                scratch.buffers,
+                scratch.offsets,
+                scratch.sizes,
+                scratch.dataPtrs,
             );
             return;
         }
@@ -4123,10 +4170,10 @@ const fullSurfaceBackend = {
         writeBatch(
             native,
             hotU64(entries.length),
-            scratch.buffers.subarray(0, entries.length),
-            scratch.offsets.subarray(0, entries.length),
-            scratch.sizes.subarray(0, entries.length),
-            scratch.data.subarray(0, byteLength),
+            scratch.buffers,
+            scratch.offsets,
+            scratch.sizes,
+            scratch.data,
         );
     },
     queueWriteTexture(_queue, native, destination, data, dataLayout, size) {
@@ -4144,12 +4191,12 @@ const fullSurfaceBackend = {
     },
     async queueOnSubmittedWorkDone(queue, native) {
         try {
-            if (typeof wgpu.symbols.doeNativeQueueFlushBreakdown === "function") {
+            if (DOE_WEBGPU_SUBMIT_BREAKDOWN && typeof wgpu.symbols.doeNativeQueueFlushBreakdown === "function") {
                 queueFlushBreakdownScratch(queue);
                 const waitCompletedNs = queue._flushWaitCompletedNs;
                 const deferredCopyNs = queue._flushDeferredCopyNs;
                 const deferredResolveNs = queue._flushDeferredResolveNs;
-                const flushStartedAt = performance.now();
+                const flushStartedAt = submitTimingStart();
                 wgpu.symbols.doeNativeQueueFlushBreakdown(
                     native,
                     bunPtr(waitCompletedNs),
@@ -4163,7 +4210,7 @@ const fullSurfaceBackend = {
                 return;
             }
             if (typeof wgpu.symbols.doeNativeQueueFlush === "function") {
-                const flushStartedAt = performance.now();
+                const flushStartedAt = submitTimingStart();
                 wgpu.symbols.doeNativeQueueFlush(native);
                 accumulateQueueSubmitBreakdown(queue, "submitQueueFlushTotalNs", flushStartedAt);
                 return;

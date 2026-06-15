@@ -19,7 +19,11 @@ zig/.zig-cache-sandbox/
 zig/.zig-global-cache-sandbox/
 zig/zig-out/
 runtime/zig/.zig-cache/
+runtime/zig/.zig-cache-global/
+runtime/zig/zig-cache/
 runtime/zig/zig-out/
+runtime/zig/*.o
+runtime/zig/wgsl_probe.*.zig
 packages/doe-gpu/build/
 packages/doe-gpu/prebuilds/
 packages/doe-gpu-*/bin/
@@ -141,6 +145,8 @@ runtime/zig/examples/simulator/**/compile/**/out*.json
 runtime/zig/examples/simulator/**/compile/**/sim.log
 runtime/zig/examples/simulator/**/compile/**/simfab_traces/
 runtime/zig/examples/simulator/**/compile/**/corefile.cs1
+runtime/bridge/onnxruntime-ep/artifacts/
+runtime/zig/bench/out/
 
 # Streaming executor hand-written CSL kernel sources — these are source
 # code, not generated artifacts, and are required by the runners in

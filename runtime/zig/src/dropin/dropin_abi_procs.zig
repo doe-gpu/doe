@@ -487,10 +487,12 @@ pub export fn doeBufferMapReadCopyUnmapFlat(
     breakdown_ptr: ?[*]u64,
 ) callconv(.c) abi_base.WGPUStatus {
     const dst_raw = dst_ptr orelse return 0;
-    const breakdown = breakdown_ptr orelse return 0;
     if (mode != abi_base.WGPUMapMode_Read) return 0;
-    for (0..MAP_READ_COPY_UNMAP_BREAKDOWN_FIELD_COUNT) |index| {
-        breakdown[index] = 0;
+    const wants_breakdown = breakdown_ptr != null;
+    if (breakdown_ptr) |breakdown| {
+        for (0..MAP_READ_COPY_UNMAP_BREAKDOWN_FIELD_COUNT) |index| {
+            breakdown[index] = 0;
+        }
     }
 
     if (should_flush != 0) {
@@ -498,11 +500,13 @@ pub export fn doeBufferMapReadCopyUnmapFlat(
             if (q.dev.backend == .metal) {
                 const dst: [*]u8 = @ptrCast(dst_raw);
                 const flush = queue_flush_breakdown.flushPendingWorkTimedDirectReadback(q, buffer, offset, size, dst);
-                breakdown[BREAKDOWN_WAIT_COMPLETED_INDEX] = flush.breakdown.waitCompletedNs;
-                breakdown[BREAKDOWN_DEFERRED_COPY_INDEX] = flush.breakdown.deferredCopyNs;
-                breakdown[BREAKDOWN_DEFERRED_RESOLVE_INDEX] = flush.breakdown.deferredResolveNs;
+                if (breakdown_ptr) |breakdown| {
+                    breakdown[BREAKDOWN_WAIT_COMPLETED_INDEX] = flush.breakdown.waitCompletedNs;
+                    breakdown[BREAKDOWN_DEFERRED_COPY_INDEX] = flush.breakdown.deferredCopyNs;
+                    breakdown[BREAKDOWN_DEFERRED_RESOLVE_INDEX] = flush.breakdown.deferredResolveNs;
+                }
                 if (flush.copied_direct) return abi_base.WGPUStatus_Success;
-            } else {
+            } else if (wants_breakdown) {
                 var wait_completed_ns: u64 = 0;
                 var deferred_copy_ns: u64 = 0;
                 var deferred_resolve_ns: u64 = 0;
@@ -512,11 +516,15 @@ pub export fn doeBufferMapReadCopyUnmapFlat(
                     &deferred_copy_ns,
                     &deferred_resolve_ns,
                 );
-                breakdown[BREAKDOWN_WAIT_COMPLETED_INDEX] = wait_completed_ns;
-                breakdown[BREAKDOWN_DEFERRED_COPY_INDEX] = deferred_copy_ns;
-                breakdown[BREAKDOWN_DEFERRED_RESOLVE_INDEX] = deferred_resolve_ns;
+                if (breakdown_ptr) |breakdown| {
+                    breakdown[BREAKDOWN_WAIT_COMPLETED_INDEX] = wait_completed_ns;
+                    breakdown[BREAKDOWN_DEFERRED_COPY_INDEX] = deferred_copy_ns;
+                    breakdown[BREAKDOWN_DEFERRED_RESOLVE_INDEX] = deferred_resolve_ns;
+                }
+            } else {
+                native.doeNativeQueueFlush(queue);
             }
-        } else {
+        } else if (wants_breakdown) {
             var wait_completed_ns: u64 = 0;
             var deferred_copy_ns: u64 = 0;
             var deferred_resolve_ns: u64 = 0;
@@ -526,9 +534,13 @@ pub export fn doeBufferMapReadCopyUnmapFlat(
                 &deferred_copy_ns,
                 &deferred_resolve_ns,
             );
-            breakdown[BREAKDOWN_WAIT_COMPLETED_INDEX] = wait_completed_ns;
-            breakdown[BREAKDOWN_DEFERRED_COPY_INDEX] = deferred_copy_ns;
-            breakdown[BREAKDOWN_DEFERRED_RESOLVE_INDEX] = deferred_resolve_ns;
+            if (breakdown_ptr) |breakdown| {
+                breakdown[BREAKDOWN_WAIT_COMPLETED_INDEX] = wait_completed_ns;
+                breakdown[BREAKDOWN_DEFERRED_COPY_INDEX] = deferred_copy_ns;
+                breakdown[BREAKDOWN_DEFERRED_RESOLVE_INDEX] = deferred_resolve_ns;
+            }
+        } else {
+            native.doeNativeQueueFlush(queue);
         }
     }
 
@@ -540,14 +552,16 @@ pub export fn doeBufferMapReadCopyUnmapFlat(
         .userdata1 = @ptrCast(&result),
         .userdata2 = null,
     };
-    const map_started_ns = std.time.nanoTimestamp();
+    const map_started_ns = if (wants_breakdown) std.time.nanoTimestamp() else 0;
     const future = native.doeNativeBufferMapAsync(buffer, mode, offset, size, info);
     if (future.id == 0 or !result.done or result.status != abi_base.WGPUMapAsyncStatus_Success) {
         return 0;
     }
-    breakdown[BREAKDOWN_MAP_INDEX] = @intCast(std.time.nanoTimestamp() - map_started_ns);
+    if (breakdown_ptr) |breakdown| {
+        breakdown[BREAKDOWN_MAP_INDEX] = @intCast(std.time.nanoTimestamp() - map_started_ns);
+    }
 
-    const copy_started_ns = std.time.nanoTimestamp();
+    const copy_started_ns = if (wants_breakdown) std.time.nanoTimestamp() else 0;
     const src_ptr = native.doeNativeBufferGetConstMappedRange(buffer, offset, size) orelse {
         native.doeNativeBufferUnmap(buffer);
         return 0;
@@ -555,11 +569,15 @@ pub export fn doeBufferMapReadCopyUnmapFlat(
     const src: [*]const u8 = @ptrCast(src_ptr);
     const dst: [*]u8 = @ptrCast(dst_raw);
     @memcpy(dst[0..size], src[0..size]);
-    breakdown[BREAKDOWN_COPY_INDEX] = @intCast(std.time.nanoTimestamp() - copy_started_ns);
+    if (breakdown_ptr) |breakdown| {
+        breakdown[BREAKDOWN_COPY_INDEX] = @intCast(std.time.nanoTimestamp() - copy_started_ns);
+    }
 
-    const unmap_started_ns = std.time.nanoTimestamp();
+    const unmap_started_ns = if (wants_breakdown) std.time.nanoTimestamp() else 0;
     native.doeNativeBufferUnmap(buffer);
-    breakdown[BREAKDOWN_UNMAP_INDEX] = @intCast(std.time.nanoTimestamp() - unmap_started_ns);
+    if (breakdown_ptr) |breakdown| {
+        breakdown[BREAKDOWN_UNMAP_INDEX] = @intCast(std.time.nanoTimestamp() - unmap_started_ns);
+    }
     return abi_base.WGPUStatus_Success;
 }
 

@@ -122,6 +122,17 @@ function nsFromMs(ms) {
   return Math.max(0, Math.round(ms * 1_000_000));
 }
 
+function envFlagEnabled(value) {
+  if (value === undefined || value === null) {
+    return false;
+  }
+  const normalized = String(value).trim().toLowerCase();
+  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+}
+
+const DOE_WEBGPU_SUBMIT_BREAKDOWN = envFlagEnabled(process.env.DOE_WEBGPU_SUBMIT_BREAKDOWN);
+const VALIDATION_OK = { ok: true };
+
 function readbackDigestCacheKey(view) {
   if (!(view instanceof Uint8Array) || view.byteLength > READBACK_DIGEST_CACHE_MAX_BYTES) {
     return '';
@@ -158,7 +169,7 @@ function readbackDigestCacheKey(view) {
 }
 
 function rememberProcessReadbackDigest(cacheKey, digest) {
-  if (!cacheKey) {
+  if (cacheKey === '' || cacheKey === undefined || cacheKey === null) {
     return;
   }
   readbackDigestProcessCache.set(cacheKey, digest);
@@ -168,7 +179,21 @@ function rememberProcessReadbackDigest(cacheKey, digest) {
   }
 }
 
-function digestBytes(view, cache = null) {
+function digestBytes(view, cache = null, decodedU32Le = undefined) {
+  if (view instanceof Uint8Array && view.byteLength === 4) {
+    const cacheKey = decodedU32Le !== undefined ? decodedU32Le : decodeU32Le(view);
+    if (cacheKey !== undefined) {
+      const cachedDigest = cache?.get(cacheKey) ?? readbackDigestProcessCache.get(cacheKey);
+      if (cachedDigest) {
+        cache?.set(cacheKey, cachedDigest);
+        return cachedDigest;
+      }
+      const digest = createHash('sha256').update(view).digest('hex');
+      cache?.set(cacheKey, digest);
+      rememberProcessReadbackDigest(cacheKey, digest);
+      return digest;
+    }
+  }
   const cacheKey = readbackDigestCacheKey(view);
   if (cacheKey) {
     const cachedDigest = cache?.get(cacheKey) ?? readbackDigestProcessCache.get(cacheKey);
@@ -248,39 +273,167 @@ function decodeU32Le(view) {
   ) >>> 0;
 }
 
+function buildReadbackCaptureTemplate(stepIndex, step) {
+  const fields = {};
+  if (typeof step?.bufferId === 'string') fields.bufferId = step.bufferId;
+  if (typeof step?.semanticOpId === 'string') fields.semanticOpId = step.semanticOpId;
+  if (typeof step?.semanticStage === 'string') fields.semanticStage = step.semanticStage;
+  if (typeof step?.semanticPhase === 'string') fields.semanticPhase = step.semanticPhase;
+  if (Number.isInteger(step?.semanticTokenIndex)) fields.semanticTokenIndex = step.semanticTokenIndex;
+  if (Number.isInteger(step?.semanticLayerIndex)) fields.semanticLayerIndex = step.semanticLayerIndex;
+  if (typeof step?.semanticExecutionPlanHash === 'string') {
+    fields.semanticExecutionPlanHash = step.semanticExecutionPlanHash;
+  }
+  if (typeof step?.captureSourceBufferId === 'string') {
+    fields.captureSourceBufferId = step.captureSourceBufferId;
+  }
+  if (Number.isInteger(step?.captureOffset)) fields.captureOffset = step.captureOffset;
+  if (Number.isInteger(step?.captureSize)) fields.captureSize = step.captureSize;
+  if (typeof step?.captureDecode === 'string') fields.captureDecode = step.captureDecode;
+  let expectedU32Le;
+  let expectedU32Sha256;
+  if (
+    step?.validate?.kind === 'u32PrefixEquals'
+    && Array.isArray(step.validate.values)
+    && step.validate.values.length === 1
+  ) {
+    const value = Number(step.validate.values[0]);
+    if (Number.isInteger(value) && value >= 0 && value <= 0xffffffff) {
+      expectedU32Le = value >>> 0;
+      const expectedBytes = Buffer.allocUnsafe(4);
+      expectedBytes.writeUInt32LE(expectedU32Le, 0);
+      expectedU32Sha256 = createHash('sha256').update(expectedBytes).digest('hex');
+    }
+  }
+  return {
+    stepIndex,
+    stepId: typeof step?.id === 'string' ? step.id : `step-${stepIndex}`,
+    fields,
+    expectedU32Le,
+    expectedU32Sha256,
+  };
+}
+
+function buildDeterminismCaptureTemplate(step) {
+  if (typeof step?.semanticPhase !== 'string') {
+    return null;
+  }
+  const semanticTokenIndex = Number.isInteger(step.semanticTokenIndex) ? step.semanticTokenIndex : 0;
+  return {
+    key: `${semanticTokenIndex}:${step.semanticPhase}`,
+    row: {
+      bytes: null,
+      semanticOpId: typeof step.semanticOpId === 'string' ? step.semanticOpId : null,
+      semanticStage: typeof step.semanticStage === 'string' ? step.semanticStage : null,
+      semanticPhase: step.semanticPhase,
+      semanticTokenIndex,
+    },
+  };
+}
+
+function buildValidationTemplate(expectation) {
+  if (!expectation || typeof expectation !== 'object' || Array.isArray(expectation)) {
+    return null;
+  }
+  if (expectation.kind === 'f32PrefixEquals' || expectation.kind === 'u32PrefixEquals') {
+    const values = Array.isArray(expectation.values) ? expectation.values.map((value) => Number(value)) : [];
+    return {
+      kind: expectation.kind,
+      values,
+      singleU32Expected: expectation.kind === 'u32PrefixEquals' && values.length === 1
+        ? values[0] >>> 0
+        : undefined,
+      cachePrefix: `${expectation.kind}:${values.join(',')}:`,
+    };
+  }
+  return { expectation };
+}
+
+function validatePreparedSampleExpectation(view, template, cache = null) {
+  if (!template) {
+    return VALIDATION_OK;
+  }
+  if (template.singleU32Expected !== undefined) {
+    const expected = template.singleU32Expected;
+    const actual = decodeU32Le(view);
+    if (actual !== expected) {
+      return {
+        ok: false,
+        detail: `expected uint32[0] === ${expected}, got ${actual}`,
+      };
+    }
+    return VALIDATION_OK;
+  }
+  const cacheKey = cache && template.cachePrefix
+    ? `${template.cachePrefix}${readbackDigestCacheKey(view)}`
+    : '';
+  if (cacheKey && cache.get(cacheKey) === true) {
+    return { ok: true };
+  }
+  if (template.kind === 'f32PrefixEquals') {
+    const { values } = template;
+    const actual = new Float32Array(view.buffer, view.byteOffset, Math.min(values.length, view.byteLength / 4));
+    for (let index = 0; index < values.length; index += 1) {
+      if (actual[index] !== values[index]) {
+        return {
+          ok: false,
+          detail: `expected float32[${index}] === ${values[index]}, got ${actual[index]}`,
+        };
+      }
+    }
+    if (cacheKey) cache.set(cacheKey, true);
+    return VALIDATION_OK;
+  }
+  if (template.kind === 'u32PrefixEquals') {
+    const { values } = template;
+    const actual = new Uint32Array(view.buffer, view.byteOffset, Math.min(values.length, view.byteLength / 4));
+    for (let index = 0; index < values.length; index += 1) {
+      if (actual[index] !== values[index]) {
+        return {
+          ok: false,
+          detail: `expected uint32[${index}] === ${values[index]}, got ${actual[index]}`,
+        };
+      }
+    }
+    if (cacheKey) cache.set(cacheKey, true);
+    return VALIDATION_OK;
+  }
+  return validateSampleExpectation(view, template.expectation);
+}
+
+function summarizePreparedReadbackCapture(repeatIndex, view, captureTemplate, digestCache) {
+  const decodedU32Le = decodeU32Le(view);
+  const sha256 = (
+    view.byteLength === 4
+    && decodedU32Le !== undefined
+    && decodedU32Le === captureTemplate.expectedU32Le
+    && typeof captureTemplate.expectedU32Sha256 === 'string'
+  )
+    ? captureTemplate.expectedU32Sha256
+    : digestBytes(view, digestCache, decodedU32Le);
+  const summary = {
+    repeatIndex,
+    stepIndex: captureTemplate.stepIndex,
+    stepId: captureTemplate.stepId,
+    byteLength: view.byteLength,
+    sha256,
+  };
+  if (decodedU32Le !== undefined) summary.decodedU32Le = decodedU32Le;
+  Object.assign(summary, captureTemplate.fields);
+  return summary;
+}
+
 export function summarizeReadbackCapture({
   repeatIndex,
   stepIndex,
   step,
   bytes,
   digestCache = null,
+  template = null,
 }) {
   const view = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes ?? []);
-  const summary = {
-    repeatIndex,
-    stepIndex,
-    stepId: typeof step?.id === 'string' ? step.id : `step-${stepIndex}`,
-    byteLength: view.byteLength,
-    sha256: digestBytes(view, digestCache),
-  };
-  const decodedU32Le = decodeU32Le(view);
-  if (decodedU32Le !== undefined) summary.decodedU32Le = decodedU32Le;
-  if (typeof step?.bufferId === 'string') summary.bufferId = step.bufferId;
-  if (typeof step?.semanticOpId === 'string') summary.semanticOpId = step.semanticOpId;
-  if (typeof step?.semanticStage === 'string') summary.semanticStage = step.semanticStage;
-  if (typeof step?.semanticPhase === 'string') summary.semanticPhase = step.semanticPhase;
-  if (Number.isInteger(step?.semanticTokenIndex)) summary.semanticTokenIndex = step.semanticTokenIndex;
-  if (Number.isInteger(step?.semanticLayerIndex)) summary.semanticLayerIndex = step.semanticLayerIndex;
-  if (typeof step?.semanticExecutionPlanHash === 'string') {
-    summary.semanticExecutionPlanHash = step.semanticExecutionPlanHash;
-  }
-  if (typeof step?.captureSourceBufferId === 'string') {
-    summary.captureSourceBufferId = step.captureSourceBufferId;
-  }
-  if (Number.isInteger(step?.captureOffset)) summary.captureOffset = step.captureOffset;
-  if (Number.isInteger(step?.captureSize)) summary.captureSize = step.captureSize;
-  if (typeof step?.captureDecode === 'string') summary.captureDecode = step.captureDecode;
-  return summary;
+  const captureTemplate = template ?? buildReadbackCaptureTemplate(stepIndex, step);
+  return summarizePreparedReadbackCapture(repeatIndex, view, captureTemplate, digestCache);
 }
 
 export function materializeWriteBufferDataForStep(cache, stepIndex, bufferData) {
@@ -322,6 +475,9 @@ function addReadbackBreakdown(target, source) {
 }
 
 function readDoeDirectReadbackDiagnosticsNs(buffer) {
+  if (!DOE_WEBGPU_SUBMIT_BREAKDOWN) {
+    return null;
+  }
   const values = {};
   const jsBreakdown = buffer?.__doe_readback_breakdown_ns;
   if (jsBreakdown && typeof jsBreakdown === 'object') {
@@ -386,7 +542,10 @@ export async function copyReadBufferBytes({
     const fastNs = nsDelta(fastStartedAt);
     if (copied !== null && copied !== undefined) {
       breakdownNs.readbackMapReadCopyUnmapTotalNs += fastNs;
-      addReadbackBreakdown(breakdownNs, readDoeDirectReadbackDiagnosticsNs(buffer));
+      const directDiagnostics = readDoeDirectReadbackDiagnosticsNs(buffer);
+      if (directDiagnostics) {
+        addReadbackBreakdown(breakdownNs, directDiagnostics);
+      }
       return {
         bytes: viewFromReadbackCopy(copied, expectedBytes),
         breakdownNs,
@@ -2082,6 +2241,16 @@ async function executeSample(
   const determinismCaptureRows = new Map();
   const readbackCaptures = [];
   const readbackDigestCache = new Map();
+  const readbackValidationCache = new Map();
+  const readbackCaptureTemplates = normalizedPlan.steps.map((step, index) => (
+    step.kind === 'readBuffer' ? buildReadbackCaptureTemplate(index, step) : null
+  ));
+  const determinismCaptureTemplates = normalizedPlan.steps.map((step) => (
+    step.kind === 'readBuffer' ? buildDeterminismCaptureTemplate(step) : null
+  ));
+  const validationTemplates = normalizedPlan.steps.map((step) => (
+    step.kind === 'readBuffer' ? buildValidationTemplate(step.validate) : null
+  ));
   const materializedWriteDataCache = new Map();
   const compactWriteBatchCache = new Map();
   const packageFastPathStatsStart = snapshotPackageFastPathStats(runtime.providerModule);
@@ -2561,6 +2730,7 @@ async function executeSample(
       if (!buffer) {
         throw new Error(`readBuffer references unknown buffer: ${step.bufferId}`);
       }
+      const determinismCaptureTemplate = determinismCaptureTemplates[index];
       const readStartedAt = performance.now();
       const readback = await copyReadBufferBytes({
         buffer,
@@ -2569,30 +2739,29 @@ async function executeSample(
         readbackMode: packageReadbackMode,
       });
       const validationStartedAt = performance.now();
-      const validation = validateSampleExpectation(readback.bytes, step.validate);
+      const validation = validatePreparedSampleExpectation(
+        readback.bytes,
+        validationTemplates[index],
+        readbackValidationCache,
+      );
       readback.breakdownNs.readbackValidationTotalNs += nsDelta(validationStartedAt);
       if (!validation.ok) {
         throw new Error(`validation failed for ${step.bufferId}: ${validation.detail}`);
       }
+      const captureTemplate = readbackCaptureTemplates[index];
       const captureStartedAt = performance.now();
-      readbackCaptures.push(summarizeReadbackCapture({
+      const readbackView = readback.bytes instanceof Uint8Array
+        ? readback.bytes
+        : new Uint8Array(readback.bytes ?? []);
+      readbackCaptures.push(summarizePreparedReadbackCapture(
         repeatIndex,
-        stepIndex: index,
-        step,
-        bytes: readback.bytes,
-        digestCache: readbackDigestCache,
-      }));
-      if (typeof step.semanticPhase === 'string') {
-        determinismCaptureRows.set(
-          `${Number.isInteger(step.semanticTokenIndex) ? step.semanticTokenIndex : 0}:${step.semanticPhase}`,
-          {
-            bytes: readback.bytes,
-            semanticOpId: typeof step.semanticOpId === 'string' ? step.semanticOpId : null,
-            semanticStage: typeof step.semanticStage === 'string' ? step.semanticStage : null,
-            semanticPhase: step.semanticPhase,
-            semanticTokenIndex: Number.isInteger(step.semanticTokenIndex) ? step.semanticTokenIndex : 0,
-          },
-        );
+        readbackView,
+        captureTemplate,
+        readbackDigestCache,
+      ));
+      if (determinismCaptureTemplate) {
+        determinismCaptureTemplate.row.bytes = readbackView;
+        determinismCaptureRows.set(determinismCaptureTemplate.key, determinismCaptureTemplate.row);
       }
       readback.breakdownNs.readbackCaptureTotalNs += nsDelta(captureStartedAt);
       if (readbackMapCompletesSubmit) {

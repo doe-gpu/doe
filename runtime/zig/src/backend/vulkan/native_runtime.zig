@@ -20,6 +20,7 @@ const vk_compute_sync = @import("vk_compute_sync.zig");
 const vk_render = @import("vk_render.zig");
 const vk_dispatch_repeat = @import("vk_dispatch_repeat.zig");
 const vk_metrics = @import("vk_metrics.zig");
+const vk_command_buffers = @import("vk_command_buffers.zig");
 const surface_ops = @import("vk_runtime_surface_ops.zig");
 const render_bundle = @import("../../render_bundle.zig");
 const vk_texture_commands = @import("vk_texture_commands.zig");
@@ -82,6 +83,8 @@ pub const NativeVulkanRuntime = struct {
     bound_descriptor_bindings_hash: u64 = 0,
     current_entry_point_owned: ?[:0]u8 = null,
     current_descriptor_state_cache: std.AutoHashMapUnmanaged(u64, vk_pipeline.CachedDescriptorState) = .{},
+    hot_descriptor_state_hashes: [vk_pipeline.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** vk_pipeline.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY,
+    hot_descriptor_states: [vk_pipeline.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]vk_pipeline.CachedDescriptorState = undefined,
     retired_pipeline_states: std.ArrayListUnmanaged(vk_pipeline.RetiredPipelineState) = .{},
     retired_descriptor_states: std.ArrayListUnmanaged(vk_pipeline.RetiredDescriptorState) = .{},
     hot_compute_state_hashes: [vk_pipeline.HOT_COMPUTE_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** vk_pipeline.HOT_COMPUTE_STATE_CACHE_CAPACITY,
@@ -132,7 +135,9 @@ pub const NativeVulkanRuntime = struct {
     has_pending_compute_writes: bool = false,
     has_pending_transfer_writes: bool = false,
     recorded_submit_replay_active: bool = false,
-    pending_compute_write_buffers: std.AutoHashMapUnmanaged(u64, void) = .{},
+    pending_compute_write_tracking_complete: bool = true,
+    pending_compute_write_buffer_handles: [vk_compute_sync.MAX_TRACKED_COMPUTE_BINDINGS]u64 = [_]u64{0} ** vk_compute_sync.MAX_TRACKED_COMPUTE_BINDINGS,
+    pending_compute_write_buffer_count: u32 = 0,
     current_compute_bindings: [vk_compute_sync.MAX_TRACKED_COMPUTE_BINDINGS]vk_compute_sync.ComputeBindingAccess = [_]vk_compute_sync.ComputeBindingAccess{.{}} ** vk_compute_sync.MAX_TRACKED_COMPUTE_BINDINGS,
     current_compute_binding_count: u32 = 0,
     current_compute_binding_tracking_complete: bool = true,
@@ -181,7 +186,6 @@ pub const NativeVulkanRuntime = struct {
         vk_pipeline.release_retired_states(self);
         vk_upload.release_pending_uploads(self);
         self.pending_uploads.deinit(self.allocator);
-        self.pending_compute_write_buffers.deinit(self.allocator);
         self.retired_pipeline_states.deinit(self.allocator);
         self.retired_descriptor_states.deinit(self.allocator);
         self.streaming_copy_buffers.deinit(self.allocator);
@@ -403,9 +407,9 @@ pub const NativeVulkanRuntime = struct {
             self.deferred_command_buffer_index = 0;
             command_buffer = self.primary_command_buffer;
         } else if (replay_deferred) {
-            command_buffer = try begin_recorded_submit_replay(self);
+            command_buffer = try vk_command_buffers.begin_recorded_submit_replay(self);
         } else {
-            command_buffer = try acquire_deferred_command_buffer(self);
+            command_buffer = try vk_command_buffers.acquire_deferred_command_buffer(self);
         }
         if (!replay_deferred) {
             var begin_info = c.VkCommandBufferBeginInfo{
@@ -523,6 +527,49 @@ pub const NativeVulkanRuntime = struct {
         };
     }
 
+    pub fn record_prepared_dispatch_replay(
+        self: *NativeVulkanRuntime,
+        x: u32,
+        y: u32,
+        z: u32,
+    ) !void {
+        const command_buffer = try self.begin_prepared_dispatch_replay();
+        try self.record_prepared_dispatch_replay_on(command_buffer, x, y, z);
+    }
+
+    pub fn begin_prepared_dispatch_replay(self: *NativeVulkanRuntime) !c.VkCommandBuffer {
+        if (!self.recorded_submit_replay_active) return error.InvalidState;
+        try vk_upload.flush_streaming_copy_before_dispatch(self, true, .deferred);
+        try vk_device.ensure_submission_state(self);
+        return vk_command_buffers.begin_recorded_submit_replay(self);
+    }
+
+    pub fn begin_prepared_dispatch_replay_batch(self: *NativeVulkanRuntime) !c.VkCommandBuffer {
+        if (!self.recorded_submit_replay_active) return error.InvalidState;
+        if (self.replay_recording_active) return self.replay_command_buffer;
+        try vk_upload.flush_streaming_copy_before_dispatch(self, true, .deferred);
+        try vk_device.ensure_submission_state(self);
+        return vk_command_buffers.begin_recorded_submit_replay(self);
+    }
+
+    pub fn record_prepared_dispatch_replay_on(
+        self: *NativeVulkanRuntime,
+        command_buffer: c.VkCommandBuffer,
+        x: u32,
+        y: u32,
+        z: u32,
+    ) !void {
+        if (x == 0 or y == 0 or z == 0) return error.InvalidArgument;
+        if (!self.has_pipeline) return error.Unsupported;
+        if (command_buffer == null) return error.InvalidState;
+        vk_compute_sync.make_prior_transfer_writes_visible(self, command_buffer);
+        vk_compute_sync.make_prior_compute_writes_visible_for_current_bindings(self, command_buffer);
+        vk_pipeline.bind_compute_pipeline_if_needed(self, command_buffer);
+        vk_pipeline.bind_descriptor_sets_if_needed(self, command_buffer);
+        c.vkCmdDispatch(command_buffer, x, y, z);
+        vk_compute_sync.remember_current_compute_writes(self);
+    }
+
     pub fn run_dispatch_repeat(
         self: *NativeVulkanRuntime,
         x: u32,
@@ -550,9 +597,9 @@ pub const NativeVulkanRuntime = struct {
         try vk_upload.flush_streaming_copy_before_dispatch(self, replay_deferred, queue_sync_mode);
         try vk_device.ensure_submission_state(self);
 
-        const indirect_args = try ensure_dispatch_indirect_args_buffer(self);
+        const indirect_args = try vk_command_buffers.ensure_dispatch_indirect_args_buffer(self);
         const encode_start = common_timing.now_ns();
-        try write_dispatch_indirect_args(indirect_args, x, y, z);
+        try vk_command_buffers.write_dispatch_indirect_args(indirect_args, x, y, z);
 
         var command_buffer: c.VkCommandBuffer = null;
         if (queue_sync_mode == .per_command) {
@@ -560,9 +607,9 @@ pub const NativeVulkanRuntime = struct {
             self.deferred_command_buffer_index = 0;
             command_buffer = self.primary_command_buffer;
         } else if (replay_deferred) {
-            command_buffer = try begin_recorded_submit_replay(self);
+            command_buffer = try vk_command_buffers.begin_recorded_submit_replay(self);
         } else {
-            command_buffer = try acquire_deferred_command_buffer(self);
+            command_buffer = try vk_command_buffers.acquire_deferred_command_buffer(self);
         }
         if (!replay_deferred) {
             var begin_info = c.VkCommandBufferBeginInfo{
@@ -683,6 +730,10 @@ pub const NativeVulkanRuntime = struct {
             self.deferred_command_buffer_index = 0;
         }
         return waited_ns +| common_timing.ns_delta(common_timing.now_ns(), cleanup_start);
+    }
+
+    pub fn has_pending_compute_write_for_buffer(self: *const NativeVulkanRuntime, resource_handle: u64) bool {
+        return vk_compute_sync.pending_compute_write_buffer_contains(self, resource_handle);
     }
 
     pub fn make_compute_writes_visible_for_capture(
@@ -935,61 +986,3 @@ pub const NativeVulkanRuntime = struct {
         return self.queue_family_index_value_cache != null and self.timestamp_query_supported_value;
     }
 };
-
-const DISPATCH_INDIRECT_ARGS_BYTES = @sizeOf([3]u32);
-
-fn ensure_dispatch_indirect_args_buffer(self: *NativeVulkanRuntime) !vk_resources.ComputeBuffer {
-    if (self.dispatch_indirect_args_buffer == null) {
-        self.dispatch_indirect_args_buffer = try vk_resources.create_host_visible_buffer(
-            self,
-            DISPATCH_INDIRECT_ARGS_BYTES,
-            c.VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
-        );
-    }
-    return self.dispatch_indirect_args_buffer.?;
-}
-
-fn write_dispatch_indirect_args(buffer: vk_resources.ComputeBuffer, x: u32, y: u32, z: u32) !void {
-    const mapped = buffer.mapped orelse return error.InvalidState;
-    const dispatch_args = [3]u32{ x, y, z };
-    const dispatch_arg_bytes = std.mem.asBytes(&dispatch_args);
-    @memcpy(@as([*]u8, @ptrCast(mapped))[0..dispatch_arg_bytes.len], dispatch_arg_bytes);
-}
-
-fn begin_recorded_submit_replay(self: *NativeVulkanRuntime) !c.VkCommandBuffer {
-    if (self.replay_recording_active) return self.replay_command_buffer;
-    const command_buffer = try acquire_deferred_command_buffer(self);
-    var begin_info = c.VkCommandBufferBeginInfo{
-        .sType = c.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .pNext = null,
-        .flags = c.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-        .pInheritanceInfo = null,
-    };
-    try c.check_vk(c.vkBeginCommandBuffer(command_buffer, &begin_info));
-    vk_pipeline.reset_bound_compute_state(self);
-    self.replay_command_buffer = command_buffer;
-    self.replay_recording_active = true;
-    self.has_deferred_submissions = true;
-    return command_buffer;
-}
-
-fn acquire_deferred_command_buffer(self: *NativeVulkanRuntime) !c.VkCommandBuffer {
-    if (self.deferred_command_buffer_index < self.deferred_command_buffers.items.len) {
-        const command_buffer = self.deferred_command_buffers.items[self.deferred_command_buffer_index];
-        self.deferred_command_buffer_index += 1;
-        return command_buffer;
-    }
-
-    var command_buffer: c.VkCommandBuffer = null;
-    var alloc_info = c.VkCommandBufferAllocateInfo{
-        .sType = c.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .pNext = null,
-        .commandPool = self.command_pool,
-        .level = c.VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-        .commandBufferCount = 1,
-    };
-    try c.check_vk(c.vkAllocateCommandBuffers(self.device, &alloc_info, @ptrCast(&command_buffer)));
-    try self.deferred_command_buffers.append(self.allocator, command_buffer);
-    self.deferred_command_buffer_index += 1;
-    return command_buffer;
-}

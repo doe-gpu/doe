@@ -129,6 +129,7 @@ pub const RetiredDescriptorState = struct {
 pub const CachedDescriptorState = vk_pipeline_cache.CachedDescriptorState;
 pub const CachedComputeState = vk_pipeline_cache.CachedComputeState;
 pub const HOT_COMPUTE_STATE_CACHE_CAPACITY = vk_pipeline_cache.HOT_COMPUTE_STATE_CACHE_CAPACITY;
+pub const HOT_DESCRIPTOR_STATE_CACHE_CAPACITY = vk_pipeline_cache.HOT_DESCRIPTOR_STATE_CACHE_CAPACITY;
 
 const activate_cached_compute_state = vk_pipeline_cache.activate_cached_compute_state;
 const activate_cached_descriptor_state = vk_pipeline_cache.activate_cached_descriptor_state;

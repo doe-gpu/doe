@@ -3,6 +3,7 @@ const c = @import("vk_constants.zig");
 
 const VK_NULL_U64 = c.VK_NULL_U64;
 pub const HOT_COMPUTE_STATE_CACHE_CAPACITY: usize = 16;
+pub const HOT_DESCRIPTOR_STATE_CACHE_CAPACITY: usize = 32;
 
 pub const CachedDescriptorState = struct {
     descriptor_pool: c.VkDescriptorPool = VK_NULL_U64,
@@ -24,6 +25,8 @@ pub const CachedComputeState = struct {
     current_layout_hash: u64 = 0,
     current_descriptor_bindings_hash: u64 = 0,
     current_entry_point_owned: ?[:0]u8 = null,
+    hot_descriptor_state_hashes: [HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** HOT_DESCRIPTOR_STATE_CACHE_CAPACITY,
+    hot_descriptor_states: [HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]CachedDescriptorState = undefined,
     descriptor_state_cache: std.AutoHashMapUnmanaged(u64, CachedDescriptorState) = .{},
     has_shader_module: bool = false,
     has_pipeline_layout: bool = false,
@@ -54,6 +57,8 @@ pub fn clear_active_compute_state(self: anytype) void {
     self.current_layout_hash = 0;
     self.current_descriptor_bindings_hash = 0;
     self.current_entry_point_owned = null;
+    self.hot_descriptor_state_hashes = [_]u64{0} ** HOT_DESCRIPTOR_STATE_CACHE_CAPACITY;
+    self.hot_descriptor_states = undefined;
     self.current_descriptor_state_cache = .{};
     self.has_shader_module = false;
     self.has_pipeline_layout = false;
@@ -75,6 +80,8 @@ pub fn capture_active_compute_state(self: anytype) CachedComputeState {
         .current_layout_hash = self.current_layout_hash,
         .current_descriptor_bindings_hash = self.current_descriptor_bindings_hash,
         .current_entry_point_owned = self.current_entry_point_owned,
+        .hot_descriptor_state_hashes = self.hot_descriptor_state_hashes,
+        .hot_descriptor_states = self.hot_descriptor_states,
         .descriptor_state_cache = self.current_descriptor_state_cache,
         .has_shader_module = self.has_shader_module,
         .has_pipeline_layout = self.has_pipeline_layout,
@@ -96,6 +103,8 @@ pub fn restore_active_compute_state(self: anytype, cached: CachedComputeState) v
     self.current_layout_hash = cached.current_layout_hash;
     self.current_descriptor_bindings_hash = cached.current_descriptor_bindings_hash;
     self.current_entry_point_owned = cached.current_entry_point_owned;
+    self.hot_descriptor_state_hashes = cached.hot_descriptor_state_hashes;
+    self.hot_descriptor_states = cached.hot_descriptor_states;
     self.current_descriptor_state_cache = cached.descriptor_state_cache;
     self.has_shader_module = cached.has_shader_module;
     self.has_pipeline_layout = cached.has_pipeline_layout;
@@ -111,6 +120,11 @@ pub fn destroy_cached_descriptor_state(self: anytype, cached: CachedDescriptorSt
 }
 
 pub fn release_descriptor_state_cache(self: anytype) void {
+    for (self.hot_descriptor_state_hashes, 0..) |hash, index| {
+        if (hash == 0) continue;
+        destroy_cached_descriptor_state(self, self.hot_descriptor_states[index]);
+        self.hot_descriptor_state_hashes[index] = 0;
+    }
     var it = self.current_descriptor_state_cache.valueIterator();
     while (it.next()) |cached| destroy_cached_descriptor_state(self, cached.*);
     self.current_descriptor_state_cache.deinit(self.allocator);
@@ -121,6 +135,10 @@ pub fn destroy_cached_compute_state(self: anytype, cached: CachedComputeState) v
     if (cached.pipeline != VK_NULL_U64) c.vkDestroyPipeline(self.device, cached.pipeline, null);
     if (cached.shader_module != VK_NULL_U64) c.vkDestroyShaderModule(self.device, cached.shader_module, null);
     if (cached.descriptor_pool != VK_NULL_U64) c.vkDestroyDescriptorPool(self.device, cached.descriptor_pool, null);
+    for (cached.hot_descriptor_state_hashes, 0..) |hash, index| {
+        if (hash == 0) continue;
+        destroy_cached_descriptor_state(self, cached.hot_descriptor_states[index]);
+    }
     var descriptor_state_cache = cached.descriptor_state_cache;
     var descriptor_it = descriptor_state_cache.valueIterator();
     while (descriptor_it.next()) |descriptor_cached| {
@@ -208,6 +226,8 @@ test "hot compute state cache activates before hash map fallback" {
         current_layout_hash: u64 = 0,
         current_descriptor_bindings_hash: u64 = 0,
         current_entry_point_owned: ?[:0]u8 = null,
+        hot_descriptor_state_hashes: [HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** HOT_DESCRIPTOR_STATE_CACHE_CAPACITY,
+        hot_descriptor_states: [HOT_DESCRIPTOR_STATE_CACHE_CAPACITY]CachedDescriptorState = undefined,
         current_descriptor_state_cache: std.AutoHashMapUnmanaged(u64, CachedDescriptorState) = .{},
         hot_compute_state_hashes: [HOT_COMPUTE_STATE_CACHE_CAPACITY]u64 = [_]u64{0} ** HOT_COMPUTE_STATE_CACHE_CAPACITY,
         hot_compute_states: [HOT_COMPUTE_STATE_CACHE_CAPACITY]CachedComputeState = undefined,
@@ -260,12 +280,38 @@ pub fn restore_active_descriptor_state(self: anytype, cached: CachedDescriptorSt
     self.has_current_descriptor_bindings_hash = cached.has_current_descriptor_bindings_hash;
 }
 
+fn take_hot_descriptor_state(self: anytype, descriptor_bindings_hash: u64) ?CachedDescriptorState {
+    if (descriptor_bindings_hash == 0) return null;
+    for (self.hot_descriptor_state_hashes, 0..) |hash, index| {
+        if (hash != descriptor_bindings_hash) continue;
+        const cached = self.hot_descriptor_states[index];
+        self.hot_descriptor_state_hashes[index] = 0;
+        return cached;
+    }
+    return null;
+}
+
+fn put_hot_descriptor_state(self: anytype, descriptor_bindings_hash: u64, cached: CachedDescriptorState) bool {
+    if (descriptor_bindings_hash == 0) return false;
+    for (self.hot_descriptor_state_hashes, 0..) |hash, index| {
+        if (hash != 0 and hash != descriptor_bindings_hash) continue;
+        if (hash == descriptor_bindings_hash) {
+            destroy_cached_descriptor_state(self, self.hot_descriptor_states[index]);
+        }
+        self.hot_descriptor_states[index] = cached;
+        self.hot_descriptor_state_hashes[index] = descriptor_bindings_hash;
+        return true;
+    }
+    return false;
+}
+
 pub fn stash_active_descriptor_state(self: anytype) !void {
     if (!self.has_descriptor_pool or !self.has_current_descriptor_bindings_hash) return;
     const cache_key = self.current_descriptor_bindings_hash;
     if (cache_key == 0) return;
     const cached = capture_active_descriptor_state(self);
     clear_active_descriptor_state(self);
+    if (put_hot_descriptor_state(self, cache_key, cached)) return;
     if (self.current_descriptor_state_cache.fetchRemove(cache_key)) |removed| {
         destroy_cached_descriptor_state(self, removed.value);
     }
@@ -273,6 +319,10 @@ pub fn stash_active_descriptor_state(self: anytype) !void {
 }
 
 pub fn activate_cached_descriptor_state(self: anytype, descriptor_bindings_hash: u64) bool {
+    if (take_hot_descriptor_state(self, descriptor_bindings_hash)) |cached| {
+        restore_active_descriptor_state(self, cached);
+        return true;
+    }
     const removed = self.current_descriptor_state_cache.fetchRemove(descriptor_bindings_hash) orelse return false;
     restore_active_descriptor_state(self, removed.value);
     return true;

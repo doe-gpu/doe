@@ -4,6 +4,16 @@
  * Buffer
  * ================================================================ */
 
+static int readback_breakdown_enabled(void) {
+    static int cached = -1;
+    if (cached >= 0) return cached;
+    const char* value = getenv("DOE_WEBGPU_SUBMIT_BREAKDOWN");
+    if (!value || value[0] == '\0') return cached = 0;
+    if (strcmp(value, "0") == 0) return cached = 0;
+    if (strcmp(value, "false") == 0 || strcmp(value, "False") == 0 || strcmp(value, "FALSE") == 0) return cached = 0;
+    return cached = 1;
+}
+
 napi_value doe_create_buffer(napi_env env, napi_callback_info info) {
     NAPI_ASSERT_ARGC(env, info, 2);
     CHECK_LIB_LOADED(env);
@@ -168,6 +178,7 @@ napi_value doe_buffer_map_read_copy_unmap(napi_env env, napi_callback_info info)
         void* copy = NULL;
         napi_value bytes;
         napi_create_arraybuffer(env, (size_t)size_i, &copy, &bytes);
+        const int wants_breakdown = readback_breakdown_enabled();
         uint64_t breakdown[DOE_READBACK_BREAKDOWN_FIELD_COUNT] = {0};
         const uint32_t status = pfn_doeBufferMapReadCopyUnmapFlat(
             queue,
@@ -177,10 +188,13 @@ napi_value doe_buffer_map_read_copy_unmap(napi_env env, napi_callback_info info)
             (size_t)size_i,
             should_flush ? 1u : 0u,
             copy,
-            breakdown
+            wants_breakdown ? breakdown : NULL
         );
         if (status != WGPU_STATUS_SUCCESS) {
             NAPI_THROW(env, "bufferMapReadCopyUnmapFlat failed");
+        }
+        if (!wants_breakdown) {
+            return bytes;
         }
 
         napi_value result_obj;

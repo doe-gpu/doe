@@ -343,6 +343,7 @@ class NodeWebGPUExecutorTests(unittest.TestCase):
         self.assertIn("fastPathStats.flushAndMap += 1;", source)
         self.assertIn("fastPathStats.dispatchFlush += 1;", source)
         self.assertIn("function addonSubmitBreakdownIndicatesDispatchFlush(addonBreakdown)", source)
+        self.assertIn("if (!addonBreakdown) {\n    return false;\n  }", source)
         self.assertIn("queueWriteBufferBatchDataPtrs", source)
         self.assertIn("export { fastPathStats };", source)
         self.assertIn("fastPathStats,", source)
@@ -756,6 +757,7 @@ console.log(JSON.stringify({{
         result = subprocess.run(
             ["node", "--input-type=module", "-e", script],
             cwd=REPO_ROOT,
+            env={**os.environ, "DOE_WEBGPU_SUBMIT_BREAKDOWN": "1"},
             capture_output=True,
             text=True,
             check=False,
@@ -774,9 +776,49 @@ console.log(JSON.stringify({{
         self.assertEqual(payload["unmapNs"], 625_000)
         self.assertEqual(payload["mapAsyncNs"], 0)
 
-    def test_readback_copy_helper_uses_native_read_copy_after_map(self) -> None:
+    def test_readback_copy_helper_skips_direct_diagnostics_by_default(self) -> None:
         script = f"""
 import {{ copyReadBufferBytes }} from {json.dumps(EXECUTOR_MODULE_URL)};
+const buffer = {{
+  size: 4,
+  __doe_diag_map_read_copy_unmap_queue_wait_completed_ms: 1.25,
+  __doe_readback_breakdown_ns: {{
+    readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: 500000,
+  }},
+  _mapReadCopyUnmap() {{
+    return new Uint8Array([1, 2, 3, 4]).buffer;
+  }},
+}};
+const result = await copyReadBufferBytes({{
+  buffer,
+  globals: {{ GPUMapMode: {{ READ: 1 }} }},
+  sizeBytes: 4,
+}});
+console.log(JSON.stringify({{
+  path: result.path,
+  bytes: Array.from(result.bytes),
+  queueWaitNs: result.breakdownNs.readbackMapReadCopyUnmapQueueWaitCompletedTotalNs,
+}}));
+"""
+        env = {**os.environ}
+        env.pop("DOE_WEBGPU_SUBMIT_BREAKDOWN", None)
+        result = subprocess.run(
+            ["node", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT,
+            env=env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["path"], "map-read-copy-unmap")
+        self.assertEqual(payload["bytes"], [1, 2, 3, 4])
+        self.assertEqual(payload["queueWaitNs"], 0)
+
+    def test_readback_copy_helper_uses_native_read_copy_after_map(self) -> None:
+        script = f"""
+	import {{ copyReadBufferBytes }} from {json.dumps(EXECUTOR_MODULE_URL)};
 const calls = [];
 const buffer = {{
   size: 4,
@@ -1281,7 +1323,8 @@ console.log(JSON.stringify({{
 
         napi_source = NAPI_QUEUE_PATH.read_text(encoding="utf-8")
         self.assertIn("read_command_bind_groups(env, cmd", napi_source)
-        self.assertIn('has_prop(env, cmd, "b")', napi_source)
+        self.assertIn('compact_bind_groups = get_prop(env, cmd, "b")', napi_source)
+        self.assertIn("compact_type != napi_undefined", napi_source)
         self.assertIn("get_command_type(env, cmd)", napi_source)
         self.assertNotIn("get_command_field(env, cmd", napi_source)
         self.assertNotIn("bool cmd_is_array", napi_source)
@@ -1322,7 +1365,14 @@ console.log(JSON.stringify({{
         self.assertIn("queue_submit.flush_before_submit_if_needed_timed(q)", compute_source)
         self.assertIn("pfn_doeNativeComputeDispatchBatchCopyFlush", napi_source)
         self.assertIn("dispatch_then_copy", napi_source)
-        self.assertIn("return make_submit_breakdown(env, command_replay_ns, queue_submit_ns, 0);", napi_source)
+        self.assertIn(
+            "if (!submit_breakdown_enabled()) return make_submit_completion_hint(env, flush_ns, 0, 0, 0);",
+            napi_source,
+        )
+        self.assertIn(
+            "return make_submit_completion_hint(env, flush_ns, wait_completed_ns, deferred_copy_ns, deferred_resolve_ns);",
+            napi_source,
+        )
         self.assertIn("doeNativeComputeDispatchBatchCopyFlush", bun_source)
         self.assertIn("dispatchThenCopy", bun_source)
 
@@ -1426,6 +1476,7 @@ console.log(JSON.stringify({{
   sameDigest: first.sha256 === second.sha256,
   decodedU32Le: second.decodedU32Le,
   cacheSize: digestCache.size,
+  hasNumericKey: digestCache.has(2291),
 }}));
 """
         result = subprocess.run(
@@ -1440,6 +1491,7 @@ console.log(JSON.stringify({{
         self.assertTrue(payload["sameDigest"])
         self.assertEqual(payload["decodedU32Le"], 2291)
         self.assertEqual(payload["cacheSize"], 1)
+        self.assertTrue(payload["hasNumericKey"])
 
     def test_write_buffer_materialization_cache_reuses_step_data(self) -> None:
         script = f"""
@@ -1632,7 +1684,7 @@ console.log(JSON.stringify({{ matched, missed }}));
 
     def test_lookup_package_write_batching_entry_matches_provider_method(self) -> None:
         script = f"""
-import {{ lookupPackageWriteBatchingEntry }} from {json.dumps(EXECUTOR_MODULE_URL)};
+	import {{ lookupPackageWriteBatchingEntry }} from {json.dumps(EXECUTOR_MODULE_URL)};
 const policy = {{
   schemaVersion: 1,
   writeBatching: [
@@ -1674,7 +1726,7 @@ console.log(JSON.stringify({{ matched, missed }}));
 
     def test_lookup_package_readback_mode_entry_matches_workload(self) -> None:
         script = f"""
-import {{ lookupPackageReadbackModeEntry }} from {json.dumps(EXECUTOR_MODULE_URL)};
+	import {{ lookupPackageReadbackModeEntry }} from {json.dumps(EXECUTOR_MODULE_URL)};
 const policy = {{
   schemaVersion: 1,
   readbackMode: [

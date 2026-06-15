@@ -92,7 +92,7 @@ pub fn make_prior_compute_writes_visible_for_buffer_copy(
     dst_buffer: c.VkBuffer,
 ) void {
     if (!self.has_pending_compute_writes) return;
-    if (!self.current_compute_binding_tracking_complete or self.pending_compute_write_buffers.count() == 0) {
+    if (!self.pending_compute_write_tracking_complete or self.pending_compute_write_buffer_count == 0) {
         make_prior_compute_writes_visible_for_transfer_read(self, command_buffer);
         return;
     }
@@ -102,10 +102,10 @@ pub fn make_prior_compute_writes_visible_for_buffer_copy(
         buffer_memory_barrier(dst_buffer, c.VK_ACCESS_TRANSFER_WRITE_BIT),
     };
     var barrier_count: u32 = 0;
-    if (src_handle != 0 and self.pending_compute_write_buffers.contains(src_handle)) {
+    if (src_handle != 0 and pending_compute_write_buffer_contains(self, src_handle)) {
         barrier_count = 1;
     }
-    if (dst_handle != 0 and self.pending_compute_write_buffers.contains(dst_handle)) {
+    if (dst_handle != 0 and pending_compute_write_buffer_contains(self, dst_handle)) {
         if (barrier_count == 1 and src_handle == dst_handle) {
             barriers[0].dstAccessMask |= c.VK_ACCESS_TRANSFER_WRITE_BIT;
         } else {
@@ -128,9 +128,9 @@ pub fn make_prior_compute_writes_visible_for_buffer_copy(
         null,
     );
 
-    if (src_handle != 0) _ = self.pending_compute_write_buffers.remove(src_handle);
-    if (dst_handle != 0 and dst_handle != src_handle) _ = self.pending_compute_write_buffers.remove(dst_handle);
-    self.has_pending_compute_writes = self.pending_compute_write_buffers.count() != 0;
+    if (src_handle != 0) remove_pending_compute_write_buffer(self, src_handle);
+    if (dst_handle != 0 and dst_handle != src_handle) remove_pending_compute_write_buffer(self, dst_handle);
+    self.has_pending_compute_writes = self.pending_compute_write_buffer_count != 0;
 }
 
 pub fn make_transfer_writes_visible_for_host_read(command_buffer: c.VkCommandBuffer) void {
@@ -187,14 +187,14 @@ pub fn make_prior_compute_writes_visible_for_current_bindings(
     command_buffer: c.VkCommandBuffer,
 ) void {
     if (!self.has_pending_compute_writes) return;
-    if (!self.current_compute_binding_tracking_complete or self.pending_compute_write_buffers.count() == 0) {
+    if (!self.pending_compute_write_tracking_complete or self.pending_compute_write_buffer_count == 0) {
         emit_compute_write_visibility_barrier(self, command_buffer);
         return;
     }
 
     for (current_compute_bindings(self)) |binding| {
         if (!binding.reads and !binding.writes) continue;
-        if (self.pending_compute_write_buffers.contains(binding.resource_handle)) {
+        if (pending_compute_write_buffer_contains(self, binding.resource_handle)) {
             emit_compute_write_visibility_barrier(self, command_buffer);
             return;
         }
@@ -203,7 +203,8 @@ pub fn make_prior_compute_writes_visible_for_current_bindings(
 
 pub fn remember_current_compute_writes(self: anytype) void {
     if (!self.current_compute_binding_tracking_complete) {
-        self.pending_compute_write_buffers.clearRetainingCapacity();
+        clear_pending_compute_write_buffers(self);
+        self.pending_compute_write_tracking_complete = false;
         self.has_pending_compute_writes = true;
         return;
     }
@@ -212,8 +213,9 @@ pub fn remember_current_compute_writes(self: anytype) void {
     for (current_compute_bindings(self)) |binding| {
         if (!binding.writes) continue;
         recorded_write = true;
-        self.pending_compute_write_buffers.put(self.allocator, binding.resource_handle, {}) catch {
-            self.pending_compute_write_buffers.clearRetainingCapacity();
+        add_pending_compute_write_buffer(self, binding.resource_handle) catch {
+            clear_pending_compute_write_buffers(self);
+            self.pending_compute_write_tracking_complete = false;
             self.has_pending_compute_writes = true;
             return;
         };
@@ -223,7 +225,8 @@ pub fn remember_current_compute_writes(self: anytype) void {
 
 pub fn clear_pending_compute_writes(self: anytype) void {
     self.has_pending_compute_writes = false;
-    self.pending_compute_write_buffers.clearRetainingCapacity();
+    self.pending_compute_write_tracking_complete = true;
+    clear_pending_compute_write_buffers(self);
 }
 
 fn emit_compute_write_visibility_barrier(self: anytype, command_buffer: c.VkCommandBuffer) void {
@@ -275,6 +278,43 @@ fn access_for_buffer_binding(binding: model_compute_types.KernelBinding) Compute
 fn current_compute_bindings(self: anytype) []const ComputeBindingAccess {
     const count: usize = @intCast(self.current_compute_binding_count);
     return self.current_compute_bindings[0..count];
+}
+
+pub fn pending_compute_write_buffer_contains(self: anytype, resource_handle: u64) bool {
+    if (resource_handle == 0) return false;
+    if (!self.pending_compute_write_tracking_complete) return true;
+    for (self.pending_compute_write_buffer_handles[0..@intCast(self.pending_compute_write_buffer_count)]) |handle| {
+        if (handle == resource_handle) return true;
+    }
+    return false;
+}
+
+fn add_pending_compute_write_buffer(self: anytype, resource_handle: u64) !void {
+    if (resource_handle == 0 or pending_compute_write_buffer_contains(self, resource_handle)) return;
+    const index: usize = @intCast(self.pending_compute_write_buffer_count);
+    if (index >= MAX_TRACKED_COMPUTE_BINDINGS) return error.Overflow;
+    self.pending_compute_write_buffer_handles[index] = resource_handle;
+    self.pending_compute_write_buffer_count += 1;
+}
+
+fn remove_pending_compute_write_buffer(self: anytype, resource_handle: u64) void {
+    if (resource_handle == 0 or !self.pending_compute_write_tracking_complete) return;
+    var index: usize = 0;
+    const count: usize = @intCast(self.pending_compute_write_buffer_count);
+    while (index < count) : (index += 1) {
+        if (self.pending_compute_write_buffer_handles[index] != resource_handle) continue;
+        const last_index = count - 1;
+        self.pending_compute_write_buffer_handles[index] = self.pending_compute_write_buffer_handles[last_index];
+        self.pending_compute_write_buffer_handles[last_index] = 0;
+        self.pending_compute_write_buffer_count -= 1;
+        return;
+    }
+}
+
+fn clear_pending_compute_write_buffers(self: anytype) void {
+    const count: usize = @intCast(self.pending_compute_write_buffer_count);
+    @memset(self.pending_compute_write_buffer_handles[0..count], 0);
+    self.pending_compute_write_buffer_count = 0;
 }
 
 fn merge_current_binding_access(self: anytype, resource_handle: u64, access: ComputeBindingAccess) bool {

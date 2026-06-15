@@ -1,9 +1,0 @@
-{
-  "artifact": "zig-out/lib/libdoe_webgpu.so",
-  "error": "missing artifact: zig-out/lib/libdoe_webgpu.so",
-  "generatedAtUtc": "2026-03-05T15:33:29.183248Z",
-  "outputTimestamp": "20260305T153329Z",
-  "pass": false,
-  "schemaVersion": 1,
-  "symbolsPath": "config/dropin_abi.symbols.txt"
-}

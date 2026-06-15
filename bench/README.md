@@ -29,6 +29,32 @@ Purpose:
 
 This module is self-contained and does not depend on external runtime code.
 
+## Directory Ownership
+
+Treat `bench/` as several surfaces, not one body of authored benchmark code:
+
+- Authored benchmark code: `cli.py`, `lib/`, `runners/`, `executors/`,
+  `gates/`, `tools/`, `native_compare_modules/`, and focused tests.
+- Workload inputs and policy: `workloads/`, `native-compare/`, and relevant
+  `config/` files at repo root.
+- Kernel inputs: `kernels/` for backend/runtime compare lanes and
+  `inference-pipeline/kernels/` for model inference lanes. A small mirrored
+  compatibility set is documented in `kernels/README.md`.
+- Fixtures: `fixtures/` contains small canonical inputs and pinned evidence
+  snapshots. Exact duplicate fixture bytes are not enough reason to delete a
+  path when the path has semantic meaning in a manifest.
+- Generated material: `plans/generated/`, `ir/`, and most timestamped
+  `out/` trees should be regenerated or materialized deliberately instead of
+  treated as authored code.
+- Durable evidence: curated receipts may stay checked in when they back a
+  promoted claim, release, or reproducibility contract.
+- Scratch output: local A/B runs, bulky workspaces, harvested corpora, and
+  transient reports belong in ignored `bench/out/` locations unless promoted.
+
+Cleanup rule: move generated or scratch material out of tracking only when the
+generator, source inputs, or durable evidence reference remains clear. During an
+active A/B pass, do not prune the receipts needed to compare the current runs.
+
 ## Quick Start
 
 `bench/cli.py` is the only canonical benchmark front door. Use:

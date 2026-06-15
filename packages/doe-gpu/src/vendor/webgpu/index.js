@@ -109,6 +109,10 @@ const NS_PER_MS = 1_000_000;
 const WHOLE_SIZE_SENTINEL = -1;
 const fastPathStats = { dispatchFlush: 0, flushAndMap: 0, commandBufferBuild: 0 };
 const NODE_QUEUE_WRITE_BATCH_MAX_BYTES = UINT32_MAX;
+function envFlagEnabled(value) {
+  return value === '1' || value === 'true' || value === 'yes' || value === 'on';
+}
+const DOE_WEBGPU_SUBMIT_BREAKDOWN = envFlagEnabled(process.env.DOE_WEBGPU_SUBMIT_BREAKDOWN);
 
 let addon;
 let doeLibraryPath;
@@ -834,6 +838,10 @@ function elapsedNsSince(startedAtMs) {
   return Math.max(0, Math.round((performance.now() - startedAtMs) * NS_PER_MS));
 }
 
+function submitTimingStart() {
+  return DOE_WEBGPU_SUBMIT_BREAKDOWN ? performance.now() : 0;
+}
+
 function zeroQueueSubmitBreakdown() {
   return {
     submitCommandPrepTotalNs: 0,
@@ -857,6 +865,7 @@ function zeroQueueSubmitBreakdown() {
 }
 
 function accumulateQueueSubmitBreakdown(queue, field, startedAtMs) {
+  if (!startedAtMs) return;
   queue._submitBreakdownNs[field] += elapsedNsSince(startedAtMs);
 }
 
@@ -880,7 +889,7 @@ function accumulateAddonSubmitBreakdown(queue, addonBreakdown) {
 
 function addonSubmitBreakdownIndicatesDispatchFlush(addonBreakdown) {
   if (!addonBreakdown) {
-    return true;
+    return false;
   }
   if (typeof addonBreakdown !== 'object') {
     return false;
@@ -1716,6 +1725,19 @@ const fullSurfaceBackend = {
         wrapper._queue.markSubmittedWorkDone();
         fastPathStats.flushAndMap += 1;
       }
+      if (result instanceof ArrayBuffer || ArrayBuffer.isView(result)) {
+        wrapper.__doe_readback_breakdown_ns = {
+          readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: 0,
+          readbackMapReadCopyUnmapDeferredCopyTotalNs: 0,
+          readbackMapReadCopyUnmapDeferredResolveTotalNs: 0,
+          readbackMapReadCopyUnmapMapTotalNs: 0,
+          readbackMapReadCopyUnmapCopyTotalNs: 0,
+          readbackMapReadCopyUnmapUnmapTotalNs: 0,
+        };
+        wrapper._mapMode = 0;
+        wrapper._mappedWriteRanges = [];
+        return result;
+      }
       wrapper.__doe_readback_breakdown_ns = {
         readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: Number(result?.waitCompletedNs ?? 0),
         readbackMapReadCopyUnmapDeferredCopyTotalNs: Number(result?.deferredCopyNs ?? 0),
@@ -1831,19 +1853,19 @@ const fullSurfaceBackend = {
     const deviceNative = assertLiveResource(queue._device, 'GPUQueue.submit', 'GPUDevice');
     queue._submittedSerial += 1;
     if (buffers.length === 1 && buffers[0]?._batched && Array.isArray(buffers[0]._commands)) {
-      const prepStartedAt = performance.now();
+      const prepStartedAt = submitTimingStart();
       failIfSubmittedCommandBuffer(buffers[0], 0);
       const cmds = buffers[0]._commands;
       accumulateQueueSubmitBreakdown(queue, 'submitCommandPrepTotalNs', prepStartedAt);
       if (cmds.length === 0) {
-        const bookkeepingStartedAt = performance.now();
+        const bookkeepingStartedAt = submitTimingStart();
         queue.markSubmittedWorkDone();
         consumeSubmittedCommandBuffers(buffers);
         presentPendingCanvasContexts(queue);
         accumulateQueueSubmitBreakdown(queue, 'submitPostSubmitBookkeepingTotalNs', bookkeepingStartedAt);
         return;
       }
-      const addonStartedAt = performance.now();
+      const addonStartedAt = submitTimingStart();
       const addonBreakdown = addon.submitBatched(deviceNative, queueNative, cmds);
       accumulateQueueSubmitBreakdown(queue, 'submitAddonCallTotalNs', addonStartedAt);
       accumulateAddonSubmitBreakdown(queue, addonBreakdown);
@@ -1851,7 +1873,7 @@ const fullSurfaceBackend = {
       if (addonCompletedSubmission) {
         fastPathStats.dispatchFlush += 1;
       }
-      const bookkeepingStartedAt = performance.now();
+      const bookkeepingStartedAt = submitTimingStart();
       if (addonCompletedSubmission) {
         queue.markSubmittedWorkDone();
       }
@@ -1861,7 +1883,7 @@ const fullSurfaceBackend = {
       return;
     }
     if (buffers.every((commandBuffer) => commandBuffer?._batched && Array.isArray(commandBuffer._commands))) {
-      const prepStartedAt = performance.now();
+      const prepStartedAt = submitTimingStart();
       for (let index = 0; index < buffers.length; index += 1) {
         failIfSubmittedCommandBuffer(buffers[index], index);
       }
@@ -1871,14 +1893,14 @@ const fullSurfaceBackend = {
       }
       accumulateQueueSubmitBreakdown(queue, 'submitCommandPrepTotalNs', prepStartedAt);
       if (allCommands.length === 0) {
-        const bookkeepingStartedAt = performance.now();
+        const bookkeepingStartedAt = submitTimingStart();
         queue.markSubmittedWorkDone();
         consumeSubmittedCommandBuffers(buffers);
         presentPendingCanvasContexts(queue);
         accumulateQueueSubmitBreakdown(queue, 'submitPostSubmitBookkeepingTotalNs', bookkeepingStartedAt);
         return;
       }
-      const addonStartedAt = performance.now();
+      const addonStartedAt = submitTimingStart();
       const addonBreakdown = addon.submitBatched(deviceNative, queueNative, allCommands);
       accumulateQueueSubmitBreakdown(queue, 'submitAddonCallTotalNs', addonStartedAt);
       accumulateAddonSubmitBreakdown(queue, addonBreakdown);
@@ -1886,7 +1908,7 @@ const fullSurfaceBackend = {
       if (addonCompletedSubmission) {
         fastPathStats.dispatchFlush += 1;
       }
-      const bookkeepingStartedAt = performance.now();
+      const bookkeepingStartedAt = submitTimingStart();
       if (addonCompletedSubmission) {
         queue.markSubmittedWorkDone();
       }
@@ -1895,7 +1917,7 @@ const fullSurfaceBackend = {
       accumulateQueueSubmitBreakdown(queue, 'submitPostSubmitBookkeepingTotalNs', bookkeepingStartedAt);
       return;
     }
-    const prepStartedAt = performance.now();
+    const prepStartedAt = submitTimingStart();
     let natives = null;
     let singleNative = null;
     if (buffers.length === 1) {
@@ -1915,13 +1937,13 @@ const fullSurfaceBackend = {
       });
     }
     accumulateQueueSubmitBreakdown(queue, 'submitCommandPrepTotalNs', prepStartedAt);
-    const addonStartedAt = performance.now();
+    const addonStartedAt = submitTimingStart();
     const addonBreakdown = singleNative != null && typeof addon.queueSubmitOne === 'function'
       ? addon.queueSubmitOne(queueNative, singleNative)
       : addon.queueSubmit(queueNative, natives ?? [singleNative]);
     accumulateQueueSubmitBreakdown(queue, 'submitAddonCallTotalNs', addonStartedAt);
     accumulateAddonSubmitBreakdown(queue, addonBreakdown);
-    const bookkeepingStartedAt = performance.now();
+    const bookkeepingStartedAt = submitTimingStart();
     consumeSubmittedCommandBuffers(buffers);
     presentPendingCanvasContexts(queue);
     accumulateQueueSubmitBreakdown(queue, 'submitPostSubmitBookkeepingTotalNs', bookkeepingStartedAt);
@@ -2000,11 +2022,11 @@ const fullSurfaceBackend = {
       return;
     }
     try {
-      const flushStartedAt = performance.now();
+      const flushStartedAt = submitTimingStart();
       const flushBreakdown = addon.queueFlush(queue._instance, queueNative);
       accumulateQueueSubmitBreakdown(queue, 'submitQueueFlushTotalNs', flushStartedAt);
       accumulateQueueFlushBreakdown(queue, flushBreakdown);
-      const bookkeepingStartedAt = performance.now();
+      const bookkeepingStartedAt = submitTimingStart();
       queue.markSubmittedWorkDone();
       accumulateQueueSubmitBreakdown(queue, 'submitQueueWaitBookkeepingTotalNs', bookkeepingStartedAt);
     } catch (error) {
