@@ -19,7 +19,7 @@ RUNTIME_DIR = REPO_ROOT / "runtime" / "zig"
 PLAN_PATH = (
     REPO_ROOT / "bench" / "plans" / "generated" / "inference_gemma3_270m_prefill_32tok.plan.json"
 )
-EXPECTED_PLAN_SHA256 = "510bf6c94457473704e9829a97bf8b7114985f0884542aa1f5cc908ca640467a"
+EXPECTED_PLAN_SHA256 = "0d3316fab695566c11da52e44bdfcbaa366d082c8d9449802f32dd423a23b981"
 DEFAULT_WORKLOAD = "inference_gemma3_270m_prefill_32tok"
 
 

@@ -3,9 +3,14 @@ import unittest
 from pathlib import Path
 
 from bench.runners.export_numeric_fragility_corpus import build_rows
+from bench.runners.export_numeric_fragility_corpus import LM_HEAD_REPORT_ROOT
 from bench.runners.export_numeric_fragility_corpus import write_outputs
 
 
+@unittest.skipUnless(
+    LM_HEAD_REPORT_ROOT.exists(),
+    "requires materialized Apple Metal LM-head hunt reports",
+)
 class ExportNumericFragilityCorpusTests(unittest.TestCase):
     def test_build_rows_includes_red_light_surprisal_metrics(self):
         rows = build_rows()

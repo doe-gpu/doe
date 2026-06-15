@@ -28,9 +28,14 @@ class PromoteNumericFragilitySignaturesTests(unittest.TestCase):
         cls.route_metadata_by_decision = {
             entry["decision"]: entry for entry in cls.registry["routeDecisionMetadata"]
         }
-        cls.source_jsonl_path, cls.source_manifest_path = latest_corpus_paths(
-            REPO_ROOT / "bench" / "out" / "apple-metal-numeric-fragility-corpus"
-        )
+        try:
+            cls.source_jsonl_path, cls.source_manifest_path = latest_corpus_paths(
+                REPO_ROOT / "bench" / "out" / "apple-metal-numeric-fragility-corpus"
+            )
+        except FileNotFoundError as exc:
+            raise unittest.SkipTest(
+                "requires materialized numeric fragility corpus export"
+            ) from exc
         cls.rows = load_jsonl(cls.source_jsonl_path)
 
     def test_selection_rules_match_prompt_and_operator_promotions(self) -> None:

@@ -54,14 +54,6 @@ UPSTREAM_31B_CONFIG = (
     / "execution-v1"
     / "gemma-4-31b-smoke.json"
 )
-UPSTREAM_61L_COMPILE_ROOT = (
-    REPO_ROOT
-    / "bench"
-    / "out"
-    / "r3-1-31b-manifest-fullgraph-compile-steps"
-    / "compile"
-)
-
 
 def _emit_bundle(*, num_layers: int, bundle_root: Path) -> None:
     """Run doe-csl-host-plan-tool against a config patched with the
@@ -88,6 +80,11 @@ def _emit_bundle(*, num_layers: int, bundle_root: Path) -> None:
     )
 
 
+def _configured_num_layers() -> int:
+    config = json.loads(UPSTREAM_31B_CONFIG.read_text(encoding="utf-8"))
+    return int(config["modelConfig"]["numLayers"])
+
+
 class OneLayerByteIdentityTest(unittest.TestCase):
 
     @classmethod
@@ -96,25 +93,25 @@ class OneLayerByteIdentityTest(unittest.TestCase):
             raise unittest.SkipTest(
                 f"doe-csl-host-plan-tool not built at {HOST_PLAN_TOOL}"
             )
-        if not UPSTREAM_61L_COMPILE_ROOT.is_dir():
-            raise unittest.SkipTest(
-                f"upstream 61L compile root missing: {UPSTREAM_61L_COMPILE_ROOT}"
-            )
 
     def test_one_layer_emits_byte_identical_per_kernel_artifacts_to_61L(
         self,
     ) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            bundle_root = Path(tmp)
-            _emit_bundle(num_layers=1, bundle_root=bundle_root)
-            one_layer_compile = bundle_root / "compile"
+        with tempfile.TemporaryDirectory() as tmp_full, \
+             tempfile.TemporaryDirectory() as tmp_one:
+            full_root = Path(tmp_full)
+            one_root = Path(tmp_one)
+            _emit_bundle(num_layers=_configured_num_layers(), bundle_root=full_root)
+            _emit_bundle(num_layers=1, bundle_root=one_root)
+            full_compile = full_root / "compile"
+            one_layer_compile = one_root / "compile"
             self.assertTrue(
                 one_layer_compile.is_dir(),
                 f"1L compile root not produced: {one_layer_compile}",
             )
 
             receipt = build_receipt(
-                left_root=UPSTREAM_61L_COMPILE_ROOT,
+                left_root=full_compile,
                 right_root=one_layer_compile,
                 label_left="61L",
                 label_right="1L",

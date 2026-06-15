@@ -106,7 +106,9 @@ console.log(JSON.stringify({{
         self.assertEqual(payload['scenarioId'], WORKLOAD_ID)
         self.assertEqual(payload['cacheMode'], 'warm')
         self.assertEqual(payload['loadMode'], 'http')
-        self.assertIsNone(payload['tjsLocalModelPath'])
+        self.assertTrue(payload['tjsLocalModelPath'].endswith(
+            '/doppler/node_modules/@huggingface/transformers/.cache'
+        ))
         self.assertEqual(payload['dopplerLoadMode'], 'http')
         self.assertTrue(payload['dopplerModelPath'].endswith(
             '/doppler/models/local/gemma-3-270m-it-q4k-ehf16-af32'

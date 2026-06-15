@@ -859,22 +859,24 @@ function executeSampleCpu(symbols, target) {
       value /= temperature;
       if (value > bestVal) { bestVal = value; bestIdx = i; }
     }
-    tokens[0] = bestIdx;
+    tokens[0] = base + bestIdx;
     return;
   }
   assertElementCount('logits', logits.length, width * chunkSize);
   assertElementCount('tokens', tokens.length, width);
+  let bestVal = F32_NEG_MAX;
+  let bestIdx = 0;
   for (let pe = 0; pe < width; pe += 1) {
-    let bestVal = F32_NEG_MAX;
-    let bestIdx = 0;
+    tokens[pe] = 0;
+    const base = pe * chunkSize;
     for (let i = 0; i < chunkSize; i += 1) {
-      let value = logits[pe * chunkSize + i];
+      let value = logits[base + i];
       if (softcap !== 0.0) value = softcap * Math.tanh(value / softcap);
       value /= temperature;
-      if (value > bestVal) { bestVal = value; bestIdx = i; }
+      if (value > bestVal) { bestVal = value; bestIdx = base + i; }
     }
-    tokens[pe] = bestIdx;
   }
+  tokens[Math.max(0, width - 1)] = bestIdx;
 }
 
 function executeLaunchCpu(symbols, target, operation, state) {

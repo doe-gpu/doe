@@ -48,14 +48,6 @@ QWEN_SMOKE_CONFIG = (
     / "execution-v1"
     / "qwen-3-6-27b-smoke.json"
 )
-UPSTREAM_64L_COMPILE_ROOT = (
-    REPO_ROOT
-    / "bench"
-    / "out"
-    / "r3-2-27b-manifest-fullgraph-compile-steps"
-    / "compile"
-)
-
 
 def _emit_bundle(*, num_layers: int, bundle_root: Path) -> None:
     """Run doe-csl-host-plan-tool against a Qwen smoke config patched
@@ -82,6 +74,11 @@ def _emit_bundle(*, num_layers: int, bundle_root: Path) -> None:
     )
 
 
+def _configured_num_layers() -> int:
+    config = json.loads(QWEN_SMOKE_CONFIG.read_text(encoding="utf-8"))
+    return int(config["modelConfig"]["numLayers"])
+
+
 class Qwen3_6_OneLayerByteIdentityTest(unittest.TestCase):
 
     @classmethod
@@ -94,31 +91,25 @@ class Qwen3_6_OneLayerByteIdentityTest(unittest.TestCase):
             raise unittest.SkipTest(
                 f"Qwen smoke config missing: {QWEN_SMOKE_CONFIG}"
             )
-        if not UPSTREAM_64L_COMPILE_ROOT.is_dir():
-            raise unittest.SkipTest(
-                f"upstream 64L Qwen compile root missing: "
-                f"{UPSTREAM_64L_COMPILE_ROOT}. Materialize first with "
-                f"doe-csl-host-plan-tool --input "
-                f"runtime/zig/examples/execution-v1/qwen-3-6-27b-smoke.json "
-                f"--bundle-root "
-                f"bench/out/r3-2-27b-manifest-fullgraph-compile-steps "
-                f"--mode steps."
-            )
 
     def test_one_layer_emits_byte_identical_per_kernel_artifacts_to_64L(
         self,
     ) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            bundle_root = Path(tmp)
-            _emit_bundle(num_layers=1, bundle_root=bundle_root)
-            one_layer_compile = bundle_root / "compile"
+        with tempfile.TemporaryDirectory() as tmp_full, \
+             tempfile.TemporaryDirectory() as tmp_one:
+            full_root = Path(tmp_full)
+            one_root = Path(tmp_one)
+            _emit_bundle(num_layers=_configured_num_layers(), bundle_root=full_root)
+            _emit_bundle(num_layers=1, bundle_root=one_root)
+            full_compile = full_root / "compile"
+            one_layer_compile = one_root / "compile"
             self.assertTrue(
                 one_layer_compile.is_dir(),
                 f"1L compile root not produced: {one_layer_compile}",
             )
 
             receipt = build_receipt(
-                left_root=UPSTREAM_64L_COMPILE_ROOT,
+                left_root=full_compile,
                 right_root=one_layer_compile,
                 label_left="64L",
                 label_right="1L",

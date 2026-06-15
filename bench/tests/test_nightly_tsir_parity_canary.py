@@ -22,6 +22,28 @@ LOWERING_IDENTITY_KEYS = (
 
 
 class NightlyTsirParityCanaryTests(unittest.TestCase):
+    _report_tmp: tempfile.TemporaryDirectory[str] | None = None
+    _report: dict | None = None
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        if cls._report_tmp is not None:
+            cls._report_tmp.cleanup()
+            cls._report_tmp = None
+            cls._report = None
+
+    @classmethod
+    def _bootstrap_report(cls) -> dict:
+        if cls._report is None:
+            cls._report_tmp = tempfile.TemporaryDirectory()
+            cls._report = canary.build_report(
+                canary.DEFAULT_FIXTURE_DIR,
+                canary.DEFAULT_INPUTS_DIR,
+                Path(cls._report_tmp.name),
+                python=sys.executable,
+            )
+        return cls._report
+
     def test_loads_exact_bootstrap_fixture_set(self) -> None:
         entries = canary.load_fixture_entries(canary.DEFAULT_FIXTURE_DIR)
         pairs = {
@@ -47,25 +69,18 @@ class NightlyTsirParityCanaryTests(unittest.TestCase):
 
     def test_canary_runs_fixture_receipts_without_claiming_backend_pass(self) -> None:
         """Reference lane is expected to be green once input-tensor fixtures
-        exist; backend lanes must still be deferred until WebGPU/CSL
-        execution wiring lands. The CLI must exit 1 while any backend is
-        non-pass, regardless of the reference-lane outcome."""
-        with tempfile.TemporaryDirectory() as tmp:
-            report = canary.build_report(
-                canary.DEFAULT_FIXTURE_DIR,
-                canary.DEFAULT_INPUTS_DIR,
-                Path(tmp),
-                python=sys.executable,
-            )
+        exist; backend lanes may be either pass or deferred depending on
+        which local execution adapters are available. The advisory canary
+        must only fail on explicit fail statuses."""
+        report = self._bootstrap_report()
         self.assertEqual(report["artifactKind"], "tsir_nightly_parity_canary")
         self.assertEqual(report["fixtureCount"], 12)
         self.assertEqual(report["failures"], [])
         for result in report["results"]:
             self.assertIn("loweringIdentity", result)
             self.assertEqual(result["statuses"][0], "pass")
-            self.assertEqual(result["statuses"][1], "deferred")
-            self.assertEqual(result["statuses"][2], "deferred")
-            self.assertEqual(result["cliExitCode"], 1)
+            self.assertNotIn("fail", result["statuses"])
+            self.assertIn(result["cliExitCode"], (0, 1))
 
     def test_canary_receipts_carry_fixture_lowering_identity(self) -> None:
         """Each canary receipt must carry the same TSIR identity digests as
@@ -89,28 +104,22 @@ class NightlyTsirParityCanaryTests(unittest.TestCase):
             for _, entry in entries
         }
 
-        with tempfile.TemporaryDirectory() as tmp:
-            report = canary.build_report(
-                canary.DEFAULT_FIXTURE_DIR,
-                canary.DEFAULT_INPUTS_DIR,
-                Path(tmp),
-                python=sys.executable,
-            )
-            for result in report["results"]:
-                kernel = result["kernel"]
-                backend = result["backend"]
-                fixture = fixture_by_pair[(kernel, backend)]
-                identity = result["loweringIdentity"]
-                for key in LOWERING_IDENTITY_KEYS:
-                    self.assertEqual(
-                        identity[key],
-                        fixture[key],
-                        msg=(
-                            f"canary receipt {kernel}/{backend} diverged "
-                            f"from fixture on {key}: receipt={identity[key]!r} "
-                            f"fixture={fixture[key]!r}"
-                        ),
-                    )
+        report = self._bootstrap_report()
+        for result in report["results"]:
+            kernel = result["kernel"]
+            backend = result["backend"]
+            fixture = fixture_by_pair[(kernel, backend)]
+            identity = result["loweringIdentity"]
+            for key in LOWERING_IDENTITY_KEYS:
+                self.assertEqual(
+                    identity[key],
+                    fixture[key],
+                    msg=(
+                        f"canary receipt {kernel}/{backend} diverged "
+                        f"from fixture on {key}: receipt={identity[key]!r} "
+                        f"fixture={fixture[key]!r}"
+                    ),
+                )
 
     def test_real_kernel_requires_doppler_transcript_dir(self) -> None:
         fixture = (

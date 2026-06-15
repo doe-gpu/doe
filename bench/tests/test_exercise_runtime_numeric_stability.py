@@ -18,6 +18,15 @@ from bench.runners.promote_numeric_fragility_signatures import FRAGILITY_SIGNATU
 from bench.lib.config_validation import load_validated_config  # noqa: E402
 
 
+def _has_primary_fixture(signature: dict) -> bool:
+    return any(
+        (REPO_ROOT / related_path).is_file()
+        for related_path in signature.get("relatedArtifactPaths") or []
+        if related_path.endswith(".fixture.json")
+        and "selective_stable_rerun" not in related_path
+    )
+
+
 class ExerciseRuntimeNumericStabilityTests(unittest.TestCase):
     def test_prompt_request_from_signature_decodes_real_red_light_operands(self) -> None:
         signature = load_validated_config(
@@ -28,6 +37,8 @@ class ExerciseRuntimeNumericStabilityTests(unittest.TestCase):
             / "prompt-lm-head-flip-red-go-stop-answer-2f8677733c.json",
             FRAGILITY_SIGNATURE_SCHEMA_PATH,
         )
+        if not _has_primary_fixture(signature):
+            self.skipTest("requires materialized red-light LM-head fixture")
         request, source_info = prompt_request_from_signature(
             signature,
             "numeric-stability/prefer-stable-on-selected-token-disagreement-v1",

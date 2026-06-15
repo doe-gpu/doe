@@ -4,11 +4,15 @@
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 from pathlib import Path
 
 import jsonschema
-import pytest
+try:
+    import pytest
+except ModuleNotFoundError:
+    pytest = None
 
 from bench.tools import check_wgsl_minimization_receipt as check_minimize
 from bench.tools import minimize_wgsl_corpus_failure as minimize
@@ -23,6 +27,32 @@ SAMPLE_PATH = REPO_ROOT / "examples" / "wgsl-minimization-receipt.sample.json"
 
 def _load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+class _Raises:
+    def __init__(self, expected: type[BaseException], match: str) -> None:
+        self.expected = expected
+        self.match = match
+
+    def __enter__(self) -> "_Raises":
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> bool:
+        if exc_type is None:
+            raise AssertionError(f"{self.expected.__name__} was not raised")
+        if not issubclass(exc_type, self.expected):
+            return False
+        if self.match and re.search(self.match, str(exc)) is None:
+            raise AssertionError(
+                f"exception message {str(exc)!r} did not match {self.match!r}"
+            )
+        return True
+
+
+def _raises(expected: type[BaseException], *, match: str):
+    if pytest is not None:
+        return pytest.raises(expected, match=match)
+    return _Raises(expected, match)
 
 
 def test_wgsl_minimization_receipt_preserves_source_identity() -> None:
@@ -101,7 +131,7 @@ def test_wgsl_minimization_checker_rejects_parent_hash_drift() -> None:
 
 def test_wgsl_minimization_rejects_unknown_shader_id() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
-        with pytest.raises(ValueError, match="shader id 'missing' not found"):
+        with _raises(ValueError, match="shader id 'missing' not found"):
             minimize.build_receipt(
                 manifest=_load(MANIFEST_PATH),
                 manifest_path="config/wgsl-browser-corpus.json",
@@ -121,7 +151,7 @@ def test_wgsl_minimization_rejects_unsafe_manifest_source_path() -> None:
     manifest = _load(MANIFEST_PATH)
     manifest["rows"][-1]["sourcePath"] = "/tmp/missing-return.wgsl"
     with tempfile.TemporaryDirectory() as tmpdir:
-        with pytest.raises(ValueError, match="unsafe sourcePath"):
+        with _raises(ValueError, match="unsafe sourcePath"):
             minimize.build_receipt(
                 manifest=manifest,
                 manifest_path="config/wgsl-browser-corpus.json",
@@ -139,7 +169,7 @@ def test_wgsl_minimization_rejects_unsafe_manifest_source_path() -> None:
 
 def test_wgsl_minimization_rejects_taxonomy_stage_mismatch() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
-        with pytest.raises(ValueError, match="has stage 'sema', not 'wgsl_parse'"):
+        with _raises(ValueError, match="has stage 'sema', not 'wgsl_parse'"):
             minimize.build_receipt(
                 manifest=_load(MANIFEST_PATH),
                 manifest_path="config/wgsl-browser-corpus.json",
@@ -159,7 +189,7 @@ def test_wgsl_minimization_rejects_unexpected_backend_target() -> None:
     manifest = _load(MANIFEST_PATH)
     manifest["rows"][-1]["expectedBackendTargets"] = ["msl"]
     with tempfile.TemporaryDirectory() as tmpdir:
-        with pytest.raises(ValueError, match="backend target not expected"):
+        with _raises(ValueError, match="backend target not expected"):
             minimize.build_receipt(
                 manifest=manifest,
                 manifest_path="config/wgsl-browser-corpus.json",
