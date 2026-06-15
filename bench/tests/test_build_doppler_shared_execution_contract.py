@@ -76,6 +76,15 @@ class TestBuildDopplerSharedExecutionContract(unittest.TestCase):
                         "role": "weight",
                         "layout": "row_major",
                     },
+                    "model.language_model.lm_head.weight": {
+                        "dtype": "Q4_K_M",
+                        "shape": [16, 32],
+                        "size": 64,
+                        "shard": 0,
+                        "offset": 0,
+                        "role": "weight",
+                        "layout": "row_major",
+                    },
                 },
             }
             graph = {

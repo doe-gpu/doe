@@ -39,9 +39,11 @@ APPLE_METAL_VENDOR = "apple"
 
 PATH_ASYMMETRY_NOTE = (
     "Doe Metal cache opt-in lane serves PSO from pre-built MTLBinaryArchive "
-    "(bench/kernels/doe_pipeline_archive.metallib); the Dawn delegate path "
-    "does not have an equivalent archive. Treat this as cache-specific "
-    "diagnostic evidence, not apples-to-apples Dawn-vs-Doe speed evidence."
+    "(bench/kernels/doe_pipeline_archive.metallib, opened by "
+    "runtime/zig/src/backend/metal/metal_native_runtime.zig); the Dawn "
+    "delegate path does not have an equivalent archive. Treat this as "
+    "cache-specific diagnostic evidence, not apples-to-apples Dawn-vs-Doe "
+    "speed evidence."
 )
 
 
