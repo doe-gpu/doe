@@ -65,6 +65,10 @@ fn samePreparedDispatch(
     return true;
 }
 
+fn hasDispatchPreconditions(pipe: *const DoeComputePipeline) bool {
+    return pipe.dispatch_preconditions.len != 0 or pipe.texture_dispatch_preconditions.len != 0;
+}
+
 fn findPreparedDispatchCache(
     cache: []const PreparedDispatchCacheEntry,
     pipe: *DoeComputePipeline,
@@ -112,6 +116,7 @@ fn validatedBindGroups(
     dz: u32,
 ) ?BindGroupArray {
     const bind_groups = collectBindGroups(bg_ptrs, bg_count);
+    if (!hasDispatchPreconditions(pipe)) return bind_groups;
     compute_preconditions.validate_bind_groups(
         pipe.dispatch_preconditions,
         pipe.texture_dispatch_preconditions,
@@ -290,16 +295,16 @@ pub fn dispatchBatchCopyFlush(
         const pipe = native_helpers.cast(DoeComputePipeline, pipe_ptrs[index]) orelse continue;
         const bg_offset = index * MAX_COMPUTE_BIND_GROUPS;
         const dim_offset = index * 3;
+        const bg_count = @min(bg_counts[index], MAX_COMPUTE_BIND_GROUPS);
         const bind_groups = validatedBindGroups(
             pipe,
             bg_ptrs + bg_offset,
-            bg_counts[index],
+            bg_count,
             dispatch_dims[dim_offset],
             dispatch_dims[dim_offset + 1],
             dispatch_dims[dim_offset + 2],
         ) orelse continue;
         const prepare_started_ns = if (collect_timings) monotonicNowNs() else 0;
-        const bg_count = @min(bg_counts[index], MAX_COMPUTE_BIND_GROUPS);
         if (!samePreparedDispatch(prepared_pipe, &prepared_bind_groups, prepared_bg_count, pipe, &bind_groups, bg_count)) {
             prepared_pipe = null;
             const cache_index = findPreparedDispatchCache(

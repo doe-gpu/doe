@@ -108,6 +108,14 @@ const TEXTURE_SWIZZLE_COMPONENT_MAP = Object.freeze({
 const NS_PER_MS = 1_000_000;
 const WHOLE_SIZE_SENTINEL = -1;
 const fastPathStats = { dispatchFlush: 0, flushAndMap: 0, commandBufferBuild: 0 };
+const ZERO_READBACK_BREAKDOWN_NS = Object.freeze({
+  readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: 0,
+  readbackMapReadCopyUnmapDeferredCopyTotalNs: 0,
+  readbackMapReadCopyUnmapDeferredResolveTotalNs: 0,
+  readbackMapReadCopyUnmapMapTotalNs: 0,
+  readbackMapReadCopyUnmapCopyTotalNs: 0,
+  readbackMapReadCopyUnmapUnmapTotalNs: 0,
+});
 const NODE_QUEUE_WRITE_BATCH_MAX_BYTES = UINT32_MAX;
 function envFlagEnabled(value) {
   return value === '1' || value === 'true' || value === 'yes' || value === 'on';
@@ -1726,14 +1734,7 @@ const fullSurfaceBackend = {
         fastPathStats.flushAndMap += 1;
       }
       if (result instanceof ArrayBuffer || ArrayBuffer.isView(result)) {
-        wrapper.__doe_readback_breakdown_ns = {
-          readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: 0,
-          readbackMapReadCopyUnmapDeferredCopyTotalNs: 0,
-          readbackMapReadCopyUnmapDeferredResolveTotalNs: 0,
-          readbackMapReadCopyUnmapMapTotalNs: 0,
-          readbackMapReadCopyUnmapCopyTotalNs: 0,
-          readbackMapReadCopyUnmapUnmapTotalNs: 0,
-        };
+        wrapper.__doe_readback_breakdown_ns = ZERO_READBACK_BREAKDOWN_NS;
         wrapper._mapMode = 0;
         wrapper._mappedWriteRanges = [];
         return result;

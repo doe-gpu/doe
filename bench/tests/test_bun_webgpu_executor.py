@@ -236,23 +236,16 @@ class BunWebGPUExecutorTests(unittest.TestCase):
         self.assertIn("if (!updatePassPipelineState(pass, pipelineNative)) {", source)
         self.assertIn("if (!updatePassBindGroupState(pass, index, bindGroupNative)) {", source)
 
-    def test_bun_lazy_dispatch_copy_finishes_to_native_command_buffer(self) -> None:
+    def test_bun_lazy_dispatch_copy_uses_submit_flush_paths(self) -> None:
         source = BUN_FFI_PATH.read_text(encoding="utf-8")
 
-        self.assertIn("function canFinishBunLazyDispatchCopyCommandsAsNativeBuffer(commands)", source)
-        self.assertIn(
-            "function finishBunLazyDispatchCopyCommandsAsNativeCommandBuffer(encoder, commands)",
-            source,
-        )
-        self.assertIn(
-            "function tryFinishBunLazyDispatchCopyCommandsAsNativeCommandBuffer(encoder, commands)",
-            source,
-        )
-        self.assertIn("doeNativeCreateComputeDispatchCopyCommandBuffer", source)
-        self.assertIn("doeNativeCreateComputeDispatchCopyCommandBufferOneBindGroup", source)
-        self.assertIn("doeNativeCreateComputeDispatchBatchCopyCommandBuffer", source)
+        self.assertNotIn("function canFinishBunLazyDispatchCopyCommandsAsNativeBuffer(commands)", source)
+        self.assertNotIn("function finishBunLazyDispatchCopyCommandsAsNativeCommandBuffer(encoder, commands)", source)
+        self.assertNotIn("function tryFinishBunLazyDispatchCopyCommandsAsNativeCommandBuffer(encoder, commands)", source)
+        self.assertNotIn("doeNativeCreateComputeDispatchCopyCommandBuffer", source)
+        self.assertNotIn("doeNativeCreateComputeDispatchCopyCommandBufferOneBindGroup", source)
+        self.assertNotIn("doeNativeCreateComputeDispatchBatchCopyCommandBuffer", source)
         self.assertIn("commandBufferBuild: 0", source)
-        self.assertIn("fastPathStats.commandBufferBuild += 1;", source)
         self.assertIn("const cmds = buffers[0]._commands;", source)
         self.assertIn("let batchedCommands = null;", source)
         self.assertIn("batchedCommands = commandBuffer._commands;", source)
@@ -265,8 +258,7 @@ class BunWebGPUExecutorTests(unittest.TestCase):
         self.assertIn("export function prewarmPreparedDispatches(queue, dispatchCommands)", source)
         self.assertIn("computePrewarmDispatchBindings", source)
         self.assertIn("doeNativeComputeDispatchFlush", source)
-        self.assertIn("bunCommandBindGroupCount(cmd) === 1", source)
-        self.assertIn("bunCommandBindGroupAt(cmd, 0)", source)
+        self.assertIn("doeNativeComputeDispatchFlushOneBindGroup", source)
 
     def test_bun_lazy_submit_breakdown_is_opt_in_and_shader_bytes_are_cached(self) -> None:
         source = BUN_FFI_PATH.read_text(encoding="utf-8")
@@ -324,7 +316,9 @@ class BunWebGPUExecutorTests(unittest.TestCase):
 
         self.assertIn("function ensureBindGroupPtrScratch(queue, count)", source)
         self.assertIn("function ensureDispatchBatchScratch(queue, dispatchCount)", source)
-        self.assertIn("const bgPtrs = ensureBindGroupPtrScratch(queue, bgCount);", source)
+        self.assertIn("let bgPtrs = null;", source)
+        self.assertIn('typeof dispatchFlushOneBindGroup === "function"', source)
+        self.assertIn("bgPtrs = ensureBindGroupPtrScratch(queue, bgCount);", source)
         self.assertIn("const scratch = ensureDispatchBatchScratch(queue, dispatchCount);", source)
         self.assertIn("doeQueueSubmitOneAndRelease", source)
         self.assertIn("wgpu.symbols.doeQueueSubmitOneAndRelease(queueNative, commandBuffer._native);", source)

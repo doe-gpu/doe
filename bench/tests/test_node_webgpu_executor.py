@@ -328,6 +328,8 @@ class NodeWebGPUExecutorTests(unittest.TestCase):
         self.assertIn("bufferMapReadCopyUnmap(wrapper, native, mode, offset, size) {", source)
         self.assertIn("typeof addon.bufferMapReadCopyUnmap === 'function'", source)
         self.assertIn("addon.bufferMapReadCopyUnmap(", source)
+        self.assertIn("const ZERO_READBACK_BREAKDOWN_NS = Object.freeze({", source)
+        self.assertIn("wrapper.__doe_readback_breakdown_ns = ZERO_READBACK_BREAKDOWN_NS;", source)
         self.assertIn("wrapper.__doe_readback_breakdown_ns = {", source)
         self.assertIn("const copied = addon.bufferReadCopy(native, offset, size);", source)
         self.assertIn("addon.bufferUnmap(native);", source)

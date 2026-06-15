@@ -90,6 +90,37 @@ pub export fn doeNativeComputePrewarmDispatchBindings(
     );
 }
 
+pub export fn doeNativeComputeDispatchFlushOneBindGroup(
+    q_raw: ?*anyopaque,
+    pipe_raw: ?*anyopaque,
+    bg0_raw: ?*anyopaque,
+    dx: u32,
+    dy: u32,
+    dz: u32,
+    copy_src: ?*anyopaque,
+    copy_src_off: u64,
+    copy_dst: ?*anyopaque,
+    copy_dst_off: u64,
+    copy_size: u64,
+) callconv(.c) void {
+    var bg_ptrs = [_]?*anyopaque{bg0_raw};
+    compute_fast.computeDispatchFlushDirect(
+        q_raw,
+        pipe_raw,
+        &bg_ptrs,
+        bg_ptrs.len,
+        dx,
+        dy,
+        dz,
+        copy_src,
+        copy_src_off,
+        copy_dst,
+        copy_dst_off,
+        copy_size,
+        null,
+    );
+}
+
 fn ensureNativeLibraryLocked() bool {
     if (g_library_ready) return !g_library_failed;
     g_library_ready = true;

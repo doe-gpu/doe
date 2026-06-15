@@ -478,7 +478,7 @@ pub export fn doeNativeCreateComputeDispatchBatchCopyCommandBuffer(
 /// When the follow-on copy is a CPU-visible shared-buffer readback, we schedule it as
 /// a deferred CPU memcpy after GPU completion to preserve macOS correctness while
 /// keeping the direct dispatch path.
-fn computeDispatchFlushDirect(
+pub fn computeDispatchFlushDirect(
     q_raw: ?*anyopaque,
     pipe_raw: ?*anyopaque,
     bg_ptrs: [*]?*anyopaque,

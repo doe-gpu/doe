@@ -65,6 +65,7 @@ export interface NativeFastPathInfo {
   queueWriteBufferBatch: boolean;
   queueWriteBufferBatchDataPtrs: boolean;
   computeDispatchFlush: boolean;
+  computeDispatchFlushOneBindGroup: boolean;
   computeDispatchFlushBreakdown: boolean;
   computeDispatchBatchFlush: boolean;
   computeDispatchBatchCopyFlush: boolean;
