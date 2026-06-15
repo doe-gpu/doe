@@ -568,6 +568,18 @@ def _hash_output_files(
         record["sha256"] = _sha256_file(path)
 
 
+def _metadata_path_for_kernel(*, kernel: str, source_root: Path) -> Path:
+    candidates = [
+        source_root / kernel / "pe_program.metadata.json",
+        source_root / "compile" / kernel / "pe_program.metadata.json",
+        source_root / "compiled" / kernel / "pe_program.metadata.json",
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return candidates[0]
+
+
 def run_one_kernel(
     *,
     kernel: str,
