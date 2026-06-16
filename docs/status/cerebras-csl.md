@@ -21,22 +21,32 @@ This doc retains dated context entries (architecture, named blockers,
 follow-up work) below. Numbers, verdicts, and "which launch are we on"
 belong in the snapshot, never here.
 
-Sharding follow-up: owner Doe Cerebras; split
-`bench/runners/csl-runners/gemma4_31b_af16_session_runtime.py` by moving
-checkpoint identity and transcript artifact assembly into focused modules.
+Sharding follow-up: owner Doe Cerebras; split remaining HostPlan front-door
+and runtime materialization targets:
+`bench/runners/csl-runners/int4ple_hostplan_execution_plan.py`,
+`bench/runners/csl-runners/int4ple_compile_target_sim_runner.py`, and
+`bench/runners/csl-runners/gemma4_31b_af16_hostplan_streaming_runner.py`.
 
 Contract note: `doe-transcript-parity-report` schema v2 makes generated-token
 exact parity and logits comparison status explicit. `max_abs` is the Doppler
 tolerance-backed logits gate unless a reference export declares
 `sha256_exact`.
 
+## 2026-06-16 — 31B af16 session runtime sharded
+
+`bench/runners/csl-runners/gemma4_31b_af16_session_runtime.py` is now a
+compatibility facade. Shared constants/path helpers, weight mappings and
+reference requests, scheduler assembly, and runtime/checkpoint/transcript
+execution live in focused `gemma4_31b_af16_session_*` modules. The checkpoint
+identity now hashes the facade plus split helper modules so runtime-version
+drift is still detected after the split.
+
 ## 2026-06-16 — E2B self-check contracts sharded
 
 `bench/tools/e2b_layer_block_self_check.py` now stays focused on step
 orchestration and dispatches receipt, model, demo tooling, and evidence-bundle
 contract assertions through focused modules. The E2B layer-block sharding
-follow-up is closed; the remaining live Python sharding follow-up is the
-Gemma 4 31B af16 session runtime split above.
+follow-up is closed.
 
 ## 2026-05-06 — Gemma and Qwen CSL tail checks widened
 
