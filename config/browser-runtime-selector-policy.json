@@ -41,6 +41,19 @@
     "explicit_operator_override",
     "unknown_selection_error"
   ],
+  "evidenceBlockerMap": {
+    "global_disable_active": "fallback_applied",
+    "runtime_artifact_missing": "runtime_library_unavailable",
+    "runtime_artifact_load_failed": "runtime_library_unavailable",
+    "runtime_initialization_failed": "runtime_library_unavailable",
+    "symbol_surface_incomplete": "native_webgpu_unavailable",
+    "wire_proc_table_incomplete": "native_webgpu_unavailable",
+    "profile_denylisted": "adapter_unavailable",
+    "capability_requirement_failed": "unsupported_runtime_host",
+    "runtime_health_degraded": "provider_unavailable",
+    "explicit_operator_override": "unsupported_runtime_host",
+    "unknown_selection_error": "runner_error"
+  },
   "forcedDoeFailure": {
     "failClosed": true,
     "fallbackToDawn": false

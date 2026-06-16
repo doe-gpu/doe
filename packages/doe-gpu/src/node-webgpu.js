@@ -16,6 +16,45 @@ const ADAPTER_PROBE_OPTIONS = Object.freeze([
   { powerPreference: 'low-power' },
   null,
 ]);
+const PROVIDER_FAILURE_REASONS = Object.freeze([
+  'native_webgpu_unavailable',
+  'native_addon_unavailable',
+  'runtime_library_unavailable',
+  'provider_unavailable',
+  'adapter_unavailable',
+  'provider_import_failed',
+  'unsupported_runtime_host',
+  'runner_error',
+]);
+const PROVIDER_FAILURE_REASON_SET = new Set(PROVIDER_FAILURE_REASONS);
+
+function normalizeProviderFailureReason(reason) {
+  return PROVIDER_FAILURE_REASON_SET.has(reason) ? reason : 'runner_error';
+}
+
+function providerAvailabilityFailure({
+  reason,
+  provider = '',
+  stage = '',
+  detail = '',
+}) {
+  return Object.freeze({
+    ok: false,
+    reason: normalizeProviderFailureReason(reason),
+    provider,
+    stage,
+    detail: String(detail ?? ''),
+  });
+}
+
+function attachProviderAvailability(error, failure) {
+  if (!error || !failure) {
+    return error;
+  }
+  error.providerAvailability = failure;
+  error.providerFailureReason = failure.reason;
+  return error;
+}
 
 export function hasNavigatorGpu() {
   return typeof globalThis.navigator !== 'undefined'
@@ -241,15 +280,27 @@ function formatAdapterProbeDetail(error) {
 
 async function probeInstalledGpuAdapter() {
   if (!hasNavigatorGpu()) {
+    const detail = 'navigator.gpu.requestAdapter is unavailable after provider installation.';
     return {
       ok: false,
-      detail: 'navigator.gpu.requestAdapter is unavailable after provider installation.',
+      detail,
+      failure: providerAvailabilityFailure({
+        reason: 'native_webgpu_unavailable',
+        stage: 'probeInstalledGpuAdapter',
+        detail,
+      }),
     };
   }
   if (!hasGpuEnums()) {
+    const detail = 'WebGPU enum globals are unavailable after provider installation.';
     return {
       ok: false,
-      detail: 'WebGPU enum globals are unavailable after provider installation.',
+      detail,
+      failure: providerAvailabilityFailure({
+        reason: 'native_webgpu_unavailable',
+        stage: 'probeInstalledGpuAdapter',
+        detail,
+      }),
     };
   }
 
@@ -265,9 +316,15 @@ async function probeInstalledGpuAdapter() {
     }
   }
 
+  const detail = formatAdapterProbeDetail(lastError);
   return {
     ok: false,
-    detail: formatAdapterProbeDetail(lastError),
+    detail,
+    failure: providerAvailabilityFailure({
+      reason: 'adapter_unavailable',
+      stage: 'probeInstalledGpuAdapter',
+      detail,
+    }),
   };
 }
 
@@ -277,19 +334,33 @@ async function tryInstallAndProbeProvider(providerSpecifier, options = {}) {
   try {
     mod = await import(specifier);
   } catch (error) {
+    const detail = `import failed: ${error?.message || String(error)}`;
     return {
       ok: false,
       provider: providerSpecifier,
-      detail: `import failed: ${error?.message || String(error)}`,
+      detail,
+      failure: providerAvailabilityFailure({
+        reason: 'provider_import_failed',
+        provider: providerSpecifier,
+        stage: 'provider.import',
+        detail,
+      }),
       module: null,
     };
   }
 
   if (!installWebgpuFromModule(mod, { force: options.force === true })) {
+    const detail = 'failed to install WebGPU provider globals.';
     return {
       ok: false,
       provider: providerSpecifier,
-      detail: 'failed to install WebGPU provider globals.',
+      detail,
+      failure: providerAvailabilityFailure({
+        reason: 'native_webgpu_unavailable',
+        provider: providerSpecifier,
+        stage: 'provider.installGlobals',
+        detail,
+      }),
       module: mod,
     };
   }
@@ -300,6 +371,12 @@ async function tryInstallAndProbeProvider(providerSpecifier, options = {}) {
       ok: false,
       provider: providerSpecifier,
       detail: probe.detail,
+      failure: providerAvailabilityFailure({
+        reason: probe.failure?.reason ?? 'adapter_unavailable',
+        provider: providerSpecifier,
+        stage: probe.failure?.stage ?? 'provider.probeAdapter',
+        detail: probe.detail,
+      }),
       module: mod,
     };
   }
@@ -317,8 +394,11 @@ export async function bootstrapNodeWebGPUProvider(providerSpecifier, options = {
     force: options.force === true,
   });
   if (!attempt.ok) {
-    throw new Error(
-      `failed to install Doe Node WebGPU provider "${providerSpecifier}": ${attempt.detail}`,
+    throw attachProviderAvailability(
+      new Error(
+        `failed to install Doe Node WebGPU provider "${providerSpecifier}": ${attempt.detail}`,
+      ),
+      attempt.failure,
     );
   }
   return {

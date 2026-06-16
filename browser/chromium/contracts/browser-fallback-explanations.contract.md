@@ -6,14 +6,16 @@ Status: `draft`
 
 Define developer-visible unsupported-capability and fallback explanations for
 browser-lane artifacts. Explanations must name the capability, surface, status,
-reason code, developer action, evidence path, and fallback visibility policy.
+browser reason code, shared Doe evidence blocker code, developer action,
+evidence path, and fallback visibility policy.
 
 ## Input shape
 
 The explanation schema is
 [`config/browser-fallback-explanations.schema.json`](../../../config/browser-fallback-explanations.schema.json).
 Each artifact declares runtime identity, explanation rows, and origin-scoped
-privacy policy.
+privacy policy. It also declares the shared evidence blocker taxonomy used by
+each row's `evidenceBlockerCode`.
 When `--runtime-identity-root` is supplied, the checker resolves
 `runtimeIdentity.runtimeIdentityPath` and requires its selected runtime and
 fallback state to match either a `browser_runtime_identity` artifact or the
@@ -39,6 +41,9 @@ The structural checker reports:
 - `invalid_artifact_kind`
 - `unsafe_artifact_path`
 - `missing_reason_code`
+- `missing_evidence_blocker_code`
+- `unknown_evidence_blocker_code`
+- `evidence_blocker_code_mismatch`
 - `missing_developer_action`
 - `fallback_status_mismatch`
 - `unsafe_privacy_policy`
@@ -49,6 +54,9 @@ The structural checker reports:
 
 Hidden fallback is never allowed. If a fallback is applied, the row status must
 be `fallback` and the row must carry a reason code.
+Every row must also carry an `evidenceBlockerCode` from
+[`config/evidence-blocker-taxonomy.json`](../../../config/evidence-blocker-taxonomy.json)
+that matches the browser reason taxonomy crosswalk.
 Explanation evidence paths must be repo-relative references; absolute paths and
 parent traversal are rejected before promotion checks.
 

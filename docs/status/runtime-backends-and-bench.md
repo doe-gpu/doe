@@ -3,6 +3,33 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-06-16 — Shared evidence blocker taxonomy is gated
+
+Runner-visible evidence blockers now have a shared taxonomy at
+`config/evidence-blocker-taxonomy.json` with a schema target and focused gate.
+The vocabulary covers provider setup, native WebGPU availability, adapter
+selection, hidden fallback, shader/pipeline/dispatch/readback failures, digest
+gaps, checkpoint stops, runtime-incomplete states, receipt invalidity, and the
+existing model-runtime `executionBlocker` enum. This gives receipt emitters a
+stable set of codes to emit without changing receipt payloads in the same pass.
+The Chromium runtime selector policy and browser unsupported/fallback reason
+taxonomy also map browser-specific fallback reasons into the shared blocker
+vocabulary. Developer-visible browser fallback explanations now carry
+`evidenceBlockerCode`, so forced-Doe/browser diagnostics can preserve browser
+reason detail while still participating in Doe receipt taxonomy checks.
+
+Validation:
+
+- `python3 bench/gates/evidence_blocker_taxonomy_gate.py`
+- `python3 bench/gates/schema_gate.py`
+- `python3 -m unittest bench.tests.test_evidence_blocker_taxonomy_gate bench.tests.test_config_schemas`
+- `python3 browser/chromium/scripts/check-browser-runtime-selector-policy.py --policy config/browser-runtime-selector-policy.json --json`
+- `python3 -m unittest bench.tests.test_browser_runtime_selector_policy`
+- `python3 bench/tools/check_browser_unsupported_reason_taxonomy.py --taxonomy config/browser-unsupported-reason-taxonomy.json --json`
+- `python3 -m unittest bench.tests.test_browser_unsupported_reason_taxonomy`
+- `python3 browser/chromium/scripts/check-browser-fallback-explanations.py --explanations examples/browser-fallback-explanations.sample.json --taxonomy-root . --runtime-identity-root . --json`
+- `python3 -m unittest bench.tests.test_browser_fallback_explanations`
+
 ## 2026-06-08 — Package warmup accounting is corrected; Bun Vulkan is claimable
 
 The native compare runner now treats `iterations` as the number of timed

@@ -108,6 +108,17 @@ const TEXTURE_SWIZZLE_COMPONENT_MAP = Object.freeze({
 const NS_PER_MS = 1_000_000;
 const WHOLE_SIZE_SENTINEL = -1;
 const fastPathStats = { dispatchFlush: 0, flushAndMap: 0, commandBufferBuild: 0 };
+const PROVIDER_FAILURE_REASONS = Object.freeze([
+  'native_webgpu_unavailable',
+  'native_addon_unavailable',
+  'runtime_library_unavailable',
+  'provider_unavailable',
+  'adapter_unavailable',
+  'provider_import_failed',
+  'unsupported_runtime_host',
+  'runner_error',
+]);
+const PROVIDER_FAILURE_REASON_SET = new Set(PROVIDER_FAILURE_REASONS);
 const ZERO_READBACK_BREAKDOWN_NS = Object.freeze({
   readbackMapReadCopyUnmapQueueWaitCompletedTotalNs: 0,
   readbackMapReadCopyUnmapDeferredCopyTotalNs: 0,
@@ -128,6 +139,34 @@ let doeBuildMetadata;
 let libraryLoaded = false;
 let packagePipelineCacheExitHookRegistered = false;
 let nativeMetalCanvasBackend = null;
+
+function normalizeProviderFailureReason(reason) {
+  return PROVIDER_FAILURE_REASON_SET.has(reason) ? reason : 'runner_error';
+}
+
+function providerAvailabilityFailure({
+  reason,
+  stage = '',
+  detail = '',
+}) {
+  return Object.freeze({
+    ok: false,
+    reason: normalizeProviderFailureReason(reason),
+    provider: 'doe-gpu',
+    stage,
+    detail: String(detail ?? ''),
+  });
+}
+
+function attachProviderAvailability(error, failure) {
+  if (!error || !failure) {
+    return error;
+  }
+  error.providerAvailability = failure;
+  error.providerFailureReason = failure.reason;
+  return error;
+}
+
 let fullSurfaceClasses = null;
 let canvasSurfaceClasses = null;
 let DoeGPUComputePassEncoder;
@@ -233,14 +272,30 @@ function ensureLibrary() {
   if (libraryLoaded) return;
   const nativeAddon = currentAddon();
   if (!nativeAddon) {
-    throw new Error(
+    const detail = (
       'doe-gpu: Native addon not found. Install the matching doe-gpu optional platform package, or run `npm run build:addon` / `npx node-gyp rebuild` in a built workspace.'
+    );
+    throw attachProviderAvailability(
+      new Error(detail),
+      providerAvailabilityFailure({
+        reason: 'native_addon_unavailable',
+        stage: 'native.ensureLibrary',
+        detail,
+      }),
     );
   }
   const libraryPath = currentDoeLibraryPath();
   if (!libraryPath) {
-    throw new Error(
+    const detail = (
       'doe-gpu: libwebgpu_doe not found. Install the matching doe-gpu optional platform package, or build it with `cd runtime/zig && zig build dropin`, or set DOE_WEBGPU_LIB.'
+    );
+    throw attachProviderAvailability(
+      new Error(detail),
+      providerAvailabilityFailure({
+        reason: 'runtime_library_unavailable',
+        stage: 'native.ensureLibrary',
+        detail,
+      }),
     );
   }
   nativeAddon.loadLibrary(libraryPath);

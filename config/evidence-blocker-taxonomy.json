@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "evidence_blocker_taxonomy",
+  "taxonomyId": "evidence-blocker-taxonomy-v0",
+  "codes": [
+    {
+      "blockerCode": "none",
+      "category": "ready",
+      "stages": ["runner"],
+      "receiptStatuses": ["output_ready"],
+      "claimImpact": "claimable",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The runner produced the required evidence and no blocker is active."
+    },
+    {
+      "blockerCode": "native_webgpu_unavailable",
+      "category": "blocked",
+      "stages": ["provider_gate", "runtime_selection"],
+      "receiptStatuses": ["native_webgpu_unavailable", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The selected host cannot provide native WebGPU for this lane."
+    },
+    {
+      "blockerCode": "native_addon_unavailable",
+      "category": "blocked",
+      "stages": ["provider_gate", "runtime_selection"],
+      "receiptStatuses": ["native_addon_unavailable", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The native addon required by the package lane was not loadable."
+    },
+    {
+      "blockerCode": "runtime_library_unavailable",
+      "category": "blocked",
+      "stages": ["provider_gate", "runtime_selection"],
+      "receiptStatuses": ["runtime_library_unavailable", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The runtime library required by the selected provider was not available."
+    },
+    {
+      "blockerCode": "provider_unavailable",
+      "category": "blocked",
+      "stages": ["provider_gate", "runtime_selection"],
+      "receiptStatuses": ["provider_unavailable", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The requested provider could not be selected, without a more specific code."
+    },
+    {
+      "blockerCode": "adapter_unavailable",
+      "category": "blocked",
+      "stages": ["adapter_request"],
+      "receiptStatuses": ["adapter_unavailable", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The runtime could not acquire a compatible GPU adapter."
+    },
+    {
+      "blockerCode": "provider_import_failed",
+      "category": "failure",
+      "stages": ["provider_gate", "runtime_selection"],
+      "receiptStatuses": ["provider_import_failed", "runner_error"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The provider module import failed before runtime setup completed."
+    },
+    {
+      "blockerCode": "unsupported_runtime_host",
+      "category": "unsupported",
+      "stages": ["provider_gate", "runtime_selection"],
+      "receiptStatuses": ["unsupported_runtime_host", "unsupported_capability"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The selected runtime host is not supported by this lane."
+    },
+    {
+      "blockerCode": "hidden_fallback_applied",
+      "category": "fallback",
+      "stages": ["runtime_selection"],
+      "receiptStatuses": ["hidden_fallback_applied", "blocked"],
+      "claimImpact": "blocks_claim",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "A hidden fallback was observed, so the lane cannot support a forced-Doe claim."
+    },
+    {
+      "blockerCode": "fallback_applied",
+      "category": "fallback",
+      "stages": ["runtime_selection"],
+      "receiptStatuses": ["fallback_applied", "blocked"],
+      "claimImpact": "blocks_claim",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "A declared fallback was applied, so the lane cannot support a forced-Doe claim."
+    },
+    {
+      "blockerCode": "artifact_missing",
+      "category": "blocked",
+      "stages": ["artifact"],
+      "receiptStatuses": ["artifact_missing", "blocked"],
+      "claimImpact": "blocks_claim",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "A required evidence artifact is missing from the receipt chain."
+    },
+    {
+      "blockerCode": "shader_compile_failed",
+      "category": "failure",
+      "stages": ["shader_compile"],
+      "receiptStatuses": ["shader_compile_failed", "compile_failed"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "Shader compilation failed before a dispatchable pipeline existed."
+    },
+    {
+      "blockerCode": "pipeline_create_failed",
+      "category": "failure",
+      "stages": ["pipeline_create"],
+      "receiptStatuses": ["pipeline_create_failed", "compile_failed"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "Pipeline creation failed after shader compilation."
+    },
+    {
+      "blockerCode": "dispatch_failed",
+      "category": "failure",
+      "stages": ["dispatch"],
+      "receiptStatuses": ["dispatch_failed", "runner_error"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The command dispatch failed before output evidence could be produced."
+    },
+    {
+      "blockerCode": "readback_failed",
+      "category": "failure",
+      "stages": ["readback"],
+      "receiptStatuses": ["readback_failed", "runner_error"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The runner could not read back the output buffer or transcript evidence."
+    },
+    {
+      "blockerCode": "output_digest_missing",
+      "category": "blocked",
+      "stages": ["digest"],
+      "receiptStatuses": ["output_digest_missing", "blocked"],
+      "claimImpact": "blocks_claim",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "Output bytes may exist, but no output digest was emitted into the receipt."
+    },
+    {
+      "blockerCode": "transcript_digest_missing",
+      "category": "blocked",
+      "stages": ["transcript", "digest"],
+      "receiptStatuses": ["transcript_digest_missing", "blocked"],
+      "claimImpact": "blocks_claim",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The transcript exists without a digest that can pin the runtime evidence."
+    },
+    {
+      "blockerCode": "digest_mismatch",
+      "category": "failure",
+      "stages": ["digest"],
+      "receiptStatuses": ["digest_mismatch"],
+      "claimImpact": "blocks_claim",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "A declared output, transcript, or artifact digest did not match the observed bytes."
+    },
+    {
+      "blockerCode": "checkpoint_stopped",
+      "category": "blocked",
+      "stages": ["checkpoint"],
+      "receiptStatuses": ["checkpoint_stopped", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "Execution intentionally stopped at a checkpoint before the full target output was ready."
+    },
+    {
+      "blockerCode": "runtime_incomplete",
+      "category": "blocked",
+      "stages": ["runner", "model_runtime"],
+      "receiptStatuses": ["runtime_incomplete", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The runtime path is present but incomplete for the requested end-to-end lane."
+    },
+    {
+      "blockerCode": "receipt_invalid",
+      "category": "failure",
+      "stages": ["schema_gate"],
+      "receiptStatuses": ["receipt_invalid"],
+      "claimImpact": "blocks_claim",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The emitted receipt failed its schema or invariant gate."
+    },
+    {
+      "blockerCode": "runner_error",
+      "category": "failure",
+      "stages": ["runner"],
+      "receiptStatuses": ["runner_error"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The runner failed without a more specific blocker code."
+    },
+    {
+      "blockerCode": "model_runtime_blocked",
+      "category": "blocked",
+      "stages": ["model_runtime"],
+      "receiptStatuses": ["blocked", "execution_not_attempted"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "A model runtime receipt is blocked by a model-specific prerequisite."
+    },
+    {
+      "blockerCode": "sdk_layout_streaming_executor_missing",
+      "category": "blocked",
+      "stages": ["model_runtime"],
+      "receiptStatuses": ["streaming_executor_unavailable", "execution_not_attempted"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "Legacy model receipt code for a missing SdkLayout streaming executor."
+    },
+    {
+      "blockerCode": "streaming_executor_not_bound_to_execution_plan",
+      "category": "blocked",
+      "stages": ["model_runtime"],
+      "receiptStatuses": ["streaming_executor_unavailable", "execution_not_attempted"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "Legacy model receipt code for a streaming executor not bound to the execution plan."
+    },
+    {
+      "blockerCode": "cs_python_not_available_in_build_environment",
+      "category": "blocked",
+      "stages": ["model_runtime", "runner"],
+      "receiptStatuses": ["cs_python_unavailable", "execution_not_attempted"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The Cerebras Python runtime is unavailable in the build environment."
+    },
+    {
+      "blockerCode": "full_transformer_layer_block_incomplete",
+      "category": "blocked",
+      "stages": ["model_runtime", "checkpoint"],
+      "receiptStatuses": ["full_transformer_layer_block_incomplete", "checkpoint_stopped"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The layer-block path has not reached the full transformer layer target."
+    },
+    {
+      "blockerCode": "hardware_endpoint_unavailable",
+      "category": "blocked",
+      "stages": ["model_runtime", "runner"],
+      "receiptStatuses": ["hardware_failed", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The hardware endpoint required for this model runtime lane is unavailable."
+    },
+    {
+      "blockerCode": "full_grid_compile_unattempted",
+      "category": "blocked",
+      "stages": ["model_runtime", "shader_compile"],
+      "receiptStatuses": ["full_grid_compile_unattempted", "execution_not_attempted"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The full-grid compile required for model promotion has not been attempted."
+    },
+    {
+      "blockerCode": "partial_kernel_coverage",
+      "category": "blocked",
+      "stages": ["model_runtime", "artifact"],
+      "receiptStatuses": ["partial_kernel_coverage", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The host plan has kernels without runtime-ready coverage."
+    },
+    {
+      "blockerCode": "memory_plan_does_not_fit",
+      "category": "blocked",
+      "stages": ["model_runtime", "artifact"],
+      "receiptStatuses": ["memory_plan_does_not_fit", "blocked"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The declared model memory plan does not fit the target runtime budget."
+    },
+    {
+      "blockerCode": "real_weights_absent",
+      "category": "blocked",
+      "stages": ["model_runtime", "artifact"],
+      "receiptStatuses": ["real_weights_absent", "artifact_missing"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The real-weight artifact required for model promotion is absent."
+    },
+    {
+      "blockerCode": "real_weight_parity_failed",
+      "category": "failure",
+      "stages": ["model_runtime", "digest"],
+      "receiptStatuses": ["real_weight_parity_failed", "digest_mismatch"],
+      "claimImpact": "blocks_execution",
+      "developerVisible": true,
+      "retryable": false,
+      "notes": "The real-weight parity check failed for the model runtime lane."
+    }
+  ]
+}

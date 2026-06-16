@@ -51,6 +51,7 @@ def run_optional_artifact_gates(
     browser_unsupported_reason_taxonomy_check = (
         tools_dir / "check_browser_unsupported_reason_taxonomy.py"
     )
+    evidence_blocker_taxonomy_gate = gates_dir / "evidence_blocker_taxonomy_gate.py"
     browser_responsibility_map_check = tools_dir / "check_browser_responsibility_map.py"
     chromium_fork_maintenance_policy_check = (
         tools_dir / "check_chromium_fork_maintenance_policy.py"
@@ -347,6 +348,39 @@ def run_optional_artifact_gates(
                 str(browser_unsupported_reason_taxonomy_check),
                 "--taxonomy",
                 str(taxonomy_path),
+            ],
+        )
+
+    if args.with_evidence_blocker_taxonomy_gate:
+        taxonomy_path = require_existing_path(
+            args.evidence_blocker_taxonomy,
+            "--evidence-blocker-taxonomy",
+        )
+        schema_path = require_existing_path(
+            args.evidence_blocker_taxonomy_schema,
+            "--evidence-blocker-taxonomy-schema",
+        )
+        model_runtime_schema_path = require_existing_path(
+            args.evidence_blocker_model_runtime_schema,
+            "--evidence-blocker-model-runtime-schema",
+        )
+        if (
+            taxonomy_path is None
+            or schema_path is None
+            or model_runtime_schema_path is None
+        ):
+            return 1
+        run_gate(
+            "evidence-blocker-taxonomy",
+            [
+                sys.executable,
+                str(evidence_blocker_taxonomy_gate),
+                "--taxonomy",
+                str(taxonomy_path),
+                "--schema",
+                str(schema_path),
+                "--model-runtime-schema",
+                str(model_runtime_schema_path),
             ],
         )
 

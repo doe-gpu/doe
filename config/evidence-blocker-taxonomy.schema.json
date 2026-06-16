@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.doe.deco/evidence-blocker-taxonomy.schema.json",
+  "title": "Doe evidence blocker taxonomy",
+  "description": "Shared blocker vocabulary for receipt-producing lanes. Emitters use these codes when a run is ready, blocked, unsupported, diagnostic-only, or failed before claimable evidence can be produced.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "artifactKind", "taxonomyId", "codes"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "evidence_blocker_taxonomy" },
+    "taxonomyId": { "type": "string", "minLength": 1 },
+    "codes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/BlockerCode" }
+    }
+  },
+  "$defs": {
+    "BlockerCode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "blockerCode",
+        "category",
+        "stages",
+        "receiptStatuses",
+        "claimImpact",
+        "developerVisible",
+        "retryable",
+        "notes"
+      ],
+      "properties": {
+        "blockerCode": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "ready",
+            "blocked",
+            "unsupported",
+            "fallback",
+            "failure",
+            "diagnostic"
+          ]
+        },
+        "stages": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "provider_gate",
+              "runtime_selection",
+              "adapter_request",
+              "artifact",
+              "cache",
+              "doppler_manifest",
+              "shader_compile",
+              "pipeline_create",
+              "dispatch",
+              "readback",
+              "digest",
+              "checkpoint",
+              "transcript",
+              "model_runtime",
+              "runner",
+              "schema_gate"
+            ]
+          }
+        },
+        "receiptStatuses": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "output_ready",
+              "blocked",
+              "checkpoint_stopped",
+              "runtime_incomplete",
+              "native_webgpu_unavailable",
+              "provider_unavailable",
+              "unsupported_capability",
+              "adapter_unavailable",
+              "shader_compile_failed",
+              "pipeline_create_failed",
+              "dispatch_failed",
+              "readback_failed",
+              "digest_mismatch",
+              "receipt_invalid",
+              "runner_error",
+              "fallback_applied",
+              "unsupported_runtime_host",
+              "provider_import_failed",
+              "native_addon_unavailable",
+              "runtime_library_unavailable",
+              "output_digest_missing",
+              "transcript_digest_missing",
+              "artifact_missing",
+              "checkpoint_missing",
+              "execution_not_attempted",
+              "compile_failed",
+              "simulator_failed",
+              "hardware_failed",
+              "memory_plan_does_not_fit",
+              "partial_kernel_coverage",
+              "real_weights_absent",
+              "real_weight_parity_failed",
+              "full_transformer_layer_block_incomplete",
+              "full_grid_compile_unattempted",
+              "cs_python_unavailable",
+              "streaming_executor_unavailable",
+              "hidden_fallback_applied"
+            ]
+          }
+        },
+        "claimImpact": {
+          "type": "string",
+          "enum": [
+            "claimable",
+            "diagnostic_only",
+            "blocks_claim",
+            "blocks_execution"
+          ]
+        },
+        "developerVisible": { "type": "boolean" },
+        "retryable": { "type": "boolean" },
+        "notes": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

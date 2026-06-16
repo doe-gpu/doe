@@ -506,6 +506,26 @@ def parse_args() -> argparse.Namespace:
         help="Browser unsupported reason taxonomy passed to the checker.",
     )
     parser.add_argument(
+        "--with-evidence-blocker-taxonomy-gate",
+        action="store_true",
+        help="Run evidence_blocker_taxonomy_gate.py on shared evidence blocker codes.",
+    )
+    parser.add_argument(
+        "--evidence-blocker-taxonomy",
+        default="config/evidence-blocker-taxonomy.json",
+        help="Evidence blocker taxonomy passed to the checker.",
+    )
+    parser.add_argument(
+        "--evidence-blocker-taxonomy-schema",
+        default="config/evidence-blocker-taxonomy.schema.json",
+        help="Evidence blocker taxonomy schema passed to the checker.",
+    )
+    parser.add_argument(
+        "--evidence-blocker-model-runtime-schema",
+        default="config/doe-model-runtime-receipt.schema.json",
+        help="Model runtime receipt schema checked against the evidence blocker taxonomy.",
+    )
+    parser.add_argument(
         "--with-browser-responsibility-map-gate",
         action="store_true",
         help="Run check_browser_responsibility_map.py on the browser responsibility map.",
@@ -1139,5 +1159,4 @@ def parse_args() -> argparse.Namespace:
         help="Forward --expected-backend-id to claim_gate.py.",
     )
     return parser.parse_args()
-
 

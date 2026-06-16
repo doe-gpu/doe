@@ -586,6 +586,10 @@
       "data": "config/shader-error-taxonomy.json"
     },
     {
+      "schema": "config/evidence-blocker-taxonomy.schema.json",
+      "data": "config/evidence-blocker-taxonomy.json"
+    },
+    {
       "schema": "config/dropin-abi-behavior.schema.json",
       "data": "config/dropin-abi-behavior.json"
     },

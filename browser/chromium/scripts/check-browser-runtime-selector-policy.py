@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any
 
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
+EVIDENCE_BLOCKER_TAXONOMY_PATH = REPO_ROOT / "config" / "evidence-blocker-taxonomy.json"
 REQUIRED_SELECTION_MODES = {"dawn", "doe", "auto"}
 REQUIRED_PRECEDENCE = [
     "emergency_kill_switch",
@@ -22,7 +24,9 @@ REQUIRED_FALLBACK_REASONS = {
     "global_disable_active",
     "runtime_artifact_missing",
     "runtime_artifact_load_failed",
+    "runtime_initialization_failed",
     "symbol_surface_incomplete",
+    "wire_proc_table_incomplete",
     "profile_denylisted",
     "capability_requirement_failed",
     "runtime_health_degraded",
@@ -76,8 +80,24 @@ def failure(code: str, path: str, message: str) -> dict[str, str]:
     return {"code": code, "path": path, "message": message}
 
 
-def check_policy(payload: dict[str, Any]) -> list[dict[str, str]]:
+def load_evidence_blocker_codes(path: Path = EVIDENCE_BLOCKER_TAXONOMY_PATH) -> set[str]:
+    payload = load_json(path)
+    codes = payload.get("codes", [])
+    if not isinstance(codes, list):
+        return set()
+    return {
+        str(code["blockerCode"])
+        for code in codes
+        if isinstance(code, dict) and isinstance(code.get("blockerCode"), str)
+    }
+
+
+def check_policy(
+    payload: dict[str, Any],
+    evidence_blocker_codes: set[str] | None = None,
+) -> list[dict[str, str]]:
     failures: list[dict[str, str]] = []
+    evidence_blocker_codes = evidence_blocker_codes or load_evidence_blocker_codes()
     selection_modes = set(payload.get("selectionModes", []))
     if selection_modes != REQUIRED_SELECTION_MODES:
         failures.append(
@@ -102,6 +122,56 @@ def check_policy(payload: dict[str, Any]) -> list[dict[str, str]]:
     missing_reasons = REQUIRED_FALLBACK_REASONS - fallback_reasons
     for reason in sorted(missing_reasons):
         failures.append(failure("missing_fallback_reason", "fallbackReasons", f"missing fallback reason {reason}"))
+
+    evidence_blocker_map = payload.get("evidenceBlockerMap", {})
+    if not isinstance(evidence_blocker_map, dict):
+        failures.append(
+            failure("invalid_evidence_blocker_map", "evidenceBlockerMap", "evidenceBlockerMap must be an object")
+        )
+    else:
+        for reason in sorted(fallback_reasons):
+            if reason not in evidence_blocker_map:
+                failures.append(
+                    failure(
+                        "missing_evidence_blocker_mapping",
+                        "evidenceBlockerMap",
+                        f"missing evidence blocker mapping for fallback reason {reason}",
+                    )
+                )
+        for reason, blocker_code in sorted(evidence_blocker_map.items()):
+            if reason not in fallback_reasons:
+                failures.append(
+                    failure(
+                        "unknown_evidence_blocker_mapping",
+                        f"evidenceBlockerMap.{reason}",
+                        f"evidence blocker mapping references unknown fallback reason {reason}",
+                    )
+                )
+            if not isinstance(blocker_code, str) or not blocker_code:
+                failures.append(
+                    failure(
+                        "invalid_evidence_blocker_code",
+                        f"evidenceBlockerMap.{reason}",
+                        "evidence blocker mapping value must be a non-empty string",
+                    )
+                )
+                continue
+            if blocker_code == "none":
+                failures.append(
+                    failure(
+                        "invalid_evidence_blocker_code",
+                        f"evidenceBlockerMap.{reason}",
+                        f"fallback reason {reason} cannot map to none",
+                    )
+                )
+            elif blocker_code not in evidence_blocker_codes:
+                failures.append(
+                    failure(
+                        "unknown_evidence_blocker_code",
+                        f"evidenceBlockerMap.{reason}",
+                        f"evidence blocker code '{blocker_code}' is not defined in config/evidence-blocker-taxonomy.json",
+                    )
+                )
 
     forced_doe_failure = payload.get("forcedDoeFailure", {})
     if (

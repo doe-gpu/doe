@@ -77,10 +77,13 @@ def resolve_repo_path(root: Path, path_text: str) -> Path | None:
     return resolved
 
 
-def load_taxonomy(payload: dict[str, Any], root: Path) -> tuple[dict[str, dict[str, Any]], list[dict[str, str]]]:
+def load_taxonomy(
+    payload: dict[str, Any],
+    root: Path,
+) -> tuple[dict[str, dict[str, Any]], dict[str, str], list[dict[str, str]]]:
     taxonomy_path_text = payload.get("taxonomyPath")
     if not isinstance(taxonomy_path_text, str) or not taxonomy_path_text:
-        return {}, [
+        return {}, {}, [
             failure(
                 "missing_taxonomy_path",
                 "taxonomyPath",
@@ -89,7 +92,7 @@ def load_taxonomy(payload: dict[str, Any], root: Path) -> tuple[dict[str, dict[s
         ]
     taxonomy_path = resolve_repo_path(root, taxonomy_path_text)
     if taxonomy_path is None:
-        return {}, [
+        return {}, {}, [
             failure(
                 "unsafe_taxonomy_path",
                 "taxonomyPath",
@@ -97,7 +100,7 @@ def load_taxonomy(payload: dict[str, Any], root: Path) -> tuple[dict[str, dict[s
             )
         ]
     if not taxonomy_path.is_file():
-        return {}, [
+        return {}, {}, [
             failure(
                 "missing_taxonomy_file",
                 "taxonomyPath",
@@ -107,7 +110,7 @@ def load_taxonomy(payload: dict[str, Any], root: Path) -> tuple[dict[str, dict[s
     try:
         taxonomy = load_json(taxonomy_path)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
-        return {}, [
+        return {}, {}, [
             failure(
                 "invalid_taxonomy",
                 "taxonomyPath",
@@ -115,7 +118,7 @@ def load_taxonomy(payload: dict[str, Any], root: Path) -> tuple[dict[str, dict[s
             )
         ]
     if taxonomy.get("artifactKind") != "browser_unsupported_reason_taxonomy":
-        return {}, [
+        return {}, {}, [
             failure(
                 "invalid_taxonomy_kind",
                 "taxonomyPath",
@@ -123,6 +126,11 @@ def load_taxonomy(payload: dict[str, Any], root: Path) -> tuple[dict[str, dict[s
             )
         ]
     codes: dict[str, dict[str, Any]] = {}
+    evidence_blocker_map = {
+        str(reason_code): str(blocker_code)
+        for reason_code, blocker_code in taxonomy.get("evidenceBlockerMap", {}).items()
+        if isinstance(reason_code, str) and isinstance(blocker_code, str)
+    } if isinstance(taxonomy.get("evidenceBlockerMap"), dict) else {}
     failures: list[dict[str, str]] = []
     for index, row in enumerate(taxonomy.get("codes", [])):
         if not isinstance(row, dict):
@@ -139,7 +147,68 @@ def load_taxonomy(payload: dict[str, Any], root: Path) -> tuple[dict[str, dict[s
                 )
             )
         codes[code] = row
-    return codes, failures
+    return codes, evidence_blocker_map, failures
+
+
+def load_evidence_blocker_codes(payload: dict[str, Any], root: Path) -> tuple[set[str], list[dict[str, str]]]:
+    path_text = payload.get("evidenceBlockerTaxonomyPath")
+    if not isinstance(path_text, str) or not path_text:
+        return set(), [
+            failure(
+                "missing_evidence_blocker_taxonomy_path",
+                "evidenceBlockerTaxonomyPath",
+                "fallback explanations must reference the evidence blocker taxonomy",
+            )
+        ]
+    path = resolve_repo_path(root, path_text)
+    if path is None:
+        return set(), [
+            failure(
+                "unsafe_evidence_blocker_taxonomy_path",
+                "evidenceBlockerTaxonomyPath",
+                "evidence blocker taxonomy path must be repo-relative",
+            )
+        ]
+    if not path.is_file():
+        return set(), [
+            failure(
+                "missing_evidence_blocker_taxonomy_file",
+                "evidenceBlockerTaxonomyPath",
+                f"evidence blocker taxonomy file not found: {path_text}",
+            )
+        ]
+    try:
+        taxonomy = load_json(path)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return set(), [
+            failure(
+                "invalid_evidence_blocker_taxonomy",
+                "evidenceBlockerTaxonomyPath",
+                f"evidence blocker taxonomy is not a valid JSON object: {exc}",
+            )
+        ]
+    if taxonomy.get("artifactKind") != "evidence_blocker_taxonomy":
+        return set(), [
+            failure(
+                "invalid_evidence_blocker_taxonomy_kind",
+                "evidenceBlockerTaxonomyPath",
+                "evidence blocker taxonomy artifactKind must be evidence_blocker_taxonomy",
+            )
+        ]
+    codes = taxonomy.get("codes", [])
+    if not isinstance(codes, list):
+        return set(), [
+            failure(
+                "invalid_evidence_blocker_taxonomy",
+                "evidenceBlockerTaxonomyPath",
+                "evidence blocker taxonomy codes must be an array",
+            )
+        ]
+    return {
+        str(row["blockerCode"])
+        for row in codes
+        if isinstance(row, dict) and isinstance(row.get("blockerCode"), str)
+    }, []
 
 
 def check_explanations(
@@ -166,8 +235,11 @@ def check_explanations(
         )
     if runtime_identity_root is not None:
         failures.extend(check_runtime_identity_reference(payload, runtime_identity_root))
-    taxonomy, taxonomy_failures = load_taxonomy(payload, taxonomy_root or REPO_ROOT)
+    root = taxonomy_root or REPO_ROOT
+    taxonomy, evidence_blocker_map, taxonomy_failures = load_taxonomy(payload, root)
     failures.extend(taxonomy_failures)
+    evidence_blocker_codes, evidence_blocker_failures = load_evidence_blocker_codes(payload, root)
+    failures.extend(evidence_blocker_failures)
     explanations = payload.get("explanations", [])
     for index, explanation in enumerate(explanations):
         if not isinstance(explanation, dict):
@@ -196,6 +268,23 @@ def check_explanations(
                     "explanation requires reasonCode",
                 )
             )
+        evidence_blocker_code = explanation.get("evidenceBlockerCode")
+        if not isinstance(evidence_blocker_code, str) or not evidence_blocker_code:
+            failures.append(
+                failure(
+                    "missing_evidence_blocker_code",
+                    f"{explanation_path}.evidenceBlockerCode",
+                    "explanation requires evidenceBlockerCode",
+                )
+            )
+        elif evidence_blocker_code not in evidence_blocker_codes:
+            failures.append(
+                failure(
+                    "unknown_evidence_blocker_code",
+                    f"{explanation_path}.evidenceBlockerCode",
+                    f"evidenceBlockerCode {evidence_blocker_code!r} is not defined in the evidence blocker taxonomy",
+                )
+            )
         if not explanation.get("developerAction"):
             failures.append(
                 failure(
@@ -215,6 +304,19 @@ def check_explanations(
                 )
             )
         elif taxonomy_row is not None:
+            expected_blocker_code = evidence_blocker_map.get(reason_code)
+            if (
+                expected_blocker_code
+                and isinstance(evidence_blocker_code, str)
+                and evidence_blocker_code != expected_blocker_code
+            ):
+                failures.append(
+                    failure(
+                        "evidence_blocker_code_mismatch",
+                        f"{explanation_path}.evidenceBlockerCode",
+                        f"reasonCode {reason_code!r} must map to evidenceBlockerCode {expected_blocker_code!r}",
+                    )
+                )
             capabilities = taxonomy_row.get("capabilities", [])
             statuses = taxonomy_row.get("statuses", [])
             if explanation.get("capability") not in capabilities:

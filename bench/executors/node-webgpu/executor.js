@@ -118,6 +118,75 @@ const PACKAGE_READBACK_MODE_NATIVE = 'native-map-read-copy-unmap';
 const PACKAGE_READBACK_MODE_MAP_ASYNC = 'mapAsync';
 let packageExecutionPolicyPromise = null;
 
+export const PROVIDER_FAILURE_REASONS = Object.freeze([
+  'native_webgpu_unavailable',
+  'native_addon_unavailable',
+  'runtime_library_unavailable',
+  'provider_unavailable',
+  'adapter_unavailable',
+  'provider_import_failed',
+  'unsupported_runtime_host',
+  'runner_error',
+]);
+
+const PROVIDER_FAILURE_REASON_SET = new Set(PROVIDER_FAILURE_REASONS);
+
+export function normalizeProviderFailureReason(reason) {
+  return PROVIDER_FAILURE_REASON_SET.has(reason) ? reason : 'runner_error';
+}
+
+export function providerAvailabilityFailure({
+  reason,
+  provider = '',
+  providerName = '',
+  runtimeHost = '',
+  loader = '',
+  stage = '',
+  detail = '',
+  externalCode = '',
+}) {
+  return Object.freeze({
+    ok: false,
+    reason: normalizeProviderFailureReason(reason),
+    provider,
+    providerName,
+    runtimeHost,
+    loader,
+    stage,
+    detail: String(detail ?? ''),
+    ...(externalCode ? { externalCode } : {}),
+  });
+}
+
+function providerAvailabilityOk({
+  provider = '',
+  providerName = '',
+  runtimeHost = '',
+  loader = '',
+  stage = '',
+  module = null,
+}) {
+  return Object.freeze({
+    ok: true,
+    reason: null,
+    provider,
+    providerName,
+    runtimeHost,
+    loader,
+    stage,
+    module,
+  });
+}
+
+function attachProviderAvailability(error, availability) {
+  if (!error || !availability) {
+    return error;
+  }
+  error.providerAvailability = availability;
+  error.providerFailureReason = availability.reason;
+  return error;
+}
+
 function nsFromMs(ms) {
   return Math.max(0, Math.round(ms * 1_000_000));
 }
@@ -1329,12 +1398,14 @@ function makeUnsupportedNodeWebGpuError({
   message,
   detail = '',
   hostExecutorInitTotalNs = 0,
+  availability = null,
 }) {
   const error = new Error(message);
   error.code = NODE_WEBGPU_UNSUPPORTED_ERROR_CODE;
   error.unsupportedCode = unsupportedCode;
   error.unsupportedDetail = detail;
   error.hostExecutorInitTotalNs = hostExecutorInitTotalNs;
+  attachProviderAvailability(error, availability);
   return error;
 }
 
@@ -1356,6 +1427,7 @@ export function classifyBringupUnsupported(stage, error) {
     return null;
   }
   return {
+    reason: 'adapter_unavailable',
     unsupportedCode: stage === 'requestDevice' ? 'device_unavailable' : 'adapter_unavailable',
     detail: message,
   };
@@ -1372,6 +1444,8 @@ export function buildUnsupportedExecutionResult({
   processWallMs,
   unsupportedCode = '',
   unsupportedDetail = '',
+  providerFailureReason = '',
+  evidenceBlockerCode = '',
   workloadId = '',
   planPath = '',
   queueWaitMode = PACKAGE_QUEUE_WAIT_MODE,
@@ -1426,6 +1500,8 @@ export function buildUnsupportedExecutionResult({
     executionQueueWaitSubmitCadence: queueWaitSubmitCadence,
     ...(unsupportedCode ? { unsupportedCode } : {}),
     ...(unsupportedDetail ? { unsupportedDetail } : {}),
+    ...(providerFailureReason ? { providerFailureReason } : {}),
+    ...(evidenceBlockerCode ? { evidenceBlockerCode } : {}),
     workload: planMeta.workloadId,
     canonicalWorkloadId: planMeta.canonicalWorkloadId,
     planId: planMeta.planId,
@@ -1466,6 +1542,8 @@ export function buildErrorExecutionResult({
   hostWorkloadPrepareTotalNs,
   hostExecutorInitTotalNs,
   processWallMs,
+  providerFailureReason = '',
+  evidenceBlockerCode = '',
   workloadId = '',
   planPath = '',
   queueWaitMode = PACKAGE_QUEUE_WAIT_MODE,
@@ -1518,6 +1596,8 @@ export function buildErrorExecutionResult({
     executionQueueWaitMode: queueWaitMode,
     executionQueueWaitScope: queueWaitScope,
     executionQueueWaitSubmitCadence: queueWaitSubmitCadence,
+    ...(providerFailureReason ? { providerFailureReason } : {}),
+    ...(evidenceBlockerCode ? { evidenceBlockerCode } : {}),
     workload: planMeta.workloadId,
     canonicalWorkloadId: planMeta.canonicalWorkloadId,
     planId: planMeta.planId,
@@ -1581,9 +1661,19 @@ export function providerSpec(provider, runtimeHost = 'node') {
   const normalized = typeof provider === 'string' ? provider.trim().toLowerCase() : '';
   const spec = runtimeProviders[normalized];
   if (!spec) {
-    throw new Error(
+    const detail = (
       `unsupported provider: ${provider} for runtime ${runtimeHost} `
-      + `(expected one of ${Object.keys(runtimeProviders).join(', ')})`,
+      + `(expected one of ${Object.keys(runtimeProviders).join(', ')})`
+    );
+    throw attachProviderAvailability(
+      new Error(detail),
+      providerAvailabilityFailure({
+        reason: 'unsupported_runtime_host',
+        provider: normalized,
+        runtimeHost,
+        stage: 'providerSpec',
+        detail,
+      }),
     );
   }
   return spec;
@@ -1820,6 +1910,78 @@ async function resolveProviderModule(spec) {
   }
 }
 
+function classifyProviderModuleFailure(error) {
+  const message = String(error?.message ?? error ?? '');
+  const normalized = message.toLowerCase();
+  if (
+    normalized.includes('native addon not found')
+    || normalized.includes('doe_napi.node')
+  ) {
+    return 'native_addon_unavailable';
+  }
+  if (
+    normalized.includes('libwebgpu_doe not found')
+    || normalized.includes('doe_webgpu_lib')
+  ) {
+    return 'runtime_library_unavailable';
+  }
+  if (normalized.includes('unsupported provider loader')) {
+    return 'unsupported_runtime_host';
+  }
+  if (
+    normalized.includes('cannot find package')
+    || normalized.includes('cannot find module')
+    || normalized.includes('err_module_not_found')
+    || normalized.includes('module not found')
+  ) {
+    return 'provider_import_failed';
+  }
+  if (
+    normalized.includes('does not export')
+    || normalized.includes('did not install navigator.gpu')
+    || normalized.includes('global gpu')
+    || normalized.includes('global gpubufferusage')
+    || normalized.includes('global gpushaderstage')
+    || normalized.includes('global gpumapmode')
+    || normalized.includes('global gputextureusage')
+  ) {
+    return 'native_webgpu_unavailable';
+  }
+  return 'runner_error';
+}
+
+export async function resolveProviderModuleAvailability(spec, {
+  runtimeHost = '',
+} = {}) {
+  try {
+    const module = await resolveProviderModule(spec);
+    return providerAvailabilityOk({
+      provider: spec.provider,
+      providerName: spec.providerName,
+      runtimeHost,
+      loader: spec.loader,
+      stage: 'provider.resolve',
+      module,
+    });
+  } catch (error) {
+    const sourceAvailability = error?.providerAvailability ?? null;
+    return providerAvailabilityFailure({
+      reason: sourceAvailability?.reason ?? classifyProviderModuleFailure(error),
+      provider: spec.provider,
+      providerName: spec.providerName,
+      runtimeHost,
+      loader: spec.loader,
+      stage: 'provider.resolve',
+      detail: sourceAvailability?.detail ?? String(error?.message ?? error ?? ''),
+    });
+  }
+}
+
+function makeProviderAvailabilityError(availability) {
+  const error = new Error(availability.detail || availability.reason);
+  return attachProviderAvailability(error, availability);
+}
+
 function buildBindingDescriptor(binding, buffers, globals) {
   const buffer = buffers.get(binding.bufferId);
   if (!buffer) {
@@ -1925,6 +2087,7 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
         requestIndex,
         found: false,
         unsupportedCode: unsupported.unsupportedCode,
+        reason: unsupported.reason,
         detail: unsupported.detail,
       });
       continue;
@@ -1938,11 +2101,22 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
     }
   }
   if (!adapter) {
+    const detail = adapterAttemptDetails.join('; ') || 'requestAdapter returned null for all requests';
     throw makeUnsupportedNodeWebGpuError({
       unsupportedCode: 'adapter_unavailable',
       message: `node-webgpu adapter unavailable for provider ${spec.provider}`,
-      detail: adapterAttemptDetails.join('; ') || 'requestAdapter returned null for all requests',
+      detail,
       hostExecutorInitTotalNs: nsDelta(executorInitStartedAt),
+      availability: providerAvailabilityFailure({
+        reason: 'adapter_unavailable',
+        provider: spec.provider,
+        providerName: spec.providerName,
+        runtimeHost,
+        loader: spec.loader,
+        stage: 'requestAdapter',
+        detail,
+        externalCode: 'adapter_unavailable',
+      }),
     });
   }
   const adapterIssue = describeUnusableAdapterInfo(adapter?.info ?? null, spec.providerName);
@@ -1952,6 +2126,16 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
       message: `node-webgpu adapter unavailable for provider ${spec.provider}`,
       detail: adapterIssue,
       hostExecutorInitTotalNs: nsDelta(executorInitStartedAt),
+      availability: providerAvailabilityFailure({
+        reason: 'adapter_unavailable',
+        provider: spec.provider,
+        providerName: spec.providerName,
+        runtimeHost,
+        loader: spec.loader,
+        stage: 'requestAdapter',
+        detail: adapterIssue,
+        externalCode: 'adapter_unavailable',
+      }),
     });
   }
 
@@ -1975,6 +2159,16 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
       message: `node-webgpu device unavailable for provider ${spec.provider}`,
       detail: unsupported.detail,
       hostExecutorInitTotalNs: nsDelta(executorInitStartedAt),
+      availability: providerAvailabilityFailure({
+        reason: unsupported.reason,
+        provider: spec.provider,
+        providerName: spec.providerName,
+        runtimeHost,
+        loader: spec.loader,
+        stage: 'requestDevice',
+        detail: unsupported.detail,
+        externalCode: unsupported.unsupportedCode,
+      }),
     });
   }
   debugLog('runtime.requestDevice.done', {});
@@ -1988,6 +2182,16 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
       message: `node-webgpu device unavailable for provider ${spec.provider}`,
       detail: deviceIssue,
       hostExecutorInitTotalNs: nsDelta(executorInitStartedAt),
+      availability: providerAvailabilityFailure({
+        reason: 'adapter_unavailable',
+        provider: spec.provider,
+        providerName: spec.providerName,
+        runtimeHost,
+        loader: spec.loader,
+        stage: 'requestDevice',
+        detail: deviceIssue,
+        externalCode: 'device_unavailable',
+      }),
     });
   }
   const hostExecutorInitTotalNs = nsDelta(executorInitStartedAt);
@@ -3153,18 +3357,31 @@ export async function executePlanFile({
     await writeExecutorArtifacts(traceMetaPath, null, unsupportedResult.meta, unsupportedResult.rows);
     return unsupportedResult;
   }
-  const webgpuResolveStartedAt = performance.now();
-  debugLog('provider.resolve.start', {
-    provider: spec.provider,
-  });
-  const webgpu = await resolveProviderModule(spec);
-  const providerModuleResolveTotalNs = nsDelta(webgpuResolveStartedAt);
-  debugLog('provider.resolve.done', {
-    provider: spec.provider,
-    providerModuleResolveTotalNs,
-  });
   let runtime = null;
+  let providerModuleResolveTotalNs = 0;
   try {
+    const webgpuResolveStartedAt = performance.now();
+    debugLog('provider.resolve.start', {
+      provider: spec.provider,
+    });
+    const providerAvailability = await resolveProviderModuleAvailability(spec, {
+      runtimeHost,
+    });
+    providerModuleResolveTotalNs = nsDelta(webgpuResolveStartedAt);
+    if (!providerAvailability.ok) {
+      debugLog('provider.resolve.failed', {
+        provider: spec.provider,
+        reason: providerAvailability.reason,
+        detail: providerAvailability.detail,
+        providerModuleResolveTotalNs,
+      });
+      throw makeProviderAvailabilityError(providerAvailability);
+    }
+    const webgpu = providerAvailability.module;
+    debugLog('provider.resolve.done', {
+      provider: spec.provider,
+      providerModuleResolveTotalNs,
+    });
     const timedEnvelopeStartedAt = performance.now();
     runtime = await createRuntime(normalizedPlan, webgpu, spec, {
       debugLog,
@@ -3226,8 +3443,12 @@ export async function executePlanFile({
     return result;
   } catch (error) {
     if (isUnsupportedNodeWebGpuError(error)) {
+      const providerFailureReason = normalizeProviderFailureReason(
+        error.providerFailureReason ?? error.providerAvailability?.reason,
+      );
       debugLog('runtime.unsupported', {
         unsupportedCode: error.unsupportedCode,
+        providerFailureReason,
         detail: error.unsupportedDetail ?? '',
       });
       const unsupportedResult = buildUnsupportedExecutionResult({
@@ -3236,16 +3457,18 @@ export async function executePlanFile({
         preparedSession,
         hostInputReadTotalNs,
         hostInputParseTotalNs,
-      hostWorkloadPrepareTotalNs,
-      hostExecutorInitTotalNs: providerModuleResolveTotalNs + (error.hostExecutorInitTotalNs ?? 0),
-      processWallMs: performance.now() - executionEnvelopeStartedAt,
-      unsupportedCode: error.unsupportedCode ?? '',
-      unsupportedDetail: error.unsupportedDetail ?? '',
-      queueWaitMode,
-      queueWaitScope,
-      queueWaitSubmitCadence,
-      residentBufferLoads,
-    });
+        hostWorkloadPrepareTotalNs,
+        hostExecutorInitTotalNs: providerModuleResolveTotalNs + (error.hostExecutorInitTotalNs ?? 0),
+        processWallMs: performance.now() - executionEnvelopeStartedAt,
+        unsupportedCode: error.unsupportedCode ?? '',
+        unsupportedDetail: error.unsupportedDetail ?? '',
+        providerFailureReason,
+        evidenceBlockerCode: providerFailureReason,
+        queueWaitMode,
+        queueWaitScope,
+        queueWaitSubmitCadence,
+        residentBufferLoads,
+      });
       const artifactFinalizeStartedAt = performance.now();
       await writeExecutorArtifacts(traceMetaPath, traceJsonlPath, unsupportedResult.meta, unsupportedResult.rows);
       unsupportedResult.meta.hostArtifactFinalizeTotalNs = nsDelta(artifactFinalizeStartedAt);
@@ -3262,6 +3485,12 @@ export async function executePlanFile({
       hostWorkloadPrepareTotalNs,
       hostExecutorInitTotalNs: providerModuleResolveTotalNs + (runtime?.hostExecutorInitTotalNs ?? 0),
       processWallMs: performance.now() - executionEnvelopeStartedAt,
+      providerFailureReason: normalizeProviderFailureReason(
+        error.providerFailureReason ?? error.providerAvailability?.reason,
+      ),
+      evidenceBlockerCode: normalizeProviderFailureReason(
+        error.providerFailureReason ?? error.providerAvailability?.reason,
+      ),
       queueWaitMode,
       queueWaitScope,
       queueWaitSubmitCadence,

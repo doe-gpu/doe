@@ -4,11 +4,31 @@
   "title": "Browser unsupported reason taxonomy",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "artifactKind", "taxonomyId", "codes"],
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "taxonomyId",
+    "evidenceBlockerTaxonomyPath",
+    "evidenceBlockerMap",
+    "codes"
+  ],
   "properties": {
     "schemaVersion": { "type": "integer", "const": 1 },
     "artifactKind": { "type": "string", "const": "browser_unsupported_reason_taxonomy" },
     "taxonomyId": { "type": "string", "minLength": 1 },
+    "evidenceBlockerTaxonomyPath": { "type": "string", "minLength": 1 },
+    "evidenceBlockerMap": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+      }
+    },
     "codes": {
       "type": "array",
       "minItems": 1,

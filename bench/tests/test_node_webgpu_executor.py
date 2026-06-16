@@ -454,7 +454,75 @@ console.log(JSON.stringify(classified));
         self.assertEqual(result.returncode, 0, result.stderr)
         classified = json.loads(result.stdout)
         self.assertEqual(classified["unsupportedCode"], "device_unavailable")
+        self.assertEqual(classified["reason"], "adapter_unavailable")
         self.assertIn("vulkan runtime init failed", classified["detail"])
+
+    def test_provider_failure_reason_normalization(self) -> None:
+        script = f"""
+import {{
+  PROVIDER_FAILURE_REASONS,
+  normalizeProviderFailureReason,
+  providerAvailabilityFailure,
+}} from {json.dumps(EXECUTOR_MODULE_URL)};
+const payload = {{
+  reasons: PROVIDER_FAILURE_REASONS,
+  known: normalizeProviderFailureReason('native_webgpu_unavailable'),
+  unknown: normalizeProviderFailureReason('new_future_reason'),
+  failure: providerAvailabilityFailure({{
+    reason: 'provider_import_failed',
+    provider: 'node-webgpu',
+    providerName: 'node-webgpu',
+    runtimeHost: 'node',
+    loader: 'node-dawn',
+    stage: 'provider.resolve',
+    detail: 'Cannot find package webgpu',
+  }}),
+}};
+console.log(JSON.stringify(payload));
+"""
+        result = subprocess.run(
+            ["node", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertIn("native_webgpu_unavailable", payload["reasons"])
+        self.assertEqual(payload["known"], "native_webgpu_unavailable")
+        self.assertEqual(payload["unknown"], "runner_error")
+        self.assertEqual(payload["failure"]["reason"], "provider_import_failed")
+        self.assertEqual(payload["failure"]["runtimeHost"], "node")
+
+    def test_resolve_provider_module_availability_classifies_loader_failure(self) -> None:
+        script = f"""
+import {{ resolveProviderModuleAvailability }} from {json.dumps(EXECUTOR_MODULE_URL)};
+const availability = await resolveProviderModuleAvailability({{
+  provider: 'unit-test-provider',
+  providerName: 'Unit Test Provider',
+  executionBackend: 'unit_test_backend',
+  loader: 'unit-test-loader',
+}}, {{ runtimeHost: 'node' }});
+console.log(JSON.stringify(availability));
+"""
+        result = subprocess.run(
+            ["node", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        availability = json.loads(result.stdout)
+        self.assertFalse(availability["ok"])
+        self.assertEqual(availability["reason"], "unsupported_runtime_host")
+        self.assertEqual(availability["provider"], "unit-test-provider")
+        self.assertEqual(availability["providerName"], "Unit Test Provider")
+        self.assertEqual(availability["runtimeHost"], "node")
+        self.assertEqual(availability["loader"], "unit-test-loader")
+        self.assertEqual(availability["stage"], "provider.resolve")
+        self.assertIn("unsupported provider loader", availability["detail"])
 
     def test_build_shader_source_receipt_hashes_exact_source_text(self) -> None:
         script = f"""
@@ -519,6 +587,8 @@ const result = buildUnsupportedExecutionResult({{
   processWallMs: 1.5,
   unsupportedCode: 'provider_execution_unavailable',
   unsupportedDetail: 'node-webgpu execution unavailable for provider node-webgpu on this Apple host',
+  providerFailureReason: 'native_webgpu_unavailable',
+  evidenceBlockerCode: 'native_webgpu_unavailable',
 }});
 console.log(JSON.stringify(result));
 """
@@ -540,6 +610,8 @@ console.log(JSON.stringify(result));
             meta["unsupportedDetail"],
             "node-webgpu execution unavailable for provider node-webgpu on this Apple host",
         )
+        self.assertEqual(meta["providerFailureReason"], "native_webgpu_unavailable")
+        self.assertEqual(meta["evidenceBlockerCode"], "native_webgpu_unavailable")
         self.assertEqual(meta["hostInputReadTotalNs"], 0)
         self.assertEqual(meta["hostInputParseTotalNs"], 0)
         self.assertEqual(meta["hostWorkloadPrepareTotalNs"], 0)

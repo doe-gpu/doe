@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
 REQUIRED_CODES = {
     "runtime_available",
     "webgpu_runtime_unavailable",
@@ -85,7 +86,71 @@ def failure(code: str, path: str, message: str) -> dict[str, str]:
     return {"code": code, "path": path, "message": message}
 
 
-def check_taxonomy(payload: dict[str, Any]) -> list[dict[str, str]]:
+def load_evidence_blocker_codes(payload: dict[str, Any], root: Path = REPO_ROOT) -> tuple[set[str], list[dict[str, str]]]:
+    path_text = payload.get("evidenceBlockerTaxonomyPath")
+    if not isinstance(path_text, str) or not path_text:
+        return set(), [
+            failure(
+                "missing_evidence_blocker_taxonomy_path",
+                "evidenceBlockerTaxonomyPath",
+                "browser taxonomy must reference the shared evidence blocker taxonomy",
+            )
+        ]
+    source_path = Path(path_text)
+    if source_path.is_absolute() or ".." in source_path.parts:
+        return set(), [
+            failure(
+                "unsafe_evidence_blocker_taxonomy_path",
+                "evidenceBlockerTaxonomyPath",
+                "evidence blocker taxonomy path must be repo-relative",
+            )
+        ]
+    path = root.joinpath(*source_path.parts).resolve()
+    try:
+        path.relative_to(root.resolve())
+    except ValueError:
+        return set(), [
+            failure(
+                "unsafe_evidence_blocker_taxonomy_path",
+                "evidenceBlockerTaxonomyPath",
+                "evidence blocker taxonomy path must be repo-relative",
+            )
+        ]
+    if not path.is_file():
+        return set(), [
+            failure(
+                "missing_evidence_blocker_taxonomy_file",
+                "evidenceBlockerTaxonomyPath",
+                f"evidence blocker taxonomy file not found: {path_text}",
+            )
+        ]
+    try:
+        evidence_taxonomy = load_json(path)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return set(), [
+            failure(
+                "invalid_evidence_blocker_taxonomy",
+                "evidenceBlockerTaxonomyPath",
+                f"evidence blocker taxonomy is not a valid JSON object: {exc}",
+            )
+        ]
+    codes = evidence_taxonomy.get("codes", [])
+    if not isinstance(codes, list):
+        return set(), [
+            failure(
+                "invalid_evidence_blocker_taxonomy",
+                "evidenceBlockerTaxonomyPath",
+                "evidence blocker taxonomy codes must be an array",
+            )
+        ]
+    return {
+        str(row["blockerCode"])
+        for row in codes
+        if isinstance(row, dict) and isinstance(row.get("blockerCode"), str)
+    }, []
+
+
+def check_taxonomy(payload: dict[str, Any], root: Path | None = None) -> list[dict[str, str]]:
     failures: list[dict[str, str]] = []
     if payload.get("schemaVersion") != 1:
         failures.append(failure("invalid_schema_version", "schemaVersion", "schemaVersion must be 1"))
@@ -100,8 +165,11 @@ def check_taxonomy(payload: dict[str, Any]) -> list[dict[str, str]]:
     codes = payload.get("codes")
     if not isinstance(codes, list) or not codes:
         return failures + [failure("missing_codes", "codes", "codes must be a non-empty array")]
+    evidence_blocker_codes, evidence_failures = load_evidence_blocker_codes(payload, root or REPO_ROOT)
+    failures.extend(evidence_failures)
 
     seen: set[str] = set()
+    categories: dict[str, str] = {}
     for index, row in enumerate(codes):
         row_path = f"codes[{index}]"
         if not isinstance(row, dict):
@@ -116,6 +184,7 @@ def check_taxonomy(payload: dict[str, Any]) -> list[dict[str, str]]:
             failures.append(failure("duplicate_reason_code", f"{row_path}.reasonCode", f"duplicate reasonCode {code}"))
         else:
             seen.add(code)
+            categories[code] = str(row.get("category"))
         category = row.get("category")
         if category not in VALID_CATEGORIES:
             failures.append(failure("invalid_category", f"{row_path}.category", "category must use the browser unsupported reason taxonomy"))
@@ -168,6 +237,68 @@ def check_taxonomy(payload: dict[str, Any]) -> list[dict[str, str]]:
 
     for code in sorted(REQUIRED_CODES - seen):
         failures.append(failure("missing_required_reason_code", "codes", f"missing required reasonCode {code}"))
+
+    evidence_blocker_map = payload.get("evidenceBlockerMap")
+    if not isinstance(evidence_blocker_map, dict):
+        failures.append(
+            failure(
+                "missing_evidence_blocker_map",
+                "evidenceBlockerMap",
+                "browser taxonomy must map reason codes to evidence blocker codes",
+            )
+        )
+    else:
+        for code in sorted(seen):
+            if code not in evidence_blocker_map:
+                failures.append(
+                    failure(
+                        "missing_evidence_blocker_mapping",
+                        "evidenceBlockerMap",
+                        f"missing evidence blocker mapping for reasonCode {code}",
+                    )
+                )
+        for code, blocker_code in sorted(evidence_blocker_map.items()):
+            if code not in seen:
+                failures.append(
+                    failure(
+                        "unknown_evidence_blocker_mapping",
+                        f"evidenceBlockerMap.{code}",
+                        f"evidence blocker mapping references unknown reasonCode {code}",
+                    )
+                )
+            if not isinstance(blocker_code, str) or not blocker_code:
+                failures.append(
+                    failure(
+                        "invalid_evidence_blocker_code",
+                        f"evidenceBlockerMap.{code}",
+                        "evidence blocker code must be a non-empty string",
+                    )
+                )
+                continue
+            if blocker_code not in evidence_blocker_codes:
+                failures.append(
+                    failure(
+                        "unknown_evidence_blocker_code",
+                        f"evidenceBlockerMap.{code}",
+                        f"evidence blocker code {blocker_code!r} is not defined in config/evidence-blocker-taxonomy.json",
+                    )
+                )
+            elif categories.get(code) == "supported" and blocker_code != "none":
+                failures.append(
+                    failure(
+                        "supported_reason_has_blocker",
+                        f"evidenceBlockerMap.{code}",
+                        f"supported reasonCode {code} must map to none",
+                    )
+                )
+            elif categories.get(code) != "supported" and blocker_code == "none":
+                failures.append(
+                    failure(
+                        "non_supported_reason_missing_blocker",
+                        f"evidenceBlockerMap.{code}",
+                        f"non-supported reasonCode {code} must map to a blocker code",
+                    )
+                )
     return failures
 
 

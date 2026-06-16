@@ -13,6 +13,7 @@
     "autoModePreconditions",
     "denylist",
     "fallbackReasons",
+    "evidenceBlockerMap",
     "forcedDoeFailure",
     "observabilityFields"
   ],
@@ -96,6 +97,29 @@
           "explicit_operator_override",
           "unknown_selection_error"
         ]
+      }
+    },
+    "evidenceBlockerMap": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "enum": [
+          "global_disable_active",
+          "runtime_artifact_missing",
+          "runtime_artifact_load_failed",
+          "runtime_initialization_failed",
+          "symbol_surface_incomplete",
+          "wire_proc_table_incomplete",
+          "profile_denylisted",
+          "capability_requirement_failed",
+          "runtime_health_degraded",
+          "explicit_operator_override",
+          "unknown_selection_error"
+        ]
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
       }
     },
     "forcedDoeFailure": {

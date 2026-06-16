@@ -711,7 +711,7 @@ resolves its entries against repo root.
 - `check_browser_artifact_identity_coverage.py`
   - validates the configured identity anchors for smoke, flight-recorder, derived probe, claim, promotion, and release artifacts.
 - `check_browser_unsupported_reason_taxonomy.py`
-  - validates browser unsupported/fallback reason-code governance used by developer-visible fallback explanations.
+  - validates browser unsupported/fallback reason-code governance and its shared evidence-blocker mapping used by developer-visible fallback explanations.
 - `check_browser_claim_policy.py`
   - validates browser claim policy semantics for local and release modes, including required modes, strict/headless flags, no data-URL fallback, and release percentile coverage.
 - `check_browser_ownership.py`
@@ -723,7 +723,7 @@ resolves its entries against repo root.
 - `check_webgpu_integration_chromium.py`
   - validates the Chromium integration overlay, required browser seam capabilities, external-texture blocked state, wire-protocol notes, and optional repo-relative smoke-artifact linkage.
 - `check-browser-runtime-selector-policy.py`
-  - validates browser runtime selector modes, fallback taxonomy, fail-closed Doe behavior, and required observability fields.
+  - validates browser runtime selector modes, fallback taxonomy, fail-closed Doe behavior, required observability fields, and fallback-to-evidence-blocker mapping.
 - `check-browser-promotion-approvals.py`
   - validates browser promotion approval roles, approval timestamps, and exact workflow-required approval coverage.
 - `check-browser-workflow-manifest.py`

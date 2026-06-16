@@ -10,6 +10,7 @@
     "explanationSetId",
     "runtimeIdentity",
     "taxonomyPath",
+    "evidenceBlockerTaxonomyPath",
     "explanations",
     "privacy"
   ],
@@ -18,6 +19,7 @@
     "artifactKind": { "type": "string", "const": "browser_fallback_explanations" },
     "explanationSetId": { "type": "string", "minLength": 1 },
     "taxonomyPath": { "type": "string", "minLength": 1 },
+    "evidenceBlockerTaxonomyPath": { "type": "string", "minLength": 1 },
     "runtimeIdentity": {
       "type": "object",
       "additionalProperties": false,
@@ -55,6 +57,7 @@
         "surface",
         "status",
         "reasonCode",
+        "evidenceBlockerCode",
         "fallbackApplied",
         "hiddenFallbackAllowed",
         "developerAction",
@@ -77,6 +80,10 @@
         "surface": { "type": "string", "minLength": 1 },
         "status": { "enum": ["supported", "unsupported", "fallback", "blocked"] },
         "reasonCode": { "type": "string", "minLength": 1 },
+        "evidenceBlockerCode": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+        },
         "fallbackApplied": { "type": "boolean" },
         "hiddenFallbackAllowed": { "type": "boolean", "const": false },
         "developerAction": { "type": "string", "minLength": 1 },

@@ -59,6 +59,36 @@ def repo_relative(path: Path | str) -> str:
         return str(path)
 
 
+def repo_path(path_text: str) -> Path:
+    path = Path(path_text)
+    if path.is_absolute():
+        return path
+    return REPO_ROOT / path
+
+
+def load_browser_reason_taxonomy(path_text: str) -> dict[str, Any]:
+    return load_json(repo_path(path_text))
+
+
+def attach_evidence_blocker_codes(artifact: dict[str, Any], taxonomy: dict[str, Any]) -> dict[str, Any]:
+    evidence_blocker_map = taxonomy.get("evidenceBlockerMap", {})
+    if not isinstance(evidence_blocker_map, dict):
+        evidence_blocker_map = {}
+    evidence_blocker_taxonomy_path = taxonomy.get("evidenceBlockerTaxonomyPath")
+    artifact["evidenceBlockerTaxonomyPath"] = (
+        str(evidence_blocker_taxonomy_path)
+        if isinstance(evidence_blocker_taxonomy_path, str) and evidence_blocker_taxonomy_path
+        else "config/evidence-blocker-taxonomy.json"
+    )
+    for row in artifact.get("explanations", []):
+        if not isinstance(row, dict):
+            continue
+        reason_code = row.get("reasonCode")
+        blocker_code = evidence_blocker_map.get(reason_code)
+        row["evidenceBlockerCode"] = str(blocker_code) if isinstance(blocker_code, str) else "runtime_incomplete"
+    return artifact
+
+
 def find_mode_result(report: dict[str, Any], mode: str) -> dict[str, Any]:
     for result in report.get("modeResults", []):
         if isinstance(result, dict) and result.get("mode") == mode:
@@ -304,7 +334,7 @@ def build_explanations(
 ) -> dict[str, Any]:
     mode_result = find_mode_result(report, args.mode)
     report_ref = repo_relative(report_path)
-    return {
+    artifact = {
         "schemaVersion": 1,
         "artifactKind": "browser_fallback_explanations",
         "explanationSetId": args.explanation_set_id,
@@ -329,6 +359,7 @@ def build_explanations(
             "rawPageDataIncluded": False,
         },
     }
+    return attach_evidence_blocker_codes(artifact, load_browser_reason_taxonomy(args.taxonomy))
 
 
 def main() -> int:

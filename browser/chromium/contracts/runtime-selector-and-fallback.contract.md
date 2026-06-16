@@ -22,7 +22,8 @@ In scope:
 2. Kill switch policy.
 3. Adapter/profile denylist policy.
 4. Fallback reason taxonomy.
-5. Required observability fields.
+5. Fallback-to-evidence-blocker mapping.
+6. Required observability fields.
 
 Out of scope:
 
@@ -38,7 +39,8 @@ and validates against
 [`config/browser-runtime-selector-policy.schema.json`](../../../config/browser-runtime-selector-policy.schema.json).
 The policy records the selection modes, control precedence, emergency kill
 switch, auto-mode preconditions, denylist reason, fallback taxonomy,
-forced-Doe failure behavior, and required observability fields.
+fallback-to-evidence-blocker mapping, forced-Doe failure behavior, and required
+observability fields.
 Chromium source adapter filtering must also carry denylist detail once adapter
 identity is available: `adapter_denylist_detail` includes
 `profile_denylisted`, vendor/device IDs, adapter/backend type, and the
@@ -126,6 +128,15 @@ language.
 
 No free-form fallback reasons in reporting; reasons must be typed from this taxonomy.
 
+## Evidence blocker mapping
+
+Each fallback reason in the browser policy must map through
+`evidenceBlockerMap` to a shared code from
+[`config/evidence-blocker-taxonomy.json`](../../../config/evidence-blocker-taxonomy.json).
+Browser reports keep the browser-specific `fallbackReasonCode`, while Doe
+receipts and gates can interpret the same state through the shared blocker
+vocabulary. Forced-Doe failures must never map to `none`.
+
 ## Required observability fields
 
 Per runtime session:
@@ -212,5 +223,6 @@ Advisory:
 
 1. Control-surface precedence implemented and tested.
 2. Fallback taxonomy implemented and schema-backed.
-3. Required observability fields present in artifacts.
-4. Required negative tests pass in CI for target matrix.
+3. Fallback-to-evidence-blocker mapping implemented and schema-backed.
+4. Required observability fields present in artifacts.
+5. Required negative tests pass in CI for target matrix.

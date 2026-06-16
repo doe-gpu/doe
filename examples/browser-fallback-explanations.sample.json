@@ -3,6 +3,7 @@
   "artifactKind": "browser_fallback_explanations",
   "explanationSetId": "browser-fallback-smoke",
   "taxonomyPath": "config/browser-unsupported-reason-taxonomy.json",
+  "evidenceBlockerTaxonomyPath": "config/evidence-blocker-taxonomy.json",
   "runtimeIdentity": {
     "runtimeIdentityPath": "examples/browser-runtime-identity.sample.json",
     "selectedRuntime": "browser_navigator_gpu",
@@ -15,6 +16,7 @@
       "surface": "navigator.gpu",
       "status": "supported",
       "reasonCode": "runtime_available",
+      "evidenceBlockerCode": "none",
       "fallbackApplied": false,
       "hiddenFallbackAllowed": false,
       "developerAction": "keep forced-runtime artifact attached to browser report",
@@ -26,6 +28,7 @@
       "surface": "GPUExternalTexture",
       "status": "unsupported",
       "reasonCode": "external_texture_probe_not_promoted",
+      "evidenceBlockerCode": "runtime_incomplete",
       "fallbackApplied": false,
       "hiddenFallbackAllowed": false,
       "developerAction": "run the external texture probe before claiming media-path support",
