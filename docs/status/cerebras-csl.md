@@ -21,10 +21,9 @@ This doc retains dated context entries (architecture, named blockers,
 follow-up work) below. Numbers, verdicts, and "which launch are we on"
 belong in the snapshot, never here.
 
-Sharding follow-up: owner Doe Cerebras; split remaining HostPlan front-door
-and runtime materialization targets:
-`bench/runners/csl-runners/int4ple_compile_target_sim_runner.py` and
-`bench/runners/csl-runners/gemma4_31b_af16_hostplan_streaming_runner.py`.
+Sharding follow-up: owner Doe Cerebras; split the remaining HostPlan runtime
+subprocess/checkpoint launch loop out of
+`bench/runners/csl-runners/int4ple_compile_target_sim_runner.py`.
 
 Contract note: `doe-transcript-parity-report` schema v2 makes generated-token
 exact parity and logits comparison status explicit. `max_abs` is the Doppler
@@ -37,6 +36,13 @@ tolerance-backed logits gate unless a reference export declares
 final execution-plan builder and compatibility exports. Metadata/common
 parsing, tensor transform rules, binding materialization, and buffer planning
 live in focused `int4ple_hostplan_execution_*` modules.
+
+## 2026-06-16 — 31B af16 HostPlan front door sharded
+
+`bench/runners/csl-runners/gemma4_31b_af16_hostplan_streaming_runner.py` now
+keeps CLI parsing, per-kernel refresh, evidence-gate evaluation, and final
+trace assembly. Shared constants/path helpers and the weight-staging plus
+dispatch-planning logic live in focused `gemma4_31b_af16_hostplan_*` modules.
 
 ## 2026-06-16 — 31B af16 session runtime sharded
 
