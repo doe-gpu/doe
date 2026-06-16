@@ -25,14 +25,18 @@ Sharding follow-up: owner Doe Cerebras; split
 `bench/runners/csl-runners/gemma4_31b_af16_session_runtime.py` by moving
 checkpoint identity and transcript artifact assembly into focused modules.
 
-Sharding follow-up: owner Doe Cerebras; split
-`bench/tools/e2b_layer_block_self_check.py` by moving E2B layer-block
-verification helpers into focused modules.
-
 Contract note: `doe-transcript-parity-report` schema v2 makes generated-token
 exact parity and logits comparison status explicit. `max_abs` is the Doppler
 tolerance-backed logits gate unless a reference export declares
 `sha256_exact`.
+
+## 2026-06-16 — E2B self-check contracts sharded
+
+`bench/tools/e2b_layer_block_self_check.py` now stays focused on step
+orchestration and dispatches receipt, model, demo tooling, and evidence-bundle
+contract assertions through focused modules. The E2B layer-block sharding
+follow-up is closed; the remaining live Python sharding follow-up is the
+Gemma 4 31B af16 session runtime split above.
 
 ## 2026-05-06 — Gemma and Qwen CSL tail checks widened
 

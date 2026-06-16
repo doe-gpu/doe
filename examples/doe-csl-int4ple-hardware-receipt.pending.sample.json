@@ -86,7 +86,7 @@
     "hostEntrypointSha256": "fa549136f8d099cb4e86e8dd28df213a4a828da620039e0ae2aa6f6e567f6e5f",
     "inputSetSha256": "08b6c8575a07da302a2369533efa23aeaa800c053c85fbba014a88db7dd8c7a0",
     "manifestPath": "/home/x/deco/doppler/models/local/gemma-4-e2b-it-q4k-ehf16-af32-int4ple/manifest.json",
-    "manifestSha256": "d3bd97d3f9065d2950cbee4267b93f345eabbb626eb7b8b9c96c9b0f590b6264",
+    "manifestSha256": "22d7d942436738ba7c0ea35e30f2a3f305fc57da2a4c41b247ad194b9ccbfef4",
     "programBundle": {
       "path": "bench/out/doppler-reference/gemma-4-e2b-int4ple-doe-csl-hostplan/doppler-program-bundle.json",
       "sha256": "pending",

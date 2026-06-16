@@ -224,7 +224,7 @@
     "status": "hostplan_ready",
     "weightMappingCoverage": {
       "manifestPath": "/home/x/deco/doppler/models/local/gemma-4-e2b-it-q4k-ehf16-af32-int4ple/manifest.json",
-      "manifestSha256": "d3bd97d3f9065d2950cbee4267b93f345eabbb626eb7b8b9c96c9b0f590b6264",
+      "manifestSha256": "22d7d942436738ba7c0ea35e30f2a3f305fc57da2a4c41b247ad194b9ccbfef4",
       "mappedWeightCount": 142,
       "mappedWeightKeysSha256": "62c167c16349c6d52ac90e66c9c508206897aaff6e3d8c004cf6af52ce6aec56",
       "missingWeightCount": 0,
@@ -984,7 +984,7 @@
     "graphSha256": "a596c0a4ebfa181d94c191efa026b682a05c57993b8f02ac19e9aa17e8891765",
     "inputSetSha256": "352c293b4e41d1eeb7b9cddee3a96a36f31b4c488de21d0af0399dacc64bb39c",
     "manifestPath": "/home/x/deco/doppler/models/local/gemma-4-e2b-it-q4k-ehf16-af32-int4ple/manifest.json",
-    "manifestSha256": "d3bd97d3f9065d2950cbee4267b93f345eabbb626eb7b8b9c96c9b0f590b6264",
+    "manifestSha256": "22d7d942436738ba7c0ea35e30f2a3f305fc57da2a4c41b247ad194b9ccbfef4",
     "weightSetId": "gemma-4-e2b-it-q4k-ehf16-af32-int4ple-wp-catalog-v1",
     "weightSha256": "b5d9977ff3e211ed28dff3625474421ffab828b3a324ae8f052eab341fe9e4d4"
   },

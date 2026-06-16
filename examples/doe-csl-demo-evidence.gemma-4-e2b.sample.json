@@ -54,7 +54,7 @@
         "graphPath": "bench/out/doppler-reference/gemma-4-e2b-int4ple-production-final-logits/execution_graph.json",
         "graphSha256": "a596c0a4ebfa181d94c191efa026b682a05c57993b8f02ac19e9aa17e8891765",
         "manifestPath": "/home/x/deco/doppler/models/local/gemma-4-e2b-it-q4k-ehf16-af32-int4ple/manifest.json",
-        "manifestSha256": "d3bd97d3f9065d2950cbee4267b93f345eabbb626eb7b8b9c96c9b0f590b6264",
+        "manifestSha256": "22d7d942436738ba7c0ea35e30f2a3f305fc57da2a4c41b247ad194b9ccbfef4",
         "weightSetId": "gemma-4-e2b-it-q4k-ehf16-af32-int4ple-wp-catalog-v1",
         "weightSha256": "b5d9977ff3e211ed28dff3625474421ffab828b3a324ae8f052eab341fe9e4d4"
       },
@@ -72,7 +72,7 @@
         "graphPath": "bench/out/doppler-reference/gemma-4-e2b-int4ple-production-final-logits/execution_graph.json",
         "graphSha256": "a596c0a4ebfa181d94c191efa026b682a05c57993b8f02ac19e9aa17e8891765",
         "manifestPath": "/home/x/deco/doppler/models/local/gemma-4-e2b-it-q4k-ehf16-af32-int4ple/manifest.json",
-        "manifestSha256": "d3bd97d3f9065d2950cbee4267b93f345eabbb626eb7b8b9c96c9b0f590b6264",
+        "manifestSha256": "22d7d942436738ba7c0ea35e30f2a3f305fc57da2a4c41b247ad194b9ccbfef4",
         "weightSetId": "gemma-4-e2b-it-q4k-ehf16-af32-int4ple-wp-catalog-v1",
         "weightSha256": "b5d9977ff3e211ed28dff3625474421ffab828b3a324ae8f052eab341fe9e4d4"
       },
