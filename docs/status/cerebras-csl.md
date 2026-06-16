@@ -26,8 +26,8 @@ Sharding follow-up: owner Doe Cerebras; split
 checkpoint identity and transcript artifact assembly into focused modules.
 
 Sharding follow-up: owner Doe Cerebras; split
-`bench/runners/csl-runners/int4ple_compile_target_sim_runner.py` by moving
-session compact-dispatch helpers into focused runtime modules.
+`bench/tools/e2b_layer_block_self_check.py` by moving E2B layer-block
+verification helpers into focused modules.
 
 Contract note: `doe-transcript-parity-report` schema v2 makes generated-token
 exact parity and logits comparison status explicit. `max_abs` is the Doppler
