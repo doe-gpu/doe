@@ -36,6 +36,53 @@ from bench.native_compare_modules.executor_registry import (
 BUN = shutil.which("bun")
 
 
+def _bun_webgpu_unavailable_reason() -> str:
+    if not BUN:
+        return "bun is required for Bun ORT provider helper tests"
+    script = """
+try {
+  const mod = await import('bun-webgpu');
+  if (typeof mod.setupGlobals !== 'function') {
+    throw new Error('bun-webgpu does not export setupGlobals()');
+  }
+  mod.setupGlobals();
+  if (!globalThis.navigator?.gpu) {
+    throw new Error('bun-webgpu did not install navigator.gpu');
+  }
+} catch (error) {
+  console.error(error?.stack || String(error));
+  process.exit(1);
+}
+"""
+    result = subprocess.run(
+        [BUN, "--eval", script],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode == 0:
+        return ""
+    lines = [
+        line.strip()
+        for line in (result.stderr or result.stdout).strip().splitlines()
+        if line.strip()
+    ]
+    for line in lines:
+        if "bun-webgpu is not supported" in line:
+            return line
+    for line in lines:
+        if "Bun has crashed" in line:
+            return "bun-webgpu provider probe crashed under Bun"
+    for line in lines:
+        if line.startswith("Error:"):
+            return line
+    return lines[-1] if lines else "bun-webgpu provider is unavailable"
+
+
+BUN_WEBGPU_UNAVAILABLE = _bun_webgpu_unavailable_reason()
+
+
 @dataclass(frozen=True)
 class LaneFixture:
     workloads_path: Path
@@ -209,7 +256,7 @@ class BunOrtWebGpuProviderCompareLaneTests(_CompareLaneBase):
     def test_node_scenario_loader_resolves_bun_provider_compare_fields(self) -> None:
         self._run_scenario_loader()
 
-    @unittest.skipUnless(BUN, "bun is required for Bun ORT provider helper tests")
+    @unittest.skipIf(BUN_WEBGPU_UNAVAILABLE, BUN_WEBGPU_UNAVAILABLE)
     def test_bun_provider_helper_supports_doe_and_bun_webgpu(self) -> None:
         script = f"""
 import {{ installTjsOrtWebGpuProvider }} from {json.dumps(_BUN_SHARED_MODULE_URL)};
@@ -256,7 +303,7 @@ console.log(JSON.stringify({{
         self.assertTrue(payload["hasDoeGpu"])
         self.assertTrue(payload["hasBunGpu"])
 
-    @unittest.skipUnless(BUN, "bun is required for Bun ORT provider helper tests")
+    @unittest.skipIf(BUN_WEBGPU_UNAVAILABLE, BUN_WEBGPU_UNAVAILABLE)
     def test_bun_provider_helper_allows_backend_type_override_to_default(self) -> None:
         script = f"""
 import {{ installTjsOrtWebGpuProvider }} from {json.dumps(_BUN_SHARED_MODULE_URL)};
