@@ -23,14 +23,20 @@ belong in the snapshot, never here.
 
 Sharding follow-up: owner Doe Cerebras; split remaining HostPlan front-door
 and runtime materialization targets:
-`bench/runners/csl-runners/int4ple_hostplan_execution_plan.py`,
-`bench/runners/csl-runners/int4ple_compile_target_sim_runner.py`, and
+`bench/runners/csl-runners/int4ple_compile_target_sim_runner.py` and
 `bench/runners/csl-runners/gemma4_31b_af16_hostplan_streaming_runner.py`.
 
 Contract note: `doe-transcript-parity-report` schema v2 makes generated-token
 exact parity and logits comparison status explicit. `max_abs` is the Doppler
 tolerance-backed logits gate unless a reference export declares
 `sha256_exact`.
+
+## 2026-06-16 — HostPlan execution-plan materialization sharded
+
+`bench/runners/csl-runners/int4ple_hostplan_execution_plan.py` now keeps the
+final execution-plan builder and compatibility exports. Metadata/common
+parsing, tensor transform rules, binding materialization, and buffer planning
+live in focused `int4ple_hostplan_execution_*` modules.
 
 ## 2026-06-16 — 31B af16 session runtime sharded
 
