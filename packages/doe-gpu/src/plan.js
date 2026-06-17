@@ -436,6 +436,110 @@ function unsupported(graph, method, reason) {
   throw new Error(`Doe capture provider does not support ${method}: ${reason}`);
 }
 
+function sha256Urn(value) {
+  if (typeof value !== 'string' || value.length === 0) {
+    return null;
+  }
+  return value.startsWith('sha256:') ? value : `sha256:${value}`;
+}
+
+function parseWgslWorkgroupSize(code) {
+  if (typeof code !== 'string') {
+    return null;
+  }
+  const match = code.match(/@workgroup_size\s*\(\s*(\d+)(?:\s*,\s*(\d+))?(?:\s*,\s*(\d+))?\s*\)/u);
+  if (!match) {
+    return null;
+  }
+  return [
+    Number(match[1]),
+    Number(match[2] ?? 1),
+    Number(match[3] ?? 1),
+  ];
+}
+
+export function collectCaptureDispatchShaderEvidence(graph) {
+  const shaderModulesSource = Array.isArray(graph?.shaderModules) ? graph.shaderModules : [];
+  const computePipelines = Array.isArray(graph?.computePipelines) ? graph.computePipelines : [];
+  const commandBuffers = Array.isArray(graph?.commandBuffers) ? graph.commandBuffers : [];
+  const readbacks = Array.isArray(graph?.readbacks) ? graph.readbacks : [];
+  const missing = [];
+  const modulesById = new Map(shaderModulesSource.map((module) => [module.id, module]));
+  const pipelinesById = new Map(computePipelines.map((pipeline) => [pipeline.id, pipeline]));
+  const shaderModules = shaderModulesSource.map((module) => {
+    const sourceSha256 = sha256Urn(module.wgslSha256);
+    const workgroupSize = parseWgslWorkgroupSize(module.code);
+    if (!sourceSha256) {
+      missing.push({
+        field: 'shaderModules.sourceSha256',
+        moduleId: module.id,
+        reason: 'materialized_shader_hash_unavailable',
+      });
+    }
+    if (!workgroupSize) {
+      missing.push({
+        field: 'shaderModules.workgroupSize',
+        moduleId: module.id,
+        reason: 'workgroup_size_unavailable',
+      });
+    }
+    missing.push({
+      field: 'shaderModules.sourcePath',
+      moduleId: module.id,
+      reason: 'capture_graph_source_path_unavailable',
+    });
+    return {
+      moduleId: String(module.id),
+      sourcePath: null,
+      sourceSha256,
+      entryPoint: null,
+      workgroupSize,
+    };
+  });
+  const dispatches = [];
+  for (const commandBuffer of commandBuffers) {
+    for (const command of commandBuffer.commands ?? []) {
+      if (command?.kind !== 'beginComputePass') {
+        continue;
+      }
+      for (const passCommand of command.commands ?? []) {
+        if (passCommand?.kind !== 'dispatchWorkgroups') {
+          continue;
+        }
+        const pipeline = pipelinesById.get(passCommand.pipeline) ?? null;
+        const shaderModule = pipeline ? modulesById.get(pipeline.module) : null;
+        dispatches.push({
+          dispatchIndex: dispatches.length,
+          pipelineId: pipeline ? String(pipeline.id) : null,
+          shaderModuleId: shaderModule ? String(shaderModule.id) : null,
+          entryPoint: pipeline?.entryPoint ?? null,
+          workgroups: [
+            Number(passCommand.x ?? 1),
+            Number(passCommand.y ?? 1),
+            Number(passCommand.z ?? 1),
+          ],
+        });
+      }
+    }
+  }
+  const digestReadback = [...readbacks]
+    .reverse()
+    .find((readback) => typeof readback?.sha256 === 'string' && readback.sha256);
+  const outputDigest = sha256Urn(digestReadback?.sha256);
+  if (!outputDigest) {
+    missing.push({
+      field: 'outputDigest',
+      reason: 'readback_digest_unavailable',
+    });
+  }
+  return Object.freeze({
+    shaderModules,
+    dispatches,
+    outputDigest,
+    ...(missing.length > 0 ? { missing } : {}),
+  });
+}
+
 export function createCaptureProvider(options = {}) {
   let nextId = 1;
   const graph = {

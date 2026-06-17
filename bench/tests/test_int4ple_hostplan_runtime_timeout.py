@@ -1176,5 +1176,107 @@ class HostPlanRuntimeTimeout(unittest.TestCase):
             self.assertIn("hostplan_launch_timeout", phases)
 
 
+class HostPlanRuntimeLaunchHelperTest(unittest.TestCase):
+    def test_helper_generic_launch_preserves_checkpoint_status_shape(self) -> None:
+        helper = runner._runtime_launch
+
+        def unused_launch_hook(**_kwargs: object) -> dict:
+            raise AssertionError("unexpected launch hook")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            progress_path = tmp / "progress.jsonl"
+            trace_path = tmp / "trace.json"
+            output_path = tmp / "hostplan-runtime" / "buffers" / "output.npy"
+            bootstrap = {
+                "launches": [
+                    {
+                        "launchIndex": 2,
+                        "targetName": "generic_target",
+                        "launchFunction": "compute",
+                        "compileDir": str(tmp / "compiled"),
+                        "targetGeometry": {"width": 1, "height": 1},
+                    }
+                ],
+                "targetSessions": [{"targetName": "generic_target"}],
+            }
+
+            def fake_stage_launch_arrays(
+                **_kwargs: object,
+            ) -> tuple[list[dict], list[dict]]:
+                return [], [
+                    {
+                        "symbol": "output",
+                        "buffer": "activation:generic",
+                        "path": str(output_path),
+                        "dtype": "f16",
+                    }
+                ]
+
+            hooks = helper.HostPlanRuntimeLaunchHooks(
+                execute_embed_roi_launch=unused_launch_hook,
+                stage_launch_arrays=fake_stage_launch_arrays,
+                execute_tiled_q4k_gemv_launch=unused_launch_hook,
+                execute_compact_ple_proj_launch=unused_launch_hook,
+                execute_compact_attention_prefill_launch=unused_launch_hook,
+                execute_rmsnorm_roi_launch=unused_launch_hook,
+                execute_residual_prefill_roi_launch=unused_launch_hook,
+                execute_compact_gated_prefill_launch=unused_launch_hook,
+                execute_dense_gemv_tiled_session_launch=unused_launch_hook,
+            )
+
+            def fake_run(
+                command: list[str],
+                **_kwargs: object,
+            ) -> subprocess.CompletedProcess[str]:
+                receipt_path = Path(command[command.index("--receipt-out") + 1])
+                receipt_path.parent.mkdir(parents=True, exist_ok=True)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                output_path.write_bytes(b"out")
+                receipt_path.write_text(
+                    json.dumps(
+                        {
+                            "schemaVersion": 1,
+                            "artifactKind": "int4ple_launch_step_receipt",
+                            "status": "succeeded",
+                            "blockers": [],
+                            "launchIndex": 2,
+                            "targetName": "generic_target",
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                return subprocess.CompletedProcess(
+                    command,
+                    0,
+                    stdout="stdout line\n",
+                    stderr="stderr line\n",
+                )
+
+            with (
+                mock.patch.object(helper, "cs_python_executable", return_value=sys.executable),
+                mock.patch.object(helper.subprocess, "run", side_effect=fake_run),
+            ):
+                result = helper.execute_hostplan_runtime(
+                    bootstrap=bootstrap,
+                    export={},
+                    progress_path=progress_path,
+                    cmaddr=None,
+                    trace_path=trace_path,
+                    hooks=hooks,
+                    stop_after_launch=2,
+                )
+
+            self.assertEqual(result["status"], "stopped_at_checkpoint")
+            self.assertEqual(result["blockers"], [])
+            self.assertEqual(result["executedLaunchCount"], 1)
+            self.assertEqual(result["launchCount"], 1)
+            self.assertEqual(result["targetSessions"], bootstrap["targetSessions"])
+            self.assertTrue(result["stoppedAtCheckpoint"])
+            self.assertEqual(result["launches"][0]["status"], "succeeded")
+            self.assertEqual(result["launches"][0]["stdoutTail"], ["stdout line"])
+            self.assertEqual(result["launches"][0]["stderrTail"], ["stderr line"])
+
+
 if __name__ == "__main__":
     unittest.main()

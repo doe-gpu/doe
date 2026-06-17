@@ -314,6 +314,134 @@ function shaderSourceReceiptFields(shaderSourceReceipts) {
   };
 }
 
+function parseWgslWorkgroupSize(code) {
+  if (typeof code !== 'string') {
+    return null;
+  }
+  const match = code.match(/@workgroup_size\s*\(\s*(\d+)(?:\s*,\s*(\d+))?(?:\s*,\s*(\d+))?\s*\)/u);
+  if (!match) {
+    return null;
+  }
+  return [
+    Number(match[1]),
+    Number(match[2] ?? 1),
+    Number(match[3] ?? 1),
+  ];
+}
+
+function sha256Urn(value) {
+  if (typeof value !== 'string' || value.length === 0) {
+    return null;
+  }
+  return value.startsWith('sha256:') ? value : `sha256:${value}`;
+}
+
+export function collectPackageDispatchShaderEvidence({
+  normalizedPlan,
+  shaderSourceReceipts = [],
+  shaderModuleEvidenceInputs = [],
+  dispatchStates = [],
+  readbackCaptures = [],
+}) {
+  const modules = Array.isArray(normalizedPlan?.modules) ? normalizedPlan.modules : [];
+  const steps = Array.isArray(normalizedPlan?.steps) ? normalizedPlan.steps : [];
+  const receiptsByModule = new Map(
+    shaderSourceReceipts.map((receipt) => [receipt.moduleId, receipt]),
+  );
+  const evidenceInputsByModule = new Map(
+    shaderModuleEvidenceInputs.map((entry) => [entry.moduleId, entry]),
+  );
+  const missing = [];
+  const shaderModules = modules.map((moduleDef) => {
+    const receipt = receiptsByModule.get(moduleDef.id) ?? {};
+    const evidenceInput = evidenceInputsByModule.get(moduleDef.id) ?? {};
+    const sourcePath = (
+      typeof evidenceInput.sourcePath === 'string'
+        ? evidenceInput.sourcePath
+        : typeof receipt.path === 'string'
+          ? receipt.path
+        : moduleDef.source?.kind === 'file' && typeof moduleDef.source?.path === 'string'
+          ? moduleDef.source.path
+          : null
+    );
+    const sourceSha256 = sha256Urn(evidenceInput.sourceSha256 ?? receipt.sha256);
+    const workgroupSize = Array.isArray(evidenceInput.workgroupSize)
+      ? [...evidenceInput.workgroupSize]
+      : Array.isArray(moduleDef.workgroupSize)
+        ? [...moduleDef.workgroupSize]
+      : null;
+    if (!sourceSha256) {
+      missing.push({
+        field: 'shaderModules.sourceSha256',
+        moduleId: moduleDef.id,
+        reason: 'shader_source_receipt_unavailable',
+      });
+    }
+    if (!workgroupSize) {
+      missing.push({
+        field: 'shaderModules.workgroupSize',
+        moduleId: moduleDef.id,
+        reason: 'workgroup_size_unavailable',
+      });
+    }
+    return {
+      moduleId: moduleDef.id,
+      sourcePath,
+      sourceSha256,
+      entryPoint: evidenceInput.entryPoint ?? receipt.entryPoint ?? moduleDef.entryPoint ?? null,
+      workgroupSize,
+    };
+  });
+  const moduleEntryPoints = new Map(
+    modules.map((moduleDef) => [moduleDef.id, moduleDef.entryPoint ?? null]),
+  );
+  let dispatchIndex = 0;
+  const dispatches = [];
+  for (const step of steps) {
+    if (step?.kind !== 'dispatch') {
+      continue;
+    }
+    const state = dispatchStates[dispatchIndex] ?? null;
+    const entryPoint = (
+      state?.entryPoint
+      ?? step.entryPoint
+      ?? moduleEntryPoints.get(step.moduleId)
+      ?? null
+    );
+    dispatches.push({
+      dispatchIndex,
+      pipelineId: state?.pipelineId ?? null,
+      shaderModuleId: state?.shaderModuleId ?? step.moduleId ?? null,
+      entryPoint,
+      workgroups: Array.isArray(step.workgroups) ? [...step.workgroups] : null,
+    });
+    if (!state?.pipelineId) {
+      missing.push({
+        field: 'dispatches.pipelineId',
+        dispatchIndex,
+        reason: 'pipeline_state_unavailable',
+      });
+    }
+    dispatchIndex += 1;
+  }
+  const lastDigestCapture = [...readbackCaptures]
+    .reverse()
+    .find((capture) => typeof capture?.sha256 === 'string' && capture.sha256);
+  const outputDigest = sha256Urn(lastDigestCapture?.sha256);
+  if (!outputDigest) {
+    missing.push({
+      field: 'outputDigest',
+      reason: 'readback_digest_unavailable',
+    });
+  }
+  return Object.freeze({
+    shaderModules,
+    dispatches,
+    outputDigest,
+    ...(missing.length > 0 ? { missing } : {}),
+  });
+}
+
 async function readShaderSource(moduleDef) {
   if (moduleDef.source.kind === 'inline') {
     return moduleDef.source.code;
@@ -2206,6 +2334,7 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
   const bindGroupCache = new Map();
   const setupBreakdownNs = zeroPackageSetupBreakdown();
   const shaderSourceInputs = [];
+  const shaderModuleEvidenceInputs = [];
   debugLog('runtime.setup.start', {
     bufferCount: normalizedPlan.buffers.length,
     moduleCount: normalizedPlan.modules.length,
@@ -2254,6 +2383,13 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
     shaderModules.set(moduleDef.id, device.createShaderModule({ code }));
     setupBreakdownNs.shaderModuleCreateTotalNs += nsDelta(moduleStartedAt);
     shaderSourceInputs.push({ moduleDef, code });
+    shaderModuleEvidenceInputs.push({
+      moduleId: moduleDef.id,
+      sourcePath: moduleDef.source?.kind === 'file' ? moduleDef.source.path : null,
+      sourceSha256: sha256Urn(digestText(code)),
+      entryPoint: moduleDef.entryPoint ?? null,
+      workgroupSize: parseWgslWorkgroupSize(code),
+    });
   }
 
   let dispatchSetupIndex = 0;
@@ -2294,9 +2430,17 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
     let pipelineLayout = pipelineLayoutCache.get(layoutKey);
     let pipeline = pipelineCache.get(pipelineKey);
     let bindGroup = bindGroupCache.get(bindGroupKey);
+    const dispatchState = () => ({
+      step,
+      pipeline,
+      bindGroup,
+      pipelineId: pipelineKey,
+      shaderModuleId: step.moduleId,
+      entryPoint: step.entryPoint ?? 'main',
+    });
 
     if (bindGroupLayout && pipelineLayout && pipeline && bindGroup) {
-      dispatchStates.push({ step, pipeline, bindGroup });
+      dispatchStates.push(dispatchState());
       dispatchSetupIndex += 1;
       continue;
     }
@@ -2335,7 +2479,7 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
       setupBreakdownNs.bindGroupCreateTotalNs += nsDelta(bindGroupStartedAt);
       bindGroupCache.set(bindGroupKey, bindGroup);
     }
-    dispatchStates.push({ step, pipeline, bindGroup });
+    dispatchStates.push(dispatchState());
     dispatchSetupIndex += 1;
   }
   const dispatchPrewarmTotalNs = prewarmDispatchBindings
@@ -2380,6 +2524,7 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
     setupTotalNs,
     setupBreakdownNs,
     shaderSourceReceipts,
+    shaderModuleEvidenceInputs,
   };
 }
 
@@ -3072,6 +3217,13 @@ async function executeSample(
     runtime.queue,
     packagePipelineCacheFlushNs,
   );
+  runtime.internalDispatchShaderEvidence = collectPackageDispatchShaderEvidence({
+    normalizedPlan,
+    shaderSourceReceipts: runtime.shaderSourceReceipts,
+    shaderModuleEvidenceInputs: runtime.shaderModuleEvidenceInputs,
+    dispatchStates: runtime.dispatchStates,
+    readbackCaptures,
+  });
 
   const meta = {
     schemaVersion: 1,

@@ -87,6 +87,58 @@ function sha256OfBytes(bytes) {
   return createHash('sha256').update(bytes).digest('hex');
 }
 
+function sha256Urn(value) {
+  if (typeof value !== 'string' || value.length === 0) {
+    return null;
+  }
+  return value.startsWith('sha256:') ? value : `sha256:${value}`;
+}
+
+function firstString(...values) {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value;
+    }
+  }
+  return null;
+}
+
+function collectMissingIdentity(identity) {
+  const missing = {};
+  for (const [field, value] of Object.entries(identity)) {
+    if (value === null || value === undefined || value === '') {
+      missing[field] = { reason: `${field}_unavailable` };
+    }
+  }
+  return missing;
+}
+
+export function collectProgramBundleIdentity(loaded) {
+  const bundle = loaded?.bundle ?? {};
+  const runtimeProfile = bundle.runtimeProfile ?? {};
+  const kernelRegistry = bundle.kernelRegistry ?? {};
+  const identity = {
+    modelId: firstString(bundle.modelId),
+    manifestPath: firstString(bundle.manifest?.path),
+    manifestSha256: sha256Urn(bundle.manifest?.sha256),
+    runtimeProfileId: firstString(
+      runtimeProfile.id,
+      runtimeProfile.profileId,
+    ),
+    runtimeProfilePath: firstString(runtimeProfile.path),
+    runtimeProfileSha256: sha256Urn(runtimeProfile.sha256),
+    kernelRegistryPath: firstString(kernelRegistry.path),
+    kernelRegistrySha256: sha256Urn(kernelRegistry.sha256),
+    shardSetHash: sha256Urn(bundle.shardSetHash),
+    inputContractSha256: sha256Urn(bundle.tokenizerInput?.inputSetSha256),
+  };
+  const missing = collectMissingIdentity(identity);
+  return Object.freeze({
+    ...identity,
+    ...(Object.keys(missing).length > 0 ? { missing } : {}),
+  });
+}
+
 function loadBundle(programBundlePath) {
   const bundlePath = resolve(programBundlePath);
   if (!existsSync(bundlePath)) {
@@ -352,6 +404,7 @@ export async function runProgramBundleInference(options = {}) {
   }
 
   const loaded = loadBundle(programBundlePath);
+  const internalDopplerIdentity = collectProgramBundleIdentity(loaded);
   const sourceRoot = resolveWgslSourceRoot(loaded, options.wgslSourceRoot);
   const modulesInventory = inventoryWgslModules(loaded, sourceRoot);
   const hostEntrypoint = declaredHostEntrypoint(loaded);
@@ -368,7 +421,7 @@ export async function runProgramBundleInference(options = {}) {
     },
     bundle: {
       bundleId: loaded.bundle.bundleId || null,
-      modelId: loaded.bundle.modelId || null,
+      modelId: internalDopplerIdentity.modelId || null,
       executionGraphHash:
         (loaded.bundle.execution && loaded.bundle.execution.graphHash) ||
         loaded.bundle.executionGraphHash ||

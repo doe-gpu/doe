@@ -466,7 +466,8 @@ import {{
 }} from {json.dumps(EXECUTOR_MODULE_URL)};
 const payload = {{
   reasons: PROVIDER_FAILURE_REASONS,
-  known: normalizeProviderFailureReason('native_webgpu_unavailable'),
+  knownNative: normalizeProviderFailureReason('native_webgpu_unavailable'),
+  knownAddon: normalizeProviderFailureReason('native_addon_unavailable'),
   unknown: normalizeProviderFailureReason('new_future_reason'),
   failure: providerAvailabilityFailure({{
     reason: 'provider_import_failed',
@@ -490,10 +491,14 @@ console.log(JSON.stringify(payload));
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
         self.assertIn("native_webgpu_unavailable", payload["reasons"])
-        self.assertEqual(payload["known"], "native_webgpu_unavailable")
+        self.assertIn("provider_unavailable", payload["reasons"])
+        self.assertEqual(payload["knownNative"], "native_webgpu_unavailable")
+        self.assertEqual(payload["knownAddon"], "native_addon_unavailable")
         self.assertEqual(payload["unknown"], "runner_error")
+        self.assertFalse(payload["failure"]["ok"])
         self.assertEqual(payload["failure"]["reason"], "provider_import_failed")
         self.assertEqual(payload["failure"]["runtimeHost"], "node")
+        self.assertEqual(payload["failure"]["stage"], "provider.resolve")
 
     def test_resolve_provider_module_availability_classifies_loader_failure(self) -> None:
         script = f"""
@@ -523,6 +528,60 @@ console.log(JSON.stringify(availability));
         self.assertEqual(availability["loader"], "unit-test-loader")
         self.assertEqual(availability["stage"], "provider.resolve")
         self.assertIn("unsupported provider loader", availability["detail"])
+
+    def test_collect_package_dispatch_shader_evidence_uses_internal_state(self) -> None:
+        script = f"""
+import {{ collectPackageDispatchShaderEvidence }} from {json.dumps(EXECUTOR_MODULE_URL)};
+const evidence = collectPackageDispatchShaderEvidence({{
+  normalizedPlan: {{
+    modules: [
+      {{
+        id: 'multiply',
+        entryPoint: 'main',
+        source: {{ kind: 'file', path: 'bench/kernels/multiply.wgsl' }},
+      }},
+    ],
+    steps: [
+      {{ kind: 'dispatch', moduleId: 'multiply', workgroups: [2, 3, 4] }},
+      {{ kind: 'readBuffer', bufferId: 'readback' }},
+    ],
+  }},
+  shaderModuleEvidenceInputs: [
+    {{
+      moduleId: 'multiply',
+      sourcePath: 'bench/kernels/multiply.wgsl',
+      sourceSha256: 'sha256:abc123',
+      entryPoint: 'main',
+      workgroupSize: [64, 1, 1],
+    }},
+  ],
+  dispatchStates: [
+    {{
+      pipelineId: 'multiply:main:layout',
+      shaderModuleId: 'multiply',
+      entryPoint: 'main',
+    }},
+  ],
+  readbackCaptures: [{{ sha256: 'def456' }}],
+}});
+console.log(JSON.stringify(evidence));
+"""
+        result = subprocess.run(
+            ["node", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        evidence = json.loads(result.stdout)
+        self.assertEqual(evidence["shaderModules"][0]["moduleId"], "multiply")
+        self.assertEqual(evidence["shaderModules"][0]["sourceSha256"], "sha256:abc123")
+        self.assertEqual(evidence["shaderModules"][0]["workgroupSize"], [64, 1, 1])
+        self.assertEqual(evidence["dispatches"][0]["pipelineId"], "multiply:main:layout")
+        self.assertEqual(evidence["dispatches"][0]["workgroups"], [2, 3, 4])
+        self.assertEqual(evidence["outputDigest"], "sha256:def456")
+        self.assertNotIn("missing", evidence)
 
     def test_build_shader_source_receipt_hashes_exact_source_text(self) -> None:
         script = f"""

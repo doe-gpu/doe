@@ -9,6 +9,8 @@ import process from "node:process";
 import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { collectDopplerBrowserIdentity } from "./doppler-identity.js";
+
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(SCRIPT_DIR, "..", "..");
 const DEFAULT_MODEL_MOUNT = "/__doe_probe_model";
@@ -541,6 +543,9 @@ async function runProbe(config) {
   const dopplerRepoPath = resolvePath(config.dopplerRepoPath, "dopplerRepoPath");
   const modelArtifactPath = resolvePath(config.modelArtifactPath, "modelArtifactPath");
   const outputDir = resolvePath(config.outputDir, "outputDir");
+  const internalDopplerIdentity = await collectDopplerBrowserIdentity(config, {
+    modelArtifactPath,
+  });
   await mkdir(outputDir, { recursive: true });
   const repeatCount = asPositiveInt(config.repeatCount, "repeatCount", 1);
   const continuationSteps = asPositiveInt(config.continuationSteps, "continuationSteps", 1);
@@ -619,7 +624,7 @@ async function runProbe(config) {
     return {
       schemaVersion: 1,
       source: "doppler-browser-route-branches",
-      modelId: config.modelId ?? null,
+      modelId: internalDopplerIdentity.modelId ?? null,
       dopplerRepoPath: relativeOrAbsolute(dopplerRepoPath),
       modelArtifactPath: relativeOrAbsolute(modelArtifactPath),
       staticModelUrl: DEFAULT_MODEL_MOUNT,
