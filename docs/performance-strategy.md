@@ -157,7 +157,7 @@ Interpretation:
 
 - the 64KB issue is primarily a reliability/methodology + submit behavior problem, not a simple one-dimensional throughput limit.
 - claim-mode now enforces timing-scope consistency; legacy runs before this enforcement should be treated as diagnostic.
-- queue wait implementation strategy can affect host behavior; keep wait-path changes explicit and benchmark-backed before promoting them into claim workloads.
+- queue wait implementation strategy can affect host behavior; keep wait-path changes explicit, trace-meta visible, and benchmark-backed before promoting them into claim workloads.
 
 ## Architecture Guidance: Zig vs C++
 

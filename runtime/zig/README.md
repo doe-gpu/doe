@@ -513,6 +513,9 @@ Execution capabilities:
   timestamp-valid bits, and graphics support so compute-only queue probes cannot
   be hidden heuristics.
 - native queue waiting is configurable via `--queue-wait-mode process-events|wait-any` (default: `process-events`; `wait-any` fails explicitly when unsupported).
+- delegate WebGPU FFI queue waiting has an explicit guard via
+  `--webgpu-ffi-queue-wait-timeout-ns`; delegate trace-meta emits
+  `webgpuFfiQueueWaitTimeoutNs` when the guard applies.
 - queue synchronization timing is configurable via `--queue-sync-mode per-command|deferred` (default: `per-command`);
   deferred mode skips per-submit waits and performs one final queue flush after the command loop.
 - kernel-dispatch GPU timestamp querying is configurable via `--gpu-timestamp-mode auto|off|require` (default: `auto`).

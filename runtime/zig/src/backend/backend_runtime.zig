@@ -91,6 +91,10 @@ pub const BackendRuntime = struct {
         self.backend.set_queue_wait_mode(mode);
     }
 
+    pub fn set_webgpu_ffi_queue_wait_timeout_ns(self: *BackendRuntime, timeout_ns: u64) void {
+        self.backend.set_webgpu_ffi_queue_wait_timeout_ns(timeout_ns);
+    }
+
     pub fn set_queue_sync_mode(self: *BackendRuntime, mode: runtime_types.QueueSyncMode) void {
         self.backend.set_queue_sync_mode(mode);
     }

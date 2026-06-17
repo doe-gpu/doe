@@ -203,6 +203,7 @@ pub fn runCli() !void {
             ctx.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
             ctx.configureGpuTimestampMode(options.gpu_timestamp_mode);
             ctx.configureQueueWaitMode(options.queue_wait_mode);
+            ctx.configureWebgpuFfiQueueWaitTimeoutNs(options.webgpu_ffi_queue_wait_timeout_ns);
             ctx.configureQueueSyncMode(options.queue_sync_mode);
             host_timing.host_executor_init_total_ns += elapsedSince(executor_init_start_ns);
 
@@ -273,6 +274,8 @@ pub fn runCli() !void {
         options.profile_family,
         options.profile_driver,
         backend_lane,
+        options.queue_wait_mode,
+        options.webgpu_ffi_queue_wait_timeout_ns,
         options.queue_sync_mode,
         options.quirk_mode,
         if (execution_context) |*ctx| ctx else null,

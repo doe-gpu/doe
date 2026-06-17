@@ -195,6 +195,10 @@ pub const WebGPUBackend = struct {
         return support.setQueueWaitMode(self, wait_mode);
     }
 
+    pub fn setWebgpuFfiQueueWaitTimeoutNs(self: *Self, timeout_ns: u64) void {
+        return support.setWebgpuFfiQueueWaitTimeoutNs(self, timeout_ns);
+    }
+
     pub fn setQueueSyncMode(self: *Self, sync_mode: QueueSyncMode) void {
         return support.setQueueSyncMode(self, sync_mode);
     }

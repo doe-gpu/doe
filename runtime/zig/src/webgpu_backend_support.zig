@@ -69,6 +69,11 @@ pub fn setQueueWaitMode(self: anytype, wait_mode: QueueWaitMode) void {
     self.core.queue_wait_mode = wait_mode;
 }
 
+pub fn setWebgpuFfiQueueWaitTimeoutNs(self: anytype, timeout_ns: u64) void {
+    if (timeout_ns == 0) return;
+    self.core.webgpu_ffi_queue_wait_timeout_ns = timeout_ns;
+}
+
 pub fn setQueueSyncMode(self: anytype, sync_mode: QueueSyncMode) void {
     self.core.queue_sync_mode = sync_mode;
 }

@@ -7,6 +7,7 @@ const backend_ids = @import("backend/backend_ids.zig");
 const backend_policy = @import("backend/backend_policy.zig");
 const backend_telemetry = @import("backend/backend_telemetry.zig");
 const runtime_types = @import("backend/runtime_types.zig");
+const wgpu_loader = @import("core/abi/wgpu_loader.zig");
 const semantic_trace = @import("semantic_trace.zig");
 
 const model = struct {
@@ -20,6 +21,8 @@ pub const BackendMode = enum {
     trace,
     native,
 };
+
+pub const DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS: u64 = wgpu_loader.QUEUE_WAIT_TIMEOUT_NS;
 
 pub const ExecutionStatus = enum {
     skipped,
@@ -485,6 +488,16 @@ pub const ExecutionContext = struct {
         }
     }
 
+    pub fn configureWebgpuFfiQueueWaitTimeoutNs(
+        self: *ExecutionContext,
+        timeout_ns: u64,
+    ) void {
+        if (self.mode != .native) return;
+        if (self.backend) |*backend| {
+            backend.set_webgpu_ffi_queue_wait_timeout_ns(timeout_ns);
+        }
+    }
+
     pub fn configureQueueSyncMode(
         self: *ExecutionContext,
         sync_mode: QueueSyncMode,
@@ -573,10 +586,24 @@ pub fn parseQueueWaitMode(raw: []const u8) ?QueueWaitMode {
     return null;
 }
 
+pub fn queueWaitModeName(mode: QueueWaitMode) []const u8 {
+    return switch (mode) {
+        .process_events => "process-events",
+        .wait_any => "wait-any",
+    };
+}
+
 pub fn parseQueueSyncMode(raw: []const u8) ?QueueSyncMode {
     if (std.ascii.eqlIgnoreCase(raw, "per-command")) return .per_command;
     if (std.ascii.eqlIgnoreCase(raw, "deferred")) return .deferred;
     return null;
+}
+
+pub fn queueSyncModeName(mode: QueueSyncMode) []const u8 {
+    return switch (mode) {
+        .per_command => "per-command",
+        .deferred => "deferred",
+    };
 }
 
 pub fn parseGpuTimestampMode(raw: []const u8) ?GpuTimestampMode {
@@ -672,6 +699,11 @@ test "parseQueueWaitMode accepts valid modes and rejects unknown input" {
     try testing.expect(parseQueueWaitMode("spin") == null);
 }
 
+test "queueWaitModeName returns CLI spellings" {
+    try testing.expectEqualStrings("process-events", queueWaitModeName(.process_events));
+    try testing.expectEqualStrings("wait-any", queueWaitModeName(.wait_any));
+}
+
 test "parseQueueSyncMode accepts valid modes and rejects unknown input" {
     try testing.expectEqual(QueueSyncMode.per_command, parseQueueSyncMode("per-command").?);
     try testing.expectEqual(QueueSyncMode.deferred, parseQueueSyncMode("deferred").?);
@@ -679,6 +711,11 @@ test "parseQueueSyncMode accepts valid modes and rejects unknown input" {
     try testing.expectEqual(QueueSyncMode.deferred, parseQueueSyncMode("DEFERRED").?);
     // unknown
     try testing.expect(parseQueueSyncMode("batch") == null);
+}
+
+test "queueSyncModeName returns CLI spellings" {
+    try testing.expectEqualStrings("per-command", queueSyncModeName(.per_command));
+    try testing.expectEqualStrings("deferred", queueSyncModeName(.deferred));
 }
 
 test "parseGpuTimestampMode accepts valid modes and rejects unknown input" {

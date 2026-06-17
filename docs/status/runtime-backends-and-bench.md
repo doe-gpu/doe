@@ -3,6 +3,45 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-06-17 — Delegate queue wait guard is explicit evidence
+
+The `doe-zig-runtime` CLI now exposes
+`--webgpu-ffi-queue-wait-timeout-ns` for WebGPU FFI delegate queue waits. The
+guard is wired through the backend interface to Dawn/WebKit delegate lanes and
+is emitted as `webgpuFfiQueueWaitTimeoutNs` in trace-meta when that delegate
+path is active. Direct Doe Vulkan/Metal/D3D12 lanes do not claim this field,
+because their native wait primitives are not the WebGPU FFI wait loop.
+
+The AMD Vulkan release preset declares the guard in its command templates so a
+delegate queue wait limit is visible in the workload receipt instead of hidden
+inside runtime code. A focused `compute_workgroup_atomic_1024` rerun completed
+on both sides and produced post-hoc compare and claim artifacts:
+
+- compare:
+  `bench/out/amd-vulkan/20260617T140952Z/dawn-vs-doe.amd.vulkan.release.atomic-current.compare.json`
+- claim:
+  `bench/out/amd-vulkan/20260617T140952Z/dawn-vs-doe.amd.vulkan.release.atomic-current.claim.json`
+
+The canonical strict AMD release pipeline is still blocked on this shell by
+host GPU state, not by the new runtime flag. `vulkaninfo` exposes only llvmpipe
+after RADV fails to open `/dev/dri/renderD128`, and a stale
+DiffusionGemma/Doppler benchmark process remains in uninterruptible sleep while
+holding the render node's reported VRAM allocation. The broader AMD release
+claim must wait for a clean AMD render node before promotion.
+
+Validation:
+
+- `zig build -Doptimize=ReleaseFast` from `runtime/zig`
+- focused AMD Vulkan release baseline and comparison runs with
+  `--workload-filter compute_workgroup_atomic_1024`
+- post-hoc compare and release claim over the focused receipts listed above
+- `python3 bench/gates/schema_gate.py`
+- `python3 -m unittest bench.tests.test_native_compare_config_support bench.tests.test_compare_assessment bench.tests.test_run_artifact`
+- `zig build test` from `runtime/zig`
+- `python3 -m unittest discover bench/tests`
+- host-blocked strict AMD preflight:
+  `python3 bench/runners/run_release_pipeline.py --config bench/native-compare/compare.config.amd.vulkan.release.json --strict-amd-vulkan --with-claim-gate --no-compare-html-output`
+
 ## 2026-06-16 — Shared evidence blocker taxonomy is gated
 
 Runner-visible evidence blockers now have a shared taxonomy at

@@ -127,6 +127,7 @@
     "hostPlanArtifactHash": { "type": "string" },
     "queueSyncMode": { "type": "string" },
     "queueWaitMode": { "type": "string" },
+    "webgpuFfiQueueWaitTimeoutNs": { "type": "integer", "minimum": 1 },
     "queueWaitScope": { "type": "string" },
     "queueWaitSubmitCadence": { "type": "integer", "minimum": 0 },
     "provider": { "type": "string" },

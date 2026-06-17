@@ -6,6 +6,7 @@ pub fn printUsage(stdout: anytype) !void {
         \\ [--upload-buffer-usage copy-dst-copy-src|copy-dst] [--upload-submit-every N]
         \\ [--gpu-timestamp-mode auto|off|require]
         \\ [--queue-wait-mode process-events|wait-any]
+        \\ [--webgpu-ffi-queue-wait-timeout-ns N]
         \\ [--queue-sync-mode per-command|deferred]
         \\ [--numeric-stability-execution-profile <id>]  (experimental)
         \\ [--kernel-root <path>]
@@ -66,6 +67,7 @@ pub fn printUsage(stdout: anytype) !void {
         \\--queue-wait-mode controls queue completion waiting strategy for native execution.
         \\  process-events: callback + process-events loop (default).
         \\  wait-any: callback + wgpuInstanceWaitAny wait path (fails explicitly when unsupported).
+        \\--webgpu-ffi-queue-wait-timeout-ns controls the delegate WebGPU FFI queue wait guard.
         \\--queue-sync-mode controls when queue synchronization occurs.
         \\  per-command: waitForQueue after every submit (default).
         \\  deferred: skip per-submit waits; one final flush after the command loop.

@@ -92,6 +92,8 @@ pub const TraceRunSummary = struct {
     profile_api: []const u8,
     profile_family: ?[]const u8,
     profile_driver: []const u8,
+    queue_wait_mode: ?[]const u8 = null,
+    webgpu_ffi_queue_wait_timeout_ns: ?u64 = null,
     queue_sync_mode: ?[]const u8 = null,
     quirk_mode: ?[]const u8 = null,
     determinism: ?trace_determinism.TraceDeterminismSummary = null,
@@ -736,6 +738,14 @@ pub fn writeTraceMeta(path: []const u8, summary: TraceRunSummary) !void {
         try writer.writeAll("\"queueSyncMode\":");
         try writeJsonString(&writer, sync_mode);
         try writer.writeAll(",");
+    }
+    if (summary.queue_wait_mode) |wait_mode| {
+        try writer.writeAll("\"queueWaitMode\":");
+        try writeJsonString(&writer, wait_mode);
+        try writer.writeAll(",");
+    }
+    if (summary.webgpu_ffi_queue_wait_timeout_ns) |timeout_ns| {
+        try writef(writer, "\"webgpuFfiQueueWaitTimeoutNs\":{},", .{timeout_ns});
     }
     if (summary.quirk_mode) |qmode| {
         try writer.writeAll("\"quirkMode\":");

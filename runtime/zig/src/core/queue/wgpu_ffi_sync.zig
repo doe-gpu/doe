@@ -98,7 +98,7 @@ pub fn waitForQueueProcessEvents(self: anytype) !void {
         queue_done_callback_info,
     );
     if (queue_done_future.id == 0) return error.QueueFutureUnavailable;
-    try self.processEventsUntil(&done_state.done, loader.QUEUE_WAIT_TIMEOUT_NS);
+    try self.processEventsUntil(&done_state.done, self.core.webgpu_ffi_queue_wait_timeout_ns);
     if (!done_state.done) return error.QueueSubmitTimeout;
     if (done_state.status == .@"error") {
         return error.QueueSubmissionError;
@@ -132,7 +132,7 @@ pub fn waitForQueueWaitAny(self: anytype) !void {
         self.core.instance.?,
         wait_infos.len,
         wait_infos[0..].ptr,
-        loader.QUEUE_WAIT_TIMEOUT_NS,
+        self.core.webgpu_ffi_queue_wait_timeout_ns,
     );
     switch (wait_status) {
         .success => {},

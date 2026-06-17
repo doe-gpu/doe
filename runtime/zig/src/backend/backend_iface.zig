@@ -16,6 +16,7 @@ pub const BackendVTable = struct {
     execute_buffer_write_bytes: *const fn (ctx: *anyopaque, handle: u64, offset: u64, buffer_size: u64, data: []const u8) anyerror!runtime_types.NativeExecutionResult,
     set_upload_behavior: *const fn (ctx: *anyopaque, mode: runtime_types.UploadBufferUsageMode, submit_every: u32) void,
     set_queue_wait_mode: *const fn (ctx: *anyopaque, mode: runtime_types.QueueWaitMode) void,
+    set_webgpu_ffi_queue_wait_timeout_ns: *const fn (ctx: *anyopaque, timeout_ns: u64) void,
     set_queue_sync_mode: *const fn (ctx: *anyopaque, mode: runtime_types.QueueSyncMode) void,
     set_gpu_timestamp_mode: *const fn (ctx: *anyopaque, mode: runtime_types.GpuTimestampMode) void,
     flush_queue: *const fn (ctx: *anyopaque) anyerror!u64,
@@ -54,6 +55,10 @@ pub const BackendIface = struct {
 
     pub fn set_queue_wait_mode(self: *BackendIface, mode: runtime_types.QueueWaitMode) void {
         self.vtable.set_queue_wait_mode(self.context, mode);
+    }
+
+    pub fn set_webgpu_ffi_queue_wait_timeout_ns(self: *BackendIface, timeout_ns: u64) void {
+        self.vtable.set_webgpu_ffi_queue_wait_timeout_ns(self.context, timeout_ns);
     }
 
     pub fn set_queue_sync_mode(self: *BackendIface, mode: runtime_types.QueueSyncMode) void {

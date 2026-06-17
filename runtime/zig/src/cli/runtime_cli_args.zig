@@ -39,6 +39,7 @@ pub const RunOptions = struct {
     upload_submit_every: u32 = 1,
     gpu_timestamp_mode: execution.GpuTimestampMode = .auto,
     queue_wait_mode: execution.QueueWaitMode = .process_events,
+    webgpu_ffi_queue_wait_timeout_ns: u64 = execution.DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS,
     queue_sync_mode: execution.QueueSyncMode = .per_command,
 };
 
@@ -71,6 +72,7 @@ const OPTIONS_WITH_VALUE = [_][]const u8{
     "--upload-submit-every",
     "--gpu-timestamp-mode",
     "--queue-wait-mode",
+    "--webgpu-ffi-queue-wait-timeout-ns",
     "--queue-sync-mode",
     "--pipeline-cache-dir",
     "--replay",
@@ -201,6 +203,17 @@ pub fn parseArgs(argv: [][:0]u8, stdout: anytype) !ParseOutcome {
                 );
                 return .exit_requested;
             }
+        } else if (std.mem.eql(u8, argv[i], "--webgpu-ffi-queue-wait-timeout-ns") and i + 1 < argv.len) {
+            i += 1;
+            const parsed = std.fmt.parseUnsigned(u64, argv[i], 10) catch {
+                try trace.writef(stdout, "invalid --webgpu-ffi-queue-wait-timeout-ns value: {s}\n", .{argv[i]});
+                return .exit_requested;
+            };
+            if (parsed == 0) {
+                try trace.writef(stdout, "invalid --webgpu-ffi-queue-wait-timeout-ns value: must be >= 1\n", .{});
+                return .exit_requested;
+            }
+            options.webgpu_ffi_queue_wait_timeout_ns = parsed;
         } else if (std.mem.eql(u8, argv[i], "--queue-sync-mode") and i + 1 < argv.len) {
             i += 1;
             if (execution.parseQueueSyncMode(argv[i])) |mode| {

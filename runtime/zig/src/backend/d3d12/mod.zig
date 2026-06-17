@@ -563,6 +563,11 @@ fn set_queue_wait_mode(ctx: *anyopaque, mode: webgpu.QueueWaitMode) void {
     self.queue_wait_mode = mode;
 }
 
+fn set_webgpu_ffi_queue_wait_timeout_ns(ctx: *anyopaque, timeout_ns: u64) void {
+    _ = ctx;
+    _ = timeout_ns;
+}
+
 fn set_queue_sync_mode(ctx: *anyopaque, mode: webgpu.QueueSyncMode) void {
     const self = cast(ctx);
     if (self.queue_sync_mode == mode) return;
@@ -621,6 +626,7 @@ const VTABLE = backend_iface.BackendVTable{
     .execute_buffer_write_bytes = execute_buffer_write_bytes,
     .set_upload_behavior = set_upload_behavior,
     .set_queue_wait_mode = set_queue_wait_mode,
+    .set_webgpu_ffi_queue_wait_timeout_ns = set_webgpu_ffi_queue_wait_timeout_ns,
     .set_queue_sync_mode = set_queue_sync_mode,
     .set_gpu_timestamp_mode = set_gpu_timestamp_mode,
     .flush_queue = flush_queue,

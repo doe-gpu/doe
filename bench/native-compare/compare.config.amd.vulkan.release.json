@@ -2,11 +2,11 @@
   "workloads": "bench/workloads/workloads.amd.vulkan.json",
   "baseline": {
     "name": "doe",
-    "commandTemplate": "env LD_LIBRARY_PATH=bench/vendor/dawn/out/Release:$LD_LIBRARY_PATH runtime/zig/zig-out/bin/doe-zig-runtime --commands {commands} --quirks {quirks} --vendor {vendor} --api {api} --family {family} --driver {driver} --backend native --backend-lane vulkan_doe_release --execute --trace --pipeline-cache-dir bench/out/pipeline-cache/amd-vulkan-release --queue-sync-mode {queue_sync_mode} --upload-buffer-usage {upload_buffer_usage} --upload-submit-every {upload_submit_every} --trace-jsonl {trace_jsonl} --trace-meta {trace_meta} --kernel-root bench/kernels {extra_args}"
+    "commandTemplate": "env LD_LIBRARY_PATH=bench/vendor/dawn/out/Release:$LD_LIBRARY_PATH runtime/zig/zig-out/bin/doe-zig-runtime --commands {commands} --quirks {quirks} --vendor {vendor} --api {api} --family {family} --driver {driver} --backend native --backend-lane vulkan_doe_release --execute --trace --pipeline-cache-dir bench/out/pipeline-cache/amd-vulkan-release --queue-sync-mode {queue_sync_mode} --webgpu-ffi-queue-wait-timeout-ns 10000000000 --upload-buffer-usage {upload_buffer_usage} --upload-submit-every {upload_submit_every} --trace-jsonl {trace_jsonl} --trace-meta {trace_meta} --kernel-root bench/kernels {extra_args}"
   },
   "comparison": {
     "name": "dawn_delegate",
-    "commandTemplate": "env LD_LIBRARY_PATH=bench/vendor/dawn/out/Release:$LD_LIBRARY_PATH runtime/zig/zig-out/bin/doe-zig-runtime --commands {commands} --quirks {quirks} --vendor {vendor} --api {api} --family {family} --driver {driver} --backend native --backend-lane vulkan_dawn_release --execute --trace --pipeline-cache-dir bench/out/pipeline-cache/amd-vulkan-release --queue-sync-mode {queue_sync_mode} --upload-buffer-usage {upload_buffer_usage} --upload-submit-every {upload_submit_every} --trace-jsonl {trace_jsonl} --trace-meta {trace_meta} --kernel-root bench/kernels {extra_args}"
+    "commandTemplate": "env LD_LIBRARY_PATH=bench/vendor/dawn/out/Release:$LD_LIBRARY_PATH runtime/zig/zig-out/bin/doe-zig-runtime --commands {commands} --quirks {quirks} --vendor {vendor} --api {api} --family {family} --driver {driver} --backend native --backend-lane vulkan_dawn_release --execute --trace --pipeline-cache-dir bench/out/pipeline-cache/amd-vulkan-release --queue-sync-mode {queue_sync_mode} --webgpu-ffi-queue-wait-timeout-ns 10000000000 --upload-buffer-usage {upload_buffer_usage} --upload-submit-every {upload_submit_every} --trace-jsonl {trace_jsonl} --trace-meta {trace_meta} --kernel-root bench/kernels {extra_args}"
   },
   "run": {
     "iterations": 16,

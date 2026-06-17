@@ -1,4 +1,5 @@
 const std = @import("std");
+const backend_ids = @import("../backend/backend_ids.zig");
 const backend_policy = @import("../backend/backend_policy.zig");
 const execution = @import("../execution.zig");
 const model_profile = @import("../model_profile.zig");
@@ -42,6 +43,8 @@ pub fn initTraceSummary(
     profile_family: ?[]const u8,
     profile_driver: []const u8,
     backend_lane: backend_policy.BackendLane,
+    queue_wait_mode: execution.QueueWaitMode,
+    webgpu_ffi_queue_wait_timeout_ns: u64,
     queue_sync_mode: execution.QueueSyncMode,
     quirk_mode: quirk.QuirkMode,
     execution_context: ?*execution.ExecutionContext,
@@ -101,10 +104,11 @@ pub fn initTraceSummary(
         .queue_family_index = null,
         .present_capable = null,
         .queue_sync_mode = if (execution_context != null)
-            switch (queue_sync_mode) {
-                .per_command => "per-command",
-                .deferred => "deferred",
-            }
+            execution.queueSyncModeName(queue_sync_mode)
+        else
+            null,
+        .queue_wait_mode = if (execution_context != null)
+            execution.queueWaitModeName(queue_wait_mode)
         else
             null,
         .quirk_mode = quirk_mode.name(),
@@ -116,6 +120,11 @@ pub fn initTraceSummary(
             summary.backend_selection_reason = selection.backend_selection_reason;
             summary.fallback_used = selection.fallback_used;
             summary.selection_policy_hash = selection.selection_policy_hash;
+            if (selection.backend_id == backend_ids.BackendId.dawn_delegate or
+                selection.backend_id == backend_ids.BackendId.webkit_delegate)
+            {
+                summary.webgpu_ffi_queue_wait_timeout_ns = webgpu_ffi_queue_wait_timeout_ns;
+            }
             summary.shader_artifact_manifest_path = selection.shader_artifact_manifest_path;
             summary.shader_artifact_manifest_hash = selection.shader_artifact_manifest_hash;
             summary.host_plan_artifact_path = selection.host_plan_artifact_path;
