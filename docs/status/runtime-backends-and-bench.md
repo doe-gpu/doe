@@ -22,12 +22,27 @@ on both sides and produced post-hoc compare and claim artifacts:
 - claim:
   `bench/out/amd-vulkan/20260617T140952Z/dawn-vs-doe.amd.vulkan.release.atomic-current.claim.json`
 
-The canonical strict AMD release pipeline is still blocked on this shell by
-host GPU state, not by the new runtime flag. `vulkaninfo` exposes only llvmpipe
-after RADV fails to open `/dev/dri/renderD128`, and a stale
+This is not the full AMD Vulkan package history. Earlier Node and Bun package
+compare receipts already exist, and the current stricter package status is
+split: Bun AMD Vulkan package decode remains claimable, while the newer Node
+package decode is diagnostic under the submit-scope audit. Use these artifacts
+for the package lane state:
+
+- historical Node package compare:
+  `bench/out/amd-vulkan/20260410T235522Z/gemma270m.node-package.ir.compare.json`
+- historical Bun package compare:
+  `bench/out/amd-vulkan/20260410T235541Z/gemma270m.bun-package.ir.compare.json`
+- current Bun package claim:
+  `bench/out/amd-vulkan/20260608T205740Z/gemma270m.bun-package.decode.resident.warm.ir.clean-process-warm.claim.json`
+- current Node package diagnostic claim sidecar:
+  `bench/out/amd-vulkan/20260608T205217Z/gemma270m.node-package.decode.resident.warm.ir.strict-scope-audit.claim.json`
+
+The host blocker applies to fresh strict AMD release promotion from this shell,
+not to the existence of prior AMD Vulkan wins. `vulkaninfo` exposes only
+llvmpipe after RADV fails to open `/dev/dri/renderD128`, and a stale
 DiffusionGemma/Doppler benchmark process remains in uninterruptible sleep while
-holding the render node's reported VRAM allocation. The broader AMD release
-claim must wait for a clean AMD render node before promotion.
+holding the render node's reported VRAM allocation. Broader rerun promotion
+must wait for a clean AMD render node before the release lane is updated.
 
 Validation:
 
