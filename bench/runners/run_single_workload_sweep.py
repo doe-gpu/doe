@@ -12,7 +12,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+BENCH_ROOT = REPO_ROOT / "bench"
+for path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
+    if path_entry not in sys.path:
+        sys.path.insert(0, path_entry)
+
 from bench.lib import compare_claim_artifacts as artifacts_mod
+from bench.native_compare_modules.reporting import safe_float
 
 
 def parse_args() -> argparse.Namespace:
@@ -33,13 +40,6 @@ def parse_args() -> argparse.Namespace:
 
 def timestamp_id() -> str:
     return datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-
-
-def safe_float(value: Any) -> float | None:
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
 
 
 def median(values: list[float]) -> float | None:
