@@ -109,6 +109,22 @@ class OperatorDiffTests(unittest.TestCase):
             self.assertEqual(summary["firstDivergence"]["type"], "capture_digest_mismatch")
             self.assertEqual(summary["firstDivergence"]["semanticOpId"], "layer.4.attn.softmax")
 
+    def test_operator_diff_ignores_malformed_manifest(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="fawn-operator-diff-") as tmpdir:
+            root = Path(tmpdir)
+            left_manifest = root / "left.operators.json"
+            right_manifest = root / "right.operators.json"
+            left_manifest.write_text("{not-json", encoding="utf-8")
+            right_manifest.write_text("[]\n", encoding="utf-8")
+
+            summary = operator_diff.summarize_workload_operator_diff(
+                {"commandSamples": [self.build_sample(left_manifest)]},
+                {"commandSamples": [self.build_sample(right_manifest)]},
+            )
+
+            self.assertEqual(summary["available"], False)
+            self.assertEqual(summary["status"], "missing_operator_manifests")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

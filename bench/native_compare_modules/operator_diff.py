@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
+from bench.lib.bench_utils import load_json
 from native_compare_modules.runner import file_sha256
 
 
 def _load_json_object(path: Path) -> dict[str, Any] | None:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
+        payload = load_json(path)
+    except (OSError, UnicodeError, ValueError):
         return None
     if isinstance(payload, dict):
         return payload
@@ -21,8 +21,8 @@ def _load_json_object(path: Path) -> dict[str, Any] | None:
 
 def _load_json_array(path: Path) -> list[dict[str, Any]] | None:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
+        payload = load_json(path)
+    except (OSError, UnicodeError, ValueError):
         return None
     if not isinstance(payload, list):
         return None
