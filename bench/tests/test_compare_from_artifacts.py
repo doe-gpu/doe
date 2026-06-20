@@ -356,6 +356,48 @@ class TestCompareFromArtifacts(unittest.TestCase):
             )
         )
 
+    def test_package_readback_without_effective_path_blocks_comparability(self) -> None:
+        baseline = _attach_readback_capture(_make_receipt("doe"), "a" * 64, 47)
+        comparison = _attach_readback_capture(_make_receipt("dawn"), "a" * 64, 47)
+        for sample in baseline["samples"]:
+            sample["traceMeta"]["executionBackend"] = "doe_node_webgpu"
+            sample["traceMeta"]["executionShape"] = {
+                "dispatchCount": 1,
+                "readBufferCount": 1,
+            }
+        for sample in comparison["samples"]:
+            sample["traceMeta"]["executionBackend"] = "node_webgpu_package"
+            sample["traceMeta"]["executionShape"] = {
+                "dispatchCount": 1,
+                "readBufferCount": 1,
+            }
+
+        entry = compare_workload_from_artifacts(
+            baseline=baseline,
+            comparison=comparison,
+        )
+
+        self.assertFalse(entry["comparability"]["comparable"])
+        obligations = {
+            obligation["id"]: obligation
+            for obligation in entry["comparability"]["obligations"]
+        }
+        capture_obligation = obligations["baseline_comparison_readback_capture_match"]
+        path_obligation = obligations[
+            "baseline_comparison_effective_readback_path_match"
+        ]
+        self.assertTrue(capture_obligation["passes"])
+        self.assertTrue(path_obligation["applicable"])
+        self.assertFalse(path_obligation["passes"])
+        self.assertEqual(path_obligation["details"]["baselineReadBufferCounts"], [1])
+        self.assertEqual(path_obligation["details"]["comparisonReadBufferCounts"], [1])
+        self.assertTrue(
+            any(
+                "effective readback path evidence missing" in reason
+                for reason in entry["comparability"]["reasons"]
+            )
+        )
+
     def test_package_resident_buffer_load_mode_mismatch_blocks_comparability(self) -> None:
         baseline = _make_receipt("doe")
         comparison = _make_receipt("dawn")

@@ -37,6 +37,7 @@ from native_compare_modules.compare_assessment_helpers import (
     collect_effective_readback_paths,
     collect_execution_backends,
     collect_execution_shapes,
+    collect_readback_counts,
     collect_resident_buffer_load_shapes,
     collect_shader_source_receipt_hashes,
     collect_trace_meta_optional_values,
@@ -197,6 +198,8 @@ def compare_assessment(
     right_resident_buffer_load_shapes = collect_resident_buffer_load_shapes(right_samples)
     left_effective_readback_paths = collect_effective_readback_paths(left_samples)
     right_effective_readback_paths = collect_effective_readback_paths(right_samples)
+    left_readback_counts = collect_readback_counts(left_samples)
+    right_readback_counts = collect_readback_counts(right_samples)
 
     left_shader_source_receipt_hashes = collect_shader_source_receipt_hashes(left_samples)
     right_shader_source_receipt_hashes = collect_shader_source_receipt_hashes(right_samples)
@@ -454,6 +457,8 @@ def compare_assessment(
     ) = assess_effective_readback_path_equivalence(
         left_effective_readback_paths,
         right_effective_readback_paths,
+        left_readback_counts=left_readback_counts,
+        right_readback_counts=right_readback_counts,
     )
     _record_obligation(
         obligations,

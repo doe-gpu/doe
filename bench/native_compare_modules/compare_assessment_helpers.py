@@ -108,8 +108,20 @@ def collect_effective_readback_paths(samples: list[dict[str, Any]]) -> set[str]:
 def assess_effective_readback_path_equivalence(
     left_paths: set[str],
     right_paths: set[str],
-) -> tuple[bool, bool, dict[str, list[str]], str]:
-    applies = bool(left_paths) or bool(right_paths)
+    *,
+    left_readback_counts: set[int] | None = None,
+    right_readback_counts: set[int] | None = None,
+) -> tuple[bool, bool, dict[str, Any], str]:
+    left_counts = left_readback_counts or set()
+    right_counts = right_readback_counts or set()
+    left_required = any(count > 0 for count in left_counts)
+    right_required = any(count > 0 for count in right_counts)
+    applies = (
+        left_required
+        or right_required
+        or bool(left_paths)
+        or bool(right_paths)
+    )
     passes = (
         len(left_paths) == 1
         and len(right_paths) == 1
@@ -120,11 +132,21 @@ def assess_effective_readback_path_equivalence(
     details = {
         "baselineEffectiveReadbackPaths": sorted(left_paths),
         "comparisonEffectiveReadbackPaths": sorted(right_paths),
+        "baselineReadBufferCounts": sorted(left_counts),
+        "comparisonReadBufferCounts": sorted(right_counts),
+        "baselineEffectiveReadbackPathRequired": left_required,
+        "comparisonEffectiveReadbackPathRequired": right_required,
     }
-    failure_reason = (
-        "baseline/comparison effective readback path mismatch: "
-        f"{left_paths} vs {right_paths}"
-    )
+    if (left_required and not left_paths) or (right_required and not right_paths):
+        failure_reason = (
+            "baseline/comparison effective readback path evidence missing for "
+            f"readBufferCount evidence: {left_counts} vs {right_counts}"
+        )
+    else:
+        failure_reason = (
+            "baseline/comparison effective readback path mismatch: "
+            f"{left_paths} vs {right_paths}"
+        )
     return applies, passes, details, failure_reason
 
 
