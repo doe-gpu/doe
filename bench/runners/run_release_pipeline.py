@@ -14,12 +14,12 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
 
 
 import argparse
-import json
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 from bench.lib import output_paths
+from bench.lib.bench_utils import load_json_object as load_json
 from bench.runners.release_pipeline_receipts import run_receipt_first_compare
 
 
@@ -348,13 +348,6 @@ def parse_args() -> argparse.Namespace:
         help="Stamp compare/drop-in artifact paths with a UTC timestamp suffix.",
     )
     return parser.parse_args()
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def resolve_report_path(config_path: Path, explicit_report: str) -> Path:

@@ -14,7 +14,6 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
 
 
 import argparse
-import json
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -23,6 +22,8 @@ from typing import Any
 
 from bench.lib import compare_claim_artifacts as artifacts_mod
 from bench.lib import output_paths
+from bench.lib.bench_utils import load_json_object as load_json
+from bench.lib.bench_utils import write_json_object as write_report
 
 
 def parse_args() -> argparse.Namespace:
@@ -199,13 +200,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
-
-
 def resolve_config_report_path(config_path: Path) -> Path:
     config_payload = load_json(config_path)
     run_payload = config_payload.get("run")
@@ -261,11 +255,6 @@ def summarize_report(report_path: Path) -> dict[str, Any]:
         "nonComparableWorkloadIds": non_comparable_ids,
     }
     return summary
-
-
-def write_report(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def main() -> int:

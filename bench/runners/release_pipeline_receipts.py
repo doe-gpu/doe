@@ -2,17 +2,11 @@
 
 from __future__ import annotations
 
-import json
 import subprocess
 from pathlib import Path
 from typing import Any
 
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
+from bench.lib.bench_utils import load_json_object as load_json
 
 
 def resolve_product_names(config_path: Path) -> tuple[str, str]:
