@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -170,13 +169,6 @@ def non_claimable_count(compare_report: dict[str, Any], claim_report: dict[str, 
         if claim_entry.get("claimable") is not True:
             count += 1
     return count
-
-
-def _load_json_object(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def load_run_receipt(
@@ -484,4 +476,3 @@ def load_compare_bundle(
         required=require_claim,
     )
     return compare_report, claim_report, claim_path
-
