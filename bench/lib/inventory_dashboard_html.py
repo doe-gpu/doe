@@ -8,13 +8,8 @@ from typing import Any
 
 from bench.lib import visual_report_theme
 
-
-def safe_float(value: Any) -> float | None:
-    return visual_report_theme.safe_float(value)
-
-
-def format_delta(value: float | None) -> str:
-    return visual_report_theme.format_delta(value)
+safe_float = visual_report_theme.safe_float
+format_delta = visual_report_theme.format_delta
 
 
 def infer_matrix_lane(matrix_id: str) -> str:
