@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import argparse
-import json
 import shlex
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Sequence
 
+from bench.lib.bench_utils import load_json_object
 from native_compare_modules.reporting import parse_int
 
 DEFAULT_WORKLOADS_PATH = "bench/workloads/specialized/workloads.generic.json"
@@ -412,7 +412,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 
 def load_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return load_json_object(path)
 
 
 def get_nested(payload: dict[str, Any], path: str) -> Any:
