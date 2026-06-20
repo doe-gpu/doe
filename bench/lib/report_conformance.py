@@ -3,11 +3,12 @@
 
 from __future__ import annotations
 
-import json
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Any
 
 from bench.lib import compare_claim_artifacts as artifacts_mod
+from bench.lib.bench_utils import load_json_object
 from bench.lib.hash_utils import file_sha256, json_sha256
 
 
@@ -26,13 +27,6 @@ def parse_int(value: Any) -> int | None:
     if isinstance(value, float) and value.is_integer():
         return int(value)
     return None
-
-
-def load_json_object(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def is_sha256_hex(value: Any) -> bool:
@@ -296,7 +290,7 @@ def validate_report_conformance(
             raw_contract_path=raw_contract_path,
             report_contract_hash=report_contract_hash,
         )
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+    except (OSError, UnicodeError, JSONDecodeError, ValueError) as exc:
         return False, str(exc)
     if not resolved_contract_path.exists():
         return False, f"workload manifest path does not exist: {resolved_contract_path}"
@@ -310,7 +304,7 @@ def validate_report_conformance(
 
     try:
         contract_workload_rows = load_contract_workloads_by_id(resolved_contract_path)
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+    except (OSError, UnicodeError, JSONDecodeError, ValueError) as exc:
         return False, str(exc)
     contract_workload_ids = set(contract_workload_rows)
 
