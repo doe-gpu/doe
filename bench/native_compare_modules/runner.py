@@ -11,8 +11,9 @@ import re
 from pathlib import Path
 from typing import Any
 
-from native_compare_modules import compilation_runner as compilation_runner_mod
 from bench.lib import synthetic_assets as synthetic_assets_mod
+from bench.lib.hash_utils import file_sha256, json_sha256
+from native_compare_modules import compilation_runner as compilation_runner_mod
 from native_compare_modules.normalization import (
     derive_counter_derived_divisor,
     derive_workload_unit_normalization_divisor,
@@ -66,28 +67,6 @@ def run_compilation_workload(*args: Any, **kwargs: Any) -> dict[str, Any]:
         *args,
         **kwargs,
     )
-
-def file_sha256(path: Path) -> str:
-    import hashlib
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        while True:
-            chunk = handle.read(1024 * 1024)
-            if not chunk:
-                break
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def json_sha256(value: Any) -> str:
-    import hashlib
-    payload = json.dumps(
-        value,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-    ).encode("utf-8")
-    return hashlib.sha256(payload).hexdigest()
 
 def collect_trace_meta_hashes(command_samples: list[dict[str, Any]]) -> list[dict[str, str]]:
     by_path: dict[str, str] = {}
