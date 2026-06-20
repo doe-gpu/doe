@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import collections
 import json
-import struct
 import sys
 import time
 from pathlib import Path
@@ -19,9 +18,6 @@ if str(REPO_ROOT) not in sys.path:
 from bench.runners.run_real_lm_head_slice_hunt import (
     TensorRowReader,
     decode_f32_buffer,
-    exact_dot,
-    f16,
-    f32,
     forward_dot_f16accum,
     forward_dot_f32,
     load_json,

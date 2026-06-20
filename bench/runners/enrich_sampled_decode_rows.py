@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 from typing import Any
@@ -18,14 +17,12 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
 
 from bench.lib.config_validation import load_validated_config
 from bench.lib.sampled_decode_fragility import (
-    MANIFEST_FILE_NAME,
     adjacent_decode_persistence,
     decode_rows_by_step,
     decode_step_key,
     load_json,
     receipt_repeat_signature,
     relative_or_absolute,
-    repo_rel,
     suffix_replay_override,
     write_json,
 )

@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from bench.lib import synthetic_assets as synthetic_assets_mod
-from bench.lib.hash_utils import file_sha256, json_sha256
+from bench.lib.hash_utils import file_sha256
 from native_compare_modules import compilation_runner as compilation_runner_mod
 from native_compare_modules.normalization import (
     derive_counter_derived_divisor,
