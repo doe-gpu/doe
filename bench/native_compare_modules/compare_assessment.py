@@ -33,10 +33,10 @@ from native_compare_modules.comparability_runtime import (
 )
 from native_compare_modules.compare_assessment_helpers import (
     assess_effective_readback_path_equivalence,
+    assess_readback_capture_equivalence,
     collect_effective_readback_paths,
     collect_execution_backends,
     collect_execution_shapes,
-    collect_readback_capture_signatures,
     collect_resident_buffer_load_shapes,
     collect_shader_source_receipt_hashes,
     collect_trace_meta_optional_values,
@@ -201,8 +201,6 @@ def compare_assessment(
     left_shader_source_receipt_hashes = collect_shader_source_receipt_hashes(left_samples)
     right_shader_source_receipt_hashes = collect_shader_source_receipt_hashes(right_samples)
 
-    left_readback_captures = collect_readback_capture_signatures(left_samples)
-    right_readback_captures = collect_readback_capture_signatures(right_samples)
     is_left_dawn_perf = "dawn-perf-tests" in left_execution_backends
     is_right_dawn_perf = "dawn-perf-tests" in right_execution_backends
     is_left_dawn_direct = any(
@@ -628,25 +626,21 @@ def compare_assessment(
             "comparisonReason": execution_shape_mismatch_reason,
         },
     )
-    readback_capture_match_applies = (
-        len(left_readback_captures) > 0
-        or len(right_readback_captures) > 0
-    )
+    (
+        readback_capture_match_applies,
+        readback_capture_match,
+        readback_capture_details,
+        readback_capture_failure_reason,
+    ) = assess_readback_capture_equivalence(left_samples, right_samples)
     _record_obligation(
         obligations,
         reasons,
         obligation_id="baseline_comparison_readback_capture_match",
         blocking=True,
         applicable=readback_capture_match_applies,
-        passes=left_readback_captures == right_readback_captures,
-        failure_reason=(
-            "baseline/comparison readback capture mismatch: "
-            f"{left_readback_captures} vs {right_readback_captures}"
-        ),
-        details={
-            "baselineReadbackCaptures": left_readback_captures,
-            "comparisonReadbackCaptures": right_readback_captures,
-        },
+        passes=readback_capture_match,
+        failure_reason=readback_capture_failure_reason,
+        details=readback_capture_details,
     )
     hardware_path_match_applies = comparability_mode == "strict" and is_dawn_vs_doe
     hardware_path_failure_reason = (

@@ -325,6 +325,37 @@ class TestCompareFromArtifacts(unittest.TestCase):
             obligations["baseline_comparison_readback_capture_match"]["passes"]
         )
 
+    def test_readback_shape_without_capture_blocks_comparability(self) -> None:
+        baseline = _make_receipt("doe")
+        comparison = _make_receipt("dawn")
+        for sample in baseline["samples"] + comparison["samples"]:
+            sample["traceMeta"]["executionShape"] = {
+                "dispatchCount": 1,
+                "readBufferCount": 1,
+            }
+
+        entry = compare_workload_from_artifacts(
+            baseline=baseline,
+            comparison=comparison,
+        )
+
+        self.assertFalse(entry["comparability"]["comparable"])
+        obligations = {
+            obligation["id"]: obligation
+            for obligation in entry["comparability"]["obligations"]
+        }
+        obligation = obligations["baseline_comparison_readback_capture_match"]
+        self.assertTrue(obligation["applicable"])
+        self.assertFalse(obligation["passes"])
+        self.assertEqual(obligation["details"]["baselineReadBufferCounts"], [1])
+        self.assertEqual(obligation["details"]["comparisonReadBufferCounts"], [1])
+        self.assertTrue(
+            any(
+                "readback capture evidence missing" in reason
+                for reason in entry["comparability"]["reasons"]
+            )
+        )
+
     def test_package_resident_buffer_load_mode_mismatch_blocks_comparability(self) -> None:
         baseline = _make_receipt("doe")
         comparison = _make_receipt("dawn")

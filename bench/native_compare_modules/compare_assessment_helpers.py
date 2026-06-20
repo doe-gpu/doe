@@ -284,6 +284,66 @@ def collect_readback_capture_signatures(samples: list[dict[str, Any]]) -> list[d
     ]
 
 
+def collect_readback_counts(samples: list[dict[str, Any]]) -> set[int]:
+    counts: set[int] = set()
+    for sample in samples:
+        if not isinstance(sample, dict):
+            continue
+        trace_meta = sample.get("traceMeta", {})
+        if not isinstance(trace_meta, dict):
+            continue
+        execution_shape = trace_meta.get("executionShape", {})
+        if not isinstance(execution_shape, dict):
+            continue
+        readback_count = safe_int(execution_shape.get("readBufferCount"), default=-1)
+        if readback_count >= 0:
+            counts.add(readback_count)
+    return counts
+
+
+def assess_readback_capture_equivalence(
+    left_samples: list[dict[str, Any]],
+    right_samples: list[dict[str, Any]],
+) -> tuple[bool, bool, dict[str, Any], str]:
+    left_captures = collect_readback_capture_signatures(left_samples)
+    right_captures = collect_readback_capture_signatures(right_samples)
+    left_readback_counts = collect_readback_counts(left_samples)
+    right_readback_counts = collect_readback_counts(right_samples)
+    capture_required = (
+        any(count > 0 for count in left_readback_counts)
+        or any(count > 0 for count in right_readback_counts)
+    )
+    applies = capture_required or bool(left_captures) or bool(right_captures)
+    required_captures_present = (
+        not capture_required
+        or (bool(left_captures) and bool(right_captures))
+    )
+    passes = required_captures_present and left_captures == right_captures
+    details = {
+        "baselineReadBufferCounts": sorted(left_readback_counts),
+        "comparisonReadBufferCounts": sorted(right_readback_counts),
+        "baselineReadbackCaptureRequired": any(
+            count > 0 for count in left_readback_counts
+        ),
+        "comparisonReadbackCaptureRequired": any(
+            count > 0 for count in right_readback_counts
+        ),
+        "baselineReadbackCaptures": left_captures,
+        "comparisonReadbackCaptures": right_captures,
+    }
+    if not required_captures_present:
+        failure_reason = (
+            "baseline/comparison readback capture evidence missing for "
+            f"readBufferCount evidence: {left_readback_counts} vs {right_readback_counts}"
+        )
+    else:
+        failure_reason = (
+            "baseline/comparison readback capture mismatch: "
+            f"{left_captures} vs {right_captures}"
+        )
+    return applies, passes, details, failure_reason
+
+
 def normalize_execution_shapes(
     shapes: list[dict[str, int]],
     *,
