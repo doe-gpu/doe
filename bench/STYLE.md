@@ -9,6 +9,12 @@ and Python helper tooling under `runtime/zig/tools/`.
 - Type-annotate all function signatures.
 - Prefer `pathlib.Path` over `os.path`.
 - Keep modules focused. Shard at 1200 lines.
+- Fairness before speed: benchmark code must prove both sides did equivalent
+  work before presenting a faster result as evidence.
+- Treat implausibly large speedups as suspected path or measurement
+  differences until the report proves otherwise. Check cache/prepared-session
+  state, skipped work, one-sided setup/upload/submit/readback costs, hidden
+  fallback, stale artifacts, and timing scope before accepting the result.
 
 ## File naming
 

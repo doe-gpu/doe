@@ -33,6 +33,9 @@ Applies to:
 
 ## 1) Non-negotiables
 
+- Fairness comes before speed. Do not present a faster number as evidence
+  until the benchmark proves both sides performed equivalent work under the
+  same timing scope.
 - Comparable benchmark surfaces must be apples-to-apples by default.
 - Any runtime-visible benchmark contract change must be schema/config-backed.
 - Strict comparability must fail fast on mismatch, not silently report timings.
@@ -260,7 +263,12 @@ Before accepting claimable results from any run:
 5. For upload workloads on UMA hardware, verify both sides use the same transfer path (staging+copy vs shared-memory memset). If paths differ, mark `pathAsymmetry: true` and treat the workload as non-comparable for strict claim surfaces.
    Current strict Doe Metal/Vulkan/D3D12 compare surfaces should prove this from config: `config/backend-runtime-policy.json` must set `uploadPathPolicy: "staged_copy_only"` on `metal_doe_comparable` / `metal_doe_release`, `vulkan_doe_comparable` / `vulkan_doe_release`, and `d3d12_doe_comparable` / `d3d12_doe_release`.
    Once strict compare surfaces are staged-copy-only and timing phases match, remove the stale `pathAsymmetry` flag from the strict comparable workload contract; keep it only on directional/non-strict contracts or workloads with a separate unresolved plausibility issue.
-6. Reject any "X/Y claimable" summary that has not passed per-workload structural equivalence checks.
+6. Treat unusually large speedups as suspicious until audited. Check whether
+   the result is really a runtime improvement or instead comes from
+   cache/prepared-session state, skipped work, one-sided setup/upload/submit/
+   readback cost, stale artifacts, hidden fallback, mismatched runtime paths,
+   or a timing-scope mismatch.
+7. Reject any "X/Y claimable" summary that has not passed per-workload structural equivalence checks.
 
 ## 6) Timing selection and normalization policy
 
@@ -431,6 +439,9 @@ python3 bench/gates/timing_policy_gate.py --backend vulkan --report bench/out/<t
 - Presenting hardware-path shortcuts (UMA memset vs staging+copy) as general speed claims without transferability caveats.
 - Accepting aggregate "N/N claimable" without per-workload timing-phase audit. The metadata can pass while the actual work performed is structurally different.
 - Applying execution-shape parity only to compute domains. Render, upload, resource, and pipeline workloads need the same checks.
+- Citing an unusually large speedup before explaining why it is not caused by
+  cache state, prepared-session state, stale receipts, skipped work, one-sided
+  overhead, hidden fallback, or a timing-scope mismatch.
 
 ## 13) Templates
 

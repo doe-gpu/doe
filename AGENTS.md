@@ -269,6 +269,8 @@ editing code in that surface:
 
 ## Benchmark style
 
+- fairness is the first benchmark requirement; a faster number is not useful
+  until the benchmark proves both sides did equivalent work
 - benchmark output must conform to the trace-meta schema
 - include traceability fields: module, hash chain, timing source, timing class
 - warmup before timed runs; discard warmup from reported metrics
@@ -285,6 +287,11 @@ editing code in that surface:
 - Before accepting any claimable result, verify structural work equivalence:
   both sides must report matching dispatch counts, non-zero execution in the same timing phases,
   and equivalent GPU operations. A positive delta from mismatched work is not a speed claim.
+- Treat implausibly large speedups as suspicious until audited. Before citing
+  them, check for cache/prepared-session differences, skipped work, one-sided
+  setup/upload/submit/readback cost, mismatched runtime paths, hidden fallback,
+  stale artifacts, and timing-scope errors. If the cause is not proven fair,
+  label the result diagnostic instead of claimable.
 - Zero-phase anomaly: if one side reports zero for an entire timing phase (setup, encode, or submit_wait)
   across all workloads while the other side reports material values, flag as instrumentation gap
   and classify all affected workloads as diagnostic until audited.
@@ -319,7 +326,11 @@ For each change set, verify:
 - gate expectations were updated or confirmed in `docs/process.md`
 - pipeline/trace/replay outputs are consistent with the changed behavior
 - if Dawn-vs-Doe benchmarking changed, apples-to-apples methodology is documented and enforced by fail-fast checks
-- if any workload is marked claimable, verify structural work equivalence: both sides executed the same commands, dispatch counts match, timing phases have symmetric non-zero coverage, and no hardware-path asymmetry is unannoted
+- if any workload is marked claimable, verify structural work equivalence:
+  both sides executed the same commands, dispatch counts match, timing phases
+  have symmetric non-zero coverage, no hardware-path asymmetry is
+  unannotated, and any unusually large speedup has a fairness audit before it
+  is cited
 - the status log (`docs/status.md` plus the relevant topical shard) records remaining placeholders, temporary methodology choices, and follow-up work
 
 ## Pick the real fix

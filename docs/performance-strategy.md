@@ -14,6 +14,8 @@ Use this for:
 
 Do not optimize or claim from intuition.  
 Optimize only from comparable measurements with explicit workload contracts.
+Fairness comes before speed: when a result looks too large for the code path,
+audit the benchmark before citing the number.
 
 ## Claimability Order (Always)
 
@@ -78,6 +80,14 @@ Use two labels only:
 - both sides must perform structurally equivalent GPU operations. If one side takes a hardware-specific shortcut (e.g. UMA shared-memory memset) that bypasses operations the other side performs (e.g. staging buffer allocation + GPU blit copy), the delta measures architectural path choice on specific hardware, not implementation quality.
 - such workloads must carry `pathAsymmetry: true` and a transferability caveat. In strict Dawn-vs-Doe claim surfaces they are blocking comparability failures until structural equivalence is restored.
 - the gap from path asymmetry would vanish or invert on hardware where the shortcut does not apply (e.g. discrete GPUs with separate VRAM).
+9. suspicious-speedup audit:
+- if the headline speedup is unusually large for the code path, first assume
+  the benchmark may be measuring different work
+- audit cache state, prepared-session state, skipped commands, one-sided
+  setup/upload/submit/readback overhead, stale receipts, hidden fallback,
+  runtime path mismatch, and timing scope
+- cite the result only after the report explains why the large delta is fair;
+  otherwise classify it as diagnostic
 
 If any condition fails, classify the run as `diagnostic`.
 
@@ -175,6 +185,8 @@ Target advantage is not "Zig magic"; it is lower hot-path complexity plus faster
 ## Anti-Patterns (Do Not Do)
 
 - accepting startup-only timings as comparable performance
+- citing an unusually large speedup before auditing whether both sides did
+  equivalent work
 - allowing implicit filter autodiscovery fallback in strict claim runs
 - mixing timing classes (`process-wall` vs `operation`) for per-op claims
 - hiding methodology knobs in code instead of workload/config
