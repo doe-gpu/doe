@@ -15,6 +15,7 @@ from bench.lib import report_conformance
 from bench.lib import compare_axes as compare_axes_mod
 from bench.lib.bench_utils import load_json, load_json_object
 from native_compare_modules import timing_sanity
+from native_compare_modules.reporting import safe_float
 
 
 def parse_utc_iso(value: Any) -> datetime | None:
@@ -63,16 +64,6 @@ def parse_report_timestamp(payload: dict[str, Any], source_path: Path) -> dateti
 
 def run_id_from_timestamp(value: datetime) -> str:
     return value.strftime(output_paths.TIMESTAMP_FORMAT)
-
-
-def safe_float(value: Any) -> float | None:
-    try:
-        parsed = float(value)
-    except (TypeError, ValueError):
-        return None
-    if parsed != parsed:
-        return None
-    return parsed
 
 
 def parse_int(value: Any) -> int | None:
