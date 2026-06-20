@@ -17,6 +17,8 @@ from bench.lib.bench_utils import load_json, load_json_object
 from native_compare_modules import timing_sanity
 from native_compare_modules.reporting import safe_float
 
+parse_int = report_conformance.parse_int
+
 
 def parse_utc_iso(value: Any) -> datetime | None:
     if not isinstance(value, str) or not value.strip():
@@ -64,16 +66,6 @@ def parse_report_timestamp(payload: dict[str, Any], source_path: Path) -> dateti
 
 def run_id_from_timestamp(value: datetime) -> str:
     return value.strftime(output_paths.TIMESTAMP_FORMAT)
-
-
-def parse_int(value: Any) -> int | None:
-    if isinstance(value, bool):
-        return None
-    if isinstance(value, int):
-        return value
-    if isinstance(value, float) and value.is_integer():
-        return int(value)
-    return None
 
 
 def median_non_null(values: list[float | None]) -> float | None:
