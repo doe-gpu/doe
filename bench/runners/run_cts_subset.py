@@ -7,6 +7,7 @@ import argparse
 import json
 import shlex
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,6 +15,10 @@ from typing import Any
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from bench.lib.bench_utils import load_json_object, write_json_object
 
 
 def normalize_label(value: str) -> str:
@@ -58,13 +63,6 @@ def parse_args() -> argparse.Namespace:
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def ensure_string_list(value: Any, *, field: str) -> list[str]:
@@ -229,7 +227,7 @@ def main() -> int:
         return 1
 
     try:
-        config = load_json(config_path)
+        config = load_json_object(config_path)
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"FAIL: {exc}")
         return 1
@@ -342,9 +340,8 @@ def main() -> int:
 
     out_json = Path(args.out_json)
     out_md = Path(args.out_md)
-    out_json.parent.mkdir(parents=True, exist_ok=True)
     out_md.parent.mkdir(parents=True, exist_ok=True)
-    out_json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_json_object(out_json, payload)
     out_md.write_text(markdown(payload), encoding="utf-8")
     print(
         json.dumps(

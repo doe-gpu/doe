@@ -4,14 +4,17 @@
 from __future__ import annotations
 
 import argparse
-import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from bench.lib.bench_utils import load_json_object
+
 BENCH_DIR = REPO_ROOT / "bench"
 PREFLIGHT = BENCH_DIR / "runners" / "preflight_d3d12_host.py"
 CLI = BENCH_DIR / "cli.py"
@@ -55,15 +58,8 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
-
-
 def config_report_path(config_path: Path) -> Path:
-    payload = load_json(config_path)
+    payload = load_json_object(config_path)
     run_payload = payload.get("run")
     if not isinstance(run_payload, dict):
         raise ValueError(f"invalid compare config: {config_path}")
