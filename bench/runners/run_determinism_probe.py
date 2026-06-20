@@ -12,11 +12,17 @@ import json
 import os
 import struct
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from bench.lib.bench_utils import load_json
+
 DEFAULT_FIXTURE = REPO_ROOT / "bench" / "fixtures" / "determinism" / "apple-metal-gemma3-270m-decode1tok.json"
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "bench" / "out" / "apple-metal-determinism"
 RUNTIME_BIN = REPO_ROOT / "runtime" / "zig" / "zig-out" / "bin" / "doe-zig-runtime"
@@ -38,10 +44,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Output root for probe artifacts.")
     parser.add_argument("--build", action="store_true", help="Build doe-zig-runtime before running the probe.")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def sha256_bytes(payload: bytes) -> str:

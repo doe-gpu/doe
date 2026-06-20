@@ -4,24 +4,25 @@
 from __future__ import annotations
 
 import datetime as dt
-import json
 import math
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from bench.lib.bench_utils import load_json
+
 _MULTI_SPACE_RE = re.compile(r"\s+")
 _NON_WORD_RE = re.compile(r"[^a-z0-9'-]+")
 _WORD_BOUNDARY_CACHE: dict[str, re.Pattern[str]] = {}
 DEFAULT_SINGLE_TOKEN_RE = re.compile(r"^[A-Za-z][A-Za-z'-]*$")
 DEFAULT_TRIGGER_POLICY_PATH = REPO_ROOT / "config" / "determinism-trigger-policy.json"
 DEFAULT_ANSWER_SET_REGISTRY_PATH = REPO_ROOT / "config" / "determinism-answer-set-registry.json"
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def resolve_repo_path(raw: str) -> Path:
