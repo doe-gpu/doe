@@ -18,6 +18,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from bench.lib.bench_utils import load_json
+
 DEFAULT_FIXTURE = REPO_ROOT / "bench" / "fixtures" / "determinism" / "apple-metal-sample-only-tie-break.gemma270m.json"
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "bench" / "out" / "apple-metal-sample-only-tie-break"
 DOE_STABLE_TOKEN_EXECUTOR = REPO_ROOT / "bench" / "executors" / "run-doe-stable-token.js"
@@ -54,10 +56,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timestamp", default=None, help="UTC timestamp label (default: current UTC time).")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Output root for probe artifacts.")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def timestamp_label(raw: str | None) -> str:

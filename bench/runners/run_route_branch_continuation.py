@@ -17,6 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from bench.lib.bench_utils import load_json
 from bench.runners.run_real_logit_hunt import resolve_repo_path
 from bench.runners.run_sample_only_tie_break_probe import ensure_fixture_shape
 from bench.runners.run_sample_only_tie_break_probe import load_f32_logits
@@ -46,10 +47,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timestamp", default=None, help="UTC timestamp label (default: current UTC time).")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Output root for route artifacts.")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def timestamp_label(raw: str | None) -> str:

@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from bench.lib.bench_utils import load_json
 from bench.runners.determinism_search_helpers import relative_or_absolute
 from bench.runners.run_determinism_probe import annotate_commands
 from bench.runners.run_determinism_probe import infer_captures_for_mode
@@ -53,10 +54,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timestamp", default=None, help="UTC timestamp label (default: current UTC time).")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Output root for package receipt artifacts.")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def timestamp_label(raw: str | None) -> str:

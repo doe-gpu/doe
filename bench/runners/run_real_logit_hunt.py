@@ -16,6 +16,11 @@ from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from bench.lib.bench_utils import load_json
+
 DEFAULT_FIXTURE = REPO_ROOT / "bench" / "fixtures" / "determinism" / "apple-metal-real-logit-hunt.gemma270m.json"
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "bench" / "out" / "apple-metal-real-logit-hunt"
 HELPER_SCRIPT = REPO_ROOT / "bench" / "executors" / "harvest-doppler-browser-logits.js"
@@ -30,10 +35,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--persist-logits", action="store_true", help="Persist harvested logits .bin artifacts.")
     parser.add_argument("--top-candidates", type=int, default=10, help="Number of ranked candidates to keep in the summary.")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def resolve_repo_path(raw: str) -> Path:
