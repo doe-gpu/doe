@@ -9,6 +9,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from bench.lib.bench_utils import load_json as load_bench_json
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RUNTIME_CANDIDATES = [
@@ -47,7 +49,7 @@ SHORT_ANSWER_WORDS = {"yes", "no", "keep", "flip"}
 
 
 def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return load_bench_json(path)
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
