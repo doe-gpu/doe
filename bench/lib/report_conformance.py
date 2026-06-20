@@ -9,7 +9,7 @@ from typing import Any
 
 from bench.lib import compare_claim_artifacts as artifacts_mod
 from bench.lib.bench_utils import load_json_object
-from bench.lib.hash_utils import file_sha256, json_sha256
+from bench.lib.hash_utils import file_sha256
 
 
 REPORT_SCHEMA_VERSION = 1
