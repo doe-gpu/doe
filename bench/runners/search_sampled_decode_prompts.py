@@ -17,6 +17,7 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
         __import__("sys").path.insert(0, _path_entry)
 
 from bench.lib.config_validation import load_validated_config
+from bench.lib.bench_utils import load_json
 from bench.lib.sampled_decode_fragility import write_json
 from bench.runners.determinism_search_helpers import normalize_prompt_text
 from bench.runners.determinism_search_helpers import relative_or_absolute
@@ -84,12 +85,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timestamp", default=None, help="UTC timestamp label.")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Output root.")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> Any:
-    import json
-
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def collapse_whitespace(text: str) -> str:

@@ -28,6 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from bench.lib.bench_utils import load_json
 from bench.runners.run_determinism_probe import (
     RUNTIME_BIN,
     runtime_env,
@@ -100,10 +101,6 @@ def parse_args() -> argparse.Namespace:
         help="UTC timestamp label (default: current UTC time).",
     )
     return parser.parse_args()
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def sha256_bytes(payload: bytes) -> str:
