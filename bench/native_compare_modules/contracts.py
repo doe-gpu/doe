@@ -8,13 +8,14 @@ semantics are unchanged.
 
 from __future__ import annotations
 
-import hashlib
-import json
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Any
 
 import jsonschema
 
+from bench.lib.bench_utils import load_json_object as load_json
+from bench.lib.hash_utils import file_sha256 as artifact_sha256
 from native_compare_modules.reporting import safe_int, valid_sync_mode
 from native_compare_modules.timing_selection import (
     canonical_timing_source,
@@ -30,26 +31,8 @@ REQUIRED_BACKEND_KEYS = (
 )
 
 
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
-
-
 def load_schema(path: Path) -> dict[str, Any]:
     return load_json(path)
-
-
-def artifact_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        while True:
-            chunk = handle.read(1024 * 1024)
-            if not chunk:
-                break
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def resolve_relative_path(base_dir: Path, raw_path: str) -> Path:
@@ -71,7 +54,7 @@ def validate_artifact(
 
     try:
         payload = load_json(path)
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+    except (OSError, UnicodeError, JSONDecodeError, ValueError) as exc:
         return [f"{path}: invalid JSON: {exc}"]
 
     validator = jsonschema.Draft202012Validator(schema)
