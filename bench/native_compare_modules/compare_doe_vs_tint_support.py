@@ -19,7 +19,7 @@ from bench.lib.adhoc_claim_gating import (
     aggregate_claim_status,
     gate_workload_claim,
 )
-from bench.lib.hash_utils import file_sha256, json_sha256 as stable_json_sha256
+from bench.lib.hash_utils import file_sha256
 from bench.native_compare_modules.reporting import (
     format_stats,
     subtract_baseline_ms,

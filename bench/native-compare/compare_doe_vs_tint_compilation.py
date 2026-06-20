@@ -37,6 +37,10 @@ if str(REPO_ROOT) not in sys.path:
 from bench.lib.adhoc_claim_gating import (  # noqa: E402
     DELTA_PERCENT_CONVENTION,
 )
+from bench.lib.hash_utils import (  # noqa: E402
+    file_sha256,
+    json_sha256 as stable_json_sha256,
+)
 from bench.native_compare_modules.compare_doe_vs_tint_support import (  # noqa: E402
     build_claim_report,
     build_claimability,
@@ -46,7 +50,6 @@ from bench.native_compare_modules.compare_doe_vs_tint_support import (  # noqa: 
     command_version,
     duration_to_ns,
     evidence_args_for_target,
-    file_sha256,
     git_revision,
     google_benchmark_filter_literal,
     infer_shader_stage,
@@ -58,7 +61,6 @@ from bench.native_compare_modules.compare_doe_vs_tint_support import (  # noqa: 
     required_tool_gaps,
     run_tint_bench,
     source_gaps_for_config,
-    stable_json_sha256,
     tint_warm_benchmark_aliases,
 )
 
