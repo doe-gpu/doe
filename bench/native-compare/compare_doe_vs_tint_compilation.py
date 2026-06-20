@@ -43,7 +43,6 @@ from bench.native_compare_modules.compare_doe_vs_tint_support import (  # noqa: 
     build_row_comparability,
     build_tint_warm_alias_map,
     build_toolchain_info,
-    bytes_sha256,
     command_version,
     duration_to_ns,
     evidence_args_for_target,

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import datetime
-import hashlib
 import json
 import subprocess
 import sys
@@ -20,6 +19,7 @@ from bench.lib.adhoc_claim_gating import (
     aggregate_claim_status,
     gate_workload_claim,
 )
+from bench.lib.hash_utils import file_sha256, json_sha256 as stable_json_sha256
 from bench.native_compare_modules.reporting import (
     format_stats,
     subtract_baseline_ms,
@@ -35,23 +35,6 @@ CLAIMABLE_REQUIRED_PHASES = ("parse", "sema", "lower", "emit", "total")
 _TINT_STARTUP_BASELINE_WGSL = """@compute @workgroup_size(1)
 fn main() {}
 """
-
-
-def file_sha256(path):
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(65536), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def bytes_sha256(value):
-    return hashlib.sha256(value).hexdigest()
-
-
-def stable_json_sha256(value):
-    payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return bytes_sha256(payload)
 
 
 def repo_relative(path):
