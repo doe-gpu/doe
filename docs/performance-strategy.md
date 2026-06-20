@@ -74,6 +74,10 @@ Use two labels only:
 7. structural work equivalence:
 - both sides must execute the same commands with non-zero work output. If one side reports 0 dispatches while the other reports >0, the comparison is invalid regardless of other metadata.
 - both sides must report non-trivial timing in the same phases (setup, encode, submit_wait). If one side reports zero across an entire phase while the other reports material cost, the timing scopes do not match and the result is diagnostic.
+- package/runtime runs must use the same effective readback path. If one side
+  actually uses native map-read-copy-unmap and the other uses `mapAsync`, the
+  result is diagnostic even when requested readback modes or dispatch shape
+  match.
 - if baseline setup_ns=0 for all workloads AND comparison setup_ns>0 for a material fraction: flag as timing-instrumentation asymmetry.
 - if baseline submit_wait_ns=0 for all workloads AND comparison submit_wait_ns>0: flag as scope mismatch (baseline is not measuring GPU submission cost).
 8. hardware-path equivalence:

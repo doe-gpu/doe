@@ -141,6 +141,7 @@ claim-discipline gate depend on `docs/cerebras-evidence-bundle.md` and
 - host kernel/pipeline prewarm is diagnostic host overhead outside selected execution timing unless the workload contract declares a separate timing class for it. Record the provenance, but do not fold it into `doe-execution-total-ns` for a selected operation-timing claim.
 - if selected operation timing and workload-unit wall disagree on claim sign, classify the row as diagnostic and audit timing scope before accepting any speed claim.
 - hardware-path asymmetry (e.g. UMA shared-memory memset vs staging-buffer GPU copy) must carry explicit transferability caveats and cannot be presented as a general speed claim. Mark such workloads with `"pathAsymmetry": true` and document the non-transferable condition.
+- package/runtime readback claims require matching effective readback paths, not just matching requested mode. If one side uses native map-read-copy-unmap and the other uses `mapAsync`, classify the result as diagnostic until both sides perform the same readback path or the workload explicitly declares a non-claimable path asymmetry.
 - benchmark fairness is the first concern. Do not answer that Doe beats Dawn from `claimStatus=claimable` alone; inspect the raw `baselineStatsMs` and `comparisonStatsMs`, convert the result to a speed ratio, and confirm the compared work and timing scope are actually the same.
 - very large wins are fairness-audit triggers, not automatic product claims. A speedup at or above `reliability.suspiciousSpeedupRatio` in `config/benchmark-methodology-thresholds.json`, or a delta near `+90%` or higher under the percent-of-comparison convention, must be called out as suspicious until the artifact proves same work, same timing scope, no one-sided cache/preparation shortcut, no hidden fallback, and no missing dispatch/readback work.
 - if a result looks suspicious, say so immediately in status or chat, even when existing gates currently label it comparable or claimable.
@@ -290,6 +291,9 @@ editing code in that surface:
 - Before accepting any claimable result, verify structural work equivalence:
   both sides must report matching dispatch counts, non-zero execution in the same timing phases,
   and equivalent GPU operations. A positive delta from mismatched work is not a speed claim.
+- Package/runtime readback comparisons must verify effective readback-path
+  equality from actual trace telemetry. Requested mode alone is not evidence of
+  what ran.
 - Treat implausibly large speedups as suspicious until audited. Before citing
   them, check for cache/prepared-session differences, skipped work, one-sided
   setup/upload/submit/readback cost, mismatched runtime paths, hidden fallback,

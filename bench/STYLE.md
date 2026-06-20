@@ -11,6 +11,10 @@ and Python helper tooling under `runtime/zig/tools/`.
 - Keep modules focused. Shard at 1200 lines.
 - Fairness before speed: benchmark code must prove both sides did equivalent
   work before presenting a faster result as evidence.
+- For package/runtime benchmarks, compare the effective readback path from
+  trace telemetry. A requested readback mode is not enough; native
+  map-read-copy-unmap versus `mapAsync` is a structural mismatch for speed
+  claims.
 - Read raw timing before percent deltas. Use `baselineStatsMs` and
   `comparisonStatsMs` to compute the speed ratio before saying a result is a
   win.
