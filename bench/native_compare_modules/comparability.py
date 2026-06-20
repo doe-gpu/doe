@@ -2,17 +2,12 @@
 
 from __future__ import annotations
 
-import json
-import statistics
-import subprocess
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from bench.lib.config_validation import load_validated_config
 from native_compare_modules.timing_selection import (
     RENDER_ENCODE_TIMING_DOMAINS,
-    canonical_timing_source,
-    classify_timing_source,
 )
 
 
