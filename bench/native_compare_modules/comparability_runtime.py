@@ -4,15 +4,10 @@ from __future__ import annotations
 
 import json
 import statistics
-import subprocess
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from native_compare_modules.comparability import (
-    DAWN_OPERATION_TIMING_SOURCES,
-    DOE_OPERATION_TIMING_SOURCES,
-    NATIVE_EXECUTION_OPERATION_TIMING_SOURCES,
-    OBLIGATION_SCHEMA_VERSION,
     _PHASE_ASYMMETRY_THRESHOLD,
     _PHASE_MATERIAL_FLOOR_FRACTION,
     _PHASE_MATERIAL_MIN_SAMPLES,
@@ -20,24 +15,10 @@ from native_compare_modules.comparability import (
     _TIMING_PHASE_FIELDS,
     _all_samples_zero,
     _material_sample_count,
-    _normalized_domain,
-    _record_obligation,
-    _sources_match_with_runtime_compatibility,
-    _timing_selection_policy_match_with_runtime_compatibility,
-)
-from native_compare_modules.comparability_upload_contract import (
-    assert_runtime_not_stale,
-    find_fawn_runtime_index,
-    is_dawn_writebuffer_upload_workload,
-    subprocess_combined_output,
-    validate_upload_apples_to_apples,
-    verify_fawn_upload_runtime_contract,
 )
 from native_compare_modules.normalization import sample_normalized_elapsed_ms
-from native_compare_modules.reporting import parse_int, safe_float, safe_int, valid_sync_mode
+from native_compare_modules.reporting import safe_int
 from native_compare_modules.timing_selection import (
-    canonical_timing_source,
-    classify_timing_source,
     effective_execution_total_ns_for_sample,
     effective_setup_total_ns_for_sample,
 )
