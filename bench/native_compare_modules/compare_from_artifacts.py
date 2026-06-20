@@ -15,6 +15,10 @@ from native_compare_modules.runner import file_sha256
 
 COMPARE_REPORT_SCHEMA_VERSION = 1
 COMPARE_REPORT_KIND = "compare-report"
+DELTA_PERCENT_CONVENTION = (
+    "positive_means_baseline_faster_percent_of_comparison_time_saved"
+)
+DELTA_PERCENT_FORMULA = "((comparisonMs - baselineMs) / comparisonMs) * 100"
 
 
 def _dedupe_reasons(reasons: list[str]) -> list[str]:
@@ -661,6 +665,8 @@ def build_compare_report(
         "outPath": out_path,
         "comparisonStatus": comparison_status,
         "primaryMetric": primary_metric,
+        "deltaPercentConvention": DELTA_PERCENT_CONVENTION,
+        "deltaPercentFormula": DELTA_PERCENT_FORMULA,
         "comparabilityPolicy": {
             "mode": comparability_mode,
             "requireTimingClass": required_timing_class,

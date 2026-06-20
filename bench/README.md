@@ -150,6 +150,11 @@ Two rules for first-time operators:
   explicit per-side `run-config` commands.
 - Do not infer that every taxonomy tuple is runnable or promoted. The backend
   matrix is broader than the current plan/package matrix.
+- Fairness comes before speed. Before reporting a winner, read the raw
+  `baselineStatsMs` and `comparisonStatsMs`, compute the speed ratio, and treat
+  any win at or above the configured
+  `reliability.suspiciousSpeedupRatio` as suspicious until same work and same
+  timing scope are proven by the receipts.
 
 Browser runtime identity artifacts can be checked without launching Chromium:
 

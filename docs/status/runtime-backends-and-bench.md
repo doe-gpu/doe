@@ -3,6 +3,98 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-06-18 — AMD Vulkan Node and Bun package readback audit
+
+The AMD Vulkan package resident decode anchors are diagnostic under the current
+fairness contract. The historical Node and Bun compare/claim sidecars remain
+useful evidence, but they are not clean Doe-wins-Dawn product claims after the
+effective readback-path audit. Regenerated strict compares from the same
+receipts now block comparability because the Doe side used
+`native-map-read-copy-unmap` while the Dawn package side used `mapAsync`.
+New package trace metadata emits `packageEffectiveReadbackPaths` so fresh
+receipts record the actual path taken. Older package receipts are still audited
+from readback timing buckets.
+
+The historical workload manifest recorded by these anchors is preserved through
+`config/workload-manifest-archives.json` and
+`bench/workloads/archive/workloads.package.inference.prepared.20260614.json`.
+These are package-surface, prepared-session, resident-buffer-load artifacts over
+`inference_gemma3_270m_decode_1tok`, with operation-timing compare reports and
+local claim sidecars.
+
+Node anchor:
+
+- compare:
+  `bench/out/amd-vulkan/20260614T194937Z/gemma270m.node-package.decode.resident.warm.ir.compare.json`
+- claim:
+  `bench/out/amd-vulkan/20260614T194937Z/gemma270m.node-package.decode.resident.warm.ir.claim.json`
+- regenerated post-hoc claim from the same receipts:
+  `/tmp/doe-node-package-readback-current.claim.json`
+- result:
+  under the current comparability code, regenerated output is
+  `comparisonStatus=diagnostic`, `claimStatus=diagnostic` because effective
+  readback paths differ. The checked-in sidecar is historical evidence, not a
+  current fair-readback product claim.
+
+Bun anchor:
+
+- compare:
+  `bench/out/amd-vulkan/20260608T205740Z/gemma270m.bun-package.decode.resident.warm.ir.clean-process-warm.compare.json`
+- claim:
+  `bench/out/amd-vulkan/20260608T205740Z/gemma270m.bun-package.decode.resident.warm.ir.clean-process-warm.claim.json`
+- regenerated post-hoc claim from the same receipts:
+  `/tmp/doe-bun-package-readback-current.claim.json`
+- result:
+  the historical checked-in sidecar says `claimStatus=claimable`, but current
+  comparability code and benchmark policy regenerate this lane as
+  `comparisonStatus=diagnostic`, `claimStatus=diagnostic`. The old sidecar is
+  also stale with respect to the current benchmark policy hash.
+- fairness note:
+  this historical Bun anchor carries a selected-timing win that trips the
+  configured suspicious-speedup policy and also has effective readback-path
+  mismatch. Treat it as diagnostic until the compared paths are structurally
+  fair.
+
+Fresh promotion against the current tracked workload manifest remains blocked
+from this host. The claim reports above are valid local claim reports, but the
+promotion gate still rejects them when it requires the current
+`bench/workloads/workloads.package.inference.prepared.json` hash:
+the receipts carry
+`33df5777c08ba8d8cd39cf4834387c52d820052e801ed38df5899038c9bddbcd`, while
+the current tracked manifest is
+`7d6d1152fe78b002609e8a4e022a320fe4bf3bc78abed476ce4a93db91a623bf`.
+That freshness blocker is independent of the readback-path blocker. The current
+manifest also carries newer plan, compatibility-command, and source-IR hashes,
+so these anchors must not be promoted as current-manifest release evidence until
+fresh AMD Vulkan package receipts are generated with matched effective readback
+paths.
+
+The hardware blocker is also unchanged: `vulkaninfo --summary` exposes only
+llvmpipe because RADV cannot open `/dev/dri/renderD128` with
+`VK_ERROR_INCOMPATIBLE_DRIVER`, and PID `3681148` is still in `Ds` state while
+holding `/dev/dri/renderD128`. Fresh AMD Vulkan Node/Bun receipts need that
+render node cleared before the current-manifest promotion gate can pass.
+
+Local validation:
+
+- regenerated Node strict compare:
+  `/tmp/doe-node-package-readback-current.compare.json`
+- regenerated Node local claim:
+  `/tmp/doe-node-package-readback-current.claim.json`
+- regenerated Bun strict compare:
+  `/tmp/doe-bun-package-readback-current.compare.json`
+- regenerated Bun local claim:
+  `/tmp/doe-bun-package-readback-current.claim.json`
+- `python3 bench/gates/claim_gate.py --report /tmp/doe-node-package-readback-current.compare.json --claim-report /tmp/doe-node-package-readback-current.claim.json --require-comparison-status diagnostic --require-claim-status diagnostic --require-claimability-mode local --require-min-timed-samples 15 --config bench/native-compare/compare.config.amd.vulkan.gemma270m.node-package.decode.resident.warm.ir.json`
+- `python3 bench/gates/claim_gate.py --report /tmp/doe-bun-package-readback-current.compare.json --claim-report /tmp/doe-bun-package-readback-current.claim.json --require-comparison-status diagnostic --require-claim-status diagnostic --require-claimability-mode local --require-min-timed-samples 15 --config bench/native-compare/compare.config.amd.vulkan.gemma270m.bun-package.decode.resident.warm.ir.json`
+
+Expected current-promotion rejection:
+
+- `python3 bench/gates/claim_gate.py --report bench/out/amd-vulkan/20260614T194937Z/gemma270m.node-package.decode.resident.warm.ir.compare.json --claim-report bench/out/amd-vulkan/20260614T194937Z/gemma270m.node-package.decode.resident.warm.ir.claim.json --require-comparison-status comparable --require-claim-status claimable --require-claimability-mode local --require-min-timed-samples 15 --config bench/native-compare/compare.config.amd.vulkan.gemma270m.node-package.decode.resident.warm.ir.json --expected-workload-contract bench/workloads/workloads.package.inference.prepared.json --require-workload-contract-hash`
+- `vulkaninfo --summary`
+- `ps -o pid,ppid,stat,etime,cmd -p 3681148`
+- `fuser -v /dev/dri/renderD128`
+
 ## 2026-06-17 — Delegate queue wait guard is explicit evidence
 
 The `doe-zig-runtime` CLI now exposes
@@ -23,23 +115,24 @@ on both sides and produced post-hoc compare and claim artifacts:
   `bench/out/amd-vulkan/20260617T140952Z/dawn-vs-doe.amd.vulkan.release.atomic-current.claim.json`
 
 This is not the full AMD Vulkan package history. Earlier Node and Bun package
-compare receipts already exist, and the current stricter package status is
-split: Bun AMD Vulkan package decode remains claimable, while the newer Node
-package decode is diagnostic under the submit-scope audit. Use these artifacts
-for the package lane state:
+compare receipts already exist. The stricter package status from June 8 split
+Bun and Node at that point, but the June 18 package anchor section above records
+the later Node and Bun anchors plus the current effective-readback and
+current-manifest blockers. Use these artifacts for the June 17 package-lane
+context:
 
 - historical Node package compare:
   `bench/out/amd-vulkan/20260410T235522Z/gemma270m.node-package.ir.compare.json`
 - historical Bun package compare:
   `bench/out/amd-vulkan/20260410T235541Z/gemma270m.bun-package.ir.compare.json`
-- current Bun package claim:
+- historical Bun package claim:
   `bench/out/amd-vulkan/20260608T205740Z/gemma270m.bun-package.decode.resident.warm.ir.clean-process-warm.claim.json`
-- current Node package diagnostic claim sidecar:
+- June 8 Node package diagnostic claim sidecar:
   `bench/out/amd-vulkan/20260608T205217Z/gemma270m.node-package.decode.resident.warm.ir.strict-scope-audit.claim.json`
 
 The host blocker applies to fresh strict AMD release promotion from this shell,
-not to the existence of prior AMD Vulkan wins. `vulkaninfo` exposes only
-llvmpipe after RADV fails to open `/dev/dri/renderD128`, and a stale
+not to the existence of prior AMD Vulkan package evidence. `vulkaninfo` exposes
+only llvmpipe after RADV fails to open `/dev/dri/renderD128`, and a stale
 DiffusionGemma/Doppler benchmark process remains in uninterruptible sleep while
 holding the render node's reported VRAM allocation. Broader rerun promotion
 must wait for a clean AMD render node before the release lane is updated.

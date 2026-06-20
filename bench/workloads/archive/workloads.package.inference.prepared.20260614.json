@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "ownership": "standalone",
+  "workloads": [
+    {
+      "id": "inference_gemma3_270m_decode_1tok",
+      "api": "webgpu",
+      "runnerType": "zig-runtime",
+      "irPath": "bench/ir/gemma3_270m.json",
+      "irScenario": "inference_gemma3_270m_decode_1tok",
+      "comparabilityNotes": "Prepared-session package-surface Gemma-3-270M-shaped decode step. Both sides repeat the same retained inference kernels, identical buffer-write + dispatch command stream, and matching sampled-token readback capture inside one timed sample.",
+      "comparable": true,
+      "benchmarkClass": "comparable",
+      "claimEligible": true,
+      "baselineCommandRepeat": 8,
+      "comparisonCommandRepeat": 8,
+      "baselineTimingDivisor": 8,
+      "comparisonTimingDivisor": 8,
+      "strictNormalizationUnit": "cycle",
+      "timingNormalizationNote": "Prepared package inference runs repeat the full decode plan cycle inside each timed sample and report per-cycle normalized timing.",
+      "default": false,
+      "description": "Prepared single-token Gemma-3-270M-shaped decode step with explicit cache/position uniform writes and a sampled-token readback capture.",
+      "domain": "compute",
+      "driver": "1.0.0",
+      "family": "package-surface",
+      "name": "gemma-3 270m shaped decode 1tok prepared",
+      "vendor": "generic",
+      "workloadOrigin": "doe_contract_with_dawn_mapping",
+      "planPath": "bench/plans/generated/inference_gemma3_270m_decode_1tok.plan.json",
+      "planSchemaVersion": 1,
+      "planHash": "efadf93f9ef5cc92a9f0077f1f7840a2ad0a2374852092a2a769aae7a7b13d6a",
+      "planCommandCount": 37,
+      "planDispatchCount": 18,
+      "planBufferWriteCount": 6,
+      "planBufferLoadCount": 13,
+      "compatibilityCommandHash": "59cecb6a1dee989181076dcfd14ce8c048748be558f287f995a88f1886f58340",
+      "sourceIrSha256": "2af3f800c9fd4ecafd7e2d691a4515ffb5fd3a0ef2a8d9db5ccb4cc5457a45ab",
+      "commandsPath": "bench/plans/generated/compat/inference_gemma3_270m_decode_1tok_commands.json",
+      "cohorts": [
+        "regression",
+        "exploration"
+      ]
+    }
+  ]
+}

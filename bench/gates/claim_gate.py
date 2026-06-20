@@ -15,12 +15,15 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
 
 import argparse
 import json
-from pathlib import Path
 from typing import Any
 
 from bench.lib import compare_claim_artifacts as artifacts_mod
 from bench.lib import report_conformance
-from native_compare_modules.config_support import load_workloads
+from native_compare_modules.claimability import assess_suspicious_speedup
+from native_compare_modules.config_support import (
+    load_benchmark_methodology_policy,
+    load_workloads,
+)
 
 
 VALID_COMPARISON_STATUSES = {"comparable", "diagnostic"}
@@ -180,6 +183,24 @@ def expected_positive_percentiles_for_mode(mode: str) -> list[str]:
     if mode == "local":
         return LOCAL_REQUIRED_POSITIVE_PERCENTILES
     return []
+
+
+def suspicious_speedup_failures(
+    *,
+    workload_id: str,
+    baseline_stats: dict[str, Any],
+    comparison_stats: dict[str, Any],
+    suspicious_speedup_ratio: float,
+) -> list[str]:
+    return [
+        f"{workload_id}: {reason}"
+        for reason in assess_suspicious_speedup(
+            left_stats=baseline_stats,
+            right_stats=comparison_stats,
+            claim_metric_scope="selectedTiming",
+            suspicious_speedup_ratio=suspicious_speedup_ratio,
+        )
+    ]
 
 
 def workload_runtime_hint(workload: dict[str, Any]) -> str:
@@ -722,6 +743,18 @@ def main() -> int:
         failures.append("claimPolicy.benchmarkPolicy.path missing or invalid")
     if not report_conformance.is_sha256_hex(benchmark_policy_sha):
         failures.append("claimPolicy.benchmarkPolicy.sha256 missing or invalid")
+    suspicious_speedup_ratio = 0.0
+    if isinstance(benchmark_policy_path, str) and benchmark_policy_path.strip():
+        benchmark_policy_config_path = Path(benchmark_policy_path)
+        if not benchmark_policy_config_path.is_absolute():
+            benchmark_policy_config_path = repo_root / benchmark_policy_config_path
+        try:
+            loaded_benchmark_policy = load_benchmark_methodology_policy(
+                str(benchmark_policy_config_path)
+            )
+            suspicious_speedup_ratio = loaded_benchmark_policy.suspicious_speedup_ratio
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+            failures.append(str(exc))
 
     non_claimable_count = artifacts_mod.non_claimable_count(compare_report, claim_report)
     if args.require_claim_status == "claimable" and non_claimable_count != 0:
@@ -847,8 +880,14 @@ def main() -> int:
             failures.append(f"{workload_id}: claimability.claimable must be false")
 
         if args.require_claim_status == "claimable":
-            left_count = parse_int(workload.get("baselineStatsMs", {}).get("count"))
-            right_count = parse_int(workload.get("comparisonStatsMs", {}).get("count"))
+            baseline_stats = workload.get("baselineStatsMs", {})
+            comparison_stats = workload.get("comparisonStatsMs", {})
+            if not isinstance(baseline_stats, dict):
+                baseline_stats = {}
+            if not isinstance(comparison_stats, dict):
+                comparison_stats = {}
+            left_count = parse_int(baseline_stats.get("count"))
+            right_count = parse_int(comparison_stats.get("count"))
             effective_min_timed_samples = (
                 min_samples
                 if min_samples is not None
@@ -877,6 +916,14 @@ def main() -> int:
                             f"{workload_id}: deltaPercent.{percentile} must be > 0 "
                             "(positive means baseline faster)"
                         )
+            failures.extend(
+                suspicious_speedup_failures(
+                    workload_id=str(workload_id),
+                    baseline_stats=baseline_stats,
+                    comparison_stats=comparison_stats,
+                    suspicious_speedup_ratio=suspicious_speedup_ratio,
+                )
+            )
 
         workload_comparability = workload.get("comparability")
         if not isinstance(workload_comparability, dict):

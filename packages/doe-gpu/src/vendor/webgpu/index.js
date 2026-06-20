@@ -897,6 +897,22 @@ function consumeSubmittedCommandBuffers(commandBuffers) {
   }
 }
 
+function flattenBatchedCommands(commandBuffers) {
+  let commandCount = 0;
+  for (const commandBuffer of commandBuffers) {
+    commandCount += commandBuffer._commands.length;
+  }
+  const commands = new Array(commandCount);
+  let commandIndex = 0;
+  for (const commandBuffer of commandBuffers) {
+    for (const command of commandBuffer._commands) {
+      commands[commandIndex] = command;
+      commandIndex += 1;
+    }
+  }
+  return commands;
+}
+
 function elapsedNsSince(startedAtMs) {
   return Math.max(0, Math.round((performance.now() - startedAtMs) * NS_PER_MS));
 }
@@ -1943,10 +1959,7 @@ const fullSurfaceBackend = {
       for (let index = 0; index < buffers.length; index += 1) {
         failIfSubmittedCommandBuffer(buffers[index], index);
       }
-      const allCommands = [];
-      for (const cb of buffers) {
-        allCommands.push(...cb._commands);
-      }
+      const allCommands = flattenBatchedCommands(buffers);
       accumulateQueueSubmitBreakdown(queue, 'submitCommandPrepTotalNs', prepStartedAt);
       if (allCommands.length === 0) {
         const bookkeepingStartedAt = submitTimingStart();

@@ -841,6 +841,28 @@ console.log(JSON.stringify({{ a, b, c }}));
         self.assertEqual(payload["a"], payload["b"])
         self.assertNotEqual(payload["a"], payload["c"])
 
+    def test_effective_package_readback_path_normalizes_actual_readback_path(self) -> None:
+        script = f"""
+import {{ effectivePackageReadbackPath }} from {json.dumps(EXECUTOR_MODULE_URL)};
+console.log(JSON.stringify({{
+  nativePath: effectivePackageReadbackPath('map-read-copy-unmap'),
+  nativeReadCopyAfterMap: effectivePackageReadbackPath('mapped-native-read-copy'),
+  hostCopyAfterMap: effectivePackageReadbackPath('mapped-range-host-copy'),
+}}));
+"""
+        result = subprocess.run(
+            ["node", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["nativePath"], "native-map-read-copy-unmap")
+        self.assertEqual(payload["nativeReadCopyAfterMap"], "mapAsync")
+        self.assertEqual(payload["hostCopyAfterMap"], "mapAsync")
+
     def test_readback_copy_helper_prefers_combined_native_path(self) -> None:
         script = f"""
 import {{ copyReadBufferBytes }} from {json.dumps(EXECUTOR_MODULE_URL)};
@@ -1450,6 +1472,9 @@ console.log(JSON.stringify({{
         self.assertIn("bg: pass._bindGroups.slice()", source)
         self.assertIn("b: bindGroup", source)
         self.assertIn("return { _commands: commands, _batched: true };", source)
+        self.assertIn("function flattenBatchedCommands(commandBuffers)", source)
+        self.assertIn("const allCommands = flattenBatchedCommands(buffers);", source)
+        self.assertNotIn("allCommands.push(...", source)
         self.assertIn("const addonBreakdown = addon.submitBatched(deviceNative, queueNative, cmds);", source)
         self.assertIn("fastPathStats.dispatchFlush += 1", source)
         self.assertIn("nativeFastPathInfo()", source)

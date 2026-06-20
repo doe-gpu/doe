@@ -10,6 +10,8 @@
     "outPath",
     "comparisonStatus",
     "primaryMetric",
+    "deltaPercentConvention",
+    "deltaPercentFormula",
     "comparabilityPolicy",
     "participants",
     "workloadManifest",
@@ -49,6 +51,14 @@
         "measured_ms",
         "wall_ms"
       ]
+    },
+    "deltaPercentConvention": {
+      "type": "string",
+      "const": "positive_means_baseline_faster_percent_of_comparison_time_saved"
+    },
+    "deltaPercentFormula": {
+      "type": "string",
+      "const": "((comparisonMs - baselineMs) / comparisonMs) * 100"
     },
     "comparabilityPolicy": {
       "type": "object",

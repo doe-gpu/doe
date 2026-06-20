@@ -10,6 +10,8 @@
     "workloadCount": 1
   },
   "comparisonStatus": "comparable",
+  "deltaPercentConvention": "positive_means_baseline_faster_percent_of_comparison_time_saved",
+  "deltaPercentFormula": "((comparisonMs - baselineMs) / comparisonMs) * 100",
   "generatedAt": "2026-04-09T12:05:00+00:00",
   "outPath": "bench/out/sample.compare.json",
   "overall": {

@@ -15,6 +15,8 @@ from native_compare_modules.claim_report import build_claim_report
 from native_compare_modules.compare_from_artifacts import (
     COMPARE_REPORT_KIND,
     COMPARE_REPORT_SCHEMA_VERSION,
+    DELTA_PERCENT_CONVENTION,
+    DELTA_PERCENT_FORMULA,
     build_compare_report,
     compare_workload_from_artifacts,
     group_run_artifacts_by_workload,
@@ -232,6 +234,7 @@ def _benchmark_policy() -> object:
             "comparability_min_timed_samples": 3,
             "min_operation_wall_coverage_ratio": 0.0,
             "max_operation_wall_coverage_asymmetry_ratio": 10.0,
+            "suspicious_speedup_ratio": 10.0,
             "min_row_timing_floor_ns": 0,
             "smoke_comparability_min_timed_samples": 2,
         },
@@ -421,6 +424,169 @@ class TestCompareFromArtifacts(unittest.TestCase):
             [{"count": 13, "bytes": 1024}],
         )
 
+    def test_package_effective_readback_path_mismatch_blocks_comparability(self) -> None:
+        baseline = _make_receipt("doe")
+        comparison = _make_receipt("dawn")
+        for sample in baseline["samples"]:
+            sample["traceMeta"]["executionBackend"] = "doe_node_webgpu"
+            sample["traceMeta"]["packageStepBreakdownNs"] = {
+                "readbackMapAsyncTotalNs": 0,
+                "readbackMapReadCopyUnmapTotalNs": 7_000,
+                "readbackTotalNs": 8_000,
+            }
+        for sample in comparison["samples"]:
+            sample["traceMeta"]["executionBackend"] = "node_webgpu_package"
+            sample["traceMeta"]["packageStepBreakdownNs"] = {
+                "readbackMapAsyncTotalNs": 7_000,
+                "readbackMapReadCopyUnmapTotalNs": 0,
+                "readbackTotalNs": 8_000,
+            }
+
+        entry = compare_workload_from_artifacts(
+            baseline=baseline,
+            comparison=comparison,
+        )
+
+        obligations = {
+            obligation["id"]: obligation
+            for obligation in entry["comparability"]["obligations"]
+        }
+        obligation = obligations[
+            "baseline_comparison_effective_readback_path_match"
+        ]
+        self.assertFalse(entry["comparability"]["comparable"])
+        self.assertTrue(obligation["applicable"])
+        self.assertFalse(obligation["passes"])
+        self.assertEqual(
+            obligation["details"]["baselineEffectiveReadbackPaths"],
+            ["native-map-read-copy-unmap"],
+        )
+        self.assertEqual(
+            obligation["details"]["comparisonEffectiveReadbackPaths"],
+            ["mapAsync"],
+        )
+
+    def test_package_effective_readback_path_prefers_explicit_trace_field(self) -> None:
+        baseline = _make_receipt("doe")
+        comparison = _make_receipt("dawn")
+        for sample in baseline["samples"]:
+            sample["traceMeta"]["executionBackend"] = "doe_node_webgpu"
+            sample["traceMeta"]["packageEffectiveReadbackPaths"] = [
+                "native-map-read-copy-unmap",
+            ]
+            sample["traceMeta"]["packageStepBreakdownNs"] = {
+                "readbackMapAsyncTotalNs": 7_000,
+                "readbackMapReadCopyUnmapTotalNs": 0,
+                "readbackTotalNs": 8_000,
+            }
+        for sample in comparison["samples"]:
+            sample["traceMeta"]["executionBackend"] = "node_webgpu_package"
+            sample["traceMeta"]["packageEffectiveReadbackPaths"] = [
+                "native-map-read-copy-unmap",
+            ]
+            sample["traceMeta"]["packageStepBreakdownNs"] = {
+                "readbackMapAsyncTotalNs": 0,
+                "readbackMapReadCopyUnmapTotalNs": 7_000,
+                "readbackTotalNs": 8_000,
+            }
+
+        entry = compare_workload_from_artifacts(
+            baseline=baseline,
+            comparison=comparison,
+        )
+
+        obligations = {
+            obligation["id"]: obligation
+            for obligation in entry["comparability"]["obligations"]
+        }
+        obligation = obligations[
+            "baseline_comparison_effective_readback_path_match"
+        ]
+        self.assertTrue(obligation["applicable"])
+        self.assertTrue(obligation["passes"])
+        self.assertEqual(
+            obligation["details"]["baselineEffectiveReadbackPaths"],
+            ["native-map-read-copy-unmap"],
+        )
+        self.assertEqual(
+            obligation["details"]["comparisonEffectiveReadbackPaths"],
+            ["native-map-read-copy-unmap"],
+        )
+
+    def test_package_unknown_readback_path_blocks_comparability(self) -> None:
+        baseline = _make_receipt("doe")
+        comparison = _make_receipt("dawn")
+        for sample in baseline["samples"] + comparison["samples"]:
+            sample["traceMeta"]["executionBackend"] = "doe_node_webgpu"
+            sample["traceMeta"]["packageStepBreakdownNs"] = {
+                "readbackMapAsyncTotalNs": 0,
+                "readbackMapReadCopyUnmapTotalNs": 0,
+                "readbackTotalNs": 8_000,
+            }
+
+        entry = compare_workload_from_artifacts(
+            baseline=baseline,
+            comparison=comparison,
+        )
+
+        obligations = {
+            obligation["id"]: obligation
+            for obligation in entry["comparability"]["obligations"]
+        }
+        obligation = obligations[
+            "baseline_comparison_effective_readback_path_match"
+        ]
+        self.assertFalse(entry["comparability"]["comparable"])
+        self.assertTrue(obligation["applicable"])
+        self.assertFalse(obligation["passes"])
+        self.assertEqual(
+            obligation["details"]["baselineEffectiveReadbackPaths"],
+            ["unknown-readback"],
+        )
+        self.assertEqual(
+            obligation["details"]["comparisonEffectiveReadbackPaths"],
+            ["unknown-readback"],
+        )
+
+    def test_package_invalid_explicit_readback_path_blocks_comparability(self) -> None:
+        baseline = _make_receipt("doe")
+        comparison = _make_receipt("dawn")
+        for sample in baseline["samples"] + comparison["samples"]:
+            sample["traceMeta"]["executionBackend"] = "doe_node_webgpu"
+            sample["traceMeta"]["packageEffectiveReadbackPaths"] = [
+                "native-map-read-copy-unmap",
+                "not-a-real-readback-path",
+            ]
+            sample["traceMeta"]["packageStepBreakdownNs"] = {
+                "readbackMapAsyncTotalNs": 0,
+                "readbackMapReadCopyUnmapTotalNs": 7_000,
+                "readbackTotalNs": 8_000,
+            }
+
+        entry = compare_workload_from_artifacts(
+            baseline=baseline,
+            comparison=comparison,
+        )
+
+        obligations = {
+            obligation["id"]: obligation
+            for obligation in entry["comparability"]["obligations"]
+        }
+        obligation = obligations[
+            "baseline_comparison_effective_readback_path_match"
+        ]
+        self.assertFalse(entry["comparability"]["comparable"])
+        self.assertTrue(obligation["applicable"])
+        self.assertFalse(obligation["passes"])
+        self.assertIn(
+            "invalid-readback-path",
+            obligation["details"]["baselineEffectiveReadbackPaths"],
+        )
+        self.assertIn(
+            "invalid-readback-path",
+            obligation["details"]["comparisonEffectiveReadbackPaths"],
+        )
+
     def test_build_compare_report_and_claim_report(self) -> None:
         baseline = _make_receipt("doe")
         comparison = _make_receipt("dawn")
@@ -449,6 +615,11 @@ class TestCompareFromArtifacts(unittest.TestCase):
             self.assertEqual(report["schemaVersion"], COMPARE_REPORT_SCHEMA_VERSION)
             self.assertEqual(report["artifactKind"], COMPARE_REPORT_KIND)
             self.assertEqual(report["comparisonStatus"], "comparable")
+            self.assertEqual(
+                report["deltaPercentConvention"],
+                DELTA_PERCENT_CONVENTION,
+            )
+            self.assertEqual(report["deltaPercentFormula"], DELTA_PERCENT_FORMULA)
             self.assertEqual(report["comparabilityCoherence"]["status"], "pass")
             self.assertNotIn("claimStatus", report)
             self.assertAlmostEqual(

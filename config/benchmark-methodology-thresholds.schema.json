@@ -53,12 +53,14 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "suspiciousSpeedupRatio",
         "localRequiredPositivePercentiles",
         "releaseRequiredPositivePercentiles",
         "flakeBudgetPercent",
         "retryPolicy"
       ],
       "properties": {
+        "suspiciousSpeedupRatio": { "type": "number", "minimum": 1.0 },
         "localRequiredPositivePercentiles": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },

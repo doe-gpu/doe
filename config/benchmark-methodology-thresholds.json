@@ -18,6 +18,7 @@
     "minRowTimingFloorNs": 5000000
   },
   "reliability": {
+    "suspiciousSpeedupRatio": 10.0,
     "localRequiredPositivePercentiles": [
       "p50Percent",
       "p95Percent"

@@ -15,6 +15,7 @@ REPORT_SCHEMA_VERSION = 1
 ACCEPTED_REPORT_SCHEMA_VERSIONS = {1}
 SHA256_HEX_LENGTH = 64
 SHA256_ZERO = "0" * SHA256_HEX_LENGTH
+WORKLOAD_MANIFEST_ARCHIVE_REGISTRY = Path("config/workload-manifest-archives.json")
 
 
 def parse_int(value: Any) -> int | None:
@@ -113,6 +114,113 @@ def resolve_contract_path(
     return repo_relative
 
 
+def normalize_reported_manifest_path(raw_contract_path: str, repo_root: Path) -> str:
+    path = Path(raw_contract_path)
+    if path.is_absolute():
+        try:
+            return path.resolve().relative_to(repo_root.resolve()).as_posix()
+        except ValueError:
+            return path.as_posix()
+    return path.as_posix()
+
+
+def load_workload_manifest_archives(path: Path) -> dict[tuple[str, str], str]:
+    payload = load_json_object(path)
+    schema_version = parse_int(payload.get("schemaVersion"))
+    if schema_version != 1:
+        raise ValueError(
+            f"invalid workload manifest archive registry: schemaVersion must be 1 in {path}"
+        )
+    raw_archives = payload.get("archives")
+    if not isinstance(raw_archives, list):
+        raise ValueError(
+            f"invalid workload manifest archive registry: archives missing/invalid in {path}"
+        )
+    archives: dict[tuple[str, str], str] = {}
+    for index, raw in enumerate(raw_archives):
+        if not isinstance(raw, dict):
+            raise ValueError(
+                "invalid workload manifest archive registry: "
+                f"archives[{index}] must be object in {path}"
+            )
+        original_path = raw.get("originalPath")
+        archive_hash = raw.get("sha256")
+        archive_path = raw.get("archivePath")
+        if not isinstance(original_path, str) or not original_path.strip():
+            raise ValueError(
+                "invalid workload manifest archive registry: "
+                f"archives[{index}].originalPath missing/invalid in {path}"
+            )
+        if not is_sha256_hex(archive_hash):
+            raise ValueError(
+                "invalid workload manifest archive registry: "
+                f"archives[{index}].sha256 missing/invalid in {path}"
+            )
+        if not isinstance(archive_path, str) or not archive_path.strip():
+            raise ValueError(
+                "invalid workload manifest archive registry: "
+                f"archives[{index}].archivePath missing/invalid in {path}"
+            )
+        key = (Path(original_path).as_posix(), archive_hash)
+        if key in archives:
+            raise ValueError(
+                "invalid workload manifest archive registry: duplicate archive for "
+                f"{original_path}@{archive_hash} in {path}"
+            )
+        archives[key] = archive_path
+    return archives
+
+
+def resolve_archived_contract_path(
+    *,
+    repo_root: Path,
+    raw_contract_path: str,
+    report_contract_hash: str,
+) -> Path | None:
+    registry_path = repo_root / WORKLOAD_MANIFEST_ARCHIVE_REGISTRY
+    if not registry_path.exists():
+        return None
+    archives = load_workload_manifest_archives(registry_path)
+    key = (
+        normalize_reported_manifest_path(raw_contract_path, repo_root),
+        report_contract_hash,
+    )
+    archive_path_raw = archives.get(key)
+    if archive_path_raw is None:
+        return None
+    archive_path = Path(archive_path_raw)
+    if archive_path.is_absolute():
+        return archive_path
+    return (repo_root / archive_path).resolve()
+
+
+def resolve_contract_path_for_report_hash(
+    *,
+    report_path: Path,
+    repo_root: Path,
+    raw_contract_path: str,
+    report_contract_hash: str,
+) -> Path:
+    resolved_contract_path = resolve_contract_path(
+        report_path=report_path,
+        repo_root=repo_root,
+        raw_contract_path=raw_contract_path,
+    )
+    if (
+        resolved_contract_path.exists()
+        and file_sha256(resolved_contract_path) == report_contract_hash
+    ):
+        return resolved_contract_path
+    archived_contract_path = resolve_archived_contract_path(
+        repo_root=repo_root,
+        raw_contract_path=raw_contract_path,
+        report_contract_hash=report_contract_hash,
+    )
+    if archived_contract_path is not None:
+        return archived_contract_path
+    return resolved_contract_path
+
+
 def load_contract_workloads_by_id(path: Path) -> dict[str, dict[str, Any]]:
     payload = load_json_object(path)
     raw_workloads = payload.get("workloads")
@@ -181,11 +289,15 @@ def validate_report_conformance(
     if not isinstance(report_contract_hash, str) or not report_contract_hash.strip():
         return False, "workloadManifest.sha256 missing or invalid"
 
-    resolved_contract_path = resolve_contract_path(
-        report_path=report_path,
-        repo_root=repo_root,
-        raw_contract_path=raw_contract_path,
-    )
+    try:
+        resolved_contract_path = resolve_contract_path_for_report_hash(
+            report_path=report_path,
+            repo_root=repo_root,
+            raw_contract_path=raw_contract_path,
+            report_contract_hash=report_contract_hash,
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        return False, str(exc)
     if not resolved_contract_path.exists():
         return False, f"workload manifest path does not exist: {resolved_contract_path}"
     expected_contract_hash = file_sha256(resolved_contract_path)

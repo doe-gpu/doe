@@ -141,6 +141,9 @@ claim-discipline gate depend on `docs/cerebras-evidence-bundle.md` and
 - host kernel/pipeline prewarm is diagnostic host overhead outside selected execution timing unless the workload contract declares a separate timing class for it. Record the provenance, but do not fold it into `doe-execution-total-ns` for a selected operation-timing claim.
 - if selected operation timing and workload-unit wall disagree on claim sign, classify the row as diagnostic and audit timing scope before accepting any speed claim.
 - hardware-path asymmetry (e.g. UMA shared-memory memset vs staging-buffer GPU copy) must carry explicit transferability caveats and cannot be presented as a general speed claim. Mark such workloads with `"pathAsymmetry": true` and document the non-transferable condition.
+- benchmark fairness is the first concern. Do not answer that Doe beats Dawn from `claimStatus=claimable` alone; inspect the raw `baselineStatsMs` and `comparisonStatsMs`, convert the result to a speed ratio, and confirm the compared work and timing scope are actually the same.
+- very large wins are fairness-audit triggers, not automatic product claims. A speedup at or above `reliability.suspiciousSpeedupRatio` in `config/benchmark-methodology-thresholds.json`, or a delta near `+90%` or higher under the percent-of-comparison convention, must be called out as suspicious until the artifact proves same work, same timing scope, no one-sided cache/preparation shortcut, no hidden fallback, and no missing dispatch/readback work.
+- if a result looks suspicious, say so immediately in status or chat, even when existing gates currently label it comparable or claimable.
 
 8. Incumbent development discipline
 - performance development against Dawn must preserve matched workload semantics: backend/adapter constraints, operation shape, repeat accounting, and timing unit normalization.

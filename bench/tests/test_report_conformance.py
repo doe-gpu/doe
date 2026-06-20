@@ -56,6 +56,27 @@ class TestReportConformance(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp_dir.cleanup()
 
+    def _write_archive_registry(self, archive_path: Path, archive_hash: str) -> None:
+        config_dir = self.root / "config"
+        config_dir.mkdir()
+        registry_path = config_dir / "workload-manifest-archives.json"
+        registry_path.write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 1,
+                    "archives": [
+                        {
+                            "originalPath": "workloads.json",
+                            "sha256": archive_hash,
+                            "archivePath": archive_path.name,
+                            "reason": "fixture historical manifest",
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
     def _compare_payload(self) -> dict[str, object]:
         return {
             "schemaVersion": 1,
@@ -64,6 +85,10 @@ class TestReportConformance(unittest.TestCase):
             "outPath": str(self.compare_path),
             "comparisonStatus": "comparable",
             "primaryMetric": "measured_ms",
+            "deltaPercentConvention": (
+                "positive_means_baseline_faster_percent_of_comparison_time_saved"
+            ),
+            "deltaPercentFormula": "((comparisonMs - baselineMs) / comparisonMs) * 100",
             "comparabilityPolicy": {
                 "mode": "strict",
                 "requireTimingClass": "operation",
@@ -188,6 +213,66 @@ class TestReportConformance(unittest.TestCase):
         self.assertTrue(ok, reason)
         self.assertEqual(reason, "")
 
+    def test_validate_report_conformance_accepts_registered_archive_manifest(self) -> None:
+        archive_path = self.root / "workloads.archive.json"
+        archive_path.write_text(self.contract_path.read_text(encoding="utf-8"), encoding="utf-8")
+        archive_hash = report_conformance.file_sha256(archive_path)
+        self.contract_path.write_text(
+            json.dumps(
+                {
+                    "workloads": [
+                        {
+                            "id": "w0",
+                            "pathAsymmetry": True,
+                            "pathAsymmetryNote": "current manifest changed",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        self._write_archive_registry(archive_path, archive_hash)
+
+        payload = self._compare_payload()
+        payload["workloadManifest"]["sha256"] = archive_hash
+        self.compare_path.write_text(json.dumps(payload), encoding="utf-8")
+        schema_version, obligation_ids = report_conformance.load_obligation_contract(
+            self.obligations_path
+        )
+        ok, reason = report_conformance.validate_report_conformance(
+            payload=payload,
+            report_path=self.compare_path,
+            repo_root=self.root,
+            expected_obligation_schema_version=schema_version,
+            expected_obligation_ids=obligation_ids,
+        )
+        self.assertTrue(ok, reason)
+        self.assertEqual(reason, "")
+
+        resolved_live_path = report_conformance.resolve_contract_path(
+            report_path=self.compare_path,
+            repo_root=self.root,
+            raw_contract_path=str(self.contract_path),
+        )
+        self.assertEqual(resolved_live_path, self.contract_path)
+
+    def test_validate_report_conformance_rejects_unregistered_manifest_hash(self) -> None:
+        payload = self._compare_payload()
+        payload["workloadManifest"]["sha256"] = "b" * 64
+        self.compare_path.write_text(json.dumps(payload), encoding="utf-8")
+        schema_version, obligation_ids = report_conformance.load_obligation_contract(
+            self.obligations_path
+        )
+        ok, reason = report_conformance.validate_report_conformance(
+            payload=payload,
+            report_path=self.compare_path,
+            repo_root=self.root,
+            expected_obligation_schema_version=schema_version,
+            expected_obligation_ids=obligation_ids,
+        )
+        self.assertFalse(ok)
+        self.assertIn("workloadManifest.sha256 mismatch", reason)
+
     def test_validate_claim_report_conformance_accepts_matching_sidecar(self) -> None:
         compare_payload = self._compare_payload()
         self.compare_path.write_text(json.dumps(compare_payload), encoding="utf-8")
@@ -222,4 +307,3 @@ class TestReportConformance(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

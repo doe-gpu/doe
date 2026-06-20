@@ -102,6 +102,10 @@
       "data": "config/comparability-obligations.json"
     },
     {
+      "schema": "config/workload-manifest-archives.schema.json",
+      "data": "config/workload-manifest-archives.json"
+    },
+    {
       "schema": "config/comparability-obligation-fixtures.schema.json",
       "data": "bench/fixtures/comparability_obligation_fixtures.json"
     },

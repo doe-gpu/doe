@@ -38,19 +38,30 @@ Make Doe faster than Dawn without breaking apples-to-apples methodology.
    - Verify execution-shape parity, timing-source parity, and phase symmetry.
    - Reject rows with structural work mismatch or timing-scope mismatch.
 
-5. Read the metrics in this order.
+5. Convert percent deltas back to raw speed before making a claim.
+   - Use `baselineStatsMs` and `comparisonStatsMs`; do not infer speed from
+     `deltaPercent` alone.
+   - For the current compare convention, speed ratio is
+     `comparisonStatsMs / baselineStatsMs`.
+   - Treat any speedup at or above
+     `reliability.suspiciousSpeedupRatio` in
+     `config/benchmark-methodology-thresholds.json` as a fairness-audit
+     trigger until the artifact proves identical work, timing scope, cache
+     state, fallback state, dispatch work, and readback/output work.
+
+6. Read the metrics in this order.
    - `selectedTiming`: core comparable operation scope.
    - `workloadUnitWall`: full timed workload-unit wall.
    - `hostOverheadBreakdown`: coarse explanation of wall minus selected timing.
 
-6. Tune the bottleneck the artifact actually shows.
+7. Tune the bottleneck the artifact actually shows.
    - If `selectedTiming` is bad, optimize shader compilation, command encode,
      submit/wait, or GPU work.
    - If `selectedTiming` wins but `workloadUnitWall` loses, target the
      breakdown buckets: input read/parse, workload prepare, executor init,
      prewarm, command orchestration, or artifact finalize.
 
-7. Re-run the same workload after each meaningful change.
+8. Re-run the same workload after each meaningful change.
    - Keep the workload contract fixed while tuning.
    - Only change methodology deliberately and document it when you do.
 

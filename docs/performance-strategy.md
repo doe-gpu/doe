@@ -133,6 +133,25 @@ For the usual Doe-vs-Dawn compare report (`baseline=doe`, `comparison=dawn`):
 - positive: Doe faster than Dawn
 - negative: Doe slower than Dawn
 
+## Fairness-first reporting rule
+
+Do not report a Dawn-vs-Doe win from `claimStatus=claimable` alone. First read
+the raw `baselineStatsMs` and `comparisonStatsMs`, then convert the selected
+metric to a speed ratio. Under the current convention, use
+`comparisonStatsMs / baselineStatsMs`.
+
+A very large positive delta is not "roughly twice as fast." A delta near
+`+90%` means around `10x`; a delta near `+99%` means around `100x`. Treat any
+result at or above `reliability.suspiciousSpeedupRatio` in
+`config/benchmark-methodology-thresholds.json` as a fairness-audit trigger
+until the receipt proves same work, same timing scope, equivalent
+cache/preparation state, no fallback, and matching dispatch/readback/output
+evidence.
+
+If a compare report is missing `deltaPercentConvention` or
+`deltaPercentFormula`, use the raw timing fields and explicitly mention that the
+old artifact lacked the convention metadata.
+
 ## Near-Term Optimization Priorities
 
 1. Align upload timing-source semantics so claim runs are methodologically stable.

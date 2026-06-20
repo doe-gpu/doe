@@ -27,6 +27,7 @@ BENCHMARK_POLICY = BenchmarkMethodologyPolicy(
     comparability_min_timed_samples=7,
     min_operation_wall_coverage_ratio=0.05,
     max_operation_wall_coverage_asymmetry_ratio=128.0,
+    suspicious_speedup_ratio=10.0,
     min_row_timing_floor_ns=5000000,
     smoke_comparability_min_timed_samples=3,
 )
@@ -612,6 +613,45 @@ class ClaimabilityMetricScopeTests(unittest.TestCase):
 
         floor_reasons = [r for r in claimability["reasons"] if "scheduler-noise floor" in r]
         self.assertEqual(floor_reasons, [], f"unexpected floor reasons: {floor_reasons}")
+
+    def test_suspicious_speedup_blocks_claimability(self) -> None:
+        workload = SimpleNamespace(
+            id="inference_decode",
+            domain="inference",
+            path_asymmetry=False,
+            path_asymmetry_note="",
+        )
+        left = {"stats": make_stats(0.1, 0.11), "commandSamples": []}
+        right = {"stats": make_stats(20.0, 21.0), "commandSamples": []}
+        timing_interpretation = {
+            "selectedTiming": {
+                "scope": "operation-total",
+                "scopeClass": "operation-total",
+            },
+            "workloadUnitWall": {"available": False},
+        }
+
+        claimability = assess_claimability(
+            mode="local",
+            min_timed_samples=19,
+            workload=workload,
+            baseline=left,
+            comparison=right,
+            delta={
+                "p50Percent": 99.5,
+                "p95Percent": 99.47,
+                "p99Percent": 99.47,
+            },
+            timing_interpretation=timing_interpretation,
+            comparability={"comparable": True},
+            benchmark_policy=BENCHMARK_POLICY,
+        )
+
+        self.assertFalse(claimability["claimable"])
+        self.assertTrue(
+            any("fairness-audit threshold" in r for r in claimability["reasons"]),
+            f"expected suspicious-speedup reason, got: {claimability['reasons']}",
+        )
 
     def test_does_not_switch_when_headline_tail_is_not_positive(self) -> None:
         workload = SimpleNamespace(

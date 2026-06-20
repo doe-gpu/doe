@@ -260,6 +260,7 @@ class PolicyLoadingTests(unittest.TestCase):
         )
         self.assertEqual(policy.comparability_min_timed_samples, 7)
         self.assertEqual(policy.smoke_comparability_min_timed_samples, 3)
+        self.assertEqual(policy.suspicious_speedup_ratio, 10.0)
 
     def test_smoke_floor_above_main_floor_rejected(self) -> None:
         import json
@@ -289,6 +290,7 @@ class PolicyLoadingTests(unittest.TestCase):
                 "minRowTimingFloorNs": 0,
             },
             "reliability": {
+                "suspiciousSpeedupRatio": 10.0,
                 "localRequiredPositivePercentiles": ["p50Percent"],
                 "releaseRequiredPositivePercentiles": ["p50Percent"],
                 "flakeBudgetPercent": 5.0,

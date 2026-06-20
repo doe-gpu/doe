@@ -19,6 +19,8 @@
     "baseline_comparison_queue_sync_mode_match",
     "submit_scope_match_applies",
     "baseline_comparison_submit_scope_match",
+    "effective_readback_path_match_applies",
+    "baseline_comparison_effective_readback_path_match",
     "timing_phase_match_applies",
     "baseline_comparison_timing_phase_match",
     "package_resident_buffer_load_mode_match_applies",
@@ -133,6 +135,12 @@
       "blocking": true,
       "applicableWhen": { "fact": "submit_scope_match_applies" },
       "passesWhen": { "fact": "baseline_comparison_submit_scope_match" }
+    },
+    {
+      "id": "baseline_comparison_effective_readback_path_match",
+      "blocking": true,
+      "applicableWhen": { "fact": "effective_readback_path_match_applies" },
+      "passesWhen": { "fact": "baseline_comparison_effective_readback_path_match" }
     },
     {
       "id": "baseline_comparison_timing_phase_match",

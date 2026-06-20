@@ -32,6 +32,8 @@ from native_compare_modules.comparability_runtime import (
     assess_timing_phase_equivalence,
 )
 from native_compare_modules.compare_assessment_helpers import (
+    assess_effective_readback_path_equivalence,
+    collect_effective_readback_paths,
     collect_execution_backends,
     collect_execution_shapes,
     collect_readback_capture_signatures,
@@ -44,6 +46,8 @@ from native_compare_modules.compare_assessment_helpers import (
     median_timing_wall_ratio,
     normalize_execution_shapes,
     ratio_asymmetry,
+    uses_doe_execution,
+    uses_package_execution,
 )
 from native_compare_modules.comparability_upload_contract import (
     assert_runtime_not_stale,
@@ -56,15 +60,6 @@ from native_compare_modules.comparability_upload_contract import (
 from native_compare_modules.normalization import sample_normalized_elapsed_ms
 from native_compare_modules.reporting import parse_int, safe_float, safe_int, valid_sync_mode
 from native_compare_modules.timing_selection import canonical_timing_source, classify_timing_source
-
-
-_PACKAGE_EXECUTION_BACKENDS = frozenset({
-    "node_webgpu_package",
-    "doe_node_webgpu",
-    "doe_node_native_direct",
-    "bun_webgpu_package",
-    "doe_bun_package",
-})
 
 
 def compare_assessment(
@@ -185,10 +180,9 @@ def compare_assessment(
 
     left_execution_backends = collect_execution_backends(left_samples)
     right_execution_backends = collect_execution_backends(right_samples)
-    package_execution_applies = (
-        bool(left_execution_backends & _PACKAGE_EXECUTION_BACKENDS)
-        or bool(right_execution_backends & _PACKAGE_EXECUTION_BACKENDS)
-    )
+    package_execution_applies = uses_package_execution(
+        left_execution_backends
+    ) or uses_package_execution(right_execution_backends)
 
     left_resident_buffer_load_modes = collect_trace_meta_values(
         left_samples,
@@ -201,6 +195,8 @@ def compare_assessment(
 
     left_resident_buffer_load_shapes = collect_resident_buffer_load_shapes(left_samples)
     right_resident_buffer_load_shapes = collect_resident_buffer_load_shapes(right_samples)
+    left_effective_readback_paths = collect_effective_readback_paths(left_samples)
+    right_effective_readback_paths = collect_effective_readback_paths(right_samples)
 
     left_shader_source_receipt_hashes = collect_shader_source_receipt_hashes(left_samples)
     right_shader_source_receipt_hashes = collect_shader_source_receipt_hashes(right_samples)
@@ -229,8 +225,8 @@ def compare_assessment(
     )
     is_left_dawn = is_left_dawn_delegate or is_left_dawn_direct or is_left_dawn_perf
     is_right_dawn = is_right_dawn_delegate or is_right_dawn_direct or is_right_dawn_perf
-    is_left_doe = "doe_metal" in left_execution_backends or "doe_vulkan" in left_execution_backends or "doe_d3d12" in left_execution_backends or "doe_node_webgpu" in left_execution_backends or "doe_node_native_direct" in left_execution_backends or "doe_bun_package" in left_execution_backends or "webgpu-ffi" in left_execution_backends or "native" in left_execution_backends
-    is_right_doe = "doe_metal" in right_execution_backends or "doe_vulkan" in right_execution_backends or "doe_d3d12" in right_execution_backends or "doe_node_webgpu" in right_execution_backends or "doe_node_native_direct" in right_execution_backends or "doe_bun_package" in right_execution_backends or "webgpu-ffi" in right_execution_backends or "native" in right_execution_backends
+    is_left_doe = uses_doe_execution(left_execution_backends)
+    is_right_doe = uses_doe_execution(right_execution_backends)
     is_dawn_vs_doe = (is_left_dawn and is_right_doe) or (is_left_doe and is_right_dawn)
 
     reasons: list[str] = []
@@ -451,6 +447,29 @@ def compare_assessment(
             "comparisonExecutionBackends": sorted(right_execution_backends),
             **submit_scope_details,
         },
+    )
+    (
+        readback_path_match_applies,
+        readback_path_match,
+        readback_path_details,
+        readback_path_failure_reason,
+    ) = assess_effective_readback_path_equivalence(
+        left_effective_readback_paths,
+        right_effective_readback_paths,
+    )
+    _record_obligation(
+        obligations,
+        reasons,
+        obligation_id="baseline_comparison_effective_readback_path_match",
+        blocking=True,
+        applicable=(
+            comparability_mode == "strict"
+            and package_execution_applies
+            and readback_path_match_applies
+        ),
+        passes=readback_path_match,
+        failure_reason=readback_path_failure_reason,
+        details=readback_path_details,
     )
     (
         timing_phase_match_applies,

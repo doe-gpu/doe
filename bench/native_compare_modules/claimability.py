@@ -14,6 +14,12 @@ from native_compare_modules.timing_selection import (
 )
 
 END_TO_END_CLAIM_UNDERCOVERAGE_RATIO = 0.5
+SPEEDUP_STAT_KEYS = (
+    ("p50Ms", "p50"),
+    ("p95Ms", "p95"),
+    ("p99Ms", "p99"),
+    ("meanMs", "mean"),
+)
 
 
 def coverage_ratio(measured_ms: float | None, wall_ms: float | None) -> float | None:
@@ -273,6 +279,33 @@ def assess_throughput_plausibility(
                 f"{upload_bytes / (1024**2):.0f} MB upload at p50={p50_ms:.4f}ms; "
                 f"exceeds plausibility ceiling of "
                 f"{_MAX_PLAUSIBLE_THROUGHPUT_BYTES_PER_SEC / 1e9:.0f} GB/s"
+            )
+    return reasons
+
+
+def assess_suspicious_speedup(
+    *,
+    left_stats: dict[str, Any],
+    right_stats: dict[str, Any],
+    claim_metric_scope: str,
+    suspicious_speedup_ratio: float,
+) -> list[str]:
+    if suspicious_speedup_ratio < 1.0:
+        return []
+    reasons: list[str] = []
+    for stat_key, label in SPEEDUP_STAT_KEYS:
+        left_ms = safe_float(left_stats.get(stat_key))
+        right_ms = safe_float(right_stats.get(stat_key))
+        if left_ms is None or right_ms is None or left_ms <= 0.0:
+            continue
+        speedup_ratio = right_ms / left_ms
+        if speedup_ratio >= suspicious_speedup_ratio:
+            reasons.append(
+                f"{claim_metric_scope} {label} speedup {speedup_ratio:.2f}x "
+                f"exceeds fairness-audit threshold "
+                f"{suspicious_speedup_ratio:.2f}x; treat as non-claimable "
+                "until same work, timing scope, cache/preparation state, "
+                "fallback state, dispatch work, and readback/output work are audited"
             )
     return reasons
 
@@ -593,6 +626,14 @@ def assess_claimability(
             workload_domain=workload.domain,
             left_p50_ms=left_p50_ms,
             right_p50_ms=right_p50_ms,
+        )
+    )
+    reasons.extend(
+        assess_suspicious_speedup(
+            left_stats=claim_left_stats,
+            right_stats=claim_right_stats,
+            claim_metric_scope=claim_metric_scope,
+            suspicious_speedup_ratio=benchmark_policy.suspicious_speedup_ratio,
         )
     )
 

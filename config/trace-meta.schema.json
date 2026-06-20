@@ -231,6 +231,14 @@
       "type": "string",
       "enum": ["native-map-read-copy-unmap", "mapAsync"]
     },
+    "packageEffectiveReadbackPaths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["native-map-read-copy-unmap", "mapAsync"]
+      },
+      "uniqueItems": true
+    },
     "packageSetupTotalNs": { "type": "integer", "minimum": 0 },
     "packageSetupBreakdownNs": {
       "type": "object",

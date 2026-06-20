@@ -131,6 +131,29 @@ class ClaimGateTests(unittest.TestCase):
             failures,
         )
 
+    def test_suspicious_speedup_rejected_even_with_claimable_sidecar(self) -> None:
+        failures = claim_gate.suspicious_speedup_failures(
+            workload_id="gemma_decode",
+            baseline_stats={
+                "p50Ms": 0.1,
+                "p95Ms": 0.11,
+                "p99Ms": 0.11,
+                "meanMs": 0.1,
+            },
+            comparison_stats={
+                "p50Ms": 20.0,
+                "p95Ms": 21.0,
+                "p99Ms": 21.0,
+                "meanMs": 20.0,
+            },
+            suspicious_speedup_ratio=10.0,
+        )
+
+        self.assertTrue(
+            any("fairness-audit threshold" in failure for failure in failures),
+            f"expected suspicious-speedup failure, got: {failures}",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

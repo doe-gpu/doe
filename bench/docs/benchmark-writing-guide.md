@@ -322,17 +322,27 @@ Important:
 
 ## 7) Delta percent convention
 
-Current report convention is ratio-style with baseline as baseline:
-- `((rightMs / leftMs) - 1) * 100`
+Current compare reports use a percent-of-comparison convention:
+- `((comparisonMs - baselineMs) / comparisonMs) * 100`
 - positive means baseline faster
 - negative means baseline slower
 
 Interpretation examples:
-- `+300%` means baseline is `4x` faster.
-- `+400%` means baseline is `5x` faster.
-- `-50%` means baseline is `2x` slower.
+- `+50%` means baseline is `2x` faster.
+- `+90%` means baseline is `10x` faster.
+- `+99%` means baseline is `100x` faster.
 
-Always read this from report metadata field `deltaPercentConvention`.
+Always read the convention from report metadata fields
+`deltaPercentConvention` and `deltaPercentFormula`. If an older artifact lacks
+those fields, use the raw `baselineStatsMs` and `comparisonStatsMs` values and
+state the speed ratio directly.
+
+Fairness rule:
+- never accept a speed claim from `deltaPercent` alone.
+- any speedup at or above the configured
+  `reliability.suspiciousSpeedupRatio` is suspicious until the receipts prove
+  same work, same timing scope, equivalent cache/preparation state, no
+  fallback, and matching dispatch/readback/output evidence.
 
 ## 8) Workload catalog size vs run size
 

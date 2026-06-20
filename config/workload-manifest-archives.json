@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "archives": [
+    {
+      "originalPath": "bench/workloads/workloads.package.inference.prepared.json",
+      "sha256": "33df5777c08ba8d8cd39cf4834387c52d820052e801ed38df5899038c9bddbcd",
+      "archivePath": "bench/workloads/archive/workloads.package.inference.prepared.20260614.json",
+      "reason": "Package-surface Node/Bun AMD Vulkan compare anchors were generated before the prepared workload manifest was refreshed with newer plan, compatibility-command, and source-IR hashes."
+    }
+  ]
+}

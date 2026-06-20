@@ -116,6 +116,7 @@ const READBACK_DIGEST_PROCESS_CACHE_MAX_ENTRIES = 1024;
 const readbackDigestProcessCache = new Map();
 const PACKAGE_READBACK_MODE_NATIVE = 'native-map-read-copy-unmap';
 const PACKAGE_READBACK_MODE_MAP_ASYNC = 'mapAsync';
+const PACKAGE_READBACK_RESULT_NATIVE = 'map-read-copy-unmap';
 let packageExecutionPolicyPromise = null;
 
 export const PROVIDER_FAILURE_REASONS = Object.freeze([
@@ -719,6 +720,12 @@ function packageReadbackModeFromEnv() {
     return PACKAGE_READBACK_MODE_NATIVE;
   }
   return '';
+}
+
+export function effectivePackageReadbackPath(readbackPath) {
+  return readbackPath === PACKAGE_READBACK_RESULT_NATIVE
+    ? PACKAGE_READBACK_MODE_NATIVE
+    : PACKAGE_READBACK_MODE_MAP_ASYNC;
 }
 
 export async function copyReadBufferBytes({
@@ -2589,6 +2596,7 @@ async function executeSample(
   const rows = [];
   const determinismCaptureRows = new Map();
   const readbackCaptures = [];
+  const packageEffectiveReadbackPaths = new Set();
   const readbackDigestCache = new Map();
   const readbackValidationCache = new Map();
   const readbackCaptureTemplates = normalizedPlan.steps.map((step, index) => (
@@ -3087,6 +3095,7 @@ async function executeSample(
         sizeBytes: buffer.size,
         readbackMode: packageReadbackMode,
       });
+      packageEffectiveReadbackPaths.add(effectivePackageReadbackPath(readback.path));
       const validationStartedAt = performance.now();
       const validation = validatePreparedSampleExpectation(
         readback.bytes,
@@ -3281,6 +3290,7 @@ async function executeSample(
     packageResidentBufferLoads: residentBufferLoads,
     packageResidentBufferLoadBreakdown: residentBufferLoadBreakdown,
     packageReadbackMode,
+    packageEffectiveReadbackPaths: Array.from(packageEffectiveReadbackPaths).sort(),
     ...(packageNativeFastPaths ? { packageNativeFastPaths } : {}),
     ...(packageNativeQueueSyncInfo ? { packageNativeQueueSyncInfo } : {}),
     ...(pipelineCache ? { pipelineCache } : {}),

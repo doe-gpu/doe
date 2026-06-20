@@ -89,6 +89,7 @@ class NativeCompareConfigSupportTests(unittest.TestCase):
         policy = config_support.load_benchmark_methodology_policy(
             REPO_ROOT / "config" / "benchmark-methodology-thresholds.json"
         )
+        self.assertEqual(policy.suspicious_speedup_ratio, 10.0)
         for config_name in smoke_configs:
             config_path = REPO_ROOT / "bench" / "native-compare" / config_name
             with self.subTest(config=config_name):

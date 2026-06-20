@@ -11,7 +11,11 @@ and Python helper tooling under `runtime/zig/tools/`.
 - Keep modules focused. Shard at 1200 lines.
 - Fairness before speed: benchmark code must prove both sides did equivalent
   work before presenting a faster result as evidence.
-- Treat implausibly large speedups as suspected path or measurement
+- Read raw timing before percent deltas. Use `baselineStatsMs` and
+  `comparisonStatsMs` to compute the speed ratio before saying a result is a
+  win.
+- Treat speedups at or above the configured
+  `reliability.suspiciousSpeedupRatio` as suspected path or measurement
   differences until the report proves otherwise. Check cache/prepared-session
   state, skipped work, one-sided setup/upload/submit/readback costs, hidden
   fallback, stale artifacts, and timing scope before accepting the result.

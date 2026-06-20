@@ -10,6 +10,132 @@ from native_compare_modules.reporting import safe_float, safe_int
 from native_compare_modules.timing_selection import canonical_timing_source
 
 
+_NATIVE_READBACK_FIELDS = (
+    "readbackMapReadCopyUnmapTotalNs",
+    "readbackMapReadCopyUnmapMapTotalNs",
+    "readbackMapReadCopyUnmapCopyTotalNs",
+    "readbackMapReadCopyUnmapDeferredCopyTotalNs",
+    "readbackMapReadCopyUnmapDeferredResolveTotalNs",
+    "readbackMapReadCopyUnmapQueueWaitCompletedTotalNs",
+    "readbackMapReadCopyUnmapUnmapTotalNs",
+    "readbackNativeReadCopyTotalNs",
+)
+_MAP_ASYNC_READBACK_FIELDS = (
+    "readbackMapAsyncTotalNs",
+    "readbackGetMappedRangeTotalNs",
+    "readbackHostCopyTotalNs",
+    "readbackUnmapTotalNs",
+)
+_PACKAGE_EFFECTIVE_READBACK_PATHS = frozenset({
+    "native-map-read-copy-unmap",
+    "mapAsync",
+})
+_INVALID_EFFECTIVE_READBACK_PATH = "invalid-readback-path"
+_PACKAGE_EXECUTION_BACKENDS = frozenset({
+    "node_webgpu_package",
+    "doe_node_webgpu",
+    "doe_node_native_direct",
+    "bun_webgpu_package",
+    "doe_bun_package",
+})
+_DOE_EXECUTION_BACKENDS = frozenset({
+    "doe_metal",
+    "doe_vulkan",
+    "doe_d3d12",
+    "doe_node_webgpu",
+    "doe_node_native_direct",
+    "doe_bun_package",
+    "webgpu-ffi",
+    "native",
+})
+
+
+def _has_positive_field(payload: dict[str, Any], fields: tuple[str, ...]) -> bool:
+    return any(safe_int(payload.get(field), default=0) > 0 for field in fields)
+
+
+def _effective_readback_path(trace_meta: dict[str, Any]) -> str:
+    breakdown = trace_meta.get("packageStepBreakdownNs")
+    if not isinstance(breakdown, dict):
+        return ""
+    native_readback = _has_positive_field(breakdown, _NATIVE_READBACK_FIELDS)
+    map_async_readback = _has_positive_field(breakdown, _MAP_ASYNC_READBACK_FIELDS)
+    if native_readback and map_async_readback:
+        return "mixed-native-mapAsync"
+    if native_readback:
+        return "native-map-read-copy-unmap"
+    if map_async_readback:
+        return "mapAsync"
+    if safe_int(breakdown.get("readbackTotalNs"), default=0) > 0:
+        return "unknown-readback"
+    return ""
+
+
+def _explicit_effective_readback_paths(trace_meta: dict[str, Any]) -> set[str] | None:
+    raw_paths = trace_meta.get("packageEffectiveReadbackPaths")
+    if not isinstance(raw_paths, list):
+        return None
+    paths: set[str] = set()
+    for path in raw_paths:
+        if isinstance(path, str) and path in _PACKAGE_EFFECTIVE_READBACK_PATHS:
+            paths.add(path)
+        else:
+            paths.add(_INVALID_EFFECTIVE_READBACK_PATH)
+    if not paths and _effective_readback_path(trace_meta):
+        paths.add("unknown-readback")
+    return paths
+
+
+def collect_effective_readback_paths(samples: list[dict[str, Any]]) -> set[str]:
+    paths: set[str] = set()
+    for sample in samples:
+        if not isinstance(sample, dict):
+            continue
+        trace_meta = sample.get("traceMeta", {})
+        if not isinstance(trace_meta, dict):
+            continue
+        explicit_paths = _explicit_effective_readback_paths(trace_meta)
+        if explicit_paths is not None:
+            if explicit_paths:
+                paths.update(explicit_paths)
+            continue
+        path = _effective_readback_path(trace_meta)
+        if path:
+            paths.add(path)
+    return paths
+
+
+def assess_effective_readback_path_equivalence(
+    left_paths: set[str],
+    right_paths: set[str],
+) -> tuple[bool, bool, dict[str, list[str]], str]:
+    applies = bool(left_paths) or bool(right_paths)
+    passes = (
+        len(left_paths) == 1
+        and len(right_paths) == 1
+        and left_paths == right_paths
+        and left_paths <= _PACKAGE_EFFECTIVE_READBACK_PATHS
+        and right_paths <= _PACKAGE_EFFECTIVE_READBACK_PATHS
+    )
+    details = {
+        "baselineEffectiveReadbackPaths": sorted(left_paths),
+        "comparisonEffectiveReadbackPaths": sorted(right_paths),
+    }
+    failure_reason = (
+        "baseline/comparison effective readback path mismatch: "
+        f"{left_paths} vs {right_paths}"
+    )
+    return applies, passes, details, failure_reason
+
+
+def uses_package_execution(backends: set[str]) -> bool:
+    return bool(backends & _PACKAGE_EXECUTION_BACKENDS)
+
+
+def uses_doe_execution(backends: set[str]) -> bool:
+    return bool(backends & _DOE_EXECUTION_BACKENDS)
+
+
 def collect_execution_shapes(samples: list[dict[str, Any]]) -> list[dict[str, int]]:
     shape_set: set[tuple[int, int, int, int]] = set()
     for sample in samples:
