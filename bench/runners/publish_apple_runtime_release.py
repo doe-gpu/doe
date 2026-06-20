@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import json
 import platform
 import shutil
 import socket
@@ -25,6 +24,8 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
 
 from bench.lib import output_paths
 from bench.lib import compare_claim_artifacts as artifacts_mod
+from bench.lib.bench_utils import load_json_object as load_json
+from bench.lib.bench_utils import write_json_object as write_json
 
 
 def utc_now() -> str:
@@ -184,23 +185,11 @@ def strip_copy(src: Path, dst: Path) -> tuple[list[str], int]:
     raise RuntimeError(f"strip failed for {dst} (last exit={last_return})")
 
 
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
-
-
 def relpath(path: Path) -> str:
     try:
         return str(path.resolve().relative_to(REPO_ROOT.resolve()))
     except ValueError:
         return str(path)
-
-
-def write_json(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def update_cts_ledger(

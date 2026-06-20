@@ -15,7 +15,6 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
 
 import argparse
 import hashlib
-import json
 import os
 import shutil
 import subprocess
@@ -26,6 +25,8 @@ from typing import Any
 import jsonschema
 
 from bench.lib import output_paths
+from bench.lib.bench_utils import load_json_object as load_json
+from bench.lib.bench_utils import write_json_object as write_json
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_ZIG_ROOT = REPO_ROOT / "runtime" / "zig"
@@ -119,13 +120,6 @@ def resolve_repo_path(raw: str) -> Path:
     return (REPO_ROOT / path).resolve()
 
 
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
-
-
 def validate_against(path: Path, schema_path: Path) -> dict[str, Any]:
     payload = load_json(path)
     schema = load_json(schema_path)
@@ -135,11 +129,6 @@ def validate_against(path: Path, schema_path: Path) -> dict[str, Any]:
 
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def write_json(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def write_markdown(path: Path, report: dict[str, Any]) -> None:

@@ -14,7 +14,6 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
 
 
 import argparse
-import json
 import shutil
 import subprocess
 from datetime import datetime, timezone
@@ -22,6 +21,8 @@ from pathlib import Path
 from typing import Any
 
 from bench.lib import output_paths
+from bench.lib.bench_utils import load_json_object as load_json
+from bench.lib.bench_utils import write_json_object as write_json
 from native_compare_modules import contracts as contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -49,18 +50,6 @@ def parse_args() -> argparse.Namespace:
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
-
-
-def write_json(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def run_step(name: str, command: list[str], *, cwd: Path, dry_run: bool) -> int:
