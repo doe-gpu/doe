@@ -6,10 +6,8 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
-import struct
 import subprocess
 import sys
-import tempfile
 import time
 from pathlib import Path
 from typing import Any
@@ -22,7 +20,6 @@ from bench.runners.run_real_lm_head_slice_hunt import (
     TensorRowReader,
     decode_f32_buffer,
     load_json,
-    resolve_model_answer_sets,
     resolve_repo_path,
     resolve_tensor_name,
 )

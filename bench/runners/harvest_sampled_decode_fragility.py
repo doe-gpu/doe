@@ -23,7 +23,6 @@ from bench.lib.sampled_decode_fragility import (
     CASE_REPORT_FILE_NAME,
     COMMANDS_FILE_NAME,
     MANIFEST_FILE_NAME,
-    RECEIPT_FILE_NAME,
     TRACE_JSONL_FILE_NAME,
     TRACE_META_FILE_NAME,
     decode_rows_by_step,

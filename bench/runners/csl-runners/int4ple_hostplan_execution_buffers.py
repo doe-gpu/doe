@@ -6,10 +6,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-from int4ple_hostplan_execution_common import (
-    _dtype_byte_width,
-)
-
 def _compile_params(compile_dir: Path) -> dict[str, int]:
     out_path = compile_dir / "out.json"
     if not out_path.is_file():

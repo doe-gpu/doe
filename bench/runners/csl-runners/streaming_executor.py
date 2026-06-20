@@ -37,18 +37,12 @@ import time
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-
 from cerebras.sdk.runtime.sdkruntimepybind import (  # pylint: disable=no-name-in-module
     SdkLayout,
     SdkRuntime,
     SdkTarget,
     SimfabConfig,
-    MemcpyDataType,
-    MemcpyOrder,
-    WSE3,
     get_platform,
-    get_simulator,
 )
 
 

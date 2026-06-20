@@ -44,9 +44,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
 import json
-import os
 import re
-import subprocess
 import sys
 import time
 from pathlib import Path
