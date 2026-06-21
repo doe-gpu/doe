@@ -28,6 +28,7 @@ if str(BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(BENCH_ROOT))
 
 from bench.lib import output_paths
+from bench.lib.bench_utils import load_json_object as load_json
 from bench.lib.config_validation import load_validated_config
 from bench.tools import build_browser_claim_promotion_receipt
 from bench.tools import check_browser_responsibility_map
@@ -137,13 +138,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--doe-lib", default="")
     parser.add_argument("--json", action="store_true", dest="emit_json")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def stable_hash(payload: Any) -> str:

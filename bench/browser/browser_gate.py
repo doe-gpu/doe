@@ -31,6 +31,7 @@ if str(BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(BENCH_ROOT))
 
 from bench.lib import output_paths
+from bench.lib.bench_utils import load_json
 from bench.tools import check_browser_responsibility_map
 
 
@@ -92,10 +93,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--doe-lib", default="")
     parser.add_argument("--json", action="store_true", dest="emit_json")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def js_number_literal(value: int | float) -> str:
