@@ -21,6 +21,7 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
     if _path_entry not in os.sys.path:
         os.sys.path.insert(0, _path_entry)
 
+from bench.lib.bench_utils import load_json_object as load_json
 from bench.lib.config_validation import load_validated_config
 from bench.runners.promote_numeric_fragility_signatures import (
     FRAGILITY_SIGNATURE_SCHEMA_PATH,
@@ -86,11 +87,6 @@ def repo_rel(path_value: str | Path | None) -> str | None:
         return str(absolute.relative_to(REPO_ROOT.resolve()))
     except ValueError:
         return str(absolute)
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:

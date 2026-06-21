@@ -21,6 +21,7 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
     if _path_entry not in os.sys.path:
         os.sys.path.insert(0, _path_entry)
 
+from bench.lib.bench_utils import load_json_object as load_json
 from bench.lib.config_validation import load_validated_config
 from bench.runners.exercise_runtime_numeric_stability import (
     build_stats,
@@ -61,11 +62,6 @@ def timestamp_label() -> str:
     import datetime as dt
 
     return dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
 
 
 def f32_bits(values: list[float]) -> list[int]:

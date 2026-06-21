@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import subprocess
 import sys
 import time
@@ -18,6 +17,7 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
     if _path_entry not in sys.path:
         sys.path.insert(0, _path_entry)
 
+from bench.lib.bench_utils import load_json
 from bench.lib.config_validation import load_validated_config
 from bench.lib.sampled_decode_fragility import (
     CASE_REPORT_FILE_NAME,
@@ -52,10 +52,6 @@ def timestamp_label() -> str:
     import datetime as dt
 
     return dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-
-def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def resolved_path(path_value: str | None, *, default: Path | None = None) -> Path | None:
