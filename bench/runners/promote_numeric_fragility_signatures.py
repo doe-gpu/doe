@@ -16,6 +16,7 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
     if _path_entry not in sys.path:
         sys.path.insert(0, _path_entry)
 
+from bench.lib.bench_utils import load_json_object as load_json
 from bench.lib.config_validation import load_validated_config
 
 
@@ -66,11 +67,6 @@ def parse_args() -> argparse.Namespace:
         help="Do not remove existing promoted signature JSON files before writing the new set.",
     )
     return parser.parse_args()
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:

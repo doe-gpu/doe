@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import re
 import subprocess
 import sys
@@ -20,6 +19,8 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
         sys.path.insert(0, _path_entry)
 
 from bench.lib import output_paths
+from bench.lib.bench_utils import load_json_object as load_json
+from bench.lib.bench_utils import write_json_object as write_json
 
 NO_MATCH_GLOB = "bench/out/__visualization_pipeline_no_match__/*.json"
 TIMESTAMP_SUFFIX_RE = re.compile(r"\d{8}T\d{6}Z$")
@@ -99,14 +100,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-
-
 def collect_paths(patterns: list[str], explicit_paths: list[str]) -> list[Path]:
     candidates: list[Path] = []
     seen: set[str] = set()
@@ -161,13 +154,6 @@ def lane_label(kind: str, path: Path) -> str:
     if kind == "node":
         return f"{surface} Node package"
     return f"{surface} Bun package"
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def default_claim_report_path(report_path: Path) -> Path | None:

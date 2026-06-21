@@ -10,11 +10,19 @@ import json
 import math
 import os
 import struct
+import sys
 from pathlib import Path
 from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+BENCH_ROOT = REPO_ROOT / "bench"
+for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
+    if _path_entry not in sys.path:
+        sys.path.insert(0, _path_entry)
+
+from bench.lib.bench_utils import load_json_object as load_json
+
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "bench" / "out" / "apple-metal-numeric-fragility-corpus"
 LM_HEAD_REPORT_ROOT = REPO_ROOT / "bench" / "out" / "apple-metal-real-lm-head-slice-hunt"
 
@@ -215,11 +223,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timestamp", default=None, help="UTC timestamp label. Default: current UTC time.")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Output root for the exported corpus.")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
 
 
 def timestamp_label() -> str:
