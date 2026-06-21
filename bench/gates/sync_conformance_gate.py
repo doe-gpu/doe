@@ -20,9 +20,9 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
 
 
 import argparse
-import json
 from typing import Any
 
+from bench.lib.bench_utils import load_json_object as load_json
 from native_compare_modules import contracts
 
 
@@ -35,13 +35,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--report", default="bench/out/dawn-vs-doe.json")
     parser.add_argument("--timing-policy", default="config/backend-timing-policy.json")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def policy_entry(policy: dict[str, Any], domain: str) -> dict[str, Any]:

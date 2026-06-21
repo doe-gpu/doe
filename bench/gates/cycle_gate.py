@@ -22,6 +22,7 @@ from typing import Any
 from bench.lib import compare_claim_artifacts as artifacts_mod
 from bench.lib import output_paths
 from bench.lib import report_conformance
+from bench.lib.bench_utils import load_json_object as load_json
 from bench.lib.config_validation import load_validated_config
 
 
@@ -102,13 +103,6 @@ def parse_float(value: Any) -> float | None:
     if isinstance(value, (int, float)):
         return float(value)
     return None
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def resolve_path(repo_root: Path, raw_path: str) -> Path:

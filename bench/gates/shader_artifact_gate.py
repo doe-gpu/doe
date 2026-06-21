@@ -19,6 +19,7 @@ import json
 import subprocess
 from typing import Any
 
+from bench.lib.bench_utils import load_json_object as load_json
 from native_compare_modules import contracts
 
 
@@ -42,13 +43,6 @@ def parse_args() -> argparse.Namespace:
         help="Fail when SPIR-V artifacts are present but no validator is configured.",
     )
     return parser.parse_args()
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
 
 
 def load_json_file(path: Path) -> dict[str, Any] | None:

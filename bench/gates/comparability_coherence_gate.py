@@ -16,6 +16,7 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
         sys.path.insert(0, _path_entry)
 
 from bench.lib import comparability_coherence  # noqa: E402
+from bench.lib.bench_utils import load_json_object as load_json  # noqa: E402
 from native_compare_modules.config_support import (  # noqa: E402
     load_benchmark_methodology_policy,
 )
@@ -36,13 +37,6 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--out", default="", help="Optional JSON result path")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"expected JSON object: {path}")
-    return payload
 
 
 def main() -> int:

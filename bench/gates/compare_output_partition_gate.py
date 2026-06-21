@@ -9,19 +9,20 @@ import sys
 from pathlib import Path
 from typing import Any
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+BENCH_ROOT = REPO_ROOT / "bench"
+for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
+    if _path_entry not in sys.path:
+        sys.path.insert(0, _path_entry)
+
+from bench.lib.bench_utils import load_json_object as load_json
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--report", required=True, help="Compare report JSON path.")
     parser.add_argument("--json", action="store_true", dest="emit_json")
     return parser.parse_args()
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"expected JSON object: {path}")
-    return payload
 
 
 def failure(code: str, path: str, message: str) -> dict[str, str]:
