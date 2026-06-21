@@ -5,7 +5,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+BENCH_ROOT = REPO_ROOT / "bench"
+for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
+    if _path_entry not in sys.path:
+        sys.path.insert(0, _path_entry)
+
+from bench.lib.bench_utils import load_json_object
 
 
 PROOF_RANK = {
@@ -16,10 +25,7 @@ PROOF_RANK = {
 
 
 def load_json(path: str) -> dict:
-    payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"invalid JSON object: {path}")
-    return payload
+    return load_json_object(Path(path))
 
 
 def parse_jsonl(path: Path) -> list[dict]:

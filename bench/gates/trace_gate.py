@@ -17,6 +17,13 @@ from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+BENCH_ROOT = REPO_ROOT / "bench"
+for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
+    if _path_entry not in sys.path:
+        sys.path.insert(0, _path_entry)
+
+from bench.lib.bench_utils import load_json_object
+
 REPLAY_SCRIPT = REPO_ROOT / "pipeline" / "trace" / "replay.py"
 COMPARE_SCRIPT = REPO_ROOT / "pipeline" / "trace" / "compare_dispatch_traces.py"
 DOE_MODULE_PREFIX = "doe-"
@@ -43,7 +50,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_json(path: str) -> dict[str, Any]:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    return load_json_object(Path(path))
 
 
 def fail(message: str) -> None:
@@ -81,12 +88,9 @@ def run_semantic_parity_check(baseline_jsonl: Path, comparison_jsonl: Path) -> t
 
 def load_json_file(path: Path) -> dict[str, Any] | None:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
+        return load_json_object(path)
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError):
         return None
-    if isinstance(payload, dict):
-        return payload
-    return None
 
 
 def workload_side_payload(workload: dict[str, Any], side: str) -> dict[str, Any]:
