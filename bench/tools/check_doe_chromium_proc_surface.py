@@ -13,6 +13,13 @@ from typing import Any, Callable
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+BENCH_ROOT = REPO_ROOT / "bench"
+for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
+    if _path_entry not in sys.path:
+        sys.path.insert(0, _path_entry)
+
+from bench.lib.bench_utils import load_json_object as load_json
+
 DEFAULT_CONFIG = "config/doe-chromium-proc-surface.json"
 EXPECTED_SURFACE_ID = "doe-chromium-proc-surface"
 
@@ -67,13 +74,6 @@ def resolve_path(root: Path, path_text: str) -> Path | None:
     if not safe_repo_path(path_text):
         return None
     return root.joinpath(*PurePosixPath(path_text).parts)
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"expected JSON object: {path}")
-    return payload
 
 
 def check_row(
