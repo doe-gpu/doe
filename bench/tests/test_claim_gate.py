@@ -5,6 +5,7 @@ from __future__ import annotations
 import unittest
 
 from bench.gates import claim_gate
+from bench.gates.claim_comparability import workload_comparability_failures
 
 
 def _doe_package_meta() -> dict:
@@ -90,7 +91,7 @@ def _comparability(
 
 class ClaimGateTests(unittest.TestCase):
     def test_comparability_helper_rejects_missing_object(self) -> None:
-        failures, has_comparability = claim_gate.workload_comparability_failures(
+        failures, has_comparability = workload_comparability_failures(
             workload_id="gemma_decode",
             workload={},
             require_comparison_status="comparable",
@@ -106,7 +107,7 @@ class ClaimGateTests(unittest.TestCase):
     def test_comparability_helper_rejects_readback_blocker(self) -> None:
         blocker_id = "baseline_comparison_effective_readback_path_match"
 
-        failures, has_comparability = claim_gate.workload_comparability_failures(
+        failures, has_comparability = workload_comparability_failures(
             workload_id="gemma_decode",
             workload=_comparability(
                 comparable=False,
@@ -133,7 +134,7 @@ class ClaimGateTests(unittest.TestCase):
     def test_comparability_helper_rejects_stale_blocking_list(self) -> None:
         blocker_id = "baseline_comparison_effective_readback_path_match"
 
-        failures, has_comparability = claim_gate.workload_comparability_failures(
+        failures, has_comparability = workload_comparability_failures(
             workload_id="gemma_decode",
             workload=_comparability(
                 comparable=True,
