@@ -11,6 +11,7 @@ from bench.gates.claim_package_telemetry import (
     doe_package_telemetry_failures,
     required_comparability_obligation_ids_for_workload,
 )
+from bench.gates.claim_speed_policy import suspicious_speedup_failures
 
 
 def _doe_package_meta() -> dict:
@@ -303,7 +304,7 @@ class ClaimGateTests(unittest.TestCase):
         )
 
     def test_suspicious_speedup_rejected_even_with_claimable_sidecar(self) -> None:
-        failures = claim_gate.suspicious_speedup_failures(
+        failures = suspicious_speedup_failures(
             workload_id="gemma_decode",
             baseline_stats={
                 "p50Ms": 0.1,

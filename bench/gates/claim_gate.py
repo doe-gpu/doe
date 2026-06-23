@@ -22,9 +22,12 @@ from bench.gates.claim_package_telemetry import (
     doe_package_telemetry_failures,
     required_comparability_obligation_ids_for_workload,
 )
+from bench.gates.claim_speed_policy import (
+    claimable_speed_failures,
+    expected_positive_percentiles_for_mode,
+)
 from bench.lib import compare_claim_artifacts as artifacts_mod
 from bench.lib import report_conformance
-from native_compare_modules.claimability import assess_suspicious_speedup
 from native_compare_modules.config_support import (
     load_benchmark_methodology_policy,
     load_workloads,
@@ -35,8 +38,6 @@ VALID_COMPARISON_STATUSES = {"comparable", "diagnostic"}
 VALID_CLAIM_STATUSES = {"claimable", "diagnostic"}
 VALID_CLAIMABILITY_MODES = {"local", "release"}
 VALID_BENCHMARK_CLASSES = {"comparable", "directional"}
-RELEASE_REQUIRED_POSITIVE_PERCENTILES = ["p50Percent", "p95Percent", "p99Percent"]
-LOCAL_REQUIRED_POSITIVE_PERCENTILES = ["p50Percent", "p95Percent"]
 
 
 def parse_args() -> argparse.Namespace:
@@ -148,32 +149,6 @@ def parse_string_list(value: Any) -> list[str] | None:
             return None
         parsed.append(item)
     return parsed
-
-
-def expected_positive_percentiles_for_mode(mode: str) -> list[str]:
-    if mode == "release":
-        return RELEASE_REQUIRED_POSITIVE_PERCENTILES
-    if mode == "local":
-        return LOCAL_REQUIRED_POSITIVE_PERCENTILES
-    return []
-
-
-def suspicious_speedup_failures(
-    *,
-    workload_id: str,
-    baseline_stats: dict[str, Any],
-    comparison_stats: dict[str, Any],
-    suspicious_speedup_ratio: float,
-) -> list[str]:
-    return [
-        f"{workload_id}: {reason}"
-        for reason in assess_suspicious_speedup(
-            left_stats=baseline_stats,
-            right_stats=comparison_stats,
-            claim_metric_scope="selectedTiming",
-            suspicious_speedup_ratio=suspicious_speedup_ratio,
-        )
-    ]
 
 
 def workload_runtime_hint(workload: dict[str, Any]) -> str:
@@ -647,47 +622,17 @@ def main() -> int:
             failures.append(f"{workload_id}: claimability.claimable must be false")
 
         if args.require_claim_status == "claimable":
-            baseline_stats = workload.get("baselineStatsMs", {})
-            comparison_stats = workload.get("comparisonStatsMs", {})
-            if not isinstance(baseline_stats, dict):
-                baseline_stats = {}
-            if not isinstance(comparison_stats, dict):
-                comparison_stats = {}
-            left_count = parse_int(baseline_stats.get("count"))
-            right_count = parse_int(comparison_stats.get("count"))
             effective_min_timed_samples = (
                 min_samples
                 if min_samples is not None
                 else args.require_min_timed_samples
             )
-            if left_count is None or left_count < effective_min_timed_samples:
-                failures.append(
-                    f"{workload_id}: baselineStatsMs.count must be >= {effective_min_timed_samples}"
-                )
-            if right_count is None or right_count < effective_min_timed_samples:
-                failures.append(
-                    f"{workload_id}: comparisonStatsMs.count must be >= {effective_min_timed_samples}"
-                )
-            delta = workload.get("deltaPercent")
-            if not isinstance(delta, dict):
-                failures.append(f"{workload_id}: missing deltaPercent object")
-            else:
-                for percentile in expected_required:
-                    value = parse_float(delta.get(percentile))
-                    if value is None:
-                        failures.append(
-                            f"{workload_id}: deltaPercent.{percentile} missing or invalid"
-                        )
-                    elif value <= 0.0:
-                        failures.append(
-                            f"{workload_id}: deltaPercent.{percentile} must be > 0 "
-                            "(positive means baseline faster)"
-                        )
             failures.extend(
-                suspicious_speedup_failures(
+                claimable_speed_failures(
                     workload_id=str(workload_id),
-                    baseline_stats=baseline_stats,
-                    comparison_stats=comparison_stats,
+                    workload=workload,
+                    expected_required_percentiles=expected_required,
+                    min_timed_samples=effective_min_timed_samples,
                     suspicious_speedup_ratio=suspicious_speedup_ratio,
                 )
             )
