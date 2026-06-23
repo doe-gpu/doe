@@ -14,6 +14,8 @@ receipts now block comparability because the Doe side used
 New package trace metadata emits `packageEffectiveReadbackPaths` so fresh
 receipts record the actual path taken. Older package receipts are still audited
 from readback timing buckets.
+The claim gate now requires that effective-path list on successful Doe package
+trace metadata before a package row can be treated as claimable.
 
 The historical workload manifest recorded by these anchors is preserved through
 `config/workload-manifest-archives.json` and
