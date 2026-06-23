@@ -13,11 +13,12 @@ from typing import Any
 
 import jsonschema
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-for _path_entry in (str(REPO_ROOT), str(REPO_ROOT / "bench")):
-    if _path_entry not in sys.path:
-        sys.path.insert(0, _path_entry)
+try:
+    from bench.tools._repo_import import ensure_repo_root
+except ModuleNotFoundError:
+    from _repo_import import ensure_repo_root
 
+REPO_ROOT = ensure_repo_root(__file__)
 from bench.lib import benchmark_ir as benchmark_ir_mod
 from native_compare_modules.runner import file_sha256
 
