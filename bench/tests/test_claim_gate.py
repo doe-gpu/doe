@@ -5,6 +5,7 @@ from __future__ import annotations
 import unittest
 
 from bench.gates import claim_gate
+from bench.gates.claim_backend_telemetry import backend_telemetry_failures
 from bench.gates.claim_comparability import workload_comparability_failures
 from bench.gates.claim_package_telemetry import (
     PACKAGE_EFFECTIVE_READBACK_OBLIGATION_ID,
@@ -96,7 +97,49 @@ def _comparability(
     }
 
 
+def _backend_workload(trace_meta: dict) -> dict:
+    return {
+        "baseline": {
+            "commandSamples": [
+                {
+                    "returnCode": 0,
+                    "traceMeta": trace_meta,
+                }
+            ]
+        }
+    }
+
+
 class ClaimGateTests(unittest.TestCase):
+    def test_backend_telemetry_accepts_complete_trace_meta(self) -> None:
+        self.assertEqual(
+            backend_telemetry_failures(
+                workload_id="atomic",
+                workload=_backend_workload(
+                    {
+                        "backendId": "doe_vulkan",
+                        "backendSelectionReason": "policy",
+                        "selectionPolicyHash": "abc123",
+                        "fallbackUsed": False,
+                    }
+                ),
+                expected_backend_id="doe_vulkan",
+            ),
+            [],
+        )
+
+    def test_backend_telemetry_rejects_missing_fields(self) -> None:
+        failures = backend_telemetry_failures(
+            workload_id="atomic",
+            workload=_backend_workload({}),
+            expected_backend_id="doe_vulkan",
+        )
+
+        self.assertIn("atomic: sample 0 missing backendId", failures)
+        self.assertIn("atomic: sample 0 missing backendSelectionReason", failures)
+        self.assertIn("atomic: sample 0 missing selectionPolicyHash", failures)
+        self.assertIn("atomic: sample 0 missing fallbackUsed bool", failures)
+
     def test_comparability_helper_rejects_missing_object(self) -> None:
         failures, has_comparability = workload_comparability_failures(
             workload_id="gemma_decode",
