@@ -203,6 +203,90 @@ def suspicious_speedup_failures(
     ]
 
 
+def workload_comparability_failures(
+    *,
+    workload_id: str,
+    workload: dict[str, Any],
+    require_comparison_status: str,
+    expected_obligation_ids: set[str],
+    expected_obligation_schema_version: int,
+) -> tuple[list[str], bool]:
+    failures: list[str] = []
+    workload_comparability = workload.get("comparability")
+    if not isinstance(workload_comparability, dict):
+        return [f"{workload_id}: missing comparability object"], False
+
+    comparable_flag = workload_comparability.get("comparable")
+    if require_comparison_status == "comparable" and comparable_flag is not True:
+        failures.append(f"{workload_id}: comparability.comparable must be true")
+
+    obligation_schema_version = parse_int(
+        workload_comparability.get("obligationSchemaVersion")
+    )
+    if obligation_schema_version != expected_obligation_schema_version:
+        failures.append(
+            f"{workload_id}: comparability.obligationSchemaVersion must be "
+            f"{expected_obligation_schema_version}"
+        )
+
+    obligations = workload_comparability.get("obligations")
+    if not isinstance(obligations, list) or not obligations:
+        failures.append(
+            f"{workload_id}: comparability.obligations must be a non-empty list"
+        )
+    else:
+        for obligation_idx, obligation in enumerate(obligations):
+            if not isinstance(obligation, dict):
+                failures.append(
+                    f"{workload_id}: comparability.obligations[{obligation_idx}] "
+                    "must be an object"
+                )
+                continue
+            obligation_id = obligation.get("id")
+            if not isinstance(obligation_id, str) or not obligation_id:
+                failures.append(
+                    f"{workload_id}: comparability.obligations[{obligation_idx}].id "
+                    "must be a non-empty string"
+                )
+            elif obligation_id not in expected_obligation_ids:
+                failures.append(
+                    f"{workload_id}: comparability.obligations[{obligation_idx}].id "
+                    f"{obligation_id!r} is not in canonical obligation contract"
+                )
+            for field_name in ("blocking", "applicable", "passes"):
+                if not isinstance(obligation.get(field_name), bool):
+                    failures.append(
+                        f"{workload_id}: comparability.obligations[{obligation_idx}]."
+                        f"{field_name} must be bool"
+                    )
+
+    blocking_failed = workload_comparability.get("blockingFailedObligations")
+    if not isinstance(blocking_failed, list):
+        failures.append(
+            f"{workload_id}: comparability.blockingFailedObligations must be a list"
+        )
+    else:
+        for failed_idx, failed_obligation in enumerate(blocking_failed):
+            if not isinstance(failed_obligation, str) or not failed_obligation:
+                failures.append(
+                    f"{workload_id}: comparability.blockingFailedObligations"
+                    f"[{failed_idx}] must be a non-empty string"
+                )
+            elif failed_obligation not in expected_obligation_ids:
+                failures.append(
+                    f"{workload_id}: comparability.blockingFailedObligations"
+                    f"[{failed_idx}] {failed_obligation!r} is not in canonical "
+                    "obligation contract"
+                )
+        if comparable_flag is True and blocking_failed:
+            failures.append(
+                f"{workload_id}: comparable workload must not have "
+                "blockingFailedObligations"
+            )
+
+    return failures, True
+
+
 def workload_runtime_hint(workload: dict[str, Any]) -> str:
     workload_id = str(workload.get("id", "unknown"))
     claimability = workload.get("claimability")
@@ -925,13 +1009,16 @@ def main() -> int:
                 )
             )
 
-        workload_comparability = workload.get("comparability")
-        if not isinstance(workload_comparability, dict):
-            failures.append(f"{workload_id}: missing comparability object")
+        comparability_failures, has_comparability = workload_comparability_failures(
+            workload_id=str(workload_id),
+            workload=workload,
+            require_comparison_status=args.require_comparison_status,
+            expected_obligation_ids=expected_obligation_ids,
+            expected_obligation_schema_version=expected_obligation_schema_version,
+        )
+        failures.extend(comparability_failures)
+        if not has_comparability:
             continue
-        comparable_flag = workload_comparability.get("comparable")
-        if args.require_comparison_status == "comparable" and comparable_flag is not True:
-            failures.append(f"{workload_id}: comparability.comparable must be true")
 
         if args.require_claim_status == "claimable":
             failures.extend(
@@ -948,61 +1035,6 @@ def main() -> int:
                     side_payload=workload.get("comparison"),
                 )
             )
-
-        obligation_schema_version = parse_int(
-            workload_comparability.get("obligationSchemaVersion")
-        )
-        if obligation_schema_version != expected_obligation_schema_version:
-            failures.append(
-                f"{workload_id}: comparability.obligationSchemaVersion must be "
-                f"{expected_obligation_schema_version}"
-            )
-
-        obligations = workload_comparability.get("obligations")
-        if not isinstance(obligations, list) or not obligations:
-            failures.append(f"{workload_id}: comparability.obligations must be a non-empty list")
-        else:
-            for obligation_idx, obligation in enumerate(obligations):
-                if not isinstance(obligation, dict):
-                    failures.append(
-                        f"{workload_id}: comparability.obligations[{obligation_idx}] must be an object"
-                    )
-                    continue
-                obligation_id = obligation.get("id")
-                if not isinstance(obligation_id, str) or not obligation_id:
-                    failures.append(
-                        f"{workload_id}: comparability.obligations[{obligation_idx}].id must be a non-empty string"
-                    )
-                elif obligation_id not in expected_obligation_ids:
-                    failures.append(
-                        f"{workload_id}: comparability.obligations[{obligation_idx}].id "
-                        f"{obligation_id!r} is not in canonical obligation contract"
-                    )
-                for field_name in ("blocking", "applicable", "passes"):
-                    if not isinstance(obligation.get(field_name), bool):
-                        failures.append(
-                            f"{workload_id}: comparability.obligations[{obligation_idx}].{field_name} must be bool"
-                        )
-
-        blocking_failed = workload_comparability.get("blockingFailedObligations")
-        if not isinstance(blocking_failed, list):
-            failures.append(f"{workload_id}: comparability.blockingFailedObligations must be a list")
-        else:
-            for failed_idx, failed_obligation in enumerate(blocking_failed):
-                if not isinstance(failed_obligation, str) or not failed_obligation:
-                    failures.append(
-                        f"{workload_id}: comparability.blockingFailedObligations[{failed_idx}] "
-                        "must be a non-empty string"
-                    )
-                elif failed_obligation not in expected_obligation_ids:
-                    failures.append(
-                        f"{workload_id}: comparability.blockingFailedObligations[{failed_idx}] "
-                        f"{failed_obligation!r} is not in canonical obligation contract"
-                    )
-            if comparable_flag is True and blocking_failed:
-                failures.append(
-                    f"{workload_id}: comparable workload must not have blockingFailedObligations"
-                )
 
         if args.require_backend_telemetry and args.require_claim_status == "claimable":
             left_payload = workload.get("baseline")

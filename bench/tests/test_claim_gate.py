@@ -65,7 +65,92 @@ def _side(meta: dict, *, name: str = "doe_gpu_node_package_prepared") -> dict:
     }
 
 
+def _comparability(
+    *,
+    comparable: bool,
+    blocking_failed: list[str] | None = None,
+) -> dict:
+    blocker_id = "baseline_comparison_effective_readback_path_match"
+    return {
+        "comparability": {
+            "blockingFailedObligations": blocking_failed or [],
+            "comparable": comparable,
+            "obligationSchemaVersion": 1,
+            "obligations": [
+                {
+                    "applicable": True,
+                    "blocking": True,
+                    "id": blocker_id,
+                    "passes": not blocking_failed,
+                }
+            ],
+        }
+    }
+
+
 class ClaimGateTests(unittest.TestCase):
+    def test_comparability_helper_rejects_missing_object(self) -> None:
+        failures, has_comparability = claim_gate.workload_comparability_failures(
+            workload_id="gemma_decode",
+            workload={},
+            require_comparison_status="comparable",
+            expected_obligation_ids={
+                "baseline_comparison_effective_readback_path_match"
+            },
+            expected_obligation_schema_version=1,
+        )
+
+        self.assertFalse(has_comparability)
+        self.assertEqual(failures, ["gemma_decode: missing comparability object"])
+
+    def test_comparability_helper_rejects_readback_blocker(self) -> None:
+        blocker_id = "baseline_comparison_effective_readback_path_match"
+
+        failures, has_comparability = claim_gate.workload_comparability_failures(
+            workload_id="gemma_decode",
+            workload=_comparability(
+                comparable=False,
+                blocking_failed=[blocker_id],
+            ),
+            require_comparison_status="comparable",
+            expected_obligation_ids={blocker_id},
+            expected_obligation_schema_version=1,
+        )
+
+        self.assertTrue(has_comparability)
+        self.assertIn(
+            "gemma_decode: comparability.comparable must be true",
+            failures,
+        )
+        self.assertFalse(
+            any(
+                "not in canonical obligation contract" in failure
+                for failure in failures
+            ),
+            f"unexpected canonical-id failure: {failures}",
+        )
+
+    def test_comparability_helper_rejects_stale_blocking_list(self) -> None:
+        blocker_id = "baseline_comparison_effective_readback_path_match"
+
+        failures, has_comparability = claim_gate.workload_comparability_failures(
+            workload_id="gemma_decode",
+            workload=_comparability(
+                comparable=True,
+                blocking_failed=[blocker_id],
+            ),
+            require_comparison_status="comparable",
+            expected_obligation_ids={blocker_id},
+            expected_obligation_schema_version=1,
+        )
+
+        self.assertTrue(has_comparability)
+        self.assertIn(
+            "gemma_decode: comparable workload must not have "
+            "blockingFailedObligations",
+            failures,
+        )
+
     def test_doe_package_telemetry_accepts_complete_trace_meta(self) -> None:
         self.assertEqual(
             claim_gate.doe_package_telemetry_failures(
