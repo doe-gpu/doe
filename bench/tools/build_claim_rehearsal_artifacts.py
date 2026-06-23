@@ -6,19 +6,17 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-BENCH_ROOT = REPO_ROOT / "bench"
-for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
-    if _path_entry not in sys.path:
-        sys.path.insert(0, _path_entry)
+try:
+    from bench.tools._repo_import import ensure_repo_root
+except ModuleNotFoundError:
+    from _repo_import import ensure_repo_root
 
+REPO_ROOT = ensure_repo_root(__file__)
 
 import argparse
 import json
 import subprocess
-import sys
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 from bench.lib import compare_claim_artifacts as artifacts_mod
