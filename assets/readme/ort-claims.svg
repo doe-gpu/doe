@@ -2,194 +2,194 @@
   <title id="chart-title">Additional ORT compare lanes</title>
   <desc id="chart-desc">ORT compare claims</desc>
   <defs><style>
-  text { fill: #111111; font-family: Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0; }
+  text { fill: #000000; font-family: Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0; }
   .ev-title { font-size: 30px; font-weight: 700; }
-  .ev-subtitle { font-size: 14px; fill: #5a5a5a; font-weight: 500; }
+  .ev-subtitle { font-size: 14px; fill: #6b2cff; font-weight: 500; }
   .ev-node-title { font-size: 20px; font-weight: 700; }
-  .ev-label { font-size: 12px; fill: #5a5a5a; font-weight: 600; }
+  .ev-label { font-size: 12px; fill: #6b2cff; font-weight: 600; }
   .ev-mono { font-family: SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; }
 </style></defs>
   <rect x="0" y="0" width="1340" height="1168" fill="#ffffff" />
-  <rect x="14" y="14" width="1312" height="1140" rx="4" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+  <rect x="14" y="14" width="1312" height="1140" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
   <text x="36" y="70" class="ev-title">Additional ORT compare lanes</text>
 <text x="36" y="102" class="ev-subtitle">Current ORT compare lanes, shown as artifact-backed Doe versus ORT WebGPU timings.</text>
-<rect x="998" y="34" width="296" height="38" rx="3" fill="#f7f7f7" stroke="#111111" stroke-width="1.25" />
-<text x="1146" y="58" text-anchor="middle" class="ev-label ev-mono" style="fill:#111111">BARS IN MS; LOWER IS BETTER</text>
+<rect x="998" y="34" width="296" height="38" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<text x="1146" y="58" text-anchor="middle" class="ev-label ev-mono" style="fill:#000000">BARS IN MS; LOWER IS BETTER</text>
 <text x="322" y="148" class="ev-label">Each lane scales its own bars; exact ms and sample counts are printed on the row.</text>
-<rect x="24" y="156" width="1292" height="176" rx="4" fill="#f7f7f7" stroke="#111111" stroke-width="1.25" />
+<rect x="24" y="156" width="1292" height="176" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="48" y="194" class="ev-node-title">Native ORT</text>
-<rect x="48" y="208" width="176" height="30" rx="3" fill="#111111" fill-opacity="0.14" stroke="#111111" stroke-width="1.25" />
-<text x="64" y="228" class="ev-label" style="fill:#111111">AMD Vulkan</text>
+<rect x="48" y="208" width="176" height="30" rx="3" fill="#000000" fill-opacity="0.14" stroke="#000000" stroke-width="1.25" />
+<text x="64" y="228" class="ev-label" style="fill:#000000">AMD Vulkan</text>
 <text x="322" y="174" class="ev-label ev-mono">p50 ms</text>
-<circle cx="330" cy="188" r="4" fill="#111111" />
+<circle cx="330" cy="188" r="4" fill="#000000" />
 <text x="342" y="192" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="182" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="183" width="293.10984542531764" height="10" rx="3" fill="#111111" />
+<rect x="412" y="182" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="183" width="293.10984542531764" height="10" rx="3" fill="#000000" />
 <text x="944" y="192" class="ev-mono" font-size="11">100.4 ms</text>
-<circle cx="330" cy="206" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="206" r="4" fill="#315bff" />
 <text x="342" y="210" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="200" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="201" width="482.5142972873042" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="200" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="201" width="482.5142972873042" height="10" rx="3" fill="#315bff" />
 <text x="944" y="210" class="ev-mono" font-size="11">164.8 ms</text>
 <text x="322" y="226" class="ev-label ev-mono">p95 ms</text>
-<circle cx="330" cy="240" r="4" fill="#111111" />
+<circle cx="330" cy="240" r="4" fill="#000000" />
 <text x="342" y="244" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="234" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="235" width="307.56574462387687" height="10" rx="3" fill="#111111" />
+<rect x="412" y="234" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="235" width="307.56574462387687" height="10" rx="3" fill="#000000" />
 <text x="944" y="244" class="ev-mono" font-size="11">105.3 ms</text>
-<circle cx="330" cy="258" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="258" r="4" fill="#315bff" />
 <text x="342" y="262" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="252" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="253" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="252" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="253" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="262" class="ev-mono" font-size="11">170.1 ms</text>
 <text x="322" y="308" class="ev-label">Doe n=18</text>
 <text x="470" y="308" class="ev-label">ORT WebGPU n=18</text>
-<rect x="1134" y="178" width="160" height="40" rx="3" fill="#b8a8d8" fill-opacity="0.14" stroke="#b8a8d8" stroke-width="1.25" />
-<text x="1214" y="204" text-anchor="middle" font-size="18" font-weight="700" style="fill:#b8a8d8">+39.1%</text>
-<rect x="1134" y="228" width="160" height="34" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="178" width="160" height="40" rx="3" fill="#6b2cff" fill-opacity="0.14" stroke="#6b2cff" stroke-width="1.25" />
+<text x="1214" y="204" text-anchor="middle" font-size="18" font-weight="700" style="fill:#6b2cff">+39.1%</text>
+<rect x="1134" y="228" width="160" height="34" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="249" text-anchor="middle" class="ev-label">p95 +38.1%</text>
-<rect x="1134" y="272" width="160" height="28" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="272" width="160" height="28" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="290" text-anchor="middle" class="ev-label ev-mono">artifact-backed</text>
-<rect x="24" y="350" width="1292" height="176" rx="4" fill="#f7f7f7" stroke="#111111" stroke-width="1.25" />
+<rect x="24" y="350" width="1292" height="176" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="48" y="388" class="ev-node-title">Node ORT</text>
-<rect x="48" y="402" width="176" height="30" rx="3" fill="#111111" fill-opacity="0.14" stroke="#111111" stroke-width="1.25" />
-<text x="64" y="422" class="ev-label" style="fill:#111111">AMD Vulkan</text>
+<rect x="48" y="402" width="176" height="30" rx="3" fill="#000000" fill-opacity="0.14" stroke="#000000" stroke-width="1.25" />
+<text x="64" y="422" class="ev-label" style="fill:#000000">AMD Vulkan</text>
 <text x="322" y="368" class="ev-label ev-mono">p50 ms</text>
-<circle cx="330" cy="382" r="4" fill="#111111" />
+<circle cx="330" cy="382" r="4" fill="#000000" />
 <text x="342" y="386" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="376" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="377" width="453.2973434612735" height="10" rx="3" fill="#111111" />
+<rect x="412" y="376" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="377" width="453.2973434612735" height="10" rx="3" fill="#000000" />
 <text x="944" y="386" class="ev-mono" font-size="11">8,186.2 ms</text>
-<circle cx="330" cy="400" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="400" r="4" fill="#315bff" />
 <text x="342" y="404" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="394" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="395" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="394" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="395" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="404" class="ev-mono" font-size="11">8,990.0 ms</text>
 <text x="322" y="420" class="ev-label ev-mono">p95 ms</text>
-<circle cx="330" cy="434" r="4" fill="#111111" />
+<circle cx="330" cy="434" r="4" fill="#000000" />
 <text x="342" y="438" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="428" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="429" width="453.2973434612735" height="10" rx="3" fill="#111111" />
+<rect x="412" y="428" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="429" width="453.2973434612735" height="10" rx="3" fill="#000000" />
 <text x="944" y="438" class="ev-mono" font-size="11">8,186.2 ms</text>
-<circle cx="330" cy="452" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="452" r="4" fill="#315bff" />
 <text x="342" y="456" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="446" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="447" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="446" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="447" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="456" class="ev-mono" font-size="11">8,990.0 ms</text>
 <text x="322" y="502" class="ev-label">Doe n=3</text>
 <text x="470" y="502" class="ev-label">ORT WebGPU n=3</text>
-<rect x="1134" y="372" width="160" height="40" rx="3" fill="#b8a8d8" fill-opacity="0.14" stroke="#b8a8d8" stroke-width="1.25" />
-<text x="1214" y="398" text-anchor="middle" font-size="18" font-weight="700" style="fill:#b8a8d8">+8.9%</text>
-<rect x="1134" y="422" width="160" height="34" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="372" width="160" height="40" rx="3" fill="#6b2cff" fill-opacity="0.14" stroke="#6b2cff" stroke-width="1.25" />
+<text x="1214" y="398" text-anchor="middle" font-size="18" font-weight="700" style="fill:#6b2cff">+8.9%</text>
+<rect x="1134" y="422" width="160" height="34" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="443" text-anchor="middle" class="ev-label">p95 +8.9%</text>
-<rect x="1134" y="466" width="160" height="28" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="466" width="160" height="28" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="484" text-anchor="middle" class="ev-label ev-mono">artifact-backed</text>
-<rect x="24" y="544" width="1292" height="176" rx="4" fill="#f7f7f7" stroke="#111111" stroke-width="1.25" />
+<rect x="24" y="544" width="1292" height="176" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="48" y="582" class="ev-node-title">Bun ORT</text>
-<rect x="48" y="596" width="176" height="30" rx="3" fill="#111111" fill-opacity="0.14" stroke="#111111" stroke-width="1.25" />
-<text x="64" y="616" class="ev-label" style="fill:#111111">AMD Vulkan</text>
+<rect x="48" y="596" width="176" height="30" rx="3" fill="#000000" fill-opacity="0.14" stroke="#000000" stroke-width="1.25" />
+<text x="64" y="616" class="ev-label" style="fill:#000000">AMD Vulkan</text>
 <text x="322" y="562" class="ev-label ev-mono">p50 ms</text>
-<circle cx="330" cy="576" r="4" fill="#111111" />
+<circle cx="330" cy="576" r="4" fill="#000000" />
 <text x="342" y="580" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="570" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="571" width="478.02400526281843" height="10" rx="3" fill="#111111" />
+<rect x="412" y="570" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="571" width="478.02400526281843" height="10" rx="3" fill="#000000" />
 <text x="944" y="580" class="ev-mono" font-size="11">2,811.9 ms</text>
-<circle cx="330" cy="594" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="594" r="4" fill="#315bff" />
 <text x="342" y="598" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="588" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="589" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="588" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="589" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="598" class="ev-mono" font-size="11">2,928.9 ms</text>
 <text x="322" y="614" class="ev-label ev-mono">p95 ms</text>
-<circle cx="330" cy="628" r="4" fill="#111111" />
+<circle cx="330" cy="628" r="4" fill="#000000" />
 <text x="342" y="632" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="622" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="623" width="478.02400526281843" height="10" rx="3" fill="#111111" />
+<rect x="412" y="622" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="623" width="478.02400526281843" height="10" rx="3" fill="#000000" />
 <text x="944" y="632" class="ev-mono" font-size="11">2,811.9 ms</text>
-<circle cx="330" cy="646" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="646" r="4" fill="#315bff" />
 <text x="342" y="650" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="640" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="641" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="640" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="641" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="650" class="ev-mono" font-size="11">2,928.9 ms</text>
 <text x="322" y="696" class="ev-label">Doe n=3</text>
 <text x="470" y="696" class="ev-label">ORT WebGPU n=3</text>
-<rect x="1134" y="566" width="160" height="40" rx="3" fill="#b8a8d8" fill-opacity="0.14" stroke="#b8a8d8" stroke-width="1.25" />
-<text x="1214" y="592" text-anchor="middle" font-size="18" font-weight="700" style="fill:#b8a8d8">+4.0%</text>
-<rect x="1134" y="616" width="160" height="34" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="566" width="160" height="40" rx="3" fill="#6b2cff" fill-opacity="0.14" stroke="#6b2cff" stroke-width="1.25" />
+<text x="1214" y="592" text-anchor="middle" font-size="18" font-weight="700" style="fill:#6b2cff">+4.0%</text>
+<rect x="1134" y="616" width="160" height="34" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="637" text-anchor="middle" class="ev-label">p95 +4.0%</text>
-<rect x="1134" y="660" width="160" height="28" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="660" width="160" height="28" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="678" text-anchor="middle" class="ev-label ev-mono">artifact-backed</text>
-<rect x="24" y="738" width="1292" height="176" rx="4" fill="#f7f7f7" stroke="#111111" stroke-width="1.25" />
+<rect x="24" y="738" width="1292" height="176" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="48" y="776" class="ev-node-title">Node ORT</text>
-<rect x="48" y="790" width="176" height="30" rx="3" fill="#111111" fill-opacity="0.14" stroke="#111111" stroke-width="1.25" />
-<text x="64" y="810" class="ev-label" style="fill:#111111">Apple Metal</text>
+<rect x="48" y="790" width="176" height="30" rx="3" fill="#000000" fill-opacity="0.14" stroke="#000000" stroke-width="1.25" />
+<text x="64" y="810" class="ev-label" style="fill:#000000">Apple Metal</text>
 <text x="322" y="756" class="ev-label ev-mono">p50 ms</text>
-<circle cx="330" cy="770" r="4" fill="#111111" />
+<circle cx="330" cy="770" r="4" fill="#000000" />
 <text x="342" y="774" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="764" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="765" width="492.63811199403676" height="10" rx="3" fill="#111111" />
+<rect x="412" y="764" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="765" width="492.63811199403676" height="10" rx="3" fill="#000000" />
 <text x="944" y="774" class="ev-mono" font-size="11">3,098.2 ms</text>
-<circle cx="330" cy="788" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="788" r="4" fill="#315bff" />
 <text x="342" y="792" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="782" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="783" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="782" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="783" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="792" class="ev-mono" font-size="11">3,131.8 ms</text>
 <text x="322" y="808" class="ev-label ev-mono">p95 ms</text>
-<circle cx="330" cy="822" r="4" fill="#111111" />
+<circle cx="330" cy="822" r="4" fill="#000000" />
 <text x="342" y="826" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="816" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="817" width="492.63811199403676" height="10" rx="3" fill="#111111" />
+<rect x="412" y="816" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="817" width="492.63811199403676" height="10" rx="3" fill="#000000" />
 <text x="944" y="826" class="ev-mono" font-size="11">3,098.2 ms</text>
-<circle cx="330" cy="840" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="840" r="4" fill="#315bff" />
 <text x="342" y="844" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="834" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="835" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="834" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="835" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="844" class="ev-mono" font-size="11">3,131.8 ms</text>
 <text x="322" y="890" class="ev-label">Doe n=3</text>
 <text x="470" y="890" class="ev-label">ORT WebGPU n=3</text>
-<rect x="1134" y="760" width="160" height="40" rx="3" fill="#b8a8d8" fill-opacity="0.14" stroke="#b8a8d8" stroke-width="1.25" />
-<text x="1214" y="786" text-anchor="middle" font-size="18" font-weight="700" style="fill:#b8a8d8">+1.1%</text>
-<rect x="1134" y="810" width="160" height="34" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="760" width="160" height="40" rx="3" fill="#6b2cff" fill-opacity="0.14" stroke="#6b2cff" stroke-width="1.25" />
+<text x="1214" y="786" text-anchor="middle" font-size="18" font-weight="700" style="fill:#6b2cff">+1.1%</text>
+<rect x="1134" y="810" width="160" height="34" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="831" text-anchor="middle" class="ev-label">p95 +1.1%</text>
-<rect x="1134" y="854" width="160" height="28" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="854" width="160" height="28" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="872" text-anchor="middle" class="ev-label ev-mono">artifact-backed</text>
-<rect x="24" y="932" width="1292" height="176" rx="4" fill="#f7f7f7" stroke="#111111" stroke-width="1.25" />
+<rect x="24" y="932" width="1292" height="176" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="48" y="970" class="ev-node-title">Bun ORT</text>
-<rect x="48" y="984" width="176" height="30" rx="3" fill="#111111" fill-opacity="0.14" stroke="#111111" stroke-width="1.25" />
-<text x="64" y="1004" class="ev-label" style="fill:#111111">Apple Metal</text>
+<rect x="48" y="984" width="176" height="30" rx="3" fill="#000000" fill-opacity="0.14" stroke="#000000" stroke-width="1.25" />
+<text x="64" y="1004" class="ev-label" style="fill:#000000">Apple Metal</text>
 <text x="322" y="950" class="ev-label ev-mono">p50 ms</text>
-<circle cx="330" cy="964" r="4" fill="#111111" />
+<circle cx="330" cy="964" r="4" fill="#000000" />
 <text x="342" y="968" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="958" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="959" width="483.79587672197096" height="10" rx="3" fill="#111111" />
+<rect x="412" y="958" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="959" width="483.79587672197096" height="10" rx="3" fill="#000000" />
 <text x="944" y="968" class="ev-mono" font-size="11">1,462.0 ms</text>
-<circle cx="330" cy="982" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="982" r="4" fill="#315bff" />
 <text x="342" y="986" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="976" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="977" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="976" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="977" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="986" class="ev-mono" font-size="11">1,504.7 ms</text>
 <text x="322" y="1002" class="ev-label ev-mono">p95 ms</text>
-<circle cx="330" cy="1016" r="4" fill="#111111" />
+<circle cx="330" cy="1016" r="4" fill="#000000" />
 <text x="342" y="1020" font-size="11" font-weight="700">Doe</text>
-<rect x="412" y="1010" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="1011" width="483.79587672197096" height="10" rx="3" fill="#111111" />
+<rect x="412" y="1010" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="1011" width="483.79587672197096" height="10" rx="3" fill="#000000" />
 <text x="944" y="1020" class="ev-mono" font-size="11">1,462.0 ms</text>
-<circle cx="330" cy="1034" r="4" fill="#9bb7d6" />
+<circle cx="330" cy="1034" r="4" fill="#315bff" />
 <text x="342" y="1038" font-size="11" font-weight="700">ORT WebGPU</text>
-<rect x="412" y="1028" width="520" height="12" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
-<rect x="413" y="1029" width="498" height="10" rx="3" fill="#9bb7d6" />
+<rect x="412" y="1028" width="520" height="12" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
+<rect x="413" y="1029" width="498" height="10" rx="3" fill="#315bff" />
 <text x="944" y="1038" class="ev-mono" font-size="11">1,504.7 ms</text>
 <text x="322" y="1084" class="ev-label">Doe n=3</text>
 <text x="470" y="1084" class="ev-label">ORT WebGPU n=3</text>
-<rect x="1134" y="954" width="160" height="40" rx="3" fill="#b8a8d8" fill-opacity="0.14" stroke="#b8a8d8" stroke-width="1.25" />
-<text x="1214" y="980" text-anchor="middle" font-size="18" font-weight="700" style="fill:#b8a8d8">+2.8%</text>
-<rect x="1134" y="1004" width="160" height="34" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="954" width="160" height="40" rx="3" fill="#6b2cff" fill-opacity="0.14" stroke="#6b2cff" stroke-width="1.25" />
+<text x="1214" y="980" text-anchor="middle" font-size="18" font-weight="700" style="fill:#6b2cff">+2.8%</text>
+<rect x="1134" y="1004" width="160" height="34" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="1025" text-anchor="middle" class="ev-label">p95 +2.8%</text>
-<rect x="1134" y="1048" width="160" height="28" rx="3" fill="#ffffff" stroke="#111111" stroke-width="1.25" />
+<rect x="1134" y="1048" width="160" height="28" rx="3" fill="#ffffff" stroke="#000000" stroke-width="1.25" />
 <text x="1214" y="1066" text-anchor="middle" class="ev-label ev-mono">artifact-backed</text>
-<rect x="36" y="1128" width="18" height="18" rx="3" fill="#111111" />
+<rect x="36" y="1128" width="18" height="18" rx="3" fill="#000000" />
 <text x="64" y="1141" font-size="13">Doe timing bars</text>
-<rect x="250" y="1128" width="18" height="18" rx="3" fill="#9bb7d6" />
+<rect x="250" y="1128" width="18" height="18" rx="3" fill="#315bff" />
 <text x="278" y="1141" font-size="13">comparison timing bars</text>
-<rect x="540" y="1128" width="18" height="18" rx="3" fill="#b8a8d8" />
+<rect x="540" y="1128" width="18" height="18" rx="3" fill="#6b2cff" />
 <text x="568" y="1141" font-size="13">summary pill = p50 and p95 faster summary</text>
 </svg>

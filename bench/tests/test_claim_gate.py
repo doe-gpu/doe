@@ -70,8 +70,8 @@ def _comparability(
     *,
     comparable: bool,
     blocking_failed: list[str] | None = None,
+    obligation_id: str = "baseline_comparison_effective_readback_path_match",
 ) -> dict:
-    blocker_id = "baseline_comparison_effective_readback_path_match"
     return {
         "comparability": {
             "blockingFailedObligations": blocking_failed or [],
@@ -81,7 +81,7 @@ def _comparability(
                 {
                     "applicable": True,
                     "blocking": True,
-                    "id": blocker_id,
+                    "id": obligation_id,
                     "passes": not blocking_failed,
                 }
             ],
@@ -150,6 +150,49 @@ class ClaimGateTests(unittest.TestCase):
             "gemma_decode: comparable workload must not have "
             "blockingFailedObligations",
             failures,
+        )
+
+    def test_comparability_helper_rejects_missing_required_obligation(self) -> None:
+        required_id = "baseline_comparison_effective_readback_path_match"
+
+        failures, has_comparability = workload_comparability_failures(
+            workload_id="gemma_decode",
+            workload=_comparability(
+                comparable=True,
+                obligation_id="baseline_comparison_timing_phase_match",
+            ),
+            require_comparison_status="comparable",
+            expected_obligation_ids={
+                required_id,
+                "baseline_comparison_timing_phase_match",
+            },
+            expected_obligation_schema_version=1,
+            required_obligation_ids={required_id},
+        )
+
+        self.assertTrue(has_comparability)
+        self.assertIn(
+            "gemma_decode: comparability missing required obligation "
+            "baseline_comparison_effective_readback_path_match",
+            failures,
+        )
+
+    def test_package_claim_requires_effective_readback_obligation(self) -> None:
+        self.assertEqual(
+            claim_gate.required_comparability_obligation_ids_for_workload(
+                require_claim_status="claimable",
+                workload={"baseline": _side(_doe_package_meta())},
+            ),
+            {claim_gate.PACKAGE_EFFECTIVE_READBACK_OBLIGATION_ID},
+        )
+
+    def test_diagnostic_package_does_not_require_readback_obligation(self) -> None:
+        self.assertEqual(
+            claim_gate.required_comparability_obligation_ids_for_workload(
+                require_claim_status="diagnostic",
+                workload={"baseline": _side(_doe_package_meta())},
+            ),
+            set(),
         )
 
     def test_doe_package_telemetry_accepts_complete_trace_meta(self) -> None:

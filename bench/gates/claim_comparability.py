@@ -20,6 +20,7 @@ def workload_comparability_failures(
     require_comparison_status: str,
     expected_obligation_ids: set[str],
     expected_obligation_schema_version: int,
+    required_obligation_ids: set[str] | None = None,
 ) -> tuple[list[str], bool]:
     failures: list[str] = []
     workload_comparability = workload.get("comparability")
@@ -40,6 +41,7 @@ def workload_comparability_failures(
         )
 
     obligations = workload_comparability.get("obligations")
+    observed_obligation_ids: set[str] = set()
     if not isinstance(obligations, list) or not obligations:
         failures.append(
             f"{workload_id}: comparability.obligations must be a non-empty list"
@@ -63,12 +65,21 @@ def workload_comparability_failures(
                     f"{workload_id}: comparability.obligations[{obligation_idx}].id "
                     f"{obligation_id!r} is not in canonical obligation contract"
                 )
+            else:
+                observed_obligation_ids.add(obligation_id)
             for field_name in ("blocking", "applicable", "passes"):
                 if not isinstance(obligation.get(field_name), bool):
                     failures.append(
                         f"{workload_id}: comparability.obligations[{obligation_idx}]."
                         f"{field_name} must be bool"
                     )
+
+    for obligation_id in sorted(required_obligation_ids or set()):
+        if obligation_id not in observed_obligation_ids:
+            failures.append(
+                f"{workload_id}: comparability missing required obligation "
+                f"{obligation_id}"
+            )
 
     blocking_failed = workload_comparability.get("blockingFailedObligations")
     if not isinstance(blocking_failed, list):

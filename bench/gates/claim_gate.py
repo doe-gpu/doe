@@ -31,6 +31,9 @@ VALID_COMPARISON_STATUSES = {"comparable", "diagnostic"}
 VALID_CLAIM_STATUSES = {"claimable", "diagnostic"}
 VALID_CLAIMABILITY_MODES = {"local", "release"}
 VALID_BENCHMARK_CLASSES = {"comparable", "directional"}
+PACKAGE_EFFECTIVE_READBACK_OBLIGATION_ID = (
+    "baseline_comparison_effective_readback_path_match"
+)
 RELEASE_REQUIRED_POSITIVE_PERCENTILES = ["p50Percent", "p95Percent", "p99Percent"]
 LOCAL_REQUIRED_POSITIVE_PERCENTILES = ["p50Percent", "p95Percent"]
 DOE_PACKAGE_EXECUTION_BACKENDS = {
@@ -319,6 +322,20 @@ def _side_declares_doe_package(side_payload: Any) -> bool:
         if execution_backend in DOE_PACKAGE_EXECUTION_BACKENDS:
             return True
     return False
+
+
+def required_comparability_obligation_ids_for_workload(
+    *,
+    require_claim_status: str,
+    workload: dict[str, Any],
+) -> set[str]:
+    if require_claim_status != "claimable":
+        return set()
+    if _side_declares_doe_package(workload.get("baseline")):
+        return {PACKAGE_EFFECTIVE_READBACK_OBLIGATION_ID}
+    if _side_declares_doe_package(workload.get("comparison")):
+        return {PACKAGE_EFFECTIVE_READBACK_OBLIGATION_ID}
+    return set()
 
 
 def _non_negative_number_dict(value: Any) -> bool:
@@ -932,6 +949,10 @@ def main() -> int:
             require_comparison_status=args.require_comparison_status,
             expected_obligation_ids=expected_obligation_ids,
             expected_obligation_schema_version=expected_obligation_schema_version,
+            required_obligation_ids=required_comparability_obligation_ids_for_workload(
+                require_claim_status=args.require_claim_status,
+                workload=workload,
+            ),
         )
         failures.extend(comparability_failures)
         if not has_comparability:

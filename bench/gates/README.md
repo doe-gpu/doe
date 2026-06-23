@@ -16,7 +16,8 @@ Gate classes:
   drifts from artifact reality.
   `claim_gate.py` also requires claimable Doe package rows to carry
   receipt-visible package telemetry, including native fast-path flags,
-  write breakdowns, readback mode, and selected setup-timing scope.
+  write breakdowns, readback mode, selected setup-timing scope, and the
+  effective readback-path comparability obligation.
 - **Compiler evidence** (`tint_compiler_evidence_gate.py`) — block
   Doe-vs-Tint compiler claims unless reports carry schema-valid corpus,
   toolchain, hash, validation, timing-phase, and comparability evidence.
