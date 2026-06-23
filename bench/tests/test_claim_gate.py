@@ -14,6 +14,7 @@ def _doe_package_meta() -> dict:
         "packagePreparedSession": True,
         "packageSetupIncludedInSelectedTiming": False,
         "packageReadbackMode": "native-map-read-copy-unmap",
+        "packageEffectiveReadbackPaths": ["native-map-read-copy-unmap"],
         "packageFastPathStats": {
             "commandBufferBuild": 0,
             "dispatchFlush": 1,
@@ -223,6 +224,42 @@ class ClaimGateTests(unittest.TestCase):
         )
         self.assertIn(
             "gemma64: baseline sample 0 missing packageNativeFastPaths boolean map",
+            failures,
+        )
+
+    def test_doe_package_telemetry_rejects_missing_effective_readback_path(
+        self,
+    ) -> None:
+        meta = _doe_package_meta()
+        del meta["packageEffectiveReadbackPaths"]
+
+        failures = claim_gate.doe_package_telemetry_failures(
+            workload_id="gemma64",
+            side_name="baseline",
+            side_payload=_side(meta),
+        )
+
+        self.assertIn(
+            "gemma64: baseline sample 0 missing packageEffectiveReadbackPaths "
+            "non-empty string list",
+            failures,
+        )
+
+    def test_doe_package_telemetry_rejects_invalid_effective_readback_path(
+        self,
+    ) -> None:
+        meta = _doe_package_meta()
+        meta["packageEffectiveReadbackPaths"] = ["requested-mode-only"]
+
+        failures = claim_gate.doe_package_telemetry_failures(
+            workload_id="gemma64",
+            side_name="baseline",
+            side_payload=_side(meta),
+        )
+
+        self.assertIn(
+            "gemma64: baseline sample 0 packageEffectiveReadbackPaths contains "
+            "invalid readback path",
             failures,
         )
 

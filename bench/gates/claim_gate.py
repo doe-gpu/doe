@@ -51,6 +51,11 @@ DOE_PACKAGE_REQUIRED_BOOL_FIELDS = (
     "packageSetupIncludedInSelectedTiming",
 )
 DOE_PACKAGE_REQUIRED_STRING_FIELDS = ("packageReadbackMode",)
+DOE_PACKAGE_EFFECTIVE_READBACK_PATHS = {
+    "native-map-read-copy-unmap",
+    "mapAsync",
+}
+DOE_PACKAGE_REQUIRED_STRING_LIST_FIELDS = ("packageEffectiveReadbackPaths",)
 DOE_PACKAGE_REQUIRED_OBJECT_FIELDS = (
     "packageFastPathStats",
     "packageNativeFastPaths",
@@ -476,6 +481,25 @@ def doe_package_telemetry_failures(
                 failures.append(
                     f"{workload_id}: {side_name} sample {sample_idx} "
                     f"missing {field_name} string"
+                )
+        for field_name in DOE_PACKAGE_REQUIRED_STRING_LIST_FIELDS:
+            value = trace_meta.get(field_name)
+            if not isinstance(value, list) or not value:
+                failures.append(
+                    f"{workload_id}: {side_name} sample {sample_idx} "
+                    f"missing {field_name} non-empty string list"
+                )
+                continue
+            invalid_items = [
+                item
+                for item in value
+                if not isinstance(item, str)
+                or item not in DOE_PACKAGE_EFFECTIVE_READBACK_PATHS
+            ]
+            if invalid_items:
+                failures.append(
+                    f"{workload_id}: {side_name} sample {sample_idx} "
+                    f"{field_name} contains invalid readback path"
                 )
         for field_name in DOE_PACKAGE_REQUIRED_OBJECT_FIELDS:
             value = trace_meta.get(field_name)
