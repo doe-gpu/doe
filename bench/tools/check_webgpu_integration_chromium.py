@@ -9,12 +9,12 @@ import sys
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-BENCH_ROOT = REPO_ROOT / "bench"
-for path in (str(REPO_ROOT), str(BENCH_ROOT)):
-    if path not in sys.path:
-        sys.path.insert(0, path)
+try:
+    from bench.tools._repo_import import ensure_repo_root
+except ModuleNotFoundError:
+    from _repo_import import ensure_repo_root
 
+REPO_ROOT = ensure_repo_root(__file__)
 from bench.browser.browser_gate import validate_runtime_selection, validate_smoke_report
 from bench.lib.bench_utils import load_json_object as load_json
 
