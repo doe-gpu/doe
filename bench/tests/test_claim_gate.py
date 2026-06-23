@@ -6,6 +6,11 @@ import unittest
 
 from bench.gates import claim_gate
 from bench.gates.claim_comparability import workload_comparability_failures
+from bench.gates.claim_package_telemetry import (
+    PACKAGE_EFFECTIVE_READBACK_OBLIGATION_ID,
+    doe_package_telemetry_failures,
+    required_comparability_obligation_ids_for_workload,
+)
 
 
 def _doe_package_meta() -> dict:
@@ -180,16 +185,16 @@ class ClaimGateTests(unittest.TestCase):
 
     def test_package_claim_requires_effective_readback_obligation(self) -> None:
         self.assertEqual(
-            claim_gate.required_comparability_obligation_ids_for_workload(
+            required_comparability_obligation_ids_for_workload(
                 require_claim_status="claimable",
                 workload={"baseline": _side(_doe_package_meta())},
             ),
-            {claim_gate.PACKAGE_EFFECTIVE_READBACK_OBLIGATION_ID},
+            {PACKAGE_EFFECTIVE_READBACK_OBLIGATION_ID},
         )
 
     def test_diagnostic_package_does_not_require_readback_obligation(self) -> None:
         self.assertEqual(
-            claim_gate.required_comparability_obligation_ids_for_workload(
+            required_comparability_obligation_ids_for_workload(
                 require_claim_status="diagnostic",
                 workload={"baseline": _side(_doe_package_meta())},
             ),
@@ -198,7 +203,7 @@ class ClaimGateTests(unittest.TestCase):
 
     def test_doe_package_telemetry_accepts_complete_trace_meta(self) -> None:
         self.assertEqual(
-            claim_gate.doe_package_telemetry_failures(
+            doe_package_telemetry_failures(
                 workload_id="gemma64",
                 side_name="baseline",
                 side_payload=_side(_doe_package_meta()),
@@ -211,7 +216,7 @@ class ClaimGateTests(unittest.TestCase):
         del meta["packageFastPathStats"]
         del meta["packageNativeFastPaths"]
 
-        failures = claim_gate.doe_package_telemetry_failures(
+        failures = doe_package_telemetry_failures(
             workload_id="gemma64",
             side_name="baseline",
             side_payload=_side(meta),
@@ -233,7 +238,7 @@ class ClaimGateTests(unittest.TestCase):
         meta = _doe_package_meta()
         del meta["packageEffectiveReadbackPaths"]
 
-        failures = claim_gate.doe_package_telemetry_failures(
+        failures = doe_package_telemetry_failures(
             workload_id="gemma64",
             side_name="baseline",
             side_payload=_side(meta),
@@ -251,7 +256,7 @@ class ClaimGateTests(unittest.TestCase):
         meta = _doe_package_meta()
         meta["packageEffectiveReadbackPaths"] = ["requested-mode-only"]
 
-        failures = claim_gate.doe_package_telemetry_failures(
+        failures = doe_package_telemetry_failures(
             workload_id="gemma64",
             side_name="baseline",
             side_payload=_side(meta),
@@ -265,7 +270,7 @@ class ClaimGateTests(unittest.TestCase):
 
     def test_non_doe_package_side_does_not_require_package_telemetry(self) -> None:
         self.assertEqual(
-            claim_gate.doe_package_telemetry_failures(
+            doe_package_telemetry_failures(
                 workload_id="gemma64",
                 side_name="comparison",
                 side_payload=_side(
@@ -280,7 +285,7 @@ class ClaimGateTests(unittest.TestCase):
         meta = _doe_package_meta()
         meta["packageWriteBreakdown"]["batchedWriteCount"] = 1
 
-        failures = claim_gate.doe_package_telemetry_failures(
+        failures = doe_package_telemetry_failures(
             workload_id="gemma64",
             side_name="baseline",
             side_payload=_side(meta),
