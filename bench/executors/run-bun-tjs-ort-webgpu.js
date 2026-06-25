@@ -3,9 +3,12 @@
 import { loadVendorNodeScenario, parseVendorNodeCliArgs } from './vendor-node/scenario.js';
 import {
   createTjsGenerationOptions,
+  collectOrtProfileSummary,
+  createOrtProfileContext,
   destroyDevice,
   disposeTjsPipeline,
   importTransformersNodeModule,
+  installWebGpuExecutionCounters,
   installTjsOrtWebGpuProvider,
   nowMs,
   requestAdapterAndDevice,
@@ -63,6 +66,7 @@ async function main() {
     const adapterDevice = await requestAdapterAndDevice(providerRuntime);
     const adapter = adapterDevice.adapter;
     device = adapterDevice.device;
+    const webgpuCounters = installWebGpuExecutionCounters(device);
     const adapterInfo = summarizeAdapterInfo(adapter, device);
 
     const promptStartedMs = nowMs();
@@ -84,6 +88,10 @@ async function main() {
     }
 
     const modelLocator = resolveTjsModelLocator(scenario);
+    const ortProfileContext = await createOrtProfileContext(
+      args.traceMetaPath,
+      `${executionProvider}-ort`,
+    );
     const loadStartedMs = nowMs();
     pipeline = await transformers.pipeline(
       'text-generation',
@@ -92,6 +100,7 @@ async function main() {
         device: 'webgpu',
         dtype: scenario.tjs.dtype,
         local_files_only: !!scenario.tjs.localModelPath,
+        session_options: ortProfileContext.sessionOptions,
       },
     );
     const loadResolvedMs = nowMs();
@@ -100,6 +109,7 @@ async function main() {
     const output = await pipeline(prompt.prompt, createTjsGenerationOptions(scenario));
     await waitForDeviceIdle(device);
     const generateResolvedMs = nowMs();
+    const ortProfileSummary = await collectOrtProfileSummary(pipeline, ortProfileContext);
 
     const processWallMs = nowMs() - startedMs;
     const promptSummary = {
@@ -122,6 +132,7 @@ async function main() {
       pipelineLoadMs: loadResolvedMs - loadStartedMs,
       generationMs: generateResolvedMs - generateStartedMs,
     };
+    const selectedTimingMs = phaseTimingsMs.generationMs;
 
     await writeVendorNodeSuccessTrace({
       runtimeHost: RUNTIME_HOST,
@@ -135,6 +146,9 @@ async function main() {
       executionProvider,
       executionProviderName,
       processWallMs,
+      timingMs: selectedTimingMs,
+      timingSource: 'tjs-ort-generation-ms',
+      timingClass: 'operation',
       adapterInfo,
       phaseTimingsMs,
       promptSummary,
@@ -144,6 +158,8 @@ async function main() {
         cacheMode: scenario.cacheMode,
         loadMode: scenario.loadMode,
         requestedAdapterName,
+        ...webgpuCounters.snapshot(),
+        ...ortProfileSummary,
       },
     });
   } catch (error) {

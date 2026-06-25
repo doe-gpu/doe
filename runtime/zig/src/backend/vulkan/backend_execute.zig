@@ -48,11 +48,14 @@ fn execute_upload(self: anytype, setup_ns: u64, upload: model.UploadCommand) !we
     const upload_setup_ns = common_timing.ns_delta(common_timing.now_ns(), upload_setup_start);
 
     var submit_wait_ns: u64 = 0;
+    var submit_count: u32 = 0;
     self.pending_upload_commands +|= 1;
     if (self.pending_upload_commands >= self.upload_submit_every) {
         self.pending_upload_commands = 0;
         submit_wait_ns = try runtime.flush_queue();
+        submit_count = if (submit_wait_ns > 0) 1 else 0;
     }
+    runtime.last_submit_count = submit_count;
 
     return .{
         .status = .ok,
@@ -70,6 +73,7 @@ fn execute_upload(self: anytype, setup_ns: u64, upload: model.UploadCommand) !we
 fn execute_barrier(self: anytype, setup_ns: u64) !webgpu.NativeExecutionResult {
     const runtime = try self.ensure_runtime_bootstrapped();
     const submit_wait_ns = try runtime.barrier(self.queue_wait_mode);
+    runtime.last_submit_count = if (submit_wait_ns > 0) 1 else 0;
 
     return .{
         .status = .ok,
@@ -101,7 +105,18 @@ fn execute_buffer_write_bytes(self: anytype, setup_ns: u64, handle: u64, offset:
 
     const vk_resources = @import("vk_resources.zig");
     const compute_buffer = try vk_resources.ensure_compute_buffer(runtime, handle, required_size, false);
-    try vk_resources.stage_compute_buffer_write(runtime, compute_buffer, offset, data_bytes);
+    try vk_resources.stage_compute_buffer_write(runtime, compute_buffer, offset, data_bytes, self.upload_path_policy);
+    var submit_wait_ns: u64 = 0;
+    var submit_count: u32 = 0;
+    if (runtime.streaming_copy_active and self.queue_sync_mode == .per_command) {
+        const submit_start = common_timing.now_ns();
+        try runtime.flush_streaming_copy(true);
+        submit_wait_ns = common_timing.ns_delta(common_timing.now_ns(), submit_start);
+        submit_count = 1;
+    } else if (runtime.streaming_copy_active) {
+        submit_count = 1;
+    }
+    runtime.last_submit_count = submit_count;
 
     const write_ns = common_timing.ns_delta(common_timing.now_ns(), write_start);
     const status_message = switch (compute_buffer.memory_kind) {
@@ -114,7 +129,7 @@ fn execute_buffer_write_bytes(self: anytype, setup_ns: u64, handle: u64, offset:
         .status_message = status_message,
         .setup_ns = setup_ns +| write_ns,
         .encode_ns = 0,
-        .submit_wait_ns = 0,
+        .submit_wait_ns = submit_wait_ns,
         .dispatch_count = 0,
         .gpu_timestamp_ns = 0,
         .gpu_timestamp_attempted = false,

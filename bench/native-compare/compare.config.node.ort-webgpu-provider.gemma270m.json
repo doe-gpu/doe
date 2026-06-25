@@ -9,7 +9,7 @@
     "commandTemplate": "env DOE_NODE_WEBGPU_ADAPTER='Radeon 8060S Graphics (RADV STRIX_HALO)' node bench/executors/run-node-tjs-ort-webgpu.js --provider node-webgpu --scenario {commands} --trace-jsonl {trace_jsonl} --trace-meta {trace_meta} --workload {workload}"
   },
   "run": {
-    "iterations": 4,
+    "iterations": 7,
     "warmup": 1,
     "out": "bench/out/node-ort-webgpu-provider-compare/gemma270m.compare.json",
     "workspace": "bench/out/node-ort-webgpu-provider-compare/gemma270m.workspace",
@@ -18,7 +18,7 @@
   },
   "comparability": {
     "mode": "strict",
-    "requireTimingClass": "process-wall",
+    "requireTimingClass": "operation",
     "allowBaselineNoExecution": false
   },
   "claimability": {

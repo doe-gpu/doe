@@ -951,7 +951,7 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
       browserVersion,
       elapsedMs: Date.now() - startedMs,
       launchArgs,
-      timingClass: "process-wall",
+      timingClass: "operation",
       runtimeSelection: buildRuntimeSelection(mode, args, launchArgs),
       shaderCompilerIdentity: shaderCompilerIdentity(mode, args),
       pipelineLoadMs: result.loadMs,

@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { mkdir, readdir, readFile } from 'node:fs/promises';
+import { basename, dirname, resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -53,6 +54,210 @@ function installGlobals(globals) {
   for (const [name, value] of Object.entries(globals)) {
     globalThis[name] = value;
   }
+}
+
+function patchCountedMethod(target, methodName, counterName, counters) {
+  if (!target || typeof target[methodName] !== 'function') {
+    return false;
+  }
+  const original = target[methodName];
+  try {
+    Object.defineProperty(target, methodName, {
+      configurable: true,
+      writable: true,
+      value: function countedWebGpuMethod(...methodArgs) {
+        counters[counterName] += 1;
+        return original.apply(this, methodArgs);
+      },
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function installWebGpuExecutionCounters(device = null) {
+  const counters = {
+    dispatchWorkgroups: 0,
+    dispatchWorkgroupsIndirect: 0,
+    queueSubmit: 0,
+  };
+  const patches = {
+    dispatchWorkgroups: patchCountedMethod(
+      globalThis.GPUComputePassEncoder?.prototype,
+      'dispatchWorkgroups',
+      'dispatchWorkgroups',
+      counters,
+    ),
+    dispatchWorkgroupsIndirect: patchCountedMethod(
+      globalThis.GPUComputePassEncoder?.prototype,
+      'dispatchWorkgroupsIndirect',
+      'dispatchWorkgroupsIndirect',
+      counters,
+    ),
+    queueSubmit: patchCountedMethod(
+      globalThis.GPUQueue?.prototype,
+      'submit',
+      'queueSubmit',
+      counters,
+    ),
+    queueSubmitInstance: false,
+  };
+  if (!patches.queueSubmit) {
+    patches.queueSubmitInstance = patchCountedMethod(
+      device?.queue,
+      'submit',
+      'queueSubmit',
+      counters,
+    );
+  }
+
+  const dispatchPatchActive = patches.dispatchWorkgroups || patches.dispatchWorkgroupsIndirect;
+  const submitPatchActive = patches.queueSubmit || patches.queueSubmitInstance;
+  return {
+    patches,
+    reset() {
+      counters.dispatchWorkgroups = 0;
+      counters.dispatchWorkgroupsIndirect = 0;
+      counters.queueSubmit = 0;
+    },
+    snapshot() {
+      const snapshot = {
+        vendorNodeWebgpuCounterPatches: patches,
+        vendorNodeWebgpuDispatchWorkgroups: counters.dispatchWorkgroups,
+        vendorNodeWebgpuDispatchWorkgroupsIndirect: counters.dispatchWorkgroupsIndirect,
+        vendorNodeWebgpuQueueSubmitCount: counters.queueSubmit,
+      };
+      if (dispatchPatchActive && counters.dispatchWorkgroups + counters.dispatchWorkgroupsIndirect > 0) {
+        snapshot.executionDispatchCount =
+          counters.dispatchWorkgroups + counters.dispatchWorkgroupsIndirect;
+      }
+      if (submitPatchActive && counters.queueSubmit > 0) {
+        snapshot.executionSubmitCount = counters.queueSubmit;
+      }
+      return snapshot;
+    },
+  };
+}
+
+function ortProfilingEnabledFromEnv() {
+  const value = normalizeString(process.env.DOE_ORT_PROFILE_EVIDENCE);
+  return value === null || !['0', 'false', 'off', 'no'].includes(value.toLowerCase());
+}
+
+export async function createOrtProfileContext(traceMetaPath, label = 'ort') {
+  if (!ortProfilingEnabledFromEnv()) {
+    return {
+      enabled: false,
+      sessionOptions: {},
+      traceMeta: {
+        ortProfileEnabled: false,
+      },
+    };
+  }
+  const safeLabel = normalizeString(label)?.replace(/[^A-Za-z0-9_.-]/g, '-') ?? 'ort';
+  const traceMetaDir = dirname(traceMetaPath);
+  const traceMetaBase = basename(traceMetaPath).replace(/\.meta\.json$/u, '');
+  const profileDir = resolve(traceMetaDir, `${traceMetaBase}.ort-profile`);
+  await mkdir(profileDir, { recursive: true });
+  return {
+    enabled: true,
+    profileDir,
+    profileFilePrefix: resolve(profileDir, safeLabel),
+    sessionOptions: {
+      enableProfiling: true,
+      profileFilePrefix: resolve(profileDir, safeLabel),
+    },
+    traceMeta: {
+      ortProfileEnabled: true,
+      ortProfileDir: profileDir,
+    },
+  };
+}
+
+function incrementMapValue(map, key) {
+  if (!key) {
+    return;
+  }
+  map.set(key, (map.get(key) ?? 0) + 1);
+}
+
+function mapToSortedObject(map) {
+  return Object.fromEntries(
+    [...map.entries()].sort(([left], [right]) => left.localeCompare(right)),
+  );
+}
+
+function topMapEntries(map, limit = 12) {
+  return [...map.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, limit)
+    .map(([name, count]) => ({ name, count }));
+}
+
+export async function collectOrtProfileSummary(pipeline, profileContext) {
+  if (!profileContext?.enabled) {
+    return profileContext?.traceMeta ?? { ortProfileEnabled: false };
+  }
+  const sessions = pipeline?.model?.sessions;
+  if (sessions && typeof sessions === 'object') {
+    for (const session of Object.values(sessions)) {
+      if (session && typeof session.endProfiling === 'function') {
+        session.endProfiling();
+      }
+    }
+  }
+
+  const entries = await readdir(profileContext.profileDir, { withFileTypes: true });
+  const profilePaths = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => resolve(profileContext.profileDir, entry.name))
+    .sort();
+  let nodeCount = 0;
+  let webGpuNodeCount = 0;
+  let cpuNodeCount = 0;
+  const providerCounts = new Map();
+  const webGpuOpCounts = new Map();
+  for (const profilePath of profilePaths) {
+    let events;
+    try {
+      events = JSON.parse(await readFile(profilePath, 'utf8'));
+    } catch {
+      continue;
+    }
+    if (!Array.isArray(events)) {
+      continue;
+    }
+    for (const event of events) {
+      if (!event || typeof event !== 'object' || event.cat !== 'Node') {
+        continue;
+      }
+      nodeCount += 1;
+      const provider = normalizeString(event.args?.provider);
+      incrementMapValue(providerCounts, provider ?? '<unknown>');
+      if (provider === 'WebGpuExecutionProvider') {
+        webGpuNodeCount += 1;
+        incrementMapValue(webGpuOpCounts, normalizeString(event.args?.op_name) ?? '<unknown>');
+      } else if (provider === 'CPUExecutionProvider') {
+        cpuNodeCount += 1;
+      }
+    }
+  }
+  const traceMeta = {
+    ...(profileContext.traceMeta ?? {}),
+    ortProfileFileCount: profilePaths.length,
+    ortProfilePaths: profilePaths,
+    ortProfileNodeCount: nodeCount,
+    ortProfileWebGpuNodeCount: webGpuNodeCount,
+    ortProfileCpuNodeCount: cpuNodeCount,
+    ortProfileProviderCounts: mapToSortedObject(providerCounts),
+    ortProfileWebGpuTopOps: topMapEntries(webGpuOpCounts),
+  };
+  if (webGpuNodeCount > 0) {
+    traceMeta.executionDispatchCount = webGpuNodeCount;
+    traceMeta.executionDispatchEvidenceSource = 'ort-profile-webgpu-node-count';
+  }
+  return traceMeta;
 }
 
 function isProbablySoftwareAdapter(adapterName) {

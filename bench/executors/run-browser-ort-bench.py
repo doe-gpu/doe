@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SCENARIO_KIND = "vendor-browser-benchmark-scenario"
 SCENARIO_SCHEMA_VERSION = 1
 BENCHMARK_LANE = "browser-ort-webgpu-compare"
+BROWSER_ORT_TIMED_MEAN_SOURCE = "browser-ort-timed-mean-ms"
 
 
 def _default_script_path() -> Path:
@@ -189,6 +190,7 @@ def _trace_meta(
 ) -> dict[str, Any]:
     timed_mean_ms = mode_report.get("timedMeanMs")
     timing_ms = timed_mean_ms if isinstance(timed_mean_ms, (int, float)) else mode_report.get("elapsedMs")
+    suite_wall_ms = mode_report.get("elapsedMs")
     samples_ms = _number_list(mode_report.get("timedIterationsMs"))
     if not samples_ms:
         fallback_timing_ms = _nonnegative_float(timing_ms)
@@ -206,9 +208,11 @@ def _trace_meta(
         "executionLabel": f"Chromium Playwright ORT WebGPU {mode}",
         "executionProvider": mode,
         "executionProviderName": mode,
-        "processWallMs": timing_ms,
+        "processWallMs": suite_wall_ms,
+        "browserOrtTimedMeanMs": timing_ms,
+        "browserOrtTimedIterationsMs": samples_ms,
         "timingMs": timing_ms,
-        "timingSource": "wall-time",
+        "timingSource": BROWSER_ORT_TIMED_MEAN_SOURCE,
         "adapterInfo": mode_report.get("adapterSummary"),
         "executionRowCount": 1,
         "executionSuccessCount": 1 if mode_report.get("success") else 0,
@@ -217,7 +221,7 @@ def _trace_meta(
         "executionUnsupportedCount": 0,
         "browserTask": scenario["task"],
         "browserTaskConfig": report.get("taskConfig"),
-        "timingClass": mode_report.get("timingClass", report.get("timingClass", "process-wall")),
+        "timingClass": "operation",
         "browserVersion": mode_report.get("browserVersion"),
         "phaseTimingsMs": {
             "pipelineLoadMs": mode_report.get("pipelineLoadMs"),
@@ -359,6 +363,8 @@ def main(argv: list[str] | None = None) -> int:
                 "workloadId": args.workload,
                 "scenarioId": scenario["scenarioId"],
                 "processWallMs": mode_report.get("elapsedMs", 0),
+                "timingMs": trace_meta["timingMs"],
+                "timingSource": trace_meta["timingSource"],
                 "errorMessage": error_message,
             }
         ]
@@ -382,6 +388,8 @@ def main(argv: list[str] | None = None) -> int:
                 "workloadId": args.workload,
                 "scenarioId": scenario["scenarioId"],
                 "processWallMs": trace_meta["processWallMs"],
+                "timingMs": trace_meta["timingMs"],
+                "timingSource": trace_meta["timingSource"],
                 "phaseTimingsMs": trace_meta["phaseTimingsMs"],
                 "resultSummary": mode_report.get("outputSummary"),
             }

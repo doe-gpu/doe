@@ -9,7 +9,7 @@
     "executorId": "tjs_ort_bun_webgpu_package"
   },
   "run": {
-    "iterations": 3,
+    "iterations": 7,
     "warmup": 1,
     "out": "bench/out/bun-ort-webgpu-provider-breadth/breadth.compare.json",
     "workspace": "bench/out/bun-ort-webgpu-provider-breadth/breadth.workspace",
@@ -18,7 +18,7 @@
   },
   "comparability": {
     "mode": "strict",
-    "requireTimingClass": "process-wall",
+    "requireTimingClass": "operation",
     "allowBaselineNoExecution": false
   },
   "claimability": {

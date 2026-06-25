@@ -230,6 +230,8 @@ def classify_timing_source(source: str) -> str:
         "dawn-perf-gpu-time",
         "dawn-perf-wall-ns",
         "doe-trace-window",
+        "browser-ort-timed-mean-ms",
+        "tjs-ort-generation-ms",
     ):
         return "operation"
     if canonical == "wall-time":

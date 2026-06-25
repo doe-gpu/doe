@@ -160,7 +160,7 @@ fn writeBufferValidated(q: *DoeQueue, buf: *DoeBuffer, offset: u64, data: [*]con
                     return false;
                 };
                 if (rt.compute_buffers.get(buf.vk_id)) |cb| {
-                    vk_resources.stage_compute_buffer_write(rt, cb, offset, data[0..size]) catch |err| {
+                    vk_resources.stage_compute_buffer_write(rt, cb, offset, data[0..size], .allow_mapped_shortcuts) catch |err| {
                         shared.deliverInternalError(
                             q.dev,
                             "doe_queue_write_buffer: vulkan stage buffer write: {s}",

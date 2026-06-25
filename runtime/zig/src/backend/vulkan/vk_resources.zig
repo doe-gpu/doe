@@ -12,6 +12,7 @@ const model_resource_types = @import("../../model_resource_types.zig");
 const model_compute_types = @import("../../model_compute_types.zig");
 const model_gpu_types = @import("../../model_texture_value_types.zig");
 const model_render_types = @import("../../model_render_types.zig");
+const backend_policy = @import("../backend_policy.zig");
 const common_errors = @import("../common/errors.zig");
 const common_timing = @import("../common/timing.zig");
 
@@ -317,6 +318,7 @@ pub fn stage_compute_buffer_write(
     compute_buffer: ComputeBuffer,
     offset: u64,
     data_bytes: []const u8,
+    upload_path_policy: backend_policy.UploadPathPolicy,
 ) !void {
     if (data_bytes.len == 0) return error.InvalidArgument;
     const end = std.math.add(u64, offset, data_bytes.len) catch return error.InvalidArgument;
@@ -339,7 +341,7 @@ pub fn stage_compute_buffer_write(
         self.streaming_copy_pending_count != 0 or
         self.replay_prefix_copy_pending;
 
-    if (compute_buffer.memory_kind == .host_visible and !queue_has_pending_work) {
+    if (upload_path_policy == .allow_mapped_shortcuts and compute_buffer.memory_kind == .host_visible and !queue_has_pending_work) {
         const mapped = compute_buffer.mapped orelse return error.InvalidState;
         const dst: [*]u8 = @ptrCast(mapped);
         @memcpy(dst[@intCast(offset)..][0..data_bytes.len], data_bytes);

@@ -1978,6 +1978,29 @@ console.log(JSON.stringify({{ matched, missed, nodeMatched, nodeColdMatched }}))
         self.assertIn("package_queue_submit_completion", mapasync_entry["workloadId"])
         self.assertEqual(native_queue_entries, [])
 
+    def test_package_execution_policy_keeps_prepared_inference_lanes_on_mapasync(self) -> None:
+        policy = json.loads(PACKAGE_EXECUTION_POLICY_PATH.read_text(encoding="utf-8"))
+        entries = policy["readbackMode"]
+        expected_workloads = {
+            "compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces",
+            "compute_stable_fluids_multistage_256grid_18pressure_4steps",
+            "inference_gemma3_1b_prefill_64tok_decode_64tok",
+            "inference_gemma3_270m_decode_1tok",
+            "inference_gemma3_270m_prefill_64tok_decode_64tok",
+        }
+        for runtime_host in ("node", "bun"):
+            entry = next(
+                policy_entry
+                for policy_entry in entries
+                if policy_entry["id"] == f"{runtime_host}-package-inference-mapasync-readback-prepared"
+            )
+            self.assertEqual(entry["runtimeHost"], runtime_host)
+            expected_provider = "doe-ffi" if runtime_host == "bun" else "doe"
+            self.assertEqual(entry["provider"], expected_provider)
+            self.assertTrue(entry["packagePreparedSession"])
+            self.assertEqual(entry["mode"], "mapAsync")
+            self.assertEqual(set(entry["workloadId"]), expected_workloads)
+
     def test_prepared_session_boundary_scopes_pre_boundary_host_totals(self) -> None:
         script = f"""
 import {{ boundaryScopedHostTotals }} from {json.dumps(EXECUTOR_MODULE_URL)};

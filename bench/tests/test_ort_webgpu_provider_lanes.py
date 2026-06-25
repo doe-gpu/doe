@@ -10,6 +10,7 @@ probes, node trace-artifact writer) stay on the per-lane subclasses.
 from __future__ import annotations
 
 import json
+import importlib.util
 import os
 import shutil
 import subprocess
@@ -31,6 +32,7 @@ from bench.native_compare_modules.executor_registry import (
     resolve_executor_boundary,
     resolve_executor_command_template,
 )
+from bench.native_compare_modules.timing_selection import classify_timing_source
 
 
 BUN = shutil.which("bun")
@@ -109,7 +111,7 @@ class LaneHelpersMixin(unittest.TestCase):
         )
 
     def _assert_compare_config_core(
-        self, payload: dict, *, require_timing_class: str = "process-wall"
+        self, payload: dict, *, require_timing_class: str = "operation"
     ) -> None:
         baseline = payload["baseline"]
         self.assertEqual(baseline["executorId"], self.fixture.baseline_executor_id)
@@ -147,9 +149,10 @@ class _CompareLaneBase(LaneHelpersMixin):
         self.assertEqual(workload.commands_path, self.commands_path)
         self.assertTrue((REPO_ROOT / workload.commands_path).exists())
 
-    def test_compare_config_is_strict_process_wall_claimable(self) -> None:
+    def test_compare_config_is_strict_operation_claimable(self) -> None:
         payload = json.loads(self.fixture.compare_config_path.read_text(encoding="utf-8"))
         self._assert_compare_config_core(payload)
+        self.assertGreaterEqual(payload["run"]["iterations"], 7)
         self.assertEqual(payload["claimability"]["minTimedSamples"], self.min_timed_samples)
         self.assertEqual(payload["selector"]["ids"], [self.workload_id])
 
@@ -215,6 +218,7 @@ class _BreadthLaneBase(LaneHelpersMixin):
     def test_compare_config_tracks_expected_breadth_ids(self) -> None:
         payload = json.loads(self.fixture.compare_config_path.read_text(encoding="utf-8"))
         self._assert_compare_config_core(payload)
+        self.assertGreaterEqual(payload["run"]["iterations"], 7)
         self.assertEqual(payload["selector"]["ids"], list(self.fixture.expected_ids))
 
 
@@ -224,6 +228,7 @@ class _BreadthLaneBase(LaneHelpersMixin):
 _BUN_SHARED_MODULE_URL = (
     REPO_ROOT / "bench" / "executors" / "vendor-node" / "shared.js"
 ).resolve().as_uri()
+_NODE_SHARED_MODULE_URL = _BUN_SHARED_MODULE_URL
 
 
 class BunOrtWebGpuProviderCompareLaneTests(_CompareLaneBase):
@@ -384,6 +389,104 @@ class NodeOrtWebGpuProviderCompareLaneTests(_CompareLaneBase):
     def test_node_scenario_loader_resolves_provider_compare_fields(self) -> None:
         self._run_scenario_loader()
 
+    def test_webgpu_execution_counter_helper_records_dispatch_and_submit_counts(self) -> None:
+        script = f"""
+import {{ installWebGpuExecutionCounters }} from {json.dumps(_NODE_SHARED_MODULE_URL)};
+
+class GPUComputePassEncoder {{
+  dispatchWorkgroups() {{
+    return 'dispatch';
+  }}
+  dispatchWorkgroupsIndirect() {{
+    return 'dispatch-indirect';
+  }}
+}}
+
+class GPUQueue {{
+  submit() {{
+    return 'submit';
+  }}
+}}
+
+globalThis.GPUComputePassEncoder = GPUComputePassEncoder;
+globalThis.GPUQueue = GPUQueue;
+
+const queue = new GPUQueue();
+const counters = installWebGpuExecutionCounters({{ queue }});
+const pass = new GPUComputePassEncoder();
+pass.dispatchWorkgroups(1, 1, 1);
+pass.dispatchWorkgroupsIndirect({{}}, 0);
+queue.submit([]);
+const first = counters.snapshot();
+counters.reset();
+const second = counters.snapshot();
+console.log(JSON.stringify({{ first, second }}));
+"""
+        result = subprocess.run(
+            ["node", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        first = payload["first"]
+        second = payload["second"]
+        self.assertTrue(first["vendorNodeWebgpuCounterPatches"]["dispatchWorkgroups"])
+        self.assertTrue(first["vendorNodeWebgpuCounterPatches"]["dispatchWorkgroupsIndirect"])
+        self.assertTrue(first["vendorNodeWebgpuCounterPatches"]["queueSubmit"])
+        self.assertEqual(first["executionDispatchCount"], 2)
+        self.assertEqual(first["executionSubmitCount"], 1)
+        self.assertNotIn("executionDispatchCount", second)
+        self.assertNotIn("executionSubmitCount", second)
+
+    def test_ort_profile_summary_uses_webgpu_node_count_as_dispatch_evidence(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="doe-node-ort-profile-evidence-") as tmpdir:
+            trace_meta_path = Path(tmpdir) / "sample.meta.json"
+            script = f"""
+import {{ writeFile }} from 'node:fs/promises';
+import {{ resolve }} from 'node:path';
+import {{
+  collectOrtProfileSummary,
+  createOrtProfileContext,
+}} from {json.dumps(_NODE_SHARED_MODULE_URL)};
+
+const context = await createOrtProfileContext({json.dumps(str(trace_meta_path))}, 'node-webgpu-ort');
+await writeFile(resolve(context.profileDir, 'node-webgpu-ort_2026-01-01.json'), JSON.stringify([
+  {{ cat: 'Session', name: 'session_initialization', args: {{}} }},
+  {{ cat: 'Node', name: 'matmul_kernel_time', args: {{ provider: 'WebGpuExecutionProvider', op_name: 'MatMul' }} }},
+  {{ cat: 'Node', name: 'cast_kernel_time', args: {{ provider: 'WebGpuExecutionProvider', op_name: 'Cast' }} }},
+  {{ cat: 'Node', name: 'shape_kernel_time', args: {{ provider: 'CPUExecutionProvider', op_name: 'Shape' }} }}
+]));
+let ended = 0;
+const summary = await collectOrtProfileSummary(
+  {{ model: {{ sessions: {{ model: {{ endProfiling() {{ ended += 1; }} }} }} }} }},
+  context,
+);
+console.log(JSON.stringify({{ ended, summary }}));
+"""
+            result = subprocess.run(
+                ["node", "--input-type=module", "-e", script],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        summary = payload["summary"]
+        self.assertEqual(payload["ended"], 1)
+        self.assertTrue(summary["ortProfileEnabled"])
+        self.assertEqual(summary["ortProfileFileCount"], 1)
+        self.assertEqual(summary["ortProfileNodeCount"], 3)
+        self.assertEqual(summary["ortProfileWebGpuNodeCount"], 2)
+        self.assertEqual(summary["ortProfileCpuNodeCount"], 1)
+        self.assertEqual(summary["executionDispatchCount"], 2)
+        self.assertEqual(summary["executionDispatchEvidenceSource"], "ort-profile-webgpu-node-count")
+        self.assertEqual(summary["ortProfileProviderCounts"]["WebGpuExecutionProvider"], 2)
+        self.assertEqual(summary["ortProfileWebGpuTopOps"][0]["name"], "Cast")
+
     def test_trace_artifact_writer_emits_custom_provider_compare_metadata(self) -> None:
         with tempfile.TemporaryDirectory(prefix="doe-node-ort-webgpu-provider-compare-") as tmpdir:
             tmp = Path(tmpdir)
@@ -410,6 +513,9 @@ await writeVendorNodeSuccessTrace({{
   executionProvider: 'doe',
   executionProviderName: 'doe-gpu',
   processWallMs: 42.5,
+  timingMs: 20.5,
+  timingSource: 'tjs-ort-generation-ms',
+  timingClass: 'operation',
   adapterInfo: {{ vendor: 'AMD', architecture: 'gfx11', device: 'mock', description: '', subgroupMinSize: 32, subgroupMaxSize: 64 }},
   phaseTimingsMs: {{ promptSynthesisMs: 10, pipelineLoadMs: 12, generationMs: 20.5 }},
   promptSummary: {{ promptSource: 'synthetic', promptLength: 512, prefillTokens: 64, decodeTokens: 64 }},
@@ -463,7 +569,13 @@ console.log(JSON.stringify({{
         self.assertEqual(success_meta["executionProviderName"], "doe-gpu")
         self.assertEqual(success_meta["executionSuccessCount"], 1)
         self.assertEqual(success_meta["executionErrorCount"], 0)
+        self.assertEqual(success_meta["timingMs"], 20.5)
+        self.assertEqual(success_meta["timingSource"], "tjs-ort-generation-ms")
+        self.assertEqual(success_meta["timingClass"], "operation")
         self.assertEqual(success_meta["phaseTimingsMs"]["generationMs"], 20.5)
+        self.assertEqual(success_row["timingMs"], 20.5)
+        self.assertEqual(success_row["timingSource"], "tjs-ort-generation-ms")
+        self.assertEqual(success_row["timingClass"], "operation")
         self.assertEqual(success_row["status"], "success")
 
         self.assertEqual(failure_meta["benchmarkLane"], "node-ort-webgpu-provider-compare")
@@ -555,6 +667,15 @@ class BrowserOrtWebGpuCompareLaneTests(_BreadthLaneBase):
             self.assertTrue(workload.comparable)
             self.assertFalse(workload.claim_eligible)
             self.assertTrue((REPO_ROOT / workload.commands_path).exists())
+            scenario = json.loads((REPO_ROOT / workload.commands_path).read_text(encoding="utf-8"))[0]
+            self.assertGreaterEqual(scenario["timedIters"], 20)
+            self.assertGreaterEqual(scenario["warmupIters"], 5)
+
+    def test_compare_config_tracks_expected_breadth_ids(self) -> None:
+        payload = json.loads(self.fixture.compare_config_path.read_text(encoding="utf-8"))
+        self._assert_compare_config_core(payload, require_timing_class="operation")
+        self.assertGreaterEqual(payload["run"]["iterations"], 7)
+        self.assertEqual(payload["selector"]["ids"], list(self.fixture.expected_ids))
 
     def test_executor_registry_resolves_browser_compare_executors(self) -> None:
         dawn_template = resolve_executor_command_template("browser_ort_webgpu_dawn")
@@ -564,6 +685,38 @@ class BrowserOrtWebGpuCompareLaneTests(_BreadthLaneBase):
         self.assertIn("--mode doe", doe_template)
         self.assertEqual(resolve_executor_boundary("browser_ort_webgpu_dawn"), "commands")
         self.assertEqual(resolve_executor_boundary("browser_ort_webgpu_doe"), "commands")
+
+    def test_browser_ort_timed_mean_is_operation_timing(self) -> None:
+        self.assertEqual(classify_timing_source("browser-ort-timed-mean-ms"), "operation")
+        self.assertEqual(classify_timing_source("tjs-ort-generation-ms"), "operation")
+        executor_path = REPO_ROOT / "bench" / "executors" / "run-browser-ort-bench.py"
+        spec = importlib.util.spec_from_file_location("run_browser_ort_bench", executor_path)
+        self.assertIsNotNone(spec)
+        module = importlib.util.module_from_spec(spec)
+        assert spec is not None and spec.loader is not None
+        spec.loader.exec_module(module)
+
+        trace_meta = module._trace_meta(
+            workload_id="browser_ort_webgpu_compare_sentiment",
+            scenario={"scenarioId": "browser_ort_webgpu_compare_sentiment", "task": "sentiment"},
+            mode="doe",
+            mode_report={
+                "success": True,
+                "timedMeanMs": 12.5,
+                "timedIterationsMs": [12.0, 12.5, 13.0],
+                "elapsedMs": 1500,
+                "webgpuDispatchCount": 10,
+                "webgpuQueueSubmitCount": 4,
+            },
+            report={"taskConfig": {"model": "distilbert"}},
+        )
+        self.assertEqual(trace_meta["timingSource"], "browser-ort-timed-mean-ms")
+        self.assertEqual(trace_meta["timingClass"], "operation")
+        self.assertEqual(trace_meta["timingMs"], 12.5)
+        self.assertEqual(trace_meta["browserOrtTimedMeanMs"], 12.5)
+        self.assertEqual(trace_meta["processWallMs"], 1500)
+        self.assertEqual(trace_meta["executionDispatchCount"], 10)
+        self.assertEqual(trace_meta["executionSubmitCount"], 4)
 
 
 # Guard against unittest discovering the abstract base classes as test cases.

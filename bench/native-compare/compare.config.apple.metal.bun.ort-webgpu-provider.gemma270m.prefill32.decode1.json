@@ -9,7 +9,7 @@
     "executorId": "tjs_ort_bun_webgpu_package"
   },
   "run": {
-    "iterations": 4,
+    "iterations": 7,
     "warmup": 1,
     "out": "bench/out/apple-metal-ort-bun/gemma270m-prefill32-decode1.compare.json",
     "workspace": "bench/out/apple-metal-ort-bun/gemma270m-prefill32-decode1.workspace",
@@ -18,7 +18,7 @@
   },
   "comparability": {
     "mode": "strict",
-    "requireTimingClass": "process-wall",
+    "requireTimingClass": "operation",
     "allowBaselineNoExecution": false
   },
   "claimability": {

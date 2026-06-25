@@ -9,7 +9,7 @@
     "executorId": "tjs_ort_node_webgpu_package"
   },
   "run": {
-    "iterations": 4,
+    "iterations": 7,
     "warmup": 1,
     "out": "bench/out/apple-metal-ort-node/gemma270m.compare.json",
     "workspace": "bench/out/apple-metal-ort-node/gemma270m.workspace",
@@ -18,7 +18,7 @@
   },
   "comparability": {
     "mode": "strict",
-    "requireTimingClass": "process-wall",
+    "requireTimingClass": "operation",
     "allowBaselineNoExecution": false
   },
   "claimability": {

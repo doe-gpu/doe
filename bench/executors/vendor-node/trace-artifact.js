@@ -26,10 +26,13 @@ function createBaseTraceMeta({
   executionBackend,
   executionLabel,
   processWallMs,
+  timingMs = processWallMs,
+  timingSource = 'wall-time',
+  timingClass = null,
   adapterInfo,
   extraMeta,
 }) {
-  return {
+  const traceMeta = {
     traceMetaVersion: 1,
     runtimeHost,
     benchmarkLane,
@@ -40,11 +43,15 @@ function createBaseTraceMeta({
     executionProvider,
     executionProviderName,
     processWallMs,
-    timingMs: processWallMs,
-    timingSource: 'wall-time',
+    timingMs,
+    timingSource,
     adapterInfo,
     ...extraMeta,
   };
+  if (timingClass !== null) {
+    traceMeta.timingClass = timingClass;
+  }
+  return traceMeta;
 }
 
 export async function writeVendorNodeSuccessTrace({
@@ -59,6 +66,9 @@ export async function writeVendorNodeSuccessTrace({
   executionBackend,
   executionLabel,
   processWallMs,
+  timingMs = processWallMs,
+  timingSource = 'wall-time',
+  timingClass = null,
   adapterInfo,
   phaseTimingsMs,
   promptSummary,
@@ -75,6 +85,9 @@ export async function writeVendorNodeSuccessTrace({
     executionBackend,
     executionLabel,
     processWallMs,
+    timingMs,
+    timingSource,
+    timingClass,
     adapterInfo,
     extraMeta: {
       executionRowCount: 1,
@@ -94,6 +107,9 @@ export async function writeVendorNodeSuccessTrace({
       workloadId,
       scenarioId,
       processWallMs,
+      timingMs,
+      timingSource,
+      ...(timingClass !== null ? { timingClass } : {}),
       phaseTimingsMs,
       promptSummary,
       resultSummary,

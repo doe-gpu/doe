@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
 import { createHash } from 'node:crypto';
@@ -1994,12 +1994,45 @@ function globalsFromGlobalThis() {
   return globals;
 }
 
+function resolveInstalledBunWebGpuModulePath() {
+  const homeDir = typeof process.env.HOME === 'string' && process.env.HOME.trim() !== ''
+    ? process.env.HOME.trim()
+    : '';
+  if (!homeDir) {
+    return null;
+  }
+  const cacheRoot = resolve(homeDir, '.bun', 'install', 'cache');
+  if (!existsSync(cacheRoot)) {
+    return null;
+  }
+  const entries = readdirSync(cacheRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith('bun-webgpu@'))
+    .map((entry) => entry.name)
+    .sort()
+    .reverse();
+  for (const entry of entries) {
+    const candidate = resolve(cacheRoot, entry, 'index.js');
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
 async function resolveBunWebGpuModule() {
   let mod;
   try {
     mod = await import(pathToFileURL(FALLBACK_BUN_WEBGPU_PATH).href);
   } catch (_err) {
-    mod = await import('bun-webgpu');
+    try {
+      mod = await import('bun-webgpu');
+    } catch (error) {
+      const fallbackPath = resolveInstalledBunWebGpuModulePath();
+      if (!fallbackPath) {
+        throw error;
+      }
+      mod = await import(pathToFileURL(fallbackPath).href);
+    }
   }
   if (typeof mod.setupGlobals !== 'function') {
     throw new Error('bun-webgpu does not export setupGlobals()');

@@ -9,7 +9,7 @@
     "executorId": "browser_ort_webgpu_doe"
   },
   "run": {
-    "iterations": 4,
+    "iterations": 7,
     "warmup": 1,
     "out": "bench/out/browser-ort-webgpu-compare/browser.compare.json",
     "workspace": "bench/out/browser-ort-webgpu-compare/browser.workspace",
@@ -18,7 +18,7 @@
   },
   "comparability": {
     "mode": "strict",
-    "requireTimingClass": "process-wall",
+    "requireTimingClass": "operation",
     "allowBaselineNoExecution": false
   },
   "claimability": {

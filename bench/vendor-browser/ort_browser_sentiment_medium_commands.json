@@ -5,8 +5,8 @@
     "scenarioId": "browser_ort_webgpu_compare_sentiment_medium",
     "task": "sentiment_medium",
     "headless": true,
-    "timedIters": 5,
-    "warmupIters": 2,
+    "timedIters": 20,
+    "warmupIters": 5,
     "scriptPath": "../../browser/chromium/scripts/webgpu-playwright-ort-bench.mjs"
   }
 ]
