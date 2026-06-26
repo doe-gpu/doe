@@ -38,6 +38,9 @@ const DEFAULT_WARMUP_ITERS = 1;
 const DEFAULT_SUITE_TIMEOUT_MS = 240000;
 const DEFAULT_OPERATION_TIMEOUT_MS = 120000;
 const DEFAULT_BROWSER_CLOSE_TIMEOUT_MS = 10000;
+const DEFAULT_WEBGPU_PREFERRED_LAYOUT = (
+  process.env.DOE_BROWSER_ORT_WEBGPU_PREFERRED_LAYOUT ?? ""
+).trim();
 const CONTENT_TYPE_BY_EXTENSION = Object.freeze({
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -185,6 +188,8 @@ Options:
   --suite-timeout-ms N      Max time for one mode suite run (default: ${DEFAULT_SUITE_TIMEOUT_MS})
   --op-timeout-ms N         Max time for one async browser op (default: ${DEFAULT_OPERATION_TIMEOUT_MS})
   --chrome-arg ARG          Extra Chromium arg (repeatable)
+  --webgpu-preferred-layout NCHW|NHWC
+                            Optional ORT WebGPU preferred layout
   --strict                  Exit non-zero if any mode fails
   --help                    Show this message
 `);
@@ -264,6 +269,7 @@ function parseArgs(argv) {
     suiteTimeoutMs: DEFAULT_SUITE_TIMEOUT_MS,
     opTimeoutMs: DEFAULT_OPERATION_TIMEOUT_MS,
     chromeArgs: [],
+    webgpuPreferredLayout: DEFAULT_WEBGPU_PREFERRED_LAYOUT,
     strict: false,
   };
 
@@ -315,6 +321,9 @@ function parseArgs(argv) {
     } else if (token === "--chrome-arg") {
       args.chromeArgs.push(readOptionValue(argv, i, "--chrome-arg"));
       i += 1;
+    } else if (token === "--webgpu-preferred-layout") {
+      args.webgpuPreferredLayout = readOptionValue(argv, i, "--webgpu-preferred-layout").trim();
+      i += 1;
     } else {
       throw new Error(`unknown option: ${token}`);
     }
@@ -329,6 +338,13 @@ function parseArgs(argv) {
   args.runtimeSelectorPolicy = loadRuntimeSelectorPolicy(args.runtimeSelectorPolicyPath);
   if (!Object.hasOwn(TASKS, args.task)) {
     throw new Error(`--task must be one of ${Object.keys(TASKS).join(", ")}`);
+  }
+  if (
+    args.webgpuPreferredLayout &&
+    args.webgpuPreferredLayout !== "NCHW" &&
+    args.webgpuPreferredLayout !== "NHWC"
+  ) {
+    throw new Error("--webgpu-preferred-layout must be empty, NCHW, or NHWC");
   }
   if (!existsSync(args.chromePath)) {
     throw new Error(`chrome binary not found: ${args.chromePath}`);
@@ -435,6 +451,9 @@ function baseLaunchArgs(port) {
     "--no-sandbox",
     "--disable-setuid-sandbox",
     "--disable-dev-shm-usage",
+    "--disable-background-timer-throttling",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-renderer-backgrounding",
     "--ignore-gpu-blocklist",
     "--enable-unsafe-webgpu",
     `--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:${port}`,
@@ -669,10 +688,15 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
           timedIters,
           transformersModuleUrlValue,
           warmupIters,
+          webgpuPreferredLayout,
         }) => {
           const webgpuCounters = {
+            bufferGetMappedRange: 0,
+            bufferMapAsync: 0,
+            bufferUnmap: 0,
             dispatchWorkgroups: 0,
             dispatchWorkgroupsIndirect: 0,
+            queueOnSubmittedWorkDone: 0,
             queueSubmit: 0,
           };
           const patchMethod = (prototype, methodName, counterName) => {
@@ -695,6 +719,21 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
             }
           };
           const webgpuCounterPatches = {
+            bufferGetMappedRange: patchMethod(
+              globalThis.GPUBuffer?.prototype,
+              "getMappedRange",
+              "bufferGetMappedRange",
+            ),
+            bufferMapAsync: patchMethod(
+              globalThis.GPUBuffer?.prototype,
+              "mapAsync",
+              "bufferMapAsync",
+            ),
+            bufferUnmap: patchMethod(
+              globalThis.GPUBuffer?.prototype,
+              "unmap",
+              "bufferUnmap",
+            ),
             dispatchWorkgroups: patchMethod(
               globalThis.GPUComputePassEncoder?.prototype,
               "dispatchWorkgroups",
@@ -710,10 +749,19 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
               "submit",
               "queueSubmit",
             ),
+            queueOnSubmittedWorkDone: patchMethod(
+              globalThis.GPUQueue?.prototype,
+              "onSubmittedWorkDone",
+              "queueOnSubmittedWorkDone",
+            ),
           };
           const resetWebgpuCounters = () => {
+            webgpuCounters.bufferGetMappedRange = 0;
+            webgpuCounters.bufferMapAsync = 0;
+            webgpuCounters.bufferUnmap = 0;
             webgpuCounters.dispatchWorkgroups = 0;
             webgpuCounters.dispatchWorkgroupsIndirect = 0;
+            webgpuCounters.queueOnSubmittedWorkDone = 0;
             webgpuCounters.queueSubmit = 0;
           };
           const withOpTimeout = async (label, promiseFactory) => {
@@ -807,9 +855,13 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
           };
 
           const taskInput = structuredClone(taskConfig.inputPayload);
+          const adapterRequestOptions = {
+            powerPreference: "high-performance",
+            forceFallbackAdapter: false,
+          };
           const adapter = await withOpTimeout(
             "navigator.gpu.requestAdapter",
-            () => navigator.gpu.requestAdapter(),
+            () => navigator.gpu.requestAdapter(adapterRequestOptions),
           );
           if (!adapter) {
             throw new Error("navigator.gpu.requestAdapter returned null");
@@ -822,6 +874,8 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
           ort.env.wasm.proxy = false;
           ort.env.wasm.numThreads = 1;
           ort.env.wasm.wasmPaths = ortDistBaseUrlValue;
+          ort.env.webgpu.powerPreference = adapterRequestOptions.powerPreference;
+          ort.env.webgpu.forceFallbackAdapter = adapterRequestOptions.forceFallbackAdapter;
 
           const tokenizer = await withOpTimeout(
             "AutoTokenizer.from_pretrained",
@@ -831,17 +885,23 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
             `/browser/chromium/src/third_party/jetstream/main/transformersjs/build/models/${taskConfig.modelId}/onnx/model_uint8.onnx`,
             modelBaseUrlValue,
           ).href;
+          const webgpuExecutionProvider = webgpuPreferredLayout
+            ? { name: "webgpu", preferredLayout: webgpuPreferredLayout }
+            : "webgpu";
+          const ortSessionOptions = {
+            executionProviders: [webgpuExecutionProvider],
+            graphOptimizationLevel: "all",
+            webgpuPreferredLayout: webgpuPreferredLayout || null,
+          };
           const loadStarted = performance.now();
           const session = await withOpTimeout(
             "ort.InferenceSession.create",
             () => ort.InferenceSession.create(
               modelPath,
-              {
-                executionProviders: ["webgpu"],
-                graphOptimizationLevel: "all",
-              },
+              ortSessionOptions,
             ),
           );
+          const executionAdapter = ort.env.webgpu.adapter ?? adapter;
           const loadEnded = performance.now();
           const encoded = await withOpTimeout(
             "tokenizer",
@@ -911,8 +971,10 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
           }
 
           return {
-            adapterSummary: summarizeAdapter(adapter),
+            adapterSummary: summarizeAdapter(executionAdapter),
+            adapterRequestOptions,
             loadMs: loadEnded - loadStarted,
+            ortSessionOptions,
             outputSummary: summarizeOutputs(finalOutput),
             sequenceLength: Array.isArray(dims) ? dims[1] : null,
             sessionInputNames,
@@ -921,6 +983,10 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
             webgpuDispatchCount,
             webgpuDispatchWorkgroups: webgpuCounters.dispatchWorkgroups,
             webgpuDispatchWorkgroupsIndirect: webgpuCounters.dispatchWorkgroupsIndirect,
+            webgpuBufferGetMappedRangeCount: webgpuCounters.bufferGetMappedRange,
+            webgpuBufferMapAsyncCount: webgpuCounters.bufferMapAsync,
+            webgpuBufferUnmapCount: webgpuCounters.bufferUnmap,
+            webgpuQueueOnSubmittedWorkDoneCount: webgpuCounters.queueOnSubmittedWorkDone,
             webgpuQueueSubmitCount: webgpuCounters.queueSubmit,
             webgpuAvailable: typeof navigator.gpu !== "undefined",
           };
@@ -934,6 +1000,7 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
           timedIters: args.timedIters,
           transformersModuleUrlValue: transformersModuleUrl(localUrl),
           warmupIters: args.warmupIters,
+          webgpuPreferredLayout: args.webgpuPreferredLayout,
         },
       ),
       args.suiteTimeoutMs,
@@ -955,6 +1022,7 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
       runtimeSelection: buildRuntimeSelection(mode, args, launchArgs),
       shaderCompilerIdentity: shaderCompilerIdentity(mode, args),
       pipelineLoadMs: result.loadMs,
+      ortSessionOptions: result.ortSessionOptions,
       sequenceLength: result.sequenceLength,
       sessionInputNames: result.sessionInputNames,
       timedIterationsMs: result.timedIterationsMs,
@@ -962,12 +1030,17 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
       timedP50Ms: percentile(result.timedIterationsMs, 0.5),
       timedP95Ms: percentile(result.timedIterationsMs, 0.95),
       adapterSummary: result.adapterSummary,
+      adapterRequestOptions: result.adapterRequestOptions,
       adapterIdentity: adapterIdentityFromSummary(result.adapterSummary),
       outputSummary: result.outputSummary,
       webgpuCounterPatches: result.webgpuCounterPatches,
       webgpuDispatchCount: result.webgpuDispatchCount,
       webgpuDispatchWorkgroups: result.webgpuDispatchWorkgroups,
       webgpuDispatchWorkgroupsIndirect: result.webgpuDispatchWorkgroupsIndirect,
+      webgpuBufferGetMappedRangeCount: result.webgpuBufferGetMappedRangeCount,
+      webgpuBufferMapAsyncCount: result.webgpuBufferMapAsyncCount,
+      webgpuBufferUnmapCount: result.webgpuBufferUnmapCount,
+      webgpuQueueOnSubmittedWorkDoneCount: result.webgpuQueueOnSubmittedWorkDoneCount,
       webgpuQueueSubmitCount: result.webgpuQueueSubmitCount,
       webgpuAvailable: result.webgpuAvailable,
     };

@@ -103,6 +103,7 @@ def load_scenario(path: Path) -> dict[str, Any]:
         "timedIters": timed_iters,
         "warmupIters": warmup_iters,
         "headless": bool(scenario.get("headless", True)),
+        "webgpuPreferredLayout": str(scenario.get("webgpuPreferredLayout", "") or "").strip(),
         "scriptPath": str(script_path),
         "chromePath": _resolve_optional_path(scenario_dir, scenario.get("chromePath")),
         "doeLibPath": _resolve_optional_path(scenario_dir, scenario.get("doeLibPath")),
@@ -214,6 +215,8 @@ def _trace_meta(
         "timingMs": timing_ms,
         "timingSource": BROWSER_ORT_TIMED_MEAN_SOURCE,
         "adapterInfo": mode_report.get("adapterSummary"),
+        "adapterRequestOptions": mode_report.get("adapterRequestOptions"),
+        "browserOrtSessionOptions": mode_report.get("ortSessionOptions"),
         "executionRowCount": 1,
         "executionSuccessCount": 1 if mode_report.get("success") else 0,
         "executionErrorCount": 0 if mode_report.get("success") else 1,
@@ -246,8 +249,12 @@ def _trace_meta(
     elif mode_report.get("success") is not True:
         trace_meta["executionSubmitCount"] = 0
     for source_key, trace_key in (
+        ("webgpuBufferGetMappedRangeCount", "browserWebgpuBufferGetMappedRangeCount"),
+        ("webgpuBufferMapAsyncCount", "browserWebgpuBufferMapAsyncCount"),
+        ("webgpuBufferUnmapCount", "browserWebgpuBufferUnmapCount"),
         ("webgpuDispatchWorkgroups", "browserWebgpuDispatchWorkgroups"),
         ("webgpuDispatchWorkgroupsIndirect", "browserWebgpuDispatchWorkgroupsIndirect"),
+        ("webgpuQueueOnSubmittedWorkDoneCount", "browserWebgpuQueueOnSubmittedWorkDoneCount"),
         ("webgpuQueueSubmitCount", "browserWebgpuQueueSubmitCount"),
     ):
         value = _nonnegative_int(mode_report.get(source_key))
@@ -287,6 +294,8 @@ def main(argv: list[str] | None = None) -> int:
             command.extend(["--chrome", scenario["chromePath"]])
         if scenario["doeLibPath"]:
             command.extend(["--doe-lib", scenario["doeLibPath"]])
+        if scenario["webgpuPreferredLayout"]:
+            command.extend(["--webgpu-preferred-layout", scenario["webgpuPreferredLayout"]])
 
         proc = subprocess.run(
             command,

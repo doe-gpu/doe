@@ -51,6 +51,7 @@
   "files": [
     "src/",
     "examples/",
+    "assets/",
     "!src/vendor/build/",
     "scripts/",
     "binding.gyp",

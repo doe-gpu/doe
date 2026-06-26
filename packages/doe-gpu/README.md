@@ -30,26 +30,23 @@ npm install doe-gpu
 - Browser shim available when you want API compatibility rather than runtime
   replacement
 
-## Current evidence
+## Current Evidence
 
-End-to-end Gemma 3 inference evidence compares Doe-backed WebGPU with
-Dawn-backed WebGPU on the same host lane: Node.js through `webgpu`, and Bun
-through `bun-webgpu`. Positive percentages mean the Doe-backed lane finished
-faster.
+End-to-end Gemma 3 package evidence compares Doe-backed WebGPU with the
+Dawn-backed package lanes on the same AMD Vulkan host. Doe is the baseline in
+every row, so positive percentages mean Doe finished faster.
 
-![doe-gpu benchmark claims](https://raw.githubusercontent.com/doerun/doe/main/assets/readme/package-claims.svg)
+![doe-gpu package results](https://raw.githubusercontent.com/doerun/doe/main/packages/doe-gpu/assets/package-results.svg)
 
 Outputs:
-- [Node package, AMD Vulkan](https://github.com/doerun/doe/blob/main/bench/out/amd-vulkan/20260410T235522Z/gemma270m.node-package.ir.compare.json)
-- [Bun package, AMD Vulkan](https://github.com/doerun/doe/blob/main/bench/out/amd-vulkan/20260410T235541Z/gemma270m.bun-package.ir.compare.json)
-- [Node package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260414T010826Z/gemma64.node-package.warm.ir.compare.json)
-- [Bun package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260414T010736Z/gemma64.bun-package.warm.ir.compare.json)
+- Node package: `+12.25% p50`, `+10.74% p95`, `+10.74% p99`
+- Bun package: `+12.86% p50`, `+7.91% p95`, `+7.91% p99`
 
 ## Additional benchmark outputs
 
-ONNX Runtime (ORT) lanes and broader follow-up work live in the repo status. Read
-[`docs/status.md`](https://github.com/doerun/doe/blob/main/docs/status.md)
-for the current scope and artifacts.
+Native, release, ORT, and browser lanes are summarized in the repo README. Read
+[`README.md`](https://github.com/doerun/doe/blob/main/README.md) for the
+current scope and artifacts.
 
 ## Usage
 

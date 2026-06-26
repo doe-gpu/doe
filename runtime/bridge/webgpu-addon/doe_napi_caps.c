@@ -399,10 +399,6 @@ napi_value doe_adapter_get_info(napi_env env, napi_callback_info info) {
         return obj;
     }
 
-    if (tried_native_adapter_info) {
-        return obj;
-    }
-
     WGPUAdapterInfo info_view;
     memset(&info_view, 0, sizeof(info_view));
     info_view.vendor.length = WGPU_STRLEN;

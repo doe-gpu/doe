@@ -178,6 +178,12 @@ pub const VkPipelineShaderStageCreateInfo = extern struct {
     pSpecializationInfo: ?*const anyopaque,
 };
 
+pub const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo = extern struct {
+    sType: vk.VkStructureType,
+    pNext: ?*const anyopaque,
+    requiredSubgroupSize: u32,
+};
+
 pub const VkDescriptorSetLayoutBinding = extern struct {
     binding: u32,
     descriptorType: u32,

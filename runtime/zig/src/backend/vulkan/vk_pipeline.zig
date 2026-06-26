@@ -404,13 +404,34 @@ pub fn build_pipeline_for_words(
     if (self.pending_spirv_bytes_owned) |stale| self.allocator.free(stale);
     self.pending_spirv_bytes_owned = self.allocator.dupe(u8, std.mem.sliceAsBytes(words)) catch null;
 
-    const stage_info = c.VkPipelineShaderStageCreateInfo{ .sType = c.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, .pNext = null, .flags = 0, .stage = c.VK_SHADER_STAGE_COMPUTE_BIT, .module = self.shader_module, .pName = owned_entry.ptr, .pSpecializationInfo = null };
+    var required_subgroup_size_info = c.VkPipelineShaderStageRequiredSubgroupSizeCreateInfo{
+        .sType = c.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO,
+        .pNext = null,
+        .requiredSubgroupSize = 0,
+    };
+    const stage_pnext: ?*const anyopaque = if (required_subgroup_size_for_pipeline(self)) |required_size| blk: {
+        required_subgroup_size_info.requiredSubgroupSize = required_size;
+        break :blk @ptrCast(&required_subgroup_size_info);
+    } else null;
+    const stage_info = c.VkPipelineShaderStageCreateInfo{ .sType = c.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, .pNext = stage_pnext, .flags = 0, .stage = c.VK_SHADER_STAGE_COMPUTE_BIT, .module = self.shader_module, .pName = owned_entry.ptr, .pSpecializationInfo = null };
     var pipeline_info = c.VkComputePipelineCreateInfo{ .sType = c.VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO, .pNext = null, .flags = 0, .stage = stage_info, .layout = self.pipeline_layout, .basePipelineHandle = VK_NULL_U64, .basePipelineIndex = -1 };
     const compute_cache_handle = vk_pipeline_cache_persistent.handle_for_pipeline_creation();
     try c.check_vk(c.vkCreateComputePipelines(self.device, compute_cache_handle, 1, @ptrCast(&pipeline_info), null, @ptrCast(&self.pipeline)));
     self.has_pipeline = true;
     self.current_entry_point_owned = owned_entry;
     self.current_pipeline_hash = pipeline_hash;
+}
+
+fn required_subgroup_size_for_pipeline(self: anytype) ?u32 {
+    if (!self.has_subgroup_size_control_ext) return null;
+    if (std.posix.getenv("DOE_VULKAN_REQUIRED_SUBGROUP_SIZE")) |value| {
+        if (value.len == 0) return null;
+        const parsed = std.fmt.parseUnsigned(u32, value, 10) catch return null;
+        if (parsed == 0) return null;
+        return parsed;
+    }
+    if (self.required_compute_subgroup_size == 0) return null;
+    return self.required_compute_subgroup_size;
 }
 
 pub fn destroy_pipeline_objects(self: anytype) void {

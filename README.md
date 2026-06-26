@@ -55,24 +55,12 @@ visible, lowering preserves identity, and every claim has a receipt path.
   [`docs/status.md`](docs/status.md), with public README receipt paths indexed
   in [`reports/claim-index.json`](reports/claim-index.json).
 
-## Current evidence
+## Current Evidence
 
-These charts summarize the current public benchmark lanes. Positive
-percentages mean Doe finished faster than Dawn in that lane.
+Fresh local receipts on this AMD Vulkan host use Doe as the baseline, so
+positive percentages always mean Doe is faster.
 
-![Doe package benchmark claims](assets/readme/package-claims.svg)
-
-Receipt paths for these charted lanes are listed in
-[`reports/claim-index.json`](reports/claim-index.json).
-
-## Additional benchmark outputs
-
-Additional ONNX Runtime (ORT) and compare-lane outputs live in the repo.
-
-![Doe ORT benchmark claims](assets/readme/ort-claims.svg)
-
-Receipt paths for these charted lanes are listed in
-[`reports/claim-index.json`](reports/claim-index.json).
+![Doe benchmark results on this machine](assets/readme/this-machine-results.svg)
 
 ## Current product surface
 

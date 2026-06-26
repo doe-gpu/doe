@@ -83,6 +83,13 @@ pub const VkPhysicalDevice16BitStorageFeatures = extern struct {
     storageInputOutput16: vk.VkBool32,
 };
 
+pub const VkPhysicalDeviceSubgroupSizeControlFeatures = extern struct {
+    sType: vk.VkStructureType,
+    pNext: ?*anyopaque,
+    subgroupSizeControl: vk.VkBool32,
+    computeFullSubgroups: vk.VkBool32,
+};
+
 pub const VkPhysicalDeviceLimits = extern struct {
     maxImageDimension1D: u32,
     maxImageDimension2D: u32,
@@ -225,6 +232,15 @@ pub const VkPhysicalDeviceSubgroupProperties = extern struct {
     supportedStages: vk.VkFlags,
     supportedOperations: vk.VkFlags,
     quadOperationsInAllStages: vk.VkBool32,
+};
+
+pub const VkPhysicalDeviceSubgroupSizeControlProperties = extern struct {
+    sType: vk.VkStructureType,
+    pNext: ?*anyopaque,
+    minSubgroupSize: u32,
+    maxSubgroupSize: u32,
+    maxComputeWorkgroupSubgroups: u32,
+    requiredSubgroupSizeStages: vk.VkFlags,
 };
 
 pub const VkPhysicalDeviceVulkan12Features = extern struct {

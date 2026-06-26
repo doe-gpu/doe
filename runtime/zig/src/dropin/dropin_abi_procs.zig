@@ -423,8 +423,7 @@ pub export fn wgpuQuerySetRelease(a0: abi_base.WGPUQuerySet) callconv(.c) void {
 }
 
 pub export fn wgpuBufferMapAsync(a0: abi_base.WGPUBuffer, a1: abi_base.WGPUMapMode, a2: usize, a3: usize, a4: abi_descriptor.WGPUBufferMapCallbackInfo) callconv(.c) abi_base.WGPUFuture {
-    const proc = loadRequiredProc(ptypes.FnWgpuBufferMapAsync, "wgpuBufferMapAsync");
-    return proc(a0, a1, a2, a3, a4);
+    return native.doeNativeBufferMapAsync(a0, a1, a2, a3, a4);
 }
 
 // FFI-friendly buffer map: flattened args for runtimes that cannot pass WGPUBufferMapCallbackInfo by value.
@@ -445,8 +444,7 @@ pub export fn doeBufferMapAsyncFlat(
         .userdata1 = userdata1,
         .userdata2 = userdata2,
     };
-    const proc = loadRequiredProc(ptypes.FnWgpuBufferMapAsync, "wgpuBufferMapAsync");
-    return proc(buffer, mode, offset, size, info);
+    return native.doeNativeBufferMapAsync(buffer, mode, offset, size, info);
 }
 
 pub export fn doeBufferMapSyncFlat(
@@ -464,8 +462,7 @@ pub export fn doeBufferMapSyncFlat(
         .userdata1 = @ptrCast(&result),
         .userdata2 = null,
     };
-    const map_proc = loadRequiredProc(ptypes.FnWgpuBufferMapAsync, "wgpuBufferMapAsync");
-    const future = map_proc(buffer, mode, offset, size, info);
+    const future = native.doeNativeBufferMapAsync(buffer, mode, offset, size, info);
     if (future.id == 0) return 0;
     const process_events = loadRequiredProc(ptypes.FnWgpuInstanceProcessEvents, "wgpuInstanceProcessEvents");
     const start_ns = std.time.nanoTimestamp();
@@ -596,18 +593,15 @@ pub export fn doeQueueOnSubmittedWorkDoneFlat(
         .userdata1 = userdata1,
         .userdata2 = userdata2,
     };
-    const proc = loadRequiredProc(ptypes.FnWgpuQueueOnSubmittedWorkDone, "wgpuQueueOnSubmittedWorkDone");
-    return proc(queue, info);
+    return native.doeNativeQueueOnSubmittedWorkDone(queue, info);
 }
 
 pub export fn wgpuBufferGetConstMappedRange(a0: abi_base.WGPUBuffer, a1: usize, a2: usize) callconv(.c) ?*const anyopaque {
-    const proc = loadRequiredProc(ptypes.FnWgpuBufferGetConstMappedRange, "wgpuBufferGetConstMappedRange");
-    return proc(a0, a1, a2);
+    return native.doeNativeBufferGetConstMappedRange(a0, a1, a2);
 }
 
 pub export fn wgpuBufferUnmap(a0: abi_base.WGPUBuffer) callconv(.c) void {
-    const proc = loadRequiredProc(ptypes.FnWgpuBufferUnmap, "wgpuBufferUnmap");
-    proc(a0);
+    native.doeNativeBufferUnmap(a0);
 }
 
 pub export fn wgpuDeviceCreateSampler(a0: abi_base.WGPUDevice, a1: ?*const abi_descriptor.WGPUSamplerDescriptor) callconv(.c) abi_base.WGPUSampler {

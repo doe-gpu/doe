@@ -26,8 +26,7 @@ pub export fn wgpuBufferGetMapState(a0: abi_core.WGPUBuffer) callconv(.c) u32 {
 }
 
 pub export fn wgpuBufferGetMappedRange(a0: abi_core.WGPUBuffer, a1: usize, a2: usize) callconv(.c) ?*anyopaque {
-    if (native.cast(native.DoeBuffer, a0) != null) return native.doeNativeBufferGetMappedRange(a0, a1, a2);
-    return null;
+    return native.doeNativeBufferGetMappedRange(a0, a1, a2);
 }
 
 pub export fn wgpuBufferGetSize(a0: abi_core.WGPUBuffer) callconv(.c) u64 {

@@ -111,8 +111,18 @@ pub fn create_device_and_queue(self: anytype) !void {
         self.physical_device,
         c.VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME,
     );
+    const subgroup_size_control_available = detect_device_extension(
+        self.physical_device,
+        c.VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME,
+    );
     var feature_query = vk_feature_caps.query(self.physical_device);
-    feature_query.enabled_vulkan12_features.pNext = @ptrCast(&feature_query.enabled_storage16_features);
+    const enable_subgroup_size_control = subgroup_size_control_available and feature_query.caps.subgroup_size_control;
+    if (enable_subgroup_size_control) {
+        feature_query.enabled_subgroup_size_control_features.pNext = @ptrCast(&feature_query.enabled_storage16_features);
+        feature_query.enabled_vulkan12_features.pNext = @ptrCast(&feature_query.enabled_subgroup_size_control_features);
+    } else {
+        feature_query.enabled_vulkan12_features.pNext = @ptrCast(&feature_query.enabled_storage16_features);
+    }
 
     var all_exts: [8][*:0]const u8 = undefined;
     var total_ext_count: usize = 0;
@@ -123,6 +133,10 @@ pub fn create_device_and_queue(self: anytype) !void {
     }
     if (depth_clip_available) {
         all_exts[total_ext_count] = c.VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME;
+        total_ext_count += 1;
+    }
+    if (enable_subgroup_size_control) {
+        all_exts[total_ext_count] = c.VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME;
         total_ext_count += 1;
     }
 
@@ -150,6 +164,14 @@ pub fn create_device_and_queue(self: anytype) !void {
     try c.check_vk(c.vkCreateDevice(self.physical_device, &device_info, null, &self.device));
     self.has_device = true;
     self.has_depth_clip_enable_ext = depth_clip_available;
+    self.has_subgroup_size_control_ext = enable_subgroup_size_control;
+    self.required_compute_subgroup_size = if (enable_subgroup_size_control and
+        feature_query.caps.subgroup_min_size <= 32 and
+        feature_query.caps.subgroup_max_size >= 32 and
+        (feature_query.caps.required_subgroup_size_stages & c.VK_SHADER_STAGE_COMPUTE_BIT) != 0)
+        32
+    else
+        0;
     c.vkGetDeviceQueue(self.device, self.queue_family_index, 0, &self.queue);
     if (self.queue == null) return error.InvalidState;
     // Create the process-level VkPipelineCache so subsequent pipeline

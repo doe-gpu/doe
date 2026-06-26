@@ -60,6 +60,7 @@ pub const VkShaderModuleCreateInfo = structs.VkShaderModuleCreateInfo;
 pub const VkPipelineCacheCreateInfo = structs.VkPipelineCacheCreateInfo;
 pub const VkPipelineLayoutCreateInfo = structs.VkPipelineLayoutCreateInfo;
 pub const VkPipelineShaderStageCreateInfo = structs.VkPipelineShaderStageCreateInfo;
+pub const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo = structs.VkPipelineShaderStageRequiredSubgroupSizeCreateInfo;
 pub const VkDescriptorSetLayoutBinding = structs.VkDescriptorSetLayoutBinding;
 pub const VkDescriptorSetLayoutCreateInfo = structs.VkDescriptorSetLayoutCreateInfo;
 pub const VkDescriptorPoolSize = structs.VkDescriptorPoolSize;
@@ -120,7 +121,9 @@ pub const VkPhysicalDeviceLimits = capability_structs.VkPhysicalDeviceLimits;
 pub const VkPhysicalDeviceProperties = capability_structs.VkPhysicalDeviceProperties;
 pub const VkPhysicalDeviceProperties2 = capability_structs.VkPhysicalDeviceProperties2;
 pub const VkPhysicalDeviceSubgroupProperties = capability_structs.VkPhysicalDeviceSubgroupProperties;
+pub const VkPhysicalDeviceSubgroupSizeControlProperties = capability_structs.VkPhysicalDeviceSubgroupSizeControlProperties;
 pub const VkPhysicalDevice16BitStorageFeatures = capability_structs.VkPhysicalDevice16BitStorageFeatures;
+pub const VkPhysicalDeviceSubgroupSizeControlFeatures = capability_structs.VkPhysicalDeviceSubgroupSizeControlFeatures;
 pub const VkPhysicalDeviceVulkan12Features = capability_structs.VkPhysicalDeviceVulkan12Features;
 
 pub const vkCreateInstance = functions.vkCreateInstance;
@@ -266,6 +269,9 @@ pub const VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER: i32 = 44;
 pub const VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER: i32 = 45;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES: i32 = 1000094000;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES: i32 = 1000083000;
+pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES: i32 = 1000225000;
+pub const VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO: i32 = 1000225001;
+pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES: i32 = 1000225002;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2: i32 = 1000059000;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2: i32 = 1000059001;
 pub const VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES: i32 = 51;
@@ -430,6 +436,7 @@ pub const VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO: i32 = 25;
 // VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT.
 pub const VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_DEPTH_CLIP_STATE_CREATE_INFO_EXT: i32 = 1000102001;
 pub const VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME: [*:0]const u8 = "VK_EXT_depth_clip_enable";
+pub const VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME: [*:0]const u8 = "VK_EXT_subgroup_size_control";
 
 // --- Graphics topology and polygon mode ---
 pub const VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST: u32 = 3;

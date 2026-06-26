@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Doe benchmark results on this AMD Vulkan machine</title>
+  <desc id="desc">Doe is baseline for every row. Positive p50, p95, and p99 percentages mean Doe is faster. All rows are comparable with zero non-comparable workloads.</desc>
+  <defs>
+    <style>
+      text { font-family: Inter, Segoe UI, Helvetica Neue, Arial, sans-serif; letter-spacing: 0; fill: #111827; }
+      .title { font-size: 34px; font-weight: 800; }
+      .sub { font-size: 15px; fill: #475569; font-weight: 500; }
+      .chip { font-size: 13px; font-weight: 800; fill: #064e3b; }
+      .head { font-size: 12px; fill: #64748b; font-weight: 800; text-transform: uppercase; }
+      .lane { font-size: 17px; font-weight: 800; }
+      .meta { font-size: 12px; fill: #64748b; font-weight: 700; }
+      .num { font-size: 12px; font-weight: 800; fill: #052e16; }
+      .foot { font-size: 12px; fill: #64748b; font-weight: 600; }
+    </style>
+    <filter id="shadow" x="-5%" y="-10%" width="110%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="700" rx="0" fill="#f8fafc"/>
+  <rect x="22" y="22" width="1156" height="656" rx="8" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+
+  <text x="52" y="74" class="title">Doe wins on this machine</text>
+  <text x="52" y="103" class="sub">AMD Vulkan host. Doe is baseline in every report. Positive deltas mean Doe is faster.</text>
+
+  <rect x="52" y="126" width="118" height="30" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="111" y="146" text-anchor="middle" class="chip">7/7 lanes</text>
+  <rect x="182" y="126" width="166" height="30" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="265" y="146" text-anchor="middle" class="chip">0 non-comparable</text>
+  <rect x="360" y="126" width="142" height="30" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="431" y="146" text-anchor="middle" class="chip">coherence pass</text>
+  <rect x="514" y="126" width="178" height="30" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="603" y="146" text-anchor="middle" class="chip">p50 / p95 / p99 wins</text>
+
+  <text x="58" y="192" class="head">Lane</text>
+  <text x="302" y="192" class="head">Rows</text>
+  <text x="440" y="192" class="head">p50 win</text>
+  <text x="620" y="192" class="head">p95 win</text>
+  <text x="800" y="192" class="head">p99 win</text>
+  <text x="1000" y="192" class="head">Gate</text>
+  <line x1="52" y1="206" x2="1148" y2="206" stroke="#e2e8f0"/>
+
+  <g transform="translate(0,0)">
+    <rect x="52" y="222" width="1096" height="48" rx="6" fill="#f8fafc"/>
+    <text x="68" y="250" class="lane">Native strict</text>
+    <text x="302" y="250" class="meta">16 workloads</text>
+    <rect x="440" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="440" y="236" width="112" height="12" rx="4" fill="#16a34a"/><text x="570" y="249" class="num">+14.02%</text>
+    <rect x="620" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="620" y="236" width="120" height="12" rx="4" fill="#16a34a"/><text x="750" y="249" class="num">+14.98%</text>
+    <rect x="800" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="800" y="236" width="120" height="12" rx="4" fill="#16a34a"/><text x="930" y="249" class="num">+14.98%</text>
+    <text x="1000" y="250" class="meta">strict comparable</text>
+  </g>
+
+  <g transform="translate(0,58)">
+    <rect x="52" y="222" width="1096" height="48" rx="6" fill="#ffffff"/>
+    <text x="68" y="250" class="lane">Native release</text>
+    <text x="302" y="250" class="meta">16 workloads</text>
+    <rect x="440" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="440" y="236" width="115" height="12" rx="4" fill="#16a34a"/><text x="570" y="249" class="num">+14.38%</text>
+    <rect x="620" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="620" y="236" width="116" height="12" rx="4" fill="#16a34a"/><text x="750" y="249" class="num">+14.48%</text>
+    <rect x="800" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="800" y="236" width="116" height="12" rx="4" fill="#16a34a"/><text x="930" y="249" class="num">+14.48%</text>
+    <text x="1000" y="250" class="meta">release p99 win</text>
+  </g>
+
+  <g transform="translate(0,116)">
+    <rect x="52" y="222" width="1096" height="48" rx="6" fill="#f8fafc"/>
+    <text x="68" y="250" class="lane">Node package</text>
+    <text x="302" y="250" class="meta">1 lane</text>
+    <rect x="440" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="440" y="236" width="98" height="12" rx="4" fill="#16a34a"/><text x="570" y="249" class="num">+12.25%</text>
+    <rect x="620" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="620" y="236" width="86" height="12" rx="4" fill="#16a34a"/><text x="750" y="249" class="num">+10.74%</text>
+    <rect x="800" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="800" y="236" width="86" height="12" rx="4" fill="#16a34a"/><text x="930" y="249" class="num">+10.74%</text>
+    <text x="1000" y="250" class="meta">strict comparable</text>
+  </g>
+
+  <g transform="translate(0,174)">
+    <rect x="52" y="222" width="1096" height="48" rx="6" fill="#ffffff"/>
+    <text x="68" y="250" class="lane">Bun package</text>
+    <text x="302" y="250" class="meta">1 lane</text>
+    <rect x="440" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="440" y="236" width="103" height="12" rx="4" fill="#16a34a"/><text x="570" y="249" class="num">+12.86%</text>
+    <rect x="620" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="620" y="236" width="63" height="12" rx="4" fill="#16a34a"/><text x="750" y="249" class="num">+7.91%</text>
+    <rect x="800" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="800" y="236" width="63" height="12" rx="4" fill="#16a34a"/><text x="930" y="249" class="num">+7.91%</text>
+    <text x="1000" y="250" class="meta">readback parity</text>
+  </g>
+
+  <g transform="translate(0,232)">
+    <rect x="52" y="222" width="1096" height="48" rx="6" fill="#f8fafc"/>
+    <text x="68" y="250" class="lane">Node ORT</text>
+    <text x="302" y="250" class="meta">1 lane</text>
+    <rect x="440" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="440" y="236" width="8" height="12" rx="4" fill="#16a34a"/><text x="570" y="249" class="num">+0.78%</text>
+    <rect x="620" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="620" y="236" width="16" height="12" rx="4" fill="#16a34a"/><text x="750" y="249" class="num">+1.99%</text>
+    <rect x="800" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="800" y="236" width="14" height="12" rx="4" fill="#16a34a"/><text x="930" y="249" class="num">+1.81%</text>
+    <text x="1000" y="250" class="meta">dispatch evidence</text>
+  </g>
+
+  <g transform="translate(0,290)">
+    <rect x="52" y="222" width="1096" height="48" rx="6" fill="#ffffff"/>
+    <text x="68" y="250" class="lane">Bun ORT</text>
+    <text x="302" y="250" class="meta">1 lane</text>
+    <rect x="440" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="440" y="236" width="7" height="12" rx="4" fill="#16a34a"/><text x="570" y="249" class="num">+0.54%</text>
+    <rect x="620" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="620" y="236" width="26" height="12" rx="4" fill="#16a34a"/><text x="750" y="249" class="num">+3.27%</text>
+    <rect x="800" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="800" y="236" width="28" height="12" rx="4" fill="#16a34a"/><text x="930" y="249" class="num">+3.53%</text>
+    <text x="1000" y="250" class="meta">strict comparable</text>
+  </g>
+
+  <g transform="translate(0,348)">
+    <rect x="52" y="222" width="1096" height="48" rx="6" fill="#f8fafc"/>
+    <text x="68" y="250" class="lane">Browser ORT</text>
+    <text x="302" y="250" class="meta">1 lane</text>
+    <rect x="440" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="440" y="236" width="6" height="12" rx="4" fill="#16a34a"/><text x="570" y="249" class="num">+0.35%</text>
+    <rect x="620" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="620" y="236" width="7" height="12" rx="4" fill="#16a34a"/><text x="750" y="249" class="num">+0.71%</text>
+    <rect x="800" y="236" width="120" height="12" rx="4" fill="#dcfce7"/><rect x="800" y="236" width="90" height="12" rx="4" fill="#16a34a"/><text x="930" y="249" class="num">+11.20%</text>
+    <text x="1000" y="250" class="meta">Doe baseline</text>
+  </g>
+
+  <text x="52" y="668" class="foot">Native rows show the worst workload win. Every row: strict comparable, zero non-comparable rows, coherence pass.</text>
+</svg>

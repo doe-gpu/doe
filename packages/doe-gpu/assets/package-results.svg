@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="300" viewBox="0 0 980 300" role="img" aria-labelledby="title desc">
+  <title id="title">doe-gpu package results on AMD Vulkan</title>
+  <desc id="desc">Doe is baseline. Positive p50, p95, and p99 percentages mean Doe is faster than the Dawn-backed package lane.</desc>
+  <defs>
+    <style>
+      text { font-family: Inter, Segoe UI, Helvetica Neue, Arial, sans-serif; letter-spacing: 0; fill: #111827; }
+      .title { font-size: 28px; font-weight: 800; }
+      .sub { font-size: 14px; fill: #475569; font-weight: 500; }
+      .head { font-size: 12px; fill: #64748b; font-weight: 800; }
+      .lane { font-size: 17px; font-weight: 800; }
+      .meta { font-size: 12px; fill: #64748b; font-weight: 700; }
+      .num { font-size: 14px; font-weight: 800; fill: #052e16; }
+      .chip { font-size: 13px; font-weight: 800; fill: #064e3b; }
+      .foot { font-size: 12px; fill: #64748b; font-weight: 600; }
+    </style>
+  </defs>
+  <rect width="980" height="300" fill="#f8fafc"/>
+  <rect x="18" y="18" width="944" height="264" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="42" y="58" class="title">doe-gpu package wins</text>
+  <text x="42" y="84" class="sub">AMD Vulkan host. Doe is baseline; positive deltas mean Doe is faster.</text>
+
+  <rect x="42" y="104" width="92" height="28" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="88" y="123" text-anchor="middle" class="chip">2/2 lanes</text>
+  <rect x="146" y="104" width="160" height="28" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="226" y="123" text-anchor="middle" class="chip">0 non-comparable</text>
+  <rect x="318" y="104" width="138" height="28" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="387" y="123" text-anchor="middle" class="chip">coherence pass</text>
+
+  <text x="48" y="166" class="head">Runtime</text>
+  <text x="230" y="166" class="head">Compare</text>
+  <text x="432" y="166" class="head">p50</text>
+  <text x="562" y="166" class="head">p95</text>
+  <text x="692" y="166" class="head">p99</text>
+  <text x="822" y="166" class="head">Gate</text>
+  <line x1="42" y1="178" x2="938" y2="178" stroke="#e2e8f0"/>
+
+  <rect x="42" y="192" width="896" height="42" rx="6" fill="#f8fafc"/>
+  <text x="58" y="218" class="lane">Node.js</text>
+  <text x="230" y="218" class="meta">Doe vs webgpu</text>
+  <text x="432" y="218" class="num">+12.25%</text>
+  <text x="562" y="218" class="num">+10.74%</text>
+  <text x="692" y="218" class="num">+10.74%</text>
+  <text x="822" y="218" class="meta">strict comparable</text>
+
+  <rect x="42" y="240" width="896" height="42" rx="6" fill="#ffffff"/>
+  <text x="58" y="266" class="lane">Bun</text>
+  <text x="230" y="266" class="meta">Doe vs bun-webgpu</text>
+  <text x="432" y="266" class="num">+12.86%</text>
+  <text x="562" y="266" class="num">+7.91%</text>
+  <text x="692" y="266" class="num">+7.91%</text>
+  <text x="822" y="266" class="meta">readback parity</text>
+
+  <text x="492" y="123" class="foot">Strict operation timing; no failed comparability obligations.</text>
+</svg>

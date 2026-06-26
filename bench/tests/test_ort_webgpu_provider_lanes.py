@@ -650,8 +650,8 @@ class BrowserOrtWebGpuCompareLaneTests(_BreadthLaneBase):
         / "bench"
         / "native-compare"
         / "compare.config.browser.ort-webgpu.json",
-        baseline_executor_id="browser_ort_webgpu_dawn",
-        comparison_executor_id="browser_ort_webgpu_doe",
+        baseline_executor_id="browser_ort_webgpu_doe",
+        comparison_executor_id="browser_ort_webgpu_dawn",
         expected_ids=(
             "browser_ort_webgpu_compare_sentiment",
             "browser_ort_webgpu_compare_sentiment_medium",

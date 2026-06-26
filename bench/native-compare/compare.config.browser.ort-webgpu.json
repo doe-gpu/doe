@@ -1,12 +1,12 @@
 {
   "workloads": "bench/workloads/workloads.browser.ort-webgpu-compare.json",
   "baseline": {
-    "name": "browser_ort_webgpu_dawn",
-    "executorId": "browser_ort_webgpu_dawn"
-  },
-  "comparison": {
     "name": "browser_ort_webgpu_doe",
     "executorId": "browser_ort_webgpu_doe"
+  },
+  "comparison": {
+    "name": "browser_ort_webgpu_dawn",
+    "executorId": "browser_ort_webgpu_dawn"
   },
   "run": {
     "iterations": 7,

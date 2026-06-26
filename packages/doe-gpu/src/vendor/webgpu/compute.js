@@ -464,6 +464,9 @@ function wrapDevice(raw) {
     queue: wrapQueue(raw.queue),
     limits: raw.limits,
     features: raw.features,
+    get adapterInfo() {
+      return raw.adapterInfo;
+    },
     get lost() {
       return raw.lost;
     },

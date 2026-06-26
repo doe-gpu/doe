@@ -117,6 +117,10 @@ pub const VulkanFeatureCaps = struct {
     subgroups: bool = false,
     subgroups_f16: bool = false,
     timeline_semaphore: bool = false,
+    subgroup_size_control: bool = false,
+    subgroup_min_size: u32 = 0,
+    subgroup_max_size: u32 = 0,
+    required_subgroup_size_stages: u32 = 0,
     texture_formats_tier1: bool = false,
     texture_formats_tier2: bool = false,
 };
@@ -125,12 +129,20 @@ pub const VulkanFeatureQuery = struct {
     caps: VulkanFeatureCaps = .{},
     enabled_features: c.VkPhysicalDeviceFeatures = std.mem.zeroes(c.VkPhysicalDeviceFeatures),
     enabled_storage16_features: c.VkPhysicalDevice16BitStorageFeatures = init_enabled_storage16_features(),
+    enabled_subgroup_size_control_features: c.VkPhysicalDeviceSubgroupSizeControlFeatures = init_enabled_subgroup_size_control_features(),
     enabled_vulkan12_features: c.VkPhysicalDeviceVulkan12Features = init_enabled_vulkan12_features(),
 };
 
 fn init_enabled_storage16_features() c.VkPhysicalDevice16BitStorageFeatures {
     var features = std.mem.zeroes(c.VkPhysicalDevice16BitStorageFeatures);
     features.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES;
+    features.pNext = null;
+    return features;
+}
+
+fn init_enabled_subgroup_size_control_features() c.VkPhysicalDeviceSubgroupSizeControlFeatures {
+    var features = std.mem.zeroes(c.VkPhysicalDeviceSubgroupSizeControlFeatures);
+    features.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_FEATURES;
     features.pNext = null;
     return features;
 }
@@ -144,8 +156,10 @@ fn init_enabled_vulkan12_features() c.VkPhysicalDeviceVulkan12Features {
 
 pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
     var raw_storage16_features = init_enabled_storage16_features();
+    var raw_subgroup_size_control_features = init_enabled_subgroup_size_control_features();
+    raw_subgroup_size_control_features.pNext = @ptrCast(&raw_storage16_features);
     var raw_vulkan12_features = init_enabled_vulkan12_features();
-    raw_vulkan12_features.pNext = @ptrCast(&raw_storage16_features);
+    raw_vulkan12_features.pNext = @ptrCast(&raw_subgroup_size_control_features);
     var raw_features2 = std.mem.zeroes(c.VkPhysicalDeviceFeatures2);
     raw_features2.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     raw_features2.pNext = @ptrCast(&raw_vulkan12_features);
@@ -154,9 +168,12 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
     var subgroup_properties = std.mem.zeroes(c.VkPhysicalDeviceSubgroupProperties);
     subgroup_properties.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES;
     subgroup_properties.pNext = null;
+    var subgroup_size_control_properties = std.mem.zeroes(c.VkPhysicalDeviceSubgroupSizeControlProperties);
+    subgroup_size_control_properties.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES;
+    subgroup_size_control_properties.pNext = @ptrCast(&subgroup_properties);
     var properties2 = std.mem.zeroes(c.VkPhysicalDeviceProperties2);
     properties2.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    properties2.pNext = @ptrCast(&subgroup_properties);
+    properties2.pNext = @ptrCast(&subgroup_size_control_properties);
     c.vkGetPhysicalDeviceProperties2(physical_device, &properties2);
 
     // Explicit override: DOE_DISABLE_SUBGROUPS=1 suppresses the WebGPU
@@ -180,6 +197,7 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
         (subgroup_properties.supportedOperations & VK_SUBGROUP_REQUIRED_OPERATIONS) == VK_SUBGROUP_REQUIRED_OPERATIONS and
         raw_vulkan12_features.subgroupBroadcastDynamicId == c.VK_TRUE;
     const has_timeline_semaphore = raw_vulkan12_features.timelineSemaphore == c.VK_TRUE;
+    const has_subgroup_size_control = raw_subgroup_size_control_features.subgroupSizeControl == c.VK_TRUE;
 
     const caps = VulkanFeatureCaps{
         .shader_f16 = has_shader_f16,
@@ -189,6 +207,10 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
         .subgroups_f16 = has_subgroups and has_shader_f16 and
             raw_vulkan12_features.shaderSubgroupExtendedTypes == c.VK_TRUE,
         .timeline_semaphore = has_timeline_semaphore,
+        .subgroup_size_control = has_subgroup_size_control,
+        .subgroup_min_size = subgroup_size_control_properties.minSubgroupSize,
+        .subgroup_max_size = subgroup_size_control_properties.maxSubgroupSize,
+        .required_subgroup_size_stages = subgroup_size_control_properties.requiredSubgroupSizeStages,
         .texture_formats_tier1 = supports_all_formats(physical_device, &TIER1_STORAGE_FORMATS, supports_storage_image),
         .texture_formats_tier2 = false,
     };
@@ -219,6 +241,9 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
     }
     if (resolved_caps.timeline_semaphore) {
         query_result.enabled_vulkan12_features.timelineSemaphore = c.VK_TRUE;
+    }
+    if (resolved_caps.subgroup_size_control) {
+        query_result.enabled_subgroup_size_control_features.subgroupSizeControl = c.VK_TRUE;
     }
     return query_result;
 }

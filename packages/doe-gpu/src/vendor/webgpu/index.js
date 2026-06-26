@@ -2443,6 +2443,7 @@ const fullSurfaceBackend = {
       device.queue.label = descriptor?.defaultQueue?.label ?? '';
     }
     device._adapter = adapter;
+    device._adapterInfo = adapter.info;
     installNodeDeviceCallbacks(device);
     return device;
   },
