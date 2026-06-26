@@ -18,6 +18,11 @@ const JETSTREAM_BUILD_ROOT = resolve(
   ROOT,
   "browser/chromium/src/third_party/jetstream/main/transformersjs/build",
 );
+const JETSTREAM_LANE_VOLUME_BUILD_ROOT = resolve(
+  ROOT,
+  "browser/chromium_webgpu_lane/.local_volume/chromium_webgpu_lane/src/third_party/jetstream/main/transformersjs/build",
+);
+const BROWSER_ORT_ASSET_PREFIX = "/__doe_browser_ort_assets/";
 const ORT_BROWSER_DIST_ROOT = resolve(
   ROOT,
   "bench/node_modules/onnxruntime-web/dist",
@@ -163,6 +168,22 @@ function defaultDoeLibPath() {
   return candidates[0];
 }
 
+function defaultJetstreamBuildRoot() {
+  const envJetstreamBuild = process.env.FAWN_TRANSFORMERSJS_BUILD;
+  const candidates = [
+    envJetstreamBuild,
+    JETSTREAM_BUILD_ROOT,
+    JETSTREAM_LANE_VOLUME_BUILD_ROOT,
+  ].filter((value) => typeof value === "string" && value.length > 0);
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return candidates[0];
+}
+
 function usage() {
   console.log(`Usage:
   node browser/chromium/scripts/webgpu-playwright-ort-bench.mjs [options]
@@ -171,6 +192,8 @@ Options:
   --mode dawn|doe|auto|both Runtime mode to run (default: both)
   --chrome PATH             Chrome binary path
   --doe-lib PATH            libwebgpu_doe_full.{so,dylib,dll} path (for doe mode)
+  --transformersjs-build PATH
+                            Transformers.js browser build root
   --runtime-selector-policy PATH
                             Runtime selector policy JSON path (default: config/browser-runtime-selector-policy.json)
   --runtime-selector-profile-id ID
@@ -252,6 +275,7 @@ function parseArgs(argv) {
     mode: "both",
     chromePath: defaultChromePath(),
     doeLibPath: defaultDoeLibPath(),
+    jetstreamBuildRoot: defaultJetstreamBuildRoot(),
     runtimeSelectorPolicyPath: DEFAULT_RUNTIME_SELECTOR_POLICY,
     runtimeSelectorPolicy: null,
     runtimeSelectorProfileId: "",
@@ -284,6 +308,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === "--doe-lib") {
       args.doeLibPath = readOptionValue(argv, i, "--doe-lib");
+      i += 1;
+    } else if (token === "--transformersjs-build") {
+      args.jetstreamBuildRoot = readOptionValue(argv, i, "--transformersjs-build");
       i += 1;
     } else if (token === "--runtime-selector-policy") {
       args.runtimeSelectorPolicyPath = readOptionValue(argv, i, "--runtime-selector-policy");
@@ -336,8 +363,8 @@ function parseArgs(argv) {
   if ((args.mode === "doe" || args.mode === "both") && !existsSync(args.doeLibPath)) {
     throw new Error(`doe runtime library not found: ${args.doeLibPath}`);
   }
-  if (!existsSync(JETSTREAM_BUILD_ROOT)) {
-    throw new Error(`Transformers.js browser build not found: ${JETSTREAM_BUILD_ROOT}`);
+  if (!existsSync(args.jetstreamBuildRoot)) {
+    throw new Error(`Transformers.js browser build not found: ${args.jetstreamBuildRoot}`);
   }
   if (!existsSync(ORT_BROWSER_WEBGPU_MODULE_PATH)) {
     throw new Error(`onnxruntime-web WebGPU module not found: ${ORT_BROWSER_WEBGPU_MODULE_PATH}`);
@@ -374,11 +401,19 @@ function htmlPage() {
   return "<!doctype html><meta charset='utf-8'><title>doe-webgpu-ort-bench</title>";
 }
 
-function aliasPathForRequest(requestPath) {
+function aliasPathForRequest(requestPath, args) {
+  if (requestPath.startsWith(BROWSER_ORT_ASSET_PREFIX)) {
+    const relativeAssetPath = requestPath.slice(BROWSER_ORT_ASSET_PREFIX.length);
+    const absoluteAssetPath = resolve(args.jetstreamBuildRoot, relativeAssetPath);
+    if (!pathWithin(absoluteAssetPath, args.jetstreamBuildRoot)) {
+      return null;
+    }
+    return absoluteAssetPath;
+  }
   return resolve(ROOT, requestPath.replace(/^\/+/, ""));
 }
 
-function startLocalServer() {
+function startLocalServer(args) {
   const server = http.createServer((req, res) => {
     const requestPath = new URL(req.url ?? "/", "http://127.0.0.1").pathname;
     const headers = {
@@ -388,8 +423,14 @@ function startLocalServer() {
       "Cache-Control": "no-store",
     };
     if (requestPath !== "/") {
-      const absolutePath = aliasPathForRequest(requestPath);
-      if (!pathWithin(absolutePath, ROOT)) {
+      const absolutePath = aliasPathForRequest(requestPath, args);
+      if (absolutePath === null) {
+        res.writeHead(404, headers);
+        res.end("not found");
+        return;
+      }
+      const requestUsesAssetAlias = requestPath.startsWith(BROWSER_ORT_ASSET_PREFIX);
+      if (!requestUsesAssetAlias && !pathWithin(absolutePath, ROOT)) {
         res.writeHead(404, headers);
         res.end("not found");
         return;
@@ -537,6 +578,28 @@ function runtimeArtifactIdentity(mode, args) {
   };
 }
 
+function browserOrtSourceIdentity(args) {
+  const taskConfig = taskDefinition(args.task);
+  const transformersModulePath = resolve(args.jetstreamBuildRoot, "transformers.js");
+  const modelPath = resolve(
+    args.jetstreamBuildRoot,
+    "models",
+    taskConfig.modelId,
+    "onnx",
+    "model_uint8.onnx",
+  );
+  return {
+    transformersjsBuildRoot: args.jetstreamBuildRoot,
+    transformersModulePath,
+    transformersModuleSha256: fileHashHex(transformersModulePath),
+    ortWebGpuModulePath: ORT_BROWSER_WEBGPU_MODULE_PATH,
+    ortWebGpuModuleSha256: fileHashHex(ORT_BROWSER_WEBGPU_MODULE_PATH),
+    modelId: taskConfig.modelId,
+    modelPath,
+    modelSha256: fileHashHex(modelPath),
+  };
+}
+
 function runtimeSelectionResolution(mode, args) {
   return resolveRuntimeSelection({
     requestedMode: mode,
@@ -592,14 +655,14 @@ function taskDefinition(taskId) {
 
 function modelBaseUrl(baseUrl) {
   return new URL(
-    "/browser/chromium/src/third_party/jetstream/main/transformersjs/build/models/",
+    `${BROWSER_ORT_ASSET_PREFIX}models/`,
     baseUrl,
   ).href;
 }
 
 function transformersModuleUrl(baseUrl) {
   return new URL(
-    "/browser/chromium/src/third_party/jetstream/main/transformersjs/build/transformers.js",
+    `${BROWSER_ORT_ASSET_PREFIX}transformers.js`,
     baseUrl,
   ).href;
 }
@@ -828,7 +891,7 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
             () => AutoTokenizer.from_pretrained(taskConfig.modelId, { local_files_only: true }),
           );
           const modelPath = new URL(
-            `/browser/chromium/src/third_party/jetstream/main/transformersjs/build/models/${taskConfig.modelId}/onnx/model_uint8.onnx`,
+            `${taskConfig.modelId}/onnx/model_uint8.onnx`,
             modelBaseUrlValue,
           ).href;
           const loadStarted = performance.now();
@@ -970,6 +1033,7 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
       webgpuDispatchWorkgroupsIndirect: result.webgpuDispatchWorkgroupsIndirect,
       webgpuQueueSubmitCount: result.webgpuQueueSubmitCount,
       webgpuAvailable: result.webgpuAvailable,
+      browserOrtSourceIdentity: browserOrtSourceIdentity(args),
     };
   } catch (error) {
     if (browser) {
@@ -1036,6 +1100,8 @@ function buildReport(args, serverInfo, modeResults) {
     headless: args.headless,
     chromePath: args.chromePath,
     doeLibPath: args.mode === "dawn" ? null : args.doeLibPath,
+    transformersjsBuildRoot: args.jetstreamBuildRoot,
+    browserOrtSourceIdentity: browserOrtSourceIdentity(args),
     localServerUrl: serverInfo.url,
     timingClass: "process-wall",
     hashAlgorithm: HASH_ALGORITHM,
@@ -1069,7 +1135,7 @@ function printSummary(report) {
 async function main() {
   const args = parseArgs(process.argv);
   const chromium = await loadChromiumDriver();
-  const serverInfo = await startLocalServer();
+  const serverInfo = await startLocalServer(args);
   try {
     const modes = args.mode === "both" ? ["dawn", "doe"] : [args.mode];
     const modeResults = [];

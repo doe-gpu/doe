@@ -223,6 +223,11 @@ def _trace_meta(
         "browserTaskConfig": report.get("taskConfig"),
         "timingClass": "operation",
         "browserVersion": mode_report.get("browserVersion"),
+        "browserOrtSourceIdentity": mode_report.get("browserOrtSourceIdentity")
+        or report.get("browserOrtSourceIdentity"),
+        "runtimeSelection": mode_report.get("runtimeSelection"),
+        "shaderCompilerIdentity": mode_report.get("shaderCompilerIdentity"),
+        "transformersjsBuildRoot": report.get("transformersjsBuildRoot"),
         "phaseTimingsMs": {
             "pipelineLoadMs": mode_report.get("pipelineLoadMs"),
             "timedMeanMs": mode_report.get("timedMeanMs"),

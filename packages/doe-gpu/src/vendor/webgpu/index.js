@@ -1722,6 +1722,12 @@ const nodeEncoderBackend = {
     if (encoder._native == null) {
       const commands = encoder._commands;
       encoder._commands = [];
+      if (commands.length > 0) {
+        const nativeCommandBuffer = finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands);
+        if (nativeCommandBuffer) {
+          return { _native: nativeCommandBuffer, _batched: false };
+        }
+      }
       return { _commands: commands, _batched: true };
     }
     const cmd = addon.commandEncoderFinish(encoder._native);

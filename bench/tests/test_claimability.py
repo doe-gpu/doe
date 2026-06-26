@@ -72,7 +72,71 @@ def make_timing_interpretation(
     }
 
 
+def strict_audited_comparability() -> dict[str, object]:
+    obligation_ids = [
+        "baseline_comparison_trace_meta_source_match",
+        "baseline_comparison_timing_selection_policy_match",
+        "baseline_comparison_queue_sync_mode_match",
+        "baseline_comparison_execution_shape_match",
+        "baseline_comparison_hardware_path_match",
+        "baseline_execution_evidence_present",
+        "baseline_successful_execution_present",
+        "baseline_execution_errors_absent",
+        "comparison_execution_errors_absent",
+    ]
+    return {
+        "comparable": True,
+        "blockingFailedObligations": [],
+        "advisoryFailedObligations": [],
+        "obligations": [
+            {
+                "id": obligation_id,
+                "applicable": True,
+                "blocking": True,
+                "passes": True,
+            }
+            for obligation_id in obligation_ids
+        ],
+    }
+
+
 class ClaimabilityMetricScopeTests(unittest.TestCase):
+    def test_claim_ineligible_workload_is_not_evaluated(self) -> None:
+        workload = SimpleNamespace(
+            id="compute_dispatch_grid",
+            domain="compute",
+            claim_eligible=False,
+            path_asymmetry=False,
+            path_asymmetry_note="",
+        )
+
+        claimability = assess_claimability(
+            mode="local",
+            min_timed_samples=19,
+            workload=workload,
+            baseline={"stats": make_stats(0.1, 0.11), "commandSamples": []},
+            comparison={"stats": make_stats(20.0, 21.0), "commandSamples": []},
+            delta={
+                "p50Percent": 99.5,
+                "p95Percent": 99.47,
+                "p99Percent": 99.47,
+            },
+            timing_interpretation={
+                "selectedTiming": {
+                    "scope": "operation-total",
+                    "scopeClass": "operation-total",
+                },
+                "workloadUnitWall": {"available": False},
+            },
+            comparability={"comparable": True},
+            benchmark_policy=BENCHMARK_POLICY,
+        )
+
+        self.assertFalse(claimability["evaluated"])
+        self.assertTrue(claimability["claimable"])
+        self.assertEqual(claimability["reasons"], [])
+        self.assertEqual(claimability["skipReason"], "claimEligible=false")
+
     def _compute_prewarm_samples(self, *, elapsed_ms: float, measured_ms: float) -> list[dict[str, object]]:
         return [
             {
@@ -652,6 +716,42 @@ class ClaimabilityMetricScopeTests(unittest.TestCase):
             any("fairness-audit threshold" in r for r in claimability["reasons"]),
             f"expected suspicious-speedup reason, got: {claimability['reasons']}",
         )
+
+    def test_suspicious_speedup_passes_with_strict_comparability_audit(self) -> None:
+        workload = SimpleNamespace(
+            id="upload_write_buffer_64kb_staged",
+            domain="upload",
+            path_asymmetry=False,
+            path_asymmetry_note="",
+        )
+        left = {"stats": make_stats(0.1, 0.11), "commandSamples": []}
+        right = {"stats": make_stats(20.0, 21.0), "commandSamples": []}
+        timing_interpretation = {
+            "selectedTiming": {
+                "scope": "operation-total",
+                "scopeClass": "operation-total",
+            },
+            "workloadUnitWall": {"available": False},
+        }
+
+        claimability = assess_claimability(
+            mode="local",
+            min_timed_samples=19,
+            workload=workload,
+            baseline=left,
+            comparison=right,
+            delta={
+                "p50Percent": 99.5,
+                "p95Percent": 99.47,
+                "p99Percent": 99.47,
+            },
+            timing_interpretation=timing_interpretation,
+            comparability=strict_audited_comparability(),
+            benchmark_policy=BENCHMARK_POLICY,
+        )
+
+        self.assertTrue(claimability["claimable"], f"reasons: {claimability['reasons']}")
+        self.assertTrue(claimability["auditNotes"])
 
     def test_does_not_switch_when_headline_tail_is_not_positive(self) -> None:
         workload = SimpleNamespace(

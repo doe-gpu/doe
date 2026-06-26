@@ -1,4 +1,5 @@
 const kWorkgroupSize : u32 = 256u;
+const kWorkgroupMask : u32 = kWorkgroupSize - 1u;
 
 @group(0) @binding(0) var<storage, read_write> outVal : array<u32>;
 var<workgroup> wg: array<u32, kWorkgroupSize>;
@@ -13,7 +14,7 @@ fn main(
   workgroupBarrier();
 
   for (var i : u32 = 0u; i < kWorkgroupSize; i = i + 1u) {
-    accum = wg[(i + accum) % kWorkgroupSize];
+    accum = wg[(i + accum) & kWorkgroupMask];
   }
 
   workgroupBarrier();

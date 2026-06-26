@@ -133,6 +133,8 @@ const EMPTY_ADAPTER_INFO = Object.freeze({
     subgroupMinSize: 0,
     subgroupMaxSize: 0,
 });
+const METAL_WEBGPU_SUBGROUP_MIN_SIZE = 4;
+const METAL_WEBGPU_SUBGROUP_MAX_SIZE = 64;
 const SAMPLER_BINDING_TYPE = Object.freeze({
     filtering: 2,
     "non-filtering": 3,
@@ -2540,8 +2542,12 @@ function readAdapterInfo(native) {
             architecture: decodeCString(Number(archOut[0] ?? 0n)),
             device: decodeCString(Number(deviceOut[0] ?? 0n)),
             description: decodeCString(Number(descOut[0] ?? 0n)),
-            subgroupMinSize: 32,
-            subgroupMaxSize: 32,
+            subgroupMinSize: process.platform === "darwin"
+                ? METAL_WEBGPU_SUBGROUP_MIN_SIZE
+                : 32,
+            subgroupMaxSize: process.platform === "darwin"
+                ? METAL_WEBGPU_SUBGROUP_MAX_SIZE
+                : 32,
         });
     } finally {
         if (block !== 0) {

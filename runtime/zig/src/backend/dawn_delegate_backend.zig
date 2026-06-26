@@ -6,6 +6,7 @@ const webgpu = @import("../webgpu_backend.zig");
 const backend_ids = @import("backend_ids.zig");
 const backend_iface = @import("backend_iface.zig");
 const backend_telemetry = @import("backend_telemetry.zig");
+const submit_count_policy = @import("common/submit_count_policy.zig");
 
 const model = struct {
     pub const Command = model_commands.Command;
@@ -58,15 +59,6 @@ pub const DawnDelegateBackend = struct {
     }
 };
 
-fn estimate_selected_submit_count(command: model.Command, result: webgpu.NativeExecutionResult) ?u32 {
-    if (result.status != .ok) return null;
-    return switch (command) {
-        .kernel_dispatch, .dispatch, .dispatch_indirect => if (result.dispatch_count > 0) 1 else 0,
-        .upload, .buffer_write, .copy_buffer_to_texture, .barrier, .render_draw, .draw_indirect, .draw_indexed_indirect, .render_pass, .texture_write, .texture_query, .texture_destroy => if (result.submit_wait_ns > 0) 1 else 0,
-        else => null,
-    };
-}
-
 fn cast(ctx: *anyopaque) *DawnDelegateBackend {
     return @as(*DawnDelegateBackend, @ptrCast(@alignCast(ctx)));
 }
@@ -82,7 +74,7 @@ fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.Nati
     const self = cast(ctx);
     self.last_submit_count = null;
     const result = try self.inner.executeCommand(command);
-    self.last_submit_count = estimate_selected_submit_count(command, result);
+    self.last_submit_count = submit_count_policy.selectedCommandSubmitCount(command, result);
     return result;
 }
 
@@ -90,7 +82,7 @@ fn execute_buffer_write_bytes(ctx: *anyopaque, handle: u64, offset: u64, buffer_
     const self = cast(ctx);
     self.last_submit_count = null;
     const result = try self.inner.executeBufferWriteBytes(handle, offset, buffer_size, data);
-    self.last_submit_count = if (result.status == .ok and result.submit_wait_ns > 0) 1 else 0;
+    self.last_submit_count = submit_count_policy.selectedKindSubmitCount(.buffer_write, result);
     return result;
 }
 

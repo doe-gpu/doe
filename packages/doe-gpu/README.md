@@ -33,17 +33,15 @@ npm install doe-gpu
 ## Current evidence
 
 End-to-end Gemma 3 inference evidence compares Doe-backed WebGPU with
-Dawn-backed WebGPU on the same host lane: Node.js through `webgpu`, and Bun
-through `bun-webgpu`. Positive percentages mean the Doe-backed lane finished
-faster.
+Dawn-backed WebGPU on the same Apple Metal host lane: Node.js through `webgpu`,
+and Bun through `bun-webgpu`. Positive percentages mean the Doe-backed lane
+finished faster.
 
 ![doe-gpu benchmark claims](https://raw.githubusercontent.com/doerun/doe/main/assets/readme/package-claims.svg)
 
 Outputs:
-- [Node package, AMD Vulkan](https://github.com/doerun/doe/blob/main/bench/out/amd-vulkan/20260410T235522Z/gemma270m.node-package.ir.compare.json)
-- [Bun package, AMD Vulkan](https://github.com/doerun/doe/blob/main/bench/out/amd-vulkan/20260410T235541Z/gemma270m.bun-package.ir.compare.json)
-- [Node package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260414T010826Z/gemma64.node-package.warm.ir.compare.json)
-- [Bun package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260414T010736Z/gemma64.bun-package.warm.ir.compare.json)
+- [Node package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json)
+- [Bun package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json)
 
 ## Additional benchmark outputs
 

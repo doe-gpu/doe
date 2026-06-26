@@ -1,4 +1,5 @@
 const kBufferSize : u32 = 1024u;
+const kBufferMask : u32 = kBufferSize - 1u;
 
 @group(0) @binding(0) var<storage, read_write> inout_data : array<u32, kBufferSize>;
 var<workgroup> wg_data : array<u32, kBufferSize>;
@@ -12,7 +13,7 @@ fn main() {
   }
 
   for (var i : u32 = 0u; i < 1000000u; i = i + 1u) {
-    let idx = (i + accum) % kBufferSize;
+    let idx = (i + accum) & kBufferMask;
     accum = (accum ^ wg_data[idx]) + 123u;
   }
 

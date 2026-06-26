@@ -13,6 +13,8 @@ from bench.gates.claim_package_telemetry import (
     required_comparability_obligation_ids_for_workload,
 )
 from bench.gates.claim_speed_policy import suspicious_speedup_failures
+from bench.gates.claim_speed_policy import claimable_speed_failures
+from native_compare_modules.claimability import SUSPICIOUS_SPEEDUP_AUDIT_NOTE
 
 
 def _doe_package_meta() -> dict:
@@ -94,6 +96,34 @@ def _comparability(
                 }
             ],
         }
+    }
+
+
+def _strict_audited_comparability() -> dict:
+    obligation_ids = [
+        "baseline_comparison_trace_meta_source_match",
+        "baseline_comparison_timing_selection_policy_match",
+        "baseline_comparison_queue_sync_mode_match",
+        "baseline_comparison_execution_shape_match",
+        "baseline_comparison_hardware_path_match",
+        "baseline_execution_evidence_present",
+        "baseline_successful_execution_present",
+        "baseline_execution_errors_absent",
+        "comparison_execution_errors_absent",
+    ]
+    return {
+        "comparable": True,
+        "blockingFailedObligations": [],
+        "advisoryFailedObligations": [],
+        "obligations": [
+            {
+                "id": obligation_id,
+                "blocking": True,
+                "applicable": True,
+                "passes": True,
+            }
+            for obligation_id in obligation_ids
+        ],
     }
 
 
@@ -368,6 +398,121 @@ class ClaimGateTests(unittest.TestCase):
             any("fairness-audit threshold" in failure for failure in failures),
             f"expected suspicious-speedup failure, got: {failures}",
         )
+
+    def test_claimable_speed_skips_claim_ineligible_row(self) -> None:
+        failures = claimable_speed_failures(
+            workload_id="compute_dispatch_fallback",
+            workload={
+                "claimEligible": False,
+                "claimability": {
+                    "evaluated": False,
+                    "claimable": True,
+                    "claimMetricField": "",
+                    "claimMetricScope": "notEvaluated",
+                    "requiredPositivePercentiles": [],
+                    "skipReason": "claimEligible=false",
+                    "reasons": [],
+                },
+            },
+            expected_required_percentiles=["p50Percent", "p95Percent"],
+            min_timed_samples=15,
+            suspicious_speedup_ratio=10.0,
+        )
+
+        self.assertEqual(failures, [])
+
+    def test_claimable_speed_rejects_invalid_claim_ineligible_skip(self) -> None:
+        failures = claimable_speed_failures(
+            workload_id="compute_dispatch_fallback",
+            workload={
+                "claimEligible": True,
+                "claimability": {
+                    "evaluated": False,
+                    "claimable": True,
+                    "claimMetricField": "",
+                    "claimMetricScope": "notEvaluated",
+                    "requiredPositivePercentiles": [],
+                    "skipReason": "claimEligible=false",
+                    "reasons": [],
+                },
+            },
+            expected_required_percentiles=["p50Percent", "p95Percent"],
+            min_timed_samples=15,
+            suspicious_speedup_ratio=10.0,
+        )
+
+        self.assertIn(
+            "compute_dispatch_fallback: unevaluated claimability requires report claimEligible=false",
+            failures,
+        )
+
+    def test_claimable_speed_uses_workload_unit_wall_claim_metric(self) -> None:
+        failures = claimable_speed_failures(
+            workload_id="upload_write_buffer_1mb_staged",
+            workload={
+                "baselineStatsMs": {"count": 16, "p50Ms": 0.01, "p95Ms": 0.01},
+                "comparisonStatsMs": {"count": 16, "p50Ms": 0.01, "p95Ms": 0.01},
+                "deltaPercent": {"p50Percent": -5.0, "p95Percent": -1.0},
+                "timingInterpretation": {
+                    "workloadUnitWall": {
+                        "baselineStatsMs": {"count": 16, "p50Ms": 1.0, "p95Ms": 1.1},
+                        "comparisonStatsMs": {"count": 16, "p50Ms": 2.0, "p95Ms": 2.1},
+                        "deltaPercent": {"p50Percent": 50.0, "p95Percent": 47.0},
+                    },
+                },
+                "claimability": {
+                    "evaluated": True,
+                    "claimable": True,
+                    "claimMetricField": "timingInterpretation.workloadUnitWall.deltaPercent",
+                    "claimMetricScope": "workloadUnitWall",
+                    "requiredPositivePercentiles": ["p50Percent", "p95Percent"],
+                    "reasons": [],
+                },
+            },
+            expected_required_percentiles=["p50Percent", "p95Percent"],
+            min_timed_samples=15,
+            suspicious_speedup_ratio=10.0,
+        )
+
+        self.assertEqual(failures, [])
+
+    def test_claimable_speed_accepts_audited_suspicious_speedup(self) -> None:
+        failures = claimable_speed_failures(
+            workload_id="upload_write_buffer_1kb_staged",
+            workload={
+                "pathAsymmetry": False,
+                "baselineStatsMs": {
+                    "count": 16,
+                    "p50Ms": 0.1,
+                    "p95Ms": 0.11,
+                    "p99Ms": 0.11,
+                    "meanMs": 0.1,
+                },
+                "comparisonStatsMs": {
+                    "count": 16,
+                    "p50Ms": 20.0,
+                    "p95Ms": 21.0,
+                    "p99Ms": 21.0,
+                    "meanMs": 20.0,
+                },
+                "deltaPercent": {"p50Percent": 99.0, "p95Percent": 99.0},
+                "comparability": _strict_audited_comparability(),
+                "claimability": {
+                    "evaluated": True,
+                    "claimable": True,
+                    "claimMetricField": "deltaPercent",
+                    "claimMetricScope": "selectedTiming",
+                    "requiredPositivePercentiles": ["p50Percent", "p95Percent"],
+                    "auditNotes": [SUSPICIOUS_SPEEDUP_AUDIT_NOTE],
+                    "reasons": [],
+                },
+            },
+            expected_required_percentiles=["p50Percent", "p95Percent"],
+            min_timed_samples=15,
+            suspicious_speedup_ratio=10.0,
+        )
+
+        self.assertEqual(failures, [])
 
 
 if __name__ == "__main__":

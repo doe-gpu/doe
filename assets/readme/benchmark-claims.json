@@ -1,78 +1,64 @@
 {
   "packageClaims": {
-    "title": "Published package compare lanes",
-    "subtitle": "Current public package compare lanes, shown as artifact-backed Doe versus Dawn timings.",
-    "caption": "Package compare claims",
+    "title": "Apple Metal package compare lanes",
+    "subtitle": "Fresh strict-comparable Doe-baseline package lanes on macOS Metal.",
+    "caption": "Apple Metal package compare claims",
     "rows": [
       {
         "label": "Node package",
-        "platform": "AMD Vulkan",
-        "baselineLabel": "Doe",
-        "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/amd-vulkan/20260410T235522Z/gemma270m.node-package.ir.compare.json"
-      },
-      {
-        "label": "Bun package",
-        "platform": "AMD Vulkan",
-        "baselineLabel": "Doe",
-        "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/amd-vulkan/20260410T235541Z/gemma270m.bun-package.ir.compare.json"
-      },
-      {
-        "label": "Node package",
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
         "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/apple-metal/20260414T010826Z/gemma64.node-package.warm.ir.compare.json"
+        "artifactPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json"
       },
       {
         "label": "Bun package",
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
         "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/apple-metal/20260414T010736Z/gemma64.bun-package.warm.ir.compare.json"
+        "artifactPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json"
       }
     ]
   },
   "ortClaims": {
-    "title": "Additional ORT compare lanes",
-    "subtitle": "Current ORT compare lanes, shown as artifact-backed Doe versus ORT WebGPU timings.",
-    "caption": "ORT compare claims",
+    "title": "Apple Metal native and ORT lanes",
+    "subtitle": "Fresh strict-comparable Doe-baseline native, ORT, and browser lanes on macOS Metal.",
+    "caption": "Apple Metal native and ORT compare claims",
     "rows": [
       {
-        "label": "Native ORT",
-        "platform": "AMD Vulkan",
+        "label": "Native strict",
+        "platform": "Apple Metal",
         "baselineLabel": "Doe",
-        "comparisonLabel": "ORT WebGPU",
-        "artifactPath": "bench/out/native-ort-webgpu-provider/20260413T175708Z/basic-ops.compare.json"
+        "comparisonLabel": "Dawn",
+        "artifactPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json"
       },
       {
-        "label": "Node ORT",
-        "platform": "AMD Vulkan",
+        "label": "Native release",
+        "platform": "Apple Metal",
         "baselineLabel": "Doe",
-        "comparisonLabel": "ORT WebGPU",
-        "artifactPath": "bench/out/node-ort-webgpu-provider-compare/20260413T191817Z/gemma270m.compare.json"
-      },
-      {
-        "label": "Bun ORT",
-        "platform": "AMD Vulkan",
-        "baselineLabel": "Doe",
-        "comparisonLabel": "ORT WebGPU",
-        "artifactPath": "bench/out/bun-ort-webgpu-provider-compare/gemma270m-prefill32-decode1.compare.json"
+        "comparisonLabel": "Dawn",
+        "artifactPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json"
       },
       {
         "label": "Node ORT",
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
-        "comparisonLabel": "ORT WebGPU",
-        "artifactPath": "bench/out/apple-metal-ort-node/20260415T005827Z/gemma270m.compare.json"
+        "comparisonLabel": "Dawn",
+        "artifactPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.compare.json"
       },
       {
         "label": "Bun ORT",
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
-        "comparisonLabel": "ORT WebGPU",
-        "artifactPath": "bench/out/apple-metal-ort-bun/20260415T005827Z/gemma270m-prefill32-decode1.compare.json"
+        "comparisonLabel": "Dawn",
+        "artifactPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.compare.json"
+      },
+      {
+        "label": "Browser ORT",
+        "platform": "Apple Metal",
+        "baselineLabel": "Doe",
+        "comparisonLabel": "Dawn",
+        "artifactPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
       }
     ]
   }

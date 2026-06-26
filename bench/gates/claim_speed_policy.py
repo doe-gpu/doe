@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from native_compare_modules.claimability import assess_suspicious_speedup
+from native_compare_modules.claimability import (
+    SUSPICIOUS_SPEEDUP_AUDIT_NOTE,
+    assess_suspicious_speedup,
+    suspicious_speedup_audit_passes,
+)
 
 
 RELEASE_REQUIRED_POSITIVE_PERCENTILES = ["p50Percent", "p95Percent", "p99Percent"]
@@ -53,6 +57,126 @@ def suspicious_speedup_failures(
     ]
 
 
+def _claimability_object(workload: dict[str, Any]) -> dict[str, Any]:
+    claimability = workload.get("claimability")
+    return claimability if isinstance(claimability, dict) else {}
+
+
+def _string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str) and item]
+
+
+def _claimability_reasons_empty(claimability: dict[str, Any]) -> bool:
+    reasons = claimability.get("reasons")
+    return isinstance(reasons, list) and not reasons
+
+
+def claimability_skip_failures(
+    *,
+    workload_id: str,
+    workload: dict[str, Any],
+) -> tuple[list[str], bool]:
+    """Return validation failures and whether speed checks should run."""
+    claimability = _claimability_object(workload)
+    if claimability.get("evaluated") is not False:
+        return [], True
+
+    failures: list[str] = []
+    skip_reason = claimability.get("skipReason")
+    if skip_reason != "claimEligible=false":
+        failures.append(
+            f"{workload_id}: unevaluated claimability requires skipReason=claimEligible=false"
+        )
+    if workload.get("claimEligible") is not False:
+        failures.append(
+            f"{workload_id}: unevaluated claimability requires report claimEligible=false"
+        )
+    if claimability.get("claimable") is not True:
+        failures.append(
+            f"{workload_id}: claim-ineligible skipped row must remain claimable"
+        )
+    if claimability.get("claimMetricField") not in ("", None):
+        failures.append(
+            f"{workload_id}: unevaluated claimability requires empty claimMetricField"
+        )
+    if claimability.get("claimMetricScope") != "notEvaluated":
+        failures.append(
+            f"{workload_id}: unevaluated claimability requires claimMetricScope=notEvaluated"
+        )
+    if _string_list(claimability.get("requiredPositivePercentiles")):
+        failures.append(
+            f"{workload_id}: unevaluated claimability requires no requiredPositivePercentiles"
+        )
+    if not _claimability_reasons_empty(claimability):
+        failures.append(f"{workload_id}: unevaluated claimability requires no reasons")
+    return failures, False
+
+
+def _claim_metric_payload(
+    *,
+    workload_id: str,
+    workload: dict[str, Any],
+    claimability: dict[str, Any],
+) -> tuple[list[str], dict[str, Any], dict[str, Any], dict[str, Any]]:
+    scope = str(claimability.get("claimMetricScope", ""))
+    field = str(claimability.get("claimMetricField", ""))
+    if field == "deltaPercent" or scope == "selectedTiming":
+        baseline_stats = workload.get("baselineStatsMs", {})
+        comparison_stats = workload.get("comparisonStatsMs", {})
+        delta = workload.get("deltaPercent", {})
+    elif (
+        field == "timingInterpretation.workloadUnitWall.deltaPercent"
+        or scope == "workloadUnitWall"
+    ):
+        timing_interpretation = workload.get("timingInterpretation")
+        if not isinstance(timing_interpretation, dict):
+            timing_interpretation = {}
+        workload_unit_wall = timing_interpretation.get("workloadUnitWall")
+        if not isinstance(workload_unit_wall, dict):
+            workload_unit_wall = {}
+        baseline_stats = workload_unit_wall.get("baselineStatsMs", {})
+        comparison_stats = workload_unit_wall.get("comparisonStatsMs", {})
+        delta = workload_unit_wall.get("deltaPercent", {})
+    else:
+        return [
+            f"{workload_id}: unsupported claim metric "
+            f"field={field!r} scope={scope!r}"
+        ], {}, {}, {}
+
+    failures: list[str] = []
+    if not isinstance(baseline_stats, dict):
+        failures.append(f"{workload_id}: claim metric baselineStatsMs missing/invalid")
+        baseline_stats = {}
+    if not isinstance(comparison_stats, dict):
+        failures.append(f"{workload_id}: claim metric comparisonStatsMs missing/invalid")
+        comparison_stats = {}
+    if not isinstance(delta, dict):
+        failures.append(f"{workload_id}: claim metric deltaPercent missing/invalid")
+        delta = {}
+    return failures, baseline_stats, comparison_stats, delta
+
+
+def _suspicious_speedup_is_audited(
+    *,
+    workload: dict[str, Any],
+    claimability: dict[str, Any],
+) -> bool:
+    if claimability.get("claimable") is not True:
+        return False
+    if not _claimability_reasons_empty(claimability):
+        return False
+    if SUSPICIOUS_SPEEDUP_AUDIT_NOTE not in _string_list(claimability.get("auditNotes")):
+        return False
+    if workload.get("pathAsymmetry") is True:
+        return False
+    comparability = workload.get("comparability")
+    if not isinstance(comparability, dict):
+        return False
+    return suspicious_speedup_audit_passes(comparability)
+
+
 def claimable_speed_failures(
     *,
     workload_id: str,
@@ -62,12 +186,21 @@ def claimable_speed_failures(
     suspicious_speedup_ratio: float,
 ) -> list[str]:
     failures: list[str] = []
-    baseline_stats = workload.get("baselineStatsMs", {})
-    comparison_stats = workload.get("comparisonStatsMs", {})
-    if not isinstance(baseline_stats, dict):
-        baseline_stats = {}
-    if not isinstance(comparison_stats, dict):
-        comparison_stats = {}
+    skip_failures, should_check_speed = claimability_skip_failures(
+        workload_id=workload_id,
+        workload=workload,
+    )
+    failures.extend(skip_failures)
+    if not should_check_speed:
+        return failures
+
+    claimability = _claimability_object(workload)
+    metric_failures, baseline_stats, comparison_stats, delta = _claim_metric_payload(
+        workload_id=workload_id,
+        workload=workload,
+        claimability=claimability,
+    )
+    failures.extend(metric_failures)
     left_count = _parse_int(baseline_stats.get("count"))
     right_count = _parse_int(comparison_stats.get("count"))
     if left_count is None or left_count < min_timed_samples:
@@ -78,27 +211,34 @@ def claimable_speed_failures(
         failures.append(
             f"{workload_id}: comparisonStatsMs.count must be >= {min_timed_samples}"
         )
-    delta = workload.get("deltaPercent")
-    if not isinstance(delta, dict):
-        failures.append(f"{workload_id}: missing deltaPercent object")
-    else:
-        for percentile in expected_required_percentiles:
-            value = _parse_float(delta.get(percentile))
-            if value is None:
-                failures.append(
-                    f"{workload_id}: deltaPercent.{percentile} missing or invalid"
-                )
-            elif value <= 0.0:
-                failures.append(
-                    f"{workload_id}: deltaPercent.{percentile} must be > 0 "
-                    "(positive means baseline faster)"
-                )
-    failures.extend(
-        suspicious_speedup_failures(
-            workload_id=workload_id,
-            baseline_stats=baseline_stats,
-            comparison_stats=comparison_stats,
-            suspicious_speedup_ratio=suspicious_speedup_ratio,
-        )
+    for percentile in expected_required_percentiles:
+        value = _parse_float(delta.get(percentile))
+        if value is None:
+            failures.append(
+                f"{workload_id}: deltaPercent.{percentile} missing or invalid"
+            )
+        elif value <= 0.0:
+            failures.append(
+                f"{workload_id}: deltaPercent.{percentile} must be > 0 "
+                "(positive means baseline faster)"
+            )
+
+    speedup_failures = suspicious_speedup_failures(
+        workload_id=workload_id,
+        baseline_stats=baseline_stats,
+        comparison_stats=comparison_stats,
+        suspicious_speedup_ratio=suspicious_speedup_ratio,
     )
+    if speedup_failures and not _suspicious_speedup_is_audited(
+        workload=workload,
+        claimability=claimability,
+    ):
+        failures.extend(speedup_failures)
+    if not speedup_failures and SUSPICIOUS_SPEEDUP_AUDIT_NOTE in _string_list(
+        claimability.get("auditNotes")
+    ):
+        failures.append(
+            f"{workload_id}: suspicious-speedup audit note present without "
+            "a matching speedup trigger"
+        )
     return failures

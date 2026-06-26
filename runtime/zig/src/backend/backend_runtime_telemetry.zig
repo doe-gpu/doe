@@ -78,6 +78,7 @@ pub fn refresh(backend: *backend_iface.BackendIface) void {
                 backend.telemetry.pipeline_cache_warmup_count = cache_telemetry.count;
                 backend.telemetry.pipeline_cache_warmup_ns = cache_telemetry.ns;
                 backend.telemetry.pipeline_cache_active = metal_backend.pipeline_cache_active_from_context(backend.context);
+                backend.telemetry.last_submit_count = metal_backend.last_submit_count_from_context(backend.context);
             }
         },
         .doe_d3d12 => {

@@ -3,6 +3,69 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-06-26 — Apple Metal Doe-baseline compare refresh
+
+The macOS Metal compare lane was refreshed from new receipts with Doe as the
+baseline and Dawn as the comparison across native strict, native release, Node
+package, Bun package, Node ORT, Bun ORT, and browser ORT. The promoted native,
+package, and Node/Bun ORT reports are claimable under their configured
+claimability modes; browser ORT remains a strict comparable browser-lane
+receipt with claimability intentionally off in its config.
+
+Stack fixes from the refresh:
+
+- ORT Node/Bun reports now use trace-meta process wall as the selected
+  process-wall timing boundary, rather than Python wrapper wall.
+- successful vendor-node traces emit `workloadUnitWallSource` so the selected
+  wall-time source is explicit in receipts.
+- Bun's WebGPU FFI adapter identity reports Darwin Metal subgroup bounds that
+  match the Dawn-backed Bun provider on this host.
+- the browser ORT harness resolves the existing lane-volume Transformers.js
+  build and records browser ORT source identity hashes in trace metadata.
+- the Node package command encoder materializes lazy dispatch/copy commands at
+  `finish()` so submit telemetry and command-buffer identity do not diverge.
+
+Fresh compare and claim artifacts:
+
+- native strict compare:
+  `bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json`
+- native strict claim:
+  `bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json`
+- native release compare:
+  `bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json`
+- native release claim:
+  `bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json`
+- Node package compare:
+  `bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json`
+- Node package claim:
+  `bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json`
+- Bun package compare:
+  `bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json`
+- Bun package claim:
+  `bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json`
+- Node ORT compare:
+  `bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.compare.json`
+- Node ORT claim:
+  `bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.claim.json`
+- Bun ORT compare:
+  `bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.compare.json`
+- Bun ORT claim:
+  `bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.claim.json`
+- browser ORT compare:
+  `bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json`
+
+Validation run against the fresh artifacts:
+
+- `compare_output_partition_gate.py`
+- `comparability_coherence_gate.py --require-pass`
+- `structural_equivalence_gate.py --require-all-pass`
+- `claim_gate.py` for native strict, native release, Node package, Bun package,
+  Node ORT, and Bun ORT
+
+The README chart inputs now reference these Apple Metal reports in
+`assets/readme/benchmark-claims.json`, `reports/claim-index.json`,
+`assets/readme/package-claims.svg`, and `assets/readme/ort-claims.svg`.
+
 ## 2026-06-18 — AMD Vulkan Node and Bun package readback audit
 
 The AMD Vulkan package resident decode anchors are diagnostic under the current

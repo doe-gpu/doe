@@ -1,4 +1,5 @@
 const kWorkgroupSize : u32 = 256u;
+const kWorkgroupMask : u32 = kWorkgroupSize - 1u;
 const kInnerIters : u32 = 100u;
 
 @group(0) @binding(0) var<storage, read_write> outVal : array<u32>;
@@ -24,7 +25,7 @@ fn main(
       if (i >= kWorkgroupSize) {
         break;
       }
-      accum = atomicLoad(&wg[(i + accum) % kWorkgroupSize]);
+      accum = atomicLoad(&wg[(i + accum) & kWorkgroupMask]);
       i = i + 1u;
     }
 

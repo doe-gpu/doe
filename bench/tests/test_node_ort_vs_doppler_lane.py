@@ -185,10 +185,12 @@ console.log(JSON.stringify({{
         self.assertEqual(success_meta['executionSuccessCount'], 1)
         self.assertEqual(success_meta['executionErrorCount'], 0)
         self.assertEqual(success_meta['timingSource'], 'wall-time')
+        self.assertEqual(success_meta['workloadUnitWallSource'], 'trace-meta-process-wall')
         self.assertEqual(success_meta['phaseTimingsMs']['generationMs'], 20.5)
         self.assertEqual(success_meta['promptSummary']['prefillTokens'], 64)
         self.assertEqual(success_meta['resultSummary']['generatedTextPreview'], 'alpha')
         self.assertEqual(success_row['traceFormat'], 'vendor-node-benchmark-v1')
+        self.assertEqual(success_row['workloadUnitWallSource'], 'trace-meta-process-wall')
         self.assertEqual(success_row['status'], 'success')
 
         self.assertEqual(failure_meta['benchmarkLane'], 'node-ort-vs-doppler')
