@@ -170,6 +170,9 @@ pub export fn doeNativeDeviceCreateBuffer(dev_raw: ?*anyopaque, desc: ?*const ab
         return null;
     }
     buf.metal_private_storage = use_private_storage;
+    if (!use_private_storage) {
+        buf.metal_mapped_ptr = metal_bridge_buffer_contents(buf.mtl);
+    }
     if (d.mappedAtCreation != 0) buf.mapped = true;
     const result = toOpaque(buf);
     label_store.set(result, d.label.data, d.label.length);
@@ -212,6 +215,7 @@ pub export fn doeNativeBufferRelease(raw: ?*anyopaque) callconv(.c) void {
             alloc.destroy(b);
             return;
         }
+        b.metal_mapped_ptr = null;
         if (b.mtl) |m| metal_bridge_release(m);
         alloc.destroy(b);
     }
@@ -298,7 +302,7 @@ pub export fn doeNativeBufferGetConstMappedRange(buf_raw: ?*anyopaque, offset: u
         const base: [*]u8 = @ptrCast(mapped);
         return @ptrCast(base + offset);
     }
-    const contents = metal_bridge_buffer_contents(buf.mtl) orelse return null;
+    const contents = buf.metal_mapped_ptr orelse metal_bridge_buffer_contents(buf.mtl) orelse return null;
     return @ptrCast(contents + offset);
 }
 

@@ -150,10 +150,10 @@ const DEFAULT_ITERATIONS = {
   upload: 300,
   dispatch: 200,
   render: 120,
-  pipeline: 20,
-  asyncPipeline: 10,
+  pipeline: 256,
+  asyncPipeline: 64,
   workflow: 80,
-  texture: 16,
+  texture: 64,
 };
 
 function timestampId() {
@@ -174,6 +174,14 @@ function usage() {
 
 Options:
   --mode dawn|doe|auto|both Runtime mode to run (default: both)
+  --mode-order dawn,doe|doe,dawn
+                            Runtime order when --mode=both (default: dawn,doe)
+  --mode-schedule grouped|paired|paired-balanced
+                            grouped runs all rows for one runtime before the next;
+                            paired alternates runtimes per row when --mode=both;
+                            paired-balanced runs both row orders and averages
+                            numeric metrics per runtime
+                            (default: grouped)
   --chrome PATH             Chrome binary path
   --dawn-chrome PATH        Browser executable for dawn mode (defaults to --chrome)
   --doe-chrome PATH         Browser executable for doe mode (defaults to --chrome)
@@ -194,10 +202,10 @@ Options:
   --iters-upload N          Upload scenario iterations (default: 300)
   --iters-dispatch N        Dispatch scenario iterations (default: 200)
   --iters-render N          Render scenario iterations (default: 120)
-  --iters-pipeline N        Pipeline scenario iterations (default: 20)
-  --iters-async-pipeline N  Async pipeline iterations (default: 10)
+  --iters-pipeline N        Pipeline scenario iterations (default: 256)
+  --iters-async-pipeline N  Async pipeline iterations (default: 64)
   --iters-workflow N        Workflow loop iterations (default: 80)
-  --iters-texture N         Texture scenario iterations (default: 16)
+  --iters-texture N         Texture scenario iterations (default: 64)
   --focus-category CATEGORY Run only rows in this diagnostic category (repeatable or comma-separated)
   --strict                  Exit non-zero when required rows fail
   --help                    Show this message
@@ -242,6 +250,27 @@ function parsePowerPreference(text) {
     return text;
   }
   throw new Error("--power-preference must be default, high-performance, or low-power");
+}
+
+function parseModeOrder(text) {
+  const values = parseListOption(text, "--mode-order");
+  if (
+    values.length !== 2 ||
+    !values.includes("dawn") ||
+    !values.includes("doe") ||
+    values[0] === values[1]
+  ) {
+    throw new Error("--mode-order must be dawn,doe or doe,dawn");
+  }
+  return values;
+}
+
+function parseModeSchedule(text) {
+  const normalized = text.trim().toLowerCase();
+  if (["grouped", "paired", "paired-balanced"].includes(normalized)) {
+    return normalized;
+  }
+  throw new Error("--mode-schedule must be grouped, paired, or paired-balanced");
 }
 
 function pathWithin(pathValue, rootPath) {
@@ -399,6 +428,8 @@ function parseArgs(argv) {
     powerPreference: DEFAULT_POWER_PREFERENCE,
     chromeArgs: [],
     focusCategories: [],
+    modeOrder: null,
+    modeSchedule: "grouped",
     strict: false,
     iterations: { ...DEFAULT_ITERATIONS },
   };
@@ -416,6 +447,12 @@ function parseArgs(argv) {
       args.allowDataUrlFallback = true;
     } else if (token === "--mode") {
       args.mode = readOptionValue(argv, i, "--mode");
+      i += 1;
+    } else if (token === "--mode-order") {
+      args.modeOrder = parseModeOrder(readOptionValue(argv, i, "--mode-order"));
+      i += 1;
+    } else if (token === "--mode-schedule") {
+      args.modeSchedule = parseModeSchedule(readOptionValue(argv, i, "--mode-schedule"));
       i += 1;
     } else if (token === "--chrome") {
       args.chromePath = readOptionValue(argv, i, "--chrome");
@@ -509,6 +546,12 @@ function parseArgs(argv) {
   if (!["dawn", "doe", "auto", "both"].includes(args.mode)) {
     throw new Error("--mode must be one of dawn, doe, auto, both");
   }
+  if (args.mode !== "both" && args.modeOrder !== null) {
+    throw new Error("--mode-order is only valid with --mode=both");
+  }
+  if (args.mode !== "both" && args.modeSchedule !== "grouped") {
+    throw new Error("--mode-schedule paired modes are only valid with --mode=both");
+  }
   if (!existsSync(args.runtimeSelectorPolicyPath)) {
     throw new Error(`runtime selector policy not found: ${args.runtimeSelectorPolicyPath}`);
   }
@@ -575,8 +618,8 @@ function requireHashHex(value, label) {
 
 function loadProjectionManifest(path) {
   const payload = loadJsonObject(path);
-  if (payload.schemaVersion !== 2) {
-    throw new Error(`invalid projection manifest schemaVersion, expected 2: ${path}`);
+  if (payload.schemaVersion !== 3) {
+    throw new Error(`invalid projection manifest schemaVersion, expected 3: ${path}`);
   }
   if (!Array.isArray(payload.rows) || payload.rows.length === 0) {
     throw new Error(`invalid projection manifest: ${path}`);
@@ -637,10 +680,65 @@ function loadProjectionManifest(path) {
       claimScope,
       claimLanguage: requireString(row.claimLanguage, `rows[${index}].claimLanguage`),
       projectionNote: requireString(row.projectionNote, `rows[${index}].projectionNote`),
+      browserWorkload: parseBrowserWorkload(
+        row.browserWorkload,
+        `rows[${index}].browserWorkload`,
+        row.domain,
+      ),
       runtimes: {},
     };
   });
   return { metadata, rows };
+}
+
+function parseBrowserWorkload(value, label, domain) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${label} must be an object`);
+  }
+  if (typeof value.sourceComparable !== "boolean") {
+    throw new Error(`${label}.sourceComparable must be a boolean`);
+  }
+  if (typeof value.sourceClaimEligible !== "boolean") {
+    throw new Error(`${label}.sourceClaimEligible must be a boolean`);
+  }
+  const parsed = {
+    sourceComparable: value.sourceComparable,
+    sourceClaimEligible: value.sourceClaimEligible,
+  };
+  if (typeof value.benchmarkClass === "string" && value.benchmarkClass.length > 0) {
+    parsed.benchmarkClass = value.benchmarkClass;
+  }
+  if (value.uploadBytes !== undefined) {
+    if (!Number.isSafeInteger(value.uploadBytes) || value.uploadBytes <= 0) {
+      throw new Error(`${label}.uploadBytes must be a positive integer`);
+    }
+    parsed.uploadBytes = value.uploadBytes;
+  }
+  if (domain === "upload" && !Number.isSafeInteger(parsed.uploadBytes)) {
+    throw new Error(`${label}.uploadBytes is required for upload rows`);
+  }
+  if (typeof value.computeProjection === "string" && value.computeProjection.length > 0) {
+    parsed.computeProjection = value.computeProjection;
+  }
+  if (domain === "compute" && parsed.computeProjection !== "generic_empty_dispatch_component") {
+    throw new Error(`${label}.computeProjection is required for compute rows`);
+  }
+  for (const key of ["textureWidth", "textureHeight", "mipLevelCount"]) {
+    if (value[key] !== undefined) {
+      if (!Number.isSafeInteger(value[key]) || value[key] <= 0) {
+        throw new Error(`${label}.${key} must be a positive integer`);
+      }
+      parsed[key] = value[key];
+    }
+  }
+  if (domain === "texture-contract") {
+    for (const key of ["textureWidth", "textureHeight", "mipLevelCount"]) {
+      if (!Number.isSafeInteger(parsed[key])) {
+        throw new Error(`${label}.${key} is required for texture-contract rows`);
+      }
+    }
+  }
+  return parsed;
 }
 
 function loadWorkflowManifest(path) {
@@ -1120,9 +1218,26 @@ async function runScenario(page, template, iterations, browserSurfaceArgs, scena
         result.metrics[`${metricName}P99`] = summary.p99;
       }
 
+      function uploadIterationsForSize(size, requestedIterations) {
+        if (size <= 4 * 1024) {
+          return Math.max(requestedIterations, 4096);
+        }
+        if (size <= 64 * 1024) {
+          return Math.max(requestedIterations, 1024);
+        }
+        if (size <= 1024 * 1024) {
+          return Math.max(requestedIterations, 256);
+        }
+        return requestedIterations;
+      }
+
       async function runWriteBuffer(device) {
-        const iterations = runIterations.upload;
-        const size = 64 * 1024;
+        const requestedIterations = runIterations.upload;
+        const size = scenarioConfig?.browserWorkload?.uploadBytes;
+        if (!Number.isSafeInteger(size) || size <= 0) {
+          throw new Error("write_buffer_upload missing browserWorkload.uploadBytes");
+        }
+        const iterations = uploadIterationsForSize(size, requestedIterations);
         const payload = new Uint8Array(size);
         const buffer = device.createBuffer({
           size,
@@ -1139,6 +1254,10 @@ async function runScenario(page, template, iterations, browserSurfaceArgs, scena
         await device.queue.onSubmittedWorkDone();
         const t1 = nowMs();
         result.metrics.iterations = iterations;
+        result.metrics.requestedIterations = requestedIterations;
+        result.metrics.uploadBytes = size;
+        result.metrics.totalUploadBytes = size * iterations;
+        result.metrics.iterationPolicy = "browser-upload-size-floor-v1";
         result.metrics.usPerOp = ((t1 - t0) * 1000) / iterations;
       }
 
@@ -1563,7 +1682,11 @@ async function runScenario(page, template, iterations, browserSurfaceArgs, scena
 
       async function runTextureWriteQueryDestroy(device) {
         const iterations = runIterations.texture;
-        const payload = new Uint8Array(128 * 128 * 4);
+        const textureConfig = scenarioConfig?.browserWorkload ?? {};
+        const width = textureConfig.textureWidth ?? 128;
+        const height = textureConfig.textureHeight ?? 128;
+        const mipLevelCount = textureConfig.mipLevelCount ?? 1;
+        const payload = new Uint8Array(width * height * 4);
         payload.fill(17);
         const samples = [];
 
@@ -1573,13 +1696,13 @@ async function runScenario(page, template, iterations, browserSurfaceArgs, scena
 
           let t0 = nowMs();
           const texture = device.createTexture({
-            size: { width: 128, height: 128, depthOrArrayLayers: 1 },
+            size: { width, height, depthOrArrayLayers: 1 },
             format: "rgba8unorm",
             usage:
               GPUTextureUsage.TEXTURE_BINDING |
               GPUTextureUsage.COPY_DST |
               GPUTextureUsage.RENDER_ATTACHMENT,
-            mipLevelCount: 1,
+            mipLevelCount,
             sampleCount: 1,
           });
           sample.createTextureMs = nowMs() - t0;
@@ -1588,8 +1711,8 @@ async function runScenario(page, template, iterations, browserSurfaceArgs, scena
           device.queue.writeTexture(
             { texture },
             payload,
-            { bytesPerRow: 128 * 4, rowsPerImage: 128 },
-            { width: 128, height: 128, depthOrArrayLayers: 1 },
+            { bytesPerRow: width * 4, rowsPerImage: height },
+            { width, height, depthOrArrayLayers: 1 },
           );
           sample.writeTextureMs = nowMs() - t0;
 
@@ -2083,12 +2206,13 @@ async function runMode(chromium, mode, args, pageTarget, l1Rows, l2Rows, chromeP
         continue;
       }
       await page.goto(pageTarget.url, { waitUntil: "load", timeout: 120000 });
-      const scenarioResult = await runScenario(
-        page,
-        row.scenarioTemplate,
-        args.iterations,
-        browserSurfaceArgs,
-      );
+        const scenarioResult = await runScenario(
+          page,
+          row.scenarioTemplate,
+          args.iterations,
+          browserSurfaceArgs,
+          row,
+        );
       rowResultsById.set(
         row.sourceWorkloadId,
         makeModeRowResult(
@@ -2231,6 +2355,123 @@ function hasRequiredFailures(summary) {
   return summary.overallRequiredFailures > 0;
 }
 
+function buildModeSchedule(modes, l1Rows, l2Rows, modeSchedule) {
+  if (modeSchedule === "grouped") {
+    return modes.map((mode) => ({
+      mode,
+      l1Rows,
+      l2Rows,
+      scheduleUnit: "all",
+      scheduleLayer: "all",
+    }));
+  }
+
+  const entries = [];
+  const orderedL1Rows = [...l1Rows].sort((left, right) => {
+    const priority = { strict: 0, component: 1, none: 2 };
+    const leftPriority = priority[left.comparabilityExpectation] ?? 3;
+    const rightPriority = priority[right.comparabilityExpectation] ?? 3;
+    if (leftPriority !== rightPriority) return leftPriority - rightPriority;
+    return String(left.sourceWorkloadId).localeCompare(String(right.sourceWorkloadId));
+  });
+  const rowModeOrders =
+    modeSchedule === "paired-balanced" ? [modes, [...modes].reverse()] : [modes];
+  for (const row of orderedL1Rows) {
+    if (row.layerTarget === "l0_only") {
+      for (const mode of modes) {
+        row.runtimes[mode] = makeModeRowResult("l0_only", "l0_only");
+      }
+      continue;
+    }
+    for (let passIndex = 0; passIndex < rowModeOrders.length; passIndex += 1) {
+      for (const mode of rowModeOrders[passIndex]) {
+        entries.push({
+          mode,
+          l1Rows: [row],
+          l2Rows: [],
+          scheduleUnit: row.sourceWorkloadId,
+          scheduleLayer: "l1",
+          schedulePass: passIndex + 1,
+        });
+      }
+    }
+  }
+
+  for (const workflow of l2Rows) {
+    for (let passIndex = 0; passIndex < rowModeOrders.length; passIndex += 1) {
+      for (const mode of rowModeOrders[passIndex]) {
+        entries.push({
+          mode,
+          l1Rows: [],
+          l2Rows: [workflow],
+          scheduleUnit: workflow.id,
+          scheduleLayer: "l2",
+          schedulePass: passIndex + 1,
+        });
+      }
+    }
+  }
+
+  return entries;
+}
+
+function requiredFailureCount(rows, mode) {
+  return rows.filter((row) => {
+    if (row.requiredStatus !== "ok") {
+      return false;
+    }
+    const status = row.runtimes[mode]?.status;
+    return status !== "ok";
+  }).length;
+}
+
+function mergeMetricValues(left, right) {
+  if (typeof left === "number" && Number.isFinite(left) && typeof right === "number" && Number.isFinite(right)) {
+    return (left + right) / 2;
+  }
+  if (left === right) {
+    return left;
+  }
+  return right ?? left;
+}
+
+function mergeMetrics(leftMetrics, rightMetrics) {
+  const merged = {};
+  const keys = new Set([
+    ...Object.keys(leftMetrics ?? {}),
+    ...Object.keys(rightMetrics ?? {}),
+  ]);
+  for (const key of keys) {
+    if (key === "orderBalancedSampleCount") {
+      continue;
+    }
+    merged[key] = mergeMetricValues(leftMetrics?.[key], rightMetrics?.[key]);
+  }
+  merged.orderBalancedSampleCount =
+    (leftMetrics?.orderBalancedSampleCount ?? 1) +
+    (rightMetrics?.orderBalancedSampleCount ?? 1);
+  return merged;
+}
+
+function combineModeRowResult(existing, next) {
+  if (!next) {
+    return existing ?? null;
+  }
+  if (!existing) {
+    return next;
+  }
+  const sameStatus = existing.status === next.status && existing.statusCode === next.statusCode;
+  return {
+    status: sameStatus ? next.status : "fail",
+    statusCode: sameStatus ? next.statusCode : "scenario_runtime_error",
+    error: sameStatus
+      ? (next.error ?? existing.error)
+      : [existing.error, next.error].filter(Boolean).join(" | "),
+    metrics: mergeMetrics(existing.metrics ?? {}, next.metrics ?? {}),
+    measuredAt: new Date().toISOString(),
+  };
+}
+
 async function main() {
   const args = parseArgs(process.argv);
   const chromium = await loadChromiumDriver();
@@ -2245,7 +2486,13 @@ async function main() {
   const l1Rows = filteredWorkloads.l1Rows;
   const l2Rows = filteredWorkloads.l2Rows;
 
-  const modes = args.mode === "both" ? ["dawn", "doe"] : [args.mode];
+  const modes = args.mode === "both" ? (args.modeOrder ?? ["dawn", "doe"]) : [args.mode];
+  const modeScheduleEntries = buildModeSchedule(
+    modes,
+    l1Rows,
+    l2Rows,
+    args.modeSchedule,
+  );
   const modeRunDetails = [];
 
   const pageTarget = await resolvePageTarget(args.allowDataUrlFallback, args.apiSurface);
@@ -2253,7 +2500,8 @@ async function main() {
     console.log(`[warn] ${pageTarget.warning}`);
   }
   try {
-    for (const mode of modes) {
+    for (const scheduleEntry of modeScheduleEntries) {
+      const mode = scheduleEntry.mode;
       const modeSelection = runtimeSelectionResolution(mode, args);
       const chromePathForMode =
         modeSelection.selectedRuntime === "dawn" ? args.modeChromePaths.dawn : args.modeChromePaths.doe;
@@ -2264,7 +2512,7 @@ async function main() {
           statusCode: "mode_execution_unavailable",
           error: pageTarget.warning ?? "page target unavailable",
         };
-        for (const row of l1Rows) {
+        for (const row of scheduleEntry.l1Rows) {
           if (row.layerTarget === "l0_only") {
             row.runtimes[mode] = makeModeRowResult("l0_only", "l0_only");
           } else {
@@ -2275,7 +2523,7 @@ async function main() {
             );
           }
         }
-        for (const workflow of l2Rows) {
+        for (const workflow of scheduleEntry.l2Rows) {
           workflow.runtimes[mode] = makeModeRowResult(
             failure.status,
             failure.statusCode,
@@ -2284,6 +2532,9 @@ async function main() {
         }
         modeRunDetails.push({
           mode,
+          scheduleUnit: scheduleEntry.scheduleUnit,
+          scheduleLayer: scheduleEntry.scheduleLayer,
+          schedulePass: scheduleEntry.schedulePass ?? 1,
           elapsedMs: 0,
           launchArgs: [],
           runtimeSelection: buildRuntimeSelection(
@@ -2334,12 +2585,15 @@ async function main() {
         mode,
         args,
         pageTarget,
-        l1Rows,
-        l2Rows,
+        scheduleEntry.l1Rows,
+        scheduleEntry.l2Rows,
         chromePathForMode,
       );
       modeRunDetails.push({
         mode: modeRun.mode,
+        scheduleUnit: scheduleEntry.scheduleUnit,
+        scheduleLayer: scheduleEntry.scheduleLayer,
+        schedulePass: scheduleEntry.schedulePass ?? 1,
         chromePath: modeRun.chromePath,
         elapsedMs: modeRun.elapsedMs,
         launchArgs: modeRun.launchArgs,
@@ -2350,25 +2604,28 @@ async function main() {
         modeFailure: modeRun.modeFailure,
       });
 
-      for (const row of l1Rows) {
-        row.runtimes[mode] = modeRun.rowResultsById.get(row.sourceWorkloadId) ?? null;
+      for (const row of scheduleEntry.l1Rows) {
+        row.runtimes[mode] = combineModeRowResult(
+          row.runtimes[mode],
+          modeRun.rowResultsById.get(row.sourceWorkloadId) ?? null,
+        );
       }
-      for (const workflow of l2Rows) {
-        workflow.runtimes[mode] = modeRun.workflowResultsById.get(workflow.id) ?? null;
+      for (const workflow of scheduleEntry.l2Rows) {
+        workflow.runtimes[mode] = combineModeRowResult(
+          workflow.runtimes[mode],
+          modeRun.workflowResultsById.get(workflow.id) ?? null,
+        );
       }
 
-      const requiredL1Rows = l1Rows.filter((row) => row.requiredStatus === "ok");
-      const requiredL1Failed = requiredL1Rows.filter((row) => {
-        const status = row.runtimes[mode]?.status;
-        return status !== "ok";
-      }).length;
-      const requiredL2Rows = l2Rows.filter((row) => row.requiredStatus === "ok");
-      const requiredL2Failed = requiredL2Rows.filter((row) => {
-        const status = row.runtimes[mode]?.status;
-        return status !== "ok";
-      }).length;
+      const requiredL1Failed = requiredFailureCount(scheduleEntry.l1Rows, mode);
+      const requiredL2Failed = requiredFailureCount(scheduleEntry.l2Rows, mode);
+      const scheduleLabel = `${scheduleEntry.scheduleLayer}:${scheduleEntry.scheduleUnit}`;
       console.log(
-        `[mode=${mode}] runtime.webgpu=${modeRun.runtimeProbe.webgpuAvailable} runtime.adapter=${modeRun.runtimeProbe.adapterAvailable} requiredL1Failed=${requiredL1Failed} requiredL2Failed=${requiredL2Failed}`,
+        `[mode=${mode} schedule=${scheduleLabel}] `
+          + `runtime.webgpu=${modeRun.runtimeProbe.webgpuAvailable} `
+          + `runtime.adapter=${modeRun.runtimeProbe.adapterAvailable} `
+          + `requiredL1Failed=${requiredL1Failed} `
+          + `requiredL2Failed=${requiredL2Failed}`,
       );
     }
   } finally {
@@ -2424,6 +2681,7 @@ async function main() {
     doeLibPath: args.doeLibPath,
     mode: args.mode,
     modeOrder: modes,
+    modeSchedule: args.modeSchedule,
     headless: args.headless,
     chromeArgs: args.chromeArgs,
     powerPreference: args.powerPreference,
@@ -2440,6 +2698,7 @@ async function main() {
     runtimeSelections: modeRunDetailsWithHashes.map((entry) => entry.runtimeSelection),
     methodology: {
       scenarioIterations: args.iterations,
+      modeSchedule: args.modeSchedule,
       browserBuildConfigurationEvidence: browserBuildConfigurationEvidence(args),
       adapterRequest: {
         powerPreference: args.powerPreference,

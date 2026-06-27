@@ -172,7 +172,7 @@ fn writeBufferValidated(q: *DoeQueue, buf: *DoeBuffer, offset: u64, data: [*]con
         }
         return true;
     }
-    const contents = bridge.metal_bridge_buffer_contents(buf.mtl) orelse {
+    const contents = buf.metal_mapped_ptr orelse bridge.metal_bridge_buffer_contents(buf.mtl) orelse {
         writeMetalBufferThroughStaging(q, buf, offset, data, size);
         return true;
     };

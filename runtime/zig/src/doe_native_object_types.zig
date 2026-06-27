@@ -94,6 +94,7 @@ pub const DoeBuffer = struct {
     backend: shared.BackendKind = .metal,
     mtl: ?*anyopaque = null,
     metal_private_storage: bool = false,
+    metal_mapped_ptr: ?[*]u8 = null,
     size: u64 = 0,
     usage: u64 = 0,
     mapped: bool = false,

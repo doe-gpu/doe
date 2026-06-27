@@ -17,7 +17,7 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 2
+      "const": 3
     },
     "generatedAt": {
       "type": "string",
@@ -73,7 +73,8 @@
         "requiredStatus",
         "claimScope",
         "claimLanguage",
-        "projectionNote"
+        "projectionNote",
+        "browserWorkload"
       ],
       "properties": {
         "sourceWorkloadId": {
@@ -137,6 +138,51 @@
         "projectionNote": {
           "type": "string",
           "minLength": 1
+        },
+        "browserWorkload": {
+          "$ref": "#/$defs/browserWorkload"
+        }
+      },
+      "additionalProperties": false
+    },
+    "browserWorkload": {
+      "type": "object",
+      "required": [
+        "sourceComparable",
+        "sourceClaimEligible"
+      ],
+      "properties": {
+        "sourceComparable": {
+          "type": "boolean"
+        },
+        "sourceClaimEligible": {
+          "type": "boolean"
+        },
+        "benchmarkClass": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uploadBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "computeProjection": {
+          "type": "string",
+          "enum": [
+            "generic_empty_dispatch_component"
+          ]
+        },
+        "textureWidth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "textureHeight": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mipLevelCount": {
+          "type": "integer",
+          "minimum": 1
         }
       },
       "additionalProperties": false

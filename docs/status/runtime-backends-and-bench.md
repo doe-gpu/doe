@@ -3,6 +3,40 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-06-27 — Browser Chromium/Dawn versus Fawn/Doe fairness refresh
+
+The raw Chromium browser lane now separates strict source-comparable browser
+rows from directional/component diagnostics in the score sidecar. Projection
+manifests record browser-executed workload parameters, including upload byte
+counts, texture dimensions, mip counts, and compute projection class. Directional
+upload rows remain visible for bottleneck diagnosis but are excluded from
+`strictComparable`; oversized browser uploads stay `l0_only`; compute rows that
+do not execute source shader semantics remain component-only.
+
+The layered runner now records runtime order and supports grouped, paired, or
+paired-balanced mode scheduling. Grouped mode preserves the historical
+all-Dawn/all-Doe pass. Paired mode alternates runtimes per row and records the
+schedule unit in `modeRunDetails`. Paired-balanced mode runs both row orders and
+averages numeric metrics per runtime, so order-sensitive reports have
+receipt-visible order-balance evidence. Non-grouped schedules execute
+strict-comparable rows before component diagnostics so component probes do not
+precondition strict browser evidence.
+
+Fresh diagnostic artifacts from the grouped and reverse-order same-Fawn runs,
+the order-balanced full Apple browser run, and the stock Chrome versus Fawn/Doe
+consumer diagnostic, live under:
+
+- `browser/chromium/artifacts/20260627T172252Z/`
+- `browser/chromium/artifacts/20260627T172452Z/`
+- `browser/chromium/artifacts/20260627TfullPairedBalancedStrictFirstZ/`
+- `browser/chromium/artifacts/20260627T172555Z/`
+
+Status: grouped same-Fawn reports remain order-sensitive diagnostics. The
+strict-first paired-balanced same-Fawn Apple browser report is the current fair
+raw Chromium runtime-swap diagnostic. The stock Chrome versus Fawn/Doe artifact
+is also diagnostic because the compared browser versions/build classes do not
+match and release-class Fawn build evidence is not present.
+
 ## 2026-06-26 — Apple Metal Doe-baseline compare refresh
 
 The macOS Metal compare lane was refreshed from new receipts with Doe as the
