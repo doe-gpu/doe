@@ -2,6 +2,7 @@
 using namespace metal;
 
 constant uint kWorkgroupSize = 256u;
+constant uint kWorkgroupMask = kWorkgroupSize - 1u;
 
 [[max_total_threads_per_threadgroup(256)]]
 kernel void main_kernel(
@@ -16,7 +17,7 @@ kernel void main_kernel(
     threadgroup_barrier(mem_flags::mem_threadgroup);
 
     for (uint i = 0u; i < kWorkgroupSize; i++) {
-        accum = atomic_load_explicit(&wg[(i + accum) % kWorkgroupSize], memory_order_relaxed);
+        accum = atomic_load_explicit(&wg[(i + accum) & kWorkgroupMask], memory_order_relaxed);
     }
     threadgroup_barrier(mem_flags::mem_threadgroup);
     outVal[gid] = accum;

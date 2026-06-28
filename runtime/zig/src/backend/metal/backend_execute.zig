@@ -14,6 +14,7 @@ const command_requirements = @import("../common/command_requirements.zig");
 const capabilities = @import("../common/capabilities.zig");
 const artifact_meta = @import("../common/artifact_meta.zig");
 const artifact_policy = @import("../common/artifact_policy.zig");
+const submit_count_policy = @import("../common/submit_count_policy.zig");
 const bridge = @import("metal_bridge_decls.zig");
 const host_plan_artifact = @import("metal_host_plan_artifact.zig");
 
@@ -397,7 +398,8 @@ fn execute_native_command(self: anytype, command: model.Command) !webgpu.NativeE
 }
 
 pub fn execute_command(self: anytype, command: model.Command) anyerror!webgpu.NativeExecutionResult {
-    return execute_native_command(self, command) catch |err| {
+    self.last_submit_count = null;
+    const result = execute_native_command(self, command) catch |err| {
         const requirements = command_requirements.requirements(command);
         return .{
             .status = common_errors.map_error_status(err),
@@ -407,10 +409,13 @@ pub fn execute_command(self: anytype, command: model.Command) anyerror!webgpu.Na
             .gpu_timestamp_valid = false,
         };
     };
+    self.last_submit_count = submit_count_policy.selectedCommandSubmitCount(command, result);
+    return result;
 }
 
 pub fn execute_buffer_write_bytes_iface(self: anytype, handle: u64, offset: u64, buffer_size: u64, data: []const u8) anyerror!webgpu.NativeExecutionResult {
-    return execute_buffer_write_bytes(self, handle, offset, buffer_size, data) catch |err| {
+    self.last_submit_count = null;
+    const result = execute_buffer_write_bytes(self, handle, offset, buffer_size, data) catch |err| {
         return .{
             .status = common_errors.map_error_status(err),
             .status_message = self.write_status("{s}", .{common_errors.error_code(err)}),
@@ -419,6 +424,8 @@ pub fn execute_buffer_write_bytes_iface(self: anytype, handle: u64, offset: u64,
             .gpu_timestamp_valid = false,
         };
     };
+    self.last_submit_count = submit_count_policy.selectedKindSubmitCount(.buffer_write, result);
+    return result;
 }
 
 pub fn set_upload_behavior(self: anytype, mode: webgpu.UploadBufferUsageMode, submit_every: u32) void {

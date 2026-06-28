@@ -31,6 +31,7 @@ const PROVIDER_LABELS = Object.freeze({
 });
 const BENCHMARK_LANE = 'bun-ort-webgpu-provider-compare';
 const RUNTIME_HOST = 'bun';
+const PROCESS_WALL_TIMING_SOURCE = 'tjs-ort-process-wall-ms';
 
 function requireMatchingWorkloadId(scenarioId, workloadId) {
   if (scenarioId !== workloadId) {
@@ -132,7 +133,7 @@ async function main() {
       pipelineLoadMs: loadResolvedMs - loadStartedMs,
       generationMs: generateResolvedMs - generateStartedMs,
     };
-    const selectedTimingMs = phaseTimingsMs.generationMs;
+    const selectedTimingMs = processWallMs;
 
     await writeVendorNodeSuccessTrace({
       runtimeHost: RUNTIME_HOST,
@@ -147,8 +148,8 @@ async function main() {
       executionProviderName,
       processWallMs,
       timingMs: selectedTimingMs,
-      timingSource: 'tjs-ort-generation-ms',
-      timingClass: 'operation',
+      timingSource: PROCESS_WALL_TIMING_SOURCE,
+      timingClass: 'process-wall',
       adapterInfo,
       phaseTimingsMs,
       promptSummary,

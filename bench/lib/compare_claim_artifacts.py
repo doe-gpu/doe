@@ -227,19 +227,32 @@ def workload_claimability(
     required_positive = row.get("requiredPositivePercentiles")
     if not isinstance(required_positive, list):
         required_positive = []
+    audit_notes = row.get("auditNotes")
+    if not isinstance(audit_notes, list):
+        audit_notes = []
+    evaluated = row.get("evaluated")
+    if not isinstance(evaluated, bool):
+        evaluated = True
+    skip_reason = row.get("skipReason")
+    if not isinstance(skip_reason, str):
+        skip_reason = ""
     return {
-        "evaluated": True,
+        "evaluated": evaluated,
         "claimable": row.get("claimable") is True,
         "reasons": [
             str(item)
             for item in row.get("reasons", [])
             if isinstance(item, str) and item
         ],
+        "auditNotes": [
+            str(item) for item in audit_notes if isinstance(item, str) and item
+        ],
         "claimMetricField": str(row.get("claimMetricField", "")),
         "claimMetricScope": str(row.get("claimMetricScope", "")),
         "requiredPositivePercentiles": [
             str(item) for item in required_positive if isinstance(item, str) and item
         ],
+        "skipReason": skip_reason,
     }
 
 

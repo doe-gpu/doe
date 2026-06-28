@@ -120,10 +120,13 @@ def build_claim_report(
         )
         workload_result = {
             "workloadId": entry.get("id", ""),
+            "evaluated": bool(claimability.get("evaluated", True)),
             "claimable": bool(claimability.get("claimable", False)),
             "reasons": list(claimability.get("reasons", [])),
             "claimMetricField": claimability.get("claimMetricField", ""),
             "claimMetricScope": claimability.get("claimMetricScope", ""),
+            "skipReason": claimability.get("skipReason", ""),
+            "auditNotes": list(claimability.get("auditNotes", [])),
             "requiredPositivePercentiles": list(
                 claimability.get("requiredPositivePercentiles", [])
             ),

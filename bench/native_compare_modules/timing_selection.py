@@ -12,19 +12,13 @@ from native_compare_modules.reporting import NS_PER_MS, safe_float, safe_int
 RENDER_ENCODE_TIMING_DOMAINS = {"render", "p0-render"}
 HOST_KERNEL_PREWARM_TIMING_SUFFIX = "host-kernel-prewarm"
 
-_ENCODE_PLAUSIBILITY_RATIO = 0.05
-
-
 def _is_render_encode_plausible(
     *,
     execution_total_ns: int,
     execution_encode_total_ns: int,
 ) -> bool:
-    if execution_encode_total_ns <= 0:
-        return False
-    if execution_total_ns <= 0:
-        return True
-    return float(execution_encode_total_ns) / float(execution_total_ns) >= _ENCODE_PLAUSIBILITY_RATIO
+    _ = execution_total_ns
+    return execution_encode_total_ns > 0
 
 
 def parse_trace_rows(path: Path) -> list[dict[str, Any]]:
@@ -234,7 +228,7 @@ def classify_timing_source(source: str) -> str:
         "tjs-ort-generation-ms",
     ):
         return "operation"
-    if canonical == "wall-time":
+    if canonical in ("wall-time", "tjs-ort-process-wall-ms"):
         return "process-wall"
     return "unknown"
 

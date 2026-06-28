@@ -39,6 +39,33 @@ def _sample(
 
 
 class KernelPrewarmTimingTests(unittest.TestCase):
+    def test_render_timing_selects_encode_when_encode_share_is_small(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            trace_path = Path(tmpdir) / "trace.ndjson"
+            trace_path.write_text('{"command":"render_draw"}\n', encoding="utf-8")
+            measured_ms, source, meta = pick_measured_timing_ms(
+                wall_ms=20.0,
+                trace_meta={
+                    "timingMs": 10.0,
+                    "timingSource": "doe-execution-total-ns",
+                    "executionTotalNs": 10_000_000,
+                    "executionSetupTotalNs": 4_900_000,
+                    "executionEncodeTotalNs": 100_000,
+                    "executionSubmitWaitTotalNs": 5_000_000,
+                    "executionDispatchCount": 2_000,
+                    "executionRowCount": 1,
+                    "executionSuccessCount": 1,
+                },
+                trace_jsonl=trace_path,
+                required_timing_class="operation",
+                benchmark_policy=None,
+                workload_domain="render",
+            )
+
+        self.assertEqual(measured_ms, 0.1)
+        self.assertEqual(source, "doe-execution-encode-ns")
+        self.assertEqual(meta["timingSelectionPolicy"], "render-encode-preferred")
+
     def test_operation_timing_keeps_host_kernel_prewarm_outside_selected_timing(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             trace_path = Path(tmpdir) / "trace.ndjson"

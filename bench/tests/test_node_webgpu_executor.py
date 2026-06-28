@@ -1459,13 +1459,15 @@ console.log(JSON.stringify({{
         self.assertIn("runtime.queueWaitMode === NODE_PACKAGE_QUEUE_WAIT_MODE", source)
         self.assertIn("readBufferMapCanCompleteSubmit(normalizedPlan.steps, index, step)", source)
 
-    def test_node_doe_package_source_keeps_dispatch_copy_batched_for_submit(self) -> None:
+    def test_node_doe_package_source_materializes_lazy_dispatch_copy_at_finish(self) -> None:
         source = (
             REPO_ROOT / "packages" / "doe-gpu" / "src" / "vendor" / "webgpu" / "index.js"
         ).read_text(encoding="utf-8")
         self.assertIn("encoder._native = addon.createCommandEncoder(", source)
         self.assertIn("new classes.DoeGPUComputePassEncoder(null, encoder)", source)
         self.assertIn("finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands)", source)
+        self.assertIn("const nativeCommandBuffer = finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands);", source)
+        self.assertIn("return { _native: nativeCommandBuffer, _batched: false };", source)
         self.assertIn("addon.createComputeDispatchCopyCommandBuffer(", source)
         self.assertIn("addon.createComputeDispatchBatchCopyCommandBuffer(", source)
         self.assertIn("canFinishNodeLazyDispatchCopyCommandsAsNativeBuffer(commands)", source)

@@ -4,28 +4,13 @@
   "description": "Stable index of public README benchmark receipt surfaces. Bulky generated run workspaces stay under ignored bench/out paths.",
   "entries": [
     {
-      "id": "package-node-amd-vulkan",
-      "surface": "package",
-      "runtimeHost": "node",
-      "backend": "amd-vulkan",
-      "comparison": "doe-vs-node-webgpu",
-      "reportPath": "bench/out/amd-vulkan/20260410T235522Z/gemma270m.node-package.ir.compare.json"
-    },
-    {
-      "id": "package-bun-amd-vulkan",
-      "surface": "package",
-      "runtimeHost": "bun",
-      "backend": "amd-vulkan",
-      "comparison": "doe-vs-bun-webgpu",
-      "reportPath": "bench/out/amd-vulkan/20260410T235541Z/gemma270m.bun-package.ir.compare.json"
-    },
-    {
       "id": "package-node-apple-metal",
       "surface": "package",
       "runtimeHost": "node",
       "backend": "apple-metal",
       "comparison": "doe-vs-node-webgpu",
-      "reportPath": "bench/out/apple-metal/20260414T010826Z/gemma64.node-package.warm.ir.compare.json"
+      "reportPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json",
+      "claimPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json"
     },
     {
       "id": "package-bun-apple-metal",
@@ -33,33 +18,24 @@
       "runtimeHost": "bun",
       "backend": "apple-metal",
       "comparison": "doe-vs-bun-webgpu",
-      "reportPath": "bench/out/apple-metal/20260414T010736Z/gemma64.bun-package.warm.ir.compare.json"
+      "reportPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json",
+      "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json"
     },
     {
-      "id": "ort-native-amd-vulkan",
-      "surface": "native-ort",
-      "backend": "amd-vulkan",
-      "comparison": "doe-ep-vs-incumbent-webgpu-provider",
-      "reportPath": "bench/out/native-ort-webgpu-provider/20260413T175708Z/basic-ops.compare.json",
-      "claimPath": "bench/out/native-ort-webgpu-provider/20260413T175708Z/basic-ops.claim.json"
+      "id": "native-strict-apple-metal",
+      "surface": "native",
+      "backend": "apple-metal",
+      "comparison": "doe-vs-dawn",
+      "reportPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json",
+      "claimPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json"
     },
     {
-      "id": "ort-node-amd-vulkan",
-      "surface": "node-ort",
-      "runtimeHost": "node",
-      "backend": "amd-vulkan",
-      "comparison": "doe-vs-node-webgpu",
-      "reportPath": "bench/out/node-ort-webgpu-provider-compare/20260413T191817Z/gemma270m.compare.json",
-      "claimPath": "bench/out/node-ort-webgpu-provider-compare/20260413T191817Z/gemma270m.claim.json"
-    },
-    {
-      "id": "ort-bun-amd-vulkan",
-      "surface": "bun-ort",
-      "runtimeHost": "bun",
-      "backend": "amd-vulkan",
-      "comparison": "doe-vs-bun-webgpu",
-      "reportPath": "bench/out/bun-ort-webgpu-provider-compare/gemma270m-prefill32-decode1.compare.json",
-      "claimPath": "bench/out/bun-ort-webgpu-provider-compare/gemma270m-prefill32-decode1.claim.json"
+      "id": "native-release-apple-metal",
+      "surface": "native",
+      "backend": "apple-metal",
+      "comparison": "doe-vs-dawn",
+      "reportPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json",
+      "claimPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json"
     },
     {
       "id": "ort-node-apple-metal",
@@ -67,7 +43,8 @@
       "runtimeHost": "node",
       "backend": "apple-metal",
       "comparison": "doe-vs-node-webgpu",
-      "reportPath": "bench/out/apple-metal-ort-node/20260415T005827Z/gemma270m.compare.json"
+      "reportPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.compare.json",
+      "claimPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.claim.json"
     },
     {
       "id": "ort-bun-apple-metal",
@@ -75,7 +52,16 @@
       "runtimeHost": "bun",
       "backend": "apple-metal",
       "comparison": "doe-vs-bun-webgpu",
-      "reportPath": "bench/out/apple-metal-ort-bun/20260415T005827Z/gemma270m-prefill32-decode1.compare.json"
+      "reportPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.compare.json",
+      "claimPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.claim.json"
+    },
+    {
+      "id": "ort-browser-apple-metal",
+      "surface": "browser-ort",
+      "runtimeHost": "browser",
+      "backend": "apple-metal",
+      "comparison": "doe-vs-dawn",
+      "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
     }
   ]
 }

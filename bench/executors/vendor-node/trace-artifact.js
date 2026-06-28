@@ -1,6 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 
+const TRACE_META_PROCESS_WALL_SOURCE = 'trace-meta-process-wall';
+
 async function ensureParentDir(path) {
   await mkdir(dirname(path), { recursive: true });
 }
@@ -93,6 +95,7 @@ export async function writeVendorNodeSuccessTrace({
       executionRowCount: 1,
       executionSuccessCount: 1,
       executionErrorCount: 0,
+      workloadUnitWallSource: TRACE_META_PROCESS_WALL_SOURCE,
       phaseTimingsMs,
       promptSummary,
       resultSummary,
@@ -107,6 +110,7 @@ export async function writeVendorNodeSuccessTrace({
       workloadId,
       scenarioId,
       processWallMs,
+      workloadUnitWallSource: TRACE_META_PROCESS_WALL_SOURCE,
       timingMs,
       timingSource,
       ...(timingClass !== null ? { timingClass } : {}),

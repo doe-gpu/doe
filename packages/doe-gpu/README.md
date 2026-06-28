@@ -32,15 +32,18 @@ npm install doe-gpu
 
 ## Current Evidence
 
-End-to-end Gemma 3 package evidence compares Doe-backed WebGPU with the
-Dawn-backed package lanes on the same AMD Vulkan host. Doe is the baseline in
-every row, so positive percentages mean Doe finished faster.
+End-to-end Gemma 3 package and inference evidence compares Doe-backed WebGPU
+with Dawn-backed package lanes on matching host/runtime lanes. Doe is the
+baseline in each row where percentages are shown, so positive percentages mean
+the Doe-backed lane finished faster.
 
 ![doe-gpu package results](https://raw.githubusercontent.com/doerun/doe/main/packages/doe-gpu/assets/package-results.svg)
 
 Outputs:
-- Node package: `+12.25% p50`, `+10.74% p95`, `+10.74% p99`
-- Bun package: `+12.86% p50`, `+7.91% p95`, `+7.91% p99`
+- AMD Vulkan Node package: `+12.25% p50`, `+10.74% p95`, `+10.74% p99`
+- AMD Vulkan Bun package: `+12.86% p50`, `+7.91% p95`, `+7.91% p99`
+- [Node package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json)
+- [Bun package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json)
 
 ## Additional benchmark outputs
 

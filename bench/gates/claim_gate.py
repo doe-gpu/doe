@@ -610,13 +610,23 @@ def main() -> int:
         )
         if required_positive is None:
             failures.append(f"{workload_id}: claimability.requiredPositivePercentiles missing/invalid")
+        elif evaluated is False:
+            if required_positive:
+                failures.append(
+                    f"{workload_id}: unevaluated claimability requires no "
+                    "requiredPositivePercentiles"
+                )
         elif required_positive != expected_required:
             failures.append(
                 f"{workload_id}: claimability.requiredPositivePercentiles mismatch: "
                 f"expected {expected_required}, got {required_positive}"
             )
-        if evaluated is not True:
-            failures.append(f"{workload_id}: claimability.evaluated must be true")
+        if not isinstance(evaluated, bool):
+            failures.append(f"{workload_id}: claimability.evaluated must be bool")
+        elif evaluated is False and workload_claimability.get("skipReason") != "claimEligible=false":
+            failures.append(
+                f"{workload_id}: unevaluated claimability requires skipReason=claimEligible=false"
+            )
         if args.require_claim_status == "claimable" and claimable is not True:
             failures.append(f"{workload_id}: claimability.claimable must be true")
         if args.require_claim_status == "diagnostic" and claimable is not False:

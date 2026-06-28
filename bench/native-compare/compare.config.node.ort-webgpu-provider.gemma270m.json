@@ -18,7 +18,7 @@
   },
   "comparability": {
     "mode": "strict",
-    "requireTimingClass": "operation",
+    "requireTimingClass": "process-wall",
     "allowBaselineNoExecution": false
   },
   "claimability": {

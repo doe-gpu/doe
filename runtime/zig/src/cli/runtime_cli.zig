@@ -81,6 +81,28 @@ fn executionRowTotalNs(executed: execution.ExecutionResult) u64 {
     return executed.duration_ns;
 }
 
+fn applyDeferredFlushToTraceRows(
+    flush_ns: u64,
+    compact_upload_trace_row_totals: ?*std.ArrayList(u64),
+    buffered_trace_rows: ?*std.ArrayList(BufferedTraceRow),
+) void {
+    if (flush_ns == 0) return;
+    if (compact_upload_trace_row_totals) |rows| {
+        if (rows.items.len > 0) {
+            rows.items[rows.items.len - 1] +|= flush_ns;
+        }
+    }
+    if (buffered_trace_rows) |rows| {
+        if (rows.items.len > 0) {
+            const last_row = &rows.items[rows.items.len - 1];
+            if (last_row.execution_result) |*exec| {
+                exec.submit_wait_ns +|= flush_ns;
+                exec.duration_ns +|= flush_ns;
+            }
+        }
+    }
+}
+
 pub fn runCli() !void {
     const allocator = std.heap.page_allocator;
     const argv = try std.process.argsAlloc(allocator);
@@ -488,8 +510,19 @@ pub fn runCli() !void {
         if (needs_explicit_drain) {
             const flush_start_ns = nowNs();
             const flush_ns = try ctx.flushQueue();
-            trace_summary.execution_submit_wait_total_ns += flush_ns;
-            host_command_orchestration_total_ns += elapsedSince(flush_start_ns);
+            const flush_elapsed_ns = elapsedSince(flush_start_ns);
+            if (flush_ns > 0) {
+                applyDeferredFlushToTraceRows(
+                    flush_ns,
+                    if (compact_upload_trace_row_totals) |*rows| rows else null,
+                    if (buffered_trace_rows) |*rows| rows else null,
+                );
+                trace_summary.execution_submit_wait_total_ns += flush_ns;
+                trace_summary.execution_total_ns += flush_ns;
+            }
+            if (flush_elapsed_ns > flush_ns) {
+                host_command_orchestration_total_ns += flush_elapsed_ns - flush_ns;
+            }
         }
     }
 

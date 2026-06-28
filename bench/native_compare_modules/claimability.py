@@ -310,6 +310,47 @@ def assess_suspicious_speedup(
     return reasons
 
 
+_SUSPICIOUS_SPEEDUP_AUDIT_OBLIGATIONS = {
+    "baseline_comparison_trace_meta_source_match",
+    "baseline_comparison_timing_selection_policy_match",
+    "baseline_comparison_queue_sync_mode_match",
+    "baseline_comparison_execution_shape_match",
+    "baseline_comparison_hardware_path_match",
+    "baseline_execution_evidence_present",
+    "baseline_successful_execution_present",
+    "baseline_execution_errors_absent",
+    "comparison_execution_errors_absent",
+}
+SUSPICIOUS_SPEEDUP_AUDIT_NOTE = (
+    "suspicious speedup trigger accepted after strict comparability audit"
+)
+
+
+def suspicious_speedup_audit_passes(comparability: dict[str, Any]) -> bool:
+    if not comparability.get("comparable", False):
+        return False
+    if comparability.get("blockingFailedObligations") or comparability.get("advisoryFailedObligations"):
+        return False
+    obligations = comparability.get("obligations")
+    if not isinstance(obligations, list) or not obligations:
+        return False
+    required_seen: set[str] = set()
+    for obligation in obligations:
+        if not isinstance(obligation, dict):
+            return False
+        obligation_id = str(obligation.get("id", ""))
+        applicable = obligation.get("applicable") is True
+        blocking = obligation.get("blocking") is True
+        passes = obligation.get("passes") is True
+        if applicable and blocking and not passes:
+            return False
+        if obligation_id in _SUSPICIOUS_SPEEDUP_AUDIT_OBLIGATIONS:
+            if not applicable or not passes:
+                return False
+            required_seen.add(obligation_id)
+    return _SUSPICIOUS_SPEEDUP_AUDIT_OBLIGATIONS.issubset(required_seen)
+
+
 def should_prefer_workload_unit_wall_for_upload_claim(
     *,
     workload_id: str,
@@ -384,8 +425,23 @@ def assess_claimability(
             "requiredPositivePercentiles": [],
             "reasons": [],
         }
+    if getattr(workload, "claim_eligible", True) is False:
+        return {
+            "mode": mode,
+            "evaluated": False,
+            "claimable": True,
+            "minTimedSamples": 0,
+            "requiredPositivePercentiles": [],
+            "claimMetricField": "",
+            "claimMetricScope": "notEvaluated",
+            "baselineTimedSamples": 0,
+            "comparisonTimedSamples": 0,
+            "skipReason": "claimEligible=false",
+            "reasons": [],
+        }
 
     reasons: list[str] = []
+    audit_notes: list[str] = []
     effective_min_samples = (
         min_timed_samples
         if min_timed_samples > 0
@@ -628,14 +684,20 @@ def assess_claimability(
             right_p50_ms=right_p50_ms,
         )
     )
-    reasons.extend(
-        assess_suspicious_speedup(
-            left_stats=claim_left_stats,
-            right_stats=claim_right_stats,
-            claim_metric_scope=claim_metric_scope,
-            suspicious_speedup_ratio=benchmark_policy.suspicious_speedup_ratio,
-        )
+    suspicious_speedup_reasons = assess_suspicious_speedup(
+        left_stats=claim_left_stats,
+        right_stats=claim_right_stats,
+        claim_metric_scope=claim_metric_scope,
+        suspicious_speedup_ratio=benchmark_policy.suspicious_speedup_ratio,
     )
+    if suspicious_speedup_reasons:
+        if (
+            not getattr(workload, "path_asymmetry", False)
+            and suspicious_speedup_audit_passes(comparability)
+        ):
+            audit_notes.append(SUSPICIOUS_SPEEDUP_AUDIT_NOTE)
+        else:
+            reasons.extend(suspicious_speedup_reasons)
 
     for percentile_key in required_percentiles:
         value = safe_float(claim_delta.get(percentile_key))
@@ -699,5 +761,6 @@ def assess_claimability(
         "claimMetricScope": claim_metric_scope,
         "baselineTimedSamples": left_count,
         "comparisonTimedSamples": right_count,
+        "auditNotes": audit_notes,
         "reasons": reasons,
     }

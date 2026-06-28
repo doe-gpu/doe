@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_rt_helpers = @import("doe_native_runtime_helpers.zig");
 const native_shared = @import("doe_native_shared_types.zig");
@@ -14,6 +15,7 @@ const DoeComputePipeline = native_types.DoeComputePipeline;
 const DoeQueue = native_types.DoeQueue;
 const MAX_COMPUTE_BIND_GROUPS = native_shared.MAX_COMPUTE_BIND_GROUPS;
 const BATCH_PREPARED_CACHE_CAPACITY: usize = 64;
+const has_vulkan = (builtin.os.tag == .linux);
 
 pub const DispatchBatchCopyFlushTimings = struct {
     command_replay_ns: u64 = 0,
@@ -210,6 +212,7 @@ pub fn prewarmPreparedDispatchBindings(
     bg_ptrs: [*]?*anyopaque,
     bg_counts: [*]const u32,
 ) u32 {
+    if (comptime !has_vulkan) return 0;
     if (dispatch_count == 0) return 0;
     const rt = native_rt_helpers.device_vk_runtime(q.dev) orelse return 0;
     var prepared_cache: [BATCH_PREPARED_CACHE_CAPACITY]PreparedDispatchCacheEntry = undefined;
@@ -277,6 +280,7 @@ pub fn dispatchBatchCopyFlush(
     collect_timings: bool,
 ) DispatchBatchCopyFlushTimings {
     var timings = DispatchBatchCopyFlushTimings{};
+    if (comptime !has_vulkan) return timings;
     if (dispatch_count == 0) return timings;
     const rt = native_rt_helpers.device_vk_runtime(q.dev) orelse return timings;
     const previous_replay_state = rt.recorded_submit_replay_active;

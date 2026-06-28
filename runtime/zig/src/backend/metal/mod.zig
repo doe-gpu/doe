@@ -69,6 +69,7 @@ pub const ZigMetalBackend = struct {
     queue_sync_mode: webgpu.QueueSyncMode = .per_command,
     gpu_timestamp_mode: webgpu.GpuTimestampMode = .auto,
     pending_upload_commands: u32 = 0,
+    last_submit_count: ?u32 = null,
 
     capability_set: capabilities.CapabilitySet,
     status_message_storage: [STATUS_MESSAGE_BYTES]u8 = [_]u8{0} ** STATUS_MESSAGE_BYTES,
@@ -137,6 +138,7 @@ pub const ZigMetalBackend = struct {
             .queue_sync_mode = .per_command,
             .gpu_timestamp_mode = .auto,
             .pending_upload_commands = 0,
+            .last_submit_count = null,
             .capability_set = native_capability_set(),
             .status_message_storage = [_]u8{0} ** STATUS_MESSAGE_BYTES,
             .status_message_len = 0,
@@ -325,6 +327,10 @@ pub fn pipeline_cache_warmup_telemetry_from_context(ctx: *anyopaque) metal_pipel
 pub fn pipeline_cache_active_from_context(ctx: *anyopaque) bool {
     _ = ctx;
     return metal_pipeline_cache.process_active_cache_present();
+}
+
+pub fn last_submit_count_from_context(ctx: *anyopaque) ?u32 {
+    return cast(ctx).last_submit_count;
 }
 
 pub fn set_pipeline_cache_disabled(disabled: bool) void {

@@ -111,7 +111,7 @@ class LaneHelpersMixin(unittest.TestCase):
         )
 
     def _assert_compare_config_core(
-        self, payload: dict, *, require_timing_class: str = "operation"
+        self, payload: dict, *, require_timing_class: str = "process-wall"
     ) -> None:
         baseline = payload["baseline"]
         self.assertEqual(baseline["executorId"], self.fixture.baseline_executor_id)
@@ -149,7 +149,7 @@ class _CompareLaneBase(LaneHelpersMixin):
         self.assertEqual(workload.commands_path, self.commands_path)
         self.assertTrue((REPO_ROOT / workload.commands_path).exists())
 
-    def test_compare_config_is_strict_operation_claimable(self) -> None:
+    def test_compare_config_is_strict_process_wall_claimable(self) -> None:
         payload = json.loads(self.fixture.compare_config_path.read_text(encoding="utf-8"))
         self._assert_compare_config_core(payload)
         self.assertGreaterEqual(payload["run"]["iterations"], 7)
@@ -513,9 +513,9 @@ await writeVendorNodeSuccessTrace({{
   executionProvider: 'doe',
   executionProviderName: 'doe-gpu',
   processWallMs: 42.5,
-  timingMs: 20.5,
-  timingSource: 'tjs-ort-generation-ms',
-  timingClass: 'operation',
+  timingMs: 42.5,
+  timingSource: 'tjs-ort-process-wall-ms',
+  timingClass: 'process-wall',
   adapterInfo: {{ vendor: 'AMD', architecture: 'gfx11', device: 'mock', description: '', subgroupMinSize: 32, subgroupMaxSize: 64 }},
   phaseTimingsMs: {{ promptSynthesisMs: 10, pipelineLoadMs: 12, generationMs: 20.5 }},
   promptSummary: {{ promptSource: 'synthetic', promptLength: 512, prefillTokens: 64, decodeTokens: 64 }},
@@ -569,13 +569,15 @@ console.log(JSON.stringify({{
         self.assertEqual(success_meta["executionProviderName"], "doe-gpu")
         self.assertEqual(success_meta["executionSuccessCount"], 1)
         self.assertEqual(success_meta["executionErrorCount"], 0)
-        self.assertEqual(success_meta["timingMs"], 20.5)
-        self.assertEqual(success_meta["timingSource"], "tjs-ort-generation-ms")
-        self.assertEqual(success_meta["timingClass"], "operation")
+        self.assertEqual(success_meta["timingMs"], 42.5)
+        self.assertEqual(success_meta["timingSource"], "tjs-ort-process-wall-ms")
+        self.assertEqual(success_meta["timingClass"], "process-wall")
+        self.assertEqual(success_meta["workloadUnitWallSource"], "trace-meta-process-wall")
         self.assertEqual(success_meta["phaseTimingsMs"]["generationMs"], 20.5)
-        self.assertEqual(success_row["timingMs"], 20.5)
-        self.assertEqual(success_row["timingSource"], "tjs-ort-generation-ms")
-        self.assertEqual(success_row["timingClass"], "operation")
+        self.assertEqual(success_row["timingMs"], 42.5)
+        self.assertEqual(success_row["timingSource"], "tjs-ort-process-wall-ms")
+        self.assertEqual(success_row["timingClass"], "process-wall")
+        self.assertEqual(success_row["workloadUnitWallSource"], "trace-meta-process-wall")
         self.assertEqual(success_row["status"], "success")
 
         self.assertEqual(failure_meta["benchmarkLane"], "node-ort-webgpu-provider-compare")
@@ -586,6 +588,80 @@ console.log(JSON.stringify({{
         self.assertEqual(failure_meta["executionErrorCount"], 1)
         self.assertEqual(failure_row["status"], "error")
         self.assertIn("adapter unavailable", failure_row["errorMessage"])
+
+
+class AppleMetalOrtWebGpuProviderCompareLaneTests(unittest.TestCase):
+    def test_apple_provider_compare_lanes_are_process_wall_claimable(self) -> None:
+        cases = (
+            {
+                "workloads_path": REPO_ROOT
+                / "bench"
+                / "workloads"
+                / "workloads.node.ort-webgpu-provider-compare.apple-metal.json",
+                "compare_config_path": REPO_ROOT
+                / "bench"
+                / "native-compare"
+                / "compare.config.apple.metal.node.ort-webgpu-provider.gemma270m.json",
+                "baseline_executor_id": "tjs_ort_node_doe",
+                "comparison_executor_id": "tjs_ort_node_webgpu_package",
+                "workload_id": (
+                    "apple_metal_node_ort_webgpu_provider_compare_"
+                    "gemma3_270m_prefill_64tok_decode_64tok"
+                ),
+            },
+            {
+                "workloads_path": REPO_ROOT
+                / "bench"
+                / "workloads"
+                / "workloads.bun.ort-webgpu-provider-compare.apple-metal.json",
+                "compare_config_path": REPO_ROOT
+                / "bench"
+                / "native-compare"
+                / "compare.config.apple.metal.bun.ort-webgpu-provider.gemma270m.prefill32.decode1.json",
+                "baseline_executor_id": "tjs_ort_bun_doe",
+                "comparison_executor_id": "tjs_ort_bun_webgpu_package",
+                "workload_id": (
+                    "apple_metal_bun_ort_webgpu_provider_compare_"
+                    "gemma3_270m_prefill_32tok_decode_1tok"
+                ),
+            },
+        )
+        for case in cases:
+            with self.subTest(workload_id=case["workload_id"]):
+                workloads = config_support.load_workloads(
+                    case["workloads_path"],
+                    "",
+                    include_noncomparable=True,
+                    include_extended=False,
+                    workload_cohort="all",
+                    selector={"ids": [case["workload_id"]]},
+                )
+                self.assertEqual(len(workloads), 1)
+                workload = workloads[0]
+                self.assertTrue(workload.comparable)
+                self.assertTrue(workload.claim_eligible)
+                self.assertEqual(workload.vendor, "apple")
+                self.assertEqual(workload.api, "webgpu")
+                self.assertTrue((REPO_ROOT / workload.commands_path).exists())
+
+                payload = json.loads(
+                    case["compare_config_path"].read_text(encoding="utf-8")
+                )
+                self.assertEqual(
+                    payload["baseline"]["executorId"],
+                    case["baseline_executor_id"],
+                )
+                self.assertEqual(
+                    payload["comparison"]["executorId"],
+                    case["comparison_executor_id"],
+                )
+                self.assertEqual(
+                    payload["comparability"]["requireTimingClass"],
+                    "process-wall",
+                )
+                self.assertEqual(payload["claimability"]["mode"], "local")
+                self.assertGreaterEqual(payload["run"]["iterations"], 7)
+                self.assertEqual(payload["selector"]["ids"], [case["workload_id"]])
 
 
 # === Breadth lanes ===
@@ -689,6 +765,7 @@ class BrowserOrtWebGpuCompareLaneTests(_BreadthLaneBase):
     def test_browser_ort_timed_mean_is_operation_timing(self) -> None:
         self.assertEqual(classify_timing_source("browser-ort-timed-mean-ms"), "operation")
         self.assertEqual(classify_timing_source("tjs-ort-generation-ms"), "operation")
+        self.assertEqual(classify_timing_source("tjs-ort-process-wall-ms"), "process-wall")
         executor_path = REPO_ROOT / "bench" / "executors" / "run-browser-ort-bench.py"
         spec = importlib.util.spec_from_file_location("run_browser_ort_bench", executor_path)
         self.assertIsNotNone(spec)
