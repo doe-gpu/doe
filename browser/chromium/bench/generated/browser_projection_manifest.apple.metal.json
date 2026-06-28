@@ -1,6 +1,6 @@
 {
   "schemaVersion": 4,
-  "generatedAt": "2026-06-28T01:13:03.005810Z",
+  "generatedAt": "2026-06-28T01:19:50.464245Z",
   "sourceWorkloadsPath": "bench/workloads/specialized/workloads.apple.metal.superset.json",
   "sourceWorkloadsSha256": "d2e7d7255270e5bc40727787771425c02349a7ae73b43ff4c5f2627c010c05cc",
   "rulesPath": "browser/chromium/bench/projection-rules.json",
