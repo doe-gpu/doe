@@ -4,76 +4,47 @@
   <img src="https://raw.githubusercontent.com/doerun/doe/main/assets/doe-logo.svg" alt="Doe logo" width="96" />
 </p>
 
-Doe is a source-preserving accelerator runtime and compiler system. It keeps
-shader/program bodies visible, lowers them across execution targets, and
-produces receipts that prove what ran.
+Doe is a source-preserving accelerator runtime and compiler. It keeps shader and
+program bodies inspectable, lowers them across execution targets, and writes
+receipts for what ran.
 
-In practice that means embedding where Dawn is too heavy, lowering kernels to
-multiple GPU and spatial backends from the same IR, and emitting
-artifact-backed receipts that bind every claim to a specific build.
+Doe has two active surfaces:
 
-The core roadmap is two-pronged:
-
-- **Chromium-family WebGPU:** make Doe the evidence-backed open-source runtime
-  and compiler path that can beat Dawn/Tint without silent fallbacks or broad
-  browser-fork drift.
-- **Doppler -> Doe -> Cerebras:** consume a closed Doppler Program Bundle,
-  lower the same declared WGSL/program identity through TSIR, HostPlan, and
-  CSL, and produce parity receipts for simulator and hardware promotion.
-
-These are not separate theses. Both prongs use the same discipline:
-source-visible programs, explicit lowering contracts, and receipt-backed
-claims.
+- A local WebGPU/runtime path for native, browser, Node, and Bun workloads.
+- A compiler path for model systems such as Doppler, where model programs can be
+  lowered through Doe IR toward backends such as Cerebras.
 
 Published npm surface: [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md).
 
-## Tenants
+## What it is
 
-The repo carries five tenants:
+- `doe-gpu`: JavaScript package entry point for WebGPU-backed workloads.
+- `doe-zig-runtime` and `libwebgpu_doe`: native WebGPU runtime surfaces used by
+  strict and release comparison lanes.
+- `runtime/zig/src/doe_wgsl`: WGSL lowering and backend emission work.
+- `pipeline/trace`, `pipeline/lean`, and `bench`: trace, checking, and benchmark
+  receipt surfaces.
+- Doppler ingest and Cerebras path: model bundle ingest, TSIR/HostPlan lowering,
+  CSL emission, and emulator receipts.
 
-| Tenant | Role |
-|---|---|
-| Dawn replacement (Zig WebGPU runtime) | runtime tenant; embeddable WebGPU runtime details in [`docs/thesis.md`](docs/thesis.md). |
-| Vulkan / Metal / D3D12 emitters | backend tenant; multi-target lowering from the WGSL compiler (`runtime/zig/src/doe_wgsl/`). |
-| Cerebras (TSIR / HostPlan / CSL) | spatial retargeting tenant; Tiled Spatial IR plus host-plan and CSL emit (`runtime/zig/src/tsir/`, `runtime/zig/src/doe_wgsl/emit_csl_*`). |
-| Lean proof pipeline | verification tenant; proof-eliminated runtime branches and verified artifacts (`pipeline/lean/`). |
-| Benchmarks and evidence bundles | proof tenant; claim-discipline gates, parity receipts, hardware-validation bundles (`bench/`). |
+## How it works
 
-Same discipline applied to different targets: shader/program bodies stay
-visible, lowering preserves identity, and every claim has a receipt path.
+1. Workloads enter as source-visible WGSL, IR, or model-plan contracts.
+2. Config selects the backend and comparability rules.
+3. Doe lowers and executes the workload, or rejects unsupported contracts.
+4. Bench and trace tools emit receipts.
+5. Public claims point at receipt artifacts instead of prose-only summaries.
 
-## Why Doe
+## Benchmark evidence
 
-- Lean runtime: a Zig runtime with a small package layer instead of
-  treating Chromium's in-tree Dawn stack as the permanent ceiling.
-- Chromium-family target: source-preserving compiler output, explicit
-  runtime behavior, and browser-lane receipts into a better WebGPU
-  implementation path for Chromium-derived browsers.
-- Explicit behavior: no silent fallback, clear runtime boundaries, and
-  artifact-backed benchmarking instead of hand-wavy claims.
-- Performance work with receipts: current results live in
-  [`docs/status.md`](docs/status.md), with public README receipt paths indexed
-  in [`reports/claim-index.json`](reports/claim-index.json).
+The chart below is a compact view of the current README-indexed receipt set.
 
-## Current Evidence
+![Doe benchmark receipt summary](assets/readme/this-machine-results.svg)
 
-Fresh local receipts on this AMD Vulkan host use Doe as the baseline, so
-positive percentages always mean Doe is faster.
-
-![Doe benchmark results on this machine](assets/readme/this-machine-results.svg)
-
-## Current product surface
-
-- Strategic runtime target: Chromium-family WebGPU implementation.
-- Strategic retargeting target: Doppler-authored model programs lowered to
-  Cerebras WSE through receipt-backed TSIR / HostPlan / CSL artifacts.
-- Competitive evidence today: native, package, embedded, and server-side
-  JavaScript lanes.
-- `doe-gpu/browser` is a browser shim over the browser's incumbent WebGPU
-  implementation. It does not run Doe runtime code.
-- [`browser/chromium/`](browser/chromium/README.md) is the strategic
-  Chromium integration lane for replacing Dawn at the `navigator.gpu` seam
-  after compatibility, trace, correctness, and comparability gates pass.
+See [`reports/claim-index.json`](reports/claim-index.json) for the public claim
+index and [`bench/out`](bench/out) for receipt payloads. AMD Vulkan support
+status is tracked in [`docs/doe-support-matrix.md`](docs/doe-support-matrix.md);
+there is no current Vulkan row in the README claim index.
 
 ## Start here
 
@@ -84,18 +55,16 @@ positive percentages always mean Doe is faster.
 - Chromium WebGPU strategy:
   [`docs/chromium-webgpu-task-list.md`](docs/chromium-webgpu-task-list.md)
 - Doppler Program Bundle ingest: [`docs/doppler-ingest.md`](docs/doppler-ingest.md)
-- Cerebras lane (Doppler → Doe → Cerebras):
-  [`docs/cerebras.md`](docs/cerebras.md). Progress, source, reproduce,
-  hardware runbook, rationale.
-- TSIR (Tiled Spatial IR) compiler work:
+- Cerebras lane: [`docs/cerebras.md`](docs/cerebras.md)
+- TSIR compiler work:
   [`docs/tsir-lowering-plan.md`](docs/tsir-lowering-plan.md),
-  [`docs/loop-protocol.md`](docs/loop-protocol.md), live status at
+  [`docs/loop-protocol.md`](docs/loop-protocol.md), and
   [`docs/status/tsir.md`](docs/status/tsir.md)
 - Project rationale and boundaries: [`docs/thesis.md`](docs/thesis.md),
-  [`docs/architecture.md`](docs/architecture.md),
+  [`docs/architecture.md`](docs/architecture.md), and
   [`docs/process.md`](docs/process.md)
 - Proof and trace pipeline: [`pipeline/lean/README.md`](pipeline/lean/README.md),
-  [`pipeline/trace/README.md`](pipeline/trace/README.md),
+  [`pipeline/trace/README.md`](pipeline/trace/README.md), and
   [`pipeline/agent/README.md`](pipeline/agent/README.md)
 
 ## Quick start

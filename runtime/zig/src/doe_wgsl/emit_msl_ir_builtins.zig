@@ -10,7 +10,6 @@ const maps = @import("emit_msl_maps.zig");
 const texture_builtins = @import("emit_msl_texture.zig");
 const layout = @import("layout_utils.zig");
 const workgroup_policy = @import("emit_msl_workgroup_zero.zig");
-const atomic_relax = @import("emit_msl_atomic_relax.zig");
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -94,10 +93,6 @@ pub fn emit_call(self: anytype, function: ir.Function, result_ty: ir.TypeId, cal
         if (try texture_builtins.emit_builtin(self, function, call)) return;
         if (std.mem.eql(u8, call.name, "atomicLoad")) {
             if (call.args.len != 1) return error.InvalidIr;
-            if (atomic_relax.callTargetsRelaxedAtomic(self.module, function, call)) {
-                try self.emit_expr(function, function.expr_args.items[call.args.start]);
-                return;
-            }
             try self.write("atomic_load_explicit(&(");
             try self.emit_expr(function, function.expr_args.items[call.args.start]);
             try self.write("), memory_order_relaxed)");
@@ -105,12 +100,6 @@ pub fn emit_call(self: anytype, function: ir.Function, result_ty: ir.TypeId, cal
         }
         if (std.mem.eql(u8, call.name, "atomicStore")) {
             if (call.args.len != 2) return error.InvalidIr;
-            if (atomic_relax.callTargetsRelaxedAtomic(self.module, function, call)) {
-                try self.emit_expr(function, function.expr_args.items[call.args.start]);
-                try self.write(" = ");
-                try self.emit_expr(function, function.expr_args.items[call.args.start + 1]);
-                return;
-            }
             try self.write("atomic_store_explicit(&(");
             try self.emit_expr(function, function.expr_args.items[call.args.start]);
             try self.write("), ");

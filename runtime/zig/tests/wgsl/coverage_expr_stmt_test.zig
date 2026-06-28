@@ -13,6 +13,16 @@ fn contains(haystack: []const u8, needle: []const u8) bool {
     return std.mem.indexOf(u8, haystack, needle) != null;
 }
 
+fn countSubstr(haystack: []const u8, needle: []const u8) usize {
+    var count: usize = 0;
+    var offset: usize = 0;
+    while (std.mem.indexOfPos(u8, haystack, offset, needle)) |index| {
+        count += 1;
+        offset = index + needle.len;
+    }
+    return count;
+}
+
 test "expressions: unary negation through MSL" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<f32>;
@@ -115,6 +125,25 @@ test "expressions: division and modulo operators through MSL" {
     const msl = out[0..len];
     try std.testing.expect(contains(msl, "/"));
     try std.testing.expect(contains(msl, "%"));
+}
+
+test "expressions: scalar global consts inline through MSL" {
+    const source =
+        \\const kMask: u32 = 3u;
+        \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main(@builtin(global_invocation_id) id: vec3u) {
+        \\    data[id.x] = data[id.x & kMask] + kMask;
+        \\}
+    ;
+
+    var out: [MAX_OUTPUT]u8 = undefined;
+    const len = try translateToMsl(std.testing.allocator, source, &out);
+    try std.testing.expect(len > 0);
+    const msl = out[0..len];
+    try std.testing.expectEqual(@as(usize, 1), countSubstr(msl, "kMask"));
+    try std.testing.expect(contains(msl, "& 3"));
 }
 
 test "statements: for loop through MSL" {

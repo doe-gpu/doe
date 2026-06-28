@@ -391,6 +391,18 @@ def parse_args() -> argparse.Namespace:
         help="Untimed source-kernel timing batches passed to the layered runner before samples.",
     )
     parser.add_argument(
+        "--source-kernel-schedule-slices",
+        type=positive_int,
+        default=None,
+        help="Source-kernel paired schedule slices passed to the layered runner.",
+    )
+    parser.add_argument(
+        "--source-kernel-schedule-slice-min-dispatch-repeat",
+        type=positive_int,
+        default=None,
+        help="Minimum source dispatchRepeat for paired schedule slicing.",
+    )
+    parser.add_argument(
         "--source-kernel-submit-policy",
         choices=("iteration-batch-v1", "sample-batch-v1"),
         default=None,
@@ -627,6 +639,11 @@ def extend_iteration_args(command: list[str], args: argparse.Namespace) -> None:
         ("--iters-texture", args.iters_texture),
         ("--source-kernel-samples", args.source_kernel_samples),
         ("--source-kernel-warmup-samples", args.source_kernel_warmup_samples),
+        ("--source-kernel-schedule-slices", args.source_kernel_schedule_slices),
+        (
+            "--source-kernel-schedule-slice-min-dispatch-repeat",
+            args.source_kernel_schedule_slice_min_dispatch_repeat,
+        ),
         ("--source-kernel-submit-policy", args.source_kernel_submit_policy),
     ]
     for flag, value in iteration_args:
@@ -991,6 +1008,10 @@ def main() -> int:
                 "texture": args.iters_texture,
                 "sourceKernelSamples": args.source_kernel_samples,
                 "sourceKernelWarmupSamples": args.source_kernel_warmup_samples,
+                "sourceKernelScheduleSlices": args.source_kernel_schedule_slices,
+                "sourceKernelScheduleSliceMinDispatchRepeat": (
+                    args.source_kernel_schedule_slice_min_dispatch_repeat
+                ),
                 "sourceKernelSubmitPolicy": args.source_kernel_submit_policy,
             },
         },

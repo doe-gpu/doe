@@ -1420,6 +1420,28 @@ def check_report_methodology(payload: Any, mode_schedule: str) -> list[str]:
     source_kernel_warmup_samples = payload.get("sourceKernelWarmupSamples")
     if not isinstance(source_kernel_warmup_samples, int) or source_kernel_warmup_samples < 0:
         errors.append("report methodology.sourceKernelWarmupSamples must be a non-negative integer")
+    source_kernel_schedule_slices = payload.get("sourceKernelScheduleSlices", 1)
+    if not isinstance(source_kernel_schedule_slices, int) or source_kernel_schedule_slices <= 0:
+        errors.append("report methodology.sourceKernelScheduleSlices must be a positive integer")
+    elif (
+        isinstance(source_kernel_samples, int)
+        and source_kernel_samples > 0
+        and source_kernel_schedule_slices > source_kernel_samples
+    ):
+        errors.append(
+            "report methodology.sourceKernelScheduleSlices cannot exceed sourceKernelSamples"
+        )
+    source_kernel_schedule_slice_min_dispatch_repeat = payload.get(
+        "sourceKernelScheduleSliceMinDispatchRepeat", 1
+    )
+    if (
+        not isinstance(source_kernel_schedule_slice_min_dispatch_repeat, int)
+        or source_kernel_schedule_slice_min_dispatch_repeat <= 0
+    ):
+        errors.append(
+            "report methodology.sourceKernelScheduleSliceMinDispatchRepeat "
+            "must be a positive integer"
+        )
     source_kernel_submit_policy = payload.get("sourceKernelSubmitPolicy")
     if source_kernel_submit_policy not in VALID_SOURCE_KERNEL_SUBMIT_POLICIES:
         errors.append("report methodology.sourceKernelSubmitPolicy must be a known policy")

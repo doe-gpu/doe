@@ -160,6 +160,8 @@ const DEFAULT_ITERATIONS = {
 };
 const DEFAULT_SOURCE_KERNEL_SAMPLES = 1;
 const DEFAULT_SOURCE_KERNEL_WARMUP_SAMPLES = 0;
+const DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICES = 1;
+const DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICE_MIN_DISPATCH_REPEAT = 1;
 const DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY = "iteration-batch-v1";
 const SOURCE_KERNEL_SUBMIT_POLICIES = new Set([
   "iteration-batch-v1",
@@ -219,6 +221,10 @@ Options:
   --source-kernel-samples N Source-kernel compute timing samples (default: 1)
   --source-kernel-warmup-samples N
                             Untimed source-kernel timing batches before samples (default: 0)
+  --source-kernel-schedule-slices N
+                            Split source-kernel samples across N paired schedule slices (default: 1)
+  --source-kernel-schedule-slice-min-dispatch-repeat N
+                            Apply schedule slicing only when source dispatchRepeat is at least N (default: 1)
   --source-kernel-submit-policy ${[...SOURCE_KERNEL_SUBMIT_POLICIES].join("|")}
                             Source-kernel queue submit cadence (default: ${DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY})
   --focus-category CATEGORY Run only rows in this diagnostic category (repeatable or comma-separated)
@@ -462,6 +468,9 @@ function parseArgs(argv) {
     iterations: { ...DEFAULT_ITERATIONS },
     sourceKernelSamples: DEFAULT_SOURCE_KERNEL_SAMPLES,
     sourceKernelWarmupSamples: DEFAULT_SOURCE_KERNEL_WARMUP_SAMPLES,
+    sourceKernelScheduleSlices: DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICES,
+    sourceKernelScheduleSliceMinDispatchRepeat:
+      DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICE_MIN_DISPATCH_REPEAT,
     sourceKernelSubmitPolicy: DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY,
   };
 
@@ -584,6 +593,18 @@ function parseArgs(argv) {
         throw new Error("--source-kernel-warmup-samples must be a non-negative integer");
       }
       i += 1;
+    } else if (token === "--source-kernel-schedule-slices") {
+      args.sourceKernelScheduleSlices = parsePositiveInt(
+        readOptionValue(argv, i, "--source-kernel-schedule-slices"),
+        "--source-kernel-schedule-slices",
+      );
+      i += 1;
+    } else if (token === "--source-kernel-schedule-slice-min-dispatch-repeat") {
+      args.sourceKernelScheduleSliceMinDispatchRepeat = parsePositiveInt(
+        readOptionValue(argv, i, "--source-kernel-schedule-slice-min-dispatch-repeat"),
+        "--source-kernel-schedule-slice-min-dispatch-repeat",
+      );
+      i += 1;
     } else if (token === "--source-kernel-submit-policy") {
       args.sourceKernelSubmitPolicy = parseSourceKernelSubmitPolicy(
         readOptionValue(argv, i, "--source-kernel-submit-policy"),
@@ -602,6 +623,12 @@ function parseArgs(argv) {
   }
   if (args.mode !== "both" && args.modeSchedule !== "grouped") {
     throw new Error("--mode-schedule paired modes are only valid with --mode=both");
+  }
+  if (args.sourceKernelScheduleSlices > 1 && args.modeSchedule === "grouped") {
+    throw new Error("--source-kernel-schedule-slices greater than 1 requires paired mode scheduling");
+  }
+  if (args.sourceKernelScheduleSlices > args.sourceKernelSamples) {
+    throw new Error("--source-kernel-schedule-slices cannot exceed --source-kernel-samples");
   }
   if (!existsSync(args.runtimeSelectorPolicyPath)) {
     throw new Error(`runtime selector policy not found: ${args.runtimeSelectorPolicyPath}`);
@@ -2600,7 +2627,16 @@ function applyModeWideFailure(l1Rows, l2Rows, rowResultsById, workflowResultsByI
   }
 }
 
-async function runMode(chromium, mode, args, pageTarget, l1Rows, l2Rows, chromePath) {
+async function runMode(
+  chromium,
+  mode,
+  args,
+  pageTarget,
+  l1Rows,
+  l2Rows,
+  chromePath,
+  scheduledSourceKernelSamples,
+) {
   const selection = runtimeSelectionResolution(mode, args);
   const launchArgs = [
     ...baseLaunchArgs(pageTarget.port),
@@ -2684,7 +2720,7 @@ async function runMode(chromium, mode, args, pageTarget, l1Rows, l2Rows, chromeP
         args.iterations,
         browserSurfaceArgs,
         sourceKernelScenarioConfig(row),
-        args.sourceKernelSamples,
+        scheduledSourceKernelSamples,
         args.sourceKernelWarmupSamples,
         args.sourceKernelSubmitPolicy,
       );
@@ -2721,7 +2757,7 @@ async function runMode(chromium, mode, args, pageTarget, l1Rows, l2Rows, chromeP
         args.iterations,
         browserSurfaceArgs,
         workflow,
-        args.sourceKernelSamples,
+        scheduledSourceKernelSamples,
         args.sourceKernelWarmupSamples,
         args.sourceKernelSubmitPolicy,
       );
@@ -2833,7 +2869,28 @@ function hasRequiredFailures(summary) {
   return summary.overallRequiredFailures > 0;
 }
 
-function buildModeSchedule(modes, l1Rows, l2Rows, modeSchedule) {
+function isSlicedSourceKernelRow(row, minDispatchRepeat) {
+  if (row?.browserWorkload?.computeProjection !== "source_kernel_dispatch_v1") {
+    return false;
+  }
+  return (row.browserWorkload.dispatchRepeat ?? 0) >= minDispatchRepeat;
+}
+
+function sourceKernelSamplesForSlice(totalSamples, sliceIndex, sliceCount) {
+  const base = Math.floor(totalSamples / sliceCount);
+  const remainder = totalSamples % sliceCount;
+  return base + (sliceIndex < remainder ? 1 : 0);
+}
+
+function buildModeSchedule(
+  modes,
+  l1Rows,
+  l2Rows,
+  modeSchedule,
+  sourceKernelSamples,
+  sourceKernelScheduleSlices,
+  sourceKernelScheduleSliceMinDispatchRepeat,
+) {
   if (modeSchedule === "grouped") {
     return modes.map((mode) => ({
       mode,
@@ -2841,6 +2898,7 @@ function buildModeSchedule(modes, l1Rows, l2Rows, modeSchedule) {
       l2Rows,
       scheduleUnit: "all",
       scheduleLayer: "all",
+      sourceKernelSamples,
     }));
   }
 
@@ -2861,16 +2919,30 @@ function buildModeSchedule(modes, l1Rows, l2Rows, modeSchedule) {
       }
       continue;
     }
-    for (let passIndex = 0; passIndex < rowModeOrders.length; passIndex += 1) {
-      for (const mode of rowModeOrders[passIndex]) {
-        entries.push({
-          mode,
-          l1Rows: [row],
-          l2Rows: [],
-          scheduleUnit: row.sourceWorkloadId,
-          scheduleLayer: "l1",
-          schedulePass: passIndex + 1,
-        });
+    const scheduleSlices = isSlicedSourceKernelRow(
+      row,
+      sourceKernelScheduleSliceMinDispatchRepeat,
+    ) ? sourceKernelScheduleSlices : 1;
+    for (let sliceIndex = 0; sliceIndex < scheduleSlices; sliceIndex += 1) {
+      const sliceSamples = sourceKernelSamplesForSlice(
+        sourceKernelSamples,
+        sliceIndex,
+        scheduleSlices,
+      );
+      for (let passIndex = 0; passIndex < rowModeOrders.length; passIndex += 1) {
+        for (const mode of rowModeOrders[passIndex]) {
+          entries.push({
+            mode,
+            l1Rows: [row],
+            l2Rows: [],
+            scheduleUnit: row.sourceWorkloadId,
+            scheduleLayer: "l1",
+            schedulePass: passIndex + 1,
+            scheduleSlice: sliceIndex + 1,
+            scheduleSlices,
+            sourceKernelSamples: sliceSamples,
+          });
+        }
       }
     }
   }
@@ -2885,6 +2957,7 @@ function buildModeSchedule(modes, l1Rows, l2Rows, modeSchedule) {
           scheduleUnit: workflow.id,
           scheduleLayer: "l2",
           schedulePass: passIndex + 1,
+          sourceKernelSamples,
         });
       }
     }
@@ -2956,12 +3029,36 @@ function summarizeSampleValues(values) {
   };
 }
 
-function applyMergedSampleStats(metrics, sampleKey, metricName) {
-  const samples = metrics[sampleKey];
-  if (!Array.isArray(samples) || samples.length === 0) {
-    return;
+function averageSampleGroupSummaries(groups) {
+  const summaries = groups
+    .filter((group) => Array.isArray(group) && group.length > 0)
+    .map((group) => summarizeSampleValues(group))
+    .filter((summary) => summary !== null);
+  if (summaries.length === 0 || summaries.length !== groups.length) {
+    return null;
   }
-  const summary = summarizeSampleValues(samples);
+  const totals = { avg: 0, p10: 0, p50: 0, p95: 0, p99: 0 };
+  for (const summary of summaries) {
+    totals.avg += summary.avg;
+    totals.p10 += summary.p10;
+    totals.p50 += summary.p50;
+    totals.p95 += summary.p95;
+    totals.p99 += summary.p99;
+  }
+  return {
+    avg: totals.avg / summaries.length,
+    p10: totals.p10 / summaries.length,
+    p50: totals.p50 / summaries.length,
+    p95: totals.p95 / summaries.length,
+    p99: totals.p99 / summaries.length,
+  };
+}
+
+function applyMergedSampleStats(metrics, sampleKey, metricName) {
+  const groups = metrics[`${sampleKey}Groups`];
+  const summary = Array.isArray(groups) && groups.length > 0
+    ? averageSampleGroupSummaries(groups)
+    : summarizeSampleValues(metrics[sampleKey] ?? []);
   if (!summary) {
     return;
   }
@@ -3026,6 +3123,7 @@ function mergeMetrics(leftMetrics, rightMetrics) {
       merged[`${key}Groups`] = groups;
     }
   }
+  applyMergedSourceKernelStats(merged);
   return merged;
 }
 
@@ -3068,6 +3166,9 @@ async function main() {
     l1Rows,
     l2Rows,
     args.modeSchedule,
+    args.sourceKernelSamples,
+    args.sourceKernelScheduleSlices,
+    args.sourceKernelScheduleSliceMinDispatchRepeat,
   );
   const modeRunDetails = [];
 
@@ -3111,6 +3212,9 @@ async function main() {
           scheduleUnit: scheduleEntry.scheduleUnit,
           scheduleLayer: scheduleEntry.scheduleLayer,
           schedulePass: scheduleEntry.schedulePass ?? 1,
+          scheduleSlice: scheduleEntry.scheduleSlice ?? 1,
+          scheduleSlices: scheduleEntry.scheduleSlices ?? 1,
+          sourceKernelSamples: scheduleEntry.sourceKernelSamples ?? args.sourceKernelSamples,
           elapsedMs: 0,
           launchArgs: [],
           runtimeSelection: buildRuntimeSelection(
@@ -3164,12 +3268,16 @@ async function main() {
         scheduleEntry.l1Rows,
         scheduleEntry.l2Rows,
         chromePathForMode,
+        scheduleEntry.sourceKernelSamples ?? args.sourceKernelSamples,
       );
       modeRunDetails.push({
         mode: modeRun.mode,
         scheduleUnit: scheduleEntry.scheduleUnit,
         scheduleLayer: scheduleEntry.scheduleLayer,
         schedulePass: scheduleEntry.schedulePass ?? 1,
+        scheduleSlice: scheduleEntry.scheduleSlice ?? 1,
+        scheduleSlices: scheduleEntry.scheduleSlices ?? 1,
+        sourceKernelSamples: scheduleEntry.sourceKernelSamples ?? args.sourceKernelSamples,
         chromePath: modeRun.chromePath,
         elapsedMs: modeRun.elapsedMs,
         launchArgs: modeRun.launchArgs,
@@ -3276,6 +3384,9 @@ async function main() {
       scenarioIterations: args.iterations,
       sourceKernelSamples: args.sourceKernelSamples,
       sourceKernelWarmupSamples: args.sourceKernelWarmupSamples,
+      sourceKernelScheduleSlices: args.sourceKernelScheduleSlices,
+      sourceKernelScheduleSliceMinDispatchRepeat:
+        args.sourceKernelScheduleSliceMinDispatchRepeat,
       sourceKernelSubmitPolicy: args.sourceKernelSubmitPolicy,
       modeSchedule: args.modeSchedule,
       browserBuildConfigurationEvidence: browserBuildConfigurationEvidence(args),
