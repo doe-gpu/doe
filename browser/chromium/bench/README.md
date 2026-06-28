@@ -25,7 +25,7 @@ This module implements a layered browser benchmark superset for Chromium Track A
 2. `projection-manifest.schema.json`
    - schema for generated projection manifest.
 3. `generated/browser_projection_manifest.json`
-   - generated `L1/L0` projection rows with contract hashes and repo-relative source/rules paths.
+   - generated `L1/L0` projection rows with contract hashes, repo-relative source/rules paths, and browser workload parameters such as upload byte counts.
 4. `workflows/browser-workflow-manifest.json`
    - `L2` workflow definitions with required status, claim scope, and promotion approver roles.
 5. `workflows/browser-workflow-manifest.schema.json`
@@ -110,12 +110,26 @@ plus the comparison percent delta. `overall` is row-weighted.
 `categoryBalancedOverall` uses the geometric mean of per-category geomeans so a
 dense category cannot dominate the headline view. The legacy relative index is
 still present in JSON as `score` for compatibility, but it is not the primary
-readout. `bottlenecks` lists the slowest categories, rows, and measured phases
-so regressions do not require manual row sorting. The score is directional
+readout. `strictComparable` is the fair browser-projection summary and includes
+only scorable rows whose projection says `comparabilityExpectation=strict` and
+whose `browserWorkload` records `sourceComparable=true`,
+`sourceClaimEligible=true`, and `benchmarkClass=comparable`.
+`bottlenecks` lists the slowest categories, rows, and measured phases so
+regressions do not require manual row sorting. The score is directional
 diagnostic evidence, not a release performance claim. The score sidecar carries
-source report, workload, browser executable, runtime, shader compiler, adapter,
-and trace-hash identity anchors and is covered by the browser artifact identity
-coverage gate.
+source report, workload, mode order, browser executable, runtime, shader
+compiler, adapter, and trace-hash identity anchors and is covered by the
+browser artifact identity coverage gate.
+
+`--mode-order` records which runtime runs first. `--mode-schedule grouped`
+preserves the historical behavior of running all rows for one runtime before
+the next. `--mode-schedule paired` alternates runtimes per row and records each
+schedule unit in `modeRunDetails`. `--mode-schedule paired-balanced` runs both
+row orders and averages numeric metrics per runtime, with
+`orderBalancedSampleCount` recorded in row metrics. Use order-balanced evidence
+when auditing order-sensitive browser results before promotion. Non-grouped
+schedules run strict-comparable `L1` rows before component diagnostics so
+component probes do not precondition strict browser evidence.
 
 The L2 workflow manifest includes optional `fawn_visual_resource` rows for the
 checked-in Fawn HTML pages under `browser/chromium/resources/`. Those rows load
@@ -136,6 +150,11 @@ phase-level diagnostic medians and tails, including texture creation,
 texture write, view creation, render pipeline creation, submit/readback,
 map/read, wait, and destroy where the scenario exercises those phases. Use
 `--iters-texture` to set the texture sample count.
+
+Upload L1 rows emit the requested and effective iteration counts, upload bytes,
+total uploaded bytes, and `iterationPolicy`. Browser upload rows above the
+exact-upload ceiling remain `l0_only` in the generated projection manifest
+instead of being silently downscaled.
 
 Render-readback L1 rows emit `renderMs` plus render-path phase timings so
 adapter/device setup stays outside the render category score while remaining in

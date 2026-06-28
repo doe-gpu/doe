@@ -81,6 +81,10 @@ CATEGORY_BY_WORKFLOW_ID = {
 }
 
 SCORE_METHOD_ID = "browser-layered-geomean-lower-is-better-v1"
+STRICT_COMPARABLE_CRITERIA = (
+    "comparabilityExpectation=strict, browserWorkload.sourceComparable=true, "
+    "browserWorkload.sourceClaimEligible=true, browserWorkload.benchmarkClass=comparable"
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -284,6 +288,12 @@ def build_row_score(
         "resourceSha256": row.get("resourceSha256") if isinstance(row.get("resourceSha256"), str) else None,
         "category": category,
         "scenarioTemplate": row.get("scenarioTemplate", ""),
+        "projectionClass": row.get("projectionClass"),
+        "comparabilityExpectation": row.get("comparabilityExpectation"),
+        "claimScope": row.get("claimScope"),
+        "browserWorkload": row.get("browserWorkload")
+        if isinstance(row.get("browserWorkload"), dict)
+        else None,
         "metric": metric,
         "unit": unit,
         "baselineMode": baseline_mode,
@@ -381,6 +391,74 @@ def summarize_category_balanced(
     }
 
 
+def strict_comparable_exclusion_reason(row: dict[str, Any]) -> str | None:
+    if row.get("comparabilityExpectation") != "strict":
+        return "comparabilityExpectation is not strict"
+    browser_workload = row.get("browserWorkload")
+    if not isinstance(browser_workload, dict):
+        return "missing browserWorkload"
+    if browser_workload.get("sourceComparable") is not True:
+        return "sourceComparable is not true"
+    if browser_workload.get("sourceClaimEligible") is not True:
+        return "sourceClaimEligible is not true"
+    if browser_workload.get("benchmarkClass") != "comparable":
+        return "benchmarkClass is not comparable"
+    return None
+
+
+def strict_comparable_excluded_row(row: dict[str, Any], reason: str) -> dict[str, Any]:
+    return {
+        "layer": row.get("layer"),
+        "rowId": row.get("rowId"),
+        "category": row.get("category"),
+        "reason": reason,
+        "comparabilityExpectation": row.get("comparabilityExpectation"),
+        "browserWorkload": row.get("browserWorkload"),
+    }
+
+
+def strict_comparable_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    candidates = [row for row in rows if row.get("comparabilityExpectation") == "strict"]
+    selected: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
+    for row in candidates:
+        exclusion_reason = strict_comparable_exclusion_reason(row)
+        if exclusion_reason is None:
+            selected.append(row)
+        else:
+            excluded.append(strict_comparable_excluded_row(row, exclusion_reason))
+
+    if not selected:
+        return {
+            "selectionCriteria": STRICT_COMPARABLE_CRITERIA,
+            "candidateRowCount": len(candidates),
+            "rowCount": 0,
+            "excludedRowCount": len(excluded),
+            "excludedRows": excluded,
+            "overall": None,
+            "categoryBalancedOverall": None,
+            "categories": [],
+            "bottlenecks": summarize_bottlenecks(categories=[], rows=[]),
+        }
+
+    categories = summarize_categories(selected)
+    return {
+        "selectionCriteria": STRICT_COMPARABLE_CRITERIA,
+        "candidateRowCount": len(candidates),
+        "rowCount": len(selected),
+        "excludedRowCount": len(excluded),
+        "excludedRows": excluded,
+        "overall": summarize_rows(selected),
+        "categoryBalancedOverall": summarize_category_balanced(
+            categories,
+            baseline_mode=str(selected[0]["baselineMode"]),
+            comparison_mode=str(selected[0]["comparisonMode"]),
+        ),
+        "bottlenecks": summarize_bottlenecks(categories=categories, rows=selected),
+        "categories": categories,
+    }
+
+
 def summarize_bottlenecks(
     *,
     categories: list[dict[str, Any]],
@@ -471,9 +549,30 @@ def mode_detail_by_mode(report_payload: dict[str, Any]) -> dict[str, dict[str, A
         if not isinstance(detail, dict):
             continue
         mode = detail.get("mode")
-        if isinstance(mode, str) and mode:
+        if isinstance(mode, str) and mode and mode not in details:
             details[mode] = detail
     return details
+
+
+def mode_run_trace(report_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    details_raw = report_payload.get("modeRunDetails")
+    if not isinstance(details_raw, list):
+        return []
+    trace: list[dict[str, Any]] = []
+    for detail in details_raw:
+        if not isinstance(detail, dict):
+            continue
+        trace.append(
+            {
+                "mode": detail.get("mode", ""),
+                "scheduleLayer": detail.get("scheduleLayer", ""),
+                "scheduleUnit": detail.get("scheduleUnit", ""),
+                "schedulePass": detail.get("schedulePass"),
+                "hash": detail.get("hash"),
+                "previousHash": detail.get("previousHash"),
+            }
+        )
+    return trace
 
 
 def build_mode_identity(mode: str, detail: dict[str, Any] | None) -> dict[str, Any]:
@@ -603,6 +702,8 @@ def build_score_report(
         },
         "baselineMode": baseline_mode,
         "comparisonMode": comparison_mode,
+        "modeOrder": report_payload.get("modeOrder", []),
+        "modeSchedule": report_payload.get("modeSchedule", "grouped"),
         "browserExecutables": {
             "baseline": mode_chrome_paths.get(baseline_mode, ""),
             "comparison": mode_chrome_paths.get(comparison_mode, ""),
@@ -621,6 +722,7 @@ def build_score_report(
                 mode_details.get(comparison_mode),
             ),
         },
+        "modeRunTrace": mode_run_trace(report_payload),
         "scoreMethod": {
             "id": SCORE_METHOD_ID,
             "legacyRelativeIndexParityScore": 100.0,
@@ -629,6 +731,7 @@ def build_score_report(
             "categoryBalancedScoreFormula": "100 * geometric_mean(categoryGeomeanRatios)",
             "pairedModeScoreFormula": "baselineScore=100/(1+ratio), comparisonScore=100*ratio/(1+ratio)",
             "comparisonDeltaPercentFormula": "(comparisonScore / baselineScore - 1) * 100",
+            "strictComparableBasis": f"strictComparable includes only scorable rows with {STRICT_COMPARABLE_CRITERIA}.",
             "metricPriority": [metric for metric, _unit in METRIC_PRIORITY],
             "categoryMapping": {
                 "source": "domain for L1 rows; workflow id for L2 rows",
@@ -641,6 +744,7 @@ def build_score_report(
                 "comparisonDeltaPercent is positive when the comparison mode was faster.",
                 "Legacy score is 100 * geomeanRatio and is retained for compatibility.",
                 "overall is row-weighted; categoryBalancedOverall gives each category one vote.",
+                "strictComparable is the fair summary for strict projected browser rows that are source-comparable and source-claim-eligible.",
                 "This score is diagnostic and not a release performance claim.",
             ],
         },
@@ -658,6 +762,7 @@ def build_score_report(
             categories=categories,
             rows=scored_rows,
         ),
+        "strictComparable": strict_comparable_summary(scored_rows),
         "categories": categories,
         "rows": scored_rows,
         "excludedRows": excluded_rows,

@@ -52,6 +52,21 @@ Each projected workload row must include:
 8. `claimScope` (`l1_strict_candidate`, `l1_component_only`, `l0_only_no_claim`)
 9. `claimLanguage`
 10. `projectionNote`
+11. `browserWorkload`
+
+`browserWorkload` records browser-executed parameters derived from the source
+workload contract. Upload rows must include `uploadBytes` so reports prove the
+effective upload size rather than inferring it from workload names.
+Upload rows above the browser lane's exact-upload ceiling must stay
+`non_projectable`/`l0_only`; they must not be silently downscaled into a
+different browser workload.
+The browser upload runner may increase per-row iterations for small byte sizes
+using an explicit `iterationPolicy`; reports must record requested iterations,
+effective iterations, upload bytes, and total upload bytes.
+Compute rows whose source shader semantics are not implemented in the browser
+runner must remain component diagnostics and must identify their
+`computeProjection`. Texture contract rows must include the effective texture
+dimensions and mip count.
 
 Projection manifests must also carry:
 
@@ -88,12 +103,27 @@ artifact no longer proves which page source ran.
 The browser layered score sidecar remains diagnostic. It preserves the
 row-weighted `overall` summary for existing consumers and also emits
 `categoryBalancedOverall`, computed from the geometric mean of category
-geomeans. Both summaries must carry separate paired scores for baseline and
-comparison modes plus comparison percent delta. The category-balanced summary is
-the browser-bench style headline: each category contributes once, while
-row-level evidence remains available for auditing. Score sidecars must also
-emit `bottlenecks`, sorted by negative comparison delta, so weak categories,
-rows, and measured phases are explicit in the artifact.
+geomeans. The fair browser-projection summary is `strictComparable`; it must
+only include rows with `comparabilityExpectation=strict` and
+`browserWorkload.sourceComparable=true`,
+`browserWorkload.sourceClaimEligible=true`, and
+`browserWorkload.benchmarkClass=comparable`.
+Both summaries must carry separate paired scores for baseline and comparison
+modes plus comparison percent delta. The category-balanced summary is the
+browser-bench style headline: each category contributes once, while row-level
+evidence remains available for auditing. Score sidecars must also emit
+`bottlenecks`, sorted by negative comparison delta, so weak categories, rows,
+and measured phases are explicit in the artifact.
+Reports must record `modeOrder` and `modeSchedule`. `modeSchedule=grouped`
+means all rows ran for one runtime before the next runtime.
+`modeSchedule=paired` means each row records paired runtime execution in
+`modeRunDetails` before moving to the next row. `modeSchedule=paired-balanced`
+runs both row orders and averages numeric metrics per runtime, with
+`orderBalancedSampleCount` recorded in row metrics. Order-sensitive reports
+remain diagnostic until order-balanced evidence passes the same structural and
+score gates as the grouped report. Non-grouped schedules must execute
+strict-comparable `L1` rows before component diagnostics so component probes do
+not precondition strict browser evidence.
 
 Texture scenario rows must expose `textureMs` when the row can measure the
 texture path separately from scenario startup. The score metric priority prefers

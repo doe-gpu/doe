@@ -27,6 +27,16 @@ pub fn flush_pending_work_timed(q: *DoeQueue) QueueFlushBreakdown {
     return queue_flush_breakdown.flushPendingWorkTimed(q);
 }
 
+fn hasPendingMetalWork(q: *const DoeQueue) bool {
+    return q.pending_cmd != null or
+        q.staged_write_cmd != null or
+        q.staged_write_blit != null or
+        q.deferred_copy_count != 0 or
+        q.deferred_resolve_count != 0 or
+        q.deferred_release_count != 0 or
+        q.event_counter > q.completed_event_counter;
+}
+
 pub fn flush_before_submit_if_needed(q: *DoeQueue) void {
     queue_flush_breakdown.commitStagedWriteBlits(q);
     if (q.dev.backend != .metal or q.mtl_event == null or q.deferred_copy_count != 0 or q.deferred_resolve_count != 0) {
@@ -117,6 +127,9 @@ pub fn flush_pending_work_dropin_sync(q: *DoeQueue) void {
                 };
             }
         },
-        else => queue_flush_breakdown.flushPendingWork(q),
+        else => {
+            if (!hasPendingMetalWork(q)) return;
+            queue_flush_breakdown.flushPendingWork(q);
+        },
     }
 }

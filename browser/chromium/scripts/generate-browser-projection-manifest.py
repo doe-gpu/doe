@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -15,6 +16,13 @@ VALID_LAYER_TARGETS = {"l1_browser_api", "l0_only"}
 VALID_COMPARABILITY = {"strict", "component", "none"}
 VALID_REQUIRED_STATUS = {"ok", "not_applicable"}
 VALID_CLAIM_SCOPE = {"l1_strict_candidate", "l1_component_only", "l0_only_no_claim"}
+MAX_BROWSER_EXACT_UPLOAD_BYTES = 16 * 1024 * 1024
+SIZE_UNITS = {
+    "b": 1,
+    "kb": 1024,
+    "mb": 1024 * 1024,
+    "gb": 1024 * 1024 * 1024,
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -145,6 +153,101 @@ def require_rule_shape(rule: dict[str, Any], label: str) -> dict[str, str]:
     }
 
 
+def parse_size_bytes(text: str) -> int | None:
+    match = re.search(r"(?P<count>[0-9]+)\s*(?P<unit>gb|mb|kb|b)\b", text, flags=re.I)
+    if match is None:
+        return None
+    count = int(match.group("count"))
+    unit = match.group("unit").lower()
+    multiplier = SIZE_UNITS.get(unit)
+    if multiplier is None:
+        return None
+    return count * multiplier
+
+
+def browser_workload_metadata(workload: dict[str, Any], domain: str) -> dict[str, Any]:
+    metadata: dict[str, Any] = {
+        "sourceComparable": bool(workload.get("comparable")),
+        "sourceClaimEligible": bool(workload.get("claimEligible")),
+    }
+    benchmark_class = workload.get("benchmarkClass")
+    if isinstance(benchmark_class, str) and benchmark_class.strip():
+        metadata["benchmarkClass"] = benchmark_class
+    elif metadata["sourceComparable"] and metadata["sourceClaimEligible"]:
+        metadata["benchmarkClass"] = "comparable"
+    else:
+        metadata["benchmarkClass"] = "directional"
+
+    if domain == "upload":
+        search_text = " ".join(
+            str(workload.get(key, ""))
+            for key in ("id", "name", "description", "dawnFilter")
+        )
+        upload_bytes = parse_size_bytes(search_text)
+        if upload_bytes is None:
+            raise ValueError(f"upload workload missing parseable byte size: {workload.get('id')}")
+        metadata["uploadBytes"] = upload_bytes
+    elif domain == "compute":
+        metadata["computeProjection"] = "generic_empty_dispatch_component"
+    elif domain == "texture-contract":
+        workload_id = str(workload.get("id", ""))
+        metadata["textureWidth"] = 128
+        metadata["textureHeight"] = 128
+        metadata["mipLevelCount"] = 8 if workload_id.endswith("_mip8") else 1
+
+    return metadata
+
+
+def component_compute_rule() -> dict[str, str]:
+    return {
+        "projectionClass": "medium",
+        "layerTarget": "l1_browser_api",
+        "scenarioTemplate": "compute_dispatch_basic",
+        "comparabilityExpectation": "component",
+        "requiredStatus": "ok",
+        "claimScope": "l1_component_only",
+        "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
+        "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+    }
+
+
+def source_strict_comparable(browser_workload: dict[str, Any]) -> bool:
+    return (
+        browser_workload.get("sourceComparable") is True
+        and browser_workload.get("sourceClaimEligible") is True
+        and browser_workload.get("benchmarkClass") == "comparable"
+    )
+
+
+def component_source_diagnostic_rule(rule: dict[str, str]) -> dict[str, str]:
+    return {
+        **rule,
+        "comparabilityExpectation": "component",
+        "claimScope": "l1_component_only",
+        "claimLanguage": "Component-level browser API diagnostic only; source workload is not strict-claim eligible.",
+        "projectionNote": (
+            f"{rule['projectionNote']} Source workload metadata prevents strict "
+            "browser comparison; keep this row as a directional/component diagnostic."
+        ),
+    }
+
+
+def non_projectable_browser_upload_rule(upload_bytes: int) -> dict[str, str]:
+    return {
+        "projectionClass": "non_projectable",
+        "layerTarget": "l0_only",
+        "scenarioTemplate": "none",
+        "comparabilityExpectation": "none",
+        "requiredStatus": "not_applicable",
+        "claimScope": "l0_only_no_claim",
+        "claimLanguage": "Oversized upload row remains an L0 runtime contract; no browser-layer claim language is allowed.",
+        "projectionNote": (
+            "Exact browser upload projection is disabled because uploadBytes="
+            f"{upload_bytes} exceeds maxBrowserExactUploadBytes={MAX_BROWSER_EXACT_UPLOAD_BYTES}."
+        ),
+    }
+
+
 def build_manifest(
     workloads_payload: dict[str, Any],
     rules_payload: dict[str, Any],
@@ -189,6 +292,19 @@ def build_manifest(
         seen_ids.add(workload_id)
 
         rule = domain_rules.get(domain, default_rule)
+        browser_workload = browser_workload_metadata(workload_raw, domain)
+        if (
+            domain == "upload"
+            and browser_workload.get("uploadBytes", 0) > MAX_BROWSER_EXACT_UPLOAD_BYTES
+        ):
+            rule = non_projectable_browser_upload_rule(int(browser_workload["uploadBytes"]))
+        elif domain == "compute":
+            rule = component_compute_rule()
+        elif (
+            rule["comparabilityExpectation"] == "strict"
+            and not source_strict_comparable(browser_workload)
+        ):
+            rule = component_source_diagnostic_rule(rule)
 
         row = {
             "sourceWorkloadId": workload_id,
@@ -202,6 +318,7 @@ def build_manifest(
             "claimScope": rule["claimScope"],
             "claimLanguage": rule["claimLanguage"],
             "projectionNote": rule["projectionNote"],
+            "browserWorkload": browser_workload,
         }
         rows.append(row)
 
@@ -214,7 +331,7 @@ def build_manifest(
     )
 
     return {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "generatedAt": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "sourceWorkloadsPath": workloads_path,
         "sourceWorkloadsSha256": workloads_sha256,

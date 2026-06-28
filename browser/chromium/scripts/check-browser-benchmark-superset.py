@@ -21,6 +21,7 @@ VALID_L2_CLAIM_SCOPE = {"l2_component_only", "l2_diagnostic_only"}
 VALID_RUNTIME_STATUS = {"ok", "fail", "unsupported", "l0_only"}
 VALID_REPORT_MODES = {"dawn", "doe", "auto"}
 VALID_SELECTED_RUNTIMES = {"dawn", "doe"}
+VALID_MODE_SCHEDULES = {"grouped", "paired", "paired-balanced"}
 VALID_POWER_PREFERENCES = {"default", "high-performance", "low-power"}
 VALID_RUNTIME_STATUS_CODES = {
     "ok": {"ok"},
@@ -208,8 +209,8 @@ def parse_workloads(workloads_payload: dict[str, Any]) -> list[dict[str, str]]:
 
 def parse_projection_manifest(manifest_payload: dict[str, Any]) -> dict[str, Any]:
     schema_version = manifest_payload.get("schemaVersion")
-    if schema_version != 2:
-        raise ValueError(f"invalid manifest schemaVersion: expected 2, got {schema_version}")
+    if schema_version != 3:
+        raise ValueError(f"invalid manifest schemaVersion: expected 3, got {schema_version}")
 
     manifest = {
         "generatedAt": require_string(manifest_payload.get("generatedAt"), "manifest.generatedAt"),
@@ -273,6 +274,11 @@ def parse_projection_manifest(manifest_payload: dict[str, Any]) -> dict[str, Any
             "projectionNote": require_string(
                 row_raw.get("projectionNote"), f"rows[{index}].projectionNote"
             ),
+            "browserWorkload": parse_browser_workload(
+                row_raw.get("browserWorkload"),
+                f"rows[{index}].browserWorkload",
+                row_raw.get("domain"),
+            ),
         }
 
         if source_workload_id in seen_ids:
@@ -324,6 +330,11 @@ def parse_projection_manifest(manifest_payload: dict[str, Any]) -> dict[str, Any
 
         if row["comparabilityExpectation"] == "strict" and row["claimScope"] != "l1_strict_candidate":
             raise ValueError(f"{source_workload_id} strict comparability requires l1_strict_candidate")
+        if row["comparabilityExpectation"] == "strict" and not browser_workload_strict_comparable(row["browserWorkload"]):
+            raise ValueError(
+                f"{source_workload_id} strict comparability requires "
+                "sourceComparable=true, sourceClaimEligible=true, and benchmarkClass=comparable"
+            )
         if row["comparabilityExpectation"] == "component" and row["claimScope"] != "l1_component_only":
             raise ValueError(f"{source_workload_id} component comparability requires l1_component_only")
         if row["comparabilityExpectation"] == "none" and row["claimScope"] != "l0_only_no_claim":
@@ -333,6 +344,55 @@ def parse_projection_manifest(manifest_payload: dict[str, Any]) -> dict[str, Any
 
     manifest["rows"] = rows
     return manifest
+
+
+def parse_browser_workload(value: Any, label: str, domain: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be an object")
+    source_comparable = value.get("sourceComparable")
+    source_claim_eligible = value.get("sourceClaimEligible")
+    if not isinstance(source_comparable, bool):
+        raise ValueError(f"{label}.sourceComparable must be a boolean")
+    if not isinstance(source_claim_eligible, bool):
+        raise ValueError(f"{label}.sourceClaimEligible must be a boolean")
+    parsed: dict[str, Any] = {
+        "sourceComparable": source_comparable,
+        "sourceClaimEligible": source_claim_eligible,
+    }
+    benchmark_class = value.get("benchmarkClass")
+    if isinstance(benchmark_class, str) and benchmark_class.strip():
+        parsed["benchmarkClass"] = benchmark_class
+    upload_bytes = value.get("uploadBytes")
+    if upload_bytes is not None:
+        if not isinstance(upload_bytes, int) or upload_bytes <= 0:
+            raise ValueError(f"{label}.uploadBytes must be a positive integer")
+        parsed["uploadBytes"] = upload_bytes
+    if domain == "upload" and "uploadBytes" not in parsed:
+        raise ValueError(f"{label}.uploadBytes is required for upload rows")
+    compute_projection = value.get("computeProjection")
+    if isinstance(compute_projection, str) and compute_projection.strip():
+        parsed["computeProjection"] = compute_projection
+    if domain == "compute" and parsed.get("computeProjection") != "generic_empty_dispatch_component":
+        raise ValueError(f"{label}.computeProjection is required for compute rows")
+    for key in ("textureWidth", "textureHeight", "mipLevelCount"):
+        metric_value = value.get(key)
+        if metric_value is not None:
+            if not isinstance(metric_value, int) or metric_value <= 0:
+                raise ValueError(f"{label}.{key} must be a positive integer")
+            parsed[key] = metric_value
+    if domain == "texture-contract":
+        for key in ("textureWidth", "textureHeight", "mipLevelCount"):
+            if key not in parsed:
+                raise ValueError(f"{label}.{key} is required for texture-contract rows")
+    return parsed
+
+
+def browser_workload_strict_comparable(value: dict[str, Any]) -> bool:
+    return (
+        value.get("sourceComparable") is True
+        and value.get("sourceClaimEligible") is True
+        and value.get("benchmarkClass") == "comparable"
+    )
 
 
 def parse_workflow_manifest(workflows_payload: dict[str, Any]) -> dict[str, Any]:
@@ -813,19 +873,27 @@ def check_workload_identity(payload: Any, manifest: dict[str, Any]) -> list[str]
     return errors
 
 
-def check_report_methodology(payload: Any) -> list[str]:
+def check_report_methodology(payload: Any, mode_schedule: str) -> list[str]:
     if not isinstance(payload, dict):
         return ["report missing methodology object"]
+    errors: list[str] = []
+    methodology_schedule = payload.get("modeSchedule", "grouped")
+    if methodology_schedule != mode_schedule:
+        errors.append(
+            "report methodology.modeSchedule mismatch: "
+            f"methodology={methodology_schedule} topLevel={mode_schedule}"
+        )
     adapter_request = payload.get("adapterRequest")
     if not isinstance(adapter_request, dict):
-        return ["report methodology.adapterRequest must be an object"]
+        errors.append("report methodology.adapterRequest must be an object")
+        return errors
     power_preference = adapter_request.get("powerPreference")
     if power_preference not in VALID_POWER_PREFERENCES:
-        return [
+        errors.append(
             "report methodology.adapterRequest.powerPreference must be one of "
             f"{sorted(VALID_POWER_PREFERENCES)}"
-        ]
-    return []
+        )
+    return errors
 
 
 def category_for_manifest_row(row: dict[str, Any]) -> str:
@@ -913,7 +981,12 @@ def check_report_coverage(
             f"report={report_projection_hash} manifest={manifest['projectionContractHash']}"
         )
     errors.extend(check_workload_identity(report_payload.get("workloadIdentity"), manifest))
-    errors.extend(check_report_methodology(report_payload.get("methodology")))
+
+    mode_schedule = report_payload.get("modeSchedule", "grouped")
+    if mode_schedule not in VALID_MODE_SCHEDULES:
+        errors.append(f"report modeSchedule invalid: {mode_schedule}")
+        mode_schedule = "grouped"
+    errors.extend(check_report_methodology(report_payload.get("methodology"), mode_schedule))
 
     env_evidence = report_payload.get("browserEnvironmentEvidence")
     if not isinstance(env_evidence, dict):
@@ -945,7 +1018,17 @@ def check_report_coverage(
             if detail_mode not in VALID_REPORT_MODES:
                 errors.append(f"modeRunDetails[{index}] has invalid mode: {detail_mode}")
                 continue
-            mode_run_details[str(detail_mode)] = detail
+            schedule_layer = detail.get("scheduleLayer", "all")
+            schedule_unit = detail.get("scheduleUnit", "all")
+            if not isinstance(schedule_layer, str) or not schedule_layer:
+                errors.append(f"modeRunDetails[{index}] missing scheduleLayer")
+            if not isinstance(schedule_unit, str) or not schedule_unit:
+                errors.append(f"modeRunDetails[{index}] missing scheduleUnit")
+            schedule_pass = detail.get("schedulePass", 1)
+            if not isinstance(schedule_pass, int) or schedule_pass <= 0:
+                errors.append(f"modeRunDetails[{index}] schedulePass must be a positive integer")
+            if str(detail_mode) not in mode_run_details:
+                mode_run_details[str(detail_mode)] = detail
 
     for mode in required_modes:
         detail = mode_run_details.get(mode)
@@ -1067,8 +1150,12 @@ def check_report_coverage(
             continue
         if report_row.get("claimScope") != manifest_row["claimScope"]:
             errors.append(f"L1 row claimScope drift for {workload_id}")
+        if report_row.get("comparabilityExpectation") != manifest_row["comparabilityExpectation"]:
+            errors.append(f"L1 row comparabilityExpectation drift for {workload_id}")
         if report_row.get("requiredStatus") != manifest_row["requiredStatus"]:
             errors.append(f"L1 row requiredStatus drift for {workload_id}")
+        if report_row.get("browserWorkload") != manifest_row["browserWorkload"]:
+            errors.append(f"L1 row browserWorkload drift for {workload_id}")
 
         if required_modes:
             runtimes = report_row.get("runtimes")

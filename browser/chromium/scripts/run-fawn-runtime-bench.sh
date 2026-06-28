@@ -41,8 +41,8 @@ exec "${SCRIPT_DIR}/run-bench.sh" \
   --iters-upload 180 \
   --iters-dispatch 160 \
   --iters-render 96 \
-  --iters-pipeline 16 \
-  --iters-async-pipeline 8 \
+  --iters-pipeline 256 \
+  --iters-async-pipeline 64 \
   --iters-workflow 64 \
-  --iters-texture 16 \
+  --iters-texture 64 \
   "$@"

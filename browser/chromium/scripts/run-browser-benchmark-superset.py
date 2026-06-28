@@ -296,6 +296,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--doe-lib", default=str(DEFAULT_DOE_LIB))
     parser.add_argument("--mode", choices=["dawn", "doe", "auto", "both"], default="both")
     parser.add_argument(
+        "--mode-order",
+        choices=["dawn,doe", "doe,dawn"],
+        help="Runtime execution order for --mode=both.",
+    )
+    parser.add_argument(
+        "--mode-schedule",
+        choices=["grouped", "paired", "paired-balanced"],
+        default="grouped",
+        help=(
+            "Runtime scheduling policy for --mode=both. grouped runs all rows "
+            "for one runtime before the next; paired alternates runtimes per "
+            "row; paired-balanced runs both row orders and averages numeric "
+            "metrics per runtime."
+        ),
+    )
+    parser.add_argument(
         "--runtime-selector-policy",
         default=str(DEFAULT_RUNTIME_SELECTOR_POLICY),
         help="Runtime selector policy JSON passed to the layered runner.",
@@ -575,6 +591,8 @@ def format_score_line(score_payload: dict[str, Any]) -> str:
 
 def extend_iteration_args(command: list[str], args: argparse.Namespace) -> None:
     iteration_args = [
+        ("--mode-order", args.mode_order),
+        ("--mode-schedule", args.mode_schedule),
         ("--iters-upload", args.iters_upload),
         ("--iters-dispatch", args.iters_dispatch),
         ("--iters-render", args.iters_render),
@@ -923,6 +941,8 @@ def main() -> int:
             "runtimeSelectorPolicy": str(runtime_selector_policy),
             "runtimeSelectorProfileId": args.runtime_selector_profile_id,
             "mode": args.mode,
+            "modeOrder": args.mode_order,
+            "modeSchedule": args.mode_schedule,
             "browserReleaseClasses": browser_release_classes,
             "browserReleaseSettings": {
                 mode: fawn_release_settings_evidence(path)
