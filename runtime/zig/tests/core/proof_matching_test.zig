@@ -624,9 +624,9 @@ test "DispatchPrecondition default fields are correct" {
     try testing.expectEqual(@as(u64, 0), precondition.element_offset);
 }
 
-test "DispatchPreconditionKind has exactly 7 variants" {
+test "DispatchPreconditionKind has exactly 8 variants" {
     const fields = @typeInfo(ir.DispatchPreconditionKind).@"enum".fields;
-    try testing.expectEqual(@as(usize, 7), fields.len);
+    try testing.expectEqual(@as(usize, 8), fields.len);
 }
 
 // ============================================================

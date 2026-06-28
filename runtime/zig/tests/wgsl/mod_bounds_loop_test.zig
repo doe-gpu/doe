@@ -61,7 +61,7 @@ test "analyzeToIrWithConfig records generalized for-loop gid preconditions" {
     try std.testing.expect(!has_call_named(&elided_ir.functions.items[0], "min"));
 }
 
-test "compute runtime translation drops _doe_sizes for proof-covered generalized for-loop bounds only" {
+test "compute runtime translation drops _doe_sizes for dispatch-validated generalized for-loop bounds" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
         \\@compute @workgroup_size(8)
@@ -82,11 +82,8 @@ test "compute runtime translation drops _doe_sizes for proof-covered generalized
     );
     defer translation.info.deinit(std.testing.allocator);
 
-    if (lean_proof.boundsProven(.gid_1d_storage_buffer_loop_offset)) {
-        try std.testing.expect(!translation.info.needs_sizes_buf);
-    } else {
-        try std.testing.expect(translation.info.needs_sizes_buf);
-    }
+    try std.testing.expect(!translation.info.needs_sizes_buf);
+    try std.testing.expect(translation.info.dispatch_preconditions.len > 0);
 }
 
 test "analyzeToIrWithConfig records generalized guarded loop gid preconditions" {
@@ -125,7 +122,7 @@ test "analyzeToIrWithConfig records generalized guarded loop gid preconditions" 
     try std.testing.expect(!has_call_named(&elided_ir.functions.items[0], "min"));
 }
 
-test "compute runtime translation drops _doe_sizes for proof-covered generalized guarded loop bounds only" {
+test "compute runtime translation drops _doe_sizes for dispatch-validated generalized guarded loop bounds" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
         \\@compute @workgroup_size(8)
@@ -151,11 +148,8 @@ test "compute runtime translation drops _doe_sizes for proof-covered generalized
     );
     defer translation.info.deinit(std.testing.allocator);
 
-    if (lean_proof.boundsProven(.gid_1d_storage_buffer_loop_offset)) {
-        try std.testing.expect(!translation.info.needs_sizes_buf);
-    } else {
-        try std.testing.expect(translation.info.needs_sizes_buf);
-    }
+    try std.testing.expect(!translation.info.needs_sizes_buf);
+    try std.testing.expect(translation.info.dispatch_preconditions.len > 0);
 }
 
 test "analyzeToIrWithConfig records affine loop gid preconditions" {
@@ -227,7 +221,7 @@ test "analyzeToIrWithConfig records matvec-style guarded loop preconditions" {
     try std.testing.expect(!has_call_named(&elided_ir.functions.items[0], "min"));
 }
 
-test "compute runtime translation drops _doe_sizes for proof-covered affine loop bounds only" {
+test "compute runtime translation drops _doe_sizes for dispatch-validated affine loop bounds" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
         \\@compute @workgroup_size(8)
@@ -248,11 +242,8 @@ test "compute runtime translation drops _doe_sizes for proof-covered affine loop
     );
     defer translation.info.deinit(std.testing.allocator);
 
-    if (lean_proof.boundsProven(.gid_1d_storage_buffer_loop_affine)) {
-        try std.testing.expect(!translation.info.needs_sizes_buf);
-    } else {
-        try std.testing.expect(translation.info.needs_sizes_buf);
-    }
+    try std.testing.expect(!translation.info.needs_sizes_buf);
+    try std.testing.expect(translation.info.dispatch_preconditions.len > 0);
 }
 
 test "analyzeToIrWithConfig records while-loop gid preconditions" {
@@ -288,7 +279,7 @@ test "analyzeToIrWithConfig records while-loop gid preconditions" {
     try std.testing.expect(!has_call_named(&elided_ir.functions.items[0], "min"));
 }
 
-test "compute runtime translation drops _doe_sizes for proof-covered while-loop bounds only" {
+test "compute runtime translation drops _doe_sizes for dispatch-validated while-loop bounds" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
         \\@compute @workgroup_size(8)
@@ -311,11 +302,8 @@ test "compute runtime translation drops _doe_sizes for proof-covered while-loop 
     );
     defer translation.info.deinit(std.testing.allocator);
 
-    if (lean_proof.boundsProven(.gid_1d_storage_buffer_loop_offset)) {
-        try std.testing.expect(!translation.info.needs_sizes_buf);
-    } else {
-        try std.testing.expect(translation.info.needs_sizes_buf);
-    }
+    try std.testing.expect(!translation.info.needs_sizes_buf);
+    try std.testing.expect(translation.info.dispatch_preconditions.len > 0);
 }
 
 test "analyzeToIrWithConfig records descending for-loop gid preconditions" {
@@ -349,7 +337,7 @@ test "analyzeToIrWithConfig records descending for-loop gid preconditions" {
     try std.testing.expect(!has_call_named(&elided_ir.functions.items[0], "min"));
 }
 
-test "compute runtime translation drops _doe_sizes for proof-covered descending for-loop bounds only" {
+test "compute runtime translation drops _doe_sizes for dispatch-validated descending for-loop bounds" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
         \\@compute @workgroup_size(8)
@@ -370,11 +358,8 @@ test "compute runtime translation drops _doe_sizes for proof-covered descending 
     );
     defer translation.info.deinit(std.testing.allocator);
 
-    if (lean_proof.boundsProven(.gid_1d_storage_buffer_loop_offset)) {
-        try std.testing.expect(!translation.info.needs_sizes_buf);
-    } else {
-        try std.testing.expect(translation.info.needs_sizes_buf);
-    }
+    try std.testing.expect(!translation.info.needs_sizes_buf);
+    try std.testing.expect(translation.info.dispatch_preconditions.len > 0);
 }
 
 test "analyzeToIrWithConfig records descending while-loop gid preconditions" {

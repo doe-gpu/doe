@@ -106,11 +106,14 @@ The wrapper writes the same layered diagnostic artifacts plus:
 - `browser/chromium/artifacts/<timestamp>/chrome-vs-fawn.browser-layered.superset.score.json`
 
 The CLI prints separate paired scores for the baseline and comparison modes,
-plus the comparison percent delta. `overall` is row-weighted.
+with Doe as the default baseline and Dawn as the default comparison. Positive
+`comparisonDeltaPercent` / `baselineLeadPercent` means the baseline mode is
+faster, so the default score reads positive when Doe beats Dawn. `overall` is
+row-weighted.
 `categoryBalancedOverall` uses the geometric mean of per-category geomeans so a
 dense category cannot dominate the headline view. The legacy relative index is
-still present in JSON as `score` for compatibility, but it is not the primary
-readout. `strictComparable` is the fair browser-projection summary and includes
+still present in JSON as `legacyRatioScore` for compatibility; `score` is the
+baseline paired score. `strictComparable` is the fair browser-projection summary and includes
 only scorable rows whose projection says `comparabilityExpectation=strict` and
 whose `browserWorkload` records `sourceComparable=true`,
 `sourceClaimEligible=true`, and `benchmarkClass=comparable`.

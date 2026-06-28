@@ -17,7 +17,7 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 3
+      "const": 4
     },
     "generatedAt": {
       "type": "string",
@@ -169,8 +169,102 @@
         "computeProjection": {
           "type": "string",
           "enum": [
-            "generic_empty_dispatch_component"
+            "generic_empty_dispatch_component",
+            "source_kernel_dispatch_v1"
           ]
+        },
+        "bindGroupLayoutMode": {
+          "type": "string",
+          "enum": [
+            "explicit_min_binding_size_v1"
+          ]
+        },
+        "readbackBindingPolicy": {
+          "type": "string",
+          "enum": [
+            "first_writable_storage_binding_v1"
+          ]
+        },
+        "commandsPath": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+        },
+        "commandsSha256": {
+          "$ref": "#/$defs/hashHex"
+        },
+        "kernelPath": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+        },
+        "kernelSha256": {
+          "$ref": "#/$defs/hashHex"
+        },
+        "dispatchX": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dispatchY": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dispatchZ": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dispatchRepeat": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "warmupDispatchCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "storageBindings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "group",
+              "binding",
+              "bufferSize",
+              "minBindingSize",
+              "bufferType",
+              "bufferBindingType"
+            ],
+            "properties": {
+              "group": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "binding": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "bufferSize": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minBindingSize": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "bufferType": {
+                "type": "string",
+                "minLength": 1
+              },
+              "bufferBindingType": {
+                "type": "string",
+                "enum": [
+                  "storage",
+                  "read-only-storage"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
         },
         "textureWidth": {
           "type": "integer",

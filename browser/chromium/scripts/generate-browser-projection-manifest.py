@@ -11,12 +11,16 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
 VALID_PROJECTION_CLASSES = {"high", "medium", "non_projectable"}
 VALID_LAYER_TARGETS = {"l1_browser_api", "l0_only"}
 VALID_COMPARABILITY = {"strict", "component", "none"}
 VALID_REQUIRED_STATUS = {"ok", "not_applicable"}
 VALID_CLAIM_SCOPE = {"l1_strict_candidate", "l1_component_only", "l0_only_no_claim"}
 MAX_BROWSER_EXACT_UPLOAD_BYTES = 16 * 1024 * 1024
+PROJECTION_MANIFEST_SCHEMA_VERSION = 4
+SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1"
+SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1"
 SIZE_UNITS = {
     "b": 1,
     "kb": 1024,
@@ -165,6 +169,116 @@ def parse_size_bytes(text: str) -> int | None:
     return count * multiplier
 
 
+def source_strict_comparable(browser_workload: dict[str, Any]) -> bool:
+    return (
+        browser_workload.get("sourceComparable") is True
+        and browser_workload.get("sourceClaimEligible") is True
+        and browser_workload.get("benchmarkClass") == "comparable"
+    )
+
+
+def resolve_kernel_path(kernel_name: str, repo_root: Path) -> Path | None:
+    kernel_path = Path(kernel_name)
+    candidates: list[Path] = []
+    if kernel_path.suffix:
+        candidates.append(repo_root / "bench/kernels" / kernel_path.name)
+        candidates.append(resolve_path(kernel_name, repo_root))
+    else:
+        candidates.append(repo_root / "bench/kernels" / f"{kernel_name}.wgsl")
+        candidates.append(repo_root / "bench/kernels" / kernel_name)
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if resolved.is_file() and resolved.suffix == ".wgsl":
+            return resolved
+    return None
+
+
+def webgpu_buffer_binding_type(buffer_type: Any) -> str | None:
+    if buffer_type in {"readonly", "read-only-storage"}:
+        return "read-only-storage"
+    if buffer_type in {None, "storage"}:
+        return "storage"
+    return None
+
+
+def compute_source_projection(
+    workload: dict[str, Any],
+    browser_workload: dict[str, Any],
+    repo_root: Path,
+) -> dict[str, Any] | None:
+    if not source_strict_comparable(browser_workload):
+        return None
+    commands_rel = workload.get("commandsPath")
+    if not isinstance(commands_rel, str) or not commands_rel.strip():
+        return None
+    commands_path = resolve_path(commands_rel, repo_root)
+    if not commands_path.is_file():
+        return None
+    commands_payload = json.loads(commands_path.read_text(encoding="utf-8"))
+    if not isinstance(commands_payload, list) or len(commands_payload) != 1:
+        return None
+    command = commands_payload[0]
+    if not isinstance(command, dict) or command.get("kind") != "kernel_dispatch":
+        return None
+    kernel_name = command.get("kernel")
+    if not isinstance(kernel_name, str) or not kernel_name.strip():
+        return None
+    kernel_path = resolve_kernel_path(kernel_name, repo_root)
+    if kernel_path is None:
+        return None
+
+    bindings_raw = command.get("bindings")
+    if not isinstance(bindings_raw, list) or not bindings_raw:
+        return None
+    storage_bindings: list[dict[str, Any]] = []
+    for binding_raw in bindings_raw:
+        if not isinstance(binding_raw, dict):
+            return None
+        if binding_raw.get("kind") != "buffer":
+            return None
+        buffer_size = binding_raw.get("buffer_size")
+        group = binding_raw.get("group")
+        binding = binding_raw.get("binding")
+        if not isinstance(buffer_size, int) or buffer_size <= 0:
+            return None
+        if not isinstance(group, int) or group < 0:
+            return None
+        if not isinstance(binding, int) or binding < 0:
+            return None
+        buffer_binding_type = webgpu_buffer_binding_type(binding_raw.get("buffer_type"))
+        if buffer_binding_type is None:
+            return None
+        storage_bindings.append(
+            {
+                "group": group,
+                "binding": binding,
+                "bufferSize": buffer_size,
+                "minBindingSize": buffer_size,
+                "bufferType": str(binding_raw.get("buffer_type", "storage")),
+                "bufferBindingType": buffer_binding_type,
+            }
+        )
+
+    if not any(binding["bufferBindingType"] == "storage" for binding in storage_bindings):
+        return None
+
+    return {
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE,
+        "readbackBindingPolicy": SOURCE_KERNEL_READBACK_BINDING_POLICY,
+        "commandsPath": display_path(commands_path, repo_root),
+        "commandsSha256": file_sha256(commands_path),
+        "kernelPath": display_path(kernel_path, repo_root),
+        "kernelSha256": file_sha256(kernel_path),
+        "dispatchX": int(command.get("x", 1)),
+        "dispatchY": int(command.get("y", 1)),
+        "dispatchZ": int(command.get("z", 1)),
+        "dispatchRepeat": int(command.get("repeat", 1)),
+        "warmupDispatchCount": int(command.get("warmup_dispatch_count", 1)),
+        "storageBindings": storage_bindings,
+    }
+
+
 def browser_workload_metadata(workload: dict[str, Any], domain: str) -> dict[str, Any]:
     metadata: dict[str, Any] = {
         "sourceComparable": bool(workload.get("comparable")),
@@ -188,7 +302,11 @@ def browser_workload_metadata(workload: dict[str, Any], domain: str) -> dict[str
             raise ValueError(f"upload workload missing parseable byte size: {workload.get('id')}")
         metadata["uploadBytes"] = upload_bytes
     elif domain == "compute":
-        metadata["computeProjection"] = "generic_empty_dispatch_component"
+        source_projection = compute_source_projection(workload, metadata, REPO_ROOT)
+        if source_projection is not None:
+            metadata.update(source_projection)
+        else:
+            metadata["computeProjection"] = "generic_empty_dispatch_component"
     elif domain == "texture-contract":
         workload_id = str(workload.get("id", ""))
         metadata["textureWidth"] = 128
@@ -209,14 +327,6 @@ def component_compute_rule() -> dict[str, str]:
         "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
         "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
     }
-
-
-def source_strict_comparable(browser_workload: dict[str, Any]) -> bool:
-    return (
-        browser_workload.get("sourceComparable") is True
-        and browser_workload.get("sourceClaimEligible") is True
-        and browser_workload.get("benchmarkClass") == "comparable"
-    )
 
 
 def component_source_diagnostic_rule(rule: dict[str, str]) -> dict[str, str]:
@@ -298,7 +408,10 @@ def build_manifest(
             and browser_workload.get("uploadBytes", 0) > MAX_BROWSER_EXACT_UPLOAD_BYTES
         ):
             rule = non_projectable_browser_upload_rule(int(browser_workload["uploadBytes"]))
-        elif domain == "compute":
+        elif (
+            domain == "compute"
+            and browser_workload.get("computeProjection") != "source_kernel_dispatch_v1"
+        ):
             rule = component_compute_rule()
         elif (
             rule["comparabilityExpectation"] == "strict"
@@ -331,7 +444,7 @@ def build_manifest(
     )
 
     return {
-        "schemaVersion": 3,
+        "schemaVersion": PROJECTION_MANIFEST_SCHEMA_VERSION,
         "generatedAt": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "sourceWorkloadsPath": workloads_path,
         "sourceWorkloadsSha256": workloads_sha256,

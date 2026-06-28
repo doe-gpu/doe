@@ -1360,11 +1360,12 @@ void metal_bridge_compute_encoder_encode_dispatch(
     [encoder dispatchThreadgroups:grid_size threadsPerThreadgroup:tg_size];
 }
 
-void metal_bridge_compute_encoder_encode_dispatch_batch(
+static void metal_bridge_compute_encoder_encode_dispatch_batch_impl(
     MetalHandle         encoder_h,
     const MetalHandle*  pipelines,
     const MetalHandle*  buffers,
     const uint32_t*     buffer_counts,
+    const uint32_t*     repeat_counts,
     const uint32_t*     dispatch_dims,
     const uint32_t*     workgroup_dims,
     uint32_t            dispatch_count,
@@ -1414,6 +1415,8 @@ void metal_bridge_compute_encoder_encode_dispatch_batch(
         const uint32_t wg_x = workgroup_dims[dim_offset];
         const uint32_t wg_y = workgroup_dims[dim_offset + 1];
         const uint32_t wg_z = workgroup_dims[dim_offset + 2];
+        const uint32_t repeat_count = repeat_counts != NULL ? repeat_counts[dispatch_index] : 1;
+        if (repeat_count == 0) continue;
 
         MTLSize tg_size;
         if (wg_x > 0) {
@@ -1424,8 +1427,55 @@ void metal_bridge_compute_encoder_encode_dispatch_batch(
             tg_size = MTLSizeMake(max_tg, 1, 1);
         }
         MTLSize grid_size = MTLSizeMake(x, y, z);
-        [encoder dispatchThreadgroups:grid_size threadsPerThreadgroup:tg_size];
+        for (uint32_t repeat_index = 0; repeat_index < repeat_count; repeat_index++) {
+            [encoder dispatchThreadgroups:grid_size threadsPerThreadgroup:tg_size];
+        }
     }
+}
+
+void metal_bridge_compute_encoder_encode_dispatch_batch(
+    MetalHandle         encoder_h,
+    const MetalHandle*  pipelines,
+    const MetalHandle*  buffers,
+    const uint32_t*     buffer_counts,
+    const uint32_t*     dispatch_dims,
+    const uint32_t*     workgroup_dims,
+    uint32_t            dispatch_count,
+    uint32_t            max_buffer_count)
+{
+    metal_bridge_compute_encoder_encode_dispatch_batch_impl(
+        encoder_h,
+        pipelines,
+        buffers,
+        buffer_counts,
+        NULL,
+        dispatch_dims,
+        workgroup_dims,
+        dispatch_count,
+        max_buffer_count);
+}
+
+void metal_bridge_compute_encoder_encode_dispatch_batch_repeated(
+    MetalHandle         encoder_h,
+    const MetalHandle*  pipelines,
+    const MetalHandle*  buffers,
+    const uint32_t*     buffer_counts,
+    const uint32_t*     repeat_counts,
+    const uint32_t*     dispatch_dims,
+    const uint32_t*     workgroup_dims,
+    uint32_t            dispatch_count,
+    uint32_t            max_buffer_count)
+{
+    metal_bridge_compute_encoder_encode_dispatch_batch_impl(
+        encoder_h,
+        pipelines,
+        buffers,
+        buffer_counts,
+        repeat_counts,
+        dispatch_dims,
+        workgroup_dims,
+        dispatch_count,
+        max_buffer_count);
 }
 
 MetalHandle metal_bridge_compute_dispatch_batch_copy_signal_commit(

@@ -548,6 +548,9 @@ pub const DispatchPreconditionKind = enum {
     /// Workgroup ID component (`workgroup_id.{x,y,z}`) indexed storage access.
     /// The host bound check uses dispatch workgroup count, not invocations.
     workgroup_component,
+    /// Local invocation ID component (`local_invocation_id.{x,y,z}`) indexed
+    /// storage access. The host bound check uses only declared workgroup size.
+    local_invocation_component,
     gid_component_tiled,
     flat_index_2d_dispatch_x,
     flat_index_3d_dispatch_xy,

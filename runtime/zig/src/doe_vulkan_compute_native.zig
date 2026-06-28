@@ -834,15 +834,19 @@ pub fn vulkan_prepare_recorded_dispatch(rt: *NativeVulkanRuntime, dispatch: anyt
 
 pub fn vulkan_run_prepared_dispatch(rt: *NativeVulkanRuntime, dispatch: anytype) void {
     if (comptime !has_vulkan) return;
-    rt.record_prepared_dispatch_replay(dispatch.x, dispatch.y, dispatch.z) catch |err| {
-        std.log.err("doe_vulkan_compute: recorded run_dispatch({},{},{}) failed: {s}", .{
-            dispatch.x,
-            dispatch.y,
-            dispatch.z,
-            @errorName(err),
-        });
-        return;
-    };
+    const repeat_count = if (dispatch.repeat_count == 0) 1 else dispatch.repeat_count;
+    var repeat_index: u32 = 0;
+    while (repeat_index < repeat_count) : (repeat_index += 1) {
+        rt.record_prepared_dispatch_replay(dispatch.x, dispatch.y, dispatch.z) catch |err| {
+            std.log.err("doe_vulkan_compute: recorded run_dispatch({},{},{}) failed: {s}", .{
+                dispatch.x,
+                dispatch.y,
+                dispatch.z,
+                @errorName(err),
+            });
+            return;
+        };
+    }
 }
 
 pub fn vulkan_submit_recorded_dispatch(rt: *NativeVulkanRuntime, dispatch: anytype) void {

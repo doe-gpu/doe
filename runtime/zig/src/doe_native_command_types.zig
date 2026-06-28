@@ -1,3 +1,4 @@
+const std = @import("std");
 const shared = @import("doe_native_shared_types.zig");
 const model_compute_types = @import("model_compute_types.zig");
 
@@ -52,12 +53,14 @@ pub const RecordedCmd = union(CmdTag) {
         buf_sizes: [shared.MAX_FLAT_BIND]u64,
         buf_count: u32,
         vulkan_binding_state: RecordedVulkanBindingState = .{},
+        bind_groups: [shared.MAX_COMPUTE_BIND_GROUPS]?*anyopaque = [_]?*anyopaque{null} ** shared.MAX_COMPUTE_BIND_GROUPS,
         x: u32,
         y: u32,
         z: u32,
         wg_x: u32,
         wg_y: u32,
         wg_z: u32,
+        repeat_count: u32 = 1,
     },
     dispatch_indirect: struct {
         compute_pipeline: ?*anyopaque = null,
@@ -189,3 +192,67 @@ pub const RecordedCmd = union(CmdTag) {
         dst_offset: u64,
     },
 };
+
+pub const RecordedDispatch = std.meta.TagPayload(RecordedCmd, .dispatch);
+
+pub fn dispatchesCanMerge(left: *const RecordedDispatch, right: *const RecordedDispatch) bool {
+    if (left.compute_pipeline != right.compute_pipeline) return false;
+    if (left.pso != right.pso) return false;
+    if (left.needs_sizes_buf != right.needs_sizes_buf) return false;
+    if (left.buf_count != right.buf_count) return false;
+    if (left.x != right.x or left.y != right.y or left.z != right.z) return false;
+    if (left.wg_x != right.wg_x or left.wg_y != right.wg_y or left.wg_z != right.wg_z) return false;
+
+    const count: usize = @intCast(left.buf_count);
+    return std.mem.eql(?*anyopaque, left.bufs[0..count], right.bufs[0..count]) and
+        std.mem.eql(u64, left.buf_offsets[0..count], right.buf_offsets[0..count]) and
+        std.mem.eql(u64, left.buf_sizes[0..count], right.buf_sizes[0..count]);
+}
+
+pub fn tryMergeDispatchIntoLast(cmds: *std.ArrayListUnmanaged(RecordedCmd), cmd: *const RecordedCmd) bool {
+    if (cmds.items.len == 0) return false;
+    const right = switch (cmd.*) {
+        .dispatch => |dispatch| dispatch,
+        else => return false,
+    };
+    const last = &cmds.items[cmds.items.len - 1];
+    switch (last.*) {
+        .dispatch => |*left| {
+            if (!dispatchesCanMerge(left, &right)) return false;
+            const left_repeat = if (left.repeat_count == 0) 1 else left.repeat_count;
+            const right_repeat = if (right.repeat_count == 0) 1 else right.repeat_count;
+            left.repeat_count = std.math.add(u32, left_repeat, right_repeat) catch return false;
+            return true;
+        },
+        else => return false,
+    }
+}
+
+test "tryMergeDispatchIntoLast coalesces identical dispatch commands" {
+    var cmds: std.ArrayListUnmanaged(RecordedCmd) = .{};
+    defer cmds.deinit(std.testing.allocator);
+
+    var first = RecordedCmd{ .dispatch = .{
+        .compute_pipeline = @ptrFromInt(0x1000),
+        .pso = @ptrFromInt(0x2000),
+        .needs_sizes_buf = false,
+        .bufs = [_]?*anyopaque{null} ** shared.MAX_FLAT_BIND,
+        .buf_offsets = [_]u64{0} ** shared.MAX_FLAT_BIND,
+        .buf_sizes = [_]u64{0} ** shared.MAX_FLAT_BIND,
+        .buf_count = 1,
+        .x = 1,
+        .y = 1,
+        .z = 1,
+        .wg_x = 256,
+        .wg_y = 1,
+        .wg_z = 1,
+    } };
+    first.dispatch.bufs[0] = @ptrFromInt(0x3000);
+    first.dispatch.buf_sizes[0] = 8192;
+    var second = first;
+
+    try cmds.append(std.testing.allocator, first);
+    try std.testing.expect(tryMergeDispatchIntoLast(&cmds, &second));
+    try std.testing.expectEqual(@as(usize, 1), cmds.items.len);
+    try std.testing.expectEqual(@as(u32, 2), cmds.items[0].dispatch.repeat_count);
+}

@@ -342,10 +342,10 @@ fn appendRecordedDispatch(
         &cmd.dispatch.buf_sizes,
     );
     vulkan_fast.populateRecordedDispatchBindingState(pipe, &cmd.dispatch);
+    if (native_cmds.tryMergeDispatchIntoLast(cmds, &cmd)) return true;
     cmds.append(alloc, cmd) catch std.debug.panic("doe_compute_fast: OOM recording dispatch command", .{});
     return true;
 }
-
 fn appendCopyIfPresent(
     cmds: *std.ArrayListUnmanaged(RecordedCmd),
     copy_src: ?*anyopaque,

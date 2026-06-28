@@ -26,7 +26,6 @@ pub fn try_elide_storage_index(
             };
         }
     }
-
     if (lean_proof.boundsProven(.gid_1d_storage_buffer_offset)) {
         if (match_gid_component_plus_offset(function, index_data.index, .global_invocation_id)) |match| {
             return .{
@@ -39,7 +38,6 @@ pub fn try_elide_storage_index(
             };
         }
     }
-
     if (lean_proof.boundsProven(.gid_1d_storage_buffer_stride)) {
         if (match_gid_component_times_stride_plus_offset(function, index_data.index, .global_invocation_id)) |match| {
             return .{
@@ -52,7 +50,6 @@ pub fn try_elide_storage_index(
             };
         }
     }
-
     if (lean_proof.boundsProven(.gid_1d_storage_buffer_loop_affine)) {
         if (match_gid_component_loop_affine_plus_offset(module, function, index_data.index, .global_invocation_id)) |match| {
             if (loop_match.find_bounded_loop_limit(module, function, expr_id, match.local_idx)) |loop_limit| {
@@ -86,7 +83,6 @@ pub fn try_elide_storage_index(
             }
         }
     }
-
     if (lean_proof.boundsProven(.gid_1d_storage_buffer_tiled)) {
         if (match_gid_component_tiled_plus_offset(function, index_data.index, .global_invocation_id)) |match| {
             return .{
@@ -100,7 +96,6 @@ pub fn try_elide_storage_index(
             };
         }
     }
-
     if (lean_proof.boundsProven(.loop_1d_storage_buffer_affine)) {
         if (match_loop_only_affine_plus_offset(module, function, index_data.index)) |match| {
             if (loop_match.find_bounded_loop_limit(module, function, expr_id, match.local_idx)) |loop_limit| {
@@ -117,7 +112,6 @@ pub fn try_elide_storage_index(
             }
         }
     }
-
     if (lean_proof.boundsProven(.gid_2d_flat_storage_buffer_offset)) {
         if (match_flat_index_2d_dispatch_x(module, function, function_id, index_data.index)) |offset| {
             return .{
@@ -141,7 +135,6 @@ pub fn try_elide_storage_index(
             };
         }
     }
-
     if (lean_proof.boundsProven(.gid_3d_flat_storage_buffer_offset)) {
         if (match_flat_index_3d_dispatch_xy(module, function, function_id, index_data.index)) |offset| {
             return .{
@@ -165,22 +158,57 @@ pub fn try_elide_storage_index(
             };
         }
     }
-
     return null;
 }
 
 pub fn try_elide_dispatch_validated_storage_index(
     module: *const ir.Module,
     function: *const ir.Function,
+    expr_id: ir.ExprId,
     index_data: @FieldType(ir.Expr, "index"),
     allow_global_invocation_id: bool,
 ) ?ir.DispatchPrecondition {
     const binding = resolve_storage_binding(module, function, index_data.base) orelse return null;
     const element_stride_bytes = resolve_runtime_array_element_stride(module, function, index_data.base) orelse return null;
+    const Candidate = struct {
+        builtin: ir.Builtin,
+        kind: ir.DispatchPreconditionKind,
+        requires_global_opt_in: bool = false,
+    };
+    const candidates = [_]Candidate{
+        .{ .builtin = .local_invocation_id, .kind = .local_invocation_component },
+        .{ .builtin = .workgroup_id, .kind = .workgroup_component },
+        .{ .builtin = .global_invocation_id, .kind = .gid_component, .requires_global_opt_in = true },
+    };
+    for (candidates) |candidate| {
+        if (candidate.requires_global_opt_in and !allow_global_invocation_id) continue;
+        if (try_elide_dispatch_validated_builtin_index(
+            module,
+            function,
+            expr_id,
+            index_data.index,
+            binding,
+            element_stride_bytes,
+            candidate.builtin,
+            candidate.kind,
+        )) |precondition| return precondition;
+    }
+    return null;
+}
 
-    if (classify_builtin_component(function, index_data.index, .workgroup_id)) |axis| {
+fn try_elide_dispatch_validated_builtin_index(
+    module: *const ir.Module,
+    function: *const ir.Function,
+    expr_id: ir.ExprId,
+    index_expr_id: ir.ExprId,
+    binding: ir.BindingPoint,
+    element_stride_bytes: u64,
+    builtin: ir.Builtin,
+    kind: ir.DispatchPreconditionKind,
+) ?ir.DispatchPrecondition {
+    if (classify_builtin_component(function, index_expr_id, builtin)) |axis| {
         return .{
-            .kind = .workgroup_component,
+            .kind = kind,
             .gid_axis = axis,
             .storage_binding = binding,
             .element_multiplier = 1,
@@ -188,10 +216,9 @@ pub fn try_elide_dispatch_validated_storage_index(
             .element_offset = 0,
         };
     }
-
-    if (match_gid_component_times_stride_plus_offset(function, index_data.index, .workgroup_id)) |match| {
+    if (match_gid_component_times_stride_plus_offset(function, index_expr_id, builtin)) |match| {
         return .{
-            .kind = .workgroup_component,
+            .kind = kind,
             .gid_axis = match.axis,
             .storage_binding = binding,
             .element_multiplier = match.multiplier,
@@ -199,16 +226,17 @@ pub fn try_elide_dispatch_validated_storage_index(
             .element_offset = match.offset,
         };
     }
-
-    if (allow_global_invocation_id) {
-        if (classify_builtin_component(function, index_data.index, .global_invocation_id)) |axis| {
+    if (match_gid_component_loop_affine_plus_offset(module, function, index_expr_id, builtin)) |match| {
+        if (loop_match.find_bounded_loop_limit(module, function, expr_id, match.local_idx)) |loop_limit| {
             return .{
-                .kind = .gid_component,
-                .gid_axis = axis,
+                .kind = kind,
+                .gid_axis = match.axis,
                 .storage_binding = binding,
-                .element_multiplier = 1,
+                .element_multiplier = match.gid_multiplier,
+                .loop_limit = loop_limit,
+                .loop_limit_multiplier = match.loop_multiplier,
                 .element_stride_bytes = element_stride_bytes,
-                .element_offset = 0,
+                .element_offset = match.offset,
             };
         }
     }

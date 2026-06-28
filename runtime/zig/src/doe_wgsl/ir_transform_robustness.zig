@@ -14,6 +14,7 @@ pub const Config = struct {
     elide_proven_texture_bounds: bool = false,
     elide_dispatch_validated_bounds: bool = false,
     elide_dispatch_validated_global_bounds: bool = false,
+    elide_static_storage_bounds: bool = false,
     elide_uniform_validated_bounds: bool = false,
 };
 
@@ -47,7 +48,7 @@ fn transform_function(
                     .array => |arr| {
                         if (arr.len) |len| {
                             if (len > 0) {
-                                if (robustness_static_bounds.sizedArrayIndexProvablyInBounds(module, function, i, index_data.base, index_data.index, len)) {
+                                if (robustness_static_bounds.sizedArrayIndexProvablyInBounds(module, function, i, index_data.base, index_data.index, len, config.elide_static_storage_bounds)) {
                                     continue;
                                 }
                                 try clamp_sized(allocator, module, function, i, len);
@@ -63,7 +64,7 @@ fn transform_function(
                                 }
                             }
                             if (config.elide_dispatch_validated_bounds) {
-                                if (dispatch_proof_match.try_elide_dispatch_validated_storage_index(module, function, index_data, false)) |precondition| {
+                                if (dispatch_proof_match.try_elide_dispatch_validated_storage_index(module, function, i, index_data, false)) |precondition| {
                                     module.dispatch_preconditions.append(
                                         module.allocator,
                                         precondition,
@@ -78,7 +79,7 @@ fn transform_function(
                                 }
                             }
                             if (config.elide_dispatch_validated_global_bounds) {
-                                if (dispatch_proof_match.try_elide_dispatch_validated_storage_index(module, function, index_data, true)) |precondition| {
+                                if (dispatch_proof_match.try_elide_dispatch_validated_storage_index(module, function, i, index_data, true)) |precondition| {
                                     module.dispatch_preconditions.append(module.allocator, precondition) catch return error.OutOfMemory;
                                     continue;
                                 }

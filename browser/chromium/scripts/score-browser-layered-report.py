@@ -29,10 +29,12 @@ METRIC_PRIORITY: tuple[tuple[str, str], ...] = (
 )
 
 PHASE_METRICS: tuple[str, ...] = (
+    "bufferInitMs",
     "createTextureMs",
     "writeTextureMs",
     "createRenderTargetMs",
     "shaderModuleMs",
+    "computePipelineMs",
     "renderPipelineMs",
     "createViewMs",
     "createSamplerMs",
@@ -42,6 +44,14 @@ PHASE_METRICS: tuple[str, ...] = (
     "waitMs",
     "propertyQueryMs",
     "destroyMs",
+)
+
+SELECTED_METRIC_DISTRIBUTION_SUFFIXES: tuple[tuple[str, str], ...] = (
+    ("avg", "Avg"),
+    ("p10", "P10"),
+    ("p50", "P50"),
+    ("p95", "P95"),
+    ("p99", "P99"),
 )
 
 CATEGORY_BY_DOMAIN = {
@@ -80,7 +90,7 @@ CATEGORY_BY_WORKFLOW_ID = {
     "fawn_visual_prismatic_fluids": "visual",
 }
 
-SCORE_METHOD_ID = "browser-layered-geomean-lower-is-better-v1"
+SCORE_METHOD_ID = "browser-layered-geomean-lower-is-better-v2"
 STRICT_COMPARABLE_CRITERIA = (
     "comparabilityExpectation=strict, browserWorkload.sourceComparable=true, "
     "browserWorkload.sourceClaimEligible=true, browserWorkload.benchmarkClass=comparable"
@@ -91,8 +101,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--report", required=True, help="Layered diagnostic report JSON.")
     parser.add_argument("--out", required=True, help="Score report output JSON.")
-    parser.add_argument("--baseline-mode", default="dawn", help="Baseline runtime mode.")
-    parser.add_argument("--comparison-mode", default="doe", help="Comparison runtime mode.")
+    parser.add_argument("--baseline-mode", default="doe", help="Baseline runtime mode.")
+    parser.add_argument("--comparison-mode", default="dawn", help="Comparison runtime mode.")
     return parser.parse_args()
 
 
@@ -131,6 +141,57 @@ def numeric_phase_metric(metrics: dict[str, Any], key: str) -> float | None:
     return parsed
 
 
+def selected_metric_distribution(metrics: dict[str, Any], metric: str) -> dict[str, Any] | None:
+    values: dict[str, Any] = {}
+    for label, suffix in SELECTED_METRIC_DISTRIBUTION_SUFFIXES:
+        value = numeric_metric(metrics, f"{metric}{suffix}")
+        if value is not None:
+            values[label] = value
+    sample_count = metrics.get("sourceKernelSampleCount")
+    if isinstance(sample_count, int) and sample_count > 0:
+        values["sampleCount"] = sample_count
+    samples = metrics.get(f"{metric}Samples")
+    if isinstance(samples, list) and samples:
+        numeric_samples = [
+            float(value)
+            for value in samples
+            if isinstance(value, int | float) and math.isfinite(float(value)) and float(value) > 0.0
+        ]
+        if len(numeric_samples) == len(samples):
+            values["samples"] = numeric_samples
+    if not values:
+        return None
+    return values
+
+
+def selected_metric_percentile_deltas(
+    baseline_metrics: dict[str, Any],
+    comparison_metrics: dict[str, Any],
+    metric: str,
+) -> list[dict[str, Any]]:
+    deltas = []
+    for label, suffix in SELECTED_METRIC_DISTRIBUTION_SUFFIXES:
+        if label == "avg":
+            continue
+        baseline_value = numeric_metric(baseline_metrics, f"{metric}{suffix}")
+        comparison_value = numeric_metric(comparison_metrics, f"{metric}{suffix}")
+        if baseline_value is None or comparison_value is None:
+            continue
+        baseline_lead_percent = ((comparison_value - baseline_value) / comparison_value) * 100.0
+        deltas.append(
+            {
+                "percentile": label,
+                "metric": metric,
+                "baselineValue": baseline_value,
+                "comparisonValue": comparison_value,
+                "comparisonDelta": comparison_value - baseline_value,
+                "comparisonDeltaPercent": baseline_lead_percent,
+                "baselineLeadPercent": baseline_lead_percent,
+            }
+        )
+    return deltas
+
+
 def select_metric(
     baseline_metrics: dict[str, Any],
     comparison_metrics: dict[str, Any],
@@ -155,6 +216,11 @@ def summarize_phase_metrics(
             continue
         if baseline_value == 0.0 and comparison_value == 0.0:
             continue
+        baseline_lead_percent = (
+            ((comparison_value - baseline_value) / comparison_value) * 100.0
+            if comparison_value > 0.0
+            else None
+        )
         phases.append(
             {
                 "metric": metric,
@@ -162,11 +228,8 @@ def summarize_phase_metrics(
                 "baselineValue": baseline_value,
                 "comparisonValue": comparison_value,
                 "comparisonDelta": comparison_value - baseline_value,
-                "comparisonDeltaPercent": (
-                    ((comparison_value / baseline_value) - 1.0) * 100.0
-                    if baseline_value > 0.0
-                    else None
-                ),
+                "comparisonDeltaPercent": baseline_lead_percent,
+                "baselineLeadPercent": baseline_lead_percent,
             }
         )
     return phases
@@ -281,6 +344,11 @@ def build_row_score(
 
     metric, unit, baseline_value, comparison_value = selected
     ratio = baseline_value / comparison_value
+    paired_scores = paired_mode_scores_from_ratio(
+        ratio,
+        baseline_mode=baseline_mode,
+        comparison_mode=comparison_mode,
+    )
     return {
         "layer": layer,
         "rowId": row_id,
@@ -300,17 +368,23 @@ def build_row_score(
         "comparisonMode": comparison_mode,
         "baselineValue": baseline_value,
         "comparisonValue": comparison_value,
+        "selectedMetricDistribution": {
+            "baseline": selected_metric_distribution(baseline_metrics, metric),
+            "comparison": selected_metric_distribution(comparison_metrics, metric),
+            "percentileDeltas": selected_metric_percentile_deltas(
+                baseline_metrics,
+                comparison_metrics,
+                metric,
+            ),
+        },
         "phaseMetrics": summarize_phase_metrics(
             baseline_metrics,
             comparison_metrics,
         ),
         "ratio": ratio,
-        **paired_mode_scores_from_ratio(
-            ratio,
-            baseline_mode=baseline_mode,
-            comparison_mode=comparison_mode,
-        ),
-        "score": ratio * 100.0,
+        "legacyRatioScore": ratio * 100.0,
+        **paired_scores,
+        "score": paired_scores["baselineScore"],
     }, None
 
 
@@ -333,24 +407,27 @@ def paired_mode_scores_from_ratio(
         "comparisonMode": comparison_mode,
         "baselineScore": baseline_score,
         "comparisonScore": comparison_score,
-        "comparisonDeltaPercent": (ratio - 1.0) * 100.0,
+        "comparisonDeltaPercent": (1.0 - ratio) * 100.0,
+        "baselineLeadPercent": (1.0 - ratio) * 100.0,
     }
 
 
 def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     ratios = [float(row["ratio"]) for row in rows]
     geomean_ratio = geometric_mean(ratios)
+    paired_scores = paired_mode_scores_from_ratio(
+        geomean_ratio,
+        baseline_mode=str(rows[0]["baselineMode"]),
+        comparison_mode=str(rows[0]["comparisonMode"]),
+    )
     return {
-        **paired_mode_scores_from_ratio(
-            geomean_ratio,
-            baseline_mode=str(rows[0]["baselineMode"]),
-            comparison_mode=str(rows[0]["comparisonMode"]),
-        ),
-        "score": geomean_ratio * 100.0,
+        **paired_scores,
+        "score": paired_scores["baselineScore"],
+        "legacyRatioScore": geomean_ratio * 100.0,
         "geomeanRatio": geomean_ratio,
         "rowCount": len(rows),
-        "fasterRowCount": sum(1 for ratio in ratios if ratio > 1.0),
-        "slowerRowCount": sum(1 for ratio in ratios if ratio < 1.0),
+        "fasterRowCount": sum(1 for ratio in ratios if ratio < 1.0),
+        "slowerRowCount": sum(1 for ratio in ratios if ratio > 1.0),
         "parityRowCount": sum(1 for ratio in ratios if ratio == 1.0),
     }
 
@@ -375,18 +452,20 @@ def summarize_category_balanced(
 ) -> dict[str, Any]:
     ratios = [float(category["geomeanRatio"]) for category in categories]
     geomean_ratio = geometric_mean(ratios)
+    paired_scores = paired_mode_scores_from_ratio(
+        geomean_ratio,
+        baseline_mode=baseline_mode,
+        comparison_mode=comparison_mode,
+    )
     return {
-        **paired_mode_scores_from_ratio(
-            geomean_ratio,
-            baseline_mode=baseline_mode,
-            comparison_mode=comparison_mode,
-        ),
+        **paired_scores,
         "categoryCount": len(categories),
         "rowCount": sum(int(category["rowCount"]) for category in categories),
-        "score": geomean_ratio * 100.0,
+        "score": paired_scores["baselineScore"],
+        "legacyRatioScore": geomean_ratio * 100.0,
         "geomeanRatio": geomean_ratio,
-        "fasterCategoryCount": sum(1 for ratio in ratios if ratio > 1.0),
-        "slowerCategoryCount": sum(1 for ratio in ratios if ratio < 1.0),
+        "fasterCategoryCount": sum(1 for ratio in ratios if ratio < 1.0),
+        "slowerCategoryCount": sum(1 for ratio in ratios if ratio > 1.0),
         "parityCategoryCount": sum(1 for ratio in ratios if ratio == 1.0),
     }
 
@@ -468,21 +547,21 @@ def summarize_bottlenecks(
     slower_categories = [
         category
         for category in categories
-        if float(category["comparisonDeltaPercent"]) < 0.0
+        if float(category["baselineLeadPercent"]) < 0.0
     ]
     slower_rows = [
         row
         for row in rows
-        if float(row["comparisonDeltaPercent"]) < 0.0
+        if float(row["baselineLeadPercent"]) < 0.0
     ]
 
     worst_categories = sorted(
         slower_categories,
-        key=lambda category: float(category["comparisonDeltaPercent"]),
+        key=lambda category: float(category["baselineLeadPercent"]),
     )[:limit]
     worst_rows = sorted(
         slower_rows,
-        key=lambda row: float(row["comparisonDeltaPercent"]),
+        key=lambda row: float(row["baselineLeadPercent"]),
     )[:limit]
     slower_phases = [
         {
@@ -494,29 +573,51 @@ def summarize_bottlenecks(
             "baselineValue": phase["baselineValue"],
             "comparisonValue": phase["comparisonValue"],
             "comparisonDelta": phase["comparisonDelta"],
-            "comparisonDeltaPercent": phase["comparisonDeltaPercent"],
+            "baselineLeadPercent": phase["baselineLeadPercent"],
         }
         for row in rows
         for phase in row["phaseMetrics"]
-        if float(phase["comparisonDelta"]) > 0.0
+        if float(phase["comparisonDelta"]) < 0.0
+    ]
+    slower_percentiles = [
+        {
+            "layer": row["layer"],
+            "rowId": row["rowId"],
+            "category": row["category"],
+            "scenarioTemplate": row["scenarioTemplate"],
+            "metric": percentile["metric"],
+            "percentile": percentile["percentile"],
+            "baselineValue": percentile["baselineValue"],
+            "comparisonValue": percentile["comparisonValue"],
+            "comparisonDelta": percentile["comparisonDelta"],
+            "baselineLeadPercent": percentile["baselineLeadPercent"],
+        }
+        for row in rows
+        for percentile in row["selectedMetricDistribution"]["percentileDeltas"]
+        if float(percentile["comparisonDelta"]) < 0.0
     ]
     worst_phases = sorted(
         slower_phases,
         key=lambda phase: float(phase["comparisonDelta"]),
-        reverse=True,
+    )[:limit]
+    worst_percentiles = sorted(
+        slower_percentiles,
+        key=lambda percentile: float(percentile["comparisonDelta"]),
     )[:limit]
 
     return {
-        "basis": "comparisonDeltaPercent ascending; negative means comparison mode was slower",
+        "basis": "baselineLeadPercent ascending; negative means baseline mode was slower",
         "slowerCategoryCount": len(slower_categories),
         "slowerRowCount": len(slower_rows),
         "slowerPhaseCount": len(slower_phases),
+        "slowerSelectedPercentileCount": len(slower_percentiles),
         "worstCategories": [
             {
                 "category": category["category"],
                 "baselineScore": category["baselineScore"],
                 "comparisonScore": category["comparisonScore"],
                 "comparisonDeltaPercent": category["comparisonDeltaPercent"],
+                "baselineLeadPercent": category["baselineLeadPercent"],
                 "rowCount": category["rowCount"],
             }
             for category in worst_categories
@@ -531,12 +632,14 @@ def summarize_bottlenecks(
                 "baselineValue": row["baselineValue"],
                 "comparisonValue": row["comparisonValue"],
                 "comparisonDeltaPercent": row["comparisonDeltaPercent"],
+                "baselineLeadPercent": row["baselineLeadPercent"],
                 "resourcePath": row["resourcePath"],
                 "resourceSha256": row["resourceSha256"],
             }
             for row in worst_rows
         ],
         "worstPhases": worst_phases,
+        "worstSelectedPercentiles": worst_percentiles,
     }
 
 
@@ -727,12 +830,18 @@ def build_score_report(
             "id": SCORE_METHOD_ID,
             "legacyRelativeIndexParityScore": 100.0,
             "ratioFormula": "baselineMetric / comparisonMetric",
-            "scoreFormula": "100 * geometric_mean(rowRatios)",
-            "categoryBalancedScoreFormula": "100 * geometric_mean(categoryGeomeanRatios)",
+            "scoreFormula": "baselineScore from pairedModeScoreFormula",
+            "legacyRatioScoreFormula": "100 * geometric_mean(rowRatios)",
+            "categoryBalancedScoreFormula": "baselineScore from pairedModeScoreFormula over category geomean ratios",
             "pairedModeScoreFormula": "baselineScore=100/(1+ratio), comparisonScore=100*ratio/(1+ratio)",
-            "comparisonDeltaPercentFormula": "(comparisonScore / baselineScore - 1) * 100",
+            "comparisonDeltaPercentFormula": "(1 - baselineMetric / comparisonMetric) * 100",
+            "baselineLeadPercentFormula": "(comparisonMetric - baselineMetric) / comparisonMetric * 100",
             "strictComparableBasis": f"strictComparable includes only scorable rows with {STRICT_COMPARABLE_CRITERIA}.",
             "metricPriority": [metric for metric, _unit in METRIC_PRIORITY],
+            "selectedMetricDistribution": {
+                "sampleCountField": "sourceKernelSampleCount when emitted by the row",
+                "percentiles": ["p10", "p50", "p95", "p99"],
+            },
             "categoryMapping": {
                 "source": "domain for L1 rows; workflow id for L2 rows",
                 "domainRules": CATEGORY_BY_DOMAIN,
@@ -741,8 +850,8 @@ def build_score_report(
             "notes": [
                 "Lower metric values are better.",
                 "baselineScore and comparisonScore are paired mode scores; parity is 50/50.",
-                "comparisonDeltaPercent is positive when the comparison mode was faster.",
-                "Legacy score is 100 * geomeanRatio and is retained for compatibility.",
+                "comparisonDeltaPercent and baselineLeadPercent are positive when the baseline mode was faster.",
+                "score is the baseline paired score; legacyRatioScore keeps the older geomean-ratio index.",
                 "overall is row-weighted; categoryBalancedOverall gives each category one vote.",
                 "strictComparable is the fair summary for strict projected browser rows that are source-comparable and source-claim-eligible.",
                 "This score is diagnostic and not a release performance claim.",
@@ -798,10 +907,10 @@ def main() -> int:
         "[browser-score] "
         f"{args.baseline_mode}={overall['baselineScore']:.2f} "
         f"{args.comparison_mode}={overall['comparisonScore']:.2f} "
-        f"delta={overall['comparisonDeltaPercent']:+.2f}% "
+        f"delta={overall['baselineLeadPercent']:+.2f}% "
         f"categoryBalanced.{args.baseline_mode}={category_balanced['baselineScore']:.2f} "
         f"categoryBalanced.{args.comparison_mode}={category_balanced['comparisonScore']:.2f} "
-        f"categoryBalanced.delta={category_balanced['comparisonDeltaPercent']:+.2f}% "
+        f"categoryBalanced.delta={category_balanced['baselineLeadPercent']:+.2f}% "
         f"rows={overall['rowCount']} "
         f"categories={category_balanced['categoryCount']} "
         f"out={out_path}"

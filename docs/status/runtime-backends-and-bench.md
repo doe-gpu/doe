@@ -8,10 +8,19 @@ This is a live topical status shard. Follow the shared shard policy in
 The raw Chromium browser lane now separates strict source-comparable browser
 rows from directional/component diagnostics in the score sidecar. Projection
 manifests record browser-executed workload parameters, including upload byte
-counts, texture dimensions, mip counts, and compute projection class. Directional
-upload rows remain visible for bottleneck diagnosis but are excluded from
-`strictComparable`; oversized browser uploads stay `l0_only`; compute rows that
-do not execute source shader semantics remain component-only.
+counts, texture dimensions, mip counts, and compute projection class. Compute
+rows can now promote to `source_kernel_dispatch_v1` only when the manifest
+links the browser row to the source command file, WGSL kernel file, hashes,
+dispatch shape, repeat count, warmup dispatch count, and storage bindings.
+Directional upload rows remain visible for bottleneck diagnosis but are
+excluded from `strictComparable`; oversized browser uploads stay `l0_only`;
+compute rows that do not execute source shader semantics remain component-only.
+
+The browser score sidecar now follows the Doe-vs-Dawn compare convention:
+Doe is the default baseline, Dawn is the default comparison, and positive
+`comparisonDeltaPercent` / `baselineLeadPercent` means the baseline mode is
+faster. For the default Chromium runtime-swap score, positive therefore means
+Doe beat Dawn.
 
 The layered runner now records runtime order and supports grouped, paired, or
 paired-balanced mode scheduling. Grouped mode preserves the historical

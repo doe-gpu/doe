@@ -1,101 +1,259 @@
 {
-  "schemaVersion": 3,
-  "generatedAt": "2026-06-27T19:13:39.221077Z",
+  "schemaVersion": 4,
+  "generatedAt": "2026-06-27T19:49:38.410946Z",
   "sourceWorkloadsPath": "bench/workloads/specialized/workloads.amd.vulkan.superset.json",
   "sourceWorkloadsSha256": "a99a6db97983405fff1c21f176656114cc9c82a2e7ec9c9554ad31de347bdec5",
   "rulesPath": "browser/chromium/bench/projection-rules.json",
   "rulesSha256": "06ac37731d70bb86652dbad5a6e7e80f1de4aad1b5020d530b500c98e54de245",
-  "projectionContractHash": "e319f0461663ca7feed6060d77be92073dc61f1c813ebe04e74e7967e8e27fe5",
+  "projectionContractHash": "334dd4943aa6190337a7f39094480fffa74dbf16361b382aed46d1917597e1bd",
   "sourceWorkloadCount": 80,
   "rows": [
     {
       "sourceWorkloadId": "compute_matvec_32768x2048_f32",
       "sourceWorkloadName": "matrix-vector multiply 32768x2048 f32 (naive swizzle0)",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "computeProjection": "generic_empty_dispatch_component"
+        "benchmarkClass": "comparable",
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/matrix_vector_mul_32768x2048_commands.json",
+        "commandsSha256": "cd13d3fa470304fcb2c98ac1a26f67041ab75c5fb616047de2d830f033e3baa9",
+        "kernelPath": "bench/kernels/matrix_vector_mul_32768x2048_f32_naive_swizzle0.wgsl",
+        "kernelSha256": "18bb9b1b760f44e1b507093ffd0ecaf35a5817030ac5f18e5e548746ec9230bf",
+        "dispatchX": 128,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 268435456,
+            "minBindingSize": 268435456,
+            "bufferType": "readonly",
+            "bufferBindingType": "read-only-storage"
+          },
+          {
+            "group": 0,
+            "binding": 1,
+            "bufferSize": 8192,
+            "minBindingSize": 8192,
+            "bufferType": "readonly",
+            "bufferBindingType": "read-only-storage"
+          },
+          {
+            "group": 0,
+            "binding": 2,
+            "bufferSize": 131072,
+            "minBindingSize": 131072,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {
       "sourceWorkloadId": "compute_matvec_32768x2048_f32_swizzle1",
       "sourceWorkloadName": "matrix-vector multiply 32768x2048 f32 (naive swizzle1)",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "computeProjection": "generic_empty_dispatch_component"
+        "benchmarkClass": "comparable",
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/matrix_vector_mul_32768x2048_swizzle1_commands.json",
+        "commandsSha256": "b2594526e7bf449266d919a369f1c0bf2f77673f6bf2c6449604bd772aab0c95",
+        "kernelPath": "bench/kernels/matrix_vector_mul_32768x2048_f32_swizzle1.wgsl",
+        "kernelSha256": "687cef356f0d331e0822037d1cd79d4194ae4dfa50e3b0e118302e94a08b8d82",
+        "dispatchX": 128,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 268435456,
+            "minBindingSize": 268435456,
+            "bufferType": "readonly",
+            "bufferBindingType": "read-only-storage"
+          },
+          {
+            "group": 0,
+            "binding": 1,
+            "bufferSize": 8192,
+            "minBindingSize": 8192,
+            "bufferType": "readonly",
+            "bufferBindingType": "read-only-storage"
+          },
+          {
+            "group": 0,
+            "binding": 2,
+            "bufferSize": 131072,
+            "minBindingSize": 131072,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {
       "sourceWorkloadId": "compute_matvec_32768x2048_f32_workgroupshared_swizzle1",
       "sourceWorkloadName": "matrix-vector multiply 32768x2048 f32 (workgroupshared swizzle1)",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "computeProjection": "generic_empty_dispatch_component"
+        "benchmarkClass": "comparable",
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/matrix_vector_mul_32768x2048_workgroupshared_swizzle1_commands.json",
+        "commandsSha256": "b553e203368bd7447771505f922db5d393e6251f5809d235d102fdfe65cd9bf8",
+        "kernelPath": "bench/kernels/matrix_vector_mul_32768x2048_f32_workgroupshared_swizzle1.wgsl",
+        "kernelSha256": "080408a41d8d45256a8d84b2d1b39f323ee27318270a3f691c71241cbbbeb0ce",
+        "dispatchX": 8192,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 268435456,
+            "minBindingSize": 268435456,
+            "bufferType": "readonly",
+            "bufferBindingType": "read-only-storage"
+          },
+          {
+            "group": 0,
+            "binding": 1,
+            "bufferSize": 8192,
+            "minBindingSize": 8192,
+            "bufferType": "readonly",
+            "bufferBindingType": "read-only-storage"
+          },
+          {
+            "group": 0,
+            "binding": 2,
+            "bufferSize": 131072,
+            "minBindingSize": 131072,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {
       "sourceWorkloadId": "compute_workgroup_atomic_1024",
       "sourceWorkloadName": "workgroup-atomic 1024",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "computeProjection": "generic_empty_dispatch_component"
+        "benchmarkClass": "comparable",
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/workgroup_atomic_commands.json",
+        "commandsSha256": "31c51af0b4f70fece40c62b3271e1de8ad5779bc2d3178e2889dceeceffe45a0",
+        "kernelPath": "bench/kernels/workgroup_atomic.wgsl",
+        "kernelSha256": "b7edc38f80448d1e50f6a31a72b1bb09f3a87484ac3d61b7e299ba0b577c5998",
+        "dispatchX": 1024,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 1048576,
+            "minBindingSize": 1048576,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {
       "sourceWorkloadId": "compute_workgroup_non_atomic_1024",
       "sourceWorkloadName": "workgroup-non-atomic 1024",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "computeProjection": "generic_empty_dispatch_component"
+        "benchmarkClass": "comparable",
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/workgroup_non_atomic_commands.json",
+        "commandsSha256": "5d6eae2ed53dfaff7a3817b8b7ab54022aafca339d41e5ee6a2b088ce85fe0eb",
+        "kernelPath": "bench/kernels/workgroup_non_atomic.wgsl",
+        "kernelSha256": "b1e3c7cf65d5cec0fe176ed0fa6b6a13aea3c32f6a14ea35e912475dabecfdc6",
+        "dispatchX": 1024,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 1048576,
+            "minBindingSize": 1048576,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {
@@ -112,7 +270,8 @@
       "projectionNote": "Async pipeline APIs are comparable but sensitive to browser event-loop scheduling.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": false
+        "sourceClaimEligible": false,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -129,7 +288,8 @@
       "projectionNote": "Pipeline creation remains comparable but includes browser-side scheduling overhead.",
       "browserWorkload": {
         "sourceComparable": true,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "comparable"
       }
     },
     {
@@ -146,7 +306,8 @@
       "projectionNote": "Render bundle throughput projected with browser submission overhead.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -163,7 +324,8 @@
       "projectionNote": "Render bundle throughput projected with browser submission overhead.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -180,7 +342,8 @@
       "projectionNote": "Macro render loops are projected as component-level browser runs.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": false
+        "sourceClaimEligible": false,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -197,7 +360,8 @@
       "projectionNote": "Render command shape projects to browser API with canvas/context overhead.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -214,7 +378,8 @@
       "projectionNote": "Render command shape projects to browser API with canvas/context overhead.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -231,7 +396,8 @@
       "projectionNote": "Render command shape projects to browser API with canvas/context overhead.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -248,7 +414,8 @@
       "projectionNote": "Macro render loops are projected as component-level browser runs.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -265,7 +432,8 @@
       "projectionNote": "Render command shape projects to browser API with canvas/context overhead.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -282,7 +450,8 @@
       "projectionNote": "Surface presentation can be measured in browser, but includes presentation stack overhead.",
       "browserWorkload": {
         "sourceComparable": true,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "comparable"
       }
     },
     {
@@ -300,6 +469,7 @@
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": true,
+        "benchmarkClass": "directional",
         "textureWidth": 128,
         "textureHeight": 128,
         "mipLevelCount": 1
@@ -319,7 +489,8 @@
       "projectionNote": "Texture macro loops project to browser API with non-trivial event-loop overhead.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -337,6 +508,7 @@
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": true,
+        "benchmarkClass": "directional",
         "textureWidth": 128,
         "textureHeight": 128,
         "mipLevelCount": 8
@@ -356,7 +528,8 @@
       "projectionNote": "Texture sampling+raster projection includes browser canvas integration costs.",
       "browserWorkload": {
         "sourceComparable": false,
-        "sourceClaimEligible": true
+        "sourceClaimEligible": true,
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -366,14 +539,15 @@
       "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "write_buffer_upload",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser API diagnostic only; source workload is not strict-claim eligible.",
-      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization. Source workload metadata prevents strict browser comparison; keep this row as a directional/component diagnostic.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
+        "benchmarkClass": "comparable",
         "uploadBytes": 16777216
       }
     },
@@ -403,14 +577,15 @@
       "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "write_buffer_upload",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser API diagnostic only; source workload is not strict-claim eligible.",
-      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization. Source workload metadata prevents strict browser comparison; keep this row as a directional/component diagnostic.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
+        "benchmarkClass": "comparable",
         "uploadBytes": 1024
       }
     },
@@ -421,14 +596,15 @@
       "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "write_buffer_upload",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser API diagnostic only; source workload is not strict-claim eligible.",
-      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization. Source workload metadata prevents strict browser comparison; keep this row as a directional/component diagnostic.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
+        "benchmarkClass": "comparable",
         "uploadBytes": 1048576
       }
     },
@@ -477,14 +653,15 @@
       "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "write_buffer_upload",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser API diagnostic only; source workload is not strict-claim eligible.",
-      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization. Source workload metadata prevents strict browser comparison; keep this row as a directional/component diagnostic.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
+        "benchmarkClass": "comparable",
         "uploadBytes": 4194304
       }
     },
@@ -495,14 +672,15 @@
       "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "write_buffer_upload",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser API diagnostic only; source workload is not strict-claim eligible.",
-      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization. Source workload metadata prevents strict browser comparison; keep this row as a directional/component diagnostic.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct queue.writeBuffer mapping with per-op normalization.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
+        "benchmarkClass": "comparable",
         "uploadBytes": 65536
       }
     },
@@ -546,19 +724,40 @@
       "sourceWorkloadId": "compute_concurrent_execution_single",
       "sourceWorkloadName": "concurrent execution single-dispatch contract",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
         "benchmarkClass": "comparable",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/concurrent_execution_single_commands.json",
+        "commandsSha256": "707d3cabe5c2d9186c7d811d50e2c2512479e9c0e0242f3887439d523c14e0f3",
+        "kernelPath": "bench/kernels/concurrent_execution_runsingle_u32.wgsl",
+        "kernelSha256": "57313155741224f77622b55aa9e739ec7698e5cc3079d92584d253334f1d95a6",
+        "dispatchX": 1,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 1,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 4096,
+            "minBindingSize": 4096,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {

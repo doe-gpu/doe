@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -23,6 +24,12 @@ VALID_REPORT_MODES = {"dawn", "doe", "auto"}
 VALID_SELECTED_RUNTIMES = {"dawn", "doe"}
 VALID_MODE_SCHEDULES = {"grouped", "paired", "paired-balanced"}
 VALID_POWER_PREFERENCES = {"default", "high-performance", "low-power"}
+VALID_SOURCE_KERNEL_SUBMIT_POLICIES = {"iteration-batch-v1", "sample-batch-v1"}
+PROJECTION_MANIFEST_SCHEMA_VERSION = 4
+SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1"
+SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1"
+SOURCE_KERNEL_STORAGE_BUFFER_USAGE = ["STORAGE", "COPY_DST", "COPY_SRC"]
+SOURCE_KERNEL_READBACK_SAMPLE_BYTES = 16
 VALID_RUNTIME_STATUS_CODES = {
     "ok": {"ok"},
     "fail": {"browser_launch_failed", "mode_setup_failed", "mode_execution_failed", "scenario_runtime_error"},
@@ -209,8 +216,11 @@ def parse_workloads(workloads_payload: dict[str, Any]) -> list[dict[str, str]]:
 
 def parse_projection_manifest(manifest_payload: dict[str, Any]) -> dict[str, Any]:
     schema_version = manifest_payload.get("schemaVersion")
-    if schema_version != 3:
-        raise ValueError(f"invalid manifest schemaVersion: expected 3, got {schema_version}")
+    if schema_version != PROJECTION_MANIFEST_SCHEMA_VERSION:
+        raise ValueError(
+            "invalid manifest schemaVersion: "
+            f"expected {PROJECTION_MANIFEST_SCHEMA_VERSION}, got {schema_version}"
+        )
 
     manifest = {
         "generatedAt": require_string(manifest_payload.get("generatedAt"), "manifest.generatedAt"),
@@ -372,8 +382,59 @@ def parse_browser_workload(value: Any, label: str, domain: Any) -> dict[str, Any
     compute_projection = value.get("computeProjection")
     if isinstance(compute_projection, str) and compute_projection.strip():
         parsed["computeProjection"] = compute_projection
-    if domain == "compute" and parsed.get("computeProjection") != "generic_empty_dispatch_component":
+    if domain == "compute" and parsed.get("computeProjection") not in {
+        "generic_empty_dispatch_component",
+        "source_kernel_dispatch_v1",
+    }:
         raise ValueError(f"{label}.computeProjection is required for compute rows")
+    if parsed.get("computeProjection") == "source_kernel_dispatch_v1":
+        parsed["bindGroupLayoutMode"] = require_string(
+            value.get("bindGroupLayoutMode"),
+            f"{label}.bindGroupLayoutMode",
+        )
+        if parsed["bindGroupLayoutMode"] != SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE:
+            raise ValueError(
+                f"{label}.bindGroupLayoutMode must be {SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE}"
+            )
+        parsed["readbackBindingPolicy"] = require_string(
+            value.get("readbackBindingPolicy"),
+            f"{label}.readbackBindingPolicy",
+        )
+        if parsed["readbackBindingPolicy"] != SOURCE_KERNEL_READBACK_BINDING_POLICY:
+            raise ValueError(
+                f"{label}.readbackBindingPolicy must be {SOURCE_KERNEL_READBACK_BINDING_POLICY}"
+            )
+        parsed["commandsPath"] = require_string(value.get("commandsPath"), f"{label}.commandsPath")
+        if not safe_repo_path(parsed["commandsPath"]):
+            raise ValueError(f"{label}.commandsPath must be repo-relative")
+        parsed["commandsSha256"] = require_hash_hex(
+            value.get("commandsSha256"),
+            f"{label}.commandsSha256",
+        )
+        parsed["kernelPath"] = require_string(value.get("kernelPath"), f"{label}.kernelPath")
+        if not safe_repo_path(parsed["kernelPath"]):
+            raise ValueError(f"{label}.kernelPath must be repo-relative")
+        parsed["kernelSha256"] = require_hash_hex(value.get("kernelSha256"), f"{label}.kernelSha256")
+        parsed["dispatchX"] = require_positive_int(value.get("dispatchX"), f"{label}.dispatchX")
+        parsed["dispatchY"] = require_positive_int(value.get("dispatchY"), f"{label}.dispatchY")
+        parsed["dispatchZ"] = require_positive_int(value.get("dispatchZ"), f"{label}.dispatchZ")
+        parsed["dispatchRepeat"] = require_positive_int(
+            value.get("dispatchRepeat"),
+            f"{label}.dispatchRepeat",
+        )
+        parsed["warmupDispatchCount"] = require_positive_int(
+            value.get("warmupDispatchCount"),
+            f"{label}.warmupDispatchCount",
+            allow_zero=True,
+        )
+        parsed["storageBindings"] = parse_storage_bindings(
+            value.get("storageBindings"),
+            f"{label}.storageBindings",
+        )
+        if not any(
+            binding["bufferBindingType"] == "storage" for binding in parsed["storageBindings"]
+        ):
+            raise ValueError(f"{label}.storageBindings must include a writable storage binding")
     for key in ("textureWidth", "textureHeight", "mipLevelCount"):
         metric_value = value.get(key)
         if metric_value is not None:
@@ -393,6 +454,63 @@ def browser_workload_strict_comparable(value: dict[str, Any]) -> bool:
         and value.get("sourceClaimEligible") is True
         and value.get("benchmarkClass") == "comparable"
     )
+
+
+def require_positive_int(value: Any, label: str, *, allow_zero: bool = False) -> int:
+    minimum = 0 if allow_zero else 1
+    if not isinstance(value, int) or value < minimum:
+        if allow_zero:
+            raise ValueError(f"{label} must be a non-negative integer")
+        raise ValueError(f"{label} must be a positive integer")
+    return value
+
+
+def parse_storage_bindings(value: Any, label: str) -> list[dict[str, Any]]:
+    if not isinstance(value, list) or not value:
+        raise ValueError(f"{label} must be a non-empty array")
+    bindings: list[dict[str, Any]] = []
+    seen: set[tuple[int, int]] = set()
+    for index, raw in enumerate(value):
+        if not isinstance(raw, dict):
+            raise ValueError(f"{label}[{index}] must be an object")
+        group = require_positive_int(raw.get("group"), f"{label}[{index}].group", allow_zero=True)
+        binding = require_positive_int(
+            raw.get("binding"),
+            f"{label}[{index}].binding",
+            allow_zero=True,
+        )
+        key = (group, binding)
+        if key in seen:
+            raise ValueError(f"{label}[{index}] duplicates group/binding {group}/{binding}")
+        seen.add(key)
+        buffer_type = require_string(raw.get("bufferType"), f"{label}[{index}].bufferType")
+        buffer_binding_type = require_string(
+            raw.get("bufferBindingType"),
+            f"{label}[{index}].bufferBindingType",
+        )
+        if buffer_binding_type not in {"storage", "read-only-storage"}:
+            raise ValueError(f"{label}[{index}].bufferBindingType is unsupported")
+        buffer_size = require_positive_int(
+            raw.get("bufferSize"),
+            f"{label}[{index}].bufferSize",
+        )
+        min_binding_size = require_positive_int(
+            raw.get("minBindingSize"),
+            f"{label}[{index}].minBindingSize",
+        )
+        if min_binding_size != buffer_size:
+            raise ValueError(f"{label}[{index}].minBindingSize must equal bufferSize")
+        bindings.append(
+            {
+                "group": group,
+                "binding": binding,
+                "bufferSize": buffer_size,
+                "minBindingSize": min_binding_size,
+                "bufferType": buffer_type,
+                "bufferBindingType": buffer_binding_type,
+            }
+        )
+    return bindings
 
 
 def parse_workflow_manifest(workflows_payload: dict[str, Any]) -> dict[str, Any]:
@@ -687,6 +805,36 @@ def check_projection_hash_sync(
     return errors
 
 
+def check_source_kernel_hash_sync(manifest_rows: list[dict[str, Any]]) -> list[str]:
+    errors: list[str] = []
+    for row in manifest_rows:
+        browser_workload = row.get("browserWorkload")
+        if not isinstance(browser_workload, dict):
+            continue
+        if browser_workload.get("computeProjection") != "source_kernel_dispatch_v1":
+            continue
+        workload_id = row["sourceWorkloadId"]
+        for path_key, hash_key in (
+            ("commandsPath", "commandsSha256"),
+            ("kernelPath", "kernelSha256"),
+        ):
+            path_text = browser_workload[path_key]
+            if not safe_repo_path(path_text):
+                errors.append(f"{workload_id}: {path_key} must be repo-relative: {path_text}")
+                continue
+            path = resolve_repo_path(path_text)
+            if not path.exists():
+                errors.append(f"{workload_id}: {path_key} not found: {path_text}")
+                continue
+            current_hash = file_sha256(path)
+            if current_hash != browser_workload[hash_key]:
+                errors.append(
+                    f"{workload_id}: {hash_key} mismatch: "
+                    f"manifest={browser_workload[hash_key]} current={current_hash}"
+                )
+    return errors
+
+
 def parse_required_modes(value: str) -> list[str]:
     if not value.strip():
         return []
@@ -716,6 +864,389 @@ def check_mode_result(
         errors.append(
             f"{row_label}: invalid statusCode '{status_code}' for mode '{mode}' and status '{status}'"
         )
+    return errors
+
+
+def is_positive_number(value: Any) -> bool:
+    return isinstance(value, int | float) and value > 0
+
+
+def is_nonnegative_number(value: Any) -> bool:
+    return isinstance(value, int | float) and value >= 0
+
+
+def is_nonnegative_int(value: Any) -> bool:
+    return isinstance(value, int) and value >= 0
+
+
+def percentile(sorted_values: list[float], fraction: float) -> float:
+    if not sorted_values:
+        return 0.0
+    index = min(
+        len(sorted_values) - 1,
+        max(0, int(math.ceil(len(sorted_values) * fraction)) - 1),
+    )
+    return sorted_values[index]
+
+
+def summarize_sample_values(samples: list[Any]) -> dict[str, float] | None:
+    numeric = [
+        float(value)
+        for value in samples
+        if isinstance(value, int | float) and float(value) > 0
+    ]
+    if len(numeric) != len(samples) or not numeric:
+        return None
+    numeric.sort()
+    return {
+        "": percentile(numeric, 0.50),
+        "Avg": sum(numeric) / len(numeric),
+        "P10": percentile(numeric, 0.10),
+        "P50": percentile(numeric, 0.50),
+        "P95": percentile(numeric, 0.95),
+        "P99": percentile(numeric, 0.99),
+    }
+
+
+def numbers_close(left: Any, right: float) -> bool:
+    if not isinstance(left, int | float):
+        return False
+    return abs(float(left) - right) <= max(1e-9, abs(right) * 1e-9)
+
+
+def group_summary_average(groups: list[list[Any]]) -> dict[str, float] | None:
+    summaries = []
+    for group in groups:
+        summary = summarize_sample_values(group)
+        if summary is None:
+            return None
+        summaries.append(summary)
+    if not summaries:
+        return None
+    return {
+        suffix: sum(summary[suffix] for summary in summaries) / len(summaries)
+        for suffix in summaries[0]
+    }
+
+
+def sample_groups_for(metrics: dict[str, Any], sample_key: str) -> tuple[list[list[Any]], list[str]]:
+    errors: list[str] = []
+    groups_key = f"{sample_key}Groups"
+    raw_groups = metrics.get(groups_key)
+    if raw_groups is None:
+        samples = metrics.get(sample_key)
+        return ([samples] if isinstance(samples, list) else []), errors
+    if not isinstance(raw_groups, list) or not raw_groups:
+        return [], [f"metrics.{groups_key} must be a non-empty array when present"]
+    groups: list[list[Any]] = []
+    for group_index, group in enumerate(raw_groups):
+        if not isinstance(group, list) or not group:
+            errors.append(f"metrics.{groups_key}[{group_index}] must be a non-empty sample array")
+            continue
+        groups.append(group)
+    samples = metrics.get(sample_key)
+    if isinstance(samples, list):
+        flattened = [value for group in groups for value in group]
+        if len(flattened) != len(samples):
+            errors.append(
+                f"metrics.{groups_key} flattened length must match metrics.{sample_key} "
+                f"(groups={len(flattened)} samples={len(samples)})"
+            )
+        else:
+            for index, (left, right) in enumerate(zip(flattened, samples, strict=True)):
+                if not isinstance(right, int | float) or not numbers_close(left, float(right)):
+                    errors.append(
+                        f"metrics.{groups_key} flattened sample {index} must match metrics.{sample_key}"
+                    )
+                    break
+    return groups, errors
+
+
+def check_sample_summary_consistency(
+    metrics: dict[str, Any],
+    row_label: str,
+    mode: str,
+    sample_key: str,
+    metric_name: str,
+) -> list[str]:
+    groups, group_errors = sample_groups_for(metrics, sample_key)
+    errors = [f"{row_label}: {error} for mode '{mode}'" for error in group_errors]
+    if not groups:
+        return errors
+    summary = group_summary_average(groups)
+    if summary is None:
+        return errors
+    for suffix, expected in summary.items():
+        key = f"{metric_name}{suffix}"
+        if not numbers_close(metrics.get(key), expected):
+            errors.append(
+                f"{row_label}: metrics.{key} must match {sample_key} summary for mode '{mode}' "
+                f"(report={metrics.get(key)!r} expected={expected!r})"
+            )
+    return errors
+
+
+def check_source_kernel_runtime_evidence(
+    mode_result: dict[str, Any],
+    manifest_row: dict[str, Any],
+    row_label: str,
+    mode: str,
+) -> list[str]:
+    browser_workload = manifest_row.get("browserWorkload")
+    if not isinstance(browser_workload, dict):
+        return []
+    if browser_workload.get("computeProjection") != "source_kernel_dispatch_v1":
+        return []
+    if mode_result.get("status") != "ok":
+        return []
+
+    errors: list[str] = []
+    metrics = mode_result.get("metrics")
+    if not isinstance(metrics, dict):
+        return [f"{row_label}: metrics missing for source kernel mode '{mode}'"]
+
+    for metric_key, workload_key in (
+        ("dispatchWorkgroupsX", "dispatchX"),
+        ("dispatchWorkgroupsY", "dispatchY"),
+        ("dispatchWorkgroupsZ", "dispatchZ"),
+        ("dispatchRepeat", "dispatchRepeat"),
+        ("warmupDispatchCount", "warmupDispatchCount"),
+    ):
+        if metrics.get(metric_key) != browser_workload.get(workload_key):
+            errors.append(
+                f"{row_label}: metrics.{metric_key} drift for mode '{mode}' "
+                f"(report={metrics.get(metric_key)!r} manifest={browser_workload.get(workload_key)!r})"
+            )
+
+    if metrics.get("kernelPath") != browser_workload.get("kernelPath"):
+        errors.append(f"{row_label}: metrics.kernelPath drift for mode '{mode}'")
+    if metrics.get("kernelSha256") != browser_workload.get("kernelSha256"):
+        errors.append(f"{row_label}: metrics.kernelSha256 drift for mode '{mode}'")
+    if metrics.get("commandsPath") != browser_workload.get("commandsPath"):
+        errors.append(f"{row_label}: metrics.commandsPath drift for mode '{mode}'")
+    if metrics.get("commandsSha256") != browser_workload.get("commandsSha256"):
+        errors.append(f"{row_label}: metrics.commandsSha256 drift for mode '{mode}'")
+    if metrics.get("bindGroupLayoutMode") != browser_workload.get("bindGroupLayoutMode"):
+        errors.append(f"{row_label}: metrics.bindGroupLayoutMode drift for mode '{mode}'")
+    if metrics.get("readbackBindingPolicy") != browser_workload.get("readbackBindingPolicy"):
+        errors.append(f"{row_label}: metrics.readbackBindingPolicy drift for mode '{mode}'")
+
+    iterations = metrics.get("iterations")
+    if not isinstance(iterations, int) or iterations <= 0:
+        errors.append(f"{row_label}: metrics.iterations must be positive for mode '{mode}'")
+    source_kernel_submit_policy = metrics.get("sourceKernelSubmitPolicy")
+    if source_kernel_submit_policy not in VALID_SOURCE_KERNEL_SUBMIT_POLICIES:
+        errors.append(
+            f"{row_label}: metrics.sourceKernelSubmitPolicy must be a known policy for mode '{mode}'"
+        )
+        source_kernel_submit_policy = "iteration-batch-v1"
+    source_kernel_sample_count = metrics.get("sourceKernelSampleCount")
+    if not isinstance(source_kernel_sample_count, int) or source_kernel_sample_count <= 0:
+        errors.append(
+            f"{row_label}: metrics.sourceKernelSampleCount must be positive for mode '{mode}'"
+        )
+        source_kernel_sample_count = 1
+    source_kernel_warmup_sample_count = metrics.get("sourceKernelWarmupSampleCount")
+    if not isinstance(source_kernel_warmup_sample_count, int) or source_kernel_warmup_sample_count < 0:
+        errors.append(
+            f"{row_label}: metrics.sourceKernelWarmupSampleCount must be non-negative for mode '{mode}'"
+        )
+        source_kernel_warmup_sample_count = 0
+    if isinstance(iterations, int) and iterations > 0:
+        expected_dispatches_per_sample = iterations * int(browser_workload["dispatchRepeat"])
+        expected_submits_per_sample = (
+            1 if source_kernel_submit_policy == "sample-batch-v1" else iterations
+        )
+        if metrics.get("dispatchesPerSample") != expected_dispatches_per_sample:
+            errors.append(
+                f"{row_label}: metrics.dispatchesPerSample drift for mode '{mode}' "
+                f"(report={metrics.get('dispatchesPerSample')!r} expected={expected_dispatches_per_sample})"
+            )
+        if metrics.get("submitsPerSample") != expected_submits_per_sample:
+            errors.append(
+                f"{row_label}: metrics.submitsPerSample drift for mode '{mode}' "
+                f"(report={metrics.get('submitsPerSample')!r} expected={expected_submits_per_sample})"
+            )
+        expected_warmup_dispatches = expected_dispatches_per_sample * source_kernel_warmup_sample_count
+        if metrics.get("sourceKernelWarmupDispatches") != expected_warmup_dispatches:
+            errors.append(
+                f"{row_label}: metrics.sourceKernelWarmupDispatches drift for mode '{mode}' "
+                f"(report={metrics.get('sourceKernelWarmupDispatches')!r} expected={expected_warmup_dispatches})"
+            )
+        expected_warmup_submits = expected_submits_per_sample * source_kernel_warmup_sample_count
+        if metrics.get("sourceKernelWarmupSubmits") != expected_warmup_submits:
+            errors.append(
+                f"{row_label}: metrics.sourceKernelWarmupSubmits drift for mode '{mode}' "
+                f"(report={metrics.get('sourceKernelWarmupSubmits')!r} expected={expected_warmup_submits})"
+            )
+        order_balanced_sample_count = metrics.get("orderBalancedSampleCount")
+        if not isinstance(order_balanced_sample_count, int) or order_balanced_sample_count <= 0:
+            order_balanced_sample_count = 1
+        expected_total_warmup_dispatches = (
+            int(browser_workload["warmupDispatchCount"]) * order_balanced_sample_count
+        ) + expected_warmup_dispatches
+        if metrics.get("totalWarmupDispatches") != expected_total_warmup_dispatches:
+            errors.append(
+                f"{row_label}: metrics.totalWarmupDispatches drift for mode '{mode}' "
+                f"(report={metrics.get('totalWarmupDispatches')!r} expected={expected_total_warmup_dispatches})"
+            )
+        expected_warmup_submit_count = 1 if int(browser_workload["warmupDispatchCount"]) > 0 else 0
+        if metrics.get("warmupSubmitCount") not in {expected_warmup_submit_count, expected_warmup_submit_count * order_balanced_sample_count}:
+            errors.append(
+                f"{row_label}: metrics.warmupSubmitCount drift for mode '{mode}' "
+                f"(report={metrics.get('warmupSubmitCount')!r} expected={expected_warmup_submit_count})"
+            )
+        expected_total_warmup_submits = (
+            expected_warmup_submit_count * order_balanced_sample_count
+        ) + expected_warmup_submits
+        if metrics.get("totalWarmupSubmits") != expected_total_warmup_submits:
+            errors.append(
+                f"{row_label}: metrics.totalWarmupSubmits drift for mode '{mode}' "
+                f"(report={metrics.get('totalWarmupSubmits')!r} expected={expected_total_warmup_submits})"
+            )
+        expected_total_dispatches = expected_dispatches_per_sample * source_kernel_sample_count
+        if metrics.get("totalDispatches") != expected_total_dispatches:
+            errors.append(
+                f"{row_label}: metrics.totalDispatches drift for mode '{mode}' "
+                f"(report={metrics.get('totalDispatches')!r} expected={expected_total_dispatches})"
+            )
+        expected_total_submits = expected_submits_per_sample * source_kernel_sample_count
+        if metrics.get("totalSubmits") != expected_total_submits:
+            errors.append(
+                f"{row_label}: metrics.totalSubmits drift for mode '{mode}' "
+                f"(report={metrics.get('totalSubmits')!r} expected={expected_total_submits})"
+            )
+
+    for metric_key in (
+        "dispatchElapsedMs",
+        "dispatchElapsedMsAvg",
+        "dispatchElapsedMsP10",
+        "dispatchElapsedMsP50",
+        "dispatchElapsedMsP95",
+        "dispatchElapsedMsP99",
+        "usPerOp",
+        "usPerOpAvg",
+        "usPerOpP10",
+        "usPerOpP50",
+        "usPerOpP95",
+        "usPerOpP99",
+    ):
+        if not is_positive_number(metrics.get(metric_key)):
+            errors.append(f"{row_label}: metrics.{metric_key} must be positive for mode '{mode}'")
+    for metric_key in ("dispatchElapsedMsSamples", "usPerOpSamples"):
+        samples = metrics.get(metric_key)
+        if not isinstance(samples, list) or len(samples) != source_kernel_sample_count:
+            errors.append(
+                f"{row_label}: metrics.{metric_key} must have sourceKernelSampleCount entries for mode '{mode}'"
+            )
+        else:
+            for index, value in enumerate(samples):
+                if not is_positive_number(value):
+                    errors.append(
+                        f"{row_label}: metrics.{metric_key}[{index}] must be positive for mode '{mode}'"
+                    )
+    errors.extend(
+        check_sample_summary_consistency(
+            metrics,
+            row_label,
+            mode,
+            "dispatchElapsedMsSamples",
+            "dispatchElapsedMs",
+        )
+    )
+    errors.extend(
+        check_sample_summary_consistency(
+            metrics,
+            row_label,
+            mode,
+            "usPerOpSamples",
+            "usPerOp",
+        )
+    )
+    if metrics.get("sourceKernelTimingPolicy") != "batched_source_kernel_samples_v1":
+        errors.append(
+            f"{row_label}: metrics.sourceKernelTimingPolicy must be batched_source_kernel_samples_v1 for mode '{mode}'"
+        )
+    for metric_key in (
+        "createBindGroupLayoutMs",
+        "createPipelineLayoutMs",
+        "submitReadbackMs",
+        "mapReadMs",
+    ):
+        if not is_nonnegative_number(metrics.get(metric_key)):
+            errors.append(f"{row_label}: metrics.{metric_key} must be non-negative for mode '{mode}'")
+
+    storage_bindings = browser_workload.get("storageBindings")
+    if not isinstance(storage_bindings, list) or not storage_bindings:
+        errors.append(f"{row_label}: manifest storageBindings missing for source kernel")
+        return errors
+
+    expected_storage_bytes = sum(int(binding["bufferSize"]) for binding in storage_bindings)
+    expected_min_binding_size_bytes = sum(
+        int(binding["minBindingSize"]) for binding in storage_bindings
+    )
+    expected_layout_entries = sorted(
+        [
+            {
+                "group": binding["group"],
+                "binding": binding["binding"],
+                "bufferBindingType": binding["bufferBindingType"],
+                "minBindingSize": binding["minBindingSize"],
+            }
+            for binding in storage_bindings
+        ],
+        key=lambda entry: (entry["group"], entry["binding"]),
+    )
+    if metrics.get("storageBindingCount") != len(storage_bindings):
+        errors.append(f"{row_label}: metrics.storageBindingCount drift for mode '{mode}'")
+    if metrics.get("storageBufferBytes") != expected_storage_bytes:
+        errors.append(f"{row_label}: metrics.storageBufferBytes drift for mode '{mode}'")
+    if metrics.get("bindGroupLayoutEntryCount") != len(storage_bindings):
+        errors.append(f"{row_label}: metrics.bindGroupLayoutEntryCount drift for mode '{mode}'")
+    if metrics.get("minBindingSizeBytes") != expected_min_binding_size_bytes:
+        errors.append(f"{row_label}: metrics.minBindingSizeBytes drift for mode '{mode}'")
+    if metrics.get("bindGroupLayoutEntries") != expected_layout_entries:
+        errors.append(f"{row_label}: metrics.bindGroupLayoutEntries drift for mode '{mode}'")
+    if metrics.get("storageBufferUsage") != SOURCE_KERNEL_STORAGE_BUFFER_USAGE:
+        errors.append(
+            f"{row_label}: metrics.storageBufferUsage must be {SOURCE_KERNEL_STORAGE_BUFFER_USAGE!r} "
+            f"for mode '{mode}'"
+        )
+
+    writable_bindings = [
+        binding
+        for binding in sorted(storage_bindings, key=lambda item: (item["group"], item["binding"]))
+        if binding["bufferBindingType"] == "storage"
+    ]
+    if not writable_bindings:
+        errors.append(f"{row_label}: manifest storageBindings missing writable storage binding")
+        return errors
+    readback_binding = writable_bindings[0]
+    if metrics.get("readbackBindingGroup") != readback_binding.get("group"):
+        errors.append(f"{row_label}: metrics.readbackBindingGroup drift for mode '{mode}'")
+    if metrics.get("readbackBinding") != readback_binding.get("binding"):
+        errors.append(f"{row_label}: metrics.readbackBinding drift for mode '{mode}'")
+    if metrics.get("readbackBytes") != readback_binding.get("bufferSize"):
+        errors.append(f"{row_label}: metrics.readbackBytes drift for mode '{mode}'")
+    if not is_nonnegative_int(metrics.get("readbackChecksum")):
+        errors.append(f"{row_label}: metrics.readbackChecksum must be a non-negative integer for mode '{mode}'")
+
+    sample = metrics.get("readbackSampleBytes")
+    if not isinstance(sample, list) or not sample:
+        errors.append(f"{row_label}: metrics.readbackSampleBytes must be a non-empty array for mode '{mode}'")
+    else:
+        expected_sample_len = min(SOURCE_KERNEL_READBACK_SAMPLE_BYTES, int(readback_binding["bufferSize"]))
+        if len(sample) != expected_sample_len:
+            errors.append(
+                f"{row_label}: metrics.readbackSampleBytes length drift for mode '{mode}' "
+                f"(report={len(sample)} expected={expected_sample_len})"
+            )
+        for index, value in enumerate(sample):
+            if not isinstance(value, int) or value < 0 or value > 255:
+                errors.append(
+                    f"{row_label}: metrics.readbackSampleBytes[{index}] must be a byte for mode '{mode}'"
+                )
+
     return errors
 
 
@@ -883,6 +1414,15 @@ def check_report_methodology(payload: Any, mode_schedule: str) -> list[str]:
             "report methodology.modeSchedule mismatch: "
             f"methodology={methodology_schedule} topLevel={mode_schedule}"
         )
+    source_kernel_samples = payload.get("sourceKernelSamples")
+    if not isinstance(source_kernel_samples, int) or source_kernel_samples <= 0:
+        errors.append("report methodology.sourceKernelSamples must be a positive integer")
+    source_kernel_warmup_samples = payload.get("sourceKernelWarmupSamples")
+    if not isinstance(source_kernel_warmup_samples, int) or source_kernel_warmup_samples < 0:
+        errors.append("report methodology.sourceKernelWarmupSamples must be a non-negative integer")
+    source_kernel_submit_policy = payload.get("sourceKernelSubmitPolicy")
+    if source_kernel_submit_policy not in VALID_SOURCE_KERNEL_SUBMIT_POLICIES:
+        errors.append("report methodology.sourceKernelSubmitPolicy must be a known policy")
     adapter_request = payload.get("adapterRequest")
     if not isinstance(adapter_request, dict):
         errors.append("report methodology.adapterRequest must be an object")
@@ -1170,6 +1710,14 @@ def check_report_coverage(
                     )
                     continue
                 errors.extend(check_mode_result(mode_result, f"L1:{workload_id}", mode))
+                errors.extend(
+                    check_source_kernel_runtime_evidence(
+                        mode_result,
+                        manifest_row,
+                        f"L1:{workload_id}",
+                        mode,
+                    )
+                )
 
     required_workflow_ids = [
         row["id"]
@@ -1285,6 +1833,7 @@ def main() -> int:
     errors: list[str] = []
     errors.extend(check_projection_completeness(workload_rows, manifest["rows"]))
     errors.extend(check_projection_hash_sync(manifest, workloads_path))
+    errors.extend(check_source_kernel_hash_sync(manifest["rows"]))
 
     required_modes = parse_required_modes(args.require_modes)
     if args.report:

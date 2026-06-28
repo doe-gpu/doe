@@ -3,6 +3,8 @@ const ir = @import("ir.zig");
 const lean_proof = @import("../lean_proof.zig");
 const mod = @import("mod.zig");
 
+const MIN_RECORDED_PHASE_NS: u64 = 1;
+
 pub const TranslationInfo = struct {
     workgroup_size: [3]u32 = .{ 1, 1, 1 },
     needs_sizes_buf: bool = false,
@@ -32,14 +34,17 @@ fn nowNs() i128 {
 }
 
 fn elapsedNs(start: i128, end: i128) u64 {
-    if (end <= start) return 0;
-    return @intCast(end - start);
+    if (end <= start) return MIN_RECORDED_PHASE_NS;
+    const elapsed: u64 = @intCast(end - start);
+    return @max(elapsed, MIN_RECORDED_PHASE_NS);
 }
 
 pub fn compute_runtime_robustness_config() mod.ir_transform_robustness.Config {
     return .{
         .elide_proven_bounds = lean_proof.bounds_elimination_available,
         .elide_dispatch_validated_bounds = true,
+        .elide_dispatch_validated_global_bounds = true,
+        .elide_static_storage_bounds = true,
         .elide_uniform_validated_bounds = true,
         // Runtime translation carries dispatch preconditions into pipeline
         // metadata, so it can safely consume proof-backed texture clamp elision.
@@ -60,6 +65,7 @@ pub fn vulkan_compute_runtime_robustness_config() mod.ir_transform_robustness.Co
         .elide_proven_bounds = lean_proof.bounds_elimination_available,
         .elide_dispatch_validated_bounds = true,
         .elide_dispatch_validated_global_bounds = true,
+        .elide_static_storage_bounds = true,
         .elide_uniform_validated_bounds = true,
     };
 }
@@ -440,6 +446,241 @@ test "compute runtime elides workgroup id storage clamp with dispatch preconditi
     try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
 }
 
+test "compute runtime elides global id storage clamp with dispatch precondition" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> data: array<f32>;
+        \\@compute @workgroup_size(64)
+        \\fn main(@builtin(global_invocation_id) id: vec3u) {
+        \\    data[id.x] = 1.0;
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    try std.testing.expectEqual(@as(usize, 1), result.info.dispatch_preconditions.len);
+    const precondition = result.info.dispatch_preconditions[0];
+    try std.testing.expectEqual(ir.DispatchPreconditionKind.gid_component, precondition.kind);
+    try std.testing.expectEqual(@as(u8, 0), precondition.gid_axis);
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+}
+
+test "compute runtime elides local invocation loop storage clamp with dispatch precondition" {
+    const source =
+        \\const K_WORKGROUP_SIZE: u32 = 256u;
+        \\const K_WORKGROUP_ARRAY_SIZE: u32 = 2048u;
+        \\const K_LOOP_LENGTH: u32 = K_WORKGROUP_ARRAY_SIZE / K_WORKGROUP_SIZE;
+        \\@group(0) @binding(0) var<storage, read_write> dst: array<f32>;
+        \\var<workgroup> wg: array<f32, K_WORKGROUP_ARRAY_SIZE>;
+        \\@compute @workgroup_size(K_WORKGROUP_SIZE, 1, 1)
+        \\fn main(@builtin(local_invocation_id) local_id: vec3u) {
+        \\    for (var k: u32 = 0u; k < K_LOOP_LENGTH; k = k + 1u) {
+        \\        let index: u32 = K_LOOP_LENGTH * local_id.x + k;
+        \\        dst[index] = wg[index];
+        \\    }
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    try std.testing.expectEqual(@as(usize, 1), result.info.dispatch_preconditions.len);
+    const precondition = result.info.dispatch_preconditions[0];
+    try std.testing.expectEqual(ir.DispatchPreconditionKind.local_invocation_component, precondition.kind);
+    try std.testing.expectEqual(@as(u8, 0), precondition.gid_axis);
+    try std.testing.expectEqual(@as(u64, 8), precondition.element_multiplier);
+    try std.testing.expectEqual(@as(u64, 8), precondition.loop_limit);
+    try std.testing.expectEqual(@as(u64, 1), precondition.loop_limit_multiplier);
+    try std.testing.expect(!result.info.needs_sizes_buf);
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+}
+
+test "compute runtime emits zero for unwritten workgroup reads" {
+    const source =
+        \\const K_WORKGROUP_SIZE: u32 = 256u;
+        \\const K_WORKGROUP_ARRAY_SIZE: u32 = 2048u;
+        \\const K_LOOP_LENGTH: u32 = K_WORKGROUP_ARRAY_SIZE / K_WORKGROUP_SIZE;
+        \\@group(0) @binding(0) var<storage, read_write> dst: array<f32>;
+        \\var<workgroup> wg: array<f32, K_WORKGROUP_ARRAY_SIZE>;
+        \\@compute @workgroup_size(K_WORKGROUP_SIZE, 1, 1)
+        \\fn main(@builtin(local_invocation_id) local_id: vec3u) {
+        \\    for (var k: u32 = 0u; k < K_LOOP_LENGTH; k = k + 1u) {
+        \\        let index: u32 = K_LOOP_LENGTH * local_id.x + k;
+        \\        dst[index] = wg[index];
+        \\    }
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    try std.testing.expect(!result.info.needs_sizes_buf);
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup float wg") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "wg[") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "= 0.0") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+}
+
+test "compute runtime preserves written workgroup storage" {
+    const source =
+        \\const K_WORKGROUP_SIZE: u32 = 256u;
+        \\const K_WORKGROUP_ARRAY_SIZE: u32 = 2048u;
+        \\const K_LOOP_LENGTH: u32 = K_WORKGROUP_ARRAY_SIZE / K_WORKGROUP_SIZE;
+        \\@group(0) @binding(0) var<storage, read_write> dst: array<f32>;
+        \\var<workgroup> wg: array<f32, K_WORKGROUP_ARRAY_SIZE>;
+        \\@compute @workgroup_size(K_WORKGROUP_SIZE, 1, 1)
+        \\fn main(@builtin(local_invocation_id) local_id: vec3u) {
+        \\    for (var k: u32 = 0u; k < K_LOOP_LENGTH; k = k + 1u) {
+        \\        let index: u32 = K_LOOP_LENGTH * local_id.x + k;
+        \\        wg[index] = f32(index);
+        \\        dst[index] = wg[index];
+        \\    }
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup float wg") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "wg[") != null);
+}
+
+test "compute runtime relaxes barrier-separated workgroup atomic load store" {
+    const source =
+        \\const kWorkgroupSize : u32 = 256u;
+        \\const kWorkgroupMask : u32 = kWorkgroupSize - 1u;
+        \\@group(0) @binding(0) var<storage, read_write> outVal : array<u32>;
+        \\var<workgroup> wg: array<atomic<u32>, kWorkgroupSize>;
+        \\@compute @workgroup_size(kWorkgroupSize, 1, 1)
+        \\fn main(@builtin(local_invocation_id) local_id : vec3u,
+        \\        @builtin(global_invocation_id) global_id : vec3u) {
+        \\  var accum : u32 = outVal[global_id.x];
+        \\  atomicStore(&wg[local_id.x], accum + global_id.x);
+        \\  workgroupBarrier();
+        \\  for (var i : u32 = 0u; i < kWorkgroupSize; i = i + 1u) {
+        \\    accum = atomicLoad(&wg[(i + accum) & kWorkgroupMask]);
+        \\  }
+        \\  workgroupBarrier();
+        \\  outVal[global_id.x] = accum;
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup uint wg[256]") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "atomic_uint") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "atomic_store_explicit") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "atomic_load_explicit") == null);
+}
+
+test "compute runtime lowers single invocation workgroup storage to thread local" {
+    const source =
+        \\const kBufferSize : u32 = 1024u;
+        \\@group(0) @binding(0) var<storage, read_write> data : array<u32, kBufferSize>;
+        \\var<workgroup> wg_data : array<u32, kBufferSize>;
+        \\@compute @workgroup_size(1, 1, 1)
+        \\fn main() {
+        \\    for (var i : u32 = 0u; i < kBufferSize; i = i + 1u) {
+        \\        wg_data[i] = data[i];
+        \\    }
+        \\    workgroupBarrier();
+        \\    data[0] = wg_data[0];
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup uint wg_data") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "uint wg_data[1024];") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup_barrier") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "(void)0") != null);
+}
+
+test "compute runtime elides bitmasked workgroup array clamp" {
+    const source =
+        \\const kBufferSize : u32 = 1024u;
+        \\const kBufferMask : u32 = kBufferSize - 1u;
+        \\@group(0) @binding(0) var<storage, read_write> inout_data : array<u32, kBufferSize>;
+        \\var<workgroup> wg_data : array<u32, kBufferSize>;
+        \\@compute @workgroup_size(1, 1, 1)
+        \\fn main() {
+        \\    var accum : u32 = inout_data[0];
+        \\    for (var i : u32 = 0u; i < kBufferSize; i = i + 1u) {
+        \\        wg_data[i] = inout_data[i];
+        \\    }
+        \\    for (var i : u32 = 0u; i < 1000000u; i = i + 1u) {
+        \\        let idx = (i + accum) & kBufferMask;
+        \\        accum = (accum ^ wg_data[idx]) + 123u;
+        \\    }
+        \\    inout_data[0] = accum;
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "wg_data[min(") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "wg_data[idx]") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "inout_data[min(") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "inout_data[i]") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "inout_data[uint(0)]") != null or
+        std.mem.indexOf(u8, msl, "inout_data[0]") != null);
+}
+
 test "vulkan compute runtime elides global id storage clamp with dispatch precondition" {
     const source =
         \\@group(0) @binding(0) var<storage, read> input_values: array<f32>;
@@ -611,4 +852,26 @@ test "compute runtime elides uniform guarded gid storage clamps" {
     try std.testing.expect(!result.info.needs_sizes_buf);
     try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
     try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+}
+
+test "compute runtime emits Metal max total threads from workgroup size" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
+        \\@compute @workgroup_size(8, 4, 2)
+        \\fn main(@builtin(global_invocation_id) gid: vec3u) {
+        \\    data[gid.x] = gid.y + gid.z;
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "[[max_total_threads_per_threadgroup(64)]]") != null);
 }

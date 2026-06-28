@@ -379,6 +379,24 @@ def parse_args() -> argparse.Namespace:
         help="Texture scenario iterations passed to the layered runner.",
     )
     parser.add_argument(
+        "--source-kernel-samples",
+        type=positive_int,
+        default=None,
+        help="Source-kernel compute timing samples passed to the layered runner.",
+    )
+    parser.add_argument(
+        "--source-kernel-warmup-samples",
+        type=nonnegative_int,
+        default=None,
+        help="Untimed source-kernel timing batches passed to the layered runner before samples.",
+    )
+    parser.add_argument(
+        "--source-kernel-submit-policy",
+        choices=("iteration-batch-v1", "sample-batch-v1"),
+        default=None,
+        help="Source-kernel queue submit cadence passed to the layered runner.",
+    )
+    parser.add_argument(
         "--out",
         default="",
         help=(
@@ -475,6 +493,13 @@ def positive_int(value: str) -> int:
     parsed = int(value, 10)
     if parsed <= 0:
         raise argparse.ArgumentTypeError(f"expected positive integer, got {value}")
+    return parsed
+
+
+def nonnegative_int(value: str) -> int:
+    parsed = int(value, 10)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError(f"expected non-negative integer, got {value}")
     return parsed
 
 
@@ -600,6 +625,9 @@ def extend_iteration_args(command: list[str], args: argparse.Namespace) -> None:
         ("--iters-async-pipeline", args.iters_async_pipeline),
         ("--iters-workflow", args.iters_workflow),
         ("--iters-texture", args.iters_texture),
+        ("--source-kernel-samples", args.source_kernel_samples),
+        ("--source-kernel-warmup-samples", args.source_kernel_warmup_samples),
+        ("--source-kernel-submit-policy", args.source_kernel_submit_policy),
     ]
     for flag, value in iteration_args:
         if value is not None:
@@ -906,9 +934,9 @@ def main() -> int:
                 "--out",
                 str(score_out),
                 "--baseline-mode",
-                "dawn",
-                "--comparison-mode",
                 "doe",
+                "--comparison-mode",
+                "dawn",
             ]
             run_step("score", score_command, dry_run=False)
             score_payload = load_json(score_out)
@@ -961,6 +989,9 @@ def main() -> int:
                 "asyncPipeline": args.iters_async_pipeline,
                 "workflow": args.iters_workflow,
                 "texture": args.iters_texture,
+                "sourceKernelSamples": args.source_kernel_samples,
+                "sourceKernelWarmupSamples": args.source_kernel_warmup_samples,
+                "sourceKernelSubmitPolicy": args.source_kernel_submit_policy,
             },
         },
         "commands": {

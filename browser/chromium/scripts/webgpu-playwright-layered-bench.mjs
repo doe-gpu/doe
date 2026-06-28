@@ -110,7 +110,10 @@ const DEFAULT_OUT_FILE = "dawn-vs-doe.browser-layered.diagnostic.json";
 const DEFAULT_API_SURFACE = "native";
 const DEFAULT_POWER_PREFERENCE = "high-performance";
 const HASH_ALGORITHM = "sha256";
+const PROJECTION_MANIFEST_SCHEMA_VERSION = 4;
 const RUNTIME_SELECTOR_VERSION = "browser-runtime-selector-v1";
+const SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1";
+const SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1";
 const CATEGORY_BY_DOMAIN = {
   compute: "compute",
   "p0-compute": "compute",
@@ -155,6 +158,13 @@ const DEFAULT_ITERATIONS = {
   workflow: 80,
   texture: 64,
 };
+const DEFAULT_SOURCE_KERNEL_SAMPLES = 1;
+const DEFAULT_SOURCE_KERNEL_WARMUP_SAMPLES = 0;
+const DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY = "iteration-batch-v1";
+const SOURCE_KERNEL_SUBMIT_POLICIES = new Set([
+  "iteration-batch-v1",
+  "sample-batch-v1",
+]);
 
 function timestampId() {
   return new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
@@ -206,6 +216,11 @@ Options:
   --iters-async-pipeline N  Async pipeline iterations (default: 64)
   --iters-workflow N        Workflow loop iterations (default: 80)
   --iters-texture N         Texture scenario iterations (default: 64)
+  --source-kernel-samples N Source-kernel compute timing samples (default: 1)
+  --source-kernel-warmup-samples N
+                            Untimed source-kernel timing batches before samples (default: 0)
+  --source-kernel-submit-policy ${[...SOURCE_KERNEL_SUBMIT_POLICIES].join("|")}
+                            Source-kernel queue submit cadence (default: ${DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY})
   --focus-category CATEGORY Run only rows in this diagnostic category (repeatable or comma-separated)
   --strict                  Exit non-zero when required rows fail
   --help                    Show this message
@@ -250,6 +265,15 @@ function parsePowerPreference(text) {
     return text;
   }
   throw new Error("--power-preference must be default, high-performance, or low-power");
+}
+
+function parseSourceKernelSubmitPolicy(text) {
+  if (SOURCE_KERNEL_SUBMIT_POLICIES.has(text)) {
+    return text;
+  }
+  throw new Error(
+    `--source-kernel-submit-policy must be one of ${[...SOURCE_KERNEL_SUBMIT_POLICIES].join(", ")}`,
+  );
 }
 
 function parseModeOrder(text) {
@@ -322,6 +346,10 @@ function fileHashHex(pathValue) {
 function readTextFile(pathValue) {
   if (!pathValue || !existsSync(pathValue)) return null;
   return readFileSync(pathValue, "utf8");
+}
+
+function repoPath(pathValue) {
+  return resolve(ROOT, pathValue);
 }
 
 function releaseClassForChromePath(chromePath) {
@@ -432,6 +460,9 @@ function parseArgs(argv) {
     modeSchedule: "grouped",
     strict: false,
     iterations: { ...DEFAULT_ITERATIONS },
+    sourceKernelSamples: DEFAULT_SOURCE_KERNEL_SAMPLES,
+    sourceKernelWarmupSamples: DEFAULT_SOURCE_KERNEL_WARMUP_SAMPLES,
+    sourceKernelSubmitPolicy: DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY,
   };
 
   for (let i = 2; i < argv.length; i += 1) {
@@ -538,6 +569,26 @@ function parseArgs(argv) {
         "--iters-texture",
       );
       i += 1;
+    } else if (token === "--source-kernel-samples") {
+      args.sourceKernelSamples = parsePositiveInt(
+        readOptionValue(argv, i, "--source-kernel-samples"),
+        "--source-kernel-samples",
+      );
+      i += 1;
+    } else if (token === "--source-kernel-warmup-samples") {
+      args.sourceKernelWarmupSamples = Number.parseInt(
+        readOptionValue(argv, i, "--source-kernel-warmup-samples"),
+        10,
+      );
+      if (!Number.isSafeInteger(args.sourceKernelWarmupSamples) || args.sourceKernelWarmupSamples < 0) {
+        throw new Error("--source-kernel-warmup-samples must be a non-negative integer");
+      }
+      i += 1;
+    } else if (token === "--source-kernel-submit-policy") {
+      args.sourceKernelSubmitPolicy = parseSourceKernelSubmitPolicy(
+        readOptionValue(argv, i, "--source-kernel-submit-policy"),
+      );
+      i += 1;
     } else {
       throw new Error(`unknown argument: ${token}`);
     }
@@ -616,10 +667,75 @@ function requireHashHex(value, label) {
   return text;
 }
 
+function requirePositiveInteger(value, label, { allowZero = false } = {}) {
+  const minimum = allowZero ? 0 : 1;
+  if (!Number.isSafeInteger(value) || value < minimum) {
+    throw new Error(
+      allowZero
+        ? `${label} must be a non-negative integer`
+        : `${label} must be a positive integer`,
+    );
+  }
+  return value;
+}
+
+function parseStorageBindings(value, label) {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`${label} must be a non-empty array`);
+  }
+  const seen = new Set();
+  return value.map((binding, index) => {
+    if (!binding || typeof binding !== "object" || Array.isArray(binding)) {
+      throw new Error(`${label}[${index}] must be an object`);
+    }
+    const group = requirePositiveInteger(binding.group, `${label}[${index}].group`, {
+      allowZero: true,
+    });
+    const bindingIndex = requirePositiveInteger(
+      binding.binding,
+      `${label}[${index}].binding`,
+      { allowZero: true },
+    );
+    const key = `${group}:${bindingIndex}`;
+    if (seen.has(key)) {
+      throw new Error(`${label}[${index}] duplicates group/binding ${key}`);
+    }
+    seen.add(key);
+    const minBindingSize = requirePositiveInteger(
+      binding.minBindingSize,
+      `${label}[${index}].minBindingSize`,
+    );
+    const bufferSize = requirePositiveInteger(
+      binding.bufferSize,
+      `${label}[${index}].bufferSize`,
+    );
+    const bufferBindingType = requireString(
+      binding.bufferBindingType,
+      `${label}[${index}].bufferBindingType`,
+    );
+    if (!["storage", "read-only-storage"].includes(bufferBindingType)) {
+      throw new Error(`${label}[${index}].bufferBindingType is unsupported: ${bufferBindingType}`);
+    }
+    if (minBindingSize !== bufferSize) {
+      throw new Error(`${label}[${index}].minBindingSize must equal bufferSize`);
+    }
+    return {
+      group,
+      binding: bindingIndex,
+      bufferSize,
+      minBindingSize,
+      bufferType: requireString(binding.bufferType, `${label}[${index}].bufferType`),
+      bufferBindingType,
+    };
+  });
+}
+
 function loadProjectionManifest(path) {
   const payload = loadJsonObject(path);
-  if (payload.schemaVersion !== 3) {
-    throw new Error(`invalid projection manifest schemaVersion, expected 3: ${path}`);
+  if (payload.schemaVersion !== PROJECTION_MANIFEST_SCHEMA_VERSION) {
+    throw new Error(
+      `invalid projection manifest schemaVersion, expected ${PROJECTION_MANIFEST_SCHEMA_VERSION}: ${path}`,
+    );
   }
   if (!Array.isArray(payload.rows) || payload.rows.length === 0) {
     throw new Error(`invalid projection manifest: ${path}`);
@@ -720,8 +836,56 @@ function parseBrowserWorkload(value, label, domain) {
   if (typeof value.computeProjection === "string" && value.computeProjection.length > 0) {
     parsed.computeProjection = value.computeProjection;
   }
-  if (domain === "compute" && parsed.computeProjection !== "generic_empty_dispatch_component") {
+  if (
+    domain === "compute" &&
+    !["generic_empty_dispatch_component", "source_kernel_dispatch_v1"].includes(
+      parsed.computeProjection,
+    )
+  ) {
     throw new Error(`${label}.computeProjection is required for compute rows`);
+  }
+  if (parsed.computeProjection === "source_kernel_dispatch_v1") {
+    parsed.bindGroupLayoutMode = requireString(
+      value.bindGroupLayoutMode,
+      `${label}.bindGroupLayoutMode`,
+    );
+    if (parsed.bindGroupLayoutMode !== SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE) {
+      throw new Error(
+        `${label}.bindGroupLayoutMode must be ${SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE}`,
+      );
+    }
+    parsed.readbackBindingPolicy = requireString(
+      value.readbackBindingPolicy,
+      `${label}.readbackBindingPolicy`,
+    );
+    if (parsed.readbackBindingPolicy !== SOURCE_KERNEL_READBACK_BINDING_POLICY) {
+      throw new Error(
+        `${label}.readbackBindingPolicy must be ${SOURCE_KERNEL_READBACK_BINDING_POLICY}`,
+      );
+    }
+    parsed.commandsPath = requireString(value.commandsPath, `${label}.commandsPath`);
+    parsed.commandsSha256 = requireHashHex(value.commandsSha256, `${label}.commandsSha256`);
+    parsed.kernelPath = requireString(value.kernelPath, `${label}.kernelPath`);
+    parsed.kernelSha256 = requireHashHex(value.kernelSha256, `${label}.kernelSha256`);
+    parsed.dispatchX = requirePositiveInteger(value.dispatchX, `${label}.dispatchX`);
+    parsed.dispatchY = requirePositiveInteger(value.dispatchY, `${label}.dispatchY`);
+    parsed.dispatchZ = requirePositiveInteger(value.dispatchZ, `${label}.dispatchZ`);
+    parsed.dispatchRepeat = requirePositiveInteger(
+      value.dispatchRepeat,
+      `${label}.dispatchRepeat`,
+    );
+    parsed.warmupDispatchCount = requirePositiveInteger(
+      value.warmupDispatchCount,
+      `${label}.warmupDispatchCount`,
+      { allowZero: true },
+    );
+    parsed.storageBindings = parseStorageBindings(
+      value.storageBindings,
+      `${label}.storageBindings`,
+    );
+    if (!parsed.storageBindings.some((binding) => binding.bufferBindingType === "storage")) {
+      throw new Error(`${label}.storageBindings must include a writable storage binding`);
+    }
   }
   for (const key of ["textureWidth", "textureHeight", "mipLevelCount"]) {
     if (value[key] !== undefined) {
@@ -820,6 +984,41 @@ function loadWorkflowManifest(path) {
     return workflow;
   });
   return { promotionGateRequiredApprovals, rows };
+}
+
+function sourceKernelScenarioConfig(row) {
+  const browserWorkload = row.browserWorkload ?? {};
+  if (browserWorkload.computeProjection !== "source_kernel_dispatch_v1") {
+    return row;
+  }
+  const kernelPath = repoPath(browserWorkload.kernelPath);
+  const commandsPath = repoPath(browserWorkload.commandsPath);
+  if (!pathWithin(commandsPath, ROOT)) {
+    throw new Error(`commandsPath escapes repo root: ${browserWorkload.commandsPath}`);
+  }
+  const commandsSha256 = fileHashHex(commandsPath);
+  if (commandsSha256 !== browserWorkload.commandsSha256) {
+    throw new Error(
+      `commandsSha256 mismatch for ${row.sourceWorkloadId}: expected ${browserWorkload.commandsSha256}, got ${commandsSha256}`,
+    );
+  }
+  if (!pathWithin(kernelPath, ROOT)) {
+    throw new Error(`kernelPath escapes repo root: ${browserWorkload.kernelPath}`);
+  }
+  const kernelSource = readTextFile(kernelPath);
+  if (typeof kernelSource !== "string") {
+    throw new Error(`kernelPath not found: ${browserWorkload.kernelPath}`);
+  }
+  const kernelSha256 = fileHashHex(kernelPath);
+  if (kernelSha256 !== browserWorkload.kernelSha256) {
+    throw new Error(
+      `kernelSha256 mismatch for ${row.sourceWorkloadId}: expected ${browserWorkload.kernelSha256}, got ${kernelSha256}`,
+    );
+  }
+  return {
+    ...row,
+    kernelSource,
+  };
 }
 
 function categoryForProjectionRow(row) {
@@ -1144,9 +1343,28 @@ async function probeRuntime(page, browserSurfaceArgs) {
   }, browserSurfaceArgs);
 }
 
-async function runScenario(page, template, iterations, browserSurfaceArgs, scenarioConfig = {}) {
+async function runScenario(
+  page,
+  template,
+  iterations,
+  browserSurfaceArgs,
+  scenarioConfig = {},
+  sourceKernelSamples = DEFAULT_SOURCE_KERNEL_SAMPLES,
+  sourceKernelWarmupSamples = DEFAULT_SOURCE_KERNEL_WARMUP_SAMPLES,
+  sourceKernelSubmitPolicy = DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY,
+) {
   return page.evaluate(
-    async ({ scenarioTemplate, runIterations, apiSurface, browserModuleUrl, powerPreference, scenarioConfig }) => {
+    async ({
+      scenarioTemplate,
+      runIterations,
+      apiSurface,
+      browserModuleUrl,
+      powerPreference,
+      scenarioConfig,
+      sourceKernelSamples,
+      sourceKernelWarmupSamples,
+      sourceKernelSubmitPolicy,
+    }) => {
       const result = {
         apiSurface,
         status: "fail",
@@ -1214,6 +1432,7 @@ async function runScenario(page, template, iterations, browserSurfaceArgs, scena
         result.metrics[metricName] = summary.p50;
         result.metrics[`${metricName}Avg`] = summary.avg;
         result.metrics[`${metricName}P10`] = summary.p10;
+        result.metrics[`${metricName}P50`] = summary.p50;
         result.metrics[`${metricName}P95`] = summary.p95;
         result.metrics[`${metricName}P99`] = summary.p99;
       }
@@ -1262,6 +1481,256 @@ async function runScenario(page, template, iterations, browserSurfaceArgs, scena
       }
 
       async function runComputeDispatch(device, dispatchIters) {
+        const computeConfig = scenarioConfig?.browserWorkload ?? {};
+        if (computeConfig.computeProjection === "source_kernel_dispatch_v1") {
+          const kernelSource = scenarioConfig?.kernelSource;
+          if (typeof kernelSource !== "string" || kernelSource.length === 0) {
+            throw new Error("source_kernel_dispatch_v1 missing kernelSource");
+          }
+          const storageBindings = computeConfig.storageBindings;
+          if (!Array.isArray(storageBindings) || storageBindings.length === 0) {
+            throw new Error("source_kernel_dispatch_v1 missing storageBindings");
+          }
+          const storageBufferUsageLabels = ["STORAGE", "COPY_DST", "COPY_SRC"];
+          const readbackSampleByteCount = 16;
+
+          let t0 = nowMs();
+          const storageBufferUsage =
+            GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC;
+          const buffers = storageBindings.map((binding) => {
+            const buffer = device.createBuffer({
+              size: binding.bufferSize,
+              usage: storageBufferUsage,
+            });
+            device.queue.writeBuffer(buffer, 0, new Uint8Array(binding.bufferSize));
+            return { ...binding, buffer };
+          });
+          await device.queue.onSubmittedWorkDone();
+          result.metrics.bufferInitMs = nowMs() - t0;
+
+          t0 = nowMs();
+          const shader = device.createShaderModule({ code: kernelSource });
+          result.metrics.shaderModuleMs = nowMs() - t0;
+
+          t0 = nowMs();
+          const bindingsByGroup = new Map();
+          for (const binding of buffers) {
+            const groupEntries = bindingsByGroup.get(binding.group) ?? {
+              bindGroupEntries: [],
+              layoutEntries: [],
+            };
+            groupEntries.bindGroupEntries.push({
+              binding: binding.binding,
+              resource: { buffer: binding.buffer },
+            });
+            groupEntries.layoutEntries.push({
+              binding: binding.binding,
+              visibility: GPUShaderStage.COMPUTE,
+              buffer: {
+                type: binding.bufferBindingType,
+                minBindingSize: binding.minBindingSize,
+              },
+            });
+            bindingsByGroup.set(binding.group, groupEntries);
+          }
+          const groupedBindings = [...bindingsByGroup.entries()].sort(
+            ([left], [right]) => left - right,
+          );
+          for (let index = 0; index < groupedBindings.length; index += 1) {
+            const [group] = groupedBindings[index];
+            if (group !== index) {
+              throw new Error(
+                `source_kernel_dispatch_v1 requires contiguous bind groups from 0, saw group ${group}`,
+              );
+            }
+          }
+          const bindGroupLayouts = groupedBindings.map(([group, entries]) => ({
+            group,
+            layout: device.createBindGroupLayout({
+              entries: [...entries.layoutEntries].sort((left, right) => left.binding - right.binding),
+            }),
+          }));
+          result.metrics.createBindGroupLayoutMs = nowMs() - t0;
+
+          t0 = nowMs();
+          const pipelineLayout = device.createPipelineLayout({
+            bindGroupLayouts: bindGroupLayouts.map(({ layout }) => layout),
+          });
+          result.metrics.createPipelineLayoutMs = nowMs() - t0;
+
+          t0 = nowMs();
+          const pipeline = device.createComputePipeline({
+            layout: pipelineLayout,
+            compute: { module: shader, entryPoint: "main" },
+          });
+          result.metrics.computePipelineMs = nowMs() - t0;
+
+          t0 = nowMs();
+          const bindGroups = groupedBindings.map(([group, entries], index) => ({
+            group,
+            bindGroup: device.createBindGroup({
+              layout: bindGroupLayouts[index].layout,
+              entries: [...entries.bindGroupEntries].sort(
+                (left, right) => left.binding - right.binding,
+              ),
+            }),
+          }));
+          result.metrics.createBindGroupMs = nowMs() - t0;
+
+          function encodeDispatches(dispatchCount) {
+            const encoder = device.createCommandEncoder();
+            const pass = encoder.beginComputePass();
+            pass.setPipeline(pipeline);
+            for (const { group, bindGroup } of bindGroups) {
+              pass.setBindGroup(group, bindGroup);
+            }
+            for (let i = 0; i < dispatchCount; i += 1) {
+              pass.dispatchWorkgroups(
+                computeConfig.dispatchX,
+                computeConfig.dispatchY,
+                computeConfig.dispatchZ,
+              );
+            }
+            pass.end();
+            device.queue.submit([encoder.finish()]);
+          }
+
+          const warmupDispatchCount = computeConfig.warmupDispatchCount ?? 0;
+          const dispatchesPerSample = dispatchIters * computeConfig.dispatchRepeat;
+          const submitsPerSample = sourceKernelSubmitPolicy === "sample-batch-v1"
+            ? 1
+            : dispatchIters;
+          function encodeSampleDispatches() {
+            if (sourceKernelSubmitPolicy === "sample-batch-v1") {
+              encodeDispatches(dispatchesPerSample);
+              return;
+            }
+            for (let i = 0; i < dispatchIters; i += 1) {
+              encodeDispatches(computeConfig.dispatchRepeat);
+            }
+          }
+
+          if (warmupDispatchCount > 0) {
+            encodeDispatches(warmupDispatchCount);
+            await device.queue.onSubmittedWorkDone();
+          }
+
+          for (let sampleIndex = 0; sampleIndex < sourceKernelWarmupSamples; sampleIndex += 1) {
+            encodeSampleDispatches();
+            await device.queue.onSubmittedWorkDone();
+          }
+          const dispatchSamples = [];
+          for (let sampleIndex = 0; sampleIndex < sourceKernelSamples; sampleIndex += 1) {
+            t0 = nowMs();
+            encodeSampleDispatches();
+            await device.queue.onSubmittedWorkDone();
+            const elapsedMs = nowMs() - t0;
+            dispatchSamples.push({
+              dispatchElapsedMs: elapsedMs,
+              usPerOp: (elapsedMs * 1000) / dispatchesPerSample,
+            });
+          }
+          const totalDispatches = dispatchesPerSample * dispatchSamples.length;
+
+          const readbackBinding = [...buffers]
+            .sort((left, right) => left.group - right.group || left.binding - right.binding)
+            .find((binding) => binding.bufferBindingType === "storage");
+          if (!readbackBinding) {
+            throw new Error("source_kernel_dispatch_v1 missing writable storage binding for readback");
+          }
+          const readback = device.createBuffer({
+            size: readbackBinding.bufferSize,
+            usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+          });
+          t0 = nowMs();
+          const readbackEncoder = device.createCommandEncoder();
+          readbackEncoder.copyBufferToBuffer(
+            readbackBinding.buffer,
+            0,
+            readback,
+            0,
+            readbackBinding.bufferSize,
+          );
+          device.queue.submit([readbackEncoder.finish()]);
+          result.metrics.submitReadbackMs = nowMs() - t0;
+
+          t0 = nowMs();
+          await device.queue.onSubmittedWorkDone();
+          await readback.mapAsync(GPUMapMode.READ);
+          const readbackData = new Uint8Array(readback.getMappedRange());
+          let readbackChecksum = 0;
+          for (let index = 0; index < readbackData.length; index += 1) {
+            readbackChecksum = (readbackChecksum + readbackData[index] * ((index % 251) + 1)) >>> 0;
+          }
+          const readbackSampleBytes = Array.from(
+            readbackData.slice(0, Math.min(readbackSampleByteCount, readbackData.length)),
+          );
+          readback.unmap();
+          result.metrics.mapReadMs = nowMs() - t0;
+          const bindGroupLayoutEntries = storageBindings
+            .map((binding) => ({
+              group: binding.group,
+              binding: binding.binding,
+              bufferBindingType: binding.bufferBindingType,
+              minBindingSize: binding.minBindingSize,
+            }))
+            .sort((left, right) => left.group - right.group || left.binding - right.binding);
+
+          result.metrics.iterations = dispatchIters;
+          result.metrics.sourceKernelSampleCount = dispatchSamples.length;
+          result.metrics.sourceKernelWarmupSampleCount = sourceKernelWarmupSamples;
+          result.metrics.sourceKernelWarmupDispatches = dispatchesPerSample * sourceKernelWarmupSamples;
+          result.metrics.totalWarmupDispatches = warmupDispatchCount + result.metrics.sourceKernelWarmupDispatches;
+          result.metrics.sourceKernelSubmitPolicy = sourceKernelSubmitPolicy;
+          result.metrics.submitsPerSample = submitsPerSample;
+          result.metrics.warmupSubmitCount = warmupDispatchCount > 0 ? 1 : 0;
+          result.metrics.sourceKernelWarmupSubmits = submitsPerSample * sourceKernelWarmupSamples;
+          result.metrics.totalWarmupSubmits = result.metrics.warmupSubmitCount + result.metrics.sourceKernelWarmupSubmits;
+          result.metrics.totalSubmits = submitsPerSample * dispatchSamples.length;
+          result.metrics.dispatchesPerSample = dispatchesPerSample;
+          result.metrics.dispatchWorkgroupsX = computeConfig.dispatchX;
+          result.metrics.dispatchWorkgroupsY = computeConfig.dispatchY;
+          result.metrics.dispatchWorkgroupsZ = computeConfig.dispatchZ;
+          result.metrics.dispatchRepeat = computeConfig.dispatchRepeat;
+          result.metrics.totalDispatches = totalDispatches;
+          addTimingStats(dispatchSamples, "dispatchElapsedMs", "dispatchElapsedMs");
+          addTimingStats(dispatchSamples, "usPerOp", "usPerOp");
+          result.metrics.dispatchElapsedMsSamples = dispatchSamples.map(
+            (sample) => sample.dispatchElapsedMs,
+          );
+          result.metrics.usPerOpSamples = dispatchSamples.map((sample) => sample.usPerOp);
+          result.metrics.warmupDispatchCount = warmupDispatchCount;
+          result.metrics.sourceKernelTimingPolicy = "batched_source_kernel_samples_v1";
+          result.metrics.kernelPath = computeConfig.kernelPath;
+          result.metrics.kernelSha256 = computeConfig.kernelSha256;
+          result.metrics.commandsPath = computeConfig.commandsPath;
+          result.metrics.commandsSha256 = computeConfig.commandsSha256;
+          result.metrics.bindGroupLayoutMode = computeConfig.bindGroupLayoutMode;
+          result.metrics.readbackBindingPolicy = computeConfig.readbackBindingPolicy;
+          result.metrics.bindGroupLayoutEntryCount = bindGroupLayoutEntries.length;
+          result.metrics.bindGroupLayoutEntries = bindGroupLayoutEntries;
+          result.metrics.minBindingSizeBytes = bindGroupLayoutEntries.reduce(
+            (sum, binding) => sum + binding.minBindingSize,
+            0,
+          );
+          result.metrics.storageBindingCount = storageBindings.length;
+          result.metrics.storageBufferBytes = storageBindings.reduce(
+            (sum, binding) => sum + binding.bufferSize,
+            0,
+          );
+          result.metrics.storageBufferUsage = storageBufferUsageLabels;
+          result.metrics.readbackBindingGroup = readbackBinding.group;
+          result.metrics.readbackBinding = readbackBinding.binding;
+          result.metrics.readbackBytes = readbackBinding.bufferSize;
+          result.metrics.readbackChecksum = readbackChecksum;
+          result.metrics.readbackSampleBytes = readbackSampleBytes;
+          readback.destroy();
+          for (const { buffer } of buffers) {
+            buffer.destroy();
+          }
+          return;
+        }
+
         const shader = device.createShaderModule({
           code: `
             @compute @workgroup_size(1)
@@ -2039,6 +2508,9 @@ async function runScenario(page, template, iterations, browserSurfaceArgs, scena
       runIterations: iterations,
       ...browserSurfaceArgs,
       scenarioConfig,
+      sourceKernelSamples,
+      sourceKernelWarmupSamples,
+      sourceKernelSubmitPolicy,
     },
   );
 }
@@ -2206,13 +2678,16 @@ async function runMode(chromium, mode, args, pageTarget, l1Rows, l2Rows, chromeP
         continue;
       }
       await page.goto(pageTarget.url, { waitUntil: "load", timeout: 120000 });
-        const scenarioResult = await runScenario(
-          page,
-          row.scenarioTemplate,
-          args.iterations,
-          browserSurfaceArgs,
-          row,
-        );
+      const scenarioResult = await runScenario(
+        page,
+        row.scenarioTemplate,
+        args.iterations,
+        browserSurfaceArgs,
+        sourceKernelScenarioConfig(row),
+        args.sourceKernelSamples,
+        args.sourceKernelWarmupSamples,
+        args.sourceKernelSubmitPolicy,
+      );
       rowResultsById.set(
         row.sourceWorkloadId,
         makeModeRowResult(
@@ -2246,6 +2721,9 @@ async function runMode(chromium, mode, args, pageTarget, l1Rows, l2Rows, chromeP
         args.iterations,
         browserSurfaceArgs,
         workflow,
+        args.sourceKernelSamples,
+        args.sourceKernelWarmupSamples,
+        args.sourceKernelSubmitPolicy,
       );
       workflowResultsById.set(
         workflow.id,
@@ -2435,6 +2913,82 @@ function mergeMetricValues(left, right) {
   return right ?? left;
 }
 
+const MERGED_SUM_METRICS = new Set([
+  "sourceKernelSampleCount",
+  "sourceKernelWarmupSampleCount",
+  "sourceKernelWarmupDispatches",
+  "sourceKernelWarmupSubmits",
+  "totalWarmupDispatches",
+  "totalWarmupSubmits",
+  "totalDispatches",
+  "totalSubmits",
+]);
+const MERGED_CONCAT_METRICS = new Set([
+  "dispatchElapsedMsSamples",
+  "usPerOpSamples",
+]);
+
+function percentile(sortedValues, fraction) {
+  if (sortedValues.length === 0) {
+    return 0;
+  }
+  const index = Math.min(
+    sortedValues.length - 1,
+    Math.max(0, Math.ceil(sortedValues.length * fraction) - 1),
+  );
+  return sortedValues[index];
+}
+
+function summarizeSampleValues(values) {
+  const numeric = values
+    .filter((value) => Number.isFinite(value))
+    .sort((left, right) => left - right);
+  if (numeric.length === 0) {
+    return null;
+  }
+  const sum = numeric.reduce((acc, value) => acc + value, 0);
+  return {
+    avg: sum / numeric.length,
+    p10: percentile(numeric, 0.10),
+    p50: percentile(numeric, 0.50),
+    p95: percentile(numeric, 0.95),
+    p99: percentile(numeric, 0.99),
+  };
+}
+
+function applyMergedSampleStats(metrics, sampleKey, metricName) {
+  const samples = metrics[sampleKey];
+  if (!Array.isArray(samples) || samples.length === 0) {
+    return;
+  }
+  const summary = summarizeSampleValues(samples);
+  if (!summary) {
+    return;
+  }
+  metrics[metricName] = summary.p50;
+  metrics[`${metricName}Avg`] = summary.avg;
+  metrics[`${metricName}P10`] = summary.p10;
+  metrics[`${metricName}P50`] = summary.p50;
+  metrics[`${metricName}P95`] = summary.p95;
+  metrics[`${metricName}P99`] = summary.p99;
+}
+
+function applyMergedSourceKernelStats(metrics) {
+  applyMergedSampleStats(metrics, "dispatchElapsedMsSamples", "dispatchElapsedMs");
+  applyMergedSampleStats(metrics, "usPerOpSamples", "usPerOp");
+}
+
+function sampleGroupsFor(metrics, sampleKey) {
+  const groups = metrics?.[`${sampleKey}Groups`];
+  if (Array.isArray(groups)) {
+    return groups
+      .filter((group) => Array.isArray(group))
+      .map((group) => [...group]);
+  }
+  const samples = metrics?.[sampleKey];
+  return Array.isArray(samples) ? [[...samples]] : [];
+}
+
 function mergeMetrics(leftMetrics, rightMetrics) {
   const merged = {};
   const keys = new Set([
@@ -2442,7 +2996,7 @@ function mergeMetrics(leftMetrics, rightMetrics) {
     ...Object.keys(rightMetrics ?? {}),
   ]);
   for (const key of keys) {
-    if (key === "orderBalancedSampleCount") {
+    if (key === "orderBalancedSampleCount" || MERGED_SUM_METRICS.has(key) || MERGED_CONCAT_METRICS.has(key)) {
       continue;
     }
     merged[key] = mergeMetricValues(leftMetrics?.[key], rightMetrics?.[key]);
@@ -2450,6 +3004,28 @@ function mergeMetrics(leftMetrics, rightMetrics) {
   merged.orderBalancedSampleCount =
     (leftMetrics?.orderBalancedSampleCount ?? 1) +
     (rightMetrics?.orderBalancedSampleCount ?? 1);
+  for (const key of MERGED_SUM_METRICS) {
+    if (key in (leftMetrics ?? {}) || key in (rightMetrics ?? {})) {
+      merged[key] = (leftMetrics?.[key] ?? 0) + (rightMetrics?.[key] ?? 0);
+    }
+  }
+  for (const key of MERGED_CONCAT_METRICS) {
+    if (key in (leftMetrics ?? {}) || key in (rightMetrics ?? {})) {
+      merged[key] = [
+        ...(Array.isArray(leftMetrics?.[key]) ? leftMetrics[key] : []),
+        ...(Array.isArray(rightMetrics?.[key]) ? rightMetrics[key] : []),
+      ];
+    }
+  }
+  for (const key of MERGED_CONCAT_METRICS) {
+    const groups = [
+      ...sampleGroupsFor(leftMetrics, key),
+      ...sampleGroupsFor(rightMetrics, key),
+    ];
+    if (groups.length > 0) {
+      merged[`${key}Groups`] = groups;
+    }
+  }
   return merged;
 }
 
@@ -2698,6 +3274,9 @@ async function main() {
     runtimeSelections: modeRunDetailsWithHashes.map((entry) => entry.runtimeSelection),
     methodology: {
       scenarioIterations: args.iterations,
+      sourceKernelSamples: args.sourceKernelSamples,
+      sourceKernelWarmupSamples: args.sourceKernelWarmupSamples,
+      sourceKernelSubmitPolicy: args.sourceKernelSubmitPolicy,
       modeSchedule: args.modeSchedule,
       browserBuildConfigurationEvidence: browserBuildConfigurationEvidence(args),
       adapterRequest: {

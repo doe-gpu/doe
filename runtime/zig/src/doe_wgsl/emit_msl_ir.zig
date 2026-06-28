@@ -4,6 +4,8 @@ const maps = @import("emit_msl_maps.zig");
 const stage_render = @import("emit_msl_stage.zig");
 const subgroups = @import("emit_msl_subgroups.zig");
 const call_builtins = @import("emit_msl_ir_builtins.zig");
+const workgroup_zero = @import("emit_msl_workgroup_zero.zig");
+const atomic_relax = @import("emit_msl_atomic_relax.zig");
 const layout = @import("layout_utils.zig");
 
 pub const EmitError = error{
@@ -171,17 +173,38 @@ const Emitter = struct {
         }
     }
 
-    fn emit_function_scoped_workgroup_globals(self: *Emitter) EmitError!void {
-        for (self.module.globals.items) |global| {
+    fn emit_function_scoped_workgroup_globals(self: *Emitter, function: ir.Function) EmitError!void {
+        for (self.module.globals.items, 0..) |global, global_index| {
             if (global.binding != null) continue;
             if (global.class != .var_) continue;
             const addr_space = global.addr_space orelse continue;
             if (addr_space != .workgroup) continue;
+            if (workgroup_zero.unwrittenWorkgroupGlobal(self.module, function, @intCast(global_index))) continue;
             try self.write_indent();
-            try self.write("threadgroup ");
-            try self.emit_named_decl(global.ty, global.name);
+            if (!workgroup_zero.canLowerWorkgroupGlobalToThread(self.module, function, @intCast(global_index))) {
+                try self.write("threadgroup ");
+            }
+            if (atomic_relax.canRelaxWorkgroupAtomicGlobal(self.module, function, @intCast(global_index))) {
+                try self.emit_relaxed_atomic_workgroup_decl(global.ty, global.name);
+            } else {
+                try self.emit_named_decl(global.ty, global.name);
+            }
             try self.write(";\n");
         }
+    }
+
+    fn emit_relaxed_atomic_workgroup_decl(self: *Emitter, ty: ir.TypeId, name: []const u8) EmitError!void {
+        const arr = switch (self.module.types.get(ty)) {
+            .array => |value| value,
+            else => return error.InvalidIr,
+        };
+        const elem = atomic_relax.relaxedArrayElementType(self.module, ty) orelse return error.InvalidIr;
+        try self.emit_type(elem);
+        try self.write(" ");
+        try self.write(name);
+        try self.write("[");
+        try self.write_u32(arr.len orelse return error.InvalidIr);
+        try self.write("]");
     }
 
     fn emit_runtime_array_length_locals(self: *Emitter, function: ir.Function) EmitError!void {
@@ -224,7 +247,11 @@ const Emitter = struct {
         if (stage != null and stage.? != .compute) return stage_render.emit_stage_function(self, function_index);
 
         try self.write("\n");
-        if (stage != null) try self.write("[[kernel]]\n");
+        if (stage != null) {
+            try self.write("[[max_total_threads_per_threadgroup(");
+            try self.write_u32(function.workgroup_size[0] * function.workgroup_size[1] * function.workgroup_size[2]);
+            try self.write(")]]\n[[kernel]]\n");
+        }
         try self.emit_type(function.return_type);
         try self.write(" ");
         try self.write(maps.msl_function_name(function.name, stage));
@@ -257,7 +284,7 @@ const Emitter = struct {
         try self.write(") {\n");
         self.indent += 4;
         if (stage != null and stage.? == .compute) {
-            try self.emit_function_scoped_workgroup_globals();
+            try self.emit_function_scoped_workgroup_globals(function);
         }
         try self.emit_runtime_array_length_locals(function);
         try self.emit_stmt(function, function.root_stmt);
@@ -652,6 +679,40 @@ const Emitter = struct {
         }
     }
 
+    fn try_emit_unwritten_workgroup_zero(
+        self: *Emitter,
+        function: ir.Function,
+        ref_expr_id: ir.ExprId,
+        value_ty: ir.TypeId,
+    ) EmitError!bool {
+        const global_index = workgroup_zero.refRootGlobal(function, ref_expr_id) orelse return false;
+        if (!workgroup_zero.unwrittenWorkgroupGlobal(self.module, function, global_index)) return false;
+        try self.emit_zero_value(value_ty);
+        return true;
+    }
+
+    fn emit_zero_value(self: *Emitter, ty: ir.TypeId) EmitError!void {
+        switch (self.module.types.get(ty)) {
+            .scalar => |scalar| switch (scalar) {
+                .bool => try self.write("false"),
+                .f32, .f16, .abstract_float => try self.write("0.0"),
+                .i32, .u32, .abstract_int => try self.write("0"),
+                .void => return error.InvalidIr,
+            },
+            .vector => |vec| {
+                try self.emit_type(ty);
+                try self.write("(");
+                var i: u8 = 0;
+                while (i < vec.len) : (i += 1) {
+                    if (i > 0) try self.write(", ");
+                    try self.emit_zero_value(vec.elem);
+                }
+                try self.write(")");
+            },
+            else => return error.InvalidIr,
+        }
+    }
+
     pub fn emit_expr(self: *Emitter, function: ir.Function, expr_id: ir.ExprId) EmitError!void {
         const expr = function.exprs.items[expr_id];
         switch (expr.data) {
@@ -661,7 +722,10 @@ const Emitter = struct {
             .param_ref => |index| try self.write(function.params.items[index].name),
             .local_ref => |index| try self.write(function.locals.items[index].name),
             .global_ref => |index| try self.write(self.module.globals.items[index].name),
-            .load => |inner| try self.emit_expr(function, inner),
+            .load => |inner| {
+                if (try self.try_emit_unwritten_workgroup_zero(function, inner, expr.ty)) return;
+                try self.emit_expr(function, inner);
+            },
             .unary => |unary| {
                 try self.write("(");
                 try self.write(maps.unary_op_text(unary.op));

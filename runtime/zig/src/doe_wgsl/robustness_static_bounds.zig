@@ -11,9 +11,10 @@ pub fn sizedArrayIndexProvablyInBounds(
     base_expr_id: ir.ExprId,
     index_expr_id: ir.ExprId,
     length: u32,
+    allow_storage: bool,
 ) bool {
     const addr_space = resolve_access_address_space(module, function, base_expr_id) orelse return false;
-    if (!eligible_for_static_elision(addr_space)) return false;
+    if (!eligible_for_static_elision(addr_space, allow_storage)) return false;
 
     if (upper_bound_for_expr(module, function, access_expr_id, index_expr_id, 0)) |upper_bound| {
         if (upper_bound < @as(u64, length)) return true;
@@ -26,9 +27,10 @@ pub fn sizedArrayIndexProvablyInBounds(
     );
 }
 
-fn eligible_for_static_elision(addr_space: ir.AddressSpace) bool {
+fn eligible_for_static_elision(addr_space: ir.AddressSpace, allow_storage: bool) bool {
     return switch (addr_space) {
         .function, .private, .workgroup => true,
+        .storage => allow_storage,
         else => false,
     };
 }
@@ -706,6 +708,15 @@ fn upper_bound_for_binary(
             const rhs = match_u32_literal_value(function, binary.rhs) orelse return null;
             if (rhs >= 64) return null;
             return lhs >> @as(std.math.Log2Int(u64), @intCast(rhs));
+        },
+        .bit_and => {
+            const lhs = upper_bound_for_expr(module, function, access_expr_id, binary.lhs, depth);
+            const rhs = upper_bound_for_expr(module, function, access_expr_id, binary.rhs, depth);
+            if (lhs) |lhs_bound| {
+                if (rhs) |rhs_bound| return @min(lhs_bound, rhs_bound);
+                return lhs_bound;
+            }
+            return rhs;
         },
         else => return null,
     }

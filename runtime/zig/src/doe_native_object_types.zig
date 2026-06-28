@@ -29,6 +29,9 @@ const MAGIC_SAMPLER: u32 = 0xD0E1_0010;
 const MAGIC_RENDER_PIPE: u32 = 0xD0E1_0011;
 const MAGIC_RENDER_PASS: u32 = 0xD0E1_0012;
 
+pub const INVALID_COMPUTE_PASS_STATE_GENERATION: u64 = 0;
+pub const INITIAL_COMPUTE_PASS_STATE_GENERATION: u64 = 1;
+
 pub const DoeInstance = struct {
     pub const TYPE_MAGIC = MAGIC_INSTANCE;
     magic: u32 = TYPE_MAGIC,
@@ -229,6 +232,13 @@ pub const DoeComputePass = struct {
     enc: *DoeCommandEncoder,
     pipeline: ?*DoeComputePipeline = null,
     bind_groups: [4]?*DoeBindGroup = [_]?*DoeBindGroup{null} ** 4,
+    state_generation: u64 = INITIAL_COMPUTE_PASS_STATE_GENERATION,
+    last_dispatch_state_generation: u64 = INVALID_COMPUTE_PASS_STATE_GENERATION,
+    last_dispatch_cmd_index: usize = 0,
+    last_dispatch_pipeline: ?*DoeComputePipeline = null,
+    last_dispatch_x: u32 = 0,
+    last_dispatch_y: u32 = 0,
+    last_dispatch_z: u32 = 0,
 };
 
 pub const DoeCommandBuffer = struct {

@@ -9,6 +9,8 @@ const ir = @import("ir.zig");
 const maps = @import("emit_msl_maps.zig");
 const texture_builtins = @import("emit_msl_texture.zig");
 const layout = @import("layout_utils.zig");
+const workgroup_policy = @import("emit_msl_workgroup_zero.zig");
+const atomic_relax = @import("emit_msl_atomic_relax.zig");
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -18,15 +20,24 @@ pub const EmitError = error{
 pub fn emit_call(self: anytype, function: ir.Function, result_ty: ir.TypeId, call: @FieldType(ir.Expr, "call")) EmitError!void {
     if (call.kind == .builtin) {
         if (std.mem.eql(u8, call.name, "workgroupBarrier")) {
-            try self.write("threadgroup_barrier(mem_flags::mem_threadgroup)");
+            try self.write(if (workgroup_policy.singleInvocationWorkgroup(function))
+                "(void)0"
+            else
+                "threadgroup_barrier(mem_flags::mem_threadgroup)");
             return;
         }
         if (std.mem.eql(u8, call.name, "storageBarrier")) {
-            try self.write("threadgroup_barrier(mem_flags::mem_device)");
+            try self.write(if (workgroup_policy.singleInvocationWorkgroup(function))
+                "(void)0"
+            else
+                "threadgroup_barrier(mem_flags::mem_device)");
             return;
         }
         if (std.mem.eql(u8, call.name, "textureBarrier")) {
-            try self.write("threadgroup_barrier(mem_flags::mem_texture)");
+            try self.write(if (workgroup_policy.singleInvocationWorkgroup(function))
+                "(void)0"
+            else
+                "threadgroup_barrier(mem_flags::mem_texture)");
             return;
         }
         if (std.mem.eql(u8, call.name, "bitcast")) {
@@ -83,6 +94,10 @@ pub fn emit_call(self: anytype, function: ir.Function, result_ty: ir.TypeId, cal
         if (try texture_builtins.emit_builtin(self, function, call)) return;
         if (std.mem.eql(u8, call.name, "atomicLoad")) {
             if (call.args.len != 1) return error.InvalidIr;
+            if (atomic_relax.callTargetsRelaxedAtomic(self.module, function, call)) {
+                try self.emit_expr(function, function.expr_args.items[call.args.start]);
+                return;
+            }
             try self.write("atomic_load_explicit(&(");
             try self.emit_expr(function, function.expr_args.items[call.args.start]);
             try self.write("), memory_order_relaxed)");
@@ -90,6 +105,12 @@ pub fn emit_call(self: anytype, function: ir.Function, result_ty: ir.TypeId, cal
         }
         if (std.mem.eql(u8, call.name, "atomicStore")) {
             if (call.args.len != 2) return error.InvalidIr;
+            if (atomic_relax.callTargetsRelaxedAtomic(self.module, function, call)) {
+                try self.emit_expr(function, function.expr_args.items[call.args.start]);
+                try self.write(" = ");
+                try self.emit_expr(function, function.expr_args.items[call.args.start + 1]);
+                return;
+            }
             try self.write("atomic_store_explicit(&(");
             try self.emit_expr(function, function.expr_args.items[call.args.start]);
             try self.write("), ");

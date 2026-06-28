@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 3,
-  "generatedAt": "2026-06-27T19:13:39.186313Z",
+  "schemaVersion": 4,
+  "generatedAt": "2026-06-28T01:13:03.005810Z",
   "sourceWorkloadsPath": "bench/workloads/specialized/workloads.apple.metal.superset.json",
   "sourceWorkloadsSha256": "d2e7d7255270e5bc40727787771425c02349a7ae73b43ff4c5f2627c010c05cc",
   "rulesPath": "browser/chromium/bench/projection-rules.json",
   "rulesSha256": "06ac37731d70bb86652dbad5a6e7e80f1de4aad1b5020d530b500c98e54de245",
-  "projectionContractHash": "c70fe4da1d6225d6352f8a1a0c416cc93ffe056f4595eb6d3fbb653ba1f34bc7",
+  "projectionContractHash": "f79f92b4213e272d00fd5a6680d8b0b3be72dbb753a66b25e4cebe12fe43595b",
   "sourceWorkloadCount": 50,
   "rows": [
     {
@@ -69,38 +69,80 @@
       "sourceWorkloadId": "compute_workgroup_atomic_1024",
       "sourceWorkloadName": "workgroup-atomic 1024",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
         "benchmarkClass": "comparable",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/workgroup_atomic_commands.json",
+        "commandsSha256": "31c51af0b4f70fece40c62b3271e1de8ad5779bc2d3178e2889dceeceffe45a0",
+        "kernelPath": "bench/kernels/workgroup_atomic.wgsl",
+        "kernelSha256": "b7edc38f80448d1e50f6a31a72b1bb09f3a87484ac3d61b7e299ba0b577c5998",
+        "dispatchX": 1024,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 1048576,
+            "minBindingSize": 1048576,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {
       "sourceWorkloadId": "compute_workgroup_non_atomic_1024",
       "sourceWorkloadName": "workgroup-non-atomic 1024",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
         "benchmarkClass": "comparable",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/workgroup_non_atomic_commands.json",
+        "commandsSha256": "5d6eae2ed53dfaff7a3817b8b7ab54022aafca339d41e5ee6a2b088ce85fe0eb",
+        "kernelPath": "bench/kernels/workgroup_non_atomic.wgsl",
+        "kernelSha256": "b1e3c7cf65d5cec0fe176ed0fa6b6a13aea3c32f6a14ea35e912475dabecfdc6",
+        "dispatchX": 1024,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 1048576,
+            "minBindingSize": 1048576,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {
@@ -571,19 +613,40 @@
       "sourceWorkloadId": "compute_concurrent_execution_single",
       "sourceWorkloadName": "concurrent execution single-dispatch contract",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
         "benchmarkClass": "comparable",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/concurrent_execution_single_commands.json",
+        "commandsSha256": "707d3cabe5c2d9186c7d811d50e2c2512479e9c0e0242f3887439d523c14e0f3",
+        "kernelPath": "bench/kernels/concurrent_execution_runsingle_u32.wgsl",
+        "kernelSha256": "57313155741224f77622b55aa9e739ec7698e5cc3079d92584d253334f1d95a6",
+        "dispatchX": 1,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 1,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 4096,
+            "minBindingSize": 4096,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {
@@ -646,19 +709,40 @@
       "sourceWorkloadId": "compute_zero_initialize_workgroup_memory_256",
       "sourceWorkloadName": "zero-initialize workgroup memory (256)",
       "domain": "compute",
-      "projectionClass": "medium",
+      "projectionClass": "high",
       "layerTarget": "l1_browser_api",
       "scenarioTemplate": "compute_dispatch_basic",
-      "comparabilityExpectation": "component",
+      "comparabilityExpectation": "strict",
       "requiredStatus": "ok",
-      "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimScope": "l1_strict_candidate",
+      "claimLanguage": "Strict browser API candidate only when timing scope and semantics are explicitly matched.",
+      "projectionNote": "Direct compute dispatch projection with minimal browser mediation.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
         "benchmarkClass": "comparable",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/zero_initialize_workgroup_memory_256_commands.json",
+        "commandsSha256": "00d3d244d813e6b89e3b5b128a2573615334777279c399f75418b26cc855a4f3",
+        "kernelPath": "bench/kernels/zero_initialize_workgroup_memory_2048.wgsl",
+        "kernelSha256": "a8c4a18801b189cc5dba3f7141acdda5a79d54eda802ca90a53d5d7ba88da614",
+        "dispatchX": 1,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 50,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "bufferSize": 8192,
+            "minBindingSize": 8192,
+            "bufferType": "storage",
+            "bufferBindingType": "storage"
+          }
+        ]
       }
     },
     {

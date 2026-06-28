@@ -60,6 +60,23 @@ pub fn required_buffer_bytes(
             const total_elements = try std.math.add(u64, max_accessed, 1);
             break :blk try std.math.mul(u64, total_elements, precondition.element_stride_bytes);
         },
+        .local_invocation_component => blk: {
+            const axis = precondition.gid_axis;
+            if (axis >= workgroup_size.len) {
+                return error.DispatchPreconditionFailed;
+            }
+            const total_lanes: u64 = workgroup_size[axis];
+            if (total_lanes == 0) break :blk 0;
+            const max_lane_scaled = try std.math.mul(u64, total_lanes - 1, precondition.element_multiplier);
+            const max_loop_scaled: u64 = if (precondition.loop_limit == 0)
+                0
+            else
+                try std.math.mul(u64, precondition.loop_limit - 1, precondition.loop_limit_multiplier);
+            const affine_max = try std.math.add(u64, max_lane_scaled, max_loop_scaled);
+            const max_accessed = try std.math.add(u64, affine_max, precondition.element_offset);
+            const total_elements = try std.math.add(u64, max_accessed, 1);
+            break :blk try std.math.mul(u64, total_elements, precondition.element_stride_bytes);
+        },
         .gid_component_tiled => blk: {
             const axis = precondition.gid_axis;
             if (axis >= dispatch_workgroups.len or axis >= workgroup_size.len) {
@@ -241,6 +258,22 @@ test "required_buffer_bytes accounts for affine loop contribution" {
     // Prior over-approximate formula yielded 312; the 12-byte reclaim is the
     // `em + lm - 1 = 3` elements of slack eliminated by the tight precondition.
     try std.testing.expectEqual(@as(u64, 300), required);
+}
+
+test "required_buffer_bytes computes local invocation affine loop bound" {
+    const required = try required_buffer_bytes(.{
+        .kind = .local_invocation_component,
+        .gid_axis = 0,
+        .storage_binding = .{ .group = 0, .binding = 0 },
+        .element_multiplier = 8,
+        .loop_limit = 8,
+        .loop_limit_multiplier = 1,
+        .element_stride_bytes = 4,
+        .element_offset = 0,
+    }, .{ 5, 1, 1 }, .{ 256, 1, 1 });
+    // local_id.x is bounded by workgroup_size only:
+    // (255 * 8) + (7 * 1) + 1 = 2048 elements; *stride=4 = 8192.
+    try std.testing.expectEqual(@as(u64, 8192), required);
 }
 
 test "required_buffer_bytes computes loop-only bound independent of dispatch" {

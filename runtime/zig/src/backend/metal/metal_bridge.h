@@ -299,6 +299,17 @@ void metal_bridge_compute_encoder_encode_dispatch_batch(
     uint32_t            dispatch_count,
     uint32_t            max_buffer_count);
 
+void metal_bridge_compute_encoder_encode_dispatch_batch_repeated(
+    MetalHandle         encoder,
+    const MetalHandle*  pipelines,
+    const MetalHandle*  buffers,
+    const uint32_t*     buffer_counts,
+    const uint32_t*     repeat_counts,
+    const uint32_t*     dispatch_dims,
+    const uint32_t*     workgroup_dims,
+    uint32_t            dispatch_count,
+    uint32_t            max_buffer_count);
+
 MetalHandle metal_bridge_compute_dispatch_batch_copy_signal_commit(
     MetalHandle         queue,
     const MetalHandle*  pipelines,

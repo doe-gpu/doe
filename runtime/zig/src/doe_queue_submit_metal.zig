@@ -86,6 +86,7 @@ fn encode_recorded_dispatch_batch(
     var pipelines: [MAX_RECORDED_DISPATCH_BATCH]?*anyopaque = [_]?*anyopaque{null} ** MAX_RECORDED_DISPATCH_BATCH;
     var bufs_flat: [MAX_RECORDED_DISPATCH_BATCH * MAX_FLAT_BIND]?*anyopaque = [_]?*anyopaque{null} ** (MAX_RECORDED_DISPATCH_BATCH * MAX_FLAT_BIND);
     var buf_counts: [MAX_RECORDED_DISPATCH_BATCH]u32 = [_]u32{0} ** MAX_RECORDED_DISPATCH_BATCH;
+    var repeat_counts: [MAX_RECORDED_DISPATCH_BATCH]u32 = [_]u32{1} ** MAX_RECORDED_DISPATCH_BATCH;
     var dispatch_dims: [MAX_RECORDED_DISPATCH_BATCH * 3]u32 = [_]u32{0} ** (MAX_RECORDED_DISPATCH_BATCH * 3);
     var workgroup_dims: [MAX_RECORDED_DISPATCH_BATCH * 3]u32 = [_]u32{0} ** (MAX_RECORDED_DISPATCH_BATCH * 3);
     var sizes_to_release: [MAX_RECORDED_DISPATCH_BATCH]?*anyopaque = [_]?*anyopaque{null} ** MAX_RECORDED_DISPATCH_BATCH;
@@ -118,6 +119,7 @@ fn encode_recorded_dispatch_batch(
 
         pipelines[count] = d.pso;
         buf_counts[count] = buf_count;
+        repeat_counts[count] = if (d.repeat_count == 0) 1 else d.repeat_count;
         const buf_offset = count * MAX_FLAT_BIND;
         for (0..MAX_FLAT_BIND) |slot| {
             bufs_flat[buf_offset + slot] = bufs_copy[slot];
@@ -133,11 +135,12 @@ fn encode_recorded_dispatch_batch(
     }
 
     if (count > 0) {
-        bridge.metal_bridge_compute_encoder_encode_dispatch_batch(
+        bridge.metal_bridge_compute_encoder_encode_dispatch_batch_repeated(
             encoder,
             @as(?[*]const ?*anyopaque, &pipelines),
             @as(?[*]const ?*anyopaque, &bufs_flat),
             &buf_counts,
+            &repeat_counts,
             &dispatch_dims,
             &workgroup_dims,
             @intCast(count),
@@ -199,18 +202,22 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
                                 if (buf_count <= MSL_SIZES_SLOT) buf_count = MSL_SIZES_SLOT + 1;
                             }
                         }
-                        bridge.metal_bridge_compute_encoder_encode_dispatch(
-                            encoder,
-                            d.pso,
-                            @as(?[*]?*anyopaque, &bufs_copy),
-                            buf_count,
-                            d.x,
-                            d.y,
-                            d.z,
-                            d.wg_x,
-                            d.wg_y,
-                            d.wg_z,
-                        );
+                        const repeat_count = if (d.repeat_count == 0) 1 else d.repeat_count;
+                        var repeat_index: u32 = 0;
+                        while (repeat_index < repeat_count) : (repeat_index += 1) {
+                            bridge.metal_bridge_compute_encoder_encode_dispatch(
+                                encoder,
+                                d.pso,
+                                @as(?[*]?*anyopaque, &bufs_copy),
+                                buf_count,
+                                d.x,
+                                d.y,
+                                d.z,
+                                d.wg_x,
+                                d.wg_y,
+                                d.wg_z,
+                            );
+                        }
                         if (sizes_mtl) |smtl| bridge.metal_bridge_release(smtl);
                     } else {
                         var bufs_copy = d.bufs;
@@ -228,18 +235,22 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
                                 if (buf_count <= MSL_SIZES_SLOT) buf_count = MSL_SIZES_SLOT + 1;
                             }
                         }
-                        bridge.metal_bridge_cmd_buf_encode_compute_dispatch(
-                            mtl_cmd,
-                            d.pso,
-                            @as(?[*]?*anyopaque, &bufs_copy),
-                            buf_count,
-                            d.x,
-                            d.y,
-                            d.z,
-                            d.wg_x,
-                            d.wg_y,
-                            d.wg_z,
-                        );
+                        const repeat_count = if (d.repeat_count == 0) 1 else d.repeat_count;
+                        var repeat_index: u32 = 0;
+                        while (repeat_index < repeat_count) : (repeat_index += 1) {
+                            bridge.metal_bridge_cmd_buf_encode_compute_dispatch(
+                                mtl_cmd,
+                                d.pso,
+                                @as(?[*]?*anyopaque, &bufs_copy),
+                                buf_count,
+                                d.x,
+                                d.y,
+                                d.z,
+                                d.wg_x,
+                                d.wg_y,
+                                d.wg_z,
+                            );
+                        }
                         if (sizes_mtl) |smtl| bridge.metal_bridge_release(smtl);
                     }
                     has_gpu_work = true;
