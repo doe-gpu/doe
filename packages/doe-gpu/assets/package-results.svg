@@ -5,13 +5,13 @@
     <style>
       text { font-family: Inter, Segoe UI, Helvetica Neue, Arial, sans-serif; letter-spacing: 0; fill: #111111; }
       .title { font-size: 28px; font-weight: 800; }
-      .sub { font-size: 14px; fill: #404041; font-weight: 500; }
-      .head { font-size: 12px; fill: #404041; font-weight: 800; }
+      .sub { font-size: 14px; fill: #111111; font-weight: 500; }
+      .head { font-size: 12px; fill: #111111; font-weight: 800; }
       .lane { font-size: 17px; font-weight: 800; }
-      .meta { font-size: 12px; fill: #404041; font-weight: 700; }
+      .meta { font-size: 12px; fill: #111111; font-weight: 700; }
       .num { font-size: 14px; font-weight: 800; fill: #17358f; }
       .chip { font-size: 13px; font-weight: 800; fill: #17358f; }
-      .foot { font-size: 12px; fill: #404041; font-weight: 600; }
+      .foot { font-size: 12px; fill: #111111; font-weight: 600; }
     </style>
   </defs>
   <rect width="980" height="300" fill="#ffffff"/>
@@ -32,7 +32,7 @@
   <text x="562" y="166" class="head">p95</text>
   <text x="692" y="166" class="head">p99</text>
   <text x="822" y="166" class="head">Gate</text>
-  <line x1="42" y1="178" x2="938" y2="178" stroke="#d8d8d8"/>
+  <line x1="42" y1="178" x2="938" y2="178" stroke="#111111"/>
 
   <rect x="42" y="192" width="896" height="42" rx="6" fill="#f6f7ff"/>
   <text x="58" y="218" class="lane">Node.js</text>

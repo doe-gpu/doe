@@ -4,9 +4,9 @@
   <defs><style>
   text { fill: #111111; font-family: Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0; }
   .ev-title { font-size: 30px; font-weight: 700; }
-  .ev-subtitle { font-size: 14px; fill: #404041; font-weight: 500; }
+  .ev-subtitle { font-size: 14px; fill: #111111; font-weight: 500; }
   .ev-node-title { font-size: 20px; font-weight: 700; }
-  .ev-label { font-size: 12px; fill: #404041; font-weight: 600; }
+  .ev-label { font-size: 12px; fill: #111111; font-weight: 600; }
   .ev-mono { font-family: SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; }
 </style></defs>
   <rect x="0" y="0" width="1340" height="586" fill="#ffffff" />
