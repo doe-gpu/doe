@@ -1,0 +1,24 @@
+{
+  "receipt_version": "doe.receipt.v1.0",
+  "receipt_id": "urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+  "timestamp_utc": "2026-06-28T23:55:00Z",
+  "manifest_hash": "sha256:7c92b3a1e4f8d209c5b6a34710ef82cd19304a5fb7e689012345678901234567",
+  "shard_hashes": {
+    "layers_0_down_proj.kron": "sha256:3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b",
+    "layers_0_down_proj.siren": "sha256:8c9d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d",
+    "layers_0_down_proj.sparse": "sha256:ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+  },
+  "runtime_version": "doe-gpu@0.15.2",
+  "kernel_path": "fused_moe_gemm_v1",
+  "dtype_policy": "weight:f16,activation:f16,accumulator:f32_declared",
+  "backend": "WebGPU",
+  "device_descriptor": {
+    "device_name": "Apple M3 Max",
+    "driver_version": "Metal-343.4.9",
+    "api_feature_level": "webgpu-features-v1"
+  },
+  "input_hash": "sha256:c3ab8bff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f",
+  "output_hash": "sha256:8b2a1c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b",
+  "replay_class": "bounded_replay",
+  "execution_time_ms": 12.45
+}

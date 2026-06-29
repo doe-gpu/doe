@@ -22,6 +22,10 @@
       "data": "examples/run-receipt.sample.json"
     },
     {
+      "schema": "config/doe-run-receipt-v1.schema.json",
+      "data": "examples/doe-run-receipt-v1.sample.json"
+    },
+    {
       "schema": "config/native-command-graph-receipt.schema.json",
       "data": "examples/native-command-graph-receipt.sample.json"
     },

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe-gpu.dev/config/doe-run-receipt-v1.schema.json",
+  "title": "Doe run receipt v1",
+  "description": "Signed execution receipt capturing compile inputs, output hashes, device identity, and replay classification for a Doe backend dispatch.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "receipt_version",
+    "receipt_id",
+    "timestamp_utc",
+    "manifest_hash",
+    "shard_hashes",
+    "runtime_version",
+    "kernel_path",
+    "dtype_policy",
+    "backend",
+    "device_descriptor",
+    "input_hash",
+    "output_hash",
+    "replay_class",
+    "execution_time_ms"
+  ],
+  "properties": {
+    "receipt_version": {
+      "type": "string",
+      "const": "doe.receipt.v1.0"
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "timestamp_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "manifest_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "shard_hashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      }
+    },
+    "runtime_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kernel_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dtype_policy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "backend": {
+      "type": "string",
+      "enum": ["WebGPU", "Vulkan", "Metal", "D3D12", "CSL"]
+    },
+    "device_descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["device_name", "driver_version", "api_feature_level"],
+      "properties": {
+        "device_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "driver_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "api_feature_level": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "output_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "replay_class": {
+      "type": "string",
+      "enum": ["bit_exact", "bounded_replay"]
+    },
+    "execution_time_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "simfabric_stall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operator_shape", "stall_duration_ms", "trace_file_reference"],
+      "properties": {
+        "operator_shape": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 1
+        },
+        "stall_duration_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "trace_file_reference": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
