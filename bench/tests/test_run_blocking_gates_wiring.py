@@ -35,6 +35,10 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
             sys.argv = old_argv
 
         self.assertTrue(args.with_compare_output_partition_gate)
+        self.assertTrue(args.with_claim_index_gate)
+        self.assertTrue(args.with_dawn_replacement_frontier_gate)
+        self.assertTrue(args.with_native_backend_coverage_matrix_gate)
+        self.assertTrue(args.with_tool_surface_gate)
 
     def test_compare_output_partition_gate_can_be_disabled_for_diagnostics(self) -> None:
         old_argv = sys.argv
@@ -48,6 +52,58 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
             sys.argv = old_argv
 
         self.assertFalse(args.with_compare_output_partition_gate)
+
+    def test_claim_index_gate_can_be_disabled_for_diagnostics(self) -> None:
+        old_argv = sys.argv
+        try:
+            sys.argv = [
+                "run_blocking_gates.py",
+                "--no-with-claim-index-gate",
+            ]
+            args = self.module.parse_args()
+        finally:
+            sys.argv = old_argv
+
+        self.assertFalse(args.with_claim_index_gate)
+
+    def test_tool_surface_gate_can_be_disabled_for_diagnostics(self) -> None:
+        old_argv = sys.argv
+        try:
+            sys.argv = [
+                "run_blocking_gates.py",
+                "--no-with-tool-surface-gate",
+            ]
+            args = self.module.parse_args()
+        finally:
+            sys.argv = old_argv
+
+        self.assertFalse(args.with_tool_surface_gate)
+
+    def test_dawn_replacement_frontier_gate_can_be_disabled_for_diagnostics(self) -> None:
+        old_argv = sys.argv
+        try:
+            sys.argv = [
+                "run_blocking_gates.py",
+                "--no-with-dawn-replacement-frontier-gate",
+            ]
+            args = self.module.parse_args()
+        finally:
+            sys.argv = old_argv
+
+        self.assertFalse(args.with_dawn_replacement_frontier_gate)
+
+    def test_native_backend_coverage_matrix_gate_can_be_disabled_for_diagnostics(self) -> None:
+        old_argv = sys.argv
+        try:
+            sys.argv = [
+                "run_blocking_gates.py",
+                "--no-with-native-backend-coverage-matrix-gate",
+            ]
+            args = self.module.parse_args()
+        finally:
+            sys.argv = old_argv
+
+        self.assertFalse(args.with_native_backend_coverage_matrix_gate)
 
     def test_standalone_artifact_checker_gates_are_wired(self) -> None:
         captured: list[tuple[str, list[str]]] = []
@@ -155,6 +211,9 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
             self.module.artifacts_mod.ensure_release_strict_comparability = old_ensure_release
 
         commands_by_label = {label: command for label, command in captured}
+        self.assertIn("claim-index", commands_by_label)
+        self.assertIn("dawn-replacement-frontier", commands_by_label)
+        self.assertIn("tool-surface", commands_by_label)
         self.assertIn("browser-claim-promotion-receipt", commands_by_label)
         self.assertIn("browser-release-artifact-bundle", commands_by_label)
         self.assertIn("wgsl-lowering-link-receipt", commands_by_label)
@@ -199,6 +258,18 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
         self.assertIn("wgsl-diagnostic-fixtures", commands_by_label)
         self.assertIn("wgsl-robustness-fixtures", commands_by_label)
 
+        self.assertIn(
+            "bench/gates/claim_index_gate.py",
+            commands_by_label["claim-index"][1],
+        )
+        self.assertIn(
+            "bench/gates/dawn_replacement_frontier_gate.py",
+            commands_by_label["dawn-replacement-frontier"][1],
+        )
+        self.assertIn(
+            "bench/gates/tool_surface_gate.py",
+            commands_by_label["tool-surface"][1],
+        )
         self.assertIn(
             "bench/tools/check_browser_claim_promotion_receipt.py",
             commands_by_label["browser-claim-promotion-receipt"][1],

@@ -15,6 +15,9 @@
         "packages/doe-gpu/src/index.js",
         "packages/doe-gpu/src/api.js",
         "packages/doe-gpu/src/native.js",
+        "packages/doe-gpu/src/bun.js",
+        "packages/doe-gpu/src/deno.js",
+        "packages/doe-gpu/src/node-webgpu.js",
         "packages/doe-gpu/src/plan.js",
         "packages/doe-gpu/src/capture.js",
         "packages/doe-gpu/src/compute.js",
@@ -163,11 +166,16 @@
       ],
       "entrypoints": [
         "scripts/check-health.py",
+        "scripts/check-public-claim-surfaces.py",
         "scripts/check_zig_line_limit.py",
         "scripts/update_browser_spec_index.py"
       ],
       "docs": [
-        "docs/internal-tooling.md"
+        "docs/internal-tooling.md",
+        "docs/public-claim-boundary.md",
+        "docs/runtime-surface-boundary.md",
+        "docs/backend-evidence-matrix.md",
+        "docs/config-schema-enforcement.md"
       ]
     },
     {

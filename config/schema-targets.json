@@ -54,12 +54,20 @@
       "data": "config/native-backend-coverage-matrix.json"
     },
     {
+      "schema": "config/dawn-replacement-frontier.schema.json",
+      "data": "config/dawn-replacement-frontier.json"
+    },
+    {
       "schema": "config/compare-report.schema.json",
       "data": "examples/compare-report.sample.json"
     },
     {
       "schema": "config/claim-report.schema.json",
       "data": "examples/claim-report.sample.json"
+    },
+    {
+      "schema": "config/claim-index.schema.json",
+      "data": "reports/claim-index.json"
     },
     {
       "schema": "config/webgpu-command-coverage-core.schema.json",

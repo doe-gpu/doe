@@ -14,6 +14,15 @@ Gate classes:
 - **Correctness** (`check_correctness.py`, `claim_*.py`,
   `claim_discipline_gate.py`) — block release when claim language
   drifts from artifact reality.
+  `claim_index_gate.py` protects the public README claim inventory:
+  claim-indexed rows must name a claim sidecar and carry claimable/comparable
+  status, while diagnostic and status-only rows stay out of public speed
+  claims.
+  `dawn_replacement_frontier_gate.py` protects the Dawn/Tint replacement
+  frontier: every native/package/browser/compiler/conformance/drop-in row must
+  stay evidence-linked, blocker codes must have exit criteria, and universal
+  replacement language is blocked unless product rows are claim-allowed and
+  evidence-release rows are covered or claimable.
   `claim_gate.py` also requires claimable Doe package rows to carry
   receipt-visible package telemetry, including native fast-path flags,
   write breakdowns, readback mode, the effective readback-path list,
@@ -27,6 +36,11 @@ Gate classes:
   prevention for Doppler → Doe → Cerebras evidence.
 - **Backend selection** (`backend_selection_gate.py`) — fail closed
   on capability drift between source and runtime.
+- **Native backend coverage** (`check_native_backend_coverage_matrix.py`) —
+  fail when Metal, Vulkan, or D3D12 coverage rows drift from the required
+  native runtime classes.
+- **Tool surfaces** (`tool_surface_gate.py`) — fail when the public/internal
+  surface manifest drifts from shipped package exports or declared files.
 - **Fixture regen** (`cluster_b_fixture_regen_gate.py`) — pin fixture
   freshness for cross-repo bring-up lanes.
 

@@ -1,0 +1,395 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "dawn_replacement_frontier",
+  "frontierId": "dawn-replacement-frontier-v0",
+  "universalClaim": {
+    "allowed": false,
+    "reasonCode": "frontier_rows_not_all_claimable"
+  },
+  "blockerDefinitions": [
+    {
+      "code": "frontier_rows_not_all_claimable",
+      "exitCriteria": "Every required Dawn/Tint replacement frontier row is claim-allowed or covered according to this manifest and the public claim index.",
+      "evidencePaths": [
+        "config/dawn-replacement-frontier.json",
+        "reports/claim-index.json"
+      ]
+    },
+    {
+      "code": "fresh_amd_vulkan_release_claim_artifact",
+      "exitCriteria": "Publish current AMD Vulkan Doe-vs-Dawn release compare and claim artifacts that pass claim, structural equivalence, and readback comparability gates.",
+      "evidencePaths": [
+        "docs/status/runtime-backends-and-bench.md",
+        "config/native-backend-coverage-matrix.json"
+      ]
+    },
+    {
+      "code": "matched_effective_readback_paths",
+      "exitCriteria": "Produce package or native reports where Doe and the Dawn comparator use matching effective readback paths or carry a non-claimable path asymmetry.",
+      "evidencePaths": [
+        "docs/status/runtime-backends-and-bench.md",
+        "bench/docs/package-browser-ort-fairness-audit.md"
+      ]
+    },
+    {
+      "code": "vulkan_pipeline_cache_receipts",
+      "exitCriteria": "Publish Vulkan cache receipts showing the Doe and Dawn comparison lanes have declared cache-path parity or an explicit diagnostic boundary.",
+      "evidencePaths": [
+        "bench/docs/vulkan-pipeline-cache-integration.md",
+        "config/native-backend-coverage-matrix.json"
+      ]
+    },
+    {
+      "code": "fresh_windows_d3d12_runtime_artifact",
+      "exitCriteria": "Publish a Windows D3D12 runtime artifact from the governed D3D12 workload contract.",
+      "evidencePaths": [
+        "bench/workloads/workloads.local.d3d12.json",
+        "config/native-backend-coverage-matrix.json"
+      ]
+    },
+    {
+      "code": "d3d12_dawn_mapping_validation",
+      "exitCriteria": "Validate the D3D12 Doe-vs-Dawn workload mapping against the governed D3D12 contract and record the mapping in a release-candidate report.",
+      "evidencePaths": [
+        "bench/workloads/workloads.local.d3d12.json",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "d3d12_claim_report",
+      "exitCriteria": "Publish a D3D12 claim report and add the corresponding entry to the public claim index when it is comparable and claimable.",
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "deno_package_compare_claim_report",
+      "exitCriteria": "Publish a Deno package compare and claim report with explicit host WebGPU comparator identity.",
+      "evidencePaths": [
+        "packages/doe-gpu/README.md",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "deno_host_webgpu_comparability_audit",
+      "exitCriteria": "Audit Deno host WebGPU comparability and record whether the package lane is claimable or diagnostic.",
+      "evidencePaths": [
+        "config/tool-surfaces.json",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "claim_grade_browser_runtime_identity",
+      "exitCriteria": "Publish browser runtime identity evidence that proves the selected Chromium lane is running Doe rather than the incumbent runtime path.",
+      "evidencePaths": [
+        "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "browser_structural_equivalence_receipts",
+      "exitCriteria": "Publish browser receipts with structural equivalence for the claim surface, including source command identity and dispatch-shape parity.",
+      "evidencePaths": [
+        "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+        "docs/status/runtime-backends-and-bench.md"
+      ]
+    },
+    {
+      "code": "chromium_release_build_evidence",
+      "exitCriteria": "Publish browser release-build evidence for the Chromium runtime lane before promoting browser replacement language.",
+      "evidencePaths": [
+        "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "exitCriteria": "Run the Doe-vs-Tint compiler evidence gate in claimable mode and publish the resulting evidence report.",
+      "evidencePaths": [
+        "examples/tint-compiler-evidence.sample.json",
+        "docs/shader-compiler-architecture.md"
+      ]
+    },
+    {
+      "code": "wgsl_lowering_link_claim_bundle",
+      "exitCriteria": "Publish WGSL lowering-link receipts that connect source WGSL, lowered artifacts, validation results, and target backend identity.",
+      "evidencePaths": [
+        "examples/wgsl-lowering-link-receipt.sample.json",
+        "docs/shader-compiler-architecture.md"
+      ]
+    },
+    {
+      "code": "shader_artifact_validation_for_target_backends",
+      "exitCriteria": "Validate shader artifacts for the target backend set and attach those validation results to compiler claim evidence.",
+      "evidencePaths": [
+        "config/shader-toolchain.json",
+        "docs/shader-compiler-architecture.md"
+      ]
+    },
+    {
+      "code": "published_cts_subset_receipt",
+      "exitCriteria": "Publish a CTS subset receipt with explicit query coverage, pass/fail status, and backend identity.",
+      "evidencePaths": [
+        "config/webgpu-cts-evidence.json",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "backend_specific_cts_pass_ledger",
+      "exitCriteria": "Record backend-specific CTS pass ledgers for every backend used by the replacement claim.",
+      "evidencePaths": [
+        "config/webgpu-cts-evidence.json",
+        "config/webgpu-spec-index.jsonl"
+      ]
+    },
+    {
+      "code": "conformance_claim_policy",
+      "exitCriteria": "Define the conformance claim policy that maps CTS evidence to allowed public language.",
+      "evidencePaths": [
+        "config/webgpu-cts-evidence.json",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "non_apple_drop_in_bundle_receipts",
+      "exitCriteria": "Publish non-Apple drop-in runtime bundle receipts with hashes, ABI checks, and gate outputs.",
+      "evidencePaths": [
+        "docs/apple-metal-runtime-release.md",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "rollback_rehearsal_receipt",
+      "exitCriteria": "Publish a rollback rehearsal receipt for the drop-in runtime cutover policy.",
+      "evidencePaths": [
+        "config/backend-cutover-policy.json",
+        "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "cross_backend_abi_validation",
+      "exitCriteria": "Publish ABI validation covering the backend set named by the runtime replacement claim.",
+      "evidencePaths": [
+        "config/native-backend-coverage-matrix.json",
+        "docs/doe-support-matrix.md"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "native-metal-runtime",
+      "surface": "native_runtime",
+      "dawnComparator": "dawn_metal",
+      "doeTarget": "doe_metal",
+      "currentState": "claimable",
+      "claimAllowed": true,
+      "claimIndexEntryIds": [
+        "native-strict-apple-metal",
+        "native-release-apple-metal"
+      ],
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "docs/apple-metal-runtime-release.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "blockers": [],
+      "notes": "Apple Metal native Doe-vs-Dawn replacement claims are allowed only through the indexed strict and release claim artifacts."
+    },
+    {
+      "id": "native-vulkan-runtime",
+      "surface": "native_runtime",
+      "dawnComparator": "dawn_vulkan",
+      "doeTarget": "doe_vulkan",
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
+      "evidencePaths": [
+        "config/native-backend-coverage-matrix.json",
+        "bench/docs/vulkan-pipeline-cache-integration.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "blockers": [
+        "fresh_amd_vulkan_release_claim_artifact",
+        "matched_effective_readback_paths",
+        "vulkan_pipeline_cache_receipts"
+      ],
+      "notes": "Vulkan work remains visible as a Dawn-facing runtime frontier, but broad replacement language is blocked until current receipts clear readback and cache comparability."
+    },
+    {
+      "id": "native-d3d12-runtime",
+      "surface": "native_runtime",
+      "dawnComparator": "dawn_d3d12",
+      "doeTarget": "doe_d3d12",
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
+      "evidencePaths": [
+        "config/native-backend-coverage-matrix.json",
+        "bench/workloads/workloads.local.d3d12.json",
+        "docs/doe-support-matrix.md"
+      ],
+      "blockers": [
+        "fresh_windows_d3d12_runtime_artifact",
+        "d3d12_dawn_mapping_validation",
+        "d3d12_claim_report"
+      ],
+      "notes": "D3D12 has governed workload contracts, but replacement claims require Windows evidence and Dawn mapping validation."
+    },
+    {
+      "id": "package-node-runtime",
+      "surface": "package_runtime",
+      "dawnComparator": "dawn_node_webgpu",
+      "doeTarget": "doe-gpu-node",
+      "currentState": "claimable",
+      "claimAllowed": true,
+      "claimIndexEntryIds": [
+        "package-node-apple-metal"
+      ],
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "packages/doe-gpu/README.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "blockers": [],
+      "notes": "Node package claims are constrained to the claim-indexed Apple Metal package receipt."
+    },
+    {
+      "id": "package-bun-runtime",
+      "surface": "package_runtime",
+      "dawnComparator": "dawn_bun_webgpu",
+      "doeTarget": "doe-gpu-bun",
+      "currentState": "claimable",
+      "claimAllowed": true,
+      "claimIndexEntryIds": [
+        "package-bun-apple-metal"
+      ],
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "packages/doe-gpu/README.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "blockers": [],
+      "notes": "Bun package claims are constrained to the claim-indexed Apple Metal package receipt."
+    },
+    {
+      "id": "package-deno-runtime",
+      "surface": "package_runtime",
+      "dawnComparator": "deno_wgpu",
+      "doeTarget": "doe-gpu-deno",
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
+      "evidencePaths": [
+        "config/tool-surfaces.json",
+        "packages/doe-gpu/README.md",
+        "docs/doe-support-matrix.md"
+      ],
+      "blockers": [
+        "deno_package_compare_claim_report",
+        "deno_host_webgpu_comparability_audit"
+      ],
+      "notes": "The Deno entrypoint is part of the package surface; it is not yet a claim-indexed Dawn-facing replacement row."
+    },
+    {
+      "id": "browser-chromium-runtime",
+      "surface": "browser_runtime",
+      "dawnComparator": "chromium_dawn",
+      "doeTarget": "doe_chromium_webgpu",
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [
+        "ort-browser-apple-metal"
+      ],
+      "evidencePaths": [
+        "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+        "docs/doe-support-matrix.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "blockers": [
+        "claim_grade_browser_runtime_identity",
+        "browser_structural_equivalence_receipts",
+        "chromium_release_build_evidence"
+      ],
+      "notes": "Browser artifacts remain diagnostic until the Chromium runtime lane proves identity, structure, and release-build evidence."
+    },
+    {
+      "id": "wgsl-tint-compiler",
+      "surface": "shader_compiler",
+      "dawnComparator": "tint",
+      "doeTarget": "doe_wgsl",
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
+      "evidencePaths": [
+        "config/shader-toolchain.json",
+        "examples/tint-compiler-evidence.sample.json",
+        "docs/shader-compiler-architecture.md"
+      ],
+      "blockers": [
+        "claimable_tint_compiler_evidence_report",
+        "wgsl_lowering_link_claim_bundle",
+        "shader_artifact_validation_for_target_backends"
+      ],
+      "notes": "Doe-vs-Tint evidence is explicitly tracked but cannot support compiler replacement claims until the compiler evidence gate is run in claimable mode."
+    },
+    {
+      "id": "webgpu-cts-conformance",
+      "surface": "spec_conformance",
+      "dawnComparator": "webgpu_cts",
+      "doeTarget": "doe_webgpu_surface",
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
+      "evidencePaths": [
+        "config/webgpu-cts-evidence.json",
+        "config/webgpu-spec-index.jsonl",
+        "docs/doe-support-matrix.md"
+      ],
+      "blockers": [
+        "published_cts_subset_receipt",
+        "backend_specific_cts_pass_ledger",
+        "conformance_claim_policy"
+      ],
+      "notes": "CTS and spec coverage ledgers exist; conformance and broad Dawn replacement language require published pass ledgers."
+    },
+    {
+      "id": "drop-in-abi-runtime",
+      "surface": "drop_in_runtime",
+      "dawnComparator": "libwebgpu_dawn",
+      "doeTarget": "libwebgpu_doe",
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
+      "evidencePaths": [
+        "config/backend-cutover-policy.json",
+        "docs/apple-metal-runtime-release.md",
+        "docs/doe-support-matrix.md"
+      ],
+      "blockers": [
+        "non_apple_drop_in_bundle_receipts",
+        "rollback_rehearsal_receipt",
+        "cross_backend_abi_validation"
+      ],
+      "notes": "Apple runtime bundle evidence exists, but broad libwebgpu replacement claims need cross-backend ABI and rollback evidence."
+    },
+    {
+      "id": "release-claim-index",
+      "surface": "evidence_release",
+      "dawnComparator": "dawn_claim_surface",
+      "doeTarget": "doe_claim_surface",
+      "currentState": "covered",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "config/claim-index.schema.json",
+        "docs/process.md"
+      ],
+      "blockers": [
+        "frontier_rows_not_all_claimable"
+      ],
+      "notes": "The release claim surface is schema-backed; it still reports universal Dawn replacement as blocked while any frontier row is non-claimable."
+    }
+  ]
+}

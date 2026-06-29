@@ -50,12 +50,24 @@ Published npm surface: [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md
 - Unsupported runtime or lowering behavior must fail explicitly instead of
   switching to hidden fallback behavior.
 
+Boundary docs:
+
+- [`docs/public-claim-boundary.md`](docs/public-claim-boundary.md)
+- [`docs/runtime-surface-boundary.md`](docs/runtime-surface-boundary.md)
+- [`docs/backend-evidence-matrix.md`](docs/backend-evidence-matrix.md)
+- [`docs/config-schema-enforcement.md`](docs/config-schema-enforcement.md)
+
 ## Benchmark evidence
 
 The README chart uses one reporting contract across backends: each row states
 backend, surface, comparator, metric direction, result, claim state, and
-evidence path. Metal rows are public claim-indexed rows; Vulkan rows are shown
-with their current diagnostic/status boundary instead of being omitted.
+evidence path. Metal rows include claim-indexed native/package/Node+Bun ORT
+evidence plus the browser ORT diagnostic boundary; Vulkan rows are shown with
+their current diagnostic/status boundary instead of being omitted.
+The broader Dawn/Tint replacement frontier is tracked by
+`config/dawn-replacement-frontier.json` and blocked by
+`bench/gates/dawn_replacement_frontier_gate.py`; universal replacement language
+is not allowed until every frontier row is claim-allowed.
 
 ![Doe backend evidence summary](assets/readme/backend-evidence-summary.svg)
 
@@ -70,6 +82,9 @@ and claim boundaries are tracked in
 - Runtime contributors: [`runtime/zig/README.md`](runtime/zig/README.md)
 - Benchmarks and evidence: [`bench/README.md`](bench/README.md)
 - Current status and claim boundaries: [`docs/status.md`](docs/status.md)
+- Public claim boundary: [`docs/public-claim-boundary.md`](docs/public-claim-boundary.md)
+- Runtime surface boundary: [`docs/runtime-surface-boundary.md`](docs/runtime-surface-boundary.md)
+- Backend evidence matrix: [`docs/backend-evidence-matrix.md`](docs/backend-evidence-matrix.md)
 - Chromium WebGPU strategy:
   [`docs/chromium-webgpu-task-list.md`](docs/chromium-webgpu-task-list.md)
 - Doppler Program Bundle ingest: [`docs/doppler-ingest.md`](docs/doppler-ingest.md)

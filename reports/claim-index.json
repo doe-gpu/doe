@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "doe-claim-index",
-  "description": "Stable index of public README benchmark receipt surfaces. Bulky generated run workspaces stay under ignored bench/out paths. Every entry is a public README claim row unless claimState says otherwise.",
+  "description": "Stable index of public README benchmark receipt surfaces. Bulky generated run workspaces stay under ignored bench/out paths. Entries are public claim rows only when claimState is claim-indexed.",
   "entries": [
     {
       "id": "package-node-apple-metal",
@@ -11,6 +11,8 @@
       "comparison": "doe-vs-node-webgpu",
       "metricDirection": "lower-is-better",
       "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
       "reportPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json",
       "claimPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json"
     },
@@ -22,6 +24,8 @@
       "comparison": "doe-vs-bun-webgpu",
       "metricDirection": "lower-is-better",
       "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
       "reportPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json",
       "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json"
     },
@@ -32,6 +36,8 @@
       "comparison": "doe-vs-dawn",
       "metricDirection": "lower-is-better",
       "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
       "reportPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json",
       "claimPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json"
     },
@@ -42,6 +48,8 @@
       "comparison": "doe-vs-dawn",
       "metricDirection": "lower-is-better",
       "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
       "reportPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json",
       "claimPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json"
     },
@@ -53,6 +61,8 @@
       "comparison": "doe-vs-node-webgpu",
       "metricDirection": "lower-is-better",
       "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
       "reportPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.compare.json",
       "claimPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.claim.json"
     },
@@ -64,6 +74,8 @@
       "comparison": "doe-vs-bun-webgpu",
       "metricDirection": "lower-is-better",
       "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
       "reportPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.compare.json",
       "claimPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.claim.json"
     },
@@ -74,8 +86,31 @@
       "backend": "apple-metal",
       "comparison": "doe-vs-dawn",
       "metricDirection": "lower-is-better",
-      "claimState": "claim-indexed",
+      "claimState": "diagnostic",
+      "comparisonStatus": "comparable",
+      "claimStatus": "diagnostic",
       "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
+    },
+    {
+      "id": "native-release-amd-vulkan",
+      "surface": "native",
+      "backend": "amd-vulkan",
+      "comparison": "doe-vs-dawn",
+      "metricDirection": "lower-is-better",
+      "claimState": "diagnostic",
+      "comparisonStatus": "comparable",
+      "claimStatus": "diagnostic",
+      "reportPath": "bench/out/amd-vulkan/20260310T153903Z/dawn-vs-doe.amd.vulkan.release.json",
+      "blocker": "Current support matrix marks the lane diagnostic with a tiny-upload blocker."
+    },
+    {
+      "id": "native-d3d12",
+      "surface": "native",
+      "backend": "d3d12",
+      "comparison": "doe-vs-dawn",
+      "metricDirection": "status-only",
+      "claimState": "scaffolded",
+      "blocker": "Contracts and runtime path exist, but fresh Windows evidence and D3D12-specific Dawn mapping validation are missing."
     }
   ]
 }

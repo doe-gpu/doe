@@ -25,3 +25,6 @@ Helper Python (`compare_*.py`) here is shared between the CLI and the
 release pipeline; runtime executors live in
 [`bench/executors/`](../executors/), and apples-to-apples enforcement lives in
 [`bench/lib/comparability_coherence.py`](../lib/comparability_coherence.py).
+
+`wgpu_benchmark_adapter.py` is a real-runner adapter only. It fails closed when
+`--wgpu-runner` is absent and never emits synthetic timing or trace artifacts.

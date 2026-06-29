@@ -84,6 +84,26 @@
 - run release claimability hard gate from comparison report artifacts:
   `python3 bench/gates/claim_gate.py --report bench/out/dawn-vs-doe.json --require-claimability-mode release --require-claim-status claimable --require-comparison-status comparable --require-min-timed-samples 15`
   CI must fail hard if report claim metadata is not explicit release mode claimable/comparable.
+- run public claim inventory hard gate:
+  `python3 bench/gates/claim_index_gate.py`
+  CI must fail hard if `reports/claim-index.json` marks a row claim-indexed
+  without comparable/claimable status and a claim sidecar path.
+- run Dawn replacement frontier hard gate:
+  `python3 bench/gates/dawn_replacement_frontier_gate.py`
+  CI must fail hard if `config/dawn-replacement-frontier.json` omits a required
+  Dawn/Tint replacement row, marks a row claim-allowed without claim-indexed
+  comparable/claimable evidence, or allows universal replacement language while
+  any product frontier row is not claim-allowed or any evidence-release row is
+  not covered or claimable.
+- run native backend coverage hard gate:
+  `python3 bench/tools/check_native_backend_coverage_matrix.py --matrix config/native-backend-coverage-matrix.json`
+  CI must fail hard if Metal, Vulkan, or D3D12 coverage rows are missing or if
+  covered rows lack evidence references. Add `--verify-evidence-root .` on
+  evidence-publication lanes that need local artifact-kind verification.
+- run tool-surface hard gate:
+  `python3 bench/gates/tool_surface_gate.py`
+  CI must fail hard if `config/tool-surfaces.json` drifts from declared files
+  or from public `doe-gpu` package exports.
 - run cycle lock + rollback hard gate for claim-lane governance:
   `python3 bench/gates/cycle_gate.py --cycle config/claim-cycle.active.json --report bench/out/dawn-vs-doe.json --artifact-class claim`
   claim lanes must fail if contract hashes drift, comparable workload identity drifts, enabled rollback criteria trigger, or claim artifacts violate namespace policy.

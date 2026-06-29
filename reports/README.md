@@ -9,3 +9,6 @@ artifacts that tests, docs, or reviews may inspect directly.
 
 - `claim-index.json` lists the benchmark receipt paths that support the public
   README claim charts without requiring broad historical `bench/out` retention.
+  `claim-indexed` entries must carry `comparisonStatus=comparable`,
+  `claimStatus=claimable`, and a claim sidecar path. Diagnostic and status-only
+  entries may stay visible, but they are not public speed claims.

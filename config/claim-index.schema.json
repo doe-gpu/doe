@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe public claim index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "description", "entries"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "doe-claim-index" },
+    "description": { "type": "string", "minLength": 1 },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "surface",
+        "backend",
+        "comparison",
+        "metricDirection",
+        "claimState",
+        "comparisonStatus",
+        "claimStatus",
+        "reportPath"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "surface": {
+          "type": "string",
+          "enum": ["package", "native", "node-ort", "bun-ort", "browser-ort"]
+        },
+        "runtimeHost": {
+          "type": "string",
+          "enum": ["node", "bun", "browser", "deno"]
+        },
+        "backend": {
+          "type": "string",
+          "enum": ["apple-metal", "amd-vulkan", "d3d12", "dxil", "vulkan", "metal"]
+        },
+        "comparison": {
+          "type": "string",
+          "enum": ["doe-vs-dawn", "doe-vs-node-webgpu", "doe-vs-bun-webgpu"]
+        },
+        "metricDirection": {
+          "type": "string",
+          "enum": ["lower-is-better", "higher-is-better"]
+        },
+        "claimState": {
+          "type": "string",
+          "enum": ["claim-indexed", "diagnostic", "status-only"]
+        },
+        "comparisonStatus": {
+          "type": "string",
+          "enum": ["comparable", "diagnostic", "not-evaluated"]
+        },
+        "claimStatus": {
+          "type": "string",
+          "enum": ["claimable", "diagnostic", "not-evaluated"]
+        },
+        "reportPath": { "$ref": "#/$defs/repoJsonPath" },
+        "claimPath": { "$ref": "#/$defs/repoJsonPath" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "claimState": { "const": "claim-indexed" } },
+            "required": ["claimState"]
+          },
+          "then": {
+            "required": ["claimPath"],
+            "properties": {
+              "comparisonStatus": { "const": "comparable" },
+              "claimStatus": { "const": "claimable" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "claimState": { "const": "diagnostic" } },
+            "required": ["claimState"]
+          },
+          "then": {
+            "not": {
+              "properties": { "claimStatus": { "const": "claimable" } },
+              "required": ["claimStatus"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "claimState": { "const": "status-only" } },
+            "required": ["claimState"]
+          },
+          "then": {
+            "properties": {
+              "comparisonStatus": { "const": "not-evaluated" },
+              "claimStatus": { "const": "not-evaluated" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "claimStatus": { "const": "claimable" } },
+            "required": ["claimStatus"]
+          },
+          "then": {
+            "properties": { "claimState": { "const": "claim-indexed" } },
+            "required": ["claimPath"]
+          }
+        }
+      ]
+    },
+    "repoJsonPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/][^\\\\]*\\.json$"
+    }
+  }
+}

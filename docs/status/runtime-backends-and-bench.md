@@ -3,6 +3,62 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-06-29 — Dawn replacement frontier is gate-backed
+
+`config/dawn-replacement-frontier.json` now names the Dawn/Tint replacement
+frontier across native Metal, Vulkan, D3D12, Node package, Bun package, Deno
+package, Chromium browser, WGSL/Tint compiler, CTS conformance, drop-in ABI,
+and release claim indexing. The matching schema and
+`bench/gates/dawn_replacement_frontier_gate.py` require each row to carry
+evidence paths or public claim-index entries. Blocker codes now live in the same
+manifest with exit criteria, and the gate rejects undefined or unused blockers.
+
+The gate only allows a frontier row to be `claimAllowed=true` when it references
+public claim-index entries that are claim-indexed, comparable, claimable, and
+carry claim sidecar paths. Universal Dawn replacement remains blocked while any
+product frontier row is diagnostic, missing, unsupported, or covered-only; the
+release evidence row must stay covered or claimable. The frontier intentionally
+excludes the spatial-retargeting lane.
+
+The canonical blocking runner now also enables the native backend coverage
+matrix check by default. That default validates required Metal, Vulkan, and
+D3D12 coverage rows without requiring local generated evidence files; lanes that
+publish evidence can still pass `--native-backend-coverage-evidence-root` for
+artifact-kind verification.
+
+## 2026-06-29 — wgpu adapter no longer emits mock evidence
+
+`bench/native-compare/wgpu_benchmark_adapter.py` now fails closed unless a real
+`--wgpu-runner` is available. The previous placeholder trace writer has been
+removed, so three-way Doe/Dawn/wgpu work cannot satisfy compare tooling with
+synthetic timing or mock adapter metadata. The adapter also requires the runner
+to emit both trace metadata and JSONL trace outputs before returning success.
+
+## 2026-06-29 — Tool surface exports are gate-backed
+
+`config/tool-surfaces.json` now lists the full public `doe-gpu` package
+entrypoint set, including Bun, Deno, and `node-webgpu` entry files. The new
+`bench/gates/tool_surface_gate.py` validates declared surface paths and checks
+the public package surface against `packages/doe-gpu/package.json` export
+targets, so public package exports cannot drift from the manifest silently.
+
+The canonical blocking runner invokes the tool-surface gate by default. Package
+docs now name `node-webgpu` alongside the other documented subpath entrypoints.
+
+## 2026-06-29 — Public claim index is gate-backed
+
+`reports/claim-index.json` now has a schema target and a blocking semantic gate:
+`bench/gates/claim_index_gate.py`. Claim-indexed rows must carry
+`comparisonStatus=comparable`, `claimStatus=claimable`, and a claim sidecar
+path. Diagnostic and status-only rows cannot be marked claimable. The gate also
+checks local compare/claim artifacts when they are present under the indexed
+paths while allowing bulky generated `bench/out` artifacts to remain absent from
+the tracked tree.
+
+The Apple browser ORT row is now explicitly diagnostic in the claim index and
+the README SVG summary shows the ORT row as a mixed Node/Bun claim plus browser
+diagnostic boundary rather than a browser speed claim.
+
 ## 2026-06-27 — Browser Chromium/Dawn versus Fawn/Doe fairness refresh
 
 The raw Chromium browser lane now separates strict source-comparable browser

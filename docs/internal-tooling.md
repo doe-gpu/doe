@@ -12,8 +12,8 @@ source of truth.
 The current public package contract is:
 
 - `doe-gpu`
-- its documented subpath exports, including `api`, `native`, `plan`, `capture`,
-  `compute`, `browser`, and compatibility `hybrid`
+- its documented subpath exports, including `api`, `native`, `node-webgpu`,
+  `plan`, `capture`, `compute`, `browser`, and compatibility `hybrid`
 - the package docs in [`packages/doe-gpu/README.md`](../packages/doe-gpu/README.md)
 
 Advanced helper exports such as `createDoeRuntime()` and
@@ -33,12 +33,24 @@ stale README prose, old SVGs, or local scratch artifacts.
 Public README claim rows are indexed in
 [`reports/claim-index.json`](../reports/claim-index.json). A public claim row
 must state its backend, surface, comparator, metric direction, result, claim
-state, and evidence path. Diagnostic rows may stay visible, but they must be
-described as diagnostic or status-only rather than claimable speed evidence.
+state, evidence path, and claimable sidecar path. Diagnostic rows may stay
+visible, but they must be described as diagnostic or status-only rather than
+claimable speed evidence.
 
 Package-local docs may point to the claim index or a package-local evidence
 artifact, but they must not hardcode benchmark percentages without an explicit
 claim state and current artifact path.
+
+Run the public claim checker before publishing README/reporting changes:
+
+```bash
+python3 scripts/check-public-claim-surfaces.py
+```
+
+The checker validates the claim index shape and scans public docs for stale
+chart references or hardcoded package-performance percentages. It is
+intentionally narrow and does not replace benchmark gates, schema gates, or
+runtime tests.
 
 ## Internal operator tooling
 

@@ -62,6 +62,27 @@ def parse_args() -> argparse.Namespace:
         help="Run claim_gate.py after schema/correctness/trace gates.",
     )
     parser.add_argument(
+        "--with-claim-index-gate",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Run claim_index_gate.py over reports/claim-index.json. Default: enabled.",
+    )
+    parser.add_argument(
+        "--with-dawn-replacement-frontier-gate",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Run dawn_replacement_frontier_gate.py over "
+            "config/dawn-replacement-frontier.json. Default: enabled."
+        ),
+    )
+    parser.add_argument(
+        "--with-tool-surface-gate",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Run tool_surface_gate.py over config/tool-surfaces.json. Default: enabled.",
+    )
+    parser.add_argument(
         "--with-backend-selection-gate",
         action="store_true",
         help="Run backend_selection_gate.py after trace gate.",
@@ -457,8 +478,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--with-native-backend-coverage-matrix-gate",
-        action="store_true",
-        help="Run check_native_backend_coverage_matrix.py on the native backend coverage matrix.",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Run check_native_backend_coverage_matrix.py on the native backend "
+            "coverage matrix. Default: enabled."
+        ),
     )
     parser.add_argument(
         "--native-backend-coverage-matrix",
@@ -1159,4 +1184,3 @@ def parse_args() -> argparse.Namespace:
         help="Forward --expected-backend-id to claim_gate.py.",
     )
     return parser.parse_args()
-

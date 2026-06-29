@@ -1297,6 +1297,25 @@ resolves its entries against repo root.
   - validates comparability obligation IDs against the canonical contract in `config/comparability-obligations.json`.
   - validates compare-report and claim-report linkage via compare-report SHA, workload manifest path/hash, benchmark policy hash, and receipt/trace-meta references.
   - for claimable compare reports, independently enforces positive required tail deltas (`p50`/`p95`/`p99` in release mode) and timed-sample floors per workload.
+- `claim_index_gate.py`
+  - validates `reports/claim-index.json`, the public README claim inventory.
+  - rejects claim-indexed rows that lack a claim sidecar path or do not carry `comparisonStatus=comparable` and `claimStatus=claimable`.
+  - verifies local compare and claim artifacts when the indexed `bench/out` paths are available, while allowing bulky generated artifacts to stay out of the tracked tree.
+- `dawn_replacement_frontier_gate.py`
+  - validates `config/dawn-replacement-frontier.json`, the Dawn/Tint replacement frontier manifest.
+  - requires each native/package/browser/compiler/conformance/drop-in frontier row to carry evidence paths or public claim-index entries.
+  - rejects undefined or unused blocker codes so every gap has tracked exit criteria.
+  - rejects universal Dawn replacement language unless product frontier rows are claim-allowed and evidence-release rows are covered or claimable.
+  - keeps the excluded spatial-retargeting lane out of this Dawn-specific frontier contract.
+- `check_native_backend_coverage_matrix.py`
+  - validates `config/native-backend-coverage-matrix.json`, the Metal/Vulkan/D3D12 coverage matrix.
+  - requires every native backend and required coverage class to appear exactly once.
+  - rejects covered rows without evidence references and diagnostic/missing rows without reason codes.
+  - verifies local evidence artifact kinds when called with `--verify-evidence-root`.
+- `tool_surface_gate.py`
+  - validates `config/tool-surfaces.json`, the public/internal/archive tooling boundary manifest.
+  - rejects missing declared files and duplicate surface IDs.
+  - checks the public `doe-gpu` package surface against `packages/doe-gpu/package.json` so exported JS entrypoints stay declared in the manifest.
 - `build_claim_rehearsal_artifacts.py`
   - builds machine-readable claim rehearsal artifacts from a compare report:
     claim gate result, tail-health table, timing-invariant audit, contract-hash manifest, and a rehearsal manifest linking all outputs.

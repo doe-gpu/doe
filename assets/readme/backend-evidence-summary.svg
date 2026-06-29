@@ -74,13 +74,13 @@
   <rect x="42" y="390" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />
   <text x="56" y="421" class="cell">Apple Metal</text>
   <text x="176" y="414" class="cell">ORT provider</text>
-  <text x="176" y="432" class="small">Node/Bun/Browser</text>
+  <text x="176" y="432" class="small">Node + Bun claimed</text>
   <text x="334" y="421" class="cell">Doe vs Dawn/WebGPU</text>
   <text x="500" y="414" class="cell">p50 wall ms</text>
   <text x="500" y="432" class="small">lower is better</text>
   <text x="686" y="414" class="cell">Node +2.9%, Bun +0.1%</text>
-  <text x="686" y="432" class="cell">Browser +4.4%</text>
-  <text x="888" y="421" class="status" fill="#0f766e">claim-indexed</text>
+  <text x="686" y="432" class="cell">Browser diagnostic</text>
+  <text x="888" y="421" class="status" fill="#9a3412">mixed boundary</text>
   <text x="1030" y="421" class="path mono">reports/claim-index.json</text>
 
   <rect x="42" y="452" width="1196" height="52" rx="4" fill="#f3fbf8" stroke="#b7ded1" />

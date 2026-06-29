@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "doe://config/dawn-replacement-frontier.schema.json",
+  "title": "Dawn replacement frontier",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "frontierId",
+    "universalClaim",
+    "blockerDefinitions",
+    "rows"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "dawn_replacement_frontier" },
+    "frontierId": { "type": "string", "minLength": 1 },
+    "universalClaim": { "$ref": "#/$defs/UniversalClaim" },
+    "blockerDefinitions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/BlockerDefinition" },
+      "uniqueItems": true
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/FrontierRow" }
+    }
+  },
+  "$defs": {
+    "UniversalClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "reasonCode"],
+      "properties": {
+        "allowed": { "type": "boolean" },
+        "reasonCode": { "type": "string" }
+      }
+    },
+    "BlockerDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "exitCriteria", "evidencePaths"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_]*$"
+        },
+        "exitCriteria": { "type": "string", "minLength": 1 },
+        "evidencePaths": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "FrontierRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "surface",
+        "dawnComparator",
+        "doeTarget",
+        "currentState",
+        "claimAllowed",
+        "claimIndexEntryIds",
+        "evidencePaths",
+        "blockers",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "surface": {
+          "enum": [
+            "native_runtime",
+            "package_runtime",
+            "browser_runtime",
+            "shader_compiler",
+            "spec_conformance",
+            "drop_in_runtime",
+            "evidence_release"
+          ]
+        },
+        "dawnComparator": {
+          "enum": [
+            "dawn_metal",
+            "dawn_vulkan",
+            "dawn_d3d12",
+            "dawn_node_webgpu",
+            "dawn_bun_webgpu",
+            "deno_wgpu",
+            "chromium_dawn",
+            "tint",
+            "webgpu_cts",
+            "libwebgpu_dawn",
+            "dawn_claim_surface"
+          ]
+        },
+        "doeTarget": { "type": "string", "minLength": 1 },
+        "currentState": {
+          "enum": ["claimable", "covered", "diagnostic", "missing", "unsupported"]
+        },
+        "claimAllowed": { "type": "boolean" },
+        "claimIndexEntryIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "evidencePaths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "blockers": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

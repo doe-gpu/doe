@@ -91,6 +91,9 @@ def main() -> int:
     tools_dir = BENCH_ROOT / "tools"
     dropin_dir = BENCH_ROOT / "drop-in"
     schema_gate = gates_dir / "schema_gate.py"
+    claim_index_gate = gates_dir / "claim_index_gate.py"
+    dawn_replacement_frontier_gate = gates_dir / "dawn_replacement_frontier_gate.py"
+    tool_surface_gate = gates_dir / "tool_surface_gate.py"
     file_size_gate = gates_dir / "file_size_gate.py"
     split_coverage_gate = gates_dir / "split_coverage_gate.py"
     backend_workload_catalog_gate = tools_dir / "generate_backend_workloads.py"
@@ -190,6 +193,15 @@ def main() -> int:
                 [sys.executable, str(tracked_ignore_gate)],
             )
         run_gate("schema", [sys.executable, str(schema_gate)])
+        if args.with_claim_index_gate:
+            run_gate("claim-index", [sys.executable, str(claim_index_gate)])
+        if args.with_dawn_replacement_frontier_gate:
+            run_gate(
+                "dawn-replacement-frontier",
+                [sys.executable, str(dawn_replacement_frontier_gate)],
+            )
+        if args.with_tool_surface_gate:
+            run_gate("tool-surface", [sys.executable, str(tool_surface_gate)])
         run_gate("cerebras-artifact", [sys.executable, str(cerebras_artifact_gate)])
         run_gate("doe-private-strategy-leak", [sys.executable, str(doe_private_strategy_leak_gate)])
         run_gate("csl-fixture-mirrors", [sys.executable, str(csl_fixture_mirror_gate)])

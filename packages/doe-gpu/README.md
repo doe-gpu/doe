@@ -39,8 +39,8 @@ summarized in the repo README backend evidence chart.
 
 Read every evidence row by its explicit claim state:
 
-- `claim-indexed`: public README claim row with a report path and, when
-  applicable, a claim sidecar.
+- `claim-indexed`: public README claim row with a report path and required
+  claim sidecar.
 - `diagnostic`: useful engineering evidence, not public speed wording.
 - `status-only`: support or capability status without a promoted performance
   claim.
