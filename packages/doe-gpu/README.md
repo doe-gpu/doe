@@ -32,24 +32,28 @@ npm install doe-gpu
 
 ## Current Evidence
 
-End-to-end Gemma 3 package and inference evidence compares Doe-backed WebGPU
-with Dawn-backed package lanes on matching host/runtime lanes. Doe is the
-baseline in each row where percentages are shown, so positive percentages mean
-the Doe-backed lane finished faster.
+The package participates in receipt-backed compare lanes, but package README
+numbers are not the source of truth. Current public package and runtime claims
+are indexed in [`reports/claim-index.json`](../../reports/claim-index.json) and
+summarized in the repo README backend evidence chart.
 
-![doe-gpu package results](./assets/package-results.svg)
+Read every evidence row by its explicit claim state:
 
-Outputs:
-- AMD Vulkan Node package: `+12.25% p50`, `+10.74% p95`, `+10.74% p99`
-- AMD Vulkan Bun package: `+12.86% p50`, `+7.91% p95`, `+7.91% p99`
-- [Node package, Apple Metal](../../bench/out/apple-metal/20260413T210746Z/gemma64.node-package.warm.ir.compare.json)
-- [Bun package, Apple Metal](../../bench/out/apple-metal/20260413T214446Z/gemma64.bun-package.warm.ir.compare.json)
+- `claim-indexed`: public README claim row with a report path and, when
+  applicable, a claim sidecar.
+- `diagnostic`: useful engineering evidence, not public speed wording.
+- `status-only`: support or capability status without a promoted performance
+  claim.
+
+Do not promote historical package percentages from old charts or local run
+artifacts unless the current claim index and gates still mark the lane as
+claimable.
 
 ## Additional benchmark outputs
 
 Native, release, ORT, and browser lanes are summarized in the repo README. Read
 [`README.md`](https://github.com/doerun/doe/blob/main/README.md) for the
-current scope and artifacts.
+current scope, metric direction, claim state, and artifacts.
 
 ## Usage
 

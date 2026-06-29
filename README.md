@@ -8,24 +8,29 @@ Doe is a source-preserving accelerator runtime and compiler. It keeps shader and
 program bodies inspectable, lowers them across execution targets, and writes
 receipts for what ran.
 
-Doe has two active surfaces:
+Doe has three non-interchangeable surfaces:
 
-- A local WebGPU/runtime path for native, browser, Node, and Bun workloads.
-- A compiler path for model systems such as Doppler, where model programs can be
-  lowered through Doe IR toward backends such as Cerebras.
+- A native/package WebGPU runtime path for Node, Bun, Deno, drop-in, and
+  embedded workloads.
+- A browser compatibility shim plus a separate governed Chromium integration
+  lane. The shim wraps the browser's existing WebGPU runtime; it is not Doe
+  running inside the browser.
+- A compiler/lowering path for source-visible WGSL and model-program contracts.
 
 Published npm surface: [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md).
 
 ## What it is
 
 - `doe-gpu`: JavaScript package entry point for WebGPU-backed workloads.
+- `doe-gpu/browser`: browser API compatibility wrapper over the incumbent
+  browser WebGPU runtime, not a browser runtime replacement.
 - `doe-zig-runtime` and `libwebgpu_doe`: native WebGPU runtime surfaces used by
   strict and release comparison lanes.
 - `runtime/zig/src/doe_wgsl`: WGSL lowering and backend emission work.
 - `pipeline/trace`, `pipeline/lean`, and `bench`: trace, checking, and benchmark
   receipt surfaces.
-- Doppler ingest and Cerebras path: model bundle ingest, TSIR/HostPlan lowering,
-  CSL emission, and emulator receipts.
+- Model-program ingest and lowering: bundle/capture inputs, TSIR/HostPlan
+  planning, backend emission, and receipt-bound replay/evidence.
 
 ## How it works
 
@@ -34,6 +39,16 @@ Published npm surface: [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md
 3. Doe lowers and executes the workload, or rejects unsupported contracts.
 4. Bench and trace tools emit receipts.
 5. Public claims point at receipt artifacts instead of prose-only summaries.
+
+## Boundary rules
+
+- Package, native runtime, browser shim, Chromium integration, benchmarks, and
+  compiler lowering are separate surfaces.
+- `reports/claim-index.json` is the public README claim inventory.
+- Diagnostic evidence is useful engineering evidence, but it is not public speed
+  claim language.
+- Unsupported runtime or lowering behavior must fail explicitly instead of
+  switching to hidden fallback behavior.
 
 ## Benchmark evidence
 
@@ -58,7 +73,6 @@ and claim boundaries are tracked in
 - Chromium WebGPU strategy:
   [`docs/chromium-webgpu-task-list.md`](docs/chromium-webgpu-task-list.md)
 - Doppler Program Bundle ingest: [`docs/doppler-ingest.md`](docs/doppler-ingest.md)
-- Cerebras lane: [`docs/cerebras.md`](docs/cerebras.md)
 - TSIR compiler work:
   [`docs/tsir-lowering-plan.md`](docs/tsir-lowering-plan.md),
   [`docs/loop-protocol.md`](docs/loop-protocol.md), and

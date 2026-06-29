@@ -25,6 +25,21 @@ The npm package does not ship compare, bench, or release pipeline CLIs.
 It also does not ship a public `doe-gpu/csl` subpath until the CSL HostPlan and
 receipt contracts are stable enough to treat as semver package surface.
 
+## Claim and reporting boundary
+
+Human-facing performance claims must come from current claim metadata, not from
+stale README prose, old SVGs, or local scratch artifacts.
+
+Public README claim rows are indexed in
+[`reports/claim-index.json`](../reports/claim-index.json). A public claim row
+must state its backend, surface, comparator, metric direction, result, claim
+state, and evidence path. Diagnostic rows may stay visible, but they must be
+described as diagnostic or status-only rather than claimable speed evidence.
+
+Package-local docs may point to the claim index or a package-local evidence
+artifact, but they must not hardcode benchmark percentages without an explicit
+claim state and current artifact path.
+
 ## Internal operator tooling
 
 These are repo-only contributor/operator surfaces:
@@ -49,6 +64,8 @@ In practice:
 - `bench/` (including `bench/cts/`), `browser/chromium/`, `examples/`,
   `pipeline/`, top-level `scripts/`, and `demos/` are internal
 - `packages/doe-gpu/` is the public npm surface
+- `packages/doe-gpu/src/browser.js` is public API compatibility over incumbent
+  browser WebGPU, not the Chromium runtime replacement lane
 - overlapping helpers are allowed, but repo workflows are still owned by the
   repo tooling, not by the npm package
 

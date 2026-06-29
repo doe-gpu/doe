@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "doe-claim-index",
-  "description": "Stable index of public README benchmark receipt surfaces. Bulky generated run workspaces stay under ignored bench/out paths.",
+  "description": "Stable index of public README benchmark receipt surfaces. Bulky generated run workspaces stay under ignored bench/out paths. Every entry is a public README claim row unless claimState says otherwise.",
   "entries": [
     {
       "id": "package-node-apple-metal",
@@ -9,6 +9,8 @@
       "runtimeHost": "node",
       "backend": "apple-metal",
       "comparison": "doe-vs-node-webgpu",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
       "reportPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json",
       "claimPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json"
     },
@@ -18,6 +20,8 @@
       "runtimeHost": "bun",
       "backend": "apple-metal",
       "comparison": "doe-vs-bun-webgpu",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
       "reportPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json",
       "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json"
     },
@@ -26,6 +30,8 @@
       "surface": "native",
       "backend": "apple-metal",
       "comparison": "doe-vs-dawn",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
       "reportPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json",
       "claimPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json"
     },
@@ -34,6 +40,8 @@
       "surface": "native",
       "backend": "apple-metal",
       "comparison": "doe-vs-dawn",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
       "reportPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json",
       "claimPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json"
     },
@@ -43,6 +51,8 @@
       "runtimeHost": "node",
       "backend": "apple-metal",
       "comparison": "doe-vs-node-webgpu",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
       "reportPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.compare.json",
       "claimPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.claim.json"
     },
@@ -52,6 +62,8 @@
       "runtimeHost": "bun",
       "backend": "apple-metal",
       "comparison": "doe-vs-bun-webgpu",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
       "reportPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.compare.json",
       "claimPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.claim.json"
     },
@@ -61,6 +73,8 @@
       "runtimeHost": "browser",
       "backend": "apple-metal",
       "comparison": "doe-vs-dawn",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
       "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
     }
   ]

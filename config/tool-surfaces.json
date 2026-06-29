@@ -7,7 +7,7 @@
       "kind": "package",
       "stability": "semver",
       "shipped": true,
-      "summary": "Public npm package surface for Doe.",
+      "summary": "Public npm package surface for Doe. Browser subpath is API compatibility over incumbent browser WebGPU, not the Chromium replacement lane.",
       "rootPaths": [
         "packages/doe-gpu"
       ],
@@ -32,7 +32,7 @@
       "kind": "package_helper",
       "stability": "semver",
       "shipped": true,
-      "summary": "Advanced JS helper exports for repo-adjacent runtime orchestration.",
+      "summary": "Advanced JS helper exports for repo-adjacent runtime orchestration. These are not benchmark or release operator front doors.",
       "rootPaths": [
         "packages/doe-gpu/src"
       ],
@@ -55,7 +55,7 @@
       "kind": "runtime_binary",
       "stability": "repo_only",
       "shipped": false,
-      "summary": "Contributor/runtime binary and build surface for the Zig runtime.",
+      "summary": "Contributor/runtime binary and build surface for the Zig runtime. Product behavior reaches users through packaged or drop-in artifacts, not this repo-only CLI by itself.",
       "rootPaths": [
         "runtime/zig"
       ],
@@ -74,7 +74,7 @@
       "kind": "operator_cli",
       "stability": "repo_only",
       "shipped": false,
-      "summary": "Canonical benchmark run, compare-report, release, and workload-catalog operator entrypoints.",
+      "summary": "Canonical benchmark run, compare-report, release, and workload-catalog operator entrypoints. Outputs may become claim evidence only through gates and claim metadata.",
       "rootPaths": [
         "bench",
         "bench/native-compare",
@@ -98,7 +98,7 @@
       "kind": "browser_lane",
       "stability": "experimental",
       "shipped": false,
-      "summary": "Repo-only Chromium integration and browser benchmark surface.",
+      "summary": "Repo-only Chromium integration and browser benchmark surface. This is the future browser-runtime lane, separate from doe-gpu/browser.",
       "rootPaths": [
         "browser/chromium"
       ],
