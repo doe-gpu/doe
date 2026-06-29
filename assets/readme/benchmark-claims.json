@@ -1,8 +1,8 @@
 {
   "packageClaims": {
-    "title": "Apple Metal package compare lanes",
-    "subtitle": "Fresh strict-comparable Doe-baseline package lanes on macOS Metal.",
-    "caption": "Apple Metal package compare claims",
+    "title": "Metal &amp; Vulkan package compare lanes",
+    "subtitle": "Strict-comparable Doe-baseline package lanes on Metal and Vulkan backends.",
+    "caption": "Metal and Vulkan package compare claims",
     "rows": [
       {
         "label": "Node package",
