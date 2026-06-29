@@ -19,17 +19,17 @@ const SVG_THEME = Object.freeze({
   palette: Object.freeze({
     bg: '#ffffff',
     panel: '#ffffff',
-    panelAlt: '#f7f7f7',
+    panelAlt: '#f6f7ff',
     border: '#111111',
     text: '#111111',
-    muted: '#5a5a5a',
+    muted: '#404041',
     grid: '#d8d8d8',
-    accent: '#111111',
-    doe: '#111111',
-    incumbent: '#9bb7d6',
-    mixed: '#d98b8b',
-    positive: '#b8a8d8',
-    bad: '#d98b8b'
+    accent: '#17358f',
+    doe: '#17358f',
+    incumbent: '#6b4ee6',
+    mixed: '#cc3e45',
+    positive: '#5c6fff',
+    bad: '#cc3e45'
   }),
   fonts: Object.freeze({
     ui: 'Inter, Segoe UI, Helvetica Neue, Arial, sans-serif',

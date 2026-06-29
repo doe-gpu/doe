@@ -1,7 +1,7 @@
 # Doe
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/doerun/doe/main/assets/doe-logo.svg" alt="Doe logo" width="96" />
+  <img src="assets/doe-logo.svg" alt="Doe logo" width="96" />
 </p>
 
 Doe is a source-preserving accelerator runtime and compiler. It keeps shader and
@@ -37,14 +37,15 @@ Published npm surface: [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md
 
 ## Benchmark evidence
 
-The chart below is a compact view of the current README-indexed receipt set.
+These charts are committed Apple Metal evidence snapshots from this checkout:
 
-![Doe benchmark receipt summary](assets/readme/this-machine-results.svg)
+![Doe package benchmark receipt summary](assets/readme/package-claims.svg)
+
+![Doe ORT and browser package receipt summary](assets/readme/ort-claims.svg)
 
 See [`reports/claim-index.json`](reports/claim-index.json) for the public claim
 index and [`bench/out`](bench/out) for receipt payloads. AMD Vulkan support
-status is tracked in [`docs/doe-support-matrix.md`](docs/doe-support-matrix.md);
-there is no current Vulkan row in the README claim index.
+status is tracked in [`docs/doe-support-matrix.md`](docs/doe-support-matrix.md).
 
 ## Start here
 

@@ -1,7 +1,7 @@
 # doe-gpu
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/doerun/doe/main/assets/doe-logo.svg" alt="Doe logo" width="96" />
+<img src="../../assets/doe-logo.svg" alt="Doe logo" width="96" />
 </p>
 
 `doe-gpu` is the native, receipt-backed WebGPU runtime for Node.js and Bun.
@@ -37,13 +37,13 @@ with Dawn-backed package lanes on matching host/runtime lanes. Doe is the
 baseline in each row where percentages are shown, so positive percentages mean
 the Doe-backed lane finished faster.
 
-![doe-gpu package results](https://raw.githubusercontent.com/doerun/doe/main/packages/doe-gpu/assets/package-results.svg)
+![doe-gpu package results](./assets/package-results.svg)
 
 Outputs:
 - AMD Vulkan Node package: `+12.25% p50`, `+10.74% p95`, `+10.74% p99`
 - AMD Vulkan Bun package: `+12.86% p50`, `+7.91% p95`, `+7.91% p99`
-- [Node package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json)
-- [Bun package, Apple Metal](https://github.com/doerun/doe/blob/main/bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json)
+- [Node package, Apple Metal](../../bench/out/apple-metal/20260413T210746Z/gemma64.node-package.warm.ir.compare.json)
+- [Bun package, Apple Metal](../../bench/out/apple-metal/20260413T214446Z/gemma64.bun-package.warm.ir.compare.json)
 
 ## Additional benchmark outputs
 
