@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="620" viewBox="0 0 1280 620" role="img" aria-labelledby="title desc">
+  <title id="title">Doe backend evidence summary</title>
+  <desc id="desc">Backend evidence table for Doe README reporting. Rows show backend, surface, comparison, metric direction, result, claim state, and evidence path for Apple Metal and AMD Vulkan.</desc>
+  <defs>
+    <style>
+      text { fill: #111111; font-family: Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+      .mono { font-family: SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; }
+      .title { font-size: 30px; font-weight: 850; }
+      .sub { font-size: 14px; font-weight: 600; fill: #343a40; }
+      .eyebrow { font-size: 12px; font-weight: 850; letter-spacing: .08em; }
+      .head { font-size: 12px; font-weight: 850; letter-spacing: .04em; fill: #343a40; }
+      .cell { font-size: 13px; font-weight: 650; }
+      .small { font-size: 11px; font-weight: 650; fill: #343a40; }
+      .path { font-size: 10.5px; font-weight: 650; fill: #343a40; }
+      .status { font-size: 12px; font-weight: 850; }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="1280" height="620" fill="#fbfaf6" />
+  <rect x="18" y="18" width="1244" height="584" rx="7" fill="#ffffff" stroke="#111111" stroke-width="1.35" />
+
+  <text x="42" y="58" class="eyebrow">DOE BACKEND REPORTING</text>
+  <text x="42" y="94" class="title">Metal and Vulkan evidence, one reporting contract</text>
+  <text x="42" y="122" class="sub">Read rows independently: backend, surface, comparator, metric direction, result, claim state, and artifact pointer are always visible.</text>
+  <rect x="990" y="46" width="220" height="52" rx="5" fill="#f4f7ff" stroke="#17358f" stroke-width="1.25" />
+  <text x="1100" y="68" text-anchor="middle" class="status" fill="#17358f">TIME METRICS</text>
+  <text x="1100" y="88" text-anchor="middle" class="small mono">lower is better</text>
+
+  <line x1="42" y1="150" x2="1238" y2="150" stroke="#111111" stroke-width="1" />
+  <text x="56" y="178" class="head">BACKEND</text>
+  <text x="176" y="178" class="head">SURFACE</text>
+  <text x="334" y="178" class="head">COMPARISON</text>
+  <text x="500" y="178" class="head">METRIC</text>
+  <text x="686" y="178" class="head">RESULT</text>
+  <text x="888" y="178" class="head">CLAIM STATE</text>
+  <text x="1030" y="178" class="head">EVIDENCE</text>
+  <line x1="42" y1="194" x2="1238" y2="194" stroke="#111111" stroke-width="1" />
+
+  <rect x="42" y="204" width="1196" height="52" rx="4" fill="#f6f7ff" stroke="#d8ddf0" />
+  <text x="56" y="235" class="cell">Apple Metal</text>
+  <text x="176" y="228" class="cell">Native strict</text>
+  <text x="176" y="246" class="small">direct runtime</text>
+  <text x="334" y="235" class="cell">Doe vs Dawn</text>
+  <text x="500" y="228" class="cell">p50 ms/op</text>
+  <text x="500" y="246" class="small">lower is better</text>
+  <text x="686" y="228" class="cell">0.9 vs 1.6 ms</text>
+  <text x="686" y="246" class="status" fill="#0f766e">Doe +47.5%</text>
+  <text x="888" y="235" class="status" fill="#0f766e">claim-indexed</text>
+  <text x="1030" y="235" class="path mono">bench/out/apple-metal/compare/...metal.compare.json</text>
+
+  <rect x="42" y="266" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />
+  <text x="56" y="297" class="cell">Apple Metal</text>
+  <text x="176" y="290" class="cell">Native release</text>
+  <text x="176" y="308" class="small">release bundle</text>
+  <text x="334" y="297" class="cell">Doe vs Dawn</text>
+  <text x="500" y="290" class="cell">p50 ms/op</text>
+  <text x="500" y="308" class="small">lower is better</text>
+  <text x="686" y="290" class="cell">2.5 vs 5.6 ms</text>
+  <text x="686" y="308" class="status" fill="#0f766e">Doe +55.5%</text>
+  <text x="888" y="297" class="status" fill="#0f766e">claim-indexed</text>
+  <text x="1030" y="297" class="path mono">bench/out/apple-metal/release/...release.json</text>
+
+  <rect x="42" y="328" width="1196" height="52" rx="4" fill="#f6f7ff" stroke="#d8ddf0" />
+  <text x="56" y="359" class="cell">Apple Metal</text>
+  <text x="176" y="352" class="cell">Package</text>
+  <text x="176" y="370" class="small">Node + Bun</text>
+  <text x="334" y="359" class="cell">Doe vs host WebGPU</text>
+  <text x="500" y="352" class="cell">p50 ms/op</text>
+  <text x="500" y="370" class="small">lower is better</text>
+  <text x="686" y="352" class="cell">Node +3.7%</text>
+  <text x="686" y="370" class="cell">Bun +7.2%</text>
+  <text x="888" y="359" class="status" fill="#0f766e">claim-indexed</text>
+  <text x="1030" y="359" class="path mono">reports/claim-index.json</text>
+
+  <rect x="42" y="390" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />
+  <text x="56" y="421" class="cell">Apple Metal</text>
+  <text x="176" y="414" class="cell">ORT provider</text>
+  <text x="176" y="432" class="small">Node/Bun/Browser</text>
+  <text x="334" y="421" class="cell">Doe vs Dawn/WebGPU</text>
+  <text x="500" y="414" class="cell">p50 wall ms</text>
+  <text x="500" y="432" class="small">lower is better</text>
+  <text x="686" y="414" class="cell">Node +2.9%, Bun +0.1%</text>
+  <text x="686" y="432" class="cell">Browser +4.4%</text>
+  <text x="888" y="421" class="status" fill="#0f766e">claim-indexed</text>
+  <text x="1030" y="421" class="path mono">reports/claim-index.json</text>
+
+  <rect x="42" y="452" width="1196" height="52" rx="4" fill="#f3fbf8" stroke="#b7ded1" />
+  <text x="56" y="483" class="cell">AMD Vulkan</text>
+  <text x="176" y="476" class="cell">Native release</text>
+  <text x="176" y="494" class="small">doe-core matrix</text>
+  <text x="334" y="483" class="cell">Doe vs Dawn</text>
+  <text x="500" y="476" class="cell">release matrix</text>
+  <text x="500" y="494" class="small">lower is better</text>
+  <text x="686" y="476" class="cell">7 workloads comparable</text>
+  <text x="686" y="494" class="cell">tiny-upload blocker remains</text>
+  <text x="888" y="483" class="status" fill="#9a3412">diagnostic</text>
+  <text x="1030" y="483" class="path mono">bench/out/amd-vulkan/...release.json</text>
+
+  <rect x="42" y="514" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />
+  <text x="56" y="545" class="cell">AMD Vulkan</text>
+  <text x="176" y="538" class="cell">Package/ORT</text>
+  <text x="176" y="556" class="small">README row</text>
+  <text x="334" y="545" class="cell">public claim surface</text>
+  <text x="500" y="538" class="cell">p50 claim row</text>
+  <text x="500" y="556" class="small">not available</text>
+  <text x="686" y="538" class="cell">No README-indexed receipt</text>
+  <text x="686" y="556" class="cell">status-only coverage</text>
+  <text x="888" y="545" class="status" fill="#9a3412">not claimed</text>
+  <text x="1030" y="545" class="path mono">docs/doe-support-matrix.md</text>
+
+  <text x="42" y="592" class="small">Disclosure: this is an evidence inventory, not a cross-machine average. Compare numbers only within a row.</text>
+</svg>

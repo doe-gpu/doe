@@ -105,9 +105,9 @@ Validation run against the fresh artifacts:
 - `claim_gate.py` for native strict, native release, Node package, Bun package,
   Node ORT, and Bun ORT
 
-The README chart inputs now reference these Apple Metal reports in
-`assets/readme/benchmark-claims.json`, `reports/claim-index.json`,
-`assets/readme/package-claims.svg`, and `assets/readme/ort-claims.svg`.
+The README backend evidence summary now references these Apple Metal reports
+through `reports/claim-index.json` and shows AMD Vulkan with its current
+diagnostic/status boundary in `assets/readme/backend-evidence-summary.svg`.
 
 ## 2026-06-18 — AMD Vulkan Node and Bun package readback audit
 

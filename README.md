@@ -37,15 +37,17 @@ Published npm surface: [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md
 
 ## Benchmark evidence
 
-These charts are committed Apple Metal evidence snapshots from this checkout:
+The README chart uses one reporting contract across backends: each row states
+backend, surface, comparator, metric direction, result, claim state, and
+evidence path. Metal rows are public claim-indexed rows; Vulkan rows are shown
+with their current diagnostic/status boundary instead of being omitted.
 
-![Doe package benchmark receipt summary](assets/readme/package-claims.svg)
-
-![Doe ORT and browser package receipt summary](assets/readme/ort-claims.svg)
+![Doe backend evidence summary](assets/readme/backend-evidence-summary.svg)
 
 See [`reports/claim-index.json`](reports/claim-index.json) for the public claim
-index and [`bench/out`](bench/out) for receipt payloads. AMD Vulkan support
-status is tracked in [`docs/doe-support-matrix.md`](docs/doe-support-matrix.md).
+index and [`bench/out`](bench/out) for receipt payloads. Backend support status
+and claim boundaries are tracked in
+[`docs/doe-support-matrix.md`](docs/doe-support-matrix.md).
 
 ## Start here
 
