@@ -9,56 +9,42 @@
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
         "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json"
+        "artifactPath": "bench/out/apple-metal/20260413T210746Z/gemma64.node-package.warm.ir.compare.json"
       },
       {
         "label": "Bun package",
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
         "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json"
+        "artifactPath": "bench/out/apple-metal/20260413T214446Z/gemma64.bun-package.warm.ir.compare.json"
       }
     ]
   },
   "ortClaims": {
     "title": "Apple Metal native and ORT lanes",
-    "subtitle": "Fresh strict-comparable Doe-baseline native, ORT, and browser lanes on macOS Metal.",
-    "caption": "Apple Metal native and ORT compare claims",
+    "subtitle": "Fresh strict-comparable Doe-baseline ORT and browser package comparison lanes on macOS Metal.",
+    "caption": "Apple Metal ORT and browser package compare claims",
     "rows": [
-      {
-        "label": "Native strict",
-        "platform": "Apple Metal",
-        "baselineLabel": "Doe",
-        "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json"
-      },
-      {
-        "label": "Native release",
-        "platform": "Apple Metal",
-        "baselineLabel": "Doe",
-        "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json"
-      },
       {
         "label": "Node ORT",
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
         "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.compare.json"
+        "artifactPath": "bench/out/apple-metal-ort-node/20260415T005827Z/gemma270m.compare.json"
       },
       {
         "label": "Bun ORT",
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
         "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.compare.json"
+        "artifactPath": "bench/out/apple-metal-ort-bun/20260415T005827Z/gemma270m-prefill32-decode1.compare.json"
       },
       {
         "label": "Browser ORT",
         "platform": "Apple Metal",
         "baselineLabel": "Doe",
         "comparisonLabel": "Dawn",
-        "artifactPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
+        "artifactPath": "bench/out/browser-ort-webgpu-compare/20260624T014747Z/browser.compare.json"
       }
     ]
   }

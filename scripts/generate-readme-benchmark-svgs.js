@@ -19,34 +19,34 @@ const SVG_THEME = Object.freeze({
   palette: Object.freeze({
     bg: '#ffffff',
     panel: '#ffffff',
-    panelAlt: '#fafafa',
+    panelAlt: '#f6f7ff',
     border: '#111111',
     text: '#111111',
-    muted: '#4b5563',
-    grid: '#e5e7eb',
-    accent: '#8b5cf6',           // Purple
-    doe: '#3b82f6',              // Blue
-    incumbent: '#f87171',        // Light Red
-    mixed: '#9ca3af',
-    positive: '#8b5cf6',
-    bad: '#ef4444'
+    muted: '#111111',
+    grid: '#111111',
+    accent: '#17358f',
+    doe: '#17358f',
+    incumbent: '#6b4ee6',
+    mixed: '#cc3e45',
+    positive: '#5c6fff',
+    bad: '#cc3e45'
   }),
   fonts: Object.freeze({
-    ui: 'Outfit, Inter, system-ui, -apple-system, sans-serif',
-    mono: 'JetBrains Mono, Fira Code, SFMono-Regular, Consolas, monospace'
+    ui: 'Inter, Segoe UI, Helvetica Neue, Arial, sans-serif',
+    mono: 'SFMono-Regular, Menlo, Consolas, Liberation Mono, monospace'
   }),
   stroke: Object.freeze({
     thin: 1.25,
     normal: 1.75
   }),
   radius: Object.freeze({
-    panel: 6,
-    badge: 4
+    panel: 4,
+    badge: 3
   })
 });
 
-const FONT_UI = "Outfit, Inter, system-ui, -apple-system, sans-serif";
-const FONT_MONO = "JetBrains Mono, Fira Code, SFMono-Regular, Consolas, monospace";
+const FONT_UI = 'Inter, \'Segoe UI\', \'Helvetica Neue\', Arial, sans-serif';
+const FONT_MONO = 'SFMono-Regular, Menlo, Consolas, \'Liberation Mono\', monospace';
 const CANVAS_PADDING = 14;
 const CHART_WIDTH = 1340;
 const HEADER_HEIGHT = 126;
