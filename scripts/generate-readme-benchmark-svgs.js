@@ -19,34 +19,34 @@ const SVG_THEME = Object.freeze({
   palette: Object.freeze({
     bg: '#ffffff',
     panel: '#ffffff',
-    panelAlt: '#f7f7f7',
+    panelAlt: '#fafafa',
     border: '#111111',
     text: '#111111',
-    muted: '#5a5a5a',
-    grid: '#d8d8d8',
-    accent: '#111111',
-    doe: '#111111',
-    incumbent: '#9bb7d6',
-    mixed: '#d98b8b',
-    positive: '#b8a8d8',
-    bad: '#d98b8b'
+    muted: '#4b5563',
+    grid: '#e5e7eb',
+    accent: '#8b5cf6',           // Purple
+    doe: '#3b82f6',              // Blue
+    incumbent: '#f87171',        // Light Red
+    mixed: '#9ca3af',
+    positive: '#8b5cf6',
+    bad: '#ef4444'
   }),
   fonts: Object.freeze({
-    ui: 'Inter, Segoe UI, Helvetica Neue, Arial, sans-serif',
-    mono: 'SFMono-Regular, Menlo, Consolas, Liberation Mono, monospace'
+    ui: 'Outfit, Inter, system-ui, -apple-system, sans-serif',
+    mono: 'JetBrains Mono, Fira Code, SFMono-Regular, Consolas, monospace'
   }),
   stroke: Object.freeze({
     thin: 1.25,
     normal: 1.75
   }),
   radius: Object.freeze({
-    panel: 4,
-    badge: 3
+    panel: 6,
+    badge: 4
   })
 });
 
-const FONT_UI = 'Inter, \'Segoe UI\', \'Helvetica Neue\', Arial, sans-serif';
-const FONT_MONO = 'SFMono-Regular, Menlo, Consolas, \'Liberation Mono\', monospace';
+const FONT_UI = "Outfit, Inter, system-ui, -apple-system, sans-serif";
+const FONT_MONO = "JetBrains Mono, Fira Code, SFMono-Regular, Consolas, monospace";
 const CANVAS_PADDING = 14;
 const CHART_WIDTH = 1340;
 const HEADER_HEIGHT = 126;
