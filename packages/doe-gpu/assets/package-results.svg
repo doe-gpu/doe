@@ -1,54 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="980" height="300" viewBox="0 0 980 300" role="img" aria-labelledby="title desc">
-  <title id="title">doe-gpu package results on AMD Vulkan</title>
-  <desc id="desc">Doe is baseline. Positive p50, p95, and p99 percentages mean Doe is faster than the Dawn-backed package lane.</desc>
-<defs>
+  <title id="title">doe-gpu package lanes</title>
+  <desc id="desc">Neutral doe-gpu package lane card with Metal and Vulkan coverage.</desc>
+  <defs>
+    <linearGradient id="spectrum" x1="32" y1="40" x2="948" y2="260" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff6b7a"/>
+      <stop offset="0.5" stop-color="#5d8dff"/>
+      <stop offset="1" stop-color="#b98cff"/>
+    </linearGradient>
+    <linearGradient id="wash" x1="0" y1="0" x2="980" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff4f5"/>
+      <stop offset="0.55" stop-color="#eef4ff"/>
+      <stop offset="1" stop-color="#f8f1ff"/>
+    </linearGradient>
     <style>
-      text { font-family: Inter, Segoe UI, Helvetica Neue, Arial, sans-serif; letter-spacing: 0; fill: #111111; }
-      .title { font-size: 28px; font-weight: 800; }
-      .sub { font-size: 14px; fill: #111111; font-weight: 500; }
-      .head { font-size: 12px; fill: #111111; font-weight: 800; }
-      .lane { font-size: 17px; font-weight: 800; }
-      .meta { font-size: 12px; fill: #111111; font-weight: 700; }
-      .num { font-size: 14px; font-weight: 800; fill: #17358f; }
-      .chip { font-size: 13px; font-weight: 800; fill: #17358f; }
-      .foot { font-size: 12px; fill: #111111; font-weight: 600; }
+      text { font-family: "Space Grotesk", "Azeret Mono", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; fill: #08090c; }
+      .title { font-size: 34px; font-weight: 950; letter-spacing: -0.5px; }
+      .sub { font-size: 15px; font-weight: 700; fill: #30323a; }
+      .eyebrow { font-size: 12px; font-weight: 900; letter-spacing: 4px; fill: #30323a; }
+      .runtime { font-size: 22px; font-weight: 900; }
+      .chip { font-size: 12px; font-weight: 900; letter-spacing: 2.5px; }
     </style>
   </defs>
   <rect width="980" height="300" fill="#ffffff"/>
-  <rect x="18" y="18" width="944" height="264" rx="8" fill="#ffffff" stroke="#111111"/>
-  <text x="42" y="58" class="title">doe-gpu package wins</text>
-  <text x="42" y="84" class="sub">AMD Vulkan host. Doe is baseline; positive deltas mean Doe is faster.</text>
+  <rect x="18" y="18" width="944" height="264" rx="24" fill="url(#wash)"/>
+  <rect x="18" y="18" width="944" height="264" rx="24" fill="none" stroke="#08090c" stroke-width="2"/>
 
-<rect x="42" y="104" width="92" height="28" rx="6" fill="#f6f7ff" stroke="#111111"/>
-  <text x="88" y="123" text-anchor="middle" class="chip">2/2 lanes</text>
-<rect x="146" y="104" width="160" height="28" rx="6" fill="#f6f7ff" stroke="#111111"/>
-  <text x="226" y="123" text-anchor="middle" class="chip">0 non-comparable</text>
-<rect x="318" y="104" width="138" height="28" rx="6" fill="#f6f7ff" stroke="#111111"/>
-  <text x="387" y="123" text-anchor="middle" class="chip">coherence pass</text>
+  <text x="46" y="62" class="eyebrow">DOE-GPU</text>
+  <text x="46" y="104" class="title">Package backend lanes</text>
+  <text x="48" y="132" class="sub">Node and Bun keep Metal and Vulkan as explicit paths.</text>
 
-  <text x="48" y="166" class="head">Runtime</text>
-  <text x="230" y="166" class="head">Compare</text>
-  <text x="432" y="166" class="head">p50</text>
-  <text x="562" y="166" class="head">p95</text>
-  <text x="692" y="166" class="head">p99</text>
-  <text x="822" y="166" class="head">Gate</text>
-  <line x1="42" y1="178" x2="938" y2="178" stroke="#111111"/>
+  <g transform="translate(46 170)">
+    <rect x="0" y="0" width="410" height="70" rx="20" fill="#08090c"/>
+    <text x="28" y="43" class="runtime" style="fill:#ffffff">Node.js</text>
+    <rect x="196" y="18" width="92" height="34" rx="17" fill="#ffffff"/>
+    <text x="242" y="40" text-anchor="middle" class="chip">METAL</text>
+    <rect x="302" y="18" width="96" height="34" rx="17" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <text x="350" y="40" text-anchor="middle" class="chip" style="fill:#ffffff">VULKAN</text>
+  </g>
 
-  <rect x="42" y="192" width="896" height="42" rx="6" fill="#f6f7ff"/>
-  <text x="58" y="218" class="lane">Node.js</text>
-  <text x="230" y="218" class="meta">Doe vs webgpu</text>
-  <text x="432" y="218" class="num">+12.25%</text>
-  <text x="562" y="218" class="num">+10.74%</text>
-  <text x="692" y="218" class="num">+10.74%</text>
-  <text x="822" y="218" class="meta">strict comparable</text>
+  <g transform="translate(516 170)">
+    <rect x="0" y="0" width="410" height="70" rx="20" fill="#ffffff" stroke="#08090c" stroke-width="2"/>
+    <text x="28" y="43" class="runtime">Bun</text>
+    <rect x="196" y="18" width="92" height="34" rx="17" fill="#08090c"/>
+    <text x="242" y="40" text-anchor="middle" class="chip" style="fill:#ffffff">METAL</text>
+    <rect x="302" y="18" width="96" height="34" rx="17" fill="#ffffff" stroke="#08090c" stroke-width="2"/>
+    <text x="350" y="40" text-anchor="middle" class="chip">VULKAN</text>
+  </g>
 
-  <rect x="42" y="240" width="896" height="42" rx="6" fill="#ffffff"/>
-  <text x="58" y="266" class="lane">Bun</text>
-  <text x="230" y="266" class="meta">Doe vs bun-webgpu</text>
-  <text x="432" y="266" class="num">+12.86%</text>
-  <text x="562" y="266" class="num">+7.91%</text>
-  <text x="692" y="266" class="num">+7.91%</text>
-  <text x="822" y="266" class="meta">readback parity</text>
-
-  <text x="492" y="123" class="foot">Strict operation timing; no failed comparability obligations.</text>
+  <path d="M622 66c48-76 116-76 164 0" fill="none" stroke="#08090c" stroke-width="9" stroke-linecap="round"/>
+  <path d="M622 66c48-76 116-76 164 0" fill="none" stroke="url(#spectrum)" stroke-width="4" stroke-linecap="round"/>
 </svg>
