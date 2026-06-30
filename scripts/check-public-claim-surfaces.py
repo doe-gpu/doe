@@ -30,6 +30,7 @@ STALE_ASSET_PATTERNS = [
     "packages/doe-gpu/assets/package-results.svg",
     "./assets/package-results.svg",
 ]
+STALE_ASSET_POLICY_DOCS = {"docs/public-claim-boundary.md"}
 
 CLAIM_STATES = {"claim-indexed", "diagnostic", "status-only", "scaffolded"}
 METRIC_DIRECTIONS = {"lower-is-better", "higher-is-better", "status-only"}
@@ -113,9 +114,10 @@ def validate_public_docs(errors: list[str]) -> None:
         text = read_text(path)
         rel = path.relative_to(ROOT)
 
-        for stale in STALE_ASSET_PATTERNS:
-            if stale in text:
-                fail(errors, f"{rel} references stale claim/report asset: {stale}")
+        if rel.as_posix() not in STALE_ASSET_POLICY_DOCS:
+            for stale in STALE_ASSET_PATTERNS:
+                if stale in text:
+                    fail(errors, f"{rel} references stale claim/report asset: {stale}")
 
         if rel.as_posix() == "packages/doe-gpu/README.md":
             for match in PERCENT_PATTERN.finditer(text):

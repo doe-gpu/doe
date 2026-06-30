@@ -9,8 +9,16 @@ import json
 import re
 import sys
 from pathlib import Path
-from pathlib import PurePosixPath
 from typing import Any
+
+try:
+    from bench.tools._repo_import import ensure_repo_root
+except ModuleNotFoundError:
+    from _repo_import import ensure_repo_root
+
+ensure_repo_root(__file__)
+
+from bench.lib.bench_utils import is_safe_repo_path
 
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -57,8 +65,7 @@ def is_sha256(value: Any) -> bool:
 
 
 def safe_repo_path(path_text: str) -> bool:
-    path = PurePosixPath(path_text)
-    return bool(path_text) and not path.is_absolute() and ".." not in path.parts
+    return is_safe_repo_path(path_text)
 
 
 def resolve_path(path_text: str, verify_files_root: Path | None) -> Path:

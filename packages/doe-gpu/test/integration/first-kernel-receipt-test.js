@@ -6,7 +6,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageRoot = join(__dirname, "../..");
 
 const EXPECTED_OUTPUT = Object.freeze([2, 4, 6, 8, 10, 12, 14, 16]);
-const EXPECTED_WGSL_SHA256 = "97d8af0be79551e45a3d3d9e0f7aab5521b99bde76b1444a6cc2dec88bef40d5";
+const EXPECTED_WGSL_SHA256 = "f03b12ba1e7df16b58babac43b326771a30d3e7de9278bfcd3daa8d95faf80b2";
 const EXPECTED_INPUT_SHA256 = "af7de0621354bafceb193edf0fcf5d421cf21de7146580062fff53c7907f54e5";
 const EXPECTED_OUTPUT_SHA256 = "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf";
 

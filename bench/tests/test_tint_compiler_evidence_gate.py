@@ -247,6 +247,42 @@ class TintCompilerEvidenceGateTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertTrue(any("claimable row requires doe.irSha256" in item for item in result["failures"]))
 
+    def test_claimable_row_rejects_unsafe_source_path(self) -> None:
+        payload = claimable_report()
+        payload["rows"][0]["sourcePath"] = "../outside.wgsl"
+
+        result = self.module.evaluate_report(payload, require_claimable=True)
+
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("shader-a.sourcePath" in item for item in result["failures"]))
+
+    def test_claimable_row_rejects_unsafe_receipt_path(self) -> None:
+        payload = claimable_report()
+        payload["rows"][0]["doe"]["receiptPath"] = "/tmp/doe.json"
+
+        result = self.module.evaluate_report(payload, require_claimable=True)
+
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("shader-a:doe.receiptPath" in item for item in result["failures"]))
+
+    def test_claimable_report_rejects_unsafe_toolchain_artifact_path(self) -> None:
+        payload = claimable_report()
+        payload["toolchains"]["tint"]["artifactPath"] = "bench/vendor/../tint"
+
+        result = self.module.evaluate_report(payload, require_claimable=True)
+
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("toolchains.tint.artifactPath" in item for item in result["failures"]))
+
+    def test_report_rejects_unsafe_corpus_manifest_path(self) -> None:
+        payload = claimable_report()
+        payload["corpus"]["manifestPath"] = "bench//manifest.json"
+
+        result = self.module.evaluate_report(payload)
+
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("corpus.manifestPath" in item for item in result["failures"]))
+
     def test_claimable_report_requires_phase_split_model(self) -> None:
         payload = claimable_report()
         payload["phaseModel"]["requiredPhases"] = ["total"]

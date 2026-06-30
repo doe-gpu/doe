@@ -375,13 +375,7 @@ napi_value doe_create_render_pipeline(napi_env env, napi_callback_info info) {
         copy_library_error_meta(pfn_doeNativeCopyLastErrorKind, kind, sizeof(kind));
         if (msg[0] != '\0') {
             char full_msg[DOE_ERROR_BUF_CAP];
-            if (stage[0] != '\0' && kind[0] != '\0') {
-                snprintf(full_msg, sizeof(full_msg), "[%s/%s] %s", stage, kind, msg);
-            } else if (stage[0] != '\0') {
-                snprintf(full_msg, sizeof(full_msg), "[%s] %s", stage, msg);
-            } else {
-                snprintf(full_msg, sizeof(full_msg), "%s", msg);
-            }
+            doe_format_library_error_message(full_msg, sizeof(full_msg), stage, kind, msg);
             napi_throw_error(env, "DOE_RENDER_PIPELINE_ERROR", full_msg);
         } else {
             napi_throw_error(env, "DOE_RENDER_PIPELINE_ERROR", "createRenderPipeline failed");

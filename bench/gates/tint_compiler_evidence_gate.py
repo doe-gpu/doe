@@ -18,6 +18,8 @@ from typing import Any
 
 import jsonschema
 
+from bench.lib.bench_utils import unsafe_repo_path_reason
+
 VALID_HEX = set("0123456789abcdef")
 SIDE_KEYS = ("doe", "tint")
 CLAIMABLE_REQUIRED_PHASES = ("parse", "sema", "lower", "emit", "total")
@@ -89,6 +91,11 @@ def is_non_empty_string(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
+def repo_path_failures(path: str, value: Any) -> list[str]:
+    reason = unsafe_repo_path_reason(value)
+    return [f"{path}: {reason}"] if reason else []
+
+
 def phase_timings_complete(result: dict[str, Any], required_phases: list[str]) -> list[str]:
     failures: list[str] = []
     timings = result.get("phaseTimingsNs")
@@ -136,6 +143,8 @@ def validate_side_result(
         receipt_path = result.get("receiptPath")
         if not is_non_empty_string(receipt_path):
             blockers.append(f"{row_id}:{side}: ok result requires receiptPath")
+        else:
+            failures.extend(repo_path_failures(f"{row_id}:{side}.receiptPath", receipt_path))
     else:
         if result.get("validationStatus") == "passed":
             failures.append(f"{row_id}:{side}: non-ok result cannot have validationStatus=passed")
@@ -159,6 +168,13 @@ def toolchain_artifact_blockers(
             continue
         if not is_non_empty_string(toolchain.get("artifactPath")):
             blockers.append(f"toolchains.{name}.artifactPath must be non-empty")
+        else:
+            blockers.extend(
+                repo_path_failures(
+                    f"toolchains.{name}.artifactPath",
+                    toolchain.get("artifactPath"),
+                )
+            )
         if not is_sha256(toolchain.get("artifactSha256")):
             blockers.append(f"toolchains.{name}.artifactSha256 must be sha256 hex")
     return blockers
@@ -172,6 +188,7 @@ def row_blockers(row: dict[str, Any], required_phases: list[str]) -> tuple[list[
     if not is_sha256(row.get("sourceSha256")):
         failures.append(f"{row_id}: sourceSha256 must be a lowercase sha256")
         claimable = False
+    failures.extend(repo_path_failures(f"{row_id}.sourcePath", row.get("sourcePath", "")))
 
     for side in SIDE_KEYS:
         result = row.get(side)
@@ -260,8 +277,12 @@ def evaluate_report(payload: dict[str, Any], require_claimable: bool = False) ->
         failures.append("phaseModel.requiredPhases must include total")
 
     corpus = payload.get("corpus")
-    if isinstance(corpus, dict) and not is_sha256(corpus.get("sourceSha256")):
-        failures.append("corpus.sourceSha256 must be a lowercase sha256")
+    if isinstance(corpus, dict):
+        if not is_sha256(corpus.get("sourceSha256")):
+            failures.append("corpus.sourceSha256 must be a lowercase sha256")
+        failures.extend(
+            repo_path_failures("corpus.manifestPath", corpus.get("manifestPath", ""))
+        )
 
     rows = payload.get("rows")
     if not isinstance(rows, list):

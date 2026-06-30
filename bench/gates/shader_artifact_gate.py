@@ -129,8 +129,12 @@ def file_sha256(path: Path) -> str:
 
 def main() -> int:
     args = parse_args()
-    report = load_json(Path(args.report))
-    schema = contracts.load_schema(Path(args.schema))
+    try:
+        report = load_json(Path(args.report))
+        schema = contracts.load_schema(Path(args.schema))
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        print(f"FAIL: shader artifact gate input error: {exc}")
+        return 1
 
     failures: list[str] = []
     validated = 0

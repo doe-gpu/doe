@@ -115,6 +115,42 @@ def test_browser_style_diagnostic_entry_cannot_be_marked_claimable() -> None:
     assert "claimable_without_claim_indexed_state" in codes
 
 
+def test_scaffolded_entry_requires_blocker_not_report_artifacts() -> None:
+    schema = _schema()
+    entry = {
+        "id": "d3d12-unit",
+        "surface": "native",
+        "backend": "d3d12",
+        "comparison": "doe-vs-dawn",
+        "metricDirection": "status-only",
+        "claimState": "scaffolded",
+        "blocker": "Fresh Windows evidence is not present.",
+    }
+
+    result = gate.evaluate_index(_index(entry), schema, REPO_ROOT)
+
+    assert result["ok"], result["failures"]
+    assert result["summary"]["localReportCount"] == 0
+    assert result["summary"]["localClaimCount"] == 0
+
+
+def test_scaffolded_entry_without_blocker_fails_schema() -> None:
+    schema = _schema()
+    entry = {
+        "id": "d3d12-unit",
+        "surface": "native",
+        "backend": "d3d12",
+        "comparison": "doe-vs-dawn",
+        "metricDirection": "status-only",
+        "claimState": "scaffolded",
+    }
+
+    result = gate.evaluate_index(_index(entry), schema, REPO_ROOT)
+    codes = {item["code"] for item in result["failures"]}
+
+    assert "schema_validation" in codes
+
+
 def test_duplicate_ids_and_parent_paths_fail() -> None:
     schema = _schema()
     entry = _entry()

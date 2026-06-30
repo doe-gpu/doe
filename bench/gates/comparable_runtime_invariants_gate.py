@@ -36,7 +36,11 @@ def parse_int(value: Any, fallback: int = 0) -> int:
 
 def main() -> int:
     args = parse_args()
-    report = load_json(Path(args.report))
+    try:
+        report = load_json(Path(args.report))
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        print(f"FAIL: comparable runtime invariants gate input error: {exc}")
+        return 1
     workloads = report.get("workloads")
     if not isinstance(workloads, list):
         print("FAIL: invalid report workloads")

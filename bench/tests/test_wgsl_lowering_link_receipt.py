@@ -151,3 +151,14 @@ def test_wgsl_lowering_link_checker_rejects_unsafe_source_and_receipt_paths() ->
         "path": "rows[0].doeReceiptPath",
         "message": "doeReceiptPath must be repo-relative",
     } in failures
+
+
+def test_wgsl_lowering_link_checker_rejects_ambiguous_path_segments() -> None:
+    receipt = _load(SAMPLE_PATH)
+    receipt["rows"][0]["sourcePath"] = "bench//fixtures/sample-prefix-sum.wgsl"
+    receipt["rows"][0]["doeReceiptPath"] = "examples\\runtime-compile-report.sample.json"
+
+    failures = check_links.check_receipt(receipt, REPO_ROOT)
+
+    assert any(item["code"] == "unsafe_source_path" for item in failures)
+    assert any(item["code"] == "unsafe_doe_receipt_path" for item in failures)

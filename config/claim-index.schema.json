@@ -24,10 +24,7 @@
         "backend",
         "comparison",
         "metricDirection",
-        "claimState",
-        "comparisonStatus",
-        "claimStatus",
-        "reportPath"
+        "claimState"
       ],
       "properties": {
         "id": {
@@ -52,11 +49,11 @@
         },
         "metricDirection": {
           "type": "string",
-          "enum": ["lower-is-better", "higher-is-better"]
+          "enum": ["lower-is-better", "higher-is-better", "status-only"]
         },
         "claimState": {
           "type": "string",
-          "enum": ["claim-indexed", "diagnostic", "status-only"]
+          "enum": ["claim-indexed", "diagnostic", "status-only", "scaffolded"]
         },
         "comparisonStatus": {
           "type": "string",
@@ -67,7 +64,8 @@
           "enum": ["claimable", "diagnostic", "not-evaluated"]
         },
         "reportPath": { "$ref": "#/$defs/repoJsonPath" },
-        "claimPath": { "$ref": "#/$defs/repoJsonPath" }
+        "claimPath": { "$ref": "#/$defs/repoJsonPath" },
+        "blocker": { "type": "string", "minLength": 1 }
       },
       "allOf": [
         {
@@ -76,7 +74,7 @@
             "required": ["claimState"]
           },
           "then": {
-            "required": ["claimPath"],
+            "required": ["comparisonStatus", "claimStatus", "reportPath", "claimPath"],
             "properties": {
               "comparisonStatus": { "const": "comparable" },
               "claimStatus": { "const": "claimable" }
@@ -89,6 +87,7 @@
             "required": ["claimState"]
           },
           "then": {
+            "required": ["comparisonStatus", "claimStatus", "reportPath"],
             "not": {
               "properties": { "claimStatus": { "const": "claimable" } },
               "required": ["claimStatus"]
@@ -102,6 +101,21 @@
           },
           "then": {
             "properties": {
+              "metricDirection": { "const": "status-only" },
+              "comparisonStatus": { "const": "not-evaluated" },
+              "claimStatus": { "const": "not-evaluated" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "claimState": { "const": "scaffolded" } },
+            "required": ["claimState"]
+          },
+          "then": {
+            "required": ["blocker"],
+            "properties": {
+              "metricDirection": { "const": "status-only" },
               "comparisonStatus": { "const": "not-evaluated" },
               "claimStatus": { "const": "not-evaluated" }
             }

@@ -127,8 +127,12 @@ def validate_side_samples(
 
 def main() -> int:
     args = parse_args()
-    report = load_json(Path(args.report))
-    policy = load_validated_config(Path(args.timing_policy))
+    try:
+        report = load_json(Path(args.report))
+        policy = load_validated_config(Path(args.timing_policy))
+    except (OSError, UnicodeError, ValueError) as exc:
+        print(f"FAIL: {args.backend} timing policy gate input error: {exc}")
+        return 1
 
     failures: list[str] = []
     workloads = report.get("workloads")

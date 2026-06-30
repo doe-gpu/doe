@@ -96,6 +96,12 @@ python3 bench/cli.py claim \
   --mode local \
   --benchmark-policy config/benchmark-methodology-thresholds.json
 
+python3 bench/tools/find_dawn_claim_candidates.py \
+  --out bench/out/scratch/dawn-claim-candidate-audit.json
+
+python3 bench/tools/build_dawn_replacement_readiness_report.py \
+  --out bench/out/scratch/dawn-replacement-readiness-report.json
+
 python3 bench/cli.py compare --list-promoted
 python3 bench/cli.py compare --surface backend --backend apple-metal --preset compare --dry-run
 python3 bench/cli.py compare --surface plan --backend apple-metal --workload gemma270m-literal --dry-run
@@ -155,6 +161,10 @@ Two rules for first-time operators:
   any win at or above the configured
   `reliability.suspiciousSpeedupRatio` as suspicious until same work and same
   timing scope are proven by the receipts.
+- Use `bench/tools/find_dawn_claim_candidates.py` before editing
+  `reports/claim-index.json`. It separates already-indexed claims, index-ready
+  local candidates, scratch artifacts, diagnostics, and missing compare-report
+  links.
 
 Browser runtime identity artifacts can be checked without launching Chromium:
 
@@ -1307,6 +1317,9 @@ resolves its entries against repo root.
   - rejects undefined or unused blocker codes so every gap has tracked exit criteria.
   - rejects universal Dawn replacement language unless product frontier rows are claim-allowed and evidence-release rows are covered or claimable.
   - keeps the excluded spatial-retargeting lane out of this Dawn-specific frontier contract.
+- `build_dawn_replacement_readiness_report.py`
+  - emits a machine-readable Dawn/Tint replacement readiness report from `config/dawn-replacement-frontier.json` and `reports/claim-index.json`.
+  - reuses `dawn_replacement_frontier_gate.py` semantics and preserves blocker exit criteria, claim-index links, and row readiness state.
 - `check_native_backend_coverage_matrix.py`
   - validates `config/native-backend-coverage-matrix.json`, the Metal/Vulkan/D3D12 coverage matrix.
   - requires every native backend and required coverage class to appear exactly once.

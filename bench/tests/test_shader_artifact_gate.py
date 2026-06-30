@@ -489,6 +489,24 @@ class ShaderArtifactGateTests(unittest.TestCase):
             finally:
                 sys.argv = old_argv
 
+    def test_main_missing_report_fails_without_traceback(self) -> None:
+        old_argv = sys.argv
+        sys.argv = [
+            "shader_artifact_gate.py",
+            "--report",
+            "bench/out/missing-shader-artifact-report.json",
+            "--schema",
+            str(REPO_ROOT / "config" / "shader-artifact.schema.json"),
+        ]
+        try:
+            output = io.StringIO()
+            with redirect_stdout(output):
+                self.assertEqual(self.module.main(), 1)
+            self.assertIn("FAIL: shader artifact gate input error:", output.getvalue())
+            self.assertNotIn("Traceback", output.getvalue())
+        finally:
+            sys.argv = old_argv
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -55,6 +55,7 @@
         "metal_bridge_cmd_buf_encode_compute_dispatch",
         "metal_bridge_compute_encoder_encode_dispatch",
         "metal_bridge_compute_encoder_encode_dispatch_batch",
+        "metal_bridge_compute_encoder_encode_dispatch_batch_repeated",
         "metal_bridge_cmd_buf_encode_compute_dispatch_indirect",
         "metal_bridge_device_new_texture",
         "metal_bridge_texture_replace_region",

@@ -116,8 +116,12 @@ def infer_lane(report: dict[str, Any], explicit_lane: str) -> str:
 
 def main() -> int:
     args = parse_args()
-    report = load_json(Path(args.report))
-    policy = load_json(Path(args.policy))
+    try:
+        report = load_json(Path(args.report))
+        policy = load_json(Path(args.policy))
+    except (OSError, UnicodeError, ValueError) as exc:
+        print(f"FAIL: backend selection gate input error: {exc}")
+        return 1
 
     lanes = policy.get("lanes") if isinstance(policy.get("lanes"), dict) else {}
     lane = infer_lane(report, args.lane)

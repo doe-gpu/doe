@@ -8,7 +8,7 @@ from one place instead of copy-pasting identical definitions.
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 
@@ -57,6 +57,27 @@ def write_json_object(path: Path, payload: dict[str, Any]) -> None:
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+
+
+def unsafe_repo_path_reason(value: Any, *, allow_empty: bool = True) -> str:
+    """Return a policy reason when *value* is not a safe repo-relative path."""
+    if not isinstance(value, str):
+        return "path must be a string"
+    if not value:
+        return "" if allow_empty else "path must be a non-empty string"
+    if "\\" in value:
+        return "path must use forward slashes"
+    path = PurePosixPath(value)
+    if path.is_absolute():
+        return "path must be repository-relative"
+    if any(part in ("", ".", "..") for part in value.split("/")):
+        return "path must not contain empty, current, or parent segments"
+    return ""
+
+
+def is_safe_repo_path(value: Any, *, allow_empty: bool = False) -> bool:
+    """Return true when *value* is a repository-relative path under bench policy."""
+    return unsafe_repo_path_reason(value, allow_empty=allow_empty) == ""
 
 
 def canonical(source: Any) -> str:

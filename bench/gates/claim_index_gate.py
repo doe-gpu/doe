@@ -23,6 +23,7 @@ from bench.lib.bench_utils import detect_repo_root, load_json_object
 OPTIONAL_ARTIFACT_PREFIXES = ("bench/out/",)
 VALID_REPORT_KIND = "compare-report"
 VALID_CLAIM_KIND = "claim-report"
+MEASURED_CLAIM_STATES = {"claim-indexed", "diagnostic"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -99,6 +100,10 @@ def unsafe_path_reason(path: Any) -> str:
     if any(part in ("", ".", "..") for part in parts):
         return "path must not contain empty, current, or parent segments"
     return ""
+
+
+def requires_measured_evidence(claim_state: Any) -> bool:
+    return claim_state in MEASURED_CLAIM_STATES
 
 
 def local_artifact_path(root: Path, rel_path: str) -> Path:
@@ -295,7 +300,10 @@ def evaluate_index(
         comparison_status = entry.get("comparisonStatus")
         claim_status = entry.get("claimStatus")
 
-        report_path_reason = unsafe_path_reason(report_path)
+        if requires_measured_evidence(claim_state) or report_path is not None:
+            report_path_reason = unsafe_path_reason(report_path)
+        else:
+            report_path_reason = ""
         if report_path_reason:
             failures.append(
                 failure(
