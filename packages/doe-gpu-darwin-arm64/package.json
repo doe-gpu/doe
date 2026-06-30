@@ -1,6 +1,6 @@
 {
   "name": "doe-gpu-darwin-arm64",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "doe-gpu prebuilt binary for macOS Apple Silicon",
   "type": "module",
   "main": "./index.js",
