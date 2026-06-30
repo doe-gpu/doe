@@ -1,7 +1,7 @@
 # doe-gpu
 
 <p align="center">
-<img src="../../assets/doe-logo.svg" alt="Doe logo" width="96" />
+<img src="https://raw.githubusercontent.com/doerun/doe/main/assets/doe-logo.svg" alt="Doe logo" width="96" />
 </p>
 
 `doe-gpu` is the native, receipt-backed WebGPU runtime for Node.js and Bun.
@@ -30,12 +30,16 @@ npm install doe-gpu
 - Browser shim available when you want API compatibility rather than runtime
   replacement
 
-## Current Evidence
+## Current evidence
+
+The npm package is the JavaScript runtime surface. It does not bundle the full
+Vulkan, Metal, Dawn-vs-Doe, browser, or hardware evidence artifact trees.
 
 The package participates in receipt-backed compare lanes, but package README
 numbers are not the source of truth. Current public package and runtime claims
-are indexed in [`reports/claim-index.json`](../../reports/claim-index.json) and
-summarized in the repo README backend evidence chart.
+are indexed in
+[`reports/claim-index.json`](https://github.com/doerun/doe/blob/main/reports/claim-index.json)
+and summarized in the repo README backend evidence chart.
 
 Read every evidence row by its explicit claim state:
 
