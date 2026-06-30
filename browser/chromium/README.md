@@ -19,6 +19,31 @@ This integration layer is used for:
 This layer is intentionally process-heavy and contract-first. It exists to
 prevent architectural drift and comparability debt before implementation.
 
+## Relationship to the dominance program
+
+This lane is the Chromium-facing proof surface for Doe's larger objective:
+surpass the Chromium WebGPU incumbent stack where Chromium is the browser
+surface, Dawn is the runtime incumbent, and Tint is the shader compiler
+incumbent.
+
+The lane does not replace the independent native runtime strategy. It binds the
+native Doe runtime into Chromium's `navigator.gpu` seam and proves that the
+browser can run through Doe while preserving Chromium's process model, sandbox,
+API behavior, and fallback governance.
+
+The three governing requirements are:
+
+1. Preserve program identity.
+   Browser shaders and workloads must link back to source hashes, compiler
+   receipts, backend artifacts, command graphs, and runtime traces.
+2. Keep the native runtime path independent.
+   The browser lane consumes `doe-zig-runtime` / `libwebgpu_doe`; it does not
+   redefine Doe as a Chromium-only fork.
+3. Make every claim receipt-backed.
+   A browser-lane dominance claim requires forced-Doe evidence, hidden-fallback
+   checks, Dawn fallback identity, compiler evidence against Tint where shader
+   compilation is involved, and browser artifacts that pass the relevant gates.
+
 ## Scope
 
 In scope:

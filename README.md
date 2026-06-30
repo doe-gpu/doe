@@ -17,6 +17,12 @@ Doe has three non-interchangeable surfaces:
   running inside the browser.
 - A compiler/lowering path for source-visible WGSL and model-program contracts.
 
+The strategy is to beat the Chromium WebGPU incumbent stack by preserving
+program identity across lowering, keeping the native WebGPU runtime surface
+independent, and making every claim receipt-backed. Chromium is the browser
+surface to win, Dawn is the runtime incumbent to beat, and Tint is the compiler
+incumbent to beat.
+
 Published npm surface: [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md).
 
 ## What it is

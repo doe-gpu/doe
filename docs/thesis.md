@@ -28,6 +28,33 @@ One concrete integration lane for that scope is a Doe-backed ONNX Runtime
 plugin EP — a native ML-host surface, not a claim that Doe has displaced
 Chromium's runtime stack.
 
+## Dominance objective
+
+Doe's strategic target is dominance over the Chromium WebGPU incumbent stack:
+Chromium as the browser integration surface, Dawn as the runtime incumbent, and
+Tint as the shader compiler incumbent. That is an objective, not a standing
+claim. Any specific "Doe beats Dawn/Tint/Chromium" statement must still pass
+the claim gates and cite the artifact that proves it.
+
+The architecture compresses into three goals:
+
+1. Source-preserving execution plus multi-backend lowering equals program
+   identity preservation.
+   Doe must carry the same source/program identity through WGSL, Doe IR, TSIR,
+   HostPlan, CSL, MSL, SPIR-V, DXIL/HLSL, and runtime command receipts. Beating
+   Tint is not only a compiler-speed target; it also means producing auditable
+   source-to-backend identity with less hidden compiler state.
+2. The native WebGPU runtime path stays independent.
+   `doe-zig-runtime`, `libwebgpu_doe`, and the package/native lanes are the
+   actual runtime product surface. The Chromium lane should consume and prove
+   that runtime at the `navigator.gpu` seam; it must not become the only place
+   where Doe's runtime identity exists.
+3. Receipt-backed claims plus compiler/proof discipline equals evidence and
+   trust discipline.
+   Compiler receipts, runtime traces, proof artifacts, benchmark reports, and
+   browser-lane diagnostics are the trust surface. Narrative dominance does not
+   count; artifact-backed dominance does.
+
 The project goal is not "rewrite WebGPU in Zig" for its own sake. The goal is
 to reduce hot-path CPU cost, keep runtime behavior explainable from config and
 artifacts, and make correctness/performance claims reproducible.

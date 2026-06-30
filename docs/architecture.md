@@ -25,6 +25,29 @@ used in Chromium and much of the browser ecosystem; Doe's present scope is
 the runtime/package/native boundary, while the Chromium lane remains a future
 integration track.
 
+## Strategic decomposition
+
+Doe's docs should read as one dominance program against the Chromium WebGPU
+incumbent stack, not as isolated feature tracks. The decomposition is:
+
+1. **Program identity preservation**
+   Source-preserving execution and multi-backend lowering are the same concern:
+   preserving source/program identity from input through every lowered artifact
+   and execution receipt. WGSL, Doe IR, TSIR, HostPlan, CSL, MSL, SPIR-V,
+   DXIL/HLSL, command graphs, and trace receipts must stay linked by explicit
+   hashes and contracts.
+2. **Independent native runtime surface**
+   The native WebGPU runtime path remains its own product surface:
+   `doe-zig-runtime`, `libwebgpu_doe`, the JavaScript package bindings, and
+   native/drop-in lanes. Chromium integration should prove this runtime in a
+   browser process model; it should not collapse the runtime product into a
+   browser fork.
+3. **Evidence and trust discipline**
+   Receipt-backed claims and compiler/proof discipline are one trust system.
+   A claim against Tint, Dawn, or Chromium is valid only when the relevant
+   compiler evidence, runtime trace, browser diagnostic, proof artifact, or
+   benchmark report satisfies the gate for that surface.
+
 ## Product boundary rules
 
 The important boundary distinctions are:

@@ -25,6 +25,14 @@ the shards under [`docs/status/`](status/).
 Doe's roadmap is two-pronged. Both prongs use source-preserving lowering,
 schema-backed contracts, gates, and receipts.
 
+Across those prongs, the main goals collapse into three pillars:
+
+1. source-preserving execution plus multi-backend lowering as program identity
+   preservation,
+2. the native WebGPU runtime as an independent product/runtime surface, and
+3. receipt-backed claims plus compiler/proof discipline as the evidence and
+   trust system.
+
 - [`chromium-webgpu-task-list.md`](chromium-webgpu-task-list.md) — Chromium-family
   WebGPU replacement: Doe vs Tint, Doe vs Dawn, and forced-Doe browser work
 - [`cerebras.md`](cerebras.md) — Doppler -> Doe -> Cerebras retargeting:
