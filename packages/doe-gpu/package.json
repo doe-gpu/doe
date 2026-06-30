@@ -1,6 +1,6 @@
 {
   "name": "doe-gpu",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Zig-first WebGPU runtime for Node.js, Bun, and Deno",
   "type": "module",
   "main": "./src/index.js",
@@ -59,6 +59,7 @@
   ],
   "scripts": {
     "build:addon": "node scripts/build-addon.js",
+    "install": "node scripts/install.js",
     "stage:prebuilds": "node scripts/stage-prebuilds.js",
     "test": "npm run test:smoke && npm run test:integration",
     "test:smoke": "node test/smoke/test-smoke-load.js",
@@ -69,7 +70,7 @@
   },
   "optionalDependencies": {
     "doe-gpu-darwin-arm64": "0.4.3",
-    "doe-gpu-linux-x64": "0.4.3"
+    "doe-gpu-linux-x64": "0.4.4"
   },
   "keywords": [
     "webgpu",
