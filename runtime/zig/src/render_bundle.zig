@@ -555,7 +555,10 @@ pub fn bundle_encoder_push(enc: *DoeBundleEncoder, cmd: BundleCmd) void {
 pub fn bundle_encoder_finish(enc: *DoeBundleEncoder) ?*DoeRenderBundle {
     const a = enc.allocator;
     const bundle = a.create(DoeRenderBundle) catch return null;
-    const cmds_slice = enc.cmds.toOwnedSlice(a) catch return null;
+    const cmds_slice = enc.cmds.toOwnedSlice(a) catch {
+        a.destroy(bundle);
+        return null;
+    };
     bundle.* = .{
         .allocator = a,
         .backend = enc.backend,
@@ -564,8 +567,6 @@ pub fn bundle_encoder_finish(enc: *DoeBundleEncoder) ?*DoeRenderBundle {
         .sample_count = enc.sample_count,
         .cmds = cmds_slice,
     };
-    // Encoder cmds were moved into bundle; encoder is now empty.
-    a.destroy(enc);
     return bundle;
 }
 
