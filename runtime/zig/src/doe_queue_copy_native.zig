@@ -9,6 +9,7 @@ const native_cmds = @import("doe_native_command_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_rt_helpers = @import("doe_native_runtime_helpers.zig");
 const native_exports = @import("doe_native_exports.zig");
+const texture_sampler = @import("doe_texture_sampler_native.zig");
 const error_scope = @import("error_scope.zig");
 const shared = @import("doe_queue_submit_shared.zig");
 const queue_flush_breakdown = @import("doe_queue_flush_breakdown.zig");
@@ -229,32 +230,48 @@ fn copy_texture_for_browser_passthrough(
     source: *const abi_copy.WGPUTexelCopyTextureInfo,
     destination: *const abi_copy.WGPUTexelCopyTextureInfo,
     copy_size: *const abi_copy.WGPUExtent3D,
+    options: ?*const abi_copy.WGPUCopyTextureForBrowserOptions,
 ) void {
-    const src_texture = cast(DoeTexture, source.texture) orelse return;
-    const dst_texture = cast(DoeTexture, destination.texture) orelse return;
+    const src_texture = texture_sampler.registeredTexture(source.texture) orelse return;
+    const dst_texture = texture_sampler.registeredTexture(destination.texture) orelse return;
     if (src_texture.error_object or dst_texture.error_object) return;
+    const flip_y = if (options) |browser_options| browser_options.flipY != 0 else false;
 
     if (q.dev.backend == .vulkan) {
         if (comptime has_vulkan) {
             const rt = native_rt_helpers.device_vk_runtime(q.dev) orelse return;
             if (src_texture.vk_id == 0 or dst_texture.vk_id == 0) return;
-            rt.texture_copy(.{
-                .src_handle = src_texture.vk_id,
-                .src_mip = source.mipLevel,
-                .src_x = source.origin.x,
-                .src_y = source.origin.y,
-                .src_z = source.origin.z,
-                .dst_handle = dst_texture.vk_id,
-                .dst_mip = destination.mipLevel,
-                .dst_x = destination.origin.x,
-                .dst_y = destination.origin.y,
-                .dst_z = destination.origin.z,
-                .width = copy_size.width,
-                .height = copy_size.height,
-                .depth_or_layers = copy_size.depthOrArrayLayers,
-            }) catch |err| {
-                shared.deliverInternalError(q.dev, "doe_queue_submit: texture copy: {s}", .{@errorName(err)});
-            };
+            var row: u32 = 0;
+            const rows = if (flip_y and copy_size.height > 1) copy_size.height else 1;
+            while (row < rows) : (row += 1) {
+                const copy_height: u32 = if (flip_y and copy_size.height > 1) 1 else copy_size.height;
+                const src_y = if (flip_y and copy_size.height > 1)
+                    source.origin.y + (copy_size.height - 1 - row)
+                else
+                    source.origin.y;
+                const dst_y = if (flip_y and copy_size.height > 1)
+                    destination.origin.y + row
+                else
+                    destination.origin.y;
+                rt.texture_copy(.{
+                    .src_handle = src_texture.vk_id,
+                    .src_mip = source.mipLevel,
+                    .src_x = source.origin.x,
+                    .src_y = src_y,
+                    .src_z = source.origin.z,
+                    .dst_handle = dst_texture.vk_id,
+                    .dst_mip = destination.mipLevel,
+                    .dst_x = destination.origin.x,
+                    .dst_y = dst_y,
+                    .dst_z = destination.origin.z,
+                    .width = copy_size.width,
+                    .height = copy_height,
+                    .depth_or_layers = copy_size.depthOrArrayLayers,
+                }) catch |err| {
+                    shared.deliverInternalError(q.dev, "doe_queue_submit: texture copy: {s}", .{@errorName(err)});
+                    return;
+                };
+            }
         }
         return;
     }
@@ -262,24 +279,37 @@ fn copy_texture_for_browser_passthrough(
     const encoder = native_exports.doeNativeDeviceCreateCommandEncoder(toOpaque(q.dev), null) orelse return;
     defer native_exports.doeNativeCommandEncoderRelease(encoder);
 
-    @import("doe_command_texture_native.zig").doeNativeCommandEncoderCopyTextureToTexture(
-        encoder,
-        source.texture,
-        source.mipLevel,
-        source.origin.z,
-        source.origin.x,
-        source.origin.y,
-        source.origin.z,
-        destination.texture,
-        destination.mipLevel,
-        destination.origin.z,
-        destination.origin.x,
-        destination.origin.y,
-        destination.origin.z,
-        copy_size.width,
-        copy_size.height,
-        copy_size.depthOrArrayLayers,
-    );
+    var row: u32 = 0;
+    const rows = if (flip_y and copy_size.height > 1) copy_size.height else 1;
+    while (row < rows) : (row += 1) {
+        const copy_height: u32 = if (flip_y and copy_size.height > 1) 1 else copy_size.height;
+        const src_y = if (flip_y and copy_size.height > 1)
+            source.origin.y + (copy_size.height - 1 - row)
+        else
+            source.origin.y;
+        const dst_y = if (flip_y and copy_size.height > 1)
+            destination.origin.y + row
+        else
+            destination.origin.y;
+        @import("doe_command_texture_native.zig").doeNativeCommandEncoderCopyTextureToTexture(
+            encoder,
+            source.texture,
+            source.mipLevel,
+            source.origin.z,
+            source.origin.x,
+            src_y,
+            source.origin.z,
+            destination.texture,
+            destination.mipLevel,
+            destination.origin.z,
+            destination.origin.x,
+            dst_y,
+            destination.origin.z,
+            copy_size.width,
+            copy_height,
+            copy_size.depthOrArrayLayers,
+        );
+    }
 
     const command_buffer = native_exports.doeNativeCommandEncoderFinish(encoder, null) orelse return;
     defer native_exports.doeNativeCommandBufferRelease(command_buffer);
@@ -294,12 +324,11 @@ pub fn doeNativeQueueCopyTextureForBrowser(
     copy_size_raw: ?*const abi_copy.WGPUExtent3D,
     options_raw: ?*const abi_copy.WGPUCopyTextureForBrowserOptions,
 ) void {
-    _ = options_raw;
     const queue = cast(DoeQueue, queue_raw) orelse return;
     const source = source_raw orelse return;
     const destination = destination_raw orelse return;
     const copy_size = copy_size_raw orelse return;
-    copy_texture_for_browser_passthrough(queue, source, destination, copy_size);
+    copy_texture_for_browser_passthrough(queue, source, destination, copy_size, options_raw);
 }
 
 const ext_texture_mod = @import("doe_external_texture_native.zig");
@@ -311,6 +340,7 @@ fn copy_external_texture_to_dst(
     origin: abi_copy.WGPUOrigin3D,
     destination: *const abi_copy.WGPUTexelCopyTextureInfo,
     copy_size: *const abi_copy.WGPUExtent3D,
+    options: ?*const abi_copy.WGPUCopyTextureForBrowserOptions,
 ) void {
     if (ext_texture_mod.resolvePlane0DoeTexture(ext)) |src_tex| {
         const source_copy = abi_copy.WGPUTexelCopyTextureInfo{
@@ -319,11 +349,11 @@ fn copy_external_texture_to_dst(
             .origin = origin,
             .aspect = abi_texture.WGPUTextureAspect_All,
         };
-        copy_texture_for_browser_passthrough(queue, &source_copy, destination, copy_size);
+        copy_texture_for_browser_passthrough(queue, &source_copy, destination, copy_size, options);
         return;
     }
     const src_mtl = ext_texture_mod.resolvePlane0MtlHandle(ext) orelse return;
-    const dst_texture = cast(DoeTexture, destination.texture) orelse return;
+    const dst_texture = texture_sampler.registeredTexture(destination.texture) orelse return;
     if (dst_texture.error_object) return;
     const dst_mtl = dst_texture.mtl orelse return;
     if (queue.dev.backend != .metal) return;
@@ -362,7 +392,7 @@ pub fn doeNativeQueueCopyExternalImageToTexture(
     const ext = ext_texture_mod.cast(source.externalTexture) orelse return;
     if (ext.expired) return;
     const queue = cast(DoeQueue, queue_raw) orelse return;
-    copy_external_texture_to_dst(queue, ext, source.origin, destination, copy_size);
+    copy_external_texture_to_dst(queue, ext, source.origin, destination, copy_size, null);
 }
 
 pub fn doeNativeQueueCopyExternalTextureForBrowser(
@@ -372,12 +402,11 @@ pub fn doeNativeQueueCopyExternalTextureForBrowser(
     copy_size_raw: ?*const abi_copy.WGPUExtent3D,
     options_raw: ?*const abi_copy.WGPUCopyTextureForBrowserOptions,
 ) void {
-    _ = options_raw;
     const source = source_raw orelse return;
     const destination = destination_raw orelse return;
     const copy_size = copy_size_raw orelse return;
     const ext = ext_texture_mod.cast(source.externalTexture) orelse return;
     if (ext.expired) return;
     const queue = cast(DoeQueue, queue_raw) orelse return;
-    copy_external_texture_to_dst(queue, ext, source.origin, destination, copy_size);
+    copy_external_texture_to_dst(queue, ext, source.origin, destination, copy_size, options_raw);
 }

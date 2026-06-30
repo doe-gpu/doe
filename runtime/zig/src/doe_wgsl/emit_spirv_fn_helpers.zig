@@ -76,6 +76,11 @@ pub fn cacheableResultOpcode(opcode: u16) bool {
         spirv.Opcode.UMod,
         spirv.Opcode.SRem,
         spirv.Opcode.FRem,
+        spirv.Opcode.VectorTimesScalar,
+        spirv.Opcode.MatrixTimesScalar,
+        spirv.Opcode.VectorTimesMatrix,
+        spirv.Opcode.MatrixTimesVector,
+        spirv.Opcode.MatrixTimesMatrix,
         spirv.Opcode.BitwiseAnd,
         spirv.Opcode.BitwiseOr,
         spirv.Opcode.BitwiseXor,
@@ -126,6 +131,28 @@ pub fn removeLoadCacheEntry(entries: *std.ArrayListUnmanaged(LoadCacheEntry), ro
         }
         i += 1;
     }
+}
+
+pub fn emitZeroValue(self: anytype, ty: ir.TypeId) !u32 {
+    return switch (self.emitter.module.types.get(ty)) {
+        .scalar => |scalar| switch (scalar) {
+            .bool => try self.emitter.builder.const_bool(false),
+            .i32, .abstract_int => try self.emitter.builder.const_i32_bits(0),
+            .u32 => try self.emitter.builder.const_u32(0),
+            .f16 => try self.emitter.builder.const_f16_bits(0),
+            .f32, .abstract_float => try self.emitter.builder.const_f32_bits(0),
+            .void => error.UnsupportedConstruct,
+        },
+        .vector => |vec| blk: {
+            const zero = try emitZeroValue(self, vec.elem);
+            var components = std.ArrayListUnmanaged(u32){};
+            defer components.deinit(self.emitter.alloc);
+            var i: u32 = 0;
+            while (i < vec.len) : (i += 1) try components.append(self.emitter.alloc, zero);
+            break :blk try self.emit_construct_from_operands(ty, components.items);
+        },
+        else => error.UnsupportedConstruct,
+    };
 }
 
 pub fn ref_chain_roots_at_local(function: *const ir.Function, expr_id: ir.ExprId) ?u32 {

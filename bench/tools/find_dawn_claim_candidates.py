@@ -25,8 +25,15 @@ from bench.lib.bench_utils import (  # noqa: E402
 
 CLAIM_REPORT_KIND = "claim-report"
 COMPARE_REPORT_KIND = "compare-report"
+COMPILATION_COMPARE_REPORT_KIND = "compilation-comparison-ndjson"
+COMPILATION_COMPARE_RECORD_KIND = "compilation_comparison"
 CLAIMABLE_STATUS = "claimable"
 COMPARABLE_STATUS = "comparable"
+ALREADY_COVERED_STATUS = "already_covered"
+ALREADY_INDEXED_STATUS = "already_indexed"
+BLOCKED_STATUS = "blocked"
+DIAGNOSTIC_STATUS = "diagnostic"
+INDEX_READY_STATUS = "index_ready"
 
 
 def parse_args() -> argparse.Namespace:
@@ -211,23 +218,62 @@ def load_compare_report(root: Path, path: str) -> tuple[dict[str, Any] | None, s
         return None, "compare_report_missing"
     try:
         report = load_json_object(compare_path)
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+    except json.JSONDecodeError:
+        return load_compilation_compare_ndjson(compare_path)
+    except (OSError, UnicodeError, ValueError) as exc:
         return None, f"compare_report_parse_failed: {exc}"
     if report.get("artifactKind") != COMPARE_REPORT_KIND:
+        if report.get("kind") == COMPILATION_COMPARE_RECORD_KIND:
+            return build_compilation_compare_report([report]), ""
         return None, "compare_report_invalid_kind"
     return report, ""
+
+
+def build_compilation_compare_report(records: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "artifactKind": COMPILATION_COMPARE_REPORT_KIND,
+        "recordCount": len(records),
+        "comparisonStatus": (
+            COMPARABLE_STATUS
+            if all(record.get("status") == "compared" for record in records)
+            else "diagnostic"
+        ),
+        "records": records,
+    }
+
+
+def load_compilation_compare_ndjson(path: Path) -> tuple[dict[str, Any] | None, str]:
+    records: list[dict[str, Any]] = []
+    try:
+        for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            line = raw_line.strip()
+            if not line:
+                continue
+            record = json.loads(line)
+            if not isinstance(record, dict):
+                return None, f"compare_report_parse_failed: line {line_number} is not an object"
+            if record.get("kind") != COMPILATION_COMPARE_RECORD_KIND:
+                return None, "compare_report_invalid_kind"
+            records.append(record)
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        return None, f"compare_report_parse_failed: {exc}"
+    if not records:
+        return None, "compare_report_empty"
+    return build_compilation_compare_report(records), ""
 
 
 def status_for_candidate(
     claim_path: str,
     claim: dict[str, Any],
     compare_status: str,
+    inferred_rows: list[dict[str, str]],
     frontier_reasons: list[str],
+    already_covered_reasons: list[str],
     indexed_entry: dict[str, Any] | None,
 ) -> tuple[str, list[str], bool]:
     reasons: list[str] = []
     if indexed_entry is not None and indexed_entry.get("claimState") == "claim-indexed":
-        return "already_indexed", reasons, False
+        return ALREADY_INDEXED_STATUS, reasons, False
 
     if claim.get("comparisonStatus") != COMPARABLE_STATUS:
         reasons.append("claim_comparison_status_not_comparable")
@@ -237,6 +283,8 @@ def status_for_candidate(
         reasons.append("claim_sidecar_not_passing")
     if path_is_under(claim_path, "bench/out/scratch"):
         reasons.append("scratch_artifact")
+    if not inferred_rows:
+        reasons.append("frontier_row_unmapped")
     reasons.extend(frontier_reasons)
 
     report_path = compare_report_path(claim)
@@ -254,9 +302,11 @@ def status_for_candidate(
                 "claim_sidecar_not_passing",
             }
         ):
-            return "diagnostic", reasons, False
-        return "blocked", reasons, False
-    return "index_ready", reasons, True
+            return DIAGNOSTIC_STATUS, reasons, False
+        return BLOCKED_STATUS, reasons, False
+    if already_covered_reasons:
+        return ALREADY_COVERED_STATUS, already_covered_reasons, False
+    return INDEX_READY_STATUS, reasons, True
 
 
 def build_candidate(
@@ -287,10 +337,16 @@ def build_candidate(
     )
     frontier_reasons: list[str] = []
     frontier_blockers: list[dict[str, Any]] = []
+    already_covered_reasons: list[str] = []
     for inferred_row in inferred_rows:
         row_id = inferred_row.get("id")
         frontier_row = known_frontier_rows.get(str(row_id), {})
         if frontier_row.get("claimAllowed") is True:
+            claim_ids = frontier_row.get("claimIndexEntryIds", [])
+            if isinstance(claim_ids, list) and claim_ids:
+                already_covered_reasons.append(
+                    f"frontier_row_already_claim_allowed:{row_id}"
+                )
             continue
         blockers = frontier_row.get("blockers", [])
         if not isinstance(blockers, list):
@@ -309,7 +365,9 @@ def build_candidate(
         claim_path,
         claim,
         compare_status,
+        inferred_rows,
         frontier_reasons,
+        already_covered_reasons,
         indexed_entry,
     )
     indexed_ids: list[str] = []
@@ -346,9 +404,10 @@ def summary_for_candidates(
         "parseFailureCount": parse_failure_count,
         "claimReportCount": len(candidates),
         "indexReadyCount": sum(1 for item in candidates if item.get("indexReady") is True),
-        "alreadyIndexedCount": count_status("already_indexed"),
-        "blockedCount": count_status("blocked"),
-        "diagnosticCount": count_status("diagnostic"),
+        "alreadyIndexedCount": count_status(ALREADY_INDEXED_STATUS),
+        "alreadyCoveredCount": count_status(ALREADY_COVERED_STATUS),
+        "blockedCount": count_status(BLOCKED_STATUS),
+        "diagnosticCount": count_status(DIAGNOSTIC_STATUS),
     }
 
 
@@ -410,11 +469,12 @@ def emit_text(report: dict[str, Any]) -> None:
         "Dawn claim candidate audit: "
         f"{summary['indexReadyCount']} index-ready, "
         f"{summary['alreadyIndexedCount']} already indexed, "
+        f"{summary['alreadyCoveredCount']} already covered, "
         f"{summary['blockedCount']} blocked, "
         f"{summary['diagnosticCount']} diagnostic."
     )
     for item in report["candidates"]:
-        if item.get("promotionStatus") not in ("index_ready", "blocked"):
+        if item.get("promotionStatus") not in (INDEX_READY_STATUS, BLOCKED_STATUS):
             continue
         frontier_rows = [
             row["id"]

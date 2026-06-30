@@ -10,6 +10,649 @@ This is a live topical status shard. Follow the shared shard policy in
 stays focused on non-TSIR compiler work (shader compiler non-TSIR paths,
 WebGPU runtime, robustness).
 
+## 2026-06-30 — Browser WGSL Tint warm row is benchmark-materialized
+
+The Tint warm-corpus materializer now accepts `--wgsl-corpus-manifest`, so the
+browser WGSL corpus row can be copied into Dawn's Tint benchmark input list
+with the same receipt discipline as compilation workload rows. The browser
+state receipt records the WGSL manifest path, Dawn benchmark input path,
+benchmark name, selected backend target, and rebuilt `tint_benchmark` hash.
+
+The local Dawn `tint_benchmark` target was rebuilt after materializing the
+browser WGSL row. The refreshed browser-corpus compiler evidence now carries
+warm in-process Tint samples and is gate-recognized as comparable. It remains
+diagnostic because exact Tint `parse`, `sema`, `lower`, and `emit` phase
+timings are still missing and the warm-delta claim policy does not pass. The
+benchmark-corpus evidence, phase-benchmark receipt, target-validation receipt,
+frontier bundle, and Dawn replacement readiness report were refreshed from the
+rebuilt benchmark binary.
+
+Touched:
+
+- `bench/tools/materialize_tint_warm_corpus.py`
+- `bench/tests/test_materialize_tint_warm_corpus.py`
+- `bench/README.md`
+- `docs/shader-compiler-architecture.md`
+- `bench/fixtures/dawn_tint_browser_warm_corpus_state.json`
+- `bench/vendor/dawn/src/tint/cmd/bench/generate_benchmark_inputs.py`
+- `bench/vendor/dawn/test/tint/benchmark/doe/webgpu-prefix-sum.wgsl`
+- `bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json`
+- `bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json`
+- `bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json`
+- `bench/out/scratch/tint-compiler-frontier-bundle.spirv.json`
+- `bench/out/scratch/dawn-replacement-readiness-report.json`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/tools/materialize_tint_warm_corpus.py bench/tests/test_materialize_tint_warm_corpus.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_materialize_tint_warm_corpus`
+- `python3 bench/tools/materialize_tint_warm_corpus.py --wgsl-corpus-manifest config/wgsl-browser-corpus.json --dawn-source-dir bench/vendor/dawn --build-dir bench/vendor/dawn/out/Release --target spirv --workload-id webgpu-prefix-sum --build --ninja-bin ninja --output-state bench/fixtures/dawn_tint_browser_warm_corpus_state.json`
+- `bench/vendor/dawn/out/Release/tint_benchmark --benchmark_filter=^GenerateSPIRV/webgpu-prefix-sum\\.wgsl$ --benchmark_min_time=0.01s --benchmark_repetitions=1 --benchmark_report_aggregates_only=false --benchmark_format=json`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json --claim-mode local --evidence-out bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json --iterations 15 --warmup 1 --claim-mode release --evidence-out bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `python3 bench/tools/check_tint_phase_benchmark_evidence.py --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --out bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/tools/build_wgsl_lowering_link_receipt.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --manifest config/wgsl-browser-corpus.json --out bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json`
+- `python3 bench/tools/check_tint_compiler_target_validation.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --allow-diagnostic-rows --out bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --json`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py --tint-frontier-bundle bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --out bench/out/scratch/dawn-replacement-readiness-report.json --json`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report examples/tint-compiler-evidence.sample.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --json`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `git diff --check`
+
+## 2026-06-30 — Tint compiler evidence separates comparability from claimability
+
+Doe-vs-Tint compiler evidence now treats validated whole-target timing evidence
+as the benchmark comparability floor, while exact Tint `parse`, `sema`,
+`lower`, and `emit` phase timings remain claimability blockers. The SPIR-V
+benchmark-corpus report under `bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+is now gate-recognized as comparable in diagnostic mode instead of being held
+back by missing exact Tint phase splits. The same rows still remain
+non-claimable until the exact Tint phases and warm-delta claim policy evidence
+are present.
+
+The Tint compiler evidence gate now accepts comparable diagnostic rows with
+claim blockers in normal mode, while `--require-claimable` still promotes those
+blockers to hard failures. At this checkpoint, the browser-corpus report still
+lacked a local Tint benchmark warm sample; the later browser warm-corpus entry
+above records the follow-up materialization. The frontier bundle and Dawn
+replacement readiness report were refreshed from the current browser-corpus
+evidence, benchmark-corpus evidence, lowering-link receipt, target-validation
+receipt, and phase-benchmark receipt.
+
+Touched:
+
+- `bench/native_compare_modules/compare_doe_vs_tint_support.py`
+- `bench/native-compare/compare_doe_vs_tint_compilation.py`
+- `bench/gates/tint_compiler_evidence_gate.py`
+- `bench/tests/test_tint_compiler_evidence_gate.py`
+- `bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json`
+- `bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json`
+- `bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json`
+- `bench/out/scratch/tint-compiler-frontier-bundle.spirv.json`
+- `bench/out/scratch/dawn-replacement-readiness-report.json`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/native_compare_modules/compare_doe_vs_tint_support.py bench/native-compare/compare_doe_vs_tint_compilation.py bench/gates/tint_compiler_evidence_gate.py bench/tests/test_tint_compiler_evidence_gate.py bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_tint_compiler_evidence_gate bench.tests.test_compare_doe_vs_tint_compilation`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json --claim-mode local --evidence-out bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json --iterations 15 --warmup 1 --claim-mode release --evidence-out bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `python3 bench/tools/check_tint_phase_benchmark_evidence.py --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --out bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_target_validation.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --allow-diagnostic-rows --out bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --json`
+- `python3 bench/tools/build_wgsl_lowering_link_receipt.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --manifest config/wgsl-browser-corpus.json --out bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --json`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py --tint-frontier-bundle bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --out bench/out/scratch/dawn-replacement-readiness-report.json --json`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report examples/tint-compiler-evidence.sample.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --json`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `git diff --check`
+
+## 2026-06-30 — Tint multi-entry SPIR-V artifacts validate per entry
+
+Doe-vs-Tint SPIR-V compiler evidence now handles Tint shaders whose default
+SPIR-V CLI output is a multi-entry bundle rather than one raw SPIR-V module.
+When the raw Tint SPIR-V output fails validation and the WGSL source declares
+multiple entry points, the evidence harness reruns Tint per entry point with
+`--entry-point`/`--output-name`, validates each child SPIR-V module with
+`spirv-val`, and records a manifest as the Tint output artifact. The
+`particles.wgsl` benchmark row now records that manifest under
+`bench/out/tint-compiler-evidence.benchmark-corpus.spirv.artifacts/particles.wgsl/tint/output.spv.manifest.json`.
+
+The target-validation receipt now verifies `outputArtifacts` entries as
+first-class backend artifacts: target identity, validation status/tool, safe
+repo-relative path, and file hash are all checked under `--verify-files-root`.
+The refreshed SPIR-V compiler frontier therefore has no active Doe/Tint backend
+validation failures. It remains diagnostic because exact Tint `parse`, `sema`,
+`lower`, and `emit` phase timings are still missing from compiler evidence.
+
+Touched:
+
+- `bench/native-compare/compare_doe_vs_tint_compilation.py`
+- `bench/tools/check_tint_compiler_target_validation.py`
+- `bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `bench/tests/test_tint_compiler_target_validation.py`
+- `config/tint-compiler-evidence.schema.json`
+- `bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json`
+- `bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json`
+- `bench/out/scratch/tint-compiler-frontier-bundle.spirv.json`
+- `bench/out/scratch/dawn-replacement-readiness-report.json`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/native-compare/compare_doe_vs_tint_compilation.py bench/tools/check_tint_compiler_target_validation.py bench/tests/test_compare_doe_vs_tint_compilation.py bench/tests/test_tint_compiler_target_validation.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_compare_doe_vs_tint_compilation bench.tests.test_tint_compiler_target_validation`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json --iterations 15 --warmup 1 --claim-mode release --evidence-out bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `python3 bench/tools/check_tint_phase_benchmark_evidence.py --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --out bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_target_validation.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --allow-diagnostic-rows --out bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --json`
+- `python3 bench/tools/build_wgsl_lowering_link_receipt.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --manifest config/wgsl-browser-corpus.json --out bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --json`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py --tint-frontier-bundle bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --out bench/out/scratch/dawn-replacement-readiness-report.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report examples/tint-compiler-evidence.sample.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --json`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `git diff --check`
+
+## 2026-06-30 — SPIR-V benchmark frontier moves past matrix and texture blockers
+
+Doe's SPIR-V emitter now clears the benchmark-corpus validation blockers that
+were tied to matrix arithmetic, depth texture sampling, sampled texture queries,
+fragment derivatives, private global values, zero constructors, and graphics
+entry interfaces. Matrix multiply lowers through the SPIR-V matrix op family,
+matrix add/sub lowers column-wise, bool-vector comparisons and logical ops keep
+vector bool result types, `any`/`all` lower to native SPIR-V reductions, sampled
+`textureDimensions` supplies a level operand, and `textureNumLevels` uses the
+canonical query opcode. Zero-argument vector constructors now lower to zero
+composites, and struct member reads from private globals now load/extract value
+members instead of treating long field names as vector swizzles. Graphics entry
+wrappers now list only Input/Output globals in `OpEntryPoint`, leaving
+descriptor resources decorated at module scope.
+
+The depth texture path also now uses canonical SPIR-V opcodes for
+`textureSampleCompare` and `textureSampleCompareLevel`; the prior local opcode
+table mapped those calls to neighboring projected/explicit sample opcodes.
+`textureSampleBias` now emits an implicit-LOD sample with the SPIR-V Bias image
+operand, and fine/coarse derivatives emit the native derivative opcodes with
+the required `DerivativeControl` capability. The storage-buffer layout
+decorator now emits matrix layout decorations for runtime-array-of-matrix
+members, which covers skinned vertex shaders with joint matrix arrays.
+
+The refreshed SPIR-V benchmark evidence, composed target-validation receipt,
+frontier bundle, and readiness report are under `bench/out/` and
+`bench/out/scratch/`. The Unity vertex and fragment SPIR-V-derived WGSL paths
+now direct-compile and validate through the scratch artifacts. The frontier
+remains diagnostic because exact Tint phase timings still block replacement
+claims.
+
+Touched:
+
+- `runtime/zig/src/doe_wgsl/spirv_spec.zig`
+- `runtime/zig/src/doe_wgsl/emit_spirv.zig`
+- `runtime/zig/src/doe_wgsl/emit_spirv_fn.zig`
+- `runtime/zig/src/doe_wgsl/emit_spirv_fn_helpers.zig`
+- `runtime/zig/src/doe_wgsl/emit_spirv_builtins.zig`
+- `runtime/zig/src/doe_wgsl/emit_spirv_texture.zig`
+- `runtime/zig/src/doe_wgsl/emit_spirv_stages.zig`
+- `runtime/zig/src/doe_wgsl/emit_spirv_matrix.zig`
+- `runtime/zig/tests/wgsl/emit_spirv_builtin_test.zig`
+- `runtime/zig/tests/wgsl/emit_spirv_mixed_binary_test.zig`
+- `runtime/zig/tests/wgsl/emit_spirv_stage_test.zig`
+- `runtime/zig/tests/wgsl/emit_spirv_builder_test.zig`
+- `bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json`
+- `bench/out/scratch/tint-compiler-frontier-bundle.spirv.json`
+- `bench/out/scratch/dawn-replacement-readiness-report.json`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `zig build test-wgsl`
+- `zig build runtime-compile-report`
+- `zig build bench-compilation`
+- `spirv-val bench/out/scratch/shadow-fragment.dref-fixed.spv`
+- `spirv-val bench/out/scratch/skinned-shadowed-pbr-fragment.dref-fixed.spv`
+- `spirv-val bench/out/scratch/skinned-shadowed-pbr-vertex.layout-fixed.spv`
+- `spirv-val bench/out/scratch/unity-vs-spv.struct-member-fixed.spv`
+- `spirv-val bench/out/scratch/unity-fs-spv.bias-fixed.spv`
+- `spirv-val bench/out/scratch/unity-fs-wgsl.bias-fixed.spv`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json --iterations 15 --warmup 1 --claim-mode release --evidence-out bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `python3 bench/tools/check_tint_phase_benchmark_evidence.py --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --out bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_target_validation.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --allow-diagnostic-rows --out bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --json`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py --tint-frontier-bundle bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --out bench/out/scratch/dawn-replacement-readiness-report.json --json`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report examples/tint-compiler-evidence.sample.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --json`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `git diff --check`
+
+## 2026-06-30 — Target validation composes frontier evidence rows
+
+The Tint compiler target-validation checker now accepts repeated compiler
+evidence reports and has an explicit diagnostic-row mode. In diagnostic mode,
+rows where Doe or Tint did not produce validated backend artifacts become
+target-validation claim blockers instead of hard receipt failures; unsafe paths,
+hash mismatches, and malformed validated rows remain hard failures.
+
+The composed SPIR-V target-validation receipt now spans the browser-corpus and
+benchmark-corpus compiler evidence reports. The frontier bundle consumes that
+receipt, carries both evidence paths forward, and includes target-validation
+claim blockers in its overall claimability status. Exact Tint phase timings
+remain a separate compiler-evidence blocker. See the generated target-validation
+and frontier-bundle artifacts for current coverage and blocker details.
+
+The compiler frontier bundle now also maps diagnostic compiler evidence and
+failing target-validation receipts onto the Dawn/Tint frontier blocker codes.
+The readiness report reads that bundle for the `wgsl-tint-compiler` row, so a
+passing lowering-link receipt no longer remains listed as an active compiler
+blocker.
+The readiness report is now schema-registered and carries
+`frontierBundleEvidence` for the compiler row, including compiler-evidence
+status, grouped compiler-evidence claim blockers, and the target-validation
+claim-blocker summaries from the composed frontier bundle. See
+`examples/dawn-replacement-readiness-report.sample.json` for the current
+contract shape.
+The readiness builder also accepts `--browser-frontier-bundle` and
+`--tint-frontier-bundle`, so local audits can point the rollup at generated
+frontier bundles instead of the checked-in diagnostic samples.
+Compiler frontier bundles now fail closed when a lowering-link,
+target-validation, or phase-benchmark receipt references a compiler-evidence
+path that was not supplied explicitly with `--compiler-evidence`. This prevents
+scoped audits from silently broadening their evidence set through component
+receipt back-references.
+The checked-in target-validation and compiler frontier samples now follow the
+same diagnostic contract: component receipts pass, claim blockers carry the
+remaining evidence gaps, and hard failures stay reserved for malformed or
+unverified artifacts.
+Target-validation receipts now also include a grouped claim-blocker summary,
+plus a per-evidence-path grouped summary, and compiler frontier bundles surface
+those summaries in their target-validation component receipt. Use the artifact
+fields to identify which evidence source contributes the active target-backend
+validation categories for the remaining compiler blocker.
+Compiler evidence side results now include `diagnosticMessage` and
+`validationMessage` fields alongside the existing diagnostic code. Doe/Tint
+compile and backend-validation failures preserve bounded stderr or validator
+output in the evidence row, and target-validation diagnostic-row blockers carry
+that detail into the frontier bundle and readiness report. This turns the
+current SPIR-V target-backend blockers into file/function-level repair leads
+instead of code-only categories.
+
+Touched:
+
+- `bench/native-compare/compare_doe_vs_tint_compilation.py`
+- `bench/tools/check_tint_compiler_target_validation.py`
+- `bench/tools/check_tint_compiler_frontier_bundle.py`
+- `bench/tools/build_dawn_replacement_readiness_report.py`
+- `bench/runners/blocking_gates_args.py`
+- `bench/runners/run_blocking_gates.py`
+- `bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `bench/tests/test_tint_compiler_target_validation.py`
+- `bench/tests/test_tint_compiler_frontier_bundle.py`
+- `bench/tests/test_tint_compiler_evidence_gate.py`
+- `bench/tests/test_dawn_replacement_readiness_report.py`
+- `bench/tests/test_run_blocking_gates_wiring.py`
+- `config/tint-compiler-evidence.schema.json`
+- `config/tint-compiler-target-validation.schema.json`
+- `config/tint-compiler-frontier-bundle.schema.json`
+- `config/dawn-replacement-readiness-report.schema.json`
+- `examples/tint-compiler-evidence.sample.json`
+- `config/schema-targets.json`
+- `examples/tint-compiler-target-validation.sample.json`
+- `examples/tint-compiler-frontier-bundle.sample.json`
+- `examples/dawn-replacement-readiness-report.sample.json`
+- `bench/README.md`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/tools/check_tint_compiler_target_validation.py bench/tools/check_tint_compiler_frontier_bundle.py bench/runners/blocking_gates_args.py bench/runners/run_blocking_gates.py bench/tests/test_tint_compiler_target_validation.py bench/tests/test_tint_compiler_frontier_bundle.py bench/tests/test_run_blocking_gates_wiring.py`
+- `python3 -m py_compile bench/tools/build_dawn_replacement_readiness_report.py bench/tests/test_dawn_replacement_readiness_report.py`
+- `python3 -c "from bench.tests import test_dawn_replacement_readiness_report as t; [getattr(t, n)() for n in sorted(dir(t)) if n.startswith('test_')]"`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_tint_compiler_target_validation bench.tests.test_tint_compiler_frontier_bundle bench.tests.test_run_blocking_gates_wiring`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py --out examples/dawn-replacement-readiness-report.sample.json`
+- `python3 bench/tools/check_tint_compiler_target_validation.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --allow-diagnostic-rows --out bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --require-claimable --json` (expected failure: exact Tint phase timings and target-validation claim blockers remain)
+
+## 2026-06-30 — Tint compiler toolchain provenance is target-aware
+
+SPIR-V compiler evidence no longer carries stale MSL command metadata in its
+toolchain provenance. `build_toolchain_info` now receives the evidence backend
+target, records Doe with the matching `--target` and emit flag, and records
+Tint with the matching `--format` value.
+
+The regenerated browser-corpus and benchmark-corpus SPIR-V evidence reports now
+identify SPIR-V commands in `toolchains`. The composed frontier bundle remains
+diagnostic: benchmark-scope Tint phase evidence is present, but exact Tint
+`parse`, `sema`, `lower`, and `emit` timings are still missing and remain the
+claimability blocker. See the generated artifacts for current coverage and
+blocker counts.
+
+Touched:
+
+- `bench/native_compare_modules/compare_doe_vs_tint_support.py`
+- `bench/native-compare/compare_doe_vs_tint_compilation.py`
+- `bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/native_compare_modules/compare_doe_vs_tint_support.py bench/native-compare/compare_doe_vs_tint_compilation.py bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_compare_doe_vs_tint_compilation`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json --claim-mode local --evidence-out bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json --iterations 15 --warmup 1 --claim-mode release --evidence-out bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `python3 bench/tools/check_tint_compiler_target_validation.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-target-validation.browser-corpus.spirv.json --json`
+- `python3 bench/tools/build_wgsl_lowering_link_receipt.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --manifest config/wgsl-browser-corpus.json --out bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json`
+- `python3 bench/tools/check_wgsl_lowering_link_receipt.py --receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --verify-files-root . --json`
+- `python3 bench/tools/check_tint_phase_benchmark_evidence.py --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --out bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.browser-corpus.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.browser-corpus.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --require-claimable --json` (expected failure: exact Tint phase timings are still missing)
+
+## 2026-06-30 — Tint compiler frontier receipts compose into one bundle
+
+The Doe-vs-Tint compiler frontier now has a composed diagnostic bundle checker.
+It reads the current compiler evidence reports, WGSL lowering-link receipt,
+target-backend validation receipt, and Tint phase-benchmark receipt, then emits
+one `tint_compiler_frontier_bundle` artifact for the requested backend target.
+
+The bundle deliberately supports separate compiler evidence paths because the
+browser corpus currently proves source/backend linkage and target validation,
+while the benchmark corpus proves Tint benchmark-scope phase coverage. The
+bundle passes when those component receipts are gate-clean and records exact
+Tint phase gaps as claim blockers. Running the same checker with
+`--require-claimable` still fails until exact Tint phase timings are present.
+See `bench/out/scratch/tint-compiler-frontier-bundle.spirv.json` for the
+current generated receipt.
+
+Touched:
+
+- `bench/tools/check_tint_compiler_frontier_bundle.py`
+- `bench/runners/blocking_gates_args.py`
+- `bench/runners/run_blocking_gates.py`
+- `bench/tests/test_tint_compiler_frontier_bundle.py`
+- `bench/tests/test_run_blocking_gates_wiring.py`
+- `config/tint-compiler-frontier-bundle.schema.json`
+- `config/schema-targets.json`
+- `config/dawn-replacement-frontier.json`
+- `examples/tint-compiler-frontier-bundle.sample.json`
+- `bench/README.md`
+- `docs/shader-compiler-architecture.md`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/tools/check_tint_compiler_frontier_bundle.py bench/tests/test_tint_compiler_frontier_bundle.py bench/runners/blocking_gates_args.py bench/runners/run_blocking_gates.py bench/tests/test_run_blocking_gates_wiring.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_tint_compiler_frontier_bundle`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_run_blocking_gates_wiring`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.browser-corpus.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --json`
+- `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.browser-corpus.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --require-claimable --json` (expected failure: exact Tint phase timings are still missing)
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py`
+
+## 2026-06-30 — Tint phase benchmark evidence has a receipt checker
+
+Tint benchmark-scope timing coverage is now gate-backed without weakening the
+exact Tint phase requirement. The new checker reads a stored
+`tint-compiler-evidence` report, requires explicit backend targets, verifies
+that successful Tint rows carry `parseWgsl`, `validateIr`, and
+`generateBackend` benchmark scopes, and emits a schema-registered
+`tint_phase_benchmark_evidence` receipt. The current SPIR-V benchmark-corpus
+receipt is under `bench/out/scratch/`.
+
+The receipt also reports whether exact Tint `phaseTimingsNs` include the
+named phases needed for claimability. Missing exact phases remain diagnostic
+row data in this checker and remain claim blockers in the compiler evidence
+gate.
+
+Touched:
+
+- `bench/tools/check_tint_phase_benchmark_evidence.py`
+- `bench/runners/blocking_gates_args.py`
+- `bench/runners/run_blocking_gates.py`
+- `bench/tests/test_tint_phase_benchmark_evidence.py`
+- `bench/tests/test_run_blocking_gates_wiring.py`
+- `config/dawn-replacement-frontier.json`
+- `config/tint-phase-benchmark-evidence.schema.json`
+- `config/schema-targets.json`
+- `examples/tint-phase-benchmark-evidence.sample.json`
+- `bench/README.md`
+- `docs/shader-compiler-architecture.md`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/tools/check_tint_phase_benchmark_evidence.py bench/tests/test_tint_phase_benchmark_evidence.py bench/runners/blocking_gates_args.py bench/runners/run_blocking_gates.py bench/tests/test_run_blocking_gates_wiring.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_tint_phase_benchmark_evidence`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_run_blocking_gates_wiring`
+- `python3 bench/tools/check_tint_phase_benchmark_evidence.py --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --out bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --json`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py`
+- `python3 bench/tools/find_dawn_claim_candidates.py --json | jq '.summary'`
+- `git diff --check`
+
+## 2026-06-30 — Tint benchmark corpus evidence can target SPIR-V
+
+The Tint benchmark-corpus loader no longer hard-codes MSL metadata into every
+shader row. It now preserves the backend target declared by the comparison
+config, and the new SPIR-V benchmark-corpus config emits Doe-vs-Tint compiler
+evidence for the Dawn benchmark input list without depending on host MSL
+tooling.
+
+The SPIR-V benchmark-corpus config also collects Dawn `tint_benchmark`
+benchmark-scope timings for `ParseWGSL`, `ValidateIR`, and the selected backend
+generator into `phaseBenchmarkTimingsNs`. These fields are diagnostic evidence
+only and deliberately remain separate from `phaseTimingsNs`, so the compiler
+evidence gate still blocks claimability until exact Tint `parse`, `sema`,
+`lower`, and `emit` phase timings exist.
+
+The regenerated SPIR-V benchmark-corpus evidence remains diagnostic. It proves
+that the local lane can collect target-specific SPIR-V output validation and
+warm Tint benchmark timings for the rows that both sides compile, while also
+pinning the remaining blockers to exact Tint phase timing evidence, Doe SPIR-V
+coverage/validation gaps, and release-tail claim policy. The artifact paths
+carry the row-level details.
+
+Touched:
+
+- `bench/native-compare/compare_doe_vs_tint_compilation.py`
+- `bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json`
+- `bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `bench/README.md`
+- `docs/shader-compiler-architecture.md`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/native-compare/compare_doe_vs_tint_compilation.py bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_compare_doe_vs_tint_compilation`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.benchmark-corpus.config.json --claim-mode release --evidence-out bench/out/tint-compiler-evidence.benchmark-corpus.json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.benchmark-corpus.json --json`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json --claim-mode release --evidence-out bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --json`
+- `jq '[.rows[] | select(.tint.status == "ok") | {shaderId, exactTintPhases:.tint.phaseTimingsNs, phaseBenchmarks:.tint.phaseBenchmarkTimingsNs}]' bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`
+
+## 2026-06-30 — Target-backend shader artifacts have a validation receipt
+
+Tint compiler evidence rows now carry `outputPath` next to `outputSha256`, so
+the backend artifact hash is bound to a concrete Doe or Tint output file. The
+new target-backend validation checker reads stored `tint-compiler-evidence`
+reports, requires the requested backend target rows, checks Doe and Tint
+validation status/tool identity, enforces safe repo-relative output and receipt
+paths, and can verify the emitted backend file hashes under
+`--verify-files-root`. The same checker is now reachable from the blocking-gates
+runner through `--with-tint-compiler-target-validation-gate` with explicit
+required backend targets.
+
+The browser-corpus SPIR-V evidence now emits a passing
+`tint_compiler_target_validation` receipt for the selected WGSL corpus shader.
+That turns the `shader_artifact_validation_for_target_backends` blocker into a
+gate-backed artifact surface, while the compiler claim boundary remains
+diagnostic because the Tint per-phase timing blocker is still present.
+
+Touched:
+
+- `bench/native-compare/compare_doe_vs_tint_compilation.py`
+- `bench/runners/blocking_gates_args.py`
+- `bench/runners/run_blocking_gates.py`
+- `bench/tools/check_tint_compiler_target_validation.py`
+- `bench/tests/test_tint_compiler_target_validation.py`
+- `bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `bench/tests/test_run_blocking_gates_wiring.py`
+- `config/tint-compiler-evidence.schema.json`
+- `config/tint-compiler-target-validation.schema.json`
+- `config/schema-targets.json`
+- `config/dawn-replacement-frontier.json`
+- `examples/tint-compiler-evidence.sample.json`
+- `examples/tint-compiler-target-validation.sample.json`
+- `bench/README.md`
+- `docs/shader-compiler-architecture.md`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/native-compare/compare_doe_vs_tint_compilation.py bench/tools/check_tint_compiler_target_validation.py bench/tests/test_compare_doe_vs_tint_compilation.py bench/tests/test_tint_compiler_target_validation.py`
+- `python3 -m py_compile bench/runners/blocking_gates_args.py bench/runners/run_blocking_gates.py bench/tests/test_run_blocking_gates_wiring.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_tint_compiler_target_validation`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_compare_doe_vs_tint_compilation`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_run_blocking_gates_wiring`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json --claim-mode local --evidence-out bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json`
+- `python3 bench/tools/check_tint_compiler_target_validation.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-target-validation.browser-corpus.spirv.json --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --json`
+- `python3 bench/tools/build_wgsl_lowering_link_receipt.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --manifest config/wgsl-browser-corpus.json --out bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json`
+- `python3 bench/tools/check_wgsl_lowering_link_receipt.py --receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --verify-files-root . --json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --require-claimable` (expected diagnostic failure: Tint per-phase timing evidence is still missing)
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py`
+- `python3 bench/tools/find_dawn_claim_candidates.py --json | jq '.summary'`
+
+## 2026-06-30 — Doe-vs-Tint evidence can read the browser WGSL corpus
+
+The Doe-vs-Tint compiler harness now accepts a `wgslCorpusManifest` config
+entry and preserves WGSL corpus metadata in compiler evidence rows. Browser
+corpus rows therefore keep the manifest shader ID, source path, expected
+backend targets, expected validity, category, and shader-stage identity through
+the compiler evidence report and into WGSL lowering-link receipts.
+
+The new browser-corpus SPIR-V config selects the `webgpu-prefix-sum` row from
+`config/wgsl-browser-corpus.json`. On this host it produces diagnostic compiler
+evidence with Doe and Tint SPIR-V validation passing, then builds a linked
+lowering-link receipt whose source, Doe receipt, and Tint artifact paths verify
+under the existing receipt checker. The evidence remains non-claimable because
+the Tint warm in-process phase timing blocker is still present.
+
+Touched:
+
+- `bench/native-compare/compare_doe_vs_tint_compilation.py`
+- `bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json`
+- `bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `bench/README.md`
+- `docs/shader-compiler-architecture.md`
+- `docs/status/compiler-and-webgpu.md`
+
+Verified:
+
+- `python3 -m py_compile bench/native-compare/compare_doe_vs_tint_compilation.py bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_compare_doe_vs_tint_compilation`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json --claim-mode local --evidence-out bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --json`
+- `python3 bench/tools/build_wgsl_lowering_link_receipt.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --manifest config/wgsl-browser-corpus.json --out bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json`
+- `python3 bench/tools/check_wgsl_lowering_link_receipt.py --receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --verify-files-root . --json`
+
+## 2026-06-30 — WGSL compile receipts cover SPIR-V target evidence
+
+The runtime compile reporter now carries an explicit target contract for MSL
+and SPIR-V receipts. SPIR-V mode emits native SPIR-V output, records
+`target`, `outputBytes`, and `spirvBytes`, and keeps `mslBytes` as a
+compatibility field for older MSL consumers.
+
+Doe-vs-Tint compiler evidence now validates target-specific Doe and Tint
+backend outputs for MSL and SPIR-V, claim sidecars hash-link their compiler
+comparison sidecar, and the Dawn replacement candidate audit accepts compiler
+NDJSON comparison sidecars. The Tint compiler evidence gate keeps missing
+named Tint phase timings as claim blockers for diagnostic reports, while
+`--require-claimable` still promotes those blockers to hard failures.
+
+Touched:
+
+- `runtime/zig/src/doe_wgsl/mod.zig`
+- `runtime/zig/src/doe_wgsl/runtime_compile.zig`
+- `runtime/zig/src/doe_wgsl/runtime_compile_report.zig`
+- `config/runtime-compile-report.schema.json`
+- `examples/runtime-compile-report.sample.json`
+- `bench/native-compare/compare_doe_vs_tint_compilation.py`
+- `bench/native_compare_modules/compare_doe_vs_tint_support.py`
+- `bench/gates/tint_compiler_evidence_gate.py`
+- `bench/tools/find_dawn_claim_candidates.py`
+- `bench/tests/test_compare_doe_vs_tint_compilation.py`
+- `bench/tests/test_tint_compiler_evidence_gate.py`
+- `bench/tests/test_find_dawn_claim_candidates.py`
+- `bench/tests/test_runtime_compile_report_schema.py`
+- `runtime/zig/README.md`
+- `bench/README.md`
+
+Verified:
+
+- `python3 -m py_compile bench/gates/tint_compiler_evidence_gate.py bench/native-compare/compare_doe_vs_tint_compilation.py bench/native_compare_modules/compare_doe_vs_tint_support.py bench/tests/test_compare_doe_vs_tint_compilation.py bench/tests/test_find_dawn_claim_candidates.py bench/tests/test_runtime_compile_report_schema.py bench/tests/test_tint_compiler_evidence_gate.py bench/tests/test_wgsl_lowering_link_receipt.py bench/tools/build_wgsl_lowering_link_receipt.py bench/tools/check_wgsl_lowering_link_receipt.py bench/tools/find_dawn_claim_candidates.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_compare_doe_vs_tint_compilation`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_tint_compiler_evidence_gate`
+- `PYTHONPATH=bench:. python3 -c "from bench.tests import test_find_dawn_claim_candidates as t; [getattr(t, name)() for name in sorted(dir(t)) if name.startswith('test_')]"`
+- `PYTHONPATH=bench:. python3 -c "from bench.tests import test_runtime_compile_report_schema as t; [getattr(t, name)() for name in sorted(dir(t)) if name.startswith('test_')]"`
+- `zig build runtime-compile-report`
+- `zig build test-wgsl`
+- `runtime/zig/zig-out/bin/doe-runtime-compile-report --shader-path bench/kernels/compilation-corpus/trivial_noop_compute.wgsl --shader-name trivial_noop_compute --target msl --emit-msl bench/out/scratch/trivial_noop_compute.report.msl --out bench/out/scratch/trivial_noop_compute.report.msl.json`
+- `runtime/zig/zig-out/bin/doe-runtime-compile-report --shader-path bench/kernels/compilation-corpus/trivial_noop_compute.wgsl --shader-name trivial_noop_compute --target spirv --emit-spirv bench/out/scratch/trivial_noop_compute.report.spv --out bench/out/scratch/trivial_noop_compute.report.spv.json`
+- `spirv-val bench/out/scratch/trivial_noop_compute.report.spv`
+- `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/out/scratch/doe-vs-tint-spirv-smoke.config.json --iterations 7 --warmup 1 --claim-mode local --evidence-out bench/out/scratch/tint-compiler-evidence.spirv-smoke.json`
+- `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/scratch/tint-compiler-evidence.spirv-smoke.json`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py`
+- `python3 bench/tools/find_dawn_claim_candidates.py --json | jq '.summary'`
+
+## 2026-06-30 — WGSL lowering links bind Tint comparator artifacts
+
+The WGSL lowering-link receipt now records comparator-side artifact linkage for
+Doe-vs-Tint compiler evidence. Linked rows bind the WGSL corpus row, source
+hash, Doe IR hash, Doe backend output hash, Tint backend output hash, Doe and
+Tint validation statuses, both receipt paths, and backend target identity.
+
+Touched:
+
+- `config/wgsl-lowering-link-receipt.schema.json`
+- `examples/wgsl-lowering-link-receipt.sample.json`
+- `bench/tools/build_wgsl_lowering_link_receipt.py`
+- `bench/tools/check_wgsl_lowering_link_receipt.py`
+- `bench/tests/test_wgsl_lowering_link_receipt.py`
+- `docs/shader-compiler-architecture.md`
+- `bench/README.md`
+
+Verified:
+
+- `python3 -m py_compile bench/tools/build_wgsl_lowering_link_receipt.py bench/tools/check_wgsl_lowering_link_receipt.py bench/tests/test_wgsl_lowering_link_receipt.py`
+- `PYTHONPATH=bench:. python3 -c "from bench.tests import test_wgsl_lowering_link_receipt as t; [getattr(t, name)() for name in sorted(dir(t)) if name.startswith('test_')]"`
+- `python3 bench/tools/check_wgsl_lowering_link_receipt.py --receipt examples/wgsl-lowering-link-receipt.sample.json --verify-files-root .`
+- `python3 bench/gates/schema_gate.py`
+
 ## 2026-05-27 — WGSL verified output paths stay under verification root
 
 WGSL corpus materialization and minimization receipt checks now reject verified

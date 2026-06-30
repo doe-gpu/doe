@@ -11,6 +11,7 @@ const abi_texture = @import("core/abi/wgpu_texture_base_types.zig");
 const abi_binding = @import("core/abi/wgpu_binding_base_types.zig");
 const abi_callback = @import("core/abi/wgpu_callback_descriptor_types.zig");
 const abi_pipeline = @import("core/abi/wgpu_pipeline_descriptor_types.zig");
+const texture_sampler = @import("doe_texture_sampler_native.zig");
 
 const alloc = native_helpers.alloc;
 const make = native_helpers.make;
@@ -409,17 +410,40 @@ pub export fn doeNativeDeviceCreateBindGroup(dev_raw: ?*anyopaque, desc: ?*const
             } else if (resolve_external_texture(e)) |external_texture| {
                 const ext_mod = @import("doe_external_texture_native.zig");
                 const ext = native_helpers.cast(DoeExternalTexture, external_texture) orelse continue;
-                // Resolve the MTL handle from plane0 (works for both DoeTextureView
-                // and native-imported paths).
-                const p0_mtl = ext_mod.resolvePlane0MtlHandle(ext);
-                bg.textures[e.binding] = p0_mtl;
-                bg.texture_views[e.binding] = ext.plane0;
+                if (is_vulkan) {
+                    const plane0_view = texture_sampler.registeredTextureView(ext.plane0) orelse {
+                        alloc.destroy(bg);
+                        return null;
+                    };
+                    if (plane0_view.tex.error_object or plane0_view.tex.vk_id == 0) {
+                        alloc.destroy(bg);
+                        return null;
+                    }
+                    bg.textures[e.binding] = toOpaque(plane0_view.tex);
+                    bg.texture_views[e.binding] = toOpaque(plane0_view);
+                } else {
+                    bg.textures[e.binding] = ext_mod.resolvePlane0MtlHandle(ext);
+                    bg.texture_views[e.binding] = ext.plane0;
+                }
                 retain_external_texture(bg, e.binding, external_texture);
                 if (ext_mod.isMultiPlane(ext)) {
                     const next_slot = e.binding + 1;
                     if (next_slot < MAX_BIND) {
-                        bg.textures[next_slot] = ext_mod.resolvePlane1MtlHandle(ext);
-                        bg.texture_views[next_slot] = ext.plane1;
+                        if (is_vulkan) {
+                            const plane1_view = texture_sampler.registeredTextureView(ext.plane1) orelse {
+                                alloc.destroy(bg);
+                                return null;
+                            };
+                            if (plane1_view.tex.error_object or plane1_view.tex.vk_id == 0) {
+                                alloc.destroy(bg);
+                                return null;
+                            }
+                            bg.textures[next_slot] = toOpaque(plane1_view.tex);
+                            bg.texture_views[next_slot] = toOpaque(plane1_view);
+                        } else {
+                            bg.textures[next_slot] = ext_mod.resolvePlane1MtlHandle(ext);
+                            bg.texture_views[next_slot] = ext.plane1;
+                        }
                         if (next_slot + 1 > bg.count) bg.count = next_slot + 1;
                     }
                 }

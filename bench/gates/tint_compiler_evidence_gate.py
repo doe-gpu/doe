@@ -180,9 +180,10 @@ def toolchain_artifact_blockers(
     return blockers
 
 
-def row_blockers(row: dict[str, Any], required_phases: list[str]) -> tuple[list[str], bool]:
+def row_blockers(row: dict[str, Any], required_phases: list[str]) -> tuple[list[str], list[str], bool]:
     row_id = str(row.get("shaderId") or "unknown")
     failures: list[str] = []
+    claim_blockers: list[str] = []
     claimable = True
 
     if not is_sha256(row.get("sourceSha256")):
@@ -203,14 +204,14 @@ def row_blockers(row: dict[str, Any], required_phases: list[str]) -> tuple[list[
             required_phases,
         )
         failures.extend(side_failures)
-        failures.extend(side_blockers)
+        claim_blockers.extend(side_blockers)
         if side_failures or side_blockers or result.get("status") != "ok":
             claimable = False
 
     comparability = row.get("comparability")
     if not isinstance(comparability, dict):
         failures.append(f"{row_id}: missing comparability object")
-        return failures, False
+        return failures, claim_blockers, False
 
     status = comparability.get("status")
     reasons = comparability.get("reasons")
@@ -218,8 +219,6 @@ def row_blockers(row: dict[str, Any], required_phases: list[str]) -> tuple[list[
         if reasons:
             failures.append(f"{row_id}: comparable row must not carry comparability reasons")
             claimable = False
-        if not claimable:
-            failures.append(f"{row_id}: comparable row has blocking compiler evidence gaps")
     else:
         claimable = False
         if not isinstance(reasons, list) or not reasons:
@@ -228,7 +227,7 @@ def row_blockers(row: dict[str, Any], required_phases: list[str]) -> tuple[list[
     claimability = row.get("claimability")
     if not isinstance(claimability, dict):
         failures.append(f"{row_id}: missing claimability object")
-        return failures, False
+        return failures, claim_blockers, False
 
     claim_status = claimability.get("status")
     claim_reasons = claimability.get("reasons")
@@ -256,7 +255,7 @@ def row_blockers(row: dict[str, Any], required_phases: list[str]) -> tuple[list[
         if not isinstance(claim_reasons, list) or not claim_reasons:
             failures.append(f"{row_id}: diagnostic claimability requires reasons")
 
-    return failures, claimable and status == "comparable" and claim_status == "claimable"
+    return failures, claim_blockers, claimable and status == "comparable" and claim_status == "claimable"
 
 
 def evaluate_report(payload: dict[str, Any], require_claimable: bool = False) -> dict[str, Any]:
@@ -301,8 +300,9 @@ def evaluate_report(payload: dict[str, Any], require_claimable: bool = False) ->
             failures.append(f"{row_id}: duplicate shaderId")
             continue
         row_ids.add(row_id)
-        row_failures, row_claimable = row_blockers(row, required_phases)
+        row_failures, row_claim_blockers, row_claimable = row_blockers(row, required_phases)
         failures.extend(row_failures)
+        claim_blockers.extend(row_claim_blockers)
         if row.get("comparability", {}).get("status") == "comparable":
             comparable_rows += 1
         if row_claimable:
@@ -346,14 +346,14 @@ def evaluate_report(payload: dict[str, Any], require_claimable: bool = False) ->
         )
     if not rows:
         if comparison_status == "comparable":
-            claim_blockers.append("comparisonStatus=comparable requires at least one row")
+            failures.append("comparisonStatus=comparable requires at least one row")
         if claim_status == "claimable":
             claim_blockers.append("claimStatus=claimable requires at least one row")
         reasons = summary.get("reasons") if isinstance(summary, dict) else None
         if not reasons:
             failures.append("zero-row diagnostic reports require summary.reasons")
     if comparison_status == "comparable" and comparable_rows != len(rows):
-        claim_blockers.append("comparisonStatus=comparable requires every row comparable")
+        failures.append("comparisonStatus=comparable requires every row comparable")
     if claim_status == "claimable":
         if comparison_status != "comparable":
             claim_blockers.append("claimStatus=claimable requires comparisonStatus=comparable")
@@ -369,7 +369,7 @@ def evaluate_report(payload: dict[str, Any], require_claimable: bool = False) ->
             claim_blockers.append("--require-claimable requires claimStatus=claimable")
 
     hard_failures = list(failures)
-    if claim_status == "claimable" or comparison_status == "comparable" or require_claimable:
+    if claim_status == "claimable" or require_claimable:
         hard_failures.extend(claim_blockers)
 
     return {

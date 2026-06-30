@@ -54,10 +54,13 @@
       "doe": {
         "status": "ok",
         "diagnosticCode": "",
+        "diagnosticMessage": "",
         "outputSha256": "2222222222222222222222222222222222222222222222222222222222222222",
         "irSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "outputPath": "bench/out/scratch/sample/doe.spv",
         "validationStatus": "passed",
         "validationTool": "sample-validator",
+        "validationMessage": "",
         "phaseTimingsNs": {
           "parse": 1,
           "sema": 1,
@@ -65,16 +68,21 @@
           "emit": 1,
           "total": 4
         },
+        "phaseBenchmarkTimingsNs": {},
         "receiptPath": "bench/out/scratch/sample/doe.json"
       },
       "tint": {
         "status": "failed",
         "diagnosticCode": "sample_missing_tint_run",
+        "diagnosticMessage": "sample Tint run was not executed",
         "outputSha256": null,
         "irSha256": null,
+        "outputPath": "",
         "validationStatus": "not_run",
         "validationTool": "",
+        "validationMessage": "",
         "phaseTimingsNs": {},
+        "phaseBenchmarkTimingsNs": {},
         "receiptPath": ""
       },
       "comparability": {

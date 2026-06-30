@@ -180,6 +180,9 @@ pub fn texture_copy(self: anytype, args: struct {
     if (self.has_deferred_submissions or self.pending_uploads.items.len > 0) {
         _ = try self.flush_queue();
     }
+    const src_prev = src.layout;
+    if (src_prev == c.VK_IMAGE_LAYOUT_UNDEFINED) return error.InvalidState;
+    const dst_prev = dst.layout;
     try vk_device.ensure_submission_state(self);
     try c.check_vk(c.vkResetCommandPool(self.device, self.command_pool, 0));
     var begin_info = c.VkCommandBufferBeginInfo{
@@ -189,8 +192,6 @@ pub fn texture_copy(self: anytype, args: struct {
         .pInheritanceInfo = null,
     };
     try c.check_vk(c.vkBeginCommandBuffer(self.primary_command_buffer, &begin_info));
-    const src_prev = src.layout;
-    const dst_prev = dst.layout;
     vk_resources.transition_texture_layout(self.primary_command_buffer, src.*, src_prev, c.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vk_resources.texture_transition_source(src_prev).src_access_mask, c.VK_ACCESS_TRANSFER_READ_BIT, vk_resources.texture_transition_source(src_prev).src_stage, c.VK_PIPELINE_STAGE_TRANSFER_BIT);
     vk_resources.transition_texture_layout(self.primary_command_buffer, dst.*, dst_prev, c.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk_resources.texture_transition_source(dst_prev).src_access_mask, c.VK_ACCESS_TRANSFER_WRITE_BIT, vk_resources.texture_transition_source(dst_prev).src_stage, c.VK_PIPELINE_STAGE_TRANSFER_BIT);
     const layers = if (args.depth_or_layers > 0) args.depth_or_layers else 1;

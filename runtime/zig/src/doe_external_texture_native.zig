@@ -18,6 +18,7 @@ const external_texture_ops = @import("backend/dropin_external_texture.zig");
 const native_types = @import("doe_native_object_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_exports = @import("doe_native_exports.zig");
+const texture_sampler = @import("doe_texture_sampler_native.zig");
 const abi_callback = @import("core/abi/wgpu_callback_descriptor_types.zig");
 
 const DoeTextureView = native_types.DoeTextureView;
@@ -109,7 +110,7 @@ pub fn isMultiPlane(ext: *const DoeExternalTexture) bool {
 pub fn resolvePlane0MtlHandle(ext: *const DoeExternalTexture) ?*anyopaque {
     const p0 = ext.plane0 orelse return null;
     if (ext.native_imported) return p0;
-    const view = native_helpers.cast(DoeTextureView, p0) orelse return null;
+    const view = texture_sampler.registeredTextureView(p0) orelse return null;
     return if (view.handle) |h| h else view.tex.mtl;
 }
 
@@ -117,7 +118,7 @@ pub fn resolvePlane0MtlHandle(ext: *const DoeExternalTexture) ?*anyopaque {
 pub fn resolvePlane1MtlHandle(ext: *const DoeExternalTexture) ?*anyopaque {
     const p1 = ext.plane1 orelse return null;
     if (ext.native_imported) return p1;
-    const view = native_helpers.cast(DoeTextureView, p1) orelse return null;
+    const view = texture_sampler.registeredTextureView(p1) orelse return null;
     return if (view.handle) |h| h else view.tex.mtl;
 }
 
@@ -125,7 +126,7 @@ pub fn resolvePlane1MtlHandle(ext: *const DoeExternalTexture) ?*anyopaque {
 /// Returns null for native-imported textures (they have no DoeTexture wrapper).
 pub fn resolvePlane0DoeTexture(ext: *const DoeExternalTexture) ?*native_types.DoeTexture {
     if (ext.native_imported) return null;
-    const view = native_helpers.cast(DoeTextureView, ext.plane0) orelse return null;
+    const view = texture_sampler.registeredTextureView(ext.plane0) orelse return null;
     return view.tex;
 }
 
@@ -237,8 +238,8 @@ fn createFromTextureViews(
 ) ?*anyopaque {
     const plane0 = @as(*const ?*anyopaque, @ptrCast(@alignCast(desc_ptr + PLANE0_OFFSET))).*;
     const plane1 = @as(*const ?*anyopaque, @ptrCast(@alignCast(desc_ptr + PLANE1_OFFSET))).*;
-    const plane0_view = native_helpers.cast(DoeTextureView, plane0) orelse return null;
-    const plane1_view = native_helpers.cast(DoeTextureView, plane1);
+    const plane0_view = texture_sampler.registeredTextureView(plane0) orelse return null;
+    const plane1_view = texture_sampler.registeredTextureView(plane1);
 
     if (instance_ref) |inst| inst.ref_count +|= 1;
     native_helpers.object_add_ref(DoeTextureView, native_helpers.toOpaque(plane0_view));

@@ -14,9 +14,99 @@ fn read_u32_le(bytes: []const u8, offset: usize) u32 {
     return std.mem.readInt(u32, @as(*const [4]u8, @ptrCast(bytes[offset .. offset + 4].ptr)), .little);
 }
 
+fn count_spirv_opcode(binary: []const u8, opcode: u16) u32 {
+    const word_count = binary.len / 4;
+    var i: usize = 5;
+    var count: u32 = 0;
+    while (i < word_count) {
+        const w = read_u32_le(binary, i * 4);
+        const op = @as(u16, @truncate(w));
+        const wc = w >> 16;
+        if (op == opcode) count += 1;
+        i += wc;
+    }
+    return count;
+}
+
 // ============================================================
 // HLSL type mapping tests (via IR construction)
 // ============================================================
+
+test "spirv builtin: any and all reduce bool vectors" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> out_data: array<u32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main(@builtin(global_invocation_id) id: vec3u) {
+        \\    let mask = (id.xyxy < vec4<u32>(2u)) & vec4<bool>(true, false, true, true);
+        \\    let value = select(0u, 1u, any(mask.yw)) + select(0u, 2u, all(mask.xw));
+        \\    out_data[0] = value;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try testing.expect(len >= 20);
+    try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.Any));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.All));
+}
+
+test "spirv builtin: coarse derivatives emit native opcodes" {
+    const source =
+        \\struct FragIn {
+        \\    @location(0) uv: vec2f,
+        \\}
+        \\
+        \\@fragment
+        \\fn main(in: FragIn) -> @location(0) vec4f {
+        \\    let dx = dpdxCoarse(in.uv);
+        \\    let dy = dpdyCoarse(in.uv);
+        \\    let fw = fwidthCoarse(in.uv);
+        \\    let v = dx + dy + fw;
+        \\    return vec4f(v.x, v.y, 0.0, 1.0);
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try testing.expect(len >= 20);
+    try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.DPdxCoarse));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.DPdyCoarse));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.FwidthCoarse));
+}
+
+test "spirv texture: textureNumLevels emits OpImageQueryLevels" {
+    const source =
+        \\@group(0) @binding(0) var tex: texture_2d<f32>;
+        \\@group(0) @binding(1) var<storage, read_write> out_data: array<u32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    out_data[0] = textureNumLevels(tex);
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try testing.expect(len >= 20);
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.ImageQueryLevels));
+}
+
+test "spirv texture: sampled textureDimensions uses OpImageQuerySizeLod" {
+    const source =
+        \\@group(0) @binding(0) var tex: texture_2d<f32>;
+        \\@group(0) @binding(1) var<storage, read_write> out_data: array<u32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    let dims = textureDimensions(tex);
+        \\    out_data[0] = dims.x;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try testing.expect(len >= 20);
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.ImageQuerySizeLod));
+}
 
 test "spirv texture: textureSample produces valid SPIR-V" {
     const source =
@@ -34,6 +124,7 @@ test "spirv texture: textureSample produces valid SPIR-V" {
     const len = try translateToSpirv(allocator, source, &out);
     try testing.expect(len >= 20);
     try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.ImageSampleImplicitLod));
 }
 
 test "spirv texture: textureSampleLevel produces valid SPIR-V" {
@@ -52,6 +143,26 @@ test "spirv texture: textureSampleLevel produces valid SPIR-V" {
     const len = try translateToSpirv(allocator, source, &out);
     try testing.expect(len >= 20);
     try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.ImageSampleExplicitLod));
+}
+
+test "spirv texture: textureSampleBias emits implicit-lod sample" {
+    const source =
+        \\@group(0) @binding(0) var tex: texture_2d<f32>;
+        \\@group(0) @binding(1) var samp: sampler;
+        \\@group(0) @binding(2) var<storage, read_write> out_data: array<f32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main(@builtin(global_invocation_id) id: vec3u) {
+        \\    let uv = vec2f(0.5, 0.5);
+        \\    out_data[id.x] = textureSampleBias(tex, samp, uv, 1.0).x;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try testing.expect(len >= 20);
+    try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.ImageSampleImplicitLod));
 }
 
 test "spirv texture: textureSampleCompare produces valid SPIR-V" {
@@ -70,6 +181,7 @@ test "spirv texture: textureSampleCompare produces valid SPIR-V" {
     const len = try translateToSpirv(allocator, source, &out);
     try testing.expect(len >= 20);
     try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.ImageSampleDrefImplicitLod));
 }
 
 test "spirv texture: textureSampleCompareLevel produces valid SPIR-V" {
@@ -88,6 +200,7 @@ test "spirv texture: textureSampleCompareLevel produces valid SPIR-V" {
     const len = try translateToSpirv(allocator, source, &out);
     try testing.expect(len >= 20);
     try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.ImageSampleDrefExplicitLod));
 }
 
 test "spirv texture: textureGather produces valid SPIR-V" {

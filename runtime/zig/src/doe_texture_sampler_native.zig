@@ -75,7 +75,7 @@ extern fn metal_bridge_device_new_texture(device: ?*anyopaque, width: u32, heigh
 extern fn metal_bridge_texture_new_view(texture: ?*anyopaque, pixel_format: u32, dimension: u32, base_mip_level: u32, mip_level_count: u32, base_array_layer: u32, array_layer_count: u32, swizzle_r: u32, swizzle_g: u32, swizzle_b: u32, swizzle_a: u32) callconv(.c) ?*anyopaque;
 extern fn metal_bridge_device_new_sampler(device: ?*anyopaque, min_f: u32, mag_f: u32, mip_f: u32, addr_u: u32, addr_v: u32, addr_w: u32, lod_min: f32, lod_max: f32, max_aniso: u16) callconv(.c) ?*anyopaque;
 
-const OpaqueRegistry = struct {
+pub const OpaqueRegistry = struct {
     map: std.AutoHashMapUnmanaged(usize, void) = .{},
     mutex: std.Thread.Mutex = .{},
 
@@ -104,6 +104,28 @@ const OpaqueRegistry = struct {
 pub var d3d12_texture_registry: OpaqueRegistry = .{};
 pub var d3d12_texture_view_registry: OpaqueRegistry = .{};
 pub var d3d12_sampler_registry: OpaqueRegistry = .{};
+var texture_registry: OpaqueRegistry = .{};
+var texture_view_registry: OpaqueRegistry = .{};
+
+fn registerTexture(raw: ?*anyopaque) bool {
+    texture_registry.insert(raw) catch return false;
+    return true;
+}
+
+fn registerTextureView(raw: ?*anyopaque) bool {
+    texture_view_registry.insert(raw) catch return false;
+    return true;
+}
+
+pub fn registeredTexture(raw: ?*anyopaque) ?*DoeTexture {
+    if (!texture_registry.contains(raw)) return null;
+    return cast(DoeTexture, raw);
+}
+
+pub fn registeredTextureView(raw: ?*anyopaque) ?*DoeTextureView {
+    if (!texture_view_registry.contains(raw)) return null;
+    return cast(DoeTextureView, raw);
+}
 
 pub fn default_texture_view_dimension(tex: *const DoeTexture) u32 {
     if (tex.texture_binding_view_dimension != 0) return tex.texture_binding_view_dimension;
@@ -332,6 +354,11 @@ pub export fn doeNativeDeviceCreateTexture(dev_raw: ?*anyopaque, desc: ?*const a
             return null;
         }
         const result = toOpaque(tex);
+        if (!registerTexture(result)) {
+            vk_render.vulkan_destroy_texture(tex);
+            alloc.destroy(tex);
+            return null;
+        }
         label_store.set(result, d.label.data, d.label.length);
         return result;
     }
@@ -367,7 +394,13 @@ pub export fn doeNativeDeviceCreateTexture(dev_raw: ?*anyopaque, desc: ?*const a
         };
         tex.mtl = d3d12_texture;
         const result = toOpaque(tex);
+        if (!registerTexture(result)) {
+            d3d12_bridge_release(d3d12_texture);
+            alloc.destroy(tex);
+            return null;
+        }
         if (!d3d12_register_texture(result)) {
+            texture_registry.remove(result);
             d3d12_bridge_release(d3d12_texture);
             alloc.destroy(tex);
             return null;
@@ -382,6 +415,11 @@ pub export fn doeNativeDeviceCreateTexture(dev_raw: ?*anyopaque, desc: ?*const a
     };
     tex.mtl = mtl;
     const result = toOpaque(tex);
+    if (!registerTexture(result)) {
+        metal_bridge_release(mtl);
+        alloc.destroy(tex);
+        return null;
+    }
     label_store.set(result, d.label.data, d.label.length);
     return result;
 }
@@ -539,7 +577,20 @@ pub export fn doeNativeTextureCreateView(tex_raw: ?*anyopaque, desc: ?*const abi
         .usage = resolved_usage,
     };
     const result = toOpaque(tv);
+    if (!registerTextureView(result)) {
+        if (view_handle) |handle| {
+            if (is_d3d12_texture) {
+                d3d12_bridge_release(handle);
+            } else if (tex.mtl == null or handle != tex.mtl) {
+                metal_bridge_release(handle);
+            }
+        }
+        native_exports.doeNativeTextureRelease(tex_raw);
+        alloc.destroy(tv);
+        return null;
+    }
     if (is_d3d12_texture and !d3d12_register_texture_view(result)) {
+        texture_view_registry.remove(result);
         if (view_handle) |handle| d3d12_bridge_release(handle);
         native_exports.doeNativeTextureRelease(tex_raw);
         alloc.destroy(tv);
@@ -556,6 +607,7 @@ pub export fn doeNativeTextureDestroy(raw: ?*anyopaque) callconv(.c) void {
 pub export fn doeNativeTextureRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeTexture, raw)) |t| {
         if (!native_helpers.object_should_destroy(t)) return;
+        texture_registry.remove(raw);
         label_store.remove(raw);
         if (d3d12_texture_registry.contains(raw)) {
             d3d12_texture_registry.remove(raw);
@@ -578,6 +630,7 @@ pub export fn doeNativeTextureViewRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeTextureView, raw)) |tv| {
         if (!native_helpers.object_should_destroy(tv)) return;
         const texture = tv.tex;
+        texture_view_registry.remove(raw);
         label_store.remove(raw);
         if (d3d12_texture_view_registry.contains(raw)) {
             d3d12_texture_view_registry.remove(raw);

@@ -98,10 +98,15 @@ pub export fn doeNativeCommandEncoderCopyBufferToTexture(
                         const raw: [*]const u8 = @ptrCast(mapped_ptr);
                         const copy_res = model_transfer_types.CopyTextureResource{
                             .handle = dst_texture.vk_id,
-                            .width = width,
-                            .height = height,
-                            .depth_or_array_layers = depth_or_array_layers,
+                            .kind = .texture,
+                            .width = dst_texture.width,
+                            .height = dst_texture.height,
+                            .depth_or_array_layers = dst_texture.depth_or_array_layers,
+                            .format = dst_texture.format,
+                            .usage = dst_texture.usage,
+                            .dimension = dst_texture.dimension,
                             .mip_level = dst_mip_level,
+                            .sample_count = dst_texture.sample_count,
                             .bytes_per_row = src_bytes_per_row,
                             .rows_per_image = rows,
                         };

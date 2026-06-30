@@ -287,11 +287,15 @@
       "required": [
         "status",
         "diagnosticCode",
+        "diagnosticMessage",
         "outputSha256",
         "irSha256",
+        "outputPath",
         "validationStatus",
         "validationTool",
+        "validationMessage",
         "phaseTimingsNs",
+        "phaseBenchmarkTimingsNs",
         "receiptPath"
       ],
       "properties": {
@@ -302,17 +306,26 @@
         "diagnosticCode": {
           "type": "string"
         },
+        "diagnosticMessage": {
+          "type": "string"
+        },
         "outputSha256": {
           "$ref": "#/$defs/nullableSha256"
         },
         "irSha256": {
           "$ref": "#/$defs/nullableSha256"
         },
+        "outputPath": {
+          "type": "string"
+        },
         "validationStatus": {
           "type": "string",
           "enum": ["passed", "failed", "not_run"]
         },
         "validationTool": {
+          "type": "string"
+        },
+        "validationMessage": {
           "type": "string"
         },
         "phaseTimingsNs": {
@@ -322,7 +335,64 @@
             "minimum": 0
           }
         },
+        "phaseBenchmarkTimingsNs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
         "receiptPath": {
+          "type": "string"
+        },
+        "outputArtifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/outputArtifact"
+          }
+        }
+      }
+    },
+    "outputArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "entryPoint",
+        "shaderStage",
+        "outputSha256",
+        "outputPath",
+        "validationStatus",
+        "validationTool",
+        "validationMessage"
+      ],
+      "properties": {
+        "target": {
+          "enum": ["msl", "spirv", "dxil", "hlsl"]
+        },
+        "entryPoint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shaderStage": {
+          "type": "string",
+          "enum": ["compute", "vertex", "fragment", "mixed"]
+        },
+        "outputSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "outputPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "validationStatus": {
+          "type": "string",
+          "enum": ["passed", "failed", "not_run"]
+        },
+        "validationTool": {
+          "type": "string"
+        },
+        "validationMessage": {
           "type": "string"
         }
       }

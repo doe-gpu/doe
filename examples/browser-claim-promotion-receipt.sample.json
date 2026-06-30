@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "artifactKind": "browser_claim_promotion_receipt",
-  "receiptId": "browser-claim-promotion-sample-v1",
+  "receiptId": "browser-claim-promotion-sample",
   "claimPolicyPath": "config/browser-claim-policy.json",
   "promotionStatus": "promotable",
   "artifacts": [
     {
       "path": "examples/browser-claim-report.sample.json",
-      "sha256": "dc0e791e990837b1b50a2c487c38c3284cb901fed8f520308ed67b78c69d6645",
+      "sha256": "a6bd9f81550992e8c296f7105e4ac6411ca6ee39bb29a76cf147302dc81b8dfe",
       "mode": "doe",
       "forcedDoe": true,
       "hiddenFallbackUsed": false,

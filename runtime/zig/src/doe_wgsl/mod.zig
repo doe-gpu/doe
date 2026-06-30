@@ -309,6 +309,10 @@ pub fn analyzeToIr(allocator: std.mem.Allocator, wgsl: []const u8) TranslateErro
     return analyzeToIrWithConfig(allocator, wgsl, default_translation_robustness_config());
 }
 
+pub fn analyzeToIrTimed(allocator: std.mem.Allocator, wgsl: []const u8) TranslateError!TimedAnalyzeResult {
+    return analyzeToIrWithConfigTimed(allocator, wgsl, default_translation_robustness_config());
+}
+
 pub fn analyzeToIrWithConfig(
     allocator: std.mem.Allocator,
     wgsl: []const u8,

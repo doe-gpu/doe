@@ -36,6 +36,13 @@ REQUIRED_POLICY_KINDS = {
     "browser_artifact_identity_coverage",
     "browser_unsupported_reason_taxonomy",
 }
+PROMOTION_RECEIPT_CLAIM_FAILURE_CODES = {
+    "artifact_not_forced_doe",
+    "hidden_fallback_used",
+    "claim_policy_not_passed",
+    "hidden_fallback_check_failed",
+    "promotable_receipt_has_failures",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -45,6 +52,11 @@ def parse_args() -> argparse.Namespace:
         "--verify-files-root",
         default="",
         help="Resolve relative artifact paths under this root and verify sha256 values.",
+    )
+    parser.add_argument(
+        "--require-release-candidate",
+        action="store_true",
+        help="Require releaseStatus=release_candidate and verified artifact files.",
     )
     parser.add_argument("--json", action="store_true", dest="emit_json")
     return parser.parse_args()
@@ -117,6 +129,8 @@ def check_promotion_receipt_matches_claims(
     promotion_receipts: Any,
     claim_reports: Any,
     verify_files_root: Path | None,
+    *,
+    require_claimable_promotion: bool = False,
 ) -> list[dict[str, str]]:
     if verify_files_root is None or not isinstance(promotion_receipts, list) or not isinstance(claim_reports, list):
         return []
@@ -141,6 +155,11 @@ def check_promotion_receipt_matches_claims(
             continue
         payload = load_json(resolved_path)
         for item in promotion_check.check_receipt(payload, verify_files_root):
+            if (
+                not require_claimable_promotion
+                and item["code"] in PROMOTION_RECEIPT_CLAIM_FAILURE_CODES
+            ):
+                continue
             failures.append(
                 failure(
                     f"promotion_receipt_{item['code']}",
@@ -167,8 +186,30 @@ def check_promotion_receipt_matches_claims(
     return failures
 
 
-def check_bundle(payload: dict[str, Any], verify_files_root: Path | None = None) -> list[dict[str, str]]:
+def check_bundle(
+    payload: dict[str, Any],
+    verify_files_root: Path | None = None,
+    *,
+    require_release_candidate: bool = False,
+) -> list[dict[str, str]]:
     failures: list[dict[str, str]] = []
+    if require_release_candidate:
+        if payload.get("releaseStatus") != "release_candidate":
+            failures.append(
+                failure(
+                    "release_candidate_required",
+                    "releaseStatus",
+                    "browser release artifact bundle must be a release_candidate",
+                )
+            )
+        if verify_files_root is None:
+            failures.append(
+                failure(
+                    "release_candidate_requires_verification",
+                    "verifyFilesRoot",
+                    "release-candidate browser release bundles require --verify-files-root",
+                )
+            )
     failures.extend(check_artifact(payload.get("browserBinary"), "browserBinary", "browser_binary", verify_files_root))
     failures.extend(check_artifact(payload.get("doeRuntime"), "doeRuntime", "doe_runtime", verify_files_root))
     failures.extend(check_artifact(payload.get("shaderCompiler"), "shaderCompiler", "shader_compiler", verify_files_root))
@@ -204,7 +245,17 @@ def check_bundle(payload: dict[str, Any], verify_files_root: Path | None = None)
         )
     for kind in sorted(REQUIRED_POLICY_KINDS - policy_kinds):
         failures.append(failure("missing_policy_kind", "policies", f"missing policy artifact kind {kind}"))
-    failures.extend(check_promotion_receipt_matches_claims(promotion_receipts, claim_reports, verify_files_root))
+    failures.extend(
+        check_promotion_receipt_matches_claims(
+            promotion_receipts,
+            claim_reports,
+            verify_files_root,
+            require_claimable_promotion=(
+                require_release_candidate
+                or payload.get("releaseStatus") == "release_candidate"
+            ),
+        )
+    )
     if payload.get("releaseStatus") == "release_candidate" and payload.get("failureCodes"):
         failures.append(failure("release_candidate_has_failures", "failureCodes", "release candidates cannot carry failureCodes"))
     return failures
@@ -213,7 +264,11 @@ def check_bundle(payload: dict[str, Any], verify_files_root: Path | None = None)
 def main() -> int:
     args = parse_args()
     verify_files_root = Path(args.verify_files_root).resolve() if args.verify_files_root else None
-    failures = check_bundle(load_json(Path(args.bundle)), verify_files_root)
+    failures = check_bundle(
+        load_json(Path(args.bundle)),
+        verify_files_root,
+        require_release_candidate=args.require_release_candidate,
+    )
     report = {
         "schemaVersion": 1,
         "artifactKind": "browser_release_artifact_bundle_check",

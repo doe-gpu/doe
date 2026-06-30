@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "tint_phase_benchmark_evidence",
+  "evidencePath": "examples/tint-compiler-evidence.sample.json",
+  "requiredTargets": ["spirv"],
+  "requiredBenchmarkScopes": ["parseWgsl", "validateIr", "generateBackend"],
+  "requiredExactPhases": ["parse", "sema", "lower", "emit"],
+  "status": "pass",
+  "targetCoverage": [
+    {
+      "target": "spirv",
+      "rowCount": 1,
+      "tintOkRows": 1,
+      "phaseBenchmarkCoveredRows": 1,
+      "shaderIds": ["sample-compute-copy"]
+    }
+  ],
+  "rows": [
+    {
+      "shaderId": "sample-compute-copy",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 10,
+        "validateIr": 20,
+        "generateBackend": 30
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": ["parse", "sema", "lower", "emit"]
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "targetCount": 1,
+    "coveredTargetCount": 1,
+    "rowCount": 1,
+    "tintOkRows": 1,
+    "phaseBenchmarkCoveredRows": 1,
+    "phaseBenchmarkMissingRows": 0,
+    "exactPhaseCompleteRows": 0,
+    "exactPhaseMissingRows": 1,
+    "notApplicableRows": 0,
+    "failureCount": 0
+  }
+}

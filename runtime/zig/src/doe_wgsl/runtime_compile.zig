@@ -145,6 +145,39 @@ pub fn translateToSpirvForComputeRuntime(
     };
 }
 
+pub fn translateToSpirvTimed(
+    allocator: std.mem.Allocator,
+    wgsl: []const u8,
+    out: []u8,
+) mod.TranslateError!TimedTranslationResult {
+    var arena = std.heap.ArenaAllocator.init(allocator);
+    defer arena.deinit();
+
+    const total_start_ns = nowNs();
+    var analysis = try mod.analyzeToIrTimed(arena.allocator(), wgsl);
+
+    const emit_start_ns = nowNs();
+    const len = mod.emit_spirv.emit(&analysis.module, out) catch |err| {
+        const kind: mod.TranslateError = switch (err) {
+            error.OutputTooLarge => mod.TranslateError.OutputTooLarge,
+            error.UnsupportedConstruct => mod.TranslateError.UnsupportedConstruct,
+            error.InvalidIr => mod.TranslateError.InvalidIr,
+            error.OutOfMemory => mod.TranslateError.OutOfMemory,
+        };
+        mod.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
+        return kind;
+    };
+    const emit_end_ns = nowNs();
+    var phase_timings_ns = analysis.phase_timings_ns;
+    phase_timings_ns.emit = elapsedNs(emit_start_ns, emit_end_ns);
+    phase_timings_ns.total = elapsedNs(total_start_ns, emit_end_ns);
+    return .{
+        .len = len,
+        .info = try build_translation_info(allocator, &analysis.module),
+        .phase_timings_ns = phase_timings_ns,
+    };
+}
+
 pub fn translateToSpirvForVulkanComputeRuntime(
     allocator: std.mem.Allocator,
     wgsl: []const u8,

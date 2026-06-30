@@ -27,6 +27,9 @@ def test_runtime_compile_report_sample_matches_schema() -> None:
 
     assert sample["kind"] == "runtime_compile_report"
     assert sample["schemaVersion"] == 1
+    assert sample["target"] == "msl"
+    assert sample["outputBytes"] == sample["mslBytes"]
+    assert sample["spirvBytes"] == 0
     assert set(sample["phaseTimingsNs"]) == {"parse", "sema", "lower", "emit", "total"}
 
 

@@ -128,6 +128,121 @@ def parse_args() -> argparse.Namespace:
         help="Require claimable Doe-vs-Tint compiler evidence.",
     )
     parser.add_argument(
+        "--with-tint-compiler-target-validation-gate",
+        action="store_true",
+        help="Run check_tint_compiler_target_validation.py on Doe-vs-Tint compiler evidence.",
+    )
+    parser.add_argument(
+        "--tint-compiler-target-validation-evidence",
+        action="append",
+        default=[],
+        help=(
+            "Tint compiler evidence report passed to the target-backend validation checker. "
+            "Repeat when validation spans corpora. Defaults to --tint-compiler-evidence-report "
+            "when omitted."
+        ),
+    )
+    parser.add_argument(
+        "--tint-compiler-target-validation-required-target",
+        action="append",
+        default=[],
+        choices=["dxil", "hlsl", "msl", "spirv"],
+        help="Backend target required by the target-backend validation checker. Repeat for multiple targets.",
+    )
+    parser.add_argument(
+        "--tint-compiler-target-validation-verify-files-root",
+        default="",
+        help="Optional file root forwarded to the target-backend validation checker.",
+    )
+    parser.add_argument(
+        "--tint-compiler-target-validation-allow-diagnostic-rows",
+        action="store_true",
+        help=(
+            "Forward --allow-diagnostic-rows to the target-backend validation checker."
+        ),
+    )
+    parser.add_argument(
+        "--tint-compiler-target-validation-out",
+        default="",
+        help="Optional output receipt path for the target-backend validation checker.",
+    )
+    parser.add_argument(
+        "--with-tint-phase-benchmark-evidence-gate",
+        action="store_true",
+        help="Run check_tint_phase_benchmark_evidence.py on Doe-vs-Tint compiler evidence.",
+    )
+    parser.add_argument(
+        "--tint-phase-benchmark-evidence-report",
+        default="",
+        help=(
+            "Tint compiler evidence report passed to the phase-benchmark evidence checker. "
+            "Defaults to --tint-compiler-evidence-report when omitted."
+        ),
+    )
+    parser.add_argument(
+        "--tint-phase-benchmark-required-target",
+        action="append",
+        default=[],
+        choices=["dxil", "hlsl", "msl", "spirv"],
+        help="Backend target required by the phase-benchmark evidence checker. Repeat for multiple targets.",
+    )
+    parser.add_argument(
+        "--tint-phase-benchmark-out",
+        default="",
+        help="Optional output receipt path for the phase-benchmark evidence checker.",
+    )
+    parser.add_argument(
+        "--with-tint-compiler-frontier-bundle-gate",
+        action="store_true",
+        help="Run check_tint_compiler_frontier_bundle.py for composed Doe-vs-Tint frontier receipts.",
+    )
+    parser.add_argument(
+        "--tint-compiler-frontier-bundle-compiler-evidence",
+        action="append",
+        default=[],
+        help="Compiler evidence report included in the frontier bundle. Repeat for multiple corpora.",
+    )
+    parser.add_argument(
+        "--tint-compiler-frontier-bundle-lowering-link-receipt",
+        action="append",
+        default=[],
+        help="WGSL lowering-link receipt included in the frontier bundle. Repeat for multiple corpora.",
+    )
+    parser.add_argument(
+        "--tint-compiler-frontier-bundle-target-validation",
+        action="append",
+        default=[],
+        help="Target-validation receipt included in the frontier bundle. Repeat for multiple corpora.",
+    )
+    parser.add_argument(
+        "--tint-compiler-frontier-bundle-phase-benchmark-evidence",
+        action="append",
+        default=[],
+        help="Phase-benchmark evidence receipt included in the frontier bundle. Repeat for multiple corpora.",
+    )
+    parser.add_argument(
+        "--tint-compiler-frontier-bundle-required-target",
+        action="append",
+        default=[],
+        choices=["dxil", "hlsl", "msl", "spirv"],
+        help="Backend target required by the compiler frontier bundle checker. Repeat for multiple targets.",
+    )
+    parser.add_argument(
+        "--tint-compiler-frontier-bundle-verify-files-root",
+        default="",
+        help="Optional file root forwarded to the compiler frontier bundle checker.",
+    )
+    parser.add_argument(
+        "--tint-compiler-frontier-bundle-out",
+        default="",
+        help="Optional output receipt path for the compiler frontier bundle checker.",
+    )
+    parser.add_argument(
+        "--tint-compiler-frontier-bundle-require-claimable",
+        action="store_true",
+        help="Require the composed compiler frontier bundle to have claimable compiler evidence.",
+    )
+    parser.add_argument(
         "--shader-artifact-require-manifest",
         action="store_true",
         help="Pass --require-manifest to shader_artifact_gate.py.",
@@ -372,6 +487,11 @@ def parse_args() -> argparse.Namespace:
         help="Run check_browser_claim_promotion_receipt.py on a browser claim promotion receipt.",
     )
     parser.add_argument(
+        "--with-browser-runtime-frontier-bundle-gate",
+        action="store_true",
+        help="Run check_browser_runtime_frontier_bundle.py on composed browser runtime frontier evidence.",
+    )
+    parser.add_argument(
         "--browser-claim-promotion-receipt",
         default="examples/browser-claim-promotion-receipt.sample.json",
         help="Browser claim promotion receipt passed to the receipt checker.",
@@ -390,6 +510,41 @@ def parse_args() -> argparse.Namespace:
         "--browser-release-artifact-bundle-verify-files-root",
         default="",
         help="Optional file root forwarded to the browser release bundle checker.",
+    )
+    parser.add_argument(
+        "--browser-release-artifact-bundle-require-release-candidate",
+        action="store_true",
+        help="Require the browser release bundle gate to validate release-candidate evidence.",
+    )
+    parser.add_argument(
+        "--browser-runtime-frontier-bundle-runtime-identity",
+        default="examples/browser-runtime-identity.selector.sample.json",
+        help="Browser runtime identity artifact included in the browser runtime frontier bundle.",
+    )
+    parser.add_argument(
+        "--browser-runtime-frontier-bundle-claim-promotion-receipt",
+        default="examples/browser-claim-promotion-receipt.sample.json",
+        help="Browser claim promotion receipt included in the browser runtime frontier bundle.",
+    )
+    parser.add_argument(
+        "--browser-runtime-frontier-bundle-release-artifact-bundle",
+        default="examples/browser-release-artifact-bundle.sample.json",
+        help="Browser release artifact bundle included in the browser runtime frontier bundle.",
+    )
+    parser.add_argument(
+        "--browser-runtime-frontier-bundle-verify-files-root",
+        default="",
+        help="Optional file root forwarded to the browser runtime frontier bundle checker.",
+    )
+    parser.add_argument(
+        "--browser-runtime-frontier-bundle-require-claimable",
+        action="store_true",
+        help="Require the browser runtime frontier bundle to be claimable.",
+    )
+    parser.add_argument(
+        "--browser-runtime-frontier-bundle-out",
+        default="",
+        help="Optional output path for the browser runtime frontier bundle checker.",
     )
     parser.add_argument(
         "--with-wgsl-lowering-link-receipt-gate",

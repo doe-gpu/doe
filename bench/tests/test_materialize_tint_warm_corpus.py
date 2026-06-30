@@ -87,6 +87,114 @@ class TestMaterializeTintWarmCorpus(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(first.count("test/tint/benchmark/doe/compilation_alpha_msl.wgsl"), 1)
 
+    def test_materializes_wgsl_corpus_rows_and_records_source_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            repo = root / "repo"
+            dawn = repo / "bench" / "vendor" / "dawn"
+            build = dawn / "out" / "Release"
+            script = dawn / warm_corpus.BENCHMARK_INPUTS_SCRIPT
+            writer_bench = dawn / warm_corpus.MSL_WRITER_BENCH_SOURCE
+            shader = repo / "bench" / "fixtures" / "wgsl-corpus" / "sample-prefix-sum.wgsl"
+            manifest = repo / "config" / "wgsl-browser-corpus.json"
+            state_path = repo / "bench" / "fixtures" / "browser_tint_warm_corpus_state.json"
+            script.parent.mkdir(parents=True)
+            writer_bench.parent.mkdir(parents=True)
+            shader.parent.mkdir(parents=True)
+            manifest.parent.mkdir(parents=True)
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            script.write_text(
+                "kBenchmarkFiles = [\n"
+                "]\n\n\n"
+                "def main():\n"
+                "    pass\n",
+                encoding="utf-8",
+            )
+            writer_bench.write_text("writer benchmark source\n", encoding="utf-8")
+            shader.write_text("@compute @workgroup_size(1)\nfn main() {}\n", encoding="utf-8")
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "rows": [
+                            {
+                                "shaderId": "webgpu-prefix-sum",
+                                "category": "webgpu_sample",
+                                "sourcePath": "bench/fixtures/wgsl-corpus/sample-prefix-sum.wgsl",
+                                "expectedValidity": "valid",
+                                "expectedBackendTargets": ["msl", "spirv"],
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            rows = warm_corpus.load_wgsl_corpus_rows(
+                manifest,
+                repo_root=repo,
+                target="spirv",
+                workload_ids=["webgpu-prefix-sum"],
+            )
+            copied = warm_corpus.materialize_rows(rows, dawn_source_dir=dawn)
+            merged = warm_corpus.patch_benchmark_inputs_script(
+                script,
+                [str(row["dawnBenchmarkPath"]) for row in copied],
+            )
+            warm_corpus.write_state(
+                path=state_path,
+                input_path=manifest,
+                source_kind="wgsl_corpus",
+                dawn_source_dir=dawn,
+                build_dir=build,
+                target="spirv",
+                copied_rows=copied,
+                built=False,
+                repo_root=repo,
+            )
+
+            copied_shader = dawn / "test" / "tint" / "benchmark" / "doe" / "webgpu-prefix-sum.wgsl"
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            self.assertTrue(copied_shader.is_file())
+            self.assertIn("test/tint/benchmark/doe/webgpu-prefix-sum.wgsl", merged)
+            self.assertEqual(copied[0]["benchmarkName"], "webgpu-prefix-sum.wgsl")
+            self.assertEqual(copied[0]["sourceKind"], "wgsl_corpus")
+            self.assertEqual(copied[0]["corpusCategory"], "webgpu_sample")
+            self.assertEqual(state["sourceKind"], "wgsl_corpus")
+            self.assertEqual(state["wgslCorpusManifestPath"], "config/wgsl-browser-corpus.json")
+            self.assertNotIn("workloadsPath", state)
+
+    def test_wgsl_corpus_rows_require_requested_shader_id(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo = Path(tmpdir) / "repo"
+            shader = repo / "bench" / "fixtures" / "wgsl-corpus" / "sample-prefix-sum.wgsl"
+            manifest = repo / "config" / "wgsl-browser-corpus.json"
+            shader.parent.mkdir(parents=True)
+            manifest.parent.mkdir(parents=True)
+            shader.write_text("@compute @workgroup_size(1)\nfn main() {}\n", encoding="utf-8")
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "rows": [
+                            {
+                                "shaderId": "webgpu-prefix-sum",
+                                "sourcePath": "bench/fixtures/wgsl-corpus/sample-prefix-sum.wgsl",
+                                "expectedValidity": "valid",
+                                "expectedBackendTargets": ["spirv"],
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(RuntimeError, "WGSL corpus ids not found: missing-row"):
+                warm_corpus.load_wgsl_corpus_rows(
+                    manifest,
+                    repo_root=repo,
+                    target="spirv",
+                    workload_ids=["missing-row"],
+                )
+
     def test_copy_shader_normalizes_non_ascii_comments_for_dawn_header(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             source = Path(tmpdir) / "source.wgsl"

@@ -27,8 +27,12 @@ PRODUCT_SURFACES = {
     "spec_conformance",
     "drop_in_runtime",
 }
-
-
+BROWSER_FRONTIER_ROW_ID = "browser-chromium-runtime"
+BROWSER_FRONTIER_BUNDLE_PATH = Path("examples/browser-runtime-frontier-bundle.sample.json")
+BROWSER_FRONTIER_BUNDLE_KIND = "browser_runtime_frontier_bundle"
+TINT_FRONTIER_ROW_ID = "wgsl-tint-compiler"
+TINT_FRONTIER_BUNDLE_PATH = Path("examples/tint-compiler-frontier-bundle.sample.json")
+TINT_FRONTIER_BUNDLE_KIND = "tint_compiler_frontier_bundle"
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -50,6 +54,16 @@ def parse_args() -> argparse.Namespace:
         "--claim-index",
         default="reports/claim-index.json",
         help="Claim index path relative to the repository root.",
+    )
+    parser.add_argument(
+        "--browser-frontier-bundle",
+        default=str(BROWSER_FRONTIER_BUNDLE_PATH),
+        help="Browser runtime frontier bundle path relative to the repository root.",
+    )
+    parser.add_argument(
+        "--tint-frontier-bundle",
+        default=str(TINT_FRONTIER_BUNDLE_PATH),
+        help="Tint compiler frontier bundle path relative to the repository root.",
     )
     parser.add_argument(
         "--out",
@@ -120,10 +134,106 @@ def row_readiness_status(row: dict[str, Any]) -> str:
     return "blocked"
 
 
+def frontier_bundle_config(
+    *,
+    browser_bundle_path: Path = BROWSER_FRONTIER_BUNDLE_PATH,
+    tint_bundle_path: Path = TINT_FRONTIER_BUNDLE_PATH,
+) -> dict[str, dict[str, Any]]:
+    return {
+        BROWSER_FRONTIER_ROW_ID: {
+            "path": browser_bundle_path,
+            "kind": BROWSER_FRONTIER_BUNDLE_KIND,
+        },
+        TINT_FRONTIER_ROW_ID: {
+            "path": tint_bundle_path,
+            "kind": TINT_FRONTIER_BUNDLE_KIND,
+        },
+    }
+
+
+def compact_failure(failure: dict[str, Any]) -> dict[str, str]:
+    code = failure.get("code")
+    path = failure.get("path")
+    message = failure.get("message")
+    return {
+        "code": code if isinstance(code, str) else "",
+        "path": path if isinstance(path, str) else "",
+        "message": message if isinstance(message, str) else "",
+    }
+
+
+def unique_codes_from_failures(failures: list[dict[str, Any]]) -> list[str]:
+    codes: list[str] = []
+    for failure in failures:
+        code = failure.get("code")
+        if isinstance(code, str) and code and code not in codes:
+            codes.append(code)
+    return codes
+
+
+def frontier_bundle_evidence(
+    *,
+    row: dict[str, Any],
+    root: Path,
+    fallback_codes: list[str],
+    bundle_configs: dict[str, dict[str, Any]],
+) -> tuple[list[str], dict[str, Any] | None]:
+    bundle_config = bundle_configs.get(str(row.get("id", "")))
+    if not bundle_config:
+        return fallback_codes, None
+
+    try:
+        bundle = load_json_object(root / bundle_config["path"])
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError):
+        return fallback_codes, None
+
+    if bundle.get("artifactKind") != bundle_config["kind"]:
+        return fallback_codes, None
+    claim_blockers = bundle.get("claimBlockers")
+    if not isinstance(claim_blockers, list):
+        return fallback_codes, None
+
+    fallback_set = set(fallback_codes)
+    relevant_claim_blockers: list[dict[str, Any]] = []
+    for blocker in claim_blockers:
+        if not isinstance(blocker, dict):
+            continue
+        code = blocker.get("code")
+        if isinstance(code, str) and code in fallback_set:
+            relevant_claim_blockers.append(compact_failure(blocker))
+
+    evidence_codes = unique_codes_from_failures(relevant_claim_blockers)
+    if bundle.get("claimabilityStatus") != "claimable" and not evidence_codes:
+        blocker_codes = fallback_codes
+    else:
+        blocker_codes = evidence_codes
+
+    evidence: dict[str, Any] = {
+        "path": str(bundle_config["path"]),
+        "artifactKind": bundle.get("artifactKind", ""),
+        "status": bundle.get("status", ""),
+        "claimabilityStatus": bundle.get("claimabilityStatus", ""),
+        "claimBlockers": relevant_claim_blockers,
+        "summary": bundle.get("summary", {}),
+    }
+    claim_blocker_summary = bundle.get("claimBlockerSummary")
+    if isinstance(claim_blocker_summary, list):
+        evidence["claimBlockerSummary"] = claim_blocker_summary
+    compiler_evidence_reports = bundle.get("compilerEvidenceReports")
+    if isinstance(compiler_evidence_reports, list):
+        evidence["compilerEvidenceReports"] = compiler_evidence_reports
+    component_receipts = bundle.get("componentReceipts")
+    if isinstance(component_receipts, dict):
+        evidence["componentReceipts"] = component_receipts
+    return blocker_codes, evidence
+
+
 def build_row_report(
     row: dict[str, Any],
     definitions_by_code: dict[str, dict[str, Any]],
     entries_by_id: dict[str, dict[str, Any]],
+    root: Path,
+    bundle_configs: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     blockers = row.get("blockers", [])
     if not isinstance(blockers, list):
@@ -133,8 +243,14 @@ def build_row_report(
         claim_ids = []
 
     blocker_codes = [code for code in blockers if isinstance(code, str)]
+    blocker_codes, bundle_evidence = frontier_bundle_evidence(
+        row=row,
+        root=root,
+        fallback_codes=blocker_codes,
+        bundle_configs=bundle_configs,
+    )
     claim_entry_ids = [entry_id for entry_id in claim_ids if isinstance(entry_id, str)]
-    return {
+    row_report = {
         "id": row.get("id", ""),
         "surface": row.get("surface", ""),
         "dawnComparator": row.get("dawnComparator", ""),
@@ -150,6 +266,9 @@ def build_row_report(
         ],
         "evidencePaths": row.get("evidencePaths", []),
     }
+    if bundle_evidence is not None:
+        row_report["frontierBundleEvidence"] = bundle_evidence
+    return row_report
 
 
 def summary_for_rows(rows: list[dict[str, Any]]) -> dict[str, int]:
@@ -182,13 +301,15 @@ def build_report(
     schema: dict[str, Any],
     claim_index: dict[str, Any],
     root: Path,
+    bundle_configs: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     gate_report = frontier_gate.evaluate_frontier(frontier, schema, claim_index, root)
     definitions_by_code = blocker_map(frontier)
     entries_by_id = claim_entry_map(claim_index)
+    resolved_bundle_configs = bundle_configs or frontier_bundle_config()
     raw_rows = frontier.get("rows", [])
     rows = [
-        build_row_report(row, definitions_by_code, entries_by_id)
+        build_row_report(row, definitions_by_code, entries_by_id, root, resolved_bundle_configs)
         for row in raw_rows
         if isinstance(row, dict)
     ]
@@ -237,7 +358,16 @@ def main() -> int:
         print(f"FAIL: Dawn replacement readiness input error: {exc}")
         return 1
 
-    report = build_report(frontier, schema, claim_index, root)
+    report = build_report(
+        frontier,
+        schema,
+        claim_index,
+        root,
+        frontier_bundle_config(
+            browser_bundle_path=Path(args.browser_frontier_bundle),
+            tint_bundle_path=Path(args.tint_frontier_bundle),
+        ),
+    )
     if args.out:
         write_json_object(root / args.out, report)
     if args.emit_json:

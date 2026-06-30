@@ -21,7 +21,9 @@
   "responsibilityMapPath": "config/browser-responsibility-map.json",
   "runtimeSelectorPolicyPath": "config/browser-runtime-selector-policy.json",
   "forkMaintenancePolicyPath": "config/chromium-fork-maintenance-policy.json",
+  "chromiumPatchManifestPath": "config/chromium-patch-manifest.json",
   "capturePolicyPath": "config/browser-capture-policy.json",
+  "projectionManifestPath": "browser/chromium/bench/generated/browser_projection_manifest.json",
   "promotionApprovalsPath": "browser/chromium/bench/workflows/browser-promotion-approvals.json",
   "ownershipPath": "config/browser-ownership.json",
   "windowCount": 7,
@@ -60,12 +62,36 @@
     "comparableCount": 1,
     "claimableCount": 1
   },
+  "structuralReceipts": {
+    "status": "pass",
+    "workloadCount": 1,
+    "sourceKernelDispatchWorkloadCount": 1,
+    "sourceCommandIdentity": {
+      "verified": true,
+      "commandsPathCount": 1,
+      "kernelPathCount": 1,
+      "hashesBound": true
+    },
+    "dispatchShapeParity": {
+      "verified": true,
+      "dispatchShapeWorkloadCount": 1,
+      "runtimeModeCount": 2
+    },
+    "checkerReports": [
+      {
+        "path": "browser/chromium/artifacts/sample/dawn-vs-doe.browser-layered.superset.check.json",
+        "status": "pass",
+        "errorCount": 0
+      }
+    ],
+    "failureCodes": []
+  },
   "workloads": [
     {
       "id": "browser_claim_sample",
       "name": "Browser claim sample",
       "domain": "browser",
-      "scenarioTemplate": "startup_adapter_device",
+      "scenarioTemplate": "compute_dispatch_basic",
       "claimScope": "l1_strict_candidate",
       "comparabilityExpectation": "strict",
       "comparisonStatus": "comparable",

@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/tint-phase-benchmark-evidence.schema.json",
+  "title": "Tint phase benchmark evidence receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "evidencePath",
+    "requiredTargets",
+    "requiredBenchmarkScopes",
+    "requiredExactPhases",
+    "status",
+    "targetCoverage",
+    "rows",
+    "failures",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "tint_phase_benchmark_evidence" },
+    "evidencePath": { "type": "string", "minLength": 1 },
+    "requiredTargets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/Target" }
+    },
+    "requiredBenchmarkScopes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/BenchmarkScope" }
+    },
+    "requiredExactPhases": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "status": { "enum": ["pass", "fail"] },
+    "targetCoverage": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/TargetCoverage" }
+    },
+    "rows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Row" }
+    },
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetCount",
+        "coveredTargetCount",
+        "rowCount",
+        "tintOkRows",
+        "phaseBenchmarkCoveredRows",
+        "phaseBenchmarkMissingRows",
+        "exactPhaseCompleteRows",
+        "exactPhaseMissingRows",
+        "notApplicableRows",
+        "failureCount"
+      ],
+      "properties": {
+        "targetCount": { "type": "integer", "minimum": 0 },
+        "coveredTargetCount": { "type": "integer", "minimum": 0 },
+        "rowCount": { "type": "integer", "minimum": 0 },
+        "tintOkRows": { "type": "integer", "minimum": 0 },
+        "phaseBenchmarkCoveredRows": { "type": "integer", "minimum": 0 },
+        "phaseBenchmarkMissingRows": { "type": "integer", "minimum": 0 },
+        "exactPhaseCompleteRows": { "type": "integer", "minimum": 0 },
+        "exactPhaseMissingRows": { "type": "integer", "minimum": 0 },
+        "notApplicableRows": { "type": "integer", "minimum": 0 },
+        "failureCount": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "Target": {
+      "enum": ["msl", "spirv", "dxil", "hlsl"]
+    },
+    "BenchmarkScope": {
+      "enum": ["parseWgsl", "validateIr", "generateBackend"]
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "TimingMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "TargetCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "rowCount",
+        "tintOkRows",
+        "phaseBenchmarkCoveredRows",
+        "shaderIds"
+      ],
+      "properties": {
+        "target": { "$ref": "#/$defs/Target" },
+        "rowCount": { "type": "integer", "minimum": 0 },
+        "tintOkRows": { "type": "integer", "minimum": 0 },
+        "phaseBenchmarkCoveredRows": { "type": "integer", "minimum": 0 },
+        "shaderIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "Row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shaderId",
+        "target",
+        "tintStatus",
+        "phaseBenchmarkStatus",
+        "exactPhaseStatus",
+        "phaseBenchmarkTimingsNs",
+        "missingPhaseBenchmarkScopes",
+        "missingExactPhases"
+      ],
+      "properties": {
+        "shaderId": { "type": "string", "minLength": 1 },
+        "target": { "$ref": "#/$defs/Target" },
+        "tintStatus": { "enum": ["ok", "failed", "unsupported", "missing"] },
+        "phaseBenchmarkStatus": { "enum": ["covered", "missing", "not_applicable"] },
+        "exactPhaseStatus": { "enum": ["complete", "missing", "not_applicable"] },
+        "phaseBenchmarkTimingsNs": { "$ref": "#/$defs/TimingMap" },
+        "missingPhaseBenchmarkScopes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BenchmarkScope" }
+        },
+        "missingExactPhases": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

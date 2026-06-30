@@ -30,25 +30,8 @@ pub fn emit_io_global(emitter: anytype, global: ir.Global) EmitError!u32 {
 /// Emit a vertex or fragment entry point wrapper function with stage-appropriate
 /// execution model, I/O variable binding, and return value decomposition.
 ///
-/// Graphics-path shader promotion audit (2026-03-22):
-/// - Bound resource globals (textures, samplers, buffers) are collected as
-///   interface variables via the loop at the end of Phase 1 (lines below).
-///   This ensures OpEntryPoint lists all descriptor-bound globals regardless
-///   of stage, satisfying the SPIR-V requirement that all statically-referenced
-///   variables appear in the interface list.
-/// - Descriptor set and binding decorations are emitted by
-///   emit_bound_handle_global() and emit_bound_buffer_global() in emit_spirv.zig,
-///   which run for all globals before any entry point wrapper. These decorations
-///   are stage-independent and apply to vertex, fragment, and compute equally.
-/// - OpTypeSampler is emitted once via lower_sampler_type() and cached on the
-///   Emitter; the same sampler type is reused across stages.
-/// - OpSampledImage construction in emit_spirv_texture.zig is stage-agnostic:
-///   it pairs the image and sampler SPIR-V IDs from the function's expression
-///   tree, which works for any stage that has texture+sampler globals.
-/// - Inter-stage I/O variables (Input/Output with Location decorations) coexist
-///   with descriptor-bound UniformConstant variables without conflict because
-///   they occupy different storage classes.
-/// - No issues found: graphics-stage texture/sampler promotion is correct.
+/// Descriptor-bound resources are decorated at module scope, but SPIR-V 1.3
+/// OpEntryPoint interfaces list only Input/Output variables.
 pub fn emit_stage_entry_wrapper(emitter: anytype, entry: ir.EntryPoint) EmitError!void {
     const function = &emitter.module.functions.items[entry.function];
     const wrapper_id = emitter.entry_wrapper_ids[entry.function];
@@ -99,9 +82,9 @@ pub fn emit_stage_entry_wrapper(emitter: anytype, entry: ir.EntryPoint) EmitErro
     }
     const output_range_len: u32 = @as(u32, @intCast(interface_ids.items.len)) - output_range_start;
 
-    // Collect bound resource globals as interface variables.
+    // Include only module-scope I/O globals in the entry-point interface.
     for (emitter.module.globals.items, 0..) |global, index| {
-        if (global.binding == null and global.class != .input and global.class != .output) continue;
+        if (global.class != .input and global.class != .output) continue;
         const global_id = emitter.global_ids[index];
         if (global_id == 0) return error.InvalidIr;
         try interface_ids.append(emitter.alloc, global_id);

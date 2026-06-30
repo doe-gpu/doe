@@ -46,6 +46,11 @@ def parse_args() -> argparse.Namespace:
         help="Workload JSON containing runnerType=compilation rows.",
     )
     parser.add_argument(
+        "--wgsl-corpus-manifest",
+        default="",
+        help="WGSL corpus manifest to materialize instead of --workloads.",
+    )
+    parser.add_argument(
         "--dawn-source-dir",
         default=DEFAULT_DAWN_SOURCE_DIR,
         help="Dawn checkout directory.",
@@ -82,6 +87,13 @@ def parse_args() -> argparse.Namespace:
         help="State JSON written after materialization.",
     )
     return parser.parse_args()
+
+
+def normalize_target(value: object) -> str:
+    target = str(value or "").strip().lower()
+    if target in {"spv", "spir-v"}:
+        return "spirv"
+    return target
 
 
 def load_compilation_workloads(
@@ -124,6 +136,57 @@ def load_compilation_workloads(
             raise RuntimeError(f"workload ids not found: {', '.join(missing)}")
     if not rows:
         raise RuntimeError(f"no {target} compilation workloads found in {workloads_path}")
+    return rows
+
+
+def load_wgsl_corpus_rows(
+    manifest_path: Path,
+    *,
+    repo_root: Path,
+    target: str,
+    workload_ids: list[str],
+) -> list[dict[str, object]]:
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    requested = set(workload_ids)
+    normalized_target = normalize_target(target)
+    rows = []
+    for row in payload.get("rows", []):
+        shader_id = str(row.get("shaderId", "")).strip()
+        if requested and shader_id not in requested:
+            continue
+        if row.get("expectedValidity", "valid") != "valid":
+            continue
+        expected_targets = [
+            normalize_target(value)
+            for value in row.get("expectedBackendTargets", [])
+            if str(value or "").strip()
+        ]
+        if expected_targets and normalized_target not in expected_targets:
+            continue
+        shader_rel = str(row.get("sourcePath", "")).strip()
+        shader_path = repo_root / shader_rel
+        if not shader_id:
+            raise RuntimeError("WGSL corpus row is missing shaderId")
+        if not shader_rel or not shader_path.is_file():
+            raise RuntimeError(f"sourcePath not found for {shader_id}: {shader_path}")
+        rows.append(
+            {
+                "workloadId": shader_id,
+                "shaderPath": shader_path,
+                "shaderRepoPath": shader_rel,
+                "target": normalized_target,
+                "sourceKind": "wgsl_corpus",
+                "corpusCategory": row.get("category", "wgsl_corpus"),
+            }
+        )
+
+    if requested:
+        found = {str(row["workloadId"]) for row in rows}
+        missing = sorted(requested - found)
+        if missing:
+            raise RuntimeError(f"WGSL corpus ids not found: {', '.join(missing)}")
+    if not rows:
+        raise RuntimeError(f"no {normalized_target} WGSL corpus rows found in {manifest_path}")
     return rows
 
 
@@ -205,16 +268,20 @@ def materialize_rows(
         dest_rel = DAWN_BENCHMARK_ROOT / f"{workload_id}.wgsl"
         dest_path = dawn_source_dir / dest_rel
         ascii_normalized = copy_shader_for_tint_benchmark(shader_path, dest_path)
-        copied_rows.append(
-            {
-                "workloadId": workload_id,
-                "shaderPath": str(row["shaderRepoPath"]),
-                "target": str(row["target"]),
-                "dawnBenchmarkPath": dest_rel.as_posix(),
-                "sourceSha256": file_sha256(shader_path),
-                "asciiNormalized": ascii_normalized,
-            }
-        )
+        copied_row = {
+            "workloadId": workload_id,
+            "shaderPath": str(row["shaderRepoPath"]),
+            "target": str(row["target"]),
+            "dawnBenchmarkPath": dest_rel.as_posix(),
+            "benchmarkName": dest_rel.name,
+            "sourceSha256": file_sha256(shader_path),
+            "asciiNormalized": ascii_normalized,
+        }
+        for key in ("sourceKind", "corpusCategory"):
+            value = row.get(key)
+            if value:
+                copied_row[key] = value
+        copied_rows.append(copied_row)
     return copied_rows
 
 
@@ -235,12 +302,14 @@ def run_ninja(ninja_bin: str, build_dir: Path) -> None:
 def write_state(
     *,
     path: Path,
-    workloads_path: Path,
+    input_path: Path,
+    source_kind: str,
     dawn_source_dir: Path,
     build_dir: Path,
     target: str,
     copied_rows: list[dict[str, object]],
     built: bool,
+    repo_root: Path = REPO_ROOT,
 ) -> None:
     script_path = dawn_source_dir / BENCHMARK_INPUTS_SCRIPT
     msl_writer_bench_path = dawn_source_dir / MSL_WRITER_BENCH_SOURCE
@@ -251,28 +320,37 @@ def write_state(
         "generatedAt": datetime.datetime.now(datetime.timezone.utc)
         .isoformat()
         .replace("+00:00", "Z"),
-        "workloadsPath": repo_relative(workloads_path),
-        "dawnSourceDir": repo_relative(dawn_source_dir),
-        "dawnBuildDir": repo_relative(build_dir),
+        "sourceKind": source_kind,
+        "dawnSourceDir": repo_relative(dawn_source_dir, repo_root),
+        "dawnBuildDir": repo_relative(build_dir, repo_root),
         "target": target,
-        "benchmarkInputsScriptPath": repo_relative(script_path),
+        "benchmarkInputsScriptPath": repo_relative(script_path, repo_root),
         "benchmarkInputsScriptSha256": file_sha256(script_path),
-        "mslWriterBenchPath": repo_relative(msl_writer_bench_path),
+        "mslWriterBenchPath": repo_relative(msl_writer_bench_path, repo_root),
         "mslWriterBenchSha256": file_sha256(msl_writer_bench_path),
-        "tintBenchmarkPath": repo_relative(tint_benchmark_path),
+        "tintBenchmarkPath": repo_relative(tint_benchmark_path, repo_root),
         "tintBenchmarkSha256": file_sha256(tint_benchmark_path)
         if tint_benchmark_path.is_file()
         else None,
         "built": built,
         "rows": copied_rows,
     }
+    if source_kind == "wgsl_corpus":
+        payload["wgslCorpusManifestPath"] = repo_relative(input_path, repo_root)
+    else:
+        payload["workloadsPath"] = repo_relative(input_path, repo_root)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> int:
     args = parse_args()
-    workloads_path = (REPO_ROOT / args.workloads).resolve()
+    source_kind = "wgsl_corpus" if args.wgsl_corpus_manifest else "compilation_workloads"
+    input_path = (
+        (REPO_ROOT / args.wgsl_corpus_manifest).resolve()
+        if args.wgsl_corpus_manifest
+        else (REPO_ROOT / args.workloads).resolve()
+    )
     dawn_source_dir = (REPO_ROOT / args.dawn_source_dir).resolve()
     build_dir = (REPO_ROOT / args.build_dir).resolve()
     script_path = dawn_source_dir / BENCHMARK_INPUTS_SCRIPT
@@ -280,12 +358,20 @@ def main() -> int:
         print(f"error: Tint benchmark input script not found: {script_path}", file=sys.stderr)
         return 1
 
-    rows = load_compilation_workloads(
-        workloads_path,
-        repo_root=REPO_ROOT,
-        target=args.target,
-        workload_ids=args.workload_id,
-    )
+    if source_kind == "wgsl_corpus":
+        rows = load_wgsl_corpus_rows(
+            input_path,
+            repo_root=REPO_ROOT,
+            target=args.target,
+            workload_ids=args.workload_id,
+        )
+    else:
+        rows = load_compilation_workloads(
+            input_path,
+            repo_root=REPO_ROOT,
+            target=args.target,
+            workload_ids=args.workload_id,
+        )
     copied_rows = materialize_rows(rows, dawn_source_dir=dawn_source_dir)
     patch_benchmark_inputs_script(
         script_path,
@@ -297,10 +383,11 @@ def main() -> int:
     state_path = REPO_ROOT / args.output_state
     write_state(
         path=state_path,
-        workloads_path=workloads_path,
+        input_path=input_path,
+        source_kind=source_kind,
         dawn_source_dir=dawn_source_dir,
         build_dir=build_dir,
-        target=args.target,
+        target=normalize_target(args.target),
         copied_rows=copied_rows,
         built=bool(args.build),
     )

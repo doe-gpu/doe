@@ -17,10 +17,17 @@ def _write_json(root: Path, rel_path: str, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+def _write_text(root: Path, rel_path: str, payload: str) -> None:
+    path = root / rel_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(payload, encoding="utf-8")
+
+
 def _frontier(
     *,
     native_vulkan_claim_allowed: bool = True,
     wgsl_tint_claim_allowed: bool = True,
+    native_vulkan_claim_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     return {
         "rows": [
@@ -29,6 +36,7 @@ def _frontier(
                 "id": "native-vulkan-runtime",
                 "claimAllowed": native_vulkan_claim_allowed,
                 "blockers": ["fresh_amd_vulkan_release_claim_artifact"],
+                "claimIndexEntryIds": native_vulkan_claim_ids or [],
             },
             {
                 "id": "wgsl-tint-compiler",
@@ -111,6 +119,46 @@ def test_audit_finds_unindexed_vulkan_candidate() -> None:
         ]
 
 
+def test_audit_marks_claim_allowed_frontier_rows_as_already_covered() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        claim_path = "bench/out/amd-vulkan/release/older-dawn-vs-doe.amd.vulkan.claim.json"
+        report_path = "bench/out/amd-vulkan/release/older-dawn-vs-doe.amd.vulkan.compare.json"
+        _write_json(root, claim_path, _claim(report_path))
+        _write_json(root, report_path, _compare())
+
+        report = candidate_audit.build_audit(
+            root,
+            {"entries": []},
+            _frontier(native_vulkan_claim_ids=["native-release-amd-vulkan"]),
+        )
+
+        assert report["summary"]["alreadyCoveredCount"] == 1
+        candidate = report["candidates"][0]
+        assert candidate["promotionStatus"] == "already_covered"
+        assert candidate["indexReady"] is False
+        assert candidate["reasons"] == [
+            "frontier_row_already_claim_allowed:native-vulkan-runtime"
+        ]
+
+
+def test_audit_blocks_unmapped_claim_sidecars() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        claim_path = "bench/out/native-ort-webgpu-provider/run/basic-ops.claim.json"
+        report_path = "bench/out/native-ort-webgpu-provider/run/basic-ops.compare.json"
+        _write_json(root, claim_path, _claim(report_path))
+        _write_json(root, report_path, _compare())
+
+        report = candidate_audit.build_audit(root, {"entries": []}, _frontier())
+
+        candidate = report["candidates"][0]
+        assert candidate["promotionStatus"] == "blocked"
+        assert candidate["indexReady"] is False
+        assert candidate["reasons"] == ["frontier_row_unmapped"]
+        assert candidate["inferredFrontierRows"] == []
+
+
 def test_audit_blocks_scratch_candidates() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -177,6 +225,41 @@ def test_audit_blocks_claimable_compiler_sidecar_without_compare_report() -> Non
         candidate = report["candidates"][0]
         assert candidate["promotionStatus"] == "blocked"
         assert candidate["reasons"] == ["missing_compare_report_path"]
+        assert candidate["inferredFrontierRows"] == [
+            {
+                "id": "wgsl-tint-compiler",
+                "reason": "path-or-target mentions Tint/compiler output",
+            }
+        ]
+
+
+def test_audit_accepts_compiler_ndjson_compare_report() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        claim_path = "bench/out/compilation/doe-vs-tint.msl.claim.json"
+        report_path = "bench/out/compilation/doe-vs-tint.msl.ndjson"
+        _write_json(root, claim_path, _claim(report_path))
+        _write_text(
+            root,
+            report_path,
+            json.dumps(
+                {
+                    "kind": "compilation_comparison",
+                    "schemaVersion": 3,
+                    "shader": "shader",
+                    "target": "msl",
+                    "status": "compared",
+                }
+            )
+            + "\n",
+        )
+
+        report = candidate_audit.build_audit(root, {"entries": []}, _frontier())
+
+        candidate = report["candidates"][0]
+        assert candidate["promotionStatus"] == "index_ready"
+        assert candidate["compareReportKind"] == "compilation-comparison-ndjson"
+        assert candidate["reasons"] == []
         assert candidate["inferredFrontierRows"] == [
             {
                 "id": "wgsl-tint-compiler",

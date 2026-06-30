@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/dawn-replacement-readiness-report.schema.json",
+  "title": "Dawn replacement readiness report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "frontierId",
+    "universalClaim",
+    "gate",
+    "summary",
+    "rows"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "dawn-replacement-readiness-report" },
+    "frontierId": { "type": "string", "minLength": 1 },
+    "universalClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "reasonCode"],
+      "properties": {
+        "allowed": { "type": "boolean" },
+        "reasonCode": { "type": "string", "minLength": 1 }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "failures", "summary"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "failures": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "summary": { "$ref": "#/$defs/SummaryMap" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frontierRowCount",
+        "productRowCount",
+        "claimAllowedProductRowCount",
+        "blockedProductRowCount",
+        "coveredEvidenceReleaseRowCount",
+        "uniqueBlockerCount"
+      ],
+      "properties": {
+        "frontierRowCount": { "type": "integer", "minimum": 0 },
+        "productRowCount": { "type": "integer", "minimum": 0 },
+        "claimAllowedProductRowCount": { "type": "integer", "minimum": 0 },
+        "blockedProductRowCount": { "type": "integer", "minimum": 0 },
+        "coveredEvidenceReleaseRowCount": { "type": "integer", "minimum": 0 },
+        "uniqueBlockerCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ReadinessRow" }
+    }
+  },
+  "$defs": {
+    "ReadinessStatus": {
+      "enum": ["claimable", "covered", "blocked"]
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Blocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "exitCriteria", "evidencePaths"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "exitCriteria": { "type": "string" },
+        "evidencePaths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "ClaimIndexEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "claimState",
+        "comparisonStatus",
+        "claimStatus",
+        "reportPath",
+        "claimPath"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "claimState": { "type": "string" },
+        "comparisonStatus": { "type": "string" },
+        "claimStatus": { "type": "string" },
+        "reportPath": { "type": "string" },
+        "claimPath": { "type": "string" }
+      }
+    },
+    "FrontierBundleEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "artifactKind",
+        "status",
+        "claimabilityStatus",
+        "claimBlockers",
+        "summary"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "artifactKind": {
+          "enum": ["browser_runtime_frontier_bundle", "tint_compiler_frontier_bundle"]
+        },
+        "status": { "enum": ["pass", "fail"] },
+        "claimabilityStatus": { "enum": ["claimable", "blocked"] },
+        "claimBlockers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        },
+        "claimBlockerSummary": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FailureSummary" }
+        },
+        "summary": { "$ref": "#/$defs/SummaryMap" },
+        "compilerEvidenceReports": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JsonObject" }
+        },
+        "componentReceipts": { "$ref": "#/$defs/JsonObject" }
+      }
+    },
+    "ReadinessRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "surface",
+        "dawnComparator",
+        "doeTarget",
+        "currentState",
+        "claimAllowed",
+        "readinessStatus",
+        "claimIndexEntries",
+        "blockers",
+        "evidencePaths"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "surface": { "type": "string", "minLength": 1 },
+        "dawnComparator": { "type": "string" },
+        "doeTarget": { "type": "string" },
+        "currentState": { "type": "string", "minLength": 1 },
+        "claimAllowed": { "type": "boolean" },
+        "readinessStatus": { "$ref": "#/$defs/ReadinessStatus" },
+        "claimIndexEntries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ClaimIndexEntry" }
+        },
+        "blockers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Blocker" }
+        },
+        "evidencePaths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "frontierBundleEvidence": { "$ref": "#/$defs/FrontierBundleEvidence" }
+      }
+    },
+    "SummaryMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["integer", "string", "number", "boolean", "null"]
+      }
+    },
+    "FailureSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "count"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "message": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "JsonObject": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/JsonValue" }
+    },
+    "JsonValue": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JsonValue" }
+        },
+        { "$ref": "#/$defs/JsonObject" }
+      ]
+    }
+  }
+}

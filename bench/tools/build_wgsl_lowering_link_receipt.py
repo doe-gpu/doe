@@ -60,6 +60,7 @@ def link_row(row: dict[str, Any], manifest_row: dict[str, Any] | None) -> dict[s
     row_id = str(row.get("shaderId", ""))
     failures: list[dict[str, str]] = []
     doe = row.get("doe", {})
+    tint = row.get("tint", {})
     comparability = row.get("comparability", {})
     claimability = row.get("claimability", {})
 
@@ -93,6 +94,14 @@ def link_row(row: dict[str, Any], manifest_row: dict[str, Any] | None) -> dict[s
     if not isinstance(doe.get("receiptPath"), str) or not doe.get("receiptPath"):
         failures.append(failure("missing_doe_receipt_path", row_id, "Doe compiler result is missing receiptPath"))
 
+    if not isinstance(tint, dict) or tint.get("status") != "ok":
+        failures.append(failure("tint_result_not_ok", row_id, "Tint compiler result is not ok"))
+        tint = {} if not isinstance(tint, dict) else tint
+    if not is_sha256(tint.get("outputSha256")):
+        failures.append(failure("missing_tint_backend_hash", row_id, "Tint compiler result is missing outputSha256"))
+    if not isinstance(tint.get("receiptPath"), str) or not tint.get("receiptPath"):
+        failures.append(failure("missing_tint_receipt_path", row_id, "Tint compiler result is missing receiptPath"))
+
     linked = not failures
     return {
         "shaderId": row_id or str(manifest_row.get("shaderId", "unknown")),
@@ -105,6 +114,10 @@ def link_row(row: dict[str, Any], manifest_row: dict[str, Any] | None) -> dict[s
         "doeIrSha256": doe.get("irSha256") if is_sha256(doe.get("irSha256")) else None,
         "doeBackendOutputSha256": doe.get("outputSha256") if is_sha256(doe.get("outputSha256")) else None,
         "doeReceiptPath": str(doe.get("receiptPath", "")),
+        "doeValidationStatus": str(doe.get("validationStatus", "not_run")),
+        "tintBackendOutputSha256": tint.get("outputSha256") if is_sha256(tint.get("outputSha256")) else None,
+        "tintReceiptPath": str(tint.get("receiptPath", "")),
+        "tintValidationStatus": str(tint.get("validationStatus", "not_run")),
         "validationStatus": str(doe.get("validationStatus", "not_run")),
         "comparabilityStatus": str(comparability.get("status", "diagnostic")) if isinstance(comparability, dict) else "diagnostic",
         "claimabilityStatus": str(claimability.get("status", "diagnostic")) if isinstance(claimability, dict) else "diagnostic",

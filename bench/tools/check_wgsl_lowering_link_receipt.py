@@ -119,11 +119,18 @@ def check_receipt(
         row_failures.extend(item for item in failures_for_row if isinstance(item, dict))
         if link_status == "linked":
             linked_rows += 1
-            for field in ("sourceSha256", "doeIrSha256", "doeBackendOutputSha256"):
+            for field in (
+                "sourceSha256",
+                "doeIrSha256",
+                "doeBackendOutputSha256",
+                "tintBackendOutputSha256",
+            ):
                 if not is_sha256(row.get(field)):
                     failures.append(failure("missing_link_hash", f"{row_path}.{field}", f"{field} must be sha256 hex"))
             if not row.get("doeReceiptPath"):
                 failures.append(failure("missing_doe_receipt_path", f"{row_path}.doeReceiptPath", "Doe receipt path is required"))
+            if not row.get("tintReceiptPath"):
+                failures.append(failure("missing_tint_receipt_path", f"{row_path}.tintReceiptPath", "Tint receipt path is required"))
             if failures_for_row:
                 failures.append(failure("linked_row_has_failures", f"{row_path}.failureCodes", "linked rows cannot carry failures"))
         elif link_status == "diagnostic":
@@ -150,6 +157,15 @@ def check_receipt(
                     "unsafe_doe_receipt_path",
                     f"{row_path}.doeReceiptPath",
                     "doeReceiptPath must be repo-relative",
+                )
+            )
+        tint_receipt_path = row.get("tintReceiptPath")
+        if isinstance(tint_receipt_path, str) and tint_receipt_path and not safe_repo_path(tint_receipt_path):
+            failures.append(
+                failure(
+                    "unsafe_tint_receipt_path",
+                    f"{row_path}.tintReceiptPath",
+                    "tintReceiptPath must be repo-relative",
                 )
             )
         if verify_files_root is not None:
@@ -186,6 +202,21 @@ def check_receipt(
                             "doe_receipt_missing",
                             f"{row_path}.doeReceiptPath",
                             f"Doe receipt not found: {doe_receipt_path}",
+                        )
+                    )
+            if (
+                link_status == "linked"
+                and isinstance(tint_receipt_path, str)
+                and tint_receipt_path
+                and safe_repo_path(tint_receipt_path)
+            ):
+                resolved_receipt = resolve_path(tint_receipt_path, verify_files_root)
+                if not resolved_receipt.is_file():
+                    failures.append(
+                        failure(
+                            "tint_receipt_missing",
+                            f"{row_path}.tintReceiptPath",
+                            f"Tint receipt not found: {tint_receipt_path}",
                         )
                     )
 

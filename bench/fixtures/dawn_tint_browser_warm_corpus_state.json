@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "tint-warm-corpus-materialization",
+  "generatedAt": "2026-06-30T07:24:43.002875Z",
+  "sourceKind": "wgsl_corpus",
+  "dawnSourceDir": "bench/vendor/dawn",
+  "dawnBuildDir": "bench/vendor/dawn/out/Release",
+  "target": "spirv",
+  "benchmarkInputsScriptPath": "bench/vendor/dawn/src/tint/cmd/bench/generate_benchmark_inputs.py",
+  "benchmarkInputsScriptSha256": "185b54b579e5bf319bdc5f73392eb0961dac30b9b8ac6efe07cb4f818167b83d",
+  "mslWriterBenchPath": "bench/vendor/dawn/src/tint/cmd/bench/msl/writer_bench.cc",
+  "mslWriterBenchSha256": "1e0d328cc31e11936b52e1430cec39116f975c5bfb42cd6c8a930f46c1798730",
+  "tintBenchmarkPath": "bench/vendor/dawn/out/Release/tint_benchmark",
+  "tintBenchmarkSha256": "50b647a490d85010f281e842f2e7339df6e4c94de2fcbff95b333797df4dbef1",
+  "built": true,
+  "rows": [
+    {
+      "workloadId": "webgpu-prefix-sum",
+      "shaderPath": "bench/fixtures/wgsl-corpus/webgpu/sample-prefix-sum.wgsl",
+      "target": "spirv",
+      "dawnBenchmarkPath": "test/tint/benchmark/doe/webgpu-prefix-sum.wgsl",
+      "benchmarkName": "webgpu-prefix-sum.wgsl",
+      "sourceSha256": "a8a642a54aaca908b707d20666566db8db62dbb5c9bfd518fbe98925da22c416",
+      "asciiNormalized": false,
+      "sourceKind": "wgsl_corpus",
+      "corpusCategory": "webgpu_sample"
+    }
+  ],
+  "wgslCorpusManifestPath": "config/wgsl-browser-corpus.json"
+}

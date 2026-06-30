@@ -4,29 +4,29 @@
   "bundleId": "browser-release-diagnostic-sample-v1",
   "releaseStatus": "diagnostic",
   "browserBinary": {
-    "path": "browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
-    "sha256": "3aaae3857f75c0df9136483ae5300661812a42887c5b489f26679b2758b1aeaa",
+    "path": "browser/chromium/src/out/fawn_release/chrome-wrapper",
+    "sha256": "24c1cfddcd206a86281008e7eed38109344ef34cd88d61902a9befd520a5571c",
     "kind": "browser_binary"
   },
   "doeRuntime": {
-    "path": "runtime/zig/zig-out/lib/libwebgpu_doe_full.dylib",
-    "sha256": "29ccbc3fe75a47a3ba75a38e78b38883429c4aa47101d4398759081bbe6ccfca",
+    "path": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+    "sha256": "9b937fbbad942e8f5b43896ef93badb0b28a5107bb443497900d4af62cc3dd5f",
     "kind": "doe_runtime"
   },
   "shaderCompiler": {
     "path": "runtime/zig/zig-out/bin/doe-zig-runtime",
-    "sha256": "e67467aa3e7d64fc737c0e5a35748146de5951f43497a28d2c11f9de6c8b26dd",
+    "sha256": "0190df240d44606572c2439b4edeefd53f5441be24d662b890de6ba6f557a020",
     "kind": "shader_compiler"
   },
   "contracts": [
     {
       "path": "browser/chromium/contracts/browser-benchmark-superset.contract.md",
-      "sha256": "098449470e61678ba554d7973eca1e7d71cfede323fdd20610703af24181fe8c",
+      "sha256": "aa85aab7f93d2e9acde12ac965485d90f13a75458e2a0d3a269e3490c6db7097",
       "kind": "contract"
     },
     {
       "path": "browser/chromium/contracts/browser-canvas-webgpu-fusion.contract.md",
-      "sha256": "817b79664fe29fb0ab57f88d70d6c574c2da45d7db6c80038a296f38d7974b0d",
+      "sha256": "8a3217f3a355ae1a6270ef36f340823825dd9627a14959fcaf5935d2ff1b6931",
       "kind": "contract"
     },
     {
@@ -41,7 +41,7 @@
     },
     {
       "path": "browser/chromium/contracts/browser-fallback-explanations.contract.md",
-      "sha256": "ffd67a7095807cc8b3c1385801b8f260e6b5505e88ab3222920479c648aa9c41",
+      "sha256": "ae5766ed05e965a3497ce0a6a344e8e299c0a7fc1b8f94470ef1a1e3de5ccaad",
       "kind": "contract"
     },
     {
@@ -51,12 +51,12 @@
     },
     {
       "path": "browser/chromium/contracts/browser-gpu-scheduler.contract.md",
-      "sha256": "b3ce97bcbb8b4c9a86b59fe05eb4eed5a8214f97da8de6aa74386866668a26a5",
+      "sha256": "6052bfa0fcef56dfbd22d8eef340e261ecb67a3aa43512b31c9707150276beba",
       "kind": "contract"
     },
     {
       "path": "browser/chromium/contracts/browser-local-ai-workloads.contract.md",
-      "sha256": "556dfa69e8e261aa08bc85a6a451db9cd6e797652d4578e2450316a606d33fee",
+      "sha256": "7d90690bfe8f8ad505016a4846c870e3d79f5bbfcedd1a5d91f7c6fa2b0020a0",
       "kind": "contract"
     },
     {
@@ -76,7 +76,7 @@
     },
     {
       "path": "browser/chromium/contracts/browser-responsibility-map.contract.md",
-      "sha256": "a4daa7ffe89a77286a75cb4cf883c6f7018d51cf6746e2d83bed09d94a98e74e",
+      "sha256": "b67176867270cc9639c922820256d08537cde353e4cd508d7314d0ac54042fe2",
       "kind": "contract"
     },
     {
@@ -86,33 +86,33 @@
     },
     {
       "path": "browser/chromium/contracts/browser-webgpu-effect-experiment.contract.md",
-      "sha256": "c32ef649aff156f353916648c318bcaacbe7f8333ab0cadfc3a0fee6b20ff5a9",
+      "sha256": "c37bbd13f2edf097a4bb9f42af703145512ede7de0333f325509bedb4db12f82",
       "kind": "contract"
     },
     {
       "path": "browser/chromium/contracts/runtime-selector-and-fallback.contract.md",
-      "sha256": "c580af5040285aadcb12d14c67a752b93dcd2c8708b18b69948405b5b9016a04",
+      "sha256": "1b65c9fd1104daf9172dfcceb8b937a05b8267cc34a03f95b106b1a79e7f001b",
       "kind": "contract"
     }
   ],
   "claimReports": [
     {
       "path": "examples/browser-claim-report.sample.json",
-      "sha256": "dc0e791e990837b1b50a2c487c38c3284cb901fed8f520308ed67b78c69d6645",
+      "sha256": "a6bd9f81550992e8c296f7105e4ac6411ca6ee39bb29a76cf147302dc81b8dfe",
       "kind": "browser_claim_report"
     }
   ],
   "promotionReceipts": [
     {
       "path": "examples/browser-claim-promotion-receipt.sample.json",
-      "sha256": "449785f3dd7a6c94cfa1463d2b7b0e948a066af99abcebb94b3997da0b9d459f",
+      "sha256": "86b1763e2b287b4615e97c9cb7f27b523f060e4793eaf08d9ba10be426600f87",
       "kind": "browser_claim_promotion_receipt"
     }
   ],
   "policies": [
     {
       "path": "config/browser-runtime-selector-policy.json",
-      "sha256": "9632b2fd38e71c5a1c463680f3e16e5003b72a770ce1738a2de6032483a3af52",
+      "sha256": "df8b363ff88acc508f166f01461bac591f2686ba247054556d942265e38256d0",
       "kind": "runtime_selector_policy"
     },
     {
@@ -137,12 +137,12 @@
     },
     {
       "path": "config/browser-artifact-identity-coverage.json",
-      "sha256": "77690dcebad6ec235a492139dd4d8fd229460cc3fc04180bb03572e95637c21a",
+      "sha256": "f5c579b9efca1a294a2dc66bff9c3ecf61b7d15c85eb637323ec9c4fd6dde422",
       "kind": "browser_artifact_identity_coverage"
     },
     {
       "path": "config/browser-unsupported-reason-taxonomy.json",
-      "sha256": "1af444d6e5c30c98f14ec42ee8f1414eed18ee36f0e22acaee4673bb7f5d15f1",
+      "sha256": "33eda11e97afc55b48d1403523bcc9fb3809613f9ae201f22e6dd4dae5006bec",
       "kind": "browser_unsupported_reason_taxonomy"
     }
   ],

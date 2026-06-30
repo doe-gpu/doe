@@ -39,6 +39,12 @@ def _evidence_for_prefix_sum() -> dict:
                     "receiptPath": "bench/out/scratch/webgpu-prefix-sum/doe.json",
                     "validationStatus": "passed",
                 },
+                "tint": {
+                    "status": "ok",
+                    "outputSha256": "4" * 64,
+                    "receiptPath": "bench/out/scratch/webgpu-prefix-sum/tint.msl",
+                    "validationStatus": "passed",
+                },
                 "comparability": {"status": "diagnostic", "reasons": ["test"]},
                 "claimability": {"status": "diagnostic", "reasons": ["test"]},
             }
@@ -60,6 +66,9 @@ def test_wgsl_lowering_link_receipt_binds_source_ir_and_backend_hashes() -> None
     assert row["manifestShaderId"] == "webgpu-prefix-sum"
     assert row["doeIrSha256"] == "3" * 64
     assert row["doeBackendOutputSha256"] == "2" * 64
+    assert row["tintBackendOutputSha256"] == "4" * 64
+    assert row["doeValidationStatus"] == "passed"
+    assert row["tintValidationStatus"] == "passed"
     assert receipt["summary"]["failureCodes"] == []
     assert check_links.check_receipt(receipt) == []
 
@@ -92,6 +101,25 @@ def test_wgsl_lowering_link_receipt_reports_missing_ir_hash() -> None:
 
     codes = {item["code"] for item in receipt["summary"]["failureCodes"]}
     assert "missing_doe_ir_hash" in codes
+    assert any(
+        item["code"] == "lowering_link_has_diagnostic_rows"
+        for item in check_links.check_receipt(receipt)
+    )
+
+
+def test_wgsl_lowering_link_receipt_reports_missing_tint_hash() -> None:
+    evidence = _evidence_for_prefix_sum()
+    evidence["rows"][0]["tint"]["outputSha256"] = None
+
+    receipt = links.build_receipt(
+        evidence=evidence,
+        evidence_path="bench/out/tint-compiler-evidence.json",
+        manifest=_load(MANIFEST_PATH),
+        manifest_path="config/wgsl-browser-corpus.json",
+    )
+
+    codes = {item["code"] for item in receipt["summary"]["failureCodes"]}
+    assert "missing_tint_backend_hash" in codes
     assert any(
         item["code"] == "lowering_link_has_diagnostic_rows"
         for item in check_links.check_receipt(receipt)
@@ -138,6 +166,7 @@ def test_wgsl_lowering_link_checker_rejects_unsafe_source_and_receipt_paths() ->
     receipt = _load(SAMPLE_PATH)
     receipt["rows"][0]["sourcePath"] = "../sample-prefix-sum.wgsl"
     receipt["rows"][0]["doeReceiptPath"] = "/tmp/runtime-compile-report.json"
+    receipt["rows"][0]["tintReceiptPath"] = "/tmp/tint-output.msl"
 
     failures = check_links.check_receipt(receipt, REPO_ROOT)
 
@@ -151,14 +180,21 @@ def test_wgsl_lowering_link_checker_rejects_unsafe_source_and_receipt_paths() ->
         "path": "rows[0].doeReceiptPath",
         "message": "doeReceiptPath must be repo-relative",
     } in failures
+    assert {
+        "code": "unsafe_tint_receipt_path",
+        "path": "rows[0].tintReceiptPath",
+        "message": "tintReceiptPath must be repo-relative",
+    } in failures
 
 
 def test_wgsl_lowering_link_checker_rejects_ambiguous_path_segments() -> None:
     receipt = _load(SAMPLE_PATH)
     receipt["rows"][0]["sourcePath"] = "bench//fixtures/sample-prefix-sum.wgsl"
     receipt["rows"][0]["doeReceiptPath"] = "examples\\runtime-compile-report.sample.json"
+    receipt["rows"][0]["tintReceiptPath"] = "examples\\runtime-compile-report.sample.json"
 
     failures = check_links.check_receipt(receipt, REPO_ROOT)
 
     assert any(item["code"] == "unsafe_source_path" for item in failures)
     assert any(item["code"] == "unsafe_doe_receipt_path" for item in failures)
+    assert any(item["code"] == "unsafe_tint_receipt_path" for item in failures)

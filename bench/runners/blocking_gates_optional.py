@@ -33,6 +33,9 @@ def run_optional_artifact_gates(
     browser_release_artifact_bundle_check = (
         tools_dir / "check_browser_release_artifact_bundle.py"
     )
+    browser_runtime_frontier_bundle_check = (
+        tools_dir / "check_browser_runtime_frontier_bundle.py"
+    )
     wgsl_lowering_link_receipt_check = tools_dir / "check_wgsl_lowering_link_receipt.py"
     wgsl_minimization_receipt_check = tools_dir / "check_wgsl_minimization_receipt.py"
     wgsl_cts_shader_subset_check = tools_dir / "check_wgsl_cts_shader_subset.py"
@@ -158,7 +161,54 @@ def run_optional_artifact_gates(
                     args.browser_release_artifact_bundle_verify_files_root.strip(),
                 ]
             )
+        if args.browser_release_artifact_bundle_require_release_candidate:
+            gate_cmd.append("--require-release-candidate")
         run_gate("browser-release-artifact-bundle", gate_cmd)
+
+    if args.with_browser_runtime_frontier_bundle_gate:
+        identity_path = Path(args.browser_runtime_frontier_bundle_runtime_identity)
+        if not identity_path.exists():
+            print(
+                "FAIL: missing --browser-runtime-frontier-bundle-runtime-identity: "
+                f"{identity_path}"
+            )
+            return 1
+        receipt_path = Path(args.browser_runtime_frontier_bundle_claim_promotion_receipt)
+        if not receipt_path.exists():
+            print(
+                "FAIL: missing --browser-runtime-frontier-bundle-claim-promotion-receipt: "
+                f"{receipt_path}"
+            )
+            return 1
+        bundle_path = Path(args.browser_runtime_frontier_bundle_release_artifact_bundle)
+        if not bundle_path.exists():
+            print(
+                "FAIL: missing --browser-runtime-frontier-bundle-release-artifact-bundle: "
+                f"{bundle_path}"
+            )
+            return 1
+        gate_cmd = [
+            sys.executable,
+            str(browser_runtime_frontier_bundle_check),
+            "--runtime-identity",
+            str(identity_path),
+            "--claim-promotion-receipt",
+            str(receipt_path),
+            "--release-artifact-bundle",
+            str(bundle_path),
+        ]
+        if args.browser_runtime_frontier_bundle_verify_files_root.strip():
+            gate_cmd.extend(
+                [
+                    "--verify-files-root",
+                    args.browser_runtime_frontier_bundle_verify_files_root.strip(),
+                ]
+            )
+        if args.browser_runtime_frontier_bundle_require_claimable:
+            gate_cmd.append("--require-claimable")
+        if args.browser_runtime_frontier_bundle_out.strip():
+            gate_cmd.extend(["--out", args.browser_runtime_frontier_bundle_out.strip()])
+        run_gate("browser-runtime-frontier-bundle", gate_cmd)
 
     if args.with_wgsl_lowering_link_receipt_gate:
         receipt_path = Path(args.wgsl_lowering_link_receipt)

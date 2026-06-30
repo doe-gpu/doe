@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_runtime_frontier_bundle",
+  "status": "pass",
+  "claimabilityStatus": "blocked",
+  "componentReceipts": {
+    "runtimeIdentity": {
+      "path": "examples/browser-runtime-identity.selector.sample.json",
+      "status": "pass",
+      "evidenceSource": "runtime_selection_artifact",
+      "selectedRuntime": "doe",
+      "doeRuntimeActive": true
+    },
+    "claimPromotionReceipt": {
+      "path": "examples/browser-claim-promotion-receipt.sample.json",
+      "status": "pass",
+      "promotionStatus": "promotable",
+      "artifactCount": 1,
+      "hiddenFallbackPassed": true
+    },
+    "releaseArtifactBundle": {
+      "path": "examples/browser-release-artifact-bundle.sample.json",
+      "status": "pass",
+      "releaseStatus": "diagnostic",
+      "artifactVerification": {
+        "requiredForClaimable": true,
+        "verifyFilesRootProvided": true,
+        "verified": true
+      },
+      "claimReports": [
+        {
+          "path": "examples/browser-claim-report.sample.json",
+          "comparisonStatus": "comparable",
+          "claimStatus": "claimable",
+          "structuralStatus": "pass",
+          "workloadCount": 1,
+          "sourceKernelDispatchWorkloadCount": 1,
+          "claimBlockerCount": 0
+        }
+      ]
+    }
+  },
+  "claimBlockers": [
+    {
+      "code": "chromium_release_build_evidence",
+      "path": "releaseBundle.releaseStatus",
+      "message": "browser release artifact bundle must be a release_candidate"
+    }
+  ],
+  "claimBlockerSummary": [
+    {
+      "code": "chromium_release_build_evidence",
+      "message": "browser release artifact bundle must be a release_candidate",
+      "count": 1
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "claimReportCount": 1,
+    "claimBlockerCount": 1,
+    "failureCount": 0
+  }
+}

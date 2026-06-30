@@ -134,9 +134,55 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
                     "--with-browser-release-artifact-bundle-gate",
                     "--browser-release-artifact-bundle-verify-files-root",
                     ".",
+                    "--browser-release-artifact-bundle-require-release-candidate",
+                    "--with-browser-runtime-frontier-bundle-gate",
+                    "--browser-runtime-frontier-bundle-runtime-identity",
+                    "examples/browser-runtime-identity.selector.sample.json",
+                    "--browser-runtime-frontier-bundle-claim-promotion-receipt",
+                    "examples/browser-claim-promotion-receipt.sample.json",
+                    "--browser-runtime-frontier-bundle-release-artifact-bundle",
+                    "examples/browser-release-artifact-bundle.sample.json",
+                    "--browser-runtime-frontier-bundle-verify-files-root",
+                    ".",
+                    "--browser-runtime-frontier-bundle-out",
+                    str(Path(tmp_dir) / "browser-runtime-frontier-bundle.json"),
                     "--with-wgsl-lowering-link-receipt-gate",
                     "--wgsl-lowering-link-verify-files-root",
                     ".",
+                    "--with-tint-compiler-target-validation-gate",
+                    "--tint-compiler-target-validation-evidence",
+                    "examples/tint-compiler-evidence.sample.json",
+                    "--tint-compiler-target-validation-evidence",
+                    "examples/tint-compiler-evidence.sample.json",
+                    "--tint-compiler-target-validation-required-target",
+                    "spirv",
+                    "--tint-compiler-target-validation-verify-files-root",
+                    ".",
+                    "--tint-compiler-target-validation-allow-diagnostic-rows",
+                    "--tint-compiler-target-validation-out",
+                    str(Path(tmp_dir) / "tint-target-validation.json"),
+                    "--with-tint-phase-benchmark-evidence-gate",
+                    "--tint-phase-benchmark-evidence-report",
+                    "examples/tint-compiler-evidence.sample.json",
+                    "--tint-phase-benchmark-required-target",
+                    "spirv",
+                    "--tint-phase-benchmark-out",
+                    str(Path(tmp_dir) / "tint-phase-benchmark.json"),
+                    "--with-tint-compiler-frontier-bundle-gate",
+                    "--tint-compiler-frontier-bundle-compiler-evidence",
+                    "examples/tint-compiler-evidence.sample.json",
+                    "--tint-compiler-frontier-bundle-lowering-link-receipt",
+                    "examples/wgsl-lowering-link-receipt.sample.json",
+                    "--tint-compiler-frontier-bundle-target-validation",
+                    "examples/tint-compiler-target-validation.sample.json",
+                    "--tint-compiler-frontier-bundle-phase-benchmark-evidence",
+                    "examples/tint-phase-benchmark-evidence.sample.json",
+                    "--tint-compiler-frontier-bundle-required-target",
+                    "spirv",
+                    "--tint-compiler-frontier-bundle-verify-files-root",
+                    ".",
+                    "--tint-compiler-frontier-bundle-out",
+                    str(Path(tmp_dir) / "tint-frontier-bundle.json"),
                     "--with-wgsl-minimization-receipt-gate",
                     "--wgsl-minimization-verify-files-root",
                     ".",
@@ -216,7 +262,11 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
         self.assertIn("tool-surface", commands_by_label)
         self.assertIn("browser-claim-promotion-receipt", commands_by_label)
         self.assertIn("browser-release-artifact-bundle", commands_by_label)
+        self.assertIn("browser-runtime-frontier-bundle", commands_by_label)
         self.assertIn("wgsl-lowering-link-receipt", commands_by_label)
+        self.assertIn("tint-compiler-target-validation", commands_by_label)
+        self.assertIn("tint-phase-benchmark-evidence", commands_by_label)
+        self.assertIn("tint-compiler-frontier-bundle", commands_by_label)
         self.assertIn("wgsl-minimization-receipt", commands_by_label)
         self.assertIn("wgsl-cts-shader-subset", commands_by_label)
         self.assertIn("wgsl-corpus-materialization", commands_by_label)
@@ -283,12 +333,100 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
             commands_by_label["browser-release-artifact-bundle"][1],
         )
         self.assertIn(
+            "--require-release-candidate",
+            commands_by_label["browser-release-artifact-bundle"],
+        )
+        self.assertIn(
+            "bench/tools/check_browser_runtime_frontier_bundle.py",
+            commands_by_label["browser-runtime-frontier-bundle"][1],
+        )
+        self.assertIn(
+            "--runtime-identity",
+            commands_by_label["browser-runtime-frontier-bundle"],
+        )
+        self.assertIn(
+            "--claim-promotion-receipt",
+            commands_by_label["browser-runtime-frontier-bundle"],
+        )
+        self.assertIn(
+            "--release-artifact-bundle",
+            commands_by_label["browser-runtime-frontier-bundle"],
+        )
+        self.assertIn(
+            "--verify-files-root",
+            commands_by_label["browser-runtime-frontier-bundle"],
+        )
+        self.assertIn(
+            "--out",
+            commands_by_label["browser-runtime-frontier-bundle"],
+        )
+        self.assertIn(
             "bench/tools/check_wgsl_lowering_link_receipt.py",
             commands_by_label["wgsl-lowering-link-receipt"][1],
         )
         self.assertIn(
             "--verify-files-root",
             commands_by_label["wgsl-lowering-link-receipt"],
+        )
+        self.assertIn(
+            "bench/tools/check_tint_compiler_target_validation.py",
+            commands_by_label["tint-compiler-target-validation"][1],
+        )
+        self.assertIn(
+            "--required-target",
+            commands_by_label["tint-compiler-target-validation"],
+        )
+        self.assertIn(
+            "--verify-files-root",
+            commands_by_label["tint-compiler-target-validation"],
+        )
+        self.assertEqual(
+            commands_by_label["tint-compiler-target-validation"].count("--evidence"),
+            2,
+        )
+        self.assertIn(
+            "--allow-diagnostic-rows",
+            commands_by_label["tint-compiler-target-validation"],
+        )
+        self.assertIn(
+            "--out",
+            commands_by_label["tint-compiler-target-validation"],
+        )
+        self.assertIn(
+            "bench/tools/check_tint_phase_benchmark_evidence.py",
+            commands_by_label["tint-phase-benchmark-evidence"][1],
+        )
+        self.assertIn(
+            "--required-target",
+            commands_by_label["tint-phase-benchmark-evidence"],
+        )
+        self.assertIn(
+            "--out",
+            commands_by_label["tint-phase-benchmark-evidence"],
+        )
+        self.assertIn(
+            "bench/tools/check_tint_compiler_frontier_bundle.py",
+            commands_by_label["tint-compiler-frontier-bundle"][1],
+        )
+        self.assertIn(
+            "--compiler-evidence",
+            commands_by_label["tint-compiler-frontier-bundle"],
+        )
+        self.assertIn(
+            "--lowering-link-receipt",
+            commands_by_label["tint-compiler-frontier-bundle"],
+        )
+        self.assertIn(
+            "--target-validation",
+            commands_by_label["tint-compiler-frontier-bundle"],
+        )
+        self.assertIn(
+            "--phase-benchmark-evidence",
+            commands_by_label["tint-compiler-frontier-bundle"],
+        )
+        self.assertIn(
+            "--verify-files-root",
+            commands_by_label["tint-compiler-frontier-bundle"],
         )
         self.assertIn(
             "--verify-files-root",

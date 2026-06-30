@@ -520,3 +520,58 @@ test "spirv fragment: texture sampling with separate texture and sampler" {
     try testing.expect(found_binding);
     try testing.expect(found_location);
 }
+
+test "spirv graphics: entry interface excludes descriptor globals" {
+    const source =
+        \\struct Params { scale: f32 }
+        \\@group(0) @binding(0) var<uniform> params: Params;
+        \\
+        \\@fragment
+        \\fn main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
+        \\    return vec4<f32>(uv * params.scale, 0.0, 1.0);
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    const binary = out[0..len];
+
+    var uniform_vars: [16]u32 = undefined;
+    var uniform_var_count: usize = 0;
+    const word_count = len / 4;
+    var i: usize = 5;
+    while (i < word_count) {
+        const w = read_u32_le(binary, i * 4);
+        const op = w & 0xFFFF;
+        const wc = w >> 16;
+        if (op == spirv.Opcode.Variable and wc >= 4 and read_u32_le(binary, (i + 3) * 4) == spirv.StorageClass.Uniform) {
+            uniform_vars[uniform_var_count] = read_u32_le(binary, (i + 2) * 4);
+            uniform_var_count += 1;
+        }
+        i += wc;
+    }
+    try testing.expect(uniform_var_count > 0);
+
+    i = 5;
+    while (i < word_count) {
+        const w = read_u32_le(binary, i * 4);
+        const op = w & 0xFFFF;
+        const wc = w >> 16;
+        if (op == spirv.Opcode.EntryPoint and wc >= 3 and read_u32_le(binary, (i + 1) * 4) == spirv.ExecutionModel.Fragment) {
+            var operand_index: usize = i + 3;
+            while (operand_index < i + wc) : (operand_index += 1) {
+                const word = read_u32_le(binary, operand_index * 4);
+                if ((word & 0xff) == 0 or ((word >> 8) & 0xff) == 0 or ((word >> 16) & 0xff) == 0 or ((word >> 24) & 0xff) == 0) {
+                    operand_index += 1;
+                    break;
+                }
+            }
+            while (operand_index < i + wc) : (operand_index += 1) {
+                const operand = read_u32_le(binary, operand_index * 4);
+                for (uniform_vars[0..uniform_var_count]) |uniform_var| {
+                    try testing.expect(operand != uniform_var);
+                }
+            }
+        }
+        i += wc;
+    }
+}

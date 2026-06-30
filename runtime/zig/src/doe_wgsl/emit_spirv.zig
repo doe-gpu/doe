@@ -578,16 +578,13 @@ pub const Emitter = struct {
                     offset = round_up(field_alignment, offset);
                     if (!gop.found_existing) {
                         try self.builder.emit_member_offset_decoration(struct_type, @intCast(field_index), offset);
-                        switch (self.module.types.get(field.ty)) {
-                            .matrix => |mat| {
-                                const elem_layout = try self.decorate_memory_type(mat.elem, addr_space);
-                                const column_layout = try vector_layout_from_elem(elem_layout, mat.rows);
-                                const column_alignment = adjusted_memory_align(addr_space, .{ .vector = .{ .elem = mat.elem, .len = mat.rows } }, column_layout.alignment);
-                                const stride = round_up(column_alignment, column_layout.size);
-                                try self.builder.emit_member_col_major_decoration(struct_type, @intCast(field_index));
-                                try self.builder.emit_member_matrix_stride_decoration(struct_type, @intCast(field_index), stride);
-                            },
-                            else => {},
+                        if (matrix_member_layout(self.module, field.ty)) |mat| {
+                            const elem_layout = try self.decorate_memory_type(mat.elem, addr_space);
+                            const column_layout = try vector_layout_from_elem(elem_layout, mat.rows);
+                            const column_alignment = adjusted_memory_align(addr_space, .{ .vector = .{ .elem = mat.elem, .len = mat.rows } }, column_layout.alignment);
+                            const stride = round_up(column_alignment, column_layout.size);
+                            try self.builder.emit_member_col_major_decoration(struct_type, @intCast(field_index));
+                            try self.builder.emit_member_matrix_stride_decoration(struct_type, @intCast(field_index), stride);
                         }
                     }
                     max_align = @max(max_align, field_alignment);
@@ -652,6 +649,19 @@ fn adjusted_memory_align(addr_space: ir.AddressSpace, ty: ir.Type, base_align: u
             else => base_align,
         },
         else => base_align,
+    };
+}
+
+const MatrixMemberLayout = struct {
+    elem: ir.TypeId,
+    rows: u8,
+};
+
+fn matrix_member_layout(module: *const ir.Module, ty: ir.TypeId) ?MatrixMemberLayout {
+    return switch (module.types.get(ty)) {
+        .matrix => |mat| .{ .elem = mat.elem, .rows = mat.rows },
+        .array => |arr| matrix_member_layout(module, arr.elem),
+        else => null,
     };
 }
 

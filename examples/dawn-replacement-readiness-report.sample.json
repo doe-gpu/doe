@@ -1,0 +1,599 @@
+{
+  "artifactKind": "dawn-replacement-readiness-report",
+  "frontierId": "dawn-replacement-frontier-v0",
+  "gate": {
+    "failures": [],
+    "ok": true,
+    "summary": {
+      "claimAllowedRowCount": 3,
+      "frontierRowCount": 11,
+      "requiredRowCount": 11
+    }
+  },
+  "rows": [
+    {
+      "blockers": [],
+      "claimAllowed": true,
+      "claimIndexEntries": [
+        {
+          "claimPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json",
+          "claimState": "claim-indexed",
+          "claimStatus": "claimable",
+          "comparisonStatus": "comparable",
+          "id": "native-strict-apple-metal",
+          "reportPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json"
+        },
+        {
+          "claimPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json",
+          "claimState": "claim-indexed",
+          "claimStatus": "claimable",
+          "comparisonStatus": "comparable",
+          "id": "native-release-apple-metal",
+          "reportPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json"
+        }
+      ],
+      "currentState": "claimable",
+      "dawnComparator": "dawn_metal",
+      "doeTarget": "doe_metal",
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "docs/apple-metal-runtime-release.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "id": "native-metal-runtime",
+      "readinessStatus": "claimable",
+      "surface": "native_runtime"
+    },
+    {
+      "blockers": [
+        {
+          "code": "fresh_amd_vulkan_release_claim_artifact",
+          "evidencePaths": [
+            "docs/status/runtime-backends-and-bench.md",
+            "config/native-backend-coverage-matrix.json"
+          ],
+          "exitCriteria": "Publish current AMD Vulkan Doe-vs-Dawn release compare and claim artifacts that pass claim, structural equivalence, and readback comparability gates."
+        },
+        {
+          "code": "matched_effective_readback_paths",
+          "evidencePaths": [
+            "docs/status/runtime-backends-and-bench.md",
+            "bench/docs/package-browser-ort-fairness-audit.md"
+          ],
+          "exitCriteria": "Produce package or native reports where Doe and the Dawn comparator use matching effective readback paths or carry a non-claimable path asymmetry."
+        },
+        {
+          "code": "vulkan_pipeline_cache_receipts",
+          "evidencePaths": [
+            "bench/docs/vulkan-pipeline-cache-integration.md",
+            "config/native-backend-coverage-matrix.json"
+          ],
+          "exitCriteria": "Publish Vulkan cache receipts showing the Doe and Dawn comparison lanes have declared cache-path parity or an explicit diagnostic boundary."
+        }
+      ],
+      "claimAllowed": false,
+      "claimIndexEntries": [],
+      "currentState": "diagnostic",
+      "dawnComparator": "dawn_vulkan",
+      "doeTarget": "doe_vulkan",
+      "evidencePaths": [
+        "config/native-backend-coverage-matrix.json",
+        "bench/docs/vulkan-pipeline-cache-integration.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "id": "native-vulkan-runtime",
+      "readinessStatus": "blocked",
+      "surface": "native_runtime"
+    },
+    {
+      "blockers": [
+        {
+          "code": "fresh_windows_d3d12_runtime_artifact",
+          "evidencePaths": [
+            "bench/workloads/workloads.local.d3d12.json",
+            "config/native-backend-coverage-matrix.json"
+          ],
+          "exitCriteria": "Publish a Windows D3D12 runtime artifact from the governed D3D12 workload contract."
+        },
+        {
+          "code": "d3d12_dawn_mapping_validation",
+          "evidencePaths": [
+            "bench/workloads/workloads.local.d3d12.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Validate the D3D12 Doe-vs-Dawn workload mapping against the governed D3D12 contract and record the mapping in a release-candidate report."
+        },
+        {
+          "code": "d3d12_claim_report",
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Publish a D3D12 claim report and add the corresponding entry to the public claim index when it is comparable and claimable."
+        }
+      ],
+      "claimAllowed": false,
+      "claimIndexEntries": [],
+      "currentState": "diagnostic",
+      "dawnComparator": "dawn_d3d12",
+      "doeTarget": "doe_d3d12",
+      "evidencePaths": [
+        "config/native-backend-coverage-matrix.json",
+        "bench/workloads/workloads.local.d3d12.json",
+        "docs/doe-support-matrix.md"
+      ],
+      "id": "native-d3d12-runtime",
+      "readinessStatus": "blocked",
+      "surface": "native_runtime"
+    },
+    {
+      "blockers": [],
+      "claimAllowed": true,
+      "claimIndexEntries": [
+        {
+          "claimPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json",
+          "claimState": "claim-indexed",
+          "claimStatus": "claimable",
+          "comparisonStatus": "comparable",
+          "id": "package-node-apple-metal",
+          "reportPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json"
+        }
+      ],
+      "currentState": "claimable",
+      "dawnComparator": "dawn_node_webgpu",
+      "doeTarget": "doe-gpu-node",
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "packages/doe-gpu/README.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "id": "package-node-runtime",
+      "readinessStatus": "claimable",
+      "surface": "package_runtime"
+    },
+    {
+      "blockers": [],
+      "claimAllowed": true,
+      "claimIndexEntries": [
+        {
+          "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json",
+          "claimState": "claim-indexed",
+          "claimStatus": "claimable",
+          "comparisonStatus": "comparable",
+          "id": "package-bun-apple-metal",
+          "reportPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json"
+        }
+      ],
+      "currentState": "claimable",
+      "dawnComparator": "dawn_bun_webgpu",
+      "doeTarget": "doe-gpu-bun",
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "packages/doe-gpu/README.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "id": "package-bun-runtime",
+      "readinessStatus": "claimable",
+      "surface": "package_runtime"
+    },
+    {
+      "blockers": [
+        {
+          "code": "deno_package_compare_claim_report",
+          "evidencePaths": [
+            "packages/doe-gpu/README.md",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Publish a Deno package compare and claim report with explicit host WebGPU comparator identity."
+        },
+        {
+          "code": "deno_host_webgpu_comparability_audit",
+          "evidencePaths": [
+            "config/tool-surfaces.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Audit Deno host WebGPU comparability and record whether the package lane is claimable or diagnostic."
+        }
+      ],
+      "claimAllowed": false,
+      "claimIndexEntries": [],
+      "currentState": "diagnostic",
+      "dawnComparator": "deno_wgpu",
+      "doeTarget": "doe-gpu-deno",
+      "evidencePaths": [
+        "config/tool-surfaces.json",
+        "packages/doe-gpu/README.md",
+        "docs/doe-support-matrix.md"
+      ],
+      "id": "package-deno-runtime",
+      "readinessStatus": "blocked",
+      "surface": "package_runtime"
+    },
+    {
+      "blockers": [
+        {
+          "code": "chromium_release_build_evidence",
+          "evidencePaths": [
+            "examples/browser-runtime-frontier-bundle.sample.json",
+            "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Publish browser release-build evidence for the Chromium runtime lane with release artifact files and hashes verified before promoting browser replacement language."
+        }
+      ],
+      "claimAllowed": false,
+      "claimIndexEntries": [
+        {
+          "claimPath": "",
+          "claimState": "diagnostic",
+          "claimStatus": "diagnostic",
+          "comparisonStatus": "comparable",
+          "id": "ort-browser-apple-metal",
+          "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
+        }
+      ],
+      "currentState": "diagnostic",
+      "dawnComparator": "chromium_dawn",
+      "doeTarget": "doe_chromium_webgpu",
+      "evidencePaths": [
+        "examples/browser-runtime-frontier-bundle.sample.json",
+        "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+        "docs/doe-support-matrix.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ],
+      "frontierBundleEvidence": {
+        "artifactKind": "browser_runtime_frontier_bundle",
+        "claimBlockerSummary": [
+          {
+            "code": "chromium_release_build_evidence",
+            "count": 1,
+            "message": "browser release artifact bundle must be a release_candidate"
+          }
+        ],
+        "claimBlockers": [
+          {
+            "code": "chromium_release_build_evidence",
+            "message": "browser release artifact bundle must be a release_candidate",
+            "path": "releaseBundle.releaseStatus"
+          }
+        ],
+        "claimabilityStatus": "blocked",
+        "componentReceipts": {
+          "claimPromotionReceipt": {
+            "artifactCount": 1,
+            "hiddenFallbackPassed": true,
+            "path": "examples/browser-claim-promotion-receipt.sample.json",
+            "promotionStatus": "promotable",
+            "status": "pass"
+          },
+          "releaseArtifactBundle": {
+            "artifactVerification": {
+              "requiredForClaimable": true,
+              "verified": false,
+              "verifyFilesRootProvided": false
+            },
+            "claimReports": [
+              {
+                "claimBlockerCount": 0,
+                "claimStatus": "claimable",
+                "comparisonStatus": "comparable",
+                "path": "examples/browser-claim-report.sample.json",
+                "sourceKernelDispatchWorkloadCount": 1,
+                "structuralStatus": "pass",
+                "workloadCount": 1
+              }
+            ],
+            "path": "examples/browser-release-artifact-bundle.sample.json",
+            "releaseStatus": "diagnostic",
+            "status": "pass"
+          },
+          "runtimeIdentity": {
+            "doeRuntimeActive": true,
+            "evidenceSource": "runtime_selection_artifact",
+            "path": "examples/browser-runtime-identity.selector.sample.json",
+            "selectedRuntime": "doe",
+            "status": "pass"
+          }
+        },
+        "path": "examples/browser-runtime-frontier-bundle.sample.json",
+        "status": "pass",
+        "summary": {
+          "claimBlockerCount": 1,
+          "claimReportCount": 1,
+          "failureCount": 0
+        }
+      },
+      "id": "browser-chromium-runtime",
+      "readinessStatus": "blocked",
+      "surface": "browser_runtime"
+    },
+    {
+      "blockers": [
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "evidencePaths": [
+            "examples/tint-compiler-evidence.sample.json",
+            "docs/shader-compiler-architecture.md"
+          ],
+          "exitCriteria": "Run the Doe-vs-Tint compiler evidence gate in claimable mode and publish the resulting evidence report."
+        },
+        {
+          "code": "shader_artifact_validation_for_target_backends",
+          "evidencePaths": [
+            "config/shader-toolchain.json",
+            "examples/tint-compiler-target-validation.sample.json",
+            "docs/shader-compiler-architecture.md"
+          ],
+          "exitCriteria": "Validate shader artifacts for the target backend set and attach those validation results to compiler claim evidence."
+        }
+      ],
+      "claimAllowed": false,
+      "claimIndexEntries": [],
+      "currentState": "diagnostic",
+      "dawnComparator": "tint",
+      "doeTarget": "doe_wgsl",
+      "evidencePaths": [
+        "config/shader-toolchain.json",
+        "examples/tint-compiler-evidence.sample.json",
+        "examples/tint-compiler-target-validation.sample.json",
+        "examples/tint-phase-benchmark-evidence.sample.json",
+        "examples/tint-compiler-frontier-bundle.sample.json",
+        "docs/shader-compiler-architecture.md"
+      ],
+      "frontierBundleEvidence": {
+        "artifactKind": "tint_compiler_frontier_bundle",
+        "claimBlockers": [
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "compiler evidence must be comparable before it can support a Tint replacement claim",
+            "path": "compilerEvidence[0].comparisonStatus"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "compiler evidence must be claimable before it can support a Tint replacement claim",
+            "path": "compilerEvidence[0].claimStatus"
+          },
+          {
+            "code": "shader_artifact_validation_for_target_backends",
+            "message": "Tint compiler result is not ok: sample_missing_tint_run",
+            "path": "targetValidationReceipts[0].claimBlockers[0]"
+          }
+        ],
+        "claimabilityStatus": "blocked",
+        "compilerEvidenceReports": [
+          {
+            "claimBlockerCount": 2,
+            "claimBlockerSummary": [
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 1,
+                "message": "compiler evidence must be comparable before it can support a Tint replacement claim"
+              },
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 1,
+                "message": "compiler evidence must be claimable before it can support a Tint replacement claim"
+              }
+            ],
+            "claimStatus": "diagnostic",
+            "claimableRows": 0,
+            "comparableRows": 0,
+            "comparisonStatus": "diagnostic",
+            "diagnosticGateStatus": "pass",
+            "path": "examples/tint-compiler-evidence.sample.json",
+            "rowCount": 1
+          }
+        ],
+        "componentReceipts": {
+          "loweringLinks": [
+            {
+              "diagnosticRows": 0,
+              "evidencePath": "examples/tint-compiler-evidence.sample.json",
+              "linkedRows": 1,
+              "path": "examples/wgsl-lowering-link-receipt.sample.json",
+              "rowCount": 1,
+              "status": "pass",
+              "targets": [
+                "spirv"
+              ]
+            }
+          ],
+          "phaseBenchmarks": [
+            {
+              "evidencePath": "examples/tint-compiler-evidence.sample.json",
+              "path": "examples/tint-phase-benchmark-evidence.sample.json",
+              "status": "pass",
+              "summary": {
+                "coveredTargetCount": 1,
+                "exactPhaseCompleteRows": 0,
+                "exactPhaseMissingRows": 1,
+                "failureCount": 0,
+                "notApplicableRows": 0,
+                "phaseBenchmarkCoveredRows": 1,
+                "phaseBenchmarkMissingRows": 0,
+                "rowCount": 1,
+                "targetCount": 1,
+                "tintOkRows": 1
+              },
+              "targets": [
+                "spirv"
+              ]
+            }
+          ],
+          "targetValidations": [
+            {
+              "claimBlockerSummary": [
+                {
+                  "code": "tint_result_not_ok",
+                  "count": 1,
+                  "message": "Tint compiler result is not ok: sample_missing_tint_run"
+                }
+              ],
+              "claimBlockerSummaryByEvidencePath": [
+                {
+                  "claimBlockerSummary": [
+                    {
+                      "code": "tint_result_not_ok",
+                      "count": 1,
+                      "message": "Tint compiler result is not ok: sample_missing_tint_run"
+                    }
+                  ],
+                  "evidencePath": "examples/tint-compiler-evidence.sample.json"
+                }
+              ],
+              "evidencePath": "examples/tint-compiler-evidence.sample.json",
+              "path": "examples/tint-compiler-target-validation.sample.json",
+              "status": "pass",
+              "summary": {
+                "claimBlockerCount": 1,
+                "coveredTargetCount": 1,
+                "diagnosticRows": 1,
+                "failureCount": 0,
+                "rowCount": 1,
+                "targetCount": 1,
+                "validatedRows": 0
+              },
+              "targets": [
+                "spirv"
+              ]
+            }
+          ]
+        },
+        "path": "examples/tint-compiler-frontier-bundle.sample.json",
+        "status": "pass",
+        "summary": {
+          "claimBlockerCount": 3,
+          "compilerEvidenceReportCount": 1,
+          "coveredTargetCount": 1,
+          "failureCount": 0,
+          "loweringLinkReceiptCount": 1,
+          "phaseBenchmarkReceiptCount": 1,
+          "targetValidationReceiptCount": 1
+        }
+      },
+      "id": "wgsl-tint-compiler",
+      "readinessStatus": "blocked",
+      "surface": "shader_compiler"
+    },
+    {
+      "blockers": [
+        {
+          "code": "published_cts_subset_receipt",
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Publish a CTS subset receipt with explicit query coverage, pass/fail status, and backend identity."
+        },
+        {
+          "code": "backend_specific_cts_pass_ledger",
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "config/webgpu-spec-index.jsonl"
+          ],
+          "exitCriteria": "Record backend-specific CTS pass ledgers for every backend used by the replacement claim."
+        },
+        {
+          "code": "conformance_claim_policy",
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Define the conformance claim policy that maps CTS evidence to allowed public language."
+        }
+      ],
+      "claimAllowed": false,
+      "claimIndexEntries": [],
+      "currentState": "diagnostic",
+      "dawnComparator": "webgpu_cts",
+      "doeTarget": "doe_webgpu_surface",
+      "evidencePaths": [
+        "config/webgpu-cts-evidence.json",
+        "config/webgpu-spec-index.jsonl",
+        "docs/doe-support-matrix.md"
+      ],
+      "id": "webgpu-cts-conformance",
+      "readinessStatus": "blocked",
+      "surface": "spec_conformance"
+    },
+    {
+      "blockers": [
+        {
+          "code": "non_apple_drop_in_bundle_receipts",
+          "evidencePaths": [
+            "docs/apple-metal-runtime-release.md",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Publish non-Apple drop-in runtime bundle receipts with hashes, ABI checks, and gate outputs."
+        },
+        {
+          "code": "rollback_rehearsal_receipt",
+          "evidencePaths": [
+            "config/backend-cutover-policy.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Publish a rollback rehearsal receipt for the drop-in runtime cutover policy."
+        },
+        {
+          "code": "cross_backend_abi_validation",
+          "evidencePaths": [
+            "config/native-backend-coverage-matrix.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "exitCriteria": "Publish ABI validation covering the backend set named by the runtime replacement claim."
+        }
+      ],
+      "claimAllowed": false,
+      "claimIndexEntries": [],
+      "currentState": "diagnostic",
+      "dawnComparator": "libwebgpu_dawn",
+      "doeTarget": "libwebgpu_doe",
+      "evidencePaths": [
+        "config/backend-cutover-policy.json",
+        "docs/apple-metal-runtime-release.md",
+        "docs/doe-support-matrix.md"
+      ],
+      "id": "drop-in-abi-runtime",
+      "readinessStatus": "blocked",
+      "surface": "drop_in_runtime"
+    },
+    {
+      "blockers": [
+        {
+          "code": "frontier_rows_not_all_claimable",
+          "evidencePaths": [
+            "config/dawn-replacement-frontier.json",
+            "reports/claim-index.json"
+          ],
+          "exitCriteria": "Every required Dawn/Tint replacement frontier row is claim-allowed or covered according to this manifest and the public claim index."
+        }
+      ],
+      "claimAllowed": false,
+      "claimIndexEntries": [],
+      "currentState": "covered",
+      "dawnComparator": "dawn_claim_surface",
+      "doeTarget": "doe_claim_surface",
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "config/claim-index.schema.json",
+        "docs/process.md"
+      ],
+      "id": "release-claim-index",
+      "readinessStatus": "covered",
+      "surface": "evidence_release"
+    }
+  ],
+  "schemaVersion": 1,
+  "summary": {
+    "blockedProductRowCount": 7,
+    "claimAllowedProductRowCount": 3,
+    "coveredEvidenceReleaseRowCount": 1,
+    "frontierRowCount": 11,
+    "productRowCount": 10,
+    "uniqueBlockerCount": 18
+  },
+  "universalClaim": {
+    "allowed": false,
+    "reasonCode": "frontier_rows_not_all_claimable"
+  }
+}

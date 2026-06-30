@@ -336,6 +336,26 @@ test "spirv private global: variable remains private storage" {
     try testing.expect(has_spirv_variable_with_storage_class(binary, spirv.StorageClass.Private));
 }
 
+test "spirv private global: struct member value loads" {
+    const source =
+        \\struct State {
+        \\    value: vec4f,
+        \\}
+        \\var<private> state: State;
+        \\@group(0) @binding(0) var<storage, read_write> result: array<f32, 1>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    result[0] = state.value.x;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    const binary = out[0..len];
+
+    try testing.expect(has_spirv_variable_with_storage_class(binary, spirv.StorageClass.Private));
+}
+
 test "spirv compute: OpEntryPoint GLCompute appears" {
     const source =
         \\@compute @workgroup_size(4, 2, 1)

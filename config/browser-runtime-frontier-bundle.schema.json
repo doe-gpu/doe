@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-runtime-frontier-bundle.schema.json",
+  "title": "Browser runtime frontier bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "status",
+    "claimabilityStatus",
+    "componentReceipts",
+    "claimBlockers",
+    "claimBlockerSummary",
+    "failures",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_runtime_frontier_bundle" },
+    "status": { "enum": ["pass", "fail"] },
+    "claimabilityStatus": { "enum": ["claimable", "blocked"] },
+    "componentReceipts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtimeIdentity",
+        "claimPromotionReceipt",
+        "releaseArtifactBundle"
+      ],
+      "properties": {
+        "runtimeIdentity": { "$ref": "#/$defs/RuntimeIdentitySummary" },
+        "claimPromotionReceipt": { "$ref": "#/$defs/PromotionSummary" },
+        "releaseArtifactBundle": { "$ref": "#/$defs/ReleaseBundleSummary" }
+      }
+    },
+    "claimBlockers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    },
+    "claimBlockerSummary": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/FailureSummary" }
+    },
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimReportCount",
+        "claimBlockerCount",
+        "failureCount"
+      ],
+      "properties": {
+        "claimReportCount": { "type": "integer", "minimum": 0 },
+        "claimBlockerCount": { "type": "integer", "minimum": 0 },
+        "failureCount": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "ReceiptStatus": {
+      "enum": ["pass", "fail"]
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "FailureSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "count"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "message": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "RuntimeIdentitySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "status",
+        "evidenceSource",
+        "selectedRuntime",
+        "doeRuntimeActive"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/ReceiptStatus" },
+        "evidenceSource": { "type": "string" },
+        "selectedRuntime": { "type": "string" },
+        "doeRuntimeActive": { "type": ["boolean", "null"] }
+      }
+    },
+    "PromotionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "status",
+        "promotionStatus",
+        "artifactCount",
+        "hiddenFallbackPassed"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/ReceiptStatus" },
+        "promotionStatus": { "type": "string" },
+        "artifactCount": { "type": "integer", "minimum": 0 },
+        "hiddenFallbackPassed": { "type": ["boolean", "null"] }
+      }
+    },
+    "ReleaseBundleSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "status",
+        "releaseStatus",
+        "artifactVerification",
+        "claimReports"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/ReceiptStatus" },
+        "releaseStatus": { "type": "string" },
+        "artifactVerification": { "$ref": "#/$defs/ArtifactVerificationSummary" },
+        "claimReports": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ClaimReportSummary" }
+        }
+      }
+    },
+    "ArtifactVerificationSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requiredForClaimable",
+        "verifyFilesRootProvided",
+        "verified"
+      ],
+      "properties": {
+        "requiredForClaimable": { "type": "boolean", "const": true },
+        "verifyFilesRootProvided": { "type": "boolean" },
+        "verified": { "type": "boolean" }
+      }
+    },
+    "ClaimReportSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "comparisonStatus",
+        "claimStatus",
+        "structuralStatus",
+        "workloadCount",
+        "sourceKernelDispatchWorkloadCount",
+        "claimBlockerCount"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "comparisonStatus": { "type": "string" },
+        "claimStatus": { "type": "string" },
+        "structuralStatus": { "type": "string" },
+        "workloadCount": { "type": "integer", "minimum": 0 },
+        "sourceKernelDispatchWorkloadCount": { "type": "integer", "minimum": 0 },
+        "claimBlockerCount": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

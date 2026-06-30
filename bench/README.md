@@ -141,6 +141,14 @@ from scattered configs:
 | Node ORT WebGPU Doe-backed vs Dawn-backed `node-webgpu` package breadth matrix | repo-only strict comparable exploration surface | `python3 bench/cli.py run-config --config bench/native-compare/compare.config.node.ort-webgpu-provider.breadth.json --side baseline`, then `--side comparison`, then compare the emitted receipts with `--comparability strict --require-timing-class process-wall` |
 | Browser ORT WebGPU Doe vs Dawn | repo-only strict comparable browser surface | `python3 bench/cli.py run-config --config bench/native-compare/compare.config.browser.ort-webgpu.json --side baseline`, then `--side comparison`, then compare the emitted receipts with `--comparability strict --require-timing-class process-wall` |
 | Doe WGSL compiler vs Tint | repo-only claim-boundary contract | `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.config.json --evidence-out bench/out/tint-compiler-evidence.json`, then `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.json`; add `--require-claimable` only when the report is intended to support a compiler claim |
+| Tint benchmark corpus SPIR-V compiler evidence | repo-only diagnostic compiler coverage surface with separate Tint benchmark-scope timing evidence | `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json --claim-mode release --evidence-out bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json`, then `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --json` |
+| Tint phase benchmark evidence | repo-only diagnostic receipt for Tint benchmark-scope timing coverage | `python3 bench/tools/check_tint_phase_benchmark_evidence.py --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --out bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json`; gate-runner wiring uses `--with-tint-phase-benchmark-evidence-gate --tint-phase-benchmark-required-target spirv` |
+| Browser WGSL corpus compiler linkage | repo-only lowering-link evidence surface | `python3 bench/native-compare/compare_doe_vs_tint_compilation.py --config bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json --claim-mode local --evidence-out bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json`, then `python3 bench/tools/build_wgsl_lowering_link_receipt.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --manifest config/wgsl-browser-corpus.json --out bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json` |
+| Tint compiler target backend validation | repo-only target artifact validation receipt | `python3 bench/tools/check_tint_compiler_target_validation.py --evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --allow-diagnostic-rows --out bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json`; gate-runner wiring uses `--with-tint-compiler-target-validation-gate --tint-compiler-target-validation-required-target spirv` |
+| Tint compiler frontier bundle | repo-only composed diagnostic bundle for compiler replacement blockers | `python3 bench/tools/check_tint_compiler_frontier_bundle.py --compiler-evidence bench/out/scratch/tint-compiler-evidence.browser-corpus.spirv.json --compiler-evidence bench/out/tint-compiler-evidence.benchmark-corpus.spirv.json --lowering-link-receipt bench/out/scratch/wgsl-lowering-link-receipt.browser-corpus.spirv.json --target-validation bench/out/scratch/tint-compiler-target-validation.frontier.spirv.json --phase-benchmark-evidence bench/out/scratch/tint-phase-benchmark-evidence.benchmark-corpus.spirv.json --required-target spirv --verify-files-root . --out bench/out/scratch/tint-compiler-frontier-bundle.spirv.json`; every component receipt evidence path must also be supplied via `--compiler-evidence`; add `--require-claimable` only for claim lanes |
+| Dawn replacement readiness report | repo-only frontier rollup with schema-gated bundle evidence details for browser and compiler blockers | `python3 bench/tools/build_dawn_replacement_readiness_report.py --out bench/out/scratch/dawn-replacement-readiness-report.json`; see `examples/dawn-replacement-readiness-report.sample.json` for the contract shape |
+| Browser runtime identity from Chromium selector evidence | repo-only selector-identity extraction surface | `python3 bench/tools/build_browser_runtime_identity.py --report examples/browser-smoke-report.sample.json --mode doe --out examples/browser-runtime-identity.selector.sample.json`, then `python3 browser/chromium/scripts/check-browser-runtime-identity.py --identity examples/browser-runtime-identity.selector.sample.json` |
+| Browser runtime frontier bundle | repo-only composed diagnostic bundle for Chromium runtime replacement blockers | `python3 bench/tools/check_browser_runtime_frontier_bundle.py --runtime-identity examples/browser-runtime-identity.selector.sample.json --claim-promotion-receipt examples/browser-claim-promotion-receipt.sample.json --release-artifact-bundle examples/browser-release-artifact-bundle.sample.json --out bench/out/scratch/browser-runtime-frontier-bundle.sample.json`; add `--verify-files-root <artifact-root> --require-claimable` only for claim lanes |
 | AMD Vulkan browser superset (Chromium Playwright layered) | repo-only diagnostic; `--mode auto` is selector evidence only | `python3 browser/chromium/scripts/generate-browser-projection-manifest.py --workloads bench/workloads/specialized/workloads.amd.vulkan.superset.json` then `python3 browser/chromium/scripts/run-browser-benchmark-superset.py` on a Linux/AMD host with vulkaninfo reachable |
 | Apple Metal browser superset (Chromium Playwright layered) | repo-only diagnostic, cross-backend parity with Vulkan (50 IDs) | `python3 browser/chromium/scripts/generate-browser-projection-manifest.py --workloads bench/workloads/specialized/workloads.apple.metal.superset.json --out browser/chromium/bench/generated/browser_projection_manifest.apple.metal.json` then `python3 browser/chromium/scripts/run-browser-benchmark-superset.py --workloads bench/workloads/specialized/workloads.apple.metal.superset.json --manifest-out browser/chromium/bench/generated/browser_projection_manifest.apple.metal.json` on a macOS host |
 | Native ORT Doe EP narrow basic-ops slice | repo-only single-runtime bench surface | `python3 bench/single-runtime/run_bench.py --workloads bench/workloads/workloads.native.ort-doe-ep-smoke.json --workload-id inference_ort_doe_ep_matmul_add_relu_float32_rank2_exactshape --executor-id ort_native_doe_ep --iterations 3 --warmup 1 --out-dir bench/out/native-ort-doe-ep/matmul_add_relu --out-report bench/out/native-ort-doe-ep/matmul_add_relu.report.json --out-metadata bench/out/native-ort-doe-ep/matmul_add_relu.metadata.json --no-timestamp-output` |
@@ -352,10 +360,12 @@ it does not live in a scratch-only path.
 - structural reporter entrypoint:
   - `zig build runtime-compile-report` builds `doe-runtime-compile-report`
   - `runtime/zig/src/doe_wgsl/runtime_compile_report.zig` is the single-shader
-    structural emitter; one invocation per shader emits MSL size, `min(...)`
-    count, `_doe_sizes` presence, `needs_sizes_buf`, dispatch preconditions,
-    workgroup size, and parse/sema/lower/emit/total phase timings for the
-    current build flavor
+    structural emitter; one invocation per shader emits the target, output
+    byte count, target-specific MSL/SPIR-V byte fields, MSL-only `min(...)`
+    count and `_doe_sizes` presence, `needs_sizes_buf`, dispatch
+    preconditions, workgroup size, and parse/sema/lower/emit/total phase
+    timings for the current build flavor. Use `--target spirv --emit-spirv`
+    for SPIR-V backend receipts.
 - build flavors:
   - `-Dlean-verified=false` reports the baseline structural shape
   - `-Dlean-verified=true` reports the proof-backed structural shape with the
@@ -490,6 +500,10 @@ That document defines:
 - For Doe-owned workload rows, first materialize the WGSL corpus into the local
   Dawn Tint benchmark input set and rebuild the benchmark harness:
   `python3 bench/tools/materialize_tint_warm_corpus.py --workloads bench/workloads/workloads.apple.metal.json --dawn-source-dir bench/vendor/dawn --build-dir bench/vendor/dawn/out/Release --target msl --build --ninja-bin ninja --output-state bench/fixtures/dawn_tint_warm_corpus_state.json`
+- For browser WGSL corpus rows, use the same materializer with
+  `--wgsl-corpus-manifest` and the selected `--workload-id`; the emitted state
+  receipt records the WGSL manifest, Dawn benchmark input path, benchmark name,
+  and rebuilt `tint_benchmark` hash.
 - Raw Tint timings remain the auditable source metric; the corrected view is a
   presentation aid so process startup does not get mistaken for compile work.
   The warm view is separate again: it is a true in-process Tint measurement,
@@ -718,11 +732,20 @@ resolves its entries against repo root.
   - forwards cycle-lock/rollback gate execution per window by default; use `--no-with-cycle-gate` to disable.
   - can forward optional substantiation status into cycle-gate evaluation via `--cycle-substantiation-report`.
 - `build_browser_claim_promotion_receipt.py`
-  - turns schema-backed browser claim reports into promotion receipts with forced-Doe, claim-policy, and hidden-fallback checks.
+  - turns schema-backed browser claim reports into promotion receipts with forced-Doe, claim-policy, structural-receipt, and hidden-fallback checks.
+- `build_browser_runtime_identity.py`
+  - extracts `browser_runtime_identity` artifacts from browser reports that carry Chromium runtime-selection evidence.
+  - produces selector-backed identity for claim lanes instead of browser-wrapper probe evidence.
 - `build_browser_release_artifact_bundle.py`
   - hash-binds the browser binary, Doe runtime, shader compiler, browser claim reports, promotion receipts, contracts, and policies, including the Chromium patch manifest, browser artifact identity coverage manifest, and browser unsupported reason taxonomy, into the release artifact bundle contract.
+  - refuses `--release-status release_candidate` unless `--verify-files-root` is provided and the emitted bundle passes file/hash verification under that root.
 - `check_browser_claim_promotion_receipt.py` / `check_browser_release_artifact_bundle.py`
   - validate browser promotion/release artifacts and can verify referenced file hashes with `--verify-files-root`; verified artifact paths must resolve under that root.
+  - `check_browser_release_artifact_bundle.py --require-release-candidate` rejects diagnostic bundles and requires verified file/hash evidence for release lanes; `run_blocking_gates.py` forwards this with `--browser-release-artifact-bundle-require-release-candidate`.
+- `check_browser_runtime_frontier_bundle.py`
+  - composes runtime identity, promotion, release-bundle, and browser claim-report structural receipt evidence into the Chromium runtime frontier bundle.
+  - records browser release artifact verification state and requires `--verify-files-root` hash verification before browser release evidence can support a claimable frontier bundle.
+  - blocks structural promotion when claim reports omit source-command identity, source-kernel dispatch coverage, dispatch-shape parity, or passing browser superset checker summaries.
 - `check_browser_artifact_identity_coverage.py`
   - validates the configured identity anchors for smoke, flight-recorder, derived probe, claim, promotion, and release artifacts.
 - `check_browser_unsupported_reason_taxonomy.py`
@@ -1320,6 +1343,15 @@ resolves its entries against repo root.
 - `build_dawn_replacement_readiness_report.py`
   - emits a machine-readable Dawn/Tint replacement readiness report from `config/dawn-replacement-frontier.json` and `reports/claim-index.json`.
   - reuses `dawn_replacement_frontier_gate.py` semantics and preserves blocker exit criteria, claim-index links, and row readiness state.
+  - attaches `frontierBundleEvidence` for browser and compiler frontier rows when their composed bundle samples are valid, preserving active bundle claim blockers and component receipt summaries.
+  - accepts `--browser-frontier-bundle` and `--tint-frontier-bundle` so generated frontier bundles can drive the readiness rollup without editing the frontier manifest.
+- `find_dawn_claim_candidates.py`
+  - scans local claim sidecars for Dawn/Tint-facing promotion candidates.
+  - reports only mapped, unindexed, claimable frontier rows as `index_ready`.
+  - classifies stale sidecars for already claim-allowed frontier rows as `already_covered` and sidecars that cannot be mapped to a frontier row as blocked.
+- `build_wgsl_lowering_link_receipt.py` / `check_wgsl_lowering_link_receipt.py`
+  - build and validate `wgsl_lowering_link_receipt` artifacts from Tint compiler evidence plus the WGSL corpus manifest.
+  - linked rows bind source hash, Doe IR hash, Doe backend output hash, Tint backend output hash, validation statuses, receipt paths, and target backend identity.
 - `check_native_backend_coverage_matrix.py`
   - validates `config/native-backend-coverage-matrix.json`, the Metal/Vulkan/D3D12 coverage matrix.
   - requires every native backend and required coverage class to appear exactly once.

@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/tint-compiler-frontier-bundle.schema.json",
+  "title": "Tint compiler frontier evidence bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "requiredTargets",
+    "status",
+    "claimabilityStatus",
+    "compilerEvidenceReports",
+    "componentReceipts",
+    "coverageByTarget",
+    "claimBlockers",
+    "failures",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "tint_compiler_frontier_bundle" },
+    "requiredTargets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/Target" }
+    },
+    "status": { "enum": ["pass", "fail"] },
+    "claimabilityStatus": { "enum": ["claimable", "blocked"] },
+    "compilerEvidenceReports": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CompilerEvidenceReport" }
+    },
+    "componentReceipts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loweringLinks", "targetValidations", "phaseBenchmarks"],
+      "properties": {
+        "loweringLinks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/LoweringLinkReceipt" }
+        },
+        "targetValidations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TargetValidationReceipt" }
+        },
+        "phaseBenchmarks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StatusReceipt" }
+        }
+      }
+    },
+    "coverageByTarget": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/TargetCoverage" }
+    },
+    "claimBlockers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    },
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compilerEvidenceReportCount",
+        "loweringLinkReceiptCount",
+        "targetValidationReceiptCount",
+        "phaseBenchmarkReceiptCount",
+        "coveredTargetCount",
+        "claimBlockerCount",
+        "failureCount"
+      ],
+      "properties": {
+        "compilerEvidenceReportCount": { "type": "integer", "minimum": 0 },
+        "loweringLinkReceiptCount": { "type": "integer", "minimum": 0 },
+        "targetValidationReceiptCount": { "type": "integer", "minimum": 0 },
+        "phaseBenchmarkReceiptCount": { "type": "integer", "minimum": 0 },
+        "coveredTargetCount": { "type": "integer", "minimum": 0 },
+        "claimBlockerCount": { "type": "integer", "minimum": 0 },
+        "failureCount": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "Target": {
+      "enum": ["msl", "spirv", "dxil", "hlsl"]
+    },
+    "ReceiptStatus": {
+      "enum": ["pass", "fail"]
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "SummaryMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["integer", "string", "number", "boolean", "null", "array", "object"]
+      }
+    },
+    "CompilerEvidenceReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "diagnosticGateStatus",
+        "comparisonStatus",
+        "claimStatus",
+        "rowCount",
+        "comparableRows",
+        "claimableRows",
+        "claimBlockerCount",
+        "claimBlockerSummary"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "diagnosticGateStatus": { "$ref": "#/$defs/ReceiptStatus" },
+        "comparisonStatus": { "type": "string" },
+        "claimStatus": { "type": "string" },
+        "rowCount": { "type": "integer", "minimum": 0 },
+        "comparableRows": { "type": "integer", "minimum": 0 },
+        "claimableRows": { "type": "integer", "minimum": 0 },
+        "claimBlockerCount": { "type": "integer", "minimum": 0 },
+        "claimBlockerSummary": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FailureSummary" }
+        }
+      }
+    },
+    "LoweringLinkReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "evidencePath",
+        "status",
+        "targets",
+        "rowCount",
+        "linkedRows",
+        "diagnosticRows"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "evidencePath": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/ReceiptStatus" },
+        "targets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Target" }
+        },
+        "rowCount": { "type": "integer", "minimum": 0 },
+        "linkedRows": { "type": "integer", "minimum": 0 },
+        "diagnosticRows": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "StatusReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "evidencePath", "status", "targets", "summary"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "evidencePath": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/ReceiptStatus" },
+        "targets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Target" }
+        },
+        "summary": { "$ref": "#/$defs/SummaryMap" }
+      }
+    },
+    "TargetValidationReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "evidencePath",
+        "status",
+        "targets",
+        "summary",
+        "claimBlockerSummary",
+        "claimBlockerSummaryByEvidencePath"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/ReceiptStatus" },
+        "evidencePath": { "type": "string", "minLength": 1 },
+        "targets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Target" }
+        },
+        "summary": { "$ref": "#/$defs/SummaryMap" },
+        "claimBlockerSummary": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FailureSummary" }
+        },
+        "claimBlockerSummaryByEvidencePath": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/EvidencePathFailureSummary" }
+        }
+      }
+    },
+    "FailureSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "count"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "message": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "EvidencePathFailureSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidencePath", "claimBlockerSummary"],
+      "properties": {
+        "evidencePath": { "type": "string", "minLength": 1 },
+        "claimBlockerSummary": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FailureSummary" }
+        }
+      }
+    },
+    "TargetCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "loweringLinkReceipts",
+        "targetValidationReceipts",
+        "phaseBenchmarkReceipts",
+        "evidencePaths",
+        "linkedRows",
+        "validatedRows",
+        "phaseBenchmarkCoveredRows"
+      ],
+      "properties": {
+        "target": { "$ref": "#/$defs/Target" },
+        "loweringLinkReceipts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "targetValidationReceipts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "phaseBenchmarkReceipts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "evidencePaths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "linkedRows": { "type": "integer", "minimum": 0 },
+        "validatedRows": { "type": "integer", "minimum": 0 },
+        "phaseBenchmarkCoveredRows": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

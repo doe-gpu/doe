@@ -2,19 +2,6 @@ const std = @import("std");
 const ir = @import("ir.zig");
 const spirv = @import("spirv_builder.zig");
 
-const TextureOpcode = struct {
-    const SampledImage: u16 = 86;
-    const ImageSampleImplicitLod: u16 = 87;
-    const ImageSampleExplicitLod: u16 = 88;
-    const ImageSampleDrefImplicitLod: u16 = 90;
-    const ImageSampleDrefExplicitLod: u16 = 91;
-    const ImageGather: u16 = 96;
-    const ImageDrefGather: u16 = 97;
-    const ImageQuerySizeLod: u16 = 103;
-    const ImageQuerySize: u16 = 104;
-    const ImageQueryLevels: u16 = 109;
-};
-
 fn emit_result_inst(self: anytype, opcode: u16, result_type: u32, operands: []const u32) !u32 {
     const result_id = self.emitter.builder.reserve_id();
     var words = std.ArrayListUnmanaged(u32){};
@@ -35,7 +22,7 @@ fn emit_sampled_image(self: anytype, call: anytype, texture_arg: u32, sampler_ar
     const sampled_image_type = try self.emitter.lower_sampled_image_type(image_type);
     const sampled_image_id = try emit_result_inst(
         self,
-        TextureOpcode.SampledImage,
+        spirv.Opcode.SampledImage,
         sampled_image_type,
         &.{ image_id, sampler_id },
     );
@@ -51,7 +38,7 @@ pub fn emit_texture_sample(self: anytype, call: anytype, result_ty: ir.TypeId, e
     if (!explicit_lod) {
         return try emit_result_inst(
             self,
-            TextureOpcode.ImageSampleImplicitLod,
+            spirv.Opcode.ImageSampleImplicitLod,
             try self.emitter.lower_type(result_ty),
             &.{ si.id, coords_id },
         );
@@ -59,13 +46,42 @@ pub fn emit_texture_sample(self: anytype, call: anytype, result_ty: ir.TypeId, e
 
     return try emit_result_inst(
         self,
-        TextureOpcode.ImageSampleExplicitLod,
+        spirv.Opcode.ImageSampleExplicitLod,
         try self.emitter.lower_type(result_ty),
         &.{
             si.id,
             coords_id,
             spirv.ImageOperandsMask.Lod,
             try self.emit_value_expr(self.function.expr_args.items[call.args.start + 3]),
+        },
+    );
+}
+
+pub fn emit_texture_sample_bias(self: anytype, call: anytype, result_ty: ir.TypeId) !u32 {
+    if (call.args.len < 4 or call.args.len > 5) return error.InvalidIr;
+
+    const si = try emit_sampled_image(self, call, 0, 1);
+    const coords_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 2]);
+    const bias_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 3]);
+    if (call.args.len == 4) {
+        return try emit_result_inst(
+            self,
+            spirv.Opcode.ImageSampleImplicitLod,
+            try self.emitter.lower_type(result_ty),
+            &.{ si.id, coords_id, spirv.ImageOperandsMask.Bias, bias_id },
+        );
+    }
+    const offset_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 4]);
+    return try emit_result_inst(
+        self,
+        spirv.Opcode.ImageSampleImplicitLod,
+        try self.emitter.lower_type(result_ty),
+        &.{
+            si.id,
+            coords_id,
+            spirv.ImageOperandsMask.Bias | spirv.ImageOperandsMask.ConstOffset,
+            bias_id,
+            offset_id,
         },
     );
 }
@@ -80,7 +96,7 @@ pub fn emit_texture_sample_compare(self: anytype, call: anytype, result_ty: ir.T
     if (!explicit_lod) {
         return try emit_result_inst(
             self,
-            TextureOpcode.ImageSampleDrefImplicitLod,
+            spirv.Opcode.ImageSampleDrefImplicitLod,
             try self.emitter.lower_type(result_ty),
             &.{ si.id, coords_id, dref_id },
         );
@@ -89,7 +105,7 @@ pub fn emit_texture_sample_compare(self: anytype, call: anytype, result_ty: ir.T
     const lod_zero = try self.emitter.builder.const_f32_bits(@as(u32, @bitCast(@as(f32, 0.0))));
     return try emit_result_inst(
         self,
-        TextureOpcode.ImageSampleDrefExplicitLod,
+        spirv.Opcode.ImageSampleDrefExplicitLod,
         try self.emitter.lower_type(result_ty),
         &.{ si.id, coords_id, dref_id, spirv.ImageOperandsMask.Lod, lod_zero },
     );
@@ -103,7 +119,7 @@ pub fn emit_texture_gather(self: anytype, call: anytype, result_ty: ir.TypeId) !
     const coords_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 3]);
     return try emit_result_inst(
         self,
-        TextureOpcode.ImageGather,
+        spirv.Opcode.ImageGather,
         try self.emitter.lower_type(result_ty),
         &.{ si.id, coords_id, component_id },
     );
@@ -117,7 +133,7 @@ pub fn emit_texture_gather_compare(self: anytype, call: anytype, result_ty: ir.T
     const dref_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 3]);
     return try emit_result_inst(
         self,
-        TextureOpcode.ImageDrefGather,
+        spirv.Opcode.ImageDrefGather,
         try self.emitter.lower_type(result_ty),
         &.{ si.id, coords_id, dref_id },
     );
@@ -132,7 +148,7 @@ pub fn emit_texture_sample_grad(self: anytype, call: anytype, result_ty: ir.Type
     const ddy_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 4]);
     return try emit_result_inst(
         self,
-        TextureOpcode.ImageSampleExplicitLod,
+        spirv.Opcode.ImageSampleExplicitLod,
         try self.emitter.lower_type(result_ty),
         &.{ si.id, coords_id, spirv.ImageOperandsMask.Grad, ddx_id, ddy_id },
     );
@@ -146,7 +162,7 @@ pub fn emit_texture_sample_offset(self: anytype, call: anytype, result_ty: ir.Ty
     const offset_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 3]);
     return try emit_result_inst(
         self,
-        TextureOpcode.ImageSampleImplicitLod,
+        spirv.Opcode.ImageSampleImplicitLod,
         try self.emitter.lower_type(result_ty),
         &.{ si.id, coords_id, spirv.ImageOperandsMask.ConstOffset, offset_id },
     );
@@ -161,7 +177,7 @@ pub fn emit_texture_sample_level_offset(self: anytype, call: anytype, result_ty:
     const offset_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 4]);
     return try emit_result_inst(
         self,
-        TextureOpcode.ImageSampleExplicitLod,
+        spirv.Opcode.ImageSampleExplicitLod,
         try self.emitter.lower_type(result_ty),
         &.{
             si.id,
@@ -178,21 +194,26 @@ pub fn emit_texture_dimensions(self: anytype, call: anytype, result_ty: ir.TypeI
     try self.emitter.builder.emit_capability(spirv.Capability.ImageQuery);
     const texture_expr = self.function.expr_args.items[call.args.start];
     const image_id = try self.emit_value_expr(texture_expr);
-    const opcode: u16 = if (call.args.len == 2) TextureOpcode.ImageQuerySizeLod else TextureOpcode.ImageQuerySize;
-    if (call.args.len == 2) {
+    const texture_ty = self.emitter.module.types.get(self.function.exprs.items[texture_expr].ty);
+    const needs_lod = call.args.len == 2 or switch (texture_ty) {
+        .texture_1d, .texture_2d, .texture_2d_array, .texture_cube, .texture_3d, .texture_depth_2d, .texture_depth_cube => true,
+        else => false,
+    };
+    if (needs_lod) {
+        const lod_id = if (call.args.len == 2)
+            try self.emit_value_expr(self.function.expr_args.items[call.args.start + 1])
+        else
+            try self.emitter.builder.const_i32_bits(0);
         return try emit_result_inst(
             self,
-            opcode,
+            spirv.Opcode.ImageQuerySizeLod,
             try self.emitter.lower_type(result_ty),
-            &.{
-                image_id,
-                try self.emit_value_expr(self.function.expr_args.items[call.args.start + 1]),
-            },
+            &.{ image_id, lod_id },
         );
     }
     return try emit_result_inst(
         self,
-        opcode,
+        spirv.Opcode.ImageQuerySize,
         try self.emitter.lower_type(result_ty),
         &.{image_id},
     );
@@ -255,7 +276,7 @@ pub fn emit_texture_num_levels(self: anytype, call: anytype, result_ty: ir.TypeI
     const image_id = try self.emit_value_expr(texture_expr);
     return try emit_result_inst(
         self,
-        TextureOpcode.ImageQueryLevels,
+        spirv.Opcode.ImageQueryLevels,
         try self.emitter.lower_type(result_ty),
         &.{image_id},
     );
@@ -269,7 +290,7 @@ pub fn emit_texture_num_layers(self: anytype, call: anytype, result_ty: ir.TypeI
     // ImageQuerySize returns vec3(width, height, layers) for arrayed images.
     // We extract the last component (z) for the layer count.
     const size_type = try self.emitter.builder.type_vector(try self.emitter.builder.type_u32(), 3);
-    const size_id = try emit_result_inst(self, TextureOpcode.ImageQuerySize, size_type, &.{image_id});
+    const size_id = try emit_result_inst(self, spirv.Opcode.ImageQuerySize, size_type, &.{image_id});
     return try emit_result_inst(
         self,
         spirv.Opcode.CompositeExtract,

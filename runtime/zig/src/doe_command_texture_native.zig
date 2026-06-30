@@ -165,10 +165,15 @@ pub export fn doeNativeQueueWriteTexture(
                 const rows = if (rows_per_image > 0) rows_per_image else height;
                 const copy_res = model_transfer_types.CopyTextureResource{
                     .handle = tex.vk_id,
-                    .width = width,
-                    .height = height,
-                    .depth_or_array_layers = depth_or_layers,
+                    .kind = .texture,
+                    .width = tex.width,
+                    .height = tex.height,
+                    .depth_or_array_layers = tex.depth_or_array_layers,
+                    .format = tex.format,
+                    .usage = tex.usage,
+                    .dimension = tex.dimension,
                     .mip_level = dst_mip,
+                    .sample_count = tex.sample_count,
                     .bytes_per_row = bytes_per_row,
                     .rows_per_image = rows,
                 };

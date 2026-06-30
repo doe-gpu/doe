@@ -1,7 +1,7 @@
 # doe-gpu
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/doerun/doe/main/assets/doe-logo.svg" alt="Doe logo" width="96" />
+<img src="https://raw.githubusercontent.com/doerun/doe/main/browser/chromium/assets/logo/source/fawn-icon-main.svg" alt="Fawn icon" width="96" />
 </p>
 
 `doe-gpu` is the native, receipt-backed WebGPU runtime for Node.js and Bun.

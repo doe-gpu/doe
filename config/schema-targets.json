@@ -58,6 +58,10 @@
       "data": "config/dawn-replacement-frontier.json"
     },
     {
+      "schema": "config/dawn-replacement-readiness-report.schema.json",
+      "data": "examples/dawn-replacement-readiness-report.sample.json"
+    },
+    {
       "schema": "config/compare-report.schema.json",
       "data": "examples/compare-report.sample.json"
     },
@@ -188,6 +192,18 @@
     {
       "schema": "config/tint-compiler-evidence.schema.json",
       "data": "examples/tint-compiler-evidence.sample.json"
+    },
+    {
+      "schema": "config/tint-compiler-target-validation.schema.json",
+      "data": "examples/tint-compiler-target-validation.sample.json"
+    },
+    {
+      "schema": "config/tint-phase-benchmark-evidence.schema.json",
+      "data": "examples/tint-phase-benchmark-evidence.sample.json"
+    },
+    {
+      "schema": "config/tint-compiler-frontier-bundle.schema.json",
+      "data": "examples/tint-compiler-frontier-bundle.sample.json"
     },
     {
       "schema": "config/doe-wgsl-host-plan.schema.json",
@@ -658,6 +674,10 @@
       "data": "examples/browser-runtime-identity.sample.json"
     },
     {
+      "schema": "config/browser-runtime-identity.schema.json",
+      "data": "examples/browser-runtime-identity.selector.sample.json"
+    },
+    {
       "schema": "config/browser-canvas-webgpu-fusion.schema.json",
       "data": "examples/browser-canvas-webgpu-fusion.sample.json"
     },
@@ -724,6 +744,10 @@
     {
       "schema": "config/browser-release-artifact-bundle.schema.json",
       "data": "examples/browser-release-artifact-bundle.sample.json"
+    },
+    {
+      "schema": "config/browser-runtime-frontier-bundle.schema.json",
+      "data": "examples/browser-runtime-frontier-bundle.sample.json"
     },
     {
       "schema": "config/browser-claim-promotion-receipt.schema.json",

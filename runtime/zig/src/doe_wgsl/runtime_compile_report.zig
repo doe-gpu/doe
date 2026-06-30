@@ -7,8 +7,28 @@ const Config = struct {
     shader_path: []const u8,
     shader_name: ?[]const u8 = null,
     out_path: ?[]const u8 = null,
+    target: Target = .msl,
     emit_msl_path: ?[]const u8 = null,
+    emit_spirv_path: ?[]const u8 = null,
 };
+
+const Target = enum {
+    msl,
+    spirv,
+};
+
+fn parseTarget(value: []const u8) !Target {
+    if (std.mem.eql(u8, value, "msl")) return .msl;
+    if (std.mem.eql(u8, value, "spirv")) return .spirv;
+    return error.InvalidTarget;
+}
+
+fn targetText(value: Target) []const u8 {
+    return switch (value) {
+        .msl => "msl",
+        .spirv => "spirv",
+    };
+}
 
 fn parseArgs(allocator: std.mem.Allocator) !Config {
     const args = try std.process.argsAlloc(allocator);
@@ -29,9 +49,15 @@ fn parseArgs(allocator: std.mem.Allocator) !Config {
         } else if (std.mem.eql(u8, args[i], "--out") and i + 1 < args.len) {
             i += 1;
             config.out_path = try allocator.dupe(u8, args[i]);
+        } else if (std.mem.eql(u8, args[i], "--target") and i + 1 < args.len) {
+            i += 1;
+            config.target = try parseTarget(args[i]);
         } else if (std.mem.eql(u8, args[i], "--emit-msl") and i + 1 < args.len) {
             i += 1;
             config.emit_msl_path = try allocator.dupe(u8, args[i]);
+        } else if (std.mem.eql(u8, args[i], "--emit-spirv") and i + 1 < args.len) {
+            i += 1;
+            config.emit_spirv_path = try allocator.dupe(u8, args[i]);
         }
     }
 
@@ -66,7 +92,7 @@ pub fn main() !void {
     const config = parseArgs(allocator) catch |err| {
         const stderr = std.fs.File.stderr().deprecatedWriter();
         try stderr.print(
-            "usage: doe-runtime-compile-report --shader-path <path> [--shader-name <name>] [--out <path>] [--emit-msl <path>]\nerror: {s}\n",
+            "usage: doe-runtime-compile-report --shader-path <path> [--shader-name <name>] [--out <path>] [--target msl|spirv] [--emit-msl <path>] [--emit-spirv <path>]\nerror: {s}\n",
             .{@errorName(err)},
         );
         std.process.exit(1);
@@ -75,6 +101,7 @@ pub fn main() !void {
     defer if (config.shader_name) |value| allocator.free(value);
     defer if (config.out_path) |value| allocator.free(value);
     defer if (config.emit_msl_path) |value| allocator.free(value);
+    defer if (config.emit_spirv_path) |value| allocator.free(value);
 
     const shader_source = try std.fs.cwd().readFileAlloc(allocator, config.shader_path, 8 * 1024 * 1024);
     defer allocator.free(shader_source);
@@ -84,34 +111,57 @@ pub fn main() !void {
     else
         std.fs.path.stem(std.fs.path.basename(config.shader_path));
 
-    var out_buf = try allocator.alloc(u8, mod.MAX_OUTPUT);
+    const out_buf_len = switch (config.target) {
+        .msl => mod.MAX_OUTPUT,
+        .spirv => mod.MAX_SPIRV_OUTPUT,
+    };
+    var out_buf = try allocator.alloc(u8, out_buf_len);
     defer allocator.free(out_buf);
 
-    var translation = try runtime_compile.translateToMslForComputeRuntimeTimed(
-        allocator,
-        shader_source,
-        out_buf,
-        null,
-        0,
-    );
+    var translation = switch (config.target) {
+        .msl => try runtime_compile.translateToMslForComputeRuntimeTimed(
+            allocator,
+            shader_source,
+            out_buf,
+            null,
+            0,
+        ),
+        .spirv => try runtime_compile.translateToSpirvTimed(
+            allocator,
+            shader_source,
+            out_buf,
+        ),
+    };
     defer translation.info.deinit(allocator);
 
-    const msl = out_buf[0..translation.len];
-    const min_count = countSubstring(msl, "min(");
-    const doe_sizes_present = std.mem.indexOf(u8, msl, "_doe_sizes") != null;
+    const output = out_buf[0..translation.len];
+    const min_count = if (config.target == .msl) countSubstring(output, "min(") else 0;
+    const doe_sizes_present = config.target == .msl and std.mem.indexOf(u8, output, "_doe_sizes") != null;
 
     if (config.emit_msl_path) |path| {
+        if (config.target != .msl) return error.EmitTargetMismatch;
         const file = try std.fs.cwd().createFile(path, .{});
         defer file.close();
-        try file.writeAll(msl);
+        try file.writeAll(output);
+    }
+    if (config.emit_spirv_path) |path| {
+        if (config.target != .spirv) return error.EmitTargetMismatch;
+        const file = try std.fs.cwd().createFile(path, .{});
+        defer file.close();
+        try file.writeAll(output);
     }
 
-    const report_fmt = "{{\"kind\":\"runtime_compile_report\",\"schemaVersion\":1,\"shader\":\"{s}\",\"shaderPath\":\"{s}\",\"leanVerified\":{s},\"mslBytes\":{d},\"minCount\":{d},\"doeSizesPresent\":{s},\"needsSizesBuf\":{s},\"dispatchPreconditions\":{d},\"textureDispatchPreconditions\":{d},\"workgroupSize\":[{d},{d},{d}],\"phaseTimingsNs\":{{\"parse\":{d},\"sema\":{d},\"lower\":{d},\"emit\":{d},\"total\":{d}}}}}\n";
+    const msl_bytes = if (config.target == .msl) translation.len else 0;
+    const spirv_bytes = if (config.target == .spirv) translation.len else 0;
+    const report_fmt = "{{\"kind\":\"runtime_compile_report\",\"schemaVersion\":1,\"shader\":\"{s}\",\"shaderPath\":\"{s}\",\"target\":\"{s}\",\"leanVerified\":{s},\"outputBytes\":{d},\"mslBytes\":{d},\"spirvBytes\":{d},\"minCount\":{d},\"doeSizesPresent\":{s},\"needsSizesBuf\":{s},\"dispatchPreconditions\":{d},\"textureDispatchPreconditions\":{d},\"workgroupSize\":[{d},{d},{d}],\"phaseTimingsNs\":{{\"parse\":{d},\"sema\":{d},\"lower\":{d},\"emit\":{d},\"total\":{d}}}}}\n";
     const report_args = .{
         shader_name,
         config.shader_path,
+        targetText(config.target),
         boolText(lean_proof.lean_verified),
         translation.len,
+        msl_bytes,
+        spirv_bytes,
         min_count,
         boolText(doe_sizes_present),
         boolText(translation.info.needs_sizes_buf),

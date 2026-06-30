@@ -27,11 +27,15 @@ from bench.native_compare_modules.reporting import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-TARGET_MAP = {"msl": "msl", "spirv": "spv", "hlsl": "hlsl"}
+TARGET_MAP = {"msl": "msl", "spirv": "spirv", "hlsl": "hlsl"}
 TINT_BENCHMARK_TARGET_MAP = {"msl": "GenerateMSL", "spirv": "GenerateSPIRV", "hlsl": "GenerateHLSL"}
 DEFAULT_TINT_WARM_MIN_TIME = "0.01s"
 DEFAULT_TINT_WARM_REPETITIONS = 9
 CLAIMABLE_REQUIRED_PHASES = ("parse", "sema", "lower", "emit", "total")
+TINT_PHASE_BENCHMARK_PREFIXES = {
+    "ParseWGSL": "parseWgsl",
+    "ValidateIR": "validateIr",
+}
 _TINT_STARTUP_BASELINE_WGSL = """@compute @workgroup_size(1)
 fn main() {}
 """
@@ -288,6 +292,7 @@ def run_tint_warm_bench(cfg, shaders, target, dry_run):
 
     repetitions = int(cfg["run"].get("warmRepetitions", DEFAULT_TINT_WARM_REPETITIONS))
     min_time = cfg["run"].get("warmMinTime", DEFAULT_TINT_WARM_MIN_TIME)
+    collect_phase_benchmarks = bool(cfg["run"].get("collectPhaseBenchmarks", False))
 
     if dry_run:
         for shader in shaders:
@@ -300,12 +305,22 @@ def run_tint_warm_bench(cfg, shaders, target, dry_run):
                 repetitions,
             )
             print(f"[dry-run] {' '.join(command)}")
+            if collect_phase_benchmarks:
+                phase_command = build_tint_phase_benchmark_command(
+                    warm_bin,
+                    benchmark_prefix,
+                    benchmark_name,
+                    min_time,
+                    repetitions,
+                )
+                print(f"[dry-run] {' '.join(phase_command)}")
         return {
             shader["name"]: {
                 "p50_ns": 0,
                 "p95_ns": 0,
                 "p99_ns": 0,
                 "timingNote": "in-process tint_benchmark real_time samples",
+                "phaseBenchmarkTimingsNs": {},
             }
             for shader in shaders
         }
@@ -355,6 +370,36 @@ def run_tint_warm_bench(cfg, shaders, target, dry_run):
             continue
         result = ns_stats(samples)
         result["timingNote"] = "in-process tint_benchmark real_time samples"
+        if collect_phase_benchmarks:
+            phase_command = build_tint_phase_benchmark_command(
+                warm_bin,
+                benchmark_prefix,
+                benchmark_name,
+                min_time,
+                repetitions,
+            )
+            phase_proc = subprocess.run(phase_command, check=False, capture_output=True, text=True)
+            if phase_proc.returncode == 0:
+                try:
+                    phase_payload = parse_google_benchmark_json(phase_proc.stdout)
+                    result["phaseBenchmarkTimingsNs"] = tint_phase_benchmark_timings(
+                        phase_payload,
+                        benchmark_prefix,
+                        aliases,
+                    )
+                except ValueError as exc:
+                    print(
+                        f"  warning: tint phase benchmark JSON parse failed on {shader['name']}: {exc}",
+                        file=sys.stderr,
+                    )
+                    result["phaseBenchmarkTimingsNs"] = {}
+            else:
+                diagnostic = (phase_proc.stderr or phase_proc.stdout or "tint_benchmark failed").strip()
+                print(
+                    f"  warning: tint phase benchmark failed on {shader['name']}: {diagnostic[:200]}",
+                    file=sys.stderr,
+                )
+                result["phaseBenchmarkTimingsNs"] = {}
         results[shader["name"]] = result
     return results
 
@@ -368,6 +413,42 @@ def build_tint_warm_command(warm_bin, benchmark_prefix, benchmark_name, min_time
         "--benchmark_report_aggregates_only=false",
         "--benchmark_format=json",
     ]
+
+
+def build_tint_phase_benchmark_command(warm_bin, benchmark_prefix, benchmark_name, min_time, repetitions):
+    escaped_name = google_benchmark_filter_literal(benchmark_name)
+    phase_prefixes = "|".join([*TINT_PHASE_BENCHMARK_PREFIXES.keys(), benchmark_prefix])
+    return [
+        str(warm_bin),
+        f"--benchmark_filter=^({phase_prefixes})/{escaped_name}$",
+        f"--benchmark_min_time={min_time}",
+        f"--benchmark_repetitions={repetitions}",
+        "--benchmark_report_aggregates_only=false",
+        "--benchmark_format=json",
+    ]
+
+
+def tint_phase_benchmark_timings(payload, backend_prefix, aliases):
+    samples_by_key = {}
+    prefix_to_key = {**TINT_PHASE_BENCHMARK_PREFIXES, backend_prefix: "generateBackend"}
+    for benchmark in payload.get("benchmarks", []):
+        if benchmark.get("run_type") != "iteration":
+            continue
+        name = benchmark.get("name", "")
+        if "/" not in name:
+            continue
+        prefix, short_name = name.split("/", 1)
+        key = prefix_to_key.get(prefix)
+        if not key or short_name not in aliases:
+            continue
+        sample_ns = duration_to_ns(benchmark.get("real_time"), benchmark.get("time_unit"))
+        if sample_ns is not None:
+            samples_by_key.setdefault(key, []).append(sample_ns)
+    return {
+        key: ns_stats(samples)["p50_ns"]
+        for key, samples in sorted(samples_by_key.items())
+        if samples
+    }
 
 
 def google_benchmark_filter_literal(value):
@@ -494,7 +575,11 @@ def build_claim_report(
             },
         )
         if not warm or not warm_iterations:
-            gate["reasons"].insert(0, "no warm in-process Tint samples (config lacks warmBinaryPath)")
+            if cfg.get("comparison", {}).get("warmBinaryPath"):
+                warm_reason = "no warm in-process Tint samples (no matching or successful tint_benchmark row)"
+            else:
+                warm_reason = "no warm in-process Tint samples (config lacks warmBinaryPath)"
+            gate["reasons"].insert(0, warm_reason)
             gate["claimable"] = False
         workloads.append(gate)
 
@@ -511,7 +596,7 @@ def build_claim_report(
     claim_policy["requiredPositivePercentiles"] = required_pcts
     claim_policy["deltaPercentConvention"] = DELTA_PERCENT_CONVENTION
 
-    return {
+    report = {
         "schemaVersion": CLAIM_REPORT_SCHEMA_VERSION,
         "artifactKind": "claim-report",
         "generatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -553,9 +638,27 @@ def build_claim_report(
         "reasons": aggregate_reasons,
         "workloads": workloads,
     }
+    compare_report = cfg.get("_compareReport")
+    if isinstance(compare_report, dict):
+        compare_path = compare_report.get("path")
+        compare_sha256 = compare_report.get("sha256")
+        if isinstance(compare_path, str) and compare_path:
+            report["compareReport"] = {"path": compare_path}
+            if isinstance(compare_sha256, str) and compare_sha256:
+                report["compareReport"]["sha256"] = compare_sha256
+    return report
 
 
-def build_toolchain_info(cfg, args):
+def doe_emit_flag_for_target(target):
+    schema_target = normalize_schema_target(target)
+    if schema_target == "spirv":
+        return "--emit-spirv"
+    return f"--emit-{schema_target}"
+
+
+def build_toolchain_info(cfg, args, target="msl"):
+    schema_target = normalize_schema_target(target)
+    tint_format = TARGET_MAP.get(schema_target, schema_target)
     doe_emit_path = REPO_ROOT / args.doe_emit_binary
     tint_path = REPO_ROOT / cfg["comparison"]["binaryPath"]
     tint_warm_path = (
@@ -570,7 +673,12 @@ def build_toolchain_info(cfg, args):
             "version": command_version([str(doe_emit_path), "--version"], revision)
             if doe_emit_path.is_file()
             else "missing",
-            "command": [repo_relative(doe_emit_path), "--emit-msl"],
+            "command": [
+                repo_relative(doe_emit_path),
+                "--target",
+                schema_target,
+                doe_emit_flag_for_target(schema_target),
+            ],
             "sourceRevision": revision,
             "artifactPath": repo_relative(doe_emit_path) if doe_emit_path.exists() else "",
             "artifactSha256": file_sha256(doe_emit_path) if doe_emit_path.is_file() else None,
@@ -580,7 +688,7 @@ def build_toolchain_info(cfg, args):
             "version": command_version([str(tint_path), "--version"], "dawn-vendor")
             if tint_path.is_file()
             else "missing",
-            "command": [repo_relative(tint_path), "--format=msl"],
+            "command": [repo_relative(tint_path), f"--format={tint_format}"],
             "sourceRevision": "dawn-vendor",
             "artifactPath": repo_relative(tint_path) if tint_path.exists() else "",
             "artifactSha256": file_sha256(tint_path) if tint_path.is_file() else None,
@@ -608,13 +716,14 @@ def build_toolchain_info(cfg, args):
     }
 
 
-def build_claimability(record, claim_workload, comparable):
+def build_claimability(record, claim_workload, comparable, phase_claim_blockers=None):
     delta = {}
     if record:
         delta = record.get("warmDeltaPercent") or record.get("deltaPercent") or {}
     claim_reasons = []
     if not comparable:
         claim_reasons.append("row is not comparable")
+    claim_reasons.extend(str(reason) for reason in (phase_claim_blockers or []))
     if not record or record.get("status") != "compared":
         claim_reasons.append(f"row not compared: {record.get('reason', 'missing record') if record else 'missing record'}")
     if not record or not record.get("comparison", {}).get("warm", {}).get("p50_ns"):
@@ -666,8 +775,15 @@ def missing_phase_timings(result, required_phases):
     return missing
 
 
-def build_row_comparability(record, doe_result, tint_result, required_phases=None):
+def build_row_comparability(
+    record,
+    doe_result,
+    tint_result,
+    required_phases=None,
+    tint_required_phases=None,
+):
     required_phases = tuple(required_phases or ("total",))
+    tint_required_phases = tuple(tint_required_phases or required_phases)
     reasons = []
     if not record or record.get("status") != "compared":
         reasons.append(f"row not compared: {record.get('reason', 'missing record') if record else 'missing record'}")
@@ -679,7 +795,7 @@ def build_row_comparability(record, doe_result, tint_result, required_phases=Non
         reasons.append("missing in-process Tint warm timing evidence")
     for phase in missing_phase_timings(doe_result, required_phases):
         reasons.append(f"doe missing phase timing: {phase}")
-    for phase in missing_phase_timings(tint_result, required_phases):
+    for phase in missing_phase_timings(tint_result, tint_required_phases):
         reasons.append(f"tint missing phase timing: {phase}")
 
     deduped_reasons = []

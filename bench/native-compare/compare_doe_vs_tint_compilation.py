@@ -24,6 +24,7 @@ import ast
 import datetime
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -53,6 +54,7 @@ from bench.native_compare_modules.compare_doe_vs_tint_support import (  # noqa: 
     git_revision,
     google_benchmark_filter_literal,
     infer_shader_stage,
+    missing_phase_timings,
     normalize_schema_target,
     ns_stats,
     parse_google_benchmark_json,
@@ -61,16 +63,23 @@ from bench.native_compare_modules.compare_doe_vs_tint_support import (  # noqa: 
     required_tool_gaps,
     run_tint_bench,
     source_gaps_for_config,
+    tint_phase_benchmark_timings,
     tint_warm_benchmark_aliases,
 )
 
-TARGET_MAP = {"msl": "msl", "spirv": "spv", "hlsl": "hlsl"}
+TARGET_MAP = {"msl": "msl", "spirv": "spirv", "hlsl": "hlsl"}
 TINT_BENCHMARK_TARGET_MAP = {"msl": "GenerateMSL", "spirv": "GenerateSPIRV", "hlsl": "GenerateHLSL"}
 DEFAULT_TINT_WARM_MIN_TIME = "0.01s"
 DEFAULT_TINT_WARM_REPETITIONS = 9
 DEFAULT_DOE_EMIT_BINARY = "runtime/zig/zig-out/bin/doe-runtime-compile-report"
 SCHEMA_VERSION = 3
 CLAIMABLE_REQUIRED_PHASES = ("parse", "sema", "lower", "emit", "total")
+DIAGNOSTIC_MESSAGE_LIMIT = 500
+WGSL_ENTRY_POINT_RE = re.compile(
+    r"((?:@[A-Za-z_][A-Za-z0-9_]*(?:\([^)]*\))?\s*)+)fn\s+([A-Za-z_][A-Za-z0-9_]*)",
+    re.MULTILINE,
+)
+WGSL_STAGE_ATTR_RE = re.compile(r"@(vertex|fragment|compute)\b")
 _TINT_STARTUP_BASELINE_WGSL = """@compute @workgroup_size(1)
 fn main() {}
 """
@@ -234,7 +243,81 @@ def discover_workload_rows(workloads_path, workload_ids):
     return shaders
 
 
-def discover_tint_benchmark_rows(script_path, requested_names):
+def discover_wgsl_corpus_rows(manifest_path, workload_ids, targets):
+    if Path(manifest_path).is_absolute():
+        corpus_path = Path(manifest_path)
+    else:
+        corpus_path = REPO_ROOT / manifest_path
+    if not corpus_path.is_file():
+        print(f"error: WGSL corpus manifest not found: {corpus_path}", file=sys.stderr)
+        sys.exit(1)
+
+    payload = json.loads(corpus_path.read_text(encoding="utf-8"))
+    rows = payload.get("rows", [])
+    requested_ids = list(workload_ids or [])
+    requested_id_set = set(requested_ids)
+    target_set = {normalize_schema_target(target) for target in targets}
+    shaders = []
+
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        shader_id = row.get("shaderId", "")
+        if requested_id_set and shader_id not in requested_id_set:
+            continue
+        if row.get("expectedValidity", "valid") != "valid":
+            continue
+        expected_targets = [
+            normalize_schema_target(target)
+            for target in row.get("expectedBackendTargets", [])
+            if isinstance(target, str)
+        ]
+        if target_set and expected_targets and not target_set.intersection(expected_targets):
+            continue
+        shader_rel = row.get("sourcePath", "")
+        shader_path = REPO_ROOT / shader_rel
+        if not shader_path.is_file():
+            print(
+                f"error: sourcePath not found for WGSL corpus row {shader_id}: {shader_path}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        source_lines = len(shader_path.read_text(encoding="utf-8").splitlines())
+        stages = row.get("shaderStages", [])
+        shader_stage = stages[0] if isinstance(stages, list) and stages else infer_shader_stage(shader_path)
+        shaders.append(
+            {
+                "workloadId": shader_id,
+                "name": shader_id,
+                "tier": str(row.get("category", "wgsl_corpus")),
+                "path": str(shader_path),
+                "sourceLines": source_lines,
+                "sourceShader": shader_path.stem,
+                "corpusCategory": row.get("category", "wgsl_corpus"),
+                "expectedValidity": row.get("expectedValidity", "valid"),
+                "expectedBackendTargets": expected_targets,
+                "shaderStage": shader_stage,
+            }
+        )
+
+    if requested_id_set:
+        found_ids = {shader["workloadId"] for shader in shaders}
+        missing = [workload_id for workload_id in requested_ids if workload_id not in found_ids]
+        if missing:
+            print(
+                f"error: valid WGSL corpus ids not found in {corpus_path}: {', '.join(missing)}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+    if not shaders:
+        print(f"error: no valid WGSL corpus rows found in {corpus_path}", file=sys.stderr)
+        sys.exit(1)
+
+    return shaders
+
+
+def discover_tint_benchmark_rows(script_path, requested_names, targets=None):
     benchmark_script = REPO_ROOT / script_path
     if not benchmark_script.is_file():
         print(f"error: Tint benchmark input script not found: {benchmark_script}", file=sys.stderr)
@@ -257,6 +340,13 @@ def discover_tint_benchmark_rows(script_path, requested_names):
         sys.exit(1)
 
     requested_name_set = set(requested_names or [])
+    expected_targets = [
+        normalize_schema_target(target)
+        for target in (targets or ["msl"])
+        if normalize_schema_target(target) in TARGET_MAP
+    ]
+    if not expected_targets:
+        expected_targets = ["msl"]
     base_dir = (benchmark_script.parent / "../../../../").resolve()
     shaders = []
     for benchmark_file in benchmark_files:
@@ -280,10 +370,9 @@ def discover_tint_benchmark_rows(script_path, requested_names):
                 "path": str(shader_path),
                 "sourceLines": source_lines,
                 "sourceShader": shader_path.stem,
-                "target": "msl",
                 "corpusCategory": "tint_benchmark_corpus",
                 "expectedValidity": "valid",
-                "expectedBackendTargets": ["msl"],
+                "expectedBackendTargets": expected_targets,
             }
         )
 
@@ -407,32 +496,142 @@ def validate_msl_output(path):
     }
 
 
+def validate_spirv_output(path):
+    try:
+        proc = subprocess.run(
+            ["spirv-val", str(path)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return validation_result_not_run("spirv-val unavailable")
+
+    if proc.returncode != 0:
+        diagnostic = (proc.stderr or proc.stdout or "SPIR-V validation failed").strip()
+        return {
+            "status": "failed",
+            "tool": "spirv-val",
+            "reason": diagnostic[:500],
+        }
+    return {
+        "status": "passed",
+        "tool": "spirv-val",
+        "reason": "",
+    }
+
+
+def validate_shader_output(path, target):
+    schema_target = normalize_schema_target(target)
+    if schema_target == "msl":
+        return validate_msl_output(path)
+    if schema_target == "spirv":
+        return validate_spirv_output(path)
+    return validation_result_not_run(f"no validator configured for {schema_target}")
+
+
+def diagnostic_message(value, fallback=""):
+    if isinstance(value, bytes):
+        text = value.decode("utf-8", errors="replace")
+    elif value is None:
+        text = ""
+    else:
+        text = str(value)
+    text = text.strip()
+    if not text:
+        text = fallback
+    return text[:DIAGNOSTIC_MESSAGE_LIMIT]
+
+
+def process_diagnostic(proc, fallback):
+    return diagnostic_message(proc.stderr or proc.stdout, fallback)
+
+
+def discover_wgsl_entry_points(shader_path):
+    try:
+        source = Path(shader_path).read_text(encoding="utf-8")
+    except OSError:
+        return []
+    seen = set()
+    entries = []
+    for match in WGSL_ENTRY_POINT_RE.finditer(source):
+        attr_block, name = match.groups()
+        stage_match = WGSL_STAGE_ATTR_RE.search(attr_block)
+        if stage_match is None:
+            continue
+        stage = stage_match.group(1)
+        if name in seen:
+            continue
+        seen.add(name)
+        entries.append({"stage": stage, "entryPoint": name})
+    return entries
+
+
+def safe_artifact_stem(name):
+    return "".join(char if char.isalnum() or char in {"-", "_"} else "_" for char in name)
+
+
+def write_json(path, payload):
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def make_output_artifact(*, target, entry_point, stage, output_path, validation):
+    return {
+        "target": target,
+        "entryPoint": entry_point,
+        "shaderStage": stage,
+        "outputSha256": file_sha256(output_path),
+        "outputPath": repo_relative(output_path),
+        "validationStatus": validation["status"],
+        "validationTool": validation["tool"],
+        "validationMessage": diagnostic_message(validation.get("reason")),
+    }
+
+
 def make_compiler_result(
     *,
     status,
     diagnostic_code,
+    diagnostic_message_text="",
     output_sha256=None,
     ir_sha256=None,
+    output_path="",
     validation_status="not_run",
     validation_tool="",
+    validation_message_text="",
     phase_total_ns=0,
     phase_timings_ns=None,
+    phase_benchmark_timings_ns=None,
     receipt_path="",
+    output_artifacts=None,
 ):
     timings = {}
+    benchmark_timings = {}
     if status == "ok":
         timings = normalize_phase_timings_ns(phase_timings_ns)
         if not timings and phase_total_ns:
             timings = {"total": int(phase_total_ns)}
+        if isinstance(phase_benchmark_timings_ns, dict):
+            for key, raw in phase_benchmark_timings_ns.items():
+                if isinstance(key, str) and isinstance(raw, int) and raw > 0:
+                    benchmark_timings[key] = int(raw)
+    diagnostic_text = diagnostic_message(diagnostic_message_text)
+    if status != "ok" and not diagnostic_text:
+        diagnostic_text = diagnostic_message(diagnostic_code)
     return {
         "status": status,
         "diagnosticCode": diagnostic_code,
+        "diagnosticMessage": diagnostic_text,
         "outputSha256": output_sha256 if status == "ok" else None,
         "irSha256": ir_sha256 if status == "ok" else None,
+        "outputPath": output_path if status == "ok" else "",
         "validationStatus": validation_status,
         "validationTool": validation_tool,
+        "validationMessage": diagnostic_message(validation_message_text),
         "phaseTimingsNs": timings,
+        "phaseBenchmarkTimingsNs": benchmark_timings,
         "receiptPath": receipt_path if status == "ok" else "",
+        "outputArtifacts": output_artifacts if status == "ok" and isinstance(output_artifacts, list) else [],
     }
 
 
@@ -448,10 +647,11 @@ def get_record_total_ns(record, side):
 
 
 def compile_doe_evidence_output(shader, target, record, evidence_dir, doe_emit_binary, dry_run):
-    if normalize_schema_target(target) != "msl":
+    schema_target = normalize_schema_target(target)
+    if schema_target not in {"msl", "spirv"}:
         return make_compiler_result(
             status="unsupported",
-            diagnostic_code="doe_evidence_only_supports_msl_output",
+            diagnostic_code="doe_evidence_only_supports_msl_or_spirv_output",
         )
     if dry_run:
         return make_compiler_result(
@@ -464,11 +664,13 @@ def compile_doe_evidence_output(shader, target, record, evidence_dir, doe_emit_b
         return make_compiler_result(
             status="failed",
             diagnostic_code="missing_doe_emit_binary",
+            diagnostic_message_text=f"Doe emit binary not found: {doe_bin}",
         )
 
     row_dir = evidence_dir / shader["name"] / "doe"
     row_dir.mkdir(parents=True, exist_ok=True)
-    output_path = row_dir / "output.msl"
+    output_name = "output.msl" if schema_target == "msl" else "output.spv"
+    output_path = row_dir / output_name
     receipt_path = row_dir / "compile-report.json"
     cmd = [
         str(doe_bin),
@@ -476,25 +678,36 @@ def compile_doe_evidence_output(shader, target, record, evidence_dir, doe_emit_b
         shader["path"],
         "--shader-name",
         shader["name"],
-        "--emit-msl",
-        str(output_path),
+        "--target",
+        schema_target,
         "--out",
         str(receipt_path),
     ]
+    if schema_target == "msl":
+        cmd.extend(["--emit-msl", str(output_path)])
+    else:
+        cmd.extend(["--emit-spirv", str(output_path)])
     proc = subprocess.run(cmd, check=False, capture_output=True, text=True)
     if proc.returncode != 0 or not output_path.is_file():
         diagnostic_path = row_dir / "compile.stderr.txt"
-        diagnostic_path.write_text(proc.stderr or proc.stdout or "Doe compile failed", encoding="utf-8")
+        diagnostic = process_diagnostic(proc, "Doe compile failed")
+        diagnostic_path.write_text(proc.stderr or proc.stdout or diagnostic, encoding="utf-8")
         return make_compiler_result(
             status="failed",
             diagnostic_code="doe_compile_failed",
+            diagnostic_message_text=diagnostic,
         )
 
-    validation = validate_msl_output(output_path)
+    validation = validate_shader_output(output_path, schema_target)
     if validation["status"] != "passed":
+        validation_message = diagnostic_message(validation.get("reason"), "validation failed")
         return make_compiler_result(
             status="failed",
-            diagnostic_code=f"doe_msl_validation_{validation['status']}",
+            diagnostic_code=f"doe_{schema_target}_validation_{validation['status']}",
+            diagnostic_message_text=validation_message,
+            validation_status=validation["status"],
+            validation_tool=validation["tool"],
+            validation_message_text=validation_message,
         )
 
     compile_report = {}
@@ -509,6 +722,7 @@ def compile_doe_evidence_output(shader, target, record, evidence_dir, doe_emit_b
         return make_compiler_result(
             status="failed",
             diagnostic_code="missing_doe_timing_evidence",
+            diagnostic_message_text="Doe timing evidence is missing from phase timings and comparison records",
         )
 
     return make_compiler_result(
@@ -516,6 +730,7 @@ def compile_doe_evidence_output(shader, target, record, evidence_dir, doe_emit_b
         diagnostic_code="",
         output_sha256=file_sha256(output_path),
         ir_sha256=file_sha256(receipt_path) if receipt_path.is_file() else None,
+        output_path=repo_relative(output_path),
         validation_status="passed",
         validation_tool=validation["tool"],
         phase_total_ns=phase_total_ns,
@@ -526,10 +741,10 @@ def compile_doe_evidence_output(shader, target, record, evidence_dir, doe_emit_b
 
 def compile_tint_evidence_output(cfg, shader, target, record, evidence_dir, dry_run):
     schema_target = normalize_schema_target(target)
-    if schema_target != "msl":
+    if schema_target not in {"msl", "spirv"}:
         return make_compiler_result(
             status="unsupported",
-            diagnostic_code="tint_evidence_only_supports_msl_output",
+            diagnostic_code="tint_evidence_only_supports_msl_or_spirv_output",
         )
     if dry_run:
         return make_compiler_result(
@@ -542,27 +757,48 @@ def compile_tint_evidence_output(cfg, shader, target, record, evidence_dir, dry_
         return make_compiler_result(
             status="failed",
             diagnostic_code="missing_tint_binary",
+            diagnostic_message_text=f"Tint binary not found: {tint_bin}",
         )
 
     row_dir = evidence_dir / shader["name"] / "tint"
     row_dir.mkdir(parents=True, exist_ok=True)
-    output_path = row_dir / "output.msl"
+    output_name = "output.msl" if schema_target == "msl" else "output.spv"
+    output_path = row_dir / output_name
     stderr_path = row_dir / "compile.stderr.txt"
-    cmd = [str(tint_bin), "--format=msl", shader["path"]]
+    tint_format = TARGET_MAP.get(schema_target, schema_target)
+    cmd = [str(tint_bin), f"--format={tint_format}", shader["path"]]
     proc = subprocess.run(cmd, check=False, capture_output=True)
     if proc.returncode != 0:
-        stderr_path.write_bytes(proc.stderr or proc.stdout or b"Tint compile failed")
+        diagnostic = process_diagnostic(proc, "Tint compile failed")
+        stderr_path.write_bytes(proc.stderr or proc.stdout or diagnostic.encode("utf-8"))
         return make_compiler_result(
             status="failed",
             diagnostic_code="tint_compile_failed",
+            diagnostic_message_text=diagnostic,
         )
 
     output_path.write_bytes(proc.stdout)
-    validation = validate_msl_output(output_path)
+    validation = validate_shader_output(output_path, schema_target)
     if validation["status"] != "passed":
+        if schema_target == "spirv":
+            multi_result = compile_tint_spirv_entry_outputs(
+                tint_bin=tint_bin,
+                shader=shader,
+                row_dir=row_dir,
+                tint_format=tint_format,
+                record=record,
+                validation_message=validation.get("reason", ""),
+            )
+            if multi_result is not None:
+                return multi_result
+        validation_message = diagnostic_message(validation.get("reason"), "validation failed")
         return make_compiler_result(
             status="failed",
-            diagnostic_code=f"tint_msl_validation_{validation['status']}",
+            diagnostic_code=f"tint_{schema_target}_validation_{validation['status']}",
+            diagnostic_message_text=validation_message,
+            validation_status=validation["status"],
+            validation_tool=validation["tool"],
+            validation_message_text=validation_message,
         )
 
     phase_total_ns = get_record_total_ns(record, "tint")
@@ -570,16 +806,119 @@ def compile_tint_evidence_output(cfg, shader, target, record, evidence_dir, dry_
         return make_compiler_result(
             status="failed",
             diagnostic_code="missing_tint_timing_evidence",
+            diagnostic_message_text="Tint timing evidence is missing from comparison records",
         )
 
     return make_compiler_result(
         status="ok",
         diagnostic_code="",
         output_sha256=file_sha256(output_path),
+        output_path=repo_relative(output_path),
         validation_status="passed",
         validation_tool=validation["tool"],
         phase_total_ns=phase_total_ns,
+        phase_benchmark_timings_ns=(
+            record.get("comparison", {})
+            .get("warm", {})
+            .get("phaseBenchmarkTimingsNs", {})
+            if isinstance(record, dict)
+            else {}
+        ),
         receipt_path=repo_relative(output_path),
+    )
+
+
+def compile_tint_spirv_entry_outputs(
+    *,
+    tint_bin,
+    shader,
+    row_dir,
+    tint_format,
+    record,
+    validation_message,
+):
+    entries = discover_wgsl_entry_points(shader["path"])
+    if len(entries) <= 1:
+        return None
+
+    artifacts = []
+    for entry in entries:
+        name = entry["entryPoint"]
+        output_path = row_dir / f"output.{safe_artifact_stem(name)}.spv"
+        stderr_path = row_dir / f"compile.{safe_artifact_stem(name)}.stderr.txt"
+        cmd = [
+            str(tint_bin),
+            f"--format={tint_format}",
+            f"--entry-point={name}",
+            "--output-name",
+            str(output_path),
+            shader["path"],
+        ]
+        proc = subprocess.run(cmd, check=False, capture_output=True)
+        if proc.returncode != 0 or not output_path.is_file():
+            diagnostic = process_diagnostic(proc, f"Tint compile failed for entry point {name}")
+            stderr_path.write_bytes(proc.stderr or proc.stdout or diagnostic.encode("utf-8"))
+            return make_compiler_result(
+                status="failed",
+                diagnostic_code="tint_entry_point_compile_failed",
+                diagnostic_message_text=diagnostic,
+            )
+        validation = validate_shader_output(output_path, "spirv")
+        artifacts.append(
+            make_output_artifact(
+                target="spirv",
+                entry_point=name,
+                stage=entry["stage"],
+                output_path=output_path,
+                validation=validation,
+            )
+        )
+        if validation["status"] != "passed":
+            validation_text = diagnostic_message(validation.get("reason"), "entry point validation failed")
+            return make_compiler_result(
+                status="failed",
+                diagnostic_code=f"tint_spirv_entry_validation_{validation['status']}",
+                diagnostic_message_text=validation_text,
+                validation_status=validation["status"],
+                validation_tool=validation["tool"],
+                validation_message_text=validation_text,
+            )
+
+    manifest_path = row_dir / "output.spv.manifest.json"
+    manifest = {
+        "artifactKind": "tint_spirv_entry_outputs",
+        "sourcePath": repo_relative(shader["path"]),
+        "sourceSha256": file_sha256(Path(shader["path"])),
+        "rawValidationMessage": diagnostic_message(validation_message),
+        "artifacts": artifacts,
+    }
+    write_json(manifest_path, manifest)
+
+    phase_total_ns = get_record_total_ns(record, "tint")
+    if phase_total_ns <= 0:
+        return make_compiler_result(
+            status="failed",
+            diagnostic_code="missing_tint_timing_evidence",
+            diagnostic_message_text="Tint timing evidence is missing from comparison records",
+        )
+
+    return make_compiler_result(
+        status="ok",
+        diagnostic_code="",
+        output_sha256=file_sha256(manifest_path),
+        output_path=repo_relative(manifest_path),
+        validation_status="passed",
+        validation_tool="spirv-val",
+        phase_total_ns=phase_total_ns,
+        phase_benchmark_timings_ns=(
+            record.get("comparison", {})
+            .get("warm", {})
+            .get("phaseBenchmarkTimingsNs", {})
+            if isinstance(record, dict)
+            else {}
+        ),
+        receipt_path=repo_relative(manifest_path),
+        output_artifacts=artifacts,
     )
 
 
@@ -676,6 +1015,10 @@ def build_report(cfg, shaders, target, doe_results, tint_results):
                         "p95_ns": comparison_warm_p95,
                         "p99_ns": comparison_warm_p99,
                         "iterations": comparison_warm.get("iterations", 0),
+                        "phaseBenchmarkTimingsNs": comparison_warm.get(
+                            "phaseBenchmarkTimingsNs",
+                            {},
+                        ),
                         "timingNote": comparison_warm.get(
                             "timingNote",
                             "in-process tint_benchmark real_time samples",
@@ -742,11 +1085,13 @@ def build_evidence_report(cfg, shaders, target, records, claim_report, args):
 
     rows = []
     tool_gap_codes = {gap["name"]: gap["code"] for gap in cfg.get("_toolGaps", [])}
-    required_phases = list(CLAIMABLE_REQUIRED_PHASES)
+    claimable_required_phases = list(CLAIMABLE_REQUIRED_PHASES)
+    comparable_required_phases = ["total"]
     for shader in shaders:
         record = records_by_shader.get(shader["name"])
         shader_target = normalize_schema_target(shader.get("target", target))
-        source_sha = file_sha256(shader["path"])
+        source_path = Path(shader["path"])
+        source_sha = file_sha256(source_path)
         if tool_gap_codes:
             doe_result = make_compiler_result(
                 status="failed",
@@ -777,11 +1122,22 @@ def build_evidence_report(cfg, shaders, target, records, claim_report, args):
                 evidence_dir,
                 args.dry_run,
             )
-        comparability = build_row_comparability(record, doe_result, tint_result, required_phases)
+        comparability = build_row_comparability(
+            record,
+            doe_result,
+            tint_result,
+            comparable_required_phases,
+        )
+        phase_claim_blockers = []
+        for phase in missing_phase_timings(doe_result, claimable_required_phases):
+            phase_claim_blockers.append(f"doe missing phase timing: {phase}")
+        for phase in missing_phase_timings(tint_result, claimable_required_phases):
+            phase_claim_blockers.append(f"tint missing phase timing: {phase}")
         claimability = build_claimability(
             record,
             claim_by_shader.get(shader["name"]),
             comparability["status"] == "comparable",
+            phase_claim_blockers,
         )
         rows.append(
             {
@@ -795,7 +1151,7 @@ def build_evidence_report(cfg, shaders, target, records, claim_report, args):
                     for target in shader.get("expectedBackendTargets", [shader_target])
                 ],
                 "target": shader_target,
-                "shaderStage": infer_shader_stage(shader["path"]),
+                "shaderStage": shader.get("shaderStage", infer_shader_stage(shader["path"])),
                 "doe": doe_result,
                 "tint": tint_result,
                 "comparability": comparability,
@@ -820,7 +1176,7 @@ def build_evidence_report(cfg, shaders, target, records, claim_report, args):
         {
             "shaderId": shader.get("workloadId", shader["name"]),
             "path": repo_relative(shader["path"]),
-            "sha256": file_sha256(shader["path"]),
+            "sha256": file_sha256(Path(shader["path"])),
             "target": normalize_schema_target(shader.get("target", target)),
         }
         for shader in shaders
@@ -835,13 +1191,13 @@ def build_evidence_report(cfg, shaders, target, records, claim_report, args):
             "id": cfg["run"].get("outStem", "doe-vs-tint"),
             "source": str(cfg.get("_sourceLabel", cfg.get("corpusDir", "bench/kernels/compilation-corpus"))),
             "sourceSha256": stable_json_sha256(corpus_manifest),
-            "manifestPath": str(cfg.get("_configPath", "")),
+            "manifestPath": str(cfg.get("_evidenceManifestPath", cfg.get("_configPath", ""))),
         },
-        "toolchains": build_toolchain_info(cfg, args),
+        "toolchains": build_toolchain_info(cfg, args, target),
         "phaseModel": {
             "timingScope": "phase",
             "units": "ns",
-            "requiredPhases": required_phases,
+            "requiredPhases": claimable_required_phases,
         },
         "rows": rows,
         "summary": {
@@ -949,12 +1305,21 @@ def main():
         sys.exit(1)
     elif "tintBenchmarkInputsScriptPath" in cfg:
         benchmark_names = args.workload_id or cfg.get("shaderNames", [])
-        shaders = discover_tint_benchmark_rows(cfg["tintBenchmarkInputsScriptPath"], benchmark_names)
+        shaders = discover_tint_benchmark_rows(
+            cfg["tintBenchmarkInputsScriptPath"],
+            benchmark_names,
+            targets,
+        )
         source_label = cfg["tintBenchmarkInputsScriptPath"]
     elif "workloads" in cfg:
         workload_ids = args.workload_id or cfg.get("workloadIds", [])
         shaders = discover_workload_rows(cfg["workloads"], workload_ids)
         source_label = cfg["workloads"]
+    elif "wgslCorpusManifest" in cfg:
+        workload_ids = args.workload_id or cfg.get("workloadIds", [])
+        shaders = discover_wgsl_corpus_rows(cfg["wgslCorpusManifest"], workload_ids, targets)
+        source_label = cfg["wgslCorpusManifest"]
+        cfg["_evidenceManifestPath"] = cfg["wgslCorpusManifest"]
     else:
         shaders = discover_corpus(corpus_dir, tiers)
         source_label = corpus_dir
@@ -1027,6 +1392,10 @@ def main():
 
         claim_report = None
         if not args.dry_run:
+            cfg["_compareReport"] = {
+                "path": repo_relative(report_path),
+                "sha256": file_sha256(report_path),
+            }
             claim_report = build_claim_report(
                 cfg=cfg,
                 shaders=shaders,

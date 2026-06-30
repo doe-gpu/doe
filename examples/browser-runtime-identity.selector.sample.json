@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_runtime_identity",
+  "surface": "doe-gpu/browser",
+  "evidenceSource": "runtime_selection_artifact",
+  "selectedRuntime": "doe",
+  "executionOwner": "chromium_runtime_selector",
+  "doeRuntimeActive": true,
+  "webgpuAvailable": true,
+  "provider": {
+    "sourceReport": "examples/browser-smoke-report.sample.json",
+    "sourceReportKind": "chromium-webgpu-playwright-smoke",
+    "mode": "doe",
+    "adapterAvailable": true,
+    "adapterIdentity": {
+      "adapterInfoSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "featureCount": 0
+    },
+    "artifactIdentity": {
+      "browserExecutablePath": "/examples/fawn/Chromium",
+      "browserExecutableSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "dawnRuntimePath": "/examples/fawn/Chromium",
+      "dawnRuntimeSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "doeLibPath": "/examples/libwebgpu_doe.dylib",
+      "doeLibSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "shaderCompilerIdentity": {
+      "compilerSurface": "doe_runtime_embedded_shader_compiler",
+      "compilerArtifactPath": "/examples/libwebgpu_doe.dylib",
+      "compilerArtifactSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "identitySource": "runtime_artifact_identity"
+    }
+  },
+  "runtimeSelection": {
+    "selectionMode": "doe",
+    "selectedRuntime": "doe",
+    "forcedMode": "doe",
+    "fallbackApplied": false,
+    "fallbackReasonCode": "",
+    "hiddenFallbackAllowed": false,
+    "profile": {
+      "profileId": "",
+      "vendor": "unknown",
+      "api": "unknown",
+      "deviceFamily": "unknown",
+      "driver": "unknown"
+    },
+    "selectorVersion": "browser-runtime-selector-v1",
+    "artifactIdentity": {
+      "browserExecutablePath": "/examples/fawn/Chromium",
+      "browserExecutableSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "dawnRuntimePath": "/examples/fawn/Chromium",
+      "dawnRuntimeSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "doeLibPath": "/examples/libwebgpu_doe.dylib",
+      "doeLibSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "launchArgsHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

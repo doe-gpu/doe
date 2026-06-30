@@ -34,6 +34,9 @@ pub fn emit_builtin(self: anytype, call: anytype, result_ty: ir.TypeId) !?u32 {
     if (std.mem.eql(u8, call.name, "textureSampleLevel")) {
         return try texture.emit_texture_sample(self, call, result_ty, true);
     }
+    if (std.mem.eql(u8, call.name, "textureSampleBias")) {
+        return try texture.emit_texture_sample_bias(self, call, result_ty);
+    }
     if (std.mem.eql(u8, call.name, "textureSampleCompare")) {
         return try texture.emit_texture_sample_compare(self, call, result_ty, false);
     }
@@ -70,6 +73,12 @@ pub fn emit_builtin(self: anytype, call: anytype, result_ty: ir.TypeId) !?u32 {
     }
     if (std.mem.eql(u8, call.name, "dot")) {
         return try emit_dot(self, call, result_ty);
+    }
+    if (std.mem.eql(u8, call.name, "any")) {
+        return try emit_bool_vector_reduce(self, call, result_ty, spirv.Opcode.Any);
+    }
+    if (std.mem.eql(u8, call.name, "all")) {
+        return try emit_bool_vector_reduce(self, call, result_ty, spirv.Opcode.All);
     }
     if (std.mem.eql(u8, call.name, "bitcast")) {
         if (call.args.len != 1) return error.InvalidIr;
@@ -268,6 +277,16 @@ pub fn emit_builtin(self: anytype, call: anytype, result_ty: ir.TypeId) !?u32 {
         });
     }
 
+    if (derivative_opcode(call.name)) |opcode| {
+        if (call.args.len != 1) return error.InvalidIr;
+        if (derivative_requires_control(opcode)) {
+            try self.emitter.builder.emit_capability(spirv.Capability.DerivativeControl);
+        }
+        return try emit_result_inst(self, opcode, try self.emitter.lower_type(result_ty), &.{
+            try self.emit_value_expr(self.function.expr_args.items[call.args.start]),
+        });
+    }
+
     if (builtin_inst_1(call.name, self.scalar_kind(result_ty))) |inst| {
         return try emit_glsl_ext_inst_args(self, call, result_ty, inst);
     }
@@ -449,6 +468,28 @@ fn emit_result_inst(self: anytype, opcode: u16, result_type: u32, operands: []co
     try words.appendSlice(self.emitter.alloc, operands);
     try self.emitter.builder.append_function_inst(opcode, words.items);
     return result_id;
+}
+
+fn derivative_opcode(name: []const u8) ?u16 {
+    if (std.mem.eql(u8, name, "dpdx")) return spirv.Opcode.DPdx;
+    if (std.mem.eql(u8, name, "dpdy")) return spirv.Opcode.DPdy;
+    if (std.mem.eql(u8, name, "fwidth")) return spirv.Opcode.Fwidth;
+    if (std.mem.eql(u8, name, "dpdxFine")) return spirv.Opcode.DPdxFine;
+    if (std.mem.eql(u8, name, "dpdyFine")) return spirv.Opcode.DPdyFine;
+    if (std.mem.eql(u8, name, "fwidthFine")) return spirv.Opcode.FwidthFine;
+    if (std.mem.eql(u8, name, "dpdxCoarse")) return spirv.Opcode.DPdxCoarse;
+    if (std.mem.eql(u8, name, "dpdyCoarse")) return spirv.Opcode.DPdyCoarse;
+    if (std.mem.eql(u8, name, "fwidthCoarse")) return spirv.Opcode.FwidthCoarse;
+    return null;
+}
+
+fn derivative_requires_control(opcode: u16) bool {
+    return opcode == spirv.Opcode.DPdxFine or
+        opcode == spirv.Opcode.DPdyFine or
+        opcode == spirv.Opcode.FwidthFine or
+        opcode == spirv.Opcode.DPdxCoarse or
+        opcode == spirv.Opcode.DPdyCoarse or
+        opcode == spirv.Opcode.FwidthCoarse;
 }
 
 fn builtin_inst_1(name: []const u8, kind: anytype) ?u32 {
@@ -666,6 +707,16 @@ fn emit_dot(self: anytype, call: anytype, result_ty: ir.TypeId) !u32 {
             try self.emit_value_expr(lhs_expr),
             try self.emit_value_expr(rhs_expr),
         },
+    );
+}
+
+fn emit_bool_vector_reduce(self: anytype, call: anytype, result_ty: ir.TypeId, opcode: u16) !u32 {
+    if (call.args.len != 1) return error.InvalidIr;
+    return try emit_result_inst(
+        self,
+        opcode,
+        try self.emitter.lower_type(result_ty),
+        &.{try self.emit_value_expr(self.function.expr_args.items[call.args.start])},
     );
 }
 

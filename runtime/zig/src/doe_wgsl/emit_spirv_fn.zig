@@ -5,6 +5,7 @@ const spirv = @import("spirv_builder.zig");
 const emit_spirv_shared = @import("emit_spirv_shared.zig");
 const emit_spirv_builtins = @import("emit_spirv_builtins.zig");
 const emit_spirv_fn_helpers = @import("emit_spirv_fn_helpers.zig");
+const emit_spirv_matrix = @import("emit_spirv_matrix.zig");
 
 const EmitError = emit_spirv_shared.EmitError;
 const AccessChainEntry = emit_spirv_fn_helpers.AccessChainEntry;
@@ -26,27 +27,9 @@ pub fn FunctionState(comptime EmitterT: type) type {
         emitter: *EmitterT,
         function: *const ir.Function,
         param_ptr_ids: []u32,
-        // Parallel to params.items. Non-zero means the param is SSA-promoted
-        // (scalar/vector, non-ref) and the entry holds the SPIR-V value id of
-        // the OpFunctionParameter itself. Reads short-circuit to this id so
-        // `gid.x` becomes OpCompositeExtract on the SSA param rather than
-        // OpAccessChain + OpLoad on a Function-variable copy. Matches Tint.
         param_value_ids: []u32,
         local_ptr_ids: []u32,
-        // Parallel to locals.items. Non-zero means the local is SSA-promoted
-        // (immutable scalar/vector `let`) and the entry holds the current
-        // SPIR-V value id; reads short-circuit to this id instead of doing
-        // OpAccessChain+OpLoad on a Function OpVariable.
         local_value_ids: []u32,
-        // Per-function CSE cache for OpAccessChain results. Keyed by the
-        // (root_id, indices...) tuple that the chain walker collects; when
-        // the same shape comes up again (e.g. a read-modify-write on `sum.x`
-        // that evaluates the ref both as a store target and as a load operand)
-        // we return the prior chain's result id and skip re-emission. Only
-        // helps when the repeat indices carry stable SSA ids -- constant
-        // field_indices (via const_u32) and immediate-literal array indices
-        // both qualify; dynamically-loaded indices get a fresh OpLoad each
-        // visit and miss the cache, which is fine.
         access_chain_cache: std.ArrayListUnmanaged(AccessChainEntry) = .{},
         load_cache: std.ArrayListUnmanaged(LoadCacheEntry) = .{},
         result_inst_cache: std.ArrayListUnmanaged(ResultInstEntry) = .{},
@@ -94,13 +77,6 @@ pub fn FunctionState(comptime EmitterT: type) type {
         pub fn is_ssa_promotable_local(self: *@This(), local_index: u32) bool {
             const local = self.function.locals.items[local_index];
             if (local.mutable) return false;
-            // Scalars and vectors are safe: both are leaf composite types for
-            // WGSL swizzle/index, and `emit_load_from_ref` handles the two
-            // ref-chain shapes that can reach a promoted local through a load
-            // (single/multi swizzle and vector index) via OpCompositeExtract
-            // and OpVectorExtractDynamic against the cached SSA value. Matrix
-            // and struct-typed lets would need matrix-column or struct-field
-            // extraction paths that aren't wired yet.
             return switch (self.emitter.module.types.get(local.ty)) {
                 .scalar => |s| s != .void,
                 .vector => true,
@@ -116,10 +92,6 @@ pub fn FunctionState(comptime EmitterT: type) type {
                 else => false,
             };
             if (!type_ok) return false;
-            // WGSL function parameters are locally mutable — `fn f(x: u32) { x = 1; }`
-            // is legal — so promoting to SSA is only safe when the body never
-            // writes to the param. Scan for any `.assign` whose lhs chains to
-            // this param_ref; bail out if found.
             return !param_is_assigned(self.function, param_index);
         }
 
@@ -146,6 +118,8 @@ pub fn FunctionState(comptime EmitterT: type) type {
                     return false;
                 },
                 .expr => |expr_id| {
+                    const data = self.function.exprs.items[expr_id].data;
+                    if (data == .global_ref or data == .local_ref or data == .param_ref) return false;
                     _ = try self.emit_value_expr(expr_id);
                     return false;
                 },
@@ -319,12 +293,7 @@ pub fn FunctionState(comptime EmitterT: type) type {
 
         fn emit_label(self: *@This(), label_id: u32) EmitError!void {
             try self.emitter.builder.append_function_inst(spirv.Opcode.Label, &.{label_id});
-            // SPIR-V dominance: an <id> is only usable where its defining
-            // block dominates the use. Cached OpAccessChain ids from a
-            // previous block might not dominate this new block (e.g. reusing
-            // a THEN-branch chain inside an ELSE branch would be invalid).
-            // Flush at every label boundary so CSE only fires within a
-            // straight-line basic block, which is always safe.
+            // Cached ids may not dominate a new block; keep CSE straight-line.
             self.clearStraightLineCaches();
         }
 
@@ -366,7 +335,10 @@ pub fn FunctionState(comptime EmitterT: type) type {
                                 self.emitter.global_ids[index],
                             );
                         },
-                        else => return error.InvalidIr,
+                        else => if (global.class == .var_ and (global.addr_space orelse .private) == .private)
+                            break :blk try self.emit_load_from_ref(expr_id)
+                        else
+                            return error.InvalidIr,
                     }
                 },
                 .load => |inner| try self.emit_load_from_ref(inner),
@@ -467,36 +439,23 @@ pub fn FunctionState(comptime EmitterT: type) type {
 
         fn emit_load_from_ref(self: *@This(), ref_expr_id: ir.ExprId) EmitError!u32 {
             const ref_expr = self.function.exprs.items[ref_expr_id];
-            // WGSL `const` globals are emitted as constants, not storage.
-            // Reads return the constant id directly so callers never try to
-            // load them through a pointer.
+            // WGSL const globals are emitted as constants, not storage.
             if (ref_expr.data == .global_ref) {
                 const index = ref_expr.data.global_ref;
                 const constant_id = self.emitter.global_constant_ids[index];
                 if (constant_id != 0) return constant_id;
             }
-            // SSA-promoted `let` locals: return the cached value id directly
-            // so reads inside loops avoid the OpAccessChain+OpLoad pattern.
             if (ref_expr.data == .local_ref) {
                 const index = ref_expr.data.local_ref;
                 const value_id = self.local_value_ids[index];
                 if (value_id != 0) return value_id;
             }
-            // SSA-promoted function params: same treatment. The param's own
-            // OpFunctionParameter id is the SSA value; skipping the Function-
-            // variable copy lets `gid.x` compile to OpCompositeExtract on the
-            // raw param, which is what Tint emits.
             if (ref_expr.data == .param_ref) {
                 const index = ref_expr.data.param_ref;
                 const value_id = self.param_value_ids[index];
                 if (value_id != 0) return value_id;
             }
-            // `load(member(local_ref(promoted), field))`: WGSL single-char
-            // swizzles inherit the ref category of their base, so reads of
-            // `v.x` on a promoted vector arrive here as a member-on-local_ref
-            // pair rather than a member-on-load. The pointer path would need
-            // an address for `v`, which SSA-promoted locals do not have;
-            // extract directly from the cached SSA composite instead.
+            // Promoted vector swizzles extract from cached SSA composites.
             if (ref_expr.data == .member) {
                 const member = ref_expr.data.member;
                 const base = self.function.exprs.items[member.base];
@@ -504,9 +463,7 @@ pub fn FunctionState(comptime EmitterT: type) type {
                     return try self.emit_swizzle_from_ssa(composite_id, base.ty, member, ref_expr.ty);
                 }
             }
-            // `load(index(local_ref(promoted), idx))`: same shape for vector
-            // dynamic-index reads. OpVectorExtractDynamic operates directly
-            // on the SSA composite.
+            // Promoted vector dynamic indexes extract from cached SSA composites.
             if (ref_expr.data == .index) {
                 const index_node = ref_expr.data.index;
                 const base = self.function.exprs.items[index_node.base];
@@ -576,16 +533,15 @@ pub fn FunctionState(comptime EmitterT: type) type {
         }
 
         fn emit_member_value(self: *@This(), member: @FieldType(ir.Expr, "member"), result_ty: ir.TypeId) EmitError!u32 {
-            if (member.field_name.len == 1) {
-                return try self.emit_composite_extract(try self.emit_value_expr(member.base), result_ty, member.field_index);
-            }
-
-            const base_id = try self.emit_value_expr(member.base);
             const base_ty = self.function.exprs.items[member.base].ty;
             const vec = switch (self.emitter.module.types.get(base_ty)) {
                 .vector => |vector| vector,
-                else => return error.InvalidIr,
+                else => return try self.emit_composite_extract(try self.emit_value_expr(member.base), result_ty, member.field_index),
             };
+            if (member.field_name.len == 1) {
+                return try self.emit_composite_extract(try self.emit_value_expr(member.base), result_ty, member.field_index);
+            }
+            const base_id = try self.emit_value_expr(member.base);
             const swizzle = sema_helpers.parse_vector_swizzle(member.field_name, vec.len) catch return error.InvalidIr;
 
             var operands = std.ArrayListUnmanaged(u32){};
@@ -610,15 +566,7 @@ pub fn FunctionState(comptime EmitterT: type) type {
             return try self.emit_result_inst(opcode, try self.emitter.lower_type(result_ty), &.{operand_id});
         }
 
-        /// Pick the operand type that both sides of a binary op can coerce TO.
-        /// `coerce_binary_operand` handles scalar→vector (splat) and
-        /// same-length vector→vector (element-wise cast) but errors on
-        /// vector→scalar because demoting a vector to a scalar has no valid
-        /// semantics. When lhs/rhs shapes differ (WGSL-legal
-        /// `scalar op vector` and `vector op scalar`), we must pick the
-        /// vector as the common operand type so the scalar side gets
-        /// broadcast and the vector side passes through unchanged.
-        /// For shape-matched operands, keep the existing default of lhs_ty.
+        /// Pick the common operand type for scalar/vector binary coercion.
         fn binary_operand_type(self: *@This(), lhs_ty: ir.TypeId, rhs_ty: ir.TypeId) ir.TypeId {
             const lhs_type = self.emitter.module.types.get(lhs_ty);
             const rhs_type = self.emitter.module.types.get(rhs_ty);
@@ -644,6 +592,10 @@ pub fn FunctionState(comptime EmitterT: type) type {
             operand_ty: ir.TypeId,
             result_ty: ir.TypeId,
         ) EmitError!u32 {
+            if (op == .mul) {
+                if (try self.emit_matrix_multiply(lhs_id, rhs_id, lhs_ty, rhs_ty, result_ty)) |result_id| return result_id;
+            }
+            if (try emit_spirv_matrix.emit_matrix_elementwise(self, op, lhs_id, rhs_id, lhs_ty, rhs_ty, result_ty)) |result_id| return result_id;
             const coerced_lhs = try self.coerce_binary_operand(lhs_id, lhs_ty, operand_ty);
             const coerced_rhs = try self.coerce_binary_operand(rhs_id, rhs_ty, operand_ty);
             const opcode: u16 = switch (op) {
@@ -671,27 +623,75 @@ pub fn FunctionState(comptime EmitterT: type) type {
                     .signed => spirv.Opcode.SRem,
                     else => return error.UnsupportedConstruct,
                 },
-                .bit_and => spirv.Opcode.BitwiseAnd,
-                .bit_or => spirv.Opcode.BitwiseOr,
-                .bit_xor => spirv.Opcode.BitwiseXor,
+                .bit_and => switch (self.scalar_kind(operand_ty)) {
+                    .bool => spirv.Opcode.LogicalAnd,
+                    else => spirv.Opcode.BitwiseAnd,
+                },
+                .bit_or => switch (self.scalar_kind(operand_ty)) {
+                    .bool => spirv.Opcode.LogicalOr,
+                    else => spirv.Opcode.BitwiseOr,
+                },
+                .bit_xor => switch (self.scalar_kind(operand_ty)) {
+                    .bool => spirv.Opcode.LogicalNotEqual,
+                    else => spirv.Opcode.BitwiseXor,
+                },
                 .shift_left => spirv.Opcode.ShiftLeftLogical,
                 .shift_right => switch (self.scalar_kind(operand_ty)) {
                     .unsigned => spirv.Opcode.ShiftRightLogical,
                     else => spirv.Opcode.ShiftRightArithmetic,
                 },
-                .equal => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty),
-                .not_equal => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty),
-                .less => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty),
-                .less_equal => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty),
-                .greater => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty),
-                .greater_equal => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty),
+                .equal => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty, result_ty),
+                .not_equal => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty, result_ty),
+                .less => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty, result_ty),
+                .less_equal => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty, result_ty),
+                .greater => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty, result_ty),
+                .greater_equal => return try self.emit_compare(op, coerced_lhs, coerced_rhs, operand_ty, result_ty),
                 .logical_and => spirv.Opcode.LogicalAnd,
                 .logical_or => spirv.Opcode.LogicalOr,
             };
             return try self.emit_result_inst(opcode, try self.emitter.lower_type(result_ty), &.{ coerced_lhs, coerced_rhs });
         }
 
-        fn emit_compare(self: *@This(), op: ir.BinaryOp, lhs_id: u32, rhs_id: u32, operand_ty: ir.TypeId) EmitError!u32 {
+        fn emit_matrix_multiply(
+            self: *@This(),
+            lhs_id: u32,
+            rhs_id: u32,
+            lhs_ty: ir.TypeId,
+            rhs_ty: ir.TypeId,
+            result_ty: ir.TypeId,
+        ) EmitError!?u32 {
+            const lhs_type = self.emitter.module.types.get(lhs_ty);
+            const rhs_type = self.emitter.module.types.get(rhs_ty);
+            const result_type = try self.emitter.lower_type(result_ty);
+
+            switch (lhs_type) {
+                .scalar => switch (rhs_type) {
+                    .matrix => |rhs_mat| {
+                        const scalar_id = try self.emit_scalar_construct_from_type(rhs_mat.elem, lhs_ty, lhs_id);
+                        return try self.emit_result_inst(spirv.Opcode.MatrixTimesScalar, result_type, &.{ rhs_id, scalar_id });
+                    },
+                    else => {},
+                },
+                .vector => switch (rhs_type) {
+                    .matrix => return try self.emit_result_inst(spirv.Opcode.VectorTimesMatrix, result_type, &.{ lhs_id, rhs_id }),
+                    else => {},
+                },
+                .matrix => |lhs_mat| switch (rhs_type) {
+                    .scalar => {
+                        const scalar_id = try self.emit_scalar_construct_from_type(lhs_mat.elem, rhs_ty, rhs_id);
+                        return try self.emit_result_inst(spirv.Opcode.MatrixTimesScalar, result_type, &.{ lhs_id, scalar_id });
+                    },
+                    .vector => return try self.emit_result_inst(spirv.Opcode.MatrixTimesVector, result_type, &.{ lhs_id, rhs_id }),
+                    .matrix => return try self.emit_result_inst(spirv.Opcode.MatrixTimesMatrix, result_type, &.{ lhs_id, rhs_id }),
+                    else => {},
+                },
+                else => {},
+            }
+
+            return null;
+        }
+
+        fn emit_compare(self: *@This(), op: ir.BinaryOp, lhs_id: u32, rhs_id: u32, operand_ty: ir.TypeId, result_ty: ir.TypeId) EmitError!u32 {
             const opcode: u16 = switch (self.scalar_kind(operand_ty)) {
                 .bool => switch (op) {
                     .equal => spirv.Opcode.LogicalEqual,
@@ -726,7 +726,7 @@ pub fn FunctionState(comptime EmitterT: type) type {
                     else => return error.UnsupportedConstruct,
                 },
             };
-            return try self.emit_result_inst(opcode, try self.emitter.builder.type_bool(), &.{ lhs_id, rhs_id });
+            return try self.emit_result_inst(opcode, try self.emitter.lower_type(result_ty), &.{ lhs_id, rhs_id });
         }
 
         fn emit_call(self: *@This(), call: anytype, result_ty: ir.TypeId) EmitError!u32 {
@@ -755,6 +755,7 @@ pub fn FunctionState(comptime EmitterT: type) type {
         }
 
         fn emit_construct(self: *@This(), ty: ir.TypeId, range: ir.Range) EmitError!u32 {
+            if (range.len == 0) return try emit_spirv_fn_helpers.emitZeroValue(self, ty);
             switch (self.emitter.module.types.get(ty)) {
                 .scalar => {
                     if (range.len != 1) return error.UnsupportedConstruct;

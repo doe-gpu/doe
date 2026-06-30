@@ -83,6 +83,8 @@
       "code": "claim_grade_browser_runtime_identity",
       "exitCriteria": "Publish browser runtime identity evidence that proves the selected Chromium lane is running Doe rather than the incumbent runtime path.",
       "evidencePaths": [
+        "examples/browser-runtime-identity.selector.sample.json",
+        "examples/browser-runtime-frontier-bundle.sample.json",
         "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
         "docs/doe-support-matrix.md"
       ]
@@ -91,14 +93,16 @@
       "code": "browser_structural_equivalence_receipts",
       "exitCriteria": "Publish browser receipts with structural equivalence for the claim surface, including source command identity and dispatch-shape parity.",
       "evidencePaths": [
+        "examples/browser-runtime-frontier-bundle.sample.json",
         "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
         "docs/status/runtime-backends-and-bench.md"
       ]
     },
     {
       "code": "chromium_release_build_evidence",
-      "exitCriteria": "Publish browser release-build evidence for the Chromium runtime lane before promoting browser replacement language.",
+      "exitCriteria": "Publish browser release-build evidence for the Chromium runtime lane with release artifact files and hashes verified before promoting browser replacement language.",
       "evidencePaths": [
+        "examples/browser-runtime-frontier-bundle.sample.json",
         "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
         "docs/doe-support-matrix.md"
       ]
@@ -116,6 +120,7 @@
       "exitCriteria": "Publish WGSL lowering-link receipts that connect source WGSL, lowered artifacts, validation results, and target backend identity.",
       "evidencePaths": [
         "examples/wgsl-lowering-link-receipt.sample.json",
+        "examples/tint-compiler-frontier-bundle.sample.json",
         "docs/shader-compiler-architecture.md"
       ]
     },
@@ -124,6 +129,7 @@
       "exitCriteria": "Validate shader artifacts for the target backend set and attach those validation results to compiler claim evidence.",
       "evidencePaths": [
         "config/shader-toolchain.json",
+        "examples/tint-compiler-target-validation.sample.json",
         "docs/shader-compiler-architecture.md"
       ]
     },
@@ -302,6 +308,7 @@
         "ort-browser-apple-metal"
       ],
       "evidencePaths": [
+        "examples/browser-runtime-frontier-bundle.sample.json",
         "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
         "docs/doe-support-matrix.md",
         "docs/status/runtime-backends-and-bench.md"
@@ -324,6 +331,9 @@
       "evidencePaths": [
         "config/shader-toolchain.json",
         "examples/tint-compiler-evidence.sample.json",
+        "examples/tint-compiler-target-validation.sample.json",
+        "examples/tint-phase-benchmark-evidence.sample.json",
+        "examples/tint-compiler-frontier-bundle.sample.json",
         "docs/shader-compiler-architecture.md"
       ],
       "blockers": [

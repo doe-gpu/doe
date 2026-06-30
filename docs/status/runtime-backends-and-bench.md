@@ -3,6 +3,230 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-06-30 — Browser smoke preserves media blocker evidence
+
+The Chromium WebGPU smoke harness now records per-source
+`copyExternalImageToTexture` attempts and runs its mini upload/dispatch timing
+probes before external media probes can invalidate the Doe queue. This keeps
+forced-Doe, no-hidden-fallback browser smoke evidence useful even while the
+external media path remains diagnostic.
+
+The Chromium source checkout was rebuilt for `headless_shell` after adding
+queue-completion retention for transient browser copy resources in the
+`GPUQueue` external-copy paths. That source hardening compiled, but the fresh
+smoke artifact still reports the existing Doe-only external Instance blocker.
+The new smoke artifact is:
+
+- `browser/chromium/artifacts/current-smoke-headless-preexternal-benches/dawn-vs-doe.browser.playwright-smoke.diagnostic.json`
+
+A Doe media-path probe was generated from that smoke report and passes the
+media-probe checker while preserving the failed external-texture and
+copy-external-image statuses:
+
+- `browser/chromium/artifacts/current-smoke-headless-preexternal-benches/browser-media-path-probe.doe.json`
+
+Touched:
+
+- `browser/chromium/scripts/webgpu-playwright-smoke.mjs`
+- `browser/chromium/src/third_party/blink/renderer/modules/webgpu/gpu_queue.cc`
+- `browser/chromium/src/third_party/blink/renderer/modules/webgpu/gpu_queue.h`
+- `docs/status/runtime-backends-and-bench.md`
+
+Verified:
+
+- `node --check browser/chromium/scripts/webgpu-playwright-smoke.mjs`
+- `ninja -C browser/chromium/src/out/fawn_release headless_shell`
+- `./browser/chromium/scripts/run-smoke.sh --mode both --strict --runtime-selector-policy /home/x/deco/doe/config/browser-runtime-selector-policy.json --out /home/x/deco/doe/browser/chromium/artifacts/current-smoke-headless-preexternal-benches/dawn-vs-doe.browser.playwright-smoke.diagnostic.json --chrome /home/x/deco/doe/browser/chromium/src/out/fawn_release/headless_shell --doe-lib /home/x/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.so` (diagnostic exit while the external media checks remain failed)
+- `python3 browser/chromium/scripts/build-browser-media-path-probe.py --report browser/chromium/artifacts/current-smoke-headless-preexternal-benches/dawn-vs-doe.browser.playwright-smoke.diagnostic.json --mode doe --out browser/chromium/artifacts/current-smoke-headless-preexternal-benches/browser-media-path-probe.doe.json`
+- `python3 browser/chromium/scripts/check-browser-media-path-probe.py --probe browser/chromium/artifacts/current-smoke-headless-preexternal-benches/browser-media-path-probe.doe.json --capture-policy-root . --runtime-identity-root . --json`
+- `python3 browser/chromium/scripts/check-browser-smoke-report.py --smoke-report browser/chromium/artifacts/current-smoke-headless-preexternal-benches/dawn-vs-doe.browser.playwright-smoke.diagnostic.json --json` (expected diagnostic failure on Doe external media checks)
+- `git -C browser/chromium/src diff --check -- third_party/blink/renderer/modules/webgpu/gpu_queue.cc third_party/blink/renderer/modules/webgpu/gpu_queue.h`
+
+## 2026-06-30 — Browser structural receipts bind projection manifest
+
+The browser claim gate now accepts the generated browser projection manifest as
+an explicit artifact input and uses it to bind strict claim rows to governed
+`browserWorkload` metadata when reused layered reports do not duplicate that
+metadata inline. The browser claim report schema records
+`projectionManifestPath`, so source-kernel command hashes, kernel hashes, and
+dispatch shape evidence stay traceable in the emitted claim report.
+
+The reused Chromium browser claim report under
+`bench/out/scratch/browser-claim-reuse-20260309T015157Z/` was regenerated from
+the existing repeated-window artifacts. Its structural receipt now passes the
+source-command identity, source-kernel dispatch, dispatch-shape parity, and
+checker-report requirements. The composed browser runtime frontier bundle and
+the Dawn replacement readiness rollup were rebuilt from that claim report. The
+browser row remains diagnostic on claim-policy/tail health, promotion
+forced-Doe and hidden-fallback evidence, and `releaseStatus=diagnostic`; see the
+frontier bundle JSON for the current blocker breakdown.
+
+Touched:
+
+- `bench/browser/browser_claim_gate.py`
+- `bench/tests/test_browser_claim_gate.py`
+- `config/browser-claim-report.schema.json`
+- `examples/browser-claim-report.sample.json`
+- `examples/browser-claim-promotion-receipt.sample.json`
+- `examples/browser-release-artifact-bundle.sample.json`
+- `examples/browser-runtime-frontier-bundle.sample.json`
+- `bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.json`
+- `bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.promotion-receipt.json`
+- `bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-release-artifact-bundle.json`
+- `bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-runtime-frontier-bundle.json`
+- `bench/out/scratch/dawn-replacement-readiness-report.json`
+- `docs/status/runtime-backends-and-bench.md`
+
+Verified:
+
+- `python3 -m py_compile bench/browser/browser_claim_gate.py bench/tools/check_browser_release_artifact_bundle.py bench/tools/check_browser_runtime_frontier_bundle.py bench/tests/test_browser_claim_gate.py bench/tests/test_browser_release_artifact_bundle.py bench/tests/test_browser_runtime_frontier_bundle.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_browser_claim_gate bench.tests.test_browser_release_artifact_bundle bench.tests.test_browser_runtime_frontier_bundle`
+- Local fixture runner for module-level browser claim/release tests, because
+  `pytest` is not installed in this environment.
+- Diagnostic artifact regeneration with `python3 bench/browser/browser_claim_gate.py --reuse-artifact-root browser/chromium/artifacts/20260309T015157Z/browser-claim --report bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.json --promotion-receipt-out bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.promotion-receipt.json --json`; the command exits nonzero while the claim policy remains diagnostic.
+- `python3 bench/tools/build_browser_claim_promotion_receipt.py --claim-report examples/browser-claim-report.sample.json --out examples/browser-claim-promotion-receipt.sample.json --receipt-id browser-claim-promotion-sample --claim-policy config/browser-claim-policy.json`
+- `python3 bench/tools/build_browser_release_artifact_bundle.py --bundle-id browser-release-diagnostic-sample-v1 --release-status diagnostic --browser-binary browser/chromium/src/out/fawn_release/chrome-wrapper --doe-runtime runtime/zig/zig-out/lib/libwebgpu_doe.so --shader-compiler runtime/zig/zig-out/bin/doe-zig-runtime --claim-report examples/browser-claim-report.sample.json --promotion-receipt examples/browser-claim-promotion-receipt.sample.json --verify-files-root . --out examples/browser-release-artifact-bundle.sample.json`
+- `python3 bench/tools/check_browser_runtime_frontier_bundle.py --runtime-identity examples/browser-runtime-identity.selector.sample.json --claim-promotion-receipt examples/browser-claim-promotion-receipt.sample.json --release-artifact-bundle examples/browser-release-artifact-bundle.sample.json --verify-files-root . --out examples/browser-runtime-frontier-bundle.sample.json --json`
+- `python3 bench/tools/build_browser_release_artifact_bundle.py --bundle-id browser-release-diagnostic-reuse-20260309T015157Z --release-status diagnostic --browser-binary browser/chromium/src/out/fawn_release/chrome-wrapper --doe-runtime runtime/zig/zig-out/lib/libwebgpu_doe.so --shader-compiler runtime/zig/zig-out/bin/doe-zig-runtime --claim-report bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.json --promotion-receipt bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.promotion-receipt.json --verify-files-root . --out bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-release-artifact-bundle.json`
+- `python3 bench/tools/check_browser_runtime_frontier_bundle.py --runtime-identity examples/browser-runtime-identity.selector.sample.json --claim-promotion-receipt bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.promotion-receipt.json --release-artifact-bundle bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-release-artifact-bundle.json --verify-files-root . --out bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-runtime-frontier-bundle.json --json`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py --browser-frontier-bundle bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-runtime-frontier-bundle.json --tint-frontier-bundle bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --out bench/out/scratch/dawn-replacement-readiness-report.json --json`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `git diff --check`
+
+## 2026-06-30 — Browser claim reuse evidence composes diagnostic blockers
+
+The repeated-window Chromium browser claim artifacts under
+`browser/chromium/artifacts/20260309T015157Z/browser-claim/` now compose into a
+verified diagnostic browser release bundle and a browser runtime frontier
+bundle under `bench/out/scratch/browser-claim-reuse-20260309T015157Z/`. The
+release bundle checker still fails closed for release candidates, but diagnostic
+release bundles can now carry diagnostic promotion receipts as claim blockers
+instead of rejecting the bundle before the frontier layer can name the blocker.
+
+The refreshed Dawn replacement readiness report now points the Chromium browser
+row at
+`bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-runtime-frontier-bundle.json`.
+That bundle passes component checks and file/hash verification while preserving
+the remaining browser blockers: claim-policy promotion evidence, hidden-fallback
+promotion evidence, source-kernel structural receipts, dispatch-shape parity,
+and `releaseStatus=diagnostic`.
+
+Touched:
+
+- `bench/tools/check_browser_release_artifact_bundle.py`
+- `bench/tools/check_browser_runtime_frontier_bundle.py`
+- `bench/tests/test_browser_release_artifact_bundle.py`
+- `bench/tests/test_browser_runtime_frontier_bundle.py`
+- `bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-release-artifact-bundle.json`
+- `bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-runtime-frontier-bundle.json`
+- `bench/out/scratch/dawn-replacement-readiness-report.json`
+- `docs/status/runtime-backends-and-bench.md`
+
+Verified:
+
+- `python3 -m py_compile bench/tools/check_browser_release_artifact_bundle.py bench/tools/check_browser_runtime_frontier_bundle.py bench/tests/test_browser_release_artifact_bundle.py bench/tests/test_browser_runtime_frontier_bundle.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_browser_release_artifact_bundle bench.tests.test_browser_runtime_frontier_bundle`
+- Local fixture runner for `bench.tests.test_browser_release_artifact_bundle`
+  module-level tests, because `pytest` is not installed in this environment.
+- `python3 bench/tools/build_browser_release_artifact_bundle.py --bundle-id browser-release-diagnostic-reuse-20260309T015157Z --release-status diagnostic --browser-binary browser/chromium/src/out/fawn_release/chrome-wrapper --doe-runtime runtime/zig/zig-out/lib/libwebgpu_doe.so --shader-compiler runtime/zig/zig-out/bin/doe-zig-runtime --claim-report bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.json --promotion-receipt bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.promotion-receipt.json --verify-files-root . --out bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-release-artifact-bundle.json`
+- `python3 bench/tools/check_browser_release_artifact_bundle.py --bundle bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-release-artifact-bundle.json --verify-files-root . --json`
+- `python3 bench/tools/check_browser_runtime_frontier_bundle.py --runtime-identity examples/browser-runtime-identity.selector.sample.json --claim-promotion-receipt bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser_claim_report.promotion-receipt.json --release-artifact-bundle bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-release-artifact-bundle.json --verify-files-root . --out bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-runtime-frontier-bundle.json --json`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py --browser-frontier-bundle bench/out/scratch/browser-claim-reuse-20260309T015157Z/browser-runtime-frontier-bundle.json --tint-frontier-bundle bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --out bench/out/scratch/dawn-replacement-readiness-report.json --json`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `git diff --check`
+
+## 2026-06-30 — Browser release bundle sample verifies local artifacts
+
+The browser release artifact bundle sample now points at local, existing
+Chromium wrapper, Doe runtime, and shader-compiler artifacts and passes
+file/hash verification under `--verify-files-root .`. The composed browser
+runtime frontier sample was regenerated with that verification root, so its
+release-bundle component now records verified artifact evidence while still
+blocking browser runtime claimability on `releaseStatus=diagnostic`.
+
+The Dawn replacement readiness rollup was refreshed from the verified browser
+frontier bundle plus the current Tint compiler frontier bundle. The Chromium
+browser row therefore no longer has stale missing-file/hash-mismatch release
+bundle evidence in the local sample path; the remaining browser frontier blocker
+is publishing a real release-candidate browser bundle rather than a diagnostic
+sample.
+
+Touched:
+
+- `examples/browser-release-artifact-bundle.sample.json`
+- `examples/browser-runtime-frontier-bundle.sample.json`
+- `bench/out/scratch/dawn-replacement-readiness-report.json`
+- `bench/tests/test_browser_runtime_frontier_bundle.py`
+- `docs/status/runtime-backends-and-bench.md`
+
+Verified:
+
+- `python3 bench/tools/build_browser_release_artifact_bundle.py --bundle-id browser-release-diagnostic-sample-v1 --release-status diagnostic --browser-binary browser/chromium/src/out/fawn_release/chrome-wrapper --doe-runtime runtime/zig/zig-out/lib/libwebgpu_doe.so --shader-compiler runtime/zig/zig-out/bin/doe-zig-runtime --claim-report examples/browser-claim-report.sample.json --promotion-receipt examples/browser-claim-promotion-receipt.sample.json --verify-files-root . --out examples/browser-release-artifact-bundle.sample.json`
+- `python3 bench/tools/check_browser_release_artifact_bundle.py --bundle examples/browser-release-artifact-bundle.sample.json --verify-files-root . --json`
+- `python3 bench/tools/check_browser_runtime_frontier_bundle.py --runtime-identity examples/browser-runtime-identity.selector.sample.json --claim-promotion-receipt examples/browser-claim-promotion-receipt.sample.json --release-artifact-bundle examples/browser-release-artifact-bundle.sample.json --verify-files-root . --out examples/browser-runtime-frontier-bundle.sample.json --json`
+- `python3 bench/tools/build_dawn_replacement_readiness_report.py --browser-frontier-bundle examples/browser-runtime-frontier-bundle.sample.json --tint-frontier-bundle bench/out/scratch/tint-compiler-frontier-bundle.spirv.json --out bench/out/scratch/dawn-replacement-readiness-report.json --json`
+- `python3 -m py_compile bench/tests/test_browser_runtime_frontier_bundle.py bench/tools/check_browser_runtime_frontier_bundle.py bench/tools/build_browser_release_artifact_bundle.py bench/tools/check_browser_release_artifact_bundle.py`
+- `PYTHONPATH=bench:. python3 -m unittest bench.tests.test_browser_release_artifact_bundle bench.tests.test_browser_runtime_frontier_bundle bench.tests.test_dawn_replacement_readiness_report`
+- `python3 bench/gates/schema_gate.py`
+- `python3 bench/gates/dawn_replacement_frontier_gate.py`
+- `git diff --check`
+
+## 2026-06-30 — Browser runtime frontier bundle composes claim blockers
+
+`bench/tools/check_browser_runtime_frontier_bundle.py` now composes browser
+runtime identity, browser claim-promotion, browser release-bundle, and bundled
+browser claim-report evidence into a composed Chromium runtime frontier receipt.
+The sample bundle is registered with the schema gate and remains diagnostic: it
+passes the component receipt checks but still requires release-candidate
+Chromium build evidence before the browser runtime frontier row can be
+promoted.
+
+The optional blocking runner now exposes
+`--with-browser-runtime-frontier-bundle-gate`. Use `--require-claimable` only
+for claim lanes; diagnostic/frontier audits should preserve the claim blockers
+in the emitted bundle.
+
+Claimable browser frontier bundles now require the browser release artifact
+bundle's referenced files and hashes to verify under `--verify-files-root`.
+Without that root, the composed receipt records
+`artifactVerification.verified=false` and cannot clear Chromium release-build
+evidence even if a release bundle labels itself as a release candidate.
+The Dawn replacement readiness report now reads the composed browser frontier
+bundle for the browser row, so cleared runtime-identity and structural receipt
+evidence no longer remains listed as active browser blockers.
+That report is now schema-registered and carries `frontierBundleEvidence` for
+the browser row, including the release-bundle status and artifact-verification
+summary from the composed frontier bundle. See
+`examples/dawn-replacement-readiness-report.sample.json` for the current
+contract shape.
+The browser frontier bundle also emits a grouped `claimBlockerSummary`, so the
+readiness row distinguishes release-status blockers from file/hash verification
+blockers when generated bundles are used.
+The readiness builder also accepts `--browser-frontier-bundle`, so generated
+Chromium runtime frontier bundles can drive local readiness rollups without
+editing the frontier manifest.
+`build_browser_release_artifact_bundle.py` now also fails closed for
+`release_candidate` output unless the bundle verifies under `--verify-files-root`,
+so release-candidate browser evidence cannot be minted without concrete
+artifact files and matching hashes.
+The standalone browser release-bundle checker and optional blocking runner now
+also expose release-candidate mode, allowing claim lanes to reject diagnostic
+browser release bundles before they reach the composed frontier bundle.
+
+Browser claim reports now carry `structuralReceipts` summaries generated from
+the repeated-window browser superset checker outputs. The frontier bundle
+checks those summaries for source-command identity, source-kernel dispatch
+coverage, dispatch-shape parity, and passing checker reports before allowing the
+browser structural-equivalence blocker to clear.
+
+`bench/tools/build_browser_runtime_identity.py` now extracts selector-backed
+`browser_runtime_identity` artifacts from browser reports with Chromium
+runtime-selection evidence. The selector sample is schema-registered and lets
+the composed browser frontier bundle use Doe-active, no-hidden-fallback runtime
+identity evidence instead of the wrapper-probe sample.
+
 ## 2026-06-29 — Dawn replacement frontier is gate-backed
 
 `config/dawn-replacement-frontier.json` now names the Dawn/Tint replacement

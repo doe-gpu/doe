@@ -184,11 +184,73 @@ Doe-vs-Tint compiler claims now use an explicit evidence contract:
   [`config/tint-compiler-evidence.schema.json`](../config/tint-compiler-evidence.schema.json)
 - gate:
   `python3 bench/gates/tint_compiler_evidence_gate.py --report bench/out/tint-compiler-evidence.json`
+- browser-corpus linkage config:
+  [`bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json`](../bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json)
+- benchmark-corpus SPIR-V config:
+  [`bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json`](../bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json)
 
 The gate requires toolchain identity, source and output hashes, validation
 status, per-phase timing symmetry, and row-level comparability before a report
 can be marked claimable. Diagnostic reports remain useful for compiler bring-up
-but cannot support a Doe-over-Tint claim.
+but cannot support a Doe-over-Tint claim. The browser-corpus config reads
+`config/wgsl-browser-corpus.json` directly, so compiler evidence rows carry the
+same shader IDs, source paths, expected backend targets, source hashes, and
+shader-stage metadata as the WGSL corpus manifest.
+The Tint benchmark-corpus loader is target-aware, so MSL and SPIR-V compiler
+evidence can use the same Dawn benchmark input list while preserving the
+configured backend target in evidence rows.
+
+Compiler result rows also carry `outputPath` next to `outputSha256`. The
+target-backend validation checker,
+`bench/tools/check_tint_compiler_target_validation.py`, reads a stored
+`tint-compiler-evidence` report, requires the requested backend target rows,
+checks Doe and Tint validation status/tool identity, verifies safe
+repo-relative backend output and receipt paths, and can hash-check the emitted
+backend files under `--verify-files-root`. Its receipt schema is
+[`config/tint-compiler-target-validation.schema.json`](../config/tint-compiler-target-validation.schema.json).
+The blocking-gates runner can invoke the same check through
+`--with-tint-compiler-target-validation-gate` plus explicit
+`--tint-compiler-target-validation-required-target` values.
+
+Tint benchmark-corpus runs can also collect `phaseBenchmarkTimingsNs` from
+Dawn's `tint_benchmark` scopes (`ParseWGSL`, `ValidateIR`, and the selected
+backend generator). These values are benchmark-scope diagnostics only; they do
+not satisfy the stricter `phaseTimingsNs` claimability contract, which still
+requires exact named compiler phases.
+Browser WGSL corpus rows use the same warm benchmark path after
+`bench/tools/materialize_tint_warm_corpus.py` materializes the selected
+`wgslCorpusManifest` row into Dawn's benchmark input list and rebuilds
+`tint_benchmark`. The materialization receipt records the source manifest,
+benchmark name, Dawn benchmark path, and rebuilt benchmark binary hash.
+The diagnostic coverage checker,
+`bench/tools/check_tint_phase_benchmark_evidence.py`, verifies that successful
+Tint rows for the requested backend target carry those benchmark scopes and
+emits a `tint_phase_benchmark_evidence` receipt. Its schema is
+[`config/tint-phase-benchmark-evidence.schema.json`](../config/tint-phase-benchmark-evidence.schema.json).
+The blocking-gates runner can invoke the same check through
+`--with-tint-phase-benchmark-evidence-gate` plus explicit
+`--tint-phase-benchmark-required-target` values. This receipt reports missing
+exact phases as diagnostic row data, not as a substitute for exact
+`phaseTimingsNs`.
+
+The composed compiler frontier checker,
+`bench/tools/check_tint_compiler_frontier_bundle.py`, binds the current
+compiler evidence reports to their lowering-link, target-validation, and
+phase-benchmark receipts. It allows the browser-corpus linkage/validation
+receipt and benchmark-corpus phase receipt to remain separate evidence paths
+while still producing one `tint_compiler_frontier_bundle` artifact for the
+SPIR-V compiler frontier. The bundle passes when component receipts are
+gate-clean and reports exact Tint phase gaps as `claimBlockers`; `--require-claimable`
+promotes those blockers to hard failures for claim lanes. Its schema is
+[`config/tint-compiler-frontier-bundle.schema.json`](../config/tint-compiler-frontier-bundle.schema.json).
+
+Lowering-link claim bundles are generated from the same compiler evidence with
+`bench/tools/build_wgsl_lowering_link_receipt.py`. The receipt binds each
+evidence row back to the WGSL corpus manifest, then records the source hash,
+Doe IR hash, Doe backend output hash, Tint backend output hash, both validation
+statuses, both receipt paths, and the target backend identity. Linked rows are
+therefore source-to-IR-to-backend receipts for the Doe side and comparator
+artifact receipts for the Tint side.
 
 ## Why custom Zig IR (not SPIR-V as universal IR)
 

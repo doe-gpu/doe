@@ -33,10 +33,13 @@ def side_payload(output_digit: str) -> dict:
     return {
         "status": "ok",
         "diagnosticCode": "",
+        "diagnosticMessage": "",
         "outputSha256": output_digit * 64,
         "irSha256": "7" * 64,
+        "outputPath": f"bench/out/scratch/{output_digit}.spv",
         "validationStatus": "passed",
         "validationTool": "validator",
+        "validationMessage": "",
         "phaseTimingsNs": {
             "parse": 1,
             "sema": 1,
@@ -44,6 +47,7 @@ def side_payload(output_digit: str) -> dict:
             "emit": 1,
             "total": 4,
         },
+        "phaseBenchmarkTimingsNs": {},
         "receiptPath": f"bench/out/scratch/{output_digit}.json",
     }
 
@@ -128,6 +132,52 @@ def claimable_report() -> dict:
     }
 
 
+def diagnostic_report_with_tint_total_only_phases() -> dict:
+    payload = claimable_report()
+    payload["comparisonStatus"] = "diagnostic"
+    payload["claimStatus"] = "diagnostic"
+    row = payload["rows"][0]
+    row["tint"]["phaseTimingsNs"] = {"total": 4}
+    row["comparability"] = {
+        "status": "diagnostic",
+        "reasons": ["tint_missing_named_phase_timings"],
+    }
+    row["claimability"] = {
+        "status": "diagnostic",
+        "reasons": ["tint_missing_named_phase_timings"],
+        "deltaPercent": {},
+    }
+    payload["summary"] = {
+        "rowCount": 1,
+        "comparableRows": 0,
+        "claimableRows": 0,
+        "reasons": ["tint_missing_named_phase_timings"],
+    }
+    return payload
+
+
+def comparable_diagnostic_report_with_tint_total_only_phases() -> dict:
+    payload = diagnostic_report_with_tint_total_only_phases()
+    payload["comparisonStatus"] = "comparable"
+    row = payload["rows"][0]
+    row["comparability"] = {
+        "status": "comparable",
+        "reasons": [],
+    }
+    row["claimability"] = {
+        "status": "diagnostic",
+        "reasons": ["tint missing phase timing: parse"],
+        "deltaPercent": {},
+    }
+    payload["summary"] = {
+        "rowCount": 1,
+        "comparableRows": 1,
+        "claimableRows": 0,
+        "reasons": ["tint missing phase timing: parse"],
+    }
+    return payload
+
+
 class TintCompilerEvidenceGateTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -179,6 +229,59 @@ class TintCompilerEvidenceGateTests(unittest.TestCase):
         result = self.module.evaluate_report(payload, require_claimable=True)
         self.assertFalse(result["ok"])
         self.assertTrue(any("requires at least one row" in item for item in result["failures"]))
+
+    def test_diagnostic_report_allows_claim_blockers_without_claim_requirement(self) -> None:
+        payload = diagnostic_report_with_tint_total_only_phases()
+        jsonschema.Draft202012Validator(self.schema).validate(payload)
+
+        result = self.module.evaluate_report(payload)
+
+        self.assertTrue(result["ok"], result["failures"])
+        self.assertEqual(result["summary"]["comparableRows"], 0)
+        self.assertEqual(result["summary"]["claimableRows"], 0)
+        self.assertTrue(
+            any("tint: missing integer phase timing: parse" in item for item in result["claimBlockers"])
+        )
+
+    def test_comparable_diagnostic_report_allows_claim_blockers_without_claim_requirement(self) -> None:
+        payload = comparable_diagnostic_report_with_tint_total_only_phases()
+        jsonschema.Draft202012Validator(self.schema).validate(payload)
+
+        result = self.module.evaluate_report(payload)
+
+        self.assertTrue(result["ok"], result["failures"])
+        self.assertEqual(result["summary"]["comparisonStatus"], "comparable")
+        self.assertEqual(result["summary"]["comparableRows"], 1)
+        self.assertEqual(result["summary"]["claimableRows"], 0)
+        self.assertTrue(
+            any("tint: missing integer phase timing: parse" in item for item in result["claimBlockers"])
+        )
+
+    def test_diagnostic_report_claim_blockers_fail_when_claimable_required(self) -> None:
+        payload = diagnostic_report_with_tint_total_only_phases()
+
+        result = self.module.evaluate_report(payload, require_claimable=True)
+
+        self.assertFalse(result["ok"])
+        self.assertTrue(
+            any("tint: missing integer phase timing: parse" in item for item in result["failures"])
+        )
+        self.assertTrue(
+            any("--require-claimable requires comparisonStatus=comparable" in item for item in result["failures"])
+        )
+
+    def test_comparable_diagnostic_report_claim_blockers_fail_when_claimable_required(self) -> None:
+        payload = comparable_diagnostic_report_with_tint_total_only_phases()
+
+        result = self.module.evaluate_report(payload, require_claimable=True)
+
+        self.assertFalse(result["ok"])
+        self.assertTrue(
+            any("tint: missing integer phase timing: parse" in item for item in result["failures"])
+        )
+        self.assertTrue(
+            any("--require-claimable requires claimStatus=claimable" in item for item in result["failures"])
+        )
 
     def test_claimable_report_rejects_missing_tint_validation(self) -> None:
         payload = claimable_report()

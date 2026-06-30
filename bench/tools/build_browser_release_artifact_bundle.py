@@ -10,6 +10,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+try:
+    from bench.tools import check_browser_release_artifact_bundle as bundle_check
+except ModuleNotFoundError:
+    import check_browser_release_artifact_bundle as bundle_check  # type: ignore
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CONTRACTS = (
@@ -60,6 +65,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--claim-report", action="append", required=True)
     parser.add_argument("--promotion-receipt", action="append", default=[])
     parser.add_argument("--policy", action="append", default=[])
+    parser.add_argument(
+        "--verify-files-root",
+        default="",
+        help=(
+            "Resolve artifact paths under this root and verify hashes before writing. "
+            "Required for release_candidate bundles."
+        ),
+    )
     parser.add_argument("--out", required=True)
     return parser.parse_args()
 
@@ -137,8 +150,26 @@ def build_bundle(
     }
 
 
+def bundle_verification_failures(
+    bundle: dict[str, Any],
+    verify_files_root: Path | None,
+) -> list[dict[str, str]]:
+    if verify_files_root is None:
+        if bundle.get("releaseStatus") != "release_candidate":
+            return []
+        return [
+            bundle_check.failure(
+                "release_candidate_requires_verification",
+                "verifyFilesRoot",
+                "release_candidate browser release bundles require --verify-files-root",
+            )
+        ]
+    return bundle_check.check_bundle(bundle, verify_files_root)
+
+
 def main() -> int:
     args = parse_args()
+    verify_files_root = Path(args.verify_files_root).resolve() if args.verify_files_root else None
     bundle = build_bundle(
         bundle_id=args.bundle_id,
         release_status=args.release_status,
@@ -153,6 +184,19 @@ def main() -> int:
         ),
         policies=defaulted_paths(args.policy, DEFAULT_POLICIES),
     )
+    verification_failures = bundle_verification_failures(
+        bundle,
+        verify_files_root,
+    )
+    if verification_failures:
+        report = {
+            "schemaVersion": 1,
+            "artifactKind": "browser_release_artifact_bundle_builder_check",
+            "status": "fail",
+            "failures": verification_failures,
+        }
+        print(json.dumps(report, indent=2))
+        return 1
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(bundle, indent=2) + "\n", encoding="utf-8")

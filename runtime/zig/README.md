@@ -188,7 +188,7 @@ Build:
 - `zig build dropin-core` — core-only drop-in shared library (`libwebgpu_doe_core.so`).
 - `zig build bench-host-hotpaths` — repo-only host hotpath scalar-vs-SIMD/data-layout benchmark build.
 - `zig build bench-host-hotpaths-run` — build and run the host hotpath benchmark, writing a JSON artifact when `--out` is supplied.
-- `zig build runtime-compile-report` — repo-only CLI for WGSL runtime compile structural metrics and phase timings (`doe-runtime-compile-report`).
+- `zig build runtime-compile-report` — repo-only CLI for WGSL runtime compile structural metrics and phase timings on explicit MSL or SPIR-V targets (`doe-runtime-compile-report --target msl|spirv`, with `--emit-msl` / `--emit-spirv` for backend output receipts).
 - `zig build module-core-runner` — explicit service runner for promoted Zig
   module contracts, including the v1 numeric-stability service.
 - `zig build csl-sim-runner` — explicit CSL simulator contract runner (`doe-csl-sim-runner`).

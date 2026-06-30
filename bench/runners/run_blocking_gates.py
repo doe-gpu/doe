@@ -104,6 +104,15 @@ def main() -> int:
     backend_selection_gate = gates_dir / "backend_selection_gate.py"
     shader_artifact_gate = gates_dir / "shader_artifact_gate.py"
     tint_compiler_evidence_gate = gates_dir / "tint_compiler_evidence_gate.py"
+    tint_compiler_target_validation_check = (
+        tools_dir / "check_tint_compiler_target_validation.py"
+    )
+    tint_phase_benchmark_evidence_check = (
+        tools_dir / "check_tint_phase_benchmark_evidence.py"
+    )
+    tint_compiler_frontier_bundle_check = (
+        tools_dir / "check_tint_compiler_frontier_bundle.py"
+    )
     spirv_val_gate = gates_dir / "spirv_val_gate.py"
     dxil_validate_gate = gates_dir / "dxil_validate_gate.py"
     sync_conformance_gate = gates_dir / "sync_conformance_gate.py"
@@ -463,6 +472,121 @@ def main() -> int:
             if args.tint_compiler_evidence_require_claimable:
                 tint_gate_command.append("--require-claimable")
             run_gate("tint-compiler-evidence", tint_gate_command)
+
+        if args.with_tint_compiler_target_validation_gate:
+            target_validation_evidence_values = [
+                value.strip()
+                for value in args.tint_compiler_target_validation_evidence
+                if value.strip()
+            ] or [args.tint_compiler_evidence_report]
+            target_validation_evidence_paths = [
+                Path(value) for value in target_validation_evidence_values
+            ]
+            for target_validation_evidence_path in target_validation_evidence_paths:
+                if not target_validation_evidence_path.exists():
+                    print(
+                        "FAIL: missing --tint-compiler-target-validation-evidence: "
+                        f"{target_validation_evidence_path}"
+                    )
+                    return 1
+            if not args.tint_compiler_target_validation_required_target:
+                print(
+                    "FAIL: --with-tint-compiler-target-validation-gate "
+                    "requires --tint-compiler-target-validation-required-target"
+                )
+                return 1
+            target_validation_command = [
+                sys.executable,
+                str(tint_compiler_target_validation_check),
+            ]
+            for target_validation_evidence_path in target_validation_evidence_paths:
+                target_validation_command.extend(
+                    ["--evidence", str(target_validation_evidence_path)]
+                )
+            for target in args.tint_compiler_target_validation_required_target:
+                target_validation_command.extend(["--required-target", target])
+            if args.tint_compiler_target_validation_verify_files_root.strip():
+                target_validation_command.extend(
+                    [
+                        "--verify-files-root",
+                        args.tint_compiler_target_validation_verify_files_root.strip(),
+                    ]
+                )
+            if args.tint_compiler_target_validation_allow_diagnostic_rows:
+                target_validation_command.append("--allow-diagnostic-rows")
+            if args.tint_compiler_target_validation_out.strip():
+                target_validation_command.extend(
+                    ["--out", args.tint_compiler_target_validation_out.strip()]
+                )
+            run_gate("tint-compiler-target-validation", target_validation_command)
+
+        if args.with_tint_phase_benchmark_evidence_gate:
+            phase_benchmark_evidence = (
+                args.tint_phase_benchmark_evidence_report.strip()
+                or args.tint_compiler_evidence_report
+            )
+            phase_benchmark_evidence_path = Path(phase_benchmark_evidence)
+            if not phase_benchmark_evidence_path.exists():
+                print(
+                    "FAIL: missing --tint-phase-benchmark-evidence-report: "
+                    f"{phase_benchmark_evidence_path}"
+                )
+                return 1
+            if not args.tint_phase_benchmark_required_target:
+                print(
+                    "FAIL: --with-tint-phase-benchmark-evidence-gate "
+                    "requires --tint-phase-benchmark-required-target"
+                )
+                return 1
+            phase_benchmark_command = [
+                sys.executable,
+                str(tint_phase_benchmark_evidence_check),
+                "--evidence",
+                str(phase_benchmark_evidence_path),
+            ]
+            for target in args.tint_phase_benchmark_required_target:
+                phase_benchmark_command.extend(["--required-target", target])
+            if args.tint_phase_benchmark_out.strip():
+                phase_benchmark_command.extend(
+                    ["--out", args.tint_phase_benchmark_out.strip()]
+                )
+            run_gate("tint-phase-benchmark-evidence", phase_benchmark_command)
+
+        if args.with_tint_compiler_frontier_bundle_gate:
+            if not args.tint_compiler_frontier_bundle_required_target:
+                print(
+                    "FAIL: --with-tint-compiler-frontier-bundle-gate "
+                    "requires --tint-compiler-frontier-bundle-required-target"
+                )
+                return 1
+            frontier_bundle_command = [
+                sys.executable,
+                str(tint_compiler_frontier_bundle_check),
+            ]
+            for evidence in args.tint_compiler_frontier_bundle_compiler_evidence:
+                frontier_bundle_command.extend(["--compiler-evidence", evidence])
+            for receipt in args.tint_compiler_frontier_bundle_lowering_link_receipt:
+                frontier_bundle_command.extend(["--lowering-link-receipt", receipt])
+            for receipt in args.tint_compiler_frontier_bundle_target_validation:
+                frontier_bundle_command.extend(["--target-validation", receipt])
+            for receipt in args.tint_compiler_frontier_bundle_phase_benchmark_evidence:
+                frontier_bundle_command.extend(["--phase-benchmark-evidence", receipt])
+            for target in args.tint_compiler_frontier_bundle_required_target:
+                frontier_bundle_command.extend(["--required-target", target])
+            if args.tint_compiler_frontier_bundle_verify_files_root.strip():
+                frontier_bundle_command.extend(
+                    [
+                        "--verify-files-root",
+                        args.tint_compiler_frontier_bundle_verify_files_root.strip(),
+                    ]
+                )
+            if args.tint_compiler_frontier_bundle_out.strip():
+                frontier_bundle_command.extend(
+                    ["--out", args.tint_compiler_frontier_bundle_out.strip()]
+                )
+            if args.tint_compiler_frontier_bundle_require_claimable:
+                frontier_bundle_command.append("--require-claimable")
+            run_gate("tint-compiler-frontier-bundle", frontier_bundle_command)
 
         if args.with_spirv_val_gate:
             spirv_val_command = [

@@ -107,6 +107,16 @@ def parse_args() -> argparse.Namespace:
         default=str(root / "config/browser-capture-policy.json"),
     )
     parser.add_argument(
+        "--projection-manifest",
+        default=str(
+            root / "browser/chromium/bench/generated/browser_projection_manifest.json"
+        ),
+        help=(
+            "Generated browser projection manifest used for source-kernel "
+            "structural receipts."
+        ),
+    )
+    parser.add_argument(
         "--window-count",
         type=int,
         default=0,
@@ -286,7 +296,44 @@ def capture_policy_failures(path: Path, root: Path) -> list[str]:
     return [f"capture-policy: {output or 'check failed'}"]
 
 
-def extract_claim_rows(report_payload: dict[str, Any], required_claim_scopes: set[str]) -> dict[str, dict[str, Any]]:
+def load_projection_manifest_rows(
+    manifest_path: Path,
+) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    try:
+        payload = load_json(manifest_path)
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        return {}, [f"projection-manifest: failed to load {manifest_path}: {exc}"]
+
+    rows = payload.get("rows")
+    if not isinstance(rows, list) or not rows:
+        return {}, ["projection-manifest: rows must be a non-empty array"]
+
+    by_id: dict[str, dict[str, Any]] = {}
+    failures: list[str] = []
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            failures.append(f"projection-manifest: rows[{index}] must be object")
+            continue
+        workload_id = row.get("sourceWorkloadId")
+        if not isinstance(workload_id, str) or not workload_id:
+            failures.append(
+                f"projection-manifest: rows[{index}].sourceWorkloadId must be non-empty"
+            )
+            continue
+        if workload_id in by_id:
+            failures.append(
+                f"projection-manifest: duplicate sourceWorkloadId {workload_id}"
+            )
+            continue
+        by_id[workload_id] = row
+    return by_id, failures
+
+
+def extract_claim_rows(
+    report_payload: dict[str, Any],
+    required_claim_scopes: set[str],
+    projection_rows: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, dict[str, Any]]:
     rows = report_payload.get("l1", {}).get("rows", [])
     if not isinstance(rows, list):
         raise ValueError("layered report missing l1.rows")
@@ -303,7 +350,15 @@ def extract_claim_rows(report_payload: dict[str, Any], required_claim_scopes: se
             continue
         if row.get("requiredStatus") != "ok":
             continue
-        claim_rows[workload_id] = row
+        claim_row = dict(row)
+        if not isinstance(claim_row.get("browserWorkload"), dict) and projection_rows:
+            projection_row = projection_rows.get(workload_id)
+            if isinstance(projection_row, dict) and isinstance(
+                projection_row.get("browserWorkload"),
+                dict,
+            ):
+                claim_row["browserWorkload"] = projection_row["browserWorkload"]
+        claim_rows[workload_id] = claim_row
     return claim_rows
 
 
@@ -343,6 +398,140 @@ def metric_ms(metrics: dict[str, Any]) -> float | None:
     if divisor is None:
         return elapsed_ms
     return elapsed_ms / divisor
+
+
+def is_sha256_hex(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(char in "0123456789abcdef" for char in value)
+    )
+
+
+def check_report_error_count(payload: dict[str, Any]) -> int:
+    error_count = payload.get("errorCount")
+    if isinstance(error_count, int) and error_count >= 0:
+        return error_count
+    errors = payload.get("errors")
+    if isinstance(errors, list):
+        return len(errors)
+    return 1
+
+
+def build_structural_receipts(
+    per_window_rows: list[dict[str, Any]],
+    claim_scope_rows: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    failure_codes: list[str] = []
+    checker_reports: list[dict[str, Any]] = []
+
+    for row in per_window_rows:
+        check_path = row.get("checkReport")
+        if not isinstance(check_path, str) or not check_path:
+            failure_codes.append("missing_browser_superset_check_report")
+            continue
+        try:
+            check_payload = load_json(Path(check_path))
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError):
+            checker_reports.append(
+                {"path": check_path, "status": "fail", "errorCount": 1}
+            )
+            failure_codes.append("browser_superset_check_report_load_failed")
+            continue
+        error_count = check_report_error_count(check_payload)
+        status = (
+            "pass"
+            if check_payload.get("ok") is True
+            and check_payload.get("reportChecked") is True
+            and error_count == 0
+            else "fail"
+        )
+        if status != "pass":
+            failure_codes.append("browser_superset_check_report_failed")
+        checker_reports.append(
+            {"path": check_path, "status": status, "errorCount": error_count}
+        )
+
+    source_kernel_ids: list[str] = []
+    commands_paths: set[str] = set()
+    kernel_paths: set[str] = set()
+    runtime_modes: set[str] = set()
+    source_identity_failed = False
+    dispatch_shape_failed = False
+
+    for workload_id, row in sorted(claim_scope_rows.items()):
+        browser_workload = row.get("browserWorkload")
+        if not isinstance(browser_workload, dict):
+            continue
+        if browser_workload.get("computeProjection") != "source_kernel_dispatch_v1":
+            continue
+        source_kernel_ids.append(workload_id)
+        for path_key, hash_key, path_set in (
+            ("commandsPath", "commandsSha256", commands_paths),
+            ("kernelPath", "kernelSha256", kernel_paths),
+        ):
+            path_value = browser_workload.get(path_key)
+            if not isinstance(path_value, str) or not safe_repo_path(path_value):
+                source_identity_failed = True
+                failure_codes.append(f"{workload_id}:{path_key}_missing_or_unsafe")
+            else:
+                path_set.add(path_value)
+            if not is_sha256_hex(browser_workload.get(hash_key)):
+                source_identity_failed = True
+                failure_codes.append(f"{workload_id}:{hash_key}_missing")
+        for field in ("dispatchX", "dispatchY", "dispatchZ", "dispatchRepeat"):
+            if not isinstance(browser_workload.get(field), int) or browser_workload[field] <= 0:
+                dispatch_shape_failed = True
+                failure_codes.append(f"{workload_id}:{field}_invalid")
+        warmup = browser_workload.get("warmupDispatchCount")
+        if not isinstance(warmup, int) or warmup < 0:
+            dispatch_shape_failed = True
+            failure_codes.append(f"{workload_id}:warmupDispatchCount_invalid")
+        runtimes = row.get("runtimes")
+        if isinstance(runtimes, dict):
+            for mode in ("dawn", "doe"):
+                if isinstance(runtimes.get(mode), dict):
+                    runtime_modes.add(mode)
+
+    if not source_kernel_ids:
+        source_identity_failed = True
+        dispatch_shape_failed = True
+        failure_codes.append("source_kernel_dispatch_workload_missing")
+    if {"dawn", "doe"} - runtime_modes:
+        dispatch_shape_failed = True
+        failure_codes.append("source_kernel_runtime_mode_pair_missing")
+
+    source_identity_verified = bool(source_kernel_ids) and not source_identity_failed
+    dispatch_shape_verified = bool(source_kernel_ids) and not dispatch_shape_failed
+    checker_reports_pass = bool(checker_reports) and all(
+        row["status"] == "pass" and row["errorCount"] == 0 for row in checker_reports
+    )
+
+    return {
+        "status": (
+            "pass"
+            if source_identity_verified
+            and dispatch_shape_verified
+            and checker_reports_pass
+            and not failure_codes
+            else "fail"
+        ),
+        "workloadCount": len(claim_scope_rows),
+        "sourceKernelDispatchWorkloadCount": len(source_kernel_ids),
+        "sourceCommandIdentity": {
+            "verified": source_identity_verified,
+            "commandsPathCount": len(commands_paths),
+            "kernelPathCount": len(kernel_paths),
+            "hashesBound": source_identity_verified,
+        },
+        "dispatchShapeParity": {
+            "verified": dispatch_shape_verified,
+            "dispatchShapeWorkloadCount": len(source_kernel_ids),
+            "runtimeModeCount": len(runtime_modes),
+        },
+        "checkerReports": checker_reports,
+        "failureCodes": sorted(set(failure_codes)),
+    }
 
 
 def run_window(
@@ -462,6 +651,10 @@ def main() -> int:
         patch_manifest_error = None
         chromium_patch_manifest_path = root / "config/chromium-patch-manifest.json"
     capture_policy_path = Path(args.capture_policy).resolve()
+    projection_manifest_path = Path(args.projection_manifest).resolve()
+    projection_rows, projection_failures = load_projection_manifest_rows(
+        projection_manifest_path
+    )
     failures.extend(responsibility_map_failures(responsibility_map_path, root))
     failures.extend(runtime_selector_policy_failures(runtime_selector_policy_path, root))
     failures.extend(fork_maintenance_policy_failures(fork_maintenance_policy_path, root))
@@ -470,6 +663,7 @@ def main() -> int:
     else:
         failures.extend(chromium_patch_manifest_failures(fork_maintenance_policy_path, root))
     failures.extend(capture_policy_failures(capture_policy_path, root))
+    failures.extend(projection_failures)
     per_window_rows: list[dict[str, Any]] = []
     claim_scope_rows: dict[str, dict[str, Any]] = {}
     required_claim_scopes = set(policy["requireClaimScopes"])
@@ -502,7 +696,11 @@ def main() -> int:
             }
             if not smoke_path.exists():
                 failures.append(f"{window_dir.name}: smoke report missing")
-            current_rows = extract_claim_rows(layered_report, required_claim_scopes)
+            current_rows = extract_claim_rows(
+                layered_report,
+                required_claim_scopes,
+                projection_rows,
+            )
             if len(current_rows) != int(policy["expectedStrictCandidateRows"]):
                 failures.append(
                     f"{window_dir.name}: expected "
@@ -551,7 +749,11 @@ def main() -> int:
             if policy["promotionApprovalsRequired"] and check_report.get("promotionChecked") is not True:
                 failures.append(f"window-{window_index:02d}: promotionChecked must be true")
 
-            current_rows = extract_claim_rows(layered_report, required_claim_scopes)
+            current_rows = extract_claim_rows(
+                layered_report,
+                required_claim_scopes,
+                projection_rows,
+            )
             if len(current_rows) != int(policy["expectedStrictCandidateRows"]):
                 failures.append(
                     f"window-{window_index:02d}: expected "
@@ -590,7 +792,11 @@ def main() -> int:
         for window_index in range(1, requested_windows + 1):
             layered_path = Path(per_window_rows[window_index - 1]["layeredReport"])
             layered_report = load_json(layered_path)
-            row = extract_claim_rows(layered_report, required_claim_scopes).get(workload_id)
+            row = extract_claim_rows(
+                layered_report,
+                required_claim_scopes,
+                projection_rows,
+            ).get(workload_id)
             if not isinstance(row, dict):
                 reasons.append(f"window-{window_index:02d}: workload missing")
                 continue
@@ -719,6 +925,7 @@ def main() -> int:
         "forkMaintenancePolicyPath": str(fork_maintenance_policy_path),
         "chromiumPatchManifestPath": str(chromium_patch_manifest_path),
         "capturePolicyPath": str(capture_policy_path),
+        "projectionManifestPath": str(projection_manifest_path),
         "promotionApprovalsPath": str(Path(args.promotion_approvals).resolve()),
         "ownershipPath": str(Path(args.ownership).resolve()),
         "windowCount": requested_windows,
@@ -728,6 +935,10 @@ def main() -> int:
             "comparableCount": comparable_count,
             "claimableCount": claimable_count,
         },
+        "structuralReceipts": build_structural_receipts(
+            per_window_rows,
+            claim_scope_rows,
+        ),
         "workloads": workload_rows,
         "failures": failures,
     }

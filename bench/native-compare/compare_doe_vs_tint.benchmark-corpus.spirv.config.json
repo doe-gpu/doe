@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "tintBenchmarkInputsScriptPath": "bench/vendor/dawn/src/tint/cmd/bench/generate_benchmark_inputs.py",
+  "baseline": {
+    "name": "doe_wgsl",
+    "binaryPath": "runtime/zig/zig-out/bin/doe-compilation-bench"
+  },
+  "comparison": {
+    "name": "tint",
+    "binaryPath": "bench/vendor/dawn/out/Release/tint",
+    "warmBinaryPath": "bench/vendor/dawn/out/Release/tint_benchmark"
+  },
+  "run": {
+    "iterations": 200,
+    "warmup": 50,
+    "targets": [
+      "spirv"
+    ],
+    "outDir": "bench/out/compilation",
+    "outStem": "doe-vs-tint-benchmark",
+    "warmRepetitions": 25,
+    "warmMinTime": "0.05s",
+    "collectPhaseBenchmarks": true
+  }
+}

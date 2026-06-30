@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "tint_compiler_frontier_bundle",
+  "requiredTargets": [
+    "spirv"
+  ],
+  "status": "pass",
+  "claimabilityStatus": "blocked",
+  "compilerEvidenceReports": [
+    {
+      "path": "examples/tint-compiler-evidence.sample.json",
+      "diagnosticGateStatus": "pass",
+      "comparisonStatus": "diagnostic",
+      "claimStatus": "diagnostic",
+      "rowCount": 1,
+      "comparableRows": 0,
+      "claimableRows": 0,
+      "claimBlockerCount": 2,
+      "claimBlockerSummary": [
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "compiler evidence must be comparable before it can support a Tint replacement claim",
+          "count": 1
+        },
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "compiler evidence must be claimable before it can support a Tint replacement claim",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "componentReceipts": {
+    "loweringLinks": [
+      {
+        "path": "examples/wgsl-lowering-link-receipt.sample.json",
+        "evidencePath": "examples/tint-compiler-evidence.sample.json",
+        "status": "pass",
+        "targets": [
+          "spirv"
+        ],
+        "rowCount": 1,
+        "linkedRows": 1,
+        "diagnosticRows": 0
+      }
+    ],
+    "targetValidations": [
+      {
+        "path": "examples/tint-compiler-target-validation.sample.json",
+        "evidencePath": "examples/tint-compiler-evidence.sample.json",
+        "status": "pass",
+        "targets": [
+          "spirv"
+        ],
+        "summary": {
+          "targetCount": 1,
+          "coveredTargetCount": 1,
+          "rowCount": 1,
+          "validatedRows": 0,
+          "diagnosticRows": 1,
+          "claimBlockerCount": 1,
+          "failureCount": 0
+        },
+        "claimBlockerSummary": [
+          {
+            "code": "tint_result_not_ok",
+            "message": "Tint compiler result is not ok: sample_missing_tint_run",
+            "count": 1
+          }
+        ],
+        "claimBlockerSummaryByEvidencePath": [
+          {
+            "evidencePath": "examples/tint-compiler-evidence.sample.json",
+            "claimBlockerSummary": [
+              {
+                "code": "tint_result_not_ok",
+                "message": "Tint compiler result is not ok: sample_missing_tint_run",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "phaseBenchmarks": [
+      {
+        "path": "examples/tint-phase-benchmark-evidence.sample.json",
+        "evidencePath": "examples/tint-compiler-evidence.sample.json",
+        "status": "pass",
+        "targets": [
+          "spirv"
+        ],
+        "summary": {
+          "targetCount": 1,
+          "coveredTargetCount": 1,
+          "rowCount": 1,
+          "tintOkRows": 1,
+          "phaseBenchmarkCoveredRows": 1,
+          "phaseBenchmarkMissingRows": 0,
+          "exactPhaseCompleteRows": 0,
+          "exactPhaseMissingRows": 1,
+          "notApplicableRows": 0,
+          "failureCount": 0
+        }
+      }
+    ]
+  },
+  "coverageByTarget": [
+    {
+      "target": "spirv",
+      "loweringLinkReceipts": [
+        "examples/wgsl-lowering-link-receipt.sample.json"
+      ],
+      "targetValidationReceipts": [
+        "examples/tint-compiler-target-validation.sample.json"
+      ],
+      "phaseBenchmarkReceipts": [
+        "examples/tint-phase-benchmark-evidence.sample.json"
+      ],
+      "evidencePaths": [
+        "examples/tint-compiler-evidence.sample.json"
+      ],
+      "linkedRows": 1,
+      "validatedRows": 0,
+      "phaseBenchmarkCoveredRows": 1
+    }
+  ],
+  "claimBlockers": [
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[0].comparisonStatus",
+      "message": "compiler evidence must be comparable before it can support a Tint replacement claim"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[0].claimStatus",
+      "message": "compiler evidence must be claimable before it can support a Tint replacement claim"
+    },
+    {
+      "code": "shader_artifact_validation_for_target_backends",
+      "path": "targetValidationReceipts[0].claimBlockers[0]",
+      "message": "Tint compiler result is not ok: sample_missing_tint_run"
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "compilerEvidenceReportCount": 1,
+    "loweringLinkReceiptCount": 1,
+    "targetValidationReceiptCount": 1,
+    "phaseBenchmarkReceiptCount": 1,
+    "coveredTargetCount": 1,
+    "claimBlockerCount": 3,
+    "failureCount": 0
+  }
+}

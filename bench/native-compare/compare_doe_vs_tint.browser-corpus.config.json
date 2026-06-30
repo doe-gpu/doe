@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "wgslCorpusManifest": "config/wgsl-browser-corpus.json",
+  "workloadIds": ["webgpu-prefix-sum"],
+  "baseline": {
+    "name": "doe_wgsl",
+    "binaryPath": "runtime/zig/zig-out/bin/doe-compilation-bench"
+  },
+  "comparison": {
+    "name": "tint",
+    "binaryPath": "bench/vendor/dawn/out/Release/tint",
+    "warmBinaryPath": "bench/vendor/dawn/out/Release/tint_benchmark"
+  },
+  "run": {
+    "iterations": 7,
+    "warmup": 1,
+    "targets": ["spirv"],
+    "outDir": "bench/out/compilation",
+    "outStem": "doe-vs-tint-browser-corpus",
+    "warmRepetitions": 9,
+    "warmMinTime": "0.01s"
+  }
+}
