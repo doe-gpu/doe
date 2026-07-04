@@ -30,6 +30,32 @@
       "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json"
     },
     {
+      "id": "package-node-amd-vulkan",
+      "surface": "package",
+      "runtimeHost": "node",
+      "backend": "amd-vulkan",
+      "comparison": "doe-vs-node-webgpu",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
+      "reportPath": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
+      "claimPath": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.claim.json"
+    },
+    {
+      "id": "package-bun-amd-vulkan",
+      "surface": "package",
+      "runtimeHost": "bun",
+      "backend": "amd-vulkan",
+      "comparison": "doe-vs-bun-webgpu",
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
+      "reportPath": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
+      "claimPath": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.claim.json"
+    },
+    {
       "id": "native-strict-apple-metal",
       "surface": "native",
       "backend": "apple-metal",
@@ -92,16 +118,58 @@
       "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
     },
     {
+      "id": "browser-chromium-release",
+      "surface": "browser-chromium",
+      "runtimeHost": "browser",
+      "backend": "apple-metal",
+      "comparison": "doe-vs-dawn",
+      "metricDirection": "status-only",
+      "claimState": "scaffolded",
+      "comparisonStatus": "not-evaluated",
+      "claimStatus": "not-evaluated",
+      "browserRelease": {
+        "runtimeFrontierBundlePath": "examples/browser-runtime-frontier-bundle.sample.json",
+        "releaseArtifactBundlePath": "examples/browser-release-artifact-bundle.sample.json",
+        "releaseArchivePath": "examples/browser-release-archive.sample.zip",
+        "releaseArchiveSha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+        "releaseArchiveManifestPath": "examples/browser-release-archive-manifest.sample.json",
+        "releaseArchiveManifestSha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+        "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+        "packageInputsPath": "examples/browser-release-package-inputs-check.sample.json",
+        "provenanceReportPath": "examples/browser-release-candidate-provenance.sample.json",
+        "publicDownloadReceiptPath": "examples/browser-public-download-receipt.sample.json",
+        "proofSurfacePath": "examples/browser-published-proof-surface.sample.json",
+        "proofSurfaceCheckPath": "examples/browser-published-proof-surface-check.sample.json",
+        "browserLaunchReceiptPath": "examples/browser-release-launch-receipt.sample.json",
+        "finalizerReportPath": "examples/browser-release-candidate-finalizer.sample.json",
+        "finalizerCheckPath": "examples/browser-release-candidate-finalizer-check.sample.json",
+        "readinessReportPath": "examples/dawn-replacement-readiness-report.sample.json"
+      },
+      "blocker": "The checked-in Chromium browser release evidence is still diagnostic; claim indexing requires a published release-candidate browser archive with passing candidate consistency and a claimable browser frontier row."
+    },
+    {
       "id": "native-release-amd-vulkan",
       "surface": "native",
       "backend": "amd-vulkan",
       "comparison": "doe-vs-dawn",
       "metricDirection": "lower-is-better",
-      "claimState": "diagnostic",
+      "claimState": "claim-indexed",
       "comparisonStatus": "comparable",
-      "claimStatus": "diagnostic",
-      "reportPath": "bench/out/amd-vulkan/20260310T153903Z/dawn-vs-doe.amd.vulkan.release.json",
-      "blocker": "Current support matrix marks the lane diagnostic with a tiny-upload blocker."
+      "claimStatus": "claimable",
+      "reportPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+      "claimPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json"
+    },
+    {
+      "id": "dropin-cutover-linux-vulkan",
+      "surface": "drop-in",
+      "backend": "amd-vulkan",
+      "comparison": "doe-vs-dawn",
+      "metricDirection": "status-only",
+      "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
+      "reportPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json",
+      "claimPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json"
     },
     {
       "id": "native-d3d12",

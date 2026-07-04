@@ -482,6 +482,29 @@ def parse_args() -> argparse.Namespace:
         help="Run check_browser_release_artifact_bundle.py on the browser release bundle.",
     )
     parser.add_argument(
+        "--with-browser-release-package-inputs-gate",
+        action="store_true",
+        help="Run check_browser_release_package_inputs.py on browser archive package inputs.",
+    )
+    parser.add_argument(
+        "--with-browser-release-candidate-provenance-gate",
+        action="store_true",
+        help=(
+            "Run check_browser_release_candidate_provenance.py before the final "
+            "browser release bundle is assembled."
+        ),
+    )
+    parser.add_argument(
+        "--with-browser-published-proof-surface-gate",
+        action="store_true",
+        help="Run check_browser_published_proof_surface.py on browser proof-page and gallery evidence.",
+    )
+    parser.add_argument(
+        "--with-browser-release-candidate-finalizer-gate",
+        action="store_true",
+        help="Run check_browser_release_candidate_finalizer.py on the finalizer report.",
+    )
+    parser.add_argument(
         "--with-browser-claim-promotion-receipt-gate",
         action="store_true",
         help="Run check_browser_claim_promotion_receipt.py on a browser claim promotion receipt.",
@@ -515,6 +538,220 @@ def parse_args() -> argparse.Namespace:
         "--browser-release-artifact-bundle-require-release-candidate",
         action="store_true",
         help="Require the browser release bundle gate to validate release-candidate evidence.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-package-dir",
+        default="browser/chromium/src/out/fawn_release",
+        help="Browser package directory passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-package-root-name",
+        default="Fawn-Doe-linux-x64",
+        help="Archive root name passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-doe-runtime",
+        default="runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        help="Doe runtime input passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-dawn-fallback-runtime",
+        default="browser/chromium/src/out/fawn_release/libdawn_native.so",
+        help="Dawn fallback runtime input passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-shader-compiler",
+        default="runtime/zig/zig-out/bin/doe-zig-runtime",
+        help="Shader compiler input passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-product-version",
+        default="0.0.0-sample",
+        help="Browser product version passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-product-channel",
+        default="diagnostic",
+        choices=["diagnostic", "release_candidate", "release"],
+        help="Browser product channel passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-platform-os",
+        default="linux",
+        choices=["macos", "linux"],
+        help="Platform OS passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-platform-arch",
+        default="x64",
+        choices=["arm64", "x64"],
+        help="Platform arch passed to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-root",
+        default=".",
+        help="Repository root forwarded to the package-input checker.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-require-release-candidate-eligible",
+        action="store_true",
+        help="Require package inputs to satisfy the initial macOS arm64 release-candidate lane.",
+    )
+    parser.add_argument(
+        "--browser-release-package-inputs-out",
+        default="",
+        help="Optional output path for the package-input checker report.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-release-archive",
+        default="examples/browser-release-archive.sample.zip",
+        help="Release archive passed to the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-release-archive-url",
+        default="https://downloads.doe.dev/Fawn-Doe-macos-arm64.zip",
+        help="Public HTTPS release archive URL expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-release-archive-manifest",
+        default="examples/browser-release-archive-manifest.sample.json",
+        help="Release archive manifest passed to the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-public-download-receipt",
+        default="examples/browser-public-download-receipt.sample.json",
+        help="Public download receipt passed to the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-proof-surface",
+        default="examples/browser-published-proof-surface.sample.json",
+        help="Published proof surface passed to the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-proof-surface-check",
+        default="examples/browser-published-proof-surface-check.sample.json",
+        help="Published proof-surface checker report passed to the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-browser-launch-receipt",
+        default="examples/browser-release-launch-receipt.sample.json",
+        help="Browser launch receipt passed to the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-package-inputs",
+        default="",
+        help="Package-input preflight receipt required by the browser release-candidate provenance gate.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-product-id",
+        default="fawn-doe",
+        choices=["doe-browser", "fawn-doe"],
+        help="Browser product id expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-product-name",
+        default="Fawn Doe",
+        choices=["Doe Browser", "Fawn Doe"],
+        help="Browser product display name expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-product-version",
+        default="0.0.0-sample",
+        help="Browser product version expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-product-channel",
+        default="release_candidate",
+        choices=["diagnostic", "release_candidate", "release"],
+        help="Browser product channel expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-platform-os",
+        default="macos",
+        choices=["macos", "linux", "windows"],
+        help="Platform OS expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-platform-arch",
+        default="arm64",
+        choices=["arm64", "x64"],
+        help="Platform arch expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-package-format",
+        default="zip",
+        choices=["zip"],
+        help="Package format expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-browser-executable-archive-path",
+        default="Fawn.app/Contents/MacOS/Chromium",
+        help="Browser executable archive member path expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-browser-app-metadata-archive-path",
+        default="Fawn.app/Contents/Info.plist",
+        help="Browser app metadata archive member path expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-doe-runtime-archive-path",
+        default="Fawn.app/Contents/Frameworks/libwebgpu_doe.so",
+        help="Doe runtime archive member path expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-dawn-fallback-runtime-archive-path",
+        default="Fawn.app/Contents/Frameworks/libdawn_native.so",
+        help="Dawn fallback archive member path expected by the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-verify-files-root",
+        default="",
+        help="Optional file root forwarded to the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-provenance-out",
+        default="",
+        help="Optional output path for the browser release-candidate provenance checker.",
+    )
+    parser.add_argument(
+        "--browser-published-proof-surface",
+        default="examples/browser-published-proof-surface.sample.json",
+        help="Published browser proof-surface manifest path.",
+    )
+    parser.add_argument(
+        "--browser-published-proof-surface-verify-files-root",
+        default="",
+        help="Optional file root forwarded to the published proof-surface checker.",
+    )
+    parser.add_argument(
+        "--browser-published-proof-surface-require-public-urls",
+        action="store_true",
+        help="Require hosted public HTTPS gallery URLs in the published proof surface.",
+    )
+    parser.add_argument(
+        "--browser-published-proof-surface-check-out",
+        default="",
+        help="Optional output path for the published proof-surface checker report.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-finalizer-report",
+        default="examples/browser-release-candidate-finalizer.sample.json",
+        help="Browser release-candidate finalizer report passed to the finalizer checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-finalizer-verify-files-root",
+        default="",
+        help="Optional file root forwarded to the browser release-candidate finalizer checker.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-finalizer-require-pass",
+        action="store_true",
+        help="Require the browser release-candidate finalizer report to pass.",
+    )
+    parser.add_argument(
+        "--browser-release-candidate-finalizer-check-out",
+        default="",
+        help="Optional output path for the browser release-candidate finalizer checker.",
     )
     parser.add_argument(
         "--browser-runtime-frontier-bundle-runtime-identity",

@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Doe browser gallery sample: rendering</title>
+<main>
+  <h1>rendering</h1>
+  <p>contract: <a href="browser/chromium/contracts/browser-benchmark-superset.contract.md">browser/chromium/contracts/browser-benchmark-superset.contract.md</a></p>
+  <p>workload: browser-gallery-rendering</p>
+  <p>receipt: <a href="examples/browser-rendering-execution-receipt.sample.json">browser-gallery-rendering-doe</a></p>
+  <section>
+    <h2>Doe receipt facts</h2>
+    <p>receiptId: browser-gallery-rendering-doe</p>
+    <p>workloadId: browser-gallery-rendering</p>
+    <p>backend: webgpu-doe</p>
+    <p>source shader: wgsl main @fragment fn main() -> @location(0) vec4f { return vec4f(1.0); }</p>
+    <p>source sha256: 64f06b44708d5ea9a9f1971d16fd35568075417d35756d187977b3cb6ab59bd1</p>
+    <p>lowering path: wgsl > doe-wgsl > tsir > hostplan > webgpu</p>
+    <p>driver: sample webgpu sample-driver sample-adapter-family sample-webgpu-adapter</p>
+    <p>device: sample-adapter aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa featureCount=1</p>
+    <p>frameHash: 2222222222222222222222222222222222222222222222222222222222222222</p>
+    <p>timing: browser-operation-proxy setupNs=1100 encodeNs=2100 submitWaitNs=3100</p>
+  </section>
+</main>

@@ -25,6 +25,7 @@ REQUIRED_SURFACES = {
     "shader_links",
     "media_path_probe",
     "pipeline_cache_receipts",
+    "published_proof_surface",
     "unsupported_explanations",
 }
 VALID_PERMISSION_GATES = {"devtools_opt_in", "secure_context_devtools_opt_in", "disabled"}

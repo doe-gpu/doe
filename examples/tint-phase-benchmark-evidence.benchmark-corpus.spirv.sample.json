@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "tint_phase_benchmark_evidence",
+  "evidencePath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+  "requiredTargets": [
+    "spirv"
+  ],
+  "requiredBenchmarkScopes": [
+    "parseWgsl",
+    "validateIr",
+    "generateBackend"
+  ],
+  "requiredExactPhases": [
+    "parse",
+    "sema",
+    "lower",
+    "emit"
+  ],
+  "status": "pass",
+  "targetCoverage": [
+    {
+      "target": "spirv",
+      "rowCount": 14,
+      "tintOkRows": 14,
+      "phaseBenchmarkCoveredRows": 14,
+      "shaderIds": [
+        "atan2-const-eval.wgsl",
+        "cluster-lights.wgsl",
+        "metaball-isosurface.wgsl",
+        "particles.wgsl",
+        "shadow-fragment.wgsl",
+        "skinned-shadowed-pbr-fragment.wgsl",
+        "skinned-shadowed-pbr-vertex.wgsl",
+        "unity_webgpu_000002778DE78280.cs.spv",
+        "unity_webgpu_000002778DE78280.cs.wgsl",
+        "unity_webgpu_000002778F740030.fs.spv",
+        "unity_webgpu_000002778F740030.fs.wgsl",
+        "unity_webgpu_0000017E9E2D81A0.vs.spv",
+        "unity_webgpu_0000017E9E2D81A0.vs.wgsl",
+        "webgpu-prefix-sum.wgsl"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "shaderId": "atan2-const-eval.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 4648147,
+        "validateIr": 1109166,
+        "generateBackend": 5256845
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "cluster-lights.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 232881,
+        "validateIr": 53041,
+        "generateBackend": 242064
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "metaball-isosurface.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 455525,
+        "validateIr": 131100,
+        "generateBackend": 456776
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "particles.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 337528,
+        "validateIr": 94639,
+        "generateBackend": 932226
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "shadow-fragment.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 78433,
+        "validateIr": 18391,
+        "generateBackend": 62196
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "skinned-shadowed-pbr-fragment.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 913182,
+        "validateIr": 223309,
+        "generateBackend": 892029
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "skinned-shadowed-pbr-vertex.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 141010,
+        "validateIr": 35598,
+        "generateBackend": 169173
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "unity_webgpu_000002778DE78280.cs.spv",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 264131,
+        "validateIr": 82357,
+        "generateBackend": 241329
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "unity_webgpu_000002778DE78280.cs.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 421686,
+        "validateIr": 101800,
+        "generateBackend": 355160
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "unity_webgpu_000002778F740030.fs.spv",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 6317243,
+        "validateIr": 3545442,
+        "generateBackend": 7906390
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "unity_webgpu_000002778F740030.fs.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 12260845,
+        "validateIr": 4151003,
+        "generateBackend": 10686094
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "unity_webgpu_0000017E9E2D81A0.vs.spv",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 2689121,
+        "validateIr": 1203036,
+        "generateBackend": 2717650
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "unity_webgpu_0000017E9E2D81A0.vs.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 4974910,
+        "validateIr": 2661841,
+        "generateBackend": 4995712
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    },
+    {
+      "shaderId": "webgpu-prefix-sum.wgsl",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 21770,
+        "validateIr": 5260,
+        "generateBackend": 33146
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "targetCount": 1,
+    "coveredTargetCount": 1,
+    "rowCount": 14,
+    "tintOkRows": 14,
+    "phaseBenchmarkCoveredRows": 14,
+    "phaseBenchmarkMissingRows": 0,
+    "exactPhaseCompleteRows": 0,
+    "exactPhaseMissingRows": 14,
+    "notApplicableRows": 0,
+    "failureCount": 0
+  }
+}

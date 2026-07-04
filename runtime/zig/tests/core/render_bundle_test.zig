@@ -31,6 +31,12 @@ fn make_test_encoder(allocator: std.mem.Allocator) DoeBundleEncoder {
     };
 }
 
+fn destroy_heap_encoder(enc: *DoeBundleEncoder) void {
+    const allocator = enc.allocator;
+    enc.cmds.deinit(allocator);
+    allocator.destroy(enc);
+}
+
 fn push_draw(enc: *DoeBundleEncoder, vertex_count: u32, instance_count: u32) void {
     rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
         .vertex_count = vertex_count,
@@ -502,7 +508,7 @@ test "make_bundle_encoder produces valid encoder with correct fields" {
     try std.testing.expectEqual(@as(usize, 0), enc.cmds.items.len);
 
     // Clean up via the public destroy path.
-    enc.allocator.destroy(enc);
+    destroy_heap_encoder(enc);
 }
 
 test "make_bundle_encoder normalizes zero sample_count to 1" {
@@ -510,7 +516,7 @@ test "make_bundle_encoder normalizes zero sample_count to 1" {
 
     const enc = rb.make_bundle_encoder(0x04, 0, 0, false, false) orelse
         return error.AllocationFailed;
-    defer enc.allocator.destroy(enc);
+    defer destroy_heap_encoder(enc);
 
     try std.testing.expectEqual(@as(u32, 1), enc.sample_count);
 }
@@ -524,6 +530,7 @@ test "full lifecycle: create encoder, record, finish, destroy" {
 
     const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
+    defer destroy_heap_encoder(enc);
 
     rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
     rb.bundle_encoder_push(enc, BundleCmd{ .draw = .{
@@ -562,7 +569,7 @@ test "cast_bundle_encoder validates magic" {
 
     const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
-    defer enc.allocator.destroy(enc);
+    defer destroy_heap_encoder(enc);
 
     // Valid cast.
     const opaque_ptr: *anyopaque = @ptrCast(enc);
@@ -576,6 +583,7 @@ test "cast_bundle validates magic" {
 
     const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
+    defer destroy_heap_encoder(enc);
 
     const bundle = rb.bundle_encoder_finish(enc) orelse
         return error.FinishFailed;
@@ -682,6 +690,7 @@ test "replay sequence: all command types recorded and data preserved" {
 
     const enc = rb.make_bundle_encoder(0x04, 0x20, 4, false, false) orelse
         return error.AllocationFailed;
+    defer destroy_heap_encoder(enc);
 
     // 1. set_pipeline
     rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
@@ -820,6 +829,7 @@ test "replay sequence: multiple bind groups in replay order" {
 
     const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
+    defer destroy_heap_encoder(enc);
 
     // Record bind groups 0, 1, 2, 3 with different entry counts.
     var i: u32 = 0;
@@ -861,6 +871,7 @@ test "replay sequence: multiple vertex buffer slots" {
 
     const enc = rb.make_bundle_encoder(0x04, 0, 1, false, false) orelse
         return error.AllocationFailed;
+    defer destroy_heap_encoder(enc);
 
     rb.bundle_encoder_push(enc, BundleCmd{ .set_pipeline = .{ .pipeline_handle = null } });
 

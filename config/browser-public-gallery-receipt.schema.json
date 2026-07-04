@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-public-gallery-receipt.schema.json",
+  "title": "Browser public gallery receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "receiptId",
+    "category",
+    "url",
+    "method",
+    "statusCode",
+    "contentSha256",
+    "contentLengthBytes",
+    "galleryArtifactPath",
+    "workloadContractPath",
+    "workloadIds",
+    "receiptIds",
+    "receiptArtifactPaths",
+    "observedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_public_gallery_receipt" },
+    "receiptId": { "type": "string", "minLength": 1 },
+    "category": {
+      "enum": [
+        "compute",
+        "rendering",
+        "tensor",
+        "shader_edge",
+        "benchmark_trace"
+      ]
+    },
+    "url": { "$ref": "#/$defs/PublicHttpsUrl" },
+    "method": { "type": "string", "const": "GET" },
+    "statusCode": { "type": "integer", "const": 200 },
+    "contentSha256": { "$ref": "#/$defs/Hash" },
+    "contentLengthBytes": { "type": "integer", "minimum": 1 },
+    "galleryArtifactPath": { "type": "string", "minLength": 1 },
+    "workloadContractPath": { "type": "string", "minLength": 1 },
+    "workloadIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "receiptIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "receiptArtifactPaths": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "observedAt": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "PublicHttpsUrl": {
+      "type": "string",
+      "pattern": "^https://[^/?#]+\\.[^/?#]+",
+      "not": {
+        "anyOf": [
+          { "pattern": "^https://localhost(?::|/|$)" },
+          { "pattern": "^https://(?:127\\.0\\.0\\.1|0\\.0\\.0\\.0|10\\.|192\\.168\\.|172\\.(?:1[6-9]|2[0-9]|3[0-1])\\.)(?::|/|$)" },
+          { "pattern": "^https://\\[::1\\](?::|/|$)" },
+          { "pattern": "^https://[^/?#]*\\.(?:local|localhost|test|example|invalid)(?::|/|$)" },
+          { "pattern": "^https://(?:example\\.com|example\\.net|example\\.org)(?::|/|$)" }
+        ]
+      }
+    },
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

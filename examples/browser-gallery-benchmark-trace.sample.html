@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Doe browser gallery sample: benchmark_trace</title>
+<main>
+  <h1>benchmark_trace</h1>
+  <p>contract: <a href="browser/chromium/contracts/browser-benchmark-superset.contract.md">browser/chromium/contracts/browser-benchmark-superset.contract.md</a></p>
+  <p>workload: browser-gallery-benchmark-trace</p>
+  <p>receipt: <a href="examples/browser-benchmark-trace-execution-receipt.sample.json">browser-gallery-benchmark-trace-doe</a></p>
+  <section>
+    <h2>Doe receipt facts</h2>
+    <p>receiptId: browser-gallery-benchmark-trace-doe</p>
+    <p>workloadId: browser-gallery-benchmark-trace</p>
+    <p>backend: webgpu-doe</p>
+    <p>source shader: wgsl main @compute @workgroup_size(4) fn main() {}</p>
+    <p>source sha256: b5468e5ce9b4e1b54f7f8761476de907386bba5697202e639c7854c8bb493c5c</p>
+    <p>lowering path: wgsl > doe-wgsl > tsir > hostplan > webgpu</p>
+    <p>driver: sample webgpu sample-driver sample-adapter-family sample-webgpu-adapter</p>
+    <p>device: sample-adapter aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa featureCount=1</p>
+    <p>outputHash: 8888888888888888888888888888888888888888888888888888888888888888</p>
+    <p>timing: browser-operation-proxy setupNs=1400 encodeNs=2400 submitWaitNs=3400</p>
+  </section>
+</main>

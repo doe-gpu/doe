@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_public_gallery_receipt",
+  "receiptId": "browser-public-gallery-benchmark-trace-sample",
+  "category": "benchmark_trace",
+  "url": "https://gallery.doe.dev/doe/benchmark_trace.html",
+  "method": "GET",
+  "statusCode": 200,
+  "contentSha256": "09bb75ca27646e86125dfb368058f8a32ca2804ddd7619bfa09f0298bcc63ec5",
+  "contentLengthBytes": 1305,
+  "galleryArtifactPath": "examples/browser-gallery-benchmark-trace.sample.html",
+  "workloadContractPath": "browser/chromium/contracts/browser-benchmark-superset.contract.md",
+  "workloadIds": [
+    "browser-gallery-benchmark-trace"
+  ],
+  "receiptIds": [
+    "browser-gallery-benchmark-trace-doe"
+  ],
+  "receiptArtifactPaths": [
+    "examples/browser-benchmark-trace-execution-receipt.sample.json"
+  ],
+  "observedAt": "2026-06-30T00:00:00Z"
+}

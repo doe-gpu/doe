@@ -18,6 +18,7 @@
     "outDir": "bench/out/compilation",
     "outStem": "doe-vs-tint-browser-corpus",
     "warmRepetitions": 9,
-    "warmMinTime": "0.01s"
+    "warmMinTime": "0.01s",
+    "collectPhaseBenchmarks": true
   }
 }

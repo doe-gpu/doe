@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe WebGPU CTS Backend Pass Ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "ledgerId",
+    "ledgerStatus",
+    "claimScope",
+    "fullConformanceClaimAllowed",
+    "replacementClaimAllowed",
+    "sourceReceipt",
+    "sourceEvidence",
+    "claimLanguage",
+    "summary",
+    "backendLedgers"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "webgpu_cts_backend_pass_ledger" },
+    "ledgerId": { "type": "string", "minLength": 1 },
+    "ledgerStatus": { "enum": ["pass", "fail"] },
+    "claimScope": { "type": "string", "const": "published_subset_backend_pass_ledger" },
+    "fullConformanceClaimAllowed": { "type": "boolean", "const": false },
+    "replacementClaimAllowed": { "type": "boolean", "const": false },
+    "sourceReceipt": { "$ref": "#/$defs/SourceReceipt" },
+    "sourceEvidence": { "$ref": "#/$defs/SourceEvidence" },
+    "claimLanguage": {
+      "type": "string",
+      "const": "diagnostic_until_full_published_pass_ledger"
+    },
+    "summary": { "$ref": "#/$defs/Summary" },
+    "backendLedgers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/BackendLedger" }
+    }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "SourceReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "artifactKind", "receiptId"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "const": "webgpu_cts_subset_receipt" },
+        "receiptId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "SourceEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "artifactKind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "const": "webgpu_cts_evidence" }
+      }
+    },
+    "Summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backendLedgerCount",
+        "coverageRowCount",
+        "passCount",
+        "failCount",
+        "skipCount",
+        "notRunCount",
+        "failingBackendLedgerCount",
+        "allBackendLedgersPass"
+      ],
+      "properties": {
+        "backendLedgerCount": { "type": "integer", "minimum": 1 },
+        "coverageRowCount": { "type": "integer", "minimum": 1 },
+        "passCount": { "type": "integer", "minimum": 0 },
+        "failCount": { "type": "integer", "minimum": 0 },
+        "skipCount": { "type": "integer", "minimum": 0 },
+        "notRunCount": { "type": "integer", "minimum": 0 },
+        "failingBackendLedgerCount": { "type": "integer", "minimum": 0 },
+        "allBackendLedgersPass": { "type": "boolean" }
+      }
+    },
+    "BackendLedger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend",
+        "surface",
+        "host",
+        "os",
+        "ledgerStatus",
+        "artifactPaths",
+        "summary",
+        "queryCoverage"
+      ],
+      "properties": {
+        "backend": { "type": "string", "minLength": 1 },
+        "surface": { "type": "string", "minLength": 1 },
+        "host": { "type": "string", "minLength": 1 },
+        "os": { "type": "string", "minLength": 1 },
+        "ledgerStatus": { "enum": ["pass", "fail"] },
+        "artifactPaths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "summary": { "$ref": "#/$defs/Summary" },
+        "queryCoverage": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/QueryCoverage" }
+        }
+      }
+    },
+    "QueryCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["query", "bucket", "status", "artifactPath"],
+      "properties": {
+        "query": { "type": "string", "minLength": 1 },
+        "bucket": { "type": "string", "minLength": 1 },
+        "status": {
+          "type": "string",
+          "enum": ["pass", "fail", "skip", "not_run"]
+        },
+        "artifactPath": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_public_gallery_receipt",
+  "receiptId": "browser-public-gallery-rendering-sample",
+  "category": "rendering",
+  "url": "https://gallery.doe.dev/doe/rendering.html",
+  "method": "GET",
+  "statusCode": 200,
+  "contentSha256": "6f4375d0a83495bd52cb63c9f18a19929e997177ec9e32feab28a1c36473662d",
+  "contentLengthBytes": 1286,
+  "galleryArtifactPath": "examples/browser-gallery-rendering.sample.html",
+  "workloadContractPath": "browser/chromium/contracts/browser-benchmark-superset.contract.md",
+  "workloadIds": [
+    "browser-gallery-rendering"
+  ],
+  "receiptIds": [
+    "browser-gallery-rendering-doe"
+  ],
+  "receiptArtifactPaths": [
+    "examples/browser-rendering-execution-receipt.sample.json"
+  ],
+  "observedAt": "2026-06-30T00:00:00Z"
+}

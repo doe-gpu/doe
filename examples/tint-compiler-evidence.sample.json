@@ -43,8 +43,8 @@
   },
   "rows": [
     {
-      "shaderId": "sample-compute-copy",
-      "sourceSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "shaderId": "webgpu-prefix-sum",
+      "sourceSha256": "a8a642a54aaca908b707d20666566db8db62dbb5c9bfd518fbe98925da22c416",
       "sourcePath": "bench/fixtures/wgsl-corpus/webgpu/sample-prefix-sum.wgsl",
       "corpusCategory": "webgpu_sample",
       "expectedValidity": "valid",
@@ -69,7 +69,7 @@
           "total": 4
         },
         "phaseBenchmarkTimingsNs": {},
-        "receiptPath": "bench/out/scratch/sample/doe.json"
+        "receiptPath": "examples/runtime-compile-report.sample.json"
       },
       "tint": {
         "status": "failed",

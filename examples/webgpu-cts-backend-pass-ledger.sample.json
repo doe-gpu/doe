@@ -1,0 +1,139 @@
+{
+  "artifactKind": "webgpu_cts_backend_pass_ledger",
+  "backendLedgers": [
+    {
+      "artifactPaths": [
+        "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json"
+      ],
+      "backend": "doe_metal",
+      "host": "mac.lan",
+      "ledgerStatus": "pass",
+      "os": "darwin-25.3.0",
+      "queryCoverage": [
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "adapter",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,adapter,requestAdapter:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "adapter",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,adapter,requestDevice:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "buffer",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,buffers,createBindGroup:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "buffer",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,buffers,map:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "command_buffer",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,command_buffer,basic:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "command_buffer",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,command_buffer,copyBufferToBuffer:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "compute",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,compute,basic:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "queue",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,onSubmittedWorkDone:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "queue",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,operation,queue,writeBuffer:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "shader_execution",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:shader,execution,expression,call,builtin,textureDimensions:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "validation",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,validation,buffer,create:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+          "bucket": "validation",
+          "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+          "query": "webgpu:api,validation,error_scope:*",
+          "status": "pass"
+        }
+      ],
+      "summary": {
+        "allBackendLedgersPass": true,
+        "backendLedgerCount": 1,
+        "coverageRowCount": 12,
+        "failCount": 0,
+        "failingBackendLedgerCount": 0,
+        "notRunCount": 0,
+        "passCount": 12,
+        "skipCount": 0
+      },
+      "surface": "package"
+    }
+  ],
+  "claimLanguage": "diagnostic_until_full_published_pass_ledger",
+  "claimScope": "published_subset_backend_pass_ledger",
+  "fullConformanceClaimAllowed": false,
+  "ledgerId": "webgpu-cts-subset-20260328-doe-metal-backend-pass-ledger-doe-metal",
+  "ledgerStatus": "pass",
+  "replacementClaimAllowed": false,
+  "schemaVersion": 1,
+  "sourceEvidence": {
+    "artifactKind": "webgpu_cts_evidence",
+    "path": "config/webgpu-cts-evidence.json",
+    "sha256": "a365ed912823ec5c7cb42a23259dfcc7ab79856a1aef2757df69110852e06f76"
+  },
+  "sourceReceipt": {
+    "artifactKind": "webgpu_cts_subset_receipt",
+    "path": "examples/webgpu-cts-subset-receipt.sample.json",
+    "receiptId": "webgpu-cts-subset-20260328-doe-metal",
+    "sha256": "3eb94dd810fbf55b395f5d5cf2a8818d0cc976f939911805ad58f4a8ae1eacfb"
+  },
+  "summary": {
+    "allBackendLedgersPass": true,
+    "backendLedgerCount": 1,
+    "coverageRowCount": 12,
+    "failCount": 0,
+    "failingBackendLedgerCount": 0,
+    "notRunCount": 0,
+    "passCount": 12,
+    "skipCount": 0
+  }
+}

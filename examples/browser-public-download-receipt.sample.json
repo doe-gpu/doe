@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_public_download_receipt",
+  "receiptId": "browser-public-download-sample-linux-x64",
+  "url": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+  "method": "GET",
+  "statusCode": 200,
+  "contentSha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+  "contentLengthBytes": 11325471,
+  "releaseArchivePath": "examples/browser-release-archive.sample.zip",
+  "releaseArchiveManifestPath": "examples/browser-release-archive-manifest.sample.json",
+  "releaseArchiveManifestSha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+  "browserProduct": {
+    "productId": "fawn-doe",
+    "displayName": "Fawn Doe",
+    "version": "0.0.0-sample",
+    "channel": "diagnostic"
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "packageFormat": "zip"
+  },
+  "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+  "browserAppMetadataArchivePath": "Fawn-Doe-linux-x64/browser-product.json",
+  "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+  "dawnFallbackRuntimeArchivePath": "Fawn-Doe-linux-x64/libdawn_native.so",
+  "observedAt": "2026-06-30T00:00:00Z"
+}

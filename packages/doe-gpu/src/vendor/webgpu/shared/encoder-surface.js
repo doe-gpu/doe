@@ -33,6 +33,17 @@ function normalizeImmediateDataInput(data, dataOffset = 0, size, path) {
   return bytes.subarray(dataOffset, end);
 }
 
+function normalizeCopySize(copySize, path) {
+  if (Array.isArray(copySize)) {
+    return {
+      width: copySize[0],
+      height: copySize[1] ?? 1,
+      depthOrArrayLayers: copySize[2] ?? 1,
+    };
+  }
+  return assertObject(copySize, path, 'copySize');
+}
+
 function createEncoderClasses(backend) {
   let classes = null;
 
@@ -533,16 +544,28 @@ function createEncoderClasses(backend) {
       return pass;
     }
 
-    copyBufferToBuffer(src, srcOffset, dst, dstOffset, size) {
+    copyBufferToBuffer(src, srcOffsetOrDst, dstOrSize, dstOffsetOrUndefined, sizeOrUndefined) {
       this._assertOpen('GPUCommandEncoder.copyBufferToBuffer');
+      const srcBuffer = src;
+      const useNewSignature = typeof srcOffsetOrDst === 'object' && srcOffsetOrDst !== null;
+      const srcOffset = useNewSignature ? 0 : srcOffsetOrDst;
+      const dst = useNewSignature ? srcOffsetOrDst : dstOrSize;
+      const dstOffset = useNewSignature ? 0 : dstOffsetOrUndefined;
+      const explicitSize = useNewSignature ? dstOrSize : sizeOrUndefined;
       assertIntegerInRange(srcOffset, 'GPUCommandEncoder.copyBufferToBuffer', 'srcOffset', NON_NEGATIVE_RANGE);
       assertIntegerInRange(dstOffset, 'GPUCommandEncoder.copyBufferToBuffer', 'dstOffset', NON_NEGATIVE_RANGE);
-      assertIntegerInRange(size, 'GPUCommandEncoder.copyBufferToBuffer', 'size', POSITIVE_RANGE);
+      const srcNative = assertLiveResource(srcBuffer, 'GPUCommandEncoder.copyBufferToBuffer', 'GPUBuffer');
+      const dstNative = assertLiveResource(dst, 'GPUCommandEncoder.copyBufferToBuffer', 'GPUBuffer');
+      const size = explicitSize === undefined ? Math.max(0, srcBuffer.size - srcOffset) : explicitSize;
+      assertIntegerInRange(size, 'GPUCommandEncoder.copyBufferToBuffer', 'size', NON_NEGATIVE_RANGE);
+      if (size === 0) {
+        return;
+      }
       backend.commandEncoderCopyBufferToBuffer(
         this,
-        assertLiveResource(src, 'GPUCommandEncoder.copyBufferToBuffer', 'GPUBuffer'),
+        srcNative,
         srcOffset,
-        assertLiveResource(dst, 'GPUCommandEncoder.copyBufferToBuffer', 'GPUBuffer'),
+        dstNative,
         dstOffset,
         size,
       );
@@ -552,7 +575,7 @@ function createEncoderClasses(backend) {
       this._assertOpen('GPUCommandEncoder.copyBufferToTexture');
       const sourceObject = assertObject(source, 'GPUCommandEncoder.copyBufferToTexture', 'source');
       const destinationObject = assertObject(destination, 'GPUCommandEncoder.copyBufferToTexture', 'destination');
-      const sizeObject = assertObject(copySize, 'GPUCommandEncoder.copyBufferToTexture', 'copySize');
+      const sizeObject = normalizeCopySize(copySize, 'GPUCommandEncoder.copyBufferToTexture');
       assertIntegerInRange(sourceObject.offset ?? 0, 'GPUCommandEncoder.copyBufferToTexture', 'source.offset', NON_NEGATIVE_RANGE);
       assertIntegerInRange(sourceObject.bytesPerRow ?? 0, 'GPUCommandEncoder.copyBufferToTexture', 'source.bytesPerRow', NON_NEGATIVE_RANGE);
       assertIntegerInRange(sourceObject.rowsPerImage ?? 0, 'GPUCommandEncoder.copyBufferToTexture', 'source.rowsPerImage', NON_NEGATIVE_RANGE);
@@ -591,7 +614,7 @@ function createEncoderClasses(backend) {
       this._assertOpen('GPUCommandEncoder.copyTextureToBuffer');
       const sourceObject = assertObject(source, 'GPUCommandEncoder.copyTextureToBuffer', 'source');
       const destinationObject = assertObject(destination, 'GPUCommandEncoder.copyTextureToBuffer', 'destination');
-      const sizeObject = assertObject(copySize, 'GPUCommandEncoder.copyTextureToBuffer', 'copySize');
+      const sizeObject = normalizeCopySize(copySize, 'GPUCommandEncoder.copyTextureToBuffer');
       if (sourceObject.origin !== undefined) {
         assertObject(sourceObject.origin, 'GPUCommandEncoder.copyTextureToBuffer', 'source.origin');
       }
@@ -633,7 +656,7 @@ function createEncoderClasses(backend) {
       this._assertOpen('GPUCommandEncoder.copyTextureToTexture');
       const sourceObject = assertObject(source, 'GPUCommandEncoder.copyTextureToTexture', 'source');
       const destinationObject = assertObject(destination, 'GPUCommandEncoder.copyTextureToTexture', 'destination');
-      const sizeObject = assertObject(copySize, 'GPUCommandEncoder.copyTextureToTexture', 'copySize');
+      const sizeObject = normalizeCopySize(copySize, 'GPUCommandEncoder.copyTextureToTexture');
       backend.commandEncoderCopyTextureToTexture(
         this,
         {

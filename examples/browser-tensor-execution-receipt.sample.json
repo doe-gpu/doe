@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_execution_receipt",
+  "receiptId": "browser-gallery-tensor-doe",
+  "workloadId": "browser-gallery-tensor",
+  "selectedRuntime": "doe",
+  "sourceShader": {
+    "language": "wgsl",
+    "entryPoint": "main",
+    "source": "@compute @workgroup_size(8) fn main() { }",
+    "sha256": "c2db819b26caabb576e61254e2db88b8d707345b941f31f79de478810c886e8a"
+  },
+  "loweringPath": [
+    "wgsl",
+    "doe-wgsl",
+    "tsir",
+    "hostplan",
+    "webgpu"
+  ],
+  "backend": "webgpu-doe",
+  "driver": {
+    "vendor": "sample",
+    "api": "webgpu",
+    "driver": "sample-driver",
+    "deviceFamily": "sample-adapter-family",
+    "profileId": "sample-webgpu-adapter"
+  },
+  "device": {
+    "adapterInfoSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "featureCount": 1,
+    "adapter": "sample-adapter",
+    "device": "sample-device"
+  },
+  "commandGraph": {
+    "graphSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "artifactPath": "examples/browser-smoke-report.sample.json"
+  },
+  "commandCoverage": {
+    "commandCount": 1,
+    "successCount": 1,
+    "dispatchCount": 1
+  },
+  "outputHash": "4444444444444444444444444444444444444444444444444444444444444444",
+  "runtimeSelectorState": {
+    "selectionMode": "doe",
+    "selectedRuntime": "doe",
+    "forcedMode": "doe",
+    "fallbackApplied": false,
+    "hiddenFallbackAllowed": false,
+    "fallbackReasonCode": "",
+    "selectorVersion": "browser-runtime-selector-v1"
+  },
+  "fallbackState": {
+    "fallbackApplied": false,
+    "hiddenFallbackAllowed": false,
+    "reasonCode": ""
+  },
+  "timing": {
+    "timingClass": "browser-operation-proxy",
+    "phases": {
+      "setupNs": 1200,
+      "encodeNs": 2200,
+      "submitWaitNs": 3200
+    }
+  }
+}

@@ -13,6 +13,7 @@
     "compilerEvidenceReports",
     "componentReceipts",
     "coverageByTarget",
+    "phaseTimingCoverage",
     "claimBlockers",
     "failures",
     "summary"
@@ -55,6 +56,7 @@
       "type": "array",
       "items": { "$ref": "#/$defs/TargetCoverage" }
     },
+    "phaseTimingCoverage": { "$ref": "#/$defs/PhaseTimingCoverage" },
     "claimBlockers": {
       "type": "array",
       "items": { "$ref": "#/$defs/Failure" }
@@ -90,6 +92,10 @@
     "Target": {
       "enum": ["msl", "spirv", "dxil", "hlsl"]
     },
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
     "ReceiptStatus": {
       "enum": ["pass", "fail"]
     },
@@ -114,6 +120,7 @@
       "additionalProperties": false,
       "required": [
         "path",
+        "sha256",
         "diagnosticGateStatus",
         "comparisonStatus",
         "claimStatus",
@@ -125,6 +132,7 @@
       ],
       "properties": {
         "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
         "diagnosticGateStatus": { "$ref": "#/$defs/ReceiptStatus" },
         "comparisonStatus": { "type": "string" },
         "claimStatus": { "type": "string" },
@@ -143,7 +151,9 @@
       "additionalProperties": false,
       "required": [
         "path",
+        "sha256",
         "evidencePath",
+        "evidencePaths",
         "status",
         "targets",
         "rowCount",
@@ -152,7 +162,13 @@
       ],
       "properties": {
         "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
         "evidencePath": { "type": "string", "minLength": 1 },
+        "evidencePaths": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
         "status": { "$ref": "#/$defs/ReceiptStatus" },
         "targets": {
           "type": "array",
@@ -166,10 +182,16 @@
     "StatusReceipt": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "evidencePath", "status", "targets", "summary"],
+      "required": ["path", "sha256", "evidencePath", "evidencePaths", "status", "targets", "summary"],
       "properties": {
         "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
         "evidencePath": { "type": "string", "minLength": 1 },
+        "evidencePaths": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
         "status": { "$ref": "#/$defs/ReceiptStatus" },
         "targets": {
           "type": "array",
@@ -183,7 +205,9 @@
       "additionalProperties": false,
       "required": [
         "path",
+        "sha256",
         "evidencePath",
+        "evidencePaths",
         "status",
         "targets",
         "summary",
@@ -192,8 +216,14 @@
       ],
       "properties": {
         "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
         "status": { "$ref": "#/$defs/ReceiptStatus" },
         "evidencePath": { "type": "string", "minLength": 1 },
+        "evidencePaths": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
         "targets": {
           "type": "array",
           "items": { "$ref": "#/$defs/Target" }
@@ -265,6 +295,86 @@
         "linkedRows": { "type": "integer", "minimum": 0 },
         "validatedRows": { "type": "integer", "minimum": 0 },
         "phaseBenchmarkCoveredRows": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "PhaseTimingCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requiredExactPhases",
+        "requiredBenchmarkScopes",
+        "rowCount",
+        "doeOkRows",
+        "tintOkRows",
+        "doeExactPhaseCompleteRows",
+        "doeExactPhaseMissingRows",
+        "tintExactPhaseCompleteRows",
+        "tintExactPhaseMissingRows",
+        "tintBenchmarkScopeCoveredRows",
+        "tintBenchmarkScopeMissingRows",
+        "notApplicableRows",
+        "coverageByEvidencePath"
+      ],
+      "properties": {
+        "requiredExactPhases": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "requiredBenchmarkScopes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "rowCount": { "type": "integer", "minimum": 0 },
+        "doeOkRows": { "type": "integer", "minimum": 0 },
+        "tintOkRows": { "type": "integer", "minimum": 0 },
+        "doeExactPhaseCompleteRows": { "type": "integer", "minimum": 0 },
+        "doeExactPhaseMissingRows": { "type": "integer", "minimum": 0 },
+        "tintExactPhaseCompleteRows": { "type": "integer", "minimum": 0 },
+        "tintExactPhaseMissingRows": { "type": "integer", "minimum": 0 },
+        "tintBenchmarkScopeCoveredRows": { "type": "integer", "minimum": 0 },
+        "tintBenchmarkScopeMissingRows": { "type": "integer", "minimum": 0 },
+        "notApplicableRows": { "type": "integer", "minimum": 0 },
+        "coverageByEvidencePath": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PhaseTimingEvidenceCoverage" }
+        }
+      }
+    },
+    "PhaseTimingEvidenceCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidencePath",
+        "targets",
+        "rowCount",
+        "doeOkRows",
+        "tintOkRows",
+        "doeExactPhaseCompleteRows",
+        "doeExactPhaseMissingRows",
+        "tintExactPhaseCompleteRows",
+        "tintExactPhaseMissingRows",
+        "tintBenchmarkScopeCoveredRows",
+        "tintBenchmarkScopeMissingRows",
+        "notApplicableRows"
+      ],
+      "properties": {
+        "evidencePath": { "type": "string", "minLength": 1 },
+        "targets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Target" }
+        },
+        "rowCount": { "type": "integer", "minimum": 0 },
+        "doeOkRows": { "type": "integer", "minimum": 0 },
+        "tintOkRows": { "type": "integer", "minimum": 0 },
+        "doeExactPhaseCompleteRows": { "type": "integer", "minimum": 0 },
+        "doeExactPhaseMissingRows": { "type": "integer", "minimum": 0 },
+        "tintExactPhaseCompleteRows": { "type": "integer", "minimum": 0 },
+        "tintExactPhaseMissingRows": { "type": "integer", "minimum": 0 },
+        "tintBenchmarkScopeCoveredRows": { "type": "integer", "minimum": 0 },
+        "tintBenchmarkScopeMissingRows": { "type": "integer", "minimum": 0 },
+        "notApplicableRows": { "type": "integer", "minimum": 0 }
       }
     }
   }

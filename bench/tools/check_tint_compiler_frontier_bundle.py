@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -17,6 +18,8 @@ except ModuleNotFoundError:
 REPO_ROOT = ensure_repo_root(__file__)
 
 from bench.gates import tint_compiler_evidence_gate  # noqa: E402
+from bench.tools import check_tint_phase_benchmark_evidence  # noqa: E402
+from bench.tools import check_tint_compiler_target_validation  # noqa: E402
 from bench.tools import check_wgsl_lowering_link_receipt  # noqa: E402
 
 
@@ -25,6 +28,7 @@ TARGET_VALIDATION_KIND = "tint_compiler_target_validation"
 PHASE_BENCHMARK_KIND = "tint_phase_benchmark_evidence"
 LOWERING_LINK_KIND = "wgsl_lowering_link_receipt"
 COMPILER_EVIDENCE_KIND = "tint-compiler-evidence"
+REQUIRED_BENCHMARK_SCOPES = ("parseWgsl", "validateIr", "generateBackend")
 
 
 def parse_args() -> argparse.Namespace:
@@ -86,6 +90,10 @@ def load_json(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError(f"expected JSON object: {path}")
     return payload
+
+
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def failure(code: str, path: str, message: str) -> dict[str, str]:
@@ -171,6 +179,245 @@ def evidence_paths_from_receipt(payload: dict[str, Any]) -> list[str]:
     return [path] if path else []
 
 
+def first_evidence_path(paths: list[str]) -> str:
+    return paths[0] if paths else ""
+
+
+def summary_evidence_paths(summary: dict[str, Any]) -> list[str]:
+    paths = summary.get("evidencePaths")
+    if isinstance(paths, list):
+        normalized = [str(item) for item in paths if isinstance(item, str) and item]
+        if normalized:
+            return stable_unique(normalized)
+    path = summary.get("evidencePath")
+    return [path] if isinstance(path, str) and path else []
+
+
+def row_identity(
+    row: dict[str, Any],
+    *,
+    target_field: str = "target",
+) -> tuple[str, str] | None:
+    target = row.get(target_field)
+    shader_id = row.get("shaderId")
+    if (
+        isinstance(target, str)
+        and target in VALID_TARGETS
+        and isinstance(shader_id, str)
+        and shader_id
+    ):
+        return target, shader_id
+    return None
+
+
+def compiler_evidence_row_index(
+    *,
+    payload: dict[str, Any],
+    report_path: str,
+    failures: list[dict[str, str]],
+) -> dict[tuple[str, str], dict[str, Any]]:
+    rows = payload.get("rows")
+    if not isinstance(rows, list):
+        return {}
+    index: dict[tuple[str, str], dict[str, Any]] = {}
+    for row_index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            continue
+        key = row_identity(row)
+        if key is None:
+            continue
+        if key in index:
+            target, shader_id = key
+            failures.append(
+                failure(
+                    "compiler_evidence_duplicate_row_identity",
+                    f"{report_path}.rows[{row_index}]",
+                    (
+                        "compiler evidence rows must have unique "
+                        f"target/shaderId identity: {target}/{shader_id}"
+                    ),
+                )
+            )
+            continue
+        index[key] = row
+    return index
+
+
+def positive_integer_mapping(value: Any) -> dict[str, int]:
+    if not isinstance(value, dict):
+        return {}
+    timings: dict[str, int] = {}
+    for key, item in value.items():
+        if isinstance(key, str) and isinstance(item, int) and item > 0:
+            timings[key] = item
+    return timings
+
+
+def tint_status(result: Any) -> str:
+    if not isinstance(result, dict):
+        return "missing"
+    status = result.get("status")
+    if status in {"ok", "failed", "unsupported"}:
+        return str(status)
+    return "missing"
+
+
+def expected_phase_benchmark_row(
+    compiler_row: dict[str, Any],
+    *,
+    exact_phases: list[str],
+) -> dict[str, Any]:
+    tint = compiler_row.get("tint")
+    status = tint_status(tint)
+    if status != "ok":
+        return {
+            "tintStatus": status,
+            "phaseBenchmarkStatus": "not_applicable",
+            "exactPhaseStatus": "not_applicable",
+            "phaseBenchmarkTimingsNs": {},
+            "missingPhaseBenchmarkScopes": [],
+            "missingExactPhases": [],
+        }
+    if not isinstance(tint, dict):
+        tint = {}
+    benchmark_timings = positive_integer_mapping(tint.get("phaseBenchmarkTimingsNs"))
+    missing_scopes = [
+        scope for scope in REQUIRED_BENCHMARK_SCOPES if scope not in benchmark_timings
+    ]
+    exact_timings = positive_integer_mapping(tint.get("phaseTimingsNs"))
+    missing_exact_phases = [
+        phase for phase in exact_phases if phase not in exact_timings
+    ]
+    return {
+        "tintStatus": status,
+        "phaseBenchmarkStatus": "missing" if missing_scopes else "covered",
+        "exactPhaseStatus": "missing" if missing_exact_phases else "complete",
+        "phaseBenchmarkTimingsNs": {
+            scope: benchmark_timings[scope]
+            for scope in REQUIRED_BENCHMARK_SCOPES
+            if scope in benchmark_timings
+        },
+        "missingPhaseBenchmarkScopes": missing_scopes,
+        "missingExactPhases": missing_exact_phases,
+    }
+
+
+def exact_phase_timings_complete(result: Any, exact_phases: list[str]) -> bool:
+    if not isinstance(result, dict) or result.get("status") != "ok":
+        return False
+    timings = positive_integer_mapping(result.get("phaseTimingsNs"))
+    return all(phase in timings for phase in exact_phases)
+
+
+def benchmark_scope_timings_complete(result: Any) -> bool:
+    if not isinstance(result, dict) or result.get("status") != "ok":
+        return False
+    timings = positive_integer_mapping(result.get("phaseBenchmarkTimingsNs"))
+    return all(scope in timings for scope in REQUIRED_BENCHMARK_SCOPES)
+
+
+def phase_timing_counts(
+    *,
+    rows: list[dict[str, Any]],
+    exact_phases: list[str],
+) -> dict[str, int]:
+    counts = {
+        "rowCount": len(rows),
+        "doeOkRows": 0,
+        "tintOkRows": 0,
+        "doeExactPhaseCompleteRows": 0,
+        "doeExactPhaseMissingRows": 0,
+        "tintExactPhaseCompleteRows": 0,
+        "tintExactPhaseMissingRows": 0,
+        "tintBenchmarkScopeCoveredRows": 0,
+        "tintBenchmarkScopeMissingRows": 0,
+        "notApplicableRows": 0,
+    }
+    for row in rows:
+        doe = row.get("doe")
+        if tint_status(doe) == "ok":
+            counts["doeOkRows"] += 1
+            if exact_phase_timings_complete(doe, exact_phases):
+                counts["doeExactPhaseCompleteRows"] += 1
+            else:
+                counts["doeExactPhaseMissingRows"] += 1
+
+        tint = row.get("tint")
+        if tint_status(tint) != "ok":
+            counts["notApplicableRows"] += 1
+            continue
+        counts["tintOkRows"] += 1
+        if exact_phase_timings_complete(tint, exact_phases):
+            counts["tintExactPhaseCompleteRows"] += 1
+        else:
+            counts["tintExactPhaseMissingRows"] += 1
+        if benchmark_scope_timings_complete(tint):
+            counts["tintBenchmarkScopeCoveredRows"] += 1
+        else:
+            counts["tintBenchmarkScopeMissingRows"] += 1
+    return counts
+
+
+def phase_timing_coverage(
+    *,
+    compiler_payloads: dict[str, dict[str, Any]],
+    required_targets: list[str],
+) -> dict[str, Any]:
+    exact_phases = stable_unique(
+        [
+            phase
+            for payload in compiler_payloads.values()
+            for phase in check_tint_phase_benchmark_evidence.required_exact_phases(payload)
+        ]
+    )
+    if not exact_phases:
+        exact_phases = list(check_tint_phase_benchmark_evidence.DEFAULT_EXACT_PHASES)
+
+    required_target_set = set(required_targets)
+    by_evidence_path: list[dict[str, Any]] = []
+    all_counts = phase_timing_counts(rows=[], exact_phases=exact_phases)
+    for evidence_path, payload in compiler_payloads.items():
+        payload_rows = payload.get("rows")
+        if not isinstance(payload_rows, list):
+            payload_rows = []
+        rows = [
+            row
+            for row in payload_rows
+            if isinstance(row, dict) and row.get("target") in required_target_set
+        ]
+        targets = stable_unique(
+            [
+                row["target"]
+                for row in rows
+                if isinstance(row.get("target"), str) and row["target"] in VALID_TARGETS
+            ]
+        )
+        counts = phase_timing_counts(rows=rows, exact_phases=exact_phases)
+        for key, value in counts.items():
+            all_counts[key] += value
+        by_evidence_path.append(
+            {
+                "evidencePath": evidence_path,
+                "targets": targets,
+                **counts,
+            }
+        )
+
+    return {
+        "requiredExactPhases": exact_phases,
+        "requiredBenchmarkScopes": list(REQUIRED_BENCHMARK_SCOPES),
+        **all_counts,
+        "coverageByEvidencePath": by_evidence_path,
+    }
+
+
+def receipt_exact_phases(payload: dict[str, Any]) -> list[str]:
+    phases = payload.get("requiredExactPhases")
+    if not isinstance(phases, list):
+        return []
+    return [phase for phase in phases if isinstance(phase, str) and phase]
+
+
 def add_unique_blocker(
     blockers: list[dict[str, str]],
     *,
@@ -244,7 +491,7 @@ def load_receipts(
                     f"artifactKind must be {expected_kind}",
                 )
             )
-        receipts.append({"path": path_text, "payload": payload})
+        receipts.append({"path": path_text, "sha256": sha256_file(path), "payload": payload})
     return receipts
 
 
@@ -278,9 +525,16 @@ def evaluate_compiler_evidence(
     root: Path,
     schema: dict[str, Any],
     failures: list[dict[str, str]],
-) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, str]],
+    dict[str, dict[tuple[str, str], dict[str, Any]]],
+    dict[str, dict[str, Any]],
+]:
     reports: list[dict[str, Any]] = []
     claim_blockers: list[dict[str, str]] = []
+    row_indexes: dict[str, dict[tuple[str, str], dict[str, Any]]] = {}
+    payloads: dict[str, dict[str, Any]] = {}
     for index, path_text in enumerate(evidence_paths):
         report_path = f"compilerEvidence[{index}]"
         blocker_count_start = len(claim_blockers)
@@ -296,6 +550,13 @@ def evaluate_compiler_evidence(
                 )
             )
             continue
+        payloads[path_text] = payload
+        report_sha256 = sha256_file(path)
+        row_indexes[path_text] = compiler_evidence_row_index(
+            payload=payload,
+            report_path=report_path,
+            failures=failures,
+        )
         if payload.get("artifactKind") != COMPILER_EVIDENCE_KIND:
             failures.append(
                 failure(
@@ -378,6 +639,7 @@ def evaluate_compiler_evidence(
         reports.append(
             {
                 "path": path_text,
+                "sha256": report_sha256,
                 "diagnosticGateStatus": "pass" if result.get("ok") else "fail",
                 "comparisonStatus": summary.get("comparisonStatus", ""),
                 "claimStatus": summary.get("claimStatus", ""),
@@ -388,7 +650,390 @@ def evaluate_compiler_evidence(
                 "claimBlockerSummary": report_claim_blocker_summary,
             }
         )
-    return reports, claim_blockers
+    return reports, claim_blockers, row_indexes, payloads
+
+
+def find_compiler_row(
+    *,
+    compiler_rows: dict[str, dict[tuple[str, str], dict[str, Any]]],
+    evidence_paths: list[str],
+    key: tuple[str, str],
+) -> dict[str, Any] | None:
+    for evidence_path in evidence_paths:
+        row = compiler_rows.get(evidence_path, {}).get(key)
+        if row is not None:
+            return row
+    return None
+
+
+def compiler_side_ready(result: Any) -> bool:
+    return (
+        isinstance(result, dict)
+        and result.get("status") == "ok"
+        and result.get("validationStatus") == "passed"
+    )
+
+
+def add_lowering_row_mismatch(
+    failures: list[dict[str, str]],
+    *,
+    row_path: str,
+    field: str,
+    target: str,
+    shader_id: str,
+    detail: str,
+) -> None:
+    failures.append(
+        failure(
+            "lowering_link_row_mismatch",
+            f"{row_path}.{field}",
+            f"lowering-link {field} must match supplied compiler evidence {detail} for {target}/{shader_id}",
+        )
+    )
+
+
+def check_lowering_link_row_identities(
+    *,
+    receipts: list[dict[str, Any]],
+    compiler_rows: dict[str, dict[tuple[str, str], dict[str, Any]]],
+) -> list[dict[str, str]]:
+    failures: list[dict[str, str]] = []
+    for receipt_index, receipt in enumerate(receipts):
+        payload = receipt["payload"]
+        evidence_paths = evidence_paths_from_receipt(payload)
+        rows = payload.get("rows")
+        if not isinstance(rows, list):
+            continue
+        for row_index, row in enumerate(rows):
+            if not isinstance(row, dict):
+                continue
+            key = row_identity(row, target_field="backendTarget")
+            if key is None:
+                continue
+            compiler_row = find_compiler_row(
+                compiler_rows=compiler_rows,
+                evidence_paths=evidence_paths,
+                key=key,
+            )
+            target, shader_id = key
+            row_path = f"loweringLinkReceipts[{receipt_index}].rows[{row_index}]"
+            if compiler_row is None:
+                failures.append(
+                    failure(
+                        "lowering_link_row_not_in_compiler_evidence",
+                        f"{row_path}.shaderId",
+                        (
+                            "lowering-link row target/shaderId must exist in supplied "
+                            f"compiler evidence: {target}/{shader_id}"
+                        ),
+                    )
+                )
+                continue
+            for lowering_field, compiler_field in (
+                ("sourcePath", "sourcePath"),
+                ("expectedValidity", "expectedValidity"),
+                ("shaderStage", "shaderStage"),
+            ):
+                if row.get(lowering_field) != compiler_row.get(compiler_field):
+                    add_lowering_row_mismatch(
+                        failures,
+                        row_path=row_path,
+                        field=lowering_field,
+                        target=target,
+                        shader_id=shader_id,
+                        detail=compiler_field,
+                    )
+            compiler_source_hash = compiler_row.get("sourceSha256")
+            lowering_source_hash = row.get("sourceSha256")
+            if (
+                isinstance(compiler_source_hash, str)
+                and isinstance(lowering_source_hash, str)
+                and compiler_source_hash != lowering_source_hash
+            ):
+                failures.append(
+                    failure(
+                        "lowering_link_source_hash_mismatch",
+                        f"{row_path}.sourceSha256",
+                        (
+                            "lowering-link sourceSha256 must match supplied compiler "
+                            f"evidence for {target}/{shader_id}"
+                        ),
+                    )
+                )
+            for side, mapping in (
+                (
+                    "doe",
+                    (
+                        ("doeIrSha256", "irSha256"),
+                        ("doeBackendOutputSha256", "outputSha256"),
+                        ("doeReceiptPath", "receiptPath"),
+                        ("doeValidationStatus", "validationStatus"),
+                    ),
+                ),
+                (
+                    "tint",
+                    (
+                        ("tintBackendOutputSha256", "outputSha256"),
+                        ("tintReceiptPath", "receiptPath"),
+                        ("tintValidationStatus", "validationStatus"),
+                    ),
+                ),
+            ):
+                compiler_side = compiler_row.get(side)
+                if not compiler_side_ready(compiler_side):
+                    continue
+                assert isinstance(compiler_side, dict)
+                for lowering_field, compiler_field in mapping:
+                    if row.get(lowering_field) == compiler_side.get(compiler_field):
+                        continue
+                    add_lowering_row_mismatch(
+                        failures,
+                        row_path=row_path,
+                        field=lowering_field,
+                        target=target,
+                        shader_id=shader_id,
+                        detail=f"{side}.{compiler_field}",
+                    )
+    return failures
+
+
+def coverage_shader_identity_failures(
+    *,
+    receipt_index: int,
+    label: str,
+    code_prefix: str,
+    coverage: Any,
+    fallback_evidence_paths: list[str],
+    compiler_rows: dict[str, dict[tuple[str, str], dict[str, Any]]],
+) -> list[dict[str, str]]:
+    failures: list[dict[str, str]] = []
+    if not isinstance(coverage, list):
+        return failures
+    for coverage_index, item in enumerate(coverage):
+        if not isinstance(item, dict):
+            continue
+        target = item.get("target")
+        if not isinstance(target, str) or target not in VALID_TARGETS:
+            continue
+        evidence_paths = evidence_paths_from_receipt(item)
+        if not evidence_paths:
+            evidence_paths = fallback_evidence_paths
+        shader_ids = item.get("shaderIds")
+        if not isinstance(shader_ids, list):
+            continue
+        for shader_index, shader_id in enumerate(shader_ids):
+            if not isinstance(shader_id, str) or not shader_id:
+                continue
+            if find_compiler_row(
+                compiler_rows=compiler_rows,
+                evidence_paths=evidence_paths,
+                key=(target, shader_id),
+            ) is not None:
+                continue
+            failures.append(
+                failure(
+                    f"{code_prefix}_coverage_row_not_in_compiler_evidence",
+                    (
+                        f"{label}Receipts[{receipt_index}].targetCoverage"
+                        f"[{coverage_index}].shaderIds[{shader_index}]"
+                    ),
+                    (
+                        f"{label} coverage target/shaderId must exist in supplied "
+                        f"compiler evidence: {target}/{shader_id}"
+                    ),
+                )
+            )
+    return failures
+
+
+def check_target_validation_row_identities(
+    *,
+    receipts: list[dict[str, Any]],
+    compiler_rows: dict[str, dict[tuple[str, str], dict[str, Any]]],
+) -> list[dict[str, str]]:
+    failures: list[dict[str, str]] = []
+    for receipt_index, receipt in enumerate(receipts):
+        payload = receipt["payload"]
+        failures.extend(
+            coverage_shader_identity_failures(
+                receipt_index=receipt_index,
+                label="targetValidation",
+                code_prefix="target_validation",
+                coverage=payload.get("targetCoverage"),
+                fallback_evidence_paths=evidence_paths_from_receipt(payload),
+                compiler_rows=compiler_rows,
+            )
+        )
+    return failures
+
+
+def check_target_validation_receipt_bindings(
+    *,
+    receipts: list[dict[str, Any]],
+    compiler_payloads: dict[str, dict[str, Any]],
+    verify_files_root: Path | None,
+) -> list[dict[str, str]]:
+    failures: list[dict[str, str]] = []
+    compared_fields = (
+        "evidencePath",
+        "evidencePaths",
+        "requiredTargets",
+        "status",
+        "targetCoverage",
+        "claimBlockers",
+        "claimBlockerSummary",
+        "claimBlockerSummaryByEvidencePath",
+        "failures",
+        "summary",
+    )
+    for receipt_index, receipt in enumerate(receipts):
+        payload = receipt["payload"]
+        targets = target_list(payload)
+        evidence_paths = evidence_paths_from_receipt(payload)
+        evidence_reports = [
+            (path, compiler_payloads[path])
+            for path in evidence_paths
+            if path in compiler_payloads
+        ]
+        if not targets or not evidence_reports:
+            continue
+        expected = check_tint_compiler_target_validation.build_report(
+            evidence_reports=evidence_reports,
+            required_targets=targets,
+            verify_files_root=verify_files_root,
+            allow_diagnostic_rows=True,
+        )
+        for field in compared_fields:
+            if payload.get(field) == expected.get(field):
+                continue
+            failures.append(
+                failure(
+                    "target_validation_receipt_mismatch",
+                    f"targetValidationReceipts[{receipt_index}].{field}",
+                    (
+                        f"target-validation receipt {field} must match supplied "
+                        "compiler evidence"
+                    ),
+                )
+            )
+    return failures
+
+
+def check_phase_benchmark_row_identities(
+    *,
+    receipts: list[dict[str, Any]],
+    compiler_rows: dict[str, dict[tuple[str, str], dict[str, Any]]],
+) -> list[dict[str, str]]:
+    failures: list[dict[str, str]] = []
+    for receipt_index, receipt in enumerate(receipts):
+        payload = receipt["payload"]
+        evidence_paths = evidence_paths_from_receipt(payload)
+        exact_phases = receipt_exact_phases(payload)
+        rows = payload.get("rows")
+        if isinstance(rows, list):
+            for row_index, row in enumerate(rows):
+                if not isinstance(row, dict):
+                    continue
+                key = row_identity(row)
+                if key is None:
+                    continue
+                compiler_row = find_compiler_row(
+                    compiler_rows=compiler_rows,
+                    evidence_paths=evidence_paths,
+                    key=key,
+                )
+                target, shader_id = key
+                if compiler_row is None:
+                    failures.append(
+                        failure(
+                            "phase_benchmark_row_not_in_compiler_evidence",
+                            f"phaseBenchmarkReceipts[{receipt_index}].rows[{row_index}].shaderId",
+                            (
+                                "phase-benchmark row target/shaderId must exist in supplied "
+                                f"compiler evidence: {target}/{shader_id}"
+                            ),
+                        )
+                    )
+                    continue
+                expected = expected_phase_benchmark_row(
+                    compiler_row,
+                    exact_phases=exact_phases,
+                )
+                for field, expected_value in expected.items():
+                    if row.get(field) == expected_value:
+                        continue
+                    failures.append(
+                        failure(
+                            "phase_benchmark_row_mismatch",
+                            (
+                                f"phaseBenchmarkReceipts[{receipt_index}].rows"
+                                f"[{row_index}].{field}"
+                            ),
+                            (
+                                f"phase-benchmark row {field} must match supplied "
+                                f"compiler evidence for {target}/{shader_id}"
+                            ),
+                        )
+                    )
+        failures.extend(
+            coverage_shader_identity_failures(
+                receipt_index=receipt_index,
+                label="phaseBenchmark",
+                code_prefix="phase_benchmark",
+                coverage=payload.get("targetCoverage"),
+                fallback_evidence_paths=evidence_paths,
+                compiler_rows=compiler_rows,
+            )
+        )
+    return failures
+
+
+def check_phase_benchmark_receipt_bindings(
+    *,
+    receipts: list[dict[str, Any]],
+    compiler_payloads: dict[str, dict[str, Any]],
+) -> list[dict[str, str]]:
+    failures: list[dict[str, str]] = []
+    compared_fields = (
+        "evidencePath",
+        "requiredTargets",
+        "requiredBenchmarkScopes",
+        "requiredExactPhases",
+        "status",
+        "targetCoverage",
+        "rows",
+        "failures",
+        "summary",
+    )
+    for receipt_index, receipt in enumerate(receipts):
+        payload = receipt["payload"]
+        targets = target_list(payload)
+        evidence_paths = evidence_paths_from_receipt(payload)
+        if not targets or len(evidence_paths) != 1:
+            continue
+        evidence_path = evidence_paths[0]
+        evidence = compiler_payloads.get(evidence_path)
+        if evidence is None:
+            continue
+        expected = check_tint_phase_benchmark_evidence.build_report(
+            evidence=evidence,
+            evidence_path=evidence_path,
+            required_targets=targets,
+        )
+        for field in compared_fields:
+            if payload.get(field) == expected.get(field):
+                continue
+            failures.append(
+                failure(
+                    "phase_benchmark_receipt_mismatch",
+                    f"phaseBenchmarkReceipts[{receipt_index}].{field}",
+                    (
+                        f"phase-benchmark receipt {field} must match supplied "
+                        "compiler evidence"
+                    ),
+                )
+            )
+    return failures
 
 
 def lowering_link_claim_blockers(
@@ -486,7 +1131,9 @@ def summarize_lowering_receipt(
     evidence_paths = evidence_paths_from_receipt(payload)
     return {
         "path": path_text,
-        "evidencePath": evidence_paths[0] if evidence_paths else "",
+        "sha256": receipt["sha256"],
+        "evidencePath": first_evidence_path(evidence_paths),
+        "evidencePaths": evidence_paths,
         "status": "fail" if check_failures else "pass",
         "targets": targets,
         "rowCount": summary.get("rowCount", len(rows)),
@@ -525,7 +1172,9 @@ def summarize_status_receipt(
     evidence_paths = evidence_paths_from_receipt(payload)
     summary = {
         "path": str(receipt["path"]),
-        "evidencePath": evidence_paths[0] if evidence_paths else "",
+        "sha256": receipt["sha256"],
+        "evidencePath": first_evidence_path(evidence_paths),
+        "evidencePaths": evidence_paths,
         "status": status if status in {"pass", "fail"} else "fail",
         "targets": target_list(payload),
         "summary": payload.get("summary") if isinstance(payload.get("summary"), dict) else {},
@@ -567,9 +1216,9 @@ def coverage_for_target(
         "phaseBenchmarkReceipts": [item["path"] for item in phases_for_target],
         "evidencePaths": stable_unique(
             [
-                item.get("evidencePath", "")
+                evidence_path
                 for item in lowering_for_target + validations_for_target + phases_for_target
-                if item.get("evidencePath")
+                for evidence_path in summary_evidence_paths(item)
             ]
         ),
         "linkedRows": sum(int(item.get("linkedRows", 0)) for item in lowering_for_target),
@@ -675,11 +1324,47 @@ def build_report(
         )
     )
 
-    compiler_reports, claim_blockers = evaluate_compiler_evidence(
+    (
+        compiler_reports,
+        claim_blockers,
+        compiler_rows,
+        compiler_payloads,
+    ) = evaluate_compiler_evidence(
         evidence_paths=evidence_paths,
         root=root,
         schema=schema,
         failures=failures,
+    )
+    failures.extend(
+        check_lowering_link_row_identities(
+            receipts=lowering_receipts,
+            compiler_rows=compiler_rows,
+        )
+    )
+    failures.extend(
+        check_target_validation_row_identities(
+            receipts=target_receipts,
+            compiler_rows=compiler_rows,
+        )
+    )
+    failures.extend(
+        check_target_validation_receipt_bindings(
+            receipts=target_receipts,
+            compiler_payloads=compiler_payloads,
+            verify_files_root=verify_files_root,
+        )
+    )
+    failures.extend(
+        check_phase_benchmark_row_identities(
+            receipts=phase_receipts,
+            compiler_rows=compiler_rows,
+        )
+    )
+    failures.extend(
+        check_phase_benchmark_receipt_bindings(
+            receipts=phase_receipts,
+            compiler_payloads=compiler_payloads,
+        )
     )
 
     lowering_summaries = [
@@ -748,6 +1433,10 @@ def build_report(
                 )
             )
 
+    timing_coverage = phase_timing_coverage(
+        compiler_payloads=compiler_payloads,
+        required_targets=targets,
+    )
     claimability_status = "claimable" if not claim_blockers else "blocked"
     if require_claimable and claim_blockers:
         failures.extend(claim_blockers)
@@ -764,6 +1453,7 @@ def build_report(
             "phaseBenchmarks": phase_summaries,
         },
         "coverageByTarget": coverage,
+        "phaseTimingCoverage": timing_coverage,
         "claimBlockers": claim_blockers,
         "failures": failures,
         "summary": {

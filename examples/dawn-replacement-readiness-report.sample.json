@@ -5,7 +5,9 @@
     "failures": [],
     "ok": true,
     "summary": {
-      "claimAllowedRowCount": 3,
+      "claimAllowedEvidenceSliceCount": 5,
+      "claimAllowedRowCount": 5,
+      "evidenceSliceCount": 16,
       "frontierRowCount": 11,
       "requiredRowCount": 11
     }
@@ -40,49 +42,111 @@
         "docs/apple-metal-runtime-release.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
+      "evidenceSlices": [
+        {
+          "arch": "arm64",
+          "blockers": [],
+          "claimAllowed": true,
+          "claimIndexEntries": [
+            {
+              "claimPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json",
+              "claimState": "claim-indexed",
+              "claimStatus": "claimable",
+              "comparisonStatus": "comparable",
+              "id": "native-strict-apple-metal",
+              "reportPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json"
+            },
+            {
+              "claimPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json",
+              "claimState": "claim-indexed",
+              "claimStatus": "claimable",
+              "comparisonStatus": "comparable",
+              "id": "native-release-apple-metal",
+              "reportPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json"
+            }
+          ],
+          "currentState": "claimable",
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "docs/apple-metal-runtime-release.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "id": "native-macos-arm64-apple-metal",
+          "label": "Native macOS arm64 Apple Metal",
+          "notes": "The native Apple Metal slice is claimable only through the strict and release claim-index entries.",
+          "os": "macos",
+          "readinessStatus": "claimable",
+          "runtimeHost": "native"
+        }
+      ],
       "id": "native-metal-runtime",
       "readinessStatus": "claimable",
       "surface": "native_runtime"
     },
     {
-      "blockers": [
+      "blockers": [],
+      "claimAllowed": true,
+      "claimIndexEntries": [
         {
-          "code": "fresh_amd_vulkan_release_claim_artifact",
-          "evidencePaths": [
-            "docs/status/runtime-backends-and-bench.md",
-            "config/native-backend-coverage-matrix.json"
-          ],
-          "exitCriteria": "Publish current AMD Vulkan Doe-vs-Dawn release compare and claim artifacts that pass claim, structural equivalence, and readback comparability gates."
-        },
-        {
-          "code": "matched_effective_readback_paths",
-          "evidencePaths": [
-            "docs/status/runtime-backends-and-bench.md",
-            "bench/docs/package-browser-ort-fairness-audit.md"
-          ],
-          "exitCriteria": "Produce package or native reports where Doe and the Dawn comparator use matching effective readback paths or carry a non-claimable path asymmetry."
-        },
-        {
-          "code": "vulkan_pipeline_cache_receipts",
-          "evidencePaths": [
-            "bench/docs/vulkan-pipeline-cache-integration.md",
-            "config/native-backend-coverage-matrix.json"
-          ],
-          "exitCriteria": "Publish Vulkan cache receipts showing the Doe and Dawn comparison lanes have declared cache-path parity or an explicit diagnostic boundary."
+          "claimPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+          "claimState": "claim-indexed",
+          "claimStatus": "claimable",
+          "comparisonStatus": "comparable",
+          "id": "native-release-amd-vulkan",
+          "reportPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json"
         }
       ],
-      "claimAllowed": false,
-      "claimIndexEntries": [],
-      "currentState": "diagnostic",
+      "currentState": "claimable",
       "dawnComparator": "dawn_vulkan",
       "doeTarget": "doe_vulkan",
       "evidencePaths": [
+        "reports/claim-index.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.manifest.json",
         "config/native-backend-coverage-matrix.json",
         "bench/docs/vulkan-pipeline-cache-integration.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
+      "evidenceSlices": [
+        {
+          "arch": "x64",
+          "blockers": [],
+          "claimAllowed": true,
+          "claimIndexEntries": [
+            {
+              "claimPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+              "claimState": "claim-indexed",
+              "claimStatus": "claimable",
+              "comparisonStatus": "comparable",
+              "id": "native-release-amd-vulkan",
+              "reportPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json"
+            }
+          ],
+          "currentState": "claimable",
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.manifest.json",
+            "config/native-backend-coverage-matrix.json",
+            "bench/docs/vulkan-pipeline-cache-integration.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "id": "native-linux-x64-amd-vulkan",
+          "label": "Native Linux x64 AMD Vulkan",
+          "notes": "The native AMD Vulkan slice is claimable only through the indexed release claim and rehearsal manifest.",
+          "os": "linux",
+          "readinessStatus": "claimable",
+          "runtimeHost": "native"
+        }
+      ],
       "id": "native-vulkan-runtime",
-      "readinessStatus": "blocked",
+      "readinessStatus": "claimable",
       "surface": "native_runtime"
     },
     {
@@ -122,6 +186,53 @@
         "bench/workloads/workloads.local.d3d12.json",
         "docs/doe-support-matrix.md"
       ],
+      "evidenceSlices": [
+        {
+          "arch": "x64",
+          "blockers": [
+            {
+              "code": "fresh_windows_d3d12_runtime_artifact",
+              "evidencePaths": [
+                "bench/workloads/workloads.local.d3d12.json",
+                "config/native-backend-coverage-matrix.json"
+              ],
+              "exitCriteria": "Publish a Windows D3D12 runtime artifact from the governed D3D12 workload contract."
+            },
+            {
+              "code": "d3d12_dawn_mapping_validation",
+              "evidencePaths": [
+                "bench/workloads/workloads.local.d3d12.json",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Validate the D3D12 Doe-vs-Dawn workload mapping against the governed D3D12 contract and record the mapping in a release-candidate report."
+            },
+            {
+              "code": "d3d12_claim_report",
+              "evidencePaths": [
+                "reports/claim-index.json",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Publish a D3D12 claim report and add the corresponding entry to the public claim index when it is comparable and claimable."
+            }
+          ],
+          "claimAllowed": false,
+          "claimIndexEntries": [],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "config/native-backend-coverage-matrix.json",
+            "bench/workloads/workloads.local.d3d12.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "gpuApi": "d3d12",
+          "gpuVendor": "microsoft",
+          "id": "native-windows-x64-d3d12",
+          "label": "Native Windows x64 D3D12",
+          "notes": "The native D3D12 slice is diagnostic until Windows runtime evidence and Dawn mapping validation are published.",
+          "os": "windows",
+          "readinessStatus": "blocked",
+          "runtimeHost": "native"
+        }
+      ],
       "id": "native-d3d12-runtime",
       "readinessStatus": "blocked",
       "surface": "native_runtime"
@@ -147,6 +258,37 @@
         "packages/doe-gpu/README.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
+      "evidenceSlices": [
+        {
+          "arch": "arm64",
+          "blockers": [],
+          "claimAllowed": true,
+          "claimIndexEntries": [
+            {
+              "claimPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json",
+              "claimState": "claim-indexed",
+              "claimStatus": "claimable",
+              "comparisonStatus": "comparable",
+              "id": "package-node-apple-metal",
+              "reportPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json"
+            }
+          ],
+          "currentState": "claimable",
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "packages/doe-gpu/README.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "id": "node-macos-arm64-apple-metal",
+          "label": "Node macOS arm64 Apple Metal",
+          "notes": "The Node package slice is claimable only for the indexed Apple Metal package receipt.",
+          "os": "macos",
+          "readinessStatus": "claimable",
+          "runtimeHost": "node"
+        }
+      ],
       "id": "package-node-runtime",
       "readinessStatus": "claimable",
       "surface": "package_runtime"
@@ -171,6 +313,37 @@
         "reports/claim-index.json",
         "packages/doe-gpu/README.md",
         "docs/status/runtime-backends-and-bench.md"
+      ],
+      "evidenceSlices": [
+        {
+          "arch": "arm64",
+          "blockers": [],
+          "claimAllowed": true,
+          "claimIndexEntries": [
+            {
+              "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json",
+              "claimState": "claim-indexed",
+              "claimStatus": "claimable",
+              "comparisonStatus": "comparable",
+              "id": "package-bun-apple-metal",
+              "reportPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json"
+            }
+          ],
+          "currentState": "claimable",
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "packages/doe-gpu/README.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "id": "bun-macos-arm64-apple-metal",
+          "label": "Bun macOS arm64 Apple Metal",
+          "notes": "The Bun package slice is claimable only for the indexed Apple Metal package receipt.",
+          "os": "macos",
+          "readinessStatus": "claimable",
+          "runtimeHost": "bun"
+        }
       ],
       "id": "package-bun-runtime",
       "readinessStatus": "claimable",
@@ -205,6 +378,82 @@
         "packages/doe-gpu/README.md",
         "docs/doe-support-matrix.md"
       ],
+      "evidenceSlices": [
+        {
+          "arch": "arm64",
+          "blockers": [
+            {
+              "code": "deno_package_compare_claim_report",
+              "evidencePaths": [
+                "packages/doe-gpu/README.md",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Publish a Deno package compare and claim report with explicit host WebGPU comparator identity."
+            },
+            {
+              "code": "deno_host_webgpu_comparability_audit",
+              "evidencePaths": [
+                "config/tool-surfaces.json",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Audit Deno host WebGPU comparability and record whether the package lane is claimable or diagnostic."
+            }
+          ],
+          "claimAllowed": false,
+          "claimIndexEntries": [],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "config/tool-surfaces.json",
+            "packages/doe-gpu/README.md",
+            "docs/doe-support-matrix.md"
+          ],
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "id": "deno-macos-arm64-apple-metal",
+          "label": "Deno macOS arm64 Apple Metal",
+          "notes": "The Deno Apple Metal package slice is diagnostic until Deno comparator identity and claim evidence are published.",
+          "os": "macos",
+          "readinessStatus": "blocked",
+          "runtimeHost": "deno"
+        },
+        {
+          "arch": "x64",
+          "blockers": [
+            {
+              "code": "deno_package_compare_claim_report",
+              "evidencePaths": [
+                "packages/doe-gpu/README.md",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Publish a Deno package compare and claim report with explicit host WebGPU comparator identity."
+            },
+            {
+              "code": "deno_host_webgpu_comparability_audit",
+              "evidencePaths": [
+                "config/tool-surfaces.json",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Audit Deno host WebGPU comparability and record whether the package lane is claimable or diagnostic."
+            }
+          ],
+          "claimAllowed": false,
+          "claimIndexEntries": [],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "config/tool-surfaces.json",
+            "packages/doe-gpu/README.md",
+            "docs/doe-support-matrix.md"
+          ],
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "id": "deno-linux-x64-amd-vulkan",
+          "label": "Deno Linux x64 AMD Vulkan",
+          "notes": "The Deno AMD Vulkan package slice is diagnostic until Deno comparator identity and claim evidence are published.",
+          "os": "linux",
+          "readinessStatus": "blocked",
+          "runtimeHost": "deno"
+        }
+      ],
       "id": "package-deno-runtime",
       "readinessStatus": "blocked",
       "surface": "package_runtime"
@@ -215,6 +464,12 @@
           "code": "chromium_release_build_evidence",
           "evidencePaths": [
             "examples/browser-runtime-frontier-bundle.sample.json",
+            "examples/browser-release-package-inputs-check.sample.json",
+            "examples/browser-release-candidate-provenance.sample.json",
+            "examples/browser-published-proof-surface.sample.json",
+            "examples/browser-published-proof-surface-check.sample.json",
+            "examples/browser-release-candidate-finalizer.sample.json",
+            "examples/browser-release-candidate-finalizer-check.sample.json",
             "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
             "docs/doe-support-matrix.md"
           ],
@@ -230,6 +485,33 @@
           "comparisonStatus": "comparable",
           "id": "ort-browser-apple-metal",
           "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
+        },
+        {
+          "blocker": "The checked-in Chromium browser release evidence is still diagnostic; claim indexing requires a published release-candidate browser archive with passing candidate consistency and a claimable browser frontier row.",
+          "browserRelease": {
+            "browserLaunchReceiptPath": "examples/browser-release-launch-receipt.sample.json",
+            "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+            "finalizerCheckPath": "examples/browser-release-candidate-finalizer-check.sample.json",
+            "finalizerReportPath": "examples/browser-release-candidate-finalizer.sample.json",
+            "packageInputsPath": "examples/browser-release-package-inputs-check.sample.json",
+            "proofSurfaceCheckPath": "examples/browser-published-proof-surface-check.sample.json",
+            "proofSurfacePath": "examples/browser-published-proof-surface.sample.json",
+            "provenanceReportPath": "examples/browser-release-candidate-provenance.sample.json",
+            "publicDownloadReceiptPath": "examples/browser-public-download-receipt.sample.json",
+            "readinessReportPath": "examples/dawn-replacement-readiness-report.sample.json",
+            "releaseArchiveManifestPath": "examples/browser-release-archive-manifest.sample.json",
+            "releaseArchiveManifestSha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+            "releaseArchivePath": "examples/browser-release-archive.sample.zip",
+            "releaseArchiveSha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+            "releaseArtifactBundlePath": "examples/browser-release-artifact-bundle.sample.json",
+            "runtimeFrontierBundlePath": "examples/browser-runtime-frontier-bundle.sample.json"
+          },
+          "claimPath": "",
+          "claimState": "scaffolded",
+          "claimStatus": "not-evaluated",
+          "comparisonStatus": "not-evaluated",
+          "id": "browser-chromium-release",
+          "reportPath": ""
         }
       ],
       "currentState": "diagnostic",
@@ -237,9 +519,238 @@
       "doeTarget": "doe_chromium_webgpu",
       "evidencePaths": [
         "examples/browser-runtime-frontier-bundle.sample.json",
+        "examples/browser-release-package-inputs-check.sample.json",
+        "examples/browser-release-candidate-provenance.sample.json",
+        "examples/browser-published-proof-surface.sample.json",
+        "examples/browser-published-proof-surface-check.sample.json",
+        "examples/browser-release-candidate-finalizer.sample.json",
+        "examples/browser-release-candidate-finalizer-check.sample.json",
         "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
         "docs/doe-support-matrix.md",
         "docs/status/runtime-backends-and-bench.md"
+      ],
+      "evidenceSlices": [
+        {
+          "arch": "arm64",
+          "blockers": [
+            {
+              "code": "chromium_release_build_evidence",
+              "evidencePaths": [
+                "examples/browser-runtime-frontier-bundle.sample.json",
+                "examples/browser-release-package-inputs-check.sample.json",
+                "examples/browser-release-candidate-provenance.sample.json",
+                "examples/browser-published-proof-surface.sample.json",
+                "examples/browser-published-proof-surface-check.sample.json",
+                "examples/browser-release-candidate-finalizer.sample.json",
+                "examples/browser-release-candidate-finalizer-check.sample.json",
+                "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Publish browser release-build evidence for the Chromium runtime lane with release artifact files and hashes verified before promoting browser replacement language."
+            }
+          ],
+          "claimAllowed": false,
+          "claimIndexEntries": [
+            {
+              "claimPath": "",
+              "claimState": "diagnostic",
+              "claimStatus": "diagnostic",
+              "comparisonStatus": "comparable",
+              "id": "ort-browser-apple-metal",
+              "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
+            },
+            {
+              "blocker": "The checked-in Chromium browser release evidence is still diagnostic; claim indexing requires a published release-candidate browser archive with passing candidate consistency and a claimable browser frontier row.",
+              "browserRelease": {
+                "browserLaunchReceiptPath": "examples/browser-release-launch-receipt.sample.json",
+                "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+                "finalizerCheckPath": "examples/browser-release-candidate-finalizer-check.sample.json",
+                "finalizerReportPath": "examples/browser-release-candidate-finalizer.sample.json",
+                "packageInputsPath": "examples/browser-release-package-inputs-check.sample.json",
+                "proofSurfaceCheckPath": "examples/browser-published-proof-surface-check.sample.json",
+                "proofSurfacePath": "examples/browser-published-proof-surface.sample.json",
+                "provenanceReportPath": "examples/browser-release-candidate-provenance.sample.json",
+                "publicDownloadReceiptPath": "examples/browser-public-download-receipt.sample.json",
+                "readinessReportPath": "examples/dawn-replacement-readiness-report.sample.json",
+                "releaseArchiveManifestPath": "examples/browser-release-archive-manifest.sample.json",
+                "releaseArchiveManifestSha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+                "releaseArchivePath": "examples/browser-release-archive.sample.zip",
+                "releaseArchiveSha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+                "releaseArtifactBundlePath": "examples/browser-release-artifact-bundle.sample.json",
+                "runtimeFrontierBundlePath": "examples/browser-runtime-frontier-bundle.sample.json"
+              },
+              "claimPath": "",
+              "claimState": "scaffolded",
+              "claimStatus": "not-evaluated",
+              "comparisonStatus": "not-evaluated",
+              "id": "browser-chromium-release",
+              "reportPath": ""
+            }
+          ],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "examples/browser-runtime-frontier-bundle.sample.json",
+            "examples/browser-release-package-inputs-check.sample.json",
+            "examples/browser-release-candidate-provenance.sample.json",
+            "examples/browser-published-proof-surface.sample.json",
+            "examples/browser-published-proof-surface-check.sample.json",
+            "examples/browser-release-candidate-finalizer.sample.json",
+            "examples/browser-release-candidate-finalizer-check.sample.json",
+            "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+            "docs/doe-support-matrix.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "id": "chromium-macos-arm64-apple-metal",
+          "label": "Chromium macOS arm64 Apple Metal",
+          "notes": "The Chromium Apple Metal browser slice is diagnostic until runtime identity, structural receipts, release build evidence, and claim-index promotion are all published.",
+          "os": "macos",
+          "readinessStatus": "blocked",
+          "runtimeHost": "chromium"
+        },
+        {
+          "arch": "x64",
+          "blockers": [
+            {
+              "code": "chromium_release_build_evidence",
+              "evidencePaths": [
+                "examples/browser-runtime-frontier-bundle.sample.json",
+                "examples/browser-release-package-inputs-check.sample.json",
+                "examples/browser-release-candidate-provenance.sample.json",
+                "examples/browser-published-proof-surface.sample.json",
+                "examples/browser-published-proof-surface-check.sample.json",
+                "examples/browser-release-candidate-finalizer.sample.json",
+                "examples/browser-release-candidate-finalizer-check.sample.json",
+                "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Publish browser release-build evidence for the Chromium runtime lane with release artifact files and hashes verified before promoting browser replacement language."
+            }
+          ],
+          "claimAllowed": false,
+          "claimIndexEntries": [
+            {
+              "blocker": "The checked-in Chromium browser release evidence is still diagnostic; claim indexing requires a published release-candidate browser archive with passing candidate consistency and a claimable browser frontier row.",
+              "browserRelease": {
+                "browserLaunchReceiptPath": "examples/browser-release-launch-receipt.sample.json",
+                "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+                "finalizerCheckPath": "examples/browser-release-candidate-finalizer-check.sample.json",
+                "finalizerReportPath": "examples/browser-release-candidate-finalizer.sample.json",
+                "packageInputsPath": "examples/browser-release-package-inputs-check.sample.json",
+                "proofSurfaceCheckPath": "examples/browser-published-proof-surface-check.sample.json",
+                "proofSurfacePath": "examples/browser-published-proof-surface.sample.json",
+                "provenanceReportPath": "examples/browser-release-candidate-provenance.sample.json",
+                "publicDownloadReceiptPath": "examples/browser-public-download-receipt.sample.json",
+                "readinessReportPath": "examples/dawn-replacement-readiness-report.sample.json",
+                "releaseArchiveManifestPath": "examples/browser-release-archive-manifest.sample.json",
+                "releaseArchiveManifestSha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+                "releaseArchivePath": "examples/browser-release-archive.sample.zip",
+                "releaseArchiveSha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+                "releaseArtifactBundlePath": "examples/browser-release-artifact-bundle.sample.json",
+                "runtimeFrontierBundlePath": "examples/browser-runtime-frontier-bundle.sample.json"
+              },
+              "claimPath": "",
+              "claimState": "scaffolded",
+              "claimStatus": "not-evaluated",
+              "comparisonStatus": "not-evaluated",
+              "id": "browser-chromium-release",
+              "reportPath": ""
+            }
+          ],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "examples/browser-runtime-frontier-bundle.sample.json",
+            "examples/browser-release-package-inputs-check.sample.json",
+            "examples/browser-release-candidate-provenance.sample.json",
+            "examples/browser-published-proof-surface.sample.json",
+            "examples/browser-published-proof-surface-check.sample.json",
+            "examples/browser-release-candidate-finalizer.sample.json",
+            "examples/browser-release-candidate-finalizer-check.sample.json",
+            "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+            "docs/doe-support-matrix.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "id": "chromium-linux-x64-amd-vulkan",
+          "label": "Chromium Linux x64 AMD Vulkan",
+          "notes": "The Chromium AMD Vulkan browser slice is diagnostic until release-build evidence and browser claim-index promotion are published.",
+          "os": "linux",
+          "readinessStatus": "blocked",
+          "runtimeHost": "chromium"
+        },
+        {
+          "arch": "x64",
+          "blockers": [
+            {
+              "code": "chromium_release_build_evidence",
+              "evidencePaths": [
+                "examples/browser-runtime-frontier-bundle.sample.json",
+                "examples/browser-release-package-inputs-check.sample.json",
+                "examples/browser-release-candidate-provenance.sample.json",
+                "examples/browser-published-proof-surface.sample.json",
+                "examples/browser-published-proof-surface-check.sample.json",
+                "examples/browser-release-candidate-finalizer.sample.json",
+                "examples/browser-release-candidate-finalizer-check.sample.json",
+                "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+                "docs/doe-support-matrix.md"
+              ],
+              "exitCriteria": "Publish browser release-build evidence for the Chromium runtime lane with release artifact files and hashes verified before promoting browser replacement language."
+            }
+          ],
+          "claimAllowed": false,
+          "claimIndexEntries": [
+            {
+              "blocker": "The checked-in Chromium browser release evidence is still diagnostic; claim indexing requires a published release-candidate browser archive with passing candidate consistency and a claimable browser frontier row.",
+              "browserRelease": {
+                "browserLaunchReceiptPath": "examples/browser-release-launch-receipt.sample.json",
+                "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+                "finalizerCheckPath": "examples/browser-release-candidate-finalizer-check.sample.json",
+                "finalizerReportPath": "examples/browser-release-candidate-finalizer.sample.json",
+                "packageInputsPath": "examples/browser-release-package-inputs-check.sample.json",
+                "proofSurfaceCheckPath": "examples/browser-published-proof-surface-check.sample.json",
+                "proofSurfacePath": "examples/browser-published-proof-surface.sample.json",
+                "provenanceReportPath": "examples/browser-release-candidate-provenance.sample.json",
+                "publicDownloadReceiptPath": "examples/browser-public-download-receipt.sample.json",
+                "readinessReportPath": "examples/dawn-replacement-readiness-report.sample.json",
+                "releaseArchiveManifestPath": "examples/browser-release-archive-manifest.sample.json",
+                "releaseArchiveManifestSha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+                "releaseArchivePath": "examples/browser-release-archive.sample.zip",
+                "releaseArchiveSha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+                "releaseArtifactBundlePath": "examples/browser-release-artifact-bundle.sample.json",
+                "runtimeFrontierBundlePath": "examples/browser-runtime-frontier-bundle.sample.json"
+              },
+              "claimPath": "",
+              "claimState": "scaffolded",
+              "claimStatus": "not-evaluated",
+              "comparisonStatus": "not-evaluated",
+              "id": "browser-chromium-release",
+              "reportPath": ""
+            }
+          ],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "examples/browser-runtime-frontier-bundle.sample.json",
+            "examples/browser-release-package-inputs-check.sample.json",
+            "examples/browser-release-candidate-provenance.sample.json",
+            "examples/browser-published-proof-surface.sample.json",
+            "examples/browser-published-proof-surface-check.sample.json",
+            "examples/browser-release-candidate-finalizer.sample.json",
+            "examples/browser-release-candidate-finalizer-check.sample.json",
+            "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+            "docs/doe-support-matrix.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "d3d12",
+          "gpuVendor": "microsoft",
+          "id": "chromium-windows-x64-d3d12",
+          "label": "Chromium Windows x64 D3D12",
+          "notes": "The Chromium D3D12 browser slice is diagnostic until Windows browser release evidence and claim-index promotion are published.",
+          "os": "windows",
+          "readinessStatus": "blocked",
+          "runtimeHost": "chromium"
+        }
       ],
       "frontierBundleEvidence": {
         "artifactKind": "browser_runtime_frontier_bundle",
@@ -267,11 +778,13 @@
             "status": "pass"
           },
           "releaseArtifactBundle": {
+            "artifactKind": "browser_release_artifact_bundle",
             "artifactVerification": {
               "requiredForClaimable": true,
-              "verified": false,
-              "verifyFilesRootProvided": false
+              "verified": true,
+              "verifyFilesRootProvided": true
             },
+            "bundleId": "browser-release-diagnostic-sample-v1",
             "claimReports": [
               {
                 "claimBlockerCount": 0,
@@ -284,7 +797,9 @@
               }
             ],
             "path": "examples/browser-release-artifact-bundle.sample.json",
+            "releaseBundleIdentitySha256": "f7279a10b96a60e55bc539f5f72d881a61bbaf510713709cc6a4c51d58ae7398",
             "releaseStatus": "diagnostic",
+            "sha256": "e63260d71669a86765287fd1e58a286234cff23855bb6cb05332ce0d3fea6648",
             "status": "pass"
           },
           "runtimeIdentity": {
@@ -296,6 +811,633 @@
           }
         },
         "path": "examples/browser-runtime-frontier-bundle.sample.json",
+        "releaseCandidateEvidence": {
+          "browserLaunchReceipt": {
+            "activeBackend": "webgpu-doe",
+            "activeRuntime": "doe",
+            "artifactKind": "browser_release_launch_receipt",
+            "browserAppMetadataArchivePath": "Fawn-Doe-linux-x64/browser-product.json",
+            "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+            "browserProduct": {
+              "channel": "diagnostic",
+              "displayName": "Fawn Doe",
+              "productId": "fawn-doe",
+              "version": "0.0.0-sample"
+            },
+            "comparisonArtifactPath": "examples/browser-smoke-report.sample.json",
+            "comparisonDawnReceiptId": "browser-smoke-compute-dawn",
+            "comparisonDoeReceiptId": "browser-smoke-compute-doe",
+            "comparisonEmitsSideBySideReceipts": true,
+            "comparisonExecutionScope": "same_page",
+            "comparisonId": "browser-smoke-compute-dawn-vs-doe",
+            "comparisonLoaded": true,
+            "comparisonModes": [
+              "dawn",
+              "doe"
+            ],
+            "comparisonPageArtifactPath": "examples/browser-gallery-compute.sample.html",
+            "comparisonWorkloadId": "browser-smoke-compute",
+            "dawnFallbackRuntimeArchivePath": "Fawn-Doe-linux-x64/libdawn_native.so",
+            "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+            "galleryArtifactPath": "examples/browser-gallery-compute.sample.html",
+            "galleryCategory": "compute",
+            "galleryLoaded": true,
+            "galleryReceiptId": "browser-public-gallery-compute-sample",
+            "galleryUrl": "https://gallery.doe.dev/doe/compute.html",
+            "hiddenFallbackAllowed": false,
+            "hiddenFallbackUsed": false,
+            "launchSource": "release_archive",
+            "observedAt": "2026-06-30T00:00:00Z",
+            "observedReceiptIds": [
+              "browser-proof-page-sample",
+              "browser-public-gallery-compute-sample",
+              "browser-smoke-compute-dawn",
+              "browser-smoke-compute-doe"
+            ],
+            "path": "examples/browser-release-launch-receipt.sample.json",
+            "platform": {
+              "arch": "x64",
+              "os": "linux",
+              "packageFormat": "zip"
+            },
+            "proofPageArtifactPath": "examples/browser-proof-page.sample.html",
+            "proofPageLoaded": true,
+            "proofPageReceiptId": "browser-proof-page-sample",
+            "proofPageUrl": "about:doe",
+            "proofSurface": {
+              "kind": "browser_published_proof_surface",
+              "path": "examples/browser-published-proof-surface.sample.json",
+              "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa"
+            },
+            "receiptId": "browser-release-launch-sample",
+            "releaseArchive": {
+              "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+              "kind": "browser_release_archive",
+              "path": "examples/browser-release-archive.sample.zip",
+              "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158"
+            },
+            "releaseArchiveManifest": {
+              "kind": "browser_release_archive_manifest",
+              "path": "examples/browser-release-archive-manifest.sample.json",
+              "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b"
+            },
+            "runtimeMode": "doe",
+            "schemaVersion": 1,
+            "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b",
+            "webgpuAvailable": true
+          },
+          "chromiumSourceCheckout": {
+            "artifactKind": "chromium_source_checkout_check",
+            "checkCount": 37,
+            "missingRequired": [],
+            "missingRequiredWellFormed": true,
+            "path": "examples/chromium-source-checkout-check.sample.json",
+            "requireReady": false,
+            "requireRuntimeSelector": true,
+            "schemaVersion": 1,
+            "sha256": "3d52e6ff56d31ebad69a56e3a82dad675f2d277c0aedf783ab9ef55e159f31d1",
+            "sourceRoot": "browser/chromium/src",
+            "status": "pass"
+          },
+          "consistency": {
+            "failureCodes": [
+              "finalizer_check_not_pass",
+              "finalizer_report_not_pass",
+              "package_inputs_blockers_present",
+              "package_inputs_not_release_candidate",
+              "package_inputs_not_release_candidate_eligible",
+              "provenance_report_not_pass",
+              "release_artifact_bundle_not_release_candidate"
+            ],
+            "failureCount": 7,
+            "failures": [
+              {
+                "code": "release_artifact_bundle_not_release_candidate",
+                "message": "browser release artifact bundle must be a release_candidate",
+                "path": "releaseCandidateEvidence.releaseArtifactBundle.releaseStatus"
+              },
+              {
+                "code": "provenance_report_not_pass",
+                "message": "release-candidate provenance report must pass",
+                "path": "releaseCandidateEvidence.provenanceReport.status"
+              },
+              {
+                "code": "finalizer_report_not_pass",
+                "message": "release-candidate finalizer report must pass",
+                "path": "releaseCandidateEvidence.finalizerReport.status"
+              },
+              {
+                "code": "finalizer_check_not_pass",
+                "message": "release-candidate finalizer check must pass",
+                "path": "releaseCandidateEvidence.finalizerCheck.status"
+              },
+              {
+                "code": "package_inputs_not_release_candidate_eligible",
+                "message": "browser release package inputs must be release-candidate eligible",
+                "path": "releaseCandidateEvidence.packageInputs.releaseCandidateEligible"
+              },
+              {
+                "code": "package_inputs_not_release_candidate",
+                "message": "browser release package inputs evidenceMode must be release_candidate",
+                "path": "releaseCandidateEvidence.packageInputs.evidenceMode"
+              },
+              {
+                "code": "package_inputs_blockers_present",
+                "message": "passing package-input preflight must carry no release-candidate blockers",
+                "path": "releaseCandidateEvidence.packageInputs.releaseCandidateBlockers"
+              }
+            ],
+            "status": "fail"
+          },
+          "finalizerCheck": {
+            "artifactKind": "browser_release_candidate_finalizer_check",
+            "failureCount": 1,
+            "failures": [
+              {
+                "code": "finalizer_report_not_pass",
+                "message": "browser release-candidate finalizer report must pass",
+                "path": "status"
+              }
+            ],
+            "finalizerReportPath": "examples/browser-release-candidate-finalizer.sample.json",
+            "finalizerReportSha256": "4889b5b8f979c4b848f62a67f246b0c589b57f1dac8394fe913f7626caff5c2d",
+            "finalizerStatus": "fail",
+            "path": "examples/browser-release-candidate-finalizer-check.sample.json",
+            "requirePass": true,
+            "sha256": "ba685a520dc8e620b2bcbd1a00f6b99e570226531848c0de1a6e0b6c086e38e8",
+            "status": "fail",
+            "verifyFilesRootProvided": true
+          },
+          "finalizerReport": {
+            "artifactKind": "browser_release_candidate_finalizer",
+            "failureCount": 5,
+            "failures": [
+              {
+                "code": "package_inputs_not_release_candidate_eligible",
+                "message": "package inputs must be release-candidate eligible before final bundle assembly",
+                "path": "packageInputs.releaseCandidateEligible"
+              },
+              {
+                "code": "package_inputs_not_release_candidate_evidence",
+                "message": "package inputs evidenceMode must be release_candidate before final bundle assembly",
+                "path": "packageInputs.evidenceMode"
+              },
+              {
+                "code": "package_inputs_release_candidate_blockers_present",
+                "message": "package inputs must carry no release-candidate blockers before final bundle assembly",
+                "path": "packageInputs.releaseCandidateBlockers"
+              },
+              {
+                "code": "package_inputs_platform_mismatch",
+                "message": "release-candidate finalizer requires initial macOS arm64 zip package inputs",
+                "path": "packageInputs.platform"
+              },
+              {
+                "code": "package_inputs_channel_mismatch",
+                "message": "release-candidate finalizer requires browserProduct.channel=release_candidate",
+                "path": "browserProduct.channel"
+              }
+            ],
+            "path": "examples/browser-release-candidate-finalizer.sample.json",
+            "phase": "package_inputs_preflight",
+            "sha256": "4889b5b8f979c4b848f62a67f246b0c589b57f1dac8394fe913f7626caff5c2d",
+            "status": "fail"
+          },
+          "packageInputs": {
+            "artifactKind": "browser_release_package_inputs_check",
+            "browserProduct": {
+              "channel": "diagnostic",
+              "displayName": "Fawn Doe",
+              "productId": "fawn-doe",
+              "version": "0.0.0-sample"
+            },
+            "evidenceMode": "diagnostic",
+            "failureCount": 0,
+            "failures": [],
+            "inputs": {
+              "appMetadata": {
+                "archivePath": "Fawn-Doe-linux-x64/browser-product.json",
+                "byteLength": 448,
+                "detectedArchitectures": [],
+                "detectedFormat": "json",
+                "executable": false,
+                "exists": false,
+                "generated": true,
+                "kind": "browser_app_metadata",
+                "path": "browser/chromium/src/out/fawn_release/browser-product.json",
+                "sha256": "279022182aadd07cc564e3703d95a29350349cf03c2d097d5f04aabbaaa12b49"
+              },
+              "browserExecutable": {
+                "archivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+                "byteLength": 4510,
+                "detectedArchitectures": [],
+                "detectedFormat": "script",
+                "executable": true,
+                "exists": true,
+                "generated": false,
+                "kind": "browser_binary",
+                "path": "browser/chromium/src/out/fawn_release/chrome-wrapper",
+                "sha256": "24c1cfddcd206a86281008e7eed38109344ef34cd88d61902a9befd520a5571c"
+              },
+              "dawnFallbackRuntime": {
+                "archivePath": "Fawn-Doe-linux-x64/libdawn_native.so",
+                "byteLength": 12201232,
+                "detectedArchitectures": [
+                  "x64"
+                ],
+                "detectedFormat": "elf",
+                "executable": true,
+                "exists": true,
+                "generated": false,
+                "kind": "dawn_fallback_runtime",
+                "path": "browser/chromium/src/out/fawn_release/libdawn_native.so",
+                "sha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854"
+              },
+              "doeRuntime": {
+                "archivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+                "byteLength": 43651829,
+                "detectedArchitectures": [
+                  "x64"
+                ],
+                "detectedFormat": "elf",
+                "executable": true,
+                "exists": true,
+                "generated": false,
+                "kind": "doe_runtime",
+                "path": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+                "sha256": "1bf01661b9b48fc1811a0668aa18ce8642f7b568b1e4fffda82268ff79e0c527"
+              },
+              "shaderCompiler": {
+                "byteLength": 50425824,
+                "detectedArchitectures": [
+                  "x64"
+                ],
+                "detectedFormat": "elf",
+                "executable": true,
+                "exists": true,
+                "generated": false,
+                "kind": "shader_compiler",
+                "path": "runtime/zig/zig-out/bin/doe-zig-runtime",
+                "sha256": "fdef3b47a9b3f4f75ecb1587e9053e587be290e1035381ce5e9d38207aec3d62"
+              }
+            },
+            "packageDir": {
+              "exists": true,
+              "path": "browser/chromium/src/out/fawn_release"
+            },
+            "packageRootName": "Fawn-Doe-linux-x64",
+            "path": "examples/browser-release-package-inputs-check.sample.json",
+            "platform": {
+              "arch": "x64",
+              "os": "linux",
+              "packageFormat": "zip"
+            },
+            "releaseCandidateBlockers": [
+              {
+                "code": "release_candidate_channel_required",
+                "message": "initial browser release artifact must use release_candidate channel",
+                "path": "browserProduct.channel"
+              },
+              {
+                "code": "initial_macos_arm64_release_required",
+                "message": "initial browser release artifact must be macOS arm64 zip",
+                "path": "platform"
+              }
+            ],
+            "releaseCandidateEligible": false,
+            "schemaVersion": 1,
+            "sha256": "9346d49694f6bf786cc6235d933a5a2fa1f93b52ab8029cd76699cff9636f4b4",
+            "status": "pass",
+            "summary": {
+              "metadataSource": "generated",
+              "packageable": true,
+              "requiredArchiveMemberCount": 4,
+              "runtimeReplacementCount": 1
+            }
+          },
+          "proofSurfaceCheck": {
+            "artifactKind": "browser_published_proof_surface_check",
+            "failureCount": 0,
+            "failures": [],
+            "path": "examples/browser-published-proof-surface-check.sample.json",
+            "requirePublicUrls": true,
+            "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1",
+            "status": "pass",
+            "surfacePath": "examples/browser-published-proof-surface.sample.json",
+            "surfaceSha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+            "verifyFilesRootProvided": true
+          },
+          "provenanceReport": {
+            "artifactKind": "browser_release_candidate_provenance_report",
+            "browserProduct": {
+              "channel": "diagnostic",
+              "displayName": "Fawn Doe",
+              "productId": "fawn-doe",
+              "version": "0.0.0-sample"
+            },
+            "componentArtifacts": {
+              "browserLaunchReceipt": {
+                "kind": "browser_release_launch_receipt",
+                "path": "examples/browser-release-launch-receipt.sample.json",
+                "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b"
+              },
+              "packageInputs": {
+                "kind": "browser_release_package_inputs_check",
+                "path": "examples/browser-release-package-inputs-check.sample.json",
+                "sha256": "9346d49694f6bf786cc6235d933a5a2fa1f93b52ab8029cd76699cff9636f4b4"
+              },
+              "proofSurface": {
+                "kind": "browser_published_proof_surface",
+                "path": "examples/browser-published-proof-surface.sample.json",
+                "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa"
+              },
+              "proofSurfaceCheck": {
+                "kind": "browser_published_proof_surface_check",
+                "path": "examples/browser-published-proof-surface-check.sample.json",
+                "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1"
+              },
+              "publicDownloadReceipt": {
+                "kind": "browser_public_download_receipt",
+                "path": "examples/browser-public-download-receipt.sample.json",
+                "sha256": "fbb04fddc5e8f2250c577eddc93a8b5299af292ed923346b24f580f3f942723c"
+              },
+              "releaseArchive": {
+                "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+                "kind": "browser_release_archive",
+                "path": "examples/browser-release-archive.sample.zip",
+                "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158"
+              },
+              "releaseArchiveManifest": {
+                "kind": "browser_release_archive_manifest",
+                "path": "examples/browser-release-archive-manifest.sample.json",
+                "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b"
+              }
+            },
+            "failureCount": 5,
+            "failures": [
+              {
+                "code": "package_inputs_not_release_candidate_eligible",
+                "message": "package inputs report must be release-candidate eligible",
+                "path": "packageInputs.releaseCandidateEligible"
+              },
+              {
+                "code": "package_inputs_not_release_candidate_evidence",
+                "message": "package inputs evidenceMode must be release_candidate",
+                "path": "packageInputs.evidenceMode"
+              },
+              {
+                "code": "package_inputs_release_candidate_blockers_present",
+                "message": "package inputs report must carry no release-candidate blockers",
+                "path": "packageInputs.releaseCandidateBlockers"
+              },
+              {
+                "code": "candidate_product_channel_required",
+                "message": "release-candidate provenance must use browserProduct.channel=release_candidate",
+                "path": "browserProduct.channel"
+              },
+              {
+                "code": "candidate_platform_not_macos_arm64",
+                "message": "initial release-candidate provenance must target macOS arm64 zip",
+                "path": "platform"
+              }
+            ],
+            "path": "examples/browser-release-candidate-provenance.sample.json",
+            "platform": {
+              "arch": "x64",
+              "os": "linux",
+              "packageFormat": "zip"
+            },
+            "releaseStatus": "release_candidate",
+            "sha256": "4ae0005d89d49277fc153aef13f0c290bdcfcc270faa56f78db4f71ca2f93171",
+            "status": "fail",
+            "summary": {
+              "componentCount": 7,
+              "failureCount": 5
+            }
+          },
+          "publicDownloadReceipt": {
+            "artifactKind": "browser_public_download_receipt",
+            "browserAppMetadataArchivePath": "Fawn-Doe-linux-x64/browser-product.json",
+            "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+            "browserProduct": {
+              "channel": "diagnostic",
+              "displayName": "Fawn Doe",
+              "productId": "fawn-doe",
+              "version": "0.0.0-sample"
+            },
+            "contentLengthBytes": 11325471,
+            "contentSha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+            "dawnFallbackRuntimeArchivePath": "Fawn-Doe-linux-x64/libdawn_native.so",
+            "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+            "method": "GET",
+            "observedAt": "2026-06-30T00:00:00Z",
+            "path": "examples/browser-public-download-receipt.sample.json",
+            "platform": {
+              "arch": "x64",
+              "os": "linux",
+              "packageFormat": "zip"
+            },
+            "receiptId": "browser-public-download-sample-linux-x64",
+            "releaseArchiveManifestPath": "examples/browser-release-archive-manifest.sample.json",
+            "releaseArchiveManifestSha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+            "releaseArchivePath": "examples/browser-release-archive.sample.zip",
+            "schemaVersion": 1,
+            "sha256": "fbb04fddc5e8f2250c577eddc93a8b5299af292ed923346b24f580f3f942723c",
+            "statusCode": 200,
+            "url": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip"
+          },
+          "publishedProofSurface": {
+            "activeBackend": "webgpu-doe",
+            "artifactKind": "browser_published_proof_surface",
+            "browserProduct": {
+              "channel": "diagnostic",
+              "displayName": "Fawn Doe",
+              "productId": "fawn-doe",
+              "version": "0.0.0-sample"
+            },
+            "comparisonReceiptCount": 1,
+            "galleryCategories": [
+              "benchmark_trace",
+              "compute",
+              "rendering",
+              "shader_edge",
+              "tensor"
+            ],
+            "galleryPageCount": 5,
+            "path": "examples/browser-published-proof-surface.sample.json",
+            "platform": {
+              "arch": "x64",
+              "os": "linux",
+              "packageFormat": "zip"
+            },
+            "proofPageUrl": "about:doe",
+            "receiptPayloadCount": 2,
+            "releaseArchive": {
+              "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip",
+              "kind": "browser_release_archive",
+              "path": "examples/browser-release-archive.sample.zip",
+              "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158"
+            },
+            "runtimeIdentityPath": "examples/browser-runtime-identity.selector.sample.json",
+            "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+            "surfaceId": "browser-published-proof-surface-sample-v1",
+            "webgpuAvailable": true
+          },
+          "releaseSupportArtifacts": {
+            "claimReportKinds": [
+              "browser_claim_report"
+            ],
+            "claimReports": [
+              {
+                "kind": "browser_claim_report",
+                "path": "examples/browser-claim-report.sample.json",
+                "sha256": "a6bd9f81550992e8c296f7105e4ac6411ca6ee39bb29a76cf147302dc81b8dfe"
+              }
+            ],
+            "contractKinds": [
+              "contract"
+            ],
+            "contracts": [
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-benchmark-superset.contract.md",
+                "sha256": "aa85aab7f93d2e9acde12ac965485d90f13a75458e2a0d3a269e3490c6db7097"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-canvas-webgpu-fusion.contract.md",
+                "sha256": "8a3217f3a355ae1a6270ef36f340823825dd9627a14959fcaf5935d2ff1b6931"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-claim-methodology.contract.md",
+                "sha256": "e44969875299d51bbfdb33272312ce87a75dbe38c5db9966dc2a040af52399c0"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-cts-subset.contract.md",
+                "sha256": "6a4e1061fdd18a653948dcf73d6213c457ad0e1b353199a946df422982ea3eea"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-fallback-explanations.contract.md",
+                "sha256": "ae5766ed05e965a3497ce0a6a344e8e299c0a7fc1b8f94470ef1a1e3de5ccaad"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-gpu-flight-recorder.contract.md",
+                "sha256": "ec368154b1d9d60d2b1fe9ad48fecdf709e773c7df8cae8aa456d04a86e41b56"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-gpu-scheduler.contract.md",
+                "sha256": "6052bfa0fcef56dfbd22d8eef340e261ecb67a3aa43512b31c9707150276beba"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-local-ai-workloads.contract.md",
+                "sha256": "7d90690bfe8f8ad505016a4846c870e3d79f5bbfcedd1a5d91f7c6fa2b0020a0"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-media-path-probe.contract.md",
+                "sha256": "663f05e4c253523d3db535248540c9201e90a214a9101affbf6045ab573914e0"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-pipeline-cache-receipts.contract.md",
+                "sha256": "9aec82831409cf58962c8fce134c7689fc4f0c66cf50110d14652e5e2d0c8bb3"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-published-release.contract.md",
+                "sha256": "37bbe0223171e7ffc57b1b3eb22f8183de87efa9344b3c49b2324f7e217c2045"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-recovery-parity.contract.md",
+                "sha256": "0b05d7d390e28642e31675cd85285dac8193b543782743a05d39ac8b74fadbbb"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-responsibility-map.contract.md",
+                "sha256": "b67176867270cc9639c922820256d08537cde353e4cd508d7314d0ac54042fe2"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-shader-links.contract.md",
+                "sha256": "a031e4dc8ac0c750b68c07d9274536232a556cbd0d95c5640ce42d2d32535aa4"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/browser-webgpu-effect-experiment.contract.md",
+                "sha256": "c37bbd13f2edf097a4bb9f42af703145512ede7de0333f325509bedb4db12f82"
+              },
+              {
+                "kind": "contract",
+                "path": "browser/chromium/contracts/runtime-selector-and-fallback.contract.md",
+                "sha256": "1b65c9fd1104daf9172dfcceb8b937a05b8267cc34a03f95b106b1a79e7f001b"
+              }
+            ],
+            "policies": [
+              {
+                "kind": "runtime_selector_policy",
+                "path": "config/browser-runtime-selector-policy.json",
+                "sha256": "df8b363ff88acc508f166f01461bac591f2686ba247054556d942265e38256d0"
+              },
+              {
+                "kind": "fork_maintenance_policy",
+                "path": "config/chromium-fork-maintenance-policy.json",
+                "sha256": "20dc559f4d66cb75e9d620c1f18e444ce068487b919d486ec41a4896e39362d8"
+              },
+              {
+                "kind": "chromium_patch_manifest",
+                "path": "config/chromium-patch-manifest.json",
+                "sha256": "8716ed03a84137db72230038f3fcbd5e65bc249436b54102d65de2983914fd91"
+              },
+              {
+                "kind": "browser_claim_policy",
+                "path": "config/browser-claim-policy.json",
+                "sha256": "097027d7b1226041c7a789ae0b7b39cc746320890a435a9a4b7b261b10962a17"
+              },
+              {
+                "kind": "browser_capture_policy",
+                "path": "config/browser-capture-policy.json",
+                "sha256": "09184bd8c9d9017e93a21dd4166e3a67d47d8eaac45165ddb280978c0348cd44"
+              },
+              {
+                "kind": "browser_artifact_identity_coverage",
+                "path": "config/browser-artifact-identity-coverage.json",
+                "sha256": "3f0585872b8a89a684400e00a89ab47903bd6f6def87cbb88b8415d5f67eaa0f"
+              },
+              {
+                "kind": "browser_unsupported_reason_taxonomy",
+                "path": "config/browser-unsupported-reason-taxonomy.json",
+                "sha256": "33eda11e97afc55b48d1403523bcc9fb3809613f9ae201f22e6dd4dae5006bec"
+              }
+            ],
+            "policyKinds": [
+              "browser_artifact_identity_coverage",
+              "browser_capture_policy",
+              "browser_claim_policy",
+              "browser_unsupported_reason_taxonomy",
+              "chromium_patch_manifest",
+              "fork_maintenance_policy",
+              "runtime_selector_policy"
+            ],
+            "promotionReceiptKinds": [
+              "browser_claim_promotion_receipt"
+            ],
+            "promotionReceipts": [
+              {
+                "kind": "browser_claim_promotion_receipt",
+                "path": "examples/browser-claim-promotion-receipt.sample.json",
+                "sha256": "86b1763e2b287b4615e97c9cb7f27b523f060e4793eaf08d9ba10be426600f87"
+              }
+            ]
+          }
+        },
+        "sha256": "d5b3a1a83cb1a6a1afc8b2b9d1361741e9c0fc0655b11655fbe5fc5a4d8fd61f",
         "status": "pass",
         "summary": {
           "claimBlockerCount": 1,
@@ -313,18 +1455,12 @@
           "code": "claimable_tint_compiler_evidence_report",
           "evidencePaths": [
             "examples/tint-compiler-evidence.sample.json",
+            "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+            "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+            "examples/tint-compiler-frontier-bundle.sample.json",
             "docs/shader-compiler-architecture.md"
           ],
           "exitCriteria": "Run the Doe-vs-Tint compiler evidence gate in claimable mode and publish the resulting evidence report."
-        },
-        {
-          "code": "shader_artifact_validation_for_target_backends",
-          "evidencePaths": [
-            "config/shader-toolchain.json",
-            "examples/tint-compiler-target-validation.sample.json",
-            "docs/shader-compiler-architecture.md"
-          ],
-          "exitCriteria": "Validate shader artifacts for the target backend set and attach those validation results to compiler claim evidence."
         }
       ],
       "claimAllowed": false,
@@ -335,18 +1471,76 @@
       "evidencePaths": [
         "config/shader-toolchain.json",
         "examples/tint-compiler-evidence.sample.json",
+        "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+        "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json",
         "examples/tint-compiler-target-validation.sample.json",
+        "examples/tint-compiler-target-validation.frontier.spirv.sample.json",
         "examples/tint-phase-benchmark-evidence.sample.json",
+        "examples/tint-phase-benchmark-evidence.benchmark-corpus.spirv.sample.json",
         "examples/tint-compiler-frontier-bundle.sample.json",
         "docs/shader-compiler-architecture.md"
+      ],
+      "evidenceSlices": [
+        {
+          "arch": "any",
+          "blockers": [
+            {
+              "code": "claimable_tint_compiler_evidence_report",
+              "evidencePaths": [
+                "examples/tint-compiler-evidence.sample.json",
+                "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+                "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+                "examples/tint-compiler-frontier-bundle.sample.json",
+                "docs/shader-compiler-architecture.md"
+              ],
+              "exitCriteria": "Run the Doe-vs-Tint compiler evidence gate in claimable mode and publish the resulting evidence report."
+            }
+          ],
+          "claimAllowed": false,
+          "claimIndexEntries": [],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "config/shader-toolchain.json",
+            "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+            "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+            "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json",
+            "examples/tint-compiler-target-validation.frontier.spirv.sample.json",
+            "examples/tint-compiler-frontier-bundle.sample.json",
+            "docs/shader-compiler-architecture.md"
+          ],
+          "gpuApi": "spirv",
+          "gpuVendor": "any",
+          "id": "wgsl-spirv-cross-platform",
+          "label": "WGSL to SPIR-V cross-platform compiler",
+          "notes": "The WGSL-to-SPIR-V compiler slice is diagnostic until compiler evidence, lowering-link receipts, and backend artifact validation are claimable.",
+          "os": "cross-platform",
+          "readinessStatus": "blocked",
+          "runtimeHost": "compiler"
+        }
       ],
       "frontierBundleEvidence": {
         "artifactKind": "tint_compiler_frontier_bundle",
         "claimBlockers": [
           {
             "code": "claimable_tint_compiler_evidence_report",
-            "message": "compiler evidence must be comparable before it can support a Tint replacement claim",
-            "path": "compilerEvidence[0].comparisonStatus"
+            "message": "webgpu-prefix-sum:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[0].claimBlockers[0]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "webgpu-prefix-sum:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[0].claimBlockers[1]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "webgpu-prefix-sum:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[0].claimBlockers[2]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "webgpu-prefix-sum:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[0].claimBlockers[3]"
           },
           {
             "code": "claimable_tint_compiler_evidence_report",
@@ -354,20 +1548,315 @@
             "path": "compilerEvidence[0].claimStatus"
           },
           {
-            "code": "shader_artifact_validation_for_target_backends",
-            "message": "Tint compiler result is not ok: sample_missing_tint_run",
-            "path": "targetValidationReceipts[0].claimBlockers[0]"
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "atan2-const-eval.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[0]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "atan2-const-eval.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[1]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "atan2-const-eval.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[2]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "atan2-const-eval.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[3]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "cluster-lights.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[4]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "cluster-lights.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[5]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "cluster-lights.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[6]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "cluster-lights.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[7]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "metaball-isosurface.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[8]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "metaball-isosurface.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[9]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "metaball-isosurface.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[10]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "metaball-isosurface.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[11]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "particles.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[12]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "particles.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[13]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "particles.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[14]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "particles.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[15]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "shadow-fragment.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[16]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "shadow-fragment.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[17]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "shadow-fragment.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[18]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "shadow-fragment.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[19]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "skinned-shadowed-pbr-fragment.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[20]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "skinned-shadowed-pbr-fragment.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[21]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "skinned-shadowed-pbr-fragment.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[22]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "skinned-shadowed-pbr-fragment.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[23]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "skinned-shadowed-pbr-vertex.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[24]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "skinned-shadowed-pbr-vertex.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[25]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "skinned-shadowed-pbr-vertex.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[26]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "skinned-shadowed-pbr-vertex.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[27]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778DE78280.cs.spv:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[28]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778DE78280.cs.spv:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[29]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778DE78280.cs.spv:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[30]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778DE78280.cs.spv:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[31]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778DE78280.cs.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[32]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778DE78280.cs.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[33]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778DE78280.cs.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[34]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778DE78280.cs.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[35]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778F740030.fs.spv:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[36]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778F740030.fs.spv:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[37]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778F740030.fs.spv:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[38]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778F740030.fs.spv:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[39]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778F740030.fs.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[40]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778F740030.fs.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[41]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778F740030.fs.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[42]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_000002778F740030.fs.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[43]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_0000017E9E2D81A0.vs.spv:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[44]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_0000017E9E2D81A0.vs.spv:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[45]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_0000017E9E2D81A0.vs.spv:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[46]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_0000017E9E2D81A0.vs.spv:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[47]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_0000017E9E2D81A0.vs.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[48]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_0000017E9E2D81A0.vs.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[49]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_0000017E9E2D81A0.vs.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[50]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "unity_webgpu_0000017E9E2D81A0.vs.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[51]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "webgpu-prefix-sum.wgsl:tint: missing integer phase timing: parse",
+            "path": "compilerEvidence[1].claimBlockers[52]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "webgpu-prefix-sum.wgsl:tint: missing integer phase timing: sema",
+            "path": "compilerEvidence[1].claimBlockers[53]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "webgpu-prefix-sum.wgsl:tint: missing integer phase timing: lower",
+            "path": "compilerEvidence[1].claimBlockers[54]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "webgpu-prefix-sum.wgsl:tint: missing integer phase timing: emit",
+            "path": "compilerEvidence[1].claimBlockers[55]"
+          },
+          {
+            "code": "claimable_tint_compiler_evidence_report",
+            "message": "compiler evidence must be claimable before it can support a Tint replacement claim",
+            "path": "compilerEvidence[1].claimStatus"
           }
         ],
         "claimabilityStatus": "blocked",
         "compilerEvidenceReports": [
           {
-            "claimBlockerCount": 2,
+            "claimBlockerCount": 5,
             "claimBlockerSummary": [
               {
                 "code": "claimable_tint_compiler_evidence_report",
                 "count": 1,
-                "message": "compiler evidence must be comparable before it can support a Tint replacement claim"
+                "message": "tint: missing integer phase timing: parse"
+              },
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 1,
+                "message": "tint: missing integer phase timing: sema"
+              },
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 1,
+                "message": "tint: missing integer phase timing: lower"
+              },
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 1,
+                "message": "tint: missing integer phase timing: emit"
               },
               {
                 "code": "claimable_tint_compiler_evidence_report",
@@ -377,21 +1866,64 @@
             ],
             "claimStatus": "diagnostic",
             "claimableRows": 0,
-            "comparableRows": 0,
-            "comparisonStatus": "diagnostic",
+            "comparableRows": 1,
+            "comparisonStatus": "comparable",
             "diagnosticGateStatus": "pass",
-            "path": "examples/tint-compiler-evidence.sample.json",
-            "rowCount": 1
+            "path": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+            "rowCount": 1,
+            "sha256": "7f2e83611a2669d22f38ec2001e9527764e6bbc7d91bfbcbb845f4b904184026"
+          },
+          {
+            "claimBlockerCount": 57,
+            "claimBlockerSummary": [
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 14,
+                "message": "tint: missing integer phase timing: parse"
+              },
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 14,
+                "message": "tint: missing integer phase timing: sema"
+              },
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 14,
+                "message": "tint: missing integer phase timing: lower"
+              },
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 14,
+                "message": "tint: missing integer phase timing: emit"
+              },
+              {
+                "code": "claimable_tint_compiler_evidence_report",
+                "count": 1,
+                "message": "compiler evidence must be claimable before it can support a Tint replacement claim"
+              }
+            ],
+            "claimStatus": "diagnostic",
+            "claimableRows": 0,
+            "comparableRows": 14,
+            "comparisonStatus": "comparable",
+            "diagnosticGateStatus": "pass",
+            "path": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+            "rowCount": 14,
+            "sha256": "ab1f734b5501c6a9d8fbfbd541fe804c60f18accb3d2ac36abd49de13e7ca41b"
           }
         ],
         "componentReceipts": {
           "loweringLinks": [
             {
               "diagnosticRows": 0,
-              "evidencePath": "examples/tint-compiler-evidence.sample.json",
+              "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+              "evidencePaths": [
+                "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json"
+              ],
               "linkedRows": 1,
-              "path": "examples/wgsl-lowering-link-receipt.sample.json",
+              "path": "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json",
               "rowCount": 1,
+              "sha256": "39c1cc3603c82af8fbeaecb9364f6251a3bba746e2b509e17459366bb4163200",
               "status": "pass",
               "targets": [
                 "spirv"
@@ -400,8 +1932,12 @@
           ],
           "phaseBenchmarks": [
             {
-              "evidencePath": "examples/tint-compiler-evidence.sample.json",
-              "path": "examples/tint-phase-benchmark-evidence.sample.json",
+              "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+              "evidencePaths": [
+                "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json"
+              ],
+              "path": "examples/tint-phase-benchmark-evidence.browser-corpus.spirv.sample.json",
+              "sha256": "db3cb8559a85d3dc51d29ebac80914b812c7718c48b438b0f92964aba5d6cadd",
               "status": "pass",
               "summary": {
                 "coveredTargetCount": 1,
@@ -418,40 +1954,61 @@
               "targets": [
                 "spirv"
               ]
+            },
+            {
+              "evidencePath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+              "evidencePaths": [
+                "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
+              ],
+              "path": "examples/tint-phase-benchmark-evidence.benchmark-corpus.spirv.sample.json",
+              "sha256": "256343524b1a254e9b42adfc202a1eca8211c695005df57fb0852cecab117fcd",
+              "status": "pass",
+              "summary": {
+                "coveredTargetCount": 1,
+                "exactPhaseCompleteRows": 0,
+                "exactPhaseMissingRows": 14,
+                "failureCount": 0,
+                "notApplicableRows": 0,
+                "phaseBenchmarkCoveredRows": 14,
+                "phaseBenchmarkMissingRows": 0,
+                "rowCount": 14,
+                "targetCount": 1,
+                "tintOkRows": 14
+              },
+              "targets": [
+                "spirv"
+              ]
             }
           ],
           "targetValidations": [
             {
-              "claimBlockerSummary": [
-                {
-                  "code": "tint_result_not_ok",
-                  "count": 1,
-                  "message": "Tint compiler result is not ok: sample_missing_tint_run"
-                }
-              ],
+              "claimBlockerSummary": [],
               "claimBlockerSummaryByEvidencePath": [
                 {
-                  "claimBlockerSummary": [
-                    {
-                      "code": "tint_result_not_ok",
-                      "count": 1,
-                      "message": "Tint compiler result is not ok: sample_missing_tint_run"
-                    }
-                  ],
-                  "evidencePath": "examples/tint-compiler-evidence.sample.json"
+                  "claimBlockerSummary": [],
+                  "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json"
+                },
+                {
+                  "claimBlockerSummary": [],
+                  "evidencePath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
                 }
               ],
-              "evidencePath": "examples/tint-compiler-evidence.sample.json",
-              "path": "examples/tint-compiler-target-validation.sample.json",
+              "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+              "evidencePaths": [
+                "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+                "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
+              ],
+              "path": "examples/tint-compiler-target-validation.frontier.spirv.sample.json",
+              "sha256": "51597510a830f998602b20f6221cf3ad4dae277f1cd550dcc50fbbcfef4961ce",
               "status": "pass",
               "summary": {
-                "claimBlockerCount": 1,
+                "claimBlockerCount": 0,
                 "coveredTargetCount": 1,
-                "diagnosticRows": 1,
+                "diagnosticRows": 0,
                 "failureCount": 0,
-                "rowCount": 1,
+                "rowCount": 15,
                 "targetCount": 1,
-                "validatedRows": 0
+                "validatedRows": 15
               },
               "targets": [
                 "spirv"
@@ -460,14 +2017,72 @@
           ]
         },
         "path": "examples/tint-compiler-frontier-bundle.sample.json",
+        "phaseTimingCoverage": {
+          "coverageByEvidencePath": [
+            {
+              "doeExactPhaseCompleteRows": 1,
+              "doeExactPhaseMissingRows": 0,
+              "doeOkRows": 1,
+              "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+              "notApplicableRows": 0,
+              "rowCount": 1,
+              "targets": [
+                "spirv"
+              ],
+              "tintBenchmarkScopeCoveredRows": 1,
+              "tintBenchmarkScopeMissingRows": 0,
+              "tintExactPhaseCompleteRows": 0,
+              "tintExactPhaseMissingRows": 1,
+              "tintOkRows": 1
+            },
+            {
+              "doeExactPhaseCompleteRows": 14,
+              "doeExactPhaseMissingRows": 0,
+              "doeOkRows": 14,
+              "evidencePath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+              "notApplicableRows": 0,
+              "rowCount": 14,
+              "targets": [
+                "spirv"
+              ],
+              "tintBenchmarkScopeCoveredRows": 14,
+              "tintBenchmarkScopeMissingRows": 0,
+              "tintExactPhaseCompleteRows": 0,
+              "tintExactPhaseMissingRows": 14,
+              "tintOkRows": 14
+            }
+          ],
+          "doeExactPhaseCompleteRows": 15,
+          "doeExactPhaseMissingRows": 0,
+          "doeOkRows": 15,
+          "notApplicableRows": 0,
+          "requiredBenchmarkScopes": [
+            "parseWgsl",
+            "validateIr",
+            "generateBackend"
+          ],
+          "requiredExactPhases": [
+            "parse",
+            "sema",
+            "lower",
+            "emit"
+          ],
+          "rowCount": 15,
+          "tintBenchmarkScopeCoveredRows": 15,
+          "tintBenchmarkScopeMissingRows": 0,
+          "tintExactPhaseCompleteRows": 0,
+          "tintExactPhaseMissingRows": 15,
+          "tintOkRows": 15
+        },
+        "sha256": "84d02ebacf8659e26617622f6e4d5a12acdde4b6c70b8387504eec6e021edbe1",
         "status": "pass",
         "summary": {
-          "claimBlockerCount": 3,
-          "compilerEvidenceReportCount": 1,
+          "claimBlockerCount": 62,
+          "compilerEvidenceReportCount": 2,
           "coveredTargetCount": 1,
           "failureCount": 0,
           "loweringLinkReceiptCount": 1,
-          "phaseBenchmarkReceiptCount": 1,
+          "phaseBenchmarkReceiptCount": 2,
           "targetValidationReceiptCount": 1
         }
       },
@@ -476,85 +2091,283 @@
       "surface": "shader_compiler"
     },
     {
-      "blockers": [
-        {
-          "code": "published_cts_subset_receipt",
-          "evidencePaths": [
-            "config/webgpu-cts-evidence.json",
-            "docs/doe-support-matrix.md"
-          ],
-          "exitCriteria": "Publish a CTS subset receipt with explicit query coverage, pass/fail status, and backend identity."
-        },
-        {
-          "code": "backend_specific_cts_pass_ledger",
-          "evidencePaths": [
-            "config/webgpu-cts-evidence.json",
-            "config/webgpu-spec-index.jsonl"
-          ],
-          "exitCriteria": "Record backend-specific CTS pass ledgers for every backend used by the replacement claim."
-        },
-        {
-          "code": "conformance_claim_policy",
-          "evidencePaths": [
-            "config/webgpu-cts-evidence.json",
-            "docs/doe-support-matrix.md"
-          ],
-          "exitCriteria": "Define the conformance claim policy that maps CTS evidence to allowed public language."
-        }
-      ],
+      "blockers": [],
       "claimAllowed": false,
       "claimIndexEntries": [],
+      "ctsConformanceEvidence": {
+        "allowedClaimStates": [
+          {
+            "allowed": true,
+            "requirements": [
+              "claim policy defined",
+              "current evidence described as diagnostic"
+            ],
+            "state": "diagnostic"
+          },
+          {
+            "allowed": false,
+            "requirements": [
+              "published CTS subset receipt",
+              "backend-specific pass ledger",
+              "no failing required rows"
+            ],
+            "state": "subset_conformance"
+          },
+          {
+            "allowed": false,
+            "requirements": [
+              "all required replacement rows claimable",
+              "published CTS subset receipt",
+              "backend-specific pass ledger"
+            ],
+            "state": "replacement_conformance"
+          }
+        ],
+        "artifactKind": "webgpu_cts_evidence",
+        "backendPassLedger": {
+          "artifactKind": "webgpu_cts_backend_pass_ledger",
+          "claimScope": "published_subset_backend_pass_ledger",
+          "failures": [],
+          "fullConformanceClaimAllowed": false,
+          "ledgerId": "webgpu-cts-subset-20260328-doe-metal-backend-pass-ledger-doe-metal",
+          "ledgerStatus": "pass",
+          "path": "examples/webgpu-cts-backend-pass-ledger.sample.json",
+          "replacementClaimAllowed": false,
+          "schemaVersion": 1,
+          "sha256": "dd549a8dc3276f26d13269528689c8f7e300fa77293f4aa69817438008fdc3a2",
+          "sourceEvidence": {
+            "artifactKind": "webgpu_cts_evidence",
+            "path": "config/webgpu-cts-evidence.json",
+            "sha256": "a365ed912823ec5c7cb42a23259dfcc7ab79856a1aef2757df69110852e06f76"
+          },
+          "sourceReceipt": {
+            "artifactKind": "webgpu_cts_subset_receipt",
+            "path": "examples/webgpu-cts-subset-receipt.sample.json",
+            "receiptId": "webgpu-cts-subset-20260328-doe-metal",
+            "sha256": "3eb94dd810fbf55b395f5d5cf2a8818d0cc976f939911805ad58f4a8ae1eacfb"
+          },
+          "status": "pass",
+          "summary": {
+            "allBackendLedgersPass": true,
+            "backendLedgerCount": 1,
+            "coverageRowCount": 12,
+            "failCount": 0,
+            "failingBackendLedgerCount": 0,
+            "failureCount": 0,
+            "notRunCount": 0,
+            "passCount": 12,
+            "skipCount": 0
+          }
+        },
+        "claimLanguage": "diagnostic_until_full_published_pass_ledger",
+        "ctsRevision": "untracked",
+        "ctsSource": "bench/fixtures/cts_subset.fawn-node.json",
+        "diagnosticLanguage": "Current CTS evidence supports only subset-scoped diagnostic evidence; broad conformance and replacement language remain disallowed.",
+        "failures": [],
+        "path": "config/webgpu-cts-evidence.json",
+        "policyId": "webgpu-cts-conformance-claim-policy-v1",
+        "policyStatus": "defined",
+        "promotionRequirements": {
+          "artifactPathsRequired": true,
+          "backendIdentityRequired": true,
+          "backendSpecificPassLedger": true,
+          "noFailingRequiredRows": true,
+          "publishedSubsetReceipt": true
+        },
+        "schemaVersion": 1,
+        "sha256": "a365ed912823ec5c7cb42a23259dfcc7ab79856a1aef2757df69110852e06f76",
+        "subsetReceipt": {
+          "artifactKind": "webgpu_cts_subset_receipt",
+          "failures": [],
+          "path": "examples/webgpu-cts-subset-receipt.sample.json",
+          "publicationChannel": "repo_example",
+          "publicationStatus": "repo_published",
+          "receiptId": "webgpu-cts-subset-20260328-doe-metal",
+          "schemaVersion": 1,
+          "sha256": "3eb94dd810fbf55b395f5d5cf2a8818d0cc976f939911805ad58f4a8ae1eacfb",
+          "sourceEvidence": {
+            "artifactKind": "webgpu_cts_evidence",
+            "claimLanguage": "diagnostic_until_full_published_pass_ledger",
+            "diagnosticLanguage": "Current CTS evidence supports only subset-scoped diagnostic evidence; broad conformance and replacement language remain disallowed.",
+            "path": "config/webgpu-cts-evidence.json",
+            "policyId": "webgpu-cts-conformance-claim-policy-v1",
+            "sha256": "a365ed912823ec5c7cb42a23259dfcc7ab79856a1aef2757df69110852e06f76"
+          },
+          "status": "pass",
+          "summary": {
+            "artifactPathCount": 1,
+            "backendCount": 1,
+            "coverageRowCount": 12,
+            "failCount": 0,
+            "failureCount": 0,
+            "notRunCount": 0,
+            "passCount": 12,
+            "queryCount": 12,
+            "skipCount": 0,
+            "surfaceCount": 1
+          }
+        },
+        "summary": {
+          "backendCount": 1,
+          "evidenceRowCount": 12,
+          "passEvidenceRowCount": 12,
+          "policyFailureCount": 0
+        }
+      },
       "currentState": "diagnostic",
       "dawnComparator": "webgpu_cts",
       "doeTarget": "doe_webgpu_surface",
       "evidencePaths": [
         "config/webgpu-cts-evidence.json",
+        "examples/webgpu-cts-subset-receipt.sample.json",
+        "examples/webgpu-cts-backend-pass-ledger.sample.json",
         "config/webgpu-spec-index.jsonl",
         "docs/doe-support-matrix.md"
+      ],
+      "evidenceSlices": [
+        {
+          "arch": "arm64",
+          "blockers": [],
+          "claimAllowed": false,
+          "claimIndexEntries": [],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "examples/webgpu-cts-subset-receipt.sample.json",
+            "examples/webgpu-cts-backend-pass-ledger.sample.json",
+            "config/webgpu-spec-index.jsonl",
+            "docs/doe-support-matrix.md"
+          ],
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "id": "cts-macos-arm64-apple-metal",
+          "label": "CTS macOS arm64 Apple Metal",
+          "notes": "The Apple Metal CTS slice is diagnostic until published CTS receipts and backend pass ledgers support the claim language.",
+          "os": "macos",
+          "readinessStatus": "blocked",
+          "runtimeHost": "cts"
+        },
+        {
+          "arch": "x64",
+          "blockers": [],
+          "claimAllowed": false,
+          "claimIndexEntries": [],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "examples/webgpu-cts-subset-receipt.sample.json",
+            "examples/webgpu-cts-backend-pass-ledger.sample.json",
+            "config/webgpu-spec-index.jsonl",
+            "docs/doe-support-matrix.md"
+          ],
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "id": "cts-linux-x64-amd-vulkan",
+          "label": "CTS Linux x64 AMD Vulkan",
+          "notes": "The AMD Vulkan CTS slice is diagnostic until published CTS receipts and backend pass ledgers support the claim language.",
+          "os": "linux",
+          "readinessStatus": "blocked",
+          "runtimeHost": "cts"
+        },
+        {
+          "arch": "x64",
+          "blockers": [],
+          "claimAllowed": false,
+          "claimIndexEntries": [],
+          "currentState": "diagnostic",
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "examples/webgpu-cts-subset-receipt.sample.json",
+            "examples/webgpu-cts-backend-pass-ledger.sample.json",
+            "config/webgpu-spec-index.jsonl",
+            "docs/doe-support-matrix.md"
+          ],
+          "gpuApi": "d3d12",
+          "gpuVendor": "microsoft",
+          "id": "cts-windows-x64-d3d12",
+          "label": "CTS Windows x64 D3D12",
+          "notes": "The D3D12 CTS slice is diagnostic until published CTS receipts and backend pass ledgers support the claim language.",
+          "os": "windows",
+          "readinessStatus": "blocked",
+          "runtimeHost": "cts"
+        }
       ],
       "id": "webgpu-cts-conformance",
       "readinessStatus": "blocked",
       "surface": "spec_conformance"
     },
     {
-      "blockers": [
+      "blockers": [],
+      "claimAllowed": true,
+      "claimIndexEntries": [
         {
-          "code": "non_apple_drop_in_bundle_receipts",
-          "evidencePaths": [
-            "docs/apple-metal-runtime-release.md",
-            "docs/doe-support-matrix.md"
-          ],
-          "exitCriteria": "Publish non-Apple drop-in runtime bundle receipts with hashes, ABI checks, and gate outputs."
-        },
-        {
-          "code": "rollback_rehearsal_receipt",
-          "evidencePaths": [
-            "config/backend-cutover-policy.json",
-            "docs/doe-support-matrix.md"
-          ],
-          "exitCriteria": "Publish a rollback rehearsal receipt for the drop-in runtime cutover policy."
-        },
-        {
-          "code": "cross_backend_abi_validation",
-          "evidencePaths": [
-            "config/native-backend-coverage-matrix.json",
-            "docs/doe-support-matrix.md"
-          ],
-          "exitCriteria": "Publish ABI validation covering the backend set named by the runtime replacement claim."
+          "claimPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json",
+          "claimState": "claim-indexed",
+          "claimStatus": "claimable",
+          "comparisonStatus": "comparable",
+          "id": "dropin-cutover-linux-vulkan",
+          "reportPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json"
         }
       ],
-      "claimAllowed": false,
-      "claimIndexEntries": [],
-      "currentState": "diagnostic",
+      "currentState": "claimable",
       "dawnComparator": "libwebgpu_dawn",
       "doeTarget": "libwebgpu_doe",
       "evidencePaths": [
         "config/backend-cutover-policy.json",
+        "config/dropin-cutover-rehearsal-receipt.schema.json",
         "docs/apple-metal-runtime-release.md",
-        "docs/doe-support-matrix.md"
+        "docs/doe-support-matrix.md",
+        "bench/out/dropin/20260702T164301Z/linux-dropin-report.json",
+        "bench/out/dropin/20260702T164301Z/linux-dropin-symbol-report.json",
+        "bench/out/dropin/20260702T164301Z/linux-dropin-behavior-report.json",
+        "bench/out/dropin/20260702T164301Z/linux-dropin-benchmark-report.json",
+        "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json",
+        "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json"
+      ],
+      "evidenceSlices": [
+        {
+          "arch": "x64",
+          "blockers": [],
+          "claimAllowed": true,
+          "claimIndexEntries": [
+            {
+              "claimPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json",
+              "claimState": "claim-indexed",
+              "claimStatus": "claimable",
+              "comparisonStatus": "comparable",
+              "id": "dropin-cutover-linux-vulkan",
+              "reportPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json"
+            }
+          ],
+          "currentState": "claimable",
+          "evidencePaths": [
+            "config/backend-cutover-policy.json",
+            "config/dropin-cutover-rehearsal-receipt.schema.json",
+            "docs/apple-metal-runtime-release.md",
+            "docs/doe-support-matrix.md",
+            "bench/out/dropin/20260702T164301Z/linux-dropin-report.json",
+            "bench/out/dropin/20260702T164301Z/linux-dropin-symbol-report.json",
+            "bench/out/dropin/20260702T164301Z/linux-dropin-behavior-report.json",
+            "bench/out/dropin/20260702T164301Z/linux-dropin-benchmark-report.json",
+            "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json",
+            "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json"
+          ],
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "id": "dropin-linux-x64-amd-vulkan",
+          "label": "Drop-in ABI Linux x64 AMD Vulkan",
+          "notes": "The drop-in ABI Linux AMD Vulkan slice is claimable through the indexed cutover rehearsal receipt and AMD Vulkan delegate release claim.",
+          "os": "linux",
+          "readinessStatus": "claimable",
+          "runtimeHost": "drop-in"
+        }
       ],
       "id": "drop-in-abi-runtime",
-      "readinessStatus": "blocked",
+      "readinessStatus": "claimable",
       "surface": "drop_in_runtime"
     },
     {
@@ -578,6 +2391,37 @@
         "config/claim-index.schema.json",
         "docs/process.md"
       ],
+      "evidenceSlices": [
+        {
+          "arch": "any",
+          "blockers": [
+            {
+              "code": "frontier_rows_not_all_claimable",
+              "evidencePaths": [
+                "config/dawn-replacement-frontier.json",
+                "reports/claim-index.json"
+              ],
+              "exitCriteria": "Every required Dawn/Tint replacement frontier row is claim-allowed or covered according to this manifest and the public claim index."
+            }
+          ],
+          "claimAllowed": false,
+          "claimIndexEntries": [],
+          "currentState": "covered",
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "config/claim-index.schema.json",
+            "docs/process.md"
+          ],
+          "gpuApi": "none",
+          "gpuVendor": "none",
+          "id": "release-claim-index-cross-platform",
+          "label": "Release claim index cross-platform",
+          "notes": "The claim-index slice is covered, while universal replacement remains blocked until every product slice is claimable.",
+          "os": "cross-platform",
+          "readinessStatus": "covered",
+          "runtimeHost": "claim-index"
+        }
+      ],
       "id": "release-claim-index",
       "readinessStatus": "covered",
       "surface": "evidence_release"
@@ -585,12 +2429,15 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "blockedProductRowCount": 7,
-    "claimAllowedProductRowCount": 3,
+    "blockedEvidenceSliceCount": 10,
+    "blockedProductRowCount": 5,
+    "claimAllowedEvidenceSliceCount": 5,
+    "claimAllowedProductRowCount": 5,
     "coveredEvidenceReleaseRowCount": 1,
+    "evidenceSliceCount": 16,
     "frontierRowCount": 11,
     "productRowCount": 10,
-    "uniqueBlockerCount": 18
+    "uniqueBlockerCount": 8
   },
   "universalClaim": {
     "allowed": false,

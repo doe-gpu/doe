@@ -177,6 +177,137 @@ what to build, gate, prove, or remove. Strategy prose belongs in
 - Add developer-visible cache hit/miss and pipeline creation receipts.
 - Add developer-visible unsupported-capability and fallback explanations.
 
+## Published browser release tasks
+
+- Treat a downloadable Chromium-family browser build as the required public
+  proof artifact for browser-runtime replacement claims; npm packages and
+  browser wrappers do not satisfy this requirement.
+- Decide the release label (`Doe Browser` or `Fawn Doe`) before publishing and
+  keep the browser artifact identity stable across receipts, docs, and hosted
+  downloads.
+- Produce a macOS arm64 release zip first, with a public HTTPS download URL on
+  release infrastructure and SHA-256 for the zip and browser executable member
+  inside the zip, app metadata binding the same product identity, plus
+  hash-matched Doe and Dawn runtime members inside the zip, then use the same
+  contract for Linux and Windows release zips.
+- Package macOS archives and Linux diagnostic archives through
+  `browser/chromium/scripts/package-browser-release-archive.py` so each zip is
+  paired with a schema-backed manifest for archive hash, product/platform
+  identity, member paths, member hashes, and executable-bit state. Linux
+  archives must also carry browser metadata JSON binding the same product,
+  platform, executable, Doe runtime, and Dawn runtime paths.
+- Bind each downloadable browser archive to product identity naming Doe Browser
+  or Fawn Doe, and require the public download receipt to carry the same product
+  identity.
+- Generate public download receipts with
+  `bench/tools/build_browser_public_download_receipt.py` so the hosted GET,
+  served bytes hash, local archive path, release archive manifest path/hash,
+  product identity, platform tuple, and packaged member paths are captured
+  before release-bundle assembly.
+- Fail public download receipt generation before writing JSON when receipt ID,
+  observation identity, archive path, release archive manifest path/hash,
+  product/platform identity, or packaged member paths are missing or invalid.
+- Bind each release archive manifest into the release artifact bundle and
+  verify that it matches the archive hash, required packaged member paths,
+  required member hashes, archive byte length, and zip member metadata.
+- Reject release archives whose declared browser executable member is not
+  executable, both at package creation and release-bundle verification.
+- Bind every release candidate to a browser release artifact bundle and browser
+  runtime frontier bundle with verified file hashes for the browser binary,
+  Doe runtime, Dawn fallback runtime, shader compiler, runtime selector policy,
+  Chromium patch manifest, proof surface, capture policy, and claim reports.
+- Require every release-candidate release artifact bundle to hash-bind a
+  browser release launch receipt proving the packaged archive launched with Doe
+  active, WebGPU available, hidden fallback disabled, proof page loaded, hosted
+  gallery page loaded, same-page Dawn/Doe comparison evidence loaded, and
+  proof/gallery/Dawn/Doe receipt IDs observed.
+- Require every release-candidate release artifact bundle to hash-bind a
+  passing Chromium source checkout report with `requireRuntimeSelector=true`,
+  so packaged browser evidence cannot skip source-level runtime-selector seam
+  proof.
+- Require release-candidate proof surfaces to load the referenced runtime
+  identity and hash-match its packaged browser, Doe runtime, and Dawn fallback
+  artifact identity back to the enclosing release artifact bundle.
+- Require release-candidate proof-page diagnostics to report a compiler path
+  matching the enclosing release bundle `shaderCompiler.path`.
+- Require the browser release artifact bundle to carry a public download
+  receipt proving the hosted archive URL served bytes matching the
+  `releaseArchive.sha256` identity.
+- Emit a per-run WebGPU receipt from the published browser that records source
+  shader identity, lowering path, backend, driver/device identity, command
+  graph or flight-recorder reference, output hash or frame hash, timing class
+  and phases, runtime selector state, fallback state, and receipt ID.
+- Require release-candidate proof-surface execution receipts to carry inline
+  shader source text, not only a source hash, before they can support public
+  source-preserving browser evidence; reject receipts whose source hash does
+  not match the inline source text.
+- Generate per-run browser execution receipts with
+  `bench/tools/build_browser_execution_receipt.py` so browser smoke evidence is
+  bound to explicit shader identity, output/frame hash, command coverage,
+  timing phases, runtime selector state, and fallback state before proof-surface
+  assembly.
+- Add a Dawn-vs-Doe comparison mode that runs the same page workload through
+  forced Dawn and forced Doe, then emits side-by-side receipts with matching
+  workload identity, adapter/device policy, timing scope, command coverage, and
+  output hash policy; the gallery page for that comparison must expose the
+  comparison artifact and both Dawn/Doe receipt payloads on the same page.
+- Require each published proof-surface comparison receipt to carry an explicit
+  comparison policy for same workload ID, source shader identity,
+  adapter/device identity, timing scope, command coverage, output identity, and
+  no hidden fallback, and gate that policy against the paired receipt payloads.
+- Publish gallery pages for compute kernels, rendering/presentation, tensor or
+  model workloads, shader edge cases, and benchmark traces; every page must
+  have a hosted HTTPS URL on a non-special-use host, name its workload
+  contract, expose workload IDs, and link emitted receipt IDs to artifact
+  paths.
+- Require every release-candidate hosted gallery page to carry a public gallery
+  receipt proving the served page bytes match the hash-bound gallery artifact.
+- Generate public gallery receipts with
+  `bench/tools/build_browser_public_gallery_receipt.py` so each hosted gallery
+  GET, served bytes hash, category, URL, local gallery artifact path, and
+  workload contract path plus workload IDs, receipt IDs, and receipt artifact
+  paths are captured before proof-surface assembly.
+- Fail public gallery receipt generation before writing JSON when receipt ID,
+  observation identity, gallery artifact path, workload contract path,
+  workload IDs, receipt IDs, or receipt artifact paths are missing.
+- Add a local proof page such as `about:doe` that shows active runtime mode,
+  backend, compiler path, TSIR/HostPlan/CSL status, fallback policy, recent
+  receipt IDs, links to receipt payloads, and paired Dawn/Doe comparison
+  artifacts, plus release provenance for the downloadable browser archive and
+  archive manifest.
+- Require every release-candidate proof page to carry a diagnostic page receipt
+  proving the internal diagnostics URL loaded bytes matching the hash-bound
+  proof page artifact, diagnostics, release provenance, runtime identity path,
+  and recent receipt IDs.
+- Generate proof-page diagnostic receipts with
+  `bench/tools/build_browser_proof_page_receipt.py` so captured `about:doe`
+  bytes, active-Doe diagnostics, release provenance, runtime identity path, and
+  recent receipt IDs are bound before proof-surface assembly.
+- Require proof-page active backend diagnostics to match a linked Doe execution
+  receipt backend, so `about:doe` evidence names the actual Doe WebGPU path it
+  is proving.
+- Assemble published proof surfaces with
+  `bench/tools/build_browser_published_proof_surface.py` so proof-page,
+  gallery, execution-receipt, and paired-comparison artifacts are hash-linked
+  by a producer before release-bundle assembly.
+- Make the proof-surface producer reject hash-only execution receipts,
+  unlinked proof-page recent receipt IDs, source/hash drift, missing
+  lowering/backend/command/output/timing evidence, incomplete command coverage,
+  hidden fallback drift, failed proof-page loads, failed gallery GET receipts,
+  proof-page artifacts that do not visibly expose diagnostics/release
+  provenance/receipt links/comparison evidence, gallery artifacts that do not
+  visibly expose category/workload/receipt evidence, wrong Dawn/Doe runtime
+  labels, workload drift, command-coverage drift, comparison runner pages
+  outside the hash-linked gallery, invalid Dawn/Doe smoke comparison artifacts,
+  and paired comparison receipts whose Dawn/Doe source shader, driver, or
+  device identity differs.
+- Keep proof-page and gallery capture behavior origin-scoped and governed by a
+  checked browser capture policy surface; hash, redact, or forbid page data
+  that should not leave the browser boundary.
+- Keep browser output diagnostic until the published release contract,
+  comparison gallery, proof page, and release artifact bundle all pass their
+  gates.
+
 ## Security and fork-maintenance tasks
 
 - Keep capture artifacts origin-scoped and redact or hash page data that must
@@ -253,6 +384,8 @@ what to build, gate, prove, or remove. Strategy prose belongs in
   [`../browser/chromium/contracts/browser-cts-subset.contract.md`](../browser/chromium/contracts/browser-cts-subset.contract.md)
 - Browser CTS subset builder:
   [`../browser/chromium/scripts/build-browser-cts-subset.py`](../browser/chromium/scripts/build-browser-cts-subset.py)
+- Browser published release contract:
+  [`../browser/chromium/contracts/browser-published-release.contract.md`](../browser/chromium/contracts/browser-published-release.contract.md)
 - Runtime selector contract:
   [`../browser/chromium/contracts/runtime-selector-and-fallback.contract.md`](../browser/chromium/contracts/runtime-selector-and-fallback.contract.md)
 - Runtime selector policy:
@@ -272,6 +405,11 @@ what to build, gate, prove, or remove. Strategy prose belongs in
 - Browser release artifact bundle:
   [`../bench/tools/build_browser_release_artifact_bundle.py`](../bench/tools/build_browser_release_artifact_bundle.py),
   [`../bench/tools/check_browser_release_artifact_bundle.py`](../bench/tools/check_browser_release_artifact_bundle.py)
+- Browser release-candidate provenance/finalizer:
+  [`../bench/tools/check_browser_release_candidate_provenance.py`](../bench/tools/check_browser_release_candidate_provenance.py),
+  [`../bench/tools/stage_browser_release_candidate_provenance.py`](../bench/tools/stage_browser_release_candidate_provenance.py),
+  [`../bench/tools/finalize_browser_release_candidate_bundle.py`](../bench/tools/finalize_browser_release_candidate_bundle.py),
+  [`../bench/tools/check_browser_release_candidate_finalizer.py`](../bench/tools/check_browser_release_candidate_finalizer.py)
 - Browser claim promotion receipt:
   [`../bench/tools/build_browser_claim_promotion_receipt.py`](../bench/tools/build_browser_claim_promotion_receipt.py),
   [`../bench/tools/check_browser_claim_promotion_receipt.py`](../bench/tools/check_browser_claim_promotion_receipt.py)

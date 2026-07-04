@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-proof-page-receipt.schema.json",
+  "title": "Browser proof page receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "receiptId",
+    "url",
+    "loadType",
+    "status",
+    "contentSha256",
+    "contentLengthBytes",
+    "proofArtifactPath",
+    "runtimeIdentityPath",
+    "diagnostics",
+    "releaseProvenance",
+    "recentReceiptIds",
+    "observedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_proof_page_receipt" },
+    "receiptId": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "minLength": 1 },
+    "loadType": { "enum": ["browser_internal_page", "file"] },
+    "status": { "type": "string", "const": "loaded" },
+    "contentSha256": { "$ref": "#/$defs/Hash" },
+    "contentLengthBytes": { "type": "integer", "minimum": 1 },
+    "proofArtifactPath": { "type": "string", "minLength": 1 },
+    "runtimeIdentityPath": { "type": "string", "minLength": 1 },
+    "diagnostics": { "$ref": "#/$defs/Diagnostics" },
+    "releaseProvenance": { "$ref": "#/$defs/ReleaseProvenance" },
+    "recentReceiptIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "observedAt": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activeRuntime",
+        "activeBackend",
+        "webgpuAvailable",
+        "compilerPath",
+        "tsirStatus",
+        "hostPlanStatus",
+        "cslStatus",
+        "fallbackPolicyState"
+      ],
+      "properties": {
+        "activeRuntime": { "type": "string", "const": "doe" },
+        "activeBackend": { "type": "string", "minLength": 1 },
+        "webgpuAvailable": { "type": "boolean", "const": true },
+        "compilerPath": { "type": "string", "minLength": 1 },
+        "tsirStatus": { "type": "string", "minLength": 1 },
+        "hostPlanStatus": { "type": "string", "minLength": 1 },
+        "cslStatus": { "type": "string", "minLength": 1 },
+        "fallbackPolicyState": { "type": "string", "const": "hidden_fallback_disabled" }
+      }
+    },
+    "PublicHttpsUrl": {
+      "type": "string",
+      "pattern": "^https://[^/?#]+\\.[^/?#]+",
+      "not": {
+        "anyOf": [
+          { "pattern": "^https://localhost(?::|/|$)" },
+          { "pattern": "^https://(?:127\\.0\\.0\\.1|0\\.0\\.0\\.0|10\\.|192\\.168\\.|172\\.(?:1[6-9]|2[0-9]|3[0-1])\\.)(?::|/|$)" },
+          { "pattern": "^https://\\[::1\\](?::|/|$)" },
+          { "pattern": "^https://[^/?#]*\\.(?:local|localhost|test|example|invalid)(?::|/|$)" },
+          { "pattern": "^https://(?:example\\.com|example\\.net|example\\.org)(?::|/|$)" }
+        ]
+      }
+    },
+    "Artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "kind": { "type": "string", "minLength": 1 },
+        "downloadUrl": { "$ref": "#/$defs/PublicHttpsUrl" }
+      }
+    },
+    "BrowserProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["productId", "displayName", "version", "channel"],
+      "properties": {
+        "productId": { "enum": ["doe-browser", "fawn-doe"] },
+        "displayName": { "enum": ["Doe Browser", "Fawn Doe"] },
+        "version": { "type": "string", "minLength": 1 },
+        "channel": { "enum": ["diagnostic", "release_candidate", "release"] }
+      }
+    },
+    "Platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch", "packageFormat"],
+      "properties": {
+        "os": { "enum": ["macos", "linux", "windows"] },
+        "arch": { "enum": ["arm64", "x64"] },
+        "packageFormat": { "enum": ["zip"] }
+      }
+    },
+    "ReleaseProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "browserProduct",
+        "platform",
+        "releaseArchive",
+        "releaseArchiveManifest",
+        "publicDownloadReceipt",
+        "browserExecutableArchivePath",
+        "browserAppMetadataArchivePath",
+        "doeRuntimeArchivePath",
+        "dawnFallbackRuntimeArchivePath"
+      ],
+      "properties": {
+        "browserProduct": { "$ref": "#/$defs/BrowserProduct" },
+        "platform": { "$ref": "#/$defs/Platform" },
+        "releaseArchive": { "$ref": "#/$defs/Artifact" },
+        "releaseArchiveManifest": { "$ref": "#/$defs/Artifact" },
+        "publicDownloadReceipt": { "$ref": "#/$defs/Artifact" },
+        "browserExecutableArchivePath": { "type": "string", "minLength": 1 },
+        "browserAppMetadataArchivePath": { "type": "string", "minLength": 1 },
+        "doeRuntimeArchivePath": { "type": "string", "minLength": 1 },
+        "dawnFallbackRuntimeArchivePath": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

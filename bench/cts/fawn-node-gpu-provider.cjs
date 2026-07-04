@@ -2,7 +2,7 @@ const { resolve } = require('path');
 const { pathToFileURL } = require('url');
 
 const RUNTIME_MODULE_URL = pathToFileURL(
-  resolve(__dirname, '../packages/doe-gpu/src/index.js')
+  resolve(__dirname, '../../packages/doe-gpu/src/index.js')
 ).href;
 const dynamicImport = new Function('modulePath', 'return import(modulePath);');
 

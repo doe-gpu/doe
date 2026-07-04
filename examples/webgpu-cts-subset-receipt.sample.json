@@ -1,0 +1,178 @@
+{
+  "artifactKind": "webgpu_cts_subset_receipt",
+  "backendCoverage": [
+    {
+      "artifactPaths": [
+        "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json"
+      ],
+      "backend": "doe_metal",
+      "host": "mac.lan",
+      "os": "darwin-25.3.0",
+      "surface": "package"
+    }
+  ],
+  "claimLanguage": "diagnostic_until_full_published_pass_ledger",
+  "conformanceClaimAllowed": false,
+  "ctsRevision": "untracked",
+  "ctsSource": "bench/fixtures/cts_subset.fawn-node.json",
+  "publicationChannel": "repo_example",
+  "publicationStatus": "repo_published",
+  "queryCoverage": [
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "adapter",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,adapter,requestAdapter:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "adapter",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,adapter,requestDevice:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "buffer",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,buffers,createBindGroup:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "buffer",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,buffers,map:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "command_buffer",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,command_buffer,basic:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "command_buffer",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,command_buffer,copyBufferToBuffer:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "compute",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,compute,basic:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "queue",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,onSubmittedWorkDone:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "queue",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,operation,queue,writeBuffer:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "shader_execution",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:shader,execution,expression,call,builtin,textureDimensions:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "validation",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,validation,buffer,create:*",
+      "status": "pass",
+      "surface": "package"
+    },
+    {
+      "artifactPath": "bench/out/apple-runtime-release/20260328T031800Z/cts_baseline.json",
+      "backend": "doe_metal",
+      "bucket": "validation",
+      "host": "mac.lan",
+      "notes": "Apple Metal release publication; trend=bench/out/apple-runtime-release/20260328T031800Z/cts_trend.json; bundle=bench/out/apple-runtime-release/20260328T031800Z/apple_runtime_release_manifest.json",
+      "os": "darwin-25.3.0",
+      "query": "webgpu:api,validation,error_scope:*",
+      "status": "pass",
+      "surface": "package"
+    }
+  ],
+  "receiptId": "webgpu-cts-subset-20260328-doe-metal",
+  "remainingPromotionRequirements": [
+    "backend_specific_cts_pass_ledger"
+  ],
+  "schemaVersion": 1,
+  "sourceEvidence": {
+    "artifactKind": "webgpu_cts_evidence",
+    "claimLanguage": "diagnostic_until_full_published_pass_ledger",
+    "diagnosticLanguage": "Current CTS evidence supports only subset-scoped diagnostic evidence; broad conformance and replacement language remain disallowed.",
+    "path": "config/webgpu-cts-evidence.json",
+    "policyId": "webgpu-cts-conformance-claim-policy-v1",
+    "sha256": "a365ed912823ec5c7cb42a23259dfcc7ab79856a1aef2757df69110852e06f76"
+  },
+  "summary": {
+    "artifactPathCount": 1,
+    "backendCount": 1,
+    "coverageRowCount": 12,
+    "failCount": 0,
+    "notRunCount": 0,
+    "passCount": 12,
+    "queryCount": 12,
+    "skipCount": 0,
+    "surfaceCount": 1
+  }
+}

@@ -25,8 +25,11 @@
     "killSwitchPolicyPath": "config/browser-runtime-selector-policy.json"
   },
   "releaseArtifacts": {
+    "releaseArchiveHashRequired": true,
+    "platformIdentityRequired": true,
     "browserBinaryHashRequired": true,
     "doeRuntimeHashRequired": true,
+    "dawnFallbackRuntimeHashRequired": true,
     "compilerHashRequired": true,
     "claimReportRequired": true
   }

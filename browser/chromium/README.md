@@ -44,6 +44,17 @@ The three governing requirements are:
    checks, Dawn fallback identity, compiler evidence against Tint where shader
    compilation is involved, and browser artifacts that pass the relevant gates.
 
+The public proof target is a downloadable Chromium-family browser build with
+Doe active in the WebGPU path. The release archive must have a public HTTPS
+download URL, and the gallery pages must have hosted HTTPS URLs on
+non-special-use hosts. The minimum
+credible artifact is governed by
+[`contracts/browser-published-release.contract.md`](contracts/browser-published-release.contract.md):
+download the browser, run a WebGPU workload, inspect the source-preserving Doe
+execution receipt, and compare it against Dawn. Package installs and
+`doe-gpu/browser` compatibility wrappers do not satisfy that browser-runtime
+claim.
+
 ## Scope
 
 In scope:
@@ -377,8 +388,55 @@ Lane setup for both macOS and Linux:
      `./scripts/run-smoke.sh --mode both --flight-recorder-components examples/browser-gpu-flight-recorder.sample.json --flight-recorder-out browser/chromium/artifacts/browser-gpu-flight-recorder.json --shader-links-out browser/chromium/artifacts/browser-shader-links.json`
    - browser claim promotion receipt:
      `python3 bench/browser/browser_claim_gate.py --promotion-receipt-out bench/out/browser-claim/browser-claim-promotion-receipt.json`
-   - release artifact bundle:
-     `python3 bench/tools/build_browser_release_artifact_bundle.py --browser-binary <chromium-binary> --doe-runtime <libwebgpu_doe> --shader-compiler runtime/zig/zig-out/bin/doe-zig-runtime --claim-report <browser-claim-report.json> --promotion-receipt <browser-claim-promotion-receipt.json> --out <browser-release-artifact-bundle.json>`
+   - release package input preflight:
+     `python3 bench/tools/check_browser_release_package_inputs.py --package-dir <chromium-out-or-Fawn.app> --package-root-name <Fawn-Doe-platform-arch-or-Fawn.app> --doe-runtime <libwebgpu_doe> --dawn-fallback-runtime <libdawn_native> --shader-compiler runtime/zig/zig-out/bin/doe-zig-runtime --product-version <version> --product-channel <diagnostic|release_candidate> --platform-os <macos|linux> --platform-arch <arm64|x64> --out <browser-release-package-inputs.json>`
+   - release archive zip and manifest:
+     package-input-driven lane:
+     `python3 browser/chromium/scripts/package-browser-release-archive.py --package-inputs <browser-release-package-inputs.json> --package-inputs-root <artifact-root> --out <Fawn-Doe-platform-arch.zip> --manifest-out <Fawn-Doe-platform-arch.manifest.json>`
+     The package-input-driven manifest includes `sourcePackageInputs`, binding the exact packageability preflight that supplied product/platform identity, runtime inputs, and packaged member paths.
+     macOS release-candidate lane:
+     `python3 browser/chromium/scripts/package-browser-release-archive.py --package-dir <Fawn.app> --out <Fawn-Doe-macos-arm64.zip> --manifest-out <Fawn-Doe-macos-arm64.manifest.json> --doe-runtime <libwebgpu_doe> --dawn-fallback-runtime <libdawn_native> --product-version <version> --product-channel release_candidate --platform-os macos --platform-arch arm64`
+     Linux diagnostic lane:
+     `python3 browser/chromium/scripts/package-browser-release-archive.py --package-dir <chromium-out-dir> --package-root-name <Fawn-Doe-linux-x64> --out <Fawn-Doe-linux-x64.zip> --manifest-out <Fawn-Doe-linux-x64.manifest.json> --doe-runtime <libwebgpu_doe.so> --dawn-fallback-runtime <libdawn_native.so> --product-version <version> --product-channel diagnostic --platform-os linux --platform-arch x64`
+   - lower-level release bundle assembly must pass `--package-inputs <browser-release-package-inputs.json>` for release candidates alongside `--release-archive <browser-release.zip>` and `--release-archive-manifest <browser-release.manifest.json>` so product/platform identity, packaged member paths, and browser/runtime/compiler artifact paths come from the packageability preflight; the emitted bundle hash-binds that preflight as `packageInputs`, duplicate explicit paths must match it, and the archive manifest's `sourcePackageInputs` must bind the same report.
+   - public archive download receipt:
+     `python3 bench/tools/build_browser_public_download_receipt.py --url <https-browser-archive-url> --receipt-id <receipt-id> --release-archive <Fawn-Doe-macos-arm64.zip> --release-archive-manifest <Fawn-Doe-macos-arm64.manifest.json> --product-version <version> --product-channel release_candidate --platform-os macos --platform-arch arm64 --browser-executable-archive-path Fawn.app/Contents/MacOS/Chromium --browser-app-metadata-archive-path Fawn.app/Contents/Info.plist --doe-runtime-archive-path Fawn.app/Contents/Frameworks/libwebgpu_doe.so --dawn-fallback-runtime-archive-path Fawn.app/Contents/Frameworks/libdawn_native.so --out <browser-public-download-receipt.json>`
+   - public gallery receipts:
+     `python3 bench/tools/build_browser_public_gallery_receipt.py --url <https-gallery-page-url> --receipt-id <receipt-id> --category <compute|rendering|tensor|shader_edge|benchmark_trace> --gallery-artifact <gallery-page.html> --workload-contract-path <browser-gallery-contract.md> --receipt-payload <browser-execution-receipt.json> --out <browser-public-gallery-receipt.json>`
+   - per-run browser execution receipts:
+     `python3 bench/tools/build_browser_execution_receipt.py --smoke-report <browser-smoke-report.json> --mode <dawn|doe> --receipt-id <receipt-id> --workload-id <workload-id> --source-shader <shader.wgsl> --command-count <count> --success-count <count> --dispatch-count <count> --output-hash <sha256> --setup-ns <ns> --encode-ns <ns> --submit-wait-ns <ns> --out <browser-execution-receipt.json>`
+   - proof page diagnostic receipt:
+     `python3 bench/tools/build_browser_proof_page_receipt.py --receipt-id <receipt-id> --url about:doe --proof-artifact <captured-about-doe.html> --runtime-identity-path <browser-runtime-identity.json> --active-backend webgpu-doe --compiler-path runtime/zig/zig-out/bin/doe-zig-runtime --tsir-status <status> --host-plan-status <status> --csl-status <status> --release-archive <browser-release.zip> --release-archive-url <https-browser-archive-url> --release-archive-manifest <browser-release.manifest.json> --public-download-receipt <browser-public-download-receipt.json> --product-version <version> --product-channel release_candidate --platform-os macos --platform-arch arm64 --browser-executable-archive-path Fawn.app/Contents/MacOS/Chromium --browser-app-metadata-archive-path Fawn.app/Contents/Info.plist --doe-runtime-archive-path Fawn.app/Contents/Frameworks/libwebgpu_doe.so --dawn-fallback-runtime-archive-path Fawn.app/Contents/Frameworks/libdawn_native.so --recent-receipt-id <dawn-receipt-id> --recent-receipt-id <doe-receipt-id> --out <browser-proof-page-receipt.json>`
+   - published proof surface:
+     `python3 bench/tools/build_browser_published_proof_surface.py --surface-id <surface-id> --capture-policy-path config/browser-capture-policy.json --runtime-identity-path <browser-runtime-identity.json> --proof-page-artifact <captured-about-doe.html> --proof-page-receipt <browser-proof-page-receipt.json> --proof-receipt-payload <dawn-execution-receipt.json> --proof-receipt-payload <doe-execution-receipt.json> --gallery-entry <gallery-entry.json> --comparison-entry <comparison-entry.json> --out <browser-published-proof-surface.json>`
+   - published proof surface check:
+     `python3 bench/tools/check_browser_published_proof_surface.py --surface <browser-published-proof-surface.json> --verify-files-root <artifact-root> --require-public-urls --out <browser-published-proof-surface-check.json>`
+   - packaged browser launch receipt:
+     `python3 bench/tools/build_browser_release_launch_receipt.py --receipt-id <receipt-id> --release-archive <browser-release.zip> --release-archive-url <https-browser-archive-url> --release-archive-manifest <browser-release.manifest.json> --proof-surface <browser-published-proof-surface.json> --product-version <version> --product-channel release_candidate --platform-os macos --platform-arch arm64 --browser-executable-archive-path Fawn.app/Contents/MacOS/Chromium --browser-app-metadata-archive-path Fawn.app/Contents/Info.plist --doe-runtime-archive-path Fawn.app/Contents/Frameworks/libwebgpu_doe.so --dawn-fallback-runtime-archive-path Fawn.app/Contents/Frameworks/libdawn_native.so --active-backend webgpu-doe --proof-page-artifact-path <captured-about-doe.html> --proof-page-receipt-id <proof-page-receipt-id> --gallery-url <https-gallery-page-url> --gallery-category compute --gallery-artifact-path <gallery-page.html> --gallery-receipt-id <gallery-receipt-id> --comparison-id <comparison-id> --comparison-workload-id <workload-id> --comparison-page-artifact-path <gallery-page.html> --comparison-artifact-path <browser-smoke-report.json> --comparison-dawn-receipt-id <dawn-receipt-id> --comparison-doe-receipt-id <doe-receipt-id> --observed-receipt-id <proof-page-receipt-id> --observed-receipt-id <gallery-receipt-id> --observed-receipt-id <dawn-receipt-id> --observed-receipt-id <doe-receipt-id> --out <browser-release-launch-receipt.json>`
+   - post-download local provenance staging:
+     `python3 bench/tools/stage_browser_release_candidate_provenance.py --surface-template <previous-proof-surface.json> --release-archive <browser-release.zip> --release-archive-url <https-browser-archive-url> --release-archive-manifest <browser-release.manifest.json> --public-download-receipt <browser-public-download-receipt.json> --proof-page-artifact <captured-about-doe.html> --proof-page-receipt-id <proof-page-receipt-id> --browser-launch-receipt-id <launch-receipt-id> --package-inputs <browser-release-package-inputs.json> --tsir-status <status> --host-plan-status <status> --csl-status <status> --proof-page-receipt-out <browser-proof-page-receipt.json> --proof-surface-out <browser-published-proof-surface.json> --proof-surface-check-out <browser-published-proof-surface-check.json> --browser-launch-receipt-out <browser-release-launch-receipt.json> --provenance-report-out <browser-release-candidate-provenance.json> --verify-files-root <artifact-root>`
+     The staging helper requires `--package-inputs` and derives the proof-page compiler path from the package-input shader compiler unless an explicit duplicate path matches it.
+   - release-candidate provenance preflight:
+     `python3 bench/tools/check_browser_release_candidate_provenance.py --release-archive <browser-release.zip> --release-archive-url <https-browser-archive-url> --release-archive-manifest <browser-release.manifest.json> --public-download-receipt <browser-public-download-receipt.json> --proof-surface <browser-published-proof-surface.json> --proof-surface-check <browser-published-proof-surface-check.json> --browser-launch-receipt <browser-release-launch-receipt.json> --package-inputs <browser-release-package-inputs.json> --verify-files-root <artifact-root> --out <browser-release-candidate-provenance.json>`
+     This preflight requires the archive manifest's `sourcePackageInputs` to
+     match the same package-input receipt.
+   - release-candidate finalizer:
+     `python3 bench/tools/finalize_browser_release_candidate_bundle.py --bundle-id <bundle-id> --provenance-report <browser-release-candidate-provenance.json> --release-archive <browser-release.zip> --release-archive-url <https-browser-archive-url> --release-archive-manifest <browser-release.manifest.json> --public-download-receipt <browser-public-download-receipt.json> --proof-surface <browser-published-proof-surface.json> --proof-surface-check <browser-published-proof-surface-check.json> --browser-launch-receipt <browser-release-launch-receipt.json> --chromium-source-checkout <chromium-source-checkout-check.json> --runtime-identity <browser-runtime-identity.json> --runtime-frontier-bundle-out <browser-runtime-frontier-bundle.json> --package-inputs <browser-release-package-inputs.json> --claim-report <browser-claim-report.json> --promotion-receipt <browser-claim-promotion-receipt.json> --verify-files-root <artifact-root> --out <browser-release-artifact-bundle.json> --report-out <browser-release-candidate-finalizer.json>`
+   - release-candidate finalizer check:
+     `python3 bench/tools/check_browser_release_candidate_finalizer.py --report <browser-release-candidate-finalizer.json> --verify-files-root <artifact-root> --require-pass --out <browser-release-candidate-finalizer-check.json>`
+     Passing finalizer reports must bind `inputs.packageInputs`, and the check
+     verifies that receipt against the emitted release bundle. The checker
+     receipt also binds the checked finalizer report path/hash so readiness
+     evidence cannot pair a stale check with a different finalizer report;
+     release-candidate readiness requires the receipt to show both
+     `verifyFilesRootProvided=true` and `requirePass=true`.
+   - `build_browser_release_artifact_bundle.py --bootstrap-runtime-frontier`
+     remains the lower-level assembler; release-candidate promotion should use
+     the finalizer after the provenance report passes.
+   - release-candidate channel/provenance must be rebuilt through the archive
+     manifest, public download receipt, proof-page receipt, published proof
+     surface, and launch receipt; diagnostic-channel artifacts are expected to
+     fail candidate verification instead of being relabeled.
 6. If only Doe runtime code changed on macOS:
    - `./scripts/refresh-doe-app.sh`
    - rebuilds `libwebgpu_doe_full.dylib` and reapplies the app-bundle Doe wrapper

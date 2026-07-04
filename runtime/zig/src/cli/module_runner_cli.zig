@@ -44,6 +44,11 @@ fn getOptionValue(args: [][:0]u8, index: *usize) ![]const u8 {
     return args[index.*];
 }
 
+fn getOwnedOptionValue(allocator: Allocator, args: [][:0]u8, index: *usize) ![]const u8 {
+    const value = try getOptionValue(args, index);
+    return try allocator.dupe(u8, value);
+}
+
 fn simpleModuleRunner(comptime Module: type) ModuleRunFn {
     return struct {
         fn run(
@@ -96,11 +101,11 @@ fn parseArgs(allocator: Allocator) !RunOptions {
     var idx: usize = 1;
     while (idx < argv.len) : (idx += 1) {
         if (std.mem.eql(u8, argv[idx], "--request")) {
-            request_path = try getOptionValue(argv, &idx);
+            request_path = try getOwnedOptionValue(allocator, argv, &idx);
         } else if (std.mem.eql(u8, argv[idx], "--policy")) {
-            policy_path = try getOptionValue(argv, &idx);
+            policy_path = try getOwnedOptionValue(allocator, argv, &idx);
         } else if (std.mem.eql(u8, argv[idx], "--module")) {
-            module_id = try getOptionValue(argv, &idx);
+            module_id = try getOwnedOptionValue(allocator, argv, &idx);
         }
     }
 

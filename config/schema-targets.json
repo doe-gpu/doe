@@ -102,6 +102,14 @@
       "data": "config/webgpu-cts-evidence.json"
     },
     {
+      "schema": "config/webgpu-cts-subset-receipt.schema.json",
+      "data": "examples/webgpu-cts-subset-receipt.sample.json"
+    },
+    {
+      "schema": "config/webgpu-cts-backend-pass-ledger.schema.json",
+      "data": "examples/webgpu-cts-backend-pass-ledger.sample.json"
+    },
+    {
       "schema": "config/semantic-operator-bundle.schema.json",
       "data": "examples/semantic-operator-bundle.sample.json"
     },
@@ -158,6 +166,10 @@
       "data": "config/backend-cutover-policy.json"
     },
     {
+      "schema": "config/dropin-cutover-rehearsal-receipt.schema.json",
+      "data": "examples/dropin-cutover-rehearsal-receipt.sample.json"
+    },
+    {
       "schema": "config/shader-toolchain.schema.json",
       "data": "config/shader-toolchain.json"
     },
@@ -186,6 +198,10 @@
       "data": "examples/wgsl-lowering-link-receipt.sample.json"
     },
     {
+      "schema": "config/wgsl-lowering-link-receipt.schema.json",
+      "data": "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json"
+    },
+    {
       "schema": "config/wgsl-robustness-fixtures.schema.json",
       "data": "config/wgsl-robustness-fixtures.json"
     },
@@ -194,12 +210,32 @@
       "data": "examples/tint-compiler-evidence.sample.json"
     },
     {
+      "schema": "config/tint-compiler-evidence.schema.json",
+      "data": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json"
+    },
+    {
+      "schema": "config/tint-compiler-evidence.schema.json",
+      "data": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
+    },
+    {
       "schema": "config/tint-compiler-target-validation.schema.json",
       "data": "examples/tint-compiler-target-validation.sample.json"
     },
     {
+      "schema": "config/tint-compiler-target-validation.schema.json",
+      "data": "examples/tint-compiler-target-validation.frontier.spirv.sample.json"
+    },
+    {
       "schema": "config/tint-phase-benchmark-evidence.schema.json",
       "data": "examples/tint-phase-benchmark-evidence.sample.json"
+    },
+    {
+      "schema": "config/tint-phase-benchmark-evidence.schema.json",
+      "data": "examples/tint-phase-benchmark-evidence.browser-corpus.spirv.sample.json"
+    },
+    {
+      "schema": "config/tint-phase-benchmark-evidence.schema.json",
+      "data": "examples/tint-phase-benchmark-evidence.benchmark-corpus.spirv.sample.json"
     },
     {
       "schema": "config/tint-compiler-frontier-bundle.schema.json",
@@ -678,6 +714,30 @@
       "data": "examples/browser-runtime-identity.selector.sample.json"
     },
     {
+      "schema": "config/browser-execution-receipt.schema.json",
+      "data": "examples/browser-dawn-execution-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-execution-receipt.schema.json",
+      "data": "examples/browser-doe-execution-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-execution-receipt.schema.json",
+      "data": "examples/browser-rendering-execution-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-execution-receipt.schema.json",
+      "data": "examples/browser-tensor-execution-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-execution-receipt.schema.json",
+      "data": "examples/browser-shader-edge-execution-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-execution-receipt.schema.json",
+      "data": "examples/browser-benchmark-trace-execution-receipt.sample.json"
+    },
+    {
       "schema": "config/browser-canvas-webgpu-fusion.schema.json",
       "data": "examples/browser-canvas-webgpu-fusion.sample.json"
     },
@@ -742,8 +802,68 @@
       "data": "examples/chromium-source-checkout-check.sample.json"
     },
     {
+      "schema": "config/browser-release-package-inputs-check.schema.json",
+      "data": "examples/browser-release-package-inputs-check.sample.json"
+    },
+    {
       "schema": "config/browser-release-artifact-bundle.schema.json",
       "data": "examples/browser-release-artifact-bundle.sample.json"
+    },
+    {
+      "schema": "config/browser-release-candidate-provenance-report.schema.json",
+      "data": "examples/browser-release-candidate-provenance.sample.json"
+    },
+    {
+      "schema": "config/browser-release-candidate-finalizer.schema.json",
+      "data": "examples/browser-release-candidate-finalizer.sample.json"
+    },
+    {
+      "schema": "config/browser-release-candidate-finalizer-check.schema.json",
+      "data": "examples/browser-release-candidate-finalizer-check.sample.json"
+    },
+    {
+      "schema": "config/browser-release-archive-manifest.schema.json",
+      "data": "examples/browser-release-archive-manifest.sample.json"
+    },
+    {
+      "schema": "config/browser-public-download-receipt.schema.json",
+      "data": "examples/browser-public-download-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-release-launch-receipt.schema.json",
+      "data": "examples/browser-release-launch-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-public-gallery-receipt.schema.json",
+      "data": "examples/browser-public-gallery-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-public-gallery-receipt.schema.json",
+      "data": "examples/browser-public-gallery-rendering-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-public-gallery-receipt.schema.json",
+      "data": "examples/browser-public-gallery-tensor-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-public-gallery-receipt.schema.json",
+      "data": "examples/browser-public-gallery-shader-edge-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-public-gallery-receipt.schema.json",
+      "data": "examples/browser-public-gallery-benchmark-trace-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-proof-page-receipt.schema.json",
+      "data": "examples/browser-proof-page-receipt.sample.json"
+    },
+    {
+      "schema": "config/browser-published-proof-surface.schema.json",
+      "data": "examples/browser-published-proof-surface.sample.json"
+    },
+    {
+      "schema": "config/browser-published-proof-surface-check.schema.json",
+      "data": "examples/browser-published-proof-surface-check.sample.json"
     },
     {
       "schema": "config/browser-runtime-frontier-bundle.schema.json",

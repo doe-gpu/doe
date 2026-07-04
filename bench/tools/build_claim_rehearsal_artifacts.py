@@ -21,6 +21,7 @@ from typing import Any
 
 from bench.lib import compare_claim_artifacts as artifacts_mod
 from bench.lib import report_conformance
+from bench.lib.hash_utils import json_sha256
 
 
 def parse_args() -> argparse.Namespace:
@@ -77,6 +78,14 @@ def parse_args() -> argparse.Namespace:
         "--expected-workload-contract",
         default="",
         help="Optional expected workload contract path forwarded to claim_gate.py.",
+    )
+    parser.add_argument(
+        "--config",
+        default="",
+        help=(
+            "Optional compare config forwarded to claim_gate.py so workload ID "
+            "set checks use the same selector as the release claim gate."
+        ),
     )
     parser.add_argument(
         "--require-workload-contract-hash",
@@ -449,7 +458,7 @@ def contract_hash_manifest(
             }
         )
 
-    active_contract_hash = report_conformance.json_sha256(
+    active_contract_hash = json_sha256(
         {
             "workloadContractSha256": workload_contract.get("sha256", ""),
             "benchmarkPolicySha256": benchmark_policy.get("sha256", ""),
@@ -538,6 +547,8 @@ def run_claim_gate(
     ]
     if args.expected_workload_contract.strip():
         command.extend(["--expected-workload-contract", args.expected_workload_contract])
+    if args.config.strip():
+        command.extend(["--config", args.config.strip()])
     if args.require_workload_contract_hash:
         command.append("--require-workload-contract-hash")
     if args.require_workload_id_set_match:

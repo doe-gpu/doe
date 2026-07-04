@@ -17,11 +17,14 @@ for _path_entry in (str(REPO_ROOT), str(BENCH_ROOT)):
     if _path_entry not in sys.path:
         sys.path.insert(0, _path_entry)
 
+from bench.gates.claim_index_browser_release import validate_browser_release_artifacts
 from bench.lib.bench_utils import detect_repo_root, load_json_object
 
 
 OPTIONAL_ARTIFACT_PREFIXES = ("bench/out/",)
 VALID_REPORT_KIND = "compare-report"
+VALID_DROPIN_REHEARSAL_KIND = "dropin-cutover-rehearsal-receipt"
+VALID_REPORT_KINDS = {VALID_REPORT_KIND, VALID_DROPIN_REHEARSAL_KIND}
 VALID_CLAIM_KIND = "claim-report"
 MEASURED_CLAIM_STATES = {"claim-indexed", "diagnostic"}
 
@@ -87,19 +90,23 @@ def is_optional_artifact(path: str) -> bool:
     return any(path.startswith(prefix) for prefix in OPTIONAL_ARTIFACT_PREFIXES)
 
 
-def unsafe_path_reason(path: Any) -> str:
+def unsafe_artifact_path_reason(path: Any, *, suffix: str) -> str:
     if not isinstance(path, str) or not path:
         return "path must be a non-empty string"
     if "\\" in path:
         return "path must use forward slashes"
     if path.startswith("/"):
         return "path must be repository-relative"
-    if not path.endswith(".json"):
-        return "path must end in .json"
+    if not path.endswith(suffix):
+        return f"path must end in {suffix}"
     parts = path.split("/")
     if any(part in ("", ".", "..") for part in parts):
         return "path must not contain empty, current, or parent segments"
     return ""
+
+
+def unsafe_path_reason(path: Any) -> str:
+    return unsafe_artifact_path_reason(path, suffix=".json")
 
 
 def requires_measured_evidence(claim_state: Any) -> bool:
@@ -144,12 +151,16 @@ def validate_report_artifact(
     if report is None:
         return failures, False
 
-    if report.get("artifactKind") != VALID_REPORT_KIND:
+    artifact_kind = report.get("artifactKind")
+    if artifact_kind not in VALID_REPORT_KINDS:
         failures.append(
             failure(
                 "invalid_report_artifact_kind",
                 f"{entry_path}.reportPath",
-                f"{report_path}: artifactKind must be {VALID_REPORT_KIND}",
+                (
+                    f"{report_path}: artifactKind must be one of "
+                    f"{sorted(VALID_REPORT_KINDS)}"
+                ),
             )
         )
     if report.get("comparisonStatus") != expected_comparison_status:
@@ -244,6 +255,7 @@ def validate_claim_artifact(
             )
         )
     return failures, True
+
 
 
 def evaluate_index(
@@ -358,6 +370,8 @@ def evaluate_index(
                     "claimStatus=claimable requires claimState=claim-indexed",
                 )
             )
+
+        failures.extend(validate_browser_release_artifacts(root, entry_path, entry))
 
         if isinstance(report_path, str):
             report_failures, report_present = validate_report_artifact(

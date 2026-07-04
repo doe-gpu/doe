@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-release-archive-manifest.schema.json",
+  "title": "Browser release archive manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "archive",
+    "browserProduct",
+    "platform",
+    "appBundleName",
+    "members",
+    "archiveMembers"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_release_archive_manifest" },
+    "archive": { "$ref": "#/$defs/ArchiveArtifact" },
+    "browserProduct": { "$ref": "#/$defs/BrowserProduct" },
+    "platform": { "$ref": "#/$defs/Platform" },
+    "appBundleName": { "type": "string", "pattern": "^[^/]+(?:\\.app)?$" },
+    "sourcePackageInputs": {
+      "allOf": [
+        { "$ref": "#/$defs/Artifact" },
+        {
+          "properties": {
+            "kind": { "const": "browser_release_package_inputs_check" }
+          }
+        }
+      ]
+    },
+    "members": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "browserExecutable",
+        "appMetadata",
+        "doeRuntime",
+        "dawnFallbackRuntime"
+      ],
+      "properties": {
+        "browserExecutable": { "$ref": "#/$defs/Member" },
+        "appMetadata": { "$ref": "#/$defs/Member" },
+        "doeRuntime": { "$ref": "#/$defs/Member" },
+        "dawnFallbackRuntime": { "$ref": "#/$defs/Member" }
+      }
+    },
+    "archiveMembers": {
+      "type": "array",
+      "minItems": 4,
+      "items": { "$ref": "#/$defs/Member" }
+    }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "ArchiveArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "byteLength", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "kind": { "type": "string", "const": "browser_release_archive" }
+      }
+    },
+    "Artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "kind": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archivePath", "sha256", "byteLength", "executable"],
+      "properties": {
+        "archivePath": { "type": "string", "pattern": "^[^/]+/.+" },
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "executable": { "type": "boolean" }
+      }
+    },
+    "Platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch", "packageFormat"],
+      "properties": {
+        "os": { "enum": ["macos", "linux", "windows"] },
+        "arch": { "enum": ["arm64", "x64"] },
+        "packageFormat": { "const": "zip" }
+      }
+    },
+    "BrowserProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["productId", "displayName", "version", "channel"],
+      "properties": {
+        "productId": { "enum": ["doe-browser", "fawn-doe"] },
+        "displayName": { "enum": ["Doe Browser", "Fawn Doe"] },
+        "version": { "type": "string", "minLength": 1 },
+        "channel": { "enum": ["diagnostic", "release_candidate", "release"] }
+      }
+    }
+  }
+}

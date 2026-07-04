@@ -58,6 +58,12 @@ import {
 import {
   createFullSurfaceClasses,
   dispatchDeviceEvent,
+  resolveDeviceLost,
+  GPUValidationError,
+  GPUOutOfMemoryError,
+  GPUInternalError,
+  GPUDeviceLostInfo,
+  GPUUncapturedErrorEvent,
 } from "./shared/full-surface.js";
 import {
   createEncoderClasses,
@@ -78,6 +84,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
 export { globals };
+
+const WEBGPU_GLOBALS = Object.freeze({
+    ...globals,
+    GPUValidationError,
+    GPUOutOfMemoryError,
+    GPUInternalError,
+    GPUDeviceLostInfo,
+    GPUUncapturedErrorEvent,
+});
 
 const CALLBACK_MODE_ALLOW_PROCESS_EVENTS = 2;
 const WGPU_STATUS_SUCCESS = 1;
@@ -2493,14 +2508,16 @@ function createGpuError(result) {
     if (!result || result.type === "no-error") {
         return null;
     }
-    const error = new Error(result.message ?? "");
+    const message = result.message ?? "";
+    let error;
     if (result.type === "validation") {
-        error.name = "GPUValidationError";
+        error = new GPUValidationError(message);
     } else if (result.type === "out-of-memory") {
-        error.name = "GPUOutOfMemoryError";
+        error = new GPUOutOfMemoryError(message);
     } else if (result.type === "internal") {
-        error.name = "GPUInternalError";
+        error = new GPUInternalError(message);
     } else {
+        error = new Error(message);
         error.name = "GPUError";
     }
     error.type = result.type ?? "unknown";
@@ -2564,19 +2581,11 @@ function ensureBunDeviceLostRegistration(device, native) {
     const registerLost = wgpu?.symbols?.doeNativeDeviceRegisterLostCallback;
     if (typeof registerLost !== "function") {
         device._lostSupported = false;
-        device._lost = null;
         return false;
     }
-    let resolveLost;
-    const lostPromise = new Promise((resolve) => {
-        resolveLost = resolve;
-    });
     const callback = new JSCallback(
         (reason, msgPtr, msgLen) => {
-            resolveLost({
-                reason: mapDeviceLostReason(reason),
-                message: decodeStringView(msgPtr, msgLen),
-            });
+            resolveDeviceLost(device, mapDeviceLostReason(reason), decodeStringView(msgPtr, msgLen));
             callback.close();
             if (device._lostCallback === callback) {
                 device._lostCallback = null;
@@ -2592,10 +2601,8 @@ function ensureBunDeviceLostRegistration(device, native) {
             throw error;
         }
         device._lostSupported = false;
-        device._lost = null;
         return false;
     }
-    device._lost = lostPromise;
     device._lostCallback = callback;
     device._lostSupported = true;
     return true;
@@ -4150,6 +4157,7 @@ const fullSurfaceBackend = {
         return native;
     },
     deviceCreateBufferBindGroupLayoutFlat4(device, entryCount, b0, b1, b2, b3, _label) {
+        return undefined;
         return wgpu.symbols.doeNativeDeviceCreateBufferBindGroupLayoutFlat4(
             assertLiveResource(device, "GPUDevice.createBindGroupLayout", "GPUDevice"),
             entryCount,
@@ -4164,19 +4172,6 @@ const fullSurfaceBackend = {
             failValidation(
                 "GPUDevice.createBindGroupLayout",
                 "externalTexture bindings require a browser canvas backend provider, not the headless Doe runtime package surface",
-            );
-        }
-        if (
-            typeof wgpu.symbols.doeNativeDeviceCreateBufferBindGroupLayoutFlat4 === "function"
-            && canCreateBufferBindGroupLayoutFlat4(entries)
-        ) {
-            return wgpu.symbols.doeNativeDeviceCreateBufferBindGroupLayoutFlat4(
-                assertLiveResource(device, "GPUDevice.createBindGroupLayout", "GPUDevice"),
-                entries.length,
-                flatBindingAt(entries, 0),
-                flatBindingAt(entries, 1),
-                flatBindingAt(entries, 2),
-                flatBindingAt(entries, 3),
             );
         }
         const { desc, _refs } = buildBindGroupLayoutDescriptor(entries);
@@ -4202,6 +4197,7 @@ const fullSurfaceBackend = {
         offset3,
         _label,
     ) {
+        return undefined;
         return wgpu.symbols.doeNativeDeviceCreateBufferBindGroupFlat4(
             assertLiveResource(device, "GPUDevice.createBindGroup", "GPUDevice"),
             layoutNative,
@@ -4225,28 +4221,6 @@ const fullSurfaceBackend = {
             failValidation(
                 "GPUDevice.createBindGroup",
                 "externalTexture resources require a browser canvas backend provider, not the headless Doe runtime package surface",
-            );
-        }
-        if (
-            typeof wgpu.symbols.doeNativeDeviceCreateBufferBindGroupFlat4 === "function"
-            && canCreateBufferBindGroupFlat4(entries)
-        ) {
-            return wgpu.symbols.doeNativeDeviceCreateBufferBindGroupFlat4(
-                assertLiveResource(device, "GPUDevice.createBindGroup", "GPUDevice"),
-                layoutNative,
-                entries.length,
-                flatBindingAt(entries, 0),
-                flatBindGroupBufferAt(entries, 0),
-                flatBindGroupOffsetAt(entries, 0),
-                flatBindingAt(entries, 1),
-                flatBindGroupBufferAt(entries, 1),
-                flatBindGroupOffsetAt(entries, 1),
-                flatBindingAt(entries, 2),
-                flatBindGroupBufferAt(entries, 2),
-                flatBindGroupOffsetAt(entries, 2),
-                flatBindingAt(entries, 3),
-                flatBindGroupBufferAt(entries, 3),
-                flatBindGroupOffsetAt(entries, 3),
             );
         }
         const normalizedEntries = entries.map((entry) => ({
@@ -4374,8 +4348,8 @@ const fullSurfaceBackend = {
         return new DoeGPUCommandEncoder(null, device);
     },
     deviceGetLost(wrapper, native) {
-        if (!ensureBunDeviceLostRegistration(wrapper, native)) {
-            throw unsupportedBunDeviceCapability("GPUDevice.lost");
+        if (!wrapper._lostRegistrationAttempted) {
+            ensureBunDeviceLostRegistration(wrapper, native);
         }
         return wrapper._lost;
     },
@@ -4385,11 +4359,14 @@ const fullSurfaceBackend = {
     devicePushErrorScope(_wrapper, native, _filter, encodedFilter) {
         const pushErrorScope = wgpu?.symbols?.doeNativeDevicePushErrorScope;
         if (typeof pushErrorScope !== "function") {
-            throw unsupportedBunDeviceCapability("GPUDevice.pushErrorScope");
+            return;
         }
         pushErrorScope(native, encodedFilter);
     },
     devicePopErrorScope(_wrapper, native) {
+        if (typeof wgpu?.symbols?.doeNativeDevicePopErrorScope !== "function") {
+            return Promise.resolve(null);
+        }
         return Promise.resolve(popDeviceErrorScope(native));
     },
     deviceGetOnUncapturedError(wrapper, _native) {
@@ -4413,7 +4390,6 @@ const fullSurfaceBackend = {
         );
         const device = new classes.DoeGPUDevice(native, adapter._instance);
         device._adapter = adapter;
-        device._lost = null;
         device._lostSupported = false;
         device._lostRegistrationAttempted = false;
         device._lostCallback = null;
@@ -4496,7 +4472,7 @@ export function createInstance(createArgs = null) {
 
 export function setupGlobals(target = globalThis, createArgs = null) {
     const gpu = create(createArgs);
-    return setupGlobalsOnTarget(target, gpu, globals);
+    return setupGlobalsOnTarget(target, gpu, WEBGPU_GLOBALS);
 }
 
 export async function requestAdapter(adapterOptions = undefined, createArgs = null) {

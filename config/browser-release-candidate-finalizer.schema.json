@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-release-candidate-finalizer.schema.json",
+  "title": "Browser release candidate finalizer report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "artifactKind", "status"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_release_candidate_finalizer" },
+    "status": { "enum": ["pass", "fail"] },
+    "phase": {
+      "enum": [
+        "package_inputs_preflight",
+        "provenance_preflight",
+        "release_bundle_verification"
+      ]
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["releaseArtifactBundle", "runtimeFrontierBundle"],
+      "properties": {
+        "releaseArtifactBundle": {
+          "allOf": [
+            { "$ref": "#/$defs/Artifact" },
+            {
+              "properties": {
+                "kind": { "const": "browser_release_artifact_bundle" }
+              }
+            }
+          ]
+        },
+        "runtimeFrontierBundle": {
+          "allOf": [
+            { "$ref": "#/$defs/Artifact" },
+            {
+              "properties": {
+                "kind": { "const": "browser_runtime_frontier_bundle" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packageInputs", "provenanceReport"],
+      "properties": {
+        "packageInputs": {
+          "allOf": [
+            { "$ref": "#/$defs/Artifact" },
+            {
+              "properties": {
+                "kind": { "const": "browser_release_package_inputs_check" }
+              }
+            }
+          ]
+        },
+        "provenanceReport": {
+          "allOf": [
+            { "$ref": "#/$defs/Artifact" },
+            {
+              "properties": {
+                "kind": { "const": "browser_release_candidate_provenance_report" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimabilityStatus", "releaseBundleIdentitySha256", "failureCount"],
+      "properties": {
+        "claimabilityStatus": { "enum": ["claimable", "blocked"] },
+        "releaseBundleIdentitySha256": { "$ref": "#/$defs/Hash" },
+        "failureCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "pass" } },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["outputs", "inputs", "summary"],
+        "not": { "required": ["phase"] }
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "fail" } },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["phase", "failures"],
+        "not": { "required": ["outputs"] }
+      }
+    }
+  ],
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "kind": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

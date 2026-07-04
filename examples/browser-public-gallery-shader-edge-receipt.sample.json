@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_public_gallery_receipt",
+  "receiptId": "browser-public-gallery-shader-edge-sample",
+  "category": "shader_edge",
+  "url": "https://gallery.doe.dev/doe/shader_edge.html",
+  "method": "GET",
+  "statusCode": 200,
+  "contentSha256": "f9d141c3b9f4abca92da6efc26c4c8febbcb666b5b25a71ecc697a8fbcb7c6ed",
+  "contentLengthBytes": 1305,
+  "galleryArtifactPath": "examples/browser-gallery-shader-edge.sample.html",
+  "workloadContractPath": "browser/chromium/contracts/browser-shader-links.contract.md",
+  "workloadIds": [
+    "browser-gallery-shader-edge"
+  ],
+  "receiptIds": [
+    "browser-gallery-shader-edge-doe"
+  ],
+  "receiptArtifactPaths": [
+    "examples/browser-shader-edge-execution-receipt.sample.json"
+  ],
+  "observedAt": "2026-06-30T00:00:00Z"
+}

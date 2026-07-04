@@ -31,6 +31,10 @@ def test_smoke_help_lists_flight_recorder_options() -> None:
     assert "--flight-recorder-out PATH" in result.stdout
     assert "--flight-recorder-mode dawn|doe" in result.stdout
     assert "--shader-links-out PATH" in result.stdout
+    assert "--runtime-selector-profile-vendor VENDOR" in result.stdout
+    assert "--runtime-selector-profile-api API" in result.stdout
+    assert "--runtime-selector-profile-device-family DEVICE" in result.stdout
+    assert "--runtime-selector-profile-driver DRIVER" in result.stdout
     assert "--pipeline-cache-receipts-out PATH" in result.stdout
     assert "--fallback-explanations-out PATH" in result.stdout
     assert "--cts-subset-out PATH" in result.stdout

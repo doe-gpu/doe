@@ -1,0 +1,58 @@
+{
+  "artifactKind": "tint_spirv_entry_outputs",
+  "artifacts": [
+    {
+      "entryPoint": "vs_main",
+      "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.vs_main.spv",
+      "outputSha256": "67ce34bc1ab93c646fca282908b71fa1651072060411e1af26a8314cc64ad072",
+      "shaderStage": "vertex",
+      "target": "spirv",
+      "validationMessage": "",
+      "validationStatus": "passed",
+      "validationTool": "spirv-val"
+    },
+    {
+      "entryPoint": "fs_main",
+      "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.fs_main.spv",
+      "outputSha256": "18ca827fe6b6eb6d08cf4ac3eaa7c3896ac3a8b20bcceef113286bca77ba0fce",
+      "shaderStage": "fragment",
+      "target": "spirv",
+      "validationMessage": "",
+      "validationStatus": "passed",
+      "validationTool": "spirv-val"
+    },
+    {
+      "entryPoint": "simulate",
+      "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.simulate.spv",
+      "outputSha256": "ac5ed0373654df1b54f3ba9a8aec821f444529b3852ca47e4377495945336472",
+      "shaderStage": "compute",
+      "target": "spirv",
+      "validationMessage": "",
+      "validationStatus": "passed",
+      "validationTool": "spirv-val"
+    },
+    {
+      "entryPoint": "import_level",
+      "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.import_level.spv",
+      "outputSha256": "d9ee2119347f00da2b6019a7dbdf7925c2438f2e85ff631100cf6068b642e246",
+      "shaderStage": "compute",
+      "target": "spirv",
+      "validationMessage": "",
+      "validationStatus": "passed",
+      "validationTool": "spirv-val"
+    },
+    {
+      "entryPoint": "export_level",
+      "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.export_level.spv",
+      "outputSha256": "7ed11adf38b21368a988aa9d24f2bc517fb8b816521e4f263fac6085c8e49575",
+      "shaderStage": "compute",
+      "target": "spirv",
+      "validationMessage": "",
+      "validationStatus": "passed",
+      "validationTool": "spirv-val"
+    }
+  ],
+  "rawValidationMessage": "error: line 0: Invalid SPIR-V magic number.",
+  "sourcePath": "bench/vendor/dawn/test/tint/benchmark/particles.wgsl",
+  "sourceSha256": "cf473029d9c3048c87cb87a59690e8ca4be0a1583e90d8de51b27f7b6d47ae05"
+}

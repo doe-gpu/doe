@@ -243,6 +243,11 @@ SPIR-V compiler frontier. The bundle passes when component receipts are
 gate-clean and reports exact Tint phase gaps as `claimBlockers`; `--require-claimable`
 promotes those blockers to hard failures for claim lanes. Its schema is
 [`config/tint-compiler-frontier-bundle.schema.json`](../config/tint-compiler-frontier-bundle.schema.json).
+The bundle also emits `phaseTimingCoverage`, a row-counted summary of Doe
+exact-phase coverage, Tint exact-phase coverage, and Tint benchmark-scope
+coverage across every supplied compiler-evidence path. Readiness copies and
+validates that summary so the Tint blocker remains measurable instead of only
+appearing as repeated claim-blocker strings.
 
 Lowering-link claim bundles are generated from the same compiler evidence with
 `bench/tools/build_wgsl_lowering_link_receipt.py`. The receipt binds each

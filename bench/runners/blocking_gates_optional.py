@@ -30,6 +30,18 @@ def run_optional_artifact_gates(
     browser_claim_promotion_receipt_check = (
         tools_dir / "check_browser_claim_promotion_receipt.py"
     )
+    browser_release_candidate_provenance_check = (
+        tools_dir / "check_browser_release_candidate_provenance.py"
+    )
+    browser_published_proof_surface_check = (
+        tools_dir / "check_browser_published_proof_surface.py"
+    )
+    browser_release_candidate_finalizer_check = (
+        tools_dir / "check_browser_release_candidate_finalizer.py"
+    )
+    browser_release_package_inputs_check = (
+        tools_dir / "check_browser_release_package_inputs.py"
+    )
     browser_release_artifact_bundle_check = (
         tools_dir / "check_browser_release_artifact_bundle.py"
     )
@@ -143,6 +155,133 @@ def run_optional_artifact_gates(
             )
         run_gate("browser-claim-promotion-receipt", gate_cmd)
 
+    if args.with_browser_release_candidate_provenance_gate:
+        package_inputs = (
+            args.browser_release_candidate_provenance_package_inputs.strip()
+        )
+        if not package_inputs:
+            print(
+                "FAIL: missing "
+                "--browser-release-candidate-provenance-package-inputs: "
+                "browser release-candidate provenance gate requires the "
+                "package-input preflight receipt"
+            )
+            return 1
+        candidate_inputs = (
+            (
+                package_inputs,
+                "--browser-release-candidate-provenance-package-inputs",
+            ),
+            (
+                args.browser_release_candidate_provenance_release_archive,
+                "--browser-release-candidate-provenance-release-archive",
+            ),
+            (
+                args.browser_release_candidate_provenance_release_archive_manifest,
+                "--browser-release-candidate-provenance-release-archive-manifest",
+            ),
+            (
+                args.browser_release_candidate_provenance_public_download_receipt,
+                "--browser-release-candidate-provenance-public-download-receipt",
+            ),
+            (
+                args.browser_release_candidate_provenance_proof_surface,
+                "--browser-release-candidate-provenance-proof-surface",
+            ),
+            (
+                args.browser_release_candidate_provenance_proof_surface_check,
+                "--browser-release-candidate-provenance-proof-surface-check",
+            ),
+            (
+                args.browser_release_candidate_provenance_browser_launch_receipt,
+                "--browser-release-candidate-provenance-browser-launch-receipt",
+            ),
+        )
+        for input_path, option_name in candidate_inputs:
+            if require_existing_path(input_path, option_name) is None:
+                return 1
+        gate_cmd = [
+            sys.executable,
+            str(browser_release_candidate_provenance_check),
+            "--release-archive",
+            args.browser_release_candidate_provenance_release_archive,
+            "--release-archive-url",
+            args.browser_release_candidate_provenance_release_archive_url,
+            "--release-archive-manifest",
+            args.browser_release_candidate_provenance_release_archive_manifest,
+            "--public-download-receipt",
+            args.browser_release_candidate_provenance_public_download_receipt,
+            "--proof-surface",
+            args.browser_release_candidate_provenance_proof_surface,
+            "--proof-surface-check",
+            args.browser_release_candidate_provenance_proof_surface_check,
+            "--browser-launch-receipt",
+            args.browser_release_candidate_provenance_browser_launch_receipt,
+            "--package-inputs",
+            package_inputs,
+        ]
+        if args.browser_release_candidate_provenance_verify_files_root.strip():
+            gate_cmd.extend(
+                [
+                    "--verify-files-root",
+                    args.browser_release_candidate_provenance_verify_files_root.strip(),
+                ]
+            )
+        if args.browser_release_candidate_provenance_out.strip():
+            gate_cmd.extend(["--out", args.browser_release_candidate_provenance_out.strip()])
+        run_gate("browser-release-candidate-provenance", gate_cmd)
+
+    if args.with_browser_published_proof_surface_gate:
+        surface_path = Path(args.browser_published_proof_surface)
+        if not surface_path.exists():
+            print(f"FAIL: missing --browser-published-proof-surface: {surface_path}")
+            return 1
+        gate_cmd = [
+            sys.executable,
+            str(browser_published_proof_surface_check),
+            "--surface",
+            str(surface_path),
+        ]
+        if args.browser_published_proof_surface_verify_files_root.strip():
+            gate_cmd.extend(
+                [
+                    "--verify-files-root",
+                    args.browser_published_proof_surface_verify_files_root.strip(),
+                ]
+            )
+        if args.browser_published_proof_surface_require_public_urls:
+            gate_cmd.append("--require-public-urls")
+        if args.browser_published_proof_surface_check_out.strip():
+            gate_cmd.extend(["--out", args.browser_published_proof_surface_check_out.strip()])
+        run_gate("browser-published-proof-surface", gate_cmd)
+
+    if args.with_browser_release_candidate_finalizer_gate:
+        report_path = Path(args.browser_release_candidate_finalizer_report)
+        if not report_path.exists():
+            print(
+                "FAIL: missing --browser-release-candidate-finalizer-report: "
+                f"{report_path}"
+            )
+            return 1
+        gate_cmd = [
+            sys.executable,
+            str(browser_release_candidate_finalizer_check),
+            "--report",
+            str(report_path),
+        ]
+        if args.browser_release_candidate_finalizer_verify_files_root.strip():
+            gate_cmd.extend(
+                [
+                    "--verify-files-root",
+                    args.browser_release_candidate_finalizer_verify_files_root.strip(),
+                ]
+            )
+        if args.browser_release_candidate_finalizer_require_pass:
+            gate_cmd.append("--require-pass")
+        if args.browser_release_candidate_finalizer_check_out.strip():
+            gate_cmd.extend(["--out", args.browser_release_candidate_finalizer_check_out.strip()])
+        run_gate("browser-release-candidate-finalizer", gate_cmd)
+
     if args.with_browser_release_artifact_bundle_gate:
         bundle_path = Path(args.browser_release_artifact_bundle)
         if not bundle_path.exists():
@@ -164,6 +303,37 @@ def run_optional_artifact_gates(
         if args.browser_release_artifact_bundle_require_release_candidate:
             gate_cmd.append("--require-release-candidate")
         run_gate("browser-release-artifact-bundle", gate_cmd)
+
+    if args.with_browser_release_package_inputs_gate:
+        gate_cmd = [
+            sys.executable,
+            str(browser_release_package_inputs_check),
+            "--package-dir",
+            args.browser_release_package_inputs_package_dir,
+            "--package-root-name",
+            args.browser_release_package_inputs_package_root_name,
+            "--doe-runtime",
+            args.browser_release_package_inputs_doe_runtime,
+            "--dawn-fallback-runtime",
+            args.browser_release_package_inputs_dawn_fallback_runtime,
+            "--shader-compiler",
+            args.browser_release_package_inputs_shader_compiler,
+            "--product-version",
+            args.browser_release_package_inputs_product_version,
+            "--product-channel",
+            args.browser_release_package_inputs_product_channel,
+            "--platform-os",
+            args.browser_release_package_inputs_platform_os,
+            "--platform-arch",
+            args.browser_release_package_inputs_platform_arch,
+            "--root",
+            args.browser_release_package_inputs_root,
+        ]
+        if args.browser_release_package_inputs_require_release_candidate_eligible:
+            gate_cmd.append("--require-release-candidate-eligible")
+        if args.browser_release_package_inputs_out.strip():
+            gate_cmd.extend(["--out", args.browser_release_package_inputs_out.strip()])
+        run_gate("browser-release-package-inputs", gate_cmd)
 
     if args.with_browser_runtime_frontier_bundle_gate:
         identity_path = Path(args.browser_runtime_frontier_bundle_runtime_identity)

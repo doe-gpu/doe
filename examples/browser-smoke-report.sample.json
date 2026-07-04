@@ -25,18 +25,18 @@
       "fallbackReasonCode": "",
       "hiddenFallbackAllowed": false,
       "profile": {
-        "profileId": "",
-        "vendor": "unknown",
-        "api": "unknown",
-        "deviceFamily": "unknown",
-        "driver": "unknown"
+        "profileId": "sample-webgpu-adapter",
+        "vendor": "sample",
+        "api": "webgpu",
+        "deviceFamily": "sample-adapter-family",
+        "driver": "sample-driver"
       },
       "selectorVersion": "browser-runtime-selector-v1",
       "artifactIdentity": {
-        "browserExecutablePath": "/examples/fawn/Chromium",
-        "browserExecutableSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "dawnRuntimePath": "/examples/fawn/Chromium",
-        "dawnRuntimeSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "browserExecutablePath": "browser/chromium/src/out/fawn_release/chrome-wrapper",
+        "browserExecutableSha256": "24c1cfddcd206a86281008e7eed38109344ef34cd88d61902a9befd520a5571c",
+        "dawnRuntimePath": "browser/chromium/src/out/fawn_release/libdawn_native.so",
+        "dawnRuntimeSha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854",
         "doeLibPath": null,
         "doeLibSha256": null
       },
@@ -50,20 +50,20 @@
       "fallbackReasonCode": "",
       "hiddenFallbackAllowed": false,
       "profile": {
-        "profileId": "",
-        "vendor": "unknown",
-        "api": "unknown",
-        "deviceFamily": "unknown",
-        "driver": "unknown"
+        "profileId": "sample-webgpu-adapter",
+        "vendor": "sample",
+        "api": "webgpu",
+        "deviceFamily": "sample-adapter-family",
+        "driver": "sample-driver"
       },
       "selectorVersion": "browser-runtime-selector-v1",
       "artifactIdentity": {
-        "browserExecutablePath": "/examples/fawn/Chromium",
-        "browserExecutableSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "dawnRuntimePath": "/examples/fawn/Chromium",
-        "dawnRuntimeSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "doeLibPath": "/examples/libwebgpu_doe.dylib",
-        "doeLibSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "browserExecutablePath": "browser/chromium/src/out/fawn_release/chrome-wrapper",
+        "browserExecutableSha256": "24c1cfddcd206a86281008e7eed38109344ef34cd88d61902a9befd520a5571c",
+        "dawnRuntimePath": "browser/chromium/src/out/fawn_release/libdawn_native.so",
+        "dawnRuntimeSha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854",
+        "doeLibPath": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        "doeLibSha256": "1bf01661b9b48fc1811a0668aa18ce8642f7b568b1e4fffda82268ff79e0c527"
       },
       "launchArgsHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     }
@@ -79,18 +79,18 @@
         "fallbackReasonCode": "",
         "hiddenFallbackAllowed": false,
         "profile": {
-          "profileId": "",
-          "vendor": "unknown",
-          "api": "unknown",
-          "deviceFamily": "unknown",
-          "driver": "unknown"
+          "profileId": "sample-webgpu-adapter",
+          "vendor": "sample",
+          "api": "webgpu",
+          "deviceFamily": "sample-adapter-family",
+          "driver": "sample-driver"
         },
         "selectorVersion": "browser-runtime-selector-v1",
         "artifactIdentity": {
-          "browserExecutablePath": "/examples/fawn/Chromium",
-          "browserExecutableSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "dawnRuntimePath": "/examples/fawn/Chromium",
-          "dawnRuntimeSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "browserExecutablePath": "browser/chromium/src/out/fawn_release/chrome-wrapper",
+          "browserExecutableSha256": "24c1cfddcd206a86281008e7eed38109344ef34cd88d61902a9befd520a5571c",
+          "dawnRuntimePath": "browser/chromium/src/out/fawn_release/libdawn_native.so",
+          "dawnRuntimeSha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854",
           "doeLibPath": null,
           "doeLibSha256": null
         },
@@ -98,15 +98,17 @@
       },
       "shaderCompilerIdentity": {
         "compilerSurface": "dawn_runtime_embedded_shader_compiler",
-        "compilerArtifactPath": "/examples/fawn/Chromium",
-        "compilerArtifactSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "compilerArtifactPath": "browser/chromium/src/out/fawn_release/libdawn_native.so",
+        "compilerArtifactSha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854",
         "identitySource": "runtime_artifact_identity"
       },
       "webgpuAvailable": true,
       "adapterAvailable": true,
       "adapterIdentity": {
         "adapterInfoSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "featureCount": 0
+        "featureCount": 1,
+        "adapter": "sample-adapter",
+        "device": "sample-device"
       },
       "errors": [],
       "smoke": {
@@ -136,7 +138,7 @@
         }
       },
       "previousHash": null,
-      "hash": "91449f8ae84c1a38494dd54b04239720e43eed7b08bd97d19b45f76c37599a08"
+      "hash": "118b01afeb33239af384e0ecd565a41be041ac2563a6483c988d88a7c739cf6b"
     },
     {
       "mode": "doe",
@@ -148,34 +150,36 @@
         "fallbackReasonCode": "",
         "hiddenFallbackAllowed": false,
         "profile": {
-          "profileId": "",
-          "vendor": "unknown",
-          "api": "unknown",
-          "deviceFamily": "unknown",
-          "driver": "unknown"
+          "profileId": "sample-webgpu-adapter",
+          "vendor": "sample",
+          "api": "webgpu",
+          "deviceFamily": "sample-adapter-family",
+          "driver": "sample-driver"
         },
         "selectorVersion": "browser-runtime-selector-v1",
         "artifactIdentity": {
-          "browserExecutablePath": "/examples/fawn/Chromium",
-          "browserExecutableSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "dawnRuntimePath": "/examples/fawn/Chromium",
-          "dawnRuntimeSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "doeLibPath": "/examples/libwebgpu_doe.dylib",
-          "doeLibSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          "browserExecutablePath": "browser/chromium/src/out/fawn_release/chrome-wrapper",
+          "browserExecutableSha256": "24c1cfddcd206a86281008e7eed38109344ef34cd88d61902a9befd520a5571c",
+          "dawnRuntimePath": "browser/chromium/src/out/fawn_release/libdawn_native.so",
+          "dawnRuntimeSha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854",
+          "doeLibPath": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+          "doeLibSha256": "1bf01661b9b48fc1811a0668aa18ce8642f7b568b1e4fffda82268ff79e0c527"
         },
         "launchArgsHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       },
       "shaderCompilerIdentity": {
         "compilerSurface": "doe_runtime_embedded_shader_compiler",
-        "compilerArtifactPath": "/examples/libwebgpu_doe.dylib",
-        "compilerArtifactSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "compilerArtifactPath": "runtime/zig/zig-out/bin/doe-zig-runtime",
+        "compilerArtifactSha256": "fdef3b47a9b3f4f75ecb1587e9053e587be290e1035381ce5e9d38207aec3d62",
         "identitySource": "runtime_artifact_identity"
       },
       "webgpuAvailable": true,
       "adapterAvailable": true,
       "adapterIdentity": {
         "adapterInfoSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "featureCount": 0
+        "featureCount": 1,
+        "adapter": "sample-adapter",
+        "device": "sample-device"
       },
       "errors": [],
       "smoke": {
@@ -204,8 +208,8 @@
           "pass": true
         }
       },
-      "previousHash": "91449f8ae84c1a38494dd54b04239720e43eed7b08bd97d19b45f76c37599a08",
-      "hash": "fac2565a1e46f14c619072a14d67aa0526b8aa3f5b57f4ebc8fb7d67d4d6a00a"
+      "previousHash": "118b01afeb33239af384e0ecd565a41be041ac2563a6483c988d88a7c739cf6b",
+      "hash": "76b64402fdfb1f72fdff690152c9b8bc754747c5dc591c1c7987ddd30ea45aa7"
     }
   ],
   "comparison": {
@@ -215,5 +219,5 @@
     "bothRenderIndirectSmokePass": true,
     "bothTimestampQuerySmokePass": true
   },
-  "reportHash": "38e2d271a93ca8dd6910e8ac29babe14948feb7d101ba4a4636766785e9c9562"
+  "reportHash": "ba7476e4520bb2206fe54b59163ce58898b828e5f1604a3783028c6ea49fb416"
 }

@@ -33,7 +33,7 @@
         },
         "surface": {
           "type": "string",
-          "enum": ["package", "native", "node-ort", "bun-ort", "browser-ort"]
+          "enum": ["package", "native", "node-ort", "bun-ort", "browser-ort", "browser-chromium", "drop-in"]
         },
         "runtimeHost": {
           "type": "string",
@@ -65,9 +65,32 @@
         },
         "reportPath": { "$ref": "#/$defs/repoJsonPath" },
         "claimPath": { "$ref": "#/$defs/repoJsonPath" },
+        "browserRelease": { "$ref": "#/$defs/browserRelease" },
         "blocker": { "type": "string", "minLength": 1 }
       },
       "allOf": [
+        {
+          "if": {
+            "properties": { "surface": { "const": "browser-chromium" } },
+            "required": ["surface"]
+          },
+          "then": {
+            "required": ["runtimeHost", "browserRelease"],
+            "properties": {
+              "runtimeHost": { "const": "browser" }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["browserRelease"]
+          },
+          "then": {
+            "properties": {
+              "surface": { "const": "browser-chromium" }
+            }
+          }
+        },
         {
           "if": {
             "properties": { "claimState": { "const": "claim-indexed" } },
@@ -137,6 +160,60 @@
       "type": "string",
       "minLength": 1,
       "pattern": "^[^/][^\\\\]*\\.json$"
+    },
+    "repoZipPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/][^\\\\]*\\.zip$"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "publicHttpsUrl": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^https://"
+    },
+    "browserRelease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtimeFrontierBundlePath",
+        "releaseArtifactBundlePath",
+        "releaseArchivePath",
+        "releaseArchiveSha256",
+        "releaseArchiveManifestPath",
+        "releaseArchiveManifestSha256",
+        "downloadUrl",
+        "packageInputsPath",
+        "provenanceReportPath",
+        "publicDownloadReceiptPath",
+        "proofSurfacePath",
+        "proofSurfaceCheckPath",
+        "browserLaunchReceiptPath",
+        "finalizerReportPath",
+        "finalizerCheckPath",
+        "readinessReportPath"
+      ],
+      "properties": {
+        "runtimeFrontierBundlePath": { "$ref": "#/$defs/repoJsonPath" },
+        "releaseArtifactBundlePath": { "$ref": "#/$defs/repoJsonPath" },
+        "releaseArchivePath": { "$ref": "#/$defs/repoZipPath" },
+        "releaseArchiveSha256": { "$ref": "#/$defs/hash" },
+        "releaseArchiveManifestPath": { "$ref": "#/$defs/repoJsonPath" },
+        "releaseArchiveManifestSha256": { "$ref": "#/$defs/hash" },
+        "downloadUrl": { "$ref": "#/$defs/publicHttpsUrl" },
+        "packageInputsPath": { "$ref": "#/$defs/repoJsonPath" },
+        "provenanceReportPath": { "$ref": "#/$defs/repoJsonPath" },
+        "publicDownloadReceiptPath": { "$ref": "#/$defs/repoJsonPath" },
+        "proofSurfacePath": { "$ref": "#/$defs/repoJsonPath" },
+        "proofSurfaceCheckPath": { "$ref": "#/$defs/repoJsonPath" },
+        "browserLaunchReceiptPath": { "$ref": "#/$defs/repoJsonPath" },
+        "finalizerReportPath": { "$ref": "#/$defs/repoJsonPath" },
+        "finalizerCheckPath": { "$ref": "#/$defs/repoJsonPath" },
+        "readinessReportPath": { "$ref": "#/$defs/repoJsonPath" }
+      }
     }
   }
 }

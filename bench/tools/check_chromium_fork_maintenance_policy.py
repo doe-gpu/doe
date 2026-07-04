@@ -155,7 +155,15 @@ def check_policy(payload: dict[str, Any], root: Path = REPO_ROOT) -> list[dict[s
                 )
             )
 
-    for field in ("browserBinaryHashRequired", "doeRuntimeHashRequired", "compilerHashRequired", "claimReportRequired"):
+    for field in (
+        "releaseArchiveHashRequired",
+        "platformIdentityRequired",
+        "browserBinaryHashRequired",
+        "doeRuntimeHashRequired",
+        "dawnFallbackRuntimeHashRequired",
+        "compilerHashRequired",
+        "claimReportRequired",
+    ):
         if release.get(field) is not True:
             failures.append(failure("release_artifact_not_required", f"releaseArtifacts.{field}", f"release requires {field}"))
     return failures

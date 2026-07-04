@@ -4,6 +4,63 @@
   "title": "Browser release artifact bundle",
   "type": "object",
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": ["releaseStatus"],
+        "properties": {
+          "releaseStatus": { "const": "release_candidate" }
+        }
+      },
+      "then": {
+        "required": [
+          "releaseArchive",
+          "browserProduct",
+          "platform",
+          "packageInputs",
+          "browserExecutableArchivePath",
+          "browserAppMetadataArchivePath",
+          "doeRuntimeArchivePath",
+          "dawnFallbackRuntimeArchivePath",
+          "dawnFallbackRuntime",
+          "releaseArchiveManifest",
+          "proofSurface",
+          "proofSurfaceCheck",
+          "publicDownloadReceipt",
+          "browserLaunchReceipt",
+          "chromiumSourceCheckout",
+          "runtimeFrontierBundle"
+        ],
+        "properties": {
+          "releaseArchive": {
+            "allOf": [
+              { "$ref": "#/$defs/Artifact" },
+              { "required": ["downloadUrl"] }
+            ]
+          },
+          "browserProduct": {
+            "allOf": [
+              { "$ref": "#/$defs/BrowserProduct" },
+              {
+                "properties": {
+                  "channel": { "const": "release_candidate" }
+                }
+              }
+            ]
+          },
+          "platform": {
+            "type": "object",
+            "required": ["os", "arch", "packageFormat"],
+            "properties": {
+              "os": { "const": "macos" },
+              "arch": { "const": "arm64" },
+              "packageFormat": { "const": "zip" }
+            }
+          }
+        }
+      }
+    }
+  ],
   "required": [
     "schemaVersion",
     "artifactKind",
@@ -23,9 +80,34 @@
     "artifactKind": { "type": "string", "const": "browser_release_artifact_bundle" },
     "bundleId": { "type": "string", "minLength": 1 },
     "releaseStatus": { "enum": ["diagnostic", "release_candidate"] },
+    "releaseArchive": { "$ref": "#/$defs/Artifact" },
+    "browserProduct": { "$ref": "#/$defs/BrowserProduct" },
+    "platform": { "$ref": "#/$defs/Platform" },
+    "packageInputs": {
+      "allOf": [
+        { "$ref": "#/$defs/Artifact" },
+        {
+          "properties": {
+            "kind": { "const": "browser_release_package_inputs_check" }
+          }
+        }
+      ]
+    },
+    "browserExecutableArchivePath": { "type": "string", "minLength": 1 },
+    "browserAppMetadataArchivePath": { "type": "string", "minLength": 1 },
+    "doeRuntimeArchivePath": { "type": "string", "minLength": 1 },
+    "dawnFallbackRuntimeArchivePath": { "type": "string", "minLength": 1 },
+    "releaseArchiveManifest": { "$ref": "#/$defs/Artifact" },
     "browserBinary": { "$ref": "#/$defs/Artifact" },
     "doeRuntime": { "$ref": "#/$defs/Artifact" },
+    "dawnFallbackRuntime": { "$ref": "#/$defs/Artifact" },
     "shaderCompiler": { "$ref": "#/$defs/Artifact" },
+    "proofSurface": { "$ref": "#/$defs/Artifact" },
+    "proofSurfaceCheck": { "$ref": "#/$defs/Artifact" },
+    "publicDownloadReceipt": { "$ref": "#/$defs/Artifact" },
+    "browserLaunchReceipt": { "$ref": "#/$defs/Artifact" },
+    "chromiumSourceCheckout": { "$ref": "#/$defs/Artifact" },
+    "runtimeFrontierBundle": { "$ref": "#/$defs/Artifact" },
     "contracts": {
       "type": "array",
       "minItems": 1,
@@ -63,7 +145,42 @@
       "properties": {
         "path": { "type": "string", "minLength": 1 },
         "sha256": { "$ref": "#/$defs/Hash" },
-        "kind": { "type": "string", "minLength": 1 }
+        "kind": { "type": "string", "minLength": 1 },
+        "downloadUrl": { "$ref": "#/$defs/PublicHttpsUrl" }
+      }
+    },
+    "PublicHttpsUrl": {
+      "type": "string",
+      "pattern": "^https://[^/?#]+\\.[^/?#]+",
+      "not": {
+        "anyOf": [
+          { "pattern": "^https://localhost(?::|/|$)" },
+          { "pattern": "^https://(?:127\\.0\\.0\\.1|0\\.0\\.0\\.0|10\\.|192\\.168\\.|172\\.(?:1[6-9]|2[0-9]|3[0-1])\\.)(?::|/|$)" },
+          { "pattern": "^https://\\[::1\\](?::|/|$)" },
+          { "pattern": "^https://[^/?#]*\\.(?:local|localhost|test|example|invalid)(?::|/|$)" },
+          { "pattern": "^https://(?:example\\.com|example\\.net|example\\.org)(?::|/|$)" }
+        ]
+      }
+    },
+    "Platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch", "packageFormat"],
+      "properties": {
+        "os": { "enum": ["macos", "linux", "windows"] },
+        "arch": { "enum": ["arm64", "x64"] },
+        "packageFormat": { "enum": ["zip"] }
+      }
+    },
+    "BrowserProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["productId", "displayName", "version", "channel"],
+      "properties": {
+        "productId": { "enum": ["doe-browser", "fawn-doe"] },
+        "displayName": { "enum": ["Doe Browser", "Fawn Doe"] },
+        "version": { "type": "string", "minLength": 1 },
+        "channel": { "enum": ["diagnostic", "release_candidate", "release"] }
       }
     },
     "Failure": {

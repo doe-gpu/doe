@@ -3,6 +3,3060 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-07-03 — Browser package inputs record release build profile
+
+Browser package-input preflights now emit a `buildProfile` section when an
+`args.gn` file is present beside the Chromium output or app bundle. The
+release-candidate path requires the documented Fawn release profile:
+`is_official_build=true`, `dcheck_always_on=false`, no Chrome-for-Testing or
+branded Chrome identity, zero symbol levels, `use_clang_modules=false`, and the
+Doe WebGPU backend flag.
+
+This prevents a local `is_debug=false` Chromium build with DCHECKs, missing
+official-build optimization, or profile drift from looking release-candidate
+ready. Diagnostic Linux archives remain packageable, but the candidate blockers
+now name the build-profile mismatch explicitly.
+
+The Linux Fawn GUI benchmark investigation rebuilt
+`browser/chromium/src/out/fawn_release/chrome` with the strict official Fawn
+profile and added the matching `fawn-release-build.json` stamp. The rebuilt
+binary is Chromium `149.0.7781.0` with SHA256
+`b87b89932046d6f5d1eab0f0d54c36b3a186a2d1b335fd4ac61efbb44b0623bd`.
+Package input preflight now passes with `buildProfile.releaseProfileMatched=true`;
+the Linux artifact remains diagnostic-only because the first release lane is
+macOS arm64.
+
+Corrected same-binary evidence does not support a "Doe crushes Dawn" claim.
+The strict Fawn smoke shows Doe faster on 64 KiB upload but slower on compute
+dispatch, and Doe still fails `importExternalTexture` while returning zero
+timestamp values. The focused paired-balanced layered run over compute and
+memory rows completed with zero required row failures, but the score is
+Doe `41.93` vs Dawn `58.07` overall, and category-balanced Doe `42.09` vs Dawn
+`57.91`. The summary artifact is
+`bench/out/public-browser-release/20260703T233418Z/fawn-strict-release-profile-investigation-summary.json`.
+
+## 2026-07-03 — Dawn replacement readiness is platform-sliced
+
+`config/dawn-replacement-frontier.json` now splits each Dawn replacement
+frontier row into explicit evidence slices keyed by operating system,
+architecture, GPU API, GPU vendor, and runtime host. The schema and gate require
+those slices, validate their evidence paths, blocker definitions, and claim-index
+references, and reject a claim-allowed row if any of its slices remains blocked.
+
+The readiness rollup now emits those slices beside the product rows and reports
+slice-level claim state separately from product-row claim state. This makes
+native Linux AMD Vulkan, drop-in Linux AMD Vulkan, Chromium macOS Apple Metal,
+Chromium Linux AMD Vulkan, Chromium Windows D3D12, CTS, package, and compiler
+coverage inspectable without inflating the broader replacement claim. See
+`examples/dawn-replacement-readiness-report.sample.json` for the current
+machine-readable state.
+
+## 2026-07-02 — Linux drop-in cutover rehearsal is indexed
+
+The drop-in ABI runtime lane now has a claim-indexed Linux Vulkan cutover
+rehearsal receipt. The evidence binds the ReleaseFast `libwebgpu_doe.so`
+artifact to the drop-in symbol, behavior, proc-resolution, and benchmark gates,
+then binds rollback to the AMD Vulkan Dawn delegate release claim. See
+`bench/out/dropin/20260702T164301Z/linux-dropin-report.json`,
+`bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json`,
+`bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json`, and
+`examples/dawn-replacement-readiness-report.sample.json` for the current
+machine-readable state.
+
+## 2026-07-02 — AMD Vulkan release claim is indexed
+
+The AMD Vulkan native Doe-vs-Dawn release lane now has a claim-indexed release
+artifact. The run passed strict AMD/Vulkan preflight, blocking gates, structural
+equivalence, shader-artifact validation, Vulkan sync/timing policy gates,
+release claim gating, and claim-rehearsal artifact generation. See
+`bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json`,
+`bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json`,
+and
+`bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.manifest.json`
+for the machine-readable evidence.
+
+## 2026-07-02 — Package-input eligibility is schema-bound
+
+`config/browser-release-package-inputs-check.schema.json` now treats
+`releaseCandidateEligible=true` as a schema-level release claim. Eligible
+package-input receipts must also be passing, release-candidate-mode receipts
+with no failures or release-candidate blockers, the initial macOS arm64 zip
+platform, release-candidate channel identity, and arm64 Mach-O browser/runtime
+tool inputs plus packaged plist metadata.
+
+The package-input checker already emitted that state; the schema now rejects
+manually edited candidate receipts before higher-level release, provenance,
+finalizer, runtime-frontier, readiness, or claim-index gates consume them. The
+Chromium browser row remains blocked on `chromium_release_build_evidence`
+until a real release-candidate archive lands.
+
+## 2026-07-02 — Browser candidate byte checks stay release-scoped
+
+Browser release-candidate validation now keeps the byte-exact archive member
+checks on the candidate path while allowing diagnostic bundles to carry blocked
+Chromium checkout evidence without recalculating candidate runtime-frontier
+identity. The same candidate path still verifies the browser executable, Doe
+runtime, Dawn fallback runtime, archive manifest member hashes, and runtime
+frontier release identity before a browser artifact can promote.
+
+The release-candidate staging tool now emits `webgpuAvailable=true` into the
+proof-page diagnostics it binds, matching the proof-page receipt and published
+proof-surface contract. The Chromium browser row remains blocked on
+`chromium_release_build_evidence` until a real release-candidate archive lands.
+
+## 2026-07-02 — Public gallery pages expose backend receipt facts
+
+Browser public gallery pages now have to visibly expose the backend receipt
+facts for each linked execution receipt: receipt/workload ID, WGSL source
+shader and hash, lowering path, backend, driver/device identity, output or
+frame hash, and setup/encode/submit-wait timing phases. The proof-surface
+builder, proof-surface checker, and public-gallery receipt builder all enforce
+the same page-content rule, including HTML-escaped source text.
+
+The five checked gallery samples now show those facts for compute, rendering,
+tensor, shader-edge, and benchmark-trace receipts. The public-gallery receipts,
+published proof surface, proof-surface check, launch receipt, provenance
+report, release bundle, runtime frontier bundle, and Dawn replacement readiness
+sample were refreshed. The Chromium browser row remains blocked on
+`chromium_release_build_evidence`.
+
+## 2026-07-02 — Proof pages expose WebGPU availability
+
+The browser proof-page receipt and published proof-surface schemas now require
+`diagnostics.webgpuAvailable=true`. The proof-page receipt builder emits and
+validates the field, the proof-surface builder and checker reject unavailable
+WebGPU diagnostics, and the checked `about:doe` sample visibly shows the
+availability state before the proof surface can bind it.
+
+The Dawn replacement readiness rollup now exposes
+`publishedProofSurface.webgpuAvailable=true` for the Chromium browser row, so
+downloadable-browser evidence carries an explicit WebGPU-available diagnostic
+beside the active Doe backend and compiler path.
+
+## 2026-07-02 — Launch receipts reject unlinked observed IDs
+
+Browser release launch receipts now require `observedReceiptIds` to contain
+exactly the proof-page, public-gallery, Dawn comparison, and Doe comparison
+receipt IDs named by the launch receipt. The schema caps the list at four
+unique IDs, the launch receipt builder rejects extra IDs before emission, and
+the release bundle checker, readiness rollup, and claim-index browser release
+checks now fail candidate evidence that carries unlinked observed receipt IDs.
+
+This keeps packaged-browser launch evidence closed over the proof surface
+instead of allowing extra runtime receipts to sit outside the public proof
+gallery.
+
+## 2026-07-02 — Launch receipts prove fallback was not used
+
+Browser release launch receipts now carry `hiddenFallbackUsed=false` alongside
+the existing hidden-fallback policy state. The launch receipt builder emits the
+field, the release artifact bundle checker rejects candidate launch evidence
+that reports fallback usage, and the Dawn replacement readiness rollup keeps
+the Chromium browser row blocked when the packaged-browser launch does not
+prove hidden fallback stayed unused.
+
+The checked diagnostic sample was refreshed through launch, provenance, release
+bundle, runtime frontier, and readiness receipts. It remains blocked on
+`chromium_release_build_evidence`.
+
+## 2026-07-02 — Candidate package inputs bind shader compiler identity
+
+macOS browser release-candidate package inputs now require the
+`shaderCompiler` artifact to carry Mach-O identity for the declared platform
+architecture, matching the browser executable, Doe runtime, and Dawn fallback
+runtime checks. Release-bundle, provenance, finalizer, finalizer-check, and
+readiness consumers reuse the same package-input helper, so stale compiler
+identity can no longer pass by only being executable.
+
+## 2026-07-02 — Archive manifests bind package-input source paths
+
+Browser release archive manifest verification now checks that each
+package-sourced required member named by `sourcePackageInputs` records a
+`members.<role>.sourcePath` matching the corresponding package-input `path`.
+The Dawn replacement readiness rollup now mirrors the same check when it
+summarizes browser release-candidate consistency. Generated metadata remains
+allowed to omit `sourcePath`. This closes a same-bytes/different-source
+ambiguity before a release-candidate archive can serve as Chromium browser
+evidence.
+
+## 2026-07-01 — Provenance preflight keeps failing package identity
+
+The release-candidate provenance checker now keeps using a loaded
+`browser_release_package_inputs_check` report as the browser product, platform,
+and packaged-member source of truth even when that package-input report is not
+release-candidate eligible. The report still fails closed on the package-input
+candidate blockers and the initial macOS arm64 policy, but the checked browser
+readiness sample no longer adds provenance product/platform drift on top of the
+real blocker. See `examples/browser-release-candidate-provenance.sample.json`
+and `examples/dawn-replacement-readiness-report.sample.json` for the current
+machine-readable state.
+
+## 2026-07-01 — Candidate consumers require package-input binary identity
+
+Release-candidate provenance, staging, finalizer, finalizer-check, and release
+bundle verification now reject stale package-input reports that claim macOS
+release-candidate eligibility without Mach-O arm64 identity on the packaged
+browser executable, Doe runtime, and Dawn fallback runtime. The checked-in
+diagnostic browser sample remains diagnostic, but stale JSON can no longer
+drive candidate evidence merely by setting `releaseCandidateEligible=true`.
+
+## 2026-07-01 — Proof-surface comparison receipts bind release artifacts
+
+The browser proof-surface comparison sample now uses the release bundle's
+browser, Dawn fallback, Doe runtime, and compiler artifact identities in the
+same-page smoke report, and the Dawn/Doe execution receipts now bind the smoke
+report through command-graph evidence. The published proof surface, proof check,
+launch receipt, release bundle, runtime-frontier bundle, provenance report, and
+readiness sample were refreshed so browser release consistency no longer carries
+the comparison artifact/hash mismatch failures. The remaining browser release
+consistency failures are the real candidate-state blockers: diagnostic bundle
+status, noncandidate package inputs, failing provenance, and failing finalizer.
+
+## 2026-07-01 — Candidate provenance binds package inputs before eligibility
+
+Browser release-candidate provenance reports now hash-bind the
+`browser_release_package_inputs_check` artifact even when that package-input
+report is not release-candidate eligible. Noncandidate package inputs still
+produce explicit provenance failures and cannot drive staged candidate artifact
+generation, but readiness no longer reports missing package-input provenance
+when the failing preflight artifact is present and hash-matched.
+
+## 2026-07-01 — Proof-surface check requires public gallery URLs
+
+The checked-in browser published proof-surface check now runs with
+`--require-public-urls` and still passes against the sample proof gallery. The
+release bundle, runtime-frontier bundle, release-candidate provenance report,
+and readiness sample were refreshed so the browser release consistency rollup
+no longer carries the `proof_surface_check_without_public_urls` blocker. The
+frontier remains blocked on `chromium_release_build_evidence` until the
+diagnostic Linux/x64 archive is replaced by real release-candidate browser
+evidence.
+
+## 2026-07-01 — Browser diagnostic archive matches package inputs
+
+The browser release archive packer now has a diagnostic-only required-members
+mode for compact samples, and generated ZIP members use fixed timestamps with
+deflated payloads. The checked-in diagnostic archive, archive manifest,
+public-download receipt, proof page receipt, proof surface, launch receipt,
+release bundle, runtime-frontier bundle, claim-index pointer, and readiness
+sample now agree on the Linux/x64 package-input paths and hashes instead of
+labeling Linux inputs as a macOS app bundle. The browser frontier still remains
+blocked on `chromium_release_build_evidence`; the release-candidate provenance
+report and finalizer continue to fail until real macOS arm64 release-candidate
+package inputs exist.
+
+## 2026-07-01 — Finalizer check sample enforces pass mode
+
+The checked-in browser release-candidate finalizer-check sample now runs with
+`--verify-files-root`, so the receipt proves the finalizer report path and hash
+were checked. The underlying finalizer remains an honest
+`provenance_preflight` failure, and the checker now uses `--require-pass`, so
+the checker receipt itself fails with `finalizer_report_not_pass` until final
+browser release evidence is real. Readiness therefore drops the stale
+`finalizer_check_without_file_verification` and
+`finalizer_check_without_require_pass` failures and reports the stricter
+`finalizer_check_not_pass` failure instead.
+
+## 2026-07-01 — Browser archives reject fake macOS binary members
+
+Browser release-candidate archive checks now inspect packaged browser/runtime
+members before accepting macOS arm64 evidence. The release artifact bundle
+checker and readiness consistency rollup reject a release-candidate archive
+whose browser executable, Doe runtime, or Dawn fallback runtime is not Mach-O
+for the declared platform architecture. Forcing the current diagnostic sample
+through the release-candidate checker now reports the shell `Chromium` member
+and ELF x64 runtimes instead of letting archive path names stand in for binary
+identity.
+
+## 2026-07-01 — Browser package inputs record binary identity
+
+Browser release package-input receipts now record detected file format and
+architecture for browser/runtime/compiler inputs. The package-input checker
+rejects macOS package inputs whose browser executable, Doe runtime, or Dawn
+fallback runtime is not Mach-O for the declared platform arch, and the
+readiness rollup rejects stale release-candidate package-input artifacts that
+omit or falsify those binary identity facts. The default sample remains
+diagnostic Linux/x64 evidence and now explicitly records `chrome-wrapper` as a
+script and the local runtimes/compiler as ELF x64, preserving the
+`chromium_release_build_evidence` blocker until a real macOS arm64 browser
+release exists.
+
+## 2026-07-01 — Browser proof sample uses concrete diagnostics
+
+The checked-in browser proof page sample now reports concrete TSIR/HostPlan/CSL
+status values (`available`/`not_applicable`) instead of placeholder
+`diagnostic` values. The proof-page receipt, published proof-surface manifest,
+proof-surface check, launch receipt, provenance report, release bundle,
+runtime-frontier bundle, and readiness sample hashes were refreshed so the
+default Chromium browser release checklist no longer carries the
+`browser_release_proof_surface_non_release_diagnostic_status` failure.
+
+## 2026-07-01 — Browser readiness keeps failed candidates on release blocker
+
+Generated browser readiness rows now keep `chromium_release_build_evidence` as
+the blocker when a custom runtime-frontier bundle is otherwise claimable but
+release-candidate consistency still fails. This prevents scratch
+release-candidate rehearsals from rendering as blocked with no blocker code.
+
+## 2026-07-01 — Claim-index proof pages require concrete diagnostics
+
+Claim-indexed Chromium browser proof surfaces now reject `diagnostic`,
+`placeholder`, `sample`, `tbd`, `todo`, or `unknown` TSIR/HostPlan/CSL status
+values on `about:doe`. The readiness rollup reuses the same proof-surface
+validator, so release-candidate browser evidence now surfaces
+`browser_release_proof_surface_non_release_diagnostic_status` when proof-page
+diagnostics are still placeholders.
+
+## 2026-07-01 — Browser release consistency exposes failure-code summary
+
+Browser release-candidate readiness consistency now emits `failureCount` and
+sorted unique `failureCodes` beside the detailed failure rows. The Chromium
+release-build blocker can now be consumed as a compact checklist while still
+preserving each path-specific failure needed to close the downloadable-browser
+evidence gap.
+
+## 2026-07-01 — Finalizer-check receipts bind checked artifacts
+
+Clean browser release-candidate finalizer-check receipts now copy the checked
+finalizer `inputs.packageInputs`, `inputs.provenanceReport`,
+`outputs.releaseArtifactBundle`, and `outputs.runtimeFrontierBundle` artifact
+identities. The readiness rollup rejects missing or stale checker bindings
+against the finalizer report, and the claim-index browser release gate rejects
+claim-indexed releases whose finalizer-check receipt does not bind the same
+package-input, provenance, release-bundle, and runtime-frontier artifacts named
+by the browser release row.
+
+## 2026-07-01 — Finalizer hash-binds provenance input
+
+Passing browser release-candidate finalizer reports now hash-bind
+`inputs.provenanceReport` beside `inputs.packageInputs`. The finalizer checker,
+readiness rollup, and claim-index browser release gate verify that the bound
+provenance report matches the final release bundle, component artifacts,
+package-input receipt, and configured browser release path/hash, so final
+browser release evidence cannot be separated from the provenance preflight that
+authorized it.
+
+## 2026-07-01 — Provenance staging rejects dirty package inputs
+
+The browser release-candidate provenance preflight and staging tool now reject
+package-input receipts that are candidate-labelled but still dirty. Both paths
+require release-candidate eligibility, `evidenceMode=release_candidate`, empty
+package-input failures, empty release-candidate blockers, and
+`summary.packageable=true`, so staged proof/provenance artifacts cannot derive
+from stale packageability evidence.
+
+## 2026-07-01 — Finalizer rejects dirty package inputs
+
+The browser release-candidate finalizer now rejects package-input receipts that
+are candidate-labelled but still dirty. Final assembly and finalizer-check
+validation both require `releaseCandidateEligible=true`,
+`evidenceMode=release_candidate`, empty package-input failures, empty
+release-candidate blockers, and `summary.packageable=true`, so stale
+packageability receipts cannot survive into final browser release evidence.
+
+## 2026-07-01 — Release manifests reject diagnostic source package inputs
+
+Release-candidate archive manifest verification now rejects `sourcePackageInputs`
+receipts that are merely diagnostic/packageable. The manifest checker requires
+the source package-input receipt to be release-candidate eligible, carry
+`evidenceMode=release_candidate`, have no failures or release-candidate
+blockers, and report `summary.packageable=true`, so the release archive
+manifest cannot hash-bind the wrong packageability lane.
+
+## 2026-07-01 — Release bundles reject diagnostic package inputs
+
+Release-candidate browser bundle verification now rejects package-input
+receipts that are merely diagnostic/packageable. The release bundle checker
+requires the package-input receipt to be release-candidate eligible, carry
+`evidenceMode=release_candidate`, have no failures or release-candidate
+blockers, and report `summary.packageable=true`, so a Linux diagnostic package
+preflight cannot satisfy the final browser release bundle boundary.
+
+## 2026-07-01 — Browser package inputs reject malformed platform identity
+
+The browser release package-input preflight now rejects invalid platform OS and
+architecture values while preserving schema-valid failed reports. The
+package-input schema allows malformed platform identity only on failed reports
+and still requires macOS/Linux, arm64/x64, and zip package format whenever
+`status=pass`, so malformed platform identity cannot become packageable browser
+release evidence.
+
+## 2026-07-01 — Browser package inputs reject malformed product identity
+
+The browser release package-input preflight now rejects invalid product IDs,
+invalid product channels, and empty `browserProduct.version` values while
+preserving schema-valid failed reports. The package-input schema allows
+malformed product identity only on failed reports and still requires canonical
+product ID, display name, channel, and non-empty version whenever `status=pass`,
+so malformed product identity cannot become packageable browser release
+evidence.
+
+## 2026-07-01 — Browser package inputs reject unsafe member paths
+
+The browser release package-input preflight now has focused regression coverage
+for non-normalized browser executable package paths, app metadata package paths,
+and explicit Doe/Dawn runtime archive-path overrides. Mutated package-input
+reports fail with `invalid_archive_member_path` before archive creation, so the
+earliest packageability receipt enforces the same packaged-member path
+discipline as the release bundle, readiness, and claim-index gates.
+
+## 2026-07-01 — Browser readiness rejects unsafe app metadata paths
+
+The Dawn replacement readiness rollup now rejects unsafe
+`browserAppMetadataArchivePath` values before loading packaged app metadata
+from the release archive. Focused macOS and non-macOS regressions mutate the
+Info.plist and browser-metadata JSON member paths to include current segments
+and require `release_archive_app_metadata_path_unsafe`, keeping app metadata
+evidence under the same archive-member path rules as packaged browser/runtime
+bytes.
+
+## 2026-07-01 — Browser readiness rejects unsafe archive member indexes
+
+The Dawn replacement readiness rollup now rejects unsafe
+`releaseArchiveManifest.archiveMembers` paths before accepting the manifest
+index as release-candidate evidence. A focused regression mutates the packaged
+browser member path to include an empty segment, proving readiness reports
+`release_archive_manifest_archive_member_path_unsafe` instead of trusting
+normalized archive syntax.
+
+## 2026-07-01 — Browser claim index rejects unsafe archive member syntax
+
+The public claim-index browser release gate now rejects unsafe archive member
+paths in both release artifact bundles and release archive manifests. Focused
+claim-index regressions cover `browserExecutableArchivePath` with a current
+segment and manifest `members.browserExecutable.archivePath` with an empty
+segment, so malformed packaged-browser member paths fail before public
+claim-index evidence can rely on normalized archive syntax.
+
+## 2026-07-01 — Browser release archive members reject hidden path segments
+
+The browser release bundle checker and Dawn replacement readiness rollup now
+reject archive member paths with empty, current, parent, absolute, or backslash
+segments before matching packaged browser/runtime bytes. Focused regressions
+cover `browserExecutableArchivePath` values such as `Fawn.app/./...` and
+`Fawn.app//...`, preventing normalized archive paths from satisfying
+release-candidate evidence.
+
+## 2026-07-01 — Browser claim index rejects outside proof receipts
+
+The claim-index proof-surface receipt checks now have focused regression
+coverage for unsafe proof-page diagnostic receipt and public-gallery receipt
+paths. Mutated published proof surfaces that point those receipt artifacts at
+absolute files outside the repo fail with the corresponding `_incomplete`
+errors before the public gate loads or hashes the receipts.
+
+## 2026-07-01 — Browser claim index rejects outside execution receipts
+
+The claim-index proof-surface receipt checks now have focused regression
+coverage for unsafe backend execution receipt paths. A mutated published proof
+surface that points a Dawn comparison receipt at an absolute file outside the
+repo fails with `browser_release_proof_surface_receipt_incomplete`, so
+Dawn-vs-Doe browser receipts must remain repository-relative before the public
+claim gate loads or hashes them.
+
+## 2026-07-01 — Browser claim index rejects outside comparison artifacts
+
+The claim-index same-page comparison checks now have focused regression
+coverage for unsafe comparison artifact paths. A mutated published proof surface
+that points `comparisonReceipts[0].comparisonArtifact.path` at an absolute file
+outside the repo fails with
+`browser_release_proof_surface_comparison_artifact_incomplete`, so Dawn-vs-Doe
+comparison evidence cannot be backed by an out-of-tree smoke report.
+
+## 2026-07-01 — Browser claim index rejects outside galleries
+
+The claim-index proof-gallery checks now have focused regression coverage for
+unsafe gallery page artifact paths. A mutated published proof surface that
+points `galleryPages[0].artifact.path` at an absolute file outside the repo
+fails with `browser_release_proof_surface_public_gallery_receipt_incomplete`,
+so hosted gallery receipt evidence cannot be backed by an out-of-tree local
+page artifact.
+
+## 2026-07-01 — Browser claim index rejects outside proof pages
+
+The claim-index browser release proof-surface checks now have focused
+regression coverage for unsafe `about:doe` proof-page artifact paths. A mutated
+published proof surface that points `proofPage.artifact.path` at an absolute
+file outside the repo fails with
+`browser_release_proof_surface_proof_page_receipt_incomplete`, keeping public
+proof-page content tied to repository-relative evidence.
+
+## 2026-07-01 — Browser readiness rejects outside support artifacts
+
+The browser release readiness surface now has focused regression coverage for
+release-support artifact path safety. A mutated release bundle can no longer
+point a support policy at an absolute file outside the repo, even when the
+outside file's SHA-256 is supplied; readiness reports
+`release_support_artifact_path_unsafe` before trusting that artifact.
+
+## 2026-07-01 — Browser claim index refuses outside release paths
+
+`claim_index_browser_release.py` now routes browser-release hash and byte-length
+checks through field-aware repository-relative path guards. A focused claim-index
+regression points `browserRelease.releaseArchivePath` at an absolute zip outside
+the repo and proves the public gate reports the unsafe path without statting
+that outside file as release evidence.
+
+## 2026-07-01 — Browser readiness rejects outside release artifacts
+
+`build_dawn_replacement_readiness_report.py` now requires release archive,
+archive-manifest, and release-support artifact paths to stay
+repository-relative before readiness hashes or opens those files. Focused
+browser readiness regressions point release archive and manifest evidence at
+absolute files outside the repo and require explicit unsafe-path failures, so a
+downloadable-browser proof path cannot be satisfied by out-of-tree artifacts.
+
+## 2026-07-01 — Tint frontier rejects unsafe receipt paths
+
+`build_dawn_replacement_readiness_report.py` now rejects Tint compiler frontier
+bundle compiler-evidence and component-receipt rows whose hash-bound paths are
+absolute or escape the repository. Focused readiness regressions mutate a
+compiler evidence path to `..` and a target-validation receipt path to an
+absolute path, proving the Dawn/Tint rollup checks repository-relative identity
+before trusting receipt hashes.
+
+## 2026-07-01 — Tint frontier bundles hash-bind component receipts
+
+`check_tint_compiler_frontier_bundle.py` now emits SHA-256 values for compiler
+evidence reports, WGSL lowering-link receipts, target-validation receipts, and
+phase-benchmark receipts. The Tint frontier schema and Dawn/Tint readiness
+rollup now require those hashes and verify them against referenced file bytes
+before accepting the bundle as frontier evidence. Focused builder/readiness
+regressions prove missing or stale hash links fail before compiler blocker
+state is trusted.
+
+## 2026-07-01 — Readiness rejects stale frontier summary counts
+
+`build_dawn_replacement_readiness_report.py` now rejects frontier bundle
+evidence when `summary.claimBlockerCount` or `summary.failureCount` drifts from
+the actual `claimBlockers` or `failures` arrays. Focused Tint readiness
+regressions mutate only those summary counts, proving the Dawn/Tint rollup
+cannot expose stale compiler blocker totals while keeping the underlying
+claim-blocker list unchanged.
+
+## 2026-07-01 — Browser claim index binds finalizer summaries
+
+`claim_index_browser_release.py` now rejects claim-indexed Chromium browser
+release rows whose finalizer report summary claimability drifts from the
+runtime frontier bundle or whose `summary.releaseBundleIdentitySha256` drifts
+from the release artifact bundle identity projection. Focused claim-index
+regressions mutate only those summary fields while refreshing finalizer and
+readiness hashes, proving the public claim gate does not rely only on a stale
+finalizer-check receipt.
+
+## 2026-07-01 — Browser finalizers bind release identity projection
+
+`browser_release_candidate_finalizer` reports now carry
+`summary.releaseBundleIdentitySha256`, and both the finalizer checker and Dawn
+replacement readiness rollup reject summaries whose release identity projection
+drifts from the emitted release artifact bundle. Focused finalizer and
+readiness regressions mutate only that summary hash, proving release-candidate
+promotion receipts cannot summarize a stale browser bundle identity.
+
+## 2026-07-01 — Browser claim index mirrors release identity projection
+
+`claim_index_browser_release.py` now rejects claim-indexed Chromium browser
+release rows whose runtime frontier
+`componentReceipts.releaseArtifactBundle` summary does not bind the loaded
+release artifact bundle `artifactKind` and release identity projection hash.
+The focused claim-index regression mutates only that runtime-frontier identity
+hash and refreshes dependent release/finalizer/readiness hashes, proving public
+claim rows cannot combine a clean runtime frontier with a stale release bundle
+summary.
+
+## 2026-07-01 — Browser readiness mirrors release identity projection
+
+`build_dawn_replacement_readiness_report.py` now rejects browser runtime
+frontier bundles whose `componentReceipts.releaseArtifactBundle.artifactKind`
+or `releaseBundleIdentitySha256` drifts from the loaded release artifact
+bundle. A focused readiness regression mutates only the runtime-frontier
+release identity hash, proving the Chromium rollup sees stale release-summary
+identity instead of relying only on `bundleId` and `releaseStatus`.
+
+## 2026-07-01 — Browser release bundles bind runtime-frontier release identity
+
+`check_browser_runtime_frontier_bundle.py` now records the release bundle
+`artifactKind` and a self-stable release-bundle identity projection hash in
+`componentReceipts.releaseArtifactBundle`. `check_browser_release_artifact_bundle.py`
+rejects release bundles whose linked runtime frontier summarizes a different
+artifact kind or release identity projection, and it now validates the release
+bundle top-level `schemaVersion`/`artifactKind` before trusting component
+evidence. Focused regressions cover stale runtime-frontier release identity and
+release artifact-kind drift, while the checked-in browser release/frontier
+samples and readiness sample were regenerated from the updated gates.
+
+## 2026-07-01 — Proof-surface checker binds comparison mode results
+
+`check_browser_published_proof_surface.py` now rejects published browser proof
+surfaces when a same-page comparison artifact's Dawn or Doe mode result
+runtime selector, driver identity, or declared adapter/device identity drifts
+from the linked execution receipt. The focused checker regression mutates the
+Doe smoke mode-result driver while preserving the smoke report hash chain,
+proving the proof-surface checker catches stale side-by-side comparison
+artifacts before release bundles and claim-index rows consume the surface.
+
+## 2026-07-01 — Browser comparison artifacts bind receipt identities
+
+`claim_index_browser_release_receipts.py` now rejects Chromium proof surfaces
+when a same-page Dawn/Doe comparison artifact's mode result runtime selector,
+driver identity, or declared adapter/device identity drifts from the linked
+Dawn or Doe execution receipt. Focused claim-index and readiness regressions
+mutate the Doe mode-result driver while keeping receipt command evidence
+hash-bound to the comparison artifact, proving the public browser-release gate
+sees smoke-artifact-to-receipt identity drift instead of accepting unrelated
+side-by-side evidence.
+
+## 2026-07-01 — Browser claim index rejects repeated archive paths
+
+`claim_index_browser_release.py` now rejects claim-indexed Chromium browser
+release rows whose release artifact bundle aliases required packaged member
+paths or whose release archive manifest repeats an `archiveMembers` path.
+Focused claim-index regressions mutate the release bundle and manifest while
+refreshing dependent hashes, proving the public claim gate sees the repeated
+archive identities instead of relying only on lower-level release checks.
+
+## 2026-07-01 — Browser readiness rejects repeated archive paths
+
+`build_dawn_replacement_readiness_report.py` now rejects release-candidate
+readiness when the release artifact bundle aliases required packaged member
+paths, the release archive manifest repeats an `archiveMembers` path, or the
+release zip repeats a filename. Focused readiness regressions cover all three
+cases so the browser frontier row cannot summarize ambiguous release archive
+identity as consistent evidence.
+
+## 2026-07-01 — Browser release bundles reject aliased role paths
+
+`check_browser_release_artifact_bundle.py` now rejects release artifact bundles
+whose packaged browser executable, app metadata, Doe runtime, or Dawn fallback
+runtime fields reuse the same archive member path. The focused bundle
+regression points the Dawn fallback runtime at the Doe runtime path and proves
+the release-candidate checker reports the duplicate before the evidence can
+flow into public download, launch, proof-surface, or manifest matching.
+
+## 2026-07-01 — Browser archive manifests reject duplicate members
+
+`browser_release_archive_manifest.py` now rejects duplicate
+`archiveMembers[].archivePath` entries and duplicate filenames inside the
+referenced release zip before matching manifest rows to packaged bytes. Focused
+manifest regressions prove both the manifest-index duplicate and repeated zip
+member cases fail even when the rest of the release archive identity is kept
+consistent.
+
+## 2026-07-01 — Browser archives reject aliased members
+
+`package-browser-release-archive.py` now rejects duplicate required archive
+member paths before writing a browser release zip or manifest, so the packaged
+browser executable, app metadata, Doe runtime, and Dawn fallback runtime roles
+cannot silently alias one zip member. The focused packer regression points the
+Dawn fallback runtime at the Doe runtime archive path and proves packaging
+fails without producing either release artifact.
+
+## 2026-07-01 — Browser launch builders reject duplicate observations
+
+`build_browser_release_launch_receipt.py` now refuses duplicate
+`observedReceiptIds` before emitting packaged-browser launch receipts, and
+`check_browser_release_artifact_bundle.py` rejects release-candidate bundles
+whose launch receipt repeats an observed receipt ID. Focused builder and bundle
+checker regressions append a duplicate observation and prove both layers fail
+before the claim-index/readiness gates consume the receipt.
+
+## 2026-07-01 — Browser launch observed receipts are unique
+
+`claim_index_browser_release_proof.py` and the Dawn replacement readiness
+rollup now reject duplicate `browser_release_launch_receipt.observedReceiptIds`
+values, so packaged-browser launch evidence cannot repeat one observed receipt
+while claiming the required proof/gallery/Dawn/Doe receipts were captured.
+Focused claim-index and readiness regressions append a duplicate observed
+receipt ID and prove both gates fail on the repeated launch observation.
+
+## 2026-07-01 — Browser gallery URLs are unique
+
+`claim_index_browser_release_proof.py` now rejects duplicate
+`galleryPages[].url` values in published browser proof surfaces, so public
+gallery coverage cannot reuse one hosted URL across multiple rows while
+changing only local artifact identities. Focused claim-index and readiness
+regressions duplicate a gallery URL and prove both gates fail on the repeated
+hosted page identity.
+
+## 2026-07-01 — Browser proof-page payload links are unique
+
+`claim_index_browser_release_proof.py` now rejects duplicate
+`proofPage.receiptPayloads` receipt IDs or artifact paths in published browser
+proof surfaces, while still allowing those receipts to be referenced by
+gallery and comparison rows. Focused claim-index and readiness regressions
+append a duplicate proof-page receipt payload link and prove both gates fail on
+the repeated proof-page payload identity.
+
+## 2026-07-01 — Browser comparisons reject repeated evidence
+
+`claim_index_browser_release_proof.py` now rejects duplicate
+`comparisonReceipts[].comparisonArtifact.path` values and duplicate Dawn/Doe
+receipt pairs across published proof-surface comparison rows. Focused
+claim-index and readiness regressions clone a valid comparison under a new
+`comparisonId` and prove both gates fail on the repeated comparison artifact
+and receipt-pair identities.
+
+## 2026-07-01 — Browser gallery receipt links are unique
+
+`claim_index_browser_release_gallery.py` now rejects duplicate gallery
+`receiptIds`, duplicate `receiptArtifacts[].receiptId`, and duplicate
+`receiptArtifacts[].path` values, so a public gallery row cannot count one
+execution receipt multiple times. Focused claim-index and readiness
+regressions duplicate a gallery receipt artifact while keeping the public
+gallery receipt payload aligned, proving both gates fail on the repeated
+receipt identity.
+
+## 2026-07-01 — Browser recent receipts require unique IDs
+
+`claim_index_browser_release_proof.py` now rejects duplicate
+`proofPage.recentReceiptIds` values in published browser proof surfaces, so the
+`about:doe` proof page cannot pad recent execution evidence with repeated
+receipt IDs. Focused claim-index and readiness regressions append a duplicate
+recent receipt ID and prove both gates fail on the ambiguous proof-page
+receipt list.
+
+## 2026-07-01 — Browser comparisons require paired receipts
+
+`claim_index_browser_release_proof.py` now rejects same-page Dawn/Doe
+comparison rows that reuse the same execution receipt ID or payload path for
+both runtimes. Focused claim-index and readiness regressions mutate the Doe
+side of a comparison row to point at the Dawn receipt and prove both gates fail
+before a self-comparison can back browser release evidence.
+
+## 2026-07-01 — Browser galleries require unique artifacts
+
+`claim_index_browser_release_proof.py` now rejects duplicate
+`galleryPages[].artifact.path` values in published browser proof surfaces, so
+public gallery coverage cannot reuse one HTML artifact for multiple gallery
+rows. Focused claim-index and readiness regressions append a duplicate gallery
+row and prove both gates fail on the duplicate gallery artifact identity.
+
+## 2026-07-01 — Browser comparisons must run from gallery pages
+
+`claim_index_browser_release_proof.py` now rejects proof-surface
+`comparisonReceipts[].runner.pageArtifactPath` values that do not match a
+published proof-gallery artifact. Focused claim-index and readiness regressions
+move the same-page Dawn/Doe comparison runner to an off-surface page and prove
+both gates fail before the browser proof surface can support a claim.
+
+## 2026-07-01 — Browser proof surfaces require unique comparison IDs
+
+`claim_index_browser_release_proof.py` now rejects duplicate published
+proof-surface `comparisonReceipts[].comparisonId` values, so same-page
+Dawn/Doe comparison evidence cannot be ambiguous even when every row is
+otherwise structurally valid. Focused claim-index and readiness regressions
+append a duplicate valid comparison row and prove both gates fail on the
+duplicate comparison identity.
+
+## 2026-07-01 — Browser proof surfaces reject malformed comparison rows
+
+`claim_index_browser_release_proof.py` now validates every published
+proof-surface `comparisonReceipts` row instead of accepting the surface after
+finding one valid same-page Dawn/Doe comparison. Focused claim-index and
+readiness regressions append an incomplete comparison row to an otherwise valid
+surface and prove both gates reject the malformed surplus comparison evidence.
+
+## 2026-07-01 — Compiler readiness validates Tint component entries
+
+`build_dawn_replacement_readiness_report.py` now fails readable Tint compiler
+frontier bundle evidence closed when entries inside `loweringLinks`,
+`targetValidations`, or `phaseBenchmarks` drift from the Tint bundle schema.
+Focused regressions mutate one receipt in each component array and prove the
+rollup keeps schema-valid failed frontier evidence with field-specific
+consistency failures.
+
+## 2026-07-01 — Compiler readiness validates Tint report entries
+
+`build_dawn_replacement_readiness_report.py` now fails readable Tint compiler
+frontier bundle evidence closed when `compilerEvidenceReports` entries drift
+from the Tint bundle schema, including malformed counters and blocker-summary
+entries. Focused regressions mutate those copied compiler report fields and
+prove readiness keeps schema-valid failed frontier evidence with field-specific
+consistency failures.
+
+## 2026-07-01 — Compiler readiness validates Tint frontier collections
+
+`build_dawn_replacement_readiness_report.py` now fails readable Tint compiler
+frontier bundle evidence closed when required bundle collections drift:
+`requiredTargets`, `coverageByTarget`, or the `componentReceipts`
+`loweringLinks`/`targetValidations`/`phaseBenchmarks` arrays. Focused
+regressions mutate each collection class and prove readiness keeps schema-valid
+failed frontier evidence with field-specific consistency failures.
+
+## 2026-07-01 — Compiler readiness exposes malformed Tint reports
+
+`build_dawn_replacement_readiness_report.py` now fails readable Tint compiler
+frontier bundle evidence closed when `compilerEvidenceReports` is malformed.
+A focused regression mutates that required compiler bundle collection and
+proves the readiness rollup keeps schema-valid failed frontier evidence with a
+field-specific consistency failure.
+
+## 2026-07-01 — Browser readiness validates release component details
+
+`build_dawn_replacement_readiness_report.py` now fails readable browser runtime
+frontier bundle evidence closed when nested release-artifact component details
+drift, including `artifactVerification` fields and `claimReports` summary
+items. Focused regressions mutate those nested release component fields and
+prove the rollup emits schema-valid failed evidence with field-specific
+consistency failures.
+
+## 2026-07-01 — Browser readiness validates frontier component fields
+
+`build_dawn_replacement_readiness_report.py` now fails readable browser runtime
+frontier bundle evidence closed when required fields inside the runtime
+identity, claim-promotion, or release-artifact component summaries are missing
+or malformed. Focused regressions mutate one field in each component summary
+and prove the rollup emits schema-valid failed evidence with field-specific
+consistency failures.
+
+## 2026-07-01 — Browser readiness validates frontier components
+
+`build_dawn_replacement_readiness_report.py` now fails readable browser runtime
+frontier bundle evidence closed when a required `componentReceipts` summary is
+missing or is not an object. Focused regressions mutate the runtime identity
+and release-artifact component summaries and prove the rollup keeps
+schema-valid failed evidence with field-specific consistency failures.
+
+## 2026-07-01 — Browser readiness validates frontier failure entries
+
+`build_dawn_replacement_readiness_report.py` now fails readable runtime frontier
+bundle evidence closed when a `failures` entry is malformed. A focused browser
+regression mutates only the runtime frontier bundle `failures` payload and
+proves the readiness rollup keeps schema-valid failed evidence with a
+field-specific consistency failure.
+
+## 2026-07-01 — Browser readiness validates frontier blocker entries
+
+`build_dawn_replacement_readiness_report.py` now fails readable runtime frontier
+bundle evidence closed when an active frontier `claimBlockers` entry for the
+row is missing its readiness failure shape. A focused browser regression mutates
+the `chromium_release_build_evidence` blocker and proves the rollup emits
+schema-valid failed bundle evidence with a field-specific consistency failure.
+
+## 2026-07-01 — Browser readiness validates frontier summary shapes
+
+`build_dawn_replacement_readiness_report.py` now fails readable browser runtime
+frontier bundle evidence closed when `summary` carries non-scalar values or
+`claimBlockerSummary` entries drift from the readiness failure-summary shape.
+Focused regressions mutate those copied fields and prove the rollup stays
+schema-valid while preserving a field-specific consistency failure.
+
+## 2026-07-01 — Browser readiness exposes malformed frontier collections
+
+`build_dawn_replacement_readiness_report.py` now fails readable browser runtime
+frontier bundle evidence closed when `claimBlockerSummary`, `failures`, or
+`componentReceipts` is malformed, and when the browser-required
+`claimBlockerSummary` field is missing. Focused regressions mutate each
+collection field and prove the readiness rollup keeps the bundle visible with a
+field-specific consistency failure.
+
+## 2026-07-01 — Browser readiness validates frontier bundle scalars
+
+`build_dawn_replacement_readiness_report.py` now fails readable runtime frontier
+bundle evidence closed when `status`, `claimabilityStatus`, or `summary` drift
+from the readiness schema contract. Focused regressions mutate those fields on
+the browser runtime frontier bundle and prove the rollup stays schema-valid,
+keeps the malformed bundle visible, and records field-specific consistency
+failures.
+
+## 2026-07-01 — Browser readiness exposes malformed frontier blockers
+
+`build_dawn_replacement_readiness_report.py` now keeps readable runtime frontier
+bundle JSON in `frontierBundleEvidence` when `claimBlockers` is malformed,
+marking that evidence failed and adding a specific consistency failure. A
+focused regression mutates only the browser runtime frontier bundle
+`claimBlockers` contract field and proves the malformed bundle no longer
+disappears from the rollup.
+
+## 2026-07-01 — Browser readiness exposes malformed frontier bundles
+
+`build_dawn_replacement_readiness_report.py` now keeps readable runtime frontier
+bundle JSON in `frontierBundleEvidence` even when its `artifactKind` is wrong,
+marking that evidence failed and adding a specific consistency failure. A
+focused regression mutates only the browser runtime frontier bundle contract
+field and proves the malformed bundle no longer disappears from the rollup.
+
+## 2026-07-01 — Browser readiness rejects malformed release bundles
+
+`build_dawn_replacement_readiness_report.py` now distinguishes browser release
+artifact bundles with the wrong `artifactKind` from genuinely missing release
+bundle evidence. A focused regression mutates only that release-bundle contract
+field and proves readiness keeps support artifacts out of typed evidence while
+adding the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed finalizer checks
+
+`build_dawn_replacement_readiness_report.py` now distinguishes release-candidate
+finalizer-check receipts with the wrong `artifactKind` from genuinely missing
+finalizer-check evidence. A focused regression mutates only that checker
+contract field and proves readiness keeps the malformed receipt out of typed
+evidence while adding the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed finalizer reports
+
+`build_dawn_replacement_readiness_report.py` now distinguishes release-candidate
+finalizer reports with the wrong `artifactKind` from genuinely missing
+finalizer evidence. A focused regression mutates only that finalizer contract
+field and proves readiness keeps the malformed report out of typed evidence
+while adding the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed provenance reports
+
+`build_dawn_replacement_readiness_report.py` now distinguishes release-candidate
+provenance reports with the wrong `artifactKind` from genuinely missing
+provenance evidence. A focused regression mutates only that provenance contract
+field and proves readiness keeps the malformed report out of typed evidence
+while adding the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed package inputs
+
+`build_dawn_replacement_readiness_report.py` now distinguishes package-input
+preflight reports with the wrong `artifactKind` from genuinely missing
+package-input evidence. A focused regression mutates only that preflight
+contract field and proves readiness keeps the malformed report out of typed
+evidence while adding the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed proof surfaces
+
+`build_dawn_replacement_readiness_report.py` now distinguishes published proof
+surfaces with the wrong `artifactKind` from genuinely missing proof-surface
+evidence. A focused regression mutates only that proof-surface contract field
+and proves readiness keeps the malformed manifest out of typed evidence while
+adding the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed Chromium checkout reports
+
+`build_dawn_replacement_readiness_report.py` now distinguishes Chromium source
+checkout reports with the wrong `artifactKind` from genuinely missing checkout
+evidence. A focused regression mutates only that checkout report contract field
+and proves readiness keeps the malformed report out of typed evidence while
+adding the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed launch receipts
+
+`build_dawn_replacement_readiness_report.py` now distinguishes browser release
+launch receipts with the wrong `artifactKind` from genuinely missing launch
+evidence. A focused regression mutates only that launch receipt contract field
+and proves readiness keeps the malformed launch receipt out of typed evidence
+while adding the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed public download receipts
+
+`build_dawn_replacement_readiness_report.py` now distinguishes public-download
+receipts with the wrong `artifactKind` from genuinely missing download
+evidence. A focused regression mutates only that receipt contract field and
+proves readiness keeps the malformed receipt out of typed evidence while adding
+the specific consistency failure.
+
+## 2026-07-01 — Browser readiness rejects malformed proof-surface check reports
+
+`build_dawn_replacement_readiness_report.py` now distinguishes proof-surface
+checker reports with the wrong `artifactKind` from genuinely missing checker
+evidence. A focused regression mutates only that checker contract field and
+proves readiness keeps the malformed report out of typed evidence while adding
+the specific consistency failure.
+
+## 2026-07-01 — Browser readiness requires launch comparison identity
+
+`build_dawn_replacement_readiness_report.py` now rejects browser release launch
+receipts that omit same-page Dawn/Doe `comparisonId` or `workloadId` identity.
+A focused regression clears only those launch receipt fields, proving the
+Chromium row cannot promote on comparison evidence that lacks a stable
+comparison/workload key.
+
+## 2026-07-01 — Browser readiness validates release archive manifest contracts
+
+`build_dawn_replacement_readiness_report.py` now rejects release archive
+manifests whose `schemaVersion` or `artifactKind` drift before readiness uses
+their archive/member bindings. A focused regression mutates only those manifest
+contract fields while re-hashing the bundle references, proving the Chromium
+row fails on manifest contract drift rather than stale artifact hashes.
+
+## 2026-07-01 — Browser readiness binds launch comparison artifacts to proof surface
+
+`build_dawn_replacement_readiness_report.py` now rejects browser release launch
+receipts whose same-page Dawn/Doe `comparisonArtifactPath` drifts from the
+comparison artifact declared by the published proof surface. A focused
+regression mutates only that launch receipt path, proving the Chromium row
+cannot promote on a launch receipt that points at a different comparison report.
+
+## 2026-07-01 — Browser readiness requires launch comparison artifact links
+
+`build_dawn_replacement_readiness_report.py` now rejects browser release launch
+receipts that omit the same-page Dawn/Doe `comparisonArtifactPath`. A focused
+regression clears only that launch receipt field, proving readiness requires
+the browser launch proof to bind the comparison report artifact before the
+Chromium row can promote.
+
+## 2026-07-01 — Browser readiness checks launch comparison page identity
+
+`build_dawn_replacement_readiness_report.py` now rejects browser release launch
+receipts whose same-page Dawn/Doe comparison `pageArtifactPath` differs from
+the loaded proof-gallery artifact. A focused regression mutates only the launch
+receipt comparison page path, proving readiness mirrors the lower release
+bundle checker instead of depending only on proof-surface cross-checks.
+
+## 2026-07-01 — Browser readiness checks finalizer claimability summaries
+
+`build_dawn_replacement_readiness_report.py` now rejects passing browser
+release-candidate finalizer reports whose `summary.claimabilityStatus` does
+not match the runtime-frontier bundle used by the Chromium readiness row. A
+focused regression emits a passing finalizer report with a stale claimability
+summary, proving the rollup mirrors the lower finalizer checker before trusting
+final assembly evidence.
+
+## 2026-07-01 — Browser readiness mirrors runtime-frontier release identity
+
+`build_dawn_replacement_readiness_report.py` now rejects browser runtime
+frontier bundles whose `releaseArtifactBundle` component summary drifts from
+the loaded release bundle `bundleId`, `releaseStatus`, or optional SHA-256. A
+focused regression points readiness at a runtime-frontier bundle with a stale
+release-component `bundleId`, proving the Chromium rollup checks both sides of
+the release-bundle/frontier binding.
+
+## 2026-07-01 — Browser readiness requires release-bundled package inputs
+
+`build_dawn_replacement_readiness_report.py` now rejects browser release
+artifact bundles that do not hash-bind the same
+`browser_release_package_inputs_check` report loaded by readiness. A focused
+regression points the runtime frontier at a release bundle with a stale
+embedded package-input SHA, proving the rollup checks the release bundle's
+`packageInputs` artifact instead of trusting only adjacent packageability
+evidence.
+
+## 2026-07-01 — Browser readiness checks package-input schema version
+
+`build_dawn_replacement_readiness_report.py` now records the
+`browser_release_package_inputs_check` schema version and rejects package-input
+reports whose `schemaVersion` is not `1`, matching the lower release-bundle
+checker before release-candidate archive inputs are trusted. A focused
+readiness regression mutates only the package-input schema version, proving
+the Chromium rollup fails on contract drift even when the preflight otherwise
+still names the expected browser/runtime/compiler inputs.
+
+## 2026-07-01 — Browser readiness binds release bundle back to runtime frontier
+
+`build_dawn_replacement_readiness_report.py` now rejects browser release
+artifact bundles whose embedded `runtimeFrontierBundle` artifact does not match
+the runtime frontier bundle driving the Chromium readiness row. A focused
+regression mutates only the release bundle's embedded runtime-frontier SHA and
+points the runtime-frontier component at that bundle, proving the rollup checks
+the reverse hash binding instead of allowing a release bundle and frontier
+receipt from different candidates to be combined.
+
+## 2026-07-01 — Browser readiness checks packaged runtime member bytes
+
+`build_dawn_replacement_readiness_report.py` now directly opens the release
+archive zip and verifies the packaged browser executable, Doe runtime, and
+Dawn fallback runtime members against the release artifact bundle. The rollup
+rejects missing, unsafe, directory, non-executable browser binary, or stale
+member bytes before browser release evidence can become claimable. A focused
+regression rewrites only the packaged Doe runtime member while updating the
+outer archive SHA, proving the readiness check compares member bytes against
+`doeRuntime.sha256` and not only the archive-level hash or manifest summary.
+
+## 2026-07-01 — Browser readiness rejects invalid release zips
+
+`build_dawn_replacement_readiness_report.py` now directly validates release
+archives declared with `packageFormat=zip` before the manifest/member checks.
+The readiness rollup rejects non-zip archive bytes or corrupt zip members at
+`releaseArtifactBundle.releaseArchive.path`, matching the lower release-bundle
+checker's archive-surface rule. A focused regression points the release bundle
+at a hash-matching text file named like a zip, proving archive SHA identity
+alone cannot satisfy browser release evidence.
+
+## 2026-07-01 — Browser readiness checks non-macOS archive metadata
+
+`build_dawn_replacement_readiness_report.py` now reads non-macOS browser
+metadata JSON from the release archive zip and rejects product, platform,
+executable path, Doe runtime path, or Dawn fallback runtime path drift from
+the release artifact bundle. A focused readiness regression builds a Linux
+style archive with stale Doe runtime metadata, proving the Dawn replacement
+rollup checks packaged browser metadata bytes for later Linux/Windows release
+lanes instead of only mirroring the macOS `Info.plist` path.
+
+## 2026-07-01 — Browser readiness checks macOS archive app metadata
+
+`build_dawn_replacement_readiness_report.py` now reads the macOS
+`Info.plist` member from the release archive zip and rejects product name,
+bundle identifier, version, package type, or executable-name drift from the
+release artifact bundle. A focused readiness regression mutates `CFBundleName`
+inside a copied browser release archive, proving the Dawn replacement rollup
+checks packaged app metadata bytes instead of only trusting the release archive
+manifest.
+
+## 2026-07-01 — Browser readiness checks release product and platform
+
+`build_dawn_replacement_readiness_report.py` now rejects release artifact
+bundles whose `browserProduct` is not Doe Browser or Fawn Doe, whose product
+metadata is incomplete, whose product channel drifts from diagnostic or
+release-candidate status, whose platform tuple is invalid, or whose
+release-candidate platform is not the initial macOS arm64 zip target. Focused
+readiness regressions mutate the release bundle product ID and release-candidate
+platform independently, matching the lower release-bundle checker before the
+Chromium browser row can become claimable.
+
+## 2026-07-01 — Browser readiness checks release bundle candidate status
+
+`build_dawn_replacement_readiness_report.py` now rejects loaded browser
+release artifact bundles whose `releaseStatus` is not `release_candidate`, and
+rejects candidate evidence whose release bundle still carries `failureCodes`.
+The readiness report now mirrors the lower release-bundle checker for the
+primary Chromium release-candidate transition instead of relying only on the
+runtime-frontier component summary to surface that blocker.
+
+## 2026-07-01 — Browser readiness checks release support artifacts
+
+`build_dawn_replacement_readiness_report.py` now summarizes the release
+artifact bundle's contract, browser claim report, claim-promotion receipt, and
+policy artifacts under `releaseCandidateEvidence.releaseSupportArtifacts`.
+Readiness rejects missing required support kinds and stale support artifact
+hashes, matching the lower release-bundle checker so a Chromium release row
+cannot hide missing claim policy, capture policy, patch manifest, artifact
+identity coverage, unsupported-reason taxonomy, claim report, promotion
+receipt, or contract evidence behind a passing archive summary.
+
+## 2026-07-01 — Browser readiness checks Chromium source checkout evidence
+
+`build_dawn_replacement_readiness_report.py` now attaches the configured
+`chromium_source_checkout_check` report to the Chromium browser release
+candidate evidence and rejects schema-version drift, blocked checkout status,
+missing source roots, missing runtime-selector enforcement, missing required
+checks, or path/hash drift from the release artifact bundle. Focused readiness
+regressions mutate the source-checkout report independently from the release
+bundle, proving the Dawn replacement rollup cannot certify a browser release
+candidate without hash-bound Chromium checkout/runtime-selector evidence.
+
+## 2026-07-01 — Browser readiness checks public download receipt URL
+
+`build_dawn_replacement_readiness_report.py` now rejects public-download
+receipts whose own `url` is not public HTTPS, matching the lower release-bundle
+checker in addition to the release bundle archive URL check. A focused
+readiness regression points the receipt at localhost while leaving the release
+bundle URL unchanged, proving the Dawn replacement rollup cannot certify a
+non-public served-byte receipt for the downloadable browser archive.
+
+## 2026-07-01 — Browser readiness checks release receipt schema versions
+
+`build_dawn_replacement_readiness_report.py` now records public-download and
+packaged-browser launch receipt `schemaVersion` values and rejects versions
+other than `1`, matching the lower release-bundle checker while keeping the
+readiness report itself schema-valid for bad candidate evidence. Focused
+readiness regressions mutate each receipt version independently, proving the
+Dawn replacement rollup cannot certify off-contract release receipt payloads.
+
+## 2026-07-01 — Browser readiness requires launch receipt identity
+
+`build_dawn_replacement_readiness_report.py` now rejects packaged-browser
+launch receipts that omit `receiptId` or `observedAt`, matching the lower
+release-bundle checker before browser claim promotion. A focused readiness
+regression clears the launch receipt ID, proving the Dawn replacement rollup
+cannot certify anonymous launch evidence for the downloadable browser archive.
+
+## 2026-07-01 — Browser readiness validates release archive zip members
+
+`build_dawn_replacement_readiness_report.py` now rejects release archive
+manifests whose `archiveMembers` index omits required packaged members or
+whose declared member metadata does not match the release archive zip. Focused
+readiness regressions remove the Doe runtime from `archiveMembers` and mutate
+the Doe runtime member byte length while keeping the release bundle hash-bound
+to each manifest, proving the Dawn replacement rollup checks the manifest body
+against the downloadable archive bytes.
+
+## 2026-07-01 — Browser readiness binds release archive manifest archive
+
+`build_dawn_replacement_readiness_report.py` now rejects release archive
+manifests whose nested `archive` path, hash, kind, or byte length drifts from
+the release artifact bundle archive. A focused readiness regression mutates the
+manifest archive hash while keeping the release bundle hash-bound to that
+manifest, proving the Dawn replacement rollup cannot certify a manifest that
+describes a different downloadable archive.
+
+## 2026-07-01 — Browser readiness binds release archive manifest members
+
+`build_dawn_replacement_readiness_report.py` now rejects release archive
+manifests whose required packaged executable or runtime member paths, hashes,
+or executable state drift from the release artifact bundle. A focused readiness
+regression mutates the manifest Doe runtime member hash while keeping the
+release bundle hash-bound to that manifest, proving the Dawn replacement
+rollup cannot certify an archive manifest that names different packaged bytes.
+
+## 2026-07-01 — Browser readiness binds release archive manifest identity
+
+`build_dawn_replacement_readiness_report.py` now rejects release archive
+manifests whose `browserProduct` or `platform` identity drifts from the
+release artifact bundle. A focused readiness regression mutates the archive
+manifest browser product while keeping the release bundle hash-bound to that
+manifest, proving the Dawn replacement rollup cannot certify a browser archive
+whose manifest describes a different product identity.
+
+## 2026-07-01 — Browser readiness verifies release archive file hashes
+
+`build_dawn_replacement_readiness_report.py` now rejects browser release
+artifact bundles whose release archive or release archive manifest SHA-256 does
+not match the referenced file bytes. A focused readiness regression mutates the
+release bundle's manifest SHA while keeping the runtime frontier component
+hash-bound to that bundle, proving the Dawn replacement rollup cannot certify a
+downloadable browser release bundle with stale archive-manifest file identity.
+
+## 2026-07-01 — Browser readiness validates proof-page and gallery receipts
+
+`build_dawn_replacement_readiness_report.py` now uses the shared claim-index
+proof-surface receipt validator in the browser readiness consistency surface.
+Alongside backend and comparison receipts, the rollup now checks proof-page
+diagnostic receipts and public gallery receipts for hash identity, diagnostics,
+release provenance, recent receipt IDs, hosted/gallery/proof artifact identity,
+workload IDs, and visible page content matching the published proof surface. A
+focused readiness regression mutates the proof-page receipt diagnostics while
+updating the receipt hash, proving readiness checks receipt payload content and
+not only referenced file identity.
+
+## 2026-07-01 — Browser readiness binds comparison receipts
+
+`build_dawn_replacement_readiness_report.py` now validates comparison receipt
+payload binding for published proof surfaces. The readiness rollup rejects
+Dawn/Doe receipt pairs whose workload, source shader, device, driver, output,
+command evidence, command coverage, timing class, comparison artifact binding,
+or comparison-policy evidence drift. A focused readiness regression mutates the
+Doe execution receipt output hash while updating the proof-surface artifact
+reference, proving the rollup checks same-page Dawn/Doe receipt parity instead
+of only checking that receipt files exist.
+
+## 2026-07-01 — Browser readiness validates backend receipts
+
+`build_dawn_replacement_readiness_report.py` now validates execution receipt
+references exposed by the published proof surface. The rollup rejects stale or
+incomplete backend receipt payloads before browser claim promotion, including
+missing receipt IDs, workload IDs, WGSL source shader text/hash, lowering
+paths, backend identity, driver/device identity, output identity, command
+evidence, command coverage, fallback state, or timing phases. A focused
+readiness regression points the proof surface at a hash-updated Doe execution
+receipt with no timing block, proving the rollup checks the receipt payload and
+not only the proof-surface summary.
+
+## 2026-07-01 — Browser readiness runs proof-surface claim validation
+
+`build_dawn_replacement_readiness_report.py` now runs the claim-index
+published proof-surface validator inside the browser readiness consistency
+surface. The rollup rejects missing `about:doe` diagnostics, missing recent
+receipt links, incomplete required gallery coverage, unrecognized gallery
+categories, and invalid same-page Dawn/Doe comparison evidence before browser
+claim promotion. A focused readiness regression removes
+`proofPage.recentReceiptIds`, proving compact proof-surface summaries cannot
+hide unbacked proof-page receipt state.
+
+## 2026-07-01 — Browser readiness binds proof compiler identity
+
+`build_dawn_replacement_readiness_report.py` now rejects published proof
+surfaces whose `about:doe` diagnostics `compilerPath` does not match the
+release artifact bundle `shaderCompiler.path`. A focused readiness regression
+mutates only the proof-surface diagnostics compiler path, proving the Dawn
+replacement rollup cannot certify a proof page that advertises a different
+compiler artifact than the downloadable browser release bundle carries.
+
+## 2026-07-01 — Browser readiness binds proof runtime identity hashes
+
+`build_dawn_replacement_readiness_report.py` now applies the same
+proof-surface runtime identity hash binding used by the claim-index browser
+release gate. The readiness rollup loads the runtime identity artifact named by
+the published proof surface and rejects it unless the provider or
+runtime-selection artifact hashes match the release bundle browser binary, Doe
+runtime, and Dawn fallback runtime hashes. A focused readiness regression
+mutates the loaded runtime identity's Doe runtime hash without changing the
+release bundle, proving the Dawn replacement rollup cannot certify `about:doe`
+diagnostics that point at a different packaged runtime identity.
+
+## 2026-07-01 — Browser readiness fails closed on missing release bundles
+
+`build_dawn_replacement_readiness_report.py` now records a consistency failure
+when the browser runtime frontier bundle's `releaseArtifactBundle` component
+does not load as a `browser_release_artifact_bundle`. A focused readiness
+regression mutates only a temporary runtime frontier bundle's release artifact
+path to a missing JSON file, proving the Dawn replacement rollup cannot skip
+release-bundle identity checks when the runtime frontier receipt points at
+missing or wrong-kind release evidence.
+
+## 2026-07-01 — Browser readiness rejects dirty claimable frontier bundles
+
+`build_dawn_replacement_readiness_report.py` now rejects browser runtime
+frontier bundles that claim `claimabilityStatus=claimable` while still carrying
+failed status, failures, claim blockers, claim-blocker summaries, or nonzero
+summary failure/blocker counts. The same readiness check also rejects claimable
+frontier bundles whose runtime identity component is not active Doe, whose
+promotion component is not promotable, or whose release-bundle component is not
+a verified release candidate. It also requires the promotion component path to
+be listed by the release artifact bundle's `promotionReceipts`. Focused
+readiness regressions mutate temporary runtime frontier bundles into those
+contradictory states, proving the
+Dawn replacement rollup cannot summarize a dirty frontier receipt as if
+claim-index promotion were the only remaining browser release step.
+
+## 2026-07-01 — Browser readiness binds release proof identity
+
+`build_dawn_replacement_readiness_report.py` now rejects package-input,
+provenance, proof-surface, public-download, and browser-launch evidence whose
+browser product, platform, archive, or packaged member identities drift from
+the release artifact bundle. Focused readiness regressions mutate only
+package-input product identity, provenance platform identity, proof-surface
+product/archive identity, public-download platform identity, or launch product
+identity, proving the Dawn replacement rollup cannot certify downloadable
+browser evidence that the claim-index browser release gate would reject for
+release identity drift.
+
+## 2026-07-01 — Browser promotion requires passing frontier bundle state
+
+`build_dawn_replacement_readiness_report.py` now emits the browser
+claim-index promotion blocker only when the browser runtime frontier bundle
+reports `status=pass`, `claimabilityStatus=claimable`, and clean
+release-candidate consistency. Focused claim-promotion tests cover the
+passing path and the failed-frontier-bundle path, preventing a failed
+frontier receipt from being summarized as if claim-index promotion were the
+only remaining browser release step.
+
+## 2026-07-01 — Browser readiness binds launch fields to proof surface
+
+`build_dawn_replacement_readiness_report.py` now reuses the claim-index
+launch/proof-surface matcher and records readiness consistency failures when a
+browser launch receipt's proof page, loaded gallery page, comparison row,
+active backend, or observed receipt fields drift from the published proof
+surface. A focused readiness regression mutates only the launch receipt gallery
+artifact path to an unlisted gallery page, proving the Dawn replacement rollup
+cannot certify a packaged-browser launch receipt that is hash-bound to the
+right proof surface but does not match its published page evidence.
+
+## 2026-07-01 — Browser readiness requires public release archive URLs
+
+`build_dawn_replacement_readiness_report.py` now rejects release artifact
+bundles whose `releaseArchive.downloadUrl` is not public HTTPS, even when the
+public-download receipt and bundle agree on the same URL. A focused readiness
+regression mutates a temporary release bundle to a localhost archive URL and
+points a temporary runtime frontier bundle at it, proving the Dawn replacement
+rollup cannot certify downloadable-browser evidence that the claim-index
+browser release gate would reject as non-public.
+
+## 2026-07-01 — Browser readiness requires public launch gallery evidence
+
+`build_dawn_replacement_readiness_report.py` now rejects browser launch
+receipts whose loaded proof-gallery URL is not public HTTPS or whose gallery
+category is not one of the published proof-gallery categories. Focused
+readiness regressions mutate only the launch receipt gallery URL or category,
+proving the Dawn replacement rollup cannot certify a packaged-browser launch
+receipt that the claim-index browser release gate would reject as local,
+non-public, or off-contract gallery evidence.
+
+## 2026-07-01 — Browser readiness verifies public-download receipt length
+
+`build_dawn_replacement_readiness_report.py` now rejects browser public-download
+receipts that omit `receiptId`, omit `observedAt`, report non-positive
+`contentLengthBytes`, or report a content length that does not match the
+release archive bytes. Focused readiness regressions mutate only the public
+download receipt identity fields or content length, proving the Dawn
+replacement rollup cannot certify a hosted browser archive receipt that the
+claim-index browser release gate would reject as incomplete or byte-drifted.
+
+## 2026-07-01 — Browser readiness rejects dirty package-input preflights
+
+`build_dawn_replacement_readiness_report.py` now rejects browser package-input
+preflight evidence that is not `evidenceMode=release_candidate`, and rejects
+pass-status package-input reports that still carry failures, release-candidate
+blockers, or `summary.packageable=false`. Focused readiness regressions cover
+the checked-in diagnostic package-input sample plus a pass-labeled package
+preflight with mutated blocker/failure/packageable fields, proving the Dawn
+replacement rollup cannot certify package evidence that the claim-index browser
+release gate would reject.
+
+## 2026-07-01 — Browser readiness rejects pass-status provenance failures
+
+`build_dawn_replacement_readiness_report.py` now carries provenance report
+`summary` into the browser release-candidate evidence summary and rejects
+provenance evidence that reports `status=pass` while still carrying failures or
+a nonzero summary failure count. A focused readiness regression mutates only the
+provenance status and failure fields, proving the Dawn replacement rollup
+cannot certify a release-candidate provenance preflight that hides failed
+component checks behind pass status.
+
+## 2026-07-01 — Browser readiness rejects pass-status proof-surface-check failures
+
+`build_dawn_replacement_readiness_report.py` now rejects browser proof-surface
+checker evidence that reports `status=pass` while still carrying nonzero
+failures. A focused readiness regression mutates only the checker failure list
+on an otherwise pass-labeled proof-surface check, proving the Dawn replacement
+rollup cannot certify a published proof surface whose checker hid failed public
+gallery or diagnostics validation behind pass status.
+
+## 2026-07-01 — Browser readiness rejects pass-status finalizer failures
+
+`build_dawn_replacement_readiness_report.py` now rejects browser finalizer and
+finalizer-check evidence that reports `status=pass` while still carrying
+nonzero failure counts, including the finalizer summary failure count. Focused
+readiness regressions mutate only the finalizer or finalizer-check failure
+fields in an otherwise passing pair, proving the Dawn replacement rollup cannot
+promote a release-candidate finalizer that hides failed checks behind pass
+status.
+
+## 2026-07-01 — Browser readiness binds finalizer package inputs
+
+`build_dawn_replacement_readiness_report.py` now carries passing browser
+finalizer `inputs.packageInputs` into the release-candidate evidence summary
+and rejects candidate consistency when that input artifact does not match the
+package-input receipt used by the browser row. Focused readiness regressions
+build a passing finalizer/finalizer-check pair, then mutate only the finalizer
+package-input hash to prove the Dawn replacement rollup cannot certify a
+finalizer report assembled from stale package-input evidence.
+
+## 2026-07-01 — Browser readiness binds finalizer output bundles
+
+`build_dawn_replacement_readiness_report.py` now carries passing browser
+finalizer `outputs.releaseArtifactBundle` and `outputs.runtimeFrontierBundle`
+into the release-candidate evidence summary and rejects candidate consistency
+when those output artifacts do not match the release bundle and runtime-frontier
+bundle used by the browser row. Focused readiness regressions build a passing
+finalizer/finalizer-check pair, then mutate only the output bundle hashes to
+prove the Dawn replacement rollup cannot certify a finalizer report for
+different downloadable-browser bytes.
+The same readiness consistency surface now also requires the proof-surface
+checker receipt named by release-candidate evidence to match the release
+artifact bundle's `proofSurfaceCheck` artifact.
+
+## 2026-07-01 — Release proof pages reject vague Doe subsystem statuses
+
+`build_browser_proof_page_receipt.py` and
+`check_browser_published_proof_surface.py` now reject release-candidate or
+release proof-page evidence when TSIR, HostPlan, or CSL diagnostics still use
+placeholder status values such as `diagnostic` or `unknown`. Diagnostic samples
+can stay explicitly diagnostic, but claimable browser release evidence must show
+concrete subsystem state on the proof page and in the matching diagnostic
+receipt.
+
+## 2026-07-01 — Browser package inputs validate macOS app metadata
+
+`check_browser_release_package_inputs.py` now rejects macOS release-candidate
+package inputs unless `packageRootName` matches the `.app` bundle directory and
+the packaged `Info.plist` binds the browser product name, bundle identifier,
+version, executable name, and `APPL` package type. The focused package-input
+regressions cover both product metadata drift and package-root drift, so a
+browser release-candidate preflight cannot advance with archive member paths
+under the wrong bundle root or with app metadata that would fail later release
+bundle verification.
+
+## 2026-07-01 — Published proof surfaces require concrete receipt identity
+
+`browser_execution_receipt` schema validation and published proof-surface
+assembly now require concrete driver profile fields, adapter-info SHA-256,
+adapter label, feature count, dispatch count, and the setup/encode/submit-wait
+timing phases. The checked browser execution receipt samples now carry the same
+concrete driver/device identity required by `build_browser_execution_receipt.py`,
+and the proof-surface/release/readiness samples were regenerated against the
+stricter receipt hashes. Focused regressions prove schema validation rejects
+placeholder driver identity and the proof-surface checker rejects incomplete
+device identity before those receipts can back browser release evidence.
+
+## 2026-07-01 — Browser execution receipts reject placeholder driver/device identity
+
+`build_browser_execution_receipt.py` now rejects browser smoke rows whose
+runtime-selection profile still reports placeholder driver fields such as
+`unknown`, and requires adapter identity to include a concrete adapter, device,
+or name label alongside the adapter-info hash. The checked smoke comparison
+sample now carries concrete sample profile/device identity with refreshed
+mode-result and report hashes. Focused regressions mutate only the driver field
+or remove the adapter/device labels, proving per-run browser receipts cannot
+turn placeholder environment identity into claim-shaped driver/device evidence.
+
+## 2026-07-01 — Proof-page receipts require visible diagnostics and provenance
+
+`build_browser_proof_page_receipt.py` now reads the captured `about:doe` proof
+page before emitting a diagnostic receipt and requires visible page content for
+the diagnostics, release provenance, and recent receipt IDs that the receipt
+claims. Focused regressions remove only the compiler path, release archive
+hash, or a recent receipt ID from the captured page fixture, proving proof-page
+receipt evidence cannot be produced from a diagnostics page that hides the
+identity fields later consumed by the published proof surface.
+
+## 2026-07-01 — Public gallery receipts require visible hosted evidence
+
+`build_browser_public_gallery_receipt.py` now decodes the served gallery page
+before emitting a public gallery receipt and requires visible page content for
+the category, workload contract path, workload IDs, receipt IDs, and execution
+receipt artifact paths that the receipt claims. Focused regressions remove only
+the workload ID or receipt artifact link from the hosted page fixture, proving
+public gallery evidence cannot be produced from a hosted page that hides the
+workload/receipt links later used by the proof surface.
+
+## 2026-07-01 — Public download receipts validate archive manifests before emission
+
+`build_browser_public_download_receipt.py` now loads the release archive
+manifest before emitting hosted-download evidence and requires the manifest
+archive path, archive SHA-256, archive byte length, browser product, platform,
+and packaged executable/app/Doe runtime/Dawn fallback runtime member paths to
+match the public download receipt. Focused regressions mutate only the manifest
+archive hash or packaged Doe runtime member path while refreshing the manifest
+hash argument, proving hosted-download evidence cannot be produced from a
+generic or stale archive manifest.
+
+## 2026-07-01 — Browser launch receipts validate archive manifests before emission
+
+`build_browser_release_launch_receipt.py` now loads the release archive
+manifest before emitting a packaged-browser launch receipt and requires the
+manifest archive path, archive SHA-256, archive byte length, browser product,
+platform, and packaged executable/app/Doe runtime/Dawn fallback runtime member
+paths to match the launch receipt inputs. Focused regressions mutate only the
+manifest archive hash or the packaged Doe runtime member path, proving a launch
+receipt cannot be produced from a generic or stale manifest that merely gets
+hash-linked after the fact.
+
+## 2026-07-01 — Browser proof-surface builder backs recent receipts across the surface
+
+`build_browser_published_proof_surface.py` now validates proof-page
+`recentReceiptIds` against every receipt linked by the assembled proof surface:
+proof-page payloads, gallery receipt artifacts, and same-page Dawn/Doe
+comparison receipts. The focused builder suite now reconstructs the checked-in
+sample again while still rejecting an actually unlinked recent receipt ID,
+proving producer-side validation matches the claim-index rule for surface-wide
+recent receipt coverage.
+
+## 2026-07-01 — Browser claim-index binds proof runtime identity hashes
+
+`claim_index_gate.py` now loads the runtime identity artifact named by a
+claim-indexed Chromium proof surface and requires its provider or
+runtime-selection artifact hashes to match the release bundle browser binary,
+Doe runtime, and Dawn fallback runtime hashes. The unit browser-release fixture
+now publishes those runtime identity hashes, and a focused regression mutates
+the loaded runtime identity's Doe runtime hash without changing the release
+bundle, proving a proof surface cannot point `about:doe` diagnostics at runtime
+bytes outside the packaged release evidence.
+
+## 2026-07-01 — Browser claim-index binds launch receipt IDs to proof payloads
+
+`claim_index_gate.py` now loads the proof-surface proof-page diagnostic receipt
+and loaded gallery public receipt payloads while validating the packaged-browser
+launch receipt. The launch receipt's proof-page and gallery receipt IDs must
+match those payload `receiptId` values, not just appear in
+`observedReceiptIds`. A focused regression rewrites the launch proof/gallery
+receipt IDs and observed list while leaving the proof surface unchanged,
+proving launch evidence cannot substitute arbitrary observed IDs for the
+receipt payloads published by the proof surface.
+
+## 2026-07-01 — Browser claim-index binds proof compiler path
+
+`claim_index_gate.py` now rejects claim-indexed Chromium proof surfaces whose
+`about:doe` diagnostics `compilerPath` differs from the release artifact
+bundle's `shaderCompiler.path`. A focused regression keeps the diagnostics
+compiler path non-empty but points it at a different compiler, proving
+claim-indexed proof pages cannot report a Doe compiler path unrelated to the
+shipped release compiler artifact.
+
+## 2026-07-01 — Browser claim-index binds command evidence to comparison bytes
+
+`claim_index_gate.py` now rejects claim-indexed Chromium same-page comparison
+receipts whose Dawn or Doe execution receipt names the comparison artifact path
+but does not hash-bind the comparison artifact file hash or report hash in its
+command evidence. The unit browser-release fixture now adds
+`commandGraph.artifactSha256` after generating the strict smoke comparison
+artifact and refreshes the receipt refs. A focused regression mutates only the
+Doe receipt's comparison artifact hash while leaving the graph hash and
+artifact path intact, proving receipt command evidence cannot point at a report
+path without binding the report bytes.
+
+## 2026-07-01 — Browser claim-index binds comparison runtime hashes
+
+`claim_index_gate.py` now rejects claim-indexed Chromium proof surfaces whose
+same-page strict smoke `comparisonArtifact` names runtime-selection browser
+binary, Dawn fallback runtime, or Doe runtime hashes that differ from the
+release artifact bundle. The check covers both top-level `runtimeSelections`
+and each `modeResults[*].runtimeSelection`. A focused regression mutates only
+the top-level Doe runtime hash in the smoke report, recomputes the report hash,
+and refreshes the proof-surface comparison artifact hash, proving the
+comparison report cannot come from browser/runtime bytes outside the packaged
+release evidence.
+
+## 2026-07-01 — Browser claim-index enforces strict comparison smoke reports
+
+`claim_index_gate.py` now reuses the browser smoke validator on same-page
+`comparisonArtifact` payloads, including strict-mode, report-hash, and
+mode-result hash-chain checks. The unit browser-release fixture now emits a
+real strict smoke report with Dawn/Doe runtime selections, shader compiler
+identity, adapter identity, smoke-pass sections, chained mode hashes, and a
+report hash. A focused regression corrupts only the Doe mode-result hash while
+refreshing the proof-surface artifact reference, proving claim-indexed browser
+comparison evidence cannot pass with a hash-matched but internally forged smoke
+report.
+
+## 2026-07-01 — Browser claim-index binds same-page comparison artifacts
+
+`claim_index_gate.py` now follows the proof surface's same-page
+`comparisonArtifact`, verifies the referenced smoke report file hash, requires
+the report to cover both Dawn and Doe modes with no hidden fallback/errors, and
+checks its timing class against the declared comparison policy. The gate also
+requires both Dawn and Doe execution receipt command evidence to name that same
+comparison artifact path. Focused regressions mutate only the comparison
+artifact bytes or the Doe receipt command-evidence path, proving a
+claim-indexed Chromium proof surface cannot advertise side-by-side receipt
+parity while linking those receipts to a different or stale comparison report.
+
+## 2026-07-01 — Browser claim-index binds packaged artifact hashes
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+package-input report binds browser binary, Doe runtime, Dawn fallback runtime,
+or shader compiler path/hash/kind values that differ from the release artifact
+bundle. The gate also checks release archive manifest member hashes and the
+browser executable bit against release-bundle artifacts. Focused regressions
+mutate only the package-input Doe runtime hash or the manifest Doe runtime
+member hash, then refresh surrounding bundle/finalizer/readiness references
+where needed, proving claim-indexed browser evidence cannot swap packaged
+runtime bytes behind matching member paths.
+
+## 2026-07-01 — Browser claim-index binds archive manifest identity
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+release archive manifest does not bind the release artifact bundle's browser
+product, platform, and packaged executable/app/runtime member paths. When the
+manifest carries `sourcePackageInputs`, the gate also requires that artifact
+ref to match the release bundle's package-input receipt. Focused regressions
+mutate only the manifest Doe runtime member path or a present
+`sourcePackageInputs` ref, proving manifest body drift is visible to the
+public claim index instead of only to lower release-bundle tooling.
+
+## 2026-07-01 — Browser claim-index binds release identity tuple
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+package-input, public-download, provenance, proof-surface release provenance,
+or launch receipt identity drifts from the release artifact bundle's browser
+product, platform, and packaged member paths. Focused regressions mutate only
+package-input product version, public-download platform architecture, or
+provenance expected Doe runtime member path, then refresh the surrounding
+bundle/readiness/finalizer hashes needed for each mutation, proving a coherent
+release bundle cannot certify a different packaged browser identity.
+
+## 2026-07-01 — Browser claim-index binds runtime frontier identity components
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+claimable runtime frontier bundle does not bind
+`componentReceipts.runtimeIdentity` to the proof surface's Doe runtime identity
+or `componentReceipts.claimPromotionReceipt` to a promotable promotion receipt
+listed in the release artifact bundle. Focused regressions mutate only each
+runtime-frontier component path, then refresh the release-bundle, finalizer,
+finalizer-check, and readiness hash references around it, proving claimable
+runtime-frontier status cannot certify a different runtime selector or
+promotion receipt.
+
+## 2026-07-01 — Browser claim-index binds runtime frontier release component
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+claimable runtime frontier bundle does not bind
+`componentReceipts.releaseArtifactBundle` to the exact release-candidate bundle
+path and verified-file state named by `browserRelease.releaseArtifactBundlePath`.
+The focused regression changes only that component path inside the runtime
+frontier bundle, then refreshes the release-bundle, finalizer, finalizer-check,
+and readiness hash references around it, proving claimable runtime-frontier
+status cannot certify a different browser release bundle.
+
+## 2026-07-01 — Browser claim-index binds provenance components
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+release-candidate provenance report does not bind `componentArtifacts` for
+package inputs, public download receipt, proof surface, proof-surface check,
+and browser launch receipt to the exact paths, kinds, and file hashes named by
+`browserRelease`. The focused regression mutates only the provenance
+proof-surface component hash, then refreshes the readiness hash reference
+around that provenance report, proving clean provenance status cannot certify
+nearby or stale component receipts.
+
+## 2026-07-01 — Browser claim-index rejects dirty preflights
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+package-input preflight is not `evidenceMode=release_candidate`, still exposes
+`releaseCandidateBlockers` or `failures`, or has `summary.packageable=false`.
+It also rejects pass-labeled provenance reports with non-empty `failures` or
+nonzero `summary.failureCount`. Focused regressions dirty each preflight while
+refreshing the surrounding release-bundle, finalizer, finalizer-check, and
+readiness hashes needed for that mutation, proving claim-indexed browser
+evidence cannot hide package/provenance blockers behind pass labels.
+
+## 2026-07-01 — Browser claim-index binds finalizer artifacts
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+passing finalizer report does not bind `outputs.releaseArtifactBundle`,
+`outputs.runtimeFrontierBundle`, and `inputs.packageInputs` to the exact paths,
+kinds, and file hashes named by `browserRelease`. Focused regressions mutate
+only the finalizer output bundle hash or package-input hash, then refresh the
+finalizer-check and readiness hash references around that report, proving a
+passing finalizer status cannot certify a different bundle or input receipt.
+
+## 2026-07-01 — Browser claim-index checks public download observation
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+loaded public download receipt is not a GET observation with non-empty
+`receiptId`/`observedAt` and positive `contentLengthBytes` matching the release
+archive bytes. Focused regressions mutate only the public download method or
+served byte length, then refresh the release-bundle and readiness hash
+references around that receipt, proving a 200 label and matching SHA-256 are
+not enough for downloadable-browser evidence.
+
+## 2026-07-01 — Browser claim-index requires public archive URLs
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+`browserRelease.downloadUrl` is not a public HTTPS URL, using the same
+reserved/local-host policy as the published proof-gallery checks. The focused
+regression regenerates a complete browser-release evidence fixture with the
+archive URL consistently set to a `.test` host, proving internal receipt
+agreement is not enough for claim-indexed downloadable-browser evidence.
+
+## 2026-07-01 — Browser claim-index binds launch proof-surface identity
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+loaded packaged-browser launch receipt does not bind `proofSurface.path`,
+`proofSurface.sha256`, and `proofSurface.kind` to the exact published proof
+surface named by `browserRelease.proofSurfacePath`. The focused regression
+changes only the launch receipt's checked proof-surface hash, then refreshes
+the release-bundle and readiness hash references around that receipt, proving
+claim-indexed browser evidence cannot launch against one proof surface while
+the claim index names another.
+
+## 2026-07-01 — Browser claim-index binds finalizer-check identity
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+loaded finalizer-check receipt does not bind `finalizerReportPath` and
+`finalizerReportSha256` to the exact finalizer report named by
+`browserRelease.finalizerReportPath`. The focused regression changes only the
+finalizer-check receipt's checked finalizer hash, then refreshes the readiness
+hash reference around that receipt, proving claim-indexed browser evidence
+cannot accept a stale finalizer-check receipt for different finalizer bytes.
+
+## 2026-07-01 — Browser claim-index rejects dirty pass receipts
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+pass-labeled proof-surface checker report, finalizer report, or
+finalizer-check receipt still exposes non-empty `failures`; finalizer reports
+also require `summary.failureCount=0`. Focused regressions inject failures into
+each receipt while preserving the pass status fields and refreshing surrounding
+release-bundle/readiness hash references, proving claim-indexed browser
+evidence cannot hide proof-surface or finalizer blockers behind passing labels.
+
+## 2026-07-01 — Browser claim-index rejects dirty runtime frontiers
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+loaded runtime frontier bundle is marked claimable while still exposing
+`claimBlockers`, `claimBlockerSummary`, `failures`, or nonzero summary counts.
+The focused regression injects a runtime-frontier failure while preserving
+`status=pass` and `claimabilityStatus=claimable`, then refreshes the
+release-bundle and readiness hash references, proving claim-indexed browser
+evidence cannot hide runtime-frontier blockers behind claimable labels.
+
+## 2026-07-01 — Browser claim-index binds proof-surface checker identity
+
+`claim_index_gate.py` now rejects claim-indexed Chromium browser rows whose
+loaded `browser_published_proof_surface_check` report does not bind
+`surfacePath` and `surfaceSha256` to the exact proof surface named by
+`browserRelease.proofSurfacePath`. The focused regression changes only the
+checker report's `surfaceSha256`, then refreshes the release-bundle and
+readiness hash references around that changed checker artifact, proving the
+claim index cannot accept a passing checker report for stale or different proof
+surface bytes.
+
+## 2026-07-01 — Browser claim-index galleries reject unknown categories
+
+`claim_index_gate.py` now rejects claim-indexed Chromium proof-surface gallery
+rows whose `category` is not one of the public proof gallery categories:
+compute, rendering, tensor, shader_edge, or benchmark_trace. The focused
+regression appends a sixth `local_only` gallery row while keeping the required
+five categories present, proving claim-indexed browser evidence cannot smuggle
+private/local gallery surfaces into the public proof gallery.
+
+## 2026-07-01 — Browser claim-index galleries require public URLs
+
+`claim_index_gate.py` now uses the shared public-URL validator for claim-indexed
+Chromium browser launch gallery URLs and proof-surface gallery URLs, matching
+the stricter published proof-surface checker semantics. The focused regression
+keeps the gallery URL HTTPS but moves it to `gallery.test`, then updates the
+proof-surface gallery row, public gallery receipt, and launch receipt to match,
+proving claim-indexed browser evidence cannot pass with reserved/test gallery
+hosts masquerading as hosted public proof pages.
+
+## 2026-07-01 — Browser claim-index galleries bind workload IDs to receipts
+
+`claim_index_gate.py` now rejects proof-surface gallery rows whose
+`workloadIds` do not match the unique workload IDs loaded from the linked
+execution receipt payloads. The focused regression mutates the compute gallery
+row, hosted gallery receipt, and visible gallery artifact to advertise
+`unit-other-workload` while leaving the linked execution receipt payload at
+`unit-compute`, proving claim-indexed Chromium gallery evidence cannot claim a
+workload that the backend receipt did not run.
+
+## 2026-07-01 — Browser claim-index galleries bind receipt IDs to artifacts
+
+`claim_index_gate.py` now rejects proof-surface gallery rows whose
+`receiptIds` do not exactly match the linked execution receipt artifact IDs.
+The focused regression mutates the compute gallery row to advertise
+`unit-compute-other`, then refreshes the hosted gallery receipt, gallery HTML,
+proof page, and diagnostic receipt hashes, proving claim-indexed Chromium
+gallery evidence cannot name one receipt ID while linking a different backend
+receipt JSON.
+
+## 2026-07-01 — Browser claim-index proof pages reject unbacked recent receipts
+
+`claim_index_gate.py` now rejects proof-page `recentReceiptIds` entries that
+are not backed by an exposed execution receipt artifact from proof-page payloads,
+gallery rows, or same-page Dawn/Doe comparison receipts. The focused regression
+adds a visible `unit-phantom-receipt` ID to `about:doe` and the diagnostic
+receipt while refreshing the proof-page hashes, proving claim-indexed Chromium
+proof surfaces cannot advertise recent receipts that have no inspectable
+source-preserving backend receipt.
+
+## 2026-07-01 — Browser claim-index proof pages link every recent receipt
+
+`claim_index_gate.py` now derives recent receipt payload links from every
+execution receipt artifact exposed by the proof surface, including proof-page
+payloads, gallery rows, and same-page Dawn/Doe comparison receipts. The
+focused regression keeps the tensor gallery receipt ID visible on `about:doe`
+while removing only its receipt JSON path and refreshing the proof-page hashes,
+proving a claim-indexed Chromium proof page cannot name a recent receipt
+without linking the inspectable source-preserving backend receipt. The
+published proof-surface checker now enforces the same link contract.
+
+## 2026-07-01 — Browser claim-index proof pages cover gallery receipts
+
+`claim_index_gate.py` now requires proof-page `recentReceiptIds` to include
+the execution receipt IDs exposed by gallery rows, in addition to proof-page
+payload links and Dawn/Doe comparison receipts. The focused regression removes
+only the tensor gallery receipt ID from `about:doe` recent receipts, proving a
+claim-indexed Chromium proof surface cannot publish hash-checked gallery
+execution receipts that are absent from the browser diagnostics page. The
+checked-in proof-page sample, proof-surface sample, launch receipt, provenance,
+release bundle, readiness report, and exact-hash tests were updated to the new
+receipt coverage chain.
+
+## 2026-07-01 — Browser claim-index comparison policies bind loaded receipts
+
+`claim_index_gate.py` now derives same-page `comparisonPolicy` declarations
+from the loaded Dawn/Doe execution receipt payloads, covering workload, source
+shader, driver/device, timing scope, command coverage, output identity kind,
+and no-hidden-fallback state. The focused regression flips only
+`comparisonPolicy.outputIdentity` from `same_output_hash` to
+`same_frame_hash`, leaving both receipts unchanged, proving claim-indexed
+Chromium rows cannot advertise frame-hash comparison policy when the loaded
+receipts prove output-hash identity.
+
+## 2026-07-01 — Browser claim-index execution receipts bind source hash aliases
+
+`claim_index_gate.py` now rejects loaded browser execution receipts when an
+optional `sourceShader.sourceSha256` alias is malformed or disagrees with the
+inline `sourceShader.source` bytes. The focused regression poisons only the
+alias on a tensor execution receipt while refreshing the proof-surface receipt
+hash reference, proving claim-indexed Chromium rows cannot publish competing
+WGSL source identities inside the same receipt.
+
+## 2026-07-01 — Browser claim-index comparison receipts bind shader entry point
+
+`claim_index_gate.py` now compares browser execution receipt source identity
+as language, entry point, and source hash/text for paired Dawn/Doe same-page
+comparisons. The focused regression mutates only the Doe receipt entry point
+while refreshing the proof-surface receipt hashes, proving claim-indexed
+Chromium rows cannot promote a same-source comparison that executed a different
+shader entry point.
+
+## 2026-07-01 — Browser claim-index execution receipts require WGSL source metadata
+
+`claim_index_gate.py` now rejects loaded browser execution receipts unless
+`sourceShader.language` is `wgsl` and `sourceShader.entryPoint` is present,
+in addition to the existing inline source/hash check. The focused regression
+mutates a gallery execution receipt's source language while refreshing the
+proof-surface receipt hash reference, proving claim-indexed Chromium rows
+cannot promote receipts that preserve bytes but hide the WebGPU shader source
+contract.
+
+## 2026-07-01 — Browser claim-index comparison receipts bind output identity kind
+
+`claim_index_gate.py` now compares both the output digest and whether that
+digest is reported as `outputHash` or `frameHash` for paired Dawn/Doe browser
+execution receipts. The focused regression changes the Doe receipt from
+`outputHash` to `frameHash` while keeping the same digest and refreshing the
+proof-surface receipt hashes, proving same-page comparisons cannot mix compute
+output and render-frame identity classes.
+
+## 2026-07-01 — Browser claim-index execution receipts bind lowering to runtime
+
+`claim_index_gate.py` now rejects loaded browser execution receipts whose
+`loweringPath` does not match `selectedRuntime`: Dawn receipts must use the
+WGSL/Tint/Dawn route, while Doe receipts must use a WGSL/Doe/WebGPU route and
+must not carry Tint/Dawn-native markers. The focused regression mutates the Doe
+receipt to use the Dawn lowering route while refreshing the proof-surface
+receipt hashes, proving a claim-indexed Chromium row cannot promote a
+Doe-selected receipt that lowered through the incumbent route.
+
+## 2026-07-01 — Browser claim-index comparison receipts bind command evidence
+
+`claim_index_gate.py` now compares the hash identity of loaded command evidence
+from paired Dawn/Doe browser execution receipts before accepting a same-page
+comparison. The focused regression mutates the Doe receipt's command graph hash
+while refreshing the proof-surface receipt hashes, proving a claim-indexed
+Chromium row cannot promote paired receipts that ran against different command
+evidence.
+
+## 2026-07-01 — Browser claim-index execution receipts bind backend to runtime
+
+`claim_index_gate.py` now rejects loaded browser execution receipts whose
+backend identity does not match `selectedRuntime` (`webgpu-dawn` for Dawn and
+`webgpu-doe` for Doe). The focused regression mutates the Doe execution
+receipt backend while refreshing the proof-surface receipt hashes, proving a
+claim-indexed Chromium row cannot promote a Doe-selected receipt with an
+unrelated backend label.
+
+## 2026-07-01 — Browser claim-index execution receipts require numeric timing phases
+
+`claim_index_gate.py` now rejects loaded browser execution receipts unless the
+timing block includes `timingClass` plus non-negative integer nanosecond
+`setupNs`, `encodeNs`, and `submitWaitNs` phases. The focused regression
+replaces a gallery execution receipt's `submitWaitNs` with a non-numeric value
+while refreshing the proof-surface receipt hash reference, proving claim-indexed
+Chromium rows cannot promote with placeholder timing evidence.
+
+## 2026-07-01 — Browser claim-index receipt references must be unambiguous
+
+`claim_index_gate.py` now rejects claim-indexed Chromium proof surfaces that
+repeat an execution receipt path/runtime reference with conflicting receipt ID,
+hash, or kind, and also rejects one receipt ID pointing at multiple artifact
+paths. The focused regression appends a duplicate proof-page execution receipt
+reference with the same path but a different receipt ID, proving conflicting
+references cannot be skipped by path/runtime de-duplication.
+
+## 2026-07-01 — Browser claim-index comparison receipts bind workload identity
+
+`claim_index_gate.py` now compares loaded Dawn/Doe browser execution receipt
+payloads against each other and against the proof-surface comparison row's
+`workloadId`. The focused regression mutates the Doe comparison receipt
+workload while refreshing the proof-surface artifact hashes, proving a
+same-page comparison cannot promote with receipt payloads from a different
+workload.
+
+## 2026-07-01 — Browser claim-index execution receipts require command evidence
+
+`claim_index_gate.py` now rejects loaded browser execution receipts unless they
+declare `schemaVersion=1`, a non-empty `workloadId`, and at least one
+hash-identified command evidence block through `commandGraph` or
+`flightRecorderRef`. The focused regression removes both command evidence
+anchors from a gallery execution receipt while refreshing the proof-surface
+receipt hash reference, proving claim-indexed Chromium rows cannot promote
+without a run-provenance anchor.
+
+## 2026-07-01 — Browser claim-index execution receipts require output SHA identity
+
+`claim_index_gate.py` now rejects loaded browser execution receipts unless they
+carry exactly one lowercase SHA-256 output identity, either `outputHash` or
+`frameHash`. The focused regression mutates a gallery execution receipt to
+replace its output hash with a non-SHA value while refreshing the proof-surface
+receipt hash reference, proving claim-indexed Chromium rows cannot promote with
+a weak output identity hidden behind valid artifact hashes.
+The output-identity and no-hidden-fallback payload checks now live in
+`bench/gates/claim_index_browser_release_receipt_state.py`, keeping the
+execution/proof-page receipt shard below its current local cap for the next
+claim-index invariant.
+
+## 2026-07-01 — Browser claim-index execution receipts reject fallback drift
+
+`claim_index_gate.py` now checks every loaded browser execution receipt payload
+for explicit no-hidden-fallback state: `runtimeSelectorState.selectedRuntime`
+must match the top-level runtime, selector and fallback `fallbackApplied` flags
+must be false, hidden fallback must be disabled, and fallback reason codes must
+be empty strings. The focused regression mutates a gallery execution receipt to
+apply selector fallback and allow hidden fallback while refreshing the
+proof-surface receipt hash reference, proving claim-indexed Chromium rows
+cannot promote with fallback drift hidden behind valid receipt hashes.
+
+## 2026-07-01 — Browser claim-index execution receipts require complete command coverage
+
+`claim_index_gate.py` now checks every loaded browser execution receipt payload
+for complete command coverage: positive `commandCount`, non-negative
+`successCount`, `successCount == commandCount`, and non-negative bounded
+`dispatchCount` when present. The focused regression mutates a gallery
+execution receipt to partial success and refreshes the proof-surface hash
+reference, proving claim-indexed Chromium rows cannot promote with incomplete
+work evidence hidden behind valid receipt hashes.
+
+## 2026-07-01 — Browser claim-index comparison receipts require driver parity
+
+`claim_index_gate.py` now compares the loaded Dawn/Doe browser execution
+receipt payloads for driver identity as well as device identity before accepting
+a claim-indexed Chromium same-page comparison. The focused regression mutates
+the Doe receipt driver and refreshes the proof-surface artifact hashes, proving
+the mismatch is rejected as comparison payload drift rather than as a stale
+file reference.
+
+## 2026-07-01 — Browser claim-index proof pages must show release provenance
+
+`claim_index_gate.py` now reads the hash-verified `about:doe` proof-page
+artifact for claim-indexed Chromium proof surfaces and requires the page text
+to show release provenance fragments from the proof surface: browser product,
+platform tuple, packaged member paths, release archive, archive manifest, and
+public download receipt fields. The complete browser-release fixture now uses
+the full release-provenance shape, and focused coverage updates the proof-page
+artifact plus diagnostic-receipt hashes before proving that hidden provenance
+still blocks promotion.
+
+## 2026-07-01 — Browser claim-index comparison pages must show receipts
+
+`claim_index_gate.py` now reads the same-page comparison runner gallery
+artifact for claim-indexed Chromium proof surfaces and requires that page to
+show the comparison ID, workload ID, runner page/scope/modes, side-by-side
+receipt marker, comparison artifact path, and both Dawn/Doe receipt IDs and
+payload links. The focused regression keeps gallery artifact and public receipt
+hashes fresh while hiding the comparison fragments, proving that JSON-only
+same-page comparison evidence cannot promote.
+
+## 2026-07-01 — Browser claim-index galleries must show receipts
+
+`claim_index_gate.py` now reads each hash-verified public gallery HTML artifact
+for claim-indexed Chromium proof surfaces and requires the page content to show
+the gallery category, workload contract, workload IDs, receipt IDs, and receipt
+artifact links exposed by the proof surface. The public gallery receipt checks
+now live in `bench/gates/claim_index_browser_release_gallery.py`, while the
+aggregate proof-surface receipt entrypoint remains unchanged. Focused coverage
+updates the gallery artifact, proof-surface reference, and public receipt hashes
+before proving that hidden receipt links still block promotion.
+
+## 2026-07-01 — Browser claim-index proof pages must show diagnostics
+
+`claim_index_gate.py` now reads the hash-verified proof-page artifact for
+claim-indexed Chromium proof surfaces and requires the page content to show the
+active Doe diagnostics, compiler path, TSIR/HostPlan/CSL status,
+hidden-fallback-disabled state, recent receipt IDs, and receipt payload links
+exposed by the proof surface. The focused claim-index receipt coverage now
+updates all proof-page and diagnostic-receipt hashes before proving that missing
+visible diagnostic content still blocks promotion.
+
+## 2026-07-01 — Browser claim-index proof surfaces load proof-page receipts
+
+`claim_index_gate.py` now follows the claim-indexed Chromium proof surface's
+proof-page `diagnosticReceipt` reference, verifies the receipt file hash, loads
+the `browser_proof_page_receipt` payload, and requires it to bind the proof-page
+artifact hash and byte length, `about:doe` URL, runtime identity path,
+diagnostics, release provenance, and recent receipt IDs exposed by the proof
+surface. The complete browser-release fixture now writes real proof-page HTML
+and a proof-page diagnostic receipt, and focused coverage rejects proof-page
+receipt payload drift.
+
+## 2026-07-01 — Browser claim-index proof surfaces load public gallery receipts
+
+`claim_index_gate.py` now follows each claim-indexed Chromium proof-surface
+gallery `publicReceipt` reference, verifies the receipt file hash, loads the
+`browser_public_gallery_receipt` payload, and requires it to bind the hosted URL,
+HTTP 200 status, gallery artifact hash and byte length, workload contract,
+workload IDs, receipt IDs, and receipt artifact paths exposed by the proof
+surface. The complete browser-release fixture now writes real gallery HTML and
+public gallery receipt files instead of placeholder hashes, and focused coverage
+rejects public gallery receipt payload drift.
+
+The browser proof-surface receipt checks now live in
+`bench/gates/claim_index_browser_release_receipts.py`; launch/proof-surface
+shape checks remain in `bench/gates/claim_index_browser_release_proof.py`.
+
+## 2026-07-01 — Browser claim-index proof surfaces load execution receipts
+
+`claim_index_gate.py` now rejects claim-indexed Chromium proof surfaces whose
+`about:doe` diagnostics omit the compiler path or TSIR/HostPlan/CSL status, and
+it requires proof-page `recentReceiptIds` to cover the execution receipts
+exposed by the proof page and same-page comparison rows. Focused coverage now
+rejects missing proof-page diagnostics and stale recent-receipt coverage.
+
+`claim_index_gate.py` now cross-checks claim-indexed Chromium browser launch
+receipts against the loaded published proof surface. The launch receipt's proof
+page URL/artifact, loaded gallery URL/category/artifact, same-page comparison
+row, Dawn/Doe receipt IDs, and active backend must match the proof surface, and
+focused coverage rejects a launch receipt that names a gallery page outside the
+published proof surface.
+
+`claim_index_gate.py` now follows execution receipt artifact references from
+the claim-indexed Chromium proof surface, verifies the referenced file hashes,
+and checks the loaded `browser_execution_receipt` payloads for receipt IDs,
+source shader text/hash, lowering path, backend, driver/device identity, output
+or frame hash, and timing fields. The complete browser-release fixture now
+emits real execution receipt JSON for its proof-page, gallery, and same-page
+comparison references, and the focused tests reject a stale/incomplete Doe
+execution receipt. The gate also compares loaded Dawn/Doe comparison receipt
+payloads for source, device, output/frame, command coverage, and timing-class
+identity, with focused coverage for mismatched output hashes.
+
+## 2026-07-01 — Browser claim-index rows bind release-bundle components
+
+`claim_index_gate.py` now re-hashes loaded Chromium `browserRelease` component
+receipts and compares them against the release artifact bundle's component
+summaries for the runtime frontier bundle, release archive manifest, package
+inputs, public download receipt, proof surface, proof-surface check, and launch
+receipt. Future claim-indexed Chromium browser rows also fail when any required
+release-bundle component summary is absent, so a public row cannot point at
+receipt files that differ from the aggregate release bundle. Focused
+claim-index tests now cover component hash drift and missing claim-indexed
+bundle components.
+
+## 2026-07-01 — Browser claim-index promotion requires full proof surface
+
+`claim_index_gate.py` now directly validates the loaded
+`browser_published_proof_surface` artifact for future claim-indexed Chromium
+browser rows. Promotion requires `about:doe` Doe diagnostics,
+hidden-fallback-disabled state, hosted gallery pages for compute, rendering,
+tensor, shader-edge, and benchmark-trace categories, and a same-page Dawn/Doe
+comparison receipt with source, device, command-coverage, and fallback parity.
+The focused claim-index tests now include regressions for missing gallery
+coverage and weakened proof-surface comparison parity.
+
+The Chromium `browserRelease` validation helpers have been split out of
+`bench/gates/claim_index_gate.py`: generic claim/report validation remains in
+the main gate, archive/readiness/release evidence checks live in
+`bench/gates/claim_index_browser_release.py`, and launch/proof-surface checks
+live in `bench/gates/claim_index_browser_release_proof.py`.
+
+## 2026-07-01 — Browser claim-index promotion requires launch proof surfaces
+
+`claim_index_gate.py` now treats packaged-browser launch proof as part of the
+Chromium claim-index promotion boundary. Future claim-indexed Chromium browser
+rows must load a launch receipt proving a release-archive Doe WebGPU launch,
+active `webgpu-doe` backend, loaded `about:doe` proof page, loaded HTTPS
+gallery page, same-page Dawn/Doe comparison mode, side-by-side Dawn/Doe receipt
+emission, and observed proof/gallery/Dawn/Doe receipt IDs. The focused
+claim-index tests now include a complete claim-indexed browser-release fixture
+and regressions for proof-page drift plus missing side-by-side/observed receipt
+evidence.
+
+## 2026-07-01 — Browser claim-index rows bind release archive identity
+
+`browserRelease` claim-index evidence now carries first-class release archive
+path/SHA-256, release archive manifest path/SHA-256, and public download URL
+fields for Chromium browser rows. `claim_index_gate.py` hashes the local archive
+and manifest when present, compares those fields against the readiness row's
+public download receipt evidence, and rejects rows when the release bundle,
+provenance report, public download receipt, published proof surface, or launch
+receipt names a different archive or manifest identity. The checked-in
+`browser-chromium-release` scaffold now points at the sample macOS arm64 zip and
+manifest bytes, and the regenerated readiness sample preserves the same
+`browserRelease` object in the browser row's compact claim-index entry.
+
+## 2026-07-01 — Browser claim-index release evidence binds to readiness rows
+
+`claim_index_gate.py` now checks a Chromium browser claim-index entry's
+`browserRelease` paths and readiness-exposed receipt hashes against the
+Chromium browser row in the named Dawn replacement readiness report. The gate
+compares the runtime frontier bundle, release artifact bundle, package-input
+preflight, provenance report, public download receipt, proof surface,
+proof-surface check, launch receipt, finalizer, and finalizer-check paths
+against the readiness row's `frontierBundleEvidence`, verifies loaded
+release-candidate receipt file hashes where the readiness row carries `sha256`,
+and now includes hashes for the runtime frontier bundle and release artifact
+bundle summaries as well as the release-candidate receipt summaries. It also
+requires the readiness row to include the matching claim-index entry with the
+same `browserRelease` object. Future claim-indexed Chromium browser rows now
+also fail if their typed browser release artifacts are missing from optional
+`bench/out` locations, instead of silently skipping those release checks.
+
+## 2026-07-01 — Claim index gets a typed Chromium browser release lane
+
+`reports/claim-index.json` now has a scaffolded `browser-chromium-release`
+entry for the downloadable Chromium-family browser surface, with typed
+`browserRelease` evidence paths for the runtime frontier bundle, release
+artifact bundle, package-input preflight, release-candidate provenance, public
+download receipt, proof surface, proof-surface check, launch receipt, finalizer,
+finalizer check, and Dawn replacement readiness report. The claim-index schema
+now accepts `surface=browser-chromium` only with `runtimeHost=browser` and that
+typed release-evidence object. `claim_index_gate.py` validates those artifact
+kinds when the files are present; for any future claim-indexed Chromium browser
+row it also requires loaded release evidence to be passing, release-candidate
+grade, file-verified where relevant, launched through Doe WebGPU with hidden
+fallback disabled, and backed by a claimable browser readiness row. The tracked
+entry remains scaffolded because the checked-in browser release evidence is
+still diagnostic.
+
+## 2026-07-01 — Browser readiness names the claim-index promotion gate
+
+The Dawn replacement readiness report now fails closed when a Chromium browser
+release-candidate evidence chain is internally claimable but the frontier row
+has not yet been promoted for public replacement language. In that state the
+browser row reports `browser_claim_index_promotion` instead of showing a
+blocked readiness row with no blockers, making the next gate explicit:
+promotion through the frontier manifest and public claim index after the
+release-candidate runtime frontier, package-input, provenance, launch,
+proof-surface, finalizer, finalizer-check, and hosted-download evidence are
+all claimable and hash-bound. The checked-in diagnostic sample still blocks on
+`chromium_release_build_evidence`, while the scratch browser release-candidate
+rehearsal now reaches the promotion blocker with clean candidate consistency.
+
+## 2026-07-01 — Browser release-candidate staging preserves proof-surface paths
+
+`stage_browser_release_candidate_provenance.py` now canonicalizes same-page
+comparison `pageArtifactPath` values with the same proof-surface artifact-path
+rule used by `build_browser_published_proof_surface.py`: repo-root artifacts
+remain repository-relative in the emitted proof surface, while artifacts staged
+outside the repo stay absolute. This fixes the repo-root release rehearsal case
+where gallery page artifacts were emitted as repository-relative paths but
+comparison runners were staged as absolute paths, causing the proof-surface
+builder to reject an otherwise matching Dawn-vs-Doe same-page comparison.
+Focused coverage now asserts the repo-root path shape directly, and the
+scratch browser release-candidate rehearsal under
+`bench/out/scratch/browser-release-candidate-rehearsal/` now stages provenance,
+finalizes the release artifact bundle, passes the finalizer check with
+`--require-pass`, and produces a readiness report whose browser
+release-candidate consistency surface is clean. The canonical checked-in sample
+remains diagnostic until its own release-candidate artifacts are rebuilt and
+published.
+
+## 2026-07-01 — Browser readiness rollup fails closed on candidate receipts
+
+The Dawn replacement readiness report now treats the Chromium release-candidate
+receipt chain as a consistency surface, not just summary metadata. When browser
+release-candidate evidence is present, the rollup emits explicit consistency
+failures for a non-passing provenance report, non-passing finalizer report,
+non-passing finalizer-check receipt, package inputs that are not
+release-candidate eligible, or a provenance report that does not bind the same
+package-input preflight named by the release-candidate evidence. The blocking
+runner now also refuses the browser release-candidate provenance gate unless
+`--browser-release-candidate-provenance-package-inputs` names that package-input
+preflight, so the release lane cannot fall back to hand-entered product/member
+paths. The provenance checker now also rejects package-input-backed provenance
+unless the release archive manifest binds the same preflight as
+`sourcePackageInputs`, pulling the archive-source binding forward before final
+bundle assembly. Passing finalizer reports now require `inputs.packageInputs`
+in the schema, and the finalizer checker rejects pass reports that omit that
+binding before verifying it against the emitted release bundle. Finalizer-check
+receipts now bind the checked finalizer report path/hash, and the readiness
+rollup rejects a stale finalizer-check receipt paired with a different finalizer
+report. Readiness also requires the finalizer-check receipt to show file
+verification and `--require-pass`, so a diagnostic check run cannot satisfy
+release-candidate evidence. The rollup now also loads the public download
+receipt directly and compares its hosted URL/status, served archive hash,
+archive path, and archive-manifest binding against the provenance report and
+release artifact bundle, so hosted-download proof is visible as first-class
+candidate evidence. The rollup also loads the packaged-browser launch receipt
+and checks it against the provenance report, release artifact bundle, release
+archive, release archive manifest, proof surface, packaged member paths,
+`about:doe` proof-page load, hosted gallery load, same-page Dawn/Doe comparison
+load, observed receipt IDs, and active Doe WebGPU runtime state. Configured
+candidate receipt paths now also fail closed when the artifact is missing or
+does not load as the expected `artifactKind`, so a custom rollup cannot silently
+drop release-candidate evidence. Package-input evidence in the readiness rollup
+now also requires the release archive manifest to bind the same report as
+`sourcePackageInputs`, matching the release-bundle checker's source-package
+contract before final assembly. The current sample therefore shows the browser
+blocker as
+both the broad
+`chromium_release_build_evidence` frontier blocker and the concrete receipt
+chain that must be rebuilt: release-candidate package inputs, provenance,
+launch, finalizer, and finalizer-check evidence all have to pass together
+before the Chromium row can support a downloadable-browser replacement claim.
+
+## 2026-07-01 — Browser release package inputs gain a preflight receipt
+
+`check_browser_release_package_inputs.py` now emits a schema-backed
+`browser_release_package_inputs_check` report before archive creation. The
+report verifies the package directory, packaged browser executable, Doe runtime,
+Dawn fallback runtime, shader compiler, archive member paths, product/platform
+identity, generated Linux browser metadata, and any package-member replacement
+state. The checked-in sample binds the current Linux `fawn_release` output and
+passes packageability while remaining diagnostic: release-candidate eligibility
+is still blocked on the initial macOS arm64 zip lane and release-candidate
+product channel. `schema_gate.py`, browser artifact identity coverage,
+Chromium release evidence paths, `run_blocking_gates.py`, the bench README, and
+the Chromium release runbook now include this preflight so browser release work
+can prove package inputs before claiming a downloadable public browser.
+The Dawn replacement frontier manifest and readiness report now also bind this
+package-input receipt under the Chromium release-build blocker. The readiness
+rollup records the packageable Linux diagnostic inputs, their release-candidate
+blockers, and the current archive-member drift against the macOS release-bundle
+sample, so the next browser release rebuild target is visible at the top-level
+frontier report. `build_browser_release_artifact_bundle.py --package-inputs`
+now consumes the passing package-input report to derive the bundle's
+product/platform identity, packaged member paths, browser binary, Doe runtime,
+Dawn fallback runtime, and shader compiler, keeping the packageability preflight
+and release-bundle assembly on the same artifact identity, hash-binding that
+preflight as `packageInputs`; release-candidate bundles now require that
+binding, duplicate explicit bundle paths must match that preflight, and verified
+bundles require the archive manifest's `sourcePackageInputs` to match the same
+report. The deterministic
+release archive packer now accepts the same package-input report to derive the
+package directory, runtime inputs, product/platform identity, and packaged member
+paths before writing the zip and archive manifest, and package-input-driven
+manifests hash-bind that source preflight as `sourcePackageInputs`. The
+release-candidate finalizer now accepts the same package-input report, requires
+it to be release-candidate eligible, derives the final bundle paths from it, and
+rejects duplicate explicit paths that drift from the preflight receipt. Passing
+finalizer reports now bind the package-input report under `inputs.packageInputs`,
+and the finalizer checker verifies that receipt against the emitted release
+bundle. The release-candidate provenance checker and post-download provenance
+stager now also use that package-input receipt to derive product/platform and
+packaged member paths and bind it under `componentArtifacts.packageInputs` in
+the provenance report; the staging helper requires that receipt and rejects
+proof-page compiler-path drift from its shader-compiler input.
+
+## 2026-07-01 — Published browser proof surfaces enter replacement readiness
+
+The published proof-surface checker now writes a schema-backed
+`browser_published_proof_surface_check` report to `--out`, binding the checked
+proof-surface path/hash, file-verification flag, public-gallery URL enforcement
+flag, status, and failures. Schema targets and browser artifact identity
+coverage now include the checker report sample. The Dawn replacement readiness
+report now loads the browser release-candidate provenance report, published
+proof-surface manifest, and proof-surface checker report for the Chromium
+browser row. The row's
+`frontierBundleEvidence.releaseCandidateEvidence` now includes hash-bound
+summaries for the provenance report, proof surface, proof-surface check,
+finalizer report, and finalizer-check receipt. The proof-surface summary records
+the `about:doe` diagnostics URL, active Doe backend, browser product/platform
+tuple, release archive URL/hash, required gallery category set, linked receipt
+payload scope, and same-page comparison receipt scope. Readiness also checks
+that the proof-surface path/hash matches the provenance report component
+artifact, release artifact bundle `proofSurface` artifact, and proof-surface
+checker receipt, and it rejects checker receipts that did not verify files or
+require public gallery URLs. The current sample remains blocked because the
+release-candidate provenance report still names diagnostic product/provenance
+drift, but the top-level Dawn replacement rollup now exposes the exact browser
+artifact that must be rebuilt and published. The frontier manifest now names the
+provenance report, proof surface, and proof-surface check alongside the runtime
+frontier and finalizer receipts for Chromium release-build evidence.
+`run_blocking_gates.py` also exposes the published proof-surface checker through
+`--with-browser-published-proof-surface-gate`, including file verification,
+public-gallery URL enforcement, and checker-report output passthroughs for
+release lanes. The release artifact bundle schema, builder, checker, and
+release-candidate finalizer now also hash-bind that checker report through
+`proofSurfaceCheck`, and release-candidate verification requires it to pass with
+file verification and public URL enforcement enabled.
+The release-candidate provenance preflight now also includes
+`proofSurfaceCheck` in `componentArtifacts`, rejects stale or failing checker
+reports before finalizer assembly, and the staging helper writes that checker
+report beside the rebuilt proof surface.
+
+## 2026-07-01 — Candidate finalizer reports gain an independent checker
+
+`check_browser_release_candidate_finalizer.py` now validates
+`browser_release_candidate_finalizer` reports after assembly and emits the
+schema-backed `browser_release_candidate_finalizer_check` report. Failed
+finalizer reports remain acceptable diagnostic evidence by default, while claim
+lanes can require `status=pass` with `--require-pass`. Passing reports must be
+checked with `--verify-files-root`; the checker verifies both emitted output
+hashes, re-runs the release-candidate release bundle checker on the emitted
+bundle, confirms the finalizer runtime frontier output matches the bundle's
+embedded `runtimeFrontierBundle`, compares the finalizer summary with the
+generated runtime frontier output, rejects malformed failure entries on failed
+reports, and rejects failure-only fields on passing reports.
+`run_blocking_gates.py` exposes this through
+`--with-browser-release-candidate-finalizer-gate` and
+`--browser-release-candidate-finalizer-require-pass`, and can forward a durable
+checker report path through `--browser-release-candidate-finalizer-check-out`.
+The Chromium release recipe now includes the finalizer check immediately after
+final bundle assembly, and `schema_gate.py` covers the checker report sample. Browser
+artifact identity coverage now also anchors the finalizer-check report status
+and checked finalizer status, and the release artifact bundle sample carries
+the refreshed identity-coverage policy hash. The checker-report schema now
+also encodes the pass/fail invariant: pass reports carry no failures, while
+fail reports carry at least one failure.
+The Dawn replacement readiness report now carries those browser
+release-candidate finalizer and finalizer-check summaries under the Chromium
+browser row's `frontierBundleEvidence.releaseCandidateEvidence`, so the
+top-level replacement rollup exposes the candidate-promotion gate state beside
+the browser runtime frontier blocker. The rollup also records whether the
+finalizer-check receipt's `finalizerStatus` matches the finalizer report status,
+and the Dawn replacement frontier manifest now points the Chromium release-build
+blocker and browser row at the finalizer and finalizer-check samples.
+
+## 2026-07-01 — Candidate finalizer binds staged provenance into release bundles
+
+`finalize_browser_release_candidate_bundle.py` now makes the release-candidate
+bundle assembly depend on a passing
+`browser_release_candidate_provenance_report` and emits a schema-backed
+`browser_release_candidate_finalizer` report at `--report-out`. The finalizer
+checks that the report status, product, platform, component paths, component
+hashes, and download URL still match the archive, archive manifest, public
+download receipt, proof surface, and browser launch receipt supplied to final
+assembly. Only after that preflight passes does it delegate to the
+runtime-frontier bootstrap path, write the generated frontier receipt,
+hash-bind it into the final release artifact bundle, and run release-candidate
+verification. The finalizer report now hash-binds both emitted outputs: the
+release artifact bundle and generated runtime frontier bundle. Focused coverage
+proves a synthetic candidate can produce a verified bundle and durable
+finalizer report, and that a failed provenance report stops before final bundle
+outputs are written. Browser artifact identity coverage now anchors the
+finalizer report status, phase, and failure list. The Chromium release recipe
+now treats this finalizer as the candidate-promotion entrypoint, with
+`build_browser_release_artifact_bundle.py` remaining the lower-level assembler.
+
+## 2026-07-01 — Candidate provenance staging rebuilds local proof artifacts
+
+`stage_browser_release_candidate_provenance.py` now consumes a candidate
+archive, archive manifest, already-produced public download receipt,
+proof-page capture, and proof-surface template, then emits the candidate
+proof-page receipt, rebuilt proof surface, proof-surface checker report,
+browser launch receipt, and candidate provenance preflight report. The stage
+reuses the existing proof-page, proof-surface, launch-receipt, and provenance
+validators, resolving template artifact inputs under `--verify-files-root`, so it
+does not weaken the public download requirement: the public download receipt
+must still come from the hosted archive GET builder. Focused coverage stages a
+synthetic candidate archive/public-download receipt and proves the resulting
+proof surface, proof-surface checker report, launch receipt, and provenance
+report pass. This turns the current diagnostic provenance drift into a
+repeatable post-download rebuild step before the final release bundle uses
+runtime-frontier bootstrap.
+
+## 2026-07-01 — Release-candidate provenance has a preflight gate
+
+`check_browser_release_candidate_provenance.py` now emits a schema-backed
+`browser_release_candidate_provenance_report` before final browser release
+bundle assembly. The preflight checks that the archive manifest, public
+download receipt, proof surface, proof-page receipt, and browser launch receipt
+all bind the same macOS arm64 release-candidate product/platform/provenance
+tuple, and that the proof-surface checker report passed with file verification
+and public URL enforcement against the same proof-surface path/hash. The
+blocking runner exposes it as
+`--with-browser-release-candidate-provenance-gate` and now requires
+`--browser-release-candidate-provenance-package-inputs`, while final promotion
+still requires the release artifact bundle and runtime frontier gates. The
+checked-in sample report names the current diagnostic-to-candidate drift explicitly:
+release archive manifest product, public download product, proof surface
+release provenance, proof-page receipt release provenance, and browser launch
+product.
+
+## 2026-07-01 — Release bundle builder bootstraps frontier receipts
+
+`build_browser_release_artifact_bundle.py` now has a two-pass
+`--bootstrap-runtime-frontier` path for release-candidate bundles. The builder
+can write a provisional bundle with a runtime-frontier placeholder, generate
+the frontier receipt against the intended final bundle path, bind the generated
+frontier SHA-256 into the final release bundle, and run final candidate
+verification. The regression fixture uses a structurally claimable browser
+claim report and proves the final bundle passes `require_release_candidate`
+after the generated frontier receipt is hash-bound. Final checker comparisons
+for runtime-frontier promotion receipts and runtime identity paths now resolve
+paths under the verification root, so absolute and root-relative artifact
+references cannot create false mismatches. The Chromium release recipe now uses
+that bootstrap path for final bundle production, and a candidate rehearsal
+against the checked-in diagnostic artifacts confirms that product/channel
+provenance must be rebuilt through the archive manifest, public download
+receipt, proof surface, and launch receipt rather than relabeled.
+
+## 2026-07-01 — Runtime frontier builder can bootstrap release candidates
+
+`check_browser_runtime_frontier_bundle.py` now checks release bundles with the
+runtime-frontier artifact shape required but without recursively loading the
+frontier receipt that it is constructing. The final release artifact bundle
+checker still loads and verifies the finalized `runtimeFrontierBundle` artifact
+for release-candidate audits. Focused coverage proves a synthetic
+release-candidate bundle can produce a claimable frontier while the final
+release checker still rejects the same bundle until the frontier artifact file
+exists and hash-binds correctly. The checked-in diagnostic sample remains
+blocked only because its release bundle is still diagnostic, not because the
+frontier builder cannot represent a candidate bundle.
+
+## 2026-07-01 — Chromium source checkout passes browser-runtime selectors
+
+The Chromium source-checkout sample now runs against the real
+`browser/chromium/src` tree with `requireRuntimeSelector=true` and reports
+`status=pass` with no missing required markers. The last stale blocker was the
+adapter-denylist source-field unit-test marker; the Chromium WebGPU decoder now
+exposes a production formatter for those denial details, and
+`webgpu_decoder_unittest.cc` verifies that the formatted log line carries the
+profile-denylisted reason, adapter-detail tag, vendor ID, device ID, and
+blocklist reason. The browser release artifact bundle now hash-binds that
+passing checkout report. The release-candidate audit now advances past the
+Chromium source-checkout requirement. The runtime identity sample is also
+bound to the release bundle's packaged browser wrapper, Doe runtime, Dawn
+fallback runtime, and embedded compiler hashes, so the candidate audit now
+remains blocked on diagnostic release status and runtime-frontier claimability.
+
+## 2026-07-01 — WebGPU backend uses IOSurface native import path
+
+Chromium mailbox association no longer routes every `BackendType::WebGPU`
+device through the Skia fallback. Non-CPU WebGPU devices now use
+`AssociateMailboxDawn`, and `IOSurfaceImageBacking::ProduceDawn` accepts the
+WebGPU backend alongside Metal for the IOSurface
+`SharedTextureMemoryIOSurfaceDescriptor` import path. The IOSurface Dawn
+representation carries its backend type so WebGPU begin-access avoids the
+Metal-only device lookup, and only Metal devices are stored in the
+Metal-device scheduled-future map. The Chromium source-checkout gate now proves
+the WebGPU mailbox route, IOSurface Dawn representation, and IOSurface handle
+import from those concrete source paths.
+
+## 2026-07-01 — Present mailbox path ends shared access explicitly
+
+`HandleDissociateMailboxForPresent` now calls a named
+`EndAccessForPresent()` hook before erasing the associated shared-image entry.
+The Dawn implementation resets the scoped Dawn access, so
+`DawnImageRepresentation::ScopedAccess` runs its `EndAccess()` path before the
+present clear decision moves on; the Skia fallback uses the same hook to keep
+its upload/destroy behavior idempotent. The Chromium source-checkout gate now
+requires that hook, the present-path call, and the map erase ordering instead
+of a placeholder marker. The checkout sample remains blocked on the IOSurface
+bridge/representation/handle and adapter-denylist unit-test source markers
+listed by the sample report.
+
+## 2026-07-01 — Chromium checkout gate proves Dawn runtime lifecycle
+
+The Chromium source-checkout runtime-selector gate now supports composite
+source markers and uses them for the Doe wire runtime instance and lifecycle
+checks. Those checks now require the real Dawn WebGPU backend owner path:
+`LoadDoeWireProcTable`, external runtime library opening, `mInnerInstance`
+creation through the loaded proc table, `wgpuInstanceRelease` proc loading, and
+the `Backend::~Backend()` release/nulling path in
+`third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp`. This retires the
+stale expectation that the runtime instance has to appear as a Chromium service
+wrapper token while still rejecting partial lifecycle matches. The checkout
+sample remains blocked on the IOSurface bridge/handle, present shared-texture
+end-access, and adapter-denylist unit-test source markers listed by the sample
+report.
+
+## 2026-06-30 — Chromium checkout gate follows Dawn WebGPU runtime loader
+
+The Dawn WebGPU backend now logs explicit Doe external-runtime failure reasons
+for library load failure, missing `wgpuGetProcAddress`, incomplete required
+proc-table entries, and null instance creation while keeping required external
+runtime selection fail-closed. The Chromium source-checkout runtime-selector
+gate now accepts those diagnostics, the `LoadDoeWireProcTable` loader, and the
+native shared texture/render/external-texture proc coverage from
+`third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp` instead of requiring
+duplicated strings in `gpu/command_buffer/service/webgpu_decoder_impl.cc`.
+The bound checkout sample remains blocked on the wire runtime instance and
+lifecycle test, IOSurface bridge/handle, present shared-texture end-access,
+and adapter-denylist unit-test markers listed by the sample report.
+
+## 2026-06-30 — Doe shared-buffer mailbox path fails closed
+
+The Chromium WebGPU service now rejects `AssociateMailboxForBuffer` for devices
+whose metadata reports the WebGPU/Doe backend, returning
+`error::kInvalidArguments` with the explicit
+`doe_shared_buffer_unsupported` reason instead of attempting the Dawn shared
+buffer representation path. The source-checkout runtime-selector gate now
+passes the shared-buffer unsupported and fail-closed markers while continuing
+to block on the remaining runtime loading, shared-image, render, external
+texture, and unit-test source markers listed by the checkout report.
+
+## 2026-06-30 — Release bundles bind Chromium source checkout diagnostics
+
+The browser release artifact bundle sample now hash-binds
+`examples/chromium-source-checkout-check.sample.json`, so the release evidence
+chain carries Chromium source-checkout state instead of omitting it until the
+release-candidate lane. Diagnostic bundle checks accept blocked checkout
+reports when they are structurally consistent; release-candidate checks still
+require `requireRuntimeSelector=true`, `status=pass`, and an empty
+`missingRequired` list. The Chromium WebGPU service now reports
+`unknown_selection_error` for forced-Doe no-adapter results and logs Doe
+adapter-denylist source fields (`profile_denylisted`,
+`adapter_denylist_detail`, `vendor_id`, and `blocklist_reason`) when a forced
+Doe adapter is denied. The source-checkout gate under
+`browser/chromium/scripts/env.sh` now passes those markers while continuing to
+block on the remaining runtime-selector, proc-surface, and shared-image source
+markers listed by the checkout report.
+
+## 2026-06-30 — Browser execution receipts require inline shader source
+
+The browser execution receipt schema now requires `sourceShader.source` and
+`sourceShader.sha256`, and the receipt builder requires `--source-shader
+<file>` instead of allowing a hash-only source identity. Optional
+`--source-shader-sha256` is treated as an assertion against the file bytes. This
+aligns the per-run schema with the published proof-surface policy: every
+claimable browser WebGPU receipt must preserve the shader source body, lowering
+path, backend, driver/device identity, output or frame hash, timing evidence,
+and receipt ID.
+
+## 2026-06-30 — Release candidates require packaged-browser launch receipts
+
+Browser release candidates now require a hash-bound
+`browserLaunchReceipt` artifact. The receipt contract binds the same product,
+platform, release archive, release archive manifest, proof surface, and
+packaged executable/app/runtime member paths as the release bundle, then records
+that the packaged browser was launched from the archive with Doe active, hidden
+fallback disabled, WebGPU available, the proof page loaded, a hosted gallery
+page loaded, a same-page Dawn/Doe comparison row loaded, and the proof,
+gallery, Dawn, and Doe receipt IDs observed. The release bundle checker loads
+that receipt under file verification and rejects release candidates when any
+of those identities drift from the proof surface. The producer helper now
+loads the proof surface before emission and rejects proof-page, gallery,
+comparison, backend, product, platform, archive, and archive-member drift while
+building `browser_release_launch_receipt` JSON from observed launch facts.
+Focused tests cover missing launch receipts, WebGPU-unavailable launches,
+proof backend drift, and comparison-row drift.
+
+## 2026-06-30 — Release archives require executable browser members
+
+The browser release archive packer now rejects a package whose declared browser
+binary lacks executable permissions before writing the zip. The release artifact
+bundle checker also rejects verified archives when
+`browserExecutableArchivePath` points at a non-executable zip member, so a
+release-candidate archive cannot satisfy the downloadable-browser gate with
+bytes that hash-match but cannot run. Regression coverage landed in both the
+packer tests and release-bundle checker tests.
+
+## 2026-06-30 — Release candidates bind Chromium source checkout evidence
+
+Browser release candidates now require a hash-bound
+`chromiumSourceCheckout` artifact in the release artifact bundle. The checker
+loads that report under file verification and rejects release-candidate bundles
+unless it is a `chromium_source_checkout_check` payload with `status=pass`,
+`requireRuntimeSelector=true`, and no missing required checks. The bundle
+builder accepts `--chromium-source-checkout`, and focused release-bundle tests
+cover missing, blocked, and runtime-selector-disabled checkout reports.
+
+## 2026-06-30 — Public receipt builders fail closed on identity
+
+Published proof pages now bind their `activeBackend` diagnostic value to the
+backend reported by a linked Doe execution receipt. The proof-surface builder
+rejects a proof-page receipt before manifest emission when the diagnostics name
+a backend that none of the linked Doe receipts used, and the proof-surface
+checker enforces the same rule under file verification. The checked-in proof
+page sample now reports `webgpu-doe`, matching the Doe execution receipt
+backend, rather than the generic `webgpu` label.
+
+The public download receipt builder now rejects missing receipt IDs,
+observation identity, release archive paths, release archive manifest hash,
+browser product identity, platform identity, and packaged executable/app/runtime
+member paths before emitting a receipt. The public gallery receipt builder now
+does the same for receipt IDs, observation identity, gallery artifact path,
+workload contract path, workload IDs, receipt IDs, and receipt artifact paths.
+Focused builder tests cover these direct entry points so schema-invalid public
+receipt JSON is stopped at the producer boundary.
+
+## 2026-06-30 — Release candidates bind proof runtime identity to shipped artifacts
+
+The browser release artifact bundle checker now loads the proof surface
+`runtimeIdentityPath` for release candidates and compares runtime identity
+artifact hashes back to the same shipped release artifacts. Either
+`provider.artifactIdentity` or `runtimeSelection.artifactIdentity` may carry the
+hashes, but `browserExecutableSha256`, `doeLibSha256`, and
+`dawnRuntimeSha256` must match the bundle `browserBinary`, `doeRuntime`, and
+`dawnFallbackRuntime` SHA-256 values. Candidate fixtures now stamp those hashes
+from the generated browser, Doe runtime, and Dawn fallback files, and the
+regression test corrupts the Doe runtime hash to prove the checker rejects a
+proof page that reports active Doe for different packaged bytes.
+
+The same release-candidate checker now compares proof-page diagnostics
+`compilerPath` against the bundle `shaderCompiler.path`. Candidate fixtures
+stamp the proof-page HTML and diagnostic receipt from the generated compiler
+artifact, and the regression test rewrites those linked proof artifacts while
+leaving the bundle compiler artifact unchanged to prove the mismatch is
+rejected.
+
+Published proof-surface checks now require linked browser execution receipts to
+carry inline `sourceShader.source` and `sourceShader.sha256`. The checked-in
+Dawn/Doe compute, rendering, tensor, shader-edge, and benchmark-trace receipt
+samples now include source text with matching source hashes, and the
+proof-surface sample passes the public URL/source-text gate. The checker also
+rejects receipts whose declared source hash does not match the inline source
+text.
+The proof-surface producer now enforces the same discipline before emitting a
+manifest: execution receipts must carry inline source, source hashes must match
+that source, and paired Dawn/Doe comparison receipts must share source shader
+identity before the builder declares `same_source_shader_identity`.
+The producer and checker now also require paired comparison receipts to share
+driver identity as well as device identity before accepting
+`same_device_identity`, so a Dawn-vs-Doe browser comparison cannot mask driver
+drift behind matching workload/source/output fields.
+The proof-surface producer now rejects comparison entries before manifest
+emission when paired receipts have the wrong Dawn/Doe runtime labels, workload
+identity drift, comparison-row workload drift, or command-coverage drift. That
+keeps `same_workload_id` and `exact_match` from being producer assertions over
+unchecked receipt pairs.
+It also rejects any linked execution receipt that is missing lowering path,
+backend, command evidence, output identity, timing phases, complete command
+coverage, or clean runtime selector/fallback state before hash-linking that
+receipt into the published proof surface.
+The proof-page receipt now has producer-side linkage too: every
+`recentReceiptIds` entry must be backed by one of the execution receipt
+payloads linked from the same proof page before the surface is emitted.
+The same receipt gate now rejects proof-page receipts that do not report the
+expected load type, loaded status, receipt ID, diagnostics object, release
+provenance object, and observation identity.
+The proof-page artifact itself is now checked by the producer for visible
+diagnostics, release provenance, recent receipt IDs, receipt payload links, and
+comparison evidence before it can back a published proof surface.
+Gallery page artifacts now get the same producer-side visibility check for
+category, workload contract path, workload IDs, receipt IDs, and receipt
+artifact links before they can be hash-linked into the proof surface.
+Public gallery receipts are also rejected by the producer when they do not
+report GET, status code 200, receipt ID, and observation identity.
+Comparison rows now get the same producer discipline: the runner
+`pageArtifactPath` must match one of the gallery artifacts emitted by the
+builder, and the comparison artifact must validate as a strict Dawn+Doe
+Chromium WebGPU smoke report with a valid hash chain before the surface is
+written.
+
+## 2026-06-30 — Release archive packer supports Linux package evidence
+
+The browser release archive packer now accepts generic `--package-dir` input
+while retaining `--app-dir` compatibility, and can emit deterministic Linux
+zip archives with the same schema-backed release archive manifest used by the
+macOS lane. Linux packages get a browser metadata JSON member when one is not
+already present; the release bundle checker reads that metadata from the zip
+and verifies product identity, platform tuple, browser executable member path,
+Doe runtime member path, and Dawn fallback runtime member path against the
+release bundle. The release-candidate gate remains macOS arm64 zip first, so
+Linux archive support is diagnostic evidence until the macOS release-candidate
+lane is complete.
+
+## 2026-06-30 — Public download receipts bind archive manifests
+
+Browser public download receipts now bind the release archive manifest path and
+SHA-256 in addition to the hosted URL, served archive hash, byte length,
+product identity, platform tuple, and packaged member paths. The public
+download receipt builder requires `--release-archive-manifest` and computes the
+manifest hash, the release-bundle checker rejects manifest path/hash drift
+between `publicDownloadReceipt` and `releaseArchiveManifest`, and the browser
+artifact identity coverage manifest treats those fields as part of the receipt
+identity. The checked-in proof page, proof-page receipt, published proof
+surface, and release artifact bundle samples were re-hashed through that
+evidence chain.
+
+## 2026-06-30 — Public gallery receipts bind workload and receipt identity
+
+Published browser gallery proof now binds workload IDs, receipt IDs, and
+receipt artifact paths across the hosted page receipt, proof-surface gallery
+row, linked execution receipt payloads, and visible gallery page content.
+`bench/tools/build_browser_public_gallery_receipt.py` now derives those fields
+from `--receipt-payload` execution receipts, public gallery receipt schemas
+require `workloadIds`, `receiptIds`, and `receiptArtifactPaths`, and
+`bench/tools/build_browser_published_proof_surface.py` derives gallery
+`workloadIds` from the linked execution receipts before checking the public
+receipt. The proof-surface checker rejects missing workload IDs, public receipt
+workload/receipt drift, and gallery rows whose declared workload IDs do not
+match the linked receipt payloads. The checked-in gallery samples now use
+category-specific Doe execution receipts for rendering, tensor, shader-edge,
+and benchmark-trace pages instead of reusing the compute receipt.
+
+## 2026-06-30 — Browser proof comparisons carry explicit policy evidence
+
+Published browser proof-surface comparisons now carry a schema-backed
+`comparisonPolicy` next to the same-page Dawn/Doe runner and paired execution
+receipts. The policy declares same workload ID, same source shader identity,
+same adapter/device identity, same timing scope, exact command coverage match,
+output hash/frame hash policy, and no hidden fallback. The proof-surface
+builder derives the policy from the paired receipt payloads, and the checker
+rejects missing policy fields or policy values that drift from the Dawn/Doe
+receipt payloads. The artifact identity coverage manifest now treats those
+policy fields as part of the published proof surface identity.
+
+Focused verification:
+
+- `python3 -m unittest bench.tests.test_browser_published_proof_surface bench.tests.test_browser_published_proof_surface_builder`
+- `python3 bench/tools/check_browser_published_proof_surface.py --surface examples/browser-published-proof-surface.sample.json --verify-files-root . --json`
+
+## 2026-06-30 — Browser release bundles bind downloadable archive identity
+
+The browser release artifact bundle now has concrete public-download and proof
+surface anchors: `releaseArchive`, `releaseArchiveManifest`,
+`browserProduct`, `platform`, and `proofSurface` identity.
+Release-candidate bundles must hash-bind the
+downloadable archive, name the browser product as Doe Browser or Fawn Doe,
+identify the OS/architecture/package format, name the executable, Doe runtime,
+and Dawn fallback runtime paths inside the archive, bind the archive manifest,
+bind macOS app metadata to the same product identity, and still bind the browser
+executable, Doe runtime, Dawn fallback runtime, shader compiler, proof surface,
+claim reports, promotion receipts, contracts, runtime frontier bundle receipt,
+and policies. The builder accepts
+`--release-archive`, `--release-archive-url`, `--platform-os`,
+`--platform-arch`, `--browser-binary-archive-path`, and
+`--dawn-fallback-runtime`; it also accepts
+`--release-archive-manifest`, `--browser-app-metadata-archive-path`,
+`--doe-runtime-archive-path`,
+`--dawn-fallback-runtime-archive-path`, `--public-download-receipt`,
+`--runtime-frontier-bundle`, `--product-id`, `--product-name`,
+`--product-version`, and `--product-channel`. The checker rejects release
+candidates that are not the initial macOS arm64 zip platform or that omit the
+archive, release archive manifest, public HTTPS archive download URL, public
+download receipt, browser product identity, platform identity, packaged app
+metadata/executable/runtime member paths, Dawn fallback runtime hash, proof
+surface hash, or runtime frontier bundle receipt. The release-bundle schema now mirrors that
+release-candidate structure instead of leaving the downloadable archive and
+proof artifacts as checker-only requirements. Builder verification now also
+checks the runtime frontier receipt against the intended `--out` bundle path.
+Public URL validation is deterministic and does not fetch the network, but it
+does reject localhost, single-label hosts, non-global IP literals, and
+reserved/test suffixes such as `.local`, `.localhost`, `.test`, `.example`,
+and `.invalid`, plus the reserved `example.com` family.
+`bench/tools/build_browser_public_download_receipt.py` now performs the hosted
+archive GET and emits the schema-backed public download receipt with served
+content hash, byte length, product identity, platform tuple, archive path, and
+packaged member paths; it can also compare the served bytes against the local
+release archive before writing the receipt.
+The browser archive packer now creates deterministic macOS zip archives from a
+`.app` bundle, injects explicit Doe and Dawn runtime members, and emits a
+schema-backed release archive manifest with archive hash, product/platform
+identity, required member paths, member hashes, byte lengths, and
+executable-bit state. It rejects mismatched product identity before packaging,
+so `doe-browser` maps to `Doe Browser` and `fawn-doe` maps to `Fawn Doe`.
+The release bundle checker loads that manifest and verifies it against the
+release bundle identity plus the actual zip member metadata under
+`--verify-files-root`.
+
+Runtime frontier receipts are now content-bound back to the release bundle:
+the release checker loads the referenced frontier receipt, requires pass
+status, compares the summarized release path, `bundleId`, and `releaseStatus`,
+requires the frontier claim-promotion receipt path to match the release bundle
+`promotionReceipts`, requires the frontier runtime identity path to match the
+proof surface `runtimeIdentityPath`, and requires verified release artifact
+files, passing component summaries, promotion status `promotable`, and
+`claimabilityStatus=claimable` with no frontier claim blockers or failures for
+release candidates. A hash-bound frontier receipt for a different release
+bundle, promotion receipt, runtime identity, blocked/failed frontier, or
+non-promotable component no longer satisfies the release-candidate evidence
+surface.
+The runtime frontier composer now enforces the same input binding before it
+emits a pass receipt: the supplied promotion receipt must be bundled by the
+release artifact bundle, and the supplied runtime identity must match the proof
+surface `runtimeIdentityPath`.
+The runtime frontier schema also rejects `claimabilityStatus=claimable` receipts
+that carry blockers, failures, or non-passing component summaries.
+
+Release-candidate public download receipts must bind a successful GET of the
+hosted archive URL to the same SHA-256 as `releaseArchive.sha256`, the same
+archive path, browser product identity, platform tuple, executable archive
+member path, app metadata member path, Doe runtime archive member path, Dawn
+fallback runtime archive member path, and byte length as the verified local
+archive. A hosted URL without this matching receipt no longer satisfies the
+public-download gate.
+
+Release-candidate gallery pages now follow the same served-byte discipline:
+each hosted gallery URL must link a `browser_public_gallery_receipt` artifact
+whose successful GET result matches the hash-bound gallery page artifact,
+content length, category, URL, and workload contract path. A gallery URL alone
+no longer satisfies the public proof-surface gate. The proof-surface schema now
+requires every required gallery category, hosted gallery URLs, and public
+gallery receipt artifacts for every gallery row; schema targets validate the
+proof surface plus each public gallery receipt sample, public URL fields must
+be HTTPS and reject obvious local or reserved hosts, and identity coverage
+anchors each gallery URL plus receipt hash.
+`bench/tools/build_browser_public_gallery_receipt.py` now performs the hosted
+gallery GET and emits the schema-backed public gallery receipt with served
+content hash, byte length, category, URL, local gallery artifact path, workload
+contract path, and observation time; it can compare hosted bytes against the
+local gallery artifact before writing the receipt.
+
+Release-candidate proof pages also require a `browser_proof_page_receipt`
+artifact for the local diagnostics page. The receipt must prove the internal
+diagnostics URL loaded bytes matching the hash-bound proof page artifact,
+content length, runtime identity path, active-Doe diagnostics fields, release
+provenance, and recent receipt IDs. The proof page and proof-page receipt
+schemas require `activeRuntime=doe` and `fallbackPolicyState=hidden_fallback_disabled`.
+`bench/tools/build_browser_proof_page_receipt.py` now emits that receipt from
+the captured diagnostics page artifact, active-Doe diagnostics fields, release
+archive, archive manifest, public download receipt, product/platform identity,
+packaged member paths, runtime identity path, and recent receipt IDs.
+The proof page must visibly show the browser product, platform, archive hash,
+hosted download URL, release archive manifest, public download receipt, and packaged
+executable/app/runtime member paths. A local proof-page HTML fixture without
+this matching receipt no longer satisfies the proof-page gate.
+The release-bundle checker now also compares that proof-page release provenance
+against the enclosing release bundle, so a proof surface for one downloadable
+browser archive cannot satisfy a different release bundle.
+
+When file verification is enabled, release archives declared as
+`packageFormat=zip` must also pass zip integrity checks, and the declared
+executable member must hash-match `browserBinary.sha256`. This prevents a
+release-candidate bundle from satisfying the public-download gate with a hashed
+non-zip payload or a zip that does not contain the declared browser executable.
+
+The default release-bundle contract set now includes the published browser
+release contract, and the Chromium fork-maintenance policy now requires release
+archive hashes and platform identity. The checked-in sample bundle remains
+diagnostic, but verifies against the repo-local sample archive fixture with
+`--verify-files-root`.
+
+The new published proof-surface manifest checker verifies the local diagnostics
+proof page artifact, the checked capture policy gate, active Doe runtime
+identity, required gallery categories, linked execution receipt payloads, and
+paired Dawn-vs-Doe comparison receipts. With file verification enabled, the
+proof page artifact must show the declared diagnostics, receipt links, each
+comparison ID, workload ID, same-page runner metadata, comparison artifact, and
+both Dawn/Doe receipt payload links, and the declared runner gallery page must
+expose those comparison links together on the same page. Each gallery page
+artifact must also show its category, workload contract path, receipt IDs, and
+receipt artifact links. Execution receipts must carry the receipt ID, selected
+runtime, source shader identity, lowering path, backend, driver/device identity, command graph
+or flight-recorder identity, command coverage, output hash or frame hash,
+runtime selector state, fallback state, and timing class. The schema now binds
+top-level runtime identity to `runtimeSelectorState.selectedRuntime`, and the
+checker rejects selector fallback drift, incomplete command coverage, or
+dispatch counts that exceed the declared command count. The checker also
+compares paired Dawn/Doe receipt payloads for matching workload, source,
+output, timing, device, and command coverage identity, and it validates linked
+browser smoke comparison artifacts through the existing strict Dawn/Doe
+smoke-report gate. The browser release bundle checker delegates to that
+proof-surface checker when file verification is enabled and requires hosted
+HTTPS gallery page URLs for release candidates, so a release candidate cannot
+pass with a dangling proof page, gallery page, receipt payload, comparison
+receipt reference, missing public gallery URL, reserved/test gallery URL,
+invalid capture policy, non-Doe runtime identity, incomplete execution receipt,
+page content drift, mismatched comparison evidence, a split comparison gallery,
+or a comparison artifact that does not prove both Dawn and Doe modes.
+`bench/tools/build_browser_execution_receipt.py` now builds those per-run
+browser execution receipts from smoke-report runtime-selection evidence plus
+explicit shader identity, output/frame hash, command coverage, and timing
+inputs, failing closed on runtime selector drift, hidden fallback, fallback
+reason codes, or impossible command coverage before proof-surface assembly.
+`bench/tools/build_browser_published_proof_surface.py` now assembles that
+manifest from concrete proof-page, proof-page receipt, execution receipt,
+gallery receipt, and paired comparison artifacts, recomputing artifact hashes
+and rejecting stale proof-page or gallery public receipts before the release
+bundle consumes the proof surface.
+
+Tracked sharding follow-up: owner `browser-proof-surface`; split
+`bench/tools/check_browser_published_proof_surface.py` into proof-page receipt,
+gallery receipt, and comparison receipt checker modules. The current checker
+exceeds the Python tooling line cap while the published-browser proof surface
+is still being hardened.
+
+Tracked sharding follow-up: owner `browser-release-surface`; split
+`bench/tools/check_browser_release_artifact_bundle.py` into release archive,
+proof/runtime frontier, and promotion/policy checker modules; split
+`bench/tests/test_browser_release_artifact_bundle.py` into archive, proof
+surface, runtime frontier, and builder fixture test modules. The archive
+manifest hook now pushes both legacy files past the Python tooling line cap,
+with new manifest-specific code already isolated in dedicated modules.
+Also split `bench/tests/test_browser_runtime_frontier_bundle.py` into sample,
+release-fixture, and claimability component test modules; the release manifest
+fixture pushes that test file past the Python tooling line cap.
+
+Touched:
+
+- `bench/tools/build_browser_release_artifact_bundle.py`
+- `bench/tools/_public_url.py`
+- `bench/tools/check_browser_capture_policy.py`
+- `bench/tools/check_browser_release_artifact_bundle.py`
+- `bench/tools/check_browser_published_proof_surface.py`
+- `bench/tools/browser_release_archive_manifest.py`
+- `bench/tools/check_chromium_fork_maintenance_policy.py`
+- `bench/tests/test_package_browser_release_archive.py`
+- `bench/tests/test_browser_release_archive_manifest_binding.py`
+- `bench/tests/test_browser_published_proof_surface.py`
+- `bench/tests/test_browser_public_url_schemas.py`
+- `bench/tests/test_browser_release_artifact_bundle.py`
+- `bench/tests/test_browser_runtime_frontier_bundle.py`
+- `bench/tests/test_chromium_fork_maintenance_policy.py`
+- `browser/chromium/README.md`
+- `browser/chromium/scripts/package-browser-release-archive.py`
+- `browser/chromium/contracts/browser-published-release.contract.md`
+- `browser/chromium/plan.md`
+- `bench/README.md`
+- `config/browser-capture-policy.json`
+- `config/browser-capture-policy.schema.json`
+- `config/browser-execution-receipt.schema.json`
+- `config/browser-proof-page-receipt.schema.json`
+- `config/browser-release-archive-manifest.schema.json`
+- `config/browser-public-gallery-receipt.schema.json`
+- `config/browser-published-proof-surface.schema.json`
+- `config/browser-public-download-receipt.schema.json`
+- `config/browser-release-artifact-bundle.schema.json`
+- `config/browser-artifact-identity-coverage.json`
+- `config/browser-artifact-identity-coverage.schema.json`
+- `config/chromium-fork-maintenance-policy.json`
+- `config/chromium-fork-maintenance-policy.schema.json`
+- `config/chromium-patch-manifest.json`
+- `config/schema-targets.json`
+- `docs/chromium-webgpu-task-list.md`
+- `examples/browser-release-archive-manifest.sample.json`
+- `examples/browser-release-artifact-bundle.sample.json`
+- `examples/browser-proof-page-receipt.sample.json`
+- `examples/browser-public-download-receipt.sample.json`
+- `examples/browser-public-gallery-receipt.sample.json`
+- `examples/browser-published-proof-surface.sample.json`
+- `examples/browser-proof-page.sample.html`
+- `examples/browser-gallery-compute.sample.html`
+- `examples/browser-gallery-rendering.sample.html`
+- `examples/browser-gallery-tensor.sample.html`
+- `examples/browser-gallery-shader-edge.sample.html`
+- `examples/browser-gallery-benchmark-trace.sample.html`
+- `examples/browser-dawn-execution-receipt.sample.json`
+- `examples/browser-doe-execution-receipt.sample.json`
+- `examples/browser-release-archive.sample.zip`
+- `docs/status/runtime-backends-and-bench.md`
+
+Verified:
+
+- `python3 -m zipfile -t examples/browser-release-archive.sample.zip`
+- `python3 -m compileall -q bench/tools/_public_url.py bench/tools/check_browser_published_proof_surface.py bench/tools/check_browser_capture_policy.py bench/tools/build_browser_release_artifact_bundle.py bench/tools/check_browser_release_artifact_bundle.py bench/tools/browser_release_archive_manifest.py bench/tests/test_browser_published_proof_surface.py bench/tests/test_browser_release_artifact_bundle.py bench/tests/test_browser_release_archive_manifest_binding.py bench/tests/test_browser_runtime_frontier_bundle.py`
+- `python3 bench/tools/check_browser_capture_policy.py --policy config/browser-capture-policy.json --json`
+- `python3 bench/tools/check_browser_published_proof_surface.py --surface examples/browser-published-proof-surface.sample.json --verify-files-root . --json`
+- `python3 browser/chromium/scripts/check-browser-smoke-report.py --smoke-report examples/browser-smoke-report.sample.json --json`
+- `python3 bench/tools/check_browser_release_artifact_bundle.py --bundle examples/browser-release-artifact-bundle.sample.json --verify-files-root . --json`
+- `python3 bench/tools/check_browser_artifact_identity_coverage.py --coverage config/browser-artifact-identity-coverage.json --root . --json`
+- `python3 bench/tools/check_chromium_fork_maintenance_policy.py --policy config/chromium-fork-maintenance-policy.json --root . --json`
+- `python3 bench/tools/check_chromium_patch_manifest.py --manifest config/chromium-patch-manifest.json --policy config/chromium-fork-maintenance-policy.json --root . --json`
+- `python3 bench/tools/check_browser_runtime_frontier_bundle.py --runtime-identity examples/browser-runtime-identity.selector.sample.json --claim-promotion-receipt examples/browser-claim-promotion-receipt.sample.json --release-artifact-bundle examples/browser-release-artifact-bundle.sample.json --verify-files-root . --out /tmp/browser-runtime-frontier-bundle.new.json`
+- `python3 browser/chromium/scripts/check-browser-milestones.py`
+- `python3 -m unittest bench.tests.test_browser_published_proof_surface bench.tests.test_browser_release_artifact_bundle bench.tests.test_browser_runtime_frontier_bundle bench.tests.test_chromium_fork_maintenance_policy`
+- `python3 -m unittest bench.tests.test_browser_public_url_schemas`
+- `python3 -m unittest bench.tests.test_package_browser_release_archive`
+- `python3 -m unittest bench.tests.test_browser_release_archive_manifest_binding`
+- `env PYTHONPATH=. python3 -c "from pathlib import Path; import tempfile; from bench.tests import test_browser_release_artifact_bundle as t; funcs=[t.test_browser_release_artifact_bundle_candidate_requires_public_download_receipt,t.test_browser_release_artifact_bundle_candidate_rejects_public_download_hash_mismatch,t.test_browser_release_artifact_bundle_candidate_rejects_failed_public_download,t.test_browser_release_artifact_bundle_builder_accepts_verified_candidate]; [func(Path(tempfile.mkdtemp())) for func in funcs]; print('selected release bundle tests passed')"`
+- `python3 bench/gates/schema_gate.py`
+- `git diff --check`
+- `git -C browser/chromium/src/third_party/dawn diff --check`
+
+## 2026-06-30 — Published browser release bar is explicit
+
+The Chromium browser lane now names the credible public proof artifact: a
+downloadable Chromium-family browser build with Doe active in the WebGPU path,
+per-run source-preserving receipts, Dawn-vs-Doe comparison mode, hosted proof
+gallery pages, release zips with SHA-256, and a local proof page such as
+`about:doe`. The requirement is captured in the new draft published-release
+contract and linked from the browser README, acceptance plan, and canonical
+Chromium WebGPU task list.
+
+This does not promote any browser output to claimable. Browser evidence remains
+diagnostic until the published release contract, comparison gallery, proof page,
+and release artifact bundle all pass their gates.
+
+Touched:
+
+- `browser/chromium/contracts/browser-published-release.contract.md`
+- `browser/chromium/contracts/README.md`
+- `browser/chromium/README.md`
+- `browser/chromium/plan.md`
+- `docs/chromium-webgpu-task-list.md`
+- `docs/status/runtime-backends-and-bench.md`
+
+Verified:
+
+- `python3 browser/chromium/scripts/check-browser-milestones.py`
+- `python3 bench/gates/schema_gate.py`
+- `git diff --check`
+
+## 2026-06-30 — Forced-Doe browser smoke clears external texture probes
+
+The forced-Doe Chromium smoke now preserves the browser external-copy path and
+creates external textures without crashing the GPU process. The prior
+external-texture GPU-process crash was narrowed with a GDB GPU-process capture,
+then fixed in the WebGPU-on-WebGPU external texture wrapper by treating the
+single-plane YUV conversion matrix as optional, matching Dawn's base external
+texture parameter path. The wrapper also now validates plane inner handles and
+returns an explicit creation error if the Doe layer returns no external texture
+handle.
+
+The latest GPU-process debug capture no longer reports the render-bundle
+encoder double-free that appeared in the previous browser-smoke run.
+
+New evidence:
+
+- `browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/dawn-vs-doe.browser.playwright-smoke.doe-external-yuv-default.json`
+- `browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/dawn-vs-doe.browser.playwright-smoke.both-external-yuv-default.json`
+- `browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/browser-media-path-probe.doe-both-external-yuv-default.json`
+- `browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/chrome-doe-external-yuv-default.log`
+- `browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/gpu-process-gdb-external-noassert.log`
+
+The browser lane remains diagnostic until the published release contract,
+comparison gallery, proof page, and release artifact bundle all pass their
+gates.
+
+Touched:
+
+- `browser/chromium/src/third_party/dawn/src/dawn/native/webgpu/ExternalTextureWGPU.cpp`
+- `browser/chromium/src/third_party/dawn/src/dawn/native/webgpu/ExternalTextureWGPU.h`
+- `docs/status/runtime-backends-and-bench.md`
+
+Verified:
+
+- `zig fmt runtime/zig/src/render_bundle.zig`
+- `zig build dropin-full`
+- `third_party/depot_tools/clang-format -i third_party/dawn/src/dawn/native/webgpu/ExternalTextureWGPU.cpp third_party/dawn/src/dawn/native/webgpu/ExternalTextureWGPU.h`
+- `git diff --check`
+- `git -C browser/chromium/src/third_party/dawn diff --check`
+- `ninja -C browser/chromium/src/out/fawn_release headless_shell`
+- `env CHROME_LOG_FILE=/home/x/deco/doe/browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/chrome-doe-external-yuv-default.log node browser/chromium/scripts/webgpu-playwright-smoke.mjs --mode doe --chrome /home/x/deco/doe/browser/chromium/src/out/fawn_release/headless_shell --doe-lib /home/x/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.so --runtime-selector-policy /home/x/deco/doe/config/browser-runtime-selector-policy.json --out /home/x/deco/doe/browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/dawn-vs-doe.browser.playwright-smoke.doe-external-yuv-default.json --chrome-arg --enable-logging --chrome-arg --v=1 --chrome-arg '--vmodule=*webgpu*=2,*dawn*=2,*gpu*=1'`
+- `env CHROME_LOG_FILE=/home/x/deco/doe/browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/chrome-both-external-yuv-default.log ./browser/chromium/scripts/run-smoke.sh --mode both --strict --runtime-selector-policy /home/x/deco/doe/config/browser-runtime-selector-policy.json --out /home/x/deco/doe/browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/dawn-vs-doe.browser.playwright-smoke.both-external-yuv-default.json --chrome /home/x/deco/doe/browser/chromium/src/out/fawn_release/headless_shell --doe-lib /home/x/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.so`
+- `python3 browser/chromium/scripts/check-browser-smoke-report.py --smoke-report browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/dawn-vs-doe.browser.playwright-smoke.both-external-yuv-default.json --json`
+- `python3 browser/chromium/scripts/build-browser-media-path-probe.py --report browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/dawn-vs-doe.browser.playwright-smoke.both-external-yuv-default.json --mode doe --out browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/browser-media-path-probe.doe-both-external-yuv-default.json`
+- `python3 browser/chromium/scripts/check-browser-media-path-probe.py --probe browser/chromium/artifacts/current-smoke-headless-wgpu-browser-copy-hook/browser-media-path-probe.doe-both-external-yuv-default.json --capture-policy-root . --runtime-identity-root . --json`
+
 ## 2026-06-30 — Browser smoke preserves media blocker evidence
 
 The Chromium WebGPU smoke harness now records per-source

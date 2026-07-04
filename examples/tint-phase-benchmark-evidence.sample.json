@@ -10,25 +10,21 @@
     {
       "target": "spirv",
       "rowCount": 1,
-      "tintOkRows": 1,
-      "phaseBenchmarkCoveredRows": 1,
-      "shaderIds": ["sample-compute-copy"]
+      "tintOkRows": 0,
+      "phaseBenchmarkCoveredRows": 0,
+      "shaderIds": ["webgpu-prefix-sum"]
     }
   ],
   "rows": [
     {
-      "shaderId": "sample-compute-copy",
+      "shaderId": "webgpu-prefix-sum",
       "target": "spirv",
-      "tintStatus": "ok",
-      "phaseBenchmarkStatus": "covered",
-      "exactPhaseStatus": "missing",
-      "phaseBenchmarkTimingsNs": {
-        "parseWgsl": 10,
-        "validateIr": 20,
-        "generateBackend": 30
-      },
+      "tintStatus": "failed",
+      "phaseBenchmarkStatus": "not_applicable",
+      "exactPhaseStatus": "not_applicable",
+      "phaseBenchmarkTimingsNs": {},
       "missingPhaseBenchmarkScopes": [],
-      "missingExactPhases": ["parse", "sema", "lower", "emit"]
+      "missingExactPhases": []
     }
   ],
   "failures": [],
@@ -36,12 +32,12 @@
     "targetCount": 1,
     "coveredTargetCount": 1,
     "rowCount": 1,
-    "tintOkRows": 1,
-    "phaseBenchmarkCoveredRows": 1,
+    "tintOkRows": 0,
+    "phaseBenchmarkCoveredRows": 0,
     "phaseBenchmarkMissingRows": 0,
     "exactPhaseCompleteRows": 0,
-    "exactPhaseMissingRows": 1,
-    "notApplicableRows": 0,
+    "exactPhaseMissingRows": 0,
+    "notApplicableRows": 1,
     "failureCount": 0
   }
 }

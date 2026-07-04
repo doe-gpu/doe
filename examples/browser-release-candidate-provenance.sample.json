@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_release_candidate_provenance_report",
+  "status": "fail",
+  "releaseStatus": "release_candidate",
+  "browserProduct": {
+    "productId": "fawn-doe",
+    "displayName": "Fawn Doe",
+    "version": "0.0.0-sample",
+    "channel": "diagnostic"
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "packageFormat": "zip"
+  },
+  "expectedProvenance": {
+    "browserProduct": {
+      "productId": "fawn-doe",
+      "displayName": "Fawn Doe",
+      "version": "0.0.0-sample",
+      "channel": "diagnostic"
+    },
+    "platform": {
+      "os": "linux",
+      "arch": "x64",
+      "packageFormat": "zip"
+    },
+    "releaseArchive": {
+      "path": "examples/browser-release-archive.sample.zip",
+      "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+      "kind": "browser_release_archive",
+      "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip"
+    },
+    "releaseArchiveManifest": {
+      "path": "examples/browser-release-archive-manifest.sample.json",
+      "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+      "kind": "browser_release_archive_manifest"
+    },
+    "publicDownloadReceipt": {
+      "path": "examples/browser-public-download-receipt.sample.json",
+      "sha256": "fbb04fddc5e8f2250c577eddc93a8b5299af292ed923346b24f580f3f942723c",
+      "kind": "browser_public_download_receipt"
+    },
+    "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+    "browserAppMetadataArchivePath": "Fawn-Doe-linux-x64/browser-product.json",
+    "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+    "dawnFallbackRuntimeArchivePath": "Fawn-Doe-linux-x64/libdawn_native.so"
+  },
+  "componentArtifacts": {
+    "releaseArchive": {
+      "path": "examples/browser-release-archive.sample.zip",
+      "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+      "kind": "browser_release_archive",
+      "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip"
+    },
+    "releaseArchiveManifest": {
+      "path": "examples/browser-release-archive-manifest.sample.json",
+      "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+      "kind": "browser_release_archive_manifest"
+    },
+    "publicDownloadReceipt": {
+      "path": "examples/browser-public-download-receipt.sample.json",
+      "sha256": "fbb04fddc5e8f2250c577eddc93a8b5299af292ed923346b24f580f3f942723c",
+      "kind": "browser_public_download_receipt"
+    },
+    "proofSurface": {
+      "path": "examples/browser-published-proof-surface.sample.json",
+      "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+      "kind": "browser_published_proof_surface"
+    },
+    "proofSurfaceCheck": {
+      "path": "examples/browser-published-proof-surface-check.sample.json",
+      "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1",
+      "kind": "browser_published_proof_surface_check"
+    },
+    "browserLaunchReceipt": {
+      "path": "examples/browser-release-launch-receipt.sample.json",
+      "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b",
+      "kind": "browser_release_launch_receipt"
+    },
+    "packageInputs": {
+      "path": "examples/browser-release-package-inputs-check.sample.json",
+      "sha256": "9346d49694f6bf786cc6235d933a5a2fa1f93b52ab8029cd76699cff9636f4b4",
+      "kind": "browser_release_package_inputs_check"
+    }
+  },
+  "failures": [
+    {
+      "code": "package_inputs_not_release_candidate_eligible",
+      "path": "packageInputs.releaseCandidateEligible",
+      "message": "package inputs report must be release-candidate eligible"
+    },
+    {
+      "code": "package_inputs_not_release_candidate_evidence",
+      "path": "packageInputs.evidenceMode",
+      "message": "package inputs evidenceMode must be release_candidate"
+    },
+    {
+      "code": "package_inputs_release_candidate_blockers_present",
+      "path": "packageInputs.releaseCandidateBlockers",
+      "message": "package inputs report must carry no release-candidate blockers"
+    },
+    {
+      "code": "candidate_product_channel_required",
+      "path": "browserProduct.channel",
+      "message": "release-candidate provenance must use browserProduct.channel=release_candidate"
+    },
+    {
+      "code": "candidate_platform_not_macos_arm64",
+      "path": "platform",
+      "message": "initial release-candidate provenance must target macOS arm64 zip"
+    }
+  ],
+  "summary": {
+    "failureCount": 5,
+    "componentCount": 7
+  }
+}

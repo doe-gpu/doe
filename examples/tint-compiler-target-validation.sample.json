@@ -19,7 +19,7 @@
       "validatedRows": 0,
       "diagnosticRows": 1,
       "shaderIds": [
-        "sample-compute-copy"
+        "webgpu-prefix-sum"
       ]
     }
   ],
@@ -27,13 +27,13 @@
     {
       "code": "tint_result_not_ok",
       "path": "evidence[examples/tint-compiler-evidence.sample.json].rows[0].tint.status",
-      "message": "Tint compiler result is not ok: sample_missing_tint_run"
+      "message": "Tint compiler result is not ok: sample_missing_tint_run: sample Tint run was not executed"
     }
   ],
   "claimBlockerSummary": [
     {
       "code": "tint_result_not_ok",
-      "message": "Tint compiler result is not ok: sample_missing_tint_run",
+      "message": "Tint compiler result is not ok: sample_missing_tint_run: sample Tint run was not executed",
       "count": 1
     }
   ],
@@ -43,7 +43,7 @@
       "claimBlockerSummary": [
         {
           "code": "tint_result_not_ok",
-          "message": "Tint compiler result is not ok: sample_missing_tint_run",
+          "message": "Tint compiler result is not ok: sample_missing_tint_run: sample Tint run was not executed",
           "count": 1
         }
       ]

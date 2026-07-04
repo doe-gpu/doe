@@ -185,32 +185,43 @@ class BrowserLayeredScoreTests(unittest.TestCase):
             score["methodology"]["adapterRequest"]["powerPreference"],
             "high-performance",
         )
-        self.assertAlmostEqual(score["overall"]["score"], 200.0)
+        self.assertAlmostEqual(score["overall"]["score"], 33.333333333333336)
+        self.assertAlmostEqual(score["overall"]["legacyRatioScore"], 200.0)
         self.assertAlmostEqual(score["overall"]["baselineScore"], 33.333333333333336)
         self.assertAlmostEqual(score["overall"]["comparisonScore"], 66.66666666666667)
-        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], 100.0)
+        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], -100.0)
         self.assertEqual(score["overall"]["rowCount"], 3)
-        self.assertAlmostEqual(score["categoryBalancedOverall"]["score"], 200.0)
+        self.assertAlmostEqual(score["categoryBalancedOverall"]["score"], 33.333333333333336)
+        self.assertAlmostEqual(score["categoryBalancedOverall"]["legacyRatioScore"], 200.0)
         self.assertAlmostEqual(score["categoryBalancedOverall"]["baselineScore"], 33.333333333333336)
         self.assertAlmostEqual(score["categoryBalancedOverall"]["comparisonScore"], 66.66666666666667)
-        self.assertAlmostEqual(score["categoryBalancedOverall"]["comparisonDeltaPercent"], 100.0)
+        self.assertAlmostEqual(score["categoryBalancedOverall"]["comparisonDeltaPercent"], -100.0)
         self.assertEqual(score["categoryBalancedOverall"]["categoryCount"], 3)
-        self.assertEqual(score["bottlenecks"]["slowerCategoryCount"], 0)
-        self.assertEqual(score["bottlenecks"]["slowerRowCount"], 0)
+        self.assertEqual(score["bottlenecks"]["slowerCategoryCount"], 3)
+        self.assertEqual(score["bottlenecks"]["slowerRowCount"], 3)
         self.assertEqual(score["bottlenecks"]["slowerPhaseCount"], 0)
-        self.assertEqual(score["bottlenecks"]["worstCategories"], [])
-        self.assertEqual(score["bottlenecks"]["worstRows"], [])
+        self.assertEqual(
+            [row["category"] for row in score["bottlenecks"]["worstCategories"]],
+            ["compute", "queue", "visual"],
+        )
+        self.assertEqual(
+            [row["rowId"] for row in score["bottlenecks"]["worstRows"]],
+            ["compute_dispatch", "queue_submit_burst", "fawn_visual_particle_trails"],
+        )
         self.assertEqual(score["bottlenecks"]["worstPhases"], [])
         categories = {row["category"]: row for row in score["categories"]}
-        self.assertEqual(categories["compute"]["score"], 200.0)
-        self.assertEqual(categories["queue"]["score"], 200.0)
-        self.assertEqual(categories["visual"]["score"], 200.0)
+        self.assertEqual(categories["compute"]["score"], 33.333333333333336)
+        self.assertEqual(categories["compute"]["legacyRatioScore"], 200.0)
+        self.assertEqual(categories["queue"]["score"], 33.333333333333336)
+        self.assertEqual(categories["queue"]["legacyRatioScore"], 200.0)
+        self.assertEqual(categories["visual"]["score"], 33.333333333333336)
+        self.assertEqual(categories["visual"]["legacyRatioScore"], 200.0)
         visual_row = next(row for row in score["rows"] if row["category"] == "visual")
         self.assertEqual(visual_row["resourcePath"], "browser/chromium/resources/fawn-heavy-particles.html")
         self.assertEqual(visual_row["resourceSha256"], HASH_A)
         self.assertAlmostEqual(visual_row["baselineScore"], 33.333333333333336)
         self.assertAlmostEqual(visual_row["comparisonScore"], 66.66666666666667)
-        self.assertAlmostEqual(visual_row["comparisonDeltaPercent"], 100.0)
+        self.assertAlmostEqual(visual_row["comparisonDeltaPercent"], -100.0)
         self.assertEqual(score["excludedRows"][0]["rowId"], "render_triangle")
         self.assertEqual(score["workloadIdentity"]["kind"], "browser_layered_superset")
         self.assertEqual(score["workloadFilter"], {"kind": "none", "categories": []})
@@ -266,9 +277,11 @@ class BrowserLayeredScoreTests(unittest.TestCase):
             score["overall"]["score"],
             score["categoryBalancedOverall"]["score"],
         )
-        self.assertAlmostEqual(score["overall"]["score"], 125.99210498948732)
-        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], 25.99210498948732)
-        self.assertAlmostEqual(score["categoryBalancedOverall"]["score"], 100.0)
+        self.assertAlmostEqual(score["overall"]["score"], 44.24933340244421)
+        self.assertAlmostEqual(score["overall"]["legacyRatioScore"], 125.99210498948732)
+        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], -25.99210498948732)
+        self.assertAlmostEqual(score["categoryBalancedOverall"]["score"], 50.0)
+        self.assertAlmostEqual(score["categoryBalancedOverall"]["legacyRatioScore"], 100.0)
         self.assertAlmostEqual(score["categoryBalancedOverall"]["baselineScore"], 50.0)
         self.assertAlmostEqual(score["categoryBalancedOverall"]["comparisonScore"], 50.0)
         self.assertAlmostEqual(score["categoryBalancedOverall"]["comparisonDeltaPercent"], 0.0)
@@ -324,27 +337,26 @@ class BrowserLayeredScoreTests(unittest.TestCase):
                 report_path=report_path,
                 baseline_mode="dawn",
                 comparison_mode="doe",
-            )
+        )
 
         bottlenecks = score["bottlenecks"]
-        self.assertEqual(bottlenecks["slowerCategoryCount"], 2)
-        self.assertEqual(bottlenecks["slowerRowCount"], 2)
-        self.assertEqual(bottlenecks["slowerPhaseCount"], 2)
+        self.assertEqual(bottlenecks["slowerCategoryCount"], 1)
+        self.assertEqual(bottlenecks["slowerRowCount"], 1)
+        self.assertEqual(bottlenecks["slowerPhaseCount"], 0)
         self.assertEqual(
             [row["category"] for row in bottlenecks["worstCategories"]],
-            ["texture", "queue"],
+            ["compute"],
         )
         self.assertEqual(
             [row["rowId"] for row in bottlenecks["worstRows"]],
-            ["texture_sampler_write_query_destroy", "queue_submit_burst"],
+            ["compute_fast"],
         )
-        self.assertEqual(bottlenecks["worstRows"][0]["metric"], "textureMs")
+        self.assertEqual(bottlenecks["worstRows"][0]["metric"], "usPerOp")
         self.assertAlmostEqual(
             bottlenecks["worstRows"][0]["comparisonDeltaPercent"],
-            -50.0,
+            -300.0,
         )
-        self.assertEqual(bottlenecks["worstPhases"][0]["phaseMetric"], "waitMs")
-        self.assertAlmostEqual(bottlenecks["worstPhases"][0]["comparisonDelta"], 8.0)
+        self.assertEqual(bottlenecks["worstPhases"], [])
         self.assertEqual(score["rows"][0]["phaseMetrics"][0]["metric"], "createViewMs")
 
     def test_texture_metric_is_preferred_before_elapsed_time(self) -> None:
@@ -385,7 +397,7 @@ class BrowserLayeredScoreTests(unittest.TestCase):
         self.assertEqual(score["rows"][0]["metric"], "textureMs")
         self.assertAlmostEqual(score["rows"][0]["baselineValue"], 12.0)
         self.assertAlmostEqual(score["rows"][0]["comparisonValue"], 6.0)
-        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], 100.0)
+        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], -100.0)
 
     def test_render_metric_is_preferred_before_elapsed_time(self) -> None:
         report = _report()
@@ -425,7 +437,7 @@ class BrowserLayeredScoreTests(unittest.TestCase):
         self.assertEqual(score["rows"][0]["metric"], "renderMs")
         self.assertAlmostEqual(score["rows"][0]["baselineValue"], 9.0)
         self.assertAlmostEqual(score["rows"][0]["comparisonValue"], 3.0)
-        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], 200.0)
+        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], -200.0)
 
     def test_score_keeps_filtered_cross_category_report_context(self) -> None:
         report = _report()
@@ -452,7 +464,7 @@ class BrowserLayeredScoreTests(unittest.TestCase):
         self.assertEqual(score["workloadFilter"]["categories"], ["compute", "visual"])
         self.assertAlmostEqual(score["overall"]["baselineScore"], 33.333333333333336)
         self.assertAlmostEqual(score["overall"]["comparisonScore"], 66.66666666666667)
-        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], 100.0)
+        self.assertAlmostEqual(score["overall"]["comparisonDeltaPercent"], -100.0)
 
     def test_cli_writes_score_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -478,8 +490,8 @@ class BrowserLayeredScoreTests(unittest.TestCase):
             payload = json.loads(out_path.read_text(encoding="utf-8"))
 
         self.assertEqual(payload["overall"]["rowCount"], 3)
-        self.assertIn("dawn=33.33 doe=66.67 delta=+100.00%", completed.stdout)
-        self.assertIn("categoryBalanced.dawn=33.33 categoryBalanced.doe=66.67", completed.stdout)
+        self.assertIn("doe=66.67 dawn=33.33 delta=+50.00%", completed.stdout)
+        self.assertIn("categoryBalanced.doe=66.67 categoryBalanced.dawn=33.33", completed.stdout)
         self.assertIn("[browser-score]", completed.stdout)
 
 

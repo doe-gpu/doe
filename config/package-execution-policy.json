@@ -67,6 +67,22 @@
       "detail": "Prepared Node package-developer receipts keep the existing mapAsync session policy while native readback remains available through the session-specific cold public entry."
     },
     {
+      "id": "node-package-inference-mapasync-readback-cold",
+      "runtimeHost": "node",
+      "provider": "doe",
+      "workloadId": [
+        "compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces",
+        "compute_stable_fluids_multistage_256grid_18pressure_4steps",
+        "inference_gemma3_1b_prefill_64tok_decode_64tok",
+        "inference_gemma3_270m_decode_1tok",
+        "inference_gemma3_270m_prefill_64tok_decode_64tok"
+      ],
+      "packagePreparedSession": false,
+      "mode": "mapAsync",
+      "evidence": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
+      "detail": "Cold Node inference/package compare lanes use mapAsync readback so Doe and Dawn-backed node-webgpu receipts expose the same effective terminal readback path under strict comparability."
+    },
+    {
       "id": "node-package-inference-mapasync-readback-prepared",
       "runtimeHost": "node",
       "provider": "doe",
@@ -106,6 +122,38 @@
       "mode": "mapAsync",
       "evidence": "bench/out/apple-metal/20260531T_shared_event_listener_node_bun/bun-listener.native-vs-mapasync.phase-delta.json",
       "detail": "The listener-backed public Bun package receipts select mapAsync for buffer, image, pipeline, and queue completion rows while the vector row keeps the native entry."
+    },
+    {
+      "id": "bun-package-inference-mapasync-readback-cold",
+      "runtimeHost": "bun",
+      "provider": "doe",
+      "workloadId": [
+        "compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces",
+        "compute_stable_fluids_multistage_256grid_18pressure_4steps",
+        "inference_gemma3_1b_prefill_64tok_decode_64tok",
+        "inference_gemma3_270m_decode_1tok",
+        "inference_gemma3_270m_prefill_64tok_decode_64tok"
+      ],
+      "packagePreparedSession": false,
+      "mode": "mapAsync",
+      "evidence": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
+      "detail": "Cold Bun inference/package compare lanes use mapAsync readback so Doe and Dawn-backed bun-webgpu receipts expose the same effective terminal readback path under strict comparability."
+    },
+    {
+      "id": "bun-ffi-package-inference-mapasync-readback-cold",
+      "runtimeHost": "bun",
+      "provider": "doe-ffi",
+      "workloadId": [
+        "compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces",
+        "compute_stable_fluids_multistage_256grid_18pressure_4steps",
+        "inference_gemma3_1b_prefill_64tok_decode_64tok",
+        "inference_gemma3_270m_decode_1tok",
+        "inference_gemma3_270m_prefill_64tok_decode_64tok"
+      ],
+      "packagePreparedSession": false,
+      "mode": "mapAsync",
+      "evidence": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
+      "detail": "Cold Bun inference/package compare lanes use mapAsync readback so Doe and Dawn-backed bun-webgpu receipts expose the same effective terminal readback path under strict comparability."
     },
     {
       "id": "bun-package-inference-mapasync-readback-prepared",

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_release_launch_receipt",
+  "receiptId": "browser-release-launch-sample",
+  "observedAt": "2026-06-30T00:00:00Z",
+  "launchSource": "release_archive",
+  "browserProduct": {
+    "productId": "fawn-doe",
+    "displayName": "Fawn Doe",
+    "version": "0.0.0-sample",
+    "channel": "diagnostic"
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "packageFormat": "zip"
+  },
+  "releaseArchive": {
+    "path": "examples/browser-release-archive.sample.zip",
+    "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+    "kind": "browser_release_archive",
+    "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip"
+  },
+  "releaseArchiveManifest": {
+    "path": "examples/browser-release-archive-manifest.sample.json",
+    "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+    "kind": "browser_release_archive_manifest"
+  },
+  "proofSurface": {
+    "path": "examples/browser-published-proof-surface.sample.json",
+    "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+    "kind": "browser_published_proof_surface"
+  },
+  "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+  "browserAppMetadataArchivePath": "Fawn-Doe-linux-x64/browser-product.json",
+  "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+  "dawnFallbackRuntimeArchivePath": "Fawn-Doe-linux-x64/libdawn_native.so",
+  "runtimeMode": "doe",
+  "activeRuntime": "doe",
+  "activeBackend": "webgpu-doe",
+  "hiddenFallbackAllowed": false,
+  "hiddenFallbackUsed": false,
+  "webgpuAvailable": true,
+  "proofPage": {
+    "url": "about:doe",
+    "loaded": true,
+    "artifactPath": "examples/browser-proof-page.sample.html",
+    "receiptId": "browser-proof-page-sample"
+  },
+  "galleryPage": {
+    "url": "https://gallery.doe.dev/doe/compute.html",
+    "loaded": true,
+    "category": "compute",
+    "artifactPath": "examples/browser-gallery-compute.sample.html",
+    "receiptId": "browser-public-gallery-compute-sample"
+  },
+  "comparisonReceipt": {
+    "comparisonId": "browser-smoke-compute-dawn-vs-doe",
+    "workloadId": "browser-smoke-compute",
+    "pageArtifactPath": "examples/browser-gallery-compute.sample.html",
+    "loaded": true,
+    "executionScope": "same_page",
+    "modes": [
+      "dawn",
+      "doe"
+    ],
+    "emitsSideBySideReceipts": true,
+    "comparisonArtifactPath": "examples/browser-smoke-report.sample.json",
+    "dawnReceiptId": "browser-smoke-compute-dawn",
+    "doeReceiptId": "browser-smoke-compute-doe"
+  },
+  "observedReceiptIds": [
+    "browser-proof-page-sample",
+    "browser-public-gallery-compute-sample",
+    "browser-smoke-compute-dawn",
+    "browser-smoke-compute-doe"
+  ]
+}

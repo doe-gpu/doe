@@ -92,9 +92,10 @@
   `python3 bench/gates/dawn_replacement_frontier_gate.py`
   CI must fail hard if `config/dawn-replacement-frontier.json` omits a required
   Dawn/Tint replacement row, marks a row claim-allowed without claim-indexed
-  comparable/claimable evidence, or allows universal replacement language while
-  any product frontier row is not claim-allowed or any evidence-release row is
-  not covered or claimable.
+  comparable/claimable evidence, leaves any required platform/backend evidence
+  slice unvalidated, or allows universal replacement language while any product
+  frontier row is not claim-allowed or any evidence-release row is not covered
+  or claimable.
 - run native backend coverage hard gate:
   `python3 bench/tools/check_native_backend_coverage_matrix.py --matrix config/native-backend-coverage-matrix.json`
   CI must fail hard if Metal, Vulkan, or D3D12 coverage rows are missing or if
@@ -296,7 +297,7 @@ Browser artifact identity coverage can be checked with
 `run_blocking_gates.py --with-browser-artifact-identity-coverage-gate`. The
 coverage manifest records the required identity anchors for smoke reports,
 flight recorders, derived browser probes, claim reports, promotion receipts,
-and release bundles.
+release package input preflights, and release bundles.
 
 Track A (browser) claimability is now a separate repeated-window lane in
 `bench/browser/browser_claim_gate.py`, controlled by

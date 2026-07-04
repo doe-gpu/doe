@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "tint_phase_benchmark_evidence",
+  "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+  "requiredTargets": [
+    "spirv"
+  ],
+  "requiredBenchmarkScopes": [
+    "parseWgsl",
+    "validateIr",
+    "generateBackend"
+  ],
+  "requiredExactPhases": [
+    "parse",
+    "sema",
+    "lower",
+    "emit"
+  ],
+  "status": "pass",
+  "targetCoverage": [
+    {
+      "target": "spirv",
+      "rowCount": 1,
+      "tintOkRows": 1,
+      "phaseBenchmarkCoveredRows": 1,
+      "shaderIds": [
+        "webgpu-prefix-sum"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "shaderId": "webgpu-prefix-sum",
+      "target": "spirv",
+      "tintStatus": "ok",
+      "phaseBenchmarkStatus": "covered",
+      "exactPhaseStatus": "missing",
+      "phaseBenchmarkTimingsNs": {
+        "parseWgsl": 21511,
+        "validateIr": 7485,
+        "generateBackend": 47812
+      },
+      "missingPhaseBenchmarkScopes": [],
+      "missingExactPhases": [
+        "parse",
+        "sema",
+        "lower",
+        "emit"
+      ]
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "targetCount": 1,
+    "coveredTargetCount": 1,
+    "rowCount": 1,
+    "tintOkRows": 1,
+    "phaseBenchmarkCoveredRows": 1,
+    "phaseBenchmarkMissingRows": 0,
+    "exactPhaseCompleteRows": 0,
+    "exactPhaseMissingRows": 1,
+    "notApplicableRows": 0,
+    "failureCount": 0
+  }
+}

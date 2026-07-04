@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "tint-compiler-evidence",
+  "generatedAt": "2026-07-02T04:45:39.815335Z",
+  "comparisonStatus": "comparable",
+  "claimStatus": "diagnostic",
+  "corpus": {
+    "id": "doe-vs-tint-browser-corpus",
+    "source": "config/wgsl-browser-corpus.json",
+    "sourceSha256": "9709ee1e490032636a88f687ed2b56d3c69643ad73851807a4efc9eaade3dcfc",
+    "manifestPath": "config/wgsl-browser-corpus.json"
+  },
+  "toolchains": {
+    "doe": {
+      "name": "doe-wgsl",
+      "version": "562454bc729acee6c4090e23f9ee1d5b1ac5e298",
+      "command": [
+        "runtime/zig/zig-out/bin/doe-runtime-compile-report",
+        "--target",
+        "spirv",
+        "--emit-spirv"
+      ],
+      "sourceRevision": "562454bc729acee6c4090e23f9ee1d5b1ac5e298",
+      "artifactPath": "runtime/zig/zig-out/bin/doe-runtime-compile-report",
+      "artifactSha256": "460aa9fb7cea2fb5c2494b32de034e65e49a8e920aed1e6d3af763635ff1fdb9"
+    },
+    "tint": {
+      "name": "tint",
+      "version": "dawn-vendor",
+      "command": [
+        "bench/vendor/dawn/out/Release/tint",
+        "--format=spirv"
+      ],
+      "sourceRevision": "dawn-vendor",
+      "artifactPath": "bench/vendor/dawn/out/Release/tint",
+      "artifactSha256": "aacc72c460af7c093c088a0fbe8ad1d5e87dd18bbad6a1d10965fb7de68965a2"
+    },
+    "tintWarm": {
+      "name": "tint-benchmark",
+      "version": "dawn-vendor",
+      "command": [
+        "bench/vendor/dawn/out/Release/tint_benchmark",
+        "--benchmark_format=json"
+      ],
+      "sourceRevision": "dawn-vendor",
+      "artifactPath": "bench/vendor/dawn/out/Release/tint_benchmark",
+      "artifactSha256": "50b647a490d85010f281e842f2e7339df6e4c94de2fcbff95b333797df4dbef1"
+    }
+  },
+  "phaseModel": {
+    "timingScope": "phase",
+    "units": "ns",
+    "requiredPhases": [
+      "parse",
+      "sema",
+      "lower",
+      "emit",
+      "total"
+    ]
+  },
+  "rows": [
+    {
+      "shaderId": "webgpu-prefix-sum",
+      "sourceSha256": "a8a642a54aaca908b707d20666566db8db62dbb5c9bfd518fbe98925da22c416",
+      "sourcePath": "bench/fixtures/wgsl-corpus/webgpu/sample-prefix-sum.wgsl",
+      "corpusCategory": "webgpu_sample",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "msl",
+        "spirv",
+        "dxil",
+        "hlsl"
+      ],
+      "target": "spirv",
+      "shaderStage": "compute",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "7db2526ba73f926ef86299143a52292aea3670299cea1ae88ba757e2f30501ce",
+        "irSha256": "584cdcec2d311ae8ef1d66cdbc08e4a2bbdfe5df9926b0de2aa4f86af9cfa5c2",
+        "outputPath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.artifacts/webgpu-prefix-sum/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 230244,
+          "sema": 107442,
+          "lower": 91603,
+          "emit": 186130,
+          "total": 623264
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.artifacts/webgpu-prefix-sum/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "e8e9b46c0455cd9e1e284114cff0c9f8c1ab2865abb6646a05cd4e4e32687f6a",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.artifacts/webgpu-prefix-sum/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 46528
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 47812,
+          "parseWgsl": 21511,
+          "validateIr": 7485
+        },
+        "receiptPath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.artifacts/webgpu-prefix-sum/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -92.34% not positive",
+          "p95 delta -91.85% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -92.34,
+          "p95": -91.85,
+          "p99": -91.85
+        }
+      }
+    }
+  ],
+  "summary": {
+    "rowCount": 1,
+    "comparableRows": 1,
+    "claimableRows": 0,
+    "reasons": [
+      "tint missing phase timing: parse",
+      "tint missing phase timing: sema",
+      "tint missing phase timing: lower",
+      "tint missing phase timing: emit",
+      "p50 delta -92.34% not positive",
+      "p95 delta -91.85% not positive",
+      "legacy claim gate did not mark the row claimable"
+    ]
+  }
+}

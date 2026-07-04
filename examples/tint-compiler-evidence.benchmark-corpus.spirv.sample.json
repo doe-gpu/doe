@@ -1,0 +1,1232 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "tint-compiler-evidence",
+  "generatedAt": "2026-06-30T07:27:15.653488Z",
+  "comparisonStatus": "comparable",
+  "claimStatus": "diagnostic",
+  "corpus": {
+    "id": "doe-vs-tint-benchmark",
+    "source": "bench/vendor/dawn/src/tint/cmd/bench/generate_benchmark_inputs.py",
+    "sourceSha256": "9631293e9daa39fa5069962e5472faf26d7cf230e33cf04d0ed022f340ae6656",
+    "manifestPath": "bench/native-compare/compare_doe_vs_tint.benchmark-corpus.spirv.config.json"
+  },
+  "toolchains": {
+    "doe": {
+      "name": "doe-wgsl",
+      "version": "4341504179ceb4e5ba709738a18425fda8053a40",
+      "command": [
+        "runtime/zig/zig-out/bin/doe-runtime-compile-report",
+        "--target",
+        "spirv",
+        "--emit-spirv"
+      ],
+      "sourceRevision": "4341504179ceb4e5ba709738a18425fda8053a40",
+      "artifactPath": "runtime/zig/zig-out/bin/doe-runtime-compile-report",
+      "artifactSha256": "460aa9fb7cea2fb5c2494b32de034e65e49a8e920aed1e6d3af763635ff1fdb9"
+    },
+    "tint": {
+      "name": "tint",
+      "version": "dawn-vendor",
+      "command": [
+        "bench/vendor/dawn/out/Release/tint",
+        "--format=spirv"
+      ],
+      "sourceRevision": "dawn-vendor",
+      "artifactPath": "bench/vendor/dawn/out/Release/tint",
+      "artifactSha256": "aacc72c460af7c093c088a0fbe8ad1d5e87dd18bbad6a1d10965fb7de68965a2"
+    },
+    "tintWarm": {
+      "name": "tint-benchmark",
+      "version": "dawn-vendor",
+      "command": [
+        "bench/vendor/dawn/out/Release/tint_benchmark",
+        "--benchmark_format=json"
+      ],
+      "sourceRevision": "dawn-vendor",
+      "artifactPath": "bench/vendor/dawn/out/Release/tint_benchmark",
+      "artifactSha256": "50b647a490d85010f281e842f2e7339df6e4c94de2fcbff95b333797df4dbef1"
+    }
+  },
+  "phaseModel": {
+    "timingScope": "phase",
+    "units": "ns",
+    "requiredPhases": [
+      "parse",
+      "sema",
+      "lower",
+      "emit",
+      "total"
+    ]
+  },
+  "rows": [
+    {
+      "shaderId": "atan2-const-eval.wgsl",
+      "sourceSha256": "a75d2fea471a1fd496f2fbb821bfb55e7cea85562b34f11d536c7d5e6cceb223",
+      "sourcePath": "bench/vendor/dawn/test/tint/benchmark/atan2-const-eval.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "compute",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "17460f81d39fc29af52ef43220709322596448351482a8e0618595bb02981fd8",
+        "irSha256": "8588466e9d0208e6f6df736d7db98963d31c52d9d140119c068530dcd0f42e69",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/atan2-const-eval.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 26978199,
+          "sema": 9026397,
+          "lower": 12508135,
+          "emit": 49703931,
+          "total": 98247940
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/atan2-const-eval.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "5e7dbb44512d32ef003b7e87d85900c6d2e4bd912910a0af69620ff7b5f57e60",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/atan2-const-eval.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 2930921
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 5256845,
+          "parseWgsl": 4648147,
+          "validateIr": 1109166
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/atan2-const-eval.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -96.77% not positive",
+          "p95 delta -97.68% not positive",
+          "p99 delta -97.67% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -96.77,
+          "p95": -97.68,
+          "p99": -97.67
+        }
+      }
+    },
+    {
+      "shaderId": "cluster-lights.wgsl",
+      "sourceSha256": "6d2f99fcc6c9cbe4af02389c4f38f0820934f83d749365fbb109fd1954ab97d9",
+      "sourcePath": "bench/vendor/dawn/test/tint/benchmark/cluster-lights.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "compute",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "e6a8d4a7fb6fa7deacadacba13c4eef9b0dd42bc8d16106146dc3bc5a3a4c0cd",
+        "irSha256": "258fd29a9e607ce7e2478cfd4d323b689dbf62d7dcb00a529fb87d0122691c01",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/cluster-lights.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 1476127,
+          "sema": 445317,
+          "lower": 456188,
+          "emit": 603535,
+          "total": 2992528
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/cluster-lights.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "1cf7165ade4a19960f4316bffa80789d1fa5317235de1ee07cce03049445684b",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/cluster-lights.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 272924
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 242064,
+          "parseWgsl": 232881,
+          "validateIr": 53041
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/cluster-lights.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -92.96% not positive",
+          "p95 delta -93.60% not positive",
+          "p99 delta -93.59% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -92.96,
+          "p95": -93.6,
+          "p99": -93.59
+        }
+      }
+    },
+    {
+      "shaderId": "metaball-isosurface.wgsl",
+      "sourceSha256": "396b3dc27c9ea515dd7a27f5849ec8b1747f5a44790645a7f7c7e064a67d5482",
+      "sourcePath": "bench/vendor/dawn/test/tint/benchmark/metaball-isosurface.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "compute",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "3c8f04f3faabc9f7b70edf990942fb525b81b2fce5ec164f70c17c9fa4f3369b",
+        "irSha256": "dd4205e592506dbfd65dd12b51edba67f2f2b280e435b35b46d3af590714a99e",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/metaball-isosurface.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 2737348,
+          "sema": 725435,
+          "lower": 1008266,
+          "emit": 928566,
+          "total": 5409604
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/metaball-isosurface.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "7f4aa33c5639102b56b7d9fe7b9ccc9701e5eb8c0fc901bbbbd06a4733dc6f61",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/metaball-isosurface.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 435147
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 456776,
+          "parseWgsl": 455525,
+          "validateIr": 131100
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/metaball-isosurface.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -92.45% not positive",
+          "p95 delta -92.42% not positive",
+          "p99 delta -92.40% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -92.45,
+          "p95": -92.42,
+          "p99": -92.4
+        }
+      }
+    },
+    {
+      "shaderId": "particles.wgsl",
+      "sourceSha256": "cf473029d9c3048c87cb87a59690e8ca4be0a1583e90d8de51b27f7b6d47ae05",
+      "sourcePath": "bench/vendor/dawn/test/tint/benchmark/particles.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "mixed",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "0f7714de28ee2f6fbec3213b8e437e18946117e9b7acaaf34d797f41a6e57264",
+        "irSha256": "7af7feb8ad95acad017911b445a59e5ff80cae62bb5092620cd5402c2a807fbd",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 1865348,
+          "sema": 503547,
+          "lower": 531380,
+          "emit": 850380,
+          "total": 3759471
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "72f8c97935569bd53fcf3d2a3cf855c62a84df7e1b8a871c1dd58851732ebf25",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.spv.manifest.json",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 970148
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 932226,
+          "parseWgsl": 337528,
+          "validateIr": 94639
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.spv.manifest.json",
+        "outputArtifacts": [
+          {
+            "target": "spirv",
+            "entryPoint": "vs_main",
+            "shaderStage": "vertex",
+            "outputSha256": "67ce34bc1ab93c646fca282908b71fa1651072060411e1af26a8314cc64ad072",
+            "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.vs_main.spv",
+            "validationStatus": "passed",
+            "validationTool": "spirv-val",
+            "validationMessage": ""
+          },
+          {
+            "target": "spirv",
+            "entryPoint": "fs_main",
+            "shaderStage": "fragment",
+            "outputSha256": "18ca827fe6b6eb6d08cf4ac3eaa7c3896ac3a8b20bcceef113286bca77ba0fce",
+            "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.fs_main.spv",
+            "validationStatus": "passed",
+            "validationTool": "spirv-val",
+            "validationMessage": ""
+          },
+          {
+            "target": "spirv",
+            "entryPoint": "simulate",
+            "shaderStage": "compute",
+            "outputSha256": "ac5ed0373654df1b54f3ba9a8aec821f444529b3852ca47e4377495945336472",
+            "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.simulate.spv",
+            "validationStatus": "passed",
+            "validationTool": "spirv-val",
+            "validationMessage": ""
+          },
+          {
+            "target": "spirv",
+            "entryPoint": "import_level",
+            "shaderStage": "compute",
+            "outputSha256": "d9ee2119347f00da2b6019a7dbdf7925c2438f2e85ff631100cf6068b642e246",
+            "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.import_level.spv",
+            "validationStatus": "passed",
+            "validationTool": "spirv-val",
+            "validationMessage": ""
+          },
+          {
+            "target": "spirv",
+            "entryPoint": "export_level",
+            "shaderStage": "compute",
+            "outputSha256": "7ed11adf38b21368a988aa9d24f2bc517fb8b816521e4f263fac6085c8e49575",
+            "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/particles.wgsl/tint/output.export_level.spv",
+            "validationStatus": "passed",
+            "validationTool": "spirv-val",
+            "validationMessage": ""
+          }
+        ]
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -74.58% not positive",
+          "p95 delta -76.09% not positive",
+          "p99 delta -71.21% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -74.58,
+          "p95": -76.09,
+          "p99": -71.21
+        }
+      }
+    },
+    {
+      "shaderId": "shadow-fragment.wgsl",
+      "sourceSha256": "35db99f57bff91d02cc6ec68415d5e131b298c73fbb9e53ad5e87b58eca59b30",
+      "sourcePath": "bench/vendor/dawn/test/tint/benchmark/shadow-fragment.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "fragment",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "47f3a5cc04153312b643f73ed1b274bfc56304b138000459a032f651a2d6033e",
+        "irSha256": "b9e7d91c542877aa962a668568bb77984666ba71f37d30765e289ab9a71b322f",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/shadow-fragment.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 822237,
+          "sema": 289975,
+          "lower": 216557,
+          "emit": 362812,
+          "total": 1703624
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/shadow-fragment.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "131700e232b22b8e2b9a38e2cf1b7ee9686885260b5bfb22766505c6f99bd8b3",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/shadow-fragment.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 61603
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 62196,
+          "parseWgsl": 78433,
+          "validateIr": 18391
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/shadow-fragment.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -95.68% not positive",
+          "p95 delta -96.70% not positive",
+          "p99 delta -96.70% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -95.68,
+          "p95": -96.7,
+          "p99": -96.7
+        }
+      }
+    },
+    {
+      "shaderId": "skinned-shadowed-pbr-fragment.wgsl",
+      "sourceSha256": "d6df2c53ceb92dc25217df17cf23a2549528c2ee6a7e3406cc0993fee016f773",
+      "sourcePath": "bench/vendor/dawn/test/tint/benchmark/skinned-shadowed-pbr-fragment.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "fragment",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "898cd93f93cf06988e41cdbfa0784d80b1ca64681f96672fcdee93a7cd5ec5c5",
+        "irSha256": "50e377338beb5ebea2c4fdc2f1082eb904554e6cf194c1bac4f3f0c5341ae37b",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/skinned-shadowed-pbr-fragment.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 6811060,
+          "sema": 1828810,
+          "lower": 1677094,
+          "emit": 2207602,
+          "total": 12552719
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/skinned-shadowed-pbr-fragment.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "ed84ae7c0507f15a77c8ee3dac9cbe476cc3067ed87153a39ab1046d4c99709b",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/skinned-shadowed-pbr-fragment.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 930732
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 892029,
+          "parseWgsl": 913182,
+          "validateIr": 223309
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/skinned-shadowed-pbr-fragment.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -88.92% not positive",
+          "p95 delta -92.27% not positive",
+          "p99 delta -92.25% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -88.92,
+          "p95": -92.27,
+          "p99": -92.25
+        }
+      }
+    },
+    {
+      "shaderId": "skinned-shadowed-pbr-vertex.wgsl",
+      "sourceSha256": "2c785835ae9c3ffd12cc4beb5d5c9d4469d5f8153eb3711341c4d3c5b12ade51",
+      "sourcePath": "bench/vendor/dawn/test/tint/benchmark/skinned-shadowed-pbr-vertex.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "vertex",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "1343bc21c1a10bfb9d838624cd4436b1bec6612ad3928d9499bf74b8d6e7f9e1",
+        "irSha256": "4583f22e692e797c11544d4c16eb3bd77b2bbcde773abe7bbc2edf23ddf7ef82",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/skinned-shadowed-pbr-vertex.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 1142919,
+          "sema": 297941,
+          "lower": 246483,
+          "emit": 603865,
+          "total": 2301538
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/skinned-shadowed-pbr-vertex.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "0ccc741217f568221573802b887af5dc7ad5ae2e8359e41f84105c76bbdfb1c9",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/skinned-shadowed-pbr-vertex.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 173129
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 169173,
+          "parseWgsl": 141010,
+          "validateIr": 35598
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/skinned-shadowed-pbr-vertex.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -91.68% not positive",
+          "p95 delta -93.25% not positive",
+          "p99 delta -93.24% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -91.68,
+          "p95": -93.25,
+          "p99": -93.24
+        }
+      }
+    },
+    {
+      "shaderId": "unity_webgpu_000002778DE78280.cs.spv",
+      "sourceSha256": "e5aca5a3fbda713953c1d2e1e11eb60b14d3895ab446904ec2bbff09eee919bf",
+      "sourcePath": "bench/vendor/dawn/third_party/benchmark_shaders/unity_boat_attack/unity_webgpu_000002778DE78280.cs.spv.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "compute",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "1fd0161350f479516b3ce7714b94d67d87d26fe611deef87bdac8de2bfaa2b8a",
+        "irSha256": "6aa50e0ca5dfb7a3fbd1b2c9fefa034c644eea4e14fa2491aa580faca3bbb977",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778DE78280.cs.spv/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 2412117,
+          "sema": 575973,
+          "lower": 540697,
+          "emit": 675179,
+          "total": 4212833
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778DE78280.cs.spv/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "62fbf19183506a37fad04b95ca21ec9215af0e7f2cb6e247fce1f355112cd9ba",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778DE78280.cs.spv/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 249733
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 241329,
+          "parseWgsl": 264131,
+          "validateIr": 82357
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778DE78280.cs.spv/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -91.20% not positive",
+          "p95 delta -92.21% not positive",
+          "p99 delta -92.10% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -91.2,
+          "p95": -92.21,
+          "p99": -92.1
+        }
+      }
+    },
+    {
+      "shaderId": "unity_webgpu_000002778DE78280.cs.wgsl",
+      "sourceSha256": "791615d575c14440a0819a7d03776760add76a7ff5eb00da83024055e8492fe8",
+      "sourcePath": "bench/vendor/dawn/third_party/benchmark_shaders/unity_boat_attack/unity_webgpu_000002778DE78280.cs.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "compute",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "0d463bfe95ce2699e6c0c75d6322aa4cf2d39d497967331b067ad95dd10a2a62",
+        "irSha256": "8049a471836a5c1b0074d615585a1d4043ac1c00ff45efcd7a5724371900aa1d",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778DE78280.cs.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 2655865,
+          "sema": 688856,
+          "lower": 552278,
+          "emit": 513736,
+          "total": 4423369
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778DE78280.cs.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "15a2f7c80080fb6aa6efe6785c57632012dcf4ace26095f120a416ad786d8c5d",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778DE78280.cs.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 339383
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 355160,
+          "parseWgsl": 421686,
+          "validateIr": 101800
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778DE78280.cs.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -94.52% not positive",
+          "p95 delta -94.52% not positive",
+          "p99 delta -94.48% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -94.52,
+          "p95": -94.52,
+          "p99": -94.48
+        }
+      }
+    },
+    {
+      "shaderId": "unity_webgpu_000002778F740030.fs.spv",
+      "sourceSha256": "d9d50b9f61b99520decc3d48b7de8a6c2a5cd4fcb6b1c7944e39edd7eeae5197",
+      "sourcePath": "bench/vendor/dawn/third_party/benchmark_shaders/unity_boat_attack/unity_webgpu_000002778F740030.fs.spv.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "fragment",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "47eb1757019943d579be81b04cb096f59648de5c87d4ee3121f95697107c659b",
+        "irSha256": "2fe58d72a1620b1cc335e38c8e6abf9b4b74f328877cd4bc558d26a84e640b59",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778F740030.fs.spv/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 41446971,
+          "sema": 10890913,
+          "lower": 7385120,
+          "emit": 34547426,
+          "total": 94328048
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778F740030.fs.spv/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "c25ff163290360af100cadacf09858c6ee7b3f5f1871b41813d6341ca10745dd",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778F740030.fs.spv/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 8412959
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 7906390,
+          "parseWgsl": 6317243,
+          "validateIr": 3545442
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778F740030.fs.spv/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -90.64% not positive",
+          "p95 delta -90.63% not positive",
+          "p99 delta -90.58% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -90.64,
+          "p95": -90.63,
+          "p99": -90.58
+        }
+      }
+    },
+    {
+      "shaderId": "unity_webgpu_000002778F740030.fs.wgsl",
+      "sourceSha256": "7b70874b12057544f84a40ea3e83cbe01ef987fccc2eec7ce5ab276060606492",
+      "sourcePath": "bench/vendor/dawn/third_party/benchmark_shaders/unity_boat_attack/unity_webgpu_000002778F740030.fs.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "fragment",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "4384527c1a934eaf98a2fb888227423f2d99b8b8c27a8d8b46eb42b47c083b5f",
+        "irSha256": "4b33c21f71a7322593db811ffd2b0abe6c18d544c65dc92efecc661059c523cc",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778F740030.fs.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 74502812,
+          "sema": 19673682,
+          "lower": 15326365,
+          "emit": 29108096,
+          "total": 138772508
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778F740030.fs.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "cb5a19eef92b23e19498c01121435694622b1c43fe8ebd2908b6ee82209ac78d",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778F740030.fs.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 30648612
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 10686094,
+          "parseWgsl": 12260845,
+          "validateIr": 4151003
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_000002778F740030.fs.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -78.83% not positive",
+          "p95 delta -78.34% not positive",
+          "p99 delta -78.22% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -78.83,
+          "p95": -78.34,
+          "p99": -78.22
+        }
+      }
+    },
+    {
+      "shaderId": "unity_webgpu_0000017E9E2D81A0.vs.spv",
+      "sourceSha256": "110fd94cd4706e879290ef8a050d82f5417bbea88aba8e9cd26e81bc44ce1d9e",
+      "sourcePath": "bench/vendor/dawn/third_party/benchmark_shaders/unity_boat_attack/unity_webgpu_0000017E9E2D81A0.vs.spv.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "vertex",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "c504ce1ee46532536a1dfb7fdaf3903b667c8b7d0b61cff3cdd9f3cf32445d63",
+        "irSha256": "5db97de55fce308bb6535d971dd9152ee18da8fd221545826b38baa21821f4eb",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_0000017E9E2D81A0.vs.spv/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 13459244,
+          "sema": 4198707,
+          "lower": 2930311,
+          "emit": 11717968,
+          "total": 32331137
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_0000017E9E2D81A0.vs.spv/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "b0d92805400fdd0924b82828966297f284467cb6e490e76d69fe3efd30ec21f7",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_0000017E9E2D81A0.vs.spv/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 3036841
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 2717650,
+          "parseWgsl": 2689121,
+          "validateIr": 1203036
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_0000017E9E2D81A0.vs.spv/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -90.85% not positive",
+          "p95 delta -90.82% not positive",
+          "p99 delta -90.80% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -90.85,
+          "p95": -90.82,
+          "p99": -90.8
+        }
+      }
+    },
+    {
+      "shaderId": "unity_webgpu_0000017E9E2D81A0.vs.wgsl",
+      "sourceSha256": "ff3fd6a658e9e18f0b32c24c92067c2651490609319222b408015ceb5d04c104",
+      "sourcePath": "bench/vendor/dawn/third_party/benchmark_shaders/unity_boat_attack/unity_webgpu_0000017E9E2D81A0.vs.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "vertex",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "a9171f6f367debdafca72bd4c3b72ba0f48625a1b78139fc4ca0c20f64a8722a",
+        "irSha256": "e890503eac3a4a26d5ac6da3a926c70999a855505ca7414f317cade0b58e8b27",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_0000017E9E2D81A0.vs.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 34885691,
+          "sema": 7461894,
+          "lower": 5051240,
+          "emit": 9876556,
+          "total": 57349952
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_0000017E9E2D81A0.vs.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "cd5570c0154fe4fd15ebf3c86ac8e16f26325a69c8d5745e279fe72fb6aeed8b",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_0000017E9E2D81A0.vs.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 3846092
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 4995712,
+          "parseWgsl": 4974910,
+          "validateIr": 2661841
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/unity_webgpu_0000017E9E2D81A0.vs.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -92.88% not positive",
+          "p95 delta -92.89% not positive",
+          "p99 delta -92.87% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -92.88,
+          "p95": -92.89,
+          "p99": -92.87
+        }
+      }
+    },
+    {
+      "shaderId": "webgpu-prefix-sum.wgsl",
+      "sourceSha256": "a8a642a54aaca908b707d20666566db8db62dbb5c9bfd518fbe98925da22c416",
+      "sourcePath": "bench/vendor/dawn/test/tint/benchmark/doe/webgpu-prefix-sum.wgsl",
+      "corpusCategory": "tint_benchmark_corpus",
+      "expectedValidity": "valid",
+      "expectedBackendTargets": [
+        "spirv"
+      ],
+      "target": "spirv",
+      "shaderStage": "compute",
+      "doe": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "7db2526ba73f926ef86299143a52292aea3670299cea1ae88ba757e2f30501ce",
+        "irSha256": "f1ba85f8ba941a941e18f1ae9bf9dff66ae555b13a44674837f30724c72e32ad",
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/webgpu-prefix-sum.wgsl/doe/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "parse": 231485,
+          "sema": 108645,
+          "lower": 265559,
+          "emit": 374174,
+          "total": 994360
+        },
+        "phaseBenchmarkTimingsNs": {},
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/webgpu-prefix-sum.wgsl/doe/compile-report.json",
+        "outputArtifacts": []
+      },
+      "tint": {
+        "status": "ok",
+        "diagnosticCode": "",
+        "diagnosticMessage": "",
+        "outputSha256": "e8e9b46c0455cd9e1e284114cff0c9f8c1ab2865abb6646a05cd4e4e32687f6a",
+        "irSha256": null,
+        "outputPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/webgpu-prefix-sum.wgsl/tint/output.spv",
+        "validationStatus": "passed",
+        "validationTool": "spirv-val",
+        "validationMessage": "",
+        "phaseTimingsNs": {
+          "total": 32408
+        },
+        "phaseBenchmarkTimingsNs": {
+          "generateBackend": 33146,
+          "parseWgsl": 21770,
+          "validateIr": 5260
+        },
+        "receiptPath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.artifacts/webgpu-prefix-sum.wgsl/tint/output.spv",
+        "outputArtifacts": []
+      },
+      "comparability": {
+        "status": "comparable",
+        "reasons": []
+      },
+      "claimability": {
+        "status": "diagnostic",
+        "reasons": [
+          "tint missing phase timing: parse",
+          "tint missing phase timing: sema",
+          "tint missing phase timing: lower",
+          "tint missing phase timing: emit",
+          "p50 delta -92.21% not positive",
+          "p95 delta -92.41% not positive",
+          "p99 delta -92.32% not positive",
+          "legacy claim gate did not mark the row claimable"
+        ],
+        "deltaPercent": {
+          "p50": -92.21,
+          "p95": -92.41,
+          "p99": -92.32
+        }
+      }
+    }
+  ],
+  "summary": {
+    "rowCount": 14,
+    "comparableRows": 14,
+    "claimableRows": 0,
+    "reasons": [
+      "tint missing phase timing: parse",
+      "tint missing phase timing: sema",
+      "tint missing phase timing: lower",
+      "tint missing phase timing: emit",
+      "p50 delta -96.77% not positive",
+      "p95 delta -97.68% not positive",
+      "p99 delta -97.67% not positive",
+      "legacy claim gate did not mark the row claimable",
+      "p50 delta -92.96% not positive",
+      "p95 delta -93.60% not positive",
+      "p99 delta -93.59% not positive",
+      "p50 delta -92.45% not positive",
+      "p95 delta -92.42% not positive",
+      "p99 delta -92.40% not positive",
+      "p50 delta -74.58% not positive",
+      "p95 delta -76.09% not positive",
+      "p99 delta -71.21% not positive",
+      "p50 delta -95.68% not positive",
+      "p95 delta -96.70% not positive",
+      "p99 delta -96.70% not positive",
+      "p50 delta -88.92% not positive",
+      "p95 delta -92.27% not positive",
+      "p99 delta -92.25% not positive",
+      "p50 delta -91.68% not positive",
+      "p95 delta -93.25% not positive",
+      "p99 delta -93.24% not positive",
+      "p50 delta -91.20% not positive",
+      "p95 delta -92.21% not positive",
+      "p99 delta -92.10% not positive",
+      "p50 delta -94.52% not positive",
+      "p95 delta -94.52% not positive",
+      "p99 delta -94.48% not positive",
+      "p50 delta -90.64% not positive",
+      "p95 delta -90.63% not positive",
+      "p99 delta -90.58% not positive",
+      "p50 delta -78.83% not positive",
+      "p95 delta -78.34% not positive",
+      "p99 delta -78.22% not positive",
+      "p50 delta -90.85% not positive",
+      "p95 delta -90.82% not positive",
+      "p99 delta -90.80% not positive",
+      "p50 delta -92.88% not positive",
+      "p95 delta -92.89% not positive",
+      "p99 delta -92.87% not positive",
+      "p50 delta -92.21% not positive",
+      "p95 delta -92.41% not positive",
+      "p99 delta -92.32% not positive"
+    ]
+  }
+}

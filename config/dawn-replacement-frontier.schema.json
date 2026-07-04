@@ -68,6 +68,7 @@
         "claimAllowed",
         "claimIndexEntryIds",
         "evidencePaths",
+        "evidenceSlices",
         "blockers",
         "notes"
       ],
@@ -103,6 +104,92 @@
           ]
         },
         "doeTarget": { "type": "string", "minLength": 1 },
+        "currentState": {
+          "enum": ["claimable", "covered", "diagnostic", "missing", "unsupported"]
+        },
+        "claimAllowed": { "type": "boolean" },
+        "claimIndexEntryIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "evidencePaths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "evidenceSlices": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/EvidenceSlice" }
+        },
+        "blockers": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "EvidenceSlice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "os",
+        "arch",
+        "gpuApi",
+        "gpuVendor",
+        "runtimeHost",
+        "currentState",
+        "claimAllowed",
+        "claimIndexEntryIds",
+        "evidencePaths",
+        "blockers",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "label": { "type": "string", "minLength": 1 },
+        "os": {
+          "enum": ["macos", "linux", "windows", "cross-platform"]
+        },
+        "arch": {
+          "enum": ["arm64", "x64", "any"]
+        },
+        "gpuApi": {
+          "enum": [
+            "metal",
+            "vulkan",
+            "d3d12",
+            "spirv",
+            "wgsl",
+            "webgpu",
+            "webgpu-cts",
+            "none",
+            "mixed"
+          ]
+        },
+        "gpuVendor": {
+          "enum": ["apple", "amd", "nvidia", "microsoft", "any", "none", "mixed"]
+        },
+        "runtimeHost": {
+          "enum": [
+            "native",
+            "node",
+            "bun",
+            "deno",
+            "chromium",
+            "compiler",
+            "cts",
+            "drop-in",
+            "claim-index"
+          ]
+        },
         "currentState": {
           "enum": ["claimable", "covered", "diagnostic", "missing", "unsupported"]
         },

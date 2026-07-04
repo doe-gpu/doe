@@ -1,0 +1,351 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-published-proof-surface.schema.json",
+  "title": "Browser published proof surface",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "surfaceId",
+    "capturePolicyPath",
+    "runtimeIdentityPath",
+    "proofPage",
+    "galleryPages",
+    "comparisonReceipts"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_published_proof_surface" },
+    "surfaceId": { "type": "string", "minLength": 1 },
+    "capturePolicyPath": { "type": "string", "minLength": 1 },
+    "runtimeIdentityPath": { "type": "string", "minLength": 1 },
+    "proofPage": { "$ref": "#/$defs/ProofPage" },
+    "galleryPages": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/$defs/GalleryPage" },
+      "allOf": [
+        {
+          "contains": { "$ref": "#/$defs/ComputeGalleryPage" },
+          "minContains": 1
+        },
+        {
+          "contains": { "$ref": "#/$defs/RenderingGalleryPage" },
+          "minContains": 1
+        },
+        {
+          "contains": { "$ref": "#/$defs/TensorGalleryPage" },
+          "minContains": 1
+        },
+        {
+          "contains": { "$ref": "#/$defs/ShaderEdgeGalleryPage" },
+          "minContains": 1
+        },
+        {
+          "contains": { "$ref": "#/$defs/BenchmarkTraceGalleryPage" },
+          "minContains": 1
+        }
+      ]
+    },
+    "comparisonReceipts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/ComparisonReceipt" }
+    }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "kind": { "type": "string", "minLength": 1 },
+        "downloadUrl": { "$ref": "#/$defs/PublicHttpsUrl" }
+      }
+    },
+    "PublicHttpsUrl": {
+      "type": "string",
+      "pattern": "^https://[^/?#]+\\.[^/?#]+",
+      "not": {
+        "anyOf": [
+          { "pattern": "^https://localhost(?::|/|$)" },
+          { "pattern": "^https://(?:127\\.0\\.0\\.1|0\\.0\\.0\\.0|10\\.|192\\.168\\.|172\\.(?:1[6-9]|2[0-9]|3[0-1])\\.)(?::|/|$)" },
+          { "pattern": "^https://\\[::1\\](?::|/|$)" },
+          { "pattern": "^https://[^/?#]*\\.(?:local|localhost|test|example|invalid)(?::|/|$)" },
+          { "pattern": "^https://(?:example\\.com|example\\.net|example\\.org)(?::|/|$)" }
+        ]
+      }
+    },
+    "ReceiptArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receiptId", "path", "sha256", "kind"],
+      "properties": {
+        "receiptId": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "kind": { "type": "string", "const": "browser_execution_receipt" }
+      }
+    },
+    "ComparisonReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "comparisonId",
+        "workloadId",
+        "runner",
+        "comparisonPolicy",
+        "comparisonArtifact",
+        "dawnReceipt",
+        "doeReceipt"
+      ],
+      "properties": {
+        "comparisonId": { "type": "string", "minLength": 1 },
+        "workloadId": { "type": "string", "minLength": 1 },
+        "runner": { "$ref": "#/$defs/ComparisonRunner" },
+        "comparisonPolicy": { "$ref": "#/$defs/ComparisonPolicy" },
+        "comparisonArtifact": { "$ref": "#/$defs/ComparisonArtifact" },
+        "dawnReceipt": { "$ref": "#/$defs/ReceiptArtifact" },
+        "doeReceipt": { "$ref": "#/$defs/ReceiptArtifact" }
+      }
+    },
+    "ComparisonPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workloadIdentity",
+        "sourceShaderIdentity",
+        "adapterDeviceIdentity",
+        "timingScope",
+        "commandCoverage",
+        "outputIdentity",
+        "fallbackPolicy"
+      ],
+      "properties": {
+        "workloadIdentity": { "type": "string", "const": "same_workload_id" },
+        "sourceShaderIdentity": { "type": "string", "const": "same_source_shader_identity" },
+        "adapterDeviceIdentity": { "type": "string", "const": "same_device_identity" },
+        "timingScope": { "type": "string", "minLength": 1 },
+        "commandCoverage": { "type": "string", "const": "exact_match" },
+        "outputIdentity": { "enum": ["same_output_hash", "same_frame_hash"] },
+        "fallbackPolicy": { "type": "string", "const": "no_hidden_fallback" }
+      }
+    },
+    "ComparisonRunner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pageArtifactPath", "executionScope", "modes", "emitsSideBySideReceipts"],
+      "properties": {
+        "pageArtifactPath": { "type": "string", "minLength": 1 },
+        "executionScope": { "type": "string", "const": "same_page" },
+        "modes": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "string", "const": "dawn" },
+            { "type": "string", "const": "doe" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "emitsSideBySideReceipts": { "type": "boolean", "const": true }
+      }
+    },
+    "ComparisonArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "kind": { "type": "string", "const": "chromium-webgpu-playwright-smoke" }
+      }
+    },
+    "ProofPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact",
+        "url",
+        "diagnosticReceipt",
+        "diagnostics",
+        "releaseProvenance",
+        "recentReceiptIds",
+        "receiptPayloads"
+      ],
+      "properties": {
+        "artifact": { "$ref": "#/$defs/Artifact" },
+        "url": { "type": "string", "minLength": 1 },
+        "diagnosticReceipt": { "$ref": "#/$defs/Artifact" },
+        "diagnostics": { "$ref": "#/$defs/Diagnostics" },
+        "releaseProvenance": { "$ref": "#/$defs/ReleaseProvenance" },
+        "recentReceiptIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "receiptPayloads": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ReceiptArtifact" }
+        }
+      }
+    },
+    "Diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activeRuntime",
+        "activeBackend",
+        "webgpuAvailable",
+        "compilerPath",
+        "tsirStatus",
+        "hostPlanStatus",
+        "cslStatus",
+        "fallbackPolicyState"
+      ],
+      "properties": {
+        "activeRuntime": { "type": "string", "const": "doe" },
+        "activeBackend": { "type": "string", "minLength": 1 },
+        "webgpuAvailable": { "type": "boolean", "const": true },
+        "compilerPath": { "type": "string", "minLength": 1 },
+        "tsirStatus": { "type": "string", "minLength": 1 },
+        "hostPlanStatus": { "type": "string", "minLength": 1 },
+        "cslStatus": { "type": "string", "minLength": 1 },
+        "fallbackPolicyState": { "type": "string", "const": "hidden_fallback_disabled" }
+      }
+    },
+    "BrowserProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["productId", "displayName", "version", "channel"],
+      "properties": {
+        "productId": { "enum": ["doe-browser", "fawn-doe"] },
+        "displayName": { "enum": ["Doe Browser", "Fawn Doe"] },
+        "version": { "type": "string", "minLength": 1 },
+        "channel": { "enum": ["diagnostic", "release_candidate", "release"] }
+      }
+    },
+    "Platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch", "packageFormat"],
+      "properties": {
+        "os": { "enum": ["macos", "linux", "windows"] },
+        "arch": { "enum": ["arm64", "x64"] },
+        "packageFormat": { "enum": ["zip"] }
+      }
+    },
+    "ReleaseProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "browserProduct",
+        "platform",
+        "releaseArchive",
+        "releaseArchiveManifest",
+        "publicDownloadReceipt",
+        "browserExecutableArchivePath",
+        "browserAppMetadataArchivePath",
+        "doeRuntimeArchivePath",
+        "dawnFallbackRuntimeArchivePath"
+      ],
+      "properties": {
+        "browserProduct": { "$ref": "#/$defs/BrowserProduct" },
+        "platform": { "$ref": "#/$defs/Platform" },
+        "releaseArchive": { "$ref": "#/$defs/Artifact" },
+        "releaseArchiveManifest": { "$ref": "#/$defs/Artifact" },
+        "publicDownloadReceipt": { "$ref": "#/$defs/Artifact" },
+        "browserExecutableArchivePath": { "type": "string", "minLength": 1 },
+        "browserAppMetadataArchivePath": { "type": "string", "minLength": 1 },
+        "doeRuntimeArchivePath": { "type": "string", "minLength": 1 },
+        "dawnFallbackRuntimeArchivePath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "GalleryPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "url",
+        "artifact",
+        "publicReceipt",
+        "workloadContractPath",
+        "workloadIds",
+        "receiptIds",
+        "receiptArtifacts"
+      ],
+      "properties": {
+        "category": {
+          "enum": [
+            "compute",
+            "rendering",
+            "tensor",
+            "shader_edge",
+            "benchmark_trace"
+          ]
+        },
+        "url": { "$ref": "#/$defs/PublicHttpsUrl" },
+        "artifact": { "$ref": "#/$defs/Artifact" },
+        "publicReceipt": { "$ref": "#/$defs/Artifact" },
+        "workloadContractPath": { "type": "string", "minLength": 1 },
+        "workloadIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "receiptIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "receiptArtifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ReceiptArtifact" }
+        }
+      }
+    },
+    "ComputeGalleryPage": {
+      "type": "object",
+      "required": ["category"],
+      "properties": {
+        "category": { "const": "compute" }
+      }
+    },
+    "RenderingGalleryPage": {
+      "type": "object",
+      "required": ["category"],
+      "properties": {
+        "category": { "const": "rendering" }
+      }
+    },
+    "TensorGalleryPage": {
+      "type": "object",
+      "required": ["category"],
+      "properties": {
+        "category": { "const": "tensor" }
+      }
+    },
+    "ShaderEdgeGalleryPage": {
+      "type": "object",
+      "required": ["category"],
+      "properties": {
+        "category": { "const": "shader_edge" }
+      }
+    },
+    "BenchmarkTraceGalleryPage": {
+      "type": "object",
+      "required": ["category"],
+      "properties": {
+        "category": { "const": "benchmark_trace" }
+      }
+    }
+  }
+}

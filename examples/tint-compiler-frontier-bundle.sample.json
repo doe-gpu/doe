@@ -8,19 +8,73 @@
   "claimabilityStatus": "blocked",
   "compilerEvidenceReports": [
     {
-      "path": "examples/tint-compiler-evidence.sample.json",
+      "path": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+      "sha256": "7f2e83611a2669d22f38ec2001e9527764e6bbc7d91bfbcbb845f4b904184026",
       "diagnosticGateStatus": "pass",
-      "comparisonStatus": "diagnostic",
+      "comparisonStatus": "comparable",
       "claimStatus": "diagnostic",
       "rowCount": 1,
-      "comparableRows": 0,
+      "comparableRows": 1,
       "claimableRows": 0,
-      "claimBlockerCount": 2,
+      "claimBlockerCount": 5,
       "claimBlockerSummary": [
         {
           "code": "claimable_tint_compiler_evidence_report",
-          "message": "compiler evidence must be comparable before it can support a Tint replacement claim",
+          "message": "tint: missing integer phase timing: parse",
           "count": 1
+        },
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "tint: missing integer phase timing: sema",
+          "count": 1
+        },
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "tint: missing integer phase timing: lower",
+          "count": 1
+        },
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "tint: missing integer phase timing: emit",
+          "count": 1
+        },
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "compiler evidence must be claimable before it can support a Tint replacement claim",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "path": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+      "sha256": "ab1f734b5501c6a9d8fbfbd541fe804c60f18accb3d2ac36abd49de13e7ca41b",
+      "diagnosticGateStatus": "pass",
+      "comparisonStatus": "comparable",
+      "claimStatus": "diagnostic",
+      "rowCount": 14,
+      "comparableRows": 14,
+      "claimableRows": 0,
+      "claimBlockerCount": 57,
+      "claimBlockerSummary": [
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "tint: missing integer phase timing: parse",
+          "count": 14
+        },
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "tint: missing integer phase timing: sema",
+          "count": 14
+        },
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "tint: missing integer phase timing: lower",
+          "count": 14
+        },
+        {
+          "code": "claimable_tint_compiler_evidence_report",
+          "message": "tint: missing integer phase timing: emit",
+          "count": 14
         },
         {
           "code": "claimable_tint_compiler_evidence_report",
@@ -33,8 +87,12 @@
   "componentReceipts": {
     "loweringLinks": [
       {
-        "path": "examples/wgsl-lowering-link-receipt.sample.json",
-        "evidencePath": "examples/tint-compiler-evidence.sample.json",
+        "path": "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json",
+        "sha256": "39c1cc3603c82af8fbeaecb9364f6251a3bba746e2b509e17459366bb4163200",
+        "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "evidencePaths": [
+          "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json"
+        ],
         "status": "pass",
         "targets": [
           "spirv"
@@ -46,8 +104,13 @@
     ],
     "targetValidations": [
       {
-        "path": "examples/tint-compiler-target-validation.sample.json",
-        "evidencePath": "examples/tint-compiler-evidence.sample.json",
+        "path": "examples/tint-compiler-target-validation.frontier.spirv.sample.json",
+        "sha256": "51597510a830f998602b20f6221cf3ad4dae277f1cd550dcc50fbbcfef4961ce",
+        "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "evidencePaths": [
+          "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+          "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
+        ],
         "status": "pass",
         "targets": [
           "spirv"
@@ -55,37 +118,33 @@
         "summary": {
           "targetCount": 1,
           "coveredTargetCount": 1,
-          "rowCount": 1,
-          "validatedRows": 0,
-          "diagnosticRows": 1,
-          "claimBlockerCount": 1,
+          "rowCount": 15,
+          "validatedRows": 15,
+          "diagnosticRows": 0,
+          "claimBlockerCount": 0,
           "failureCount": 0
         },
-        "claimBlockerSummary": [
-          {
-            "code": "tint_result_not_ok",
-            "message": "Tint compiler result is not ok: sample_missing_tint_run",
-            "count": 1
-          }
-        ],
+        "claimBlockerSummary": [],
         "claimBlockerSummaryByEvidencePath": [
           {
-            "evidencePath": "examples/tint-compiler-evidence.sample.json",
-            "claimBlockerSummary": [
-              {
-                "code": "tint_result_not_ok",
-                "message": "Tint compiler result is not ok: sample_missing_tint_run",
-                "count": 1
-              }
-            ]
+            "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+            "claimBlockerSummary": []
+          },
+          {
+            "evidencePath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+            "claimBlockerSummary": []
           }
         ]
       }
     ],
     "phaseBenchmarks": [
       {
-        "path": "examples/tint-phase-benchmark-evidence.sample.json",
-        "evidencePath": "examples/tint-compiler-evidence.sample.json",
+        "path": "examples/tint-phase-benchmark-evidence.browser-corpus.spirv.sample.json",
+        "sha256": "db3cb8559a85d3dc51d29ebac80914b812c7718c48b438b0f92964aba5d6cadd",
+        "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "evidencePaths": [
+          "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json"
+        ],
         "status": "pass",
         "targets": [
           "spirv"
@@ -102,6 +161,30 @@
           "notApplicableRows": 0,
           "failureCount": 0
         }
+      },
+      {
+        "path": "examples/tint-phase-benchmark-evidence.benchmark-corpus.spirv.sample.json",
+        "sha256": "256343524b1a254e9b42adfc202a1eca8211c695005df57fb0852cecab117fcd",
+        "evidencePath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+        "evidencePaths": [
+          "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
+        ],
+        "status": "pass",
+        "targets": [
+          "spirv"
+        ],
+        "summary": {
+          "targetCount": 1,
+          "coveredTargetCount": 1,
+          "rowCount": 14,
+          "tintOkRows": 14,
+          "phaseBenchmarkCoveredRows": 14,
+          "phaseBenchmarkMissingRows": 0,
+          "exactPhaseCompleteRows": 0,
+          "exactPhaseMissingRows": 14,
+          "notApplicableRows": 0,
+          "failureCount": 0
+        }
       }
     ]
   },
@@ -109,27 +192,101 @@
     {
       "target": "spirv",
       "loweringLinkReceipts": [
-        "examples/wgsl-lowering-link-receipt.sample.json"
+        "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json"
       ],
       "targetValidationReceipts": [
-        "examples/tint-compiler-target-validation.sample.json"
+        "examples/tint-compiler-target-validation.frontier.spirv.sample.json"
       ],
       "phaseBenchmarkReceipts": [
-        "examples/tint-phase-benchmark-evidence.sample.json"
+        "examples/tint-phase-benchmark-evidence.browser-corpus.spirv.sample.json",
+        "examples/tint-phase-benchmark-evidence.benchmark-corpus.spirv.sample.json"
       ],
       "evidencePaths": [
-        "examples/tint-compiler-evidence.sample.json"
+        "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
       ],
       "linkedRows": 1,
-      "validatedRows": 0,
-      "phaseBenchmarkCoveredRows": 1
+      "validatedRows": 15,
+      "phaseBenchmarkCoveredRows": 15
     }
   ],
+  "phaseTimingCoverage": {
+    "requiredExactPhases": [
+      "parse",
+      "sema",
+      "lower",
+      "emit"
+    ],
+    "requiredBenchmarkScopes": [
+      "parseWgsl",
+      "validateIr",
+      "generateBackend"
+    ],
+    "rowCount": 15,
+    "doeOkRows": 15,
+    "tintOkRows": 15,
+    "doeExactPhaseCompleteRows": 15,
+    "doeExactPhaseMissingRows": 0,
+    "tintExactPhaseCompleteRows": 0,
+    "tintExactPhaseMissingRows": 15,
+    "tintBenchmarkScopeCoveredRows": 15,
+    "tintBenchmarkScopeMissingRows": 0,
+    "notApplicableRows": 0,
+    "coverageByEvidencePath": [
+      {
+        "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "targets": [
+          "spirv"
+        ],
+        "rowCount": 1,
+        "doeOkRows": 1,
+        "tintOkRows": 1,
+        "doeExactPhaseCompleteRows": 1,
+        "doeExactPhaseMissingRows": 0,
+        "tintExactPhaseCompleteRows": 0,
+        "tintExactPhaseMissingRows": 1,
+        "tintBenchmarkScopeCoveredRows": 1,
+        "tintBenchmarkScopeMissingRows": 0,
+        "notApplicableRows": 0
+      },
+      {
+        "evidencePath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+        "targets": [
+          "spirv"
+        ],
+        "rowCount": 14,
+        "doeOkRows": 14,
+        "tintOkRows": 14,
+        "doeExactPhaseCompleteRows": 14,
+        "doeExactPhaseMissingRows": 0,
+        "tintExactPhaseCompleteRows": 0,
+        "tintExactPhaseMissingRows": 14,
+        "tintBenchmarkScopeCoveredRows": 14,
+        "tintBenchmarkScopeMissingRows": 0,
+        "notApplicableRows": 0
+      }
+    ]
+  },
   "claimBlockers": [
     {
       "code": "claimable_tint_compiler_evidence_report",
-      "path": "compilerEvidence[0].comparisonStatus",
-      "message": "compiler evidence must be comparable before it can support a Tint replacement claim"
+      "path": "compilerEvidence[0].claimBlockers[0]",
+      "message": "webgpu-prefix-sum:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[0].claimBlockers[1]",
+      "message": "webgpu-prefix-sum:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[0].claimBlockers[2]",
+      "message": "webgpu-prefix-sum:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[0].claimBlockers[3]",
+      "message": "webgpu-prefix-sum:tint: missing integer phase timing: emit"
     },
     {
       "code": "claimable_tint_compiler_evidence_report",
@@ -137,19 +294,299 @@
       "message": "compiler evidence must be claimable before it can support a Tint replacement claim"
     },
     {
-      "code": "shader_artifact_validation_for_target_backends",
-      "path": "targetValidationReceipts[0].claimBlockers[0]",
-      "message": "Tint compiler result is not ok: sample_missing_tint_run"
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[0]",
+      "message": "atan2-const-eval.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[1]",
+      "message": "atan2-const-eval.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[2]",
+      "message": "atan2-const-eval.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[3]",
+      "message": "atan2-const-eval.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[4]",
+      "message": "cluster-lights.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[5]",
+      "message": "cluster-lights.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[6]",
+      "message": "cluster-lights.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[7]",
+      "message": "cluster-lights.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[8]",
+      "message": "metaball-isosurface.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[9]",
+      "message": "metaball-isosurface.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[10]",
+      "message": "metaball-isosurface.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[11]",
+      "message": "metaball-isosurface.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[12]",
+      "message": "particles.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[13]",
+      "message": "particles.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[14]",
+      "message": "particles.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[15]",
+      "message": "particles.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[16]",
+      "message": "shadow-fragment.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[17]",
+      "message": "shadow-fragment.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[18]",
+      "message": "shadow-fragment.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[19]",
+      "message": "shadow-fragment.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[20]",
+      "message": "skinned-shadowed-pbr-fragment.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[21]",
+      "message": "skinned-shadowed-pbr-fragment.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[22]",
+      "message": "skinned-shadowed-pbr-fragment.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[23]",
+      "message": "skinned-shadowed-pbr-fragment.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[24]",
+      "message": "skinned-shadowed-pbr-vertex.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[25]",
+      "message": "skinned-shadowed-pbr-vertex.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[26]",
+      "message": "skinned-shadowed-pbr-vertex.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[27]",
+      "message": "skinned-shadowed-pbr-vertex.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[28]",
+      "message": "unity_webgpu_000002778DE78280.cs.spv:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[29]",
+      "message": "unity_webgpu_000002778DE78280.cs.spv:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[30]",
+      "message": "unity_webgpu_000002778DE78280.cs.spv:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[31]",
+      "message": "unity_webgpu_000002778DE78280.cs.spv:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[32]",
+      "message": "unity_webgpu_000002778DE78280.cs.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[33]",
+      "message": "unity_webgpu_000002778DE78280.cs.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[34]",
+      "message": "unity_webgpu_000002778DE78280.cs.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[35]",
+      "message": "unity_webgpu_000002778DE78280.cs.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[36]",
+      "message": "unity_webgpu_000002778F740030.fs.spv:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[37]",
+      "message": "unity_webgpu_000002778F740030.fs.spv:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[38]",
+      "message": "unity_webgpu_000002778F740030.fs.spv:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[39]",
+      "message": "unity_webgpu_000002778F740030.fs.spv:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[40]",
+      "message": "unity_webgpu_000002778F740030.fs.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[41]",
+      "message": "unity_webgpu_000002778F740030.fs.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[42]",
+      "message": "unity_webgpu_000002778F740030.fs.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[43]",
+      "message": "unity_webgpu_000002778F740030.fs.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[44]",
+      "message": "unity_webgpu_0000017E9E2D81A0.vs.spv:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[45]",
+      "message": "unity_webgpu_0000017E9E2D81A0.vs.spv:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[46]",
+      "message": "unity_webgpu_0000017E9E2D81A0.vs.spv:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[47]",
+      "message": "unity_webgpu_0000017E9E2D81A0.vs.spv:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[48]",
+      "message": "unity_webgpu_0000017E9E2D81A0.vs.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[49]",
+      "message": "unity_webgpu_0000017E9E2D81A0.vs.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[50]",
+      "message": "unity_webgpu_0000017E9E2D81A0.vs.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[51]",
+      "message": "unity_webgpu_0000017E9E2D81A0.vs.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[52]",
+      "message": "webgpu-prefix-sum.wgsl:tint: missing integer phase timing: parse"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[53]",
+      "message": "webgpu-prefix-sum.wgsl:tint: missing integer phase timing: sema"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[54]",
+      "message": "webgpu-prefix-sum.wgsl:tint: missing integer phase timing: lower"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimBlockers[55]",
+      "message": "webgpu-prefix-sum.wgsl:tint: missing integer phase timing: emit"
+    },
+    {
+      "code": "claimable_tint_compiler_evidence_report",
+      "path": "compilerEvidence[1].claimStatus",
+      "message": "compiler evidence must be claimable before it can support a Tint replacement claim"
     }
   ],
   "failures": [],
   "summary": {
-    "compilerEvidenceReportCount": 1,
+    "compilerEvidenceReportCount": 2,
     "loweringLinkReceiptCount": 1,
     "targetValidationReceiptCount": 1,
-    "phaseBenchmarkReceiptCount": 1,
+    "phaseBenchmarkReceiptCount": 2,
     "coveredTargetCount": 1,
-    "claimBlockerCount": 3,
+    "claimBlockerCount": 62,
     "failureCount": 0
   }
 }

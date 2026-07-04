@@ -3,26 +3,268 @@
   "artifactKind": "chromium_source_checkout_check",
   "sourceRoot": "browser/chromium/src",
   "requireReady": false,
-  "requireRuntimeSelector": false,
-  "status": "blocked",
+  "requireRuntimeSelector": true,
+  "status": "pass",
   "checks": [
     {
       "checkId": "source_root",
-      "status": "fail",
+      "status": "pass",
       "required": true,
-      "path": "browser/chromium/src",
-      "message": "Chromium source root is missing"
+      "message": "Chromium source root exists",
+      "path": "browser/chromium/src"
+    },
+    {
+      "checkId": "marker:.gn",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium source marker exists",
+      "path": "browser/chromium/src/.gn"
+    },
+    {
+      "checkId": "marker:DEPS",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium source marker exists",
+      "path": "browser/chromium/src/DEPS"
+    },
+    {
+      "checkId": "marker:build",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium source marker exists",
+      "path": "browser/chromium/src/build"
+    },
+    {
+      "checkId": "marker:gpu",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium source marker exists",
+      "path": "browser/chromium/src/gpu"
+    },
+    {
+      "checkId": "marker:third_party/blink/renderer/modules/webgpu",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium source marker exists",
+      "path": "browser/chromium/src/third_party/blink/renderer/modules/webgpu"
+    },
+    {
+      "checkId": "selector:runtime_switch",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/config/gpu_switches.cc"
+    },
+    {
+      "checkId": "selector:doe_disable_switch",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/config/gpu_switches.cc"
+    },
+    {
+      "checkId": "selector:doe_library_switch",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/config/gpu_switches.cc"
+    },
+    {
+      "checkId": "selector:load_failure_reason",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:initialization_failure_reason",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:symbol_failure_reason",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:wire_proc_table_failure_reason",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:wire_proc_table_loader",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:doe_wire_runtime_instance",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:doe_wire_runtime_lifecycle_test",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:doe_shared_image_iosurface_bridge",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+    },
+    {
+      "checkId": "selector:doe_shared_image_iosurface_representation",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/shared_image/iosurface_image_backing.mm"
+    },
+    {
+      "checkId": "selector:doe_shared_image_native_import",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:doe_shared_image_native_begin_access",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:doe_shared_image_native_end_access",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:doe_shared_image_iosurface_handle",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/shared_image/iosurface_image_backing.mm"
+    },
+    {
+      "checkId": "selector:doe_shared_buffer_unsupported",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+    },
+    {
+      "checkId": "selector:doe_shared_buffer_fails_closed",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+    },
+    {
+      "checkId": "selector:doe_present_shared_texture_end_access",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+    },
+    {
+      "checkId": "selector:render_proc_surface",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:external_texture_proc_surface",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+    },
+    {
+      "checkId": "selector:profile_denylisted_reason",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+    },
+    {
+      "checkId": "selector:adapter_denylist_detail",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+    },
+    {
+      "checkId": "selector:adapter_denylist_vendor_id",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+    },
+    {
+      "checkId": "selector:adapter_denylist_blocklist_reason",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+    },
+    {
+      "checkId": "selector:adapter_denylist_source_fields_test",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_unittest.cc"
+    },
+    {
+      "checkId": "selector:unknown_selection_reason",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium runtime selector source marker exists",
+      "path": "gpu/command_buffer/service/webgpu_decoder_impl.cc"
     },
     {
       "checkId": "tool:gclient",
-      "status": "fail",
+      "status": "pass",
       "required": true,
-      "command": "gclient",
-      "message": "required Chromium tool is missing from PATH"
+      "message": "Chromium tool found on PATH",
+      "command": "gclient"
+    },
+    {
+      "checkId": "tool:gn",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium tool found on PATH",
+      "command": "gn"
+    },
+    {
+      "checkId": "tool:autoninja",
+      "status": "pass",
+      "required": true,
+      "message": "Chromium tool found on PATH",
+      "command": "autoninja"
+    },
+    {
+      "checkId": "tool:fetch",
+      "status": "pass",
+      "required": false,
+      "message": "Chromium tool found on PATH",
+      "command": "fetch"
     }
   ],
-  "missingRequired": [
-    "source_root",
-    "tool:gclient"
-  ]
+  "missingRequired": []
 }

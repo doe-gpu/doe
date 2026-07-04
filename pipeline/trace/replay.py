@@ -13,6 +13,7 @@ from pathlib import Path
 
 
 REPLAY_SEED = "0x9e3779b97f4a7c15"
+SUPPORTED_OP_CODES = {"dispatch", "upload", "copy", "readback"}
 
 
 def safe_int(value: Any, default: int = 0) -> int:
@@ -124,7 +125,7 @@ def main() -> int:
             print(f"FAIL: trace row={idx} invalid module")
             return 1
 
-        if row.get("opCode") not in {"dispatch", "upload"}:
+        if row.get("opCode") not in SUPPORTED_OP_CODES:
             print(f"FAIL: trace row={idx} unsupported opCode={row.get('opCode')}")
             return 1
 

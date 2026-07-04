@@ -305,6 +305,64 @@ def validate_row(
     return failures
 
 
+def validate_evidence_slices(
+    row: dict[str, Any],
+    row_path: str,
+    root: Path,
+    entries_by_id: dict[str, dict[str, Any]],
+    definitions_by_code: dict[str, dict[str, Any]],
+    seen_slice_ids: set[str],
+) -> tuple[list[dict[str, str]], set[str], int, int]:
+    failures: list[dict[str, str]] = []
+    used_blockers: set[str] = set()
+    slice_count = 0
+    claim_allowed_slice_count = 0
+    slices = row.get("evidenceSlices", [])
+    row_claim_allowed = row.get("claimAllowed") is True
+
+    if not isinstance(slices, list):
+        return failures, used_blockers, slice_count, claim_allowed_slice_count
+
+    for index, evidence_slice in enumerate(slices):
+        slice_path = f"{row_path}.evidenceSlices[{index}]"
+        if not isinstance(evidence_slice, dict):
+            continue
+        slice_count += 1
+        slice_id = evidence_slice.get("id")
+        if isinstance(slice_id, str):
+            if slice_id in seen_slice_ids:
+                failures.append(
+                    failure("duplicate_evidence_slice", f"{slice_path}.id", slice_id)
+                )
+            seen_slice_ids.add(slice_id)
+        if evidence_slice.get("claimAllowed") is True:
+            claim_allowed_slice_count += 1
+        elif row_claim_allowed:
+            failures.append(
+                failure(
+                    "claim_allowed_row_has_blocked_slice",
+                    f"{slice_path}.claimAllowed",
+                    "claim-allowed rows require every evidence slice to be claim-allowed",
+                )
+            )
+        blockers = evidence_slice.get("blockers", [])
+        if isinstance(blockers, list):
+            for blocker_index, blocker in enumerate(blockers):
+                if not isinstance(blocker, str):
+                    continue
+                used_blockers.add(blocker)
+                if blocker not in definitions_by_code:
+                    failures.append(
+                        failure(
+                            "undefined_blocker",
+                            f"{slice_path}.blockers[{blocker_index}]",
+                            f"blocker is not defined: {blocker}",
+                        )
+                    )
+        failures.extend(validate_row(evidence_slice, slice_path, root, entries_by_id))
+    return failures, used_blockers, slice_count, claim_allowed_slice_count
+
+
 def blocker_definition_failures(
     frontier: dict[str, Any],
     root: Path,
@@ -397,8 +455,11 @@ def evaluate_frontier(
     blocker_failures, definitions_by_code = blocker_definition_failures(frontier, root)
     failures.extend(blocker_failures)
     seen_ids: set[str] = set()
+    seen_slice_ids: set[str] = set()
     used_blockers: set[str] = set()
     claim_allowed_count = 0
+    evidence_slice_count = 0
+    claim_allowed_evidence_slice_count = 0
 
     if isinstance(rows, list):
         for index, row in enumerate(rows):
@@ -433,6 +494,23 @@ def evaluate_frontier(
                             )
                         )
             failures.extend(validate_row(row, row_path, root, entries_by_id))
+            (
+                slice_failures,
+                slice_blockers,
+                row_slice_count,
+                row_claim_allowed_slice_count,
+            ) = validate_evidence_slices(
+                row,
+                row_path,
+                root,
+                entries_by_id,
+                definitions_by_code,
+                seen_slice_ids,
+            )
+            failures.extend(slice_failures)
+            used_blockers.update(slice_blockers)
+            evidence_slice_count += row_slice_count
+            claim_allowed_evidence_slice_count += row_claim_allowed_slice_count
 
     for required_id in sorted(REQUIRED_FRONTIER_IDS - seen_ids):
         failures.append(
@@ -458,6 +536,8 @@ def evaluate_frontier(
         "summary": {
             "frontierRowCount": len(rows) if isinstance(rows, list) else 0,
             "claimAllowedRowCount": claim_allowed_count,
+            "evidenceSliceCount": evidence_slice_count,
+            "claimAllowedEvidenceSliceCount": claim_allowed_evidence_slice_count,
             "requiredRowCount": len(REQUIRED_FRONTIER_IDS),
         },
     }

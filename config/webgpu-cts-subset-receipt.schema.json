@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe WebGPU CTS Subset Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "receiptId",
+    "publicationStatus",
+    "publicationChannel",
+    "sourceEvidence",
+    "ctsSource",
+    "ctsRevision",
+    "conformanceClaimAllowed",
+    "claimLanguage",
+    "remainingPromotionRequirements",
+    "summary",
+    "backendCoverage",
+    "queryCoverage"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "webgpu_cts_subset_receipt" },
+    "receiptId": { "type": "string", "minLength": 1 },
+    "publicationStatus": { "type": "string", "const": "repo_published" },
+    "publicationChannel": { "type": "string", "minLength": 1 },
+    "sourceEvidence": { "$ref": "#/$defs/SourceEvidence" },
+    "ctsSource": { "type": "string", "minLength": 1 },
+    "ctsRevision": { "type": "string", "minLength": 1 },
+    "conformanceClaimAllowed": { "type": "boolean", "const": false },
+    "claimLanguage": {
+      "type": "string",
+      "const": "diagnostic_until_full_published_pass_ledger"
+    },
+    "remainingPromotionRequirements": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "summary": { "$ref": "#/$defs/Summary" },
+    "backendCoverage": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/BackendCoverage" }
+    },
+    "queryCoverage": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/QueryCoverage" }
+    }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "SourceEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "artifactKind",
+        "policyId",
+        "claimLanguage",
+        "diagnosticLanguage"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "const": "webgpu_cts_evidence" },
+        "policyId": { "type": "string", "minLength": 1 },
+        "claimLanguage": {
+          "type": "string",
+          "const": "diagnostic_until_full_published_pass_ledger"
+        },
+        "diagnosticLanguage": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverageRowCount",
+        "queryCount",
+        "backendCount",
+        "surfaceCount",
+        "artifactPathCount",
+        "passCount",
+        "failCount",
+        "skipCount",
+        "notRunCount"
+      ],
+      "properties": {
+        "coverageRowCount": { "type": "integer", "minimum": 1 },
+        "queryCount": { "type": "integer", "minimum": 1 },
+        "backendCount": { "type": "integer", "minimum": 1 },
+        "surfaceCount": { "type": "integer", "minimum": 1 },
+        "artifactPathCount": { "type": "integer", "minimum": 1 },
+        "passCount": { "type": "integer", "minimum": 0 },
+        "failCount": { "type": "integer", "minimum": 0 },
+        "skipCount": { "type": "integer", "minimum": 0 },
+        "notRunCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "BackendCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["backend", "surface", "host", "os", "artifactPaths"],
+      "properties": {
+        "backend": { "type": "string", "minLength": 1 },
+        "surface": { "type": "string", "minLength": 1 },
+        "host": { "type": "string", "minLength": 1 },
+        "os": { "type": "string", "minLength": 1 },
+        "artifactPaths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "QueryCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "query",
+        "bucket",
+        "status",
+        "surface",
+        "backend",
+        "host",
+        "os",
+        "artifactPath"
+      ],
+      "properties": {
+        "query": { "type": "string", "minLength": 1 },
+        "bucket": { "type": "string", "minLength": 1 },
+        "status": {
+          "type": "string",
+          "enum": ["pass", "fail", "skip", "not_run"]
+        },
+        "surface": { "type": "string", "minLength": 1 },
+        "backend": { "type": "string", "minLength": 1 },
+        "host": { "type": "string", "minLength": 1 },
+        "os": { "type": "string", "minLength": 1 },
+        "artifactPath": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

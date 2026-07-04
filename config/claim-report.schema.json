@@ -119,6 +119,9 @@
           "claimable": {
             "type": "boolean"
           },
+          "evaluated": {
+            "type": "boolean"
+          },
           "reasons": {
             "type": "array",
             "items": {
@@ -130,6 +133,15 @@
           },
           "claimMetricScope": {
             "type": "string"
+          },
+          "skipReason": {
+            "type": "string"
+          },
+          "auditNotes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "requiredPositivePercentiles": {
             "type": "array",

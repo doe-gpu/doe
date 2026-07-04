@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_release_candidate_finalizer",
+  "status": "fail",
+  "phase": "package_inputs_preflight",
+  "failures": [
+    {
+      "code": "package_inputs_not_release_candidate_eligible",
+      "path": "packageInputs.releaseCandidateEligible",
+      "message": "package inputs must be release-candidate eligible before final bundle assembly"
+    },
+    {
+      "code": "package_inputs_not_release_candidate_evidence",
+      "path": "packageInputs.evidenceMode",
+      "message": "package inputs evidenceMode must be release_candidate before final bundle assembly"
+    },
+    {
+      "code": "package_inputs_release_candidate_blockers_present",
+      "path": "packageInputs.releaseCandidateBlockers",
+      "message": "package inputs must carry no release-candidate blockers before final bundle assembly"
+    },
+    {
+      "code": "package_inputs_platform_mismatch",
+      "path": "packageInputs.platform",
+      "message": "release-candidate finalizer requires initial macOS arm64 zip package inputs"
+    },
+    {
+      "code": "package_inputs_channel_mismatch",
+      "path": "browserProduct.channel",
+      "message": "release-candidate finalizer requires browserProduct.channel=release_candidate"
+    }
+  ]
+}

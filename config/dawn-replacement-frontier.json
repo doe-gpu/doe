@@ -16,30 +16,6 @@
       ]
     },
     {
-      "code": "fresh_amd_vulkan_release_claim_artifact",
-      "exitCriteria": "Publish current AMD Vulkan Doe-vs-Dawn release compare and claim artifacts that pass claim, structural equivalence, and readback comparability gates.",
-      "evidencePaths": [
-        "docs/status/runtime-backends-and-bench.md",
-        "config/native-backend-coverage-matrix.json"
-      ]
-    },
-    {
-      "code": "matched_effective_readback_paths",
-      "exitCriteria": "Produce package or native reports where Doe and the Dawn comparator use matching effective readback paths or carry a non-claimable path asymmetry.",
-      "evidencePaths": [
-        "docs/status/runtime-backends-and-bench.md",
-        "bench/docs/package-browser-ort-fairness-audit.md"
-      ]
-    },
-    {
-      "code": "vulkan_pipeline_cache_receipts",
-      "exitCriteria": "Publish Vulkan cache receipts showing the Doe and Dawn comparison lanes have declared cache-path parity or an explicit diagnostic boundary.",
-      "evidencePaths": [
-        "bench/docs/vulkan-pipeline-cache-integration.md",
-        "config/native-backend-coverage-matrix.json"
-      ]
-    },
-    {
       "code": "fresh_windows_d3d12_runtime_artifact",
       "exitCriteria": "Publish a Windows D3D12 runtime artifact from the governed D3D12 workload contract.",
       "evidencePaths": [
@@ -103,8 +79,25 @@
       "exitCriteria": "Publish browser release-build evidence for the Chromium runtime lane with release artifact files and hashes verified before promoting browser replacement language.",
       "evidencePaths": [
         "examples/browser-runtime-frontier-bundle.sample.json",
+        "examples/browser-release-package-inputs-check.sample.json",
+        "examples/browser-release-candidate-provenance.sample.json",
+        "examples/browser-published-proof-surface.sample.json",
+        "examples/browser-published-proof-surface-check.sample.json",
+        "examples/browser-release-candidate-finalizer.sample.json",
+        "examples/browser-release-candidate-finalizer-check.sample.json",
         "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
         "docs/doe-support-matrix.md"
+      ]
+    },
+    {
+      "code": "browser_claim_index_promotion",
+      "exitCriteria": "Promote the Chromium browser row only after the release-candidate runtime frontier, provenance, package-input, launch, proof-surface, finalizer, finalizer-check, and public claim-index evidence are all claimable and hash-bound.",
+      "evidencePaths": [
+        "config/dawn-replacement-frontier.json",
+        "reports/claim-index.json",
+        "examples/browser-runtime-frontier-bundle.sample.json",
+        "examples/browser-release-candidate-provenance.sample.json",
+        "examples/browser-release-candidate-finalizer-check.sample.json"
       ]
     },
     {
@@ -112,6 +105,9 @@
       "exitCriteria": "Run the Doe-vs-Tint compiler evidence gate in claimable mode and publish the resulting evidence report.",
       "evidencePaths": [
         "examples/tint-compiler-evidence.sample.json",
+        "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+        "examples/tint-compiler-frontier-bundle.sample.json",
         "docs/shader-compiler-architecture.md"
       ]
     },
@@ -120,6 +116,7 @@
       "exitCriteria": "Publish WGSL lowering-link receipts that connect source WGSL, lowered artifacts, validation results, and target backend identity.",
       "evidencePaths": [
         "examples/wgsl-lowering-link-receipt.sample.json",
+        "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json",
         "examples/tint-compiler-frontier-bundle.sample.json",
         "docs/shader-compiler-architecture.md"
       ]
@@ -130,6 +127,7 @@
       "evidencePaths": [
         "config/shader-toolchain.json",
         "examples/tint-compiler-target-validation.sample.json",
+        "examples/tint-compiler-target-validation.frontier.spirv.sample.json",
         "docs/shader-compiler-architecture.md"
       ]
     },
@@ -138,6 +136,7 @@
       "exitCriteria": "Publish a CTS subset receipt with explicit query coverage, pass/fail status, and backend identity.",
       "evidencePaths": [
         "config/webgpu-cts-evidence.json",
+        "examples/webgpu-cts-subset-receipt.sample.json",
         "docs/doe-support-matrix.md"
       ]
     },
@@ -146,6 +145,7 @@
       "exitCriteria": "Record backend-specific CTS pass ledgers for every backend used by the replacement claim.",
       "evidencePaths": [
         "config/webgpu-cts-evidence.json",
+        "examples/webgpu-cts-backend-pass-ledger.sample.json",
         "config/webgpu-spec-index.jsonl"
       ]
     },
@@ -154,30 +154,6 @@
       "exitCriteria": "Define the conformance claim policy that maps CTS evidence to allowed public language.",
       "evidencePaths": [
         "config/webgpu-cts-evidence.json",
-        "docs/doe-support-matrix.md"
-      ]
-    },
-    {
-      "code": "non_apple_drop_in_bundle_receipts",
-      "exitCriteria": "Publish non-Apple drop-in runtime bundle receipts with hashes, ABI checks, and gate outputs.",
-      "evidencePaths": [
-        "docs/apple-metal-runtime-release.md",
-        "docs/doe-support-matrix.md"
-      ]
-    },
-    {
-      "code": "rollback_rehearsal_receipt",
-      "exitCriteria": "Publish a rollback rehearsal receipt for the drop-in runtime cutover policy.",
-      "evidencePaths": [
-        "config/backend-cutover-policy.json",
-        "docs/doe-support-matrix.md"
-      ]
-    },
-    {
-      "code": "cross_backend_abi_validation",
-      "exitCriteria": "Publish ABI validation covering the backend set named by the runtime replacement claim.",
-      "evidencePaths": [
-        "config/native-backend-coverage-matrix.json",
         "docs/doe-support-matrix.md"
       ]
     }
@@ -199,6 +175,30 @@
         "docs/apple-metal-runtime-release.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
+      "evidenceSlices": [
+        {
+          "id": "native-macos-arm64-apple-metal",
+          "label": "Native macOS arm64 Apple Metal",
+          "os": "macos",
+          "arch": "arm64",
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "runtimeHost": "native",
+          "currentState": "claimable",
+          "claimAllowed": true,
+          "claimIndexEntryIds": [
+            "native-strict-apple-metal",
+            "native-release-apple-metal"
+          ],
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "docs/apple-metal-runtime-release.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [],
+          "notes": "The native Apple Metal slice is claimable only through the strict and release claim-index entries."
+        }
+      ],
       "blockers": [],
       "notes": "Apple Metal native Doe-vs-Dawn replacement claims are allowed only through the indexed strict and release claim artifacts."
     },
@@ -207,20 +207,49 @@
       "surface": "native_runtime",
       "dawnComparator": "dawn_vulkan",
       "doeTarget": "doe_vulkan",
-      "currentState": "diagnostic",
-      "claimAllowed": false,
-      "claimIndexEntryIds": [],
+      "currentState": "claimable",
+      "claimAllowed": true,
+      "claimIndexEntryIds": [
+        "native-release-amd-vulkan"
+      ],
       "evidencePaths": [
+        "reports/claim-index.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.manifest.json",
         "config/native-backend-coverage-matrix.json",
         "bench/docs/vulkan-pipeline-cache-integration.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
-      "blockers": [
-        "fresh_amd_vulkan_release_claim_artifact",
-        "matched_effective_readback_paths",
-        "vulkan_pipeline_cache_receipts"
+      "evidenceSlices": [
+        {
+          "id": "native-linux-x64-amd-vulkan",
+          "label": "Native Linux x64 AMD Vulkan",
+          "os": "linux",
+          "arch": "x64",
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "runtimeHost": "native",
+          "currentState": "claimable",
+          "claimAllowed": true,
+          "claimIndexEntryIds": [
+            "native-release-amd-vulkan"
+          ],
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.manifest.json",
+            "config/native-backend-coverage-matrix.json",
+            "bench/docs/vulkan-pipeline-cache-integration.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [],
+          "notes": "The native AMD Vulkan slice is claimable only through the indexed release claim and rehearsal manifest."
+        }
       ],
-      "notes": "Vulkan work remains visible as a Dawn-facing runtime frontier, but broad replacement language is blocked until current receipts clear readback and cache comparability."
+      "blockers": [],
+      "notes": "AMD Vulkan native Doe-vs-Dawn replacement claims are allowed only through the indexed release claim artifact and its rehearsal manifest."
     },
     {
       "id": "native-d3d12-runtime",
@@ -234,6 +263,31 @@
         "config/native-backend-coverage-matrix.json",
         "bench/workloads/workloads.local.d3d12.json",
         "docs/doe-support-matrix.md"
+      ],
+      "evidenceSlices": [
+        {
+          "id": "native-windows-x64-d3d12",
+          "label": "Native Windows x64 D3D12",
+          "os": "windows",
+          "arch": "x64",
+          "gpuApi": "d3d12",
+          "gpuVendor": "microsoft",
+          "runtimeHost": "native",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
+          "evidencePaths": [
+            "config/native-backend-coverage-matrix.json",
+            "bench/workloads/workloads.local.d3d12.json",
+            "docs/doe-support-matrix.md"
+          ],
+          "blockers": [
+            "fresh_windows_d3d12_runtime_artifact",
+            "d3d12_dawn_mapping_validation",
+            "d3d12_claim_report"
+          ],
+          "notes": "The native D3D12 slice is diagnostic until Windows runtime evidence and Dawn mapping validation are published."
+        }
       ],
       "blockers": [
         "fresh_windows_d3d12_runtime_artifact",
@@ -250,15 +304,66 @@
       "currentState": "claimable",
       "claimAllowed": true,
       "claimIndexEntryIds": [
-        "package-node-apple-metal"
+        "package-node-apple-metal",
+        "package-node-amd-vulkan"
       ],
       "evidencePaths": [
         "reports/claim-index.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.claim.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.claim-rehearsal.manifest.json",
         "packages/doe-gpu/README.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
+      "evidenceSlices": [
+        {
+          "id": "node-macos-arm64-apple-metal",
+          "label": "Node macOS arm64 Apple Metal",
+          "os": "macos",
+          "arch": "arm64",
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "runtimeHost": "node",
+          "currentState": "claimable",
+          "claimAllowed": true,
+          "claimIndexEntryIds": [
+            "package-node-apple-metal"
+          ],
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "packages/doe-gpu/README.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [],
+          "notes": "The Node package slice is claimable only for the indexed Apple Metal package receipt."
+        },
+        {
+          "id": "node-linux-x64-amd-vulkan",
+          "label": "Node Linux x64 AMD Vulkan",
+          "os": "linux",
+          "arch": "x64",
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "runtimeHost": "node",
+          "currentState": "claimable",
+          "claimAllowed": true,
+          "claimIndexEntryIds": [
+            "package-node-amd-vulkan"
+          ],
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.claim.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.claim-rehearsal.manifest.json",
+            "packages/doe-gpu/README.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [],
+          "notes": "The Node package Linux AMD Vulkan slice is claimable through the indexed local Gemma 270M package comparison and claim rehearsal."
+        }
+      ],
       "blockers": [],
-      "notes": "Node package claims are constrained to the claim-indexed Apple Metal package receipt."
+      "notes": "Node package claims are constrained to claim-indexed Apple Metal and Linux AMD Vulkan package receipts."
     },
     {
       "id": "package-bun-runtime",
@@ -268,15 +373,66 @@
       "currentState": "claimable",
       "claimAllowed": true,
       "claimIndexEntryIds": [
-        "package-bun-apple-metal"
+        "package-bun-apple-metal",
+        "package-bun-amd-vulkan"
       ],
       "evidencePaths": [
         "reports/claim-index.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.claim.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.claim-rehearsal.manifest.json",
         "packages/doe-gpu/README.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
+      "evidenceSlices": [
+        {
+          "id": "bun-macos-arm64-apple-metal",
+          "label": "Bun macOS arm64 Apple Metal",
+          "os": "macos",
+          "arch": "arm64",
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "runtimeHost": "bun",
+          "currentState": "claimable",
+          "claimAllowed": true,
+          "claimIndexEntryIds": [
+            "package-bun-apple-metal"
+          ],
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "packages/doe-gpu/README.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [],
+          "notes": "The Bun package slice is claimable only for the indexed Apple Metal package receipt."
+        },
+        {
+          "id": "bun-linux-x64-amd-vulkan",
+          "label": "Bun Linux x64 AMD Vulkan",
+          "os": "linux",
+          "arch": "x64",
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "runtimeHost": "bun",
+          "currentState": "claimable",
+          "claimAllowed": true,
+          "claimIndexEntryIds": [
+            "package-bun-amd-vulkan"
+          ],
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.claim.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.claim-rehearsal.manifest.json",
+            "packages/doe-gpu/README.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [],
+          "notes": "The Bun package Linux AMD Vulkan slice is claimable through the indexed local Gemma 270M package comparison and claim rehearsal."
+        }
+      ],
       "blockers": [],
-      "notes": "Bun package claims are constrained to the claim-indexed Apple Metal package receipt."
+      "notes": "Bun package claims are constrained to claim-indexed Apple Metal and Linux AMD Vulkan package receipts."
     },
     {
       "id": "package-deno-runtime",
@@ -290,6 +446,52 @@
         "config/tool-surfaces.json",
         "packages/doe-gpu/README.md",
         "docs/doe-support-matrix.md"
+      ],
+      "evidenceSlices": [
+        {
+          "id": "deno-macos-arm64-apple-metal",
+          "label": "Deno macOS arm64 Apple Metal",
+          "os": "macos",
+          "arch": "arm64",
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "runtimeHost": "deno",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
+          "evidencePaths": [
+            "config/tool-surfaces.json",
+            "packages/doe-gpu/README.md",
+            "docs/doe-support-matrix.md"
+          ],
+          "blockers": [
+            "deno_package_compare_claim_report",
+            "deno_host_webgpu_comparability_audit"
+          ],
+          "notes": "The Deno Apple Metal package slice is diagnostic until Deno comparator identity and claim evidence are published."
+        },
+        {
+          "id": "deno-linux-x64-amd-vulkan",
+          "label": "Deno Linux x64 AMD Vulkan",
+          "os": "linux",
+          "arch": "x64",
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "runtimeHost": "deno",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
+          "evidencePaths": [
+            "config/tool-surfaces.json",
+            "packages/doe-gpu/README.md",
+            "docs/doe-support-matrix.md"
+          ],
+          "blockers": [
+            "deno_package_compare_claim_report",
+            "deno_host_webgpu_comparability_audit"
+          ],
+          "notes": "The Deno AMD Vulkan package slice is diagnostic until Deno comparator identity and claim evidence are published."
+        }
       ],
       "blockers": [
         "deno_package_compare_claim_report",
@@ -305,18 +507,128 @@
       "currentState": "diagnostic",
       "claimAllowed": false,
       "claimIndexEntryIds": [
-        "ort-browser-apple-metal"
+        "ort-browser-apple-metal",
+        "browser-chromium-release"
       ],
       "evidencePaths": [
         "examples/browser-runtime-frontier-bundle.sample.json",
+        "examples/browser-release-package-inputs-check.sample.json",
+        "examples/browser-release-candidate-provenance.sample.json",
+        "examples/browser-published-proof-surface.sample.json",
+        "examples/browser-published-proof-surface-check.sample.json",
+        "examples/browser-release-candidate-finalizer.sample.json",
+        "examples/browser-release-candidate-finalizer-check.sample.json",
         "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
         "docs/doe-support-matrix.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
+      "evidenceSlices": [
+        {
+          "id": "chromium-macos-arm64-apple-metal",
+          "label": "Chromium macOS arm64 Apple Metal",
+          "os": "macos",
+          "arch": "arm64",
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "runtimeHost": "chromium",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [
+            "ort-browser-apple-metal",
+            "browser-chromium-release"
+          ],
+          "evidencePaths": [
+            "examples/browser-runtime-frontier-bundle.sample.json",
+            "examples/browser-release-package-inputs-check.sample.json",
+            "examples/browser-release-candidate-provenance.sample.json",
+            "examples/browser-published-proof-surface.sample.json",
+            "examples/browser-published-proof-surface-check.sample.json",
+            "examples/browser-release-candidate-finalizer.sample.json",
+            "examples/browser-release-candidate-finalizer-check.sample.json",
+            "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+            "docs/doe-support-matrix.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [
+            "claim_grade_browser_runtime_identity",
+            "browser_structural_equivalence_receipts",
+            "chromium_release_build_evidence",
+            "browser_claim_index_promotion"
+          ],
+          "notes": "The Chromium Apple Metal browser slice is diagnostic until runtime identity, structural receipts, release build evidence, and claim-index promotion are all published."
+        },
+        {
+          "id": "chromium-linux-x64-amd-vulkan",
+          "label": "Chromium Linux x64 AMD Vulkan",
+          "os": "linux",
+          "arch": "x64",
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "runtimeHost": "chromium",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [
+            "browser-chromium-release"
+          ],
+          "evidencePaths": [
+            "examples/browser-runtime-frontier-bundle.sample.json",
+            "examples/browser-release-package-inputs-check.sample.json",
+            "examples/browser-release-candidate-provenance.sample.json",
+            "examples/browser-published-proof-surface.sample.json",
+            "examples/browser-published-proof-surface-check.sample.json",
+            "examples/browser-release-candidate-finalizer.sample.json",
+            "examples/browser-release-candidate-finalizer-check.sample.json",
+            "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+            "docs/doe-support-matrix.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [
+            "claim_grade_browser_runtime_identity",
+            "browser_structural_equivalence_receipts",
+            "chromium_release_build_evidence",
+            "browser_claim_index_promotion"
+          ],
+          "notes": "The Chromium AMD Vulkan browser slice is diagnostic until release-build evidence and browser claim-index promotion are published."
+        },
+        {
+          "id": "chromium-windows-x64-d3d12",
+          "label": "Chromium Windows x64 D3D12",
+          "os": "windows",
+          "arch": "x64",
+          "gpuApi": "d3d12",
+          "gpuVendor": "microsoft",
+          "runtimeHost": "chromium",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [
+            "browser-chromium-release"
+          ],
+          "evidencePaths": [
+            "examples/browser-runtime-frontier-bundle.sample.json",
+            "examples/browser-release-package-inputs-check.sample.json",
+            "examples/browser-release-candidate-provenance.sample.json",
+            "examples/browser-published-proof-surface.sample.json",
+            "examples/browser-published-proof-surface-check.sample.json",
+            "examples/browser-release-candidate-finalizer.sample.json",
+            "examples/browser-release-candidate-finalizer-check.sample.json",
+            "browser/chromium_webgpu_lane/artifacts/20260301T022843Z/dawn-vs-doe.tracka.browser-layered.superset.summary.json",
+            "docs/doe-support-matrix.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "blockers": [
+            "claim_grade_browser_runtime_identity",
+            "browser_structural_equivalence_receipts",
+            "chromium_release_build_evidence",
+            "browser_claim_index_promotion"
+          ],
+          "notes": "The Chromium D3D12 browser slice is diagnostic until Windows browser release evidence and claim-index promotion are published."
+        }
+      ],
       "blockers": [
         "claim_grade_browser_runtime_identity",
         "browser_structural_equivalence_receipts",
-        "chromium_release_build_evidence"
+        "chromium_release_build_evidence",
+        "browser_claim_index_promotion"
       ],
       "notes": "Browser artifacts remain diagnostic until the Chromium runtime lane proves identity, structure, and release-build evidence."
     },
@@ -331,10 +643,44 @@
       "evidencePaths": [
         "config/shader-toolchain.json",
         "examples/tint-compiler-evidence.sample.json",
+        "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+        "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json",
         "examples/tint-compiler-target-validation.sample.json",
+        "examples/tint-compiler-target-validation.frontier.spirv.sample.json",
         "examples/tint-phase-benchmark-evidence.sample.json",
+        "examples/tint-phase-benchmark-evidence.benchmark-corpus.spirv.sample.json",
         "examples/tint-compiler-frontier-bundle.sample.json",
         "docs/shader-compiler-architecture.md"
+      ],
+      "evidenceSlices": [
+        {
+          "id": "wgsl-spirv-cross-platform",
+          "label": "WGSL to SPIR-V cross-platform compiler",
+          "os": "cross-platform",
+          "arch": "any",
+          "gpuApi": "spirv",
+          "gpuVendor": "any",
+          "runtimeHost": "compiler",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
+          "evidencePaths": [
+            "config/shader-toolchain.json",
+            "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+            "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+            "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json",
+            "examples/tint-compiler-target-validation.frontier.spirv.sample.json",
+            "examples/tint-compiler-frontier-bundle.sample.json",
+            "docs/shader-compiler-architecture.md"
+          ],
+          "blockers": [
+            "claimable_tint_compiler_evidence_report",
+            "wgsl_lowering_link_claim_bundle",
+            "shader_artifact_validation_for_target_backends"
+          ],
+          "notes": "The WGSL-to-SPIR-V compiler slice is diagnostic until compiler evidence, lowering-link receipts, and backend artifact validation are claimable."
+        }
       ],
       "blockers": [
         "claimable_tint_compiler_evidence_report",
@@ -353,8 +699,87 @@
       "claimIndexEntryIds": [],
       "evidencePaths": [
         "config/webgpu-cts-evidence.json",
+        "examples/webgpu-cts-subset-receipt.sample.json",
+        "examples/webgpu-cts-backend-pass-ledger.sample.json",
         "config/webgpu-spec-index.jsonl",
         "docs/doe-support-matrix.md"
+      ],
+      "evidenceSlices": [
+        {
+          "id": "cts-macos-arm64-apple-metal",
+          "label": "CTS macOS arm64 Apple Metal",
+          "os": "macos",
+          "arch": "arm64",
+          "gpuApi": "metal",
+          "gpuVendor": "apple",
+          "runtimeHost": "cts",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "examples/webgpu-cts-subset-receipt.sample.json",
+            "examples/webgpu-cts-backend-pass-ledger.sample.json",
+            "config/webgpu-spec-index.jsonl",
+            "docs/doe-support-matrix.md"
+          ],
+          "blockers": [
+            "published_cts_subset_receipt",
+            "backend_specific_cts_pass_ledger",
+            "conformance_claim_policy"
+          ],
+          "notes": "The Apple Metal CTS slice is diagnostic until published CTS receipts and backend pass ledgers support the claim language."
+        },
+        {
+          "id": "cts-linux-x64-amd-vulkan",
+          "label": "CTS Linux x64 AMD Vulkan",
+          "os": "linux",
+          "arch": "x64",
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "runtimeHost": "cts",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "examples/webgpu-cts-subset-receipt.sample.json",
+            "examples/webgpu-cts-backend-pass-ledger.sample.json",
+            "config/webgpu-spec-index.jsonl",
+            "docs/doe-support-matrix.md"
+          ],
+          "blockers": [
+            "published_cts_subset_receipt",
+            "backend_specific_cts_pass_ledger",
+            "conformance_claim_policy"
+          ],
+          "notes": "The AMD Vulkan CTS slice is diagnostic until published CTS receipts and backend pass ledgers support the claim language."
+        },
+        {
+          "id": "cts-windows-x64-d3d12",
+          "label": "CTS Windows x64 D3D12",
+          "os": "windows",
+          "arch": "x64",
+          "gpuApi": "d3d12",
+          "gpuVendor": "microsoft",
+          "runtimeHost": "cts",
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
+          "evidencePaths": [
+            "config/webgpu-cts-evidence.json",
+            "examples/webgpu-cts-subset-receipt.sample.json",
+            "examples/webgpu-cts-backend-pass-ledger.sample.json",
+            "config/webgpu-spec-index.jsonl",
+            "docs/doe-support-matrix.md"
+          ],
+          "blockers": [
+            "published_cts_subset_receipt",
+            "backend_specific_cts_pass_ledger",
+            "conformance_claim_policy"
+          ],
+          "notes": "The D3D12 CTS slice is diagnostic until published CTS receipts and backend pass ledgers support the claim language."
+        }
       ],
       "blockers": [
         "published_cts_subset_receipt",
@@ -368,20 +793,59 @@
       "surface": "drop_in_runtime",
       "dawnComparator": "libwebgpu_dawn",
       "doeTarget": "libwebgpu_doe",
-      "currentState": "diagnostic",
-      "claimAllowed": false,
-      "claimIndexEntryIds": [],
+      "currentState": "claimable",
+      "claimAllowed": true,
+      "claimIndexEntryIds": [
+        "dropin-cutover-linux-vulkan"
+      ],
       "evidencePaths": [
         "config/backend-cutover-policy.json",
+        "config/dropin-cutover-rehearsal-receipt.schema.json",
         "docs/apple-metal-runtime-release.md",
-        "docs/doe-support-matrix.md"
+        "docs/doe-support-matrix.md",
+        "bench/out/dropin/20260702T164301Z/linux-dropin-report.json",
+        "bench/out/dropin/20260702T164301Z/linux-dropin-symbol-report.json",
+        "bench/out/dropin/20260702T164301Z/linux-dropin-behavior-report.json",
+        "bench/out/dropin/20260702T164301Z/linux-dropin-benchmark-report.json",
+        "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json",
+        "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+        "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json"
       ],
-      "blockers": [
-        "non_apple_drop_in_bundle_receipts",
-        "rollback_rehearsal_receipt",
-        "cross_backend_abi_validation"
+      "evidenceSlices": [
+        {
+          "id": "dropin-linux-x64-amd-vulkan",
+          "label": "Drop-in ABI Linux x64 AMD Vulkan",
+          "os": "linux",
+          "arch": "x64",
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "runtimeHost": "drop-in",
+          "currentState": "claimable",
+          "claimAllowed": true,
+          "claimIndexEntryIds": [
+            "dropin-cutover-linux-vulkan"
+          ],
+          "evidencePaths": [
+            "config/backend-cutover-policy.json",
+            "config/dropin-cutover-rehearsal-receipt.schema.json",
+            "docs/apple-metal-runtime-release.md",
+            "docs/doe-support-matrix.md",
+            "bench/out/dropin/20260702T164301Z/linux-dropin-report.json",
+            "bench/out/dropin/20260702T164301Z/linux-dropin-symbol-report.json",
+            "bench/out/dropin/20260702T164301Z/linux-dropin-behavior-report.json",
+            "bench/out/dropin/20260702T164301Z/linux-dropin-benchmark-report.json",
+            "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json",
+            "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+            "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json"
+          ],
+          "blockers": [],
+          "notes": "The drop-in ABI Linux AMD Vulkan slice is claimable through the indexed cutover rehearsal receipt and AMD Vulkan delegate release claim."
+        }
       ],
-      "notes": "Apple runtime bundle evidence exists, but broad libwebgpu replacement claims need cross-backend ABI and rollback evidence."
+      "blockers": [],
+      "notes": "Drop-in ABI replacement claims are allowed through the indexed Linux Vulkan cutover rehearsal receipt: the ReleaseFast libwebgpu_doe.so passed symbol, behavior, proc-resolution, and benchmark gates, and the rollback side is hash-bound to the AMD Vulkan Dawn delegate release claim."
     },
     {
       "id": "release-claim-index",
@@ -395,6 +859,29 @@
         "reports/claim-index.json",
         "config/claim-index.schema.json",
         "docs/process.md"
+      ],
+      "evidenceSlices": [
+        {
+          "id": "release-claim-index-cross-platform",
+          "label": "Release claim index cross-platform",
+          "os": "cross-platform",
+          "arch": "any",
+          "gpuApi": "none",
+          "gpuVendor": "none",
+          "runtimeHost": "claim-index",
+          "currentState": "covered",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "config/claim-index.schema.json",
+            "docs/process.md"
+          ],
+          "blockers": [
+            "frontier_rows_not_all_claimable"
+          ],
+          "notes": "The claim-index slice is covered, while universal replacement remains blocked until every product slice is claimable."
+        }
       ],
       "blockers": [
         "frontier_rows_not_all_claimable"

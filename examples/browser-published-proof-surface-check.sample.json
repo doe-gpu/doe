@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_published_proof_surface_check",
+  "surfacePath": "examples/browser-published-proof-surface.sample.json",
+  "surfaceSha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+  "verifyFilesRootProvided": true,
+  "requirePublicUrls": true,
+  "status": "pass",
+  "failures": []
+}

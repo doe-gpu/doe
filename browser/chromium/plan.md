@@ -54,6 +54,47 @@ artifact route changes.
 - Repeated browser claim artifacts pass the browser claim policy.
 - Browser claim reports stay separate from native/package claims.
 
+## Release-Candidate Browser Bar
+
+The credible public browser artifact is a downloadable Chromium-family build
+with Doe integrated into the WebGPU path. The release-candidate route is
+defined in
+[`contracts/browser-published-release.contract.md`](contracts/browser-published-release.contract.md).
+
+Acceptance requires:
+
+- a hosted browser zip with a public HTTPS download URL on release
+  infrastructure plus SHA-256 for the zip and browser executable member inside
+  it, app metadata binding the same product identity, plus hash-matched Doe and
+  Dawn runtime members inside it, starting with macOS arm64
+- browser product identity naming Doe Browser or Fawn Doe, with the same
+  product identity in the public download receipt
+- browser release and runtime-frontier bundle receipts with verified file
+  hashes, including the Dawn fallback runtime hash
+- a public download receipt proving the hosted archive served bytes matching
+  the release archive SHA-256
+- per-run WebGPU receipts that bind shader source, lowering path, backend,
+  driver/device identity, output hash, timing, runtime selector state, fallback
+  state, and receipt ID
+- a Dawn-vs-Doe comparison mode that emits side-by-side receipts for the same
+  page workload and exposes the comparison artifact plus both receipt payloads
+  from one gallery page
+- hosted gallery page URLs on non-special-use hosts for compute, rendering,
+  tensors, shader edge cases, and benchmark traces
+- public gallery receipts proving those hosted pages served bytes matching the
+  hash-bound gallery artifacts
+- a local proof page, such as `about:doe`, showing active runtime, backend,
+  compiler path, TSIR/HostPlan/CSL status, fallback policy, and recent receipts
+  including paired Dawn/Doe comparison receipt links plus release provenance
+  for the downloadable browser archive
+- a proof-page diagnostic receipt proving the local diagnostics URL loaded the
+  hash-bound proof page with matching diagnostics, release provenance, and
+  recent receipt IDs
+
+The public browser claim is: download the browser, run a WebGPU workload,
+inspect the source-preserving Doe execution receipt, and compare it against
+Dawn. Until that route exists, browser output stays diagnostic.
+
 ## Current task source
 
 Use the canonical task list for all new work:

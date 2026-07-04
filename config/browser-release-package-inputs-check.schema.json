@@ -1,0 +1,373 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-release-package-inputs-check.schema.json",
+  "title": "Browser release package inputs check",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "packageDir",
+    "packageRootName",
+    "browserProduct",
+    "platform",
+    "evidenceMode",
+    "releaseCandidateEligible",
+    "releaseCandidateBlockers",
+    "inputs",
+    "overwrittenPackageMembers",
+    "status",
+    "failures",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": {
+      "type": "string",
+      "const": "browser_release_package_inputs_check"
+    },
+    "packageDir": { "$ref": "#/$defs/PathCheck" },
+    "packageRootName": { "type": "string", "minLength": 1 },
+    "browserProduct": { "$ref": "#/$defs/BrowserProduct" },
+    "platform": { "$ref": "#/$defs/Platform" },
+    "evidenceMode": { "enum": ["diagnostic", "release_candidate"] },
+    "releaseCandidateEligible": { "type": "boolean" },
+    "releaseCandidateBlockers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    },
+    "buildProfile": { "$ref": "#/$defs/BuildProfile" },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "browserExecutable",
+        "appMetadata",
+        "doeRuntime",
+        "dawnFallbackRuntime",
+        "shaderCompiler"
+      ],
+      "properties": {
+        "browserExecutable": { "$ref": "#/$defs/FileInput" },
+        "appMetadata": { "$ref": "#/$defs/FileInput" },
+        "doeRuntime": { "$ref": "#/$defs/FileInput" },
+        "dawnFallbackRuntime": { "$ref": "#/$defs/FileInput" },
+        "shaderCompiler": { "$ref": "#/$defs/FileInput" }
+      }
+    },
+    "overwrittenPackageMembers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/OverwrittenMember" }
+    },
+    "status": { "enum": ["pass", "fail"] },
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "packageable",
+        "metadataSource",
+        "requiredArchiveMemberCount",
+        "runtimeReplacementCount"
+      ],
+      "properties": {
+        "packageable": { "type": "boolean" },
+        "metadataSource": { "enum": ["package", "generated", "missing"] },
+        "requiredArchiveMemberCount": { "type": "integer", "const": 4 },
+        "runtimeReplacementCount": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "pass" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "browserProduct": {
+            "properties": {
+              "productId": { "enum": ["doe-browser", "fawn-doe"] },
+              "displayName": { "enum": ["Doe Browser", "Fawn Doe"] },
+              "version": { "minLength": 1 },
+              "channel": { "enum": ["diagnostic", "release_candidate", "release"] }
+            }
+          },
+          "platform": {
+            "properties": {
+              "os": { "enum": ["macos", "linux"] },
+              "arch": { "enum": ["arm64", "x64"] },
+              "packageFormat": { "const": "zip" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "releaseCandidateEligible": { "const": true }
+        },
+        "required": ["releaseCandidateEligible"]
+      },
+      "then": {
+        "required": [
+          "status",
+          "evidenceMode",
+          "releaseCandidateBlockers",
+          "failures",
+          "summary",
+          "browserProduct",
+          "platform",
+          "inputs"
+        ],
+        "properties": {
+          "status": { "const": "pass" },
+          "evidenceMode": { "const": "release_candidate" },
+          "releaseCandidateBlockers": { "maxItems": 0 },
+          "failures": { "maxItems": 0 },
+          "summary": {
+            "properties": {
+              "packageable": { "const": true }
+            }
+          },
+          "browserProduct": {
+            "properties": {
+              "channel": { "const": "release_candidate" }
+            }
+          },
+          "platform": {
+            "properties": {
+              "os": { "const": "macos" },
+              "arch": { "const": "arm64" },
+              "packageFormat": { "const": "zip" }
+            }
+          },
+          "inputs": {
+            "properties": {
+              "browserExecutable": {
+                "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
+              },
+              "appMetadata": {
+                "$ref": "#/$defs/ReleaseCandidatePlistInput"
+              },
+              "doeRuntime": {
+                "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
+              },
+              "dawnFallbackRuntime": {
+                "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
+              },
+              "shaderCompiler": {
+                "$ref": "#/$defs/ReleaseCandidateMachoInput"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "BuildProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available",
+        "argsGn",
+        "args",
+        "checks",
+        "releaseProfileMatched"
+      ],
+      "properties": {
+        "available": { "type": "boolean" },
+        "argsGn": { "$ref": "#/$defs/BuildProfileArgsGn" },
+        "args": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "checks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BuildProfileCheck" }
+        },
+        "releaseProfileMatched": { "type": "boolean" }
+      }
+    },
+    "BuildProfileArgsGn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "exists"],
+      "properties": {
+        "path": { "type": "string" },
+        "exists": { "type": "boolean" }
+      }
+    },
+    "BuildProfileCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["arg", "expected", "actual", "matched"],
+      "properties": {
+        "arg": { "type": "string", "minLength": 1 },
+        "expected": { "type": "string", "minLength": 1 },
+        "actual": {
+          "type": ["string", "null"]
+        },
+        "matched": { "type": "boolean" }
+      }
+    },
+    "PathCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "exists"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "exists": { "type": "boolean" }
+      }
+    },
+    "FileInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "exists", "generated"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "browser_binary",
+            "browser_app_metadata",
+            "doe_runtime",
+            "dawn_fallback_runtime",
+            "shader_compiler"
+          ]
+        },
+        "path": { "type": "string", "minLength": 1 },
+        "archivePath": { "type": "string", "minLength": 1 },
+        "exists": { "type": "boolean" },
+        "generated": { "type": "boolean" },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "executable": { "type": "boolean" },
+        "detectedFormat": {
+          "enum": ["elf", "macho", "script", "plist", "json", "unknown"]
+        },
+        "detectedArchitectures": {
+          "type": "array",
+          "items": {
+            "enum": ["arm", "arm64", "x86", "x64", "unknown"]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ReleaseCandidateMachoInput": {
+      "allOf": [
+        { "$ref": "#/$defs/FileInput" },
+        {
+          "required": [
+            "sha256",
+            "byteLength",
+            "executable",
+            "detectedFormat",
+            "detectedArchitectures"
+          ],
+          "properties": {
+            "exists": { "const": true },
+            "generated": { "const": false },
+            "executable": { "const": true },
+            "detectedFormat": { "const": "macho" },
+            "detectedArchitectures": {
+              "contains": { "const": "arm64" }
+            }
+          }
+        }
+      ]
+    },
+    "ReleaseCandidatePackagedMachoInput": {
+      "allOf": [
+        { "$ref": "#/$defs/ReleaseCandidateMachoInput" },
+        { "required": ["archivePath"] }
+      ]
+    },
+    "ReleaseCandidatePlistInput": {
+      "allOf": [
+        { "$ref": "#/$defs/FileInput" },
+        {
+          "required": [
+            "archivePath",
+            "sha256",
+            "byteLength",
+            "executable",
+            "detectedFormat",
+            "detectedArchitectures"
+          ],
+          "properties": {
+            "exists": { "const": true },
+            "generated": { "const": false },
+            "executable": { "const": false },
+            "detectedFormat": { "const": "plist" },
+            "detectedArchitectures": { "maxItems": 0 }
+          }
+        }
+      ]
+    },
+    "OverwrittenMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "archivePath",
+        "sourcePath",
+        "sourceSha256",
+        "inputPath",
+        "inputSha256",
+        "matchesInput"
+      ],
+      "properties": {
+        "role": { "enum": ["doeRuntime", "dawnFallbackRuntime"] },
+        "archivePath": { "type": "string", "minLength": 1 },
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "sourceSha256": { "$ref": "#/$defs/Hash" },
+        "inputPath": { "type": "string", "minLength": 1 },
+        "inputSha256": { "$ref": "#/$defs/Hash" },
+        "matchesInput": { "type": "boolean" }
+      }
+    },
+    "Platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch", "packageFormat"],
+      "properties": {
+        "os": { "type": "string" },
+        "arch": { "type": "string" },
+        "packageFormat": { "type": "string" }
+      }
+    },
+    "BrowserProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["productId", "displayName", "version", "channel"],
+      "properties": {
+        "productId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "version": { "type": "string" },
+        "channel": { "type": "string" }
+      }
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

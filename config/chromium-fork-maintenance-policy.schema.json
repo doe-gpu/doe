@@ -50,10 +50,13 @@
     "releaseArtifacts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["browserBinaryHashRequired", "doeRuntimeHashRequired", "compilerHashRequired", "claimReportRequired"],
+      "required": ["releaseArchiveHashRequired", "platformIdentityRequired", "browserBinaryHashRequired", "doeRuntimeHashRequired", "dawnFallbackRuntimeHashRequired", "compilerHashRequired", "claimReportRequired"],
       "properties": {
+        "releaseArchiveHashRequired": { "type": "boolean", "const": true },
+        "platformIdentityRequired": { "type": "boolean", "const": true },
         "browserBinaryHashRequired": { "type": "boolean", "const": true },
         "doeRuntimeHashRequired": { "type": "boolean", "const": true },
+        "dawnFallbackRuntimeHashRequired": { "type": "boolean", "const": true },
         "compilerHashRequired": { "type": "boolean", "const": true },
         "claimReportRequired": { "type": "boolean", "const": true }
       }

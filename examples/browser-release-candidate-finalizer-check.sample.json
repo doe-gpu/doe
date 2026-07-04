@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_release_candidate_finalizer_check",
+  "status": "fail",
+  "finalizerStatus": "fail",
+  "finalizerReportPath": "examples/browser-release-candidate-finalizer.sample.json",
+  "finalizerReportSha256": "4889b5b8f979c4b848f62a67f246b0c589b57f1dac8394fe913f7626caff5c2d",
+  "verifyFilesRootProvided": true,
+  "requirePass": true,
+  "failures": [
+    {
+      "code": "finalizer_report_not_pass",
+      "path": "status",
+      "message": "browser release-candidate finalizer report must pass"
+    }
+  ]
+}

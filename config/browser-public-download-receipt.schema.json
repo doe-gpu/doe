@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-public-download-receipt.schema.json",
+  "title": "Browser public download receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "receiptId",
+    "url",
+    "method",
+    "statusCode",
+    "contentSha256",
+    "contentLengthBytes",
+    "releaseArchivePath",
+    "releaseArchiveManifestPath",
+    "releaseArchiveManifestSha256",
+    "browserProduct",
+    "platform",
+    "browserExecutableArchivePath",
+    "browserAppMetadataArchivePath",
+    "doeRuntimeArchivePath",
+    "dawnFallbackRuntimeArchivePath",
+    "observedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_public_download_receipt" },
+    "receiptId": { "type": "string", "minLength": 1 },
+    "url": { "$ref": "#/$defs/PublicHttpsUrl" },
+    "method": { "type": "string", "const": "GET" },
+    "statusCode": { "type": "integer", "const": 200 },
+    "contentSha256": { "$ref": "#/$defs/Hash" },
+    "contentLengthBytes": { "type": "integer", "minimum": 1 },
+    "releaseArchivePath": { "type": "string", "minLength": 1 },
+    "releaseArchiveManifestPath": { "type": "string", "minLength": 1 },
+    "releaseArchiveManifestSha256": { "$ref": "#/$defs/Hash" },
+    "browserProduct": { "$ref": "#/$defs/BrowserProduct" },
+    "platform": { "$ref": "#/$defs/Platform" },
+    "browserExecutableArchivePath": { "type": "string", "minLength": 1 },
+    "browserAppMetadataArchivePath": { "type": "string", "minLength": 1 },
+    "doeRuntimeArchivePath": { "type": "string", "minLength": 1 },
+    "dawnFallbackRuntimeArchivePath": { "type": "string", "minLength": 1 },
+    "observedAt": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "PublicHttpsUrl": {
+      "type": "string",
+      "pattern": "^https://[^/?#]+\\.[^/?#]+",
+      "not": {
+        "anyOf": [
+          { "pattern": "^https://localhost(?::|/|$)" },
+          { "pattern": "^https://(?:127\\.0\\.0\\.1|0\\.0\\.0\\.0|10\\.|192\\.168\\.|172\\.(?:1[6-9]|2[0-9]|3[0-1])\\.)(?::|/|$)" },
+          { "pattern": "^https://\\[::1\\](?::|/|$)" },
+          { "pattern": "^https://[^/?#]*\\.(?:local|localhost|test|example|invalid)(?::|/|$)" },
+          { "pattern": "^https://(?:example\\.com|example\\.net|example\\.org)(?::|/|$)" }
+        ]
+      }
+    },
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch", "packageFormat"],
+      "properties": {
+        "os": { "enum": ["macos", "linux", "windows"] },
+        "arch": { "enum": ["arm64", "x64"] },
+        "packageFormat": { "enum": ["zip"] }
+      }
+    },
+    "BrowserProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["productId", "displayName", "version", "channel"],
+      "properties": {
+        "productId": { "enum": ["doe-browser", "fawn-doe"] },
+        "displayName": { "enum": ["Doe Browser", "Fawn Doe"] },
+        "version": { "type": "string", "minLength": 1 },
+        "channel": { "enum": ["diagnostic", "release_candidate", "release"] }
+      }
+    }
+  }
+}

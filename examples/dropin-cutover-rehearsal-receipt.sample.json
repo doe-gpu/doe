@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "dropin-cutover-rehearsal-receipt",
+  "receiptId": "dropin-cutover-sample",
+  "generatedAt": "2026-07-02T00:00:00Z",
+  "comparisonStatus": "comparable",
+  "claimStatus": "claimable",
+  "pass": true,
+  "platform": {
+    "os": "linux",
+    "machine": "x86_64",
+    "pythonVersion": "3.14.0"
+  },
+  "cutoverPolicy": {
+    "path": "config/backend-cutover-policy.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "targetLane": "metal_doe_app",
+    "defaultBackend": "doe_vulkan",
+    "requireRollbackRehearsal": true,
+    "rollbackSwitchName": "strict_no_runtime_fallback",
+    "rollbackBackend": "dawn_delegate",
+    "requiredCiValidation": false
+  },
+  "dropinGate": {
+    "path": "bench/out/dropin/sample/dropin-report.json",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "artifact": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+    "artifactSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "outputTimestamp": "20260702T000000Z",
+    "pass": true,
+    "stepLabels": [
+      "symbol_gate",
+      "behavior_suite",
+      "proc_resolution",
+      "benchmark_suite",
+      "benchmark_visualization"
+    ],
+    "benchmarkHtml": "bench/out/dropin/sample/dropin-benchmark-report.html"
+  },
+  "abiValidation": {
+    "requiredSymbolCount": 199,
+    "exportedSymbolCount": 240,
+    "missingSymbolCount": 0,
+    "extraSymbolCount": 41,
+    "symbolGatePass": true,
+    "behaviorPass": true,
+    "procResolutionPass": true,
+    "benchmarkPass": true
+  },
+  "rollbackBackendEvidence": {
+    "report": {
+      "path": "bench/out/amd-vulkan/sample/dawn-vs-doe.amd.vulkan.release.json",
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "artifactKind": "compare-report"
+    },
+    "claim": {
+      "path": "bench/out/amd-vulkan/sample/dawn-vs-doe.amd.vulkan.release.claim.json",
+      "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "artifactKind": "claim-report"
+    },
+    "comparisonStatus": "comparable",
+    "claimStatus": "claimable",
+    "rollbackBackend": "dawn_delegate",
+    "observedExecutionBackends": [
+      "dawn_delegate",
+      "doe_vulkan"
+    ]
+  },
+  "rehearsal": {
+    "switchName": "strict_no_runtime_fallback",
+    "stagedDefaultBackend": "doe_vulkan",
+    "rollbackBackend": "dawn_delegate",
+    "dropinCandidateValid": true,
+    "rollbackCandidateValid": true,
+    "strictNoRuntimeFallback": true,
+    "rollbackRehearsed": true
+  },
+  "reasons": []
+}

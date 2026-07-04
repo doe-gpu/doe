@@ -257,9 +257,15 @@ const STORAGE_TEXTURE_FORMATS_BASE = Object.freeze(new Set([
   'rgba8snorm',
   'rgba8uint',
   'rgba8sint',
+  'r16unorm',
+  'r16snorm',
   'rgba16uint',
   'rgba16sint',
   'rgba16float',
+  'rg16unorm',
+  'rg16snorm',
+  'rgba16unorm',
+  'rgba16snorm',
   'r32float',
   'r32uint',
   'r32sint',
@@ -271,13 +277,84 @@ const STORAGE_TEXTURE_FORMATS_BASE = Object.freeze(new Set([
   'rgba32sint',
 ]));
 
-// bgra8unorm is valid for storage only with bgra8unorm-storage feature
-function isStorageTextureFormat(format, features) {
+const STORAGE_TEXTURE_READ_WRITE_FORMATS_BASE = Object.freeze(new Set([
+  'r32float',
+  'r32uint',
+  'r32sint',
+]));
+
+const STORAGE_TEXTURE_FORMATS_TIER1_READ_WRITE_ONLY = Object.freeze(new Set([
+  'r8unorm',
+  'r8snorm',
+  'r8uint',
+  'r8sint',
+  'rg8unorm',
+  'rg8snorm',
+  'rg8uint',
+  'rg8sint',
+  'r16uint',
+  'r16sint',
+  'r16float',
+  'rg16uint',
+  'rg16sint',
+  'rg16float',
+  'rgb10a2uint',
+  'rgb10a2unorm',
+  'rg11b10ufloat',
+]));
+
+const STORAGE_TEXTURE_FORMATS_TIER2_READ_WRITE = Object.freeze(new Set([
+  'r8unorm',
+  'r8uint',
+  'r8sint',
+  'rgba8unorm',
+  'rgba8uint',
+  'rgba8sint',
+  'r16uint',
+  'r16sint',
+  'r16float',
+  'rgba16uint',
+  'rgba16sint',
+  'rgba16float',
+  'rgba32uint',
+  'rgba32sint',
+  'rgba32float',
+]));
+
+function isWriteOnlyStorageTextureFormat(format, features) {
   if (STORAGE_TEXTURE_FORMATS_BASE.has(format)) return true;
   if (format === 'bgra8unorm') {
-    return features != null && features.has('bgra8unorm-storage');
+    return hasFeature(features, 'bgra8unorm-storage');
+  }
+  if (STORAGE_TEXTURE_FORMATS_TIER1_READ_WRITE_ONLY.has(format)) {
+    return hasFeature(features, 'texture-formats-tier1');
   }
   return false;
+}
+
+function isReadOnlyStorageTextureFormat(format, features) {
+  if (format === 'bgra8unorm') return false;
+  return isWriteOnlyStorageTextureFormat(format, features);
+}
+
+function isReadWriteStorageTextureFormat(format, features) {
+  if (STORAGE_TEXTURE_READ_WRITE_FORMATS_BASE.has(format)) return true;
+  if (STORAGE_TEXTURE_FORMATS_TIER2_READ_WRITE.has(format)) {
+    return hasFeature(features, 'texture-formats-tier2');
+  }
+  return false;
+}
+
+function isStorageTextureFormat(format, features, access = 'write-only') {
+  switch (access) {
+    case 'read-only':
+      return isReadOnlyStorageTextureFormat(format, features);
+    case 'read-write':
+      return isReadWriteStorageTextureFormat(format, features);
+    case 'write-only':
+    default:
+      return isWriteOnlyStorageTextureFormat(format, features);
+  }
 }
 
 // Float32 formats: default sample type is unfilterable-float.
@@ -395,15 +472,27 @@ function astcBlockSize(format) {
 
 function assertBufferDescriptor(descriptor, path) {
   assertObject(descriptor, path, 'descriptor');
-  assertIntegerInRange(descriptor.size, path, 'descriptor.size', { min: 1 });
+  assertIntegerInRange(descriptor.size, path, 'descriptor.size', { min: 0 });
   const usage = assertIntegerInRange(descriptor.usage, path, 'descriptor.usage', { min: 1 });
   if ((usage & ~ALL_BUFFER_USAGE_BITS) !== 0) {
     failValidation(path, `descriptor.usage contains unknown flag bits (0x${(usage & ~ALL_BUFFER_USAGE_BITS).toString(16)})`);
   }
+  if (
+    (usage & globals.GPUBufferUsage.MAP_READ) !== 0
+    && (usage & ~(globals.GPUBufferUsage.MAP_READ | globals.GPUBufferUsage.COPY_DST)) !== 0
+  ) {
+    failValidation(path, 'descriptor.usage with MAP_READ may only combine with COPY_DST');
+  }
+  if (
+    (usage & globals.GPUBufferUsage.MAP_WRITE) !== 0
+    && (usage & ~(globals.GPUBufferUsage.MAP_WRITE | globals.GPUBufferUsage.COPY_SRC)) !== 0
+  ) {
+    failValidation(path, 'descriptor.usage with MAP_WRITE may only combine with COPY_SRC');
+  }
   if (descriptor.mappedAtCreation !== undefined) {
     assertBoolean(descriptor.mappedAtCreation, path, 'descriptor.mappedAtCreation');
     if (descriptor.mappedAtCreation && (descriptor.size % 4) !== 0) {
-      failValidation(path, 'descriptor.size must be a multiple of 4 when mappedAtCreation is true');
+      throw new RangeError(`${path}: descriptor.size must be a multiple of 4 when mappedAtCreation is true`);
     }
   }
   return descriptor;
@@ -556,8 +645,8 @@ function normalizeStorageTextureLayout(binding, path, label, features = null) {
   const access = normalizeStorageTextureAccess(storageTexture.access ?? 'write-only', path, `${label}.access`);
   const viewDimension = normalizeTextureViewDimension(storageTexture.viewDimension ?? '2d', path, `${label}.viewDimension`);
   const format = normalizeTextureFormat(storageTexture.format, path, `${label}.format`, features);
-  if (!isStorageTextureFormat(format, features)) {
-    failValidation(path, `${label}.format is not valid for storageTexture on this device/package surface`);
+  if (!isStorageTextureFormat(format, features, access)) {
+    failValidation(path, `${label}.format is not valid for storageTexture access ${access} on this device/package surface`);
   }
   return {
     access,
@@ -608,14 +697,18 @@ function normalizeRequestDeviceDescriptor(descriptor, path = 'GPUAdapter.request
     const values = Array.isArray(normalized.requiredFeatures)
       ? normalized.requiredFeatures
       : Array.from(normalized.requiredFeatures ?? []);
-    result.requiredFeatures = values.map((value, index) => normalizeFeatureName(
-      value,
-      path,
-      `descriptor.requiredFeatures[${index}]`,
-    ));
+    try {
+      result.requiredFeatures = values.map((value, index) => normalizeFeatureName(
+        value,
+        path,
+        `descriptor.requiredFeatures[${index}]`,
+      ));
+    } catch (error) {
+      throw new TypeError(error?.message ?? String(error));
+    }
   }
-  if (normalized.requiredLimits !== undefined && process.platform !== 'win32') {
-    delete result.requiredLimits;
+  if (normalized.requiredLimits !== undefined) {
+    result.requiredLimits = assertObject(normalized.requiredLimits, path, 'descriptor.requiredLimits');
   }
   return result;
 }

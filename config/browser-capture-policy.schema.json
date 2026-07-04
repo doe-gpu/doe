@@ -36,6 +36,7 @@
             "shader_links",
             "media_path_probe",
             "pipeline_cache_receipts",
+            "published_proof_surface",
             "unsupported_explanations"
           ]
         },

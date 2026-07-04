@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-published-proof-surface-check.schema.json",
+  "title": "Browser published proof surface check",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "surfacePath",
+    "surfaceSha256",
+    "verifyFilesRootProvided",
+    "requirePublicUrls",
+    "status",
+    "failures"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_published_proof_surface_check" },
+    "surfacePath": { "$ref": "#/$defs/RepoPath" },
+    "surfaceSha256": { "$ref": "#/$defs/Hash" },
+    "verifyFilesRootProvided": { "type": "boolean" },
+    "requirePublicUrls": { "type": "boolean" },
+    "status": { "enum": ["pass", "fail"] },
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "pass" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "failures": { "maxItems": 0 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "fail" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "failures": { "minItems": 1 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "RepoPath": {
+      "type": "string",
+      "minLength": 1,
+      "not": {
+        "anyOf": [
+          { "pattern": "^/" },
+          { "pattern": "(^|/)\\.\\.(/|$)" }
+        ]
+      }
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "tint_compiler_target_validation",
+  "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+  "evidencePaths": [
+    "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+    "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
+  ],
+  "requiredTargets": [
+    "spirv"
+  ],
+  "status": "pass",
+  "targetCoverage": [
+    {
+      "target": "spirv",
+      "evidencePaths": [
+        "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+        "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json"
+      ],
+      "rowCount": 15,
+      "validatedRows": 15,
+      "diagnosticRows": 0,
+      "shaderIds": [
+        "webgpu-prefix-sum",
+        "atan2-const-eval.wgsl",
+        "cluster-lights.wgsl",
+        "metaball-isosurface.wgsl",
+        "particles.wgsl",
+        "shadow-fragment.wgsl",
+        "skinned-shadowed-pbr-fragment.wgsl",
+        "skinned-shadowed-pbr-vertex.wgsl",
+        "unity_webgpu_000002778DE78280.cs.spv",
+        "unity_webgpu_000002778DE78280.cs.wgsl",
+        "unity_webgpu_000002778F740030.fs.spv",
+        "unity_webgpu_000002778F740030.fs.wgsl",
+        "unity_webgpu_0000017E9E2D81A0.vs.spv",
+        "unity_webgpu_0000017E9E2D81A0.vs.wgsl",
+        "webgpu-prefix-sum.wgsl"
+      ]
+    }
+  ],
+  "claimBlockers": [],
+  "claimBlockerSummary": [],
+  "claimBlockerSummaryByEvidencePath": [
+    {
+      "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+      "claimBlockerSummary": []
+    },
+    {
+      "evidencePath": "examples/tint-compiler-evidence.benchmark-corpus.spirv.sample.json",
+      "claimBlockerSummary": []
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "targetCount": 1,
+    "coveredTargetCount": 1,
+    "rowCount": 15,
+    "validatedRows": 15,
+    "diagnosticRows": 0,
+    "claimBlockerCount": 0,
+    "failureCount": 0
+  }
+}

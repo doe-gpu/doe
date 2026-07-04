@@ -52,6 +52,16 @@
       "reasonCode": "receipt_only"
     },
     {
+      "surfaceId": "published_proof_surface",
+      "originScoped": true,
+      "permissionGate": "secure_context_devtools_opt_in",
+      "rawPageDataPolicy": "forbid",
+      "artifactDataPolicy": "hashes_and_redacted_metadata",
+      "replayAllowed": false,
+      "developerVisible": true,
+      "reasonCode": "published_browser_proof"
+    },
+    {
       "surfaceId": "unsupported_explanations",
       "originScoped": true,
       "permissionGate": "devtools_opt_in",

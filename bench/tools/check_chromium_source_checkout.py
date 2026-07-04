@@ -13,6 +13,7 @@ from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+SelectorNeedle = str | tuple[str, ...]
 REQUIRED_MARKERS = (
     ".gn",
     "DEPS",
@@ -22,6 +23,19 @@ REQUIRED_MARKERS = (
 )
 REQUIRED_TOOLS = ("gclient", "gn", "autoninja")
 OPTIONAL_TOOLS = ("fetch",)
+WEBGPU_DECODER_PATH = "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+DAWN_WEBGPU_BACKEND_PATH = (
+    "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
+)
+DAWN_WEBGPU_SHARED_TEXTURE_MEMORY_PATH = (
+    "third_party/dawn/src/dawn/native/webgpu/SharedTextureMemoryWGPU.cpp"
+)
+DAWN_WEBGPU_TEXTURE_PATH = (
+    "third_party/dawn/src/dawn/native/webgpu/TextureWGPU.cpp"
+)
+IOSURFACE_IMAGE_BACKING_PATH = (
+    "gpu/command_buffer/service/shared_image/iosurface_image_backing.mm"
+)
 RUNTIME_SELECTOR_MARKERS = (
     (
         "selector:runtime_switch",
@@ -56,67 +70,115 @@ RUNTIME_SELECTOR_MARKERS = (
     (
         "selector:load_failure_reason",
         "runtime_artifact_load_failed",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+        ),
     ),
     (
         "selector:initialization_failure_reason",
         "runtime_initialization_failed",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+        ),
     ),
     (
         "selector:symbol_failure_reason",
         "symbol_surface_incomplete",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+        ),
     ),
     (
         "selector:wire_proc_table_failure_reason",
         "wire_proc_table_incomplete",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+        ),
     ),
     (
         "selector:wire_proc_table_loader",
         "LoadDoeWireProcTable",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+            "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.h",
+        ),
     ),
     (
         "selector:doe_wire_runtime_instance",
-        "doe_wire_runtime_.instance",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            "LoadDoeWireProcTable",
+            "mExternalRuntimeLib.Open",
+            "mInnerInstance = mDawnProcs.createInstance",
+        ),
+        (DAWN_WEBGPU_BACKEND_PATH,),
     ),
     (
         "selector:doe_wire_runtime_lifecycle_test",
-        "DoeWireRuntimeOwnsAndReleasesInstanceLifecycle",
-        ("gpu/command_buffer/service/webgpu_decoder_unittest.cc",),
+        (
+            'load_proc(&mDawnProcs.instanceRelease, "wgpuInstanceRelease")',
+            "Backend::~Backend()",
+            "mDawnProcs.instanceRelease(mInnerInstance)",
+            "mInnerInstance = nullptr",
+        ),
+        (DAWN_WEBGPU_BACKEND_PATH,),
     ),
     (
         "selector:doe_shared_image_iosurface_bridge",
-        "doe_shared_image_iosurface_bridge",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            "if (it->second.adapterType == wgpu::AdapterType::CPU) {",
+            "AssociateMailboxDawn(mailbox, flags, device, it->second.backendType",
+        ),
+        (WEBGPU_DECODER_PATH,),
     ),
     (
         "selector:doe_shared_image_iosurface_representation",
-        "DoeSharedImageRepresentationAndAccess",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            "class IOSurfaceImageBacking::DawnRepresentation final",
+            "backend_type == wgpu::BackendType::WebGPU",
+            "std::make_unique<DawnRepresentation>",
+        ),
+        (IOSURFACE_IMAGE_BACKING_PATH,),
     ),
     (
         "selector:doe_shared_image_native_import",
         "deviceImportSharedTextureMemory",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+            DAWN_WEBGPU_SHARED_TEXTURE_MEMORY_PATH,
+        ),
     ),
     (
         "selector:doe_shared_image_native_begin_access",
         "sharedTextureMemoryBeginAccess",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+            DAWN_WEBGPU_TEXTURE_PATH,
+        ),
     ),
     (
         "selector:doe_shared_image_native_end_access",
         "sharedTextureMemoryEndAccess",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+            DAWN_WEBGPU_SHARED_TEXTURE_MEMORY_PATH,
+        ),
     ),
     (
         "selector:doe_shared_image_iosurface_handle",
-        "GetIOSurfaceForNativeImport",
-        ("gpu/command_buffer/service/shared_image/shared_image_representation.h",),
+        (
+            "wgpu::SharedTextureMemoryIOSurfaceDescriptor io_surface_desc",
+            "io_surface_desc.ioSurface = io_surface_.get();",
+            "device.ImportSharedTextureMemory(&desc)",
+        ),
+        (IOSURFACE_IMAGE_BACKING_PATH,),
     ),
     (
         "selector:doe_shared_buffer_unsupported",
@@ -130,18 +192,28 @@ RUNTIME_SELECTOR_MARKERS = (
     ),
     (
         "selector:doe_present_shared_texture_end_access",
-        "doe_present_shared_texture_end_access",
+        (
+            "virtual void EndAccessForPresent() = 0;",
+            "it->second->EndAccessForPresent();",
+            "associated_shared_image_map_.erase(it);",
+        ),
         ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
     ),
     (
         "selector:render_proc_surface",
         "wgpuCommandEncoderBeginRenderPass",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+        ),
     ),
     (
         "selector:external_texture_proc_surface",
         "wgpuQueueCopyExternalTextureForBrowser",
-        ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),
+        (
+            WEBGPU_DECODER_PATH,
+            DAWN_WEBGPU_BACKEND_PATH,
+        ),
     ),
     (
         "selector:profile_denylisted_reason",
@@ -299,17 +371,26 @@ def tool_check(command: str, *, required: bool, path_env: str | None = None) -> 
     )
 
 
-def file_contains(path: Path, needle: str) -> bool:
+def file_contains(path: Path, needle: SelectorNeedle) -> bool:
     try:
-        return needle in path.read_text(encoding="utf-8", errors="ignore")
+        text = path.read_text(encoding="utf-8", errors="ignore")
     except OSError:
         return False
+    if isinstance(needle, str):
+        return needle in text
+    return all(required in text for required in needle)
+
+
+def describe_needle(needle: SelectorNeedle) -> str:
+    if isinstance(needle, str):
+        return needle
+    return " + ".join(needle)
 
 
 def selector_marker_check(
     source_root: Path,
     check_id: str,
-    needle: str,
+    needle: SelectorNeedle,
     candidate_paths: tuple[str, ...],
 ) -> dict[str, Any]:
     for candidate in candidate_paths:
@@ -323,7 +404,8 @@ def selector_marker_check(
             )
     return failure_check(
         check_id,
-        f"Chromium runtime selector source marker is missing: {needle}",
+        "Chromium runtime selector source marker is missing: "
+        f"{describe_needle(needle)}",
         path=", ".join(candidate_paths),
         resolved_path=str(source_root),
     )

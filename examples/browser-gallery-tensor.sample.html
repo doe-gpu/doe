@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Doe browser gallery sample: tensor</title>
+<main>
+  <h1>tensor</h1>
+  <p>contract: <a href="browser/chromium/contracts/browser-local-ai-workloads.contract.md">browser/chromium/contracts/browser-local-ai-workloads.contract.md</a></p>
+  <p>workload: browser-gallery-tensor</p>
+  <p>receipt: <a href="examples/browser-tensor-execution-receipt.sample.json">browser-gallery-tensor-doe</a></p>
+  <section>
+    <h2>Doe receipt facts</h2>
+    <p>receiptId: browser-gallery-tensor-doe</p>
+    <p>workloadId: browser-gallery-tensor</p>
+    <p>backend: webgpu-doe</p>
+    <p>source shader: wgsl main @compute @workgroup_size(8) fn main() { }</p>
+    <p>source sha256: c2db819b26caabb576e61254e2db88b8d707345b941f31f79de478810c886e8a</p>
+    <p>lowering path: wgsl > doe-wgsl > tsir > hostplan > webgpu</p>
+    <p>driver: sample webgpu sample-driver sample-adapter-family sample-webgpu-adapter</p>
+    <p>device: sample-adapter aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa featureCount=1</p>
+    <p>outputHash: 4444444444444444444444444444444444444444444444444444444444444444</p>
+    <p>timing: browser-operation-proxy setupNs=1200 encodeNs=2200 submitWaitNs=3200</p>
+  </section>
+</main>

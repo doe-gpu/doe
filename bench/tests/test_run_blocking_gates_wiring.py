@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from typing import Any
 
@@ -105,6 +107,65 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
 
         self.assertFalse(args.with_native_backend_coverage_matrix_gate)
 
+    def test_release_candidate_provenance_gate_requires_package_inputs(self) -> None:
+        captured: list[tuple[str, list[str]]] = []
+        old_argv = sys.argv
+        try:
+            sys.argv = [
+                "run_blocking_gates.py",
+                "--with-browser-release-candidate-provenance-gate",
+            ]
+            args = self.module.parse_args()
+        finally:
+            sys.argv = old_argv
+
+        output = io.StringIO()
+        with redirect_stdout(output):
+            status = self.module.run_optional_artifact_gates(
+                args,
+                repo_root=REPO_ROOT,
+                bench_root=REPO_ROOT / "bench",
+                run_gate=lambda label, command: captured.append((label, command)),
+            )
+
+        self.assertEqual(status, 1)
+        self.assertEqual(captured, [])
+        self.assertIn(
+            "missing --browser-release-candidate-provenance-package-inputs",
+            output.getvalue(),
+        )
+
+    def test_release_candidate_provenance_gate_requires_existing_package_inputs(self) -> None:
+        captured: list[tuple[str, list[str]]] = []
+        old_argv = sys.argv
+        try:
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                sys.argv = [
+                    "run_blocking_gates.py",
+                    "--with-browser-release-candidate-provenance-gate",
+                    "--browser-release-candidate-provenance-package-inputs",
+                    str(Path(tmp_dir) / "missing-package-inputs.json"),
+                ]
+                args = self.module.parse_args()
+        finally:
+            sys.argv = old_argv
+
+        output = io.StringIO()
+        with redirect_stdout(output):
+            status = self.module.run_optional_artifact_gates(
+                args,
+                repo_root=REPO_ROOT,
+                bench_root=REPO_ROOT / "bench",
+                run_gate=lambda label, command: captured.append((label, command)),
+            )
+
+        self.assertEqual(status, 1)
+        self.assertEqual(captured, [])
+        self.assertIn(
+            "missing --browser-release-candidate-provenance-package-inputs",
+            output.getvalue(),
+        )
+
     def test_standalone_artifact_checker_gates_are_wired(self) -> None:
         captured: list[tuple[str, list[str]]] = []
         old_argv = sys.argv
@@ -131,10 +192,33 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
                     "--with-browser-claim-promotion-receipt-gate",
                     "--browser-claim-promotion-receipt-verify-files-root",
                     ".",
+                    "--with-browser-release-candidate-provenance-gate",
+                    "--browser-release-candidate-provenance-package-inputs",
+                    "examples/browser-release-package-inputs-check.sample.json",
+                    "--browser-release-candidate-provenance-verify-files-root",
+                    ".",
+                    "--browser-release-candidate-provenance-out",
+                    str(Path(tmp_dir) / "browser-release-candidate-provenance.json"),
+                    "--with-browser-release-candidate-finalizer-gate",
+                    "--browser-release-candidate-finalizer-verify-files-root",
+                    ".",
+                    "--browser-release-candidate-finalizer-require-pass",
+                    "--browser-release-candidate-finalizer-check-out",
+                    str(Path(tmp_dir) / "browser-release-candidate-finalizer-check.json"),
+                    "--with-browser-published-proof-surface-gate",
+                    "--browser-published-proof-surface-verify-files-root",
+                    ".",
+                    "--browser-published-proof-surface-require-public-urls",
+                    "--browser-published-proof-surface-check-out",
+                    str(Path(tmp_dir) / "browser-published-proof-surface-check.json"),
                     "--with-browser-release-artifact-bundle-gate",
                     "--browser-release-artifact-bundle-verify-files-root",
                     ".",
                     "--browser-release-artifact-bundle-require-release-candidate",
+                    "--with-browser-release-package-inputs-gate",
+                    "--browser-release-package-inputs-require-release-candidate-eligible",
+                    "--browser-release-package-inputs-out",
+                    str(Path(tmp_dir) / "browser-release-package-inputs.json"),
                     "--with-browser-runtime-frontier-bundle-gate",
                     "--browser-runtime-frontier-bundle-runtime-identity",
                     "examples/browser-runtime-identity.selector.sample.json",
@@ -261,7 +345,11 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
         self.assertIn("dawn-replacement-frontier", commands_by_label)
         self.assertIn("tool-surface", commands_by_label)
         self.assertIn("browser-claim-promotion-receipt", commands_by_label)
+        self.assertIn("browser-release-candidate-provenance", commands_by_label)
+        self.assertIn("browser-published-proof-surface", commands_by_label)
+        self.assertIn("browser-release-candidate-finalizer", commands_by_label)
         self.assertIn("browser-release-artifact-bundle", commands_by_label)
+        self.assertIn("browser-release-package-inputs", commands_by_label)
         self.assertIn("browser-runtime-frontier-bundle", commands_by_label)
         self.assertIn("wgsl-lowering-link-receipt", commands_by_label)
         self.assertIn("tint-compiler-target-validation", commands_by_label)
@@ -329,12 +417,88 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
             commands_by_label["browser-claim-promotion-receipt"],
         )
         self.assertIn(
+            "bench/tools/check_browser_release_candidate_provenance.py",
+            commands_by_label["browser-release-candidate-provenance"][1],
+        )
+        self.assertIn(
+            "--proof-surface-check",
+            commands_by_label["browser-release-candidate-provenance"],
+        )
+        self.assertIn(
+            "--package-inputs",
+            commands_by_label["browser-release-candidate-provenance"],
+        )
+        self.assertIn(
+            "examples/browser-release-package-inputs-check.sample.json",
+            commands_by_label["browser-release-candidate-provenance"],
+        )
+        self.assertIn(
+            "--verify-files-root",
+            commands_by_label["browser-release-candidate-provenance"],
+        )
+        self.assertIn(
+            "--out",
+            commands_by_label["browser-release-candidate-provenance"],
+        )
+        self.assertIn(
+            "bench/tools/check_browser_published_proof_surface.py",
+            commands_by_label["browser-published-proof-surface"][1],
+        )
+        self.assertIn(
+            "--surface",
+            commands_by_label["browser-published-proof-surface"],
+        )
+        self.assertIn(
+            "--verify-files-root",
+            commands_by_label["browser-published-proof-surface"],
+        )
+        self.assertIn(
+            "--require-public-urls",
+            commands_by_label["browser-published-proof-surface"],
+        )
+        self.assertIn(
+            "--out",
+            commands_by_label["browser-published-proof-surface"],
+        )
+        self.assertIn(
+            "bench/tools/check_browser_release_candidate_finalizer.py",
+            commands_by_label["browser-release-candidate-finalizer"][1],
+        )
+        self.assertIn(
+            "--report",
+            commands_by_label["browser-release-candidate-finalizer"],
+        )
+        self.assertIn(
+            "--verify-files-root",
+            commands_by_label["browser-release-candidate-finalizer"],
+        )
+        self.assertIn(
+            "--require-pass",
+            commands_by_label["browser-release-candidate-finalizer"],
+        )
+        self.assertIn(
+            "--out",
+            commands_by_label["browser-release-candidate-finalizer"],
+        )
+        self.assertIn(
             "bench/tools/check_browser_release_artifact_bundle.py",
             commands_by_label["browser-release-artifact-bundle"][1],
         )
         self.assertIn(
             "--require-release-candidate",
             commands_by_label["browser-release-artifact-bundle"],
+        )
+        self.assertIn(
+            "bench/tools/check_browser_release_package_inputs.py",
+            commands_by_label["browser-release-package-inputs"][1],
+        )
+        self.assertIn(
+            "--require-release-candidate-eligible",
+            commands_by_label["browser-release-package-inputs"],
+        )
+        self.assertIn(
+            "--out",
+            commands_by_label["browser-release-package-inputs"],
         )
         self.assertIn(
             "bench/tools/check_browser_runtime_frontier_bundle.py",

@@ -74,3 +74,25 @@ def test_chromium_fork_maintenance_policy_requires_release_artifacts() -> None:
         "path": "releaseArtifacts.compilerHashRequired",
         "message": "release requires compilerHashRequired",
     } in policy_check.check_policy(payload)
+
+
+def test_chromium_fork_maintenance_policy_requires_release_archive_hash() -> None:
+    payload = _load()
+    payload["releaseArtifacts"]["releaseArchiveHashRequired"] = False
+
+    assert {
+        "code": "release_artifact_not_required",
+        "path": "releaseArtifacts.releaseArchiveHashRequired",
+        "message": "release requires releaseArchiveHashRequired",
+    } in policy_check.check_policy(payload)
+
+
+def test_chromium_fork_maintenance_policy_requires_dawn_fallback_runtime_hash() -> None:
+    payload = _load()
+    payload["releaseArtifacts"]["dawnFallbackRuntimeHashRequired"] = False
+
+    assert {
+        "code": "release_artifact_not_required",
+        "path": "releaseArtifacts.dawnFallbackRuntimeHashRequired",
+        "message": "release requires dawnFallbackRuntimeHashRequired",
+    } in policy_check.check_policy(payload)

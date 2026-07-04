@@ -31,6 +31,9 @@ import {
 import {
   shaderCheckFailure,
 } from './compiler-errors.js';
+import {
+  WEBGPU_DEFAULT_LIMITS,
+} from './capabilities.js';
 
 function validateWriteBufferInput(data, dataOffset, size, path) {
   const isSharedArrayBuffer = typeof SharedArrayBuffer !== 'undefined' && data instanceof SharedArrayBuffer;
@@ -133,8 +136,104 @@ function assertShaderEntryPoint(shader, entryPoint, path) {
   }
 }
 
+function inferShaderEntryPoint(shader, explicitEntryPoint, stage, path, label) {
+  if (explicitEntryPoint !== undefined && explicitEntryPoint !== null) {
+    return assertNonEmptyString(explicitEntryPoint, path, label);
+  }
+  const code = shader?._code;
+  if (typeof code === 'string' && code.length > 0) {
+    const names = [];
+    const pattern = new RegExp(
+      `@${escapeRegexLiteral(stage)}\\b(?:\\s+@\\w+(?:\\([^)]*\\))?)*\\s+fn\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\(`,
+      'g',
+    );
+    let match;
+    while ((match = pattern.exec(code)) !== null) {
+      names.push(match[1]);
+    }
+    if (names.length === 1) {
+      return names[0];
+    }
+  }
+  return 'main';
+}
+
 const FAST_PATH_NOT_APPLIED = Symbol('fastPathNotApplied');
-const NEVER_RESOLVED = new Promise(() => {});
+
+function operationError(message) {
+  if (typeof DOMException === 'function') {
+    return new DOMException(message, 'OperationError');
+  }
+  const error = new Error(message);
+  error.name = 'OperationError';
+  return error;
+}
+
+function createDeviceLostState(device) {
+  if (device._lost instanceof Promise) {
+    return;
+  }
+  device._lostInfo = null;
+  device._resolveLost = null;
+  device._lost = new Promise((resolve) => {
+    device._resolveLost = resolve;
+  });
+}
+
+function resolveDeviceLost(device, reason = 'unknown', message = '') {
+  createDeviceLostState(device);
+  if (device._lostInfo !== null) {
+    return device._lostInfo;
+  }
+  const info = new GPUDeviceLostInfo(reason, message);
+  device._lostInfo = info;
+  device._resolveLost?.(info);
+  return info;
+}
+
+function shouldRouteDeviceError(device) {
+  if (Array.isArray(device._errorScopes) && device._errorScopes.length > 0) {
+    return true;
+  }
+  if (typeof device._onuncapturederror === 'function') {
+    return true;
+  }
+  const listeners = device._eventListeners;
+  const uncapturedListeners = listeners instanceof Map ? listeners.get('uncapturederror') : null;
+  return uncapturedListeners instanceof Set && uncapturedListeners.size > 0;
+}
+
+function captureDeviceError(device, filter, error) {
+  const scopes = Array.isArray(device._errorScopes) ? device._errorScopes : [];
+  for (let index = scopes.length - 1; index >= 0; index -= 1) {
+    const scope = scopes[index];
+    if (scope.filter !== filter) {
+      continue;
+    }
+    if (scope.error === null) {
+      scope.error = error;
+    }
+    return true;
+  }
+
+  const event = new GPUUncapturedErrorEvent('uncapturederror', { error });
+  if (typeof device._onuncapturederror === 'function') {
+    device._onuncapturederror.call(device, event);
+  }
+  dispatchDeviceEvent(device, 'uncapturederror', event);
+  return false;
+}
+
+function gpuErrorFromCreationFailure(filter, error) {
+  const message = error?.message ?? String(error);
+  if (filter === 'out-of-memory') {
+    return new GPUOutOfMemoryError(message);
+  }
+  if (filter === 'internal') {
+    return new GPUInternalError(message);
+  }
+  return new GPUValidationError(message);
+}
 
 function isObjectRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -211,6 +310,7 @@ function resolveFastBufferBindingResource(resource, path, index) {
     );
     if (resource.size !== undefined) {
       assertIntegerInRange(resource.size, path, `descriptor.entries[${index}].resource.size`, { min: 1 });
+      return null;
     }
     return { buffer, offset: offset ?? 0 };
   }
@@ -406,6 +506,17 @@ const EMPTY_ADAPTER_INFO = Object.freeze({
   subgroupMaxSize: 0,
 });
 
+const CORE_FEATURES_AND_LIMITS = 'core-features-and-limits';
+const ALIGNMENT_LIMIT_NAMES = Object.freeze(new Set([
+  'minUniformBufferOffsetAlignment',
+  'minStorageBufferOffsetAlignment',
+]));
+const MAX_ALIGNMENT_LIMIT = 2 ** 31;
+
+function isPowerOfTwo(value) {
+  return Number.isInteger(value) && value > 0 && (value & (value - 1)) === 0;
+}
+
 function createFullSurfaceClasses({
   globals,
   backend,
@@ -424,6 +535,66 @@ function createFullSurfaceClasses({
       failValidation(path, `invalid filter "${filter}"; must be "validation", "out-of-memory", or "internal"`);
     }
     return encoded;
+  }
+
+  function resolveDeviceFeatures(adapter, descriptor) {
+    const requiredFeatures = descriptor?.requiredFeatures ?? [];
+    const adapterFeatures = adapter.features;
+    for (const feature of requiredFeatures) {
+      if (!adapterFeatures.has(feature)) {
+        throw new TypeError(`GPUAdapter.requestDevice: required feature "${feature}" is not supported by this adapter`);
+      }
+    }
+    if (requiredFeatures.length > 0) {
+      return Object.freeze(new Set(requiredFeatures));
+    }
+    if (adapterFeatures.has(CORE_FEATURES_AND_LIMITS)) {
+      return Object.freeze(new Set([CORE_FEATURES_AND_LIMITS]));
+    }
+    return Object.freeze(new Set());
+  }
+
+  function validateRequiredLimitValue(name, value, adapterLimits) {
+    if (!(name in WEBGPU_DEFAULT_LIMITS)) {
+      throw operationError(`GPUAdapter.requestDevice: requiredLimits.${name} is not a supported limit`);
+    }
+    if (!Number.isFinite(value) || value < 0 || value > Number.MAX_SAFE_INTEGER) {
+      throw new TypeError(`GPUAdapter.requestDevice: requiredLimits.${name} must be a non-negative safe integer`);
+    }
+    if (!Number.isInteger(value)) {
+      throw operationError(`GPUAdapter.requestDevice: requiredLimits.${name} must be an integer`);
+    }
+    const adapterValue = adapterLimits[name] ?? WEBGPU_DEFAULT_LIMITS[name];
+    if (ALIGNMENT_LIMIT_NAMES.has(name)) {
+      if (value > MAX_ALIGNMENT_LIMIT || !isPowerOfTwo(value) || value < adapterValue) {
+        throw operationError(`GPUAdapter.requestDevice: requiredLimits.${name} is not supported by this adapter`);
+      }
+      return;
+    }
+    if (value > adapterValue) {
+      throw operationError(`GPUAdapter.requestDevice: requiredLimits.${name} is not supported by this adapter`);
+    }
+  }
+
+  function resolveDeviceLimits(adapter, descriptor) {
+    const limits = { ...WEBGPU_DEFAULT_LIMITS };
+    const requiredLimits = descriptor?.requiredLimits;
+    if (requiredLimits === undefined) {
+      return Object.freeze(limits);
+    }
+    const adapterLimits = adapter.limits;
+    for (const [name, value] of Object.entries(requiredLimits)) {
+      if (value === undefined) {
+        continue;
+      }
+      validateRequiredLimitValue(name, value, adapterLimits);
+      if (ALIGNMENT_LIMIT_NAMES.has(name)) {
+        limits[name] = Math.min(WEBGPU_DEFAULT_LIMITS[name], value);
+      } else {
+        limits[name] = Math.max(WEBGPU_DEFAULT_LIMITS[name], value);
+      }
+    }
+    return Object.freeze(limits);
   }
 
   function autoLayoutEntryKind(entry) {
@@ -547,9 +718,38 @@ function createFullSurfaceClasses({
       if (offset + size > this.size) {
         failValidation('GPUBuffer.mapAsync', `mapped range ${offset}+${size} exceeds buffer size ${this.size}`);
       }
+      const rejectValidationAsync = (message, finalState) => {
+        const error = new GPUValidationError(`GPUBuffer.mapAsync: ${message}`);
+        captureDeviceError(this._resourceOwner, 'validation', error);
+        return Promise.resolve().then(() => {
+          this._mapState = finalState;
+          throw error;
+        });
+      };
+      if (this._mapState === 'mapped' || this._mapState === 'pending') {
+        return rejectValidationAsync('buffer is already mapped or mapping is pending', this._mapState);
+      }
       this._mapState = 'pending';
       try {
+        if (this._creationValidationError) {
+          return rejectValidationAsync('buffer was created as a validation-error fallback object', 'unmapped');
+        }
+        if (mode === globals.GPUMapMode.READ) {
+          if ((this.usage & globals.GPUBufferUsage.MAP_READ) === 0) {
+            return rejectValidationAsync('buffer usage does not include MAP_READ', 'unmapped');
+          }
+        } else if (mode === globals.GPUMapMode.WRITE) {
+          if ((this.usage & globals.GPUBufferUsage.MAP_WRITE) === 0) {
+            return rejectValidationAsync('buffer usage does not include MAP_WRITE', 'unmapped');
+          }
+        } else {
+          return rejectValidationAsync('mode must be GPUMapMode.READ or GPUMapMode.WRITE', 'unmapped');
+        }
         await backend.bufferMapAsync(this, native, mode, offset, size);
+        if (this._destroyed || this._mapState !== 'pending') {
+          this._mapState = 'unmapped';
+          throw operationError('GPUBuffer.mapAsync: mapping was cancelled before it resolved');
+        }
         this._mapState = 'mapped';
       } catch (error) {
         this._mapState = 'unmapped';
@@ -624,12 +824,17 @@ function createFullSurfaceClasses({
     }
 
     unmap() {
+      if (this._destroyed || this._native == null) {
+        this._mapState = 'unmapped';
+        return;
+      }
       backend.bufferUnmap(assertLiveResource(this, 'GPUBuffer.unmap', 'GPUBuffer'), this);
       this._mapState = 'unmapped';
     }
 
     destroy() {
       destroyResource(this, (native) => backend.bufferDestroy(native, this));
+      this._mapState = 'unmapped';
     }
   }
 
@@ -691,6 +896,9 @@ function createFullSurfaceClasses({
       assertIntegerInRange(bufferOffset, 'GPUQueue.writeBuffer', 'bufferOffset', { min: 0 });
       const view = fastDefaultWriteBufferView(data, dataOffset, size)
         ?? validateWriteBufferInput(data, dataOffset, size, 'GPUQueue.writeBuffer');
+      if (bufferOffset + view.byteLength > buffer.size) {
+        failValidation('GPUQueue.writeBuffer', `write range ${bufferOffset}+${view.byteLength} exceeds buffer size ${buffer.size}`);
+      }
       return backend.queueWriteBuffer(this, native, bufferNative, bufferOffset, view);
     }
 
@@ -833,6 +1041,9 @@ function createFullSurfaceClasses({
       this._externallyOwned = meta?.externallyOwned === true;
       this.label = '';
       initResource(this, 'GPUTexture', owner);
+      if (backend.initTextureState) {
+        backend.initTextureState(this);
+      }
     }
 
     createView(descriptor) {
@@ -1022,8 +1233,11 @@ function createFullSurfaceClasses({
       this._limits = inheritedLimits ?? null;
       this._onuncapturederror = null;
       this._eventListeners = new Map();
+      this._errorScopes = [];
+      this._errorScopeDepth = 0;
       this.label = '';
       initResource(this, 'GPUDevice');
+      createDeviceLostState(this);
       if (typeof backend.initDeviceState === 'function') {
         backend.initDeviceState(this);
       }
@@ -1053,11 +1267,12 @@ function createFullSurfaceClasses({
     }
 
     get lost() {
-      if (typeof backend.deviceGetLost === 'function') {
+      if (typeof backend.deviceGetLost === 'function' && !this._destroyed) {
         const native = assertLiveResource(this, 'GPUDevice.lost', 'GPUDevice');
         return backend.deviceGetLost(this, native);
       }
-      return NEVER_RESOLVED;
+      createDeviceLostState(this);
+      return this._lost;
     }
 
     get adapterInfo() {
@@ -1083,14 +1298,21 @@ function createFullSurfaceClasses({
       if (typeof backend.devicePushErrorScope === 'function') {
         backend.devicePushErrorScope(this, native, filter, encodedFilter);
       }
+      this._errorScopes.push({ filter, error: null });
+      this._errorScopeDepth = this._errorScopes.length;
     }
 
     popErrorScope() {
       const native = assertLiveResource(this, 'GPUDevice.popErrorScope', 'GPUDevice');
-      if (typeof backend.devicePopErrorScope === 'function') {
-        return backend.devicePopErrorScope(this, native);
+      if (!Array.isArray(this._errorScopes) || this._errorScopes.length <= 0) {
+        return Promise.reject(operationError('GPUDevice.popErrorScope: no active error scope'));
       }
-      return Promise.resolve(null);
+      const scope = this._errorScopes.pop();
+      this._errorScopeDepth = this._errorScopes.length;
+      const nativePop = typeof backend.devicePopErrorScope === 'function'
+        ? backend.devicePopErrorScope(this, native)
+        : Promise.resolve(null);
+      return Promise.resolve(nativePop).then(nativeError => scope.error ?? nativeError ?? null);
     }
 
     get onuncapturederror() {
@@ -1114,11 +1336,62 @@ function createFullSurfaceClasses({
     }
 
     createBuffer(descriptor) {
-      const validated = assertBufferDescriptor(descriptor, 'GPUDevice.createBuffer');
+      let validated;
+      try {
+        validated = assertBufferDescriptor(descriptor, 'GPUDevice.createBuffer');
+      } catch (error) {
+        if (error instanceof RangeError) {
+          throw error;
+        }
+        if (!shouldRouteDeviceError(this)) {
+          throw error;
+        }
+        captureDeviceError(this, 'validation', gpuErrorFromCreationFailure('validation', error));
+        return this._createErrorScopeFallbackBuffer(
+          descriptor?.label ?? '',
+          descriptor?.size,
+          Boolean(descriptor?.mappedAtCreation),
+        );
+      }
+      if (validated.size > (this.limits?.maxBufferSize ?? WEBGPU_DEFAULT_LIMITS.maxBufferSize)) {
+        const error = new Error('GPUDevice.createBuffer: descriptor.size exceeds device.limits.maxBufferSize');
+        if (!shouldRouteDeviceError(this)) {
+          throw error;
+        }
+        captureDeviceError(this, 'validation', gpuErrorFromCreationFailure('validation', error));
+        return this._createErrorScopeFallbackBuffer(
+          descriptor?.label ?? '',
+          descriptor?.size,
+          Boolean(descriptor?.mappedAtCreation),
+        );
+      }
       const native = backend.deviceCreateBuffer(this, validated);
       const buffer = new DoeGPUBuffer(native, this._instance, validated.size, validated.usage, this.queue, this);
       buffer.label = descriptor?.label ?? '';
       if (validated.mappedAtCreation && typeof backend.bufferMarkMappedAtCreation === 'function') {
+        backend.bufferMarkMappedAtCreation(buffer);
+        buffer._mapState = 'mapped';
+      }
+      return buffer;
+    }
+
+    _createErrorScopeFallbackBuffer(label = '', requestedSize = 4, mappedAtCreation = false) {
+      const fallbackSize = Number.isSafeInteger(requestedSize)
+        && requestedSize >= 0
+        && requestedSize <= (this.limits?.maxBufferSize ?? WEBGPU_DEFAULT_LIMITS.maxBufferSize)
+        ? requestedSize
+        : 4;
+      const descriptor = {
+        label,
+        size: fallbackSize,
+        usage: globals.GPUBufferUsage.COPY_SRC | globals.GPUBufferUsage.MAP_WRITE,
+        mappedAtCreation,
+      };
+      const native = backend.deviceCreateBuffer(this, descriptor);
+      const buffer = new DoeGPUBuffer(native, this._instance, descriptor.size, descriptor.usage, this.queue, this);
+      buffer.label = label;
+      buffer._creationValidationError = true;
+      if (mappedAtCreation && typeof backend.bufferMarkMappedAtCreation === 'function') {
         backend.bufferMarkMappedAtCreation(buffer);
         buffer._mapState = 'mapped';
       }
@@ -1148,8 +1421,7 @@ function createFullSurfaceClasses({
         const compute = assertObject(pipelineDescriptor.compute, 'GPUDevice.createComputePipeline', 'descriptor.compute');
         const shader = compute.module;
         const shaderNative = assertLiveResource(shader, 'GPUDevice.createComputePipeline', 'GPUShaderModule');
-        const entryPoint = compute.entryPoint ?? 'main';
-        assertNonEmptyString(entryPoint, 'GPUDevice.createComputePipeline', 'descriptor.compute.entryPoint');
+        const entryPoint = inferShaderEntryPoint(shader, compute.entryPoint, 'compute', 'GPUDevice.createComputePipeline', 'descriptor.compute.entryPoint');
         assertShaderEntryPoint(shader, entryPoint, 'GPUDevice.createComputePipeline');
         const layout = pipelineDescriptor.layout === 'auto' || pipelineDescriptor.layout === undefined
           ? null
@@ -1181,8 +1453,7 @@ function createFullSurfaceClasses({
         const compute = assertObject(pipelineDescriptor.compute, 'GPUDevice.createComputePipelineAsync', 'descriptor.compute');
         const shader = compute.module;
         const shaderNative = assertLiveResource(shader, 'GPUDevice.createComputePipelineAsync', 'GPUShaderModule');
-        const entryPoint = compute.entryPoint ?? 'main';
-        assertNonEmptyString(entryPoint, 'GPUDevice.createComputePipelineAsync', 'descriptor.compute.entryPoint');
+        const entryPoint = inferShaderEntryPoint(shader, compute.entryPoint, 'compute', 'GPUDevice.createComputePipelineAsync', 'descriptor.compute.entryPoint');
         assertShaderEntryPoint(shader, entryPoint, 'GPUDevice.createComputePipelineAsync');
         const layout = pipelineDescriptor.layout === 'auto' || pipelineDescriptor.layout === undefined
           ? null
@@ -1275,16 +1546,28 @@ function createFullSurfaceClasses({
     }
 
     createTexture(descriptor) {
-      const textureDescriptor = assertObject(descriptor, 'GPUDevice.createTexture', 'descriptor');
-      const size = assertTextureSize(textureDescriptor.size, 'GPUDevice.createTexture');
-      const usage = assertIntegerInRange(textureDescriptor.usage, 'GPUDevice.createTexture', 'descriptor.usage', { min: 1 });
-      const normalizedDescriptor = normalizeTextureDescriptor(
-        textureDescriptor,
-        size,
-        usage,
-        this.features,
-        'GPUDevice.createTexture',
-      );
+      try {
+        const textureDescriptor = assertObject(descriptor, 'GPUDevice.createTexture', 'descriptor');
+        const size = assertTextureSize(textureDescriptor.size, 'GPUDevice.createTexture');
+        const usage = assertIntegerInRange(textureDescriptor.usage, 'GPUDevice.createTexture', 'descriptor.usage', { min: 1 });
+        const normalizedDescriptor = normalizeTextureDescriptor(
+          textureDescriptor,
+          size,
+          usage,
+          this.features,
+          'GPUDevice.createTexture',
+        );
+        return this._createTextureFromNormalizedDescriptor(textureDescriptor, normalizedDescriptor, size, usage);
+      } catch (error) {
+        if (!shouldRouteDeviceError(this)) {
+          throw error;
+        }
+        captureDeviceError(this, 'out-of-memory', gpuErrorFromCreationFailure('out-of-memory', error));
+        return this._createErrorScopeFallbackTexture(descriptor?.label ?? '');
+      }
+    }
+
+    _createTextureFromNormalizedDescriptor(textureDescriptor, normalizedDescriptor, size, usage) {
       const native = backend.deviceCreateTexture(this, normalizedDescriptor, size, usage);
       const texture = new DoeGPUTexture(native, this, {
         width: size.width,
@@ -1301,6 +1584,22 @@ function createFullSurfaceClasses({
       texture.label = normalizedDescriptor.label ?? '';
       texture._features = this.features;
       return texture;
+    }
+
+    _createErrorScopeFallbackTexture(label = '') {
+      const size = { width: 1, height: 1, depthOrArrayLayers: 1 };
+      const usage = globals.GPUTextureUsage.COPY_DST;
+      const descriptor = {
+        label,
+        size,
+        usage,
+        dimension: '2d',
+        format: 'rgba8unorm',
+        mipLevelCount: 1,
+        sampleCount: 1,
+        viewFormats: [],
+      };
+      return this._createTextureFromNormalizedDescriptor(descriptor, descriptor, size, usage);
     }
 
     createSampler(descriptor = {}) {
@@ -1327,15 +1626,18 @@ function createFullSurfaceClasses({
           : normalizeVertexBufferLayouts(vertex.buffers, 'GPUDevice.createRenderPipeline');
         const layout = renderDescriptor.layout === 'auto' || renderDescriptor.layout === undefined
           ? null
-          : assertLiveResource(renderDescriptor.layout, 'GPUDevice.createRenderPipeline', 'GPUPipelineLayout');
+          : renderDescriptor.layout;
+        if (layout !== null) {
+          assertLiveResource(layout, 'GPUDevice.createRenderPipeline', 'GPUPipelineLayout');
+        }
         const pipelineDescriptor = {
-          layout,
+          layout: layout?._native ?? null,
           vertexModule,
-          vertexEntryPoint: vertex.entryPoint ?? 'main',
+          vertexEntryPoint: inferShaderEntryPoint(vertex.module, vertex.entryPoint, 'vertex', 'GPUDevice.createRenderPipeline', 'descriptor.vertex.entryPoint'),
           vertexBuffers,
           vertexConstants: vertex.constants ?? null,
           fragmentModule,
-          fragmentEntryPoint: fragment.entryPoint ?? 'main',
+          fragmentEntryPoint: inferShaderEntryPoint(fragment.module, fragment.entryPoint, 'fragment', 'GPUDevice.createRenderPipeline', 'descriptor.fragment.entryPoint'),
           fragmentConstants: fragment.constants ?? null,
           fragmentTarget: {
             ...targets[0],
@@ -1382,15 +1684,18 @@ function createFullSurfaceClasses({
           : normalizeVertexBufferLayouts(vertex.buffers, 'GPUDevice.createRenderPipelineAsync');
         const layout = renderDescriptor.layout === 'auto' || renderDescriptor.layout === undefined
           ? null
-          : assertLiveResource(renderDescriptor.layout, 'GPUDevice.createRenderPipelineAsync', 'GPUPipelineLayout');
+          : renderDescriptor.layout;
+        if (layout !== null) {
+          assertLiveResource(layout, 'GPUDevice.createRenderPipelineAsync', 'GPUPipelineLayout');
+        }
         const pipelineDescriptor = {
-          layout,
+          layout: layout?._native ?? null,
           vertexModule,
-          vertexEntryPoint: vertex.entryPoint ?? 'main',
+          vertexEntryPoint: inferShaderEntryPoint(vertex.module, vertex.entryPoint, 'vertex', 'GPUDevice.createRenderPipelineAsync', 'descriptor.vertex.entryPoint'),
           vertexBuffers,
           vertexConstants: vertex.constants ?? null,
           fragmentModule,
-          fragmentEntryPoint: fragment.entryPoint ?? 'main',
+          fragmentEntryPoint: inferShaderEntryPoint(fragment.module, fragment.entryPoint, 'fragment', 'GPUDevice.createRenderPipelineAsync', 'descriptor.fragment.entryPoint'),
           fragmentConstants: fragment.constants ?? null,
           fragmentTarget: {
             ...targets[0],
@@ -1483,6 +1788,7 @@ function createFullSurfaceClasses({
     }
 
     destroy() {
+      resolveDeviceLost(this, 'destroyed', 'GPUDevice.destroy() was called');
       destroyResource(this, (native) => backend.deviceDestroy(native));
     }
   }
@@ -1495,6 +1801,7 @@ function createFullSurfaceClasses({
       this._features = null;
       this._limits = null;
       this._info = null;
+      this._consumed = false;
       this.label = '';
       initResource(this, 'GPUAdapter');
     }
@@ -1533,11 +1840,19 @@ function createFullSurfaceClasses({
     }
 
     async requestDevice(descriptor) {
-      return backend.adapterRequestDevice(
-        this,
-        normalizeRequestDeviceDescriptor(descriptor, 'GPUAdapter.requestDevice'),
-        classes,
-      );
+      assertLiveResource(this, 'GPUAdapter.requestDevice', 'GPUAdapter');
+      if (this._consumed) {
+        throw operationError('GPUAdapter.requestDevice: adapter has already produced a device');
+      }
+      const normalized = normalizeRequestDeviceDescriptor(descriptor, 'GPUAdapter.requestDevice');
+      const resolvedFeatures = resolveDeviceFeatures(this, normalized);
+      const resolvedLimits = resolveDeviceLimits(this, normalized);
+      const deviceResult = backend.adapterRequestDevice(this, normalized, classes);
+      this._consumed = true;
+      const device = await deviceResult;
+      device._features = resolvedFeatures;
+      device._limits = resolvedLimits;
+      return device;
     }
 
     destroy() {
@@ -1563,9 +1878,20 @@ function createFullSurfaceClasses({
     }
 
     async requestAdapter(options) {
+      const normalized = normalizeRequestAdapterOptions(options, 'GPU.requestAdapter');
+      if (normalized?.forceFallbackAdapter === true) {
+        return null;
+      }
+      if (
+        normalized?.featureLevel !== undefined
+        && normalized.featureLevel !== 'core'
+        && normalized.featureLevel !== 'compatibility'
+      ) {
+        return null;
+      }
       return backend.gpuRequestAdapter(
         this,
-        normalizeRequestAdapterOptions(options, 'GPU.requestAdapter'),
+        normalized,
         classes,
       );
     }
@@ -1596,6 +1922,9 @@ export {
   addDeviceEventListener,
   removeDeviceEventListener,
   dispatchDeviceEvent,
+  operationError,
+  createDeviceLostState,
+  resolveDeviceLost,
   GPUError,
   GPUValidationError,
   GPUOutOfMemoryError,

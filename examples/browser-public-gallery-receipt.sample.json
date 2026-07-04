@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_public_gallery_receipt",
+  "receiptId": "browser-public-gallery-compute-sample",
+  "category": "compute",
+  "url": "https://gallery.doe.dev/doe/compute.html",
+  "method": "GET",
+  "statusCode": 200,
+  "contentSha256": "2345d3411aea7a0223ad936252c8fe65872d7e79259ef1e147473ef116912553",
+  "contentLengthBytes": 2506,
+  "galleryArtifactPath": "examples/browser-gallery-compute.sample.html",
+  "workloadContractPath": "browser/chromium/contracts/browser-benchmark-superset.contract.md",
+  "workloadIds": [
+    "browser-smoke-compute"
+  ],
+  "receiptIds": [
+    "browser-smoke-compute-dawn",
+    "browser-smoke-compute-doe"
+  ],
+  "receiptArtifactPaths": [
+    "examples/browser-dawn-execution-receipt.sample.json",
+    "examples/browser-doe-execution-receipt.sample.json"
+  ],
+  "observedAt": "2026-06-30T00:00:00Z"
+}

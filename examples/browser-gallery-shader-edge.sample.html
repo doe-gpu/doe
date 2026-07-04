@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Doe browser gallery sample: shader_edge</title>
+<main>
+  <h1>shader_edge</h1>
+  <p>contract: <a href="browser/chromium/contracts/browser-shader-links.contract.md">browser/chromium/contracts/browser-shader-links.contract.md</a></p>
+  <p>workload: browser-gallery-shader-edge</p>
+  <p>receipt: <a href="examples/browser-shader-edge-execution-receipt.sample.json">browser-gallery-shader-edge-doe</a></p>
+  <section>
+    <h2>Doe receipt facts</h2>
+    <p>receiptId: browser-gallery-shader-edge-doe</p>
+    <p>workloadId: browser-gallery-shader-edge</p>
+    <p>backend: webgpu-doe</p>
+    <p>source shader: wgsl main @compute @workgroup_size(1) fn main(@builtin(global_invocation_id) id: vec3u) {}</p>
+    <p>source sha256: b8b8f6141b2a6dbeec1ebcd40608d96f8ba20a10dcf0041a9f360d719fae28e0</p>
+    <p>lowering path: wgsl > doe-wgsl > tsir > hostplan > webgpu</p>
+    <p>driver: sample webgpu sample-driver sample-adapter-family sample-webgpu-adapter</p>
+    <p>device: sample-adapter aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa featureCount=1</p>
+    <p>outputHash: 6666666666666666666666666666666666666666666666666666666666666666</p>
+    <p>timing: browser-operation-proxy setupNs=1300 encodeNs=2300 submitWaitNs=3300</p>
+  </section>
+</main>

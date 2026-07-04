@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_release_archive_manifest",
+  "archive": {
+    "path": "examples/browser-release-archive.sample.zip",
+    "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+    "byteLength": 11325471,
+    "kind": "browser_release_archive"
+  },
+  "browserProduct": {
+    "productId": "fawn-doe",
+    "displayName": "Fawn Doe",
+    "version": "0.0.0-sample",
+    "channel": "diagnostic"
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "packageFormat": "zip"
+  },
+  "appBundleName": "Fawn-Doe-linux-x64",
+  "members": {
+    "browserExecutable": {
+      "archivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+      "sha256": "24c1cfddcd206a86281008e7eed38109344ef34cd88d61902a9befd520a5571c",
+      "byteLength": 4510,
+      "executable": true,
+      "sourcePath": "browser/chromium/src/out/fawn_release/chrome-wrapper"
+    },
+    "appMetadata": {
+      "archivePath": "Fawn-Doe-linux-x64/browser-product.json",
+      "sha256": "279022182aadd07cc564e3703d95a29350349cf03c2d097d5f04aabbaaa12b49",
+      "byteLength": 448,
+      "executable": false
+    },
+    "doeRuntime": {
+      "archivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+      "sha256": "1bf01661b9b48fc1811a0668aa18ce8642f7b568b1e4fffda82268ff79e0c527",
+      "byteLength": 43651829,
+      "executable": true,
+      "sourcePath": "runtime/zig/zig-out/lib/libwebgpu_doe.so"
+    },
+    "dawnFallbackRuntime": {
+      "archivePath": "Fawn-Doe-linux-x64/libdawn_native.so",
+      "sha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854",
+      "byteLength": 12201232,
+      "executable": true,
+      "sourcePath": "browser/chromium/src/out/fawn_release/libdawn_native.so"
+    }
+  },
+  "archiveMembers": [
+    {
+      "archivePath": "Fawn-Doe-linux-x64/browser-product.json",
+      "sha256": "279022182aadd07cc564e3703d95a29350349cf03c2d097d5f04aabbaaa12b49",
+      "byteLength": 448,
+      "executable": false
+    },
+    {
+      "archivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+      "sha256": "24c1cfddcd206a86281008e7eed38109344ef34cd88d61902a9befd520a5571c",
+      "byteLength": 4510,
+      "executable": true,
+      "sourcePath": "browser/chromium/src/out/fawn_release/chrome-wrapper"
+    },
+    {
+      "archivePath": "Fawn-Doe-linux-x64/libdawn_native.so",
+      "sha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854",
+      "byteLength": 12201232,
+      "executable": true,
+      "sourcePath": "browser/chromium/src/out/fawn_release/libdawn_native.so"
+    },
+    {
+      "archivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+      "sha256": "1bf01661b9b48fc1811a0668aa18ce8642f7b568b1e4fffda82268ff79e0c527",
+      "byteLength": 43651829,
+      "executable": true,
+      "sourcePath": "runtime/zig/zig-out/lib/libwebgpu_doe.so"
+    }
+  ],
+  "sourcePackageInputs": {
+    "path": "examples/browser-release-package-inputs-check.sample.json",
+    "sha256": "9346d49694f6bf786cc6235d933a5a2fa1f93b52ab8029cd76699cff9636f4b4",
+    "kind": "browser_release_package_inputs_check"
+  }
+}

@@ -1,0 +1,44 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Doe browser gallery sample: compute</title>
+<main>
+  <h1>compute</h1>
+  <p>contract: <a href="browser/chromium/contracts/browser-benchmark-superset.contract.md">browser/chromium/contracts/browser-benchmark-superset.contract.md</a></p>
+  <section>
+    <h2>Dawn vs Doe</h2>
+    <p>runner page: examples/browser-gallery-compute.sample.html</p>
+    <p>runner scope: same_page</p>
+    <p>runner modes: dawn doe</p>
+    <p>runner receipt emission: side_by_side_receipts</p>
+    <p>workload: browser-smoke-compute</p>
+    <p>comparison: <a href="examples/browser-smoke-report.sample.json">browser-smoke-compute-dawn-vs-doe</a></p>
+    <p>Dawn receipt: <a href="examples/browser-dawn-execution-receipt.sample.json">browser-smoke-compute-dawn</a></p>
+    <p>Doe receipt: <a href="examples/browser-doe-execution-receipt.sample.json">browser-smoke-compute-doe</a></p>
+  </section>
+  <section>
+    <h2>Dawn receipt facts</h2>
+    <p>receiptId: browser-smoke-compute-dawn</p>
+    <p>workloadId: browser-smoke-compute</p>
+    <p>backend: webgpu-dawn</p>
+    <p>source shader: wgsl main @compute @workgroup_size(1) fn main() {}</p>
+    <p>source sha256: a896fc385b468ad1df5c8ee8d8470121efa07e464a1c3049c665332cdc297912</p>
+    <p>lowering path: wgsl > tint > dawn-native</p>
+    <p>driver: sample webgpu sample-driver sample-adapter-family sample-webgpu-adapter</p>
+    <p>device: sample-adapter aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa featureCount=1</p>
+    <p>outputHash: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</p>
+    <p>timing: browser-operation-proxy setupNs=1000 encodeNs=2000 submitWaitNs=3000</p>
+  </section>
+  <section>
+    <h2>Doe receipt facts</h2>
+    <p>receiptId: browser-smoke-compute-doe</p>
+    <p>workloadId: browser-smoke-compute</p>
+    <p>backend: webgpu-doe</p>
+    <p>source shader: wgsl main @compute @workgroup_size(1) fn main() {}</p>
+    <p>source sha256: a896fc385b468ad1df5c8ee8d8470121efa07e464a1c3049c665332cdc297912</p>
+    <p>lowering path: wgsl > doe-wgsl > tsir > hostplan > webgpu</p>
+    <p>driver: sample webgpu sample-driver sample-adapter-family sample-webgpu-adapter</p>
+    <p>device: sample-adapter aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa featureCount=1</p>
+    <p>outputHash: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</p>
+    <p>timing: browser-operation-proxy setupNs=1000 encodeNs=2000 submitWaitNs=3000</p>
+  </section>
+</main>

@@ -196,6 +196,14 @@ Options:
                             Runtime selector policy JSON path (default: config/browser-runtime-selector-policy.json)
   --runtime-selector-profile-id ID
                             Optional selector profileId for auto denylist checks
+  --runtime-selector-profile-vendor VENDOR
+                            Optional selector profile vendor for evidence receipts
+  --runtime-selector-profile-api API
+                            Optional selector profile API for evidence receipts
+  --runtime-selector-profile-device-family DEVICE
+                            Optional selector profile device family for evidence receipts
+  --runtime-selector-profile-driver DRIVER
+                            Optional selector profile driver for evidence receipts
   --out PATH                JSON report output path (default: browser/chromium/artifacts/<timestamp>/${DEFAULT_OUT_FILE})
   --allow-bench-out         Allow writing this diagnostic report under bench/out
   --headless true|false     Launch headless (default: true)
@@ -289,10 +297,11 @@ async function withTimeout(promise, timeoutMs, label) {
 function makeFailedResult(mode, args, launchArgs, browserVersion, startMs, error) {
   const errorText = String(error?.stack ?? error);
   const selection = runtimeSelectionResolution(mode, args);
+  const runtimeSelection = buildRuntimeSelection(mode, args, launchArgs);
   return {
     mode,
     apiSurface: args.apiSurface,
-    runtimeSelection: buildRuntimeSelection(mode, args, launchArgs),
+    runtimeSelection,
     shaderCompilerIdentity: shaderCompilerIdentity(mode, args),
     runtimeArgs: runtimeArgs(selection.selectedRuntime, args.doeLibPath),
     launchArgs,
@@ -301,7 +310,7 @@ function makeFailedResult(mode, args, launchArgs, browserVersion, startMs, error
     webgpuAvailable: false,
     adapterAvailable: false,
     adapterInfo: null,
-    adapterIdentity: adapterIdentityFromSmokeResult(null),
+    adapterIdentity: adapterIdentityFromSmokeResult(null, runtimeSelection.profile),
     features: [],
     limits: {},
     wgslLanguageFeatures: [],
@@ -462,6 +471,10 @@ function parseArgs(argv) {
     runtimeSelectorPolicyPath: DEFAULT_RUNTIME_SELECTOR_POLICY,
     runtimeSelectorPolicy: null,
     runtimeSelectorProfileId: "",
+    runtimeSelectorProfileVendor: "",
+    runtimeSelectorProfileApi: "",
+    runtimeSelectorProfileDeviceFamily: "",
+    runtimeSelectorProfileDriver: "",
     outPath: defaultOutPath(),
     allowBenchOut: false,
     headless: true,
@@ -518,6 +531,22 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === "--runtime-selector-profile-id") {
       args.runtimeSelectorProfileId = readOptionValue(argv, i, "--runtime-selector-profile-id");
+      i += 1;
+    } else if (token === "--runtime-selector-profile-vendor") {
+      args.runtimeSelectorProfileVendor = readOptionValue(argv, i, "--runtime-selector-profile-vendor");
+      i += 1;
+    } else if (token === "--runtime-selector-profile-api") {
+      args.runtimeSelectorProfileApi = readOptionValue(argv, i, "--runtime-selector-profile-api");
+      i += 1;
+    } else if (token === "--runtime-selector-profile-device-family") {
+      args.runtimeSelectorProfileDeviceFamily = readOptionValue(
+        argv,
+        i,
+        "--runtime-selector-profile-device-family",
+      );
+      i += 1;
+    } else if (token === "--runtime-selector-profile-driver") {
+      args.runtimeSelectorProfileDriver = readOptionValue(argv, i, "--runtime-selector-profile-driver");
       i += 1;
     } else if (token === "--out") {
       args.outPath = readOptionValue(argv, i, "--out");
@@ -1165,12 +1194,22 @@ function runtimeArtifactIdentity(mode, args) {
   };
 }
 
+function runtimeSelectorProfile(args) {
+  return {
+    profileId: args.runtimeSelectorProfileId,
+    vendor: args.runtimeSelectorProfileVendor,
+    api: args.runtimeSelectorProfileApi,
+    deviceFamily: args.runtimeSelectorProfileDeviceFamily,
+    driver: args.runtimeSelectorProfileDriver,
+  };
+}
+
 function runtimeSelectionResolution(mode, args) {
   return resolveRuntimeSelection({
     requestedMode: mode,
     doeLibPath: args.doeLibPath,
     policy: args.runtimeSelectorPolicy,
-    profile: { profileId: args.runtimeSelectorProfileId },
+    profile: runtimeSelectorProfile(args),
   });
 }
 
@@ -1217,18 +1256,37 @@ function extractModeResult(modeResults, mode) {
   return modeResults.find((entry) => entry.mode === mode) ?? null;
 }
 
-function adapterIdentityFromSmokeResult(result) {
+function adapterLabel(adapterInfo, profile) {
+  for (const field of ["device", "description", "name", "architecture"]) {
+    const value = adapterInfo[field];
+    if (typeof value === "string" && value.length > 0 && value !== "unknown") {
+      return value;
+    }
+  }
+  const deviceFamily = profile?.deviceFamily;
+  if (typeof deviceFamily === "string" && deviceFamily.length > 0 && deviceFamily !== "unknown") {
+    return deviceFamily;
+  }
+  return "";
+}
+
+function adapterIdentityFromSmokeResult(result, profile = {}) {
   const adapterInfo =
     result?.adapterInfo && typeof result.adapterInfo === "object" ? result.adapterInfo : {};
   const features = Array.isArray(result?.features) ? [...result.features].sort() : [];
   const limits = result?.limits && typeof result.limits === "object" ? result.limits : {};
-  return {
+  const identity = {
     adapterInfoSha256: hashHex(adapterInfo),
     featuresSha256: hashHex(features),
     limitsSha256: hashHex(limits),
     featureCount: features.length,
     limitCount: Object.keys(limits).length,
   };
+  const label = adapterLabel(adapterInfo, profile);
+  if (label) {
+    identity.adapter = label;
+  }
+  return identity;
 }
 
 function smokeWorkloadIdentity() {
@@ -2291,16 +2349,17 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
       `${mode} smoke suite`,
     );
 
+    const runtimeSelection = buildRuntimeSelection(mode, args, launchArgs);
     return {
       mode,
-      runtimeSelection: buildRuntimeSelection(mode, args, launchArgs),
+      runtimeSelection,
       shaderCompilerIdentity: shaderCompilerIdentity(mode, args),
       runtimeArgs: runtimeArgs(selection.selectedRuntime, args.doeLibPath),
       launchArgs,
       browserVersion,
       elapsedMs: Date.now() - startMs,
       ...suite,
-      adapterIdentity: adapterIdentityFromSmokeResult(suite),
+      adapterIdentity: adapterIdentityFromSmokeResult(suite, runtimeSelection.profile),
     };
   } catch (error) {
     return makeFailedResult(mode, args, launchArgs, browserVersion, startMs, error);

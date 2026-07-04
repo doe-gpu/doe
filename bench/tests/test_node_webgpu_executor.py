@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -28,6 +29,8 @@ NAPI_ND_IMMEDIATES_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "d
 BUN_ENTRY_PATH = REPO_ROOT / "packages" / "doe-gpu" / "src" / "vendor" / "webgpu" / "bun.js"
 BUN_FFI_PATH = REPO_ROOT / "packages" / "doe-gpu" / "src" / "vendor" / "webgpu" / "bun-ffi.js"
 PACKAGE_EXECUTION_POLICY_PATH = REPO_ROOT / "config" / "package-execution-policy.json"
+TRACE_REPLAY_SEED = "0x9e3779b97f4a7c15"
+PACKAGE_TRACE_MODULE = "package-webgpu-executor"
 
 
 def write_plan(path: Path, *, valid: bool = True) -> None:
@@ -1175,10 +1178,21 @@ const result = await executePlanFile({{
   dryRun: true,
   commandRepeat: 3,
 }});
+const lastRow = result.rows[result.rows.length - 1];
 console.log(JSON.stringify({{
   rowCount: result.meta.executionRowCount,
   successCount: result.meta.executionSuccessCount,
   dispatchCount: result.meta.executionDispatchCount,
+  traceVersion: result.meta.traceVersion,
+  module: result.meta.module,
+  traceRowCount: result.meta.rowCount,
+  seqMax: result.meta.seqMax,
+  hash: result.meta.hash,
+  previousHash: result.meta.previousHash,
+  firstPreviousHash: result.rows[0].previousHash,
+  lastHash: lastRow.hash,
+  lastPreviousHash: lastRow.previousHash,
+  opCodes: result.rows.map((row) => row.opCode),
   shaderSourceReceipts: result.meta.shaderSourceReceipts,
   shaderSourceReceiptsHash: result.meta.shaderSourceReceiptsHash,
   rows: result.rows.length,
@@ -1196,6 +1210,14 @@ console.log(JSON.stringify({{
             self.assertEqual(payload["rowCount"], 12)
             self.assertEqual(payload["successCount"], 12)
             self.assertEqual(payload["dispatchCount"], 3)
+            self.assertEqual(payload["traceVersion"], 1)
+            self.assertEqual(payload["module"], PACKAGE_TRACE_MODULE)
+            self.assertEqual(payload["traceRowCount"], 12)
+            self.assertEqual(payload["seqMax"], 11)
+            self.assertEqual(payload["firstPreviousHash"], TRACE_REPLAY_SEED)
+            self.assertEqual(payload["hash"], payload["lastHash"])
+            self.assertEqual(payload["previousHash"], payload["lastPreviousHash"])
+            self.assertEqual(payload["opCodes"][:4], ["upload", "dispatch", "copy", "readback"])
             self.assertEqual(len(payload["shaderSourceReceipts"]), 1)
             self.assertEqual(payload["shaderSourceReceipts"][0]["moduleId"], "multiply")
             self.assertRegex(payload["shaderSourceReceipts"][0]["sha256"], r"^[0-9a-f]{64}$")
@@ -2003,6 +2025,29 @@ console.log(JSON.stringify({{ matched, missed, nodeMatched, nodeColdMatched }}))
             self.assertEqual(entry["mode"], "mapAsync")
             self.assertEqual(set(entry["workloadId"]), expected_workloads)
 
+    def test_package_execution_policy_keeps_cold_inference_lanes_on_mapasync(self) -> None:
+        policy = json.loads(PACKAGE_EXECUTION_POLICY_PATH.read_text(encoding="utf-8"))
+        entries = policy["readbackMode"]
+        expected_workloads = {
+            "compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces",
+            "compute_stable_fluids_multistage_256grid_18pressure_4steps",
+            "inference_gemma3_1b_prefill_64tok_decode_64tok",
+            "inference_gemma3_270m_decode_1tok",
+            "inference_gemma3_270m_prefill_64tok_decode_64tok",
+        }
+        expected = {
+            "node-package-inference-mapasync-readback-cold": ("node", "doe"),
+            "bun-package-inference-mapasync-readback-cold": ("bun", "doe"),
+            "bun-ffi-package-inference-mapasync-readback-cold": ("bun", "doe-ffi"),
+        }
+        for entry_id, (runtime_host, provider) in expected.items():
+            entry = next(policy_entry for policy_entry in entries if policy_entry["id"] == entry_id)
+            self.assertEqual(entry["runtimeHost"], runtime_host)
+            self.assertEqual(entry["provider"], provider)
+            self.assertFalse(entry["packagePreparedSession"])
+            self.assertEqual(entry["mode"], "mapAsync")
+            self.assertEqual(set(entry["workloadId"]), expected_workloads)
+
     def test_prepared_session_boundary_scopes_pre_boundary_host_totals(self) -> None:
         script = f"""
 import {{ boundaryScopedHostTotals }} from {json.dumps(EXECUTOR_MODULE_URL)};
@@ -2081,6 +2126,11 @@ console.log(JSON.stringify(boundaryScopedHostTotals({{
             self.assertEqual(meta["executionRowCount"], 4)
             self.assertEqual(meta["executionSuccessCount"], 4)
             self.assertEqual(meta["executionDispatchCount"], 1)
+            self.assertEqual(meta["traceVersion"], 1)
+            self.assertEqual(meta["module"], PACKAGE_TRACE_MODULE)
+            self.assertEqual(meta["rowCount"], 4)
+            self.assertEqual(meta["commandCount"], 4)
+            self.assertEqual(meta["seqMax"], 3)
             self.assertEqual(meta["provider"], "node-webgpu")
             self.assertEqual(meta["hostInputReadTotalNs"], 0)
             self.assertEqual(meta["hostExecutorInitTotalNs"], 0)
@@ -2089,9 +2139,32 @@ console.log(JSON.stringify(boundaryScopedHostTotals({{
             self.assertEqual(meta["packageSetupTotalNs"], 0)
             self.assertEqual(len(rows), 4)
             self.assertEqual([row["stepKind"] for row in rows], ["writeBuffer", "dispatch", "copyBufferToBuffer", "readBuffer"])
+            self.assertEqual([row["opCode"] for row in rows], ["upload", "dispatch", "copy", "readback"])
+            self.assertEqual([row["seq"] for row in rows], [0, 1, 2, 3])
+            self.assertEqual(rows[0]["previousHash"], TRACE_REPLAY_SEED)
+            self.assertEqual(meta["hash"], rows[-1]["hash"])
+            self.assertEqual(meta["previousHash"], rows[-1]["previousHash"])
+            self.assertTrue(all(row["traceVersion"] == 1 for row in rows))
+            self.assertTrue(all(row["module"] == PACKAGE_TRACE_MODULE for row in rows))
+            self.assertTrue(all(row["command"] for row in rows))
             self.assertTrue(all(row["executionBackend"] == "node_webgpu_package" for row in rows))
             self.assertTrue(all(row["executionProvider"] == "node-webgpu" for row in rows))
             self.assertTrue(all(row["executionProviderName"] == "node-webgpu" for row in rows))
+            replay = subprocess.run(
+                [
+                    sys.executable,
+                    str(REPO_ROOT / "pipeline" / "trace" / "replay.py"),
+                    "--trace-meta",
+                    str(meta_path),
+                    "--trace-jsonl",
+                    str(trace_path),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(replay.returncode, 0, replay.stdout + replay.stderr)
 
     def test_dry_run_supports_doe_provider_metadata(self) -> None:
         with tempfile.TemporaryDirectory(prefix="doe-node-webgpu-executor-") as tmpdir:

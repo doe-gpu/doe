@@ -4,6 +4,49 @@
   "title": "Browser runtime frontier bundle",
   "type": "object",
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "claimabilityStatus": { "const": "claimable" }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": { "const": "pass" },
+          "claimBlockers": { "maxItems": 0 },
+          "claimBlockerSummary": { "maxItems": 0 },
+          "failures": { "maxItems": 0 },
+          "summary": {
+            "properties": {
+              "claimBlockerCount": { "const": 0 },
+              "failureCount": { "const": 0 }
+            }
+          },
+          "componentReceipts": {
+            "properties": {
+              "runtimeIdentity": {
+                "properties": {
+                  "status": { "const": "pass" }
+                }
+              },
+              "claimPromotionReceipt": {
+                "properties": {
+                  "status": { "const": "pass" },
+                  "promotionStatus": { "const": "promotable" }
+                }
+              },
+              "releaseArtifactBundle": {
+                "properties": {
+                  "status": { "const": "pass" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "required": [
     "schemaVersion",
     "artifactKind",
@@ -127,14 +170,23 @@
       "required": [
         "path",
         "status",
+        "artifactKind",
+        "bundleId",
         "releaseStatus",
+        "releaseBundleIdentitySha256",
         "artifactVerification",
         "claimReports"
       ],
       "properties": {
         "path": { "type": "string", "minLength": 1 },
         "status": { "$ref": "#/$defs/ReceiptStatus" },
+        "artifactKind": { "type": "string" },
+        "bundleId": { "type": "string" },
         "releaseStatus": { "type": "string" },
+        "releaseBundleIdentitySha256": {
+          "type": "string",
+          "pattern": "^$|^[a-f0-9]{64}$"
+        },
         "artifactVerification": { "$ref": "#/$defs/ArtifactVerificationSummary" },
         "claimReports": {
           "type": "array",

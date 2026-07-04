@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_proof_page_receipt",
+  "receiptId": "browser-proof-page-sample",
+  "url": "about:doe",
+  "loadType": "browser_internal_page",
+  "status": "loaded",
+  "contentSha256": "79f2cd2383a3df1d3ddf7499ca3973372015ecbce448c016d8a83645aeca6571",
+  "contentLengthBytes": 3284,
+  "proofArtifactPath": "examples/browser-proof-page.sample.html",
+  "runtimeIdentityPath": "examples/browser-runtime-identity.selector.sample.json",
+  "diagnostics": {
+    "activeRuntime": "doe",
+    "activeBackend": "webgpu-doe",
+    "webgpuAvailable": true,
+    "compilerPath": "runtime/zig/zig-out/bin/doe-zig-runtime",
+    "tsirStatus": "available",
+    "hostPlanStatus": "not_applicable",
+    "cslStatus": "not_applicable",
+    "fallbackPolicyState": "hidden_fallback_disabled"
+  },
+  "releaseProvenance": {
+    "browserProduct": {
+      "productId": "fawn-doe",
+      "displayName": "Fawn Doe",
+      "version": "0.0.0-sample",
+      "channel": "diagnostic"
+    },
+    "platform": {
+      "os": "linux",
+      "arch": "x64",
+      "packageFormat": "zip"
+    },
+    "releaseArchive": {
+      "path": "examples/browser-release-archive.sample.zip",
+      "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+      "kind": "browser_release_archive",
+      "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip"
+    },
+    "releaseArchiveManifest": {
+      "path": "examples/browser-release-archive-manifest.sample.json",
+      "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+      "kind": "browser_release_archive_manifest"
+    },
+    "publicDownloadReceipt": {
+      "path": "examples/browser-public-download-receipt.sample.json",
+      "sha256": "fbb04fddc5e8f2250c577eddc93a8b5299af292ed923346b24f580f3f942723c",
+      "kind": "browser_public_download_receipt"
+    },
+    "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+    "browserAppMetadataArchivePath": "Fawn-Doe-linux-x64/browser-product.json",
+    "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+    "dawnFallbackRuntimeArchivePath": "Fawn-Doe-linux-x64/libdawn_native.so"
+  },
+  "recentReceiptIds": [
+    "browser-smoke-compute-dawn",
+    "browser-smoke-compute-doe",
+    "browser-gallery-rendering-doe",
+    "browser-gallery-tensor-doe",
+    "browser-gallery-shader-edge-doe",
+    "browser-gallery-benchmark-trace-doe"
+  ],
+  "observedAt": "2026-06-30T00:00:00Z"
+}

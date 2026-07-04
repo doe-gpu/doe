@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_published_proof_surface",
+  "surfaceId": "browser-published-proof-surface-sample-v1",
+  "capturePolicyPath": "config/browser-capture-policy.json",
+  "runtimeIdentityPath": "examples/browser-runtime-identity.selector.sample.json",
+  "proofPage": {
+    "artifact": {
+      "path": "examples/browser-proof-page.sample.html",
+      "sha256": "79f2cd2383a3df1d3ddf7499ca3973372015ecbce448c016d8a83645aeca6571",
+      "kind": "browser_proof_page"
+    },
+    "url": "about:doe",
+    "diagnosticReceipt": {
+      "path": "examples/browser-proof-page-receipt.sample.json",
+      "sha256": "4f1d06f4a2336e98261db19f791e568734b2bf1b583a72ec6647f0f96431c847",
+      "kind": "browser_proof_page_receipt"
+    },
+    "diagnostics": {
+      "activeRuntime": "doe",
+      "activeBackend": "webgpu-doe",
+      "webgpuAvailable": true,
+      "compilerPath": "runtime/zig/zig-out/bin/doe-zig-runtime",
+      "tsirStatus": "available",
+      "hostPlanStatus": "not_applicable",
+      "cslStatus": "not_applicable",
+      "fallbackPolicyState": "hidden_fallback_disabled"
+    },
+    "releaseProvenance": {
+      "browserProduct": {
+        "productId": "fawn-doe",
+        "displayName": "Fawn Doe",
+        "version": "0.0.0-sample",
+        "channel": "diagnostic"
+      },
+      "platform": {
+        "os": "linux",
+        "arch": "x64",
+        "packageFormat": "zip"
+      },
+      "releaseArchive": {
+        "path": "examples/browser-release-archive.sample.zip",
+        "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+        "kind": "browser_release_archive",
+        "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip"
+      },
+      "releaseArchiveManifest": {
+        "path": "examples/browser-release-archive-manifest.sample.json",
+        "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+        "kind": "browser_release_archive_manifest"
+      },
+      "publicDownloadReceipt": {
+        "path": "examples/browser-public-download-receipt.sample.json",
+        "sha256": "fbb04fddc5e8f2250c577eddc93a8b5299af292ed923346b24f580f3f942723c",
+        "kind": "browser_public_download_receipt"
+      },
+      "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+      "browserAppMetadataArchivePath": "Fawn-Doe-linux-x64/browser-product.json",
+      "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+      "dawnFallbackRuntimeArchivePath": "Fawn-Doe-linux-x64/libdawn_native.so"
+    },
+    "recentReceiptIds": [
+      "browser-smoke-compute-dawn",
+      "browser-smoke-compute-doe",
+      "browser-gallery-rendering-doe",
+      "browser-gallery-tensor-doe",
+      "browser-gallery-shader-edge-doe",
+      "browser-gallery-benchmark-trace-doe"
+    ],
+    "receiptPayloads": [
+      {
+        "receiptId": "browser-smoke-compute-dawn",
+        "path": "examples/browser-dawn-execution-receipt.sample.json",
+        "sha256": "82d07bea3b4f6a269d0388a3fc02aaa89cf0945b55a00f22b2ac171dcdbd33fa",
+        "kind": "browser_execution_receipt"
+      },
+      {
+        "receiptId": "browser-smoke-compute-doe",
+        "path": "examples/browser-doe-execution-receipt.sample.json",
+        "sha256": "a2c3cdc85344899b6ba3b0c15097d4736f83e18e0530b382861e3430f6ecdafe",
+        "kind": "browser_execution_receipt"
+      }
+    ]
+  },
+  "galleryPages": [
+    {
+      "category": "compute",
+      "url": "https://gallery.doe.dev/doe/compute.html",
+      "artifact": {
+        "path": "examples/browser-gallery-compute.sample.html",
+        "sha256": "2345d3411aea7a0223ad936252c8fe65872d7e79259ef1e147473ef116912553",
+        "kind": "browser_gallery_page"
+      },
+      "publicReceipt": {
+        "path": "examples/browser-public-gallery-receipt.sample.json",
+        "sha256": "8b1fb0842d73c103fbfba321f0234dd4a163a57428b742de7c54c71c84e9505d",
+        "kind": "browser_public_gallery_receipt"
+      },
+      "workloadContractPath": "browser/chromium/contracts/browser-benchmark-superset.contract.md",
+      "workloadIds": [
+        "browser-smoke-compute"
+      ],
+      "receiptIds": [
+        "browser-smoke-compute-dawn",
+        "browser-smoke-compute-doe"
+      ],
+      "receiptArtifacts": [
+        {
+          "receiptId": "browser-smoke-compute-dawn",
+          "path": "examples/browser-dawn-execution-receipt.sample.json",
+          "sha256": "82d07bea3b4f6a269d0388a3fc02aaa89cf0945b55a00f22b2ac171dcdbd33fa",
+          "kind": "browser_execution_receipt"
+        },
+        {
+          "receiptId": "browser-smoke-compute-doe",
+          "path": "examples/browser-doe-execution-receipt.sample.json",
+          "sha256": "a2c3cdc85344899b6ba3b0c15097d4736f83e18e0530b382861e3430f6ecdafe",
+          "kind": "browser_execution_receipt"
+        }
+      ]
+    },
+    {
+      "category": "rendering",
+      "url": "https://gallery.doe.dev/doe/rendering.html",
+      "artifact": {
+        "path": "examples/browser-gallery-rendering.sample.html",
+        "sha256": "6f4375d0a83495bd52cb63c9f18a19929e997177ec9e32feab28a1c36473662d",
+        "kind": "browser_gallery_page"
+      },
+      "publicReceipt": {
+        "path": "examples/browser-public-gallery-rendering-receipt.sample.json",
+        "sha256": "b821badbe54ef813d1d83c1ef2a6fd7a40c3d1139c86efc57daf8b268ebcd650",
+        "kind": "browser_public_gallery_receipt"
+      },
+      "workloadContractPath": "browser/chromium/contracts/browser-benchmark-superset.contract.md",
+      "workloadIds": [
+        "browser-gallery-rendering"
+      ],
+      "receiptIds": [
+        "browser-gallery-rendering-doe"
+      ],
+      "receiptArtifacts": [
+        {
+          "receiptId": "browser-gallery-rendering-doe",
+          "path": "examples/browser-rendering-execution-receipt.sample.json",
+          "sha256": "fb574e7649738d940cbb15a15c3b9d0f4bb65283e203f98b37c2af9991a46144",
+          "kind": "browser_execution_receipt"
+        }
+      ]
+    },
+    {
+      "category": "tensor",
+      "url": "https://gallery.doe.dev/doe/tensor.html",
+      "artifact": {
+        "path": "examples/browser-gallery-tensor.sample.html",
+        "sha256": "c534feab78d6959b8b26a04fa66408eca3a5a05d74e5e04f74f0e8a23b480776",
+        "kind": "browser_gallery_page"
+      },
+      "publicReceipt": {
+        "path": "examples/browser-public-gallery-tensor-receipt.sample.json",
+        "sha256": "21b9140f2ff762ad967fd7b844f4e61e33220cc3173644d4198b7248f796a2fe",
+        "kind": "browser_public_gallery_receipt"
+      },
+      "workloadContractPath": "browser/chromium/contracts/browser-local-ai-workloads.contract.md",
+      "workloadIds": [
+        "browser-gallery-tensor"
+      ],
+      "receiptIds": [
+        "browser-gallery-tensor-doe"
+      ],
+      "receiptArtifacts": [
+        {
+          "receiptId": "browser-gallery-tensor-doe",
+          "path": "examples/browser-tensor-execution-receipt.sample.json",
+          "sha256": "5cf72cef1ada813f53bf4db0edfef1b170420c6d0a72c0e2645f3505c18961c0",
+          "kind": "browser_execution_receipt"
+        }
+      ]
+    },
+    {
+      "category": "shader_edge",
+      "url": "https://gallery.doe.dev/doe/shader_edge.html",
+      "artifact": {
+        "path": "examples/browser-gallery-shader-edge.sample.html",
+        "sha256": "f9d141c3b9f4abca92da6efc26c4c8febbcb666b5b25a71ecc697a8fbcb7c6ed",
+        "kind": "browser_gallery_page"
+      },
+      "publicReceipt": {
+        "path": "examples/browser-public-gallery-shader-edge-receipt.sample.json",
+        "sha256": "196d4f1642e4e55dbc389d1f85c1644f28012c4b79b5640f8fa38f19a9bef0fc",
+        "kind": "browser_public_gallery_receipt"
+      },
+      "workloadContractPath": "browser/chromium/contracts/browser-shader-links.contract.md",
+      "workloadIds": [
+        "browser-gallery-shader-edge"
+      ],
+      "receiptIds": [
+        "browser-gallery-shader-edge-doe"
+      ],
+      "receiptArtifacts": [
+        {
+          "receiptId": "browser-gallery-shader-edge-doe",
+          "path": "examples/browser-shader-edge-execution-receipt.sample.json",
+          "sha256": "1f7c8d336e114212acacca0b7a9760306cba3b6dd62e69cc8ffba59c3efbd1d5",
+          "kind": "browser_execution_receipt"
+        }
+      ]
+    },
+    {
+      "category": "benchmark_trace",
+      "url": "https://gallery.doe.dev/doe/benchmark_trace.html",
+      "artifact": {
+        "path": "examples/browser-gallery-benchmark-trace.sample.html",
+        "sha256": "09bb75ca27646e86125dfb368058f8a32ca2804ddd7619bfa09f0298bcc63ec5",
+        "kind": "browser_gallery_page"
+      },
+      "publicReceipt": {
+        "path": "examples/browser-public-gallery-benchmark-trace-receipt.sample.json",
+        "sha256": "375fc2da5f7c5748724b4876dc7772be885825df99635cbba6a8949324144a64",
+        "kind": "browser_public_gallery_receipt"
+      },
+      "workloadContractPath": "browser/chromium/contracts/browser-benchmark-superset.contract.md",
+      "workloadIds": [
+        "browser-gallery-benchmark-trace"
+      ],
+      "receiptIds": [
+        "browser-gallery-benchmark-trace-doe"
+      ],
+      "receiptArtifacts": [
+        {
+          "receiptId": "browser-gallery-benchmark-trace-doe",
+          "path": "examples/browser-benchmark-trace-execution-receipt.sample.json",
+          "sha256": "96ac5d4e6cf5ba8e27a9e2b0eb92d8a49749a262564b3a8924724a19269c76a7",
+          "kind": "browser_execution_receipt"
+        }
+      ]
+    }
+  ],
+  "comparisonReceipts": [
+    {
+      "comparisonId": "browser-smoke-compute-dawn-vs-doe",
+      "workloadId": "browser-smoke-compute",
+      "runner": {
+        "pageArtifactPath": "examples/browser-gallery-compute.sample.html",
+        "executionScope": "same_page",
+        "modes": [
+          "dawn",
+          "doe"
+        ],
+        "emitsSideBySideReceipts": true
+      },
+      "comparisonPolicy": {
+        "workloadIdentity": "same_workload_id",
+        "sourceShaderIdentity": "same_source_shader_identity",
+        "adapterDeviceIdentity": "same_device_identity",
+        "timingScope": "browser-operation-proxy",
+        "commandCoverage": "exact_match",
+        "outputIdentity": "same_output_hash",
+        "fallbackPolicy": "no_hidden_fallback"
+      },
+      "comparisonArtifact": {
+        "path": "examples/browser-smoke-report.sample.json",
+        "sha256": "291a1f34db21c91928c3a8234e7665c852670d9ad546f36b27cad9dc58c9170d",
+        "kind": "chromium-webgpu-playwright-smoke"
+      },
+      "dawnReceipt": {
+        "receiptId": "browser-smoke-compute-dawn",
+        "path": "examples/browser-dawn-execution-receipt.sample.json",
+        "sha256": "82d07bea3b4f6a269d0388a3fc02aaa89cf0945b55a00f22b2ac171dcdbd33fa",
+        "kind": "browser_execution_receipt"
+      },
+      "doeReceipt": {
+        "receiptId": "browser-smoke-compute-doe",
+        "path": "examples/browser-doe-execution-receipt.sample.json",
+        "sha256": "a2c3cdc85344899b6ba3b0c15097d4736f83e18e0530b382861e3430f6ecdafe",
+        "kind": "browser_execution_receipt"
+      }
+    }
+  ]
+}

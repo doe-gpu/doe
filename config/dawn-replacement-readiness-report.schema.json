@@ -48,6 +48,9 @@
         "claimAllowedProductRowCount",
         "blockedProductRowCount",
         "coveredEvidenceReleaseRowCount",
+        "evidenceSliceCount",
+        "claimAllowedEvidenceSliceCount",
+        "blockedEvidenceSliceCount",
         "uniqueBlockerCount"
       ],
       "properties": {
@@ -56,6 +59,9 @@
         "claimAllowedProductRowCount": { "type": "integer", "minimum": 0 },
         "blockedProductRowCount": { "type": "integer", "minimum": 0 },
         "coveredEvidenceReleaseRowCount": { "type": "integer", "minimum": 0 },
+        "evidenceSliceCount": { "type": "integer", "minimum": 0 },
+        "claimAllowedEvidenceSliceCount": { "type": "integer", "minimum": 0 },
+        "blockedEvidenceSliceCount": { "type": "integer", "minimum": 0 },
         "uniqueBlockerCount": { "type": "integer", "minimum": 0 }
       }
     },
@@ -67,6 +73,10 @@
   "$defs": {
     "ReadinessStatus": {
       "enum": ["claimable", "covered", "blocked"]
+    },
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
     },
     "Failure": {
       "type": "object",
@@ -108,7 +118,49 @@
         "comparisonStatus": { "type": "string" },
         "claimStatus": { "type": "string" },
         "reportPath": { "type": "string" },
-        "claimPath": { "type": "string" }
+        "claimPath": { "type": "string" },
+        "blocker": { "type": "string" },
+        "browserRelease": { "$ref": "#/$defs/BrowserReleaseClaimEvidence" }
+      }
+    },
+    "BrowserReleaseClaimEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtimeFrontierBundlePath",
+        "releaseArtifactBundlePath",
+        "releaseArchivePath",
+        "releaseArchiveSha256",
+        "releaseArchiveManifestPath",
+        "releaseArchiveManifestSha256",
+        "downloadUrl",
+        "packageInputsPath",
+        "provenanceReportPath",
+        "publicDownloadReceiptPath",
+        "proofSurfacePath",
+        "proofSurfaceCheckPath",
+        "browserLaunchReceiptPath",
+        "finalizerReportPath",
+        "finalizerCheckPath",
+        "readinessReportPath"
+      ],
+      "properties": {
+        "runtimeFrontierBundlePath": { "type": "string", "minLength": 1 },
+        "releaseArtifactBundlePath": { "type": "string", "minLength": 1 },
+        "releaseArchivePath": { "type": "string", "minLength": 1 },
+        "releaseArchiveSha256": { "$ref": "#/$defs/Hash" },
+        "releaseArchiveManifestPath": { "type": "string", "minLength": 1 },
+        "releaseArchiveManifestSha256": { "$ref": "#/$defs/Hash" },
+        "downloadUrl": { "type": "string", "minLength": 1 },
+        "packageInputsPath": { "type": "string", "minLength": 1 },
+        "provenanceReportPath": { "type": "string", "minLength": 1 },
+        "publicDownloadReceiptPath": { "type": "string", "minLength": 1 },
+        "proofSurfacePath": { "type": "string", "minLength": 1 },
+        "proofSurfaceCheckPath": { "type": "string", "minLength": 1 },
+        "browserLaunchReceiptPath": { "type": "string", "minLength": 1 },
+        "finalizerReportPath": { "type": "string", "minLength": 1 },
+        "finalizerCheckPath": { "type": "string", "minLength": 1 },
+        "readinessReportPath": { "type": "string", "minLength": 1 }
       }
     },
     "FrontierBundleEvidence": {
@@ -116,6 +168,7 @@
       "additionalProperties": false,
       "required": [
         "path",
+        "sha256",
         "artifactKind",
         "status",
         "claimabilityStatus",
@@ -124,9 +177,8 @@
       ],
       "properties": {
         "path": { "type": "string", "minLength": 1 },
-        "artifactKind": {
-          "enum": ["browser_runtime_frontier_bundle", "tint_compiler_frontier_bundle"]
-        },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "minLength": 1 },
         "status": { "enum": ["pass", "fail"] },
         "claimabilityStatus": { "enum": ["claimable", "blocked"] },
         "claimBlockers": {
@@ -142,7 +194,738 @@
           "type": "array",
           "items": { "$ref": "#/$defs/JsonObject" }
         },
-        "componentReceipts": { "$ref": "#/$defs/JsonObject" }
+        "phaseTimingCoverage": { "$ref": "#/$defs/JsonObject" },
+        "componentReceipts": { "$ref": "#/$defs/JsonObject" },
+        "consistency": { "$ref": "#/$defs/FinalizerConsistencyEvidence" },
+        "releaseCandidateEvidence": { "$ref": "#/$defs/BrowserReleaseCandidateEvidence" }
+      }
+    },
+    "CtsConformanceEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "policyStatus",
+        "subsetReceipt",
+        "backendPassLedger",
+        "failures",
+        "summary"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "schemaVersion": { "type": "integer", "minimum": 0 },
+        "artifactKind": { "type": "string" },
+        "ctsSource": { "type": "string" },
+        "ctsRevision": { "type": "string" },
+        "policyStatus": { "enum": ["defined", "malformed", "missing"] },
+        "policyId": { "type": "string" },
+        "claimLanguage": { "type": "string" },
+        "diagnosticLanguage": { "type": "string" },
+        "promotionRequirements": { "$ref": "#/$defs/JsonObject" },
+        "allowedClaimStates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JsonObject" }
+        },
+        "subsetReceipt": { "$ref": "#/$defs/CtsSubsetReceiptEvidence" },
+        "backendPassLedger": { "$ref": "#/$defs/CtsBackendPassLedgerEvidence" },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        },
+        "summary": { "$ref": "#/$defs/SummaryMap" }
+      }
+    },
+    "CtsSubsetReceiptEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "status",
+        "failures",
+        "summary"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "schemaVersion": { "type": "integer", "minimum": 0 },
+        "artifactKind": { "type": "string" },
+        "receiptId": { "type": "string" },
+        "publicationStatus": { "type": "string" },
+        "publicationChannel": { "type": "string" },
+        "status": { "enum": ["pass", "fail", "missing"] },
+        "sourceEvidence": { "$ref": "#/$defs/JsonObject" },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        },
+        "summary": { "$ref": "#/$defs/SummaryMap" }
+      }
+    },
+    "CtsBackendPassLedgerEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "status",
+        "failures",
+        "summary"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "schemaVersion": { "type": "integer", "minimum": 0 },
+        "artifactKind": { "type": "string" },
+        "ledgerId": { "type": "string" },
+        "ledgerStatus": { "type": "string" },
+        "claimScope": { "type": "string" },
+        "fullConformanceClaimAllowed": { "type": "boolean" },
+        "replacementClaimAllowed": { "type": "boolean" },
+        "status": { "enum": ["pass", "fail", "missing"] },
+        "sourceReceipt": { "$ref": "#/$defs/JsonObject" },
+        "sourceEvidence": { "$ref": "#/$defs/JsonObject" },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        },
+        "summary": { "$ref": "#/$defs/SummaryMap" }
+      }
+    },
+    "BrowserReleaseCandidateEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "provenanceReport": { "$ref": "#/$defs/ProvenanceReportEvidence" },
+        "packageInputs": { "$ref": "#/$defs/PackageInputsEvidence" },
+        "publicDownloadReceipt": { "$ref": "#/$defs/PublicDownloadReceiptEvidence" },
+        "browserLaunchReceipt": { "$ref": "#/$defs/BrowserLaunchReceiptEvidence" },
+        "chromiumSourceCheckout": { "$ref": "#/$defs/ChromiumSourceCheckoutEvidence" },
+        "publishedProofSurface": { "$ref": "#/$defs/PublishedProofSurfaceEvidence" },
+        "proofSurfaceCheck": { "$ref": "#/$defs/ProofSurfaceCheckEvidence" },
+        "finalizerReport": { "$ref": "#/$defs/FinalizerReportEvidence" },
+        "finalizerCheck": { "$ref": "#/$defs/FinalizerCheckEvidence" },
+        "releaseSupportArtifacts": { "$ref": "#/$defs/ReleaseSupportArtifactsEvidence" },
+        "consistency": { "$ref": "#/$defs/FinalizerConsistencyEvidence" }
+      }
+    },
+    "PackageInputsEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "schemaVersion",
+        "artifactKind",
+        "status",
+        "evidenceMode",
+        "releaseCandidateEligible",
+        "releaseCandidateBlockers",
+        "failureCount",
+        "failures",
+        "packageDir",
+        "packageRootName",
+        "browserProduct",
+        "platform",
+        "inputs",
+        "summary"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "artifactKind": { "type": "string", "const": "browser_release_package_inputs_check" },
+        "status": { "enum": ["pass", "fail"] },
+        "evidenceMode": { "enum": ["diagnostic", "release_candidate"] },
+        "releaseCandidateEligible": { "type": "boolean" },
+        "releaseCandidateBlockers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        },
+        "failureCount": { "type": "integer", "minimum": 0 },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        },
+        "packageDir": { "$ref": "#/$defs/JsonObject" },
+        "packageRootName": { "type": "string", "minLength": 1 },
+        "browserProduct": { "$ref": "#/$defs/JsonObject" },
+        "platform": { "$ref": "#/$defs/JsonObject" },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "browserExecutable",
+            "appMetadata",
+            "doeRuntime",
+            "dawnFallbackRuntime",
+            "shaderCompiler"
+          ],
+          "properties": {
+            "browserExecutable": { "$ref": "#/$defs/PackageInputFile" },
+            "appMetadata": { "$ref": "#/$defs/PackageInputFile" },
+            "doeRuntime": { "$ref": "#/$defs/PackageInputFile" },
+            "dawnFallbackRuntime": { "$ref": "#/$defs/PackageInputFile" },
+            "shaderCompiler": { "$ref": "#/$defs/PackageInputFile" }
+          }
+        },
+        "summary": { "$ref": "#/$defs/JsonObject" }
+      }
+    },
+    "PackageInputFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "sha256"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "archivePath": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "exists": { "type": "boolean" },
+        "generated": { "type": "boolean" },
+        "executable": { "type": "boolean" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "detectedFormat": {
+          "enum": ["elf", "macho", "script", "plist", "json", "unknown"]
+        },
+        "detectedArchitectures": {
+          "type": "array",
+          "items": {
+            "enum": ["arm", "arm64", "x86", "x64", "unknown"]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ChromiumSourceCheckoutEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "schemaVersion",
+        "artifactKind",
+        "sourceRoot",
+        "requireReady",
+        "requireRuntimeSelector",
+        "status",
+        "checkCount",
+        "missingRequiredWellFormed",
+        "missingRequired"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "schemaVersion": { "type": "integer", "minimum": 0 },
+        "artifactKind": { "type": "string", "const": "chromium_source_checkout_check" },
+        "sourceRoot": { "type": "string" },
+        "requireReady": { "type": "boolean" },
+        "requireRuntimeSelector": { "type": "boolean" },
+        "status": { "enum": ["pass", "blocked"] },
+        "checkCount": { "type": "integer", "minimum": 0 },
+        "missingRequiredWellFormed": { "type": "boolean" },
+        "missingRequired": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "PublicDownloadReceiptEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "artifactKind",
+        "receiptId",
+        "url",
+        "method",
+        "statusCode",
+        "contentSha256",
+        "contentLengthBytes",
+        "releaseArchivePath",
+        "releaseArchiveManifestPath",
+        "releaseArchiveManifestSha256",
+        "browserProduct",
+        "platform",
+        "browserExecutableArchivePath",
+        "browserAppMetadataArchivePath",
+        "doeRuntimeArchivePath",
+        "dawnFallbackRuntimeArchivePath",
+        "observedAt"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "schemaVersion": { "type": "integer", "minimum": 0 },
+        "artifactKind": { "type": "string", "const": "browser_public_download_receipt" },
+        "receiptId": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "minLength": 1 },
+        "method": { "type": "string", "minLength": 1 },
+        "statusCode": { "type": "integer" },
+        "contentSha256": { "$ref": "#/$defs/Hash" },
+        "contentLengthBytes": { "type": "integer", "minimum": 1 },
+        "releaseArchivePath": { "type": "string", "minLength": 1 },
+        "releaseArchiveManifestPath": { "type": "string", "minLength": 1 },
+        "releaseArchiveManifestSha256": { "$ref": "#/$defs/Hash" },
+        "browserProduct": { "$ref": "#/$defs/JsonObject" },
+        "platform": { "$ref": "#/$defs/JsonObject" },
+        "browserExecutableArchivePath": { "type": "string", "minLength": 1 },
+        "browserAppMetadataArchivePath": { "type": "string", "minLength": 1 },
+        "doeRuntimeArchivePath": { "type": "string", "minLength": 1 },
+        "dawnFallbackRuntimeArchivePath": { "type": "string", "minLength": 1 },
+        "observedAt": { "type": "string", "minLength": 1 }
+      }
+    },
+    "BrowserLaunchReceiptEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "artifactKind",
+        "receiptId",
+        "observedAt",
+        "launchSource",
+        "runtimeMode",
+        "activeRuntime",
+        "activeBackend",
+        "hiddenFallbackAllowed",
+        "hiddenFallbackUsed",
+        "webgpuAvailable",
+        "browserExecutableArchivePath",
+        "browserAppMetadataArchivePath",
+        "doeRuntimeArchivePath",
+        "dawnFallbackRuntimeArchivePath",
+        "proofPageUrl",
+        "proofPageLoaded",
+        "proofPageArtifactPath",
+        "proofPageReceiptId",
+        "galleryUrl",
+        "galleryLoaded",
+        "galleryCategory",
+        "galleryArtifactPath",
+        "galleryReceiptId",
+        "comparisonId",
+        "comparisonWorkloadId",
+        "comparisonPageArtifactPath",
+        "comparisonLoaded",
+        "comparisonExecutionScope",
+        "comparisonModes",
+        "comparisonEmitsSideBySideReceipts",
+        "comparisonArtifactPath",
+        "comparisonDawnReceiptId",
+        "comparisonDoeReceiptId",
+        "observedReceiptIds",
+        "browserProduct",
+        "platform",
+        "releaseArchive",
+        "releaseArchiveManifest",
+        "proofSurface"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "schemaVersion": { "type": "integer", "minimum": 0 },
+        "artifactKind": { "type": "string", "const": "browser_release_launch_receipt" },
+        "receiptId": { "type": "string", "minLength": 1 },
+        "observedAt": { "type": "string", "minLength": 1 },
+        "launchSource": { "type": "string", "const": "release_archive" },
+        "runtimeMode": { "type": "string", "const": "doe" },
+        "activeRuntime": { "type": "string", "const": "doe" },
+        "activeBackend": { "type": "string", "const": "webgpu-doe" },
+        "hiddenFallbackAllowed": { "type": "boolean", "const": false },
+        "hiddenFallbackUsed": { "type": "boolean", "const": false },
+        "webgpuAvailable": { "type": "boolean", "const": true },
+        "browserExecutableArchivePath": { "type": "string", "minLength": 1 },
+        "browserAppMetadataArchivePath": { "type": "string", "minLength": 1 },
+        "doeRuntimeArchivePath": { "type": "string", "minLength": 1 },
+        "dawnFallbackRuntimeArchivePath": { "type": "string", "minLength": 1 },
+        "proofPageUrl": { "type": "string", "const": "about:doe" },
+        "proofPageLoaded": { "type": "boolean", "const": true },
+        "proofPageArtifactPath": { "type": "string", "minLength": 1 },
+        "proofPageReceiptId": { "type": "string", "minLength": 1 },
+        "galleryUrl": { "type": "string", "minLength": 1 },
+        "galleryLoaded": { "type": "boolean", "const": true },
+        "galleryCategory": {
+          "enum": ["compute", "rendering", "tensor", "shader_edge", "benchmark_trace"]
+        },
+        "galleryArtifactPath": { "type": "string", "minLength": 1 },
+        "galleryReceiptId": { "type": "string", "minLength": 1 },
+        "comparisonId": { "type": "string", "minLength": 1 },
+        "comparisonWorkloadId": { "type": "string", "minLength": 1 },
+        "comparisonPageArtifactPath": { "type": "string", "minLength": 1 },
+        "comparisonLoaded": { "type": "boolean", "const": true },
+        "comparisonExecutionScope": { "type": "string", "const": "same_page" },
+        "comparisonModes": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "string", "const": "dawn" },
+            { "type": "string", "const": "doe" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "comparisonEmitsSideBySideReceipts": { "type": "boolean", "const": true },
+        "comparisonArtifactPath": { "type": "string", "minLength": 1 },
+        "comparisonDawnReceiptId": { "type": "string", "minLength": 1 },
+        "comparisonDoeReceiptId": { "type": "string", "minLength": 1 },
+        "observedReceiptIds": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "browserProduct": { "$ref": "#/$defs/JsonObject" },
+        "platform": { "$ref": "#/$defs/JsonObject" },
+        "releaseArchive": { "$ref": "#/$defs/ArtifactEvidence" },
+        "releaseArchiveManifest": { "$ref": "#/$defs/ArtifactEvidence" },
+        "proofSurface": { "$ref": "#/$defs/ArtifactEvidence" }
+      }
+    },
+    "FinalizerConsistencyEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "failures"],
+      "properties": {
+        "status": { "enum": ["pass", "fail"] },
+        "failureCount": { "type": "integer", "minimum": 0 },
+        "failureCodes": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "uniqueItems": true
+        },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        }
+      }
+    },
+    "FinalizerReportEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "artifactKind", "status", "failureCount"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "const": "browser_release_candidate_finalizer" },
+        "status": { "enum": ["pass", "fail"] },
+        "phase": {
+          "enum": [
+            "package_inputs_preflight",
+            "provenance_preflight",
+            "release_bundle_verification"
+          ]
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["packageInputs", "provenanceReport"],
+          "properties": {
+            "packageInputs": {
+              "allOf": [
+                { "$ref": "#/$defs/ArtifactEvidence" },
+                {
+                  "properties": {
+                    "kind": { "const": "browser_release_package_inputs_check" }
+                  }
+                }
+              ]
+            },
+            "provenanceReport": {
+              "allOf": [
+                { "$ref": "#/$defs/ArtifactEvidence" },
+                {
+                  "properties": {
+                    "kind": { "const": "browser_release_candidate_provenance_report" }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "outputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "releaseArtifactBundle": {
+              "allOf": [
+                { "$ref": "#/$defs/ArtifactEvidence" },
+                {
+                  "properties": {
+                    "kind": { "const": "browser_release_artifact_bundle" }
+                  }
+                }
+              ]
+            },
+            "runtimeFrontierBundle": {
+              "allOf": [
+                { "$ref": "#/$defs/ArtifactEvidence" },
+                {
+                  "properties": {
+                    "kind": { "const": "browser_runtime_frontier_bundle" }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "summary": { "$ref": "#/$defs/JsonObject" },
+        "failureCount": { "type": "integer", "minimum": 0 },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        }
+      }
+    },
+    "FinalizerCheckEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "artifactKind",
+        "status",
+        "finalizerStatus",
+        "finalizerReportPath",
+        "finalizerReportSha256",
+        "verifyFilesRootProvided",
+        "requirePass",
+        "failureCount",
+        "failures"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "const": "browser_release_candidate_finalizer_check" },
+        "status": { "enum": ["pass", "fail"] },
+        "finalizerStatus": { "enum": ["pass", "fail", "unknown"] },
+        "finalizerReportPath": { "type": "string", "minLength": 1 },
+        "finalizerReportSha256": { "$ref": "#/$defs/Hash" },
+        "verifyFilesRootProvided": { "type": "boolean" },
+        "requirePass": { "type": "boolean" },
+        "outputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "releaseArtifactBundle": {
+              "allOf": [
+                { "$ref": "#/$defs/ArtifactEvidence" },
+                {
+                  "properties": {
+                    "kind": { "const": "browser_release_artifact_bundle" }
+                  }
+                }
+              ]
+            },
+            "runtimeFrontierBundle": {
+              "allOf": [
+                { "$ref": "#/$defs/ArtifactEvidence" },
+                {
+                  "properties": {
+                    "kind": { "const": "browser_runtime_frontier_bundle" }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "packageInputs": {
+              "allOf": [
+                { "$ref": "#/$defs/ArtifactEvidence" },
+                {
+                  "properties": {
+                    "kind": { "const": "browser_release_package_inputs_check" }
+                  }
+                }
+              ]
+            },
+            "provenanceReport": {
+              "allOf": [
+                { "$ref": "#/$defs/ArtifactEvidence" },
+                {
+                  "properties": {
+                    "kind": { "const": "browser_release_candidate_provenance_report" }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "failureCount": { "type": "integer", "minimum": 0 },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        }
+      }
+    },
+    "ProvenanceReportEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "artifactKind",
+        "status",
+        "releaseStatus",
+        "failureCount",
+        "failures"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "const": "browser_release_candidate_provenance_report" },
+        "status": { "enum": ["pass", "fail"] },
+        "releaseStatus": { "type": "string", "const": "release_candidate" },
+        "failureCount": { "type": "integer", "minimum": 0 },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        },
+        "summary": { "$ref": "#/$defs/JsonObject" },
+        "browserProduct": { "$ref": "#/$defs/JsonObject" },
+        "platform": { "$ref": "#/$defs/JsonObject" },
+        "componentArtifacts": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/ArtifactEvidence" }
+        }
+      }
+    },
+    "PublishedProofSurfaceEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "artifactKind",
+        "surfaceId",
+        "runtimeIdentityPath",
+        "proofPageUrl",
+        "activeBackend",
+        "webgpuAvailable",
+        "browserProduct",
+        "platform",
+        "galleryCategories",
+        "galleryPageCount",
+        "comparisonReceiptCount",
+        "receiptPayloadCount"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "const": "browser_published_proof_surface" },
+        "surfaceId": { "type": "string", "minLength": 1 },
+        "runtimeIdentityPath": { "type": "string", "minLength": 1 },
+        "proofPageUrl": { "type": "string", "minLength": 1 },
+        "activeBackend": { "type": "string", "minLength": 1 },
+        "webgpuAvailable": { "type": "boolean", "const": true },
+        "browserProduct": { "$ref": "#/$defs/JsonObject" },
+        "platform": { "$ref": "#/$defs/JsonObject" },
+        "releaseArchive": { "$ref": "#/$defs/ArtifactEvidence" },
+        "galleryCategories": {
+          "type": "array",
+          "minItems": 5,
+          "items": { "enum": ["benchmark_trace", "compute", "rendering", "shader_edge", "tensor"] },
+          "uniqueItems": true
+        },
+        "galleryPageCount": { "type": "integer", "minimum": 5 },
+        "comparisonReceiptCount": { "type": "integer", "minimum": 1 },
+        "receiptPayloadCount": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "ProofSurfaceCheckEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "artifactKind",
+        "surfacePath",
+        "surfaceSha256",
+        "verifyFilesRootProvided",
+        "requirePublicUrls",
+        "status",
+        "failureCount",
+        "failures"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "artifactKind": { "type": "string", "const": "browser_published_proof_surface_check" },
+        "surfacePath": { "type": "string", "minLength": 1 },
+        "surfaceSha256": { "$ref": "#/$defs/Hash" },
+        "verifyFilesRootProvided": { "type": "boolean" },
+        "requirePublicUrls": { "type": "boolean" },
+        "status": { "enum": ["pass", "fail"] },
+        "failureCount": { "type": "integer", "minimum": 0 },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Failure" }
+        }
+      }
+    },
+    "ReleaseSupportArtifactsEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contracts",
+        "contractKinds",
+        "claimReports",
+        "claimReportKinds",
+        "promotionReceipts",
+        "promotionReceiptKinds",
+        "policies",
+        "policyKinds"
+      ],
+      "properties": {
+        "contracts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ArtifactEvidence" }
+        },
+        "contractKinds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "claimReports": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ArtifactEvidence" }
+        },
+        "claimReportKinds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "promotionReceipts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ArtifactEvidence" }
+        },
+        "promotionReceiptKinds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "policies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ArtifactEvidence" }
+        },
+        "policyKinds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "ArtifactEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "kind": { "type": "string", "minLength": 1 },
+        "downloadUrl": { "type": "string", "minLength": 1 }
       }
     },
     "ReadinessRow": {
@@ -158,7 +941,8 @@
         "readinessStatus",
         "claimIndexEntries",
         "blockers",
-        "evidencePaths"
+        "evidencePaths",
+        "evidenceSlices"
       ],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
@@ -180,7 +964,58 @@
           "type": "array",
           "items": { "type": "string", "minLength": 1 }
         },
-        "frontierBundleEvidence": { "$ref": "#/$defs/FrontierBundleEvidence" }
+        "evidenceSlices": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ReadinessEvidenceSlice" }
+        },
+        "frontierBundleEvidence": { "$ref": "#/$defs/FrontierBundleEvidence" },
+        "ctsConformanceEvidence": { "$ref": "#/$defs/CtsConformanceEvidence" }
+      }
+    },
+    "ReadinessEvidenceSlice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "os",
+        "arch",
+        "gpuApi",
+        "gpuVendor",
+        "runtimeHost",
+        "currentState",
+        "claimAllowed",
+        "readinessStatus",
+        "claimIndexEntries",
+        "blockers",
+        "evidencePaths",
+        "notes"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "os": { "type": "string", "minLength": 1 },
+        "arch": { "type": "string", "minLength": 1 },
+        "gpuApi": { "type": "string", "minLength": 1 },
+        "gpuVendor": { "type": "string", "minLength": 1 },
+        "runtimeHost": { "type": "string", "minLength": 1 },
+        "currentState": { "type": "string", "minLength": 1 },
+        "claimAllowed": { "type": "boolean" },
+        "readinessStatus": { "$ref": "#/$defs/ReadinessStatus" },
+        "claimIndexEntries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ClaimIndexEntry" }
+        },
+        "blockers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Blocker" }
+        },
+        "evidencePaths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "notes": { "type": "string" }
       }
     },
     "SummaryMap": {

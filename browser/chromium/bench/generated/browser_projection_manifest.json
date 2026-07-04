@@ -1,11 +1,11 @@
 {
   "schemaVersion": 4,
-  "generatedAt": "2026-06-27T19:49:38.410946Z",
+  "generatedAt": "2026-07-04T03:13:32.174201Z",
   "sourceWorkloadsPath": "bench/workloads/specialized/workloads.amd.vulkan.superset.json",
   "sourceWorkloadsSha256": "a99a6db97983405fff1c21f176656114cc9c82a2e7ec9c9554ad31de347bdec5",
   "rulesPath": "browser/chromium/bench/projection-rules.json",
   "rulesSha256": "06ac37731d70bb86652dbad5a6e7e80f1de4aad1b5020d530b500c98e54de245",
-  "projectionContractHash": "334dd4943aa6190337a7f39094480fffa74dbf16361b382aed46d1917597e1bd",
+  "projectionContractHash": "097531e10f45e6f47963de8714e14bf0950ae40e49506bcfcc11be3d4f2ca8ea",
   "sourceWorkloadCount": 80,
   "rows": [
     {
@@ -86,7 +86,7 @@
         "commandsPath": "examples/matrix_vector_mul_32768x2048_swizzle1_commands.json",
         "commandsSha256": "b2594526e7bf449266d919a369f1c0bf2f77673f6bf2c6449604bd772aab0c95",
         "kernelPath": "bench/kernels/matrix_vector_mul_32768x2048_f32_swizzle1.wgsl",
-        "kernelSha256": "687cef356f0d331e0822037d1cd79d4194ae4dfa50e3b0e118302e94a08b8d82",
+        "kernelSha256": "f4457bfebf14d42f57bb49a08c2e867b4b3ca8da51191f8ecfa699a35c2e84c6",
         "dispatchX": 128,
         "dispatchY": 1,
         "dispatchZ": 1,

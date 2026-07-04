@@ -4,7 +4,14 @@ import {
   buildProviderInfo,
 } from './shared/public-surface.js';
 import { createEncoderClasses } from './shared/encoder-surface.js';
-import { createFullSurfaceClasses } from './shared/full-surface.js';
+import {
+  createFullSurfaceClasses,
+  GPUValidationError,
+  GPUOutOfMemoryError,
+  GPUInternalError,
+  GPUDeviceLostInfo,
+  GPUUncapturedErrorEvent,
+} from './shared/full-surface.js';
 import {
   CANVAS_ALPHA_MODES,
   CANVAS_TONE_MAPPING_MODES,
@@ -23,6 +30,14 @@ const EMPTY_ADAPTER_INFO = Object.freeze({
   description: '',
   subgroupMinSize: 0,
   subgroupMaxSize: 0,
+});
+const WEBGPU_GLOBALS = Object.freeze({
+  ...globals,
+  GPUValidationError,
+  GPUOutOfMemoryError,
+  GPUInternalError,
+  GPUDeviceLostInfo,
+  GPUUncapturedErrorEvent,
 });
 
 function unwrap_native(value) {
@@ -335,6 +350,10 @@ function create_browser_backend({ native_gpu, canvasBackend }) {
 
     deviceGetAdapterInfo(_device, native) {
       return native.adapterInfo ?? EMPTY_ADAPTER_INFO;
+    },
+
+    deviceGetLost(device, native) {
+      return native.lost ?? device._lost;
     },
 
     deviceGetOnUncapturedError(_device, native) {
@@ -714,7 +733,7 @@ function create_browser_runtime_internal(options = {}) {
     wrapped_gpu.getPreferredCanvasFormat = function getPreferredCanvasFormat() {
       return native_gpu.getPreferredCanvasFormat?.() ?? 'bgra8unorm';
     };
-    setupGlobalsOnTarget(globalThis, wrapped_gpu, globals);
+    setupGlobalsOnTarget(globalThis, wrapped_gpu, WEBGPU_GLOBALS);
   }
   return {
     nativeGpu: native_gpu,
@@ -755,7 +774,7 @@ export function createInstance(options = {}) {
 }
 
 export function setupGlobals(target = globalThis, options = {}) {
-  return setupGlobalsOnTarget(target, create(options), globals);
+  return setupGlobalsOnTarget(target, create(options), WEBGPU_GLOBALS);
 }
 
 export async function requestAdapter(adapterOptions = undefined, options = {}) {

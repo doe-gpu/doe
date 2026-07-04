@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "wgsl_lowering_link_receipt",
+  "evidencePath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.json",
+  "manifestPath": "config/wgsl-browser-corpus.json",
+  "corpusId": "browser-wgsl-corpus-v0",
+  "rows": [
+    {
+      "shaderId": "webgpu-prefix-sum",
+      "manifestShaderId": "webgpu-prefix-sum",
+      "sourcePath": "bench/fixtures/wgsl-corpus/webgpu/sample-prefix-sum.wgsl",
+      "sourceSha256": "a8a642a54aaca908b707d20666566db8db62dbb5c9bfd518fbe98925da22c416",
+      "expectedValidity": "valid",
+      "shaderStage": "compute",
+      "backendTarget": "spirv",
+      "doeIrSha256": "584cdcec2d311ae8ef1d66cdbc08e4a2bbdfe5df9926b0de2aa4f86af9cfa5c2",
+      "doeBackendOutputSha256": "7db2526ba73f926ef86299143a52292aea3670299cea1ae88ba757e2f30501ce",
+      "doeReceiptPath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.artifacts/webgpu-prefix-sum/doe/compile-report.json",
+      "doeValidationStatus": "passed",
+      "tintBackendOutputSha256": "e8e9b46c0455cd9e1e284114cff0c9f8c1ab2865abb6646a05cd4e4e32687f6a",
+      "tintReceiptPath": "examples/tint-compiler-evidence.browser-corpus.spirv.sample.artifacts/webgpu-prefix-sum/tint/output.spv",
+      "tintValidationStatus": "passed",
+      "validationStatus": "passed",
+      "comparabilityStatus": "comparable",
+      "claimabilityStatus": "diagnostic",
+      "linkStatus": "linked",
+      "failureCodes": []
+    }
+  ],
+  "summary": {
+    "rowCount": 1,
+    "linkedRows": 1,
+    "diagnosticRows": 0,
+    "failureCodes": []
+  }
+}

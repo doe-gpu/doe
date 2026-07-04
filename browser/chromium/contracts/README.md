@@ -62,7 +62,12 @@ because the archived schemas and fixtures still use those ids.
      parity contract.
 21. `browser-cts-subset.contract.md`
    - Browser CTS subset contract for paired Dawn and forced-Doe evidence.
-22. `../bench/workflows/browser-milestones.json`
+22. `browser-published-release.contract.md`
+   - Published Chromium-family browser release contract for downloadable
+     Doe/Fawn browser artifacts, per-run receipts, Dawn-vs-Doe comparison mode,
+     hosted proof gallery with public comparison links, and local diagnostics
+     page requirements.
+23. `../bench/workflows/browser-milestones.json`
    - schema-backed M0-M6 status manifest for current nursery state and local evidence.
 
 ## Contract Rules

@@ -10,12 +10,12 @@
   },
   "doeRuntime": {
     "path": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
-    "sha256": "9b937fbbad942e8f5b43896ef93badb0b28a5107bb443497900d4af62cc3dd5f",
+    "sha256": "1bf01661b9b48fc1811a0668aa18ce8642f7b568b1e4fffda82268ff79e0c527",
     "kind": "doe_runtime"
   },
   "shaderCompiler": {
     "path": "runtime/zig/zig-out/bin/doe-zig-runtime",
-    "sha256": "0190df240d44606572c2439b4edeefd53f5441be24d662b890de6ba6f557a020",
+    "sha256": "fdef3b47a9b3f4f75ecb1587e9053e587be290e1035381ce5e9d38207aec3d62",
     "kind": "shader_compiler"
   },
   "contracts": [
@@ -70,6 +70,11 @@
       "kind": "contract"
     },
     {
+      "path": "browser/chromium/contracts/browser-published-release.contract.md",
+      "sha256": "37bbe0223171e7ffc57b1b3eb22f8183de87efa9344b3c49b2324f7e217c2045",
+      "kind": "contract"
+    },
+    {
       "path": "browser/chromium/contracts/browser-recovery-parity.contract.md",
       "sha256": "0b05d7d390e28642e31675cd85285dac8193b543782743a05d39ac8b74fadbbb",
       "kind": "contract"
@@ -117,12 +122,12 @@
     },
     {
       "path": "config/chromium-fork-maintenance-policy.json",
-      "sha256": "167385a2527ed37483c5335eef5f89068beeb41f17758cb4dbf5d647355e82d5",
+      "sha256": "20dc559f4d66cb75e9d620c1f18e444ce068487b919d486ec41a4896e39362d8",
       "kind": "fork_maintenance_policy"
     },
     {
       "path": "config/chromium-patch-manifest.json",
-      "sha256": "0cda374cce093579126e9409878e75f1c8b69ca1d840c449ab052f86ec815aff",
+      "sha256": "8716ed03a84137db72230038f3fcbd5e65bc249436b54102d65de2983914fd91",
       "kind": "chromium_patch_manifest"
     },
     {
@@ -132,12 +137,12 @@
     },
     {
       "path": "config/browser-capture-policy.json",
-      "sha256": "b993155449675d9827a524a95cfbae241e6894042f0a7f98aa54ed1a6bb5da49",
+      "sha256": "09184bd8c9d9017e93a21dd4166e3a67d47d8eaac45165ddb280978c0348cd44",
       "kind": "browser_capture_policy"
     },
     {
       "path": "config/browser-artifact-identity-coverage.json",
-      "sha256": "f5c579b9efca1a294a2dc66bff9c3ecf61b7d15c85eb637323ec9c4fd6dde422",
+      "sha256": "3f0585872b8a89a684400e00a89ab47903bd6f6def87cbb88b8415d5f67eaa0f",
       "kind": "browser_artifact_identity_coverage"
     },
     {
@@ -146,5 +151,71 @@
       "kind": "browser_unsupported_reason_taxonomy"
     }
   ],
-  "failureCodes": []
+  "failureCodes": [],
+  "releaseArchive": {
+    "path": "examples/browser-release-archive.sample.zip",
+    "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+    "kind": "browser_release_archive",
+    "downloadUrl": "https://downloads.doe.dev/Fawn-Doe-linux-x64.zip"
+  },
+  "publicDownloadReceipt": {
+    "path": "examples/browser-public-download-receipt.sample.json",
+    "sha256": "fbb04fddc5e8f2250c577eddc93a8b5299af292ed923346b24f580f3f942723c",
+    "kind": "browser_public_download_receipt"
+  },
+  "packageInputs": {
+    "path": "examples/browser-release-package-inputs-check.sample.json",
+    "sha256": "9346d49694f6bf786cc6235d933a5a2fa1f93b52ab8029cd76699cff9636f4b4",
+    "kind": "browser_release_package_inputs_check"
+  },
+  "releaseArchiveManifest": {
+    "path": "examples/browser-release-archive-manifest.sample.json",
+    "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+    "kind": "browser_release_archive_manifest"
+  },
+  "browserProduct": {
+    "productId": "fawn-doe",
+    "displayName": "Fawn Doe",
+    "version": "0.0.0-sample",
+    "channel": "diagnostic"
+  },
+  "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+  "browserAppMetadataArchivePath": "Fawn-Doe-linux-x64/browser-product.json",
+  "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so",
+  "dawnFallbackRuntimeArchivePath": "Fawn-Doe-linux-x64/libdawn_native.so",
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "packageFormat": "zip"
+  },
+  "dawnFallbackRuntime": {
+    "path": "browser/chromium/src/out/fawn_release/libdawn_native.so",
+    "sha256": "3f8a4266e31f22c662208f2371f14c7cb570a5b85df09ebb7da5c766957c2854",
+    "kind": "dawn_fallback_runtime"
+  },
+  "proofSurface": {
+    "path": "examples/browser-published-proof-surface.sample.json",
+    "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+    "kind": "browser_published_proof_surface"
+  },
+  "proofSurfaceCheck": {
+    "path": "examples/browser-published-proof-surface-check.sample.json",
+    "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1",
+    "kind": "browser_published_proof_surface_check"
+  },
+  "chromiumSourceCheckout": {
+    "path": "examples/chromium-source-checkout-check.sample.json",
+    "sha256": "3d52e6ff56d31ebad69a56e3a82dad675f2d277c0aedf783ab9ef55e159f31d1",
+    "kind": "chromium_source_checkout_check"
+  },
+  "browserLaunchReceipt": {
+    "path": "examples/browser-release-launch-receipt.sample.json",
+    "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b",
+    "kind": "browser_release_launch_receipt"
+  },
+  "runtimeFrontierBundle": {
+    "path": "examples/browser-runtime-frontier-bundle.sample.json",
+    "sha256": "d5b3a1a83cb1a6a1afc8b2b9d1361741e9c0fc0655b11655fbe5fc5a4d8fd61f",
+    "kind": "browser_runtime_frontier_bundle"
+  }
 }

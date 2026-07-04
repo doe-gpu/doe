@@ -12,6 +12,21 @@ HASH_A = "a" * 64
 HASH_B = "b" * 64
 
 
+def _browser_workload() -> dict[str, Any]:
+    return {
+        "sourceComparable": True,
+        "sourceClaimEligible": True,
+        "benchmarkClass": "comparable",
+    }
+
+
+def _l1_contract_fields() -> dict[str, Any]:
+    return {
+        "comparabilityExpectation": "strict",
+        "browserWorkload": _browser_workload(),
+    }
+
+
 def _load_module() -> Any:
     spec = importlib.util.spec_from_file_location("check_browser_benchmark_superset", MODULE_PATH)
     if spec is None or spec.loader is None:
@@ -110,6 +125,9 @@ def _report() -> dict[str, Any]:
             "workflowManifestSha256": HASH_B,
         },
         "methodology": {
+            "sourceKernelSamples": 1,
+            "sourceKernelWarmupSamples": 0,
+            "sourceKernelSubmitPolicy": "iteration-batch-v1",
             "adapterRequest": {
                 "powerPreference": "high-performance",
             },
@@ -123,6 +141,7 @@ def _report() -> dict[str, Any]:
                     "sourceWorkloadId": "copy_buffer",
                     "domain": "copy",
                     "claimScope": "l1_strict_candidate",
+                    **_l1_contract_fields(),
                     "requiredStatus": "ok",
                     "runtimes": {
                         "dawn": {"status": "ok", "statusCode": "ok"},
@@ -155,6 +174,7 @@ def _manifest() -> dict[str, Any]:
                 "domain": "copy",
                 "projectionClass": "high",
                 "claimScope": "l1_strict_candidate",
+                **_l1_contract_fields(),
                 "requiredStatus": "ok",
             }
         ],
@@ -232,6 +252,7 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
                 "domain": "render",
                 "projectionClass": "high",
                 "claimScope": "l1_strict_candidate",
+                **_l1_contract_fields(),
                 "requiredStatus": "ok",
             }
         )
@@ -262,6 +283,7 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
                 "domain": "render",
                 "projectionClass": "high",
                 "claimScope": "l1_strict_candidate",
+                **_l1_contract_fields(),
                 "requiredStatus": "ok",
             }
         )
@@ -279,6 +301,7 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
                 "sourceWorkloadId": "render_triangle",
                 "domain": "render",
                 "claimScope": "l1_strict_candidate",
+                **_l1_contract_fields(),
                 "requiredStatus": "ok",
                 "runtimes": {
                     "dawn": {"status": "ok", "statusCode": "ok"},
@@ -306,6 +329,7 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
                 "domain": "texture-raster",
                 "projectionClass": "high",
                 "claimScope": "l1_strict_candidate",
+                **_l1_contract_fields(),
                 "requiredStatus": "ok",
             }
         )
@@ -336,6 +360,7 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
                 "sourceWorkloadId": "texture_sampling",
                 "domain": "texture-raster",
                 "claimScope": "l1_strict_candidate",
+                **_l1_contract_fields(),
                 "requiredStatus": "ok",
                 "runtimes": {
                     "dawn": {"status": "ok", "statusCode": "ok"},

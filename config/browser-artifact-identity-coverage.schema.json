@@ -41,7 +41,18 @@
             "claim_policy_identity",
             "promotion_receipt_identity",
             "replay_source_identity",
-            "layered_score_identity"
+            "layered_score_identity",
+            "execution_receipt_identity",
+            "public_download_receipt_identity",
+            "public_gallery_receipt_identity",
+            "release_launch_receipt_identity",
+            "proof_page_receipt_identity",
+            "published_proof_surface_identity",
+            "published_proof_surface_check_identity",
+            "release_package_inputs_identity",
+            "runtime_frontier_bundle_identity",
+            "release_candidate_finalizer_identity",
+            "release_candidate_finalizer_check_identity"
           ]
         },
         "requiredPointers": {

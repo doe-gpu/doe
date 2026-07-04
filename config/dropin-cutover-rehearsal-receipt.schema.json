@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe drop-in cutover rehearsal receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "receiptId",
+    "generatedAt",
+    "comparisonStatus",
+    "claimStatus",
+    "pass",
+    "platform",
+    "cutoverPolicy",
+    "dropinGate",
+    "abiValidation",
+    "rollbackBackendEvidence",
+    "rehearsal",
+    "reasons"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": {
+      "type": "string",
+      "const": "dropin-cutover-rehearsal-receipt"
+    },
+    "receiptId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "comparisonStatus": { "type": "string", "const": "comparable" },
+    "claimStatus": { "type": "string", "const": "claimable" },
+    "pass": { "type": "boolean", "const": true },
+    "platform": { "$ref": "#/$defs/platform" },
+    "cutoverPolicy": { "$ref": "#/$defs/cutoverPolicy" },
+    "dropinGate": { "$ref": "#/$defs/dropinGate" },
+    "abiValidation": { "$ref": "#/$defs/abiValidation" },
+    "rollbackBackendEvidence": { "$ref": "#/$defs/rollbackBackendEvidence" },
+    "rehearsal": { "$ref": "#/$defs/rehearsal" },
+    "reasons": {
+      "type": "array",
+      "maxItems": 0,
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "repoJsonPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/][^\\\\]*\\.json$"
+    },
+    "repoPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/][^\\\\]*$"
+    },
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "machine", "pythonVersion"],
+      "properties": {
+        "os": { "type": "string", "minLength": 1 },
+        "machine": { "type": "string", "minLength": 1 },
+        "pythonVersion": { "type": "string", "minLength": 1 }
+      }
+    },
+    "cutoverPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "targetLane",
+        "defaultBackend",
+        "requireRollbackRehearsal",
+        "rollbackSwitchName",
+        "rollbackBackend",
+        "requiredCiValidation"
+      ],
+      "properties": {
+        "path": { "$ref": "#/$defs/repoJsonPath" },
+        "sha256": { "$ref": "#/$defs/hash" },
+        "targetLane": { "type": "string", "minLength": 1 },
+        "defaultBackend": {
+          "type": "string",
+          "enum": ["dawn_delegate", "doe_metal", "doe_vulkan", "doe_d3d12"]
+        },
+        "requireRollbackRehearsal": { "type": "boolean", "const": true },
+        "rollbackSwitchName": { "type": "string", "minLength": 1 },
+        "rollbackBackend": { "type": "string", "const": "dawn_delegate" },
+        "requiredCiValidation": { "type": "boolean" }
+      }
+    },
+    "dropinGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "artifact",
+        "artifactSha256",
+        "outputTimestamp",
+        "pass",
+        "stepLabels",
+        "benchmarkHtml"
+      ],
+      "properties": {
+        "path": { "$ref": "#/$defs/repoJsonPath" },
+        "sha256": { "$ref": "#/$defs/hash" },
+        "artifact": { "$ref": "#/$defs/repoPath" },
+        "artifactSha256": { "$ref": "#/$defs/hash" },
+        "outputTimestamp": { "type": "string", "minLength": 1 },
+        "pass": { "type": "boolean", "const": true },
+        "stepLabels": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "symbol_gate",
+              "behavior_suite",
+              "proc_resolution",
+              "benchmark_suite",
+              "benchmark_visualization"
+            ]
+          }
+        },
+        "benchmarkHtml": { "$ref": "#/$defs/repoPath" }
+      }
+    },
+    "abiValidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requiredSymbolCount",
+        "exportedSymbolCount",
+        "missingSymbolCount",
+        "extraSymbolCount",
+        "symbolGatePass",
+        "behaviorPass",
+        "procResolutionPass",
+        "benchmarkPass"
+      ],
+      "properties": {
+        "requiredSymbolCount": { "type": "integer", "minimum": 1 },
+        "exportedSymbolCount": { "type": "integer", "minimum": 1 },
+        "missingSymbolCount": { "type": "integer", "const": 0 },
+        "extraSymbolCount": { "type": "integer", "minimum": 0 },
+        "symbolGatePass": { "type": "boolean", "const": true },
+        "behaviorPass": { "type": "boolean", "const": true },
+        "procResolutionPass": { "type": "boolean", "const": true },
+        "benchmarkPass": { "type": "boolean", "const": true }
+      }
+    },
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "artifactKind"],
+      "properties": {
+        "path": { "$ref": "#/$defs/repoJsonPath" },
+        "sha256": { "$ref": "#/$defs/hash" },
+        "artifactKind": { "type": "string", "minLength": 1 }
+      }
+    },
+    "rollbackBackendEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report",
+        "claim",
+        "comparisonStatus",
+        "claimStatus",
+        "rollbackBackend",
+        "observedExecutionBackends"
+      ],
+      "properties": {
+        "report": { "$ref": "#/$defs/artifactRef" },
+        "claim": { "$ref": "#/$defs/artifactRef" },
+        "comparisonStatus": { "type": "string", "const": "comparable" },
+        "claimStatus": { "type": "string", "const": "claimable" },
+        "rollbackBackend": { "type": "string", "const": "dawn_delegate" },
+        "observedExecutionBackends": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "contains": { "const": "dawn_delegate" },
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "rehearsal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "switchName",
+        "stagedDefaultBackend",
+        "rollbackBackend",
+        "dropinCandidateValid",
+        "rollbackCandidateValid",
+        "strictNoRuntimeFallback",
+        "rollbackRehearsed"
+      ],
+      "properties": {
+        "switchName": { "type": "string", "minLength": 1 },
+        "stagedDefaultBackend": {
+          "type": "string",
+          "enum": ["dawn_delegate", "doe_metal", "doe_vulkan", "doe_d3d12"]
+        },
+        "rollbackBackend": { "type": "string", "const": "dawn_delegate" },
+        "dropinCandidateValid": { "type": "boolean", "const": true },
+        "rollbackCandidateValid": { "type": "boolean", "const": true },
+        "strictNoRuntimeFallback": { "type": "boolean", "const": true },
+        "rollbackRehearsed": { "type": "boolean", "const": true }
+      }
+    }
+  }
+}

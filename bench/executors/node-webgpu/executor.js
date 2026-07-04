@@ -117,6 +117,8 @@ const readbackDigestProcessCache = new Map();
 const PACKAGE_READBACK_MODE_NATIVE = 'native-map-read-copy-unmap';
 const PACKAGE_READBACK_MODE_MAP_ASYNC = 'mapAsync';
 const PACKAGE_READBACK_RESULT_NATIVE = 'map-read-copy-unmap';
+const TRACE_REPLAY_SEED = '0x9e3779b97f4a7c15';
+const PACKAGE_TRACE_MODULE = 'package-webgpu-executor';
 let packageExecutionPolicyPromise = null;
 
 export const PROVIDER_FAILURE_REASONS = Object.freeze([
@@ -282,6 +284,73 @@ function digestBytes(view, cache = null, decodedU32Le = undefined) {
 
 function stableArtifactHash(payload) {
   return createHash('sha256').update(JSON.stringify(payload), 'utf8').digest('hex');
+}
+
+function stableTraceU64Hash(payload) {
+  return `0x${stableArtifactHash(payload).slice(0, 16)}`;
+}
+
+function packageTraceOpCode(stepKind) {
+  if (stepKind === 'dispatch') {
+    return 'dispatch';
+  }
+  if (stepKind === 'copyBufferToBuffer') {
+    return 'copy';
+  }
+  if (stepKind === 'readBuffer') {
+    return 'readback';
+  }
+  return 'upload';
+}
+
+function packageTraceCommand(row) {
+  const stepKind = typeof row?.stepKind === 'string' ? row.stepKind : 'step';
+  const stepId = typeof row?.stepId === 'string' ? row.stepId : `step-${row?.stepIndex ?? 0}`;
+  return `${stepKind}:${stepId}`;
+}
+
+function stampPackageReplayFields(meta, rows) {
+  let previousHash = TRACE_REPLAY_SEED;
+  for (const [index, row] of rows.entries()) {
+    const command = packageTraceCommand(row);
+    const opCode = packageTraceOpCode(row.stepKind);
+    Object.assign(row, {
+      traceVersion: 1,
+      module: PACKAGE_TRACE_MODULE,
+      opCode,
+      seq: index,
+      timestampMonoNs: index,
+      previousHash,
+      command,
+    });
+    row.hash = stableTraceU64Hash({
+      traceVersion: row.traceVersion,
+      module: row.module,
+      opCode: row.opCode,
+      seq: row.seq,
+      timestampMonoNs: row.timestampMonoNs,
+      previousHash,
+      command,
+      stepKind: row.stepKind,
+      stepId: row.stepId,
+      executionBackend: row.executionBackend,
+      executionProvider: row.executionProvider,
+      executionDurationNs: row.executionDurationNs,
+      planHash: row.planHash,
+    });
+    previousHash = row.hash;
+  }
+
+  const lastRow = rows[rows.length - 1] ?? null;
+  Object.assign(meta, {
+    traceVersion: 1,
+    module: PACKAGE_TRACE_MODULE,
+    commandCount: rows.length,
+    rowCount: rows.length,
+    seqMax: rows.length > 0 ? rows.length - 1 : 0,
+    hash: lastRow?.hash ?? TRACE_REPLAY_SEED,
+    previousHash: lastRow?.previousHash ?? TRACE_REPLAY_SEED,
+  });
 }
 
 function digestText(text) {
@@ -891,10 +960,11 @@ async function awaitQueueCompletion(runtime) {
     await runtime.queueWaitFence.readback.mapAsync(runtime.globals.GPUMapMode.READ);
     runtime.queueWaitFence.readback.getMappedRange(0, QUEUE_WAIT_FENCE_SIZE_BYTES);
     runtime.queueWaitFence.readback.unmap();
-    return;
+    return PACKAGE_READBACK_MODE_MAP_ASYNC;
   }
   await maybeYieldBeforeQueueWait(runtime);
   await runtime.queue.onSubmittedWorkDone?.();
+  return '';
 }
 
 async function waitForQueuedWrites(runtime) {
@@ -902,10 +972,9 @@ async function waitForQueuedWrites(runtime) {
     const encoder = runtime.device.createCommandEncoder();
     appendQueueWaitFenceCopy(runtime, encoder);
     runtime.queue.submit([encoder.finish()]);
-    await awaitQueueCompletion(runtime);
-    return;
+    return await awaitQueueCompletion(runtime);
   }
-  await awaitQueueCompletion(runtime);
+  return await awaitQueueCompletion(runtime);
 }
 
 export function readBufferMapCanCompleteSubmit(steps, index, step) {
@@ -1664,8 +1733,10 @@ export function buildUnsupportedExecutionResult({
       stdev: 0,
     },
   };
+  const rows = [];
+  stampPackageReplayFields(meta, rows);
   meta.artifactHash = stableArtifactHash(meta);
-  return { meta, rows: [] };
+  return { meta, rows };
 }
 
 export function buildErrorExecutionResult({
@@ -1760,8 +1831,10 @@ export function buildErrorExecutionResult({
       stdev: 0,
     },
   };
+  const rows = [];
+  stampPackageReplayFields(meta, rows);
   meta.artifactHash = stableArtifactHash(meta);
-  return { meta, rows: [] };
+  return { meta, rows };
 }
 
 async function writeExecutorArtifacts(traceMetaPath, traceJsonlPath, meta, rows) {
@@ -2607,9 +2680,11 @@ async function preloadResidentBufferLoads(
   }
   if (residentBufferLoadBreakdown.count > 0) {
     const waitStartedAt = performance.now();
-    await waitForQueuedWrites(runtime);
+    const effectiveReadbackPath = await waitForQueuedWrites(runtime);
     residentBufferLoadBreakdown.queueWaitTotalNs += nsDelta(waitStartedAt);
+    return effectiveReadbackPath;
   }
+  return '';
 }
 
 async function executeSample(
@@ -2679,7 +2754,10 @@ async function executeSample(
         runtime.queue.submit([commandBuffer]);
         const queueSubmitNs = nsDelta(queueSubmitStartedAt);
         const queueWaitStartedAt = performance.now();
-        await awaitQueueCompletion(runtime);
+        const effectiveReadbackPath = await awaitQueueCompletion(runtime);
+        if (effectiveReadbackPath) {
+          packageEffectiveReadbackPaths.add(effectiveReadbackPath);
+        }
         const queueWaitNs = nsDelta(queueWaitStartedAt);
         const submitNs = nsFromMs(performance.now() - submitStartedAt);
         queueCompletionKnown = true;
@@ -2787,7 +2865,10 @@ async function executeSample(
           waitReason,
         });
       }
-      await awaitQueueCompletion(runtime);
+      const effectiveReadbackPath = await awaitQueueCompletion(runtime);
+      if (effectiveReadbackPath) {
+        packageEffectiveReadbackPaths.add(effectiveReadbackPath);
+      }
       queueWaitNs = nsDelta(queueWaitStartedAt);
       queueCompletionKnown = true;
       debugLog('execution.submit.queueWait.done', {
@@ -2831,13 +2912,16 @@ async function executeSample(
   }
 
   if (residentBufferLoads) {
-    await preloadResidentBufferLoads(
+    const effectiveReadbackPath = await preloadResidentBufferLoads(
       normalizedPlan,
       runtime,
       materializedWriteDataCache,
       residentBufferLoadBreakdown,
       debugLog,
     );
+    if (effectiveReadbackPath) {
+      packageEffectiveReadbackPaths.add(effectiveReadbackPath);
+    }
   }
 
   const commandLoopStartedAt = performance.now();
@@ -3342,6 +3426,7 @@ async function executeSample(
       stdev: 0,
     },
   };
+  stampPackageReplayFields(meta, rows);
   meta.artifactHash = stableArtifactHash(meta);
 
   return { meta, rows };
@@ -3481,7 +3566,6 @@ export async function executePlanFile({
         stdev: 0,
       },
     };
-    meta.artifactHash = stableArtifactHash(meta);
     const rows = [];
     for (let repeatIndex = 0; repeatIndex < normalizedCommandRepeat; repeatIndex += 1) {
       for (const [index, step] of normalizedPlan.steps.entries()) {
@@ -3510,6 +3594,8 @@ export async function executePlanFile({
         });
       }
     }
+    stampPackageReplayFields(meta, rows);
+    meta.artifactHash = stableArtifactHash(meta);
     await writeExecutorArtifacts(traceMetaPath, traceJsonlPath, meta, rows);
     return { meta, rows };
   }

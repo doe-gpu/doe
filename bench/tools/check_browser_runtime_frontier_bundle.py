@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import sys
@@ -490,6 +491,20 @@ def summarize_promotion(
     }
 
 
+def release_bundle_identity_sha256(release_bundle: dict[str, Any]) -> str:
+    projection = {
+        key: value
+        for key, value in release_bundle.items()
+        if key != "runtimeFrontierBundle"
+    }
+    encoded = json.dumps(
+        projection,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def summarize_release(
     release_bundle: dict[str, Any],
     path: str,
@@ -502,7 +517,14 @@ def summarize_release(
     return {
         "path": path,
         "status": "fail" if failures or not loaded else "pass",
+        "artifactKind": str(release_bundle.get("artifactKind", "")),
+        "bundleId": str(release_bundle.get("bundleId", "")),
         "releaseStatus": str(release_bundle.get("releaseStatus", "")),
+        "releaseBundleIdentitySha256": (
+            release_bundle_identity_sha256(release_bundle)
+            if release_bundle
+            else ""
+        ),
         "artifactVerification": artifact_verification,
         "claimReports": claim_report_summaries,
     }
@@ -521,11 +543,42 @@ def summarize_artifact_verification(
     }
 
 
+def path_matches(path_text: str, candidates: set[str], root: Path) -> bool:
+    resolved = resolve_repo_path(path_text, root)
+    return any(path_text == candidate or (resolved is not None and resolved == resolve_repo_path(candidate, root)) for candidate in candidates)
+
+
+def release_input_binding_failures(
+    release_bundle: dict[str, Any],
+    *,
+    runtime_identity_path: str,
+    claim_promotion_receipt_path: str,
+    root: Path,
+) -> list[dict[str, str]]:
+    failures: list[dict[str, str]] = []
+    promotion_paths = {row.get("path") for row in release_bundle.get("promotionReceipts", []) if isinstance(row, dict) and isinstance(row.get("path"), str)}
+    if not path_matches(claim_promotion_receipt_path, promotion_paths, root):
+        failures.append(failure("claim_promotion_receipt_release_mismatch", "claimPromotionReceipt.path", "claim promotion receipt path must match release bundle promotionReceipts"))
+    proof_surface = release_bundle.get("proofSurface")
+    proof_path = proof_surface.get("path") if isinstance(proof_surface, dict) else None
+    resolved_proof = resolve_repo_path(proof_path, root) if isinstance(proof_path, str) else None
+    proof_payload: dict[str, Any] = {}
+    if resolved_proof is not None and resolved_proof.is_file():
+        try:
+            proof_payload = load_json(resolved_proof)
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+            failures.append(failure("proof_surface_load_failed", "releaseBundle.proofSurface.path", f"proof surface cannot be loaded: {exc}"))
+    if proof_payload and not path_matches(runtime_identity_path, {str(proof_payload.get("runtimeIdentityPath", ""))}, root):
+        failures.append(failure("runtime_identity_release_mismatch", "runtimeIdentity.path", "runtime identity path must match proof surface runtimeIdentityPath"))
+    return failures
+
+
 def build_report(
     *,
     runtime_identity_path: str,
     claim_promotion_receipt_path: str,
     release_artifact_bundle_path: str,
+    release_artifact_bundle_summary_path: str | None = None,
     root: Path,
     verify_files_root: Path | None = None,
     require_claimable: bool = False,
@@ -583,10 +636,17 @@ def build_report(
         promotion_check.check_receipt(promotion, verify_files_root) if promotion else []
     )
     release_failures = (
-        release_check.check_bundle(release_bundle, verify_files_root)
+        release_check.check_bundle(
+            release_bundle,
+            verify_files_root,
+            bundle_path=release_artifact_bundle_path,
+            skip_runtime_frontier_bundle_artifact=True,
+        )
         if release_bundle
         else []
     )
+    if release_bundle:
+        release_failures.extend(release_input_binding_failures(release_bundle, runtime_identity_path=runtime_identity_path, claim_promotion_receipt_path=claim_promotion_receipt_path, root=root))
     release_status = str(release_bundle.get("releaseStatus", "")) if release_bundle else ""
     promotion_failures, promotion_claim_failures = split_promotion_failures(
         raw_promotion_failures,
@@ -640,6 +700,9 @@ def build_report(
         failures.extend(claim_blockers)
 
     claimability_status = "claimable" if not claim_blockers else "blocked"
+    release_summary_path = (
+        release_artifact_bundle_summary_path or release_artifact_bundle_path
+    )
     report = {
         "schemaVersion": 1,
         "artifactKind": EXPECTED_KIND,
@@ -663,7 +726,7 @@ def build_report(
             ),
             "releaseArtifactBundle": summarize_release(
                 release_bundle,
-                release_artifact_bundle_path,
+                release_summary_path,
                 release_failures,
                 claim_report_summaries,
                 release_artifact_verification,
@@ -718,7 +781,10 @@ def main() -> int:
                 "releaseArtifactBundle": {
                     "path": args.release_artifact_bundle,
                     "status": "fail",
+                    "artifactKind": "",
+                    "bundleId": "",
                     "releaseStatus": "",
+                    "releaseBundleIdentitySha256": "",
                     "artifactVerification": {
                         "requiredForClaimable": True,
                         "verifyFilesRootProvided": verify_files_root is not None,

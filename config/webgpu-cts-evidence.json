@@ -1,4 +1,46 @@
 {
+  "artifactKind": "webgpu_cts_evidence",
+  "claimPolicy": {
+    "allowedClaimStates": [
+      {
+        "allowed": true,
+        "requirements": [
+          "claim policy defined",
+          "current evidence described as diagnostic"
+        ],
+        "state": "diagnostic"
+      },
+      {
+        "allowed": false,
+        "requirements": [
+          "published CTS subset receipt",
+          "backend-specific pass ledger",
+          "no failing required rows"
+        ],
+        "state": "subset_conformance"
+      },
+      {
+        "allowed": false,
+        "requirements": [
+          "all required replacement rows claimable",
+          "published CTS subset receipt",
+          "backend-specific pass ledger"
+        ],
+        "state": "replacement_conformance"
+      }
+    ],
+    "artifactKind": "webgpu_cts_conformance_claim_policy",
+    "claimLanguage": "diagnostic_until_full_published_pass_ledger",
+    "diagnosticLanguage": "Current CTS evidence supports only subset-scoped diagnostic evidence; broad conformance and replacement language remain disallowed.",
+    "policyId": "webgpu-cts-conformance-claim-policy-v1",
+    "promotionRequirements": {
+      "artifactPathsRequired": true,
+      "backendIdentityRequired": true,
+      "backendSpecificPassLedger": true,
+      "noFailingRequiredRows": true,
+      "publishedSubsetReceipt": true
+    }
+  },
   "ctsRevision": "untracked",
   "ctsSource": "bench/fixtures/cts_subset.fawn-node.json",
   "evidence": [

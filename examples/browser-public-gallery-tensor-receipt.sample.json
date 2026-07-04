@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_public_gallery_receipt",
+  "receiptId": "browser-public-gallery-tensor-sample",
+  "category": "tensor",
+  "url": "https://gallery.doe.dev/doe/tensor.html",
+  "method": "GET",
+  "statusCode": 200,
+  "contentSha256": "c534feab78d6959b8b26a04fa66408eca3a5a05d74e5e04f74f0e8a23b480776",
+  "contentLengthBytes": 1243,
+  "galleryArtifactPath": "examples/browser-gallery-tensor.sample.html",
+  "workloadContractPath": "browser/chromium/contracts/browser-local-ai-workloads.contract.md",
+  "workloadIds": [
+    "browser-gallery-tensor"
+  ],
+  "receiptIds": [
+    "browser-gallery-tensor-doe"
+  ],
+  "receiptArtifactPaths": [
+    "examples/browser-tensor-execution-receipt.sample.json"
+  ],
+  "observedAt": "2026-06-30T00:00:00Z"
+}

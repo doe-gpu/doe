@@ -160,7 +160,13 @@ Cells not listed separately are intentionally folded into one of those rows:
 
 - Product contract: this document and the package contract docs define what each surface is allowed to promise.
 - Spec index and backend checklist: `config/webgpu-spec-index.jsonl` tracks the WebGPU API surface by official interface/member and string-union enum from `@webgpu/types`, and now carries per-backend checklist cells for `metal`, `vulkan`, `d3d12`, and `browser`, each split into `implementation`, `correctness`, and `performance` evidence. WGSL builtins/types remain a follow-up layer.
-- CTS evidence: `config/webgpu-cts-evidence.json` tracks actual CTS runs, query buckets, pass/fail results, and artifact paths.
+- CTS evidence: `config/webgpu-cts-evidence.json` tracks actual CTS runs,
+  query buckets, pass/fail results, artifact paths, and the claim-policy block.
+  `examples/webgpu-cts-subset-receipt.sample.json` is the hash-linked repo
+  publication receipt derived from that ledger.
+  `examples/webgpu-cts-backend-pass-ledger.sample.json` groups that subset by
+  backend identity. Broad conformance and replacement language remains
+  disallowed by the claim boundary.
 - Internal capability inventory: `config/webgpu-capability-inventory.json` remains useful for Doe implementation tracking, but it is not the spec index and it is not CTS evidence.
 - Chromium integration overlay: `config/webgpu-integration-chromium.json` records what changes when the browser lane runs through the wire protocol and browser-owned media/image paths.
 - Generated surface views: `config/generated/webgpu-surface-{compute,headless,chromium}.json` are convenience reports derived from the canonical ledgers above; they are not source-of-truth files.
@@ -310,7 +316,7 @@ All doe-core gates, plus:
 
 ### Conformance requirements
 
-- **CTS subset publication required.** Select a meaningful CTS subset covering implemented operations. Publish pass/fail counts per backend per release. Track trend.
+- **CTS subset publication required.** Select a meaningful CTS subset covering implemented operations. Publish pass/fail status and backend identity through the typed CTS subset receipt plus backend pass ledger, and track trend per release.
 - **Minimum pass rate target:** To be established after first CTS run. Initial publication of any number (even low) is required; trend direction matters more than absolute value.
 - **Regression policy:** CTS pass rate must not regress between releases. Any regression blocks release until fixed or explicitly waived with tracking in `docs/status.md`.
 

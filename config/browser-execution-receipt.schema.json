@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-execution-receipt.schema.json",
+  "title": "Browser execution receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "receiptId",
+    "workloadId",
+    "selectedRuntime",
+    "sourceShader",
+    "loweringPath",
+    "backend",
+    "driver",
+    "device",
+    "commandCoverage",
+    "runtimeSelectorState",
+    "fallbackState",
+    "timing"
+  ],
+  "anyOf": [
+    { "required": ["commandGraph"] },
+    { "required": ["flightRecorderRef"] }
+  ],
+  "oneOf": [
+    { "required": ["outputHash"] },
+    { "required": ["frameHash"] }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": ["selectedRuntime"],
+        "properties": {
+          "selectedRuntime": { "const": "dawn" }
+        }
+      },
+      "then": {
+        "properties": {
+          "runtimeSelectorState": {
+            "properties": {
+              "selectedRuntime": { "const": "dawn" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["selectedRuntime"],
+        "properties": {
+          "selectedRuntime": { "const": "doe" }
+        }
+      },
+      "then": {
+        "properties": {
+          "runtimeSelectorState": {
+            "properties": {
+              "selectedRuntime": { "const": "doe" }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_execution_receipt" },
+    "receiptId": { "type": "string", "minLength": 1 },
+    "workloadId": { "type": "string", "minLength": 1 },
+    "selectedRuntime": { "enum": ["dawn", "doe"] },
+    "sourceShader": { "$ref": "#/$defs/SourceShader" },
+    "loweringPath": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "backend": { "type": "string", "minLength": 1 },
+    "driver": { "$ref": "#/$defs/DriverIdentity" },
+    "device": { "$ref": "#/$defs/DeviceIdentity" },
+    "commandGraph": { "$ref": "#/$defs/CommandEvidence" },
+    "flightRecorderRef": { "$ref": "#/$defs/CommandEvidence" },
+    "commandCoverage": { "$ref": "#/$defs/CommandCoverage" },
+    "outputHash": { "$ref": "#/$defs/Hash" },
+    "frameHash": { "$ref": "#/$defs/Hash" },
+    "runtimeSelectorState": { "$ref": "#/$defs/RuntimeSelectorState" },
+    "fallbackState": { "$ref": "#/$defs/FallbackState" },
+    "timing": { "$ref": "#/$defs/Timing" }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "SourceShader": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["source", "sha256"],
+      "properties": {
+        "language": { "type": "string", "minLength": 1 },
+        "entryPoint": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "sourceSha256": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "CommandEvidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1,
+      "anyOf": [
+        { "required": ["sha256"] },
+        { "required": ["hash"] },
+        { "required": ["graphSha256"] },
+        { "required": ["artifactSha256"] }
+      ],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "hash": { "$ref": "#/$defs/Hash" },
+        "graphSha256": { "$ref": "#/$defs/Hash" },
+        "artifactSha256": { "$ref": "#/$defs/Hash" },
+        "artifactPath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "CommandCoverage": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["commandCount", "successCount", "dispatchCount"],
+      "properties": {
+        "commandCount": { "type": "integer", "minimum": 1 },
+        "successCount": { "type": "integer", "minimum": 0 },
+        "dispatchCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "ConcreteText": {
+      "type": "string",
+      "minLength": 1,
+      "not": { "const": "unknown" }
+    },
+    "DriverIdentity": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["vendor", "api", "driver", "deviceFamily"],
+      "properties": {
+        "vendor": { "$ref": "#/$defs/ConcreteText" },
+        "api": { "$ref": "#/$defs/ConcreteText" },
+        "driver": { "$ref": "#/$defs/ConcreteText" },
+        "deviceFamily": { "$ref": "#/$defs/ConcreteText" },
+        "profileId": { "$ref": "#/$defs/ConcreteText" }
+      }
+    },
+    "DeviceIdentity": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["adapterInfoSha256", "featureCount", "adapter"],
+      "properties": {
+        "adapterInfoSha256": { "$ref": "#/$defs/Hash" },
+        "featureCount": { "type": "integer", "minimum": 0 },
+        "adapter": { "$ref": "#/$defs/ConcreteText" }
+      }
+    },
+    "RuntimeSelectorState": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "selectedRuntime",
+        "fallbackApplied",
+        "hiddenFallbackAllowed",
+        "selectorVersion"
+      ],
+      "properties": {
+        "selectionMode": { "type": "string", "minLength": 1 },
+        "selectedRuntime": { "enum": ["dawn", "doe"] },
+        "forcedMode": { "type": "string", "minLength": 1 },
+        "fallbackApplied": { "type": "boolean", "const": false },
+        "hiddenFallbackAllowed": { "type": "boolean", "const": false },
+        "fallbackReasonCode": { "type": "string", "const": "" },
+        "selectorVersion": { "type": "string", "minLength": 1 }
+      }
+    },
+    "FallbackState": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["fallbackApplied", "hiddenFallbackAllowed", "reasonCode"],
+      "properties": {
+        "fallbackApplied": { "type": "boolean", "const": false },
+        "hiddenFallbackAllowed": { "type": "boolean", "const": false },
+        "reasonCode": { "type": "string", "const": "" }
+      }
+    },
+    "Timing": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["timingClass", "phases"],
+      "properties": {
+        "timingClass": { "type": "string", "minLength": 1 },
+        "phases": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["setupNs", "encodeNs", "submitWaitNs"],
+          "properties": {
+            "setupNs": { "type": "integer", "minimum": 0 },
+            "encodeNs": { "type": "integer", "minimum": 0 },
+            "submitWaitNs": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    }
+  }
+}

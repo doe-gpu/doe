@@ -3,12 +3,88 @@
   "title": "Fawn WebGPU CTS Evidence",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "lastUpdated", "ctsSource", "ctsRevision", "evidence"],
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "lastUpdated",
+    "ctsSource",
+    "ctsRevision",
+    "claimPolicy",
+    "evidence"
+  ],
   "properties": {
     "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "webgpu_cts_evidence" },
     "lastUpdated": { "type": "string" },
     "ctsSource": { "type": "string", "minLength": 1 },
     "ctsRevision": { "type": "string", "minLength": 1 },
+    "claimPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyId",
+        "artifactKind",
+        "claimLanguage",
+        "diagnosticLanguage",
+        "promotionRequirements",
+        "allowedClaimStates"
+      ],
+      "properties": {
+        "policyId": { "type": "string", "minLength": 1 },
+        "artifactKind": {
+          "type": "string",
+          "const": "webgpu_cts_conformance_claim_policy"
+        },
+        "claimLanguage": {
+          "type": "string",
+          "const": "diagnostic_until_full_published_pass_ledger"
+        },
+        "diagnosticLanguage": { "type": "string", "minLength": 1 },
+        "promotionRequirements": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "publishedSubsetReceipt",
+            "backendSpecificPassLedger",
+            "noFailingRequiredRows",
+            "backendIdentityRequired",
+            "artifactPathsRequired"
+          ],
+          "properties": {
+            "publishedSubsetReceipt": { "type": "boolean", "const": true },
+            "backendSpecificPassLedger": { "type": "boolean", "const": true },
+            "noFailingRequiredRows": { "type": "boolean", "const": true },
+            "backendIdentityRequired": { "type": "boolean", "const": true },
+            "artifactPathsRequired": { "type": "boolean", "const": true }
+          }
+        },
+        "allowedClaimStates": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["state", "allowed", "requirements"],
+            "properties": {
+              "state": {
+                "type": "string",
+                "enum": [
+                  "diagnostic",
+                  "subset_conformance",
+                  "replacement_conformance"
+                ]
+              },
+              "allowed": { "type": "boolean" },
+              "requirements": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
     "evidence": {
       "type": "array",
       "items": {

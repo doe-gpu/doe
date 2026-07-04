@@ -10,6 +10,165 @@ This is a live topical status shard. Follow the shared shard policy in
 stays focused on non-TSIR compiler work (shader compiler non-TSIR paths,
 WebGPU runtime, robustness).
 
+## 2026-07-02 — Browser-corpus Tint benchmark scopes are covered
+
+`bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json` now
+enables Tint benchmark-scope collection for the browser WGSL corpus path. The
+refreshed browser-corpus compiler evidence records real Tint
+`parseWgsl`/`validateIr`/`generateBackend` benchmark timings, and
+`examples/tint-phase-benchmark-evidence.browser-corpus.spirv.sample.json` is
+now schema-registered beside the benchmark-corpus phase receipt.
+
+`examples/tint-compiler-frontier-bundle.sample.json` now consumes both phase
+benchmark receipts, so `phaseTimingCoverage` has no missing Tint
+benchmark-scope rows. The `wgsl-tint-compiler` row remains blocked on
+`claimable_tint_compiler_evidence_report` because exact Tint `parse`, `sema`,
+`lower`, and `emit` timings are still missing and the current browser row is
+not a positive claimable delta.
+
+Touched:
+
+- `bench/native-compare/compare_doe_vs_tint.browser-corpus.config.json`
+- `examples/tint-compiler-evidence.browser-corpus.spirv.sample.json`
+- `examples/tint-phase-benchmark-evidence.browser-corpus.spirv.sample.json`
+- `examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json`
+- `examples/tint-compiler-target-validation.frontier.spirv.sample.json`
+- `examples/tint-compiler-frontier-bundle.sample.json`
+- `examples/dawn-replacement-readiness-report.sample.json`
+- `bench/tests/test_dawn_replacement_readiness_report.py`
+
+## 2026-07-02 — CTS backend pass ledger clears CTS evidence blockers
+
+`examples/webgpu-cts-backend-pass-ledger.sample.json` now records the
+backend-specific pass ledger derived from the published CTS subset receipt. It
+groups the subset by backend identity, binds the subset receipt and source CTS
+ledger by SHA-256, records the per-backend pass status, and keeps full
+conformance plus replacement claims explicitly disallowed.
+
+`build_dawn_replacement_readiness_report.py` now recomputes the expected
+backend pass ledger from `examples/webgpu-cts-subset-receipt.sample.json` and
+rejects stale source hashes, summary drift, backend-ledger drift, non-pass
+ledger state, and claim-boundary drift before removing
+`backend_specific_cts_pass_ledger`. The WebGPU CTS row now has no active CTS
+evidence blockers in the readiness artifact, but the row is still not
+claim-allowed for broad conformance/replacement language.
+
+Touched:
+
+- `bench/tools/build_webgpu_cts_backend_pass_ledger.py`
+- `bench/tools/build_dawn_replacement_readiness_report.py`
+- `config/webgpu-cts-backend-pass-ledger.schema.json`
+- `config/dawn-replacement-readiness-report.schema.json`
+- `examples/webgpu-cts-backend-pass-ledger.sample.json`
+- `examples/dawn-replacement-readiness-report.sample.json`
+- `bench/tests/test_webgpu_cts_backend_pass_ledger.py`
+- `bench/tests/test_dawn_replacement_readiness_report.py`
+
+## 2026-07-02 — CTS subset receipt is hash-bound
+
+`examples/webgpu-cts-subset-receipt.sample.json` now publishes the current CTS
+subset as a typed `webgpu_cts_subset_receipt`. It binds
+`config/webgpu-cts-evidence.json` by SHA-256, carries explicit query coverage,
+pass/fail status, backend identity, artifact paths, and the diagnostic claim
+boundary from the CTS claim policy.
+
+`build_dawn_replacement_readiness_report.py` validates that receipt before
+removing the `published_cts_subset_receipt` blocker from the WebGPU CTS row.
+The validator rejects stale source hashes, coverage rows that drift from the
+ledger, backend-coverage drift, summary drift, and claim-boundary drift.
+
+Touched:
+
+- `bench/tools/build_webgpu_cts_subset_receipt.py`
+- `bench/tools/build_dawn_replacement_readiness_report.py`
+- `config/webgpu-cts-subset-receipt.schema.json`
+- `config/dawn-replacement-readiness-report.schema.json`
+- `examples/webgpu-cts-subset-receipt.sample.json`
+- `examples/dawn-replacement-readiness-report.sample.json`
+- `bench/tests/test_webgpu_cts_subset_receipt.py`
+- `bench/tests/test_dawn_replacement_readiness_report.py`
+
+## 2026-07-02 — CTS conformance claim policy is machine-readable
+
+`config/webgpu-cts-evidence.json` now carries a
+`webgpu_cts_conformance_claim_policy` block that defines the public language
+boundary for CTS evidence. The policy allows only diagnostic CTS language until
+a published CTS subset receipt and backend-specific pass ledger are present,
+and it records the promotion requirements as schema-validated booleans.
+
+`build_dawn_replacement_readiness_report.py` now validates that policy before
+removing the `conformance_claim_policy` blocker from the WebGPU CTS row. The
+row remains blocked on the actual CTS subset receipt and backend-specific pass
+ledger. See `examples/dawn-replacement-readiness-report.sample.json` for the
+current blocker set.
+
+## 2026-07-02 — Tint frontier bundle exposes phase timing coverage
+
+`check_tint_compiler_frontier_bundle.py` now emits `phaseTimingCoverage` in
+the composed Tint frontier bundle. The summary counts required exact phases
+and benchmark scopes across every supplied compiler-evidence path, grouped by
+evidence path and also totaled at the bundle level. The checked SPIR-V sample
+now records 15 compiler rows: Doe has exact phase coverage for all 15 rows,
+Tint has exact phase coverage for 0 rows, and Tint benchmark-scope coverage is
+present for 14 of 15 rows. The missing benchmark-scope row is the browser WGSL
+corpus sample, while all 15 rows still lack claim-grade exact Tint `parse`,
+`sema`, `lower`, and `emit` timings.
+
+`build_dawn_replacement_readiness_report.py` now validates this coverage
+object before exposing the Tint frontier bundle as readiness evidence. It also
+rejects stale top-level coverage totals that do not equal the grouped
+`coverageByEvidencePath` rows. The `wgsl-tint-compiler` product row remains
+blocked by `claimable_tint_compiler_evidence_report`; the blocker is now
+machine-readable as coverage data in addition to the claim-blocker strings.
+
+Touched:
+
+- `bench/tools/check_tint_compiler_frontier_bundle.py`
+- `bench/tools/build_dawn_replacement_readiness_report.py`
+- `config/tint-compiler-frontier-bundle.schema.json`
+- `config/dawn-replacement-readiness-report.schema.json`
+- `examples/tint-compiler-frontier-bundle.sample.json`
+- `examples/dawn-replacement-readiness-report.sample.json`
+- `bench/tests/test_tint_compiler_frontier_bundle.py`
+- `bench/tests/test_dawn_replacement_readiness_report.py`
+- `bench/README.md`
+- `docs/shader-compiler-architecture.md`
+- `docs/status/compiler-and-webgpu.md`
+
+## 2026-07-01 — Tint frontier bundle binds component row identity
+
+`check_tint_compiler_frontier_bundle.py` now fails closed when component
+receipts drift from the supplied compiler-evidence rows. Lowering-link rows,
+target-validation coverage, and phase-benchmark rows must resolve to the same
+target/shader identity in an explicitly supplied compiler-evidence report.
+Lowering-link source hashes must also match the compiler-evidence source hash,
+and phase-benchmark rows must mirror the compiler-evidence Tint status,
+benchmark-scope timings, exact-phase status, and missing-phase lists.
+Target-validation receipts are also recomputed from the supplied compiler
+evidence in diagnostic-row mode, so stale target coverage, claim blockers,
+grouped summaries, failures, or summary counts fail the frontier bundle before
+the Dawn/Tint readiness rollup can consume them.
+Phase-benchmark receipts are now recomputed from the same supplied compiler
+evidence too, so stale target coverage, checked rows, failures, or summary
+counts cannot survive in the composed compiler frontier bundle.
+Lowering-link rows now also bind source metadata plus ready-side Doe/Tint
+output hashes, receipt paths, and validation status to the supplied compiler
+evidence. Non-ready diagnostic sides stay governed by target-validation
+claim-blockers, while ready sides cannot drift behind a passing frontier
+bundle.
+Tint frontier component summaries now expose `evidencePaths` arrays alongside
+the compatibility `evidencePath` field, so multi-corpus target-validation
+receipts preserve every compiler-evidence input in the frontier bundle and the
+Dawn/Tint readiness rollup validates that array before accepting the bundle.
+
+The checked-in diagnostic Tint samples now promote the browser WGSL SPIR-V
+evidence and the Tint benchmark SPIR-V evidence into durable `examples/`
+artifacts. The sample frontier bundle and Dawn/Tint readiness report consume
+those durable paths, so target-backend artifact validation is no longer the
+checked compiler-row blocker. The compiler row remains blocked by claim-grade
+Tint compiler evidence: exact Tint phase timings and claimable compiler deltas
+are still required before replacement language is allowed.
+
 ## 2026-06-30 — Browser WGSL Tint warm row is benchmark-materialized
 
 The Tint warm-corpus materializer now accepts `--wgsl-corpus-manifest`, so the

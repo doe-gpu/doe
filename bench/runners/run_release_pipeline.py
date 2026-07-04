@@ -917,6 +917,7 @@ def main() -> int:
                 "--expected-workload-contract",
                 str(workloads_contract_path),
             ]
+            rehearsal_cmd.extend(["--config", str(config_path)])
             if args.claim_rehearsal_prefix.strip():
                 claim_rehearsal_prefix = output_paths.with_timestamp(
                     Path(args.claim_rehearsal_prefix.strip()),

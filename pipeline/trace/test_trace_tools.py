@@ -403,6 +403,15 @@ class TestEmptyTrace(unittest.TestCase):
             result = _run_replay(mp, jsonl)
             self.assertNotEqual(result.returncode, 0)
 
+    def test_package_step_opcodes_pass(self):
+        rows, meta = _make_valid_trace(4)
+        for row, op_code in zip(rows, ["upload", "dispatch", "copy", "readback"]):
+            row["opCode"] = op_code
+        with tempfile.TemporaryDirectory() as td:
+            jsonl, mp = _write_trace_files(Path(td), rows, meta)
+            result = _run_replay(mp, jsonl)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_meta_hash_mismatch_fails(self):
         rows, meta = _make_valid_trace(2)
         meta["hash"] = "0xffffffffffffffff"
