@@ -410,8 +410,7 @@ pub export fn wgpuDeviceHasFeature(a0: abi_base.WGPUDevice, a1: abi_base.WGPUFea
 }
 
 pub export fn wgpuDeviceCreateQuerySet(a0: abi_base.WGPUDevice, a1: *const abi_descriptor.WGPUQuerySetDescriptor) callconv(.c) abi_base.WGPUQuerySet {
-    const proc = loadRequiredProc(ptypes.FnWgpuDeviceCreateQuerySet, "wgpuDeviceCreateQuerySet");
-    return proc(a0, a1);
+    return native.doeNativeDeviceCreateQuerySet(a0, a1.type, a1.count);
 }
 
 pub export fn wgpuCommandEncoderResolveQuerySet(a0: abi_base.WGPUCommandEncoder, a1: abi_base.WGPUQuerySet, a2: u32, a3: u32, a4: abi_base.WGPUBuffer, a5: u64) callconv(.c) void {

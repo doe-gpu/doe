@@ -39,6 +39,8 @@ PHASE_METRICS: tuple[str, ...] = (
     "createViewMs",
     "createSamplerMs",
     "createBindGroupMs",
+    "encodeSubmitMs",
+    "dispatchElapsedMs",
     "submitReadbackMs",
     "mapReadMs",
     "waitMs",

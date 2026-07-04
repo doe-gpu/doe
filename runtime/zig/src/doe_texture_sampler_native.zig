@@ -9,6 +9,7 @@ const native_types = @import("doe_native_object_types.zig");
 const native_shared = @import("doe_native_shared_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_exports = @import("doe_native_exports.zig");
+const vulkan_lifetime = @import("doe_vulkan_lifetime.zig");
 const d3d12_formats = resource_ops.d3d12_formats;
 
 const alloc = native_helpers.alloc;
@@ -616,6 +617,7 @@ pub export fn doeNativeTextureRelease(raw: ?*anyopaque) callconv(.c) void {
             return;
         }
         if (t.vk_id != 0) {
+            vulkan_lifetime.flushBeforeDestroy(t.vk_runtime_ref);
             const vk_render = @import("doe_vulkan_render_native.zig");
             vk_render.vulkan_destroy_texture(t);
             alloc.destroy(t);
@@ -640,6 +642,7 @@ pub export fn doeNativeTextureViewRelease(raw: ?*anyopaque) callconv(.c) void {
             return;
         }
         if (tv.tex.vk_id != 0) {
+            vulkan_lifetime.flushBeforeDestroy(tv.tex.vk_runtime_ref);
             const vk_render = @import("doe_vulkan_render_native.zig");
             vk_render.vulkan_destroy_texture_view(tv);
             alloc.destroy(tv);
@@ -723,6 +726,7 @@ pub export fn doeNativeSamplerRelease(raw: ?*anyopaque) callconv(.c) void {
         }
         if (s.vk_runtime_ref) |rt_ptr| {
             const NativeVulkanRuntime = native_shared.NativeVulkanRuntime;
+            vulkan_lifetime.flushBeforeDestroy(rt_ptr);
             const rt: *NativeVulkanRuntime = @ptrCast(@alignCast(rt_ptr));
             const vk_render = @import("doe_vulkan_render_native.zig");
             vk_render.vulkan_destroy_sampler(s, rt);

@@ -26,6 +26,8 @@ This module implements a layered browser benchmark superset for Chromium Track A
    - schema for generated projection manifest.
 3. `generated/browser_projection_manifest.json`
    - generated `L1/L0` projection rows with contract hashes, repo-relative source/rules paths, and browser workload parameters such as upload byte counts.
+   - compute direct and indirect component rows carry source command hashes plus `directDispatchArgs` or `indirectDispatchArgs` so the browser runner can replay command-shaped `dispatchWorkgroups` and `dispatchWorkgroupsIndirect` rows instead of generic placeholders.
+   - layered report schema v4 requires compute component dispatch rows plus source-kernel compute rows to emit `dispatchElapsedMs`, `encodeSubmitMs`, and `waitMs` phase telemetry.
 4. `workflows/browser-workflow-manifest.json`
    - `L2` workflow definitions with required status, claim scope, and promotion approver roles.
 5. `workflows/browser-workflow-manifest.schema.json`
@@ -113,10 +115,14 @@ row-weighted.
 `categoryBalancedOverall` uses the geometric mean of per-category geomeans so a
 dense category cannot dominate the headline view. The legacy relative index is
 still present in JSON as `legacyRatioScore` for compatibility; `score` is the
-baseline paired score. `strictComparable` is the fair browser-projection summary and includes
-only scorable rows whose projection says `comparabilityExpectation=strict` and
-whose `browserWorkload` records `sourceComparable=true`,
-`sourceClaimEligible=true`, and `benchmarkClass=comparable`.
+baseline paired score. `strictComparable` is the fair browser-projection summary
+and includes only scorable rows whose projection says
+`comparabilityExpectation=strict` and whose `browserWorkload` records
+`sourceComparable=true`, `sourceClaimEligible=true`, and
+`benchmarkClass=comparable`. Projection manifest schema v5 requires every
+non-strict browser projection to use `benchmarkClass=directional`.
+`sourceClaimEligible` is source-workload provenance; it is not browser
+claimability unless the row is strict-comparable.
 `bottlenecks` lists the slowest categories, rows, and measured phases so
 regressions do not require manual row sorting. The score is directional
 diagnostic evidence, not a release performance claim. The score sidecar carries

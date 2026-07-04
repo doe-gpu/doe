@@ -43,6 +43,12 @@ pub const CmdTag = enum {
     resolve_query_set,
 };
 
+pub const TimestampWritePosition = enum {
+    command,
+    pass_begin,
+    pass_end,
+};
+
 pub const RecordedCmd = union(CmdTag) {
     dispatch: struct {
         compute_pipeline: ?*anyopaque = null,
@@ -182,13 +188,17 @@ pub const RecordedCmd = union(CmdTag) {
     },
     write_timestamp: struct {
         counter_buffer: ?*anyopaque,
+        query_set: ?*anyopaque = null,
         query_index: u32,
+        position: TimestampWritePosition = .command,
     },
     resolve_query_set: struct {
         counter_buffer: ?*anyopaque,
+        query_set: ?*anyopaque = null,
         first_query: u32,
         query_count: u32,
         dst_mtl: ?*anyopaque,
+        dst_buffer: ?*anyopaque = null,
         dst_offset: u64,
     },
 };

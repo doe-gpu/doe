@@ -3,6 +3,350 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-07-04 — SPIR-V direct compute entry probe rejected
+
+A Vulkan SPIR-V emitter probe removed the compute entry wrapper for eligible
+compute entry functions and emitted builtin inputs directly on the user entry
+function. The emitted focused kernels validated with `spirv-val`, but browser
+evidence rejected the change: strict smoke stayed correct while the dispatch
+proxy regressed, and the focused compute strict-comparable score regressed.
+
+The probe artifacts are:
+`browser/chromium/artifacts/current-spirv-direct-compute-entry/dawn-vs-doe.browser.playwright-smoke.spirv-direct-compute-entry.json`,
+`browser/chromium/artifacts/current-spirv-direct-compute-entry/fawn-dawn-vs-fawn-doe.browser-layered.superset.diagnostic.json`,
+`browser/chromium/artifacts/current-spirv-direct-compute-entry/fawn-dawn-vs-fawn-doe.browser-layered.superset.check.json`,
+and
+`browser/chromium/artifacts/current-spirv-direct-compute-entry/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
+The code was reverted; these artifacts are negative evidence for direct compute
+entry emission under the current Vulkan browser path.
+
+## 2026-07-04 — Vulkan deferred command-buffer batching rejected
+
+The Vulkan recorded-submit replay path keeps one-at-a-time deferred
+command-buffer allocation. A refreshed no-batch run is the current evidence for
+the rebuilt runtime after command-buffer batching probes were rejected.
+
+Strict browser smoke for the current no-batch rebuilt runtime is recorded at
+`browser/chromium/artifacts/current-deferred-command-buffer-no-batch-refresh/dawn-vs-doe.browser.playwright-smoke.deferred-command-buffer-no-batch.refresh.json`.
+The refreshed focused compute report is
+`browser/chromium/artifacts/current-deferred-command-buffer-no-batch-refresh/fawn-dawn-vs-fawn-doe.browser-layered.superset.diagnostic.json`
+with checker sidecar
+`browser/chromium/artifacts/current-deferred-command-buffer-no-batch-refresh/fawn-dawn-vs-fawn-doe.browser-layered.superset.check.json`
+and score sidecar
+`browser/chromium/artifacts/current-deferred-command-buffer-no-batch-refresh/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
+The checker requires both Dawn and Doe modes. Treat this as diagnostic evidence
+only; the full focused compute category is still not a Dawn-beating performance
+claim.
+
+Initial pool-batch evidence remains at
+`browser/chromium/artifacts/current-deferred-command-buffer-pool-batch/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
+The refreshed current-hash pool-batch artifact at
+`browser/chromium/artifacts/current-deferred-command-buffer-pool-batch-refresh/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`
+failed to preserve the current no-batch focused evidence, so the code was
+reverted and both batch artifacts are negative or superseded evidence, not
+current runtime behavior.
+
+A SPIR-V entry-wrapper inline-hint probe was rejected after
+`browser/chromium/artifacts/current-spirv-entry-inline-hint/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`
+regressed the focused compute score. The code was reverted; the artifact is
+negative evidence for marking wrapper-backed WGSL functions as `Inline` under
+the current Vulkan browser path.
+
+A fence-capacity-sized command-buffer batch probe was rejected after
+`browser/chromium/artifacts/current-deferred-command-buffer-fence-capacity/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`
+regressed the focused compute score. The code was reverted.
+
+## 2026-07-04 — Vulkan SPIR-V atomics now use WGSL relaxed semantics
+
+Doe's WGSL-to-SPIR-V emitter now lowers WGSL atomic builtins with relaxed
+SPIR-V memory semantics while retaining the existing workgroup/device scope
+selection. This aligns the Vulkan shader path with WGSL's atomic memory model
+instead of over-emitting acquire/release semantics and storage-class memory
+semantics for atomic operations.
+
+Previous focused compute evidence for the rebuilt runtime is
+`browser/chromium/artifacts/current-relaxed-atomic-semantics/fawn-dawn-vs-fawn-doe.browser-layered.superset.diagnostic.json`
+with checker sidecar
+`browser/chromium/artifacts/current-relaxed-atomic-semantics/fawn-dawn-vs-fawn-doe.browser-layered.superset.check.json`
+and score sidecar
+`browser/chromium/artifacts/current-relaxed-atomic-semantics/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
+The run uses the current projection contract hash and the strict Fawn binary,
+and the checker requires both Dawn and Doe modes. Treat this as a correctness
+fix with diagnostic row movement only; it does not promote the full focused
+compute category to a performance claim.
+
+Strict browser smoke for the same rebuilt runtime is recorded at
+`browser/chromium/artifacts/current-relaxed-atomic-semantics/dawn-vs-doe.browser.playwright-smoke.relaxed-atomic-semantics.json`.
+The receipt keeps the prior `importExternalTexture` and timestamp-query
+correctness blockers green for both Dawn and Doe under the strict Fawn binary.
+
+A buffer-scoped compute-write barrier probe was rejected after
+`browser/chromium/artifacts/current-buffer-scoped-compute-barrier/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`
+regressed the focused compute score. The code was reverted; the artifact is
+negative evidence for replacing the current global compute-to-compute barrier
+with per-buffer barriers under the current Vulkan replay path.
+
+## 2026-07-04 — Browser projections separate strict claims from directional rows
+
+The browser projection manifest contract is now schema v5. Strict browser
+projection rows must carry `benchmarkClass=comparable`; component-only and
+non-projectable rows must carry `benchmarkClass=directional` even when the
+source workload remains claim-eligible in the L0 superset. This keeps source
+provenance separate from browser claimability and prevents component diagnostics
+from entering strict browser score evidence as comparable rows.
+
+The default AMD Vulkan and Apple Metal generated projection manifests were
+regenerated under the new contract:
+`browser/chromium/bench/generated/browser_projection_manifest.json` and
+`browser/chromium/bench/generated/browser_projection_manifest.apple.metal.json`.
+Existing layered reports generated under earlier projection contract hashes
+remain runtime evidence, but they must be regenerated before being cited as
+current browser-superset checker-green artifacts. This is evidence-discipline
+work only; it does not change the current browser runtime performance result or
+promote any directional row to a release claim.
+
+Previous schema-v5, report-schema-v4 focused compute evidence is
+`browser/chromium/artifacts/current-source-kernel-phase-telemetry/fawn-dawn-vs-fawn-doe.browser-layered.superset.diagnostic.json`
+with score sidecar
+`browser/chromium/artifacts/current-source-kernel-phase-telemetry/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
+The run uses `modeSchedule=paired-balanced`, passes the browser superset
+checker, and keeps required browser runtime setup green for both Dawn and Doe.
+The full focused compute category remains negative because direct dispatch and
+workgroup rows still lose. Compute component dispatch rows and strict
+source-kernel rows now emit `dispatchElapsedMs`, `encodeSubmitMs`, and `waitMs`.
+Treat this as superseded diagnostic evidence, not as a release performance
+claim. Older report-schema-v3 focused compute artifacts remain superseded by
+report-schema-v4 evidence.
+
+A scoped compute-write buffer-barrier probe was rejected after
+`browser/chromium/artifacts/current-scoped-compute-barrier-fix/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`
+regressed the focused compute score. The code was reverted; the artifact is
+negative evidence for replacing the current global compute-to-compute barrier
+with per-buffer barriers under the current Vulkan replay path.
+
+A resource-free direct-dispatch batching probe was also rejected after
+`browser/chromium/artifacts/current-resource-free-direct-batch-probe/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`
+regressed the focused compute score and worsened direct-dispatch wait-side
+timing. The code was reverted; the artifact is negative evidence for carrying
+Vulkan recorded replay across WebGPU `queue.submit` boundaries for
+resource-free direct-dispatch rows under the current browser path.
+
+Queue-policy probes were rejected as default-lane changes. The existing
+`vulkan_doe_compute_only_fence_diagnostic` lane produced diagnostic evidence at
+`browser/chromium/artifacts/current-compute-only-fence-v3-diagnostic/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`,
+but hard compute-only selection remains a diagnostic lane, not a default app
+policy. A graphics-compute fence-pool app-lane probe at
+`browser/chromium/artifacts/current-vulkan-app-fence-v3-probe/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`
+and a prefer-compute-only fence-pool app-lane probe at
+`browser/chromium/artifacts/current-vulkan-app-prefer-compute-fence-v4-probe/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`
+regressed the focused evidence. Both temporary config changes were reverted.
+
+## 2026-07-04 — Vulkan resource destruction now drains pending queue work
+
+Vulkan buffer, texture, texture-view, sampler, and query-set destruction now
+drains pending runtime queue work before destroying the backend handle. This
+closes a resource lifetime gap where a WebGPU object could be released after
+`queue.submit` while Doe still had deferred Vulkan work referencing that object.
+The change is a correctness prerequisite for any future cross-submit batching;
+it is not a performance claim.
+
+Current strict browser smoke evidence is
+`browser/chromium/artifacts/current-vulkan-lifetime-flush-fix/dawn-vs-doe.browser.playwright-smoke.vulkan-lifetime-flush.texture-view.releasefast.json`.
+It keeps timestamp-query and `importExternalTexture` smoke correctness green.
+
+Current focused compute evidence for the rebuilt runtime is
+`browser/chromium/artifacts/current-vulkan-lifetime-flush-fix/dawn-vs-doe.browser.layered-compute.vulkan-lifetime-flush.texture-view.releasefast.json`
+with score sidecar
+`browser/chromium/artifacts/current-vulkan-lifetime-flush-fix/dawn-vs-doe.browser.layered-compute.vulkan-lifetime-flush.texture-view.releasefast.score.json`.
+The report was generated before projection manifest schema v5 and must be
+rerun before it is cited as current browser-superset checker-green evidence. It
+remains diagnostic: Doe is still behind Dawn for the focused compute category
+under the same strict Fawn binary.
+
+A cross-submit replay batching probe was rejected after
+`browser/chromium/artifacts/current-cross-submit-replay-batch-probe/dawn-vs-doe.browser.layered-compute.cross-submit-replay-batch.releasefast.score.json`
+regressed the focused current-binary browser score. The code was reverted; the
+artifact remains negative evidence for deferring the Vulkan driver submit beyond
+the WebGPU `queue.submit` boundary under the current runtime design.
+
+Two later queue-replay probes were also rejected before retention. An untimed
+recorded-replay command-buffer submit batch deferred Vulkan submits to the flush
+boundary, but strict smoke did not produce a usable report. A repeated-dispatch
+command-buffer reuse probe passed local build and unit tests, but Doe-only
+browser smoke did not produce a usable report. Both patches were reverted; do
+not treat either idea as promoted without new smoke evidence.
+
+## 2026-07-04 — Browser prepared-dispatch replay cache retained, single-submit dispatch still blocks
+
+The Vulkan browser queue-submit replay path now keeps a submit-local prepared
+dispatch state and reuses it only for adjacent recorded dispatch commands with
+the same compute pipeline and exactly matching recorded Vulkan binding state.
+This preserves the submitted WebGPU command stream, dispatch count, barriers,
+and command order while avoiding redundant Vulkan pipeline/binding preparation
+inside multi-dispatch compute passes.
+
+Current focused evidence for the rebuilt runtime is
+`browser/chromium/artifacts/current-prepared-dispatch-cache-fix/dawn-vs-doe.browser.layered-compute.prepared-dispatch-cache.refresh.releasefast.json`
+with score sidecar
+`browser/chromium/artifacts/current-prepared-dispatch-cache-fix/dawn-vs-doe.browser.layered-compute.prepared-dispatch-cache.refresh.releasefast.score.json`.
+The report validates with the browser benchmark superset checker and remains
+diagnostic: Doe improves selected multi-dispatch rows but is still behind Dawn
+for the focused compute category under the same strict Fawn binary.
+
+The companion strict smoke artifact is
+`browser/chromium/artifacts/current-prepared-dispatch-cache-fix/dawn-vs-doe.browser.playwright-smoke.prepared-dispatch-cache.releasefast.json`.
+It keeps timestamp-query and `importExternalTexture` smoke correctness green,
+while the dispatch smoke still shows the single-submit compute path as the
+active browser blocker.
+
+Cross-`queue.submit` Vulkan driver-submit batching was not promoted in this
+entry. It could reduce single-submit overhead, but it also requires an explicit
+resource-lifetime contract so command buffers cannot reference buffers,
+pipelines, query sets, or textures destroyed after WebGPU `queue.submit` and
+before `onSubmittedWorkDone`.
+
+A Vulkan-only no-binding command-recording fast path was also rejected after
+`browser/chromium/artifacts/current-no-binding-recording-fastpath-fix/dawn-vs-doe.browser.layered-compute.no-binding-recording-fastpath.releasefast.score.json`
+regressed the focused current-binary browser score. The code was reverted; the
+artifact remains negative evidence for the single-submit dispatch blocker.
+
+## 2026-07-04 — Browser replay fastpath retained, direct submit remains the compute blocker
+
+The Vulkan recorded-submit replay path now reuses the active replay command
+buffer when a prepared direct dispatch records more work into the same
+queue-submit replay. This removes repeated streaming-copy flush and submission
+state checks inside an already-active recorded replay while preserving the
+existing per-dispatch transfer/compute visibility barriers and command order.
+
+Current default-policy focused evidence for the rebuilt runtime is
+`browser/chromium/artifacts/current-replay-fastpath-refresh/dawn-vs-doe.browser.layered-compute.replay-fastpath.refresh.releasefast.json`
+with score sidecar
+`browser/chromium/artifacts/current-replay-fastpath-refresh/dawn-vs-doe.browser.layered-compute.replay-fastpath.refresh.releasefast.score.json`.
+The report validates with the browser benchmark superset checker and remains
+diagnostic: the compute category is still behind Dawn under the same strict Fawn
+binary. Direct-dispatch submit-heavy rows and selected source-kernel rows remain
+active blockers.
+
+Current strict smoke correctness evidence for the same rebuilt runtime is
+`browser/chromium/artifacts/current-replay-fastpath-refresh/dawn-vs-doe.browser.playwright-smoke.replay-fastpath.refresh.releasefast.json`.
+It keeps the timestamp-query and `importExternalTexture` browser smoke blockers
+closed while preserving the existing upload-win and dispatch-loss shape.
+
+Earlier retained evidence for the replay fastpath is
+`browser/chromium/artifacts/current-replay-fastpath-retained/dawn-vs-doe.browser.layered-compute.replay-fastpath-retained.releasefast.json`
+with score sidecar
+`browser/chromium/artifacts/current-replay-fastpath-retained/dawn-vs-doe.browser.layered-compute.replay-fastpath-retained.releasefast.score.json`.
+
+Follow-on probes were rejected rather than promoted. A submit-local
+prepared-dispatch cache was removed after
+`browser/chromium/artifacts/current-submit-prepare-cache-fix/dawn-vs-doe.browser.layered-compute.submit-prepare-cache.releasefast.score.json`
+showed mixed row movement and a worse focused score. A no-binding static
+pipeline-hash shortcut was also removed after
+`browser/chromium/artifacts/current-no-binding-static-hash-fix/dawn-vs-doe.browser.layered-compute.no-binding-static-hash.releasefast.score.json`
+failed to improve the focused browser evidence. Deferred command-buffer
+batch-growth probes were reverted after
+`browser/chromium/artifacts/current-command-buffer-batch-fix/dawn-vs-doe.browser.layered-compute.command-buffer-batch.releasefast.score.json`,
+`browser/chromium/artifacts/current-command-buffer-batch-refresh/dawn-vs-doe.browser.layered-compute.command-buffer-batch.refresh.releasefast.score.json`,
+and
+`browser/chromium/artifacts/current-command-buffer-batch-256-fix/dawn-vs-doe.browser.layered-compute.command-buffer-batch-256.releasefast.score.json`
+failed to produce stable current-binary improvement. A repeated-dispatch replay
+loop probe was reverted after
+`browser/chromium/artifacts/current-repeated-dispatch-replay-refresh/dawn-vs-doe.browser.layered-compute.repeated-dispatch-replay.refresh.releasefast.score.json`
+failed the same current-binary check. The existing
+`vulkan_doe_compute_only_fence_diagnostic` policy was also run as a diagnostic
+at
+`browser/chromium/artifacts/current-fence-policy-diagnostic/dawn-vs-doe.browser.layered-compute.compute-only-fence-diagnostic.releasefast.score.json`;
+that path likewise does not justify changing the release lane policy.
+
+## 2026-07-04 — Browser compute projections now measure command-shaped dispatch
+
+The generated browser projection manifest now detects compute workloads whose
+source command artifact is made of direct dispatch commands or indirect dispatch
+commands. It emits `generic_direct_dispatch_component` workloads with
+`directDispatchArgs` and `generic_indirect_dispatch_component` workloads with
+`indirectDispatchArgs`, both hash-linked to the source command artifact. The
+Playwright layered runner accepts the new direct and indirect scenario templates
+and records command-shaped dispatch metrics, including dispatch kind, argument
+shape, submit count, dispatch count, and command hash.
+
+The browser benchmark superset checker now validates direct and indirect command
+hashes and runtime metrics, including paired-balanced aggregation. The generated
+manifest schema also records the argument contracts, and the browser benchmark
+README names the fields so the projection is inspectable.
+
+Current focused evidence is
+`browser/chromium/artifacts/current-direct-indirect-projection-fix/dawn-vs-doe.browser.layered-compute.direct-indirect-projection.releasefast.json`
+with score sidecar
+`browser/chromium/artifacts/current-direct-indirect-projection-fix/dawn-vs-doe.browser.layered-compute.direct-indirect-projection.releasefast.score.json`.
+The run is still diagnostic. It improves command-shape evidence for direct and
+indirect dispatch, but the compute category remains blocked by direct-dispatch
+and workgroup-memory losses under the same-browser matched runtime path.
+
+Follow-up: shard `browser/chromium/scripts/check-browser-benchmark-superset.py`
+by extracting projection-manifest parsing and runtime-evidence validators; owner
+runtime-bench.
+
+## 2026-07-04 — Vulkan compute indirect now replays the real indirect buffer
+
+The Doe Vulkan drop-in compute path now records `dispatchWorkgroupsIndirect`
+against the caller's Vulkan buffer instead of reading the dispatch dimensions on
+the host and copying them into a Doe-owned indirect-args buffer. Vulkan compute
+buffers now carry indirect-buffer usage, and the replay path emits transfer and
+compute visibility barriers for indirect-command reads.
+
+Focused browser evidence is in
+`browser/chromium/artifacts/current-indirect-dispatch-fix/doe.compute-dispatch-indirect.probe.releasefast.json`.
+The strict Doe and Dawn smoke artifacts for the same ReleaseFast runtime rebuild
+are
+`browser/chromium/artifacts/current-indirect-dispatch-fix/dawn-vs-doe.browser.playwright-smoke.doe.indirect-fix.releasefast.json`
+and
+`browser/chromium/artifacts/current-indirect-dispatch-fix/dawn-vs-doe.browser.playwright-smoke.dawn.indirect-fix.releasefast.json`.
+
+The paired browser compute score remains diagnostic and behind Dawn; see
+`browser/chromium/artifacts/current-indirect-dispatch-fix/dawn-vs-doe.browser.layered-compute.indirect-fix.releasefast.score.json`.
+That earlier projection still used the generic empty direct-dispatch browser
+component for indirect source workloads. The command-shaped projection entry
+above supersedes that limitation. The active performance blocker remains browser
+direct-dispatch submit overhead under matched timing scope.
+
+## 2026-07-04 — Browser external texture smoke passes in strict Fawn
+
+The Doe browser path now routes Chromium shared-image mailbox textures through
+the Skia upload fallback when the selected WebGPU runtime is Doe's external
+`BackendType::WebGPU` path. This avoids attempting a Dawn-native shared-image
+import for a Doe external-runtime texture while still sampling the real
+shared-image pixels through a normal Doe texture.
+
+The rebuilt strict Fawn binary at `browser/chromium/src/out/fawn_release/chrome`
+has SHA256
+`42355e5944508d58a1a121fbfc088d190e7a7e8ea1ca85e4c2453b0c1867c3dd`. Current
+focused evidence is
+`browser/chromium/artifacts/current-external-texture-fix/dawn-vs-doe.browser.playwright-smoke.doe.external-texture-v2.json`;
+the same binary also has the Dawn-mode companion artifact at
+`browser/chromium/artifacts/current-external-texture-fix/dawn-vs-doe.browser.playwright-smoke.dawn.external-texture-v2.json`.
+
+The strict smoke correctness blockers for timestamp query output and
+`importExternalTexture` are no longer active in those artifacts. Browser release
+readiness remains blocked on public release-candidate packaging and on the
+mixed Dawn-vs-Doe performance evidence, especially compute-dispatch rows.
+
+## 2026-07-04 — Browser timestamp smoke now rejects and fixes zero readback
+
+The Playwright browser smoke now fails timestamp queries that resolve to all
+zero values instead of accepting monotonic `[0, 0]` output. The timestamp probe
+also records a tiny compute dispatch inside the timestamped pass, so the check
+observes query writes around real GPU work.
+
+The Doe Vulkan drop-in path now routes `wgpuDeviceCreateQuerySet` through the
+descriptor ABI wrapper, records compute-pass `timestampWrites`, replays Vulkan
+query writes/resolves in queue-submit order, and drains Vulkan map-read
+readbacks before exposing mapped data. Current focused evidence is
+`browser/chromium/artifacts/current-timestamp-fix/dawn-vs-doe.browser.playwright-smoke.doe.timestamp-fix-v11.json`.
+
+That artifact shows the timestamp smoke producing non-zero values. Strict
+`chrome` smoke remains blocked by `importExternalTexture`; the previous
+zero-timestamp blocker is no longer the active failure.
+
 ## 2026-07-03 — Browser package inputs record release build profile
 
 Browser package-input preflights now emit a `buildProfile` section when an

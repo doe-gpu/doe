@@ -25,11 +25,24 @@ VALID_SELECTED_RUNTIMES = {"dawn", "doe"}
 VALID_MODE_SCHEDULES = {"grouped", "paired", "paired-balanced"}
 VALID_POWER_PREFERENCES = {"default", "high-performance", "low-power"}
 VALID_SOURCE_KERNEL_SUBMIT_POLICIES = {"iteration-batch-v1", "sample-batch-v1"}
-PROJECTION_MANIFEST_SCHEMA_VERSION = 4
+PROJECTION_MANIFEST_SCHEMA_VERSION = 5
+COMPUTE_PROJECTION_DIRECT_DISPATCH = "generic_direct_dispatch_component"
+COMPUTE_PROJECTION_EMPTY_DISPATCH = "generic_empty_dispatch_component"
+COMPUTE_PROJECTION_INDIRECT_DISPATCH = "generic_indirect_dispatch_component"
+COMPUTE_PROJECTION_SOURCE_KERNEL = "source_kernel_dispatch_v1"
+VALID_COMPUTE_PROJECTIONS = {
+    COMPUTE_PROJECTION_DIRECT_DISPATCH,
+    COMPUTE_PROJECTION_EMPTY_DISPATCH,
+    COMPUTE_PROJECTION_INDIRECT_DISPATCH,
+    COMPUTE_PROJECTION_SOURCE_KERNEL,
+}
 SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1"
 SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1"
 SOURCE_KERNEL_STORAGE_BUFFER_USAGE = ["STORAGE", "COPY_DST", "COPY_SRC"]
 SOURCE_KERNEL_READBACK_SAMPLE_BYTES = 16
+UINT32_BYTES = 4
+INDIRECT_DISPATCH_ARGUMENT_WORDS = 3
+INDIRECT_DISPATCH_ARGUMENT_BYTES = INDIRECT_DISPATCH_ARGUMENT_WORDS * UINT32_BYTES
 VALID_RUNTIME_STATUS_CODES = {
     "ok": {"ok"},
     "fail": {"browser_launch_failed", "mode_setup_failed", "mode_execution_failed", "scenario_runtime_error"},
@@ -338,15 +351,38 @@ def parse_projection_manifest(manifest_payload: dict[str, Any]) -> dict[str, Any
             if row["claimScope"] != "l0_only_no_claim":
                 raise ValueError(f"{source_workload_id} non_projectable must use l0_only_no_claim")
 
-        if row["comparabilityExpectation"] == "strict" and row["claimScope"] != "l1_strict_candidate":
-            raise ValueError(f"{source_workload_id} strict comparability requires l1_strict_candidate")
-        if row["comparabilityExpectation"] == "strict" and not browser_workload_strict_comparable(row["browserWorkload"]):
+        if (
+            row["comparabilityExpectation"] == "strict"
+            and row["claimScope"] != "l1_strict_candidate"
+        ):
+            raise ValueError(
+                f"{source_workload_id} strict comparability requires "
+                "l1_strict_candidate"
+            )
+        if (
+            row["comparabilityExpectation"] == "strict"
+            and not browser_workload_strict_comparable(row["browserWorkload"])
+        ):
             raise ValueError(
                 f"{source_workload_id} strict comparability requires "
                 "sourceComparable=true, sourceClaimEligible=true, and benchmarkClass=comparable"
             )
-        if row["comparabilityExpectation"] == "component" and row["claimScope"] != "l1_component_only":
-            raise ValueError(f"{source_workload_id} component comparability requires l1_component_only")
+        if (
+            row["comparabilityExpectation"] == "component"
+            and row["claimScope"] != "l1_component_only"
+        ):
+            raise ValueError(
+                f"{source_workload_id} component comparability requires "
+                "l1_component_only"
+            )
+        if (
+            row["comparabilityExpectation"] != "strict"
+            and row["browserWorkload"].get("benchmarkClass") == "comparable"
+        ):
+            raise ValueError(
+                f"{source_workload_id} non-strict browser projection must not "
+                "use benchmarkClass=comparable"
+            )
         if row["comparabilityExpectation"] == "none" and row["claimScope"] != "l0_only_no_claim":
             raise ValueError(f"{source_workload_id} none comparability requires l0_only_no_claim")
 
@@ -382,12 +418,39 @@ def parse_browser_workload(value: Any, label: str, domain: Any) -> dict[str, Any
     compute_projection = value.get("computeProjection")
     if isinstance(compute_projection, str) and compute_projection.strip():
         parsed["computeProjection"] = compute_projection
-    if domain == "compute" and parsed.get("computeProjection") not in {
-        "generic_empty_dispatch_component",
-        "source_kernel_dispatch_v1",
-    }:
+    if domain == "compute" and parsed.get("computeProjection") not in VALID_COMPUTE_PROJECTIONS:
         raise ValueError(f"{label}.computeProjection is required for compute rows")
-    if parsed.get("computeProjection") == "source_kernel_dispatch_v1":
+    if parsed.get("computeProjection") == COMPUTE_PROJECTION_DIRECT_DISPATCH:
+        parsed["commandsPath"] = require_string(
+            value.get("commandsPath"),
+            f"{label}.commandsPath",
+        )
+        if not safe_repo_path(parsed["commandsPath"]):
+            raise ValueError(f"{label}.commandsPath must be repo-relative")
+        parsed["commandsSha256"] = require_hash_hex(
+            value.get("commandsSha256"),
+            f"{label}.commandsSha256",
+        )
+        parsed["directDispatchArgs"] = parse_dispatch_args(
+            value.get("directDispatchArgs"),
+            f"{label}.directDispatchArgs",
+        )
+    if parsed.get("computeProjection") == COMPUTE_PROJECTION_INDIRECT_DISPATCH:
+        parsed["commandsPath"] = require_string(
+            value.get("commandsPath"),
+            f"{label}.commandsPath",
+        )
+        if not safe_repo_path(parsed["commandsPath"]):
+            raise ValueError(f"{label}.commandsPath must be repo-relative")
+        parsed["commandsSha256"] = require_hash_hex(
+            value.get("commandsSha256"),
+            f"{label}.commandsSha256",
+        )
+        parsed["indirectDispatchArgs"] = parse_dispatch_args(
+            value.get("indirectDispatchArgs"),
+            f"{label}.indirectDispatchArgs",
+        )
+    if parsed.get("computeProjection") == COMPUTE_PROJECTION_SOURCE_KERNEL:
         parsed["bindGroupLayoutMode"] = require_string(
             value.get("bindGroupLayoutMode"),
             f"{label}.bindGroupLayoutMode",
@@ -463,6 +526,23 @@ def require_positive_int(value: Any, label: str, *, allow_zero: bool = False) ->
             raise ValueError(f"{label} must be a non-negative integer")
         raise ValueError(f"{label} must be a positive integer")
     return value
+
+
+def parse_dispatch_args(value: Any, label: str) -> list[dict[str, int]]:
+    if not isinstance(value, list) or not value:
+        raise ValueError(f"{label} must be a non-empty array")
+    args_list: list[dict[str, int]] = []
+    for index, raw in enumerate(value):
+        if not isinstance(raw, dict):
+            raise ValueError(f"{label}[{index}] must be an object")
+        args_list.append(
+            {
+                "x": require_positive_int(raw.get("x"), f"{label}[{index}].x"),
+                "y": require_positive_int(raw.get("y"), f"{label}[{index}].y"),
+                "z": require_positive_int(raw.get("z"), f"{label}[{index}].z"),
+            }
+        )
+    return args_list
 
 
 def parse_storage_bindings(value: Any, label: str) -> list[dict[str, Any]]:
@@ -811,7 +891,7 @@ def check_source_kernel_hash_sync(manifest_rows: list[dict[str, Any]]) -> list[s
         browser_workload = row.get("browserWorkload")
         if not isinstance(browser_workload, dict):
             continue
-        if browser_workload.get("computeProjection") != "source_kernel_dispatch_v1":
+        if browser_workload.get("computeProjection") != COMPUTE_PROJECTION_SOURCE_KERNEL:
             continue
         workload_id = row["sourceWorkloadId"]
         for path_key, hash_key in (
@@ -832,6 +912,35 @@ def check_source_kernel_hash_sync(manifest_rows: list[dict[str, Any]]) -> list[s
                     f"{workload_id}: {hash_key} mismatch: "
                     f"manifest={browser_workload[hash_key]} current={current_hash}"
                 )
+    return errors
+
+
+def check_component_command_hash_sync(manifest_rows: list[dict[str, Any]]) -> list[str]:
+    errors: list[str] = []
+    for row in manifest_rows:
+        browser_workload = row.get("browserWorkload")
+        if not isinstance(browser_workload, dict):
+            continue
+        if browser_workload.get("computeProjection") not in {
+            COMPUTE_PROJECTION_DIRECT_DISPATCH,
+            COMPUTE_PROJECTION_INDIRECT_DISPATCH,
+        }:
+            continue
+        workload_id = row["sourceWorkloadId"]
+        path_text = browser_workload["commandsPath"]
+        if not safe_repo_path(path_text):
+            errors.append(f"{workload_id}: commandsPath must be repo-relative: {path_text}")
+            continue
+        path = resolve_repo_path(path_text)
+        if not path.exists():
+            errors.append(f"{workload_id}: commandsPath not found: {path_text}")
+            continue
+        current_hash = file_sha256(path)
+        if current_hash != browser_workload["commandsSha256"]:
+            errors.append(
+                f"{workload_id}: commandsSha256 mismatch: "
+                f"manifest={browser_workload['commandsSha256']} current={current_hash}"
+            )
     return errors
 
 
@@ -873,6 +982,22 @@ def is_positive_number(value: Any) -> bool:
 
 def is_nonnegative_number(value: Any) -> bool:
     return isinstance(value, int | float) and value >= 0
+
+
+def check_component_dispatch_timing_metrics(
+    metrics: dict[str, Any],
+    row_label: str,
+    mode: str,
+) -> list[str]:
+    errors: list[str] = []
+    for metric_key in ("dispatchElapsedMs", "encodeSubmitMs", "usPerOp"):
+        if not is_positive_number(metrics.get(metric_key)):
+            errors.append(
+                f"{row_label}: metrics.{metric_key} must be positive for mode '{mode}'"
+            )
+    if not is_nonnegative_number(metrics.get("waitMs")):
+        errors.append(f"{row_label}: metrics.waitMs must be non-negative for mode '{mode}'")
+    return errors
 
 
 def is_nonnegative_int(value: Any) -> bool:
@@ -995,7 +1120,7 @@ def check_source_kernel_runtime_evidence(
     browser_workload = manifest_row.get("browserWorkload")
     if not isinstance(browser_workload, dict):
         return []
-    if browser_workload.get("computeProjection") != "source_kernel_dispatch_v1":
+    if browser_workload.get("computeProjection") != COMPUTE_PROJECTION_SOURCE_KERNEL:
         return []
     if mode_result.get("status") != "ok":
         return []
@@ -1124,6 +1249,18 @@ def check_source_kernel_runtime_evidence(
         "dispatchElapsedMsP50",
         "dispatchElapsedMsP95",
         "dispatchElapsedMsP99",
+        "encodeSubmitMs",
+        "encodeSubmitMsAvg",
+        "encodeSubmitMsP10",
+        "encodeSubmitMsP50",
+        "encodeSubmitMsP95",
+        "encodeSubmitMsP99",
+        "waitMs",
+        "waitMsAvg",
+        "waitMsP10",
+        "waitMsP50",
+        "waitMsP95",
+        "waitMsP99",
         "usPerOp",
         "usPerOpAvg",
         "usPerOpP10",
@@ -1133,7 +1270,12 @@ def check_source_kernel_runtime_evidence(
     ):
         if not is_positive_number(metrics.get(metric_key)):
             errors.append(f"{row_label}: metrics.{metric_key} must be positive for mode '{mode}'")
-    for metric_key in ("dispatchElapsedMsSamples", "usPerOpSamples"):
+    for metric_key in (
+        "dispatchElapsedMsSamples",
+        "encodeSubmitMsSamples",
+        "waitMsSamples",
+        "usPerOpSamples",
+    ):
         samples = metrics.get(metric_key)
         if not isinstance(samples, list) or len(samples) != source_kernel_sample_count:
             errors.append(
@@ -1152,6 +1294,24 @@ def check_source_kernel_runtime_evidence(
             mode,
             "dispatchElapsedMsSamples",
             "dispatchElapsedMs",
+        )
+    )
+    errors.extend(
+        check_sample_summary_consistency(
+            metrics,
+            row_label,
+            mode,
+            "encodeSubmitMsSamples",
+            "encodeSubmitMs",
+        )
+    )
+    errors.extend(
+        check_sample_summary_consistency(
+            metrics,
+            row_label,
+            mode,
+            "waitMsSamples",
+            "waitMs",
         )
     )
     errors.extend(
@@ -1246,6 +1406,155 @@ def check_source_kernel_runtime_evidence(
                 errors.append(
                     f"{row_label}: metrics.readbackSampleBytes[{index}] must be a byte for mode '{mode}'"
                 )
+
+    return errors
+
+
+def check_indirect_runtime_evidence(
+    mode_result: dict[str, Any],
+    manifest_row: dict[str, Any],
+    row_label: str,
+    mode: str,
+) -> list[str]:
+    browser_workload = manifest_row.get("browserWorkload")
+    if not isinstance(browser_workload, dict):
+        return []
+    if (
+        browser_workload.get("computeProjection")
+        != COMPUTE_PROJECTION_INDIRECT_DISPATCH
+    ):
+        return []
+    if mode_result.get("status") != "ok":
+        return []
+
+    errors: list[str] = []
+    metrics = mode_result.get("metrics")
+    if not isinstance(metrics, dict):
+        return [f"{row_label}: metrics missing for indirect dispatch mode '{mode}'"]
+
+    if metrics.get("computeProjection") != COMPUTE_PROJECTION_INDIRECT_DISPATCH:
+        errors.append(f"{row_label}: metrics.computeProjection drift for mode '{mode}'")
+    if metrics.get("dispatchKind") != "indirect":
+        errors.append(f"{row_label}: metrics.dispatchKind must be indirect for mode '{mode}'")
+    if metrics.get("commandsPath") != browser_workload.get("commandsPath"):
+        errors.append(f"{row_label}: metrics.commandsPath drift for mode '{mode}'")
+    if metrics.get("commandsSha256") != browser_workload.get("commandsSha256"):
+        errors.append(f"{row_label}: metrics.commandsSha256 drift for mode '{mode}'")
+
+    indirect_args = browser_workload.get("indirectDispatchArgs")
+    if not isinstance(indirect_args, list) or not indirect_args:
+        errors.append(f"{row_label}: manifest indirectDispatchArgs missing")
+        return errors
+    if metrics.get("indirectDispatchArgs") != indirect_args:
+        errors.append(f"{row_label}: metrics.indirectDispatchArgs drift for mode '{mode}'")
+    if metrics.get("indirectDispatchArgBufferBytes") != (
+        len(indirect_args) * INDIRECT_DISPATCH_ARGUMENT_BYTES
+    ):
+        errors.append(
+            f"{row_label}: metrics.indirectDispatchArgBufferBytes drift for mode '{mode}'"
+        )
+
+    iterations = metrics.get("iterations")
+    if not isinstance(iterations, int) or iterations <= 0:
+        errors.append(f"{row_label}: metrics.iterations must be positive for mode '{mode}'")
+        return errors
+
+    order_balanced_sample_count = metrics.get("orderBalancedSampleCount")
+    if (
+        not isinstance(order_balanced_sample_count, int)
+        or order_balanced_sample_count <= 0
+    ):
+        order_balanced_sample_count = 1
+    dispatches_per_submit = len(indirect_args)
+    if metrics.get("dispatchesPerSubmit") != dispatches_per_submit:
+        errors.append(f"{row_label}: metrics.dispatchesPerSubmit drift for mode '{mode}'")
+    expected_total_submits = iterations * order_balanced_sample_count
+    if metrics.get("totalSubmits") != expected_total_submits:
+        errors.append(f"{row_label}: metrics.totalSubmits drift for mode '{mode}'")
+    expected_total_dispatches = expected_total_submits * dispatches_per_submit
+    if metrics.get("totalDispatches") != expected_total_dispatches:
+        errors.append(f"{row_label}: metrics.totalDispatches drift for mode '{mode}'")
+    errors.extend(check_component_dispatch_timing_metrics(metrics, row_label, mode))
+
+    warmup_submit_count = metrics.get("warmupSubmitCount")
+    if not isinstance(warmup_submit_count, int) or warmup_submit_count < 0:
+        errors.append(
+            f"{row_label}: metrics.warmupSubmitCount must be non-negative for mode '{mode}'"
+        )
+    elif metrics.get("totalWarmupDispatches") != (
+        warmup_submit_count * dispatches_per_submit * order_balanced_sample_count
+    ):
+        errors.append(f"{row_label}: metrics.totalWarmupDispatches drift for mode '{mode}'")
+
+    return errors
+
+
+def check_direct_runtime_evidence(
+    mode_result: dict[str, Any],
+    manifest_row: dict[str, Any],
+    row_label: str,
+    mode: str,
+) -> list[str]:
+    browser_workload = manifest_row.get("browserWorkload")
+    if not isinstance(browser_workload, dict):
+        return []
+    if browser_workload.get("computeProjection") != COMPUTE_PROJECTION_DIRECT_DISPATCH:
+        return []
+    if mode_result.get("status") != "ok":
+        return []
+
+    errors: list[str] = []
+    metrics = mode_result.get("metrics")
+    if not isinstance(metrics, dict):
+        return [f"{row_label}: metrics missing for direct dispatch mode '{mode}'"]
+
+    if metrics.get("computeProjection") != COMPUTE_PROJECTION_DIRECT_DISPATCH:
+        errors.append(f"{row_label}: metrics.computeProjection drift for mode '{mode}'")
+    if metrics.get("dispatchKind") != "direct":
+        errors.append(f"{row_label}: metrics.dispatchKind must be direct for mode '{mode}'")
+    if metrics.get("commandsPath") != browser_workload.get("commandsPath"):
+        errors.append(f"{row_label}: metrics.commandsPath drift for mode '{mode}'")
+    if metrics.get("commandsSha256") != browser_workload.get("commandsSha256"):
+        errors.append(f"{row_label}: metrics.commandsSha256 drift for mode '{mode}'")
+
+    direct_args = browser_workload.get("directDispatchArgs")
+    if not isinstance(direct_args, list) or not direct_args:
+        errors.append(f"{row_label}: manifest directDispatchArgs missing")
+        return errors
+    if metrics.get("directDispatchArgs") != direct_args:
+        errors.append(f"{row_label}: metrics.directDispatchArgs drift for mode '{mode}'")
+
+    iterations = metrics.get("iterations")
+    if not isinstance(iterations, int) or iterations <= 0:
+        errors.append(f"{row_label}: metrics.iterations must be positive for mode '{mode}'")
+        return errors
+
+    order_balanced_sample_count = metrics.get("orderBalancedSampleCount")
+    if (
+        not isinstance(order_balanced_sample_count, int)
+        or order_balanced_sample_count <= 0
+    ):
+        order_balanced_sample_count = 1
+    dispatches_per_submit = len(direct_args)
+    if metrics.get("dispatchesPerSubmit") != dispatches_per_submit:
+        errors.append(f"{row_label}: metrics.dispatchesPerSubmit drift for mode '{mode}'")
+    expected_total_submits = iterations * order_balanced_sample_count
+    if metrics.get("totalSubmits") != expected_total_submits:
+        errors.append(f"{row_label}: metrics.totalSubmits drift for mode '{mode}'")
+    expected_total_dispatches = expected_total_submits * dispatches_per_submit
+    if metrics.get("totalDispatches") != expected_total_dispatches:
+        errors.append(f"{row_label}: metrics.totalDispatches drift for mode '{mode}'")
+    errors.extend(check_component_dispatch_timing_metrics(metrics, row_label, mode))
+
+    warmup_submit_count = metrics.get("warmupSubmitCount")
+    if not isinstance(warmup_submit_count, int) or warmup_submit_count < 0:
+        errors.append(
+            f"{row_label}: metrics.warmupSubmitCount must be non-negative for mode '{mode}'"
+        )
+    elif metrics.get("totalWarmupDispatches") != (
+        warmup_submit_count * dispatches_per_submit * order_balanced_sample_count
+    ):
+        errors.append(f"{row_label}: metrics.totalWarmupDispatches drift for mode '{mode}'")
 
     return errors
 
@@ -1740,6 +2049,22 @@ def check_report_coverage(
                         mode,
                     )
                 )
+                errors.extend(
+                    check_direct_runtime_evidence(
+                        mode_result,
+                        manifest_row,
+                        f"L1:{workload_id}",
+                        mode,
+                    )
+                )
+                errors.extend(
+                    check_indirect_runtime_evidence(
+                        mode_result,
+                        manifest_row,
+                        f"L1:{workload_id}",
+                        mode,
+                    )
+                )
 
     required_workflow_ids = [
         row["id"]
@@ -1856,6 +2181,7 @@ def main() -> int:
     errors.extend(check_projection_completeness(workload_rows, manifest["rows"]))
     errors.extend(check_projection_hash_sync(manifest, workloads_path))
     errors.extend(check_source_kernel_hash_sync(manifest["rows"]))
+    errors.extend(check_component_command_hash_sync(manifest["rows"]))
 
     required_modes = parse_required_modes(args.require_modes)
     if args.report:

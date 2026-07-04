@@ -23,7 +23,7 @@ Status front door for Doe. Live topical shards live under
 | TSIR lowering | [`docs/status/tsir.md`](status/tsir.md), [`docs/tsir-lowering-plan.md`](tsir-lowering-plan.md), [`docs/loop-protocol.md`](loop-protocol.md) | `reports/parity/` and manifest `integrityExtensions.lowerings[]` entries |
 | Compiler and WebGPU runtime | [`docs/status/compiler-and-webgpu.md`](status/compiler-and-webgpu.md), [`docs/shader-compiler-architecture.md`](shader-compiler-architecture.md) | `zig build test-wgsl`, backend receipts, and schema-registered artifacts |
 | Chromium WebGPU task list | [`docs/chromium-webgpu-task-list.md`](chromium-webgpu-task-list.md), [`docs/browser-lane.md`](browser-lane.md), [`browser/chromium/README.md`](../browser/chromium/README.md) | browser-lane milestone manifests, Playwright diagnostics, and browser compare artifacts |
-| Runtime backends and benchmark lanes | [`docs/status/runtime-backends-and-bench.md`](status/runtime-backends-and-bench.md), [`docs/performance-strategy.md`](performance-strategy.md), [`docs/benchmark-taxonomy.md`](benchmark-taxonomy.md) | `bench/out/**/{*.json,*.claim.json}` |
+| Runtime backends and benchmark lanes | [`docs/status/runtime-backends-and-bench.md`](status/runtime-backends-and-bench.md), [`docs/performance-strategy.md`](performance-strategy.md), [`docs/benchmark-taxonomy.md`](benchmark-taxonomy.md) | `bench/out/**/{*.json,*.claim.json}` and `browser/chromium/artifacts/**/*.json` |
 | Claim and release discipline | [`docs/process.md`](process.md), [`docs/claim-discipline.md`](claim-discipline.md), [`docs/upgrade-policy.md`](upgrade-policy.md) | `config/*.json`, `config/*schema*.json`, and gate outputs |
 
 Per-model Cerebras evidence checklists live at

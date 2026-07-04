@@ -361,7 +361,7 @@ pub fn dispatchBatchCopyFlush(
         if (collect_timings) timings.command_replay_prepare_ns += monotonicNowNs() - prepare_started_ns;
         const record_started_ns = if (collect_timings) monotonicNowNs() else 0;
         if (replay_command_buffer == null) {
-            replay_command_buffer = rt.begin_prepared_dispatch_replay_batch() catch |err| {
+            replay_command_buffer = rt.begin_prepared_dispatch_replay() catch |err| {
                 std.log.err("doe_compute_fast_vulkan: begin prepared replay batch failed: {s}", .{@errorName(err)});
                 if (collect_timings) timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
                 continue;

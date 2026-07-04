@@ -11,6 +11,7 @@ const native_types = @import("doe_native_object_types.zig");
 const native_shared = @import("doe_native_shared_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_rt_helpers = @import("doe_native_runtime_helpers.zig");
+const query_native = @import("doe_query_native.zig");
 
 const alloc = native_helpers.alloc;
 const make = native_helpers.make;
@@ -49,10 +50,35 @@ pub export fn doeNativeCommandEncoderRelease(raw: ?*anyopaque) callconv(.c) void
 }
 
 pub export fn doeNativeCommandEncoderBeginComputePass(enc_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUComputePassDescriptor) callconv(.c) ?*anyopaque {
-    _ = desc;
     const enc = cast(DoeCommandEncoder, enc_raw) orelse return null;
     const pass = make(DoeComputePass) orelse return null;
-    pass.* = .{ .enc = enc };
+    var timestamp_end_query_set: ?*anyopaque = null;
+    var timestamp_end_write_index = native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX;
+    if (desc) |d| {
+        if (d.timestampWrites) |timestamp_writes| {
+            if (cast(query_native.DoeQuerySet, timestamp_writes.querySet)) |query_set| {
+                const query_set_raw = toOpaque(query_set);
+                if (timestamp_writes.beginningOfPassWriteIndex != native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX) {
+                    query_native.doeNativeCommandEncoderWriteTimestampWithPosition(
+                        enc_raw,
+                        query_set_raw,
+                        timestamp_writes.beginningOfPassWriteIndex,
+                        .pass_begin,
+                    );
+                }
+                if (timestamp_writes.endOfPassWriteIndex != native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX) {
+                    native_helpers.object_add_ref(query_native.DoeQuerySet, query_set_raw);
+                    timestamp_end_query_set = query_set_raw;
+                    timestamp_end_write_index = timestamp_writes.endOfPassWriteIndex;
+                }
+            }
+        }
+    }
+    pass.* = .{
+        .enc = enc,
+        .timestamp_end_query_set = timestamp_end_query_set,
+        .timestamp_end_write_index = timestamp_end_write_index,
+    };
     return toOpaque(pass);
 }
 

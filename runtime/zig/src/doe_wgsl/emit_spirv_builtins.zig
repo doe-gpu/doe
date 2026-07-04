@@ -580,7 +580,7 @@ fn emit_atomic_call(self: anytype, call: anytype, result_ty: ir.TypeId) !u32 {
     if (call.args.len == 0) return error.InvalidIr;
     const ptr_expr = self.function.expr_args.items[call.args.start];
     const ptr_id = try self.emit_ref_expr(ptr_expr);
-    const memory = try atomic_memory_operands(self, ptr_expr, call.name);
+    const memory = try atomic_memory_operands(self, ptr_expr);
 
     if (std.mem.eql(u8, call.name, "atomicLoad")) {
         return try emit_result_inst(
@@ -784,22 +784,17 @@ fn emit_count_trailing_zeros(self: anytype, call: anytype, result_ty: ir.TypeId)
     return try emit_result_inst(self, spirv.Opcode.Select, result_type, &.{ is_zero, const_32, lsb_id });
 }
 
-fn atomic_memory_operands(self: anytype, ref_expr_id: ir.ExprId, call_name: []const u8) !AtomicMemoryOperands {
+fn atomic_memory_operands(self: anytype, ref_expr_id: ir.ExprId) !AtomicMemoryOperands {
     const storage_class = try self.ref_storage_class(ref_expr_id);
     const scope = switch (storage_class) {
         spirv.StorageClass.Workgroup => spirv.Scope.Workgroup,
         spirv.StorageClass.StorageBuffer => spirv.Scope.Device,
         else => return error.UnsupportedConstruct,
     };
-    const ordering = if (std.mem.eql(u8, call_name, "atomicLoad"))
-        spirv.MemorySemantics.Acquire
-    else if (std.mem.eql(u8, call_name, "atomicStore"))
-        spirv.MemorySemantics.Release
-    else
-        spirv.MemorySemantics.AcquireRelease;
     const semantics = switch (storage_class) {
-        spirv.StorageClass.Workgroup => ordering | spirv.MemorySemantics.WorkgroupMemory,
-        spirv.StorageClass.StorageBuffer => ordering | spirv.MemorySemantics.UniformMemory,
+        spirv.StorageClass.Workgroup,
+        spirv.StorageClass.StorageBuffer,
+        => spirv.MemorySemantics.None,
         else => return error.UnsupportedConstruct,
     };
     return .{

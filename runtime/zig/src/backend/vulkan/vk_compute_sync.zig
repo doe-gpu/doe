@@ -33,6 +33,31 @@ pub fn make_prior_transfer_writes_visible(self: anytype, command_buffer: c.VkCom
     self.has_pending_transfer_writes = false;
 }
 
+pub fn make_prior_transfer_writes_visible_for_indirect_dispatch(self: anytype, command_buffer: c.VkCommandBuffer) void {
+    if (!self.has_pending_transfer_writes) return;
+    const barrier = c.VkMemoryBarrier{
+        .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+        .pNext = null,
+        .srcAccessMask = c.VK_ACCESS_TRANSFER_WRITE_BIT,
+        .dstAccessMask = c.VK_ACCESS_INDIRECT_COMMAND_READ_BIT |
+            c.VK_ACCESS_SHADER_READ_BIT |
+            c.VK_ACCESS_SHADER_WRITE_BIT,
+    };
+    c.vkCmdPipelineBarrier(
+        command_buffer,
+        c.VK_PIPELINE_STAGE_TRANSFER_BIT,
+        c.VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT | c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        0,
+        1,
+        @ptrCast(&barrier),
+        0,
+        null,
+        0,
+        null,
+    );
+    self.has_pending_transfer_writes = false;
+}
+
 pub fn make_prior_transfer_writes_visible_for_transfer_read(self: anytype, command_buffer: c.VkCommandBuffer) void {
     if (!self.has_pending_transfer_writes) return;
     const barrier = c.VkMemoryBarrier{
@@ -130,6 +155,53 @@ pub fn make_prior_compute_writes_visible_for_buffer_copy(
 
     if (src_handle != 0) remove_pending_compute_write_buffer(self, src_handle);
     if (dst_handle != 0 and dst_handle != src_handle) remove_pending_compute_write_buffer(self, dst_handle);
+    self.has_pending_compute_writes = self.pending_compute_write_buffer_count != 0;
+}
+
+pub fn make_prior_compute_writes_visible_for_indirect_read(
+    self: anytype,
+    command_buffer: c.VkCommandBuffer,
+    resource_handle: u64,
+    buffer: c.VkBuffer,
+) void {
+    if (!self.has_pending_compute_writes) return;
+    if (!self.pending_compute_write_tracking_complete or self.pending_compute_write_buffer_count == 0) {
+        const barrier = c.VkMemoryBarrier{
+            .sType = c.VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+            .pNext = null,
+            .srcAccessMask = c.VK_ACCESS_SHADER_WRITE_BIT,
+            .dstAccessMask = c.VK_ACCESS_INDIRECT_COMMAND_READ_BIT,
+        };
+        c.vkCmdPipelineBarrier(
+            command_buffer,
+            c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+            c.VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+            0,
+            1,
+            @ptrCast(&barrier),
+            0,
+            null,
+            0,
+            null,
+        );
+        clear_pending_compute_writes(self);
+        return;
+    }
+    if (!pending_compute_write_buffer_contains(self, resource_handle)) return;
+    var barrier = buffer_memory_barrier(buffer, c.VK_ACCESS_INDIRECT_COMMAND_READ_BIT);
+    c.vkCmdPipelineBarrier(
+        command_buffer,
+        c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        c.VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+        0,
+        0,
+        null,
+        1,
+        @ptrCast(&barrier),
+        0,
+        null,
+    );
+    remove_pending_compute_write_buffer(self, resource_handle);
     self.has_pending_compute_writes = self.pending_compute_write_buffer_count != 0;
 }
 

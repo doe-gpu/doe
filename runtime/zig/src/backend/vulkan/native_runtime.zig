@@ -541,13 +541,6 @@ pub const NativeVulkanRuntime = struct {
 
     pub fn begin_prepared_dispatch_replay(self: *NativeVulkanRuntime) !c.VkCommandBuffer {
         if (!self.recorded_submit_replay_active) return error.InvalidState;
-        try vk_upload.flush_streaming_copy_before_dispatch(self, true, .deferred);
-        try vk_device.ensure_submission_state(self);
-        return vk_command_buffers.begin_recorded_submit_replay(self);
-    }
-
-    pub fn begin_prepared_dispatch_replay_batch(self: *NativeVulkanRuntime) !c.VkCommandBuffer {
-        if (!self.recorded_submit_replay_active) return error.InvalidState;
         if (self.replay_recording_active) return self.replay_command_buffer;
         try vk_upload.flush_streaming_copy_before_dispatch(self, true, .deferred);
         try vk_device.ensure_submission_state(self);

@@ -31,6 +31,7 @@ const MAGIC_RENDER_PASS: u32 = 0xD0E1_0012;
 
 pub const INVALID_COMPUTE_PASS_STATE_GENERATION: u64 = 0;
 pub const INITIAL_COMPUTE_PASS_STATE_GENERATION: u64 = 1;
+pub const UNUSED_PASS_TIMESTAMP_WRITE_INDEX: u32 = std.math.maxInt(u32);
 
 pub const DoeInstance = struct {
     pub const TYPE_MAGIC = MAGIC_INSTANCE;
@@ -239,6 +240,8 @@ pub const DoeComputePass = struct {
     last_dispatch_x: u32 = 0,
     last_dispatch_y: u32 = 0,
     last_dispatch_z: u32 = 0,
+    timestamp_end_query_set: ?*anyopaque = null,
+    timestamp_end_write_index: u32 = UNUSED_PASS_TIMESTAMP_WRITE_INDEX,
 };
 
 pub const DoeCommandBuffer = struct {

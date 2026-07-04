@@ -12,8 +12,10 @@ const has_vulkan = (builtin.os.tag == .linux);
 const resource_ops = @import("backend/dropin_resource_ops.zig");
 const native_types = @import("doe_native_object_types.zig");
 const native_shared = @import("doe_native_shared_types.zig");
+const native_cmds = @import("doe_native_command_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_rt_helpers = @import("doe_native_runtime_helpers.zig");
+const vulkan_lifetime = @import("doe_vulkan_lifetime.zig");
 const bridge = resource_ops.metal_bridge;
 const c = if (has_vulkan) resource_ops.vk_constants else struct {
     // Minimal type stubs so DoeQuerySet struct fields compile on non-Linux.
@@ -44,6 +46,14 @@ pub const DoeQuerySet = struct {
     /// Vulkan: back-reference to NativeVulkanRuntime for command buffer access.
     vk_runtime_ref: ?*anyopaque = null,
 };
+
+fn vulkanTimestampStage(position: native_cmds.TimestampWritePosition) u32 {
+    return switch (position) {
+        .pass_begin => c.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        .pass_end => c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        .command => c.VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+    };
+}
 
 // ============================================================
 // createQuerySet
@@ -91,13 +101,27 @@ pub export fn doeNativeCommandEncoderWriteTimestamp(
     qs_raw: ?*anyopaque,
     query_index: u32,
 ) callconv(.c) void {
+    doeNativeCommandEncoderWriteTimestampWithPosition(enc_raw, qs_raw, query_index, .command);
+}
+
+pub fn doeNativeCommandEncoderWriteTimestampWithPosition(
+    enc_raw: ?*anyopaque,
+    qs_raw: ?*anyopaque,
+    query_index: u32,
+    position: native_cmds.TimestampWritePosition,
+) void {
     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     if (query_index >= qs.count) return;
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
-            vulkan_write_timestamp(qs, query_index);
+            enc.cmds.append(native_helpers.alloc, .{ .write_timestamp = .{
+                .counter_buffer = null,
+                .query_set = qs_raw,
+                .query_index = query_index,
+                .position = position,
+            } }) catch std.debug.panic("doe_query_native: OOM recording vulkan write_timestamp", .{});
             return;
         }
     }
@@ -105,7 +129,9 @@ pub export fn doeNativeCommandEncoderWriteTimestamp(
     // Metal: record for deferred execution at submit.
     enc.cmds.append(native_helpers.alloc, .{ .write_timestamp = .{
         .counter_buffer = qs.counter_sample_buffer,
+        .query_set = qs_raw,
         .query_index = query_index,
+        .position = position,
     } }) catch std.debug.panic("doe_query_native: OOM recording write_timestamp", .{});
 }
 
@@ -134,7 +160,15 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
-            vulkan_resolve_query_set(qs, first_query, query_count, dst, dst_offset);
+            enc.cmds.append(native_helpers.alloc, .{ .resolve_query_set = .{
+                .counter_buffer = null,
+                .query_set = qs_raw,
+                .first_query = first_query,
+                .query_count = query_count,
+                .dst_mtl = null,
+                .dst_buffer = dst_raw,
+                .dst_offset = dst_offset,
+            } }) catch std.debug.panic("doe_query_native: OOM recording vulkan resolve_query_set", .{});
             return;
         }
     }
@@ -142,11 +176,91 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
     // Metal: record for deferred execution at submit.
     enc.cmds.append(native_helpers.alloc, .{ .resolve_query_set = .{
         .counter_buffer = qs.counter_sample_buffer,
+        .query_set = qs_raw,
         .first_query = first_query,
         .query_count = query_count,
         .dst_mtl = dst.mtl,
+        .dst_buffer = dst_raw,
         .dst_offset = dst_offset,
     } }) catch std.debug.panic("doe_query_native: OOM recording resolve_query_set", .{});
+}
+
+pub fn vulkanRecordWriteTimestamp(
+    rt: *native_shared.NativeVulkanRuntime,
+    qs_raw: ?*anyopaque,
+    query_index: u32,
+    position: native_cmds.TimestampWritePosition,
+) !void {
+    const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return error.InvalidArgument;
+    if (qs.backend != .vulkan or query_index >= qs.count) return error.InvalidArgument;
+    const command_buffer = try rt.begin_prepared_dispatch_replay();
+    c.vkCmdResetQueryPool(command_buffer, qs.vk_query_pool, query_index, 1);
+    c.vkCmdWriteTimestamp(command_buffer, vulkanTimestampStage(position), qs.vk_query_pool, query_index);
+}
+
+pub fn vulkanRecordResolveQuerySet(
+    rt: *native_shared.NativeVulkanRuntime,
+    qs_raw: ?*anyopaque,
+    first_query: u32,
+    query_count: u32,
+    dst_raw: ?*anyopaque,
+    dst_offset: u64,
+) !void {
+    const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return error.InvalidArgument;
+    const dst = native_helpers.cast(native_types.DoeBuffer, dst_raw) orelse return error.InvalidArgument;
+    if (qs.backend != .vulkan or dst.error_object) return error.InvalidArgument;
+    if (first_query + query_count > qs.count) return error.InvalidArgument;
+    const dst_vk_buf = vk_buffer_from_doe_buffer(rt, dst) orelse return error.InvalidArgument;
+    const command_buffer = try rt.begin_prepared_dispatch_replay();
+    c.vkCmdCopyQueryPoolResults(
+        command_buffer,
+        qs.vk_query_pool,
+        first_query,
+        query_count,
+        dst_vk_buf,
+        dst_offset,
+        TIMESTAMP_BYTES,
+        c.VK_QUERY_RESULT_64_BIT | c.VK_QUERY_RESULT_WAIT_BIT,
+    );
+    rt.has_pending_transfer_writes = true;
+}
+
+pub fn vulkanCopyQueryResultsToMappedBuffer(
+    rt: *native_shared.NativeVulkanRuntime,
+    qs_raw: ?*anyopaque,
+    first_query: u32,
+    query_count: u32,
+    dst_raw: ?*anyopaque,
+    dst_offset: u64,
+) !void {
+    const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return error.InvalidArgument;
+    const dst = native_helpers.cast(native_types.DoeBuffer, dst_raw) orelse return error.InvalidArgument;
+    if (qs.backend != .vulkan or dst.error_object or rt.device == null or rt.queue == null) return error.InvalidArgument;
+    const query_end = std.math.add(u32, first_query, query_count) catch return error.InvalidArgument;
+    if (query_end > qs.count) return error.InvalidArgument;
+    const dst_compute_buffer = rt.compute_buffers.get(dst.vk_id) orelse return error.InvalidArgument;
+    const mapped = dst_compute_buffer.mapped orelse return;
+    const result_count: usize = @intCast(query_count);
+    const result_bytes = std.math.mul(usize, result_count, TIMESTAMP_BYTES) catch return error.InvalidArgument;
+    const d_off: usize = @intCast(dst_offset);
+    if (d_off + result_bytes > @as(usize, @intCast(dst.size))) return error.InvalidArgument;
+
+    const results = try native_helpers.alloc.alloc(u64, result_count);
+    defer native_helpers.alloc.free(results);
+    @memset(results, 0);
+    try c.check_vk(c.vkQueueWaitIdle(rt.queue));
+    try c.check_vk(c.vkGetQueryPoolResults(
+        rt.device,
+        qs.vk_query_pool,
+        first_query,
+        query_count,
+        result_bytes,
+        results.ptr,
+        TIMESTAMP_BYTES,
+        c.VK_QUERY_RESULT_64_BIT | c.VK_QUERY_RESULT_WAIT_BIT,
+    ));
+    const dst_bytes: [*]u8 = @ptrCast(mapped);
+    @memcpy(dst_bytes[d_off .. d_off + result_bytes], std.mem.sliceAsBytes(results));
 }
 
 // ============================================================
@@ -160,6 +274,7 @@ pub export fn doeNativeQuerySetDestroy(qs_raw: ?*anyopaque) callconv(.c) void {
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
+            vulkan_lifetime.flushBeforeDestroy(qs.vk_runtime_ref);
             if (qs.vk_query_pool != c.VK_NULL_U64) {
                 c.vkDestroyQueryPool(qs.vk_device, qs.vk_query_pool, null);
             }
@@ -225,13 +340,14 @@ fn vulkan_create_query_set(dev: *native_types.DoeDevice, query_type: u32, count:
         .vk_runtime_ref = @ptrCast(rt),
     };
 
-    // Reset all queries so they are in a valid initial state before first use.
-    vk_reset_query_pool(rt, query_pool, 0, count) catch |err| {
-        std.log.err("doe_query_native: initial query pool reset failed: {s}", .{@errorName(err)});
-        c.vkDestroyQueryPool(rt.device, query_pool, null);
-        native_helpers.alloc.destroy(qs);
-        return null;
-    };
+    if (query_type != WGPU_QUERY_TYPE_TIMESTAMP) {
+        vk_reset_query_pool(rt, query_pool, 0, count) catch |err| {
+            std.log.err("doe_query_native: initial query pool reset failed: {s}", .{@errorName(err)});
+            c.vkDestroyQueryPool(rt.device, query_pool, null);
+            native_helpers.alloc.destroy(qs);
+            return null;
+        };
+    }
 
     return native_helpers.toOpaque(qs);
 }

@@ -107,7 +107,11 @@ geomeans. The fair browser-projection summary is `strictComparable`; it must
 only include rows with `comparabilityExpectation=strict` and
 `browserWorkload.sourceComparable=true`,
 `browserWorkload.sourceClaimEligible=true`, and
-`browserWorkload.benchmarkClass=comparable`.
+`browserWorkload.benchmarkClass=comparable`. Projection manifest schema v5
+requires every non-strict browser projection to use
+`browserWorkload.benchmarkClass=directional`; source claim eligibility is
+source-workload provenance and does not make a browser row claimable unless the
+row is strict-comparable.
 Both summaries must carry separate paired scores for baseline and comparison
 modes plus comparison percent delta. The category-balanced summary is the
 browser-bench style headline: each category contributes once, while row-level
@@ -124,6 +128,14 @@ remain diagnostic until order-balanced evidence passes the same structural and
 score gates as the grouped report. Non-grouped schedules must execute
 strict-comparable `L1` rows before component diagnostics so component probes do
 not precondition strict browser evidence.
+
+Layered report schema v4 requires compute component dispatch rows and
+source-kernel compute rows to emit `dispatchElapsedMs`, `encodeSubmitMs`, and
+`waitMs` in each successful runtime metrics object. Source-kernel rows must also
+emit per-sample arrays for those phase fields. The superset checker rejects
+strict source-kernel and command-shaped component reports that omit those
+fields, because dispatch losses must say whether the measured cost is
+encode/submit or wait-side work.
 
 Texture scenario rows must expose `textureMs` when the row can measure the
 texture path separately from scenario startup. The score metric priority prefers

@@ -12,6 +12,7 @@ const native_shared = @import("doe_native_shared_types.zig");
 const native_types = @import("doe_native_object_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const runtime_helpers = @import("doe_native_runtime_helpers.zig");
+const vulkan_lifetime = @import("doe_vulkan_lifetime.zig");
 const d3d12_constants = resource_ops.d3d12_constants;
 const bridge = resource_ops.metal_bridge;
 const vk_resources = if (has_vulkan) resource_ops.vk_resources else struct {};
@@ -197,6 +198,7 @@ pub export fn doeNativeBufferRelease(raw: ?*anyopaque) callconv(.c) void {
         if (comptime has_vulkan) {
             if (b.backend == .vulkan and b.vk_id != 0) {
                 if (b.vk_runtime_ref) |rt_ptr| {
+                    vulkan_lifetime.flushBeforeDestroy(rt_ptr);
                     const rt: *NativeVulkanRuntime = @ptrCast(@alignCast(rt_ptr));
                     if (rt.compute_buffers.fetchRemove(b.vk_id)) |entry| {
                         vk_resources.release_compute_buffer(rt, entry.value);
@@ -269,6 +271,17 @@ pub export fn doeNativeBufferMapAsync(buf_raw: ?*anyopaque, mode: u64, offset: u
         b.mapped = true;
         if (cb_info.callback) |callback| callback(WGPU_MAP_ASYNC_STATUS_SUCCESS, .{ .data = null, .length = 0 }, cb_info.userdata1, cb_info.userdata2);
         return .{ .id = 3 };
+    }
+    if (comptime has_vulkan) {
+        if (b.backend == .vulkan and (mode & abi_core.WGPUMapMode_Read) != 0) {
+            if (b.vk_runtime_ref) |rt_ptr| {
+                const rt: *NativeVulkanRuntime = @ptrCast(@alignCast(rt_ptr));
+                _ = rt.flush_queue() catch {
+                    if (cb_info.callback) |callback| callback(WGPU_MAP_ASYNC_STATUS_VALIDATION_ERROR, .{ .data = null, .length = 0 }, cb_info.userdata1, cb_info.userdata2);
+                    return .{ .id = 3 };
+                };
+            }
+        }
     }
     b.mapped = true;
     if (cb_info.callback) |callback| callback(WGPU_MAP_ASYNC_STATUS_SUCCESS, .{ .data = null, .length = 0 }, cb_info.userdata1, cb_info.userdata2);

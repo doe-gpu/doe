@@ -17,7 +17,7 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 4
+      "const": 5
     },
     "generatedAt": {
       "type": "string",
@@ -143,6 +143,67 @@
           "$ref": "#/$defs/browserWorkload"
         }
       },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "comparabilityExpectation": {
+                "const": "strict"
+              }
+            },
+            "required": [
+              "comparabilityExpectation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "browserWorkload": {
+                "properties": {
+                  "sourceComparable": {
+                    "const": true
+                  },
+                  "sourceClaimEligible": {
+                    "const": true
+                  },
+                  "benchmarkClass": {
+                    "const": "comparable"
+                  }
+                },
+                "required": [
+                  "benchmarkClass"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "comparabilityExpectation": {
+                  "const": "strict"
+                }
+              },
+              "required": [
+                "comparabilityExpectation"
+              ]
+            }
+          },
+          "then": {
+            "properties": {
+              "browserWorkload": {
+                "properties": {
+                  "benchmarkClass": {
+                    "not": {
+                      "const": "comparable"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "browserWorkload": {
@@ -160,7 +221,10 @@
         },
         "benchmarkClass": {
           "type": "string",
-          "minLength": 1
+          "enum": [
+            "comparable",
+            "directional"
+          ]
         },
         "uploadBytes": {
           "type": "integer",
@@ -169,9 +233,65 @@
         "computeProjection": {
           "type": "string",
           "enum": [
+            "generic_direct_dispatch_component",
             "generic_empty_dispatch_component",
+            "generic_indirect_dispatch_component",
             "source_kernel_dispatch_v1"
           ]
+        },
+        "directDispatchArgs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "x",
+              "y",
+              "z"
+            ],
+            "properties": {
+              "x": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "y": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "z": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "indirectDispatchArgs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "x",
+              "y",
+              "z"
+            ],
+            "properties": {
+              "x": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "y": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "z": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          }
         },
         "bindGroupLayoutMode": {
           "type": "string",

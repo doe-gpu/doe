@@ -1928,6 +1928,7 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
           let querySet = null;
           let resolveBuffer = null;
           let readback = null;
+          let timestampStorage = null;
           try {
             querySet = timestampDevice.createQuerySet({ type: "timestamp", count: 2 });
             resolveBuffer = timestampDevice.createBuffer({
@@ -1938,6 +1939,30 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
               size: 16,
               usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
             });
+            timestampStorage = timestampDevice.createBuffer({
+              size: 4,
+              usage:
+                GPUBufferUsage.STORAGE |
+                GPUBufferUsage.COPY_DST,
+            });
+            timestampDevice.queue.writeBuffer(timestampStorage, 0, new Uint32Array([1]));
+            const timestampShader = timestampDevice.createShaderModule({
+              code: `
+                @group(0) @binding(0) var<storage, read_write> data: array<u32>;
+                @compute @workgroup_size(1)
+                fn main() {
+                  data[0] = data[0] + 1u;
+                }
+              `,
+            });
+            const timestampPipeline = timestampDevice.createComputePipeline({
+              layout: "auto",
+              compute: { module: timestampShader, entryPoint: "main" },
+            });
+            const timestampBindGroup = timestampDevice.createBindGroup({
+              layout: timestampPipeline.getBindGroupLayout(0),
+              entries: [{ binding: 0, resource: { buffer: timestampStorage } }],
+            });
             const encoder = timestampDevice.createCommandEncoder();
             const pass = encoder.beginComputePass({
               timestampWrites: {
@@ -1946,6 +1971,9 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
                 endOfPassWriteIndex: 1,
               },
             });
+            pass.setPipeline(timestampPipeline);
+            pass.setBindGroup(0, timestampBindGroup);
+            pass.dispatchWorkgroups(1);
             pass.end();
             encoder.resolveQuerySet(querySet, 0, 2, resolveBuffer, 0);
             encoder.copyBufferToBuffer(resolveBuffer, 0, readback, 0, 16);
@@ -1956,9 +1984,15 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
             const values = new BigUint64Array(readback.getMappedRange()).slice(0);
             const actual = Array.from(values, (value) => value.toString());
             result.smoke.timestampQuery.actual = actual;
-            result.smoke.timestampQuery.pass = values.length === 2 && values[1] >= values[0];
+            const hasRealTimestamp = values.length === 2 && values.some((value) => value > 0n);
+            const isMonotonic = values.length === 2 && values[1] >= values[0];
+            result.smoke.timestampQuery.pass = hasRealTimestamp && isMonotonic;
+            if (!result.smoke.timestampQuery.pass) {
+              result.smoke.timestampQuery.error = `timestamp query returned invalid values [${actual.join(", ")}]`;
+            }
             readback.unmap();
           } finally {
+            timestampStorage?.destroy();
             readback?.destroy();
             resolveBuffer?.destroy();
             querySet?.destroy();

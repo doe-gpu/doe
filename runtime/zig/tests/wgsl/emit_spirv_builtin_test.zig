@@ -28,6 +28,49 @@ fn count_spirv_opcode(binary: []const u8, opcode: u16) u32 {
     return count;
 }
 
+fn spirv_constant_u32(binary: []const u8, result_id: u32) ?u32 {
+    const word_count = binary.len / 4;
+    var i: usize = 5;
+    while (i < word_count) {
+        const w = read_u32_le(binary, i * 4);
+        const op = @as(u16, @truncate(w));
+        const wc: usize = @intCast(w >> 16);
+        if (wc == 0 or i + wc > word_count) return null;
+        if (op == spirv.Opcode.Constant and wc >= 4 and read_u32_le(binary, (i + 2) * 4) == result_id) {
+            return read_u32_le(binary, (i + 3) * 4);
+        }
+        i += wc;
+    }
+    return null;
+}
+
+fn expect_atomic_semantics_value(
+    binary: []const u8,
+    opcode: u16,
+    semantics_operand_index: usize,
+    expected_value: u32,
+) !u32 {
+    const word_count = binary.len / 4;
+    var i: usize = 5;
+    var count: u32 = 0;
+    while (i < word_count) {
+        const w = read_u32_le(binary, i * 4);
+        const op = @as(u16, @truncate(w));
+        const wc: usize = @intCast(w >> 16);
+        try testing.expect(wc > 0 and i + wc <= word_count);
+        if (op == opcode) {
+            try testing.expect(semantics_operand_index < wc);
+            const semantics_id = read_u32_le(binary, (i + semantics_operand_index) * 4);
+            const semantics = spirv_constant_u32(binary, semantics_id);
+            try testing.expect(semantics != null);
+            try testing.expectEqual(expected_value, semantics.?);
+            count += 1;
+        }
+        i += wc;
+    }
+    return count;
+}
+
 // ============================================================
 // HLSL type mapping tests (via IR construction)
 // ============================================================
@@ -632,6 +675,36 @@ test "spirv builtin: atomicAdd produces valid SPIR-V" {
     const len = try translateToSpirv(allocator, source, &out);
     try testing.expect(len >= 20);
     try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+}
+
+test "spirv builtin: atomic operations use relaxed memory semantics" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> counter: atomic<u32>;
+        \\var<workgroup> shared: atomic<u32>;
+        \\@compute @workgroup_size(1)
+        \\fn main(@builtin(global_invocation_id) id: vec3u) {
+        \\    atomicStore(&shared, 1u);
+        \\    let loaded = atomicLoad(&shared);
+        \\    let old = atomicAdd(&counter, loaded + id.x);
+        \\    atomicStore(&counter, old);
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try testing.expect(len >= 20);
+    try testing.expectEqual(spirv.MAGIC, read_u32_le(&out, 0));
+    try testing.expectEqual(
+        @as(u32, 1),
+        try expect_atomic_semantics_value(out[0..len], spirv.Opcode.AtomicLoad, 5, spirv.MemorySemantics.None),
+    );
+    try testing.expectEqual(
+        @as(u32, 2),
+        try expect_atomic_semantics_value(out[0..len], spirv.Opcode.AtomicStore, 3, spirv.MemorySemantics.None),
+    );
+    try testing.expectEqual(
+        @as(u32, 1),
+        try expect_atomic_semantics_value(out[0..len], spirv.Opcode.AtomicIAdd, 5, spirv.MemorySemantics.None),
+    );
 }
 
 test "spirv builtin: multiple math builtins produce valid SPIR-V" {

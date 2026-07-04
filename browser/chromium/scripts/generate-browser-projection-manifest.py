@@ -18,9 +18,14 @@ VALID_COMPARABILITY = {"strict", "component", "none"}
 VALID_REQUIRED_STATUS = {"ok", "not_applicable"}
 VALID_CLAIM_SCOPE = {"l1_strict_candidate", "l1_component_only", "l0_only_no_claim"}
 MAX_BROWSER_EXACT_UPLOAD_BYTES = 16 * 1024 * 1024
-PROJECTION_MANIFEST_SCHEMA_VERSION = 4
+PROJECTION_MANIFEST_SCHEMA_VERSION = 5
 SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1"
 SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1"
+COMPUTE_PROJECTION_DIRECT_DISPATCH = "generic_direct_dispatch_component"
+COMPUTE_PROJECTION_EMPTY_DISPATCH = "generic_empty_dispatch_component"
+COMPUTE_PROJECTION_INDIRECT_DISPATCH = "generic_indirect_dispatch_component"
+COMPUTE_PROJECTION_SOURCE_KERNEL = "source_kernel_dispatch_v1"
+DIRECT_DISPATCH_COMMAND_KINDS = {"dispatch", "dispatch_workgroups"}
 SIZE_UNITS = {
     "b": 1,
     "kb": 1024,
@@ -263,7 +268,7 @@ def compute_source_projection(
         return None
 
     return {
-        "computeProjection": "source_kernel_dispatch_v1",
+        "computeProjection": COMPUTE_PROJECTION_SOURCE_KERNEL,
         "bindGroupLayoutMode": SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE,
         "readbackBindingPolicy": SOURCE_KERNEL_READBACK_BINDING_POLICY,
         "commandsPath": display_path(commands_path, repo_root),
@@ -276,6 +281,83 @@ def compute_source_projection(
         "dispatchRepeat": int(command.get("repeat", 1)),
         "warmupDispatchCount": int(command.get("warmup_dispatch_count", 1)),
         "storageBindings": storage_bindings,
+    }
+
+
+def compute_indirect_component_projection(
+    workload: dict[str, Any],
+    repo_root: Path,
+) -> dict[str, Any] | None:
+    commands_rel = workload.get("commandsPath")
+    if not isinstance(commands_rel, str) or not commands_rel.strip():
+        return None
+    commands_path = resolve_path(commands_rel, repo_root)
+    if not commands_path.is_file():
+        return None
+    commands_payload = json.loads(commands_path.read_text(encoding="utf-8"))
+    if not isinstance(commands_payload, list) or not commands_payload:
+        return None
+
+    indirect_args: list[dict[str, int]] = []
+    for command in commands_payload:
+        if not isinstance(command, dict) or command.get("kind") != "dispatch_indirect":
+            return None
+        x = command.get("x")
+        y = command.get("y")
+        z = command.get("z")
+        if not isinstance(x, int) or x <= 0:
+            return None
+        if not isinstance(y, int) or y <= 0:
+            return None
+        if not isinstance(z, int) or z <= 0:
+            return None
+        indirect_args.append({"x": x, "y": y, "z": z})
+
+    return {
+        "computeProjection": COMPUTE_PROJECTION_INDIRECT_DISPATCH,
+        "commandsPath": display_path(commands_path, repo_root),
+        "commandsSha256": file_sha256(commands_path),
+        "indirectDispatchArgs": indirect_args,
+    }
+
+
+def compute_direct_component_projection(
+    workload: dict[str, Any],
+    repo_root: Path,
+) -> dict[str, Any] | None:
+    commands_rel = workload.get("commandsPath")
+    if not isinstance(commands_rel, str) or not commands_rel.strip():
+        return None
+    commands_path = resolve_path(commands_rel, repo_root)
+    if not commands_path.is_file():
+        return None
+    commands_payload = json.loads(commands_path.read_text(encoding="utf-8"))
+    if not isinstance(commands_payload, list) or not commands_payload:
+        return None
+
+    direct_args: list[dict[str, int]] = []
+    for command in commands_payload:
+        if (
+            not isinstance(command, dict)
+            or command.get("kind") not in DIRECT_DISPATCH_COMMAND_KINDS
+        ):
+            return None
+        x = command.get("x")
+        y = command.get("y")
+        z = command.get("z")
+        if not isinstance(x, int) or x <= 0:
+            return None
+        if not isinstance(y, int) or y <= 0:
+            return None
+        if not isinstance(z, int) or z <= 0:
+            return None
+        direct_args.append({"x": x, "y": y, "z": z})
+
+    return {
+        "computeProjection": COMPUTE_PROJECTION_DIRECT_DISPATCH,
+        "commandsPath": display_path(commands_path, repo_root),
+        "commandsSha256": file_sha256(commands_path),
+        "directDispatchArgs": direct_args,
     }
 
 
@@ -306,7 +388,15 @@ def browser_workload_metadata(workload: dict[str, Any], domain: str) -> dict[str
         if source_projection is not None:
             metadata.update(source_projection)
         else:
-            metadata["computeProjection"] = "generic_empty_dispatch_component"
+            indirect_projection = compute_indirect_component_projection(workload, REPO_ROOT)
+            if indirect_projection is not None:
+                metadata.update(indirect_projection)
+            else:
+                direct_projection = compute_direct_component_projection(workload, REPO_ROOT)
+                if direct_projection is not None:
+                    metadata.update(direct_projection)
+                else:
+                    metadata["computeProjection"] = COMPUTE_PROJECTION_EMPTY_DISPATCH
     elif domain == "texture-contract":
         workload_id = str(workload.get("id", ""))
         metadata["textureWidth"] = 128
@@ -324,8 +414,52 @@ def component_compute_rule() -> dict[str, str]:
         "comparabilityExpectation": "component",
         "requiredStatus": "ok",
         "claimScope": "l1_component_only",
-        "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-        "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+        "claimLanguage": (
+            "Component-level browser compute dispatch diagnostic only; "
+            "no source-shader parity claim language."
+        ),
+        "projectionNote": (
+            "Browser compute projection currently measures generic empty dispatch overhead, "
+            "not the source workload shader semantics."
+        ),
+    }
+
+
+def component_indirect_compute_rule() -> dict[str, str]:
+    return {
+        "projectionClass": "medium",
+        "layerTarget": "l1_browser_api",
+        "scenarioTemplate": "compute_dispatch_indirect_basic",
+        "comparabilityExpectation": "component",
+        "requiredStatus": "ok",
+        "claimScope": "l1_component_only",
+        "claimLanguage": (
+            "Component-level browser compute indirect-dispatch diagnostic only; "
+            "no source-shader parity claim language."
+        ),
+        "projectionNote": (
+            "Browser compute projection measures WebGPU dispatchWorkgroupsIndirect command shape "
+            "from the source command contract, not source shader semantics."
+        ),
+    }
+
+
+def component_direct_compute_rule() -> dict[str, str]:
+    return {
+        "projectionClass": "medium",
+        "layerTarget": "l1_browser_api",
+        "scenarioTemplate": "compute_dispatch_direct_basic",
+        "comparabilityExpectation": "component",
+        "requiredStatus": "ok",
+        "claimScope": "l1_component_only",
+        "claimLanguage": (
+            "Component-level browser compute direct-dispatch diagnostic only; "
+            "no source-shader parity claim language."
+        ),
+        "projectionNote": (
+            "Browser compute projection measures WebGPU dispatchWorkgroups command shape "
+            "from direct source command contracts, not source shader semantics."
+        ),
     }
 
 
@@ -410,7 +544,17 @@ def build_manifest(
             rule = non_projectable_browser_upload_rule(int(browser_workload["uploadBytes"]))
         elif (
             domain == "compute"
-            and browser_workload.get("computeProjection") != "source_kernel_dispatch_v1"
+            and browser_workload.get("computeProjection") == COMPUTE_PROJECTION_INDIRECT_DISPATCH
+        ):
+            rule = component_indirect_compute_rule()
+        elif (
+            domain == "compute"
+            and browser_workload.get("computeProjection") == COMPUTE_PROJECTION_DIRECT_DISPATCH
+        ):
+            rule = component_direct_compute_rule()
+        elif (
+            domain == "compute"
+            and browser_workload.get("computeProjection") != COMPUTE_PROJECTION_SOURCE_KERNEL
         ):
             rule = component_compute_rule()
         elif (
@@ -418,6 +562,8 @@ def build_manifest(
             and not source_strict_comparable(browser_workload)
         ):
             rule = component_source_diagnostic_rule(rule)
+        if rule["comparabilityExpectation"] != "strict":
+            browser_workload["benchmarkClass"] = "directional"
 
         row = {
             "sourceWorkloadId": workload_id,

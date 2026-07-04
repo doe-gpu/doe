@@ -17,9 +17,11 @@ const bind_group_native = @import("doe_bind_group_native.zig");
 const model_compute_types = @import("model_compute_types.zig");
 const model_binding_types = @import("model_binding_value_types.zig");
 const shader_native = @import("doe_shader_native.zig");
-const webgpu = @import("backend/runtime_types.zig");
+const resource_ops = @import("backend/dropin_resource_ops.zig");
 const pipeline_hash = @import("doe_vulkan_pipeline_hash.zig");
 
+const c = if (has_vulkan) resource_ops.vk_constants else struct {};
+const vk_dispatch_indirect = if (has_vulkan) resource_ops.vk_dispatch_indirect else struct {};
 const alloc = native_helpers.alloc;
 const cast = native_helpers.cast;
 const toOpaque = native_helpers.toOpaque;
@@ -43,6 +45,8 @@ const ACCESS_READ: u32 = @intFromEnum(doe_wgsl.ir.AccessMode.read);
 const ACCESS_READ_WRITE: u32 = @intFromEnum(doe_wgsl.ir.AccessMode.read_write);
 const BIND_GROUP_LAYOUT_RESOURCE_KIND_BUFFER: u32 = 1;
 const SPIRV_MAGIC: u32 = 0x07230203;
+const DISPATCH_INDIRECT_ARGS_BYTES: u64 = @sizeOf([3]u32);
+const DISPATCH_INDIRECT_ARGS_ALIGNMENT: u64 = @alignOf(u32);
 
 const BindingCollection = struct {
     count: usize,
@@ -857,19 +861,12 @@ pub fn vulkan_submit_recorded_dispatch(rt: *NativeVulkanRuntime, dispatch: anyty
 /// Replay a recorded indirect compute dispatch through NativeVulkanRuntime at queue-submit time.
 pub fn vulkan_run_prepared_dispatch_indirect(rt: *NativeVulkanRuntime, dispatch: anytype) void {
     if (comptime !has_vulkan) return;
-    const indirect_dims = resolve_indirect_dims(rt, dispatch.indirect_buf, dispatch.offset);
-    const x = indirect_dims[0];
-    const y = indirect_dims[1];
-    const z = indirect_dims[2];
-    const dispatch_x: u32 = if (x > 0) x else 1;
-    const dispatch_y: u32 = if (y > 0) y else 1;
-    const dispatch_z: u32 = if (z > 0) z else 1;
-    _ = rt.run_dispatch_indirect(
-        dispatch_x,
-        dispatch_y,
-        dispatch_z,
-        webgpu.QueueSyncMode.deferred,
-        webgpu.QueueWaitMode.process_events,
+    const indirect_buffer = resolve_indirect_buffer(rt, dispatch.indirect_buf, dispatch.offset) orelse return;
+    _ = vk_dispatch_indirect.record_prepared_replay(
+        rt,
+        indirect_buffer.buffer,
+        dispatch.offset,
+        indirect_buffer.resource_handle,
     ) catch |err| {
         std.log.err("doe_vulkan_compute: recorded dispatch_indirect failed: {s}", .{@errorName(err)});
     };
@@ -884,25 +881,27 @@ pub fn vulkan_submit_recorded_dispatch_indirect(rt: *NativeVulkanRuntime, dispat
 // Indirect buffer helpers
 // ============================================================
 
-/// Read dispatch dimensions from the mapped Vulkan indirect buffer.
-/// Returns [x, y, z] = {0, 0, 0} on any error (callers substitute safe defaults).
-fn resolve_indirect_dims(
+const ResolvedIndirectBuffer = struct {
+    buffer: c.VkBuffer,
+    resource_handle: u64,
+};
+
+fn resolve_indirect_buffer(
     rt: *NativeVulkanRuntime,
     buf_raw: ?*anyopaque,
     offset: u64,
-) [3]u32 {
-    if (comptime !has_vulkan) return .{ 0, 0, 0 };
-    const NULL_DIMS = [3]u32{ 0, 0, 0 };
-    const buf = cast(DoeBuffer, buf_raw) orelse return NULL_DIMS;
-    if (buf.error_object) return NULL_DIMS;
-    if (buf.vk_id == 0) return NULL_DIMS;
-    const cb = rt.compute_buffers.get(buf.vk_id) orelse return NULL_DIMS;
-    const base: [*]const u8 = @ptrCast(cb.mapped orelse return NULL_DIMS);
-    // Indirect dispatch buffer layout: uint32 x, uint32 y, uint32 z at `offset`.
-    const DISPATCH_STRUCT_SIZE: u64 = 12;
-    if (offset + DISPATCH_STRUCT_SIZE > cb.size) return NULL_DIMS;
-    const dims_ptr: *const [3]u32 = @ptrCast(@alignCast(base + offset));
-    return dims_ptr.*;
+) ?ResolvedIndirectBuffer {
+    if (comptime !has_vulkan) return null;
+    const buf = cast(DoeBuffer, buf_raw) orelse return null;
+    if (buf.error_object or buf.vk_id == 0) return null;
+    if ((offset % DISPATCH_INDIRECT_ARGS_ALIGNMENT) != 0) return null;
+    const cb = rt.compute_buffers.get(buf.vk_id) orelse return null;
+    const end = std.math.add(u64, offset, DISPATCH_INDIRECT_ARGS_BYTES) catch return null;
+    if (end > cb.size) return null;
+    return .{
+        .buffer = cb.buffer,
+        .resource_handle = buf.vk_id,
+    };
 }
 
 fn moveTranslationInfoToShader(

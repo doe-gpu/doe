@@ -442,7 +442,7 @@ fn resolveLocalProc(name: abi_base.WGPUStringView) p1_capability_procs.WGPUProc 
     if (symbolViewEq(name, "wgpuBufferRelease")) return fnPtr(&P.wgpuBufferRelease);
     if (symbolViewEq(name, "wgpuAdapterHasFeature")) return fnPtr(&P.wgpuAdapterHasFeature);
     if (symbolViewEq(name, "wgpuDeviceHasFeature")) return fnPtr(&P.wgpuDeviceHasFeature);
-    if (symbolViewEq(name, "wgpuDeviceCreateQuerySet")) return fnPtr(&N.doeNativeDeviceCreateQuerySet);
+    if (symbolViewEq(name, "wgpuDeviceCreateQuerySet")) return fnPtr(&P.wgpuDeviceCreateQuerySet);
     if (symbolViewEq(name, "wgpuQuerySetDestroy")) return fnPtr(&dropin_ext_a.exports.wgpuQuerySetDestroy);
     if (symbolViewEq(name, "wgpuQuerySetGetCount")) return fnPtr(&dropin_ext_a.exports.wgpuQuerySetGetCount);
     if (symbolViewEq(name, "wgpuQuerySetGetType")) return fnPtr(&dropin_ext_a.exports.wgpuQuerySetGetType);

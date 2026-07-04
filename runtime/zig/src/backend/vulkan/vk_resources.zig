@@ -231,6 +231,7 @@ fn create_compute_buffer_with_kind(
         .size = bytes,
         .usage = c.VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
             c.VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+            c.VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT |
             c.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT |
             c.VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         .sharingMode = c.VK_SHARING_MODE_EXCLUSIVE,

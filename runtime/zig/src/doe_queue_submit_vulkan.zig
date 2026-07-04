@@ -18,11 +18,14 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const native_types = @import("doe_native_object_types.zig");
+const native_shared = @import("doe_native_shared_types.zig");
+const native_cmds = @import("doe_native_command_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_rt_helpers = @import("doe_native_runtime_helpers.zig");
 const queue_submit_ops = @import("backend/dropin_queue_submit.zig");
 const shared = @import("doe_queue_submit_shared.zig");
 const vulkan_compute = @import("doe_vulkan_compute_native.zig");
+const query_native = @import("doe_query_native.zig");
 const vk_upload = queue_submit_ops.vulkan_upload;
 
 const cast = native_helpers.cast;
@@ -31,6 +34,95 @@ const DoeQueue = native_types.DoeQueue;
 
 const has_vulkan = (builtin.os.tag == .linux);
 
+const PreparedVulkanDispatchState = struct {
+    valid: bool = false,
+    compute_pipeline: ?*anyopaque = null,
+    binding_state_valid: bool = false,
+    binding_state: ?*const native_cmds.RecordedVulkanBindingState = null,
+    buf_count: u32 = 0,
+    bufs: ?*const [native_shared.MAX_FLAT_BIND]?*anyopaque = null,
+    buf_offsets: ?*const [native_shared.MAX_FLAT_BIND]u64 = null,
+    buf_sizes: ?*const [native_shared.MAX_FLAT_BIND]u64 = null,
+};
+
+fn resetPreparedDispatchState(state: *PreparedVulkanDispatchState) void {
+    state.* = .{};
+}
+
+fn bindingStatesEqual(
+    left: *const native_cmds.RecordedVulkanBindingState,
+    right: *const native_cmds.RecordedVulkanBindingState,
+) bool {
+    if (left.valid != right.valid) return false;
+    if (left.count != right.count) return false;
+    if (left.flat_mask != right.flat_mask) return false;
+    if (left.descriptor_hash != right.descriptor_hash) return false;
+    for (left.bindings[0..left.count], 0..) |binding, index| {
+        if (!std.meta.eql(binding, right.bindings[index])) return false;
+    }
+    return true;
+}
+
+fn preparedDispatchStateMatches(state: *const PreparedVulkanDispatchState, dispatch: anytype) bool {
+    if (!state.valid) return false;
+    if (state.compute_pipeline != dispatch.compute_pipeline) return false;
+    if (state.binding_state_valid != dispatch.vulkan_binding_state.valid) return false;
+    if (dispatch.vulkan_binding_state.valid) {
+        const binding_state = state.binding_state orelse return false;
+        return bindingStatesEqual(binding_state, &dispatch.vulkan_binding_state);
+    }
+
+    if (state.buf_count != dispatch.buf_count) return false;
+    const bufs = state.bufs orelse return false;
+    const buf_offsets = state.buf_offsets orelse return false;
+    const buf_sizes = state.buf_sizes orelse return false;
+    const count: usize = @intCast(dispatch.buf_count);
+    return std.mem.eql(?*anyopaque, bufs[0..count], dispatch.bufs[0..count]) and
+        std.mem.eql(u64, buf_offsets[0..count], dispatch.buf_offsets[0..count]) and
+        std.mem.eql(u64, buf_sizes[0..count], dispatch.buf_sizes[0..count]);
+}
+
+fn rememberPreparedDispatchState(state: *PreparedVulkanDispatchState, dispatch: anytype) void {
+    state.* = .{
+        .valid = true,
+        .compute_pipeline = dispatch.compute_pipeline,
+        .binding_state_valid = dispatch.vulkan_binding_state.valid,
+        .binding_state = &dispatch.vulkan_binding_state,
+        .buf_count = dispatch.buf_count,
+        .bufs = &dispatch.bufs,
+        .buf_offsets = &dispatch.buf_offsets,
+        .buf_sizes = &dispatch.buf_sizes,
+    };
+}
+
+fn prepareRecordedDispatchIfNeeded(
+    rt: *native_shared.NativeVulkanRuntime,
+    dispatch: anytype,
+    prepared_dispatch: *PreparedVulkanDispatchState,
+) bool {
+    if (preparedDispatchStateMatches(prepared_dispatch, dispatch)) return true;
+    if (!vulkan_compute.vulkan_prepare_recorded_dispatch(rt, dispatch)) {
+        resetPreparedDispatchState(prepared_dispatch);
+        return false;
+    }
+    rememberPreparedDispatchState(prepared_dispatch, dispatch);
+    return true;
+}
+
+fn flushRecordedReplay(q: *DoeQueue, rt: *native_shared.NativeVulkanRuntime, recorded_replay_work: *bool, context: []const u8) bool {
+    if (!recorded_replay_work.*) return true;
+    rt.submit_recorded_replay() catch |err| {
+        shared.deliverInternalError(q.dev, "doe_queue_submit: vulkan submit {s}: {s}", .{ context, @errorName(err) });
+        return false;
+    };
+    _ = rt.flush_queue() catch |err| {
+        shared.deliverInternalError(q.dev, "doe_queue_submit: vulkan flush {s}: {s}", .{ context, @errorName(err) });
+        return false;
+    };
+    recorded_replay_work.* = false;
+    return true;
+}
+
 pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*anyopaque) void {
     if (comptime !has_vulkan) return;
     const rt = native_rt_helpers.device_vk_runtime(q.dev) orelse return;
@@ -38,18 +130,21 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
     rt.recorded_submit_replay_active = true;
     defer rt.recorded_submit_replay_active = previous_replay_state;
 
-    var executed_any_dispatch = false;
+    var recorded_replay_work = false;
+    var prepared_dispatch = PreparedVulkanDispatchState{};
     for (cmd_bufs[0..count]) |raw| {
         const cb = cast(DoeCommandBuffer, raw) orelse continue;
-        for (cb.cmds.items) |cmd| {
-            switch (cmd) {
-                .dispatch => |dispatch_cmd| {
-                    vulkan_compute.vulkan_submit_recorded_dispatch(rt, dispatch_cmd);
-                    executed_any_dispatch = true;
+        for (cb.cmds.items) |*cmd| {
+            switch (cmd.*) {
+                .dispatch => |*dispatch_cmd| {
+                    if (!prepareRecordedDispatchIfNeeded(rt, dispatch_cmd, &prepared_dispatch)) continue;
+                    vulkan_compute.vulkan_run_prepared_dispatch(rt, dispatch_cmd);
+                    recorded_replay_work = true;
                 },
-                .dispatch_indirect => |dispatch_indirect_cmd| {
-                    vulkan_compute.vulkan_submit_recorded_dispatch_indirect(rt, dispatch_indirect_cmd);
-                    executed_any_dispatch = true;
+                .dispatch_indirect => |*dispatch_indirect_cmd| {
+                    if (!prepareRecordedDispatchIfNeeded(rt, dispatch_indirect_cmd, &prepared_dispatch)) continue;
+                    vulkan_compute.vulkan_run_prepared_dispatch_indirect(rt, dispatch_indirect_cmd);
+                    recorded_replay_work = true;
                 },
                 // Replay the copy in encoder-recorded order. When it follows
                 // recorded dispatches, keep it in the same Vulkan command
@@ -67,7 +162,8 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                     const src_has_pending_compute_write =
                         rt.has_pending_compute_writes and
                         rt.has_pending_compute_write_for_buffer(src_buf.vk_id);
-                    if (rt.replay_recording_active and (scb.mapped == null or src_has_pending_compute_write)) {
+                    const src_has_pending_transfer_write = rt.has_pending_transfer_writes;
+                    if (rt.replay_recording_active and (scb.mapped == null or src_has_pending_compute_write or src_has_pending_transfer_write)) {
                         vk_upload.record_replay_buffer_copy(
                             rt,
                             src_buf.vk_id,
@@ -84,9 +180,10 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                                 .{@errorName(err)},
                             );
                         };
+                        recorded_replay_work = true;
                         continue;
                     }
-                    if (executed_any_dispatch) {
+                    if (recorded_replay_work) {
                         _ = rt.flush_queue() catch |err| {
                             shared.deliverInternalError(
                                 q.dev,
@@ -94,7 +191,8 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                                 .{@errorName(err)},
                             );
                         };
-                        executed_any_dispatch = false;
+                        recorded_replay_work = false;
+                        resetPreparedDispatchState(&prepared_dispatch);
                     }
                     if (scb.mapped != null and dcb.mapped != null) {
                         const n: usize = @intCast(copy_cmd.size);
@@ -120,25 +218,65 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                         );
                     };
                 },
-                // Other command kinds (texture copies, clear_buffer,
-                // render passes, timestamps, query resolves) are not
-                // currently routed through the Vulkan queue by the
-                // existing encoder paths; they either no-op on this
-                // backend or are handled elsewhere. Leave as no-ops
-                // here for now — if a caller records one and relies on
-                // queue.submit executing it, that's a separate gap
-                // that would surface as its own zero/missing output.
-                .copy_buffer_to_texture => {},
-                .copy_texture_to_buffer => {},
-                .clear_buffer => {},
-                .copy_texture_to_texture => {},
-                .render_pass => {},
-                .write_timestamp => {},
-                .resolve_query_set => {},
+                .copy_buffer_to_texture,
+                .copy_texture_to_buffer,
+                .clear_buffer,
+                .copy_texture_to_texture,
+                .render_pass,
+                => {},
+                .write_timestamp => |timestamp_cmd| {
+                    query_native.vulkanRecordWriteTimestamp(
+                        rt,
+                        timestamp_cmd.query_set,
+                        timestamp_cmd.query_index,
+                        timestamp_cmd.position,
+                    ) catch |err| {
+                        shared.deliverInternalError(
+                            q.dev,
+                            "doe_queue_submit: vulkan record write_timestamp: {s}",
+                            .{@errorName(err)},
+                        );
+                    };
+                    recorded_replay_work = true;
+                },
+                .resolve_query_set => |resolve_cmd| {
+                    query_native.vulkanRecordResolveQuerySet(
+                        rt,
+                        resolve_cmd.query_set,
+                        resolve_cmd.first_query,
+                        resolve_cmd.query_count,
+                        resolve_cmd.dst_buffer,
+                        resolve_cmd.dst_offset,
+                    ) catch |err| {
+                        shared.deliverInternalError(
+                            q.dev,
+                            "doe_queue_submit: vulkan record resolve_query_set: {s}",
+                            .{@errorName(err)},
+                        );
+                    };
+                    recorded_replay_work = true;
+                    if (flushRecordedReplay(q, rt, &recorded_replay_work, "after resolve_query_set")) {
+                        resetPreparedDispatchState(&prepared_dispatch);
+                        query_native.vulkanCopyQueryResultsToMappedBuffer(
+                            rt,
+                            resolve_cmd.query_set,
+                            resolve_cmd.first_query,
+                            resolve_cmd.query_count,
+                            resolve_cmd.dst_buffer,
+                            resolve_cmd.dst_offset,
+                        ) catch |err| {
+                            shared.deliverInternalError(
+                                q.dev,
+                                "doe_queue_submit: vulkan copy query results to mapped buffer: {s}",
+                                .{@errorName(err)},
+                            );
+                        };
+                    }
+                },
             }
         }
     }
-    if (executed_any_dispatch) {
+    if (recorded_replay_work) {
         rt.submit_recorded_replay() catch |err| {
             shared.deliverInternalError(
                 q.dev,
@@ -146,5 +284,6 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                 .{@errorName(err)},
             );
         };
+        resetPreparedDispatchState(&prepared_dispatch);
     }
 }

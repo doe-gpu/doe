@@ -10,6 +10,7 @@ const compute_bind_groups = @import("doe_compute_bind_groups.zig");
 const compute_preconditions = @import("doe_compute_preconditions_native.zig");
 const vulkan_compute = @import("doe_vulkan_compute_native.zig");
 const shader_native = @import("doe_shader_native.zig");
+const query_native = @import("doe_query_native.zig");
 const wgsl_compiler = @import("doe_wgsl/mod.zig");
 const resource_ops = @import("backend/dropin_resource_ops.zig");
 const bridge = resource_ops.metal_bridge;
@@ -251,7 +252,15 @@ pub export fn doeNativeComputePassDispatchBound(
 }
 
 pub export fn doeNativeComputePassEnd(raw: ?*anyopaque) callconv(.c) void {
-    _ = raw;
+    const pass = cast(DoeComputePass, raw) orelse return;
+    const query_set = pass.timestamp_end_query_set orelse return;
+    const write_index = pass.timestamp_end_write_index;
+    pass.timestamp_end_query_set = null;
+    pass.timestamp_end_write_index = native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX;
+    if (write_index != native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX) {
+        query_native.doeNativeCommandEncoderWriteTimestampWithPosition(toOpaque(pass.enc), query_set, write_index, .pass_end);
+    }
+    query_native.doeNativeQuerySetRelease(query_set);
 }
 
 // ============================================================
@@ -277,6 +286,10 @@ pub export fn doeNativeComputePassPopDebugGroup(
 pub export fn doeNativeComputePassRelease(raw: ?*anyopaque) callconv(.c) void {
     if (cast(DoeComputePass, raw)) |p| {
         if (!native_helpers.object_should_destroy(p)) return;
+        if (p.timestamp_end_query_set) |query_set| {
+            p.timestamp_end_query_set = null;
+            query_native.doeNativeQuerySetRelease(query_set);
+        }
         native_helpers.label_store.remove(raw);
         alloc.destroy(p);
     }

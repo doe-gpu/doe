@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 4,
-  "generatedAt": "2026-07-04T03:13:32.174201Z",
+  "schemaVersion": 5,
+  "generatedAt": "2026-07-04T19:31:44.171949Z",
   "sourceWorkloadsPath": "bench/workloads/specialized/workloads.amd.vulkan.superset.json",
   "sourceWorkloadsSha256": "a99a6db97983405fff1c21f176656114cc9c82a2e7ec9c9554ad31de347bdec5",
   "rulesPath": "browser/chromium/bench/projection-rules.json",
   "rulesSha256": "06ac37731d70bb86652dbad5a6e7e80f1de4aad1b5020d530b500c98e54de245",
-  "projectionContractHash": "097531e10f45e6f47963de8714e14bf0950ae40e49506bcfcc11be3d4f2ca8ea",
+  "projectionContractHash": "403a7ae948d19ae3bfd3df3e86e127b32c20a64710142daf91618e3966c7328c",
   "sourceWorkloadCount": 80,
   "rows": [
     {
@@ -289,7 +289,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -451,7 +451,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -566,7 +566,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable",
+        "benchmarkClass": "directional",
         "uploadBytes": 1073741824
       }
     },
@@ -623,7 +623,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable",
+        "benchmarkClass": "directional",
         "uploadBytes": 268435456
       }
     },
@@ -642,7 +642,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable",
+        "benchmarkClass": "directional",
         "uploadBytes": 4294967296
       }
     },
@@ -766,17 +766,26 @@
       "domain": "compute",
       "projectionClass": "medium",
       "layerTarget": "l1_browser_api",
-      "scenarioTemplate": "compute_dispatch_basic",
+      "scenarioTemplate": "compute_dispatch_direct_basic",
       "comparabilityExpectation": "component",
       "requiredStatus": "ok",
       "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimLanguage": "Component-level browser compute direct-dispatch diagnostic only; no source-shader parity claim language.",
+      "projectionNote": "Browser compute projection measures WebGPU dispatchWorkgroups command shape from direct source command contracts, not source shader semantics.",
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": false,
         "benchmarkClass": "directional",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "generic_direct_dispatch_component",
+        "commandsPath": "examples/dispatch_workgroups_commands.json",
+        "commandsSha256": "b3db32ce3c4531d83245711c4054b50869eb2bcb26bf70ec3f718eb11bec94c4",
+        "directDispatchArgs": [
+          {
+            "x": 32,
+            "y": 1,
+            "z": 1
+          }
+        ]
       }
     },
     {
@@ -804,17 +813,26 @@
       "domain": "compute",
       "projectionClass": "medium",
       "layerTarget": "l1_browser_api",
-      "scenarioTemplate": "compute_dispatch_basic",
+      "scenarioTemplate": "compute_dispatch_indirect_basic",
       "comparabilityExpectation": "component",
       "requiredStatus": "ok",
       "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimLanguage": "Component-level browser compute indirect-dispatch diagnostic only; no source-shader parity claim language.",
+      "projectionNote": "Browser compute projection measures WebGPU dispatchWorkgroupsIndirect command shape from the source command contract, not source shader semantics.",
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": false,
         "benchmarkClass": "directional",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "generic_indirect_dispatch_component",
+        "commandsPath": "examples/compute_dispatch_indirect_large_args_commands.json",
+        "commandsSha256": "ce8c442db995a7146a1e6e4152dea623d8426ece5172c05be61a7a942ee812a7",
+        "indirectDispatchArgs": [
+          {
+            "x": 64,
+            "y": 32,
+            "z": 1
+          }
+        ]
       }
     },
     {
@@ -823,17 +841,31 @@
       "domain": "compute",
       "projectionClass": "medium",
       "layerTarget": "l1_browser_api",
-      "scenarioTemplate": "compute_dispatch_basic",
+      "scenarioTemplate": "compute_dispatch_indirect_basic",
       "comparabilityExpectation": "component",
       "requiredStatus": "ok",
       "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimLanguage": "Component-level browser compute indirect-dispatch diagnostic only; no source-shader parity claim language.",
+      "projectionNote": "Browser compute projection measures WebGPU dispatchWorkgroupsIndirect command shape from the source command contract, not source shader semantics.",
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": false,
         "benchmarkClass": "directional",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "generic_indirect_dispatch_component",
+        "commandsPath": "examples/compute_dispatch_indirect_live_args_commands.json",
+        "commandsSha256": "157ae450c9fd70fd282190fae09a01750fea9edcb6be37e7f1f346132332b507",
+        "indirectDispatchArgs": [
+          {
+            "x": 4,
+            "y": 1,
+            "z": 1
+          },
+          {
+            "x": 8,
+            "y": 1,
+            "z": 1
+          }
+        ]
       }
     },
     {
@@ -842,17 +874,26 @@
       "domain": "compute",
       "projectionClass": "medium",
       "layerTarget": "l1_browser_api",
-      "scenarioTemplate": "compute_dispatch_basic",
+      "scenarioTemplate": "compute_dispatch_indirect_basic",
       "comparabilityExpectation": "component",
       "requiredStatus": "ok",
       "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimLanguage": "Component-level browser compute indirect-dispatch diagnostic only; no source-shader parity claim language.",
+      "projectionNote": "Browser compute projection measures WebGPU dispatchWorkgroupsIndirect command shape from the source command contract, not source shader semantics.",
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": false,
         "benchmarkClass": "directional",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "generic_indirect_dispatch_component",
+        "commandsPath": "examples/compute_dispatch_indirect_single_commands.json",
+        "commandsSha256": "bdfbe35ac754d4ecf7f998cb8e2324cdad24ef7a0cf4b823cf4df29e23611121",
+        "indirectDispatchArgs": [
+          {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        ]
       }
     },
     {
@@ -861,17 +902,36 @@
       "domain": "compute",
       "projectionClass": "medium",
       "layerTarget": "l1_browser_api",
-      "scenarioTemplate": "compute_dispatch_basic",
+      "scenarioTemplate": "compute_dispatch_direct_basic",
       "comparabilityExpectation": "component",
       "requiredStatus": "ok",
       "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimLanguage": "Component-level browser compute direct-dispatch diagnostic only; no source-shader parity claim language.",
+      "projectionNote": "Browser compute projection measures WebGPU dispatchWorkgroups command shape from direct source command contracts, not source shader semantics.",
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": false,
         "benchmarkClass": "directional",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "generic_direct_dispatch_component",
+        "commandsPath": "examples/compute_dispatch_workgroups_2d_sweep_commands.json",
+        "commandsSha256": "d2808c43e838dbf82a5ce3a60e41c1dd48f78fa1638164dab67dfc3055b89a50",
+        "directDispatchArgs": [
+          {
+            "x": 16,
+            "y": 16,
+            "z": 1
+          },
+          {
+            "x": 32,
+            "y": 8,
+            "z": 1
+          },
+          {
+            "x": 64,
+            "y": 4,
+            "z": 1
+          }
+        ]
       }
     },
     {
@@ -880,17 +940,36 @@
       "domain": "compute",
       "projectionClass": "medium",
       "layerTarget": "l1_browser_api",
-      "scenarioTemplate": "compute_dispatch_basic",
+      "scenarioTemplate": "compute_dispatch_direct_basic",
       "comparabilityExpectation": "component",
       "requiredStatus": "ok",
       "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimLanguage": "Component-level browser compute direct-dispatch diagnostic only; no source-shader parity claim language.",
+      "projectionNote": "Browser compute projection measures WebGPU dispatchWorkgroups command shape from direct source command contracts, not source shader semantics.",
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": false,
         "benchmarkClass": "directional",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "generic_direct_dispatch_component",
+        "commandsPath": "examples/compute_dispatch_workgroups_3d_sweep_commands.json",
+        "commandsSha256": "d47848f25d0245b337d44c3051f690de2853e5f1e95dc373caa5870b9a673270",
+        "directDispatchArgs": [
+          {
+            "x": 8,
+            "y": 8,
+            "z": 4
+          },
+          {
+            "x": 16,
+            "y": 4,
+            "z": 4
+          },
+          {
+            "x": 4,
+            "y": 16,
+            "z": 4
+          }
+        ]
       }
     },
     {
@@ -899,17 +978,31 @@
       "domain": "compute",
       "projectionClass": "medium",
       "layerTarget": "l1_browser_api",
-      "scenarioTemplate": "compute_dispatch_basic",
+      "scenarioTemplate": "compute_dispatch_indirect_basic",
       "comparabilityExpectation": "component",
       "requiredStatus": "ok",
       "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimLanguage": "Component-level browser compute indirect-dispatch diagnostic only; no source-shader parity claim language.",
+      "projectionNote": "Browser compute projection measures WebGPU dispatchWorkgroupsIndirect command shape from the source command contract, not source shader semantics.",
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": false,
         "benchmarkClass": "directional",
-        "computeProjection": "generic_empty_dispatch_component"
+        "computeProjection": "generic_indirect_dispatch_component",
+        "commandsPath": "examples/compute_dispatch_workgroups_indirect_pipeline_switch_commands.json",
+        "commandsSha256": "de63c29ef5c004e143c397c65897b62dc980e10cea29df2cbfd7b939ea329e7f",
+        "indirectDispatchArgs": [
+          {
+            "x": 16,
+            "y": 1,
+            "z": 1
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 1
+          }
+        ]
       }
     },
     {

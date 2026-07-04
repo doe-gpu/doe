@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 4,
-  "generatedAt": "2026-06-28T03:52:07.679178Z",
+  "schemaVersion": 5,
+  "generatedAt": "2026-07-04T17:55:33.022037Z",
   "sourceWorkloadsPath": "bench/workloads/specialized/workloads.apple.metal.superset.json",
   "sourceWorkloadsSha256": "d2e7d7255270e5bc40727787771425c02349a7ae73b43ff4c5f2627c010c05cc",
   "rulesPath": "browser/chromium/bench/projection-rules.json",
   "rulesSha256": "06ac37731d70bb86652dbad5a6e7e80f1de4aad1b5020d530b500c98e54de245",
-  "projectionContractHash": "f79f92b4213e272d00fd5a6680d8b0b3be72dbb753a66b25e4cebe12fe43595b",
+  "projectionContractHash": "0d45e420cac9f50cd5216f6d53b386e12a89046bebdedc4a5ac4aac37c12828c",
   "sourceWorkloadCount": 50,
   "rows": [
     {
@@ -178,7 +178,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -196,7 +196,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -286,7 +286,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -304,7 +304,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -322,7 +322,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -379,7 +379,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -655,17 +655,26 @@
       "domain": "compute",
       "projectionClass": "medium",
       "layerTarget": "l1_browser_api",
-      "scenarioTemplate": "compute_dispatch_basic",
+      "scenarioTemplate": "compute_dispatch_direct_basic",
       "comparabilityExpectation": "component",
       "requiredStatus": "ok",
       "claimScope": "l1_component_only",
-      "claimLanguage": "Component-level browser compute dispatch diagnostic only; no source-shader parity claim language.",
-      "projectionNote": "Browser compute projection currently measures generic empty dispatch overhead, not the source workload shader semantics.",
+      "claimLanguage": "Component-level browser compute direct-dispatch diagnostic only; no source-shader parity claim language.",
+      "projectionNote": "Browser compute projection measures WebGPU dispatchWorkgroups command shape from direct source command contracts, not source shader semantics.",
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": false,
-        "benchmarkClass": "comparable",
-        "computeProjection": "generic_empty_dispatch_component"
+        "benchmarkClass": "directional",
+        "computeProjection": "generic_direct_dispatch_component",
+        "commandsPath": "examples/dispatch_workgroups_commands.json",
+        "commandsSha256": "b3db32ce3c4531d83245711c4054b50869eb2bcb26bf70ec3f718eb11bec94c4",
+        "directDispatchArgs": [
+          {
+            "x": 32,
+            "y": 1,
+            "z": 1
+          }
+        ]
       }
     },
     {
@@ -683,7 +692,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": false,
-        "benchmarkClass": "comparable",
+        "benchmarkClass": "directional",
         "computeProjection": "generic_empty_dispatch_component"
       }
     },
@@ -760,7 +769,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": false,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -778,7 +787,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": false,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -814,7 +823,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": false,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -940,7 +949,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     },
     {
@@ -1012,7 +1021,7 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": false,
-        "benchmarkClass": "comparable"
+        "benchmarkClass": "directional"
       }
     }
   ]

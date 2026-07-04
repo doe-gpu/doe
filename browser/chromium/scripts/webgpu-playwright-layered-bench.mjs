@@ -110,8 +110,18 @@ const DEFAULT_OUT_FILE = "dawn-vs-doe.browser-layered.diagnostic.json";
 const DEFAULT_API_SURFACE = "native";
 const DEFAULT_POWER_PREFERENCE = "high-performance";
 const HASH_ALGORITHM = "sha256";
-const PROJECTION_MANIFEST_SCHEMA_VERSION = 4;
+const PROJECTION_MANIFEST_SCHEMA_VERSION = 5;
 const RUNTIME_SELECTOR_VERSION = "browser-runtime-selector-v1";
+const COMPUTE_PROJECTION_DIRECT_DISPATCH = "generic_direct_dispatch_component";
+const COMPUTE_PROJECTION_EMPTY_DISPATCH = "generic_empty_dispatch_component";
+const COMPUTE_PROJECTION_INDIRECT_DISPATCH = "generic_indirect_dispatch_component";
+const COMPUTE_PROJECTION_SOURCE_KERNEL = "source_kernel_dispatch_v1";
+const COMPUTE_PROJECTIONS = Object.freeze([
+  COMPUTE_PROJECTION_DIRECT_DISPATCH,
+  COMPUTE_PROJECTION_EMPTY_DISPATCH,
+  COMPUTE_PROJECTION_INDIRECT_DISPATCH,
+  COMPUTE_PROJECTION_SOURCE_KERNEL,
+]);
 const SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1";
 const SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1";
 const CATEGORY_BY_DOMAIN = {
@@ -757,6 +767,22 @@ function parseStorageBindings(value, label) {
   });
 }
 
+function parseDispatchArgs(value, label) {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`${label} must be a non-empty array`);
+  }
+  return value.map((args, index) => {
+    if (!args || typeof args !== "object" || Array.isArray(args)) {
+      throw new Error(`${label}[${index}] must be an object`);
+    }
+    return {
+      x: requirePositiveInteger(args.x, `${label}[${index}].x`),
+      y: requirePositiveInteger(args.y, `${label}[${index}].y`),
+      z: requirePositiveInteger(args.z, `${label}[${index}].z`),
+    };
+  });
+}
+
 function loadProjectionManifest(path) {
   const payload = loadJsonObject(path);
   if (payload.schemaVersion !== PROJECTION_MANIFEST_SCHEMA_VERSION) {
@@ -863,15 +889,26 @@ function parseBrowserWorkload(value, label, domain) {
   if (typeof value.computeProjection === "string" && value.computeProjection.length > 0) {
     parsed.computeProjection = value.computeProjection;
   }
-  if (
-    domain === "compute" &&
-    !["generic_empty_dispatch_component", "source_kernel_dispatch_v1"].includes(
-      parsed.computeProjection,
-    )
-  ) {
+  if (domain === "compute" && !COMPUTE_PROJECTIONS.includes(parsed.computeProjection)) {
     throw new Error(`${label}.computeProjection is required for compute rows`);
   }
-  if (parsed.computeProjection === "source_kernel_dispatch_v1") {
+  if (parsed.computeProjection === COMPUTE_PROJECTION_DIRECT_DISPATCH) {
+    parsed.commandsPath = requireString(value.commandsPath, `${label}.commandsPath`);
+    parsed.commandsSha256 = requireHashHex(value.commandsSha256, `${label}.commandsSha256`);
+    parsed.directDispatchArgs = parseDispatchArgs(
+      value.directDispatchArgs,
+      `${label}.directDispatchArgs`,
+    );
+  }
+  if (parsed.computeProjection === COMPUTE_PROJECTION_INDIRECT_DISPATCH) {
+    parsed.commandsPath = requireString(value.commandsPath, `${label}.commandsPath`);
+    parsed.commandsSha256 = requireHashHex(value.commandsSha256, `${label}.commandsSha256`);
+    parsed.indirectDispatchArgs = parseDispatchArgs(
+      value.indirectDispatchArgs,
+      `${label}.indirectDispatchArgs`,
+    );
+  }
+  if (parsed.computeProjection === COMPUTE_PROJECTION_SOURCE_KERNEL) {
     parsed.bindGroupLayoutMode = requireString(
       value.bindGroupLayoutMode,
       `${label}.bindGroupLayoutMode`,
@@ -1013,9 +1050,26 @@ function loadWorkflowManifest(path) {
   return { promotionGateRequiredApprovals, rows };
 }
 
-function sourceKernelScenarioConfig(row) {
+function browserProjectionScenarioConfig(row) {
   const browserWorkload = row.browserWorkload ?? {};
-  if (browserWorkload.computeProjection !== "source_kernel_dispatch_v1") {
+  if (
+    browserWorkload.computeProjection === COMPUTE_PROJECTION_DIRECT_DISPATCH ||
+    browserWorkload.computeProjection === COMPUTE_PROJECTION_INDIRECT_DISPATCH
+  ) {
+    const commandsPath = repoPath(browserWorkload.commandsPath);
+    if (!pathWithin(commandsPath, ROOT)) {
+      throw new Error(`commandsPath escapes repo root: ${browserWorkload.commandsPath}`);
+    }
+    const commandsSha256 = fileHashHex(commandsPath);
+    if (commandsSha256 !== browserWorkload.commandsSha256) {
+      throw new Error(
+        `commandsSha256 mismatch for ${row.sourceWorkloadId}: ` +
+          `expected ${browserWorkload.commandsSha256}, got ${commandsSha256}`,
+      );
+    }
+    return row;
+  }
+  if (browserWorkload.computeProjection !== COMPUTE_PROJECTION_SOURCE_KERNEL) {
     return row;
   }
   const kernelPath = repoPath(browserWorkload.kernelPath);
@@ -1026,7 +1080,8 @@ function sourceKernelScenarioConfig(row) {
   const commandsSha256 = fileHashHex(commandsPath);
   if (commandsSha256 !== browserWorkload.commandsSha256) {
     throw new Error(
-      `commandsSha256 mismatch for ${row.sourceWorkloadId}: expected ${browserWorkload.commandsSha256}, got ${commandsSha256}`,
+      `commandsSha256 mismatch for ${row.sourceWorkloadId}: ` +
+        `expected ${browserWorkload.commandsSha256}, got ${commandsSha256}`,
     );
   }
   if (!pathWithin(kernelPath, ROOT)) {
@@ -1039,7 +1094,8 @@ function sourceKernelScenarioConfig(row) {
   const kernelSha256 = fileHashHex(kernelPath);
   if (kernelSha256 !== browserWorkload.kernelSha256) {
     throw new Error(
-      `kernelSha256 mismatch for ${row.sourceWorkloadId}: expected ${browserWorkload.kernelSha256}, got ${kernelSha256}`,
+      `kernelSha256 mismatch for ${row.sourceWorkloadId}: ` +
+        `expected ${browserWorkload.kernelSha256}, got ${kernelSha256}`,
     );
   }
   return {
@@ -1400,6 +1456,14 @@ async function runScenario(
         metrics: {},
       };
 
+      const computeProjectionDirectDispatch = "generic_direct_dispatch_component";
+      const computeProjectionIndirectDispatch = "generic_indirect_dispatch_component";
+      const computeProjectionSourceKernel = "source_kernel_dispatch_v1";
+      const genericComputeWarmupSubmits = 20;
+      const indirectDispatchArgumentWords = 3;
+      const indirectDispatchArgumentBytes =
+        indirectDispatchArgumentWords * Uint32Array.BYTES_PER_ELEMENT;
+
       const nowMs = () => performance.now();
       const browserSurface = apiSurface === "package-browser"
         ? await import(browserModuleUrl)
@@ -1509,14 +1573,14 @@ async function runScenario(
 
       async function runComputeDispatch(device, dispatchIters) {
         const computeConfig = scenarioConfig?.browserWorkload ?? {};
-        if (computeConfig.computeProjection === "source_kernel_dispatch_v1") {
+        if (computeConfig.computeProjection === computeProjectionSourceKernel) {
           const kernelSource = scenarioConfig?.kernelSource;
           if (typeof kernelSource !== "string" || kernelSource.length === 0) {
-            throw new Error("source_kernel_dispatch_v1 missing kernelSource");
+            throw new Error(`${computeProjectionSourceKernel} missing kernelSource`);
           }
           const storageBindings = computeConfig.storageBindings;
           if (!Array.isArray(storageBindings) || storageBindings.length === 0) {
-            throw new Error("source_kernel_dispatch_v1 missing storageBindings");
+            throw new Error(`${computeProjectionSourceKernel} missing storageBindings`);
           }
           const storageBufferUsageLabels = ["STORAGE", "COPY_DST", "COPY_SRC"];
           const readbackSampleByteCount = 16;
@@ -1567,7 +1631,8 @@ async function runScenario(
             const [group] = groupedBindings[index];
             if (group !== index) {
               throw new Error(
-                `source_kernel_dispatch_v1 requires contiguous bind groups from 0, saw group ${group}`,
+                `${computeProjectionSourceKernel} requires contiguous bind groups ` +
+                  `from 0, saw group ${group}`,
               );
             }
           }
@@ -1648,12 +1713,18 @@ async function runScenario(
           }
           const dispatchSamples = [];
           for (let sampleIndex = 0; sampleIndex < sourceKernelSamples; sampleIndex += 1) {
-            t0 = nowMs();
+            const sampleStartMs = nowMs();
+            const encodeSubmitStartMs = nowMs();
             encodeSampleDispatches();
+            const encodeSubmitMs = nowMs() - encodeSubmitStartMs;
+            const waitStartMs = nowMs();
             await device.queue.onSubmittedWorkDone();
-            const elapsedMs = nowMs() - t0;
+            const waitMs = nowMs() - waitStartMs;
+            const elapsedMs = nowMs() - sampleStartMs;
             dispatchSamples.push({
               dispatchElapsedMs: elapsedMs,
+              encodeSubmitMs,
+              waitMs,
               usPerOp: (elapsedMs * 1000) / dispatchesPerSample,
             });
           }
@@ -1663,7 +1734,9 @@ async function runScenario(
             .sort((left, right) => left.group - right.group || left.binding - right.binding)
             .find((binding) => binding.bufferBindingType === "storage");
           if (!readbackBinding) {
-            throw new Error("source_kernel_dispatch_v1 missing writable storage binding for readback");
+            throw new Error(
+              `${computeProjectionSourceKernel} missing writable storage binding for readback`,
+            );
           }
           const readback = device.createBuffer({
             size: readbackBinding.bufferSize,
@@ -1721,10 +1794,16 @@ async function runScenario(
           result.metrics.dispatchRepeat = computeConfig.dispatchRepeat;
           result.metrics.totalDispatches = totalDispatches;
           addTimingStats(dispatchSamples, "dispatchElapsedMs", "dispatchElapsedMs");
+          addTimingStats(dispatchSamples, "encodeSubmitMs", "encodeSubmitMs");
+          addTimingStats(dispatchSamples, "waitMs", "waitMs");
           addTimingStats(dispatchSamples, "usPerOp", "usPerOp");
           result.metrics.dispatchElapsedMsSamples = dispatchSamples.map(
             (sample) => sample.dispatchElapsedMs,
           );
+          result.metrics.encodeSubmitMsSamples = dispatchSamples.map(
+            (sample) => sample.encodeSubmitMs,
+          );
+          result.metrics.waitMsSamples = dispatchSamples.map((sample) => sample.waitMs);
           result.metrics.usPerOpSamples = dispatchSamples.map((sample) => sample.usPerOp);
           result.metrics.warmupDispatchCount = warmupDispatchCount;
           result.metrics.sourceKernelTimingPolicy = "batched_source_kernel_samples_v1";
@@ -1758,6 +1837,156 @@ async function runScenario(
           return;
         }
 
+        if (computeConfig.computeProjection === computeProjectionDirectDispatch) {
+          const directDispatchArgs = computeConfig.directDispatchArgs;
+          if (!Array.isArray(directDispatchArgs) || directDispatchArgs.length === 0) {
+            throw new Error(`${computeProjectionDirectDispatch} missing directDispatchArgs`);
+          }
+
+          const shader = device.createShaderModule({
+            code: `
+              @compute @workgroup_size(1)
+              fn main() {}
+            `,
+          });
+          const pipeline = device.createComputePipeline({
+            layout: "auto",
+            compute: { module: shader, entryPoint: "main" },
+          });
+
+          function encodeDirectDispatches() {
+            const encoder = device.createCommandEncoder();
+            const pass = encoder.beginComputePass();
+            pass.setPipeline(pipeline);
+            for (const args of directDispatchArgs) {
+              pass.dispatchWorkgroups(args.x, args.y, args.z);
+            }
+            pass.end();
+            device.queue.submit([encoder.finish()]);
+          }
+
+          for (let i = 0; i < genericComputeWarmupSubmits; i += 1) {
+            encodeDirectDispatches();
+          }
+          await device.queue.onSubmittedWorkDone();
+          const t0 = nowMs();
+          const encodeSubmitStart = nowMs();
+          for (let i = 0; i < dispatchIters; i += 1) {
+            encodeDirectDispatches();
+          }
+          const encodeSubmitMs = nowMs() - encodeSubmitStart;
+          const waitStart = nowMs();
+          await device.queue.onSubmittedWorkDone();
+          const waitMs = nowMs() - waitStart;
+          const t1 = nowMs();
+          const dispatchElapsedMs = t1 - t0;
+          const dispatchesPerSubmit = directDispatchArgs.length;
+          const totalDispatches = dispatchIters * dispatchesPerSubmit;
+          result.metrics.iterations = dispatchIters;
+          result.metrics.dispatchKind = "direct";
+          result.metrics.directDispatchArgs = directDispatchArgs;
+          result.metrics.dispatchesPerSubmit = dispatchesPerSubmit;
+          result.metrics.totalDispatches = totalDispatches;
+          result.metrics.totalSubmits = dispatchIters;
+          result.metrics.warmupSubmitCount = genericComputeWarmupSubmits;
+          result.metrics.totalWarmupDispatches =
+            genericComputeWarmupSubmits * dispatchesPerSubmit;
+          result.metrics.commandsPath = computeConfig.commandsPath;
+          result.metrics.commandsSha256 = computeConfig.commandsSha256;
+          result.metrics.computeProjection = computeConfig.computeProjection;
+          result.metrics.dispatchElapsedMs = dispatchElapsedMs;
+          result.metrics.encodeSubmitMs = encodeSubmitMs;
+          result.metrics.waitMs = waitMs;
+          result.metrics.usPerOp = (dispatchElapsedMs * 1000) / totalDispatches;
+          return;
+        }
+
+        if (computeConfig.computeProjection === computeProjectionIndirectDispatch) {
+          const indirectDispatchArgs = computeConfig.indirectDispatchArgs;
+          if (!Array.isArray(indirectDispatchArgs) || indirectDispatchArgs.length === 0) {
+            throw new Error(
+              `${computeProjectionIndirectDispatch} missing indirectDispatchArgs`,
+            );
+          }
+          const indirectArgWords = new Uint32Array(
+            indirectDispatchArgs.length * indirectDispatchArgumentWords,
+          );
+          for (let index = 0; index < indirectDispatchArgs.length; index += 1) {
+            const args = indirectDispatchArgs[index];
+            const offset = index * indirectDispatchArgumentWords;
+            indirectArgWords[offset] = args.x;
+            indirectArgWords[offset + 1] = args.y;
+            indirectArgWords[offset + 2] = args.z;
+          }
+          const indirectBuffer = device.createBuffer({
+            size: indirectArgWords.byteLength,
+            usage: GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_DST,
+          });
+          device.queue.writeBuffer(indirectBuffer, 0, indirectArgWords);
+
+          const shader = device.createShaderModule({
+            code: `
+              @compute @workgroup_size(1)
+              fn main() {}
+            `,
+          });
+          const pipeline = device.createComputePipeline({
+            layout: "auto",
+            compute: { module: shader, entryPoint: "main" },
+          });
+
+          function encodeIndirectDispatches() {
+            const encoder = device.createCommandEncoder();
+            const pass = encoder.beginComputePass();
+            pass.setPipeline(pipeline);
+            for (let index = 0; index < indirectDispatchArgs.length; index += 1) {
+              pass.dispatchWorkgroupsIndirect(
+                indirectBuffer,
+                index * indirectDispatchArgumentBytes,
+              );
+            }
+            pass.end();
+            device.queue.submit([encoder.finish()]);
+          }
+
+          for (let i = 0; i < genericComputeWarmupSubmits; i += 1) {
+            encodeIndirectDispatches();
+          }
+          await device.queue.onSubmittedWorkDone();
+          const t0 = nowMs();
+          const encodeSubmitStart = nowMs();
+          for (let i = 0; i < dispatchIters; i += 1) {
+            encodeIndirectDispatches();
+          }
+          const encodeSubmitMs = nowMs() - encodeSubmitStart;
+          const waitStart = nowMs();
+          await device.queue.onSubmittedWorkDone();
+          const waitMs = nowMs() - waitStart;
+          const t1 = nowMs();
+          const dispatchElapsedMs = t1 - t0;
+          const dispatchesPerSubmit = indirectDispatchArgs.length;
+          const totalDispatches = dispatchIters * dispatchesPerSubmit;
+          result.metrics.iterations = dispatchIters;
+          result.metrics.dispatchKind = "indirect";
+          result.metrics.indirectDispatchArgs = indirectDispatchArgs;
+          result.metrics.indirectDispatchArgBufferBytes = indirectArgWords.byteLength;
+          result.metrics.dispatchesPerSubmit = dispatchesPerSubmit;
+          result.metrics.totalDispatches = totalDispatches;
+          result.metrics.totalSubmits = dispatchIters;
+          result.metrics.warmupSubmitCount = genericComputeWarmupSubmits;
+          result.metrics.totalWarmupDispatches =
+            genericComputeWarmupSubmits * dispatchesPerSubmit;
+          result.metrics.commandsPath = computeConfig.commandsPath;
+          result.metrics.commandsSha256 = computeConfig.commandsSha256;
+          result.metrics.computeProjection = computeConfig.computeProjection;
+          result.metrics.dispatchElapsedMs = dispatchElapsedMs;
+          result.metrics.encodeSubmitMs = encodeSubmitMs;
+          result.metrics.waitMs = waitMs;
+          result.metrics.usPerOp = (dispatchElapsedMs * 1000) / totalDispatches;
+          indirectBuffer.destroy();
+          return;
+        }
+
         const shader = device.createShaderModule({
           code: `
             @compute @workgroup_size(1)
@@ -1768,7 +1997,7 @@ async function runScenario(
           layout: "auto",
           compute: { module: shader, entryPoint: "main" },
         });
-        for (let i = 0; i < 20; i += 1) {
+        for (let i = 0; i < genericComputeWarmupSubmits; i += 1) {
           const encoder = device.createCommandEncoder();
           const pass = encoder.beginComputePass();
           pass.setPipeline(pipeline);
@@ -1778,6 +2007,7 @@ async function runScenario(
         }
         await device.queue.onSubmittedWorkDone();
         const t0 = nowMs();
+        const encodeSubmitStart = nowMs();
         for (let i = 0; i < dispatchIters; i += 1) {
           const encoder = device.createCommandEncoder();
           const pass = encoder.beginComputePass();
@@ -1786,10 +2016,24 @@ async function runScenario(
           pass.end();
           device.queue.submit([encoder.finish()]);
         }
+        const encodeSubmitMs = nowMs() - encodeSubmitStart;
+        const waitStart = nowMs();
         await device.queue.onSubmittedWorkDone();
+        const waitMs = nowMs() - waitStart;
         const t1 = nowMs();
+        const dispatchElapsedMs = t1 - t0;
         result.metrics.iterations = dispatchIters;
-        result.metrics.usPerOp = ((t1 - t0) * 1000) / dispatchIters;
+        result.metrics.dispatchKind = "direct";
+        result.metrics.dispatchesPerSubmit = 1;
+        result.metrics.totalDispatches = dispatchIters;
+        result.metrics.totalSubmits = dispatchIters;
+        result.metrics.warmupSubmitCount = genericComputeWarmupSubmits;
+        result.metrics.totalWarmupDispatches = genericComputeWarmupSubmits;
+        result.metrics.computeProjection = computeConfig.computeProjection;
+        result.metrics.dispatchElapsedMs = dispatchElapsedMs;
+        result.metrics.encodeSubmitMs = encodeSubmitMs;
+        result.metrics.waitMs = waitMs;
+        result.metrics.usPerOp = (dispatchElapsedMs * 1000) / dispatchIters;
       }
 
       async function runRenderTriangleReadback(device) {
@@ -2465,7 +2709,11 @@ async function runScenario(
 
         if (scenarioTemplate === "write_buffer_upload") {
           await runWriteBuffer(device);
-        } else if (scenarioTemplate === "compute_dispatch_basic") {
+        } else if (
+          scenarioTemplate === "compute_dispatch_basic" ||
+          scenarioTemplate === "compute_dispatch_direct_basic" ||
+          scenarioTemplate === "compute_dispatch_indirect_basic"
+        ) {
           await runComputeDispatch(device, runIterations.dispatch);
         } else if (scenarioTemplate === "render_triangle_readback") {
           await runRenderTriangleReadback(device);
@@ -2719,7 +2967,7 @@ async function runMode(
         row.scenarioTemplate,
         args.iterations,
         browserSurfaceArgs,
-        sourceKernelScenarioConfig(row),
+        browserProjectionScenarioConfig(row),
         scheduledSourceKernelSamples,
         args.sourceKernelWarmupSamples,
         args.sourceKernelSubmitPolicy,
@@ -2870,7 +3118,7 @@ function hasRequiredFailures(summary) {
 }
 
 function isSlicedSourceKernelRow(row, minDispatchRepeat) {
-  if (row?.browserWorkload?.computeProjection !== "source_kernel_dispatch_v1") {
+  if (row?.browserWorkload?.computeProjection !== COMPUTE_PROJECTION_SOURCE_KERNEL) {
     return false;
   }
   return (row.browserWorkload.dispatchRepeat ?? 0) >= minDispatchRepeat;
@@ -2998,6 +3246,8 @@ const MERGED_SUM_METRICS = new Set([
 ]);
 const MERGED_CONCAT_METRICS = new Set([
   "dispatchElapsedMsSamples",
+  "encodeSubmitMsSamples",
+  "waitMsSamples",
   "usPerOpSamples",
 ]);
 
@@ -3072,6 +3322,8 @@ function applyMergedSampleStats(metrics, sampleKey, metricName) {
 
 function applyMergedSourceKernelStats(metrics) {
   applyMergedSampleStats(metrics, "dispatchElapsedMsSamples", "dispatchElapsedMs");
+  applyMergedSampleStats(metrics, "encodeSubmitMsSamples", "encodeSubmitMs");
+  applyMergedSampleStats(metrics, "waitMsSamples", "waitMs");
   applyMergedSampleStats(metrics, "usPerOpSamples", "usPerOp");
 }
 
@@ -3327,7 +3579,7 @@ async function main() {
   );
 
   const report = {
-    schemaVersion: 2,
+    schemaVersion: 4,
     reportKind: "browser-layered-diagnostic",
     benchmarkClass: "directional",
     comparisonStatus: "diagnostic",

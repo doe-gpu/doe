@@ -192,6 +192,42 @@ def _projection_manifest() -> dict[str, Any]:
     }
 
 
+def _projection_row(
+    comparability: str = "strict",
+    benchmark_class: str = "comparable",
+) -> dict[str, Any]:
+    claim_scope = (
+        "l1_strict_candidate" if comparability == "strict" else "l1_component_only"
+    )
+    return {
+        "sourceWorkloadId": "copy_buffer",
+        "sourceWorkloadName": "copy buffer",
+        "domain": "copy",
+        "projectionClass": "high",
+        "layerTarget": "l1_browser_api",
+        "scenarioTemplate": "copy_buffer",
+        "comparabilityExpectation": comparability,
+        "requiredStatus": "ok",
+        "claimScope": claim_scope,
+        "claimLanguage": "test claim language",
+        "projectionNote": "test projection note",
+        "browserWorkload": {
+            "sourceComparable": True,
+            "sourceClaimEligible": True,
+            "benchmarkClass": benchmark_class,
+        },
+    }
+
+
+def _parseable_projection_manifest(row: dict[str, Any]) -> dict[str, Any]:
+    manifest = _projection_manifest()
+    manifest["schemaVersion"] = 5
+    manifest["generatedAt"] = "2026-07-04T00:00:00Z"
+    manifest["sourceWorkloadCount"] = 1
+    manifest["rows"] = [row]
+    return manifest
+
+
 def _workflow_manifest() -> dict[str, Any]:
     return {
         "schemaVersion": 3,
@@ -204,6 +240,111 @@ def _workflow_manifest() -> dict[str, Any]:
         ],
         "rows": [],
     }
+
+
+def _source_kernel_manifest_row() -> dict[str, Any]:
+    row = _projection_row()
+    row["sourceWorkloadId"] = "compute_workgroup_atomic_1024"
+    row["domain"] = "compute"
+    row["scenarioTemplate"] = "compute_dispatch_basic"
+    row["browserWorkload"] = {
+        "sourceComparable": True,
+        "sourceClaimEligible": True,
+        "benchmarkClass": "comparable",
+        "computeProjection": "source_kernel_dispatch_v1",
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "commandsPath": "examples/workgroup_atomic_commands.json",
+        "commandsSha256": HASH_A,
+        "kernelPath": "bench/kernels/workgroup_atomic.wgsl",
+        "kernelSha256": HASH_B,
+        "dispatchX": 1024,
+        "dispatchY": 1,
+        "dispatchZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "storageBindings": [
+            {
+                "group": 0,
+                "binding": 0,
+                "bufferSize": 1024,
+                "minBindingSize": 1024,
+                "bufferType": "storage",
+                "bufferBindingType": "storage",
+            }
+        ],
+    }
+    return row
+
+
+def _source_kernel_metrics() -> dict[str, Any]:
+    metrics: dict[str, Any] = {
+        "iterations": 2,
+        "sourceKernelSampleCount": 2,
+        "orderBalancedSampleCount": 2,
+        "sourceKernelWarmupSampleCount": 0,
+        "sourceKernelWarmupDispatches": 0,
+        "sourceKernelWarmupSubmits": 0,
+        "sourceKernelSubmitPolicy": "iteration-batch-v1",
+        "submitsPerSample": 2,
+        "warmupSubmitCount": 1,
+        "totalWarmupDispatches": 2,
+        "totalWarmupSubmits": 2,
+        "totalSubmits": 4,
+        "dispatchesPerSample": 200,
+        "dispatchWorkgroupsX": 1024,
+        "dispatchWorkgroupsY": 1,
+        "dispatchWorkgroupsZ": 1,
+        "dispatchRepeat": 100,
+        "warmupDispatchCount": 1,
+        "totalDispatches": 400,
+        "dispatchElapsedMsSamples": [10.0, 12.0],
+        "encodeSubmitMsSamples": [2.0, 4.0],
+        "waitMsSamples": [8.0, 8.0],
+        "usPerOpSamples": [50.0, 60.0],
+        "sourceKernelTimingPolicy": "batched_source_kernel_samples_v1",
+        "kernelPath": "bench/kernels/workgroup_atomic.wgsl",
+        "kernelSha256": HASH_B,
+        "commandsPath": "examples/workgroup_atomic_commands.json",
+        "commandsSha256": HASH_A,
+        "bindGroupLayoutMode": "explicit_min_binding_size_v1",
+        "readbackBindingPolicy": "first_writable_storage_binding_v1",
+        "bindGroupLayoutEntryCount": 1,
+        "bindGroupLayoutEntries": [
+            {
+                "group": 0,
+                "binding": 0,
+                "bufferBindingType": "storage",
+                "minBindingSize": 1024,
+            }
+        ],
+        "minBindingSizeBytes": 1024,
+        "storageBindingCount": 1,
+        "storageBufferBytes": 1024,
+        "storageBufferUsage": ["STORAGE", "COPY_DST", "COPY_SRC"],
+        "readbackBindingGroup": 0,
+        "readbackBinding": 0,
+        "readbackBytes": 1024,
+        "readbackChecksum": 1234,
+        "readbackSampleBytes": [1, 2, 3, 4] * 4,
+        "createBindGroupLayoutMs": 0.1,
+        "createPipelineLayoutMs": 0.1,
+        "submitReadbackMs": 0.1,
+        "mapReadMs": 0.1,
+    }
+    for metric_name, samples in (
+        ("dispatchElapsedMs", metrics["dispatchElapsedMsSamples"]),
+        ("encodeSubmitMs", metrics["encodeSubmitMsSamples"]),
+        ("waitMs", metrics["waitMsSamples"]),
+        ("usPerOp", metrics["usPerOpSamples"]),
+    ):
+        metrics[metric_name] = samples[0]
+        metrics[f"{metric_name}Avg"] = sum(samples) / len(samples)
+        metrics[f"{metric_name}P10"] = samples[0]
+        metrics[f"{metric_name}P50"] = samples[0]
+        metrics[f"{metric_name}P95"] = samples[1]
+        metrics[f"{metric_name}P99"] = samples[1]
+    return metrics
 
 
 class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
@@ -230,6 +371,36 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
         )
 
         self.assertEqual(errors, [])
+
+    def test_source_kernel_runtime_evidence_requires_phase_samples(self) -> None:
+        row = _source_kernel_manifest_row()
+        mode_result = {
+            "status": "ok",
+            "statusCode": "ok",
+            "metrics": _source_kernel_metrics(),
+        }
+
+        errors = self.module.check_source_kernel_runtime_evidence(
+            mode_result,
+            row,
+            "compute_workgroup_atomic_1024",
+            "doe",
+        )
+
+        self.assertEqual(errors, [])
+
+        del mode_result["metrics"]["waitMsSamples"]
+        errors = self.module.check_source_kernel_runtime_evidence(
+            mode_result,
+            row,
+            "compute_workgroup_atomic_1024",
+            "doe",
+        )
+
+        self.assertIn(
+            "compute_workgroup_atomic_1024: metrics.waitMsSamples must have sourceKernelSampleCount entries for mode 'doe'",
+            errors,
+        )
 
     def test_report_coverage_rejects_missing_adapter_request_policy(self) -> None:
         report = _report()
@@ -633,6 +804,30 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
             "manifest rulesPath must be repo-relative: /tmp/projection-rules.json",
             errors,
         )
+
+    def test_parse_projection_manifest_accepts_strict_comparable_row(self) -> None:
+        manifest = _parseable_projection_manifest(_projection_row())
+
+        parsed = self.module.parse_projection_manifest(manifest)
+
+        self.assertEqual(
+            parsed["rows"][0]["browserWorkload"]["benchmarkClass"],
+            "comparable",
+        )
+
+    def test_parse_projection_manifest_rejects_non_strict_comparable_class(self) -> None:
+        manifest = _parseable_projection_manifest(
+            _projection_row(
+                comparability="component",
+                benchmark_class="comparable",
+            )
+        )
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "non-strict browser projection must not use benchmarkClass=comparable",
+        ):
+            self.module.parse_projection_manifest(manifest)
 
 
 if __name__ == "__main__":
