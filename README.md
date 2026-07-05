@@ -43,6 +43,68 @@ Apple Metal package evidence, and npm package availability are not
 interchangeable; macOS arm64 browser and native artifacts need their own
 receipts before public wording claims that platform.
 
+## Project map
+
+```text
++-------------------------+
+| Source-visible inputs   |
+| WGSL | commands | plans |
++-----------+-------------+
+            |
+            v
++--------------------------------------------------------------+
+| Doe compiler/runtime spine                                   |
+| preserve identity | lower | execute | reject unsupported      |
++------+---------------+---------------+-----------------------+
+       |               |               |
+       v               v               v
++--------------+  +--------------+  +--------------+
+| Vulkan       |  | Metal        |  | D3D12/DXIL   |
+| Linux/Fawn   |  | macOS lane   |  | Windows lane |
++------+-------+  +------+-------+  +------+-------+
+       |                |                |
+       +----------------+----------------+
+                        |
+                        v
+                 +-------------+          +----------------------+
+                 | Receipts    |<-------->| Incumbents           |
+                 | hashes/time | compare  | Dawn/Tint/Chromium   |
+                 +------+------+ fairly   +----------------------+
+                        |
+                        v
+                 +-------------+     +-------------------+
+                 | Gates       |---->| Public claims     |
+                 | schema/fair |     | claim-index/docs  |
+                 +-------------+     +-------------------+
+
+       +-----------------------+
+       | WebGPU package        |
+       | doe-gpu Node/Bun/Deno |
+       +-----------+-----------+
+                  |
+                  v
+             receipts/gates
+
+       +---------------------+
+       | Browser lane        |
+       | Fawn/Chromium       |
+       +----------+----------+
+                  |
+                  v
+             receipts/gates
+
+       +---------------------+     +---------------------+
+       | TSIR / HostPlan     |---->| CSL / WSE3          |
+       | spatial lowering    |     | current target lane |
+       +----------+----------+     +---------------------+
+                  |
+                  v
+       . . . retargeting candidates, not release claims . . .
+       . vLLM/paged KV . TPU/XLA . Groq/LPU . Tenstorrent .
+       . hosted inference . custom ASIC lanes              .
+       . . . . . . . . . . . . . . . . . . . . . . . . . .
+```
+
 ## What it is
 
 - `doe-gpu`: JavaScript package entry point for WebGPU-backed workloads.

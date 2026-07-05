@@ -1,6 +1,6 @@
 {
   "name": "doe-gpu",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Zig-first WebGPU runtime for Node.js, Bun, and Deno",
   "type": "module",
   "main": "./src/index.js",
@@ -69,8 +69,8 @@
     "sync-vendor": "node scripts/sync-vendor.js"
   },
   "optionalDependencies": {
-    "doe-gpu-darwin-arm64": "0.4.4",
-    "doe-gpu-linux-x64": "0.4.4"
+    "doe-gpu-darwin-arm64": "0.4.7",
+    "doe-gpu-linux-x64": "0.4.7"
   },
   "keywords": [
     "webgpu",

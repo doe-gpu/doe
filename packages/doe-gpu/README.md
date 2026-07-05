@@ -14,6 +14,54 @@ not.
 npm install doe-gpu
 ```
 
+## Package map
+
+```text
++-------------------+
+| app code          |
+| Node | Bun | Deno |
++---------+---------+
+         |
+         v
++--------------------------------+
+| doe-gpu npm package            |
+| JS API + native runtime loader |
++------+------------+------------+
+       |            |
+       v            v
++-------------+  +--------------------------------+
+| entrypoints |  | native library resolution      |
+| compute     |  | optional pkg | workspace build |
+| native      |  | DOE_WEBGPU_LIB / DOE_LIB       |
+| node-webgpu |  +---------------+----------------+
+| plan        |                  |
+| capture     |                  v
+| browser     |          +----------------+
++------+------+          | libwebgpu_doe  |
+      |                +-------+--------+
+      |                        |
+      |                        v
+      |          +-------------------------------+
+      |          | native backend path           |
+      |          | Metal | Vulkan | D3D12/DXIL  |
+      |          +---------------+---------------+
+      |                          |
+      +--------------------------+
+                                 v
+                      +---------------------+
+                      | receipts or explicit|
+                      | missing-runtime fail|
+                      +---------------------+
+
++------------------+     +--------------------------+
+| doe-gpu/browser  | --> | incumbent browser WebGPU |
++------------------+     +--------------------------+
+
++------------------+
+| Fawn/Chromium    | separate browser release lane
++------------------+
+```
+
 ## Usage
 
 Run the package examples:
