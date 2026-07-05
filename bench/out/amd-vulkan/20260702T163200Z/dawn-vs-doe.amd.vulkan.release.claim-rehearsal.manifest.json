@@ -1,0 +1,13 @@
+{
+  "claimGatePassed": true,
+  "claimGateResultPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.claim-gate-result.json",
+  "claimGateReturnCode": 0,
+  "claimReportPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+  "contractHashManifestPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.contract-hash-manifest.json",
+  "generatedAtUtc": "2026-07-02T16:39:06.231714Z",
+  "reportPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+  "schemaVersion": 1,
+  "strictComparableReportPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+  "tailHealthPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.tail-health.json",
+  "timingInvariantAuditPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim-rehearsal.timing-invariant-audit.json"
+}

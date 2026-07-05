@@ -1,0 +1,31 @@
+{
+  "command": [
+    "/usr/bin/python3",
+    "bench/gates/claim_gate.py",
+    "--report",
+    "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
+    "--claim-report",
+    "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+    "--require-comparison-status",
+    "comparable",
+    "--require-claim-status",
+    "claimable",
+    "--require-claimability-mode",
+    "release",
+    "--require-min-timed-samples",
+    "15",
+    "--expected-workload-contract",
+    "/home/x/deco/doe/bench/workloads/workloads.amd.vulkan.json",
+    "--config",
+    "bench/native-compare/compare.config.amd.vulkan.release.json",
+    "--require-workload-contract-hash",
+    "--require-workload-id-set-match"
+  ],
+  "executed": true,
+  "generatedAtUtc": "2026-07-02T16:39:06.230865Z",
+  "passed": true,
+  "returnCode": 0,
+  "schemaVersion": 1,
+  "stderr": "",
+  "stdout": "PASS: claim gate satisfied (requiredMode=release, comparisonStatus=comparable, claimStatus=claimable)\n"
+}

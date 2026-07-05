@@ -49,6 +49,9 @@ bench/compare_dawn_vs_doe.config.local.*.json
 bench/out/**
 !bench/out/
 !bench/out/README.local.md
+!bench/out/amd-vulkan/
+!bench/out/amd-vulkan/20260702T163200Z/
+!bench/out/amd-vulkan/20260702T163200Z/**
 nursery/webgpu/out/node-smoke.meta.json
 nursery/webgpu/out/node-smoke.ndjson
 nursery/webgpu/build/
