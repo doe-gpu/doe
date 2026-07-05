@@ -146,13 +146,15 @@ Boundary docs:
 ## Benchmark evidence
 
 The README chart uses one reporting contract across backends: each row states
-backend, surface, comparator, metric direction, result, claim state, and
-evidence path. Metal rows include claim-indexed native/package/Node+Bun ORT
-evidence plus the browser ORT diagnostic boundary; Vulkan rows are shown with
-their current diagnostic/status boundary instead of being omitted. Browser rows
-remain diagnostic or scaffolded unless the claim index and release gates say
-otherwise. Platform names matter: macOS arm64, Linux x64/AMD Vulkan, and
-Chromium browser rows are separate release surfaces.
+backend, surface, comparator, metric direction, result source, claim state, and
+evidence path. It intentionally defers raw timings and percentages to the
+current claim index and sidecar artifacts. Metal rows include claim-indexed
+native strict and Bun package evidence. Native release, Node package,
+Node+Bun ORT, and browser ORT stay diagnostic when the claim index marks them
+diagnostic. Vulkan rows include claim-indexed native/package boundaries where indexed.
+Browser rows remain diagnostic or scaffolded unless the claim index and release
+gates say otherwise. Platform names matter: macOS arm64, Linux x64/AMD Vulkan,
+and Chromium browser rows are separate release surfaces.
 The broader Dawn/Tint replacement frontier is tracked by
 `config/dawn-replacement-frontier.json` and blocked by
 `bench/gates/dawn_replacement_frontier_gate.py`; universal replacement language

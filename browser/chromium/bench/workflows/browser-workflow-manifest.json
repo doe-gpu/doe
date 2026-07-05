@@ -89,6 +89,7 @@
       "scenarioTemplate": "fawn_visual_resource",
       "description": "Existing Fawn magnetic-fluid HTML page measured as a visible WebGPU page workload.",
       "resourcePath": "browser/chromium/resources/fawn-magnetic-fluids.html",
+      "workloadSelector": "#load",
       "metrics": [
         "frameCount",
         "avgFrameMs",
@@ -106,6 +107,7 @@
       "scenarioTemplate": "fawn_visual_resource",
       "description": "Existing Fawn prismatic-fluid HTML page measured as a visible WebGPU page workload.",
       "resourcePath": "browser/chromium/resources/fawn-prismatic-fluids.html",
+      "workloadSelector": "#load",
       "metrics": [
         "frameCount",
         "avgFrameMs",

@@ -10,11 +10,11 @@
       "backend": "apple-metal",
       "comparison": "doe-vs-node-webgpu",
       "metricDirection": "lower-is-better",
-      "claimState": "claim-indexed",
+      "claimState": "diagnostic",
       "comparisonStatus": "comparable",
-      "claimStatus": "claimable",
-      "reportPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json",
-      "claimPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json"
+      "claimStatus": "diagnostic",
+      "reportPath": "bench/out/apple-metal/20260705T163736Z/gemma64.node-package.warm.ir.compare.json",
+      "claimPath": "bench/out/apple-metal/20260705T163736Z/gemma64.node-package.warm.ir.claim.json"
     },
     {
       "id": "package-bun-apple-metal",
@@ -26,8 +26,8 @@
       "claimState": "claim-indexed",
       "comparisonStatus": "comparable",
       "claimStatus": "claimable",
-      "reportPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json",
-      "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json"
+      "reportPath": "bench/out/apple-metal/20260705T163736Z/gemma64.bun-package.warm.ir.compare.json",
+      "claimPath": "bench/out/apple-metal/20260705T163736Z/gemma64.bun-package.warm.ir.claim.json"
     },
     {
       "id": "package-node-amd-vulkan",
@@ -64,8 +64,8 @@
       "claimState": "claim-indexed",
       "comparisonStatus": "comparable",
       "claimStatus": "claimable",
-      "reportPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json",
-      "claimPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json"
+      "reportPath": "bench/out/apple-metal/20260705T163736Z/runtime.apple-metal.compare.json",
+      "claimPath": "bench/out/apple-metal/20260705T163736Z/runtime.apple-metal.claim.json"
     },
     {
       "id": "native-release-apple-metal",
@@ -73,11 +73,11 @@
       "backend": "apple-metal",
       "comparison": "doe-vs-dawn",
       "metricDirection": "lower-is-better",
-      "claimState": "claim-indexed",
+      "claimState": "diagnostic",
       "comparisonStatus": "comparable",
-      "claimStatus": "claimable",
-      "reportPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json",
-      "claimPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json"
+      "claimStatus": "diagnostic",
+      "reportPath": "bench/out/apple-metal/20260705T163736Z/runtime.apple-metal.release.json",
+      "claimPath": "bench/out/apple-metal/20260705T163736Z/runtime.apple-metal.release.claim.json"
     },
     {
       "id": "ort-node-apple-metal",
@@ -86,11 +86,11 @@
       "backend": "apple-metal",
       "comparison": "doe-vs-node-webgpu",
       "metricDirection": "lower-is-better",
-      "claimState": "claim-indexed",
-      "comparisonStatus": "comparable",
-      "claimStatus": "claimable",
-      "reportPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.compare.json",
-      "claimPath": "bench/out/apple-metal-ort-node/20260626T192328Z/gemma270m.claim.json"
+      "claimState": "diagnostic",
+      "comparisonStatus": "diagnostic",
+      "claimStatus": "diagnostic",
+      "reportPath": "bench/out/apple-metal-ort-node/20260705T163736Z/gemma270m.compare.json",
+      "claimPath": "bench/out/apple-metal-ort-node/20260705T163736Z/gemma270m.claim.json"
     },
     {
       "id": "ort-bun-apple-metal",
@@ -99,11 +99,11 @@
       "backend": "apple-metal",
       "comparison": "doe-vs-bun-webgpu",
       "metricDirection": "lower-is-better",
-      "claimState": "claim-indexed",
-      "comparisonStatus": "comparable",
-      "claimStatus": "claimable",
-      "reportPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.compare.json",
-      "claimPath": "bench/out/apple-metal-ort-bun/20260626T192011Z/gemma270m-prefill32-decode1.claim.json"
+      "claimState": "diagnostic",
+      "comparisonStatus": "diagnostic",
+      "claimStatus": "diagnostic",
+      "reportPath": "bench/out/apple-metal-ort-bun/20260705T163736Z/gemma270m-prefill32-decode1.compare.json",
+      "claimPath": "bench/out/apple-metal-ort-bun/20260705T163736Z/gemma270m-prefill32-decode1.claim.json"
     },
     {
       "id": "ort-browser-apple-metal",

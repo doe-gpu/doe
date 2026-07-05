@@ -1,0 +1,44 @@
+{
+  "artifactKind": "claim-report",
+  "claimPolicy": {
+    "benchmarkPolicy": {
+      "path": "config/benchmark-methodology-thresholds.json",
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+    },
+    "minTimedSamples": 3,
+    "mode": "local",
+    "policyHash": "6c5f960a663acb963c68cfbdb3e4d8fd000dd88ff41dafcbf69e04a0e0e56bb5"
+  },
+  "claimStatus": "diagnostic",
+  "compareReport": {
+    "path": "bench/out/apple-metal-ort-node/20260705T163736Z/gemma270m.compare.json",
+    "sha256": "f8fe0259b3a0dee8db2ecb115ae6f753959071e4615095f0651c295ad6eab3df"
+  },
+  "comparisonStatus": "diagnostic",
+  "generatedAt": "2026-07-05T16:52:07.181495+00:00",
+  "pass": false,
+  "reasons": [
+    "apple_metal_node_ort_webgpu_provider_compare_gemma3_270m_prefill_64tok_decode_64tok: workload is non-comparable; reliability claimability requires comparability | p50Percent=-5.015507 is not positive (positive means baseline faster) | p95Percent=-49.123941 is not positive (positive means baseline faster)"
+  ],
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": false,
+      "evaluated": true,
+      "reasons": [
+        "workload is non-comparable; reliability claimability requires comparability",
+        "p50Percent=-5.015507 is not positive (positive means baseline faster)",
+        "p95Percent=-49.123941 is not positive (positive means baseline faster)"
+      ],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "apple_metal_node_ort_webgpu_provider_compare_gemma3_270m_prefill_64tok_decode_64tok"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "artifactKind": "claim-report",
+  "claimPolicy": {
+    "benchmarkPolicy": {
+      "path": "config/benchmark-methodology-thresholds.json",
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+    },
+    "minTimedSamples": 15,
+    "mode": "local",
+    "policyHash": "c58a192437af59287575fce3f015778332963288b8b28830021b35a502fceb0f"
+  },
+  "claimStatus": "diagnostic",
+  "compareReport": {
+    "path": "bench/out/apple-metal/20260705T163736Z/gemma64.node-package.warm.ir.compare.json",
+    "sha256": "3acf2562c4f7c669308564756fa1d3dda295ce8b1c33c2f4909a440758ece279"
+  },
+  "comparisonStatus": "comparable",
+  "generatedAt": "2026-07-05T16:38:32.580396+00:00",
+  "pass": false,
+  "reasons": [
+    "inference_gemma3_270m_prefill_64tok_decode_64tok: p50Percent=-5.798894 is not positive (positive means baseline faster) | p95Percent=-7.229345 is not positive (positive means baseline faster)"
+  ],
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": false,
+      "evaluated": true,
+      "reasons": [
+        "p50Percent=-5.798894 is not positive (positive means baseline faster)",
+        "p95Percent=-7.229345 is not positive (positive means baseline faster)"
+      ],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "inference_gemma3_270m_prefill_64tok_decode_64tok"
+    }
+  ]
+}

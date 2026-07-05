@@ -52,6 +52,15 @@ bench/out/**
 !bench/out/amd-vulkan/
 !bench/out/amd-vulkan/20260702T163200Z/
 !bench/out/amd-vulkan/20260702T163200Z/**
+!bench/out/apple-metal/
+!bench/out/apple-metal/20260705T163736Z/
+!bench/out/apple-metal/20260705T163736Z/*.json
+!bench/out/apple-metal-ort-node/
+!bench/out/apple-metal-ort-node/20260705T163736Z/
+!bench/out/apple-metal-ort-node/20260705T163736Z/*.json
+!bench/out/apple-metal-ort-bun/
+!bench/out/apple-metal-ort-bun/20260705T163736Z/
+!bench/out/apple-metal-ort-bun/20260705T163736Z/*.json
 nursery/webgpu/out/node-smoke.meta.json
 nursery/webgpu/out/node-smoke.ndjson
 nursery/webgpu/build/

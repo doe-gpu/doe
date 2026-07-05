@@ -42,10 +42,10 @@
   <text x="334" y="235" class="cell">Doe vs Dawn</text>
   <text x="500" y="228" class="cell">p50 ms/op</text>
   <text x="500" y="246" class="small">lower is better</text>
-  <text x="686" y="228" class="cell">0.9 vs 1.6 ms</text>
-  <text x="686" y="246" class="status" fill="#0f766e">Doe +47.5%</text>
+  <text x="686" y="228" class="cell">Claim-index row</text>
+  <text x="686" y="246" class="status" fill="#0f766e">See sidecar</text>
   <text x="888" y="235" class="status" fill="#0f766e">claim-indexed</text>
-  <text x="1030" y="235" class="path mono">bench/out/apple-metal/compare/...metal.compare.json</text>
+  <text x="1030" y="235" class="path mono">bench/out/apple-metal/...compare.json</text>
 
   <rect x="42" y="266" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />
   <text x="56" y="297" class="cell">Apple Metal</text>
@@ -54,10 +54,10 @@
   <text x="334" y="297" class="cell">Doe vs Dawn</text>
   <text x="500" y="290" class="cell">p50 ms/op</text>
   <text x="500" y="308" class="small">lower is better</text>
-  <text x="686" y="290" class="cell">2.5 vs 5.6 ms</text>
-  <text x="686" y="308" class="status" fill="#0f766e">Doe +55.5%</text>
-  <text x="888" y="297" class="status" fill="#0f766e">claim-indexed</text>
-  <text x="1030" y="297" class="path mono">bench/out/apple-metal/release/...release.json</text>
+  <text x="686" y="290" class="cell">Claim-index row</text>
+  <text x="686" y="308" class="status" fill="#9a3412">See sidecar</text>
+  <text x="888" y="297" class="status" fill="#9a3412">diagnostic</text>
+  <text x="1030" y="297" class="path mono">bench/out/apple-metal/...release.json</text>
 
   <rect x="42" y="328" width="1196" height="52" rx="4" fill="#f6f7ff" stroke="#d8ddf0" />
   <text x="56" y="359" class="cell">Apple Metal</text>
@@ -66,21 +66,21 @@
   <text x="334" y="359" class="cell">Doe vs host WebGPU</text>
   <text x="500" y="352" class="cell">p50 ms/op</text>
   <text x="500" y="370" class="small">lower is better</text>
-  <text x="686" y="352" class="cell">Node +3.7%</text>
-  <text x="686" y="370" class="cell">Bun +7.2%</text>
-  <text x="888" y="359" class="status" fill="#0f766e">claim-indexed</text>
+  <text x="686" y="352" class="cell">Node diagnostic</text>
+  <text x="686" y="370" class="cell">Bun claim-indexed</text>
+  <text x="888" y="359" class="status" fill="#9a3412">mixed</text>
   <text x="1030" y="359" class="path mono">reports/claim-index.json</text>
 
   <rect x="42" y="390" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />
   <text x="56" y="421" class="cell">Apple Metal</text>
   <text x="176" y="414" class="cell">ORT provider</text>
-  <text x="176" y="432" class="small">Node + Bun claimed</text>
+  <text x="176" y="432" class="small">Node + Bun</text>
   <text x="334" y="421" class="cell">Doe vs Dawn/WebGPU</text>
   <text x="500" y="414" class="cell">p50 wall ms</text>
   <text x="500" y="432" class="small">lower is better</text>
-  <text x="686" y="414" class="cell">Node +2.9%, Bun +0.1%</text>
+  <text x="686" y="414" class="cell">Node + Bun diagnostic</text>
   <text x="686" y="432" class="cell">Browser diagnostic</text>
-  <text x="888" y="421" class="status" fill="#9a3412">mixed boundary</text>
+  <text x="888" y="421" class="status" fill="#9a3412">diagnostic</text>
   <text x="1030" y="421" class="path mono">reports/claim-index.json</text>
 
   <rect x="42" y="452" width="1196" height="52" rx="4" fill="#f3fbf8" stroke="#b7ded1" />
@@ -90,22 +90,22 @@
   <text x="334" y="483" class="cell">Doe vs Dawn</text>
   <text x="500" y="476" class="cell">release matrix</text>
   <text x="500" y="494" class="small">lower is better</text>
-  <text x="686" y="476" class="cell">7 workloads comparable</text>
-  <text x="686" y="494" class="cell">tiny-upload blocker remains</text>
-  <text x="888" y="483" class="status" fill="#9a3412">diagnostic</text>
-  <text x="1030" y="483" class="path mono">bench/out/amd-vulkan/...release.json</text>
+  <text x="686" y="476" class="cell">Claim-index row</text>
+  <text x="686" y="494" class="cell">See sidecar</text>
+  <text x="888" y="483" class="status" fill="#0f766e">claim-indexed</text>
+  <text x="1030" y="483" class="path mono">reports/claim-index.json</text>
 
   <rect x="42" y="514" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />
   <text x="56" y="545" class="cell">AMD Vulkan</text>
-  <text x="176" y="538" class="cell">Package/ORT</text>
-  <text x="176" y="556" class="small">README row</text>
-  <text x="334" y="545" class="cell">public claim surface</text>
-  <text x="500" y="538" class="cell">p50 claim row</text>
-  <text x="500" y="556" class="small">not available</text>
-  <text x="686" y="538" class="cell">No README-indexed receipt</text>
-  <text x="686" y="556" class="cell">status-only coverage</text>
-  <text x="888" y="545" class="status" fill="#9a3412">not claimed</text>
-  <text x="1030" y="545" class="path mono">docs/doe-support-matrix.md</text>
+  <text x="176" y="538" class="cell">Package</text>
+  <text x="176" y="556" class="small">Node + Bun</text>
+  <text x="334" y="545" class="cell">Doe vs host WebGPU</text>
+  <text x="500" y="538" class="cell">p50 ms/op</text>
+  <text x="500" y="556" class="small">lower is better</text>
+  <text x="686" y="538" class="cell">Node claim-indexed</text>
+  <text x="686" y="556" class="cell">Bun claim-indexed</text>
+  <text x="888" y="545" class="status" fill="#0f766e">claim-indexed</text>
+  <text x="1030" y="545" class="path mono">reports/claim-index.json</text>
 
-  <text x="42" y="592" class="small">Disclosure: this is an evidence inventory, not a cross-machine average. Compare numbers only within a row.</text>
+  <text x="42" y="592" class="small">Disclosure: this is an evidence inventory, not a cross-machine average. Raw timings live in the indexed sidecars.</text>
 </svg>
