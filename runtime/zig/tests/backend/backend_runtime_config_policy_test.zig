@@ -16,7 +16,7 @@ test "backend runtime policy loads local metal lane from config" {
     try std.testing.expect(loaded.policy.upload_path_policy == .staged_copy_only);
     try std.testing.expectEqual(runtime_types.QueueFamilyPolicy.prefer_graphics_compute, loaded.policy.queue_family_policy);
     try std.testing.expectEqual(runtime_types.DeferredSubmissionSyncPolicy.prefer_timeline_semaphore, loaded.policy.deferred_submission_sync_policy);
-    try std.testing.expectEqualStrings("backend-runtime-policy-v5", loaded.policy.policy_hash);
+    try std.testing.expectEqualStrings("backend-runtime-policy-v7", loaded.policy.policy_hash);
 }
 
 test "backend runtime policy forces staged uploads on strict Vulkan lanes" {
@@ -33,7 +33,7 @@ test "backend runtime policy forces staged uploads on strict Vulkan lanes" {
     try std.testing.expect(loaded.policy.upload_path_policy == .staged_copy_only);
     try std.testing.expectEqual(runtime_types.QueueFamilyPolicy.prefer_graphics_compute, loaded.policy.queue_family_policy);
     try std.testing.expectEqual(runtime_types.DeferredSubmissionSyncPolicy.prefer_timeline_semaphore, loaded.policy.deferred_submission_sync_policy);
-    try std.testing.expectEqualStrings("backend-runtime-policy-v5", loaded.policy.policy_hash);
+    try std.testing.expectEqualStrings("backend-runtime-policy-v7", loaded.policy.policy_hash);
 }
 
 test "backend runtime policy loads Vulkan compute-only fence diagnostic lane" {
@@ -50,7 +50,7 @@ test "backend runtime policy loads Vulkan compute-only fence diagnostic lane" {
     try std.testing.expect(loaded.policy.upload_path_policy == .staged_copy_only);
     try std.testing.expectEqual(runtime_types.QueueFamilyPolicy.require_compute_only, loaded.policy.queue_family_policy);
     try std.testing.expectEqual(runtime_types.DeferredSubmissionSyncPolicy.require_fence_pool, loaded.policy.deferred_submission_sync_policy);
-    try std.testing.expectEqualStrings("backend-runtime-policy-v5", loaded.policy.policy_hash);
+    try std.testing.expectEqualStrings("backend-runtime-policy-v7", loaded.policy.policy_hash);
 }
 
 test "backend lane parser handles metal_doe_app and local metal lanes" {
@@ -91,8 +91,8 @@ test "backend runtime policy rejects fallback-enabled lane config" {
         .sub_path = path,
         .data =
         \\{
-        \\  "schemaVersion": 4,
-        \\  "selectionPolicyHashSeed": "backend-runtime-policy-v5",
+        \\  "schemaVersion": 6,
+        \\  "selectionPolicyHashSeed": "backend-runtime-policy-v7",
         \\  "lanes": {
         \\    "metal_doe_comparable": {
         \\      "defaultBackend": "doe_metal",
@@ -124,8 +124,8 @@ test "backend runtime policy rejects mapped shortcuts for strict staged-upload l
         .sub_path = path,
         .data =
         \\{
-        \\  "schemaVersion": 4,
-        \\  "selectionPolicyHashSeed": "backend-runtime-policy-v5",
+        \\  "schemaVersion": 6,
+        \\  "selectionPolicyHashSeed": "backend-runtime-policy-v7",
         \\  "lanes": {
         \\    "metal_doe_release": {
         \\      "defaultBackend": "doe_metal",
@@ -158,8 +158,8 @@ test "backend runtime policy rejects missing deferred sync policy" {
         .sub_path = path,
         .data =
         \\{
-        \\  "schemaVersion": 4,
-        \\  "selectionPolicyHashSeed": "backend-runtime-policy-v5",
+        \\  "schemaVersion": 6,
+        \\  "selectionPolicyHashSeed": "backend-runtime-policy-v7",
         \\  "lanes": {
         \\    "vulkan_doe_comparable": {
         \\      "defaultBackend": "doe_vulkan",

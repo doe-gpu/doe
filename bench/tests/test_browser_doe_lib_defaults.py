@@ -17,6 +17,7 @@ LANE_PATHS = REPO_ROOT / "browser/chromium/scripts/lane-paths.sh"
 BUILD_RELEASE_EXTERNAL = REPO_ROOT / "browser/chromium/scripts/build-release-external.sh"
 RUN_CONSUMER_BENCH = REPO_ROOT / "browser/chromium/scripts/run-consumer-bench.sh"
 RUN_FAWN_RUNTIME_BENCH = REPO_ROOT / "browser/chromium/scripts/run-fawn-runtime-bench.sh"
+RUN_WITH_LANE_DEFAULTS = REPO_ROOT / "browser/chromium/scripts/run-with-lane-defaults.sh"
 SYNC_RELEASE_ARTIFACTS_LOCAL = (
     REPO_ROOT / "browser/chromium/scripts/sync-release-artifacts-local.sh"
 )
@@ -343,6 +344,18 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
             "--required-fawn-release-profile any",
             RUN_FAWN_RUNTIME_BENCH.read_text(encoding="utf-8"),
         )
+        self.assertIn(
+            "--mode-schedule paired-balanced",
+            RUN_FAWN_RUNTIME_BENCH.read_text(encoding="utf-8"),
+        )
+        self.assertIn(
+            "--strict-run",
+            RUN_FAWN_RUNTIME_BENCH.read_text(encoding="utf-8"),
+        )
+        lane_defaults = RUN_WITH_LANE_DEFAULTS.read_text(encoding="utf-8")
+        self.assertIn('FAWN_BACKEND_LANE="vulkan_doe_app"', lane_defaults)
+        self.assertIn('FAWN_BACKEND_LANE="metal_doe_app"', lane_defaults)
+        self.assertIn('FAWN_BACKEND_LANE="d3d12_doe_app"', lane_defaults)
 
     def test_shell_lane_candidates_prefer_full_webgpu_library(self) -> None:
         proc = subprocess.run(

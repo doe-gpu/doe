@@ -297,7 +297,6 @@ fn match_flat_index_2d_dispatch_x(
     expr_id: ir.ExprId,
 ) ?u64 {
     if (match_flat_index_2d_dispatch_x_base(module, function, function_id, expr_id)) return 0;
-
     const canonical = resolve_value_alias(function, expr_id);
     const expr = function.exprs.items[canonical];
     const binary = switch (expr.data) {
@@ -305,7 +304,6 @@ fn match_flat_index_2d_dispatch_x(
         else => return null,
     };
     if (binary.op != .add) return null;
-
     if (match_u32_literal_value(function, binary.lhs)) |offset| {
         if (match_flat_index_2d_dispatch_x_base(module, function, function_id, binary.rhs)) return offset;
     }
@@ -328,7 +326,6 @@ fn match_flat_index_2d_dispatch_x_base(
         else => return false,
     };
     if (binary.op != .add) return false;
-
     return (classify_builtin_component(function, binary.lhs, .global_invocation_id) == 0 and
         match_gid_y_times_dispatch_width(module, function, function_id, binary.rhs)) or
         (classify_builtin_component(function, binary.rhs, .global_invocation_id) == 0 and
@@ -342,7 +339,6 @@ fn match_flat_index_3d_dispatch_xy(
     expr_id: ir.ExprId,
 ) ?u64 {
     if (match_flat_index_3d_dispatch_xy_base(module, function, function_id, expr_id)) return 0;
-
     const canonical = resolve_value_alias(function, expr_id);
     const expr = function.exprs.items[canonical];
     const binary = switch (expr.data) {
@@ -350,7 +346,6 @@ fn match_flat_index_3d_dispatch_xy(
         else => return null,
     };
     if (binary.op != .add) return null;
-
     if (match_u32_literal_value(function, binary.lhs)) |offset| {
         if (match_flat_index_3d_dispatch_xy_base(module, function, function_id, binary.rhs)) return offset;
     }
@@ -373,7 +368,6 @@ fn match_flat_index_3d_dispatch_xy_base(
         else => return false,
     };
     if (binary.op != .add) return false;
-
     if (classify_builtin_component(function, binary.lhs, .global_invocation_id) == 0) {
         return match_flat_index_3d_dispatch_xy_without_x(module, function, function_id, binary.rhs);
     }
@@ -396,7 +390,6 @@ fn match_flat_index_3d_dispatch_xy_without_x(
         else => return false,
     };
     if (binary.op != .add) return false;
-
     return (match_gid_z_times_dispatch_area_xy(module, function, function_id, binary.lhs) and
         match_gid_y_times_dispatch_width(module, function, function_id, binary.rhs)) or
         (match_gid_z_times_dispatch_area_xy(module, function, function_id, binary.rhs) and
@@ -416,7 +409,6 @@ fn match_gid_y_times_dispatch_width(
         else => return false,
     };
     if (binary.op != .mul) return false;
-
     return (classify_builtin_component(function, binary.lhs, .global_invocation_id) == 1 and
         match_dispatch_width(module, function, function_id, binary.rhs)) or
         (classify_builtin_component(function, binary.rhs, .global_invocation_id) == 1 and
@@ -436,7 +428,6 @@ fn match_gid_z_times_dispatch_area_xy(
         else => return false,
     };
     if (binary.op != .mul) return false;
-
     return (classify_builtin_component(function, binary.lhs, .global_invocation_id) == 2 and
         match_dispatch_area_xy(module, function, function_id, binary.rhs)) or
         (classify_builtin_component(function, binary.rhs, .global_invocation_id) == 2 and
@@ -453,7 +444,6 @@ fn match_dispatch_width(
     if (classify_builtin_component(function, expr_id, .num_workgroups) == 0) {
         return workgroup_size[0] == 1;
     }
-
     const canonical = resolve_value_alias(function, expr_id);
     const expr = function.exprs.items[canonical];
     const binary = switch (expr.data) {
@@ -461,7 +451,6 @@ fn match_dispatch_width(
         else => return false,
     };
     if (binary.op != .mul) return false;
-
     return (classify_builtin_component(function, binary.lhs, .num_workgroups) == 0 and
         match_u32_literal(function, binary.rhs, workgroup_size[0])) or
         (classify_builtin_component(function, binary.rhs, .num_workgroups) == 0 and
@@ -478,7 +467,6 @@ fn match_dispatch_height(
     if (classify_builtin_component(function, expr_id, .num_workgroups) == 1) {
         return workgroup_size[1] == 1;
     }
-
     const canonical = resolve_value_alias(function, expr_id);
     const expr = function.exprs.items[canonical];
     const binary = switch (expr.data) {
@@ -486,7 +474,6 @@ fn match_dispatch_height(
         else => return false,
     };
     if (binary.op != .mul) return false;
-
     return (classify_builtin_component(function, binary.lhs, .num_workgroups) == 1 and
         match_u32_literal(function, binary.rhs, workgroup_size[1])) or
         (classify_builtin_component(function, binary.rhs, .num_workgroups) == 1 and
@@ -506,7 +493,6 @@ fn match_dispatch_area_xy(
         else => return false,
     };
     if (binary.op != .mul) return false;
-
     return (match_dispatch_width(module, function, function_id, binary.lhs) and
         match_dispatch_height(module, function, function_id, binary.rhs)) or
         (match_dispatch_width(module, function, function_id, binary.rhs) and
@@ -555,7 +541,6 @@ pub fn match_gid_component_plus_offset(
         else => return null,
     };
     if (binary.op != .add) return null;
-
     if (classify_builtin_component(function, binary.lhs, builtin)) |axis| {
         if (match_u32_literal_value(function, binary.rhs)) |offset| {
             return .{ .axis = axis, .offset = offset };
@@ -580,7 +565,6 @@ fn match_gid_component_times_stride(
         else => return null,
     };
     if (binary.op != .mul) return null;
-
     if (classify_builtin_component(function, binary.lhs, builtin)) |axis| {
         if (match_u32_literal_value(function, binary.rhs)) |multiplier| {
             if (multiplier > 0) return .{ .axis = axis, .multiplier = multiplier };
@@ -602,14 +586,12 @@ pub fn match_gid_component_times_stride_plus_offset(
     if (match_gid_component_times_stride(function, expr_id, builtin)) |match| {
         return .{ .axis = match.axis, .multiplier = match.multiplier, .offset = 0 };
     }
-
     const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
     const binary = switch (expr.data) {
         .binary => |value| value,
         else => return null,
     };
     if (binary.op != .add) return null;
-
     if (match_u32_literal_value(function, binary.lhs)) |offset| {
         if (match_gid_component_times_stride(function, binary.rhs, builtin)) |match| {
             return .{ .axis = match.axis, .multiplier = match.multiplier, .offset = offset };

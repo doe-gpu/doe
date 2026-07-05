@@ -19,12 +19,26 @@ pub const FENCE_POOL_CAPACITY: usize = 128;
 
 /// Timeout for per-fence waits (nanoseconds). Matches vk_upload.WAIT_TIMEOUT_NS.
 pub const FENCE_WAIT_TIMEOUT_NS: u64 = std.math.maxInt(u64);
+pub const IMMEDIATE_FENCE_POLL_SPINS: usize = 2048;
+
+pub fn wait_for_fence_fast(device: c.VkDevice, fence: c.VkFence) common_errors.BackendNativeError!void {
+    var spin: usize = 0;
+    while (spin < IMMEDIATE_FENCE_POLL_SPINS) : (spin += 1) {
+        const status = c.vkGetFenceStatus(device, fence);
+        if (status == c.VK_SUCCESS) return;
+        if (status != c.VK_NOT_READY) return c.check_vk(status);
+        std.atomic.spinLoopHint();
+    }
+    try c.check_vk(c.vkWaitForFences(device, 1, @ptrCast(&fence), c.VK_TRUE, FENCE_WAIT_TIMEOUT_NS));
+}
 
 pub const FencePool = struct {
     fences: [FENCE_POOL_CAPACITY]c.VkFence = [_]c.VkFence{VK_NULL_U64} ** FENCE_POOL_CAPACITY,
     in_flight: [FENCE_POOL_CAPACITY]bool = [_]bool{false} ** FENCE_POOL_CAPACITY,
     count: u32 = 0,
     next_index: u32 = 0,
+    in_flight_count: u32 = 0,
+    last_in_flight_index: u32 = 0,
 
     /// Initialize the ring. Individual VkFence handles are created on first use.
     pub fn init(device: c.VkDevice) common_errors.BackendNativeError!FencePool {
@@ -51,12 +65,15 @@ pub const FencePool = struct {
 
         // If this slot was in-flight from a previous submission, wait + reset
         if (self.in_flight[idx]) {
-            try c.check_vk(c.vkWaitForFences(device, 1, @ptrCast(&fence), c.VK_TRUE, FENCE_WAIT_TIMEOUT_NS));
+            try wait_for_fence_fast(device, fence);
             self.in_flight[idx] = false;
+            self.in_flight_count -|= 1;
         }
 
         try c.check_vk(c.vkResetFences(device, 1, @ptrCast(&fence)));
         self.in_flight[idx] = true;
+        self.in_flight_count +|= 1;
+        self.last_in_flight_index = idx;
         self.next_index = (idx + 1) % self.count;
         return fence;
     }
@@ -64,6 +81,24 @@ pub const FencePool = struct {
     /// Wait for all in-flight fences and mark them reusable. Used to drain all
     /// deferred/pipelined submissions without vkQueueWaitIdle.
     pub fn drain(self: *FencePool, device: c.VkDevice) common_errors.BackendNativeError!void {
+        if (self.in_flight_count == 0) return;
+        if (self.in_flight_count == 1) {
+            var idx = self.last_in_flight_index;
+            if (idx >= self.count or !self.in_flight[idx]) {
+                idx = 0;
+                while (idx < self.count and !self.in_flight[idx]) : (idx += 1) {}
+                if (idx >= self.count) {
+                    self.in_flight_count = 0;
+                    return;
+                }
+            }
+            if (self.fences[idx] == VK_NULL_U64) return error.InvalidState;
+            try wait_for_fence_fast(device, self.fences[idx]);
+            self.in_flight[idx] = false;
+            self.in_flight_count = 0;
+            return;
+        }
+
         var handles: [FENCE_POOL_CAPACITY]c.VkFence = undefined;
         var handle_count: u32 = 0;
 
@@ -88,14 +123,12 @@ pub const FencePool = struct {
         while (i < self.count) : (i += 1) {
             if (self.in_flight[i]) self.in_flight[i] = false;
         }
+        self.in_flight_count = 0;
     }
 
     /// True when at least one fence is in-flight (deferred work outstanding).
     pub fn has_in_flight(self: *const FencePool) bool {
-        for (self.in_flight[0..self.count]) |f| {
-            if (f) return true;
-        }
-        return false;
+        return self.in_flight_count != 0;
     }
 
     /// Destroy all pool fences. Call before device destruction.
@@ -105,7 +138,7 @@ pub const FencePool = struct {
             if (self.fences[i] != VK_NULL_U64) {
                 // Best-effort wait before destroy to avoid validation errors
                 if (self.in_flight[i]) {
-                    _ = c.vkWaitForFences(device, 1, @ptrCast(&self.fences[i]), c.VK_TRUE, FENCE_WAIT_TIMEOUT_NS);
+                    wait_for_fence_fast(device, self.fences[i]) catch {};
                     self.in_flight[i] = false;
                 }
                 c.vkDestroyFence(device, self.fences[i], null);
@@ -114,6 +147,8 @@ pub const FencePool = struct {
         }
         self.count = 0;
         self.next_index = 0;
+        self.in_flight_count = 0;
+        self.last_in_flight_index = 0;
     }
 };
 

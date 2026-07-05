@@ -17,6 +17,21 @@ TSIR Step 7-12 block now lives under
 [`archive/2026-04-02-to-2026-04-15.md`](archive/2026-04-02-to-2026-04-15.md)
 (tail block). New TSIR entries go here going forward.
 
+## 2026-07-05 — TSIR source shards retired the line-limit allowlist
+
+The TSIR Phase A source-size exceptions are closed. The reference interpreter
+is now split into the dispatcher plus input helpers, shared result/error
+types, reduction handling, and extended body-op handlers; its public tests
+live under `runtime/zig/tests/wgsl/tsir_reference_interpreter_test.zig`.
+The frontend is split into the top-level lowering pass plus expression
+helpers, rejection extraction, collective extraction, frontend body helpers,
+and shared frontend types. The digest module moved its public digest tests to
+`runtime/zig/tests/wgsl/tsir_digest_test.zig` while keeping private
+canonicalization checks next to private helpers.
+
+`runtime/zig/tools/check_line_limits.py` now has no TSIR allowlist entries.
+That gate is the source of truth for current source-size compliance.
+
 ## 2026-04-27 — Qwen 3.6-27B audit: TSIR / CSL emit gap list
 
 Audit of what Qwen 3.6-27B (or any current Qwen 3.5 architecture extended to
@@ -291,7 +306,7 @@ Gates protecting Phase A artifacts:
   leak guard (Doe docs must not contain upstream-repo path or
   competitive-framing patterns).
 - `runtime/zig/tools/check_line_limits.py` — 999-line Zig source cap;
-  three TSIR modules allowlisted with tracked sharding follow-ups.
+  no active TSIR source exceptions.
 - `bench/tests/test_doc_link_coverage.py` — in-repo markdown link
   integrity across `docs/**` + root-level markdown.
 

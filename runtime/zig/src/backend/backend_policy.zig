@@ -28,6 +28,12 @@ pub const UploadPathPolicy = enum {
     staged_copy_only,
 };
 
+pub const VulkanSubgroupSizePolicy = enum {
+    fixed_32_when_supported,
+    suppress_for_workgroup_memory_256,
+    suppress_for_workgroup_memory_256_or_single_invocation,
+};
+
 pub const SelectionPolicy = struct {
     lane: BackendLane,
     default_backend: backend_ids.BackendId,
@@ -37,6 +43,7 @@ pub const SelectionPolicy = struct {
     upload_path_policy: UploadPathPolicy,
     queue_family_policy: runtime_types.QueueFamilyPolicy,
     deferred_submission_sync_policy: runtime_types.DeferredSubmissionSyncPolicy,
+    vulkan_subgroup_size_policy: VulkanSubgroupSizePolicy,
 };
 
 pub const LoadedSelectionPolicy = struct {
@@ -47,8 +54,8 @@ pub const LoadedSelectionPolicy = struct {
 pub const DEFAULT_RUNTIME_POLICY_PATH = "config/backend-runtime-policy.json";
 const MAX_RUNTIME_POLICY_BYTES: usize = 64 * 1024;
 const MAX_RUNTIME_POLICY_SEARCH_DEPTH: usize = 4;
-const EXPECTED_SCHEMA_VERSION: i64 = 4;
-const DEFAULT_POLICY_HASH = "backend-runtime-policy-v5";
+const EXPECTED_SCHEMA_VERSION: i64 = 6;
+const DEFAULT_POLICY_HASH = "backend-runtime-policy-v7";
 
 pub const PolicyLoadError = error{
     InvalidRuntimePolicy,
@@ -227,6 +234,15 @@ pub fn load_policy_for_lane(
         break :blk parse_deferred_submission_sync_policy(policy_name) orelse return PolicyLoadError.InvalidRuntimePolicy;
     };
 
+    const vulkan_subgroup_size_policy = blk: {
+        const policy_value = lane_obj.get("vulkanSubgroupSizePolicy") orelse break :blk default_vulkan_subgroup_size_policy(lane);
+        const policy_name = switch (policy_value) {
+            .string => |value| value,
+            else => return PolicyLoadError.InvalidRuntimePolicy,
+        };
+        break :blk parse_vulkan_subgroup_size_policy(policy_name) orelse return PolicyLoadError.InvalidRuntimePolicy;
+    };
+
     return .{
         .policy = .{
             .lane = lane,
@@ -237,6 +253,7 @@ pub fn load_policy_for_lane(
             .upload_path_policy = upload_path_policy,
             .queue_family_policy = queue_family_policy,
             .deferred_submission_sync_policy = deferred_submission_sync_policy,
+            .vulkan_subgroup_size_policy = vulkan_subgroup_size_policy,
         },
         .owned_policy_hash = owned_policy_hash,
     };
@@ -276,6 +293,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .metal_doe_comparable, .metal_doe_release => .{
             .lane = lane,
@@ -286,6 +304,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .staged_copy_only,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .metal_doe_directional => .{
             .lane = lane,
@@ -296,6 +315,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .metal_dawn_release => .{
             .lane = lane,
@@ -306,6 +326,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .metal_webkit_release => .{
             .lane = lane,
@@ -316,6 +337,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .metal_webkit_comparable => .{
             .lane = lane,
@@ -326,6 +348,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .staged_copy_only,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .vulkan_doe_app => .{
             .lane = lane,
@@ -336,6 +359,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .vulkan_doe_comparable, .vulkan_doe_release => .{
             .lane = lane,
@@ -346,6 +370,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .staged_copy_only,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .vulkan_doe_compute_only_diagnostic => .{
             .lane = lane,
@@ -356,6 +381,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .staged_copy_only,
             .queue_family_policy = .require_compute_only,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .vulkan_doe_compute_only_fence_diagnostic => .{
             .lane = lane,
@@ -366,6 +392,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .staged_copy_only,
             .queue_family_policy = .require_compute_only,
             .deferred_submission_sync_policy = .require_fence_pool,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .vulkan_dawn_release => .{
             .lane = lane,
@@ -376,6 +403,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .d3d12_doe_app => .{
             .lane = lane,
@@ -386,6 +414,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .d3d12_doe_comparable, .d3d12_doe_release => .{
             .lane = lane,
@@ -396,6 +425,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .staged_copy_only,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .d3d12_doe_directional => .{
             .lane = lane,
@@ -406,6 +436,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
         .d3d12_dawn_release => .{
             .lane = lane,
@@ -416,6 +447,7 @@ pub fn default_policy_for_lane(lane: BackendLane) SelectionPolicy {
             .upload_path_policy = .allow_mapped_shortcuts,
             .queue_family_policy = .prefer_graphics_compute,
             .deferred_submission_sync_policy = .prefer_timeline_semaphore,
+            .vulkan_subgroup_size_policy = default_vulkan_subgroup_size_policy(lane),
         },
     };
 }
@@ -437,6 +469,25 @@ fn parse_deferred_submission_sync_policy(raw: []const u8) ?runtime_types.Deferre
     if (std.mem.eql(u8, raw, "prefer_timeline_semaphore")) return .prefer_timeline_semaphore;
     if (std.mem.eql(u8, raw, "require_fence_pool")) return .require_fence_pool;
     return null;
+}
+
+fn parse_vulkan_subgroup_size_policy(raw: []const u8) ?VulkanSubgroupSizePolicy {
+    if (std.mem.eql(u8, raw, "fixed_32_when_supported")) return .fixed_32_when_supported;
+    if (std.mem.eql(u8, raw, "suppress_for_workgroup_memory_256")) return .suppress_for_workgroup_memory_256;
+    if (std.mem.eql(u8, raw, "suppress_for_workgroup_memory_256_or_single_invocation")) return .suppress_for_workgroup_memory_256_or_single_invocation;
+    return null;
+}
+
+fn default_vulkan_subgroup_size_policy(lane: BackendLane) VulkanSubgroupSizePolicy {
+    return switch (lane) {
+        .vulkan_doe_app,
+        .vulkan_doe_comparable,
+        .vulkan_doe_compute_only_diagnostic,
+        .vulkan_doe_compute_only_fence_diagnostic,
+        .vulkan_doe_release,
+        => .suppress_for_workgroup_memory_256_or_single_invocation,
+        else => .fixed_32_when_supported,
+    };
 }
 
 fn strict_staged_upload_policy_required(lane: BackendLane) bool {

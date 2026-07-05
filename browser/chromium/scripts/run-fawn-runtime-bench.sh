@@ -38,6 +38,8 @@ exec "${SCRIPT_DIR}/run-bench.sh" \
   --score-out "${score_path}" \
   --require-browser-release-class \
   --required-fawn-release-profile any \
+  --mode-schedule paired-balanced \
+  --strict-run \
   --iters-upload 180 \
   --iters-dispatch 160 \
   --iters-render 96 \

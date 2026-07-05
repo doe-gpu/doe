@@ -285,7 +285,7 @@ test "reference interpreter computes silu_gated body" {
     if (z2 < -15.0) z2 = -15.0;
     if (z2 > 15.0) z2 = 15.0;
     const silu_x2 = x2 / (1.0 + std.math.exp(z2));
-    try std.testing.expectEqual(silu_x2 * 2.0, output[2]);
+    try std.testing.expectApproxEqAbs(silu_x2 * 2.0, output[2], 1e-10);
 
     // Case 3 (gate=1, input=2).
     const x3: f32 = 1.0;

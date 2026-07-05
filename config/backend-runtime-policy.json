@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 6,
   "defaultLane": "vulkan_dawn_release",
-  "selectionPolicyHashSeed": "backend-runtime-policy-v5",
+  "selectionPolicyHashSeed": "backend-runtime-policy-v7",
   "cutoverPolicyPath": "config/backend-cutover-policy.json",
   "lanes": {
     "metal_doe_app": {
@@ -69,7 +69,8 @@
       "allowFallback": false,
       "strictNoFallback": true,
       "queueFamilyPolicy": "prefer_graphics_compute",
-      "deferredSubmissionSyncPolicy": "prefer_timeline_semaphore",
+      "deferredSubmissionSyncPolicy": "require_fence_pool",
+      "vulkanSubgroupSizePolicy": "suppress_for_workgroup_memory_256_or_single_invocation",
       "notes": "AMD Vulkan app lane after controlled cutover"
     },
     "vulkan_doe_comparable": {
@@ -79,6 +80,7 @@
       "uploadPathPolicy": "staged_copy_only",
       "queueFamilyPolicy": "prefer_graphics_compute",
       "deferredSubmissionSyncPolicy": "prefer_timeline_semaphore",
+      "vulkanSubgroupSizePolicy": "suppress_for_workgroup_memory_256_or_single_invocation",
       "notes": "Strict comparable Vulkan lane: staged copy for device-local dst, direct memcpy for host-visible dst (matches Dawn WriteBuffer behavior)"
     },
     "vulkan_doe_compute_only_diagnostic": {
@@ -88,6 +90,7 @@
       "uploadPathPolicy": "staged_copy_only",
       "queueFamilyPolicy": "require_compute_only",
       "deferredSubmissionSyncPolicy": "prefer_timeline_semaphore",
+      "vulkanSubgroupSizePolicy": "suppress_for_workgroup_memory_256_or_single_invocation",
       "notes": "Diagnostic Vulkan lane: require a compute-only queue family while preserving strict staged-upload comparability"
     },
     "vulkan_doe_compute_only_fence_diagnostic": {
@@ -97,6 +100,7 @@
       "uploadPathPolicy": "staged_copy_only",
       "queueFamilyPolicy": "require_compute_only",
       "deferredSubmissionSyncPolicy": "require_fence_pool",
+      "vulkanSubgroupSizePolicy": "suppress_for_workgroup_memory_256_or_single_invocation",
       "notes": "Diagnostic Vulkan lane: require a compute-only queue family and fence-pool deferred submission tracking while preserving strict staged-upload comparability"
     },
     "vulkan_doe_release": {
@@ -106,6 +110,7 @@
       "uploadPathPolicy": "staged_copy_only",
       "queueFamilyPolicy": "prefer_graphics_compute",
       "deferredSubmissionSyncPolicy": "prefer_timeline_semaphore",
+      "vulkanSubgroupSizePolicy": "suppress_for_workgroup_memory_256_or_single_invocation",
       "notes": "Strict AMD Vulkan extended release lane: staged copy for device-local dst, direct memcpy for host-visible dst (matches Dawn WriteBuffer behavior)"
     },
     "vulkan_dawn_release": {

@@ -1,4 +1,11 @@
 const builtin = @import("builtin");
+const has_vulkan = (builtin.os.tag == .linux);
+const std = @import("std");
+
+const error_scope = @import("../error_scope.zig");
+const model_transfer_types = @import("../model_resource_types.zig");
+const native_types = @import("../doe_native_object_types.zig");
+const native_rt_helpers = @import("../doe_native_runtime_helpers.zig");
 
 pub const metal_bridge = @import("metal/metal_bridge_decls.zig");
 pub const d3d12_constants = @import("d3d12/d3d12_constants.zig");
@@ -6,3 +13,206 @@ pub const d3d12_formats = @import("d3d12/d3d12_formats.zig");
 pub const vk_constants = if (builtin.os.tag == .linux) @import("vulkan/vk_constants.zig") else struct {};
 pub const vk_resources = if (builtin.os.tag == .linux) @import("vulkan/vk_resources.zig") else struct {};
 pub const vk_dispatch_indirect = if (builtin.os.tag == .linux) @import("vulkan/vk_dispatch_indirect.zig") else struct {};
+
+const DoeBuffer = native_types.DoeBuffer;
+const DoeCommandEncoder = native_types.DoeCommandEncoder;
+const DoeDevice = native_types.DoeDevice;
+const DoeQueue = native_types.DoeQueue;
+const DoeTexture = native_types.DoeTexture;
+
+pub const QueueWriteTextureArgs = struct {
+    data_ptr: [*]const u8,
+    data_len: usize,
+    bytes_per_row: u32,
+    rows_per_image: u32,
+    dst_mip: u32,
+    height: u32,
+};
+
+fn copyTextureResource(
+    texture: *DoeTexture,
+    mip_level: u32,
+    bytes_per_row: u32,
+    rows_per_image: u32,
+) model_transfer_types.CopyTextureResource {
+    return .{
+        .handle = texture.vk_id,
+        .kind = .texture,
+        .width = texture.width,
+        .height = texture.height,
+        .depth_or_array_layers = texture.depth_or_array_layers,
+        .format = texture.format,
+        .usage = texture.usage,
+        .dimension = texture.dimension,
+        .mip_level = mip_level,
+        .sample_count = texture.sample_count,
+        .bytes_per_row = bytes_per_row,
+        .rows_per_image = rows_per_image,
+    };
+}
+
+fn failVulkanResourceOp(dev: *DoeDevice, comptime operation: []const u8, reason: []const u8) bool {
+    var buf: [256]u8 = undefined;
+    const msg = std.fmt.bufPrint(&buf, "Vulkan {s} failed: {s}", .{ operation, reason }) catch "Vulkan resource operation failed";
+    std.log.err("dropin_resource_ops: {s}", .{msg});
+    dev.error_scopes.deliver(error_scope.ERROR_TYPE_INTERNAL, msg);
+    return true;
+}
+
+fn failVulkanResourceError(dev: *DoeDevice, comptime operation: []const u8, err: anyerror) bool {
+    return failVulkanResourceOp(dev, operation, @errorName(err));
+}
+
+pub fn handleVulkanClearBuffer(
+    enc: *DoeCommandEncoder,
+    buffer: *DoeBuffer,
+    offset: u64,
+    fill_size: u64,
+) bool {
+    if (enc.dev.backend != .vulkan) return false;
+    if (comptime !has_vulkan) return failVulkanResourceOp(enc.dev, "clearBuffer", "backend compiled without Vulkan support");
+    const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse
+        return failVulkanResourceOp(enc.dev, "clearBuffer", "device has no Vulkan runtime");
+    if (buffer.vk_id == 0) return failVulkanResourceOp(enc.dev, "clearBuffer", "buffer has no Vulkan resource");
+    const cb = rt.compute_buffers.get(buffer.vk_id) orelse
+        return failVulkanResourceOp(enc.dev, "clearBuffer", "buffer resource is not registered");
+    const ptr = cb.mapped orelse
+        return failVulkanResourceOp(enc.dev, "clearBuffer", "buffer resource is not CPU-mapped");
+    const n: usize = @intCast(fill_size);
+    const o: usize = @intCast(offset);
+    const d: [*]u8 = @ptrCast(ptr);
+    @memset(d[o .. o + n], 0);
+    return true;
+}
+
+pub fn handleVulkanCopyBufferToTexture(
+    enc: *DoeCommandEncoder,
+    src_buffer: *DoeBuffer,
+    src_offset: u64,
+    src_bytes_per_row: u32,
+    src_rows_per_image: u32,
+    dst_texture: *DoeTexture,
+    dst_mip_level: u32,
+    width: u32,
+    height: u32,
+    depth_or_array_layers: u32,
+) bool {
+    _ = width;
+    if (enc.dev.backend != .vulkan) return false;
+    if (comptime !has_vulkan) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "backend compiled without Vulkan support");
+    const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse
+        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "device has no Vulkan runtime");
+    if (src_buffer.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer has no Vulkan resource");
+    if (dst_texture.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "destination texture has no Vulkan resource");
+    const scb = rt.compute_buffers.get(src_buffer.vk_id) orelse
+        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer resource is not registered");
+    const mapped_ptr = scb.mapped orelse
+        return failVulkanResourceOp(enc.dev, "copyBufferToTexture", "source buffer resource is not CPU-mapped");
+    const rows = if (src_rows_per_image > 0) src_rows_per_image else height;
+    const byte_count: usize = @intCast(@as(u64, src_bytes_per_row) * rows * depth_or_array_layers);
+    const base_off: usize = @intCast(src_offset);
+    const raw: [*]const u8 = @ptrCast(mapped_ptr);
+    const copy_res = copyTextureResource(dst_texture, dst_mip_level, src_bytes_per_row, rows);
+    rt.texture_write(.{ .texture = copy_res, .data = raw[base_off .. base_off + byte_count] }) catch |err|
+        return failVulkanResourceError(enc.dev, "copyBufferToTexture", err);
+    return true;
+}
+
+pub fn handleVulkanCopyTextureToBuffer(
+    enc: *DoeCommandEncoder,
+    src_texture: *DoeTexture,
+    src_mip_level: u32,
+    dst_buffer: *DoeBuffer,
+    dst_offset: u64,
+    dst_bytes_per_row: u32,
+    dst_rows_per_image: u32,
+    width: u32,
+    height: u32,
+    depth_or_array_layers: u32,
+) bool {
+    _ = depth_or_array_layers;
+    if (enc.dev.backend != .vulkan) return false;
+    if (comptime !has_vulkan) return failVulkanResourceOp(enc.dev, "copyTextureToBuffer", "backend compiled without Vulkan support");
+    const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse
+        return failVulkanResourceOp(enc.dev, "copyTextureToBuffer", "device has no Vulkan runtime");
+    if (src_texture.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyTextureToBuffer", "source texture has no Vulkan resource");
+    if (dst_buffer.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyTextureToBuffer", "destination buffer has no Vulkan resource");
+    const dcb = rt.compute_buffers.get(dst_buffer.vk_id) orelse
+        return failVulkanResourceOp(enc.dev, "copyTextureToBuffer", "destination buffer resource is not registered");
+    const mapped_ptr = dcb.mapped orelse
+        return failVulkanResourceOp(enc.dev, "copyTextureToBuffer", "destination buffer resource is not CPU-mapped");
+    rt.texture_read(.{
+        .handle = src_texture.vk_id,
+        .mip_level = src_mip_level,
+        .width = width,
+        .height = height,
+        .format = src_texture.format,
+        .dst_buffer = @as(*anyopaque, @ptrCast(mapped_ptr)),
+        .dst_offset = dst_offset,
+        .dst_bytes_per_row = dst_bytes_per_row,
+        .dst_rows_per_image = dst_rows_per_image,
+    }) catch |err| return failVulkanResourceError(enc.dev, "copyTextureToBuffer", err);
+    return true;
+}
+
+pub fn handleVulkanCopyTextureToTexture(
+    enc: *DoeCommandEncoder,
+    src_texture: *DoeTexture,
+    src_mip: u32,
+    src_slice: u32,
+    src_x: u32,
+    src_y: u32,
+    src_z: u32,
+    dst_texture: *DoeTexture,
+    dst_mip: u32,
+    dst_slice: u32,
+    dst_x: u32,
+    dst_y: u32,
+    dst_z: u32,
+    width: u32,
+    height: u32,
+    depth_or_layers: u32,
+) bool {
+    _ = src_slice;
+    _ = dst_slice;
+    if (enc.dev.backend != .vulkan) return false;
+    if (comptime !has_vulkan) return failVulkanResourceOp(enc.dev, "copyTextureToTexture", "backend compiled without Vulkan support");
+    const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse
+        return failVulkanResourceOp(enc.dev, "copyTextureToTexture", "device has no Vulkan runtime");
+    if (src_texture.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyTextureToTexture", "source texture has no Vulkan resource");
+    if (dst_texture.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyTextureToTexture", "destination texture has no Vulkan resource");
+    rt.texture_copy(.{
+        .src_handle = src_texture.vk_id,
+        .src_mip = src_mip,
+        .src_x = src_x,
+        .src_y = src_y,
+        .src_z = src_z,
+        .dst_handle = dst_texture.vk_id,
+        .dst_mip = dst_mip,
+        .dst_x = dst_x,
+        .dst_y = dst_y,
+        .dst_z = dst_z,
+        .width = width,
+        .height = height,
+        .depth_or_layers = depth_or_layers,
+    }) catch |err| return failVulkanResourceError(enc.dev, "copyTextureToTexture", err);
+    return true;
+}
+
+pub fn handleVulkanQueueWriteTexture(
+    queue: ?*DoeQueue,
+    texture: *DoeTexture,
+    args: QueueWriteTextureArgs,
+) bool {
+    const q = queue orelse return false;
+    if (q.dev.backend != .vulkan) return false;
+    if (comptime !has_vulkan) return failVulkanResourceOp(q.dev, "writeTexture", "backend compiled without Vulkan support");
+    const rt = native_rt_helpers.device_vk_runtime(q.dev) orelse
+        return failVulkanResourceOp(q.dev, "writeTexture", "device has no Vulkan runtime");
+    if (texture.vk_id == 0) return failVulkanResourceOp(q.dev, "writeTexture", "texture has no Vulkan resource");
+    const rows = if (args.rows_per_image > 0) args.rows_per_image else args.height;
+    const copy_res = copyTextureResource(texture, args.dst_mip, args.bytes_per_row, rows);
+    rt.texture_write(.{ .texture = copy_res, .data = args.data_ptr[0..args.data_len] }) catch |err|
+        return failVulkanResourceError(q.dev, "writeTexture", err);
+    return true;
+}

@@ -38,35 +38,27 @@ _tint_compile_samples = compilation_runner_mod._tint_compile_samples
 _tint_startup_baseline_samples = compilation_runner_mod._tint_startup_baseline_samples
 
 
-def _with_compilation_runner_hooks(callback: Any, *args: Any, **kwargs: Any) -> dict[str, Any]:
-    original_parse = compilation_runner_mod._parse_compilation_ndjson
-    original_compile = compilation_runner_mod._tint_compile_samples
-    original_startup = compilation_runner_mod._tint_startup_baseline_samples
-    compilation_runner_mod._parse_compilation_ndjson = _parse_compilation_ndjson
-    compilation_runner_mod._tint_compile_samples = _tint_compile_samples
-    compilation_runner_mod._tint_startup_baseline_samples = _tint_startup_baseline_samples
-    try:
-        return callback(*args, **kwargs)
-    finally:
-        compilation_runner_mod._parse_compilation_ndjson = original_parse
-        compilation_runner_mod._tint_compile_samples = original_compile
-        compilation_runner_mod._tint_startup_baseline_samples = original_startup
+def _apply_compilation_runner_hooks(kwargs: dict[str, Any]) -> dict[str, Any]:
+    updated = dict(kwargs)
+    updated.setdefault("parse_compilation_ndjson", _parse_compilation_ndjson)
+    updated.setdefault("tint_compile_samples", _tint_compile_samples)
+    updated.setdefault("tint_startup_baseline_samples", _tint_startup_baseline_samples)
+    return updated
 
 
 def run_compilation_product_workload(*args: Any, **kwargs: Any) -> dict[str, Any]:
-    return _with_compilation_runner_hooks(
-        compilation_runner_mod.run_compilation_product_workload,
+    return compilation_runner_mod.run_compilation_product_workload(
         *args,
-        **kwargs,
+        **_apply_compilation_runner_hooks(kwargs),
     )
 
 
 def run_compilation_workload(*args: Any, **kwargs: Any) -> dict[str, Any]:
-    return _with_compilation_runner_hooks(
-        compilation_runner_mod.run_compilation_workload,
+    return compilation_runner_mod.run_compilation_workload(
         *args,
-        **kwargs,
+        **_apply_compilation_runner_hooks(kwargs),
     )
+
 
 def collect_trace_meta_hashes(command_samples: list[dict[str, Any]]) -> list[dict[str, str]]:
     by_path: dict[str, str] = {}

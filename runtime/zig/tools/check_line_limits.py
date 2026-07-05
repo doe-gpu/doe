@@ -7,28 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 ZIG_SRC = ROOT / "zig" / "src"
 LINE_LIMIT = 999
-# Each allowlist entry names a tracked sharding follow-up. These files
-# exceed the 999-line cap because TSIR Phase A landed as single cohesive
-# modules; the split plan is in docs/status/tsir.md. Do not add new
-# entries without an owner and a concrete next-split target recorded in
-# that status shard.
-ALLOWLIST: dict[str, str] = {
-    "tsir/reference_interpreter.zig": (
-        "TSIR Phase A oracle; split by family dispatch "
-        "(fused_gemv, rms_norm, gather, trySimpleReduction) pending — "
-        "see docs/status/tsir.md"
-    ),
-    "tsir/frontend.zig": (
-        "TSIR Phase A WGSL IR → semantic lowering; split by pass "
-        "(axis recovery, reduction recovery, body inference, epsilon "
-        "resolution) pending — see docs/status/tsir.md"
-    ),
-    "tsir/digest.zig": (
-        "TSIR canonical serialization + SHA-256 digests; split by "
-        "tier (semantic, realization, emitter-code) pending — "
-        "see docs/status/tsir.md"
-    ),
-}
+ALLOWLIST: dict[str, str] = {}
 
 
 def count_lines(path: Path) -> int:

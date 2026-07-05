@@ -137,6 +137,20 @@ if [[ "${skip_run}" -eq 0 ]]; then
   fi
 fi
 
+if [[ -z "${FAWN_BACKEND_LANE:-}" ]]; then
+  case "$(uname -s)" in
+    Darwin)
+      export FAWN_BACKEND_LANE="metal_doe_app"
+      ;;
+    MINGW*|MSYS*|CYGWIN*|Windows_NT)
+      export FAWN_BACKEND_LANE="d3d12_doe_app"
+      ;;
+    *)
+      export FAWN_BACKEND_LANE="vulkan_doe_app"
+      ;;
+  esac
+fi
+
 if [[ "${runner}" == "smoke" ]]; then
   exec node "${SCRIPT_DIR}/webgpu-playwright-smoke.mjs" \
     --chrome "${chrome_bin}" \

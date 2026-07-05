@@ -100,8 +100,11 @@ consumer-facing diagnostic wrapper:
 To isolate the runtime swap inside the same local Fawn binary:
 
 ```bash
-./browser/chromium/scripts/run-fawn-runtime-bench.sh --headless true --strict-run
+./browser/chromium/scripts/run-fawn-runtime-bench.sh --headless true
 ```
+
+The Fawn runtime wrapper defaults to `modeSchedule=paired-balanced` and
+`strict-run` so same-binary Dawn-vs-Doe evidence is order-balanced by default.
 
 The wrapper writes the same layered diagnostic artifacts plus:
 

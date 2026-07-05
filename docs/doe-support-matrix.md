@@ -22,7 +22,7 @@ Each tier is additive: doe-runtime includes all doe-core commitments; chromium i
 
 ---
 
-## Compatibility matrix snapshot (2026-03-10)
+## Compatibility matrix snapshot
 
 This is the current evidence-backed compatibility read for Doe's active lanes.
 Use it as the fast answer to "what is actually covered today?" and then follow
@@ -30,22 +30,17 @@ the tier contracts below for promotion requirements.
 
 | Layer | Evidence source | Current scope | Current read | Immediate blocker |
 |------|-----------------|---------------|--------------|-------------------|
-| `doe-core` | `bench/out/amd-vulkan/20260310T153903Z/dawn-vs-doe.amd.vulkan.release.json` | 7 release workloads backed by 7 command examples on `amd|vulkan|gfx11|24.0.0` | `comparisonStatus=comparable`, `claimStatus=diagnostic` | `examples/upload_1kb_commands.json` is still a real tiny-upload loss in the latest release artifact |
-| `doe-core` | `bench/out/apple-metal/extended-comparable/20260310T171918Z/dawn-vs-doe.local.metal.extended.comparable.json` | 31 comparable workloads backed by 30 unique command examples on `apple|metal|m3|1.0.0` | `comparisonStatus=comparable`, `claimStatus=diagnostic` | `examples/upload_1mb_commands.json` is diagnostic in the latest artifact because selected-timing `p95` is negative |
-| `doe-runtime` | `bench/workloads/workloads.local.d3d12.json` | 11 governed comparable rows selected from the canonical D3D12 catalog (`cohorts=governed`, `benchmarkClass=comparable`) | contract only; no fresh Windows artifact in the current inventory | first Windows evidence run on GCP Windows Server + NVIDIA (G2/L4 recommended), then drop-in gate, CTS subset publication, and runtime-tier gates |
-| `chromium` | `nursery/chromium/` lane docs only | browser integration lane exists in-repo | no fresh browser compatibility artifact in the current inventory | browser smoke evidence, rebase cadence, security-patch SLA, and operational commitments |
+| `doe-core` | `reports/claim-index.json` plus `bench/out/amd-vulkan/` | governed AMD Vulkan runtime and package lanes | current claim state is lane-specific and artifact-owned | latest gate sidecar controls promotion; do not generalize Linux Vulkan evidence to browser or macOS claims |
+| `doe-core` | `reports/claim-index.json` plus `bench/out/apple-metal/` | governed Apple Metal runtime and package lanes | macOS native/package evidence is first-class but separate from browser release evidence | macOS arm64 browser release needs its own archive, proof surface, launch receipt, and Dawn-vs-Doe receipts |
+| `doe-runtime` | `bench/workloads/workloads.local.d3d12.json` | governed D3D12 contracts selected from the canonical D3D12 catalog | contract-backed; no public claim unless the claim index adds the lane | first Windows evidence run, drop-in gate, CTS subset publication, and runtime-tier gates |
+| `chromium` | `browser/chromium/artifacts/` plus the browser row in `reports/claim-index.json` | governed Fawn/Chromium browser diagnostics | local same-binary Doe-vs-Dawn diagnostics exist; no public browser release claim | public HTTPS release archive, release-candidate gates, platform-specific proof/launch/comparison receipts, and a separate macOS arm64 browser lane |
 
-Current command-example coverage from active matrix artifacts/contracts:
-
-- 30 unique command examples have fresh evidence in the latest AMD/Metal artifacts.
-- 17 more command examples are wired into active workload contracts but absent from the latest published artifacts.
-- 36 command examples are not referenced by any current smoke, extended, or release matrix.
-
-The detailed file-level breakdown lives in `examples/README.md`.
+Command-example coverage is artifact-owned. The detailed file-level breakdown
+lives in `examples/README.md`.
 
 ---
 
-## Surface and competitor matrix snapshot (2026-04-13)
+## Surface and competitor matrix snapshot
 
 The tier table above answers "what can Doe honestly claim today?".
 This section answers the adjacent product question:
@@ -74,6 +69,11 @@ Subpath reminder:
   `browser/chromium/` is not part of the npm package contract
 - legacy `@simulatte/*` names are compatibility history, not primary product
   framing
+
+Public release wording must keep platform identity explicit. A `doe-gpu` npm
+release, native Apple Metal evidence, native AMD Vulkan evidence, Linux Fawn
+diagnostics, and future macOS arm64 Fawn archives are separate rows. Do not
+collapse them into one browser release or Dawn-replacement claim.
 
 Current ORT evidence to read alongside the table below:
 
@@ -125,12 +125,12 @@ but the product framing should stay on `doe-gpu`.
 
 | Host / platform | Doe surface | Reference surface | Kind | Current state | Value / note |
 |------|------|------|------|------|------|
-| macOS Apple Silicon | Doe Metal backend | Dawn Metal delegate | governed runtime compare lane | `verified` | Strong Doe-vs-Dawn direct-backend evidence exists, but the current broad full lane remains diagnostic rather than fully claimable. |
+| macOS Apple Silicon | Doe Metal backend | Dawn Metal delegate | governed runtime compare lane | `verified` | Strong Doe-vs-Dawn direct-backend evidence exists, but the current broad full lane remains diagnostic rather than fully claimable. macOS arm64 remains separate from Linux Vulkan browser diagnostics; browser release wording requires macOS-specific Fawn archive and proof receipts. |
 | Linux AMD Vulkan | Doe Vulkan backend | Dawn Vulkan delegate | governed runtime compare lane | `verified` | Real Doe-vs-Dawn runtime evidence exists; the current strict release lane remains diagnostic with one remaining upload blocker. |
 | Windows D3D12 | Doe D3D12 backend | Dawn D3D12 delegate | governed runtime compare lane | `scaffolded` | Contracts, configs, and runtime path exist, but the current inventory still lacks a fresh Windows evidence artifact. Recommended path to first evidence: GCP Windows Server 2022 + NVIDIA (G2/L4). D3D12 is fully supported on NVIDIA on Windows Server; initial results will be directional, not claimable, pending D3D12-specific Dawn mapping validation. |
 | Native apps / engines / embedded | `libwebgpu_doe.{so,dylib,dll}` drop-in runtime | Dawn / wgpu via `webgpu.h` ABI | runtime replacement target | `scaffolded` | `docs/status.md` now points at a publishable Apple Metal runtime bundle with stripped dylib, hashes/sizes, drop-in gate, native consumer, compare-dev, sync/timing gates, and CTS publication, but the broader runtime tier is still missing non-Apple runtime slices and backend-wide release publication. |
 | Any `webgpu.h` host | Doe shared-library ABI surface | Dawn ABI / `webgpu.h` expectations | validation cell | `scaffolded` | Fresh Apple dylib ABI/runtime validation is now bundled in `docs/status.md`, but full validation across the intended runtime hosts/backends is still incomplete. |
-| Chromium / Doe browser lane | Doe as browser `navigator.gpu` runtime | Chromium / Chrome Dawn path | browser compare / smoke cell | `diagnostic` | Browser lane exists and is governed, but current browser evidence is still separate from claim-grade native/package replacement language. |
+| Chromium / Doe browser lane | Doe as browser `navigator.gpu` runtime | Chromium / Chrome Dawn path | browser compare / smoke cell | `diagnostic` | Browser lane exists and is governed. Local same-binary Fawn diagnostics are engineering evidence, but public browser release and macOS arm64 coverage remain separate blockers from claim-grade native/package replacement language. |
 
 ### Exhaustiveness notes
 

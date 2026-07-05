@@ -27,7 +27,6 @@ pub const DIRECT_UPLOAD_REUSE_SKIP_ZERO_FILL_MIN_BYTES: u64 = 4 * 1024 * 1024 * 
 pub const HOT_UPLOAD_POOL_CACHE_MAX_BYTES: u64 = 64 * 1024;
 pub const WAIT_TIMEOUT_NS: u64 = std.math.maxInt(u64);
 pub const MAX_POOL_ENTRIES_PER_SIZE: usize = 8;
-pub const IMMEDIATE_FENCE_POLL_SPINS: usize = 2048;
 
 pub const PendingUpload = struct {
     src_buffer: VkBuffer,
@@ -65,14 +64,7 @@ pub const UploadPathKind = enum {
 pub const VkPool = std.AutoHashMapUnmanaged(u64, std.ArrayListUnmanaged(VkPoolEntry));
 
 pub fn wait_for_fence_fast(self: anytype, fence: c.VkFence) !void {
-    var spin: usize = 0;
-    while (spin < IMMEDIATE_FENCE_POLL_SPINS) : (spin += 1) {
-        const status = c.vkGetFenceStatus(self.device, fence);
-        if (status == c.VK_SUCCESS) return;
-        if (status != c.VK_NOT_READY) return c.check_vk(status);
-        std.atomic.spinLoopHint();
-    }
-    try c.check_vk(c.vkWaitForFences(self.device, 1, @ptrCast(&fence), c.VK_TRUE, WAIT_TIMEOUT_NS));
+    try vk_sync.wait_for_fence_fast(self.device, fence);
 }
 
 pub fn flush_queue(self: anytype) !u64 {

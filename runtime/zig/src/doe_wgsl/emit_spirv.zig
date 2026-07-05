@@ -118,8 +118,7 @@ pub const Emitter = struct {
                 if (entry.stage != filter) continue;
             }
             switch (entry.stage) {
-                .compute => if (self.direct_compute_entry_for_function(entry.function) == null)
-                    try self.emit_compute_entry_wrapper(entry),
+                .compute => try self.emit_compute_entry_wrapper(entry),
                 .vertex, .fragment => try emit_spirv_stages.emit_stage_entry_wrapper(self, entry),
             }
         }
@@ -221,36 +220,23 @@ pub const Emitter = struct {
 
     pub fn emit_function(self: *Emitter, function_index: ir.FunctionId) EmitError!void {
         const function = &self.module.functions.items[function_index];
-        const direct_compute_entry = self.direct_compute_entry_for_function(function_index);
         const fn_id = self.function_ids[function_index];
         const return_type = try self.lower_type(function.return_type);
 
         var param_types = std.ArrayListUnmanaged(u32){};
         defer param_types.deinit(self.alloc);
-        if (direct_compute_entry == null) {
-            for (function.params.items) |param| {
-                try param_types.append(self.alloc, try self.lower_param_type(param.ty));
-            }
+        for (function.params.items) |param| {
+            try param_types.append(self.alloc, try self.lower_param_type(param.ty));
         }
 
         const fn_type = try self.builder.type_function(return_type, param_types.items);
         try self.builder.emit_name(fn_id, function.name);
-        const direct_input_ids = if (direct_compute_entry) |entry|
-            try self.emit_direct_compute_entry_interface(function, fn_id, entry)
-        else
-            &[_]u32{};
-        defer if (direct_compute_entry != null) self.alloc.free(direct_input_ids);
-
         try self.builder.begin_function(return_type, fn_id, fn_type);
 
         const param_value_ids = try self.alloc.alloc(u32, function.params.items.len);
         defer self.alloc.free(param_value_ids);
-        if (direct_compute_entry) |_| {
-            @memset(param_value_ids, 0);
-        } else {
-            for (param_value_ids, function.params.items) |*slot, param| {
-                slot.* = try self.builder.function_parameter(try self.lower_param_type(param.ty));
-            }
+        for (param_value_ids, function.params.items) |*slot, param| {
+            slot.* = try self.builder.function_parameter(try self.lower_param_type(param.ty));
         }
 
         _ = try self.builder.label();
@@ -267,13 +253,11 @@ pub const Emitter = struct {
                 },
                 else => {
                     if (state.is_ssa_promotable_param(@intCast(param_index))) {
-                        if (direct_compute_entry == null) {
-                            // SSA-promoted: skip the Function OpVariable + OpStore
-                            // and cache the raw param id. Reads go through the
-                            // param_value_ids short-circuit in emit_load_from_ref.
-                            state.param_value_ids[param_index] = param_value_ids[param_index];
-                            try self.builder.emit_name(param_value_ids[param_index], param.name);
-                        }
+                        // SSA-promoted: skip the Function OpVariable + OpStore
+                        // and cache the raw param id. Reads go through the
+                        // param_value_ids short-circuit in emit_load_from_ref.
+                        state.param_value_ids[param_index] = param_value_ids[param_index];
+                        try self.builder.emit_name(param_value_ids[param_index], param.name);
                     } else {
                         const ptr_type = try self.builder.type_pointer(spirv.StorageClass.Function, try self.lower_type(param.ty));
                         const ptr_id = try self.builder.variable_function(ptr_type);
@@ -290,17 +274,6 @@ pub const Emitter = struct {
             const ptr_id = try self.builder.variable_function(ptr_type);
             state.local_ptr_ids[local_index] = ptr_id;
             try self.builder.emit_name(ptr_id, local.name);
-        }
-
-        if (direct_compute_entry != null) {
-            for (param_value_ids, function.params.items, direct_input_ids) |*slot, param, input_id| {
-                slot.* = try self.emit_function_load(try self.lower_type(param.ty), input_id);
-            }
-            for (function.params.items, 0..) |_, param_index| {
-                if (state.is_ssa_promotable_param(@intCast(param_index))) {
-                    state.param_value_ids[param_index] = param_value_ids[param_index];
-                }
-            }
         }
 
         for (function.params.items, 0..) |param, param_index| {
@@ -324,46 +297,6 @@ pub const Emitter = struct {
         }
 
         try self.builder.finish_function();
-    }
-
-    fn emit_direct_compute_entry_interface(
-        self: *Emitter,
-        function: *const ir.Function,
-        fn_id: u32,
-        entry: ir.EntryPoint,
-    ) EmitError![]u32 {
-        var interface_ids = std.ArrayListUnmanaged(u32){};
-        defer interface_ids.deinit(self.alloc);
-
-        const input_ids = try self.alloc.alloc(u32, function.params.items.len);
-        errdefer self.alloc.free(input_ids);
-        @memset(input_ids, 0);
-
-        for (function.params.items, 0..) |param, param_index| {
-            const io_attr = param.io orelse return error.UnsupportedConstruct;
-            if (io_attr.builtin == .none) return error.UnsupportedConstruct;
-            if (io_attr.builtin == .subgroup_size or io_attr.builtin == .subgroup_invocation_id) {
-                try self.builder.emit_capability(spirv.Capability.GroupNonUniform);
-            }
-            const value_type = try self.lower_type(param.ty);
-            const ptr_type = try self.builder.type_pointer(spirv.StorageClass.Input, value_type);
-            const input_id = try self.builder.variable_global(ptr_type, spirv.StorageClass.Input);
-            try self.builder.emit_name(input_id, param.name);
-            try self.builder.emit_builtin_decoration(input_id, try emit_spirv_shared.builtin_to_spirv(io_attr.builtin));
-            input_ids[param_index] = input_id;
-            try interface_ids.append(self.alloc, input_id);
-        }
-
-        for (self.module.globals.items, 0..) |global, index| {
-            if (global.class != .input and global.class != .output) continue;
-            const global_id = self.global_ids[index];
-            if (global_id == 0) return error.InvalidIr;
-            try interface_ids.append(self.alloc, global_id);
-        }
-
-        try self.builder.emit_entry_point(fn_id, function.name, interface_ids.items);
-        try self.builder.emit_execution_mode_local_size(fn_id, entry.workgroup_size[0], entry.workgroup_size[1], entry.workgroup_size[2]);
-        return input_ids;
     }
 
     fn emit_compute_entry_wrapper(self: *Emitter, entry: ir.EntryPoint) EmitError!void {
@@ -415,47 +348,6 @@ pub const Emitter = struct {
         _ = try self.emit_function_call(void_type, self.function_ids[entry.function], call_args.items);
         try self.builder.append_function_inst(spirv.Opcode.Return, &.{});
         try self.builder.finish_function();
-    }
-
-    fn direct_compute_entry_for_function(self: *Emitter, function_index: ir.FunctionId) ?ir.EntryPoint {
-        const function = &self.module.functions.items[function_index];
-        if (!ir.is_scalar(&self.module.types, function.return_type, .void)) return null;
-        if (self.function_is_called(function.name)) return null;
-
-        var matched_entry: ?ir.EntryPoint = null;
-        for (self.module.entry_points.items) |entry| {
-            if (entry.function != function_index) continue;
-            if (entry.stage != .compute) return null;
-            if (matched_entry != null) return null;
-            matched_entry = entry;
-        }
-        if (matched_entry == null) return null;
-
-        for (function.params.items) |param| {
-            const io_attr = param.io orelse return null;
-            if (io_attr.builtin == .none) return null;
-            switch (self.module.types.get(param.ty)) {
-                .scalar => |scalar| if (scalar == .void) return null,
-                .vector => {},
-                else => return null,
-            }
-        }
-
-        return matched_entry;
-    }
-
-    fn function_is_called(self: *Emitter, name: []const u8) bool {
-        for (self.module.functions.items) |function| {
-            for (function.exprs.items) |expr| {
-                switch (expr.data) {
-                    .call => |call| {
-                        if (call.kind == .user and std.mem.eql(u8, call.name, name)) return true;
-                    },
-                    else => {},
-                }
-            }
-        }
-        return false;
     }
 
     pub fn lower_type(self: *Emitter, ty: ir.TypeId) EmitError!u32 {

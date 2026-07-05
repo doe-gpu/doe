@@ -98,13 +98,30 @@ Read each row by its claim state:
 Do not promote old package charts or local run artifacts unless the current
 claim index and gates still mark the lane as claimable.
 
-## Browser Boundary
+## Release boundary
+
+A `doe-gpu` npm release is a package/native-runtime release. It is not, by
+itself, a Fawn/Chromium browser release and it does not prove that Doe replaces
+Dawn in every browser path.
+
+Platform packages and prebuilds are platform-specific. macOS arm64, Linux x64,
+and future Windows artifacts need matching native libraries, package metadata,
+and evidence rows. Keep macOS evidence and downloads separate from Linux Vulkan
+browser diagnostics.
+
+Browser runtime releases need their own public archive, SHA-256, proof surface,
+launch receipt, and Dawn-vs-Doe comparison receipts outside the npm package.
+
+## Browser boundary
 
 `doe-gpu/browser` wraps the browser's incumbent WebGPU implementation. It is
 for API compatibility in browser code; it is not Doe replacing the browser
 runtime.
 
-## More Detail
+A future Fawn/Doe browser artifact for macOS arm64 should be documented as a
+separate browser release lane, not as `doe-gpu/browser`.
+
+## More detail
 
 - repo overview:
   [`README.md`](https://github.com/doerun/doe/blob/main/README.md)

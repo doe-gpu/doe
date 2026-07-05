@@ -147,6 +147,7 @@ fn selected_backend_lane() ?backend_policy.BackendLane {
 const SelectedVulkanRuntimePolicy = struct {
     queue_family_policy: runtime_types.QueueFamilyPolicy,
     deferred_submission_sync_policy: runtime_types.DeferredSubmissionSyncPolicy,
+    vulkan_subgroup_size_policy: backend_policy.VulkanSubgroupSizePolicy,
 };
 
 fn selected_vulkan_policy() CreateDeviceError!SelectedVulkanRuntimePolicy {
@@ -155,6 +156,7 @@ fn selected_vulkan_policy() CreateDeviceError!SelectedVulkanRuntimePolicy {
         return .{
             .queue_family_policy = policy.queue_family_policy,
             .deferred_submission_sync_policy = policy.deferred_submission_sync_policy,
+            .vulkan_subgroup_size_policy = policy.vulkan_subgroup_size_policy,
         };
     };
     const loaded_policy = backend_policy.load_policy_for_lane(
@@ -166,6 +168,7 @@ fn selected_vulkan_policy() CreateDeviceError!SelectedVulkanRuntimePolicy {
     return .{
         .queue_family_policy = loaded_policy.policy.queue_family_policy,
         .deferred_submission_sync_policy = loaded_policy.policy.deferred_submission_sync_policy,
+        .vulkan_subgroup_size_policy = loaded_policy.policy.vulkan_subgroup_size_policy,
     };
 }
 
@@ -276,6 +279,7 @@ fn create_device_for_adapter(adapter: *DoeAdapter, adapter_raw: ?*anyopaque) Cre
                 null,
                 selected_policy.queue_family_policy,
                 selected_policy.deferred_submission_sync_policy,
+                selected_policy.vulkan_subgroup_size_policy,
             ) catch {
                 alloc.destroy(rt);
                 alloc.destroy(dev);

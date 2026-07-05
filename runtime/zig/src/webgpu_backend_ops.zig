@@ -67,14 +67,14 @@ pub fn prewarmKernelPipeline(self: anytype, kernel: []const u8, bindings: anytyp
         return;
     };
     self.core.pipeline_cache.put(cache_key, .{ .shader_module = shader_module, .pipeline = pipeline }) catch |err| {
-        std.debug.print("warn: webgpu_ffi: pipeline cache put: {s}\n", .{@errorName(err)});
+        self.timestampLog("prewarm_pipeline_cache_put_error={s}\n", .{@errorName(err)});
     };
     if (bindings) |bs| {
         for (bs) |b| {
             if (b.resource_kind != .buffer) continue;
             const usage = abi_core.WGPUBufferUsage_Storage | abi_core.WGPUBufferUsage_CopyDst | abi_core.WGPUBufferUsage_CopySrc;
             _ = resources.getOrCreateBuffer(self, b.resource_handle, b.buffer_size, usage) catch |err| {
-                std.debug.print("warn: webgpu_ffi: buffer prewarm: {s}\n", .{@errorName(err)});
+                self.timestampLog("prewarm_buffer_error={s}\n", .{@errorName(err)});
             };
         }
     }

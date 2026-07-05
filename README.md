@@ -25,6 +25,24 @@ incumbent to beat.
 
 Published npm surface: [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md).
 
+## Current release read
+
+Doe has package and native-runtime evidence that can support lane-specific
+release notes, but not broad "Doe beats Dawn everywhere" or public browser
+release language. Public wording must stay tied to
+[`reports/claim-index.json`](reports/claim-index.json) and the claim sidecars
+named there.
+
+The browser lane is still a separate release surface. Local Fawn/Chromium runs
+can compare Doe and Dawn in the same binary, but a public Fawn Doe browser
+release requires a public HTTPS archive, release-candidate provenance, proof
+surface, launch receipt, and platform-specific comparison receipts.
+
+macOS remains a first-class release lane. Linux Vulkan browser diagnostics,
+Apple Metal package evidence, and npm package availability are not
+interchangeable; macOS arm64 browser and native artifacts need their own
+receipts before public wording claims that platform.
+
 ## What it is
 
 - `doe-gpu`: JavaScript package entry point for WebGPU-backed workloads.
@@ -69,7 +87,10 @@ The README chart uses one reporting contract across backends: each row states
 backend, surface, comparator, metric direction, result, claim state, and
 evidence path. Metal rows include claim-indexed native/package/Node+Bun ORT
 evidence plus the browser ORT diagnostic boundary; Vulkan rows are shown with
-their current diagnostic/status boundary instead of being omitted.
+their current diagnostic/status boundary instead of being omitted. Browser rows
+remain diagnostic or scaffolded unless the claim index and release gates say
+otherwise. Platform names matter: macOS arm64, Linux x64/AMD Vulkan, and
+Chromium browser rows are separate release surfaces.
 The broader Dawn/Tint replacement frontier is tracked by
 `config/dawn-replacement-frontier.json` and blocked by
 `bench/gates/dawn_replacement_frontier_gate.py`; universal replacement language

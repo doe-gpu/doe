@@ -12,6 +12,7 @@ const vk_pipeline_cache_persistent = @import("vk_pipeline_cache_persistent.zig")
 const vk_compute_sync = @import("vk_compute_sync.zig");
 const vk_upload = @import("vk_upload.zig");
 const vk_resources = @import("vk_resources.zig");
+const vk_spirv_inspect = @import("vk_spirv_inspect.zig");
 const model_compute_types = @import("../../model_compute_types.zig");
 const model_texture_types = @import("../../model_texture_value_types.zig");
 const model_binding_types = @import("../../model_binding_value_types.zig");
@@ -32,6 +33,7 @@ const DEFAULT_KERNEL_ROOT = "bench/kernels";
 const SPIRV_OP_DECORATE: u16 = 71;
 const SPIRV_DECORATION_BINDING: u32 = 33;
 const SPIRV_OP_ENTRY_POINT: u16 = 15;
+const WORKGROUP_MEMORY_SUBGROUP_HINT_LOCAL_SIZE_X_MIN: u32 = 256;
 
 pub const compute_layout_hash = hash_contract.compute_layout_hash;
 pub const compute_descriptor_bindings_hash = hash_contract.compute_descriptor_bindings_hash;
@@ -409,7 +411,7 @@ pub fn build_pipeline_for_words(
         .pNext = null,
         .requiredSubgroupSize = 0,
     };
-    const stage_pnext: ?*const anyopaque = if (required_subgroup_size_for_pipeline(self)) |required_size| blk: {
+    const stage_pnext: ?*const anyopaque = if (required_subgroup_size_for_pipeline(self, words)) |required_size| blk: {
         required_subgroup_size_info.requiredSubgroupSize = required_size;
         break :blk @ptrCast(&required_subgroup_size_info);
     } else null;
@@ -422,7 +424,7 @@ pub fn build_pipeline_for_words(
     self.current_pipeline_hash = pipeline_hash;
 }
 
-fn required_subgroup_size_for_pipeline(self: anytype) ?u32 {
+fn required_subgroup_size_for_pipeline(self: anytype, words: []const u32) ?u32 {
     if (!self.has_subgroup_size_control_ext) return null;
     if (std.posix.getenv("DOE_VULKAN_REQUIRED_SUBGROUP_SIZE")) |value| {
         if (value.len == 0) return null;
@@ -431,7 +433,31 @@ fn required_subgroup_size_for_pipeline(self: anytype) ?u32 {
         return parsed;
     }
     if (self.required_compute_subgroup_size == 0) return null;
+    switch (self.vulkan_subgroup_size_policy) {
+        .fixed_32_when_supported => {},
+        .suppress_for_workgroup_memory_256 => {
+            if ((vk_spirv_inspect.compute_local_size_x(words) orelse 0) >= WORKGROUP_MEMORY_SUBGROUP_HINT_LOCAL_SIZE_X_MIN and
+                vk_spirv_inspect.has_workgroup_storage(words))
+            {
+                return null;
+            }
+        },
+        .suppress_for_workgroup_memory_256_or_single_invocation => {
+            const local_size = vk_spirv_inspect.compute_local_size(words);
+            if (is_single_invocation_workgroup(local_size)) return null;
+            if ((if (local_size) |size| size.x else 0) >= WORKGROUP_MEMORY_SUBGROUP_HINT_LOCAL_SIZE_X_MIN and
+                vk_spirv_inspect.has_workgroup_storage(words))
+            {
+                return null;
+            }
+        },
+    }
     return self.required_compute_subgroup_size;
+}
+
+fn is_single_invocation_workgroup(local_size: ?vk_spirv_inspect.LocalSize) bool {
+    const size = local_size orelse return false;
+    return size.x == 1 and size.y == 1 and size.z == 1;
 }
 
 pub fn destroy_pipeline_objects(self: anytype) void {

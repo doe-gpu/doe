@@ -54,6 +54,7 @@ pub const ZigVulkanBackend = struct {
     upload_submit_every: u32 = UPLOAD_BATCH_LAZY,
     queue_family_policy: webgpu.QueueFamilyPolicy = .prefer_graphics_compute,
     deferred_submission_sync_policy: webgpu.DeferredSubmissionSyncPolicy = .prefer_timeline_semaphore,
+    vulkan_subgroup_size_policy: backend_policy.VulkanSubgroupSizePolicy = .fixed_32_when_supported,
     queue_wait_mode: webgpu.QueueWaitMode = .process_events,
     queue_sync_mode: webgpu.QueueSyncMode = .per_command,
     gpu_timestamp_mode: webgpu.GpuTimestampMode = .auto,
@@ -97,6 +98,7 @@ pub const ZigVulkanBackend = struct {
             selection_policy.upload_path_policy,
             selection_policy.queue_family_policy,
             selection_policy.deferred_submission_sync_policy,
+            selection_policy.vulkan_subgroup_size_policy,
         );
     }
 
@@ -106,7 +108,7 @@ pub const ZigVulkanBackend = struct {
         kernel_root: ?[]const u8,
         upload_path_policy: backend_policy.UploadPathPolicy,
     ) !*ZigVulkanBackend {
-        return init_with_backend_policy(allocator, profile, kernel_root, upload_path_policy, .prefer_graphics_compute, .prefer_timeline_semaphore);
+        return init_with_backend_policy(allocator, profile, kernel_root, upload_path_policy, .prefer_graphics_compute, .prefer_timeline_semaphore, .fixed_32_when_supported);
     }
 
     fn init_with_backend_policy(
@@ -116,6 +118,7 @@ pub const ZigVulkanBackend = struct {
         upload_path_policy: backend_policy.UploadPathPolicy,
         queue_family_policy: webgpu.QueueFamilyPolicy,
         deferred_submission_sync_policy: webgpu.DeferredSubmissionSyncPolicy,
+        vulkan_subgroup_size_policy: backend_policy.VulkanSubgroupSizePolicy,
     ) !*ZigVulkanBackend {
         if (profile.api != .vulkan) return error.UnsupportedFeature;
 
@@ -133,6 +136,7 @@ pub const ZigVulkanBackend = struct {
             .upload_submit_every = UPLOAD_BATCH_LAZY,
             .queue_family_policy = queue_family_policy,
             .deferred_submission_sync_policy = deferred_submission_sync_policy,
+            .vulkan_subgroup_size_policy = vulkan_subgroup_size_policy,
             .queue_wait_mode = .process_events,
             .queue_sync_mode = .per_command,
             .gpu_timestamp_mode = .auto,
@@ -227,6 +231,7 @@ pub const ZigVulkanBackend = struct {
                 self.kernel_root_owned,
                 self.queue_family_policy,
                 self.deferred_submission_sync_policy,
+                self.vulkan_subgroup_size_policy,
             );
         }
         return &self.runtime.?;

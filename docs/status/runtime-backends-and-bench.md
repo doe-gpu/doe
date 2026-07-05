@@ -3,13 +3,74 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-07-05 — Vulkan resource-op failures now reach error scopes
+
+The Vulkan drop-in resource helpers for clearBuffer, texture write, and texture
+copy paths no longer log native failures and then report the operation as
+silently handled. Missing Vulkan runtime state, missing native resources,
+unregistered buffers, unmapped CPU-side transfer buffers, and native
+texture-read/write/copy failures now deliver a WebGPU internal error through
+the device error-scope stack while keeping the Vulkan path from falling into an
+unrelated Metal-style fallback.
+
+The behavior remains fail-closed for the Vulkan backend: if the native Vulkan
+path is selected and cannot perform the operation, the operation is consumed
+with an explicit error-scope report instead of pretending a successful no-op.
+
+## 2026-07-04 — Vulkan browser replay baseline retained after rejected probes
+
+The current Vulkan browser baseline remains recorded-repeat replay with
+explicit subgroup policy and fast fence-pool wait accounting. The latest sync,
+command-buffer, queue-family, subgroup, coherent-decoration, command-pool, and
+source-kernel submit-cadence probes were rejected by focused paired-balanced
+evidence and their source changes were reverted unless already part of the
+accepted baseline.
+
+Detailed negative evidence is archived at
+[`archive/2026-07-04-runtime-vulkan-browser-probes.md`](archive/2026-07-04-runtime-vulkan-browser-probes.md).
+Treat that archive and the referenced score sidecars as the audit trail before
+revisiting any of those default-lane changes.
+
+## 2026-07-04 — Vulkan recorded repeat replay reuses the prepared command buffer
+
+The Vulkan drop-in replay path now begins recorded dispatch replay once for a
+coalesced repeated dispatch command and records the repeated dispatches into
+that prepared command buffer. This preserves the same dispatch sequence and the
+same per-dispatch synchronization helpers, while removing redundant host replay
+setup from the repeat loop.
+
+Strict browser smoke for the rebuilt runtime is recorded at
+`browser/chromium/artifacts/current-vulkan-recorded-repeat-replay/dawn-vs-doe.browser.playwright-smoke.vulkan-recorded-repeat-replay.json`.
+The focused paired-balanced compute report is
+`browser/chromium/artifacts/current-vulkan-recorded-repeat-replay/fawn-dawn-vs-fawn-doe.browser-layered.superset.diagnostic.json`
+with checker sidecar
+`browser/chromium/artifacts/current-vulkan-recorded-repeat-replay/fawn-dawn-vs-fawn-doe.browser-layered.superset.check.json`
+and score sidecar
+`browser/chromium/artifacts/current-vulkan-recorded-repeat-replay/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
+Treat the score sidecar as the source of truth for row movement. The probe is
+accepted as a runtime replay cleanup, but the sidecar still shows remaining
+browser compute rows where Doe is behind Dawn.
+
+## 2026-07-04 — Fawn runtime bench wrapper is paired-balanced by default
+
+`browser/chromium/scripts/run-fawn-runtime-bench.sh` now passes
+`modeSchedule=paired-balanced` and `strict-run` by default. This makes the
+same-binary Fawn Dawn-vs-Doe browser-runtime front door match the current fair
+evidence discipline instead of relying on the grouped historical default.
+
+The wrapper still writes the standard layered report, summary, checker, and
+score artifacts under `browser/chromium/artifacts/`. The README and wrapper
+test now cover the default schedule and strict required-row handling.
+
 ## 2026-07-04 — SPIR-V direct compute entry probe rejected
 
 A Vulkan SPIR-V emitter probe removed the compute entry wrapper for eligible
 compute entry functions and emitted builtin inputs directly on the user entry
-function. The emitted focused kernels validated with `spirv-val`, but browser
-evidence rejected the change: strict smoke stayed correct while the dispatch
-proxy regressed, and the focused compute strict-comparable score regressed.
+function. The emitted focused kernels validated with `spirv-val`, but
+paired-balanced browser evidence rejected the change for the default Vulkan
+browser path. The strict smoke stayed correct, but the focused paired-balanced
+compute score and strict-comparable score regressed against the current
+no-batch wrapper baseline.
 
 The probe artifacts are:
 `browser/chromium/artifacts/current-spirv-direct-compute-entry/dawn-vs-doe.browser.playwright-smoke.spirv-direct-compute-entry.json`,
@@ -17,8 +78,16 @@ The probe artifacts are:
 `browser/chromium/artifacts/current-spirv-direct-compute-entry/fawn-dawn-vs-fawn-doe.browser-layered.superset.check.json`,
 and
 `browser/chromium/artifacts/current-spirv-direct-compute-entry/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
-The code was reverted; these artifacts are negative evidence for direct compute
-entry emission under the current Vulkan browser path.
+The paired-balanced rejection artifacts are:
+`browser/chromium/artifacts/current-spirv-direct-compute-entry-paired/fawn-dawn-vs-fawn-doe.browser-layered.superset.diagnostic.json`,
+`browser/chromium/artifacts/current-spirv-direct-compute-entry-paired/fawn-dawn-vs-fawn-doe.browser-layered.superset.check.json`,
+and
+`browser/chromium/artifacts/current-spirv-direct-compute-entry-paired/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
+A grouped no-batch comparison artifact is recorded at
+`browser/chromium/artifacts/current-no-batch-grouped-refresh/fawn-dawn-vs-fawn-doe.browser-layered.superset.score.json`.
+The code was reverted to wrapper emission; these artifacts are negative
+default-lane evidence for direct compute entry emission under the current
+Vulkan browser path.
 
 ## 2026-07-04 — Vulkan deferred command-buffer batching rejected
 

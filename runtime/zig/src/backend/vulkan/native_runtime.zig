@@ -48,6 +48,7 @@ pub const NativeVulkanRuntime = struct {
     queue_family_index_value_cache: ?u32 = null,
     queue_family_policy: webgpu.QueueFamilyPolicy = .prefer_graphics_compute,
     deferred_submission_sync_policy: webgpu.DeferredSubmissionSyncPolicy = .prefer_timeline_semaphore,
+    vulkan_subgroup_size_policy: backend_policy.VulkanSubgroupSizePolicy = .fixed_32_when_supported,
     queue_family_kind_value_cache: ?webgpu.QueueFamilyKind = null,
     required_compute_subgroup_size: u32 = 0,
     queue_family_queue_count_value_cache: ?u32 = null,
@@ -159,7 +160,7 @@ pub const NativeVulkanRuntime = struct {
     pending_spirv_bytes_owned: ?[]u8 = null,
 
     pub fn init(allocator: std.mem.Allocator, kernel_root: ?[]const u8) !NativeVulkanRuntime {
-        return init_with_backend_policy(allocator, kernel_root, .prefer_graphics_compute, .prefer_timeline_semaphore);
+        return init_with_backend_policy(allocator, kernel_root, .prefer_graphics_compute, .prefer_timeline_semaphore, .fixed_32_when_supported);
     }
 
     pub fn init_with_backend_policy(
@@ -167,12 +168,14 @@ pub const NativeVulkanRuntime = struct {
         kernel_root: ?[]const u8,
         queue_family_policy: webgpu.QueueFamilyPolicy,
         deferred_submission_sync_policy: webgpu.DeferredSubmissionSyncPolicy,
+        vulkan_subgroup_size_policy: backend_policy.VulkanSubgroupSizePolicy,
     ) !NativeVulkanRuntime {
         var self = NativeVulkanRuntime{
             .allocator = allocator,
             .kernel_root = kernel_root,
             .queue_family_policy = queue_family_policy,
             .deferred_submission_sync_policy = deferred_submission_sync_policy,
+            .vulkan_subgroup_size_policy = vulkan_subgroup_size_policy,
         };
         errdefer self.deinit();
         try vk_device.bootstrap(&self);

@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from native_compare_modules import reporting as reporting_mod
 from native_compare_modules.reporting import median_sample, subtract_baseline_ms
@@ -18,6 +18,10 @@ _TINT_STARTUP_BASELINE_CACHE: dict[tuple[str, str, int, int], list[float]] = {}
 _TINT_STARTUP_BASELINE_WGSL = """@compute @workgroup_size(1)
 fn main() {}
 """
+
+ParseCompilationNdjsonFn = Callable[[Path, str], dict[str, Any]]
+TintCompileSamplesFn = Callable[[Path, Path, str, int, int], list[float]]
+TintStartupBaselineSamplesFn = Callable[[Path, str, int, int], list[float]]
 
 
 def _parse_compilation_ndjson(path: Path, shader_name: str) -> dict[str, Any]:
@@ -113,6 +117,7 @@ def _doe_compilation_result(
     warmup: int,
     out_dir: Path,
     doe_compilation_bin: str,
+    parse_compilation_ndjson: ParseCompilationNdjsonFn = _parse_compilation_ndjson,
 ) -> dict[str, Any]:
     shader_path = Path(workload.shader_path)
     shader_name = workload.id
@@ -143,7 +148,7 @@ def _doe_compilation_result(
         str(doe_out),
     ]
     subprocess.run(doe_cmd, check=True)
-    doe_record = _parse_compilation_ndjson(doe_out, shader_name)
+    doe_record = parse_compilation_ndjson(doe_out, shader_name)
     doe_p50_ms = float(doe_record.get("p50_ns", 0)) / 1_000_000.0
     doe_trace_meta = {
         "runnerType": "compilation",
@@ -180,6 +185,8 @@ def _tint_compilation_result(
     warmup: int,
     out_dir: Path,
     tint_bin: str,
+    tint_compile_samples: TintCompileSamplesFn = _tint_compile_samples,
+    tint_startup_baseline_samples: TintStartupBaselineSamplesFn = _tint_startup_baseline_samples,
 ) -> dict[str, Any]:
     shader_path = Path(workload.shader_path)
     shader_name = workload.id
@@ -191,14 +198,14 @@ def _tint_compilation_result(
             f"Tint binary not found: {tint_bin}. "
             "Build Dawn in Release mode and place tint at the configured path."
         )
-    tint_samples = _tint_compile_samples(
+    tint_samples = tint_compile_samples(
         tint_bin_path,
         shader_path,
         target,
         iterations,
         warmup,
     )
-    startup_baseline_samples = _tint_startup_baseline_samples(
+    startup_baseline_samples = tint_startup_baseline_samples(
         tint_bin_path,
         target,
         iterations,
@@ -265,6 +272,9 @@ def run_compilation_product_workload(
     out_dir: Path,
     doe_compilation_bin: str,
     tint_bin: str,
+    parse_compilation_ndjson: ParseCompilationNdjsonFn = _parse_compilation_ndjson,
+    tint_compile_samples: TintCompileSamplesFn = _tint_compile_samples,
+    tint_startup_baseline_samples: TintStartupBaselineSamplesFn = _tint_startup_baseline_samples,
 ) -> dict[str, Any]:
     out_dir.mkdir(parents=True, exist_ok=True)
     product_kind = _compilation_product_kind(product)
@@ -275,6 +285,7 @@ def run_compilation_product_workload(
             warmup=warmup,
             out_dir=out_dir,
             doe_compilation_bin=doe_compilation_bin,
+            parse_compilation_ndjson=parse_compilation_ndjson,
         )
     return _tint_compilation_result(
         workload=workload,
@@ -282,6 +293,8 @@ def run_compilation_product_workload(
         warmup=warmup,
         out_dir=out_dir,
         tint_bin=tint_bin,
+        tint_compile_samples=tint_compile_samples,
+        tint_startup_baseline_samples=tint_startup_baseline_samples,
     )
 
 
@@ -292,6 +305,10 @@ def run_compilation_workload(
     out_dir: Path,
     doe_compilation_bin: str,
     tint_bin: str,
+    *,
+    parse_compilation_ndjson: ParseCompilationNdjsonFn = _parse_compilation_ndjson,
+    tint_compile_samples: TintCompileSamplesFn = _tint_compile_samples,
+    tint_startup_baseline_samples: TintStartupBaselineSamplesFn = _tint_startup_baseline_samples,
 ) -> dict[str, Any]:
     out_dir.mkdir(parents=True, exist_ok=True)
     return {
@@ -303,6 +320,9 @@ def run_compilation_workload(
             out_dir=out_dir / "baseline",
             doe_compilation_bin=doe_compilation_bin,
             tint_bin=tint_bin,
+            parse_compilation_ndjson=parse_compilation_ndjson,
+            tint_compile_samples=tint_compile_samples,
+            tint_startup_baseline_samples=tint_startup_baseline_samples,
         ),
         "comparison": run_compilation_product_workload(
             product="tint",
@@ -312,5 +332,8 @@ def run_compilation_workload(
             out_dir=out_dir / "comparison",
             doe_compilation_bin=doe_compilation_bin,
             tint_bin=tint_bin,
+            parse_compilation_ndjson=parse_compilation_ndjson,
+            tint_compile_samples=tint_compile_samples,
+            tint_startup_baseline_samples=tint_startup_baseline_samples,
         ),
     }

@@ -1,13 +1,9 @@
 // doe_command_texture_native.zig — clearBuffer, copyTextureToTexture, writeTexture C-ABI exports.
 // Sharded from doe_wgpu_native.zig to keep texture command concerns cohesive.
 
-const builtin = @import("builtin");
-const has_vulkan = (builtin.os.tag == .linux);
 const std = @import("std");
-const model_transfer_types = @import("model_resource_types.zig");
 const native_types = @import("doe_native_object_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
-const native_rt_helpers = @import("doe_native_runtime_helpers.zig");
 const resource_ops = @import("backend/dropin_resource_ops.zig");
 const bridge = resource_ops.metal_bridge;
 
@@ -39,20 +35,7 @@ pub export fn doeNativeCommandEncoderClearBuffer(
     else
         size;
     if (fill_size == 0) return;
-    if (enc.dev.backend == .vulkan) {
-        if (comptime has_vulkan) {
-            const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse return;
-            if (buf.vk_id != 0) {
-                if (rt.compute_buffers.get(buf.vk_id)) |cb| {
-                    if (cb.mapped) |ptr| {
-                        const n: usize = @intCast(fill_size);
-                        const o: usize = @intCast(offset);
-                        const d: [*]u8 = @ptrCast(ptr);
-                        @memset(d[o .. o + n], 0);
-                    }
-                }
-            }
-        }
+    if (resource_ops.handleVulkanClearBuffer(enc, buf, offset, fill_size)) {
         return;
     }
     enc.cmds.append(alloc, .{ .clear_buffer = .{
@@ -89,29 +72,24 @@ pub export fn doeNativeCommandEncoderCopyTextureToTexture(
     const src = cast(DoeTexture, src_texture_raw) orelse return;
     const dst = cast(DoeTexture, dst_texture_raw) orelse return;
     if (src.error_object or dst.error_object) return;
-    if (enc.dev.backend == .vulkan) {
-        if (comptime has_vulkan) {
-            const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse return;
-            if (src.vk_id != 0 and dst.vk_id != 0) {
-                rt.texture_copy(.{
-                    .src_handle = src.vk_id,
-                    .src_mip = src_mip,
-                    .src_x = src_x,
-                    .src_y = src_y,
-                    .src_z = src_z,
-                    .dst_handle = dst.vk_id,
-                    .dst_mip = dst_mip,
-                    .dst_x = dst_x,
-                    .dst_y = dst_y,
-                    .dst_z = dst_z,
-                    .width = width,
-                    .height = height,
-                    .depth_or_layers = depth_or_layers,
-                }) catch |err| {
-                    std.log.err("doe_command_texture_native: copyTextureToTexture Vulkan failed: {s}", .{@errorName(err)});
-                };
-            }
-        }
+    if (resource_ops.handleVulkanCopyTextureToTexture(
+        enc,
+        src,
+        src_mip,
+        src_slice,
+        src_x,
+        src_y,
+        src_z,
+        dst,
+        dst_mip,
+        dst_slice,
+        dst_x,
+        dst_y,
+        dst_z,
+        width,
+        height,
+        depth_or_layers,
+    )) {
         return;
     }
     enc.cmds.append(alloc, .{ .copy_texture_to_texture = .{
@@ -156,36 +134,18 @@ pub export fn doeNativeQueueWriteTexture(
     depth_or_layers: u32,
 ) callconv(.c) void {
     const q = cast(DoeQueue, queue_raw);
-    if (q != null and q.?.dev.backend == .vulkan) {
-        if (comptime has_vulkan) {
-            const rt = native_rt_helpers.device_vk_runtime(q.?.dev) orelse return;
-            const tex = cast(DoeTexture, texture_raw) orelse return;
-            if (tex.error_object) return;
-            if (tex.vk_id != 0) {
-                const rows = if (rows_per_image > 0) rows_per_image else height;
-                const copy_res = model_transfer_types.CopyTextureResource{
-                    .handle = tex.vk_id,
-                    .kind = .texture,
-                    .width = tex.width,
-                    .height = tex.height,
-                    .depth_or_array_layers = tex.depth_or_array_layers,
-                    .format = tex.format,
-                    .usage = tex.usage,
-                    .dimension = tex.dimension,
-                    .mip_level = dst_mip,
-                    .sample_count = tex.sample_count,
-                    .bytes_per_row = bytes_per_row,
-                    .rows_per_image = rows,
-                };
-                rt.texture_write(.{ .texture = copy_res, .data = data_ptr[0..data_len] }) catch |err| {
-                    std.log.err("doe_command_texture_native: writeTexture Vulkan failed: {s}", .{@errorName(err)});
-                };
-            }
-        }
-        return;
-    }
     const tex = cast(DoeTexture, texture_raw) orelse return;
     if (tex.error_object) return;
+    if (resource_ops.handleVulkanQueueWriteTexture(q, tex, .{
+        .data_ptr = data_ptr,
+        .data_len = data_len,
+        .bytes_per_row = bytes_per_row,
+        .rows_per_image = rows_per_image,
+        .dst_mip = dst_mip,
+        .height = height,
+    })) {
+        return;
+    }
     _ = bridge.metal_bridge_texture_write_region(
         tex.mtl,
         @ptrCast(data_ptr),
