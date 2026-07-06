@@ -47,7 +47,7 @@
   <text x="888" y="235" class="status" fill="#0f766e">claim-indexed</text>
   <text x="1030" y="235" class="path mono">bench/out/apple-metal/...compare.json</text>
 
-  <rect x="42" y="266" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />
+  <rect x="42" y="266" width="1196" height="52" rx="4" fill="#f3fbf8" stroke="#b7ded1" />
   <text x="56" y="297" class="cell">Apple Metal</text>
   <text x="176" y="290" class="cell">Native release</text>
   <text x="176" y="308" class="small">release bundle</text>
@@ -55,20 +55,20 @@
   <text x="500" y="290" class="cell">p50 ms/op</text>
   <text x="500" y="308" class="small">lower is better</text>
   <text x="686" y="290" class="cell">Claim-index row</text>
-  <text x="686" y="308" class="status" fill="#9a3412">See sidecar</text>
-  <text x="888" y="297" class="status" fill="#9a3412">diagnostic</text>
+  <text x="686" y="308" class="status" fill="#0f766e">See sidecar</text>
+  <text x="888" y="297" class="status" fill="#0f766e">claim-indexed</text>
   <text x="1030" y="297" class="path mono">bench/out/apple-metal/...release.json</text>
 
-  <rect x="42" y="328" width="1196" height="52" rx="4" fill="#f6f7ff" stroke="#d8ddf0" />
+  <rect x="42" y="328" width="1196" height="52" rx="4" fill="#f3fbf8" stroke="#b7ded1" />
   <text x="56" y="359" class="cell">Apple Metal</text>
   <text x="176" y="352" class="cell">Package</text>
   <text x="176" y="370" class="small">Node + Bun</text>
   <text x="334" y="359" class="cell">Doe vs host WebGPU</text>
   <text x="500" y="352" class="cell">p50 ms/op</text>
   <text x="500" y="370" class="small">lower is better</text>
-  <text x="686" y="352" class="cell">Node diagnostic</text>
+  <text x="686" y="352" class="cell">Node claim-indexed</text>
   <text x="686" y="370" class="cell">Bun claim-indexed</text>
-  <text x="888" y="359" class="status" fill="#9a3412">mixed</text>
+  <text x="888" y="359" class="status" fill="#0f766e">claim-indexed</text>
   <text x="1030" y="359" class="path mono">reports/claim-index.json</text>
 
   <rect x="42" y="390" width="1196" height="52" rx="4" fill="#ffffff" stroke="#e6e1d8" />

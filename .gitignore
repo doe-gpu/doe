@@ -55,6 +55,13 @@ bench/out/**
 !bench/out/apple-metal/
 !bench/out/apple-metal/20260705T163736Z/
 !bench/out/apple-metal/20260705T163736Z/*.json
+!bench/out/apple-metal/20260706T001434Z/
+!bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.compare.json
+!bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.claim.json
+!bench/out/apple-metal/release/
+!bench/out/apple-metal/release/20260706T001555Z/
+!bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.json
+!bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.claim.json
 !bench/out/apple-metal-ort-node/
 !bench/out/apple-metal-ort-node/20260705T163736Z/
 !bench/out/apple-metal-ort-node/20260705T163736Z/*.json

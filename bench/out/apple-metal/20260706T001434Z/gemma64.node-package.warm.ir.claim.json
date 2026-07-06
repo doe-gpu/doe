@@ -1,0 +1,38 @@
+{
+  "artifactKind": "claim-report",
+  "claimPolicy": {
+    "benchmarkPolicy": {
+      "path": "config/benchmark-methodology-thresholds.json",
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+    },
+    "minTimedSamples": 15,
+    "mode": "local",
+    "policyHash": "c58a192437af59287575fce3f015778332963288b8b28830021b35a502fceb0f"
+  },
+  "claimStatus": "claimable",
+  "compareReport": {
+    "path": "bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.compare.json",
+    "sha256": "a03853f5eae2368a5584eaba84efb632adb2e448424bfbff29c26064503f18a5"
+  },
+  "comparisonStatus": "comparable",
+  "generatedAt": "2026-07-06T00:14:49.585161+00:00",
+  "pass": true,
+  "reasons": [],
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "inference_gemma3_270m_prefill_64tok_decode_64tok"
+    }
+  ]
+}

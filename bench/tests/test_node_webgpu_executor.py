@@ -1487,9 +1487,11 @@ console.log(JSON.stringify({{
         ).read_text(encoding="utf-8")
         self.assertIn("encoder._native = addon.createCommandEncoder(", source)
         self.assertIn("new classes.DoeGPUComputePassEncoder(null, encoder)", source)
+        self.assertIn("function canSubmitNodeLazyCommandsBatched(commands)", source)
         self.assertIn("finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands)", source)
         self.assertIn("const nativeCommandBuffer = finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands);", source)
         self.assertIn("return { _native: nativeCommandBuffer, _batched: false };", source)
+        self.assertIn("&& !canSubmitNodeLazyCommandsBatched(commands)", source)
         self.assertIn("addon.createComputeDispatchCopyCommandBuffer(", source)
         self.assertIn("addon.createComputeDispatchBatchCopyCommandBuffer(", source)
         self.assertIn("canFinishNodeLazyDispatchCopyCommandsAsNativeBuffer(commands)", source)
@@ -1501,6 +1503,7 @@ console.log(JSON.stringify({{
         self.assertNotIn("allCommands.push(...", source)
         self.assertIn("const addonBreakdown = addon.submitBatched(deviceNative, queueNative, cmds);", source)
         self.assertIn("fastPathStats.dispatchFlush += 1", source)
+
         self.assertIn("nativeFastPathInfo()", source)
 
         napi_source = NAPI_QUEUE_PATH.read_text(encoding="utf-8")
@@ -1513,6 +1516,15 @@ console.log(JSON.stringify({{
         self.assertNotIn("bool copy_is_array", napi_source)
         self.assertIn("doe_queue_submit_one", napi_source)
         self.assertIn("addon.queueSubmitOne(queueNative, singleNative)", source)
+
+    def test_node_doe_package_source_bounds_large_buffer_host_shadows(self) -> None:
+        source = (
+            REPO_ROOT / "packages" / "doe-gpu" / "src" / "vendor" / "webgpu" / "index.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn("const NODE_BUFFER_HOST_SHADOW_MAX_BYTES", source)
+        self.assertIn("buffer.size > NODE_BUFFER_HOST_SHADOW_MAX_BYTES", source)
+        self.assertIn("buffer._hostShadow = null;", source)
+        self.assertIn("buffer._hostShadowValid = buffer.size <= NODE_BUFFER_HOST_SHADOW_MAX_BYTES;", source)
 
     def test_runtime_copy_buffer_records_doe_buffers_for_submit_replay(self) -> None:
         source = RUNTIME_ENCODER_NATIVE_PATH.read_text(encoding="utf-8")

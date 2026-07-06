@@ -93,6 +93,7 @@ const TEXTURE_DIMENSION_MAP = Object.freeze({
 const NODE_SPECIALIZED_CLEAR_MAX_BYTES = 64 * 1024 * 1024;
 const NODE_SPECIALIZED_STORAGE_FILL_MAX_BYTES = 64 * 1024 * 1024;
 const NODE_ZERO_SIZE_BUFFER_NATIVE_BYTES = 4;
+const NODE_BUFFER_HOST_SHADOW_MAX_BYTES = 1 * 1024 * 1024;
 const nodeBufferSizes = new WeakMap();
 const nodeBufferWrappers = new WeakMap();
 const nodeTextureWrappers = new WeakMap();
@@ -1052,6 +1053,11 @@ function ensureBufferHostShadow(buffer) {
   if (!buffer || typeof buffer !== 'object') {
     return null;
   }
+  if (buffer.size > NODE_BUFFER_HOST_SHADOW_MAX_BYTES) {
+    buffer._hostShadow = null;
+    buffer._hostShadowValid = false;
+    return null;
+  }
   if (!(buffer._hostShadow instanceof Uint8Array) || buffer._hostShadow.byteLength !== buffer.size) {
     buffer._hostShadow = new Uint8Array(buffer.size);
   }
@@ -1417,6 +1423,23 @@ function canSpecializeNodeDispatchCommands(commands) {
   return canSpecializeClearDispatchCommands(commands)
     || canSpecializeStorageFillDispatchCommands(commands)
     || canSpecializeTextureDimensionsDispatchCommands(commands);
+}
+
+function isNodeLazyDispatchCommand(command) {
+  return command?.t === 0 && command.d === undefined;
+}
+
+function canSubmitNodeLazyCommandsBatched(commands) {
+  if (!Array.isArray(commands) || commands.length === 0) {
+    return false;
+  }
+  if (commands.every(isNodeLazyDispatchCommand)) {
+    return true;
+  }
+  if (commands.length < 2 || commands[commands.length - 1]?.t !== 1) {
+    return false;
+  }
+  return commands.slice(0, -1).every(isNodeLazyDispatchCommand);
 }
 
 function tryApplySpecializedClearDispatch(queueNative, commands) {
@@ -2473,6 +2496,7 @@ const nodeEncoderBackend = {
         commands.length > 0
         && !hasDeferredValidationCommand(commands)
         && !canSpecializeNodeDispatchCommands(commands)
+        && !canSubmitNodeLazyCommandsBatched(commands)
       ) {
         const nativeCommandBuffer = finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands);
         if (nativeCommandBuffer) {
@@ -2515,8 +2539,8 @@ const fullSurfaceBackend = {
   initBufferState(buffer) {
     buffer._mapMode = 0;
     buffer._mappedWriteRanges = [];
-    buffer._hostShadow = new Uint8Array(buffer.size);
-    buffer._hostShadowValid = true;
+    buffer._hostShadow = null;
+    buffer._hostShadowValid = buffer.size <= NODE_BUFFER_HOST_SHADOW_MAX_BYTES;
     nodeBufferWrappers.set(buffer._native, buffer);
   },
   bufferMarkMappedAtCreation(buffer) {

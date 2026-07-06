@@ -106,6 +106,16 @@ claim-discipline gate depend on `docs/cerebras-evidence-bundle.md` and
 - every quality decision should emit artifacts required by gates in `docs/process.md`
 - benchmark and trace artifacts must include traceability fields (module/op hash chain)
 
+## Intent-First Operations
+
+- Treat Doe intent as source-preserving compiler/runtime evidence, not package copy or benchmark prose.
+- If the user asks whether a Doe claim is true, inspect the current artifacts, gates, raw benchmark rows, browser smoke outputs, and source files before answering.
+- When a Dawn-vs-Doe comparison is distrusted, fix or harden the benchmark fairness gate before changing README/docs language.
+- Do not answer that Doe beats Dawn from `claimStatus` alone; verify same work, same timing scope, non-missing dispatch/readback work, and raw timing sign.
+- If the user asks for a browser proof path, distinguish npm package status from a Chromium/Fawn browser artifact and report the exact build/output state.
+- Public claims must point to artifact paths or release files. Prose must not substitute for missing evidence.
+- If a result looks suspicious, say so directly and treat it as a harness or methodology problem until the artifact proves otherwise.
+
 ## Non-negotiables
 
 1. No undocumented manual toggles in runtime

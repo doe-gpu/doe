@@ -3,6 +3,23 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-07-05 — Apple Metal package and release rows refreshed for 0.4.7
+
+The macOS Apple Metal Node package row is now claim-indexed against
+`bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.compare.json`
+with claim sidecar
+`bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.claim.json`.
+The package fix keeps dispatch-only lazy command buffers on the batched submit
+path and bounds Node host shadows so large static package uploads do not copy
+through an internal JS shadow unless a small-buffer direct-read path needs it.
+
+The full Apple Metal native release matrix is also claim-indexed against
+`bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.json`
+with claim sidecar
+`bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.claim.json`.
+The release artifact keeps the `upload_write_buffer_1mb_staged` row comparable
+and positive under the release tail checks.
+
 ## 2026-07-05 — Vulkan resource-op failures now reach error scopes
 
 The Vulkan drop-in resource helpers for clearBuffer, texture write, and texture

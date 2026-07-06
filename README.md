@@ -149,9 +149,9 @@ The README chart uses one reporting contract across backends: each row states
 backend, surface, comparator, metric direction, result source, claim state, and
 evidence path. It intentionally defers raw timings and percentages to the
 current claim index and sidecar artifacts. Metal rows include claim-indexed
-native strict and Bun package evidence. Native release, Node package,
-Node+Bun ORT, and browser ORT stay diagnostic when the claim index marks them
-diagnostic. Vulkan rows include claim-indexed native/package boundaries where indexed.
+native strict, native release, and Node/Bun package evidence. Node+Bun ORT and
+browser ORT stay diagnostic when the claim index marks them diagnostic. Vulkan
+rows include claim-indexed native/package boundaries where indexed.
 Browser rows remain diagnostic or scaffolded unless the claim index and release
 gates say otherwise. Platform names matter: macOS arm64, Linux x64/AMD Vulkan,
 and Chromium browser rows are separate release surfaces.

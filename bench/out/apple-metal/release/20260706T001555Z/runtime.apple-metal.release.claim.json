@@ -1,0 +1,388 @@
+{
+  "artifactKind": "claim-report",
+  "claimPolicy": {
+    "benchmarkPolicy": {
+      "path": "config/benchmark-methodology-thresholds.json",
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+    },
+    "minTimedSamples": 15,
+    "mode": "release",
+    "policyHash": "2cc9f05f59fff1071358eebe8605e20c4ed67101ab2c8ec3ee64f96b710b2cf9"
+  },
+  "claimStatus": "claimable",
+  "compareReport": {
+    "path": "bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.json",
+    "sha256": "db905ef2937641af8328acd9c27412b9fea069f9d91bc5f42710e04137777d9c"
+  },
+  "comparisonStatus": "comparable",
+  "generatedAt": "2026-07-06T00:18:09.973428+00:00",
+  "pass": true,
+  "reasons": [],
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_concurrent_execution_single"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_workgroup_atomic_1024"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_workgroup_non_atomic_1024"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_zero_initialize_workgroup_memory_256"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "timingInterpretation.workloadUnitWall.deltaPercent",
+      "claimMetricScope": "workloadUnitWall",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "copy_buffer_to_texture"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "timingInterpretation.workloadUnitWall.deltaPercent",
+      "claimMetricScope": "workloadUnitWall",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "copy_texture_to_texture"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "pipeline_compile_stress"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "render_bundle_dynamic_bindings"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "render_bundle_dynamic_pipeline_bindings_200k"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "timingInterpretation.workloadUnitWall.deltaPercent",
+      "claimMetricScope": "workloadUnitWall",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "render_draw_redundant_pipeline_bindings_200k"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "timingInterpretation.workloadUnitWall.deltaPercent",
+      "claimMetricScope": "workloadUnitWall",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "render_draw_state_bindings"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "render_draw_throughput_200k"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "timingInterpretation.workloadUnitWall.deltaPercent",
+      "claimMetricScope": "workloadUnitWall",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "render_uniform_buffer_update_writebuffer_partial_single"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "texture_sampler_write_query_destroy"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "texture_sampler_write_query_destroy_500"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "texture_sampler_write_query_destroy_mip8"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "upload_write_buffer_16mb_staged"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "upload_write_buffer_1gb_staged"
+    },
+    {
+      "auditNotes": [
+        "suspicious speedup trigger accepted after strict comparability audit"
+      ],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "upload_write_buffer_1kb_staged"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "timingInterpretation.workloadUnitWall.deltaPercent",
+      "claimMetricScope": "workloadUnitWall",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "upload_write_buffer_1mb_staged"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "timingInterpretation.workloadUnitWall.deltaPercent",
+      "claimMetricScope": "workloadUnitWall",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "upload_write_buffer_256mb_staged"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "upload_write_buffer_4gb_staged"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "upload_write_buffer_4mb_staged"
+    },
+    {
+      "auditNotes": [
+        "suspicious speedup trigger accepted after strict comparability audit"
+      ],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "upload_write_buffer_64kb_staged"
+    }
+  ]
+}
