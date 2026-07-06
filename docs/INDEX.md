@@ -74,6 +74,8 @@ gate depend on the bundle and appendix files; do not rename.
 - [`node-bun-developer-wedge.md`](node-bun-developer-wedge.md) — Node/Bun package GTM and benchmark wedge
 - [`doe-gpu-node-runtime-scope.md`](doe-gpu-node-runtime-scope.md) — Node runtime scope
 - [`package-model.md`](package-model.md) — npm package contract
+- [`gpu-math-api-proposal.md`](gpu-math-api-proposal.md) — experimental `doe-gpu`
+  math API proposal, examples, coverage, and tradeoffs
 - [`apple-metal-runtime-release.md`](apple-metal-runtime-release.md) — Apple Metal runtime bundle
 - [`metal-macos-proof-bundle-runbook.md`](metal-macos-proof-bundle-runbook.md) — Metal macOS proof bundle runbook
 - [`fawn-fork-maintenance-policy.md`](fawn-fork-maintenance-policy.md) — Fawn (Chromium fork) policy
