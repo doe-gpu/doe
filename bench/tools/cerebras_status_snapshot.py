@@ -44,6 +44,9 @@ QWEN_SELECTED_LOGIT_SPLICE = (
     "bench/out/r3-2-27b-af16-doppler-csl-splice/"
     "selected-logit-splice/selected-logit-splice.json"
 )
+QWEN_FROZEN_REFERENCE_VALIDATION = (
+    "bench/out/r3-2-27b-frozen-reference-validation/report.json"
+)
 QWEN_HARDWARE_TRACE = "bench/out/hardware-run/qwen3-6-27b-af16-trace.json"
 QWEN_LOCAL_SIMFABRIC_CEILING = (
     "bench/out/r3-2-27b-af16-local-simfabric-ceiling/receipt.json"
@@ -62,6 +65,56 @@ GEMMA_PHASE7_TRACE = (
 )
 
 OUT_DIR = "bench/out/r3-cerebras-status"
+QWEN_NO_HARDWARE_NEXT_COMMANDS = [
+    {
+        "lane": "qwen.doppler_csl_splice.selected_logit",
+        "command": (
+            "python3 bench/tools/"
+            "run_qwen_3_6_27b_af16_doppler_selected_logit_splice.py"
+        ),
+        "purpose": "Refresh the local Doppler-to-CSL selected-logit receipt.",
+        "hardwareRequired": False,
+    },
+    {
+        "lane": "qwen.frozen_reference_validation",
+        "command": (
+            "python3 bench/tools/"
+            "validate_qwen_3_6_27b_frozen_doppler_reference.py"
+        ),
+        "purpose": "Refresh the frozen Doppler reference validation receipt.",
+        "hardwareRequired": False,
+    },
+    {
+        "lane": "qwen.simfabric_cells",
+        "command": (
+            "python3 bench/tools/"
+            "synthesize_qwen_3_6_27b_simfabric_cells_summary_receipt.py"
+        ),
+        "purpose": "Refresh the local simfabric cell summary receipt.",
+        "hardwareRequired": False,
+    },
+    {
+        "lane": "qwen.no_hardware_readiness",
+        "command": "python3 bench/tools/cerebras_status_snapshot.py",
+        "purpose": "Regenerate the status scoreboard and local readiness row.",
+        "hardwareRequired": False,
+    },
+    {
+        "lane": "qwen.no_hardware_readiness",
+        "command": "python3 bench/tools/check_cerebras_no_hardware_readiness.py",
+        "purpose": "Gate the local pre-hardware classification.",
+        "hardwareRequired": False,
+    },
+    {
+        "lane": "qwen.hardware_full_prompt",
+        "command": (
+            "bench/tools/run_qwen3_6_27b_af16_hardware_path.sh "
+            "--cmaddr <endpoint>"
+        ),
+        "purpose": "Produce the returned WSE hardware trace.",
+        "hardwareRequired": True,
+    },
+]
 
 
 def _load_json(rel_path: str) -> dict | None:
@@ -290,6 +343,32 @@ def qwen_selected_logit_splice_row() -> dict:
     )
 
 
+def qwen_frozen_reference_validation_row() -> dict:
+    d = _load_json(QWEN_FROZEN_REFERENCE_VALIDATION)
+    if d is None:
+        return _row(
+            "qwen.frozen_reference_validation",
+            QWEN_FROZEN_REFERENCE_VALIDATION,
+            "missing",
+            "frozen_reference_validation_receipt_absent",
+        )
+    verdict = d.get("verdict") or "unknown"
+    blocker = d.get("blocker")
+    if isinstance(blocker, dict):
+        blocker = blocker.get("class") or blocker.get("detail")
+    elif blocker is not None:
+        blocker = str(blocker)
+    if d.get("bound") is True and verdict == "bound":
+        blocker = None
+    return _row(
+        "qwen.frozen_reference_validation",
+        QWEN_FROZEN_REFERENCE_VALIDATION,
+        verdict,
+        blocker,
+        scope=d.get("fixtureRoot") or "",
+    )
+
+
 def qwen_multi_token_decode_row() -> dict:
     d = _load_json(QWEN_MULTI_TOKEN_DECODE)
     if d is None:
@@ -314,8 +393,8 @@ def qwen_hardware_path_row() -> dict:
         return _row(
             "qwen.hardware_full_prompt",
             QWEN_HARDWARE_TRACE,
-            "missing",
-            "returned hardware trace absent",
+            "hardware_required",
+            "hardware_endpoint_required",
             scope="runner=bench/tools/run_qwen3_6_27b_af16_hardware_path.sh",
         )
     verdict, blocker = _verdict_from_status(d.get("status"), d.get("blockers"))
@@ -440,6 +519,7 @@ def collect_rows() -> list[dict]:
     ))
     rows.append(gemma_selected_logit_splice_row())
     rows.append(qwen_selected_logit_splice_row())
+    rows.append(qwen_frozen_reference_validation_row())
     rows.append(qwen_hardware_path_row())
     rows.append(qwen_local_simfabric_ceiling_row())
     rows.append(qwen_multi_token_decode_row())
@@ -450,7 +530,107 @@ def collect_rows() -> list[dict]:
     return rows
 
 
-def render_markdown(rows: list[dict], generated_at: str) -> str:
+def _lane_map(rows: list[dict]) -> dict[str, dict]:
+    return {str(row.get("lane")): row for row in rows}
+
+
+def _readiness_row(row: dict) -> dict:
+    return {
+        "lane": row.get("lane") or "",
+        "verdict": row.get("verdict") or "unknown",
+        "blocker": row.get("blocker"),
+        "artifact": row.get("artifact") or "",
+    }
+
+
+def build_qwen_no_hardware_readiness(rows: list[dict]) -> dict:
+    row_by_lane = _lane_map(rows)
+    accepted_lanes = {
+        "compile.cross_model_parity": {"bound"},
+        "qwen.doppler_csl_splice.selected_logit": {"bound"},
+        "qwen.simfabric_cells": {
+            "bound",
+            "pass",
+            "pass_with_documented_canary_constraints",
+        },
+    }
+    typed_local_lanes = {
+        "qwen.frozen_reference_validation",
+        "qwen.per_kernel.summary",
+        "qwen.local_simfabric_ceiling",
+        "qwen.multi_token_decode",
+    }
+
+    accepted_rows = []
+    typed_blockers = []
+    hardware_required_rows = []
+    errors = []
+
+    for lane, verdicts in accepted_lanes.items():
+        row = row_by_lane.get(lane)
+        if row is None:
+            errors.append(f"{lane}:row_missing")
+            continue
+        if row.get("verdict") in verdicts:
+            accepted_rows.append(_readiness_row(row))
+            continue
+        errors.append(f"{lane}:unexpected_verdict:{row.get('verdict')}")
+
+    for lane in sorted(typed_local_lanes):
+        row = row_by_lane.get(lane)
+        if row is None:
+            errors.append(f"{lane}:row_missing")
+            continue
+        if row.get("verdict") == "bound":
+            accepted_rows.append(_readiness_row(row))
+            continue
+        if row.get("blocker"):
+            typed_blockers.append(_readiness_row(row))
+            continue
+        errors.append(f"{lane}:untyped_{row.get('verdict') or 'unknown'}")
+
+    hardware_row = row_by_lane.get("qwen.hardware_full_prompt")
+    if hardware_row is None:
+        errors.append("qwen.hardware_full_prompt:row_missing")
+    elif hardware_row.get("verdict") == "bound":
+        accepted_rows.append(_readiness_row(hardware_row))
+    elif (
+        hardware_row.get("verdict") == "hardware_required"
+        and hardware_row.get("blocker") == "hardware_endpoint_required"
+    ):
+        hardware_required_rows.append(_readiness_row(hardware_row))
+    else:
+        errors.append(
+            "qwen.hardware_full_prompt:"
+            f"unexpected_verdict:{hardware_row.get('verdict')}"
+        )
+
+    verdict = "classified" if not errors else "blocked"
+    summary = (
+        f"{len(accepted_rows)} local rows accepted; "
+        f"{len(typed_blockers)} local blocker rows typed; "
+        f"{len(hardware_required_rows)} hardware-required rows typed"
+    )
+    return {
+        "schemaVersion": 1,
+        "lane": "qwen.no_hardware_readiness",
+        "scope": "qwen3_6_27b_af16_pre_hardware",
+        "verdict": verdict,
+        "summary": summary,
+        "notHardwareClaim": True,
+        "acceptedLocalRows": accepted_rows,
+        "typedLocalBlockers": typed_blockers,
+        "hardwareRequiredRows": hardware_required_rows,
+        "nextCommands": QWEN_NO_HARDWARE_NEXT_COMMANDS,
+        "errors": errors,
+    }
+
+
+def render_markdown(
+    rows: list[dict],
+    generated_at: str,
+    local_readiness: dict | None = None,
+) -> str:
     lines = [
         "# Cerebras lane snapshot",
         "",
@@ -459,14 +639,64 @@ def render_markdown(rows: list[dict], generated_at: str) -> str:
         "",
         f"Generated: `{generated_at}`",
         "",
+    ]
+    if local_readiness:
+        lines.extend([
+            "## Local pre-hardware readiness",
+            "",
+            "| Lane | Verdict | Scope | Summary |",
+            "| --- | --- | --- | --- |",
+            (
+                f"| `{local_readiness['lane']}` | "
+                f"{local_readiness['verdict']} | "
+                f"{local_readiness['scope']} | "
+                f"{local_readiness['summary']} |"
+            ),
+            "",
+        ])
+        next_commands = local_readiness.get("nextCommands") or []
+        if next_commands:
+            lines.extend([
+                "## Next Commands",
+                "",
+                "| Lane | Hardware | Purpose | Command |",
+                "| --- | --- | --- | --- |",
+            ])
+            for command in next_commands:
+                hardware = "yes" if command.get("hardwareRequired") else "no"
+                lines.append(
+                    f"| `{command['lane']}` | {hardware} | "
+                    f"{command['purpose']} | `{command['command']}` |"
+                )
+            lines.append("")
+        gap_rows = (
+            (local_readiness.get("typedLocalBlockers") or [])
+            + (local_readiness.get("hardwareRequiredRows") or [])
+        )
+        if gap_rows:
+            lines.extend([
+                "## Gap Rows",
+                "",
+                "| Lane | Verdict | Blocker | Artifact |",
+                "| --- | --- | --- | --- |",
+            ])
+            for row in gap_rows:
+                lines.append(
+                    f"| `{row['lane']}` | {row['verdict']} | "
+                    f"{row.get('blocker') or ''} | `{row['artifact']}` |"
+                )
+            lines.append("")
+    lines.extend([
         "| Lane | Verdict | Scope | Blocker | Artifact mtime | Artifact |",
         "| --- | --- | --- | --- | --- | --- |",
-    ]
+    ])
     for r in rows:
         verdict = r["verdict"] or "unknown"
         marker = {
             "bound": "✅",
             "blocked": "❌",
+            "classified": "✅",
+            "hardware_required": "🧰",
             "in_progress": "\U0001F504",
             "missing": "❓",
         }.get(verdict, "⚠️")
@@ -495,15 +725,17 @@ def main(argv: list[str]) -> int:
 
     generated_at = datetime.now(tz=timezone.utc).isoformat()
     rows = collect_rows()
+    local_readiness = build_qwen_no_hardware_readiness(rows)
     out_dir = REPO_ROOT / args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
     snapshot_json = {
         "generatedAt": generated_at,
         "tool": "bench/tools/cerebras_status_snapshot.py",
+        "localReadiness": local_readiness,
         "rows": rows,
     }
     (out_dir / "snapshot.json").write_text(json.dumps(snapshot_json, indent=2) + "\n")
-    md = render_markdown(rows, generated_at)
+    md = render_markdown(rows, generated_at, local_readiness)
     (out_dir / "snapshot.md").write_text(md)
     if args.print:
         sys.stdout.write(md)

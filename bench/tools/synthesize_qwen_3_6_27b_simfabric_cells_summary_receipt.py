@@ -426,10 +426,17 @@ def main() -> int:
     args.out.write_text(json.dumps(receipt, indent=2) + "\n")
     print(f"wrote {_rel(args.out)} verdict={verdict} "
           f"pass={passCount}/{cellCount}")
-    # partial_with_kernel_emit_gaps is a faithful synthesis result —
-    # the gaps are recorded per-cell and in the summary, not silently
-    # masked. Exit 0 so the evidence packet can cite the receipt.
-    return 0 if verdict in ("pass", "partial", "partial_with_kernel_emit_gaps") else 1
+    # Caveated pass/partial verdicts are faithful synthesis results:
+    # constraints and gaps are recorded per-cell and in the summary,
+    # not silently masked. Exit 0 so evidence packets can cite the
+    # receipt.
+    ok_verdicts = {
+        "pass",
+        "pass_with_documented_canary_constraints",
+        "partial",
+        "partial_with_kernel_emit_gaps",
+    }
+    return 0 if verdict in ok_verdicts else 1
 
 
 if __name__ == "__main__":

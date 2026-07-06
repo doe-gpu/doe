@@ -50,6 +50,7 @@ provider prefers.
 | Run Qwen full-prompt hardware path | `bench/tools/run_qwen3_6_27b_af16_hardware_path.sh --cmaddr <endpoint>` |
 | Summarize an archive without unpacking | `bench/tools/summarize_cerebras_evidence_archive.sh <path>` |
 | Verify a returned hardware receipt | `python3 bench/tools/verify_returned_hardware_receipt.py --receipt <path>` |
+| Check no-hardware Qwen readiness classification | `python3 bench/tools/check_cerebras_no_hardware_readiness.py` |
 | Governance + claim boundaries | [`docs/hardware-validation-appendix.md`](hardware-validation-appendix.md) |
 | Cerebras lane front door | [`docs/cerebras.md`](cerebras.md) |
 | Model ledgers (acceptance bars + blockers) | [`docs/cerebras-model-ledgers.md`](cerebras-model-ledgers.md) |

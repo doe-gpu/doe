@@ -7,6 +7,7 @@ themselves (that's `bench/runners/`).
 Categories:
 
 - **Cerebras lane** — `cerebras_status_snapshot.py`,
+  `check_cerebras_no_hardware_readiness.py`,
   `prepare_cerebras_validation_bundle.sh`,
   `verify_cerebras_validation_archive.py`,
   `pack_cerebras_emulator_source_archive.py`,

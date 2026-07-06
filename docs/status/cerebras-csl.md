@@ -30,6 +30,19 @@ exact parity and logits comparison status explicit. `max_abs` is the Doppler
 tolerance-backed logits gate unless a reference export declares
 `sha256_exact`.
 
+## 2026-07-05 — Qwen no-hardware readiness classification gate
+
+`bench/tools/cerebras_status_snapshot.py` now emits `localReadiness` for the
+Qwen pre-hardware lane. The full-prompt hardware row is typed as
+`hardware_required` with `hardware_endpoint_required` when the returned WSE
+trace is absent; local blockers remain local blockers with their existing
+artifact rows.
+
+`python3 bench/tools/check_cerebras_no_hardware_readiness.py` gates that
+classification. Passing the gate means the local evidence and remaining gaps
+are typed for operator handoff. It is not a hardware execution claim and does
+not promote `qwen.hardware_full_prompt`.
+
 ## 2026-06-16 — HostPlan execution-plan materialization sharded
 
 `bench/runners/csl-runners/int4ple_hostplan_execution_plan.py` now keeps the

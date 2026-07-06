@@ -169,9 +169,6 @@ def main() -> int:
     sdk_root = resolve(args.sdk_root)
     cells_root = resolve(args.cells_root)
     tail_cells_root = resolve(args.tail_cells_root)
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
     manifest = load_json(manifest_path)
     reference_export = load_json(reference_export_path)
@@ -246,6 +243,10 @@ def main() -> int:
             selected_text = item.get("selectedText")
             break
     generated_tokens = generated_token_ids(reference_export)
+
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     compile_cache: dict[int, dict[str, Any]] = {}
     chunk_width = max(1, int(args.chunk_pe_width))

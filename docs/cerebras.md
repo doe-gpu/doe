@@ -35,6 +35,15 @@ Use the operator runbook for exact commands:
 The status snapshot command above is intentionally the only command repeated in
 this front door.
 
+For local pre-hardware classification, refresh the snapshot and then run:
+
+```bash
+python3 bench/tools/check_cerebras_no_hardware_readiness.py
+```
+
+That gate checks that Qwen local evidence, local blockers, and the missing WSE
+receipt are all typed. It is not a hardware execution claim.
+
 ## Run on hardware
 
 Operator runbook: commands, hardware receipt paths, required receipt fields,

@@ -24,6 +24,15 @@ class CerebrasStatusSnapshotTests(unittest.TestCase):
         )
         cls.module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.module)
+        gate_spec = importlib.util.spec_from_file_location(
+            "check_cerebras_no_hardware_readiness",
+            REPO_ROOT
+            / "bench"
+            / "tools"
+            / "check_cerebras_no_hardware_readiness.py",
+        )
+        cls.gate_module = importlib.util.module_from_spec(gate_spec)
+        gate_spec.loader.exec_module(cls.gate_module)
 
     def setUp(self) -> None:
         self.tmp = Path(tempfile.mkdtemp())
@@ -203,8 +212,8 @@ class CerebrasStatusSnapshotTests(unittest.TestCase):
     def test_qwen_hardware_path_missing_until_returned_trace(self) -> None:
         with mock.patch.object(self.module, "REPO_ROOT", self.tmp):
             row = self.module.qwen_hardware_path_row()
-        self.assertEqual(row["verdict"], "missing")
-        self.assertEqual(row["blocker"], "returned hardware trace absent")
+        self.assertEqual(row["verdict"], "hardware_required")
+        self.assertEqual(row["blocker"], "hardware_endpoint_required")
         self.assertIn("run_qwen3_6_27b_af16_hardware_path.sh", row["scope"])
 
     def test_qwen_hardware_path_bound_from_output_ready_trace(self) -> None:
@@ -216,6 +225,29 @@ class CerebrasStatusSnapshotTests(unittest.TestCase):
             row = self.module.qwen_hardware_path_row()
         self.assertEqual(row["verdict"], "bound")
         self.assertIsNone(row["blocker"])
+
+    def test_qwen_frozen_reference_validation_absent_is_typed(self) -> None:
+        with mock.patch.object(self.module, "REPO_ROOT", self.tmp):
+            row = self.module.qwen_frozen_reference_validation_row()
+        self.assertEqual(row["verdict"], "missing")
+        self.assertEqual(
+            row["blocker"],
+            "frozen_reference_validation_receipt_absent",
+        )
+
+    def test_qwen_frozen_reference_validation_blocker_class(self) -> None:
+        self._write(
+            self.module.QWEN_FROZEN_REFERENCE_VALIDATION,
+            {
+                "verdict": "not_attempted",
+                "bound": False,
+                "blocker": {"class": "qwen_frozen_reference_fixture_absent"},
+            },
+        )
+        with mock.patch.object(self.module, "REPO_ROOT", self.tmp):
+            row = self.module.qwen_frozen_reference_validation_row()
+        self.assertEqual(row["verdict"], "not_attempted")
+        self.assertEqual(row["blocker"], "qwen_frozen_reference_fixture_absent")
 
     def test_qwen_local_simfabric_ceiling_row(self) -> None:
         self._write(
@@ -268,14 +300,171 @@ class CerebrasStatusSnapshotTests(unittest.TestCase):
         )
         self.assertEqual(row["scope"], "memcpy_d2h_start")
 
+    def test_qwen_no_hardware_readiness_classified(self) -> None:
+        rows = [
+            {
+                "lane": "compile.cross_model_parity",
+                "artifact": "a.json",
+                "verdict": "bound",
+                "blocker": None,
+            },
+            {
+                "lane": "qwen.doppler_csl_splice.selected_logit",
+                "artifact": "b.json",
+                "verdict": "bound",
+                "blocker": None,
+            },
+            {
+                "lane": "qwen.simfabric_cells",
+                "artifact": "c.json",
+                "verdict": "pass_with_documented_canary_constraints",
+                "blocker": None,
+            },
+            {
+                "lane": "qwen.frozen_reference_validation",
+                "artifact": "d.json",
+                "verdict": "not_attempted",
+                "blocker": "qwen_frozen_reference_fixture_absent",
+            },
+            {
+                "lane": "qwen.per_kernel.summary",
+                "artifact": "e.json",
+                "verdict": "blocked",
+                "blocker": "21/22 kernels not bound",
+            },
+            {
+                "lane": "qwen.local_simfabric_ceiling",
+                "artifact": "f.json",
+                "verdict": "blocked",
+                "blocker": "embed_roi_launch_timeout",
+            },
+            {
+                "lane": "qwen.multi_token_decode",
+                "artifact": "g.json",
+                "verdict": "blocked",
+                "blocker": "boundKernelCount=0/3",
+            },
+            {
+                "lane": "qwen.hardware_full_prompt",
+                "artifact": "h.json",
+                "verdict": "hardware_required",
+                "blocker": "hardware_endpoint_required",
+            },
+        ]
+        readiness = self.module.build_qwen_no_hardware_readiness(rows)
+        self.assertEqual(readiness["verdict"], "classified")
+        self.assertTrue(readiness["notHardwareClaim"])
+        self.assertEqual(readiness["errors"], [])
+        self.assertEqual(len(readiness["typedLocalBlockers"]), 4)
+        self.assertEqual(len(readiness["hardwareRequiredRows"]), 1)
+        self.assertTrue(readiness["nextCommands"])
+
+    def test_no_hardware_gate_accepts_classified_snapshot(self) -> None:
+        readiness = {
+            "schemaVersion": 1,
+            "lane": "qwen.no_hardware_readiness",
+            "scope": "qwen3_6_27b_af16_pre_hardware",
+            "verdict": "classified",
+            "summary": "classified",
+            "notHardwareClaim": True,
+            "acceptedLocalRows": [
+                {"lane": "compile.cross_model_parity"},
+                {"lane": "qwen.doppler_csl_splice.selected_logit"},
+                {"lane": "qwen.simfabric_cells"},
+            ],
+            "typedLocalBlockers": [
+                {"lane": "qwen.frozen_reference_validation"},
+                {"lane": "qwen.per_kernel.summary"},
+                {"lane": "qwen.local_simfabric_ceiling"},
+                {"lane": "qwen.multi_token_decode"},
+            ],
+            "hardwareRequiredRows": [
+                {
+                    "lane": "qwen.hardware_full_prompt",
+                    "blocker": "hardware_endpoint_required",
+                },
+            ],
+            "nextCommands": [
+                {
+                    "lane": "qwen.doppler_csl_splice.selected_logit",
+                    "command": "python3 selected.py",
+                    "purpose": "refresh selected logit",
+                    "hardwareRequired": False,
+                },
+                {
+                    "lane": "qwen.frozen_reference_validation",
+                    "command": "python3 frozen.py",
+                    "purpose": "refresh frozen reference",
+                    "hardwareRequired": False,
+                },
+                {
+                    "lane": "qwen.simfabric_cells",
+                    "command": "python3 simfabric.py",
+                    "purpose": "refresh simfabric cells",
+                    "hardwareRequired": False,
+                },
+                {
+                    "lane": "qwen.no_hardware_readiness",
+                    "command": "python3 snapshot.py",
+                    "purpose": "refresh snapshot",
+                    "hardwareRequired": False,
+                },
+                {
+                    "lane": "qwen.hardware_full_prompt",
+                    "command": "run_hardware.sh --cmaddr endpoint",
+                    "purpose": "run hardware path",
+                    "hardwareRequired": True,
+                },
+            ],
+            "errors": [],
+        }
+        errors = self.gate_module.validate_readiness(
+            {"localReadiness": readiness}
+        )
+        self.assertEqual(errors, [])
+
     def test_render_markdown_contains_marker(self) -> None:
         rows = [
             {"lane": "x", "artifact": "a/b.json", "verdict": "bound", "blocker": None, "artifactMtime": "t"},
             {"lane": "y", "artifact": "a/c.json", "verdict": "blocked", "blocker": "z", "artifactMtime": "t"},
         ]
-        md = self.module.render_markdown(rows, "now")
+        readiness = {
+            "lane": "qwen.no_hardware_readiness",
+            "verdict": "classified",
+            "scope": "qwen3_6_27b_af16_pre_hardware",
+            "summary": "classified",
+            "typedLocalBlockers": [
+                {
+                    "lane": "qwen.per_kernel.summary",
+                    "verdict": "blocked",
+                    "blocker": "dry_run",
+                    "artifact": "a/d.json",
+                },
+            ],
+            "hardwareRequiredRows": [
+                {
+                    "lane": "qwen.hardware_full_prompt",
+                    "verdict": "hardware_required",
+                    "blocker": "hardware_endpoint_required",
+                    "artifact": "a/e.json",
+                },
+            ],
+            "nextCommands": [
+                {
+                    "lane": "qwen.no_hardware_readiness",
+                    "command": "python3 snapshot.py",
+                    "purpose": "refresh",
+                    "hardwareRequired": False,
+                },
+            ],
+        }
+        md = self.module.render_markdown(rows, "now", readiness)
         self.assertIn("✅ bound", md)
         self.assertIn("❌ blocked", md)
+        self.assertIn("Local pre-hardware readiness", md)
+        self.assertIn("qwen.no_hardware_readiness", md)
+        self.assertIn("Next Commands", md)
+        self.assertIn("Gap Rows", md)
         self.assertIn("| Lane | Verdict | Scope | Blocker |", md)
         self.assertIn("`a/b.json`", md)
 
