@@ -2,8 +2,8 @@
 
 ## Status
 
-This is a design proposal for an experimental `doe-gpu` math layer. It is not a
-shipped package contract, not a replacement for the current low-level compute
+This is a design proposal for an experimental `doe-gpu/math` layer. It is not
+a shipped package contract, not a replacement for the current low-level compute
 surface, and not public performance claim language.
 
 The purpose is to explore a more usable front door for mathematical GPU
@@ -39,7 +39,7 @@ const result = await device.compute({
 That API exposes the primitive. A math layer should expose intent:
 
 ```js
-import { gpu, wgsl } from "doe-gpu";
+import { gpu, wgsl } from "doe-gpu/math";
 
 const y = await gpu.map([1, 2, 3, 4], wgsl`x * 2.0`);
 ```
@@ -57,6 +57,31 @@ Use progressive disclosure:
 
 The front door should not own the semantics. The graph and receipt contract
 should own the semantics; the pleasant syntax should be a thin adapter over it.
+
+Prototype examples use `doe-gpu/math` intentionally. The root `doe-gpu` export
+should not expose this layer until the receipt, resource ownership, and fusion
+contracts are stable.
+
+## Ergonomic decisions
+
+- `gpu.map(data, expr)` returns the host value directly.
+- `gpu.map(data, expr, { receipt: true })` returns `{ value, receipt }`.
+- `.read()` returns a typed array derived from the output dtype by default.
+- `.read({ as: "array" })` may convert to a plain JavaScript array for small
+  ergonomic cases, but typed arrays are the default.
+- `gpu.array(data)` creates a lazy data node. It uploads only when execution
+  requires it.
+- `.materialize()` is the explicit GPU upload/execution boundary and returns an
+  owned GPU-backed math value.
+- `.plan()` is synchronous and produces generated WGSL plus a planning receipt.
+- `.compile()` is asynchronous because backend/device validation and pipeline
+  creation are runtime-sensitive.
+- Generated kernels are cached by final WGSL hash plus semantic graph hash,
+  dtype/shape/layout, symbol scopes, backend/runtime identity, relevant device
+  limits/features, workgroup policy, and fusion plan.
+- Reductions default to fast non-deterministic floating order. Deterministic
+  reductions are opt-in with `{ deterministic: true }`, and the effective policy
+  must be in the receipt.
 
 ## Proposed layers
 
@@ -130,15 +155,20 @@ string:
 
 ```js
 function wgsl(strings, ...values) {
+  if (values.length !== 0) {
+    throw new TypeError(
+      "wgsl template interpolation is not supported; pass runtime values as typed uniforms or buffers."
+    );
+  }
   return {
     kind: "wgsl",
-    source: String.raw({ raw: strings }, ...values),
+    source: String.raw({ raw: strings.raw }),
   };
 }
 ```
 
-String interpolation must not be used for runtime values. Runtime values should
-be passed as typed uniforms or buffers:
+String interpolation is rejected in the first version. Runtime values must be
+passed as typed uniforms or buffers:
 
 ```js
 const y = await gpu.map([1, 2, 3, 4], wgsl`x * scale + bias`, {
@@ -300,7 +330,22 @@ const y = await tmp
   .read();
 ```
 
-`materialize()` forces a GPU buffer boundary without CPU readback.
+`materialize()` forces a GPU buffer boundary without CPU readback. The returned
+value owns GPU resources and must expose `dispose()`. Finalizers may warn about
+leaks, but explicit disposal is the contract:
+
+```js
+const tmp = await gpu
+  .array([1, 2, 3, 4])
+  .map(wgsl`x * x`)
+  .materialize();
+
+try {
+  const y = await tmp.map(wgsl`x + 1.0`).read();
+} finally {
+  tmp.dispose();
+}
+```
 
 ### Reduction
 
@@ -346,8 +391,9 @@ const y = await gpu
   .read();
 ```
 
-Open question: whether `mat()` defaults to row-major contiguous layout or
-requires an explicit layout argument from the start.
+If matrix helpers are added later, `mat(data, [rows, cols])` should mean
+row-major contiguous layout. Any other layout must be explicit, and the receipt
+must record the effective layout.
 
 ### Stencil path
 
@@ -377,13 +423,17 @@ Users must be able to inspect generated WGSL before execution:
 const plan = gpu
   .array([1, 2, 3, 4])
   .map(wgsl`x * 2.0`)
-  .compile();
+  .plan();
 
 console.log(plan.wgsl);
 console.log(plan.receipt);
 
-const y = await plan.run().read();
+const executable = await plan.compile();
+const y = await executable.run().read();
 ```
+
+`plan()` is synchronous code generation and graph analysis. `compile()` is
+asynchronous because it may create device-specific shader modules or pipelines.
 
 ## Fusion contract
 
@@ -419,7 +469,7 @@ Reduction boundary:
 const y = await gpu
   .array([1, 2, 3, 4])
   .map(wgsl`x * x`)
-  .sum()
+  .sum({ deterministic: false })
   .read();
 ```
 
@@ -459,35 +509,91 @@ Suggested receipt shape:
 {
   "schemaVersion": 1,
   "artifactKind": "doe-gpu-math-receipt",
+  "apiStability": "experimental",
   "status": "ok",
-  "inputSummary": {
-    "dtype": "f32",
-    "shape": [4],
-    "inferred": true
+  "runtime": {
+    "package": "doe-gpu/math",
+    "backend": "doe-native-webgpu",
+    "adapter": "amd-vulkan",
+    "deviceLimitsHash": "<sha256>",
+    "featureSetHash": "<sha256>"
   },
   "graph": {
     "nodeCount": 2,
-    "nodes": ["array", "map"]
+    "nodes": [
+      {
+        "id": "array#0",
+        "op": "array",
+        "dtype": "f32",
+        "shape": [4],
+        "dtypeInferred": true,
+        "shapeInferred": true,
+        "hostInput": "plain-array"
+      },
+      {
+        "id": "map#1",
+        "op": "map",
+        "input": "array#0",
+        "outputDtype": "f32",
+        "outputShape": [4],
+        "fragment": {
+          "source": "x * 2.0",
+          "sourceSha256": "<sha256>",
+          "symbols": {
+            "x": "f32",
+            "i": "u32",
+            "n": "u32"
+          }
+        }
+      }
+    ]
   },
   "fusion": {
     "enabled": true,
     "groups": [["map#1"]],
+    "rejected": [],
     "boundaries": ["read"]
   },
   "generated": {
-    "wgslSha256": "<sha256>",
     "dispatches": [
       {
+        "id": "dispatch#0",
+        "nodes": ["map#1"],
+        "wgsl": "<full generated WGSL source>",
+        "wgslSha256": "<sha256>",
         "workgroupSize": 64,
-        "workgroups": [1, 1, 1]
+        "workgroups": [1, 1, 1],
+        "bindings": [
+          { "binding": 0, "name": "input", "addressSpace": "storage", "access": "read" },
+          { "binding": 1, "name": "output", "addressSpace": "storage", "access": "read_write" }
+        ]
       }
     ]
+  },
+  "buffers": {
+    "allocations": [
+      { "id": "buffer#input", "bytes": 16, "owner": "graph", "lifetime": "read" },
+      { "id": "buffer#output", "bytes": 16, "owner": "graph", "lifetime": "read" }
+    ],
+    "transfers": [
+      { "direction": "cpu-to-gpu", "bytes": 16, "source": "array#0" },
+      { "direction": "gpu-to-cpu", "bytes": 16, "target": "read" }
+    ]
+  },
+  "sync": {
+    "boundaries": [
+      { "kind": "readback", "operation": "read" }
+    ]
+  },
+  "cache": {
+    "key": "<sha256>",
+    "hit": false
   }
 }
 ```
 
-The concrete schema should be defined before promotion from experimental API to
-package contract.
+This is the minimum useful shape, not the final schema. The concrete schema
+must exist before promotion from experimental API to package contract.
 
 ## Error examples
 
@@ -537,10 +643,11 @@ tree support.
 | Uniform scalar wrappers | yes | yes | `gpu.f32`, `gpu.i32`, `gpu.u32`. |
 | `zip().map()` | yes | yes | Exact shape match only at first. |
 | Named zip inputs | maybe | yes | Avoid `z`, `w` symbol sprawl. |
-| `sum()` | yes | yes | Determinism policy required. |
+| `sum()` | yes | yes | Effective determinism policy appears in receipt. |
 | Custom `reduce()` | maybe | yes | Needs clearer receipt policy. |
 | `materialize()` | yes | yes | Explicit GPU boundary. |
-| `compile()`/inspection | yes | yes | Required for auditability. |
+| `plan()`/inspection | yes | yes | Synchronous generated WGSL and planning receipt. |
+| `compile()` | yes | yes | Asynchronous backend/device preparation. |
 | Matrix helpers | no | yes | Needs layout policy. |
 | Stencil/grid helpers | no | yes | Needs boundary policy. |
 | Broadcasting | no | maybe | Must never be silent. |
@@ -581,28 +688,36 @@ receipts and keep the supported inference set small.
 
 Matrix, tensor, and stencil operations are important, but they should not
 define the first API. They require layout, broadcasting, boundary, and
-determinism policies. Start with array, map, zip, reduction, materialize, read,
-compile, and receipt.
+determinism policies. Start with array, map, zip, reduction, materialize, plan,
+compile, read, and receipt.
 
-## Open questions
+## Closed decisions
 
-- Should `gpu.map(data, expr)` return a plain host value or an object containing
-  `{ value, receipt }` when receipt mode is enabled?
-- Should `.read()` default to the original typed array class or always return a
-  typed array derived from dtype?
-- Should `gpu.array([1, 2, 3])` copy immediately to a GPU buffer or remain a
-  host literal node until execution?
-- How should generated kernels be cached and invalidated?
-- What is the minimum receipt schema needed before shipping any API under
-  `doe-gpu`?
-- Is deterministic reduction a per-call option, a graph-level policy, or a
-  runtime configuration?
-- Should matrix helpers live in the base `doe-gpu` export or a separate
-  `doe-gpu/math` export until stable?
+- `gpu.map(data, expr)` returns the host value directly for the default case.
+- `gpu.map(data, expr, { receipt: true })` returns `{ value, receipt }`.
+- `.read()` returns a typed array derived from output dtype by default.
+- `.read({ as: "array" })` may return a plain JavaScript array for small
+  convenience cases.
+- `gpu.array([1, 2, 3])` remains a host literal graph node until execution.
+- Immediate GPU residency is requested with `.materialize()`, not hidden inside
+  `array(...)`.
+- Materialized values own GPU resources and require explicit `dispose()`.
+- Kernel cache invalidation is hash-based over final WGSL, graph semantics,
+  dtype/shape/layout, symbol scope, backend/runtime identity, device
+  feature/limit identity, workgroup policy, and fusion plan.
+- The minimum receipt schema is the expanded shape above: runtime identity,
+  graph nodes, fragment sources and scopes, generated WGSL, dispatches, binding
+  layout, buffer allocations, CPU/GPU transfers, sync boundaries, fusion report,
+  and cache key.
+- Reduction determinism is a per-call option with a graph-level default. The
+  default is fast non-deterministic floating order; deterministic reduction is
+  opt-in and may fail closed on unsupported backends.
+- Matrix helpers stay out of the prototype and should remain under
+  `doe-gpu/math` until stable.
 
 ## Recommended prototype slice
 
-Prototype behind an experimental export such as `doe-gpu/math`:
+Prototype behind the experimental `doe-gpu/math` export:
 
 - `wgsl`
 - `gpu.array(data, options?)`
@@ -612,6 +727,7 @@ Prototype behind an experimental export such as `doe-gpu/math`:
 - `.zip(other, options?)`
 - `.sum(options?)`
 - `.materialize()`
+- `.plan()`
 - `.compile()`
 - `.read(options?)`
 - `.receipt()`
