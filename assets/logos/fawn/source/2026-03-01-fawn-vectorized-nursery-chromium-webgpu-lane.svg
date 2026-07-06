@@ -1,15 +1,5 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="100%" viewBox="0 0 1024 912" enable-background="new 0 0 1024 912" xml:space="preserve">
-<defs>
-<linearGradient id="doe-red-blue" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1024" y2="912">
-	<stop offset="0" stop-color="#ff1f3d"/>
-	<stop offset="1" stop-color="#315bff"/>
-</linearGradient>
-<linearGradient id="doe-purple-pink" gradientUnits="userSpaceOnUse" x1="0" y1="912" x2="1024" y2="0">
-	<stop offset="0" stop-color="#6b2cff"/>
-	<stop offset="1" stop-color="#ff1f3d"/>
-</linearGradient>
-<clipPath id="doe-logo-clip" clipPathUnits="userSpaceOnUse">
 <path fill="#000000" opacity="1.000000" stroke="none"
 	d="
 M561.720642,622.786377
@@ -279,10 +269,4 @@ M218.748230,268.300903
 	C201.511658,240.883484 203.106735,242.345459 204.358475,244.460678
 	C209.023773,252.344070 213.806519,260.157959 218.748230,268.300903
 z"/>
-</clipPath>
-</defs>
-<g clip-path="url(#doe-logo-clip)" style="isolation:isolate">
-	<rect x="0" y="0" width="1024" height="912" fill="url(#doe-red-blue)"/>
-	<rect x="0" y="0" width="1024" height="912" fill="url(#doe-purple-pink)" opacity="0.62" style="mix-blend-mode:screen"/>
-</g>
 </svg>

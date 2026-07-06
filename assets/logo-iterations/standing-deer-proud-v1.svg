@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 1024 912" role="img" aria-labelledby="title desc">
+  <title id="title">Standing Doe Logo Iteration V1</title>
+  <desc id="desc">Polygonal adult doe standing in profile with lifted head and long proud stance.</desc>
+  <defs>
+    <linearGradient id="doe-proud-v1" x1="108" y1="96" x2="888" y2="836" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff1f3d"/>
+      <stop offset="0.52" stop-color="#ba25cb"/>
+      <stop offset="1" stop-color="#315bff"/>
+    </linearGradient>
+    <linearGradient id="doe-proud-v1-dark" x1="260" y1="260" x2="760" y2="780" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7f18a7"/>
+      <stop offset="1" stop-color="#151a67"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#doe-proud-v1)">
+    <polygon points="222,454 364,360 602,348 742,426 707,553 542,636 325,602"/>
+    <polygon points="602,348 662,252 754,212 838,278 742,426"/>
+    <polygon points="662,252 626,132 718,224"/>
+    <polygon points="754,212 848,138 817,262"/>
+    <polygon points="222,454 132,393 74,286 190,347 364,360"/>
+    <polygon points="742,426 884,457 826,535 707,553"/>
+    <polygon points="325,602 274,793 192,862 236,618"/>
+    <polygon points="274,793 394,788 345,850 192,862"/>
+    <polygon points="444,622 431,805 356,872 370,626"/>
+    <polygon points="431,805 547,809 498,866 356,872"/>
+    <polygon points="585,614 682,803 646,873 514,636"/>
+    <polygon points="682,803 805,800 746,857 646,873"/>
+    <polygon points="690,552 846,746 849,817 628,590"/>
+    <polygon points="846,746 932,737 906,793 849,817"/>
+  </g>
+  <g fill="url(#doe-proud-v1-dark)" opacity="0.98">
+    <polygon points="364,360 602,348 548,468 222,454"/>
+    <polygon points="548,468 742,426 707,553 542,636"/>
+    <polygon points="222,454 548,468 542,636 325,602"/>
+    <polygon points="602,348 742,426 838,278 754,212"/>
+    <polygon points="236,618 325,602 274,793"/>
+    <polygon points="370,626 444,622 431,805"/>
+    <polygon points="514,636 585,614 682,803"/>
+    <polygon points="628,590 707,553 846,746"/>
+  </g>
+  <g fill="#09060f">
+    <polygon points="733,271 759,260 779,280 751,292"/>
+    <polygon points="603,520 649,499 694,538 661,578 612,560"/>
+    <polygon points="326,586 480,645 421,681 285,625"/>
+    <polygon points="796,384 842,405 807,426"/>
+  </g>
+</svg>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 1024 912" role="img" aria-labelledby="title desc">
+  <title id="title">Standing Deer Logo Iteration V3 Stag</title>
+  <desc id="desc">Mature polygonal standing deer with raised chest, lifted head, and antlers.</desc>
+  <defs>
+    <linearGradient id="doe-proud-v3" x1="94" y1="62" x2="920" y2="850" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff1f3d"/>
+      <stop offset="0.52" stop-color="#b71fd0"/>
+      <stop offset="1" stop-color="#315bff"/>
+    </linearGradient>
+    <linearGradient id="doe-proud-v3-dark" x1="276" y1="240" x2="820" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8012a7"/>
+      <stop offset="1" stop-color="#11144d"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#doe-proud-v3)">
+    <polygon points="222,487 372,350 608,316 770,382 858,490 762,607 516,666 308,611"/>
+    <polygon points="608,316 676,205 785,166 876,226 770,382"/>
+    <polygon points="676,205 626,83 700,145 725,204"/>
+    <polygon points="785,166 803,58 844,132 876,226"/>
+    <polygon points="803,58 746,29 808,20 870,70"/>
+    <polygon points="844,132 936,63 922,139 876,226"/>
+    <polygon points="936,63 1000,51 952,109"/>
+    <polygon points="222,487 132,438 72,326 178,373 372,350"/>
+    <polygon points="858,490 955,515 884,585 762,607"/>
+    <polygon points="308,611 248,807 156,870 216,630"/>
+    <polygon points="248,807 381,800 330,858 156,870"/>
+    <polygon points="469,660 452,828 372,884 400,656"/>
+    <polygon points="452,828 584,826 528,880 372,884"/>
+    <polygon points="628,640 732,817 690,878 556,657"/>
+    <polygon points="732,817 866,812 803,866 690,878"/>
+    <polygon points="741,585 904,740 911,800 682,612"/>
+    <polygon points="904,740 974,721 958,779 911,800"/>
+  </g>
+  <g fill="url(#doe-proud-v3-dark)" opacity="0.98">
+    <polygon points="372,350 608,316 554,472 222,487"/>
+    <polygon points="554,472 770,382 858,490 762,607"/>
+    <polygon points="222,487 554,472 762,607 516,666 308,611"/>
+    <polygon points="608,316 770,382 876,226 785,166"/>
+    <polygon points="178,373 222,487 72,326"/>
+    <polygon points="216,630 308,611 248,807"/>
+    <polygon points="400,656 469,660 452,828"/>
+    <polygon points="556,657 628,640 732,817"/>
+    <polygon points="682,612 762,607 904,740"/>
+  </g>
+  <g fill="#09060f">
+    <polygon points="766,224 795,211 817,232 787,247"/>
+    <polygon points="630,536 677,512 731,558 690,596 643,578"/>
+    <polygon points="329,596 500,655 438,696 281,634"/>
+    <polygon points="807,425 858,490 816,474"/>
+  </g>
+</svg>

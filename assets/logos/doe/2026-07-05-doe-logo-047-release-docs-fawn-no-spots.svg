@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 1024 912" role="img" aria-labelledby="title desc">
+  <title id="title">Doe fawn logo, no spots</title>
+  <desc id="desc">Doe fawn mark with pointed deer ears, narrow muzzle, and Metal and Vulkan spectrum lanes.</desc>
+  <defs>
+    <linearGradient id="spectrum" x1="176" y1="120" x2="848" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff6b7a"/>
+      <stop offset="0.5" stop-color="#5d8dff"/>
+      <stop offset="1" stop-color="#b98cff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="912" rx="104" fill="#ffffff"/>
+  <rect x="64" y="64" width="896" height="784" rx="88" fill="#08090c"/>
+  <path d="M395 326c-64-104-134-150-211-126 17 98 68 176 152 235 14-41 34-78 59-109z" fill="#ffffff"/>
+  <path d="M629 326c64-104 134-150 211-126-17 98-68 176-152 235-14-41-34-78-59-109z" fill="#ffffff"/>
+  <path d="M350 358c-46-58-88-93-126-106 17 58 49 106 96 145 9-14 19-27 30-39z" fill="#08090c"/>
+  <path d="M674 358c46-58 88-93 126-106-17 58-49 106-96 145-9-14-19-27-30-39z" fill="#08090c"/>
+  <path d="M405 320c-57 52-88 123-92 211-5 103 24 187 87 252 32 33 69 49 112 49s80-16 112-49c63-65 92-149 87-252-4-88-35-159-92-211" fill="none" stroke="#ffffff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M406 334c44 55 63 123 57 204M618 334c-44 55-63 123-57 204" fill="none" stroke="url(#spectrum)" stroke-width="25" stroke-linecap="round"/>
+  <path d="M390 470c27-18 59-18 92 0M542 470c33-18 65-18 92 0" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="432" cy="530" r="18" fill="#ffffff"/>
+  <circle cx="592" cy="530" r="18" fill="#ffffff"/>
+  <path d="M452 628c16-42 36-74 60-94 24 20 44 52 60 94" fill="none" stroke="#ffffff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="512" cy="664" rx="48" ry="32" fill="#ffffff"/>
+  <path d="M490 660c13 13 31 13 44 0" fill="none" stroke="#08090c" stroke-width="12" stroke-linecap="round"/>
+  <path d="M470 724c27 22 57 22 84 0" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="396" cy="326" r="21" fill="#ff6b7a"/>
+  <circle cx="628" cy="326" r="21" fill="#b98cff"/>
+</svg>

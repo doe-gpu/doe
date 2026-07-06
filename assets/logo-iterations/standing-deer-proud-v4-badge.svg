@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 1024 912" role="img" aria-labelledby="title desc">
+  <title id="title">Standing Deer Logo Iteration V4 Badge</title>
+  <desc id="desc">Compact polygonal standing deer badge with proud lifted face and stable four-leg stance.</desc>
+  <defs>
+    <linearGradient id="doe-proud-v4" x1="124" y1="102" x2="882" y2="834" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff1f3d"/>
+      <stop offset="0.55" stop-color="#bd25ca"/>
+      <stop offset="1" stop-color="#315bff"/>
+    </linearGradient>
+    <linearGradient id="doe-proud-v4-dark" x1="288" y1="254" x2="790" y2="780" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8016a2"/>
+      <stop offset="1" stop-color="#13164c"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#doe-proud-v4)">
+    <polygon points="244,505 371,376 579,334 735,394 824,505 738,606 516,672 315,620"/>
+    <polygon points="579,334 650,224 755,182 842,242 735,394"/>
+    <polygon points="650,224 620,104 704,201"/>
+    <polygon points="755,182 854,112 822,245"/>
+    <polygon points="244,505 149,456 86,340 197,392 371,376"/>
+    <polygon points="824,505 930,538 839,600 738,606"/>
+    <polygon points="315,620 274,790 194,848 221,642"/>
+    <polygon points="274,790 394,789 344,846 194,848"/>
+    <polygon points="461,662 456,812 388,866 397,656"/>
+    <polygon points="456,812 573,813 521,864 388,866"/>
+    <polygon points="609,646 701,806 666,866 543,660"/>
+    <polygon points="701,806 822,800 767,854 666,866"/>
+    <polygon points="714,592 872,724 879,787 657,618"/>
+  </g>
+  <g fill="url(#doe-proud-v4-dark)" opacity="0.98">
+    <polygon points="371,376 579,334 535,476 244,505"/>
+    <polygon points="535,476 735,394 824,505 738,606"/>
+    <polygon points="244,505 535,476 738,606 516,672 315,620"/>
+    <polygon points="579,334 735,394 842,242 755,182"/>
+    <polygon points="197,392 244,505 86,340"/>
+    <polygon points="221,642 315,620 274,790"/>
+    <polygon points="397,656 461,662 456,812"/>
+    <polygon points="543,660 609,646 701,806"/>
+    <polygon points="657,618 738,606 872,724"/>
+  </g>
+  <g fill="#08060f">
+    <polygon points="736,242 764,230 785,250 756,264"/>
+    <polygon points="594,540 641,515 698,560 657,600 609,579"/>
+    <polygon points="332,606 492,662 434,701 287,642"/>
+    <polygon points="779,441 824,505 786,489"/>
+    <polygon points="214,522 249,505 242,546"/>
+  </g>
+</svg>

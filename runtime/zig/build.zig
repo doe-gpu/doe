@@ -1,8 +1,8 @@
 const std = @import("std");
 const APP_BUNDLE_NAME = "Doe Runtime.app";
 const APP_ICON_BASENAME = "DoeRuntime";
-const APP_ICON_SOURCE_SVG = "../../browser/chromium/assets/logo/source/fawn-icon-main.svg";
-const APP_ICON_PRECOMPILED_ICNS = "../../browser/chromium/assets/logo/compiled/macos/fawn-icon-main.icns";
+const APP_ICON_SOURCE_SVG = "../../assets/doe-logo.svg";
+const APP_ICON_PRECOMPILED_ICNS = "../../assets/doe-logo.icns";
 const ABSENT_PROOF_ARTIFACT_SHA256 = "0000000000000000000000000000000000000000000000000000000000000000";
 
 fn fileExists(path: []const u8) bool {
