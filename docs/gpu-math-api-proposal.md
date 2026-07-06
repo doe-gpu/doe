@@ -154,8 +154,8 @@ that receives it.
 
 | Operation | Symbols | Notes |
 |---|---|---|
-| `map(wgsl`...`)` | `x`, `i`, `n`, `coord` for shaped arrays | `x` is the element, `i` is `u32`, `n` is `u32`. |
-| `zip(...).map(wgsl`...`)` | `x`, `y`, `i`, `n`, `coord` | Names beyond two inputs need explicit aliases. |
+| map fragment | `x`, `i`, `n`, `coord` for shaped arrays | `x` is the element, `i` is `u32`, `n` is `u32`. |
+| zip map fragment | `x`, `y`, `i`, `n`, `coord` | Names beyond two inputs need explicit aliases. |
 | `reduce(...)` | `x` in map phase, `a`/`b` in combine phase | Floating reductions need determinism policy. |
 | `stencil(...)` | `x`, `coord`, `sample(dx, dy, ...)` | Boundary policy must be explicit. |
 | `kernel(...)` | Whatever the full function declares | Raw escape hatch controls its own function shape. |
@@ -552,7 +552,7 @@ tree support.
 
 ### Pleasant front door vs semantic weight
 
-`gpu.map([1, 2, 3], wgsl`x * 2.0`)` is attractive because it removes WebGPU
+The `gpu.map(...)` front door is attractive because it removes WebGPU
 plumbing. It also hides dtype, shape, allocation, dispatch, and readback unless
 the receipt exposes them. The API should stay pleasant, but the implementation
 must never hide those decisions.
@@ -618,4 +618,3 @@ Prototype behind an experimental export such as `doe-gpu/math`:
 
 Do not include matrix, stencil, broadcasting, strided views, or in-place writes
 until the graph receipt and fusion report are solid.
-
