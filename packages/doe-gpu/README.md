@@ -1,7 +1,7 @@
 # doe-gpu
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/doerun/doe/main/browser/chromium/assets/logo/source/fawn-icon-main.svg" alt="Fawn icon" width="96" />
+<img src="https://raw.githubusercontent.com/doerun/doe/main/assets/doe-logo.svg" alt="Doe logo" width="96" />
 </p>
 
 `doe-gpu` is the JavaScript entry point for Doe's native WebGPU runtime. It
@@ -57,9 +57,10 @@ npm install doe-gpu
 | doe-gpu/browser  | --> | incumbent browser WebGPU |
 +------------------+     +--------------------------+
 
-+------------------+
-| Fawn/Chromium    | separate browser release lane
-+------------------+
++-------------------------------+
+| Fawn/Chromium                 |
+| separate browser release lane |
++-------------------------------+
 ```
 
 ## Usage
@@ -137,6 +138,8 @@ Metal, Dawn-vs-Doe, browser, or hardware evidence trees.
 
 Current public package and runtime evidence is indexed in
 [`reports/claim-index.json`](https://github.com/doerun/doe/blob/main/reports/claim-index.json).
+The shared chart separates claim-indexed Apple Metal package/native rows, AMD
+Vulkan package/native/drop-in rows, and diagnostic ORT/browser rows.
 Read each row by its claim state:
 
 - `claim-indexed`: public claim row with a report path and claim sidecar.
