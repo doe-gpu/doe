@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.doe.deco/doe-gpu-math-receipt.schema.json",
+  "title": "Doe GPU math receipt",
+  "description": "Receipt contract for the experimental doe-gpu/math API. The receipt records graph semantics, generated WGSL, dispatches, resource ownership, synchronization, fusion, cache identity, and optional Doppler Program Bundle linkage.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "apiStability",
+    "status",
+    "runtime",
+    "interop",
+    "graph",
+    "fusion",
+    "generated",
+    "buffers",
+    "sync",
+    "cache",
+    "errors"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "doe-gpu-math-receipt" },
+    "apiStability": {
+      "type": "string",
+      "enum": ["proposal", "experimental"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "compiled", "ok", "error"]
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package",
+        "backend",
+        "adapter",
+        "deviceLimitsHash",
+        "featureSetHash"
+      ],
+      "properties": {
+        "package": { "type": "string", "const": "doe-gpu/math" },
+        "backend": { "type": "string", "minLength": 1 },
+        "adapter": { "type": "string", "minLength": 1 },
+        "deviceLimitsHash": { "$ref": "#/$defs/sha256OrPending" },
+        "featureSetHash": { "$ref": "#/$defs/sha256OrPending" }
+      }
+    },
+    "interop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dopplerProgramBundle", "sharedExecutionContract"],
+      "properties": {
+        "dopplerProgramBundle": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "bundleId",
+            "bundleSha256",
+            "executionGraphHash",
+            "wgslModuleSetHash",
+            "referenceTranscriptHash"
+          ],
+          "properties": {
+            "schema": { "type": "string", "const": "doppler.program-bundle/v1" },
+            "bundleId": { "type": "string", "minLength": 1 },
+            "bundleSha256": { "$ref": "#/$defs/sha256" },
+            "executionGraphHash": { "$ref": "#/$defs/sha256" },
+            "wgslModuleSetHash": { "$ref": "#/$defs/sha256" },
+            "referenceTranscriptHash": { "$ref": "#/$defs/sha256OrNull" }
+          }
+        },
+        "sharedExecutionContract": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["artifactKind", "contractSha256"],
+          "properties": {
+            "artifactKind": { "type": "string", "const": "doe_shared_execution_contract" },
+            "contractSha256": { "$ref": "#/$defs/sha256" }
+          }
+        }
+      }
+    },
+    "graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeCount", "nodes"],
+      "properties": {
+        "nodeCount": { "type": "integer", "minimum": 0 },
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/graphNode" }
+        }
+      }
+    },
+    "fusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "groups", "rejected", "boundaries"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        },
+        "rejected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["nodes", "reason"],
+            "properties": {
+              "nodes": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "boundaries": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "generated": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dispatches"],
+      "properties": {
+        "dispatches": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/generatedDispatch" }
+        }
+      }
+    },
+    "buffers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allocations", "transfers"],
+      "properties": {
+        "allocations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/bufferAllocation" }
+        },
+        "transfers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/bufferTransfer" }
+        }
+      }
+    },
+    "sync": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boundaries"],
+      "properties": {
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "operation"],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": ["materialize", "compile", "run", "readback", "dispose"]
+              },
+              "operation": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "cache": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "hit"],
+      "properties": {
+        "key": { "$ref": "#/$defs/sha256OrNull" },
+        "hit": { "type": "boolean" }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "message": { "type": "string", "minLength": 1 },
+          "path": { "type": ["string", "null"] },
+          "hint": { "type": ["string", "null"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "sha256OrNull": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "sha256OrPending": {
+      "type": "string",
+      "pattern": "^(pending|sha256:[0-9a-f]{64})$"
+    },
+    "dtype": {
+      "type": ["string", "null"],
+      "enum": ["f32", "i32", "u32", "f16", null]
+    },
+    "shape": {
+      "type": ["array", "null"],
+      "items": { "type": "integer", "minimum": 0 }
+    },
+    "graphNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "op",
+        "dtype",
+        "shape",
+        "dtypeInferred",
+        "shapeInferred"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "op": {
+          "type": "string",
+          "enum": ["array", "map", "zip", "sum", "reduce", "materialize", "read", "kernel"]
+        },
+        "input": { "type": ["string", "null"] },
+        "inputs": {
+          "type": ["array", "null"],
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "dtype": { "$ref": "#/$defs/dtype" },
+        "shape": { "$ref": "#/$defs/shape" },
+        "outputDtype": { "$ref": "#/$defs/dtype" },
+        "outputShape": { "$ref": "#/$defs/shape" },
+        "dtypeInferred": { "type": "boolean" },
+        "shapeInferred": { "type": "boolean" },
+        "hostInput": { "type": ["string", "null"] },
+        "deterministic": { "type": ["boolean", "null"] },
+        "fragment": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["source", "sourceSha256", "symbols"],
+          "properties": {
+            "source": { "type": "string", "minLength": 1 },
+            "sourceSha256": { "$ref": "#/$defs/sha256" },
+            "symbols": {
+              "type": "object",
+              "additionalProperties": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "generatedDispatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "nodes",
+        "wgsl",
+        "wgslSha256",
+        "workgroupSize",
+        "workgroups",
+        "bindings"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "wgsl": { "type": "string", "minLength": 1 },
+        "wgslSha256": { "$ref": "#/$defs/sha256" },
+        "workgroupSize": { "type": "integer", "minimum": 1 },
+        "workgroups": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["binding", "name", "addressSpace", "access"],
+            "properties": {
+              "group": { "type": "integer", "minimum": 0 },
+              "binding": { "type": "integer", "minimum": 0 },
+              "name": { "type": "string", "minLength": 1 },
+              "addressSpace": { "type": "string", "enum": ["storage", "uniform"] },
+              "access": { "type": "string", "enum": ["read", "read_write", "uniform"] }
+            }
+          }
+        }
+      }
+    },
+    "bufferAllocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "bytes", "owner", "lifetime"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "owner": { "type": "string", "enum": ["graph", "materialized-value", "caller"] },
+        "lifetime": { "type": "string", "minLength": 1 }
+      }
+    },
+    "bufferTransfer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["direction", "bytes", "source", "target"],
+      "properties": {
+        "direction": {
+          "type": "string",
+          "enum": ["cpu-to-gpu", "gpu-to-cpu", "gpu-to-gpu"]
+        },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "source": { "type": "string", "minLength": 1 },
+        "target": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-gpu-math-receipt",
+  "apiStability": "proposal",
+  "status": "planned",
+  "runtime": {
+    "package": "doe-gpu/math",
+    "backend": "spec-only",
+    "adapter": "not-executed",
+    "deviceLimitsHash": "pending",
+    "featureSetHash": "pending"
+  },
+  "interop": {
+    "dopplerProgramBundle": null,
+    "sharedExecutionContract": null
+  },
+  "graph": {
+    "nodeCount": 2,
+    "nodes": [
+      {
+        "id": "array#0",
+        "op": "array",
+        "dtype": "f32",
+        "shape": [4],
+        "dtypeInferred": true,
+        "shapeInferred": true,
+        "hostInput": "plain-array"
+      },
+      {
+        "id": "map#1",
+        "op": "map",
+        "input": "array#0",
+        "inputs": null,
+        "dtype": "f32",
+        "shape": [4],
+        "outputDtype": "f32",
+        "outputShape": [4],
+        "dtypeInferred": true,
+        "shapeInferred": true,
+        "hostInput": null,
+        "deterministic": null,
+        "fragment": {
+          "source": "x * 2.0",
+          "sourceSha256": "sha256:d23264e6b9f2008f61808300b8b04581cab5397a2ad4f2a9a39cf79787e397a7",
+          "symbols": {
+            "x": "f32",
+            "i": "u32",
+            "n": "u32"
+          }
+        }
+      }
+    ]
+  },
+  "fusion": {
+    "enabled": true,
+    "groups": [["map#1"]],
+    "rejected": [],
+    "boundaries": ["read"]
+  },
+  "generated": {
+    "dispatches": [
+      {
+        "id": "dispatch#0",
+        "nodes": ["map#1"],
+        "wgsl": "@group(0) @binding(0) var<storage, read> input: array<f32>;\n@group(0) @binding(1) var<storage, read_write> output: array<f32>;\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) id: vec3u) {\n  let i = id.x;\n  if (i >= 4u) { return; }\n  let x = input[i];\n  output[i] = x * 2.0;\n}\n",
+        "wgslSha256": "sha256:8405f67eb00e812272344fc4f31058aa8639259d0a9a5e71b5d6ef92880d3fda",
+        "workgroupSize": 64,
+        "workgroups": [1, 1, 1],
+        "bindings": [
+          {
+            "group": 0,
+            "binding": 0,
+            "name": "input",
+            "addressSpace": "storage",
+            "access": "read"
+          },
+          {
+            "group": 0,
+            "binding": 1,
+            "name": "output",
+            "addressSpace": "storage",
+            "access": "read_write"
+          }
+        ]
+      }
+    ]
+  },
+  "buffers": {
+    "allocations": [
+      {
+        "id": "buffer#input",
+        "bytes": 16,
+        "owner": "graph",
+        "lifetime": "read"
+      },
+      {
+        "id": "buffer#output",
+        "bytes": 16,
+        "owner": "graph",
+        "lifetime": "read"
+      }
+    ],
+    "transfers": [
+      {
+        "direction": "cpu-to-gpu",
+        "bytes": 16,
+        "source": "array#0",
+        "target": "buffer#input"
+      },
+      {
+        "direction": "gpu-to-cpu",
+        "bytes": 16,
+        "source": "buffer#output",
+        "target": "read"
+      }
+    ]
+  },
+  "sync": {
+    "boundaries": [
+      {
+        "kind": "readback",
+        "operation": "read"
+      }
+    ]
+  },
+  "cache": {
+    "key": null,
+    "hit": false
+  },
+  "errors": []
+}
