@@ -38,5 +38,6 @@ Archive files are preserve-rather-than-frozen:
 | Cerebras / CSL lane status | `cerebras-csl.md` |
 | Gemma/Qwen CSL runtime bring-up | `cerebras-csl-runtime-bringup.md` |
 | Compiler and non-TSIR WebGPU runtime work | `compiler-and-webgpu.md` |
+| Continuous integration and workflow policy | `ci.md` |
 | TSIR lowering work | `tsir.md` |
 | Runtime backends and benchmark lanes | `runtime-backends-and-bench.md` |

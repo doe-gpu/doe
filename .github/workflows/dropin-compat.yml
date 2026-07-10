@@ -1,66 +1,43 @@
 name: dropin-compat
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  build-dropin-artifact:
+  dropin-gates:
     runs-on:
       - self-hosted
       - linux
       - amd-vulkan
     steps:
-      - uses: actions/checkout@v4
-      - name: Build candidate drop-in artifact
+      - uses: actions/checkout@v7
+      - name: Prepare Dawn headers
         run: |
-          python3 bench/bootstrap_dawn.py \
+          python3 bench/tools/bootstrap_dawn.py \
             --build-system gn \
             --source-dir bench/vendor/dawn \
             --build-dir bench/vendor/dawn/out/Release \
             --targets dawn_perf_tests \
             --parallel 8
-          cd zig
-          zig build dropin -Doptimize=ReleaseFast
-          test -f zig-out/lib/libdoe_webgpu.so
-      - name: Upload candidate artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dropin-artifact
-          path: |
-            zig/zig-out/lib/libdoe_webgpu.so
-            zig/zig-out/lib/libwebgpu_dawn.so
-            zig/zig-out/lib/libwebgpu.so
-            zig/zig-out/lib/libwgpu_native.so
-
-  dropin-gates:
-    needs: build-dropin-artifact
-    runs-on:
-      - self-hosted
-      - linux
-      - amd-vulkan
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download candidate artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dropin-artifact
-          path: bench/out/dropin-artifact
-      - name: Run drop-in compatibility + benchmark suite
+      - name: Build candidate drop-in artifact
+        working-directory: runtime/zig
         run: |
-          python3 bench/dropin_gate.py \
-            --artifact bench/out/dropin-artifact/libdoe_webgpu.so \
+          zig build dropin -Doptimize=ReleaseFast
+          test -f zig-out/lib/libwebgpu_doe.so
+      - name: Run drop-in compatibility and benchmark suite
+        run: |
+          python3 bench/drop-in/dropin_gate.py \
+            --artifact runtime/zig/zig-out/lib/libwebgpu_doe.so \
             --symbol-report bench/out/dropin_symbol_report.ci.json \
             --behavior-report bench/out/dropin_behavior_report.ci.json \
             --benchmark-report bench/out/dropin_benchmark_report.ci.json \
             --report bench/out/dropin_report.ci.json \
             --no-timestamp-output
       - name: Upload drop-in reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dropin-compat-report
           path: |

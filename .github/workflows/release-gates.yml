@@ -1,12 +1,10 @@
 name: fawn-release-gates
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - master
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   release-report-gates:
@@ -15,20 +13,20 @@ jobs:
       - linux
       - amd-vulkan
     env:
-      CONFIG_PATH: bench/compare_dawn_vs_doe.config.amd.vulkan.release.json
-      DROPIN_ARTIFACT: zig/zig-out/lib/libdoe_webgpu.so
+      CONFIG_PATH: bench/native-compare/compare.config.amd.vulkan.release.json
+      DROPIN_ARTIFACT: runtime/zig/zig-out/lib/libwebgpu_doe.so
     steps:
-      - uses: actions/checkout@v4
-      - name: Build Fawn drop-in artifact
+      - uses: actions/checkout@v7
+      - name: Build Doe drop-in artifact
+        working-directory: runtime/zig
         run: |
-          cd zig
           zig build dropin -Doptimize=ReleaseFast
-          test -f zig-out/lib/libdoe_webgpu.so
+          test -f zig-out/lib/libwebgpu_doe.so
       - name: Run canonical release pipeline
         run: |
-          python3 bench/run_release_pipeline.py --config "$CONFIG_PATH" --strict-amd-vulkan --trace-semantic-parity-mode auto --with-dropin-gate --dropin-artifact "$DROPIN_ARTIFACT" --with-claim-gate
+          python3 bench/runners/run_release_pipeline.py --config "$CONFIG_PATH" --strict-amd-vulkan --trace-semantic-parity-mode auto --with-dropin-gate --dropin-artifact "$DROPIN_ARTIFACT" --with-claim-gate
       - name: Upload release artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fawn-release-gates-report
           path: |

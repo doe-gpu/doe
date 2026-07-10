@@ -4,12 +4,12 @@
   "provenance": {
     "leanToolchainRef": "leanprover/lean4:v4.16.0",
     "extractProgramSha256": "7c77fe2ba78c0211d89f218ff3df6581262def3253ab7e42fec156eb0f37b0ba",
-    "leanSourceTreeSha256": "efed4a2f97551d745063b93ac5d86fbfc38fa7fe5ac37b294938e50d5b1305c3",
-    "generatedComparabilityContractSha256": "6e1044279c1257d158a4a6b9b3b78f638405da3266c15b0ec8f8c02f3ac4ef55",
+    "leanSourceTreeSha256": "4e66256c602de88c0ed35cf91d3fc3f90ac365412e00f763fc21d625758a36e0",
+    "generatedComparabilityContractSha256": "06041825c55a7a57d41d6d4a8f98a2eecf942129bee32e31d39513c5171b8b27",
     "proofPatternSpecSha256": "a556746e3f77c774ac5abb4ae9a9d8e0ade26bad15137e0c179805d1bf8252ec"
   },
   "contractHashes": {
-    "comparabilityObligationsSha256": "35df458142977e4dbba448c7b60c344ba65af8f7c9f16ee478d8ef504e89c99e"
+    "comparabilityObligationsSha256": "20f2d04f010cac8815c545dd03b5eca9e24be40aa60214a608a96e9103895a9a"
   },
   "theorems": [
     { "name": "critical_is_max_rank", "module": "Doe.Core.Model", "category": "comptime_verified" },

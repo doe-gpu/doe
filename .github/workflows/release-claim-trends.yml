@@ -2,8 +2,9 @@ name: release-claim-trends
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "45 8 * * *"
+
+permissions:
+  contents: read
 
 jobs:
   release-trend-windows:
@@ -12,14 +13,14 @@ jobs:
       - linux
       - amd-vulkan
     env:
-      CONFIG_PATH: bench/compare_dawn_vs_doe.config.amd.vulkan.release.json
+      CONFIG_PATH: bench/native-compare/compare.config.amd.vulkan.release.json
       SUBSTANTIATION_POLICY: config/substantiation-policy.json
       WINDOWS: "3"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run release claim windows + substantiation gate
         run: |
-          python3 bench/run_release_claim_windows.py \
+          python3 bench/runners/run_release_claim_windows.py \
             --config "$CONFIG_PATH" \
             --windows "$WINDOWS" \
             --strict-amd-vulkan \
@@ -29,10 +30,10 @@ jobs:
             --substantiation-report bench/out/substantiation_report.ci.json
       - name: Build tested-profile inventory + dashboard
         run: |
-          python3 bench/build_test_inventory_dashboard.py \
+          python3 bench/tools/build_test_inventory_dashboard.py \
             --report-glob "bench/out/**/dawn-vs-doe*.json"
       - name: Upload release trend artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-claim-trend-report
           path: |

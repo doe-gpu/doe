@@ -1,9 +1,5 @@
 name: wgsl-compiler
 
-# Runs the doe_wgsl unit tests on the currently unblocked CI platforms.
-# The Windows lanes are temporarily disabled because tracked bench/out artifact
-# paths exceed the hosted runner checkout path limit before Zig setup runs.
-
 on:
   pull_request:
   push:
@@ -12,120 +8,32 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: wgsl-compiler-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # ── Shared Zig install for non-Windows hosted runners ───────────────────────
-  # setup-zig@v1 is currently returning 404 for the pinned release on hosted
-  # runners, so install the exact official Zig release directly.
-  # Keep this local to the workflow until the action path is trustworthy again.
-
-  # ── Core compiler tests (lexer / parser / emitter / IR) ─────────────────────
-  # These tests have no external toolchain dependencies and run on the
-  # currently unblocked hosted runners.
-  wgsl-core-tests:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+  wgsl-compiler:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Zig 0.15.2
+      - uses: actions/checkout@v7
+      - name: Install configured Zig toolchain
         shell: bash
         run: |
           set -euo pipefail
-          case "$(uname -s)-$(uname -m)" in
-            Linux-x86_64)
-              zig_url="https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz"
-              ;;
-            Darwin-arm64|Darwin-aarch64)
-              zig_url="https://ziglang.org/download/0.15.2/zig-aarch64-macos-0.15.2.tar.xz"
-              ;;
-            Darwin-x86_64)
-              zig_url="https://ziglang.org/download/0.15.2/zig-x86_64-macos-0.15.2.tar.xz"
-              ;;
-            *)
-              echo "Unsupported hosted runner for Zig install: $(uname -s)-$(uname -m)" >&2
-              exit 1
-              ;;
-          esac
+          zig_version="$(jq -r '.toolchains.zig.version' config/toolchains.json)"
+          zig_url="https://ziglang.org/download/${zig_version}/zig-x86_64-linux-${zig_version}.tar.xz"
           curl -fL "$zig_url" -o /tmp/zig.tar.xz
           rm -rf /tmp/zig-install
           mkdir -p /tmp/zig-install
           tar -xf /tmp/zig.tar.xz -C /tmp/zig-install --strip-components=1
           echo "/tmp/zig-install" >> "$GITHUB_PATH"
-      - name: Run WGSL compiler unit tests
+      - name: Run WGSL compiler tests
+        working-directory: runtime/zig
         run: |
-          cd zig
-          zig build test-core
-
-  # ── DXIL toolchain-config tests (no DXC binary required) ───────────────────
-  # Validates DXC discovery parsing and error messages in isolation.
-  # Runs on the currently unblocked hosted runners because the discovery logic
-  # is platform-neutral.
-  dxil-toolchain-config:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Zig 0.15.2
-        shell: bash
-        run: |
-          set -euo pipefail
-          case "$(uname -s)-$(uname -m)" in
-            Linux-x86_64)
-              zig_url="https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz"
-              ;;
-            Darwin-arm64|Darwin-aarch64)
-              zig_url="https://ziglang.org/download/0.15.2/zig-aarch64-macos-0.15.2.tar.xz"
-              ;;
-            Darwin-x86_64)
-              zig_url="https://ziglang.org/download/0.15.2/zig-x86_64-macos-0.15.2.tar.xz"
-              ;;
-            *)
-              echo "Unsupported hosted runner for Zig install: $(uname -s)-$(uname -m)" >&2
-              exit 1
-              ;;
-          esac
-          curl -fL "$zig_url" -o /tmp/zig.tar.xz
-          rm -rf /tmp/zig-install
-          mkdir -p /tmp/zig-install
-          tar -xf /tmp/zig.tar.xz -C /tmp/zig-install --strip-components=1
-          echo "/tmp/zig-install" >> "$GITHUB_PATH"
-      - name: Run DXIL toolchain-config unit tests
-        # DOE_WGSL_DXC is deliberately unset so tests exercise the
-        # ShaderToolchainUnavailable path and env-parsing logic.
-        run: |
-          cd zig
+          zig build test-wgsl
+          zig build test-wgsl -Dlean-verified=true
           zig test src/doe_wgsl/emit_dxil.zig
-
-  # ── DXIL end-to-end emission (requires DXC) ─────────────────────────────────
-  # Compiles a minimal compute shader to DXIL using the DXC that ships with
-  # Visual Studio on windows-latest.  This job is the canonical DXIL smoke test.
-  # On non-Windows CI the emitter returns ShaderToolchainUnavailable by design;
-  # that behaviour is verified by the dxil-toolchain-config job above instead.
-  dxil-emit-windows:
-    if: ${{ false }}
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Locate DXC from Windows SDK
-        # Visual Studio ships DXC under the Windows SDK binary directory.
-        # Expose it via DOE_WGSL_DXC so the emitter uses the exact path.
-        shell: pwsh
-        run: |
-          $dxc = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits" `
-            -Recurse -Filter "dxc.exe" -ErrorAction SilentlyContinue |
-            Select-Object -First 1 -ExpandProperty FullName
-          if (-not $dxc) {
-            Write-Error "DXC not found under Windows Kits — update runner image or install Windows SDK"
-            exit 1
-          }
-          echo "DOE_WGSL_DXC=$dxc" >> $env:GITHUB_ENV
-          echo "Found DXC: $dxc"
-      - name: Run DXIL end-to-end tests
-        run: |
-          cd zig
-          zig build test-d3d12

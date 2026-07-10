@@ -2,8 +2,9 @@ name: nightly-quirk-mining
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "57 2 * * *"
+
+permissions:
+  contents: read
 
 jobs:
   mine-upstream-quirks:
@@ -11,7 +12,9 @@ jobs:
       - self-hosted
       - linux
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+        with:
+          clean: false
 
       - name: Mine upstream quirks (all backends)
         run: |
@@ -40,7 +43,7 @@ jobs:
           python3 pipeline/agent/test_mine_quirks.py 2>&1 || echo "Warning: schema tests had failures"
 
       - name: Upload mining artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nightly-quirk-mining
           retention-days: 30

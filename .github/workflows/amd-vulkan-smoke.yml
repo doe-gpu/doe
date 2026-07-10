@@ -2,8 +2,9 @@ name: amd-vulkan-smoke
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "30 8 * * *"
+
+permissions:
+  contents: read
 
 jobs:
   smoke:
@@ -12,16 +13,16 @@ jobs:
       - linux
       - amd-vulkan
     env:
-      CONFIG_PATH: bench/compare_dawn_vs_doe.config.amd.vulkan.smoke.gpu.json
+      CONFIG_PATH: bench/native-compare/compare.config.amd.vulkan.smoke.gpu.json
       REPORT_PATH: bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.16mb.json
       WORKSPACE_PATH: bench/out/runtime-comparisons.amd.vulkan.smoke.gpu.16mb
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run canonical smoke pipeline
         run: |
-          python3 bench/run_release_pipeline.py --config "$CONFIG_PATH" --report "$REPORT_PATH" --strict-amd-vulkan --verify-smoke-report "$REPORT_PATH" --verify-smoke-require-comparable
+          python3 bench/runners/run_release_pipeline.py --config "$CONFIG_PATH" --report "$REPORT_PATH" --strict-amd-vulkan --local-vulkan-lane vulkan_doe_comparable --verify-smoke-report "$REPORT_PATH" --verify-smoke-require-comparable
       - name: Upload smoke artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: amd-vulkan-smoke-report
           path: |

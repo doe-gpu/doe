@@ -8,13 +8,22 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: fawn-agent-sync-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   agent-sync-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check CLAUDE.md/AGENTS.md/GEMINI.md are in sync
         run: |
           diff CLAUDE.md AGENTS.md || { echo "AGENTS.md is out of sync with CLAUDE.md"; exit 1; }
           diff CLAUDE.md GEMINI.md || { echo "GEMINI.md is out of sync with CLAUDE.md"; exit 1; }
           echo "Agent instruction files are in sync."
+      - name: Check CI workflow contracts
+        run: python3 bench/tests/test_ci_workflow_surface.py

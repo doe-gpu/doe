@@ -37,7 +37,14 @@
   `bench/cli.py claim` writes `claim-report`
 - workload-manifest freshness is advisory receipt metadata only; it does not
   block `run` or `compare`
-- current v0 CI does not execute Lean toolchain proofs as a blocking step.
+- hosted pull/push CI runs deterministic instruction, workflow, WGSL compiler,
+  Lean typecheck/extraction, package, and native-freshness contract checks.
+- hardware- or vendor-state-dependent AMD Vulkan, drop-in, browser,
+  quirk-mining, release, and claim-trend workflows are explicit
+  `workflow_dispatch` lanes. They do not occupy required push/PR status while
+  the matching self-hosted runner is unavailable.
+- Lean proof artifact extraction, validation, and proof-enabled WGSL
+  integration is a blocking hosted check.
 - run schema hard gate:
   `python3 bench/gates/schema_gate.py`
 - run Cerebras artifact hard gate (prevents SDK-distributed files and cslc
@@ -80,7 +87,9 @@
   For runtime-to-runtime reference lanes (for example Zig vs Lean trace parity), run with `--semantic-parity-mode required` so the gate fails unless semantic parity checks execute and pass.
 - run drop-in compatibility hard gate from a built shared-library artifact:
   `python3 bench/drop-in/dropin_gate.py --artifact runtime/zig/zig-out/lib/libwebgpu_doe.so --report bench/out/dropin_report.json`
-  CI must fail hard if symbol completeness, black-box behavior, or drop-in benchmark execution fails, and must emit a drop-in report on every run.
+  The manually dispatched drop-in lane must fail hard if symbol completeness,
+  black-box behavior, or drop-in benchmark execution fails, and it must emit a
+  drop-in report on every run.
 - run release claimability hard gate from comparison report artifacts:
   `python3 bench/gates/claim_gate.py --report bench/out/dawn-vs-doe.json --require-claimability-mode release --require-claim-status claimable --require-comparison-status comparable --require-min-timed-samples 15`
   CI must fail hard if report claim metadata is not explicit release mode claimable/comparable.
@@ -181,8 +190,12 @@
 
 7. Release
 - commit only when blocking gates are green
-- mandatory release precondition in CI: gate scripts must fail hard when schema, correctness, replay, drop-in compatibility, or release-claimability checks fail.
-- scheduled claim-trend publication should run the substantiation gate policy over repeated windows; single-run release CI remains focused on per-run blocking gates.
+- mandatory release precondition: the manually dispatched hardware release
+  workflow must fail hard when schema, correctness, replay, drop-in
+  compatibility, or release-claimability checks fail.
+- manually dispatched claim-trend publication runs the substantiation gate
+  policy over repeated windows; single-run release validation remains focused
+  on per-run blocking gates.
 
 ## 2. Gate Policy (v0)
 

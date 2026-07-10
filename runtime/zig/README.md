@@ -199,7 +199,7 @@ Build:
 ## How to run (toolchain must be available)
 
 ```bash
-cd zig
+cd runtime/zig
 zig build run -- --vendor intel --api vulkan --family gen12 --driver 31.0.101
 zig build run -- --quirks path/to/quirks.json --commands path/to/commands.json --trace
 zig build run -- --quirks path/to/quirks.json --commands path/to/commands.json --replay path/to/trace.jsonl

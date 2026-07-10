@@ -4,29 +4,35 @@ on:
   pull_request:
     paths:
       - ".github/workflows/webgpu-package-surface.yml"
-      - "nursery/webgpu/**"
+      - "packages/doe-gpu/**"
   push:
+    branches:
+      - main
+      - master
     paths:
       - ".github/workflows/webgpu-package-surface.yml"
-      - "nursery/webgpu/**"
+      - "packages/doe-gpu/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: webgpu-package-surface-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   package-surface:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: nursery/webgpu
+        working-directory: packages/doe-gpu
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
-          node-version: "20"
-
-      - name: Run Node package export tests
-        run: node ./test-package-exports.js
-
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Run Bun package tests
-        run: bun ./test-bun.js
+          node-version: "22"
+      - name: Run package contract tests
+        run: node --test test/unit/*.test.js
+      - name: Verify package contents
+        run: npm pack --dry-run --json

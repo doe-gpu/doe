@@ -1,6 +1,6 @@
 import Doe.Core.Model
 
-def comparabilityContractSha256 : String := "04d87a105ff82ffcb7b5d124a96e583880b78c2587fce8759b71b22bdc48fc59"
+def comparabilityContractSha256 : String := "20f2d04f010cac8815c545dd03b5eca9e24be40aa60214a608a96e9103895a9a"
 
 inductive ComparabilityObligationId where
   | workloadMarkedComparable
@@ -15,6 +15,7 @@ inductive ComparabilityObligationId where
   | baselineComparisonTimingSelectionPolicyMatch
   | baselineComparisonQueueSyncModeMatch
   | baselineComparisonSubmitScopeMatch
+  | baselineComparisonEffectiveReadbackPathMatch
   | baselineComparisonTimingPhaseMatch
   | baselineComparisonPackageResidentBufferLoadModeMatch
   | baselineComparisonPackageResidentBufferLoadShapeMatch
@@ -80,6 +81,8 @@ structure ComparabilityFacts where
   baselineComparisonQueueSyncModeMatch : Bool
   submitScopeMatchApplies : Bool
   baselineComparisonSubmitScopeMatch : Bool
+  effectiveReadbackPathMatchApplies : Bool
+  baselineComparisonEffectiveReadbackPathMatch : Bool
   timingPhaseMatchApplies : Bool
   baselineComparisonTimingPhaseMatch : Bool
   packageResidentBufferLoadModeMatchApplies : Bool
@@ -173,6 +176,10 @@ def obligationsFromFacts (facts : ComparabilityFacts) : List ComparabilityObliga
       blocking := true
       applicable := facts.submitScopeMatchApplies
       passes := facts.baselineComparisonSubmitScopeMatch },
+    { id := .baselineComparisonEffectiveReadbackPathMatch
+      blocking := true
+      applicable := facts.effectiveReadbackPathMatchApplies
+      passes := facts.baselineComparisonEffectiveReadbackPathMatch },
     { id := .baselineComparisonTimingPhaseMatch
       blocking := true
       applicable := facts.timingPhaseMatchApplies

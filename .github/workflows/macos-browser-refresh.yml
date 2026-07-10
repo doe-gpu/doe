@@ -2,8 +2,9 @@ name: macos-browser-refresh
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "15 9 * * *"
+
+permissions:
+  contents: read
 
 jobs:
   browser-refresh:
@@ -11,36 +12,36 @@ jobs:
       - self-hosted
       - macOS
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "22"
       - name: Install bench browser dependencies
         run: npm --prefix bench ci
       - name: Build local Doe/browser prerequisites
+        working-directory: runtime/zig
         run: |
-          cd zig
           zig build dropin
           zig build module-core-runner
           zig build test
       - name: Run promoted blocking gates
         run: |
           STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-          python3 bench/run_blocking_gates.py \
+          python3 bench/runners/run_blocking_gates.py \
             --report "bench/out/scratch/${STAMP}/macos-browser-refresh.json" \
             --trace-semantic-parity-mode auto \
             --with-browser-gate \
             --with-modules
       - name: Run local browser claim lane
         run: |
-          python3 bench/browser_claim_gate.py \
+          python3 bench/browser/browser_claim_gate.py \
             --policy config/browser-claim-policy.json
       - name: Prune retained artifacts
         run: |
-          python3 bench/cleanup_out.py --retention-days 14
-          python3 nursery/chromium/scripts/cleanup-browser-artifacts.py --retention-days 14
+          python3 bench/tools/cleanup_out.py --retention-days 14
+          python3 browser/chromium/scripts/cleanup-browser-artifacts.py --retention-days 14
       - name: Upload browser refresh artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: macos-browser-refresh
           retention-days: 14
@@ -48,4 +49,4 @@ jobs:
             bench/out/browser-promotion/**
             bench/out/browser-claim/**
             bench/out/scratch/**
-            nursery/chromium/artifacts/**
+            browser/chromium/artifacts/**

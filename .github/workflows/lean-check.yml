@@ -8,23 +8,30 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: fawn-lean-check-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lean-check:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install elan
         run: |
           curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Run Lean typecheck
-        run: bash pipeline/lean/check.sh
-      - name: Extract proof artifacts
+      - name: Typecheck and extract proof artifacts
         run: bash pipeline/lean/extract.sh
+      - name: Check generated comparability contract
+        run: git diff --exit-code -- pipeline/lean/Doe/Generated/ComparabilityContract.lean
       - name: Validate proof artifact
         run: python3 pipeline/lean/test_proof_pipeline.py
       - name: Upload proof artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: proven-conditions
           path: pipeline/lean/artifacts/proven-conditions.json

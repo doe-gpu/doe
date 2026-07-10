@@ -834,16 +834,33 @@ test "compute runtime elides uniform guarded gid storage clamps" {
     );
     defer result.info.deinit(std.testing.allocator);
 
-    var uniform_extent_count: usize = 0;
+    const proof_backed = lean_proof.boundsProven(.gid_1d_storage_buffer);
+    var precondition_count: usize = 0;
+    var saw_input = false;
+    var saw_output = false;
     for (result.info.dispatch_preconditions) |precondition| {
-        if (precondition.kind != .uniform_extent) continue;
-        uniform_extent_count += 1;
-        try std.testing.expectEqual(@as(u32, 0), precondition.uniform_binding.group);
-        try std.testing.expectEqual(@as(u32, 0), precondition.uniform_binding.binding);
-        try std.testing.expectEqual(@as(u32, 0), precondition.uniform_u32_offsets[0]);
-        try std.testing.expectEqual(@as(u8, 1), precondition.uniform_u32_count);
+        if (proof_backed) {
+            if (precondition.kind != .gid_component) continue;
+            try std.testing.expectEqual(@as(u8, 0), precondition.gid_axis);
+            try std.testing.expectEqual(@as(u64, 1), precondition.element_multiplier);
+        } else {
+            if (precondition.kind != .uniform_extent) continue;
+            try std.testing.expectEqual(@as(u32, 0), precondition.uniform_binding.group);
+            try std.testing.expectEqual(@as(u32, 0), precondition.uniform_binding.binding);
+            try std.testing.expectEqual(@as(u32, 0), precondition.uniform_u32_offsets[0]);
+            try std.testing.expectEqual(@as(u8, 1), precondition.uniform_u32_count);
+        }
+        try std.testing.expectEqual(@as(u32, 0), precondition.storage_binding.group);
+        switch (precondition.storage_binding.binding) {
+            1 => saw_input = true,
+            2 => saw_output = true,
+            else => return error.TestUnexpectedResult,
+        }
+        precondition_count += 1;
     }
-    try std.testing.expectEqual(@as(usize, 2), uniform_extent_count);
+    try std.testing.expectEqual(@as(usize, 2), precondition_count);
+    try std.testing.expect(saw_input);
+    try std.testing.expect(saw_output);
 
     const msl = out[0..result.len];
     try std.testing.expect(!result.info.needs_sizes_buf);

@@ -22,6 +22,7 @@ Status front door for Doe. Live topical shards live under
 | Doppler -> Doe -> Cerebras | [`docs/cerebras.md`](cerebras.md), [`docs/status/cerebras-csl.md`](status/cerebras-csl.md), [`docs/status/cerebras-csl-runtime-bringup.md`](status/cerebras-csl-runtime-bringup.md), model ledgers | `bench/out/r3-cerebras-status/snapshot.{json,md}` |
 | TSIR lowering | [`docs/status/tsir.md`](status/tsir.md), [`docs/tsir-lowering-plan.md`](tsir-lowering-plan.md), [`docs/loop-protocol.md`](loop-protocol.md) | `reports/parity/` and manifest `integrityExtensions.lowerings[]` entries |
 | Compiler and WebGPU runtime | [`docs/status/compiler-and-webgpu.md`](status/compiler-and-webgpu.md), [`docs/shader-compiler-architecture.md`](shader-compiler-architecture.md) | `zig build test-wgsl`, backend receipts, and schema-registered artifacts |
+| Continuous integration | [`docs/status/ci.md`](status/ci.md), [`docs/process.md`](process.md) | `.github/workflows/*.yml` and `bench/tests/test_ci_workflow_surface.py` |
 | Chromium WebGPU task list | [`docs/chromium-webgpu-task-list.md`](chromium-webgpu-task-list.md), [`docs/browser-lane.md`](browser-lane.md), [`browser/chromium/README.md`](../browser/chromium/README.md) | browser-lane milestone manifests, Playwright diagnostics, and browser compare artifacts |
 | Runtime backends and benchmark lanes | [`docs/status/runtime-backends-and-bench.md`](status/runtime-backends-and-bench.md), [`docs/performance-strategy.md`](performance-strategy.md), [`docs/benchmark-taxonomy.md`](benchmark-taxonomy.md) | `bench/out/**/{*.json,*.claim.json}` and `browser/chromium/artifacts/**/*.json` |
 | Claim and release discipline | [`docs/process.md`](process.md), [`docs/claim-discipline.md`](claim-discipline.md), [`docs/upgrade-policy.md`](upgrade-policy.md) | `config/*.json`, `config/*schema*.json`, and gate outputs |
@@ -40,6 +41,7 @@ expanding this index.
 - [cerebras-csl.md](status/cerebras-csl.md)
 - [cerebras-csl-runtime-bringup.md](status/cerebras-csl-runtime-bringup.md)
 - [compiler-and-webgpu.md](status/compiler-and-webgpu.md)
+- [ci.md](status/ci.md)
 - [tsir.md](status/tsir.md)
 - [runtime-backends-and-bench.md](status/runtime-backends-and-bench.md)
 
