@@ -4,6 +4,13 @@
   <img src="assets/doe-logo.svg" alt="Doe logo" width="96" />
 </p>
 
+<p align="center">
+  <a href="https://github.com/doerun/doe/actions/workflows/webgpu-package-surface.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/doerun/doe/webgpu-package-surface.yml?branch=main&amp;label=build" /></a>
+  <a href="https://www.npmjs.com/package/doe-gpu"><img alt="npm version" src="https://img.shields.io/npm/v/doe-gpu.svg?label=version" /></a>
+  <a href="https://github.com/doerun/doe/blob/main/LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" /></a>
+  <a href="https://github.com/doerun/doe/pulls"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" /></a>
+</p>
+
 Doe is a source-preserving accelerator runtime and compiler. It keeps shader and
 program bodies inspectable, lowers them across execution targets, and writes
 receipts for what ran.
