@@ -128,6 +128,7 @@ browser/chromium/.cipd/
 browser/chromium/.cipd.local_backup.*/
 browser/chromium/.local_volume/
 browser/chromium/_bad_scm/
+browser/chromium/_bad_scm
 browser/chromium/cache/
 browser/chromium/cache
 browser/chromium/depot_tools/

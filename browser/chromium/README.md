@@ -360,6 +360,8 @@ Lane setup for both macOS and Linux:
 1. Choose the platform flow and run setup:
    - macOS: `./scripts/setup-macos-external-lane.sh /Volumes/chromium-lane`
    - Linux: `./scripts/setup-linux-external-lane.sh /mnt/chromium-lane`
+   - Linux with an existing lane root:
+     `FAWN_EXTERNAL_LANE_ROOT=/mnt/doe/chromium_webgpu_lane ./scripts/setup-linux-external-lane.sh /mnt/doe`
 2. Load lane env: `source ./scripts/env.sh`
 3. Build Chromium on Linux with release output:
    - `./scripts/bringup-linux.sh --mode release --skip-fetch --skip-sync`
@@ -445,6 +447,14 @@ Notes:
 - Lane-local env file is `.external-lane.env` (mac helper also writes legacy `.external-macos.env` for compatibility).
 - External checkout/caches are stored at:
   - `<external_volume>/chromium/{src,depot_tools,cache}`
+  - or the `FAWN_EXTERNAL_LANE_ROOT` override when the external volume already
+    has a dedicated lane root.
+- When migrating an existing Linux checkout, keep `browser/chromium/` as the
+  repo-local integration layer and move only checkout/build payloads such as
+  `src`, `depot_tools`, `cache`, `.cipd`, `.gclient*`, `.gcs_entries`, and
+  `_bad_scm` to external storage. Symlink them back into `browser/chromium/`
+  so existing Linux tooling that references `browser/chromium/src` continues
+  to work. The macOS flow can continue using its own external lane root.
 - Local release sync remains in `browser/chromium/out/fawn_release_local`
   (literal current folder name used by the lane scripts).
 
