@@ -7,7 +7,7 @@
   "timingClass": "scenario",
   "timingSource": "browser-performance-now",
   "generatedAt": "2026-03-09T01:06:10.997Z",
-  "outputPath": "/Users/xyz/deco/fawn/nursery/fawn-browser/artifacts/20260309T010540Z/dawn-vs-doe.tracka.browser-layered.superset.diagnostic.json",
+  "outputPath": "/workspace/deco/fawn/nursery/fawn-browser/artifacts/20260309T010540Z/dawn-vs-doe.tracka.browser-layered.superset.diagnostic.json",
   "hashAlgorithm": "sha256",
   "projectionContractHash": "cc129ede4aeda8e3b216aaf6d9c4e2ea7afd09de01e61a42cc61e02ed356eee6",
   "sourceWorkloadsPath": "bench/workloads.amd.vulkan.extended.json",
@@ -19,34 +19,34 @@
       "--mode",
       "both",
       "--chrome",
-      "/Users/xyz/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "--dawn-chrome",
       "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
       "--doe-chrome",
-      "/Users/xyz/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "--doe-lib",
-      "/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib",
+      "/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib",
       "--manifest",
-      "/Users/xyz/deco/fawn/nursery/fawn-browser/bench/generated/browser_projection_manifest.json",
+      "/workspace/deco/fawn/nursery/fawn-browser/bench/generated/browser_projection_manifest.json",
       "--workflows",
-      "/Users/xyz/deco/fawn/nursery/fawn-browser/bench/workflows/browser-workflow-manifest.json",
+      "/workspace/deco/fawn/nursery/fawn-browser/bench/workflows/browser-workflow-manifest.json",
       "--headless",
       "true",
       "--out",
-      "/Users/xyz/deco/fawn/nursery/fawn-browser/artifacts/20260309T010540Z/dawn-vs-doe.tracka.browser-layered.superset.diagnostic.json",
+      "/workspace/deco/fawn/nursery/fawn-browser/artifacts/20260309T010540Z/dawn-vs-doe.tracka.browser-layered.superset.diagnostic.json",
       "--strict"
     ],
-    "cwd": "/Users/xyz/deco/fawn",
+    "cwd": "/workspace/deco/fawn",
     "nodeVersion": "v22.20.0",
     "platform": "darwin",
     "arch": "arm64"
   },
-  "chromePath": "/Users/xyz/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+  "chromePath": "/workspace/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
   "modeChromePaths": {
     "dawn": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    "doe": "/Users/xyz/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium"
+    "doe": "/workspace/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium"
   },
-  "doeLibPath": "/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib",
+  "doeLibPath": "/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib",
   "mode": "both",
   "modeOrder": [
     "dawn",
@@ -54,8 +54,8 @@
   ],
   "headless": true,
   "chromeArgs": [],
-  "manifestPath": "/Users/xyz/deco/fawn/nursery/fawn-browser/bench/generated/browser_projection_manifest.json",
-  "workflowsPath": "/Users/xyz/deco/fawn/nursery/fawn-browser/bench/workflows/browser-workflow-manifest.json",
+  "manifestPath": "/workspace/deco/fawn/nursery/fawn-browser/bench/generated/browser_projection_manifest.json",
+  "workflowsPath": "/workspace/deco/fawn/nursery/fawn-browser/bench/workflows/browser-workflow-manifest.json",
   "workflowPromotionGateRequiredApprovals": [
     "track_a_runtime_integration_owner",
     "track_a_quality_owner",
@@ -156,7 +156,7 @@
       "opCode": "mode_result",
       "seq": 2,
       "mode": "doe",
-      "chromePath": "/Users/xyz/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "chromePath": "/workspace/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "elapsedMs": 2710,
       "launchArgs": [
         "--no-sandbox",
@@ -168,7 +168,7 @@
         "--enable-unsafe-webgpu",
         "--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:58665",
         "--use-webgpu-runtime=doe",
-        "--doe-webgpu-library-path=/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
+        "--doe-webgpu-library-path=/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
       ],
       "runtimeProbe": {
         "webgpuAvailable": true,

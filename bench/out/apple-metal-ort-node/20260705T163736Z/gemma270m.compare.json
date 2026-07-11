@@ -126,7 +126,7 @@
       },
       "product": "tjs_ort_node_doe",
       "runtimeIdentity": {
-        "binaryPath": "/Users/xyz/.nvm/versions/node/v22.20.0/bin/node",
+        "binaryPath": "/workspace/.nvm/versions/node/v22.20.0/bin/node",
         "binarySha256": "49161ba4e67afda85c25b2daa1f0e91d1bffc023d2dbc4886eda7a9ba38bca62",
         "executionBackend": "tjs_ort_node_webgpu",
         "packageLockHash": "e2c809d83657e7f6628e7b9ff904d84058c7db9cca55bcc29d05ed27b16b9b01",
@@ -155,7 +155,7 @@
       },
       "product": "tjs_ort_node_webgpu_package",
       "runtimeIdentity": {
-        "binaryPath": "/Users/xyz/.nvm/versions/node/v22.20.0/bin/node",
+        "binaryPath": "/workspace/.nvm/versions/node/v22.20.0/bin/node",
         "binarySha256": "49161ba4e67afda85c25b2daa1f0e91d1bffc023d2dbc4886eda7a9ba38bca62",
         "executionBackend": "tjs_ort_node_webgpu_package",
         "packageLockHash": "",
@@ -607,7 +607,7 @@
                 "tjs_ort_node_webgpu_package"
               ],
               "isDawnVsDoe": false,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "webgpu"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",

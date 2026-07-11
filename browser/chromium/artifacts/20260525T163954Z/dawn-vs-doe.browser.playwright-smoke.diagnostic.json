@@ -11,21 +11,21 @@
   "invocation": {
     "argv": [
       "--chrome",
-      "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "--doe-lib",
-      "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
+      "/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
       "--mode",
       "both",
       "--strict",
       "--out",
-      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260525T163954Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json"
+      "/workspace/deco/doe/browser/chromium/artifacts/20260525T163954Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json"
     ],
-    "cwd": "/Users/xyz/deco/doe",
+    "cwd": "/workspace/deco/doe",
     "nodeVersion": "v22.20.0",
     "platform": "darwin",
     "arch": "arm64"
   },
-  "chromePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+  "chromePath": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
   "headless": true,
   "chromeArgs": [],
   "mode": "both",
@@ -51,7 +51,7 @@
       "hiddenFallbackAllowed": false,
       "selectorVersion": "browser-runtime-selector-v1",
       "artifactIdentity": {
-        "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+        "browserExecutablePath": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
         "doeLibPath": null,
         "doeLibSha256": null
       },
@@ -66,8 +66,8 @@
       "hiddenFallbackAllowed": false,
       "selectorVersion": "browser-runtime-selector-v1",
       "artifactIdentity": {
-        "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
-        "doeLibPath": "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
+        "browserExecutablePath": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+        "doeLibPath": "/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
         "doeLibSha256": "53d291bdaf6f1c33d9ab951bcbb2476e9c6b49f2d14eac7bafa8de1dd96a42ea"
       },
       "launchArgsHash": "b3a66af83251da880c48bd66e3e42281c8e5a14de1454c3ac218666f0f792def"
@@ -85,7 +85,7 @@
         "hiddenFallbackAllowed": false,
         "selectorVersion": "browser-runtime-selector-v1",
         "artifactIdentity": {
-          "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+          "browserExecutablePath": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
           "doeLibPath": null,
           "doeLibSha256": null
         },
@@ -274,15 +274,15 @@
         "hiddenFallbackAllowed": false,
         "selectorVersion": "browser-runtime-selector-v1",
         "artifactIdentity": {
-          "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
-          "doeLibPath": "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
+          "browserExecutablePath": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+          "doeLibPath": "/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
           "doeLibSha256": "53d291bdaf6f1c33d9ab951bcbb2476e9c6b49f2d14eac7bafa8de1dd96a42ea"
         },
         "launchArgsHash": "b3a66af83251da880c48bd66e3e42281c8e5a14de1454c3ac218666f0f792def"
       },
       "runtimeArgs": [
         "--use-webgpu-runtime=doe",
-        "--doe-webgpu-library-path=/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib"
+        "--doe-webgpu-library-path=/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib"
       ],
       "launchArgs": [
         "--no-sandbox",
@@ -292,7 +292,7 @@
         "--enable-unsafe-webgpu",
         "--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:54140",
         "--use-webgpu-runtime=doe",
-        "--doe-webgpu-library-path=/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib"
+        "--doe-webgpu-library-path=/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib"
       ],
       "browserVersion": "148.0.7741.0",
       "elapsedMs": 495,

@@ -71,7 +71,7 @@ def _resolve_link(doc_path: Path, raw_target: str) -> Path | None:
     if raw_target.startswith(EXTERNAL_SCHEMES):
         return None
     if raw_target.startswith("/"):
-        # Absolute paths (e.g. `/Users/xyz/...`) are unresolvable in a
+        # Absolute paths (e.g. `/opt/project/...`) are unresolvable in a
         # portable test — treat as out of scope.
         return None
 

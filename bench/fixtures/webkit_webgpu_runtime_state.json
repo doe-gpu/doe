@@ -1,14 +1,14 @@
 {
   "phase": "ready",
-  "repo": "/Users/xyz/deco/doe/bench/vendor/webkit-webgpu",
-  "buildDir": "/Users/xyz/deco/doe/bench/vendor/webkit-webgpu/out/xcode",
+  "repo": "/workspace/deco/doe/bench/vendor/webkit-webgpu",
+  "buildDir": "/workspace/deco/doe/bench/vendor/webkit-webgpu/out/xcode",
   "derivedData": "/private/tmp/webkit-webgpu-xcode-derived-data",
   "buildSystem": "xcode",
   "configuration": "Release",
   "branch": "main",
   "library": "/private/tmp/webkit-webgpu-xcode-derived-data/Build/Products/Release/WebGPU.framework/WebGPU",
   "libraryRelative": "/private/tmp/webkit-webgpu-xcode-derived-data/Build/Products/Release/WebGPU.framework/WebGPU",
-  "shimLibrary": "/Users/xyz/deco/doe/bench/vendor/webkit-webgpu/out/shim/libwebgpu_webkit_cshim.dylib",
+  "shimLibrary": "/workspace/deco/doe/bench/vendor/webkit-webgpu/out/shim/libwebgpu_webkit_cshim.dylib",
   "probe": {
     "webgpu_dir_exists": true,
     "wtf_dir_exists": true,

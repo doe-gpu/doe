@@ -11,20 +11,20 @@
   "invocation": {
     "argv": [
       "--chrome",
-      "/Users/xyz/Applications/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/Applications/Fawn.app/Contents/MacOS/Chromium",
       "--doe-lib",
-      "/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib",
+      "/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib",
       "--mode",
       "both",
       "--chrome",
-      "/Users/xyz/Applications/Fawn.app/Contents/MacOS/Chromium"
+      "/workspace/Applications/Fawn.app/Contents/MacOS/Chromium"
     ],
-    "cwd": "/Users/xyz/deco/fawn",
+    "cwd": "/workspace/deco/fawn",
     "nodeVersion": "v22.20.0",
     "platform": "darwin",
     "arch": "arm64"
   },
-  "chromePath": "/Users/xyz/Applications/Fawn.app/Contents/MacOS/Chromium",
+  "chromePath": "/workspace/Applications/Fawn.app/Contents/MacOS/Chromium",
   "headless": true,
   "chromeArgs": [],
   "mode": "both",
@@ -166,7 +166,7 @@
       "mode": "doe",
       "runtimeArgs": [
         "--use-webgpu-runtime=doe",
-        "--doe-webgpu-library-path=/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
+        "--doe-webgpu-library-path=/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
       ],
       "launchArgs": [
         "--no-sandbox",
@@ -176,7 +176,7 @@
         "--enable-unsafe-webgpu",
         "--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:56453",
         "--use-webgpu-runtime=doe",
-        "--doe-webgpu-library-path=/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
+        "--doe-webgpu-library-path=/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
       ],
       "browserVersion": "147.0.7705.0",
       "elapsedMs": 1673,

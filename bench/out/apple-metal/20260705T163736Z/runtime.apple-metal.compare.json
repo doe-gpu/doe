@@ -676,7 +676,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -1828,7 +1828,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -2980,7 +2980,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -4132,7 +4132,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -5284,7 +5284,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -6436,7 +6436,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -7588,7 +7588,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -8740,7 +8740,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -9892,7 +9892,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -11044,7 +11044,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -12196,7 +12196,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -13348,7 +13348,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -14500,7 +14500,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -15652,7 +15652,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -16804,7 +16804,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -17956,7 +17956,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -19108,7 +19108,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -20260,7 +20260,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -21412,7 +21412,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -22564,7 +22564,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -23716,7 +23716,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -24868,7 +24868,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -26020,7 +26020,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -27172,7 +27172,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -28324,7 +28324,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -29476,7 +29476,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",
@@ -30628,7 +30628,7 @@
                 "dawn_delegate"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "metal"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",

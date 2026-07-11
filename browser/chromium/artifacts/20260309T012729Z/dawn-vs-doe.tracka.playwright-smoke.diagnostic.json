@@ -11,21 +11,21 @@
   "invocation": {
     "argv": [
       "--chrome",
-      "/Users/xyz/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "--doe-lib",
-      "/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib",
+      "/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib",
       "--mode",
       "both",
       "--strict",
       "--out",
-      "/Users/xyz/deco/fawn/nursery/fawn-browser/artifacts/20260309T012729Z/dawn-vs-doe.tracka.playwright-smoke.diagnostic.json"
+      "/workspace/deco/fawn/nursery/fawn-browser/artifacts/20260309T012729Z/dawn-vs-doe.tracka.playwright-smoke.diagnostic.json"
     ],
-    "cwd": "/Users/xyz/deco/fawn",
+    "cwd": "/workspace/deco/fawn",
     "nodeVersion": "v22.20.0",
     "platform": "darwin",
     "arch": "arm64"
   },
-  "chromePath": "/Users/xyz/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+  "chromePath": "/workspace/deco/fawn/nursery/chromium_webgpu_lane/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
   "headless": true,
   "chromeArgs": [],
   "mode": "both",
@@ -167,7 +167,7 @@
       "mode": "doe",
       "runtimeArgs": [
         "--use-webgpu-runtime=doe",
-        "--doe-webgpu-library-path=/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
+        "--doe-webgpu-library-path=/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
       ],
       "launchArgs": [
         "--no-sandbox",
@@ -177,7 +177,7 @@
         "--enable-unsafe-webgpu",
         "--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:59686",
         "--use-webgpu-runtime=doe",
-        "--doe-webgpu-library-path=/Users/xyz/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
+        "--doe-webgpu-library-path=/workspace/deco/fawn/zig/zig-out/lib/libwebgpu_doe.dylib"
       ],
       "browserVersion": "147.0.7705.0",
       "elapsedMs": 1432,

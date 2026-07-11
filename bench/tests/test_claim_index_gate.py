@@ -660,6 +660,7 @@ def _write_browser_release_artifacts(
     proof_page_diagnostics = {
         "activeRuntime": "doe",
         "activeBackend": "webgpu-doe",
+        "webgpuAvailable": True,
         "compilerPath": "runtime/zig/zig-out/bin/doe-zig-runtime",
         "tsirStatus": "available",
         "hostPlanStatus": "not_applicable",

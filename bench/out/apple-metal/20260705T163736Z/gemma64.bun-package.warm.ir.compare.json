@@ -118,7 +118,7 @@
       },
       "product": "doe_gpu_bun_package_prepared",
       "runtimeIdentity": {
-        "binaryPath": "/Users/xyz/.bun/bin/bun",
+        "binaryPath": "/workspace/.bun/bin/bun",
         "binarySha256": "14b0008f960ea480de5d25df5ea0ada0fefa086a15e360ef2d305f44cae8f904",
         "executionBackend": "doe_bun_package",
         "packageLockHash": "e2c809d83657e7f6628e7b9ff904d84058c7db9cca55bcc29d05ed27b16b9b01",
@@ -147,7 +147,7 @@
       },
       "product": "bun_webgpu_package_prepared",
       "runtimeIdentity": {
-        "binaryPath": "/Users/xyz/.bun/bin/bun",
+        "binaryPath": "/workspace/.bun/bin/bun",
         "binarySha256": "14b0008f960ea480de5d25df5ea0ada0fefa086a15e360ef2d305f44cae8f904",
         "executionBackend": "bun_webgpu_package",
         "packageLockHash": "",
@@ -658,7 +658,7 @@
                 "bun_webgpu_package"
               ],
               "isDawnVsDoe": true,
-              "kernelRoot": "/Users/xyz/deco/doe/bench/kernels",
+              "kernelRoot": "/workspace/deco/doe/bench/kernels",
               "workloadApi": "webgpu"
             },
             "id": "baseline_comparison_explicit_native_shader_artifact_match",

@@ -76,6 +76,7 @@ nursery/webgpu/build/
 lean/artifacts/
 
 # Editor/temp artifacts
+.DS_Store
 .claude/
 .claude/worktrees/
 *.swp
@@ -121,6 +122,7 @@ nursery/fawn-browser/.external-macos.env
 # Canonical browser/ paths (moved from nursery/)
 browser/chromium_webgpu_lane/out/
 browser/chromium_webgpu_lane/.local_volume/
+browser/chromium_webgpu_lane/.external-macos.env
 browser/chromium/.gclient*
 browser/chromium/.gcs_entries
 browser/chromium/.cipd

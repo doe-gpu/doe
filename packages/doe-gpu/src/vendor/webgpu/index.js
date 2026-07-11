@@ -2501,7 +2501,7 @@ const nodeEncoderBackend = {
         const nativeCommandBuffer = finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands);
         if (nativeCommandBuffer) {
           invalidateLazyDispatchCommandBufferShadows(commands);
-          return { _native: nativeCommandBuffer, _batched: false };
+          return { _native: nativeCommandBuffer, _batched: false, _commands: commands };
         }
       }
       return { _commands: commands, _batched: true };
@@ -2851,6 +2851,75 @@ const fullSurfaceBackend = {
       if (addonCompletedSubmission) {
         queue.markSubmittedWorkDone();
       }
+      consumeSubmittedCommandBuffers(buffers);
+      presentPendingCanvasContexts(queue);
+      accumulateQueueSubmitBreakdown(queue, 'submitPostSubmitBookkeepingTotalNs', bookkeepingStartedAt);
+      return;
+    }
+    if (buffers.some((commandBuffer) => commandBuffer?._batched && Array.isArray(commandBuffer._commands))) {
+      const prepStartedAt = submitTimingStart();
+      for (let index = 0; index < buffers.length; index += 1) {
+        const commandBuffer = buffers[index];
+        failIfSubmittedCommandBuffer(commandBuffer, index);
+        const isBatched = commandBuffer?._batched && Array.isArray(commandBuffer._commands);
+        if (!isBatched && (!commandBuffer || typeof commandBuffer !== 'object' || commandBuffer._native == null)) {
+          failValidation('GPUQueue.submit', `commandBuffers[${index}] must be a finished command buffer`);
+        }
+      }
+      const submissionCommands = buffers.flatMap((commandBuffer) => (
+        Array.isArray(commandBuffer?._commands) ? commandBuffer._commands : []
+      ));
+      if (captureDeferredValidationCommand(queue, submissionCommands, buffers)) {
+        accumulateQueueSubmitBreakdown(queue, 'submitCommandPrepTotalNs', prepStartedAt);
+        return;
+      }
+      invalidateLazyDispatchCommandBufferShadows(submissionCommands);
+      accumulateQueueSubmitBreakdown(queue, 'submitCommandPrepTotalNs', prepStartedAt);
+
+      let segmentStart = 0;
+      while (segmentStart < buffers.length) {
+        const segmentIsBatched = buffers[segmentStart]?._batched
+          && Array.isArray(buffers[segmentStart]._commands);
+        let segmentEnd = segmentStart + 1;
+        while (segmentEnd < buffers.length) {
+          const nextIsBatched = buffers[segmentEnd]?._batched
+            && Array.isArray(buffers[segmentEnd]._commands);
+          if (nextIsBatched !== segmentIsBatched) {
+            break;
+          }
+          segmentEnd += 1;
+        }
+        const segment = buffers.slice(segmentStart, segmentEnd);
+        if (segmentIsBatched) {
+          const commands = flattenBatchedCommands(segment);
+          if (commands.length > 0 && !tryApplySpecializedNodeDispatch(queueNative, commands)) {
+            const addonStartedAt = submitTimingStart();
+            const addonBreakdown = addon.submitBatched(deviceNative, queueNative, commands);
+            accumulateQueueSubmitBreakdown(queue, 'submitAddonCallTotalNs', addonStartedAt);
+            accumulateAddonSubmitBreakdown(queue, addonBreakdown);
+            if (addonSubmitBreakdownIndicatesCompletedSubmission(addonBreakdown)) {
+              fastPathStats.dispatchFlush += 1;
+            }
+            if (segmentEnd < buffers.length) {
+              const flushStartedAt = submitTimingStart();
+              const flushBreakdown = addon.queueFlush(queue._instance, queueNative);
+              accumulateQueueSubmitBreakdown(queue, 'submitQueueFlushTotalNs', flushStartedAt);
+              accumulateQueueFlushBreakdown(queue, flushBreakdown);
+            }
+          }
+        } else {
+          const natives = segment.map((commandBuffer) => commandBuffer._native);
+          const addonStartedAt = submitTimingStart();
+          const addonBreakdown = natives.length === 1 && typeof addon.queueSubmitOne === 'function'
+            ? addon.queueSubmitOne(queueNative, natives[0])
+            : addon.queueSubmit(queueNative, natives);
+          accumulateQueueSubmitBreakdown(queue, 'submitAddonCallTotalNs', addonStartedAt);
+          accumulateAddonSubmitBreakdown(queue, addonBreakdown);
+        }
+        segmentStart = segmentEnd;
+      }
+
+      const bookkeepingStartedAt = submitTimingStart();
       consumeSubmittedCommandBuffers(buffers);
       presentPendingCanvasContexts(queue);
       accumulateQueueSubmitBreakdown(queue, 'submitPostSubmitBookkeepingTotalNs', bookkeepingStartedAt);

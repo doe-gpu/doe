@@ -631,7 +631,7 @@ test "launcher script uses explicit driver path when configured" {
     var buf: [1024]u8 = undefined;
     var pos: usize = 0;
     try emitLauncherScript(&buf, &pos, "artifacts/simulator-plan.json", .{
-        .executable_path = "/Users/xyz/deco/doe/runtime/zig/tools/csl_sdk_driver.py",
+        .executable_path = "/opt/doe/runtime/zig/tools/csl_sdk_driver.py",
     });
     const text = buf[0..pos];
     try std.testing.expect(std.mem.indexOf(u8, text, "driver_executable=") != null);

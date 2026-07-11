@@ -10,85 +10,85 @@
   "invocation": {
     "argv": [
       "--chrome",
-      "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "--doe-lib",
-      "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
+      "/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
       "--mode",
       "both"
     ],
-    "cwd": "/Users/xyz/deco/doe",
+    "cwd": "/workspace/deco/doe",
     "pythonExecutable": "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3"
   },
   "inputs": {
-    "workloads": "/Users/xyz/deco/doe/bench/workloads/specialized/workloads.amd.vulkan.superset.json",
-    "rules": "/Users/xyz/deco/doe/browser/chromium/bench/projection-rules.json",
-    "manifest": "/Users/xyz/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json",
-    "workflows": "/Users/xyz/deco/doe/browser/chromium/bench/workflows/browser-workflow-manifest.json",
-    "chrome": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
-    "dawnChrome": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
-    "doeChrome": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
-    "doeLib": "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
+    "workloads": "/workspace/deco/doe/bench/workloads/specialized/workloads.amd.vulkan.superset.json",
+    "rules": "/workspace/deco/doe/browser/chromium/bench/projection-rules.json",
+    "manifest": "/workspace/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json",
+    "workflows": "/workspace/deco/doe/browser/chromium/bench/workflows/browser-workflow-manifest.json",
+    "chrome": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+    "dawnChrome": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+    "doeChrome": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+    "doeLib": "/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
     "mode": "both",
     "apiSurface": "native",
-    "promotionApprovals": "/Users/xyz/deco/doe/browser/chromium/bench/workflows/browser-promotion-approvals.json"
+    "promotionApprovals": "/workspace/deco/doe/browser/chromium/bench/workflows/browser-promotion-approvals.json"
   },
   "commands": {
     "generate": [
       "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
-      "/Users/xyz/deco/doe/browser/chromium/scripts/generate-browser-projection-manifest.py",
+      "/workspace/deco/doe/browser/chromium/scripts/generate-browser-projection-manifest.py",
       "--workloads",
-      "/Users/xyz/deco/doe/bench/workloads/specialized/workloads.amd.vulkan.superset.json",
+      "/workspace/deco/doe/bench/workloads/specialized/workloads.amd.vulkan.superset.json",
       "--rules",
-      "/Users/xyz/deco/doe/browser/chromium/bench/projection-rules.json",
+      "/workspace/deco/doe/browser/chromium/bench/projection-rules.json",
       "--out",
-      "/Users/xyz/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json"
+      "/workspace/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json"
     ],
     "run": [
       "node",
-      "/Users/xyz/deco/doe/browser/chromium/scripts/webgpu-playwright-layered-bench.mjs",
+      "/workspace/deco/doe/browser/chromium/scripts/webgpu-playwright-layered-bench.mjs",
       "--mode",
       "both",
       "--chrome",
-      "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "--dawn-chrome",
-      "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "--doe-chrome",
-      "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+      "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
       "--doe-lib",
-      "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
+      "/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
       "--manifest",
-      "/Users/xyz/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json",
+      "/workspace/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json",
       "--workflows",
-      "/Users/xyz/deco/doe/browser/chromium/bench/workflows/browser-workflow-manifest.json",
+      "/workspace/deco/doe/browser/chromium/bench/workflows/browser-workflow-manifest.json",
       "--headless",
       "true",
       "--out",
-      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.diagnostic.json",
+      "/workspace/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.diagnostic.json",
       "--api-surface",
       "native"
     ],
     "check": [
       "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
-      "/Users/xyz/deco/doe/browser/chromium/scripts/check-browser-benchmark-superset.py",
+      "/workspace/deco/doe/browser/chromium/scripts/check-browser-benchmark-superset.py",
       "--workloads",
-      "/Users/xyz/deco/doe/bench/workloads/specialized/workloads.amd.vulkan.superset.json",
+      "/workspace/deco/doe/bench/workloads/specialized/workloads.amd.vulkan.superset.json",
       "--manifest",
-      "/Users/xyz/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json",
+      "/workspace/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json",
       "--workflows",
-      "/Users/xyz/deco/doe/browser/chromium/bench/workflows/browser-workflow-manifest.json",
+      "/workspace/deco/doe/browser/chromium/bench/workflows/browser-workflow-manifest.json",
       "--json",
       "--report",
-      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.diagnostic.json",
+      "/workspace/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.diagnostic.json",
       "--require-modes",
       "dawn,doe"
     ]
   },
   "artifacts": {
-    "layeredReportPath": "/Users/xyz/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.diagnostic.json",
-    "checkResultPath": "/Users/xyz/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.check.json",
-    "summaryPath": "/Users/xyz/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.summary.json",
-    "manifestPath": "/Users/xyz/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json",
-    "workflowsPath": "/Users/xyz/deco/doe/browser/chromium/bench/workflows/browser-workflow-manifest.json"
+    "layeredReportPath": "/workspace/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.diagnostic.json",
+    "checkResultPath": "/workspace/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.check.json",
+    "summaryPath": "/workspace/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.summary.json",
+    "manifestPath": "/workspace/deco/doe/browser/chromium/bench/generated/browser_projection_manifest.json",
+    "workflowsPath": "/workspace/deco/doe/browser/chromium/bench/workflows/browser-workflow-manifest.json"
   },
   "projectionContract": {
     "projectionContractHash": "15fe480a69d0a1baf753aea33b970a93d95f14390496e86f62ed913157967df4",
@@ -129,7 +129,7 @@
   "run": {
     "status": "report_present",
     "reason": "",
-    "reportPath": "/Users/xyz/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.diagnostic.json",
+    "reportPath": "/workspace/deco/doe/browser/chromium/artifacts/20260525T192228Z/dawn-vs-doe.browser-layered.superset.diagnostic.json",
     "reportPresent": true,
     "skipRun": false,
     "strictRun": false,
@@ -190,7 +190,7 @@
         "hiddenFallbackAllowed": false,
         "selectorVersion": "browser-runtime-selector-v1",
         "artifactIdentity": {
-          "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+          "browserExecutablePath": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
           "doeLibPath": null,
           "doeLibSha256": null
         },
@@ -205,8 +205,8 @@
         "hiddenFallbackAllowed": false,
         "selectorVersion": "browser-runtime-selector-v1",
         "artifactIdentity": {
-          "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
-          "doeLibPath": "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
+          "browserExecutablePath": "/workspace/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium",
+          "doeLibPath": "/workspace/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
           "doeLibSha256": "3bd3bd969814b3dd49da11637d890079db08ba285a0b71a59d891cd5f427b183"
         },
         "launchArgsHash": "a4188d635e46a9b215d9b77e7264dc3fd9bf24f06432467f91e12280de61fce5"

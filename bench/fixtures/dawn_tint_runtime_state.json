@@ -1,13 +1,13 @@
 {
-  "repo": "/Users/xyz/deco/doe/bench/vendor/dawn",
-  "buildDir": "/Users/xyz/deco/doe/bench/vendor/dawn/out/Release",
+  "repo": "/workspace/deco/doe/bench/vendor/dawn",
+  "buildDir": "/workspace/deco/doe/bench/vendor/dawn/out/Release",
   "branch": "main",
   "buildType": "Release",
   "buildSystem": "gn",
   "generator": null,
   "gnArgs": "is_debug=false",
   "binaries": {
-    "tint": "/Users/xyz/deco/doe/bench/vendor/dawn/out/Release/tint",
-    "tint_benchmark": "/Users/xyz/deco/doe/bench/vendor/dawn/out/Release/tint_benchmark"
+    "tint": "/workspace/deco/doe/bench/vendor/dawn/out/Release/tint",
+    "tint_benchmark": "/workspace/deco/doe/bench/vendor/dawn/out/Release/tint_benchmark"
   }
 }
