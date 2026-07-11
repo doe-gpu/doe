@@ -15,6 +15,7 @@ AUTOMATIC_WORKFLOWS = {
     "agent-sync.yml": {"pull_request", "push", "workflow_dispatch"},
     "doe-gpu-native-freshness.yml": {"pull_request", "push", "workflow_dispatch"},
     "lean-check.yml": {"pull_request", "push", "workflow_dispatch"},
+    "publication-hygiene.yml": {"pull_request", "push"},
     "webgpu-package-surface.yml": {"pull_request", "push", "workflow_dispatch"},
     "wgsl-compiler.yml": {"pull_request", "push", "workflow_dispatch"},
 }

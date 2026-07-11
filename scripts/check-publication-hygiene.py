@@ -9,18 +9,22 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
+POSIX_ROOT = "/"
+
 PRIVATE_HOME_PATTERNS = (
     (
         "macOS user home",
         re.compile(
-            r"/Users/(?!(?:<user>|runner|Shared)(?=/|[\s\"'`,:}\]]|$))"
+            POSIX_ROOT
+            + r"Users/(?!(?:<user>|runner|Shared)(?=/|[\s\"'`,:}\]]|$))"
             r"[^/\s\"'`]+"
         ),
     ),
     (
         "Linux user home",
         re.compile(
-            r"/home/(?!(?:user|runner|x|web_user|chrome)"
+            POSIX_ROOT
+            + r"home/(?!(?:user|runner|x|web_user|chrome)"
             r"(?=/|[\s\"'`,:}\]]|$))[^/\s\"'`]+"
         ),
     ),
