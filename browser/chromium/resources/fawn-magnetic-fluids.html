@@ -35,21 +35,20 @@ h1 {
   font-size: 30px;
   font-weight: 520;
 }
-.subtle {
-  max-width: 760px;
-  color: #a9a0c8;
-  font-size: 13px;
-  line-height: 1.6;
-}
 .actions {
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: flex-end;
   flex-wrap: wrap;
+}
+.actions label {
+  display: grid;
+  gap: 6px;
 }
 .back, button, select {
   color: #ece9ff;
   text-decoration: none;
+  min-height: 40px;
   padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid rgba(187, 167, 228, 0.28);
@@ -127,16 +126,12 @@ button { cursor: pointer; }
 <main class="shell">
   <div class="topbar">
     <div>
-      <div class="eyebrow">Stylized Magnetic Demo</div>
+      <div class="eyebrow">Stylized WebGPU Demo</div>
       <h1>Magnetic Fluids</h1>
-      <div class="subtle">
-        Not sold as strict ferrofluid physics. This is a compute-updated height field driven by moving magnetic wells and rendered with prismatic,
-        high-dispersion shading so the surface feels metallic, unstable, and alive. Move or hold the pointer to drag a stronger magnet through it.
-      </div>
     </div>
     <div class="actions">
       <label>
-        <span class="eyebrow">Grid</span><br>
+        <span class="eyebrow">Grid</span>
         <select id="grid-select">
           <option value="256">256 × 256</option>
           <option value="320">320 × 320</option>
@@ -149,7 +144,7 @@ button { cursor: pointer; }
         </select>
       </label>
       <label>
-        <span class="eyebrow">Substeps</span><br>
+        <span class="eyebrow">Substeps</span>
         <select id="steps-select">
           <option value="2">2</option>
           <option value="4">4</option>
