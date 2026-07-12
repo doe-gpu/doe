@@ -1,0 +1,158 @@
+{
+  "artifactKind": "metal_64kb_bimodality_transfer_receipt",
+  "schemaVersion": 1,
+  "recordedAt": "2026-07-12T19:24:08Z",
+  "status": "diagnostic_reproduced",
+  "claimClass": "runtime_performance",
+  "claimBoundary": "This receipt reproduces tail and bimodality sensitivity for the AMD 64 KB upload contract on one Apple M3 Metal host. It is not a general speed claim, release claim, training result, base-model inference result, or adapter inference result.",
+  "host": {
+    "machineName": "MacBook Air",
+    "machineModel": "Mac15,12",
+    "chip": "Apple M3",
+    "cpuCores": {
+      "total": 8,
+      "performance": 4,
+      "efficiency": 4
+    },
+    "gpuCores": 10,
+    "unifiedMemory": "24 GB",
+    "metalSupport": "Metal 4",
+    "operatingSystem": "macOS 26.3",
+    "operatingSystemBuild": "25D125",
+    "kernel": "Darwin 25.3.0",
+    "architecture": "arm64",
+    "privateIdentifiersRecorded": false
+  },
+  "repository": {
+    "name": "doerun/doe",
+    "branch": "main",
+    "commit": "dca8d151de219fcb960176343539169081c6c586"
+  },
+  "artifactIdentities": {
+    "doeRuntime": {
+      "path": "runtime/zig/zig-out/bin/doe-zig-runtime",
+      "sha256": "09afd3d6e7578c6f5cad44cf46ff08a88ecf32156ff488feb1f5c9143843b00e"
+    },
+    "dawnDelegate": {
+      "path": "bench/vendor/dawn/out/Release/libwebgpu_dawn.dylib",
+      "sha256": "22751faeb459e7a2ec778c0410ca122e23c23366eb3da145c651d1d43e26707d"
+    },
+    "commands": {
+      "path": "examples/upload_64kb_commands.json",
+      "sha256": "0c21af9bc82130d20566e570ce763b16231812d5eccce8632f0be80e02ff9d32"
+    },
+    "quirks": {
+      "path": "examples/quirks/apple_m3_noop_list.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    "standaloneWorkloadManifest": {
+      "archivePath": "m3-metal-amd64kb-transfer/workloads.json",
+      "sha256": "62638947126ae5b596ec2601a34c5fb28fbcaba1cbf4c41874412a93db16c209"
+    },
+    "standaloneCompareConfig": {
+      "archivePath": "m3-metal-amd64kb-transfer/compare.config.json",
+      "sha256": "eec986dcad28d7de60576a7ceb6a0b7e782aff298dbcdc94b62ff9683ae597ff"
+    },
+    "rawEvidenceArchive": {
+      "path": "bench/out/apple-metal/diagnostic/20260712T191716Z/m3-metal-amd64kb-transfer.raw.tar.gz",
+      "sha256": "ca86f15a379b8dbac81bf3d300cb866eeb2210b9a18a7df4d88dd34c4ff88a09",
+      "containsFileCount": 1435
+    },
+    "analysisScript": {
+      "path": "bench/out/apple-metal/diagnostic/20260712T191716Z/analyze-distribution.py",
+      "sha256": "936237eb1f3647f7ea529dddecb40de830712ef4daf38c00dbd2cdabfc24b055"
+    },
+    "analysis": {
+      "path": "bench/out/apple-metal/diagnostic/20260712T191716Z/analysis.json",
+      "sha256": "604e4bc9ec2e859a257a7adf733d85dffc65eff678a796a8814dac9aa9f930e6"
+    }
+  },
+  "runtimeConfiguration": {
+    "baselineBackendLane": "metal_doe_comparable",
+    "comparisonBackendLane": "metal_dawn_release",
+    "queueSyncMode": "deferred",
+    "pipelineCache": "disabled",
+    "gpuTimestampMode": "auto",
+    "uploadBufferUsage": "copy-dst",
+    "commandRepeat": 50,
+    "uploadSubmitEvery": 50,
+    "ignoreFirstOps": 1,
+    "timingDivisor": 1,
+    "warmupSamplesPerBatch": 1,
+    "timedSamplesPerBatch": 30,
+    "batchCountPerProduct": 5
+  },
+  "executionSummary": {
+    "strictComparablePairCount": 5,
+    "nonComparablePairCount": 0,
+    "timedSampleCountPerProduct": 150,
+    "successfulUploadOperationCountPerProduct": 7500,
+    "executionErrorCount": 0,
+    "doe": {
+      "p50Ms": 0.0007959183673469388,
+      "p95Ms": 0.0013673469387755102,
+      "p99Ms": 0.001979591836734694,
+      "maxMs": 0.007265306122448979,
+      "clearSecondaryClusterBatches": 0,
+      "classification": "isolated high samples"
+    },
+    "dawnDelegate": {
+      "p50Ms": 0.045714285714285714,
+      "p95Ms": 0.0973265306122449,
+      "p99Ms": 0.1709387755102041,
+      "maxMs": 0.19910204081632654,
+      "clearSecondaryClusterBatches": 3,
+      "classification": "repeated secondary high-latency clusters"
+    },
+    "classification": "The matched AMD 64 KB sensitivity contract reproduces on Metal. The secondary mode is repeated on the Dawn delegate; Doe shows isolated high samples under the same contract."
+  },
+  "analysisPolicy": {
+    "randomSeed": 29,
+    "covarianceType": "full",
+    "regularizationCovariance": 1e-12,
+    "perBatchInitializations": 20,
+    "pooledInitializations": 50,
+    "clearSecondaryClusterRule": "BIC(1)-BIC(2) > 10 and high-latency component weight >= 0.10",
+    "bimodalityCoefficientUse": "descriptive_only",
+    "python": "3.13.2",
+    "numpy": "2.2.3",
+    "scipy": "1.15.2",
+    "scikitLearn": "1.6.1"
+  },
+  "exactCommands": {
+    "preflight": "python3 bench/runners/preflight_metal_host.py",
+    "baselineRun": {
+      "command": "python3 bench/cli.py run-config --config bench/out/scratch/m3-metal-amd64kb-transfer/compare.config.json --side baseline",
+      "invocationCount": 5
+    },
+    "comparisonRun": {
+      "command": "python3 bench/cli.py run-config --config bench/out/scratch/m3-metal-amd64kb-transfer/compare.config.json --side comparison",
+      "invocationCount": 5
+    },
+    "pairwiseCompare": [
+      "python3 bench/cli.py compare bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191716Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T191716Z.run.json bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191720Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T191720Z.run.json --comparability strict --require-timing-class operation --out bench/out/scratch/m3-metal-amd64kb-transfer/compare.json",
+      "python3 bench/cli.py compare bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191944Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T191944Z.run.json bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191949Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T191949Z.run.json --comparability strict --require-timing-class operation --out bench/out/scratch/m3-metal-amd64kb-transfer/compare.2.json",
+      "python3 bench/cli.py compare bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191954Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T191954Z.run.json bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191959Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T191959Z.run.json --comparability strict --require-timing-class operation --out bench/out/scratch/m3-metal-amd64kb-transfer/compare.3.json",
+      "python3 bench/cli.py compare bench/out/scratch/m3-metal-amd64kb-transfer/20260712T192005Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T192005Z.run.json bench/out/scratch/m3-metal-amd64kb-transfer/20260712T192010Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T192010Z.run.json --comparability strict --require-timing-class operation --out bench/out/scratch/m3-metal-amd64kb-transfer/compare.4.json",
+      "python3 bench/cli.py compare bench/out/scratch/m3-metal-amd64kb-transfer/20260712T192016Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T192016Z.run.json bench/out/scratch/m3-metal-amd64kb-transfer/20260712T192020Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T192020Z.run.json --comparability strict --require-timing-class operation --out bench/out/scratch/m3-metal-amd64kb-transfer/compare.5.json"
+    ],
+    "analysis": "python3 bench/out/apple-metal/diagnostic/20260712T191716Z/analyze-distribution.py --root bench/out/scratch/m3-metal-amd64kb-transfer --out bench/out/apple-metal/diagnostic/20260712T191716Z/analysis.json",
+    "archive": "tar -czf bench/out/apple-metal/diagnostic/20260712T191716Z/m3-metal-amd64kb-transfer.raw.tar.gz -C bench/out/scratch m3-metal-amd64kb-transfer"
+  },
+  "inferenceFields": {
+    "dopplerCommit": null,
+    "artifactManifestChecksums": null,
+    "prompt": null,
+    "inputTokenIds": null,
+    "capturedLogits": null,
+    "selectedToken": null,
+    "generatedOutput": null,
+    "notApplicableReason": "This is a Doe native 64 KB upload benchmark receipt, not a Doppler model-inference receipt."
+  },
+  "separateClaims": {
+    "trainingImprovement": "not evaluated",
+    "baseModelInferenceCorrectness": "not evaluated",
+    "adapterInferenceCorrectness": "not evaluated",
+    "runtimePerformance": "diagnostic Metal upload distribution evidence"
+  }
+}

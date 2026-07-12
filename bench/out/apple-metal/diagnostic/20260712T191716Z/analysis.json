@@ -1,0 +1,412 @@
+{
+  "analysisPolicy": {
+    "bicImprovementThreshold": 10.0,
+    "bimodalityCoefficientUse": "descriptive_only",
+    "clearSecondaryClusterRule": "BIC(1)-BIC(2) > 10 and high-latency component weight >= 0.10",
+    "covarianceType": "full",
+    "perBatchInitializations": 20,
+    "pooledInitializations": 50,
+    "randomSeed": 29,
+    "regularizationCovariance": 1e-12,
+    "secondaryHighClusterWeightThreshold": 0.1
+  },
+  "artifactKind": "metal_64kb_bimodality_analysis",
+  "classification": {
+    "claimBoundary": "Diagnostic transfer evidence only; not a general speed, release, or cross-backend performance claim.",
+    "dawnDelegate": "three of five batches met the secondary-cluster rule",
+    "doe": "isolated high samples; no batch met the secondary-cluster rule",
+    "scope": "tail_and_bimodality_sensitivity",
+    "status": "reproduced_on_metal"
+  },
+  "comparisons": [
+    {
+      "comparisonStatus": "comparable",
+      "nonComparableCount": 0,
+      "path": "bench/out/scratch/m3-metal-amd64kb-transfer/compare.2.json",
+      "sha256": "73e400de6d9c3096995a0daab66e0a17af87c7e2d1d49ff0e8c47be1485f6c51"
+    },
+    {
+      "comparisonStatus": "comparable",
+      "nonComparableCount": 0,
+      "path": "bench/out/scratch/m3-metal-amd64kb-transfer/compare.3.json",
+      "sha256": "71009a5b5781cfbed387d031f63a2ee6380f5de452e41a8f998316ddd2d77fc8"
+    },
+    {
+      "comparisonStatus": "comparable",
+      "nonComparableCount": 0,
+      "path": "bench/out/scratch/m3-metal-amd64kb-transfer/compare.4.json",
+      "sha256": "83ccb109a44a0ca26f3b581ac82e7def73f83a5efd41b38c34f83b30f13a2a1f"
+    },
+    {
+      "comparisonStatus": "comparable",
+      "nonComparableCount": 0,
+      "path": "bench/out/scratch/m3-metal-amd64kb-transfer/compare.5.json",
+      "sha256": "2afe252178a849d43ed9e010498a87127223834b7075c6c765609e72ada151b1"
+    },
+    {
+      "comparisonStatus": "comparable",
+      "nonComparableCount": 0,
+      "path": "bench/out/scratch/m3-metal-amd64kb-transfer/compare.json",
+      "sha256": "32c804e3a8ffdd253de9824f9df62125ef162b7d92b2fc4723f610e737bd92aa"
+    }
+  ],
+  "contract": {
+    "batchCountPerProduct": 5,
+    "commandRepeat": 50,
+    "ignoreFirstOps": 1,
+    "timedSamplesPerBatch": 30,
+    "uploadBufferUsage": "copy-dst",
+    "uploadSubmitEvery": 50
+  },
+  "environment": {
+    "numpy": "2.2.3",
+    "python": "3.13.2",
+    "scikitLearn": "1.6.1",
+    "scipy": "1.15.2"
+  },
+  "products": {
+    "dawn_delegate": {
+      "batches": [
+        {
+          "bimodalityCoefficient": 0.3376123052764483,
+          "coefficientOfVariation": 0.06801783725013193,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": -8.460225693498273,
+            "bicOneComponent": -259.8314049877333,
+            "bicTwoComponents": -251.37117929423505,
+            "clearSecondaryCluster": false,
+            "componentMeansMs": [
+              0.039607907793825385,
+              0.04348151179096948
+            ],
+            "componentWeights": [
+              0.24952106753492162,
+              0.7504789324650784
+            ]
+          },
+          "maxMs": 0.047204081632653064,
+          "meanMs": 0.04251496598639455,
+          "minMs": 0.034755102040816326,
+          "p50Ms": 0.042591836734693876,
+          "p95Ms": 0.04691836734693877,
+          "p99Ms": 0.047204081632653064,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191720Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T191720Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.002891776037157479,
+          "sha256": "4e88941f6236071a076234a07ca7dc40a95c3fbbfa81020085dddb9f614b6a73"
+        },
+        {
+          "bimodalityCoefficient": 0.8050020660756749,
+          "coefficientOfVariation": 0.14709319848801305,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": 35.23034101047793,
+            "bicOneComponent": -211.98167691925167,
+            "bicTwoComponents": -247.2120179297296,
+            "clearSecondaryCluster": true,
+            "componentMeansMs": [
+              0.04129984301417806,
+              0.058877551020456144
+            ],
+            "componentWeights": [
+              0.866666666669463,
+              0.133333333330537
+            ]
+          },
+          "maxMs": 0.060224489795918365,
+          "meanMs": 0.04364353741496598,
+          "minMs": 0.0383265306122449,
+          "p50Ms": 0.04136734693877551,
+          "p95Ms": 0.05944897959183674,
+          "p99Ms": 0.060224489795918365,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191949Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T191949Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.006419667511698615,
+          "sha256": "778084a5df0997b4f34e65ad7dedb3519a24a76a12ecb6e00c17c615fa5cf0a9"
+        },
+        {
+          "bimodalityCoefficient": 0.7409547157922277,
+          "coefficientOfVariation": 0.1441741294544103,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": 26.72950908130653,
+            "bicOneComponent": -208.1313861456351,
+            "bicTwoComponents": -234.86089522694164,
+            "clearSecondaryCluster": true,
+            "componentMeansMs": [
+              0.04542403628202442,
+              0.06596598639518811
+            ],
+            "componentWeights": [
+              0.9000000000401026,
+              0.0999999999598974
+            ]
+          },
+          "maxMs": 0.06783673469387755,
+          "meanMs": 0.047478231292517006,
+          "minMs": 0.041204081632653065,
+          "p50Ms": 0.04542857142857143,
+          "p95Ms": 0.06569387755102041,
+          "p99Ms": 0.06783673469387755,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191959Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T191959Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.006845132664633781,
+          "sha256": "db28eb428929c8dec3542043abf97abd8fb64c7e74851688dca020e1a3cf2f17"
+        },
+        {
+          "bimodalityCoefficient": 0.6757577809353532,
+          "coefficientOfVariation": 0.3993689130756383,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": 11.686379254565779,
+            "bicOneComponent": -110.41041050839642,
+            "bicTwoComponents": -122.0967897629622,
+            "clearSecondaryCluster": true,
+            "componentMeansMs": [
+              0.07482605294897075,
+              0.1545278530996374
+            ],
+            "componentWeights": [
+              0.8426814340746799,
+              0.1573185659253202
+            ]
+          },
+          "maxMs": 0.19910204081632654,
+          "meanMs": 0.08736462585034012,
+          "minMs": 0.055693877551020406,
+          "p50Ms": 0.07363265306122449,
+          "p95Ms": 0.1709387755102041,
+          "p99Ms": 0.19910204081632654,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T192010Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T192010Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.03489071566711015,
+          "sha256": "8d5aff9f7d106b283f6c34fd1a6fae79dcea6dafb6214cb3c0ecd038318eef65"
+        },
+        {
+          "bimodalityCoefficient": 0.41493313783309715,
+          "coefficientOfVariation": 0.10639596320635836,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": 2.105812792182462,
+            "bicOneComponent": -226.2664284896968,
+            "bicTwoComponents": -228.37224128187927,
+            "clearSecondaryCluster": false,
+            "componentMeansMs": [
+              0.04655594266673601,
+              0.061552646322575344
+            ],
+            "componentWeights": [
+              0.9334200951832056,
+              0.06657990481679446
+            ]
+          },
+          "maxMs": 0.06287755102040817,
+          "meanMs": 0.04755442176870748,
+          "minMs": 0.03973469387755102,
+          "p50Ms": 0.047142857142857146,
+          "p95Ms": 0.060224489795918365,
+          "p99Ms": 0.06287755102040817,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T192020Z/workspace/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_64kb_staged-20260712T192020Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.005059598508803048,
+          "sha256": "239fce91dc9b1fe32fc4db745d90abeb80ed8863602336ad30148b55f6207d27"
+        }
+      ],
+      "clearSecondaryBatchCount": 3,
+      "pooled": {
+        "bimodalityCoefficient": 0.7324788629067829,
+        "coefficientOfVariation": 0.43656145072838304,
+        "gaussianMixture": {
+          "bicImprovementOneMinusTwo": 219.76497796109982,
+          "bicOneComponent": -691.1887206858055,
+          "bicTwoComponents": -910.9536986469053,
+          "clearSecondaryCluster": true,
+          "componentMeansMs": [
+            0.04390243116718811,
+            0.07654557477221464
+          ],
+          "componentWeights": [
+            0.699516522854541,
+            0.3004834771454589
+          ]
+        },
+        "maxMs": 0.19910204081632654,
+        "meanMs": 0.05371115646258502,
+        "minMs": 0.034755102040816326,
+        "p50Ms": 0.045714285714285714,
+        "p95Ms": 0.0973265306122449,
+        "p99Ms": 0.1709387755102041,
+        "sampleCount": 150,
+        "sampleStdevMs": 0.023448220385605283
+      }
+    },
+    "doe": {
+      "batches": [
+        {
+          "bimodalityCoefficient": 0.46466279953334194,
+          "coefficientOfVariation": 0.21694364136114574,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": 1.2244196655500446,
+            "bicOneComponent": -426.7606633519149,
+            "bicTwoComponents": -427.98508301746494,
+            "clearSecondaryCluster": false,
+            "componentMeansMs": [
+              0.0007896942370567295,
+              0.0013246693672992313
+            ],
+            "componentWeights": [
+              0.9336869529721876,
+              0.06631304702781239
+            ]
+          },
+          "maxMs": 0.0014489795918367348,
+          "meanMs": 0.0008251700680272108,
+          "minMs": 0.0005306122448979592,
+          "p50Ms": 0.0008163265306122449,
+          "p95Ms": 0.0012040816326530613,
+          "p99Ms": 0.0014489795918367348,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191716Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T191716Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.00017901539930004746,
+          "sha256": "04acae1df5c939c12b0677dad7adf191d64bd4a4077d3b853dead1f2be104171"
+        },
+        {
+          "bimodalityCoefficient": 0.568280714968899,
+          "coefficientOfVariation": 0.24697747869789,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": 3.0540572397202936,
+            "bicOneComponent": -415.61482298790935,
+            "bicTwoComponents": -418.66888022762964,
+            "clearSecondaryCluster": false,
+            "componentMeansMs": [
+              0.0008287627373413501,
+              0.0014884740938695131
+            ],
+            "componentWeights": [
+              0.9332641800550406,
+              0.0667358199449594
+            ]
+          },
+          "maxMs": 0.0016122448979591837,
+          "meanMs": 0.0008727891156462585,
+          "minMs": 0.0005918367346938776,
+          "p50Ms": 0.0007959183673469388,
+          "p95Ms": 0.0013673469387755102,
+          "p99Ms": 0.0016122448979591837,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191944Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T191944Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.00021555925521727406,
+          "sha256": "5f907a2732b2cf8eb609648b7d98557598eed28d63cbcef34e47b25427252066"
+        },
+        {
+          "bimodalityCoefficient": 0.8820625052271392,
+          "coefficientOfVariation": 1.1404495334268803,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": 78.29329385265652,
+            "bicOneComponent": -312.2469443008236,
+            "bicTwoComponents": -390.5402381534801,
+            "clearSecondaryCluster": false,
+            "componentMeansMs": [
+              0.0008444757213230119,
+              0.0072653061224489624
+            ],
+            "componentWeights": [
+              0.9666666666666666,
+              0.0333333333333334
+            ]
+          },
+          "maxMs": 0.007265306122448979,
+          "meanMs": 0.0010585034013605441,
+          "minMs": 0.0005510204081632653,
+          "p50Ms": 0.0007551020408163265,
+          "p95Ms": 0.0018163265306122447,
+          "p99Ms": 0.007265306122448979,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T191954Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T191954Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.0012071697102123983,
+          "sha256": "0add89344eccd102eaae779d8425d7fc8b7f1a1d7eee24fdfd20991a50a8629d"
+        },
+        {
+          "bimodalityCoefficient": 0.4819005056866499,
+          "coefficientOfVariation": 0.22480840784953382,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": -1.815283828252916,
+            "bicOneComponent": -422.62949964828897,
+            "bicTwoComponents": -420.81421582003605,
+            "clearSecondaryCluster": false,
+            "componentMeansMs": [
+              0.0008258178332725949,
+              0.0014125828164784386
+            ],
+            "componentWeights": [
+              0.9535701822757829,
+              0.04642981772421703
+            ]
+          },
+          "maxMs": 0.0015306122448979593,
+          "meanMs": 0.0008530612244897958,
+          "minMs": 0.0006122448979591836,
+          "p50Ms": 0.0007959183673469388,
+          "p95Ms": 0.001163265306122449,
+          "p99Ms": 0.0015306122448979593,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T192005Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T192005Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.00019177533567572475,
+          "sha256": "42bb3b0c61ae7e35cb057d0706fa122482dbc86ee6acf192a63f48c241ab0c64"
+        },
+        {
+          "bimodalityCoefficient": 0.587594785435157,
+          "coefficientOfVariation": 0.31907014855230714,
+          "gaussianMixture": {
+            "bicImprovementOneMinusTwo": 15.409278007548494,
+            "bicOneComponent": -399.8285741940631,
+            "bicTwoComponents": -415.2378522016116,
+            "clearSecondaryCluster": false,
+            "componentMeansMs": [
+              0.0008409570725525946,
+              0.0019795918367346895
+            ],
+            "componentWeights": [
+              0.9666666667247603,
+              0.03333333327523972
+            ]
+          },
+          "maxMs": 0.001979591836734694,
+          "meanMs": 0.0008789115646258503,
+          "minMs": 0.0005510204081632653,
+          "p50Ms": 0.0008163265306122449,
+          "p95Ms": 0.0012857142857142859,
+          "p99Ms": 0.001979591836734694,
+          "path": "bench/out/scratch/m3-metal-amd64kb-transfer/20260712T192016Z/workspace/run-artifacts/doe/doe-upload_write_buffer_64kb_staged-20260712T192016Z.run.json",
+          "sampleCount": 30,
+          "sampleStdevMs": 0.00028043444348951077,
+          "sha256": "b2aa4cdb0fef650b566781a2db7e32a73a0b77e75d5bee0eb91644eff548b0ca"
+        }
+      ],
+      "clearSecondaryBatchCount": 0,
+      "pooled": {
+        "bimodalityCoefficient": 0.8448441400072615,
+        "coefficientOfVariation": 0.6382163090218707,
+        "gaussianMixture": {
+          "bicImprovementOneMinusTwo": 253.7756752070252,
+          "bicOneComponent": -1804.730626716024,
+          "bicTwoComponents": -2058.5063019230493,
+          "clearSecondaryCluster": false,
+          "componentMeansMs": [
+            0.0008549513765237636,
+            0.0072653061224489624
+          ],
+          "componentWeights": [
+            0.9933333333333333,
+            0.006666666666666682
+          ]
+        },
+        "maxMs": 0.007265306122448979,
+        "meanMs": 0.0008976870748299321,
+        "minMs": 0.0005306122448979592,
+        "p50Ms": 0.0007959183673469388,
+        "p95Ms": 0.0013673469387755102,
+        "p99Ms": 0.001979591836734694,
+        "sampleCount": 150,
+        "sampleStdevMs": 0.000572918531554599
+      }
+    }
+  },
+  "schemaVersion": 1
+}
