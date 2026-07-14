@@ -1,0 +1,4 @@
+interface:
+  display_name: "Doe Development"
+  short_description: "Build and validate Doe project changes"
+  default_prompt: "Use $doe-development to implement and validate this change in Doe."

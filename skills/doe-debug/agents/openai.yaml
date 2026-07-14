@@ -1,0 +1,4 @@
+interface:
+  display_name: "Doe Debug"
+  short_description: "Trace and fix Doe project failures"
+  default_prompt: "Use $doe-debug to reproduce, trace, and fix this failure in Doe."
