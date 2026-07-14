@@ -25,19 +25,37 @@ VALID_SELECTED_RUNTIMES = {"dawn", "doe"}
 VALID_MODE_SCHEDULES = {"grouped", "paired", "paired-balanced"}
 VALID_POWER_PREFERENCES = {"default", "high-performance", "low-power"}
 VALID_SOURCE_KERNEL_SUBMIT_POLICIES = {"iteration-batch-v1", "sample-batch-v1"}
-PROJECTION_MANIFEST_SCHEMA_VERSION = 5
+NATIVE_METAL_TRACE_ID = "doe-metal-browser-command-path-v1"
+NATIVE_METAL_TRACE_KIND = "doe_metal_browser_command_path_v1"
+NATIVE_METAL_TRACE_NUMERIC_FIELDS = (
+    "submissionCount",
+    "sourceCommandBufferCount",
+    "recordedCommandCount",
+    "nativeCommandBufferCount",
+    "commandBufferCreateNs",
+    "commandEncodeNs",
+    "commandCommitNs",
+    "waitCompletedNs",
+    "deferredCopyNs",
+    "deferredResolveNs",
+)
+PROJECTION_MANIFEST_SCHEMA_VERSION = 6
 COMPUTE_PROJECTION_DIRECT_DISPATCH = "generic_direct_dispatch_component"
 COMPUTE_PROJECTION_EMPTY_DISPATCH = "generic_empty_dispatch_component"
 COMPUTE_PROJECTION_INDIRECT_DISPATCH = "generic_indirect_dispatch_component"
 COMPUTE_PROJECTION_SOURCE_KERNEL = "source_kernel_dispatch_v1"
+COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE = "source_kernel_dispatch_oracle_v2"
 VALID_COMPUTE_PROJECTIONS = {
     COMPUTE_PROJECTION_DIRECT_DISPATCH,
     COMPUTE_PROJECTION_EMPTY_DISPATCH,
     COMPUTE_PROJECTION_INDIRECT_DISPATCH,
     COMPUTE_PROJECTION_SOURCE_KERNEL,
+    COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
 }
 SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1"
 SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1"
+SOURCE_KERNEL_OUTPUT_ORACLE_KIND = "sha256_exact_v1"
+SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION = "zero_fill_v1"
 SOURCE_KERNEL_STORAGE_BUFFER_USAGE = ["STORAGE", "COPY_DST", "COPY_SRC"]
 SOURCE_KERNEL_READBACK_SAMPLE_BYTES = 16
 UINT32_BYTES = 4
@@ -450,7 +468,10 @@ def parse_browser_workload(value: Any, label: str, domain: Any) -> dict[str, Any
             value.get("indirectDispatchArgs"),
             f"{label}.indirectDispatchArgs",
         )
-    if parsed.get("computeProjection") == COMPUTE_PROJECTION_SOURCE_KERNEL:
+    if parsed.get("computeProjection") in {
+        COMPUTE_PROJECTION_SOURCE_KERNEL,
+        COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
+    }:
         parsed["bindGroupLayoutMode"] = require_string(
             value.get("bindGroupLayoutMode"),
             f"{label}.bindGroupLayoutMode",
@@ -498,6 +519,12 @@ def parse_browser_workload(value: Any, label: str, domain: Any) -> dict[str, Any
             binding["bufferBindingType"] == "storage" for binding in parsed["storageBindings"]
         ):
             raise ValueError(f"{label}.storageBindings must include a writable storage binding")
+        if parsed.get("computeProjection") == COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE:
+            parsed["outputOracle"] = parse_source_output_oracle(
+                value.get("outputOracle"),
+                parsed["storageBindings"],
+                f"{label}.outputOracle",
+            )
     for key in ("textureWidth", "textureHeight", "mipLevelCount"):
         metric_value = value.get(key)
         if metric_value is not None:
@@ -591,6 +618,52 @@ def parse_storage_bindings(value: Any, label: str) -> list[dict[str, Any]]:
             }
         )
     return bindings
+
+
+def parse_source_output_oracle(
+    value: Any,
+    storage_bindings: list[dict[str, Any]],
+    label: str,
+) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be an object")
+    if value.get("schemaVersion") != 1:
+        raise ValueError(f"{label}.schemaVersion must be 1")
+    kind = require_string(value.get("kind"), f"{label}.kind")
+    if kind != SOURCE_KERNEL_OUTPUT_ORACLE_KIND:
+        raise ValueError(f"{label}.kind must be {SOURCE_KERNEL_OUTPUT_ORACLE_KIND}")
+    initialization = require_string(value.get("initialization"), f"{label}.initialization")
+    if initialization != SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION:
+        raise ValueError(
+            f"{label}.initialization must be {SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION}"
+        )
+    binding_group = require_positive_int(
+        value.get("bindingGroup"), f"{label}.bindingGroup", allow_zero=True
+    )
+    binding = require_positive_int(
+        value.get("binding"), f"{label}.binding", allow_zero=True
+    )
+    if not any(
+        candidate["group"] == binding_group
+        and candidate["binding"] == binding
+        and candidate["bufferBindingType"] == "storage"
+        for candidate in storage_bindings
+    ):
+        raise ValueError(f"{label} must reference a writable storage binding")
+    return {
+        "schemaVersion": 1,
+        "kind": kind,
+        "initialization": initialization,
+        "bindingGroup": binding_group,
+        "binding": binding,
+        "dispatchCount": require_positive_int(
+            value.get("dispatchCount"), f"{label}.dispatchCount"
+        ),
+        "expectedSha256": require_hash_hex(
+            value.get("expectedSha256"), f"{label}.expectedSha256"
+        ),
+        "referenceId": require_string(value.get("referenceId"), f"{label}.referenceId"),
+    }
 
 
 def parse_workflow_manifest(workflows_payload: dict[str, Any]) -> dict[str, Any]:
@@ -891,7 +964,10 @@ def check_source_kernel_hash_sync(manifest_rows: list[dict[str, Any]]) -> list[s
         browser_workload = row.get("browserWorkload")
         if not isinstance(browser_workload, dict):
             continue
-        if browser_workload.get("computeProjection") != COMPUTE_PROJECTION_SOURCE_KERNEL:
+        if browser_workload.get("computeProjection") not in {
+            COMPUTE_PROJECTION_SOURCE_KERNEL,
+            COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
+        }:
             continue
         workload_id = row["sourceWorkloadId"]
         for path_key, hash_key in (
@@ -1120,7 +1196,10 @@ def check_source_kernel_runtime_evidence(
     browser_workload = manifest_row.get("browserWorkload")
     if not isinstance(browser_workload, dict):
         return []
-    if browser_workload.get("computeProjection") != COMPUTE_PROJECTION_SOURCE_KERNEL:
+    if browser_workload.get("computeProjection") not in {
+        COMPUTE_PROJECTION_SOURCE_KERNEL,
+        COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
+    }:
         return []
     if mode_result.get("status") != "ok":
         return []
@@ -1390,6 +1469,8 @@ def check_source_kernel_runtime_evidence(
         errors.append(f"{row_label}: metrics.readbackBytes drift for mode '{mode}'")
     if not is_nonnegative_int(metrics.get("readbackChecksum")):
         errors.append(f"{row_label}: metrics.readbackChecksum must be a non-negative integer for mode '{mode}'")
+    if not is_hash_hex(metrics.get("readbackSha256")):
+        errors.append(f"{row_label}: metrics.readbackSha256 must be SHA-256 hex for mode '{mode}'")
 
     sample = metrics.get("readbackSampleBytes")
     if not isinstance(sample, list) or not sample:
@@ -1407,7 +1488,88 @@ def check_source_kernel_runtime_evidence(
                     f"{row_label}: metrics.readbackSampleBytes[{index}] must be a byte for mode '{mode}'"
                 )
 
+    if browser_workload.get("computeProjection") != COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE:
+        return errors
+
+    output_oracle = browser_workload.get("outputOracle")
+    if not isinstance(output_oracle, dict):
+        errors.append(f"{row_label}: manifest outputOracle missing for source kernel")
+        return errors
+    expected_oracle_metrics = {
+        "outputOracleSchemaVersion": output_oracle["schemaVersion"],
+        "outputOracleKind": output_oracle["kind"],
+        "outputOracleInitialization": output_oracle["initialization"],
+        "outputOracleBindingGroup": output_oracle["bindingGroup"],
+        "outputOracleBinding": output_oracle["binding"],
+        "outputOracleDispatchCount": output_oracle["dispatchCount"],
+        "outputOracleExpectedSha256": output_oracle["expectedSha256"],
+        "outputOracleReferenceId": output_oracle["referenceId"],
+    }
+    for metric_key, expected_value in expected_oracle_metrics.items():
+        if metrics.get(metric_key) != expected_value:
+            errors.append(
+                f"{row_label}: metrics.{metric_key} drift for mode '{mode}'"
+            )
+    if metrics.get("outputOracleActualSha256") != output_oracle["expectedSha256"]:
+        errors.append(
+            f"{row_label}: output oracle SHA-256 mismatch for mode '{mode}'"
+        )
+    if metrics.get("outputOracleMatched") is not True:
+        errors.append(f"{row_label}: output oracle did not match for mode '{mode}'")
+    for metric_key in (
+        "outputOracleResetMs",
+        "outputOracleDispatchMs",
+        "outputOracleReadbackMs",
+    ):
+        if not is_nonnegative_number(metrics.get(metric_key)):
+            errors.append(
+                f"{row_label}: metrics.{metric_key} must be non-negative for mode '{mode}'"
+            )
+    oracle_sample = metrics.get("outputOracleSampleBytes")
+    if not isinstance(oracle_sample, list) or len(oracle_sample) != SOURCE_KERNEL_READBACK_SAMPLE_BYTES:
+        errors.append(
+            f"{row_label}: metrics.outputOracleSampleBytes must contain "
+            f"{SOURCE_KERNEL_READBACK_SAMPLE_BYTES} bytes for mode '{mode}'"
+        )
+    elif any(not isinstance(value, int) or value < 0 or value > 255 for value in oracle_sample):
+        errors.append(
+            f"{row_label}: metrics.outputOracleSampleBytes must contain bytes for mode '{mode}'"
+        )
+
     return errors
+
+
+def check_source_kernel_cross_runtime_parity(
+    report_row: dict[str, Any],
+    manifest_row: dict[str, Any],
+    row_label: str,
+) -> list[str]:
+    browser_workload = manifest_row.get("browserWorkload")
+    if not isinstance(browser_workload, dict):
+        return []
+    if browser_workload.get("computeProjection") not in {
+        COMPUTE_PROJECTION_SOURCE_KERNEL,
+        COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
+    }:
+        return []
+    runtimes = report_row.get("runtimes")
+    if not isinstance(runtimes, dict):
+        return []
+    hashes: dict[str, str] = {}
+    for mode in ("dawn", "doe"):
+        mode_result = runtimes.get(mode)
+        if not isinstance(mode_result, dict) or mode_result.get("status") != "ok":
+            return []
+        metrics = mode_result.get("metrics")
+        if not isinstance(metrics, dict) or not is_hash_hex(metrics.get("readbackSha256")):
+            return []
+        hashes[mode] = metrics["readbackSha256"]
+    if hashes["dawn"] != hashes["doe"]:
+        return [
+            f"{row_label}: timed output SHA-256 differs across Dawn and Doe "
+            f"(dawn={hashes['dawn']} doe={hashes['doe']})"
+        ]
+    return []
 
 
 def check_indirect_runtime_evidence(
@@ -1666,6 +1828,90 @@ def check_adapter_identity(runtime_probe: Any, row_label: str) -> list[str]:
     return errors
 
 
+def check_active_runtime_proof(
+    runtime_evidence: Any,
+    runtime_probe: Any,
+    row_label: str,
+    selected_runtime: str,
+    report_platform: str,
+) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(runtime_evidence, dict):
+        return [f"{row_label}: runtimeEvidence missing for active runtime proof"]
+    proof = runtime_evidence.get("activeRuntimeProof")
+    if not isinstance(proof, dict):
+        return [f"{row_label}: activeRuntimeProof missing"]
+    if proof.get("schemaVersion") != 1:
+        errors.append(f"{row_label}: activeRuntimeProof.schemaVersion must be 1")
+    if proof.get("identitySource") != "wgpuAdapterGetInfo":
+        errors.append(
+            f"{row_label}: activeRuntimeProof.identitySource must be wgpuAdapterGetInfo"
+        )
+    if proof.get("selectedRuntime") != selected_runtime:
+        errors.append(f"{row_label}: activeRuntimeProof.selectedRuntime mismatch")
+
+    adapter_info = (
+        runtime_probe.get("adapterInfo")
+        if isinstance(runtime_probe, dict)
+        else None
+    )
+    if not isinstance(adapter_info, dict):
+        adapter_info = {}
+        errors.append(f"{row_label}: runtimeProbe.adapterInfo must be an object")
+    expected_observed = {
+        field: adapter_info.get(field) if isinstance(adapter_info.get(field), str) else ""
+        for field in ("vendor", "architecture", "device", "description")
+    }
+    observed = proof.get("observed")
+    if observed != expected_observed:
+        errors.append(f"{row_label}: activeRuntimeProof.observed drift")
+        observed = expected_observed
+
+    expected = proof.get("expected")
+    if selected_runtime == "doe":
+        expected_architecture_by_platform = {
+            "darwin": "metal",
+            "linux": "vulkan",
+            "win32": "d3d12",
+        }
+        platform_architecture = expected_architecture_by_platform.get(report_platform)
+        if not isinstance(expected, dict):
+            errors.append(f"{row_label}: activeRuntimeProof.expected must be an object")
+            expected = {}
+        expected_architecture = expected.get("architecture")
+        if expected.get("vendor") != "Doe":
+            errors.append(f"{row_label}: activeRuntimeProof expected Doe vendor")
+        if (
+            platform_architecture is not None
+            and expected_architecture != platform_architecture
+        ):
+            errors.append(
+                f"{row_label}: activeRuntimeProof expected Doe architecture "
+                f"must be {platform_architecture} on {report_platform}"
+            )
+        recomputed_match = (
+            platform_architecture is not None
+            and observed.get("vendor") == "Doe"
+            and observed.get("architecture") == platform_architecture
+        )
+    else:
+        expected_dawn = {
+            "vendorMustNotEqual": "Doe",
+            "vendorMustBeNonEmpty": True,
+        }
+        if expected != expected_dawn:
+            errors.append(f"{row_label}: activeRuntimeProof Dawn expectation drift")
+        recomputed_match = bool(observed.get("vendor")) and observed.get("vendor") != "Doe"
+
+    if proof.get("matched") is not recomputed_match:
+        errors.append(f"{row_label}: activeRuntimeProof.matched drift")
+    if not recomputed_match:
+        errors.append(
+            f"{row_label}: active runtime does not match requested {selected_runtime} runtime"
+        )
+    return errors
+
+
 def check_shader_compiler_identity(payload: Any, row_label: str, mode: str) -> list[str]:
     errors: list[str] = []
     if not isinstance(payload, dict):
@@ -1774,6 +2020,140 @@ def check_report_methodology(payload: Any, mode_schedule: str) -> list[str]:
             "report methodology.adapterRequest.powerPreference must be one of "
             f"{sorted(VALID_POWER_PREFERENCES)}"
         )
+    native_trace = payload.get("nativeMetalTrace")
+    if not isinstance(native_trace, dict):
+        errors.append("report methodology.nativeMetalTrace must be an object")
+    else:
+        requested = native_trace.get("requested")
+        if not isinstance(requested, bool):
+            errors.append("report methodology.nativeMetalTrace.requested must be bool")
+        if native_trace.get("traceId") != NATIVE_METAL_TRACE_ID:
+            errors.append("report methodology.nativeMetalTrace.traceId mismatch")
+        if native_trace.get("environmentVariable") != "DOE_METAL_BROWSER_TRACE_PATH":
+            errors.append("report methodology.nativeMetalTrace.environmentVariable mismatch")
+        if native_trace.get("evidenceClass") != "diagnostic_only":
+            errors.append("report methodology.nativeMetalTrace.evidenceClass must be diagnostic_only")
+        if native_trace.get("timingsPerturbed") is not requested:
+            errors.append("report methodology.nativeMetalTrace.timingsPerturbed mismatch")
+        if native_trace.get("scoreEligible") is requested:
+            errors.append("report methodology.nativeMetalTrace.scoreEligible mismatch")
+        config_path = native_trace.get("configPath")
+        config_hash = native_trace.get("configSha256")
+        if not isinstance(config_path, str) or not config_path:
+            errors.append("report methodology.nativeMetalTrace.configPath missing")
+        if not is_hash_hex(config_hash):
+            errors.append("report methodology.nativeMetalTrace.configSha256 must be sha256 hex")
+        elif isinstance(config_path, str) and config_path:
+            resolved_config = Path(config_path)
+            if not resolved_config.exists():
+                errors.append("report methodology.nativeMetalTrace.configPath does not exist")
+            elif file_sha256(resolved_config) != config_hash:
+                errors.append("report methodology.nativeMetalTrace.configSha256 mismatch")
+    return errors
+
+
+def check_native_metal_trace_evidence(
+    payload: Any,
+    row_label: str,
+    requested: bool,
+    selected_runtime: str,
+) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(payload, dict):
+        return [f"{row_label}: nativeMetalTrace evidence missing"]
+    expected_enabled = requested and selected_runtime == "doe"
+    if payload.get("requested") is not requested:
+        errors.append(f"{row_label}: nativeMetalTrace.requested mismatch")
+    if payload.get("enabled") is not expected_enabled:
+        errors.append(f"{row_label}: nativeMetalTrace.enabled mismatch")
+    if payload.get("traceId") != NATIVE_METAL_TRACE_ID:
+        errors.append(f"{row_label}: nativeMetalTrace.traceId mismatch")
+    if payload.get("traceKind") != NATIVE_METAL_TRACE_KIND:
+        errors.append(f"{row_label}: nativeMetalTrace.traceKind mismatch")
+    if payload.get("evidenceClass") != "diagnostic_only":
+        errors.append(f"{row_label}: nativeMetalTrace.evidenceClass must be diagnostic_only")
+    if payload.get("timingsPerturbed") is not expected_enabled:
+        errors.append(f"{row_label}: nativeMetalTrace.timingsPerturbed mismatch")
+    if not is_hash_hex(payload.get("configSha256")):
+        errors.append(f"{row_label}: nativeMetalTrace.configSha256 must be sha256 hex")
+
+    if not expected_enabled:
+        expected_status = "not_applicable" if requested else "disabled"
+        if payload.get("status") != expected_status:
+            errors.append(f"{row_label}: nativeMetalTrace.status must be {expected_status}")
+        return errors
+
+    if payload.get("status") != "ok":
+        errors.append(f"{row_label}: nativeMetalTrace.status must be ok")
+    if payload.get("malformedRowCount") != 0:
+        errors.append(f"{row_label}: nativeMetalTrace.malformedRowCount must be zero")
+    row_count = payload.get("rowCount")
+    byte_count = payload.get("byteCount")
+    if not isinstance(row_count, int) or row_count <= 0:
+        errors.append(f"{row_label}: nativeMetalTrace.rowCount must be positive")
+    if not isinstance(byte_count, int) or byte_count <= 0:
+        errors.append(f"{row_label}: nativeMetalTrace.byteCount must be positive")
+    if payload.get("errors") != []:
+        errors.append(f"{row_label}: nativeMetalTrace.errors must be empty")
+    trace_hash = payload.get("traceSha256")
+    if not is_hash_hex(trace_hash):
+        errors.append(f"{row_label}: nativeMetalTrace.traceSha256 must be sha256 hex")
+    totals = payload.get("totals")
+    if not isinstance(totals, dict):
+        errors.append(f"{row_label}: nativeMetalTrace.totals must be an object")
+        totals = {}
+    for field in NATIVE_METAL_TRACE_NUMERIC_FIELDS:
+        value = totals.get(field)
+        if not isinstance(value, int) or value < 0:
+            errors.append(f"{row_label}: nativeMetalTrace.totals.{field} must be non-negative")
+    if isinstance(totals.get("submissionCount"), int) and totals["submissionCount"] <= 0:
+        errors.append(f"{row_label}: nativeMetalTrace.totals.submissionCount must be positive")
+
+    trace_path_raw = payload.get("tracePath")
+    if not isinstance(trace_path_raw, str) or not trace_path_raw:
+        errors.append(f"{row_label}: nativeMetalTrace.tracePath missing")
+        return errors
+    trace_path = Path(trace_path_raw)
+    if not trace_path.exists():
+        errors.append(f"{row_label}: nativeMetalTrace.tracePath does not exist")
+        return errors
+    trace_bytes = trace_path.read_bytes()
+    if len(trace_bytes) != byte_count:
+        errors.append(f"{row_label}: nativeMetalTrace.byteCount mismatch")
+    if hashlib.sha256(trace_bytes).hexdigest() != trace_hash:
+        errors.append(f"{row_label}: nativeMetalTrace.traceSha256 mismatch")
+
+    rows: list[dict[str, Any]] = []
+    for line_index, line in enumerate(trace_bytes.decode("utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            errors.append(f"{row_label}: nativeMetalTrace row {line_index} is not valid JSON")
+            continue
+        if not isinstance(row, dict):
+            errors.append(f"{row_label}: nativeMetalTrace row {line_index} must be an object")
+            continue
+        rows.append(row)
+    if len(rows) != row_count:
+        errors.append(f"{row_label}: nativeMetalTrace.rowCount mismatch")
+    recomputed_totals = {field: 0 for field in NATIVE_METAL_TRACE_NUMERIC_FIELDS}
+    for index, row in enumerate(rows, start=1):
+        if row.get("schemaVersion") != 1 or row.get("traceKind") != NATIVE_METAL_TRACE_KIND:
+            errors.append(f"{row_label}: nativeMetalTrace row {index} envelope mismatch")
+        if row.get("sequence") != index:
+            errors.append(f"{row_label}: nativeMetalTrace row {index} sequence mismatch")
+        if not isinstance(row.get("directReadback"), bool):
+            errors.append(f"{row_label}: nativeMetalTrace row {index} directReadback must be bool")
+        for field in NATIVE_METAL_TRACE_NUMERIC_FIELDS:
+            value = row.get(field)
+            if not isinstance(value, int) or value < 0:
+                errors.append(f"{row_label}: nativeMetalTrace row {index} {field} invalid")
+                continue
+            recomputed_totals[field] += value
+    if totals and recomputed_totals != totals:
+        errors.append(f"{row_label}: nativeMetalTrace totals mismatch")
     return errors
 
 
@@ -1851,6 +2231,8 @@ def check_report_coverage(
 ) -> list[str]:
     errors: list[str] = []
 
+    if report_payload.get("schemaVersion") != 5:
+        errors.append("report schemaVersion must be 5")
     report_kind = report_payload.get("reportKind")
     if report_kind != "browser-layered-diagnostic":
         errors.append(f"reportKind must be browser-layered-diagnostic (found {report_kind})")
@@ -1868,6 +2250,23 @@ def check_report_coverage(
         errors.append(f"report modeSchedule invalid: {mode_schedule}")
         mode_schedule = "grouped"
     errors.extend(check_report_methodology(report_payload.get("methodology"), mode_schedule))
+    methodology = report_payload.get("methodology")
+    native_trace_methodology = (
+        methodology.get("nativeMetalTrace")
+        if isinstance(methodology, dict)
+        else None
+    )
+    native_trace_requested = (
+        native_trace_methodology.get("requested") is True
+        if isinstance(native_trace_methodology, dict)
+        else False
+    )
+
+    invocation = report_payload.get("invocation")
+    report_platform = invocation.get("platform") if isinstance(invocation, dict) else None
+    if report_platform not in {"darwin", "linux", "win32"}:
+        errors.append("report invocation.platform must be darwin, linux, or win32")
+        report_platform = "unknown"
 
     env_evidence = report_payload.get("browserEnvironmentEvidence")
     if not isinstance(env_evidence, dict):
@@ -1908,6 +2307,27 @@ def check_report_coverage(
             schedule_pass = detail.get("schedulePass", 1)
             if not isinstance(schedule_pass, int) or schedule_pass <= 0:
                 errors.append(f"modeRunDetails[{index}] schedulePass must be a positive integer")
+            runtime_evidence = detail.get("runtimeEvidence")
+            runtime_selection = (
+                runtime_evidence.get("runtimeSelection")
+                if isinstance(runtime_evidence, dict)
+                else None
+            )
+            selected_runtime = (
+                runtime_selection.get("selectedRuntime")
+                if isinstance(runtime_selection, dict)
+                else str(detail_mode)
+            )
+            errors.extend(
+                check_native_metal_trace_evidence(
+                    runtime_evidence.get("nativeMetalTrace")
+                    if isinstance(runtime_evidence, dict)
+                    else None,
+                    f"modeRunDetails[{index}]",
+                    native_trace_requested,
+                    selected_runtime,
+                )
+            )
             if str(detail_mode) not in mode_run_details:
                 mode_run_details[str(detail_mode)] = detail
 
@@ -1953,6 +2373,15 @@ def check_report_coverage(
         if not isinstance(runtime_evidence.get("userAgent"), str):
             errors.append(f"modeRunDetails[{mode}] missing runtimeEvidence.userAgent")
         errors.extend(check_adapter_identity(detail.get("runtimeProbe"), f"modeRunDetails[{mode}]"))
+        errors.extend(
+            check_active_runtime_proof(
+                runtime_evidence,
+                detail.get("runtimeProbe"),
+                f"modeRunDetails[{mode}]",
+                compiler_mode,
+                report_platform,
+            )
+        )
         errors.extend(
             check_shader_compiler_identity(
                 detail.get("shaderCompilerIdentity"),
@@ -2075,6 +2504,13 @@ def check_report_coverage(
                         mode,
                     )
                 )
+            errors.extend(
+                check_source_kernel_cross_runtime_parity(
+                    report_row,
+                    manifest_row,
+                    f"L1:{workload_id}",
+                )
+            )
 
     required_workflow_ids = [
         row["id"]

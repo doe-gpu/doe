@@ -5,6 +5,16 @@
     "x": 1,
     "y": 1,
     "z": 1,
+    "output_oracle": {
+      "schema_version": 1,
+      "kind": "sha256_exact_v1",
+      "initialization": "zero_fill_v1",
+      "binding_group": 0,
+      "binding": 0,
+      "dispatch_count": 1,
+      "expected_sha256": "168fa648b392dbb15f142e0595196f901c9da63878e656882657d215bd5bd1f3",
+      "reference_id": "cpu_concurrent_runsingle_u32_v1"
+    },
     "bindings": [
       {
         "binding": 0,

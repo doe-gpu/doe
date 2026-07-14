@@ -107,11 +107,16 @@ geomeans. The fair browser-projection summary is `strictComparable`; it must
 only include rows with `comparabilityExpectation=strict` and
 `browserWorkload.sourceComparable=true`,
 `browserWorkload.sourceClaimEligible=true`, and
-`browserWorkload.benchmarkClass=comparable`. Projection manifest schema v5
+`browserWorkload.benchmarkClass=comparable`. Projection manifest schema v6
 requires every non-strict browser projection to use
 `browserWorkload.benchmarkClass=directional`; source claim eligibility is
 source-workload provenance and does not make a browser row claimable unless the
-row is strict-comparable.
+row is strict-comparable. Schema v6 adds
+`source_kernel_dispatch_oracle_v2`; those rows bind a zero-initialized,
+CPU-derived exact SHA-256 output oracle to a writable storage binding. The
+runner executes that oracle outside the timed region and fails the row on any
+mismatch. Legacy v1 source-kernel rows retain timed-output hashing but do not
+gain an independent correctness claim.
 Both summaries must carry separate paired scores for baseline and comparison
 modes plus comparison percent delta. The category-balanced summary is the
 browser-bench style headline: each category contributes once, while row-level
@@ -132,13 +137,15 @@ score gates as the grouped report. Non-grouped schedules must execute
 strict-comparable `L1` rows before component diagnostics so component probes do
 not precondition strict browser evidence.
 
-Layered report schema v4 requires compute component dispatch rows and
+Layered report schema v5 requires compute component dispatch rows and
 source-kernel compute rows to emit `dispatchElapsedMs`, `encodeSubmitMs`, and
 `waitMs` in each successful runtime metrics object. Source-kernel rows must also
-emit per-sample arrays for those phase fields. The superset checker rejects
+emit per-sample arrays for those phase fields and the full timed-output SHA-256.
+Oracle-v2 rows must additionally emit the exact output-oracle result. When both
+runtimes succeed, their timed output SHA-256 values must match. The superset checker rejects
 strict source-kernel and command-shaped component reports that omit those
 fields, because dispatch losses must say whether the measured cost is
-encode/submit or wait-side work.
+encode/submit or wait-side work and must not hide divergent output bytes.
 
 Texture scenario rows must expose `textureMs` when the row can measure the
 texture path separately from scenario startup. The score metric priority prefers
@@ -175,14 +182,29 @@ Nursery superset gate must fail when:
 5. a provided layered browser report misses any required projected `L1` row,
 6. required `L1/L2` rows are present without explicit `status` + `statusCode`,
 7. report claim-scope fields drift from projection/workflow contracts,
-8. report evidence lacks workload identity, runtime selection, adapter
-   identity, shader compiler identity, or trace hash fields.
+8. report evidence lacks workload identity, runtime selection, active runtime
+   proof, adapter identity, shader compiler identity, or trace hash fields.
+
+Launch switches are requested policy, not proof of the GPU-process runtime.
+Each mode must bind `activeRuntimeProof` to explicitly serialized
+`GPUAdapter.info` fields. Forced Doe requires vendor `Doe` plus the backend
+bound to `invocation.platform`: Metal on macOS, Vulkan on Linux, and D3D12 on
+Windows. Dawn requires a non-empty, non-Doe vendor. The checker recomputes this
+verdict from `runtimeProbe.adapterInfo` and rejects missing platform identity,
+observation drift, or a runtime mismatch. This active-runtime requirement is
+the v5 report boundary; v4 reports cannot be revalidated under it.
 
 Diagnostic `auto` mode is allowed only as runtime-selector evidence. It must
 carry `selectionMode=auto`, a concrete `selectedRuntime` of `dawn` or `doe`,
 `forcedMode=null`, visible fallback reason codes when fallback is applied, and
 the same artifact identities as the selected runtime. Claim gates still require
 explicit `dawn` plus forced `doe` evidence.
+
+`--native-metal-trace` is an instrumented diagnostic lane. It records Doe
+Metal command-buffer create, encode, commit, and flush phase totals using the
+schema-backed `config/browser-metal-native-trace.json` contract. Its timings
+are not score-eligible, and the checker re-reads and hash-verifies the JSONL
+trace instead of trusting report aggregates.
 
 ## Failure Taxonomy (Browser Lane)
 

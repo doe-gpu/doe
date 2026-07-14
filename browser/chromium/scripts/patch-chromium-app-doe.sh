@@ -176,28 +176,42 @@ MACOS_BIN="${APP_PATH}/Contents/MacOS/Chromium"
 REAL_BIN="${MACOS_BIN}-real"
 WRAPPER_MARKER="${MACOS_BIN}.fawn-doe-wrapped"
 
+is_fawn_doe_wrapper() {
+  local binary_path="$1"
+  [[ -f "${binary_path}" ]] \
+    && grep -Fq 'REAL_BINARY="${SCRIPT_DIR}/Chromium-real"' "${binary_path}"
+}
+
 if [[ ! -x "${MACOS_BIN}" ]]; then
   echo "missing executable: ${MACOS_BIN}" >&2
   exit 1
 fi
 
-if [[ -f "${WRAPPER_MARKER}" && "${FORCE}" -eq 0 ]]; then
-  echo "already wrapped: ${MACOS_BIN}"
+current_is_wrapper=0
+if is_fawn_doe_wrapper "${MACOS_BIN}"; then
+  current_is_wrapper=1
 fi
 
-if [[ ! -f "${WRAPPER_MARKER}" || "${FORCE}" -eq 1 ]]; then
-  if [[ -f "${WRAPPER_MARKER}" ]]; then
-    if [[ ! -f "${REAL_BIN}" ]]; then
-      echo "wrapped app is missing real binary: ${REAL_BIN}" >&2
-      exit 1
-    fi
-  else
-    if [[ -f "${REAL_BIN}" ]]; then
-      echo "wrapper target already exists: ${REAL_BIN}" >&2
-      exit 1
-    fi
-    mv "${MACOS_BIN}" "${REAL_BIN}"
+write_wrapper=0
+if [[ "${current_is_wrapper}" -eq 1 ]]; then
+  if [[ ! -f "${REAL_BIN}" ]]; then
+    echo "wrapped app is missing real binary: ${REAL_BIN}" >&2
+    exit 1
   fi
+  if [[ "${FORCE}" -eq 1 ]]; then
+    write_wrapper=1
+  else
+    echo "already wrapped: ${MACOS_BIN}"
+  fi
+else
+  if [[ -f "${REAL_BIN}" ]]; then
+    echo "refreshing relinked Chromium binary: ${REAL_BIN}"
+  fi
+  mv -f "${MACOS_BIN}" "${REAL_BIN}"
+  write_wrapper=1
+fi
+
+if [[ "${write_wrapper}" -eq 1 ]]; then
 
   cat > "${MACOS_BIN}" <<EOF
 #!/usr/bin/env bash
@@ -232,8 +246,8 @@ exec -a fawn-doe "\${REAL_BINARY}" \
   "\$@"
 EOF
   chmod 0755 "${MACOS_BIN}"
-  touch "${WRAPPER_MARKER}"
 fi
+touch "${WRAPPER_MARKER}"
 
 INFO_PLIST="${APP_PATH}/Contents/Info.plist"
 RESOURCES_DIR="${APP_PATH}/Contents/Resources"

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-metal-native-trace.schema.json",
+  "title": "Doe Metal browser native trace contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "traceId",
+    "enabledByDefault",
+    "environmentVariable",
+    "format",
+    "scope",
+    "evidenceClass",
+    "timingsPerturbed",
+    "phases"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "traceId": { "type": "string", "const": "doe-metal-browser-command-path-v1" },
+    "enabledByDefault": { "type": "boolean", "const": false },
+    "environmentVariable": { "type": "string", "const": "DOE_METAL_BROWSER_TRACE_PATH" },
+    "format": { "type": "string", "const": "jsonl" },
+    "scope": { "type": "string", "const": "doe_metal_queue_submit_and_flush" },
+    "evidenceClass": { "type": "string", "const": "diagnostic_only" },
+    "timingsPerturbed": { "type": "boolean", "const": true },
+    "phases": {
+      "type": "array",
+      "const": [
+        "command_buffer_create",
+        "command_encode",
+        "command_commit",
+        "wait_completed",
+        "deferred_copy",
+        "deferred_resolve"
+      ]
+    }
+  }
+}

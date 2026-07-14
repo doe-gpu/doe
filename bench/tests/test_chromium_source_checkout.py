@@ -272,7 +272,7 @@ def test_chromium_source_checkout_rejects_partial_dawn_lifecycle_markers(
     )
 
     assert report["status"] == "blocked"
-    assert "selector:doe_wire_runtime_instance" in report["missingRequired"]
+    assert "selector:doe_wire_runtime_instance" not in report["missingRequired"]
     assert "selector:doe_wire_runtime_lifecycle_test" in report["missingRequired"]
 
 
@@ -298,15 +298,20 @@ def test_chromium_source_checkout_passes_with_runtime_selector_markers(tmp_path:
                 "symbol_surface_incomplete",
                 "wire_proc_table_incomplete",
                 "LoadDoeWireProcTable",
-                "if (it->second.adapterType == wgpu::AdapterType::CPU) {",
-                "AssociateMailboxDawn(mailbox, flags, device, it->second.backendType",
+                "doe_wire_procs.createInstance(nullptr)",
+                "runtime->procs.instanceRelease(runtime->instance)",
+                "runtime->instance = nullptr",
+                "AssociateMailboxDoeSharedImage(",
+                "GetIOSurfaceForNativeImport()",
+                "class DoeSharedImageRepresentationAndAccess",
+                "WGPUSharedTextureMemoryIOSurfaceDescriptor",
                 "deviceImportSharedTextureMemory",
                 "sharedTextureMemoryBeginAccess",
                 "sharedTextureMemoryEndAccess",
+                "io_surface_desc.ioSurface = io_surface_.get();",
                 "doe_shared_buffer_unsupported",
                 "<< kDoeSharedBufferUnsupported;\n    return error::kInvalidArguments;",
-                "virtual void EndAccessForPresent() = 0;",
-                "it->second->EndAccessForPresent();",
+                "bool EndAccessForPresent() override",
                 "associated_shared_image_map_.erase(it);",
                 "wgpuCommandEncoderBeginRenderPass",
                 "wgpuQueueCopyExternalTextureForBrowser",
@@ -315,6 +320,18 @@ def test_chromium_source_checkout_passes_with_runtime_selector_markers(tmp_path:
                 "vendor_id",
                 "blocklist_reason",
                 "unknown_selection_error",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    gpu_process_host = source_root / "content" / "browser" / "gpu" / "gpu_process_host.cc"
+    gpu_process_host.parent.mkdir(parents=True, exist_ok=True)
+    gpu_process_host.write_text(
+        "\n".join(
+            [
+                "switches::kUseWebGPURuntime",
+                "switches::kDisableWebGPUDoe",
+                "switches::kDoeWebGPULibraryPath",
             ]
         ),
         encoding="utf-8",

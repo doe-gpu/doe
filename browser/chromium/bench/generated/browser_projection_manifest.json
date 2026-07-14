@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 5,
-  "generatedAt": "2026-07-04T19:33:10.477669Z",
+  "schemaVersion": 6,
+  "generatedAt": "2026-07-14T20:52:18.733004Z",
   "sourceWorkloadsPath": "bench/workloads/specialized/workloads.amd.vulkan.superset.json",
   "sourceWorkloadsSha256": "a99a6db97983405fff1c21f176656114cc9c82a2e7ec9c9554ad31de347bdec5",
   "rulesPath": "browser/chromium/bench/projection-rules.json",
   "rulesSha256": "06ac37731d70bb86652dbad5a6e7e80f1de4aad1b5020d530b500c98e54de245",
-  "projectionContractHash": "403a7ae948d19ae3bfd3df3e86e127b32c20a64710142daf91618e3966c7328c",
+  "projectionContractHash": "8ae2c6d43999d86c2ec66844084d3cb4a935df13f8d0caca4083e001e5d82b0b",
   "sourceWorkloadCount": 80,
   "rows": [
     {
@@ -192,11 +192,11 @@
         "sourceComparable": true,
         "sourceClaimEligible": true,
         "benchmarkClass": "comparable",
-        "computeProjection": "source_kernel_dispatch_v1",
+        "computeProjection": "source_kernel_dispatch_oracle_v2",
         "bindGroupLayoutMode": "explicit_min_binding_size_v1",
         "readbackBindingPolicy": "first_writable_storage_binding_v1",
         "commandsPath": "examples/workgroup_atomic_commands.json",
-        "commandsSha256": "31c51af0b4f70fece40c62b3271e1de8ad5779bc2d3178e2889dceeceffe45a0",
+        "commandsSha256": "3a81a82ee5391e831f2f39bc8395debe5c3f174c1b545b66ae5720fce13aa58a",
         "kernelPath": "bench/kernels/workgroup_atomic.wgsl",
         "kernelSha256": "b7edc38f80448d1e50f6a31a72b1bb09f3a87484ac3d61b7e299ba0b577c5998",
         "dispatchX": 1024,
@@ -213,7 +213,17 @@
             "bufferType": "storage",
             "bufferBindingType": "storage"
           }
-        ]
+        ],
+        "outputOracle": {
+          "schemaVersion": 1,
+          "kind": "sha256_exact_v1",
+          "initialization": "zero_fill_v1",
+          "bindingGroup": 0,
+          "binding": 0,
+          "dispatchCount": 1,
+          "expectedSha256": "bc0c7a019fa53cc1b9f96a0e282eee1e81ed30a6f053eadc8581331831b25b07",
+          "referenceId": "cpu_workgroup_recurrence_u32_v1"
+        }
       }
     },
     {
@@ -232,11 +242,11 @@
         "sourceComparable": true,
         "sourceClaimEligible": true,
         "benchmarkClass": "comparable",
-        "computeProjection": "source_kernel_dispatch_v1",
+        "computeProjection": "source_kernel_dispatch_oracle_v2",
         "bindGroupLayoutMode": "explicit_min_binding_size_v1",
         "readbackBindingPolicy": "first_writable_storage_binding_v1",
         "commandsPath": "examples/workgroup_non_atomic_commands.json",
-        "commandsSha256": "5d6eae2ed53dfaff7a3817b8b7ab54022aafca339d41e5ee6a2b088ce85fe0eb",
+        "commandsSha256": "a177904fbe1f3d86f99e6e8f1b3e351eeba016017e36de9a13889059f383cafa",
         "kernelPath": "bench/kernels/workgroup_non_atomic.wgsl",
         "kernelSha256": "b1e3c7cf65d5cec0fe176ed0fa6b6a13aea3c32f6a14ea35e912475dabecfdc6",
         "dispatchX": 1024,
@@ -253,7 +263,17 @@
             "bufferType": "storage",
             "bufferBindingType": "storage"
           }
-        ]
+        ],
+        "outputOracle": {
+          "schemaVersion": 1,
+          "kind": "sha256_exact_v1",
+          "initialization": "zero_fill_v1",
+          "bindingGroup": 0,
+          "binding": 0,
+          "dispatchCount": 1,
+          "expectedSha256": "bc0c7a019fa53cc1b9f96a0e282eee1e81ed30a6f053eadc8581331831b25b07",
+          "referenceId": "cpu_workgroup_recurrence_u32_v1"
+        }
       }
     },
     {
@@ -736,11 +756,11 @@
         "sourceComparable": true,
         "sourceClaimEligible": true,
         "benchmarkClass": "comparable",
-        "computeProjection": "source_kernel_dispatch_v1",
+        "computeProjection": "source_kernel_dispatch_oracle_v2",
         "bindGroupLayoutMode": "explicit_min_binding_size_v1",
         "readbackBindingPolicy": "first_writable_storage_binding_v1",
         "commandsPath": "examples/concurrent_execution_single_commands.json",
-        "commandsSha256": "707d3cabe5c2d9186c7d811d50e2c2512479e9c0e0242f3887439d523c14e0f3",
+        "commandsSha256": "ce5c7341b7fd64eb6bdf2a56000695733ed4cf50630e9bf50510f338e8ea5b24",
         "kernelPath": "bench/kernels/concurrent_execution_runsingle_u32.wgsl",
         "kernelSha256": "57313155741224f77622b55aa9e739ec7698e5cc3079d92584d253334f1d95a6",
         "dispatchX": 1,
@@ -757,7 +777,17 @@
             "bufferType": "storage",
             "bufferBindingType": "storage"
           }
-        ]
+        ],
+        "outputOracle": {
+          "schemaVersion": 1,
+          "kind": "sha256_exact_v1",
+          "initialization": "zero_fill_v1",
+          "bindingGroup": 0,
+          "binding": 0,
+          "dispatchCount": 1,
+          "expectedSha256": "168fa648b392dbb15f142e0595196f901c9da63878e656882657d215bd5bd1f3",
+          "referenceId": "cpu_concurrent_runsingle_u32_v1"
+        }
       }
     },
     {

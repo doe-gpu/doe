@@ -18,13 +18,16 @@ VALID_COMPARABILITY = {"strict", "component", "none"}
 VALID_REQUIRED_STATUS = {"ok", "not_applicable"}
 VALID_CLAIM_SCOPE = {"l1_strict_candidate", "l1_component_only", "l0_only_no_claim"}
 MAX_BROWSER_EXACT_UPLOAD_BYTES = 16 * 1024 * 1024
-PROJECTION_MANIFEST_SCHEMA_VERSION = 5
+PROJECTION_MANIFEST_SCHEMA_VERSION = 6
 SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1"
 SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1"
+SOURCE_KERNEL_OUTPUT_ORACLE_KIND = "sha256_exact_v1"
+SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION = "zero_fill_v1"
 COMPUTE_PROJECTION_DIRECT_DISPATCH = "generic_direct_dispatch_component"
 COMPUTE_PROJECTION_EMPTY_DISPATCH = "generic_empty_dispatch_component"
 COMPUTE_PROJECTION_INDIRECT_DISPATCH = "generic_indirect_dispatch_component"
 COMPUTE_PROJECTION_SOURCE_KERNEL = "source_kernel_dispatch_v1"
+COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE = "source_kernel_dispatch_oracle_v2"
 DIRECT_DISPATCH_COMMAND_KINDS = {"dispatch", "dispatch_workgroups"}
 SIZE_UNITS = {
     "b": 1,
@@ -206,6 +209,71 @@ def webgpu_buffer_binding_type(buffer_type: Any) -> str | None:
     return None
 
 
+def source_output_oracle(
+    command: dict[str, Any],
+    storage_bindings: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    oracle = command.get("output_oracle")
+    if oracle is None:
+        return None
+    if not isinstance(oracle, dict):
+        raise ValueError("strict source kernel command output_oracle must be an object")
+    if oracle.get("schema_version") != 1:
+        raise ValueError("strict source kernel output_oracle.schema_version must be 1")
+    kind = require_string(oracle.get("kind"), "output_oracle.kind")
+    if kind != SOURCE_KERNEL_OUTPUT_ORACLE_KIND:
+        raise ValueError(
+            f"output_oracle.kind must be {SOURCE_KERNEL_OUTPUT_ORACLE_KIND}"
+        )
+    initialization = require_string(
+        oracle.get("initialization"), "output_oracle.initialization"
+    )
+    if initialization != SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION:
+        raise ValueError(
+            "output_oracle.initialization must be "
+            f"{SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION}"
+        )
+    binding_group = oracle.get("binding_group")
+    binding = oracle.get("binding")
+    dispatch_count = oracle.get("dispatch_count")
+    if not isinstance(binding_group, int) or isinstance(binding_group, bool) or binding_group < 0:
+        raise ValueError("output_oracle.binding_group must be a non-negative integer")
+    if not isinstance(binding, int) or isinstance(binding, bool) or binding < 0:
+        raise ValueError("output_oracle.binding must be a non-negative integer")
+    if not isinstance(dispatch_count, int) or isinstance(dispatch_count, bool) or dispatch_count <= 0:
+        raise ValueError("output_oracle.dispatch_count must be a positive integer")
+    matching_binding = next(
+        (
+            candidate
+            for candidate in storage_bindings
+            if candidate["group"] == binding_group
+            and candidate["binding"] == binding
+            and candidate["bufferBindingType"] == "storage"
+        ),
+        None,
+    )
+    if matching_binding is None:
+        raise ValueError("output_oracle must reference a writable storage binding")
+    expected_sha256 = require_string(
+        oracle.get("expected_sha256"), "output_oracle.expected_sha256"
+    ).lower()
+    if re.fullmatch(r"[0-9a-f]{64}", expected_sha256) is None:
+        raise ValueError("output_oracle.expected_sha256 must be lowercase SHA-256 hex")
+    reference_id = require_string(
+        oracle.get("reference_id"), "output_oracle.reference_id"
+    )
+    return {
+        "schemaVersion": 1,
+        "kind": kind,
+        "initialization": initialization,
+        "bindingGroup": binding_group,
+        "binding": binding,
+        "dispatchCount": dispatch_count,
+        "expectedSha256": expected_sha256,
+        "referenceId": reference_id,
+    }
+
+
 def compute_source_projection(
     workload: dict[str, Any],
     browser_workload: dict[str, Any],
@@ -267,8 +335,14 @@ def compute_source_projection(
     if not any(binding["bufferBindingType"] == "storage" for binding in storage_bindings):
         return None
 
-    return {
-        "computeProjection": COMPUTE_PROJECTION_SOURCE_KERNEL,
+    output_oracle = source_output_oracle(command, storage_bindings)
+
+    projection = {
+        "computeProjection": (
+            COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE
+            if output_oracle is not None
+            else COMPUTE_PROJECTION_SOURCE_KERNEL
+        ),
         "bindGroupLayoutMode": SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE,
         "readbackBindingPolicy": SOURCE_KERNEL_READBACK_BINDING_POLICY,
         "commandsPath": display_path(commands_path, repo_root),
@@ -282,6 +356,9 @@ def compute_source_projection(
         "warmupDispatchCount": int(command.get("warmup_dispatch_count", 1)),
         "storageBindings": storage_bindings,
     }
+    if output_oracle is not None:
+        projection["outputOracle"] = output_oracle
+    return projection
 
 
 def compute_indirect_component_projection(
@@ -554,7 +631,10 @@ def build_manifest(
             rule = component_direct_compute_rule()
         elif (
             domain == "compute"
-            and browser_workload.get("computeProjection") != COMPUTE_PROJECTION_SOURCE_KERNEL
+            and browser_workload.get("computeProjection") not in {
+                COMPUTE_PROJECTION_SOURCE_KERNEL,
+                COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
+            }
         ):
             rule = component_compute_rule()
         elif (

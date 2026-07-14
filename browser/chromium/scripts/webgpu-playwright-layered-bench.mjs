@@ -95,6 +95,10 @@ function defaultDoeLibPath() {
 const DEFAULT_CHROME = defaultChromePath();
 const DEFAULT_DOE_LIB = defaultDoeLibPath();
 const DEFAULT_RUNTIME_SELECTOR_POLICY = resolve(ROOT, "config/browser-runtime-selector-policy.json");
+const DEFAULT_NATIVE_METAL_TRACE_CONFIG = resolve(
+  ROOT,
+  "config/browser-metal-native-trace.json",
+);
 const DEFAULT_MANIFEST = resolve(
   ROOT,
   "browser/chromium/bench/generated/browser_projection_manifest.json",
@@ -110,20 +114,25 @@ const DEFAULT_OUT_FILE = "dawn-vs-doe.browser-layered.diagnostic.json";
 const DEFAULT_API_SURFACE = "native";
 const DEFAULT_POWER_PREFERENCE = "high-performance";
 const HASH_ALGORITHM = "sha256";
-const PROJECTION_MANIFEST_SCHEMA_VERSION = 5;
+const PROJECTION_MANIFEST_SCHEMA_VERSION = 6;
 const RUNTIME_SELECTOR_VERSION = "browser-runtime-selector-v1";
+const NATIVE_METAL_TRACE_KIND = "doe_metal_browser_command_path_v1";
 const COMPUTE_PROJECTION_DIRECT_DISPATCH = "generic_direct_dispatch_component";
 const COMPUTE_PROJECTION_EMPTY_DISPATCH = "generic_empty_dispatch_component";
 const COMPUTE_PROJECTION_INDIRECT_DISPATCH = "generic_indirect_dispatch_component";
 const COMPUTE_PROJECTION_SOURCE_KERNEL = "source_kernel_dispatch_v1";
+const COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE = "source_kernel_dispatch_oracle_v2";
 const COMPUTE_PROJECTIONS = Object.freeze([
   COMPUTE_PROJECTION_DIRECT_DISPATCH,
   COMPUTE_PROJECTION_EMPTY_DISPATCH,
   COMPUTE_PROJECTION_INDIRECT_DISPATCH,
   COMPUTE_PROJECTION_SOURCE_KERNEL,
+  COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
 ]);
 const SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1";
 const SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1";
+const SOURCE_KERNEL_OUTPUT_ORACLE_KIND = "sha256_exact_v1";
+const SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION = "zero_fill_v1";
 const CATEGORY_BY_DOMAIN = {
   compute: "compute",
   "p0-compute": "compute",
@@ -216,6 +225,9 @@ Options:
                             Runtime selector policy JSON path (default: config/browser-runtime-selector-policy.json)
   --runtime-selector-profile-id ID
                             Optional selector profileId for auto denylist checks
+  --native-metal-trace      Collect instrumented Doe Metal queue phases (diagnostic only)
+  --native-metal-trace-config PATH
+                            Native trace contract (default: config/browser-metal-native-trace.json)
   --manifest PATH           Projection manifest JSON path
   --workflows PATH          Browser workflow manifest JSON path
   --out PATH                Output report JSON path (default: browser/chromium/artifacts/<timestamp>/${DEFAULT_OUT_FILE})
@@ -466,6 +478,9 @@ function parseArgs(argv) {
     runtimeSelectorPolicyPath: DEFAULT_RUNTIME_SELECTOR_POLICY,
     runtimeSelectorPolicy: null,
     runtimeSelectorProfileId: "",
+    nativeMetalTrace: false,
+    nativeMetalTraceConfigPath: DEFAULT_NATIVE_METAL_TRACE_CONFIG,
+    nativeMetalTraceConfig: null,
     manifestPath: DEFAULT_MANIFEST,
     workflowsPath: DEFAULT_WORKFLOWS,
     outPath: defaultOutPath(),
@@ -500,6 +515,8 @@ function parseArgs(argv) {
       args.allowBenchOut = true;
     } else if (token === "--allow-data-url-fallback") {
       args.allowDataUrlFallback = true;
+    } else if (token === "--native-metal-trace") {
+      args.nativeMetalTrace = true;
     } else if (token === "--mode") {
       args.mode = readOptionValue(argv, i, "--mode");
       i += 1;
@@ -532,6 +549,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === "--runtime-selector-profile-id") {
       args.runtimeSelectorProfileId = readOptionValue(argv, i, "--runtime-selector-profile-id");
+      i += 1;
+    } else if (token === "--native-metal-trace-config") {
+      args.nativeMetalTraceConfigPath = readOptionValue(argv, i, "--native-metal-trace-config");
       i += 1;
     } else if (token === "--manifest") {
       args.manifestPath = readOptionValue(argv, i, "--manifest");
@@ -658,6 +678,10 @@ function parseArgs(argv) {
     throw new Error(`runtime selector policy not found: ${args.runtimeSelectorPolicyPath}`);
   }
   args.runtimeSelectorPolicy = loadRuntimeSelectorPolicy(args.runtimeSelectorPolicyPath);
+  args.nativeMetalTraceConfig = loadNativeMetalTraceConfig(args.nativeMetalTraceConfigPath);
+  if (args.nativeMetalTrace && process.platform !== "darwin") {
+    throw new Error("--native-metal-trace is supported only on macOS Metal browser runs");
+  }
   if (!["native", "package-browser"].includes(args.apiSurface)) {
     throw new Error("--api-surface must be one of native, package-browser");
   }
@@ -699,6 +723,32 @@ function loadJsonObject(path) {
   const payload = JSON.parse(readFileSync(path, "utf8"));
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     throw new Error(`invalid JSON object: ${path}`);
+  }
+  return payload;
+}
+
+function loadNativeMetalTraceConfig(path) {
+  const payload = loadJsonObject(path);
+  const expectedPhases = [
+    "command_buffer_create",
+    "command_encode",
+    "command_commit",
+    "wait_completed",
+    "deferred_copy",
+    "deferred_resolve",
+  ];
+  if (
+    payload.schemaVersion !== 1 ||
+    payload.traceId !== "doe-metal-browser-command-path-v1" ||
+    payload.enabledByDefault !== false ||
+    payload.environmentVariable !== "DOE_METAL_BROWSER_TRACE_PATH" ||
+    payload.format !== "jsonl" ||
+    payload.scope !== "doe_metal_queue_submit_and_flush" ||
+    payload.evidenceClass !== "diagnostic_only" ||
+    payload.timingsPerturbed !== true ||
+    JSON.stringify(payload.phases) !== JSON.stringify(expectedPhases)
+  ) {
+    throw new Error(`invalid native Metal trace config: ${path}`);
   }
   return payload;
 }
@@ -779,6 +829,53 @@ function parseStorageBindings(value, label) {
       bufferBindingType,
     };
   });
+}
+
+function parseSourceOutputOracle(value, storageBindings, label) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${label} must be an object`);
+  }
+  if (value.schemaVersion !== 1) {
+    throw new Error(`${label}.schemaVersion must be 1`);
+  }
+  const kind = requireString(value.kind, `${label}.kind`);
+  if (kind !== SOURCE_KERNEL_OUTPUT_ORACLE_KIND) {
+    throw new Error(`${label}.kind must be ${SOURCE_KERNEL_OUTPUT_ORACLE_KIND}`);
+  }
+  const initialization = requireString(value.initialization, `${label}.initialization`);
+  if (initialization !== SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION) {
+    throw new Error(
+      `${label}.initialization must be ${SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION}`,
+    );
+  }
+  const bindingGroup = requirePositiveInteger(
+    value.bindingGroup,
+    `${label}.bindingGroup`,
+    { allowZero: true },
+  );
+  const binding = requirePositiveInteger(value.binding, `${label}.binding`, {
+    allowZero: true,
+  });
+  if (!storageBindings.some(
+    (candidate) => candidate.group === bindingGroup
+      && candidate.binding === binding
+      && candidate.bufferBindingType === "storage",
+  )) {
+    throw new Error(`${label} must reference a writable storage binding`);
+  }
+  return {
+    schemaVersion: 1,
+    kind,
+    initialization,
+    bindingGroup,
+    binding,
+    dispatchCount: requirePositiveInteger(
+      value.dispatchCount,
+      `${label}.dispatchCount`,
+    ),
+    expectedSha256: requireHashHex(value.expectedSha256, `${label}.expectedSha256`),
+    referenceId: requireString(value.referenceId, `${label}.referenceId`),
+  };
 }
 
 function parseDispatchArgs(value, label) {
@@ -922,7 +1019,10 @@ function parseBrowserWorkload(value, label, domain) {
       `${label}.indirectDispatchArgs`,
     );
   }
-  if (parsed.computeProjection === COMPUTE_PROJECTION_SOURCE_KERNEL) {
+  if ([
+    COMPUTE_PROJECTION_SOURCE_KERNEL,
+    COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
+  ].includes(parsed.computeProjection)) {
     parsed.bindGroupLayoutMode = requireString(
       value.bindGroupLayoutMode,
       `${label}.bindGroupLayoutMode`,
@@ -963,6 +1063,13 @@ function parseBrowserWorkload(value, label, domain) {
     );
     if (!parsed.storageBindings.some((binding) => binding.bufferBindingType === "storage")) {
       throw new Error(`${label}.storageBindings must include a writable storage binding`);
+    }
+    if (parsed.computeProjection === COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE) {
+      parsed.outputOracle = parseSourceOutputOracle(
+        value.outputOracle,
+        parsed.storageBindings,
+        `${label}.outputOracle`,
+      );
     }
   }
   for (const key of ["textureWidth", "textureHeight", "mipLevelCount"]) {
@@ -1083,7 +1190,10 @@ function browserProjectionScenarioConfig(row) {
     }
     return row;
   }
-  if (browserWorkload.computeProjection !== COMPUTE_PROJECTION_SOURCE_KERNEL) {
+  if (![
+    COMPUTE_PROJECTION_SOURCE_KERNEL,
+    COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
+  ].includes(browserWorkload.computeProjection)) {
     return row;
   }
   const kernelPath = repoPath(browserWorkload.kernelPath);
@@ -1367,6 +1477,39 @@ function adapterIdentityFromProbe(probe) {
   };
 }
 
+function expectedDoeAdapterArchitecture() {
+  if (process.platform === "darwin") return "metal";
+  if (process.platform === "win32") return "d3d12";
+  return "vulkan";
+}
+
+function activeRuntimeProof(selectedRuntime, probe) {
+  const adapterInfo =
+    probe?.adapterInfo && typeof probe.adapterInfo === "object" ? probe.adapterInfo : {};
+  const observed = {
+    vendor: typeof adapterInfo.vendor === "string" ? adapterInfo.vendor : "",
+    architecture:
+      typeof adapterInfo.architecture === "string" ? adapterInfo.architecture : "",
+    device: typeof adapterInfo.device === "string" ? adapterInfo.device : "",
+    description:
+      typeof adapterInfo.description === "string" ? adapterInfo.description : "",
+  };
+  const expected = selectedRuntime === "doe"
+    ? { vendor: "Doe", architecture: expectedDoeAdapterArchitecture() }
+    : { vendorMustNotEqual: "Doe", vendorMustBeNonEmpty: true };
+  const matched = selectedRuntime === "doe"
+    ? observed.vendor === expected.vendor && observed.architecture === expected.architecture
+    : observed.vendor.length > 0 && observed.vendor !== "Doe";
+  return {
+    schemaVersion: 1,
+    identitySource: "wgpuAdapterGetInfo",
+    selectedRuntime,
+    expected,
+    observed,
+    matched,
+  };
+}
+
 async function probeRuntime(page, browserSurfaceArgs) {
   return page.evaluate(async ({ apiSurface, browserModuleUrl, powerPreference }) => {
     const browserSurface = apiSurface === "package-browser"
@@ -1409,7 +1552,15 @@ async function probeRuntime(page, browserSurfaceArgs) {
       response.adapterAvailable = true;
       response.featureCount = Array.from(adapter.features).length;
       if ("info" in adapter) {
-        response.adapterInfo = adapter.info;
+        const info = adapter.info;
+        response.adapterInfo = {
+          vendor: typeof info?.vendor === "string" ? info.vendor : "",
+          architecture: typeof info?.architecture === "string" ? info.architecture : "",
+          device: typeof info?.device === "string" ? info.device : "",
+          description: typeof info?.description === "string" ? info.description : "",
+          subgroupMinSize: Number.isInteger(info?.subgroupMinSize) ? info.subgroupMinSize : 0,
+          subgroupMaxSize: Number.isInteger(info?.subgroupMaxSize) ? info.subgroupMaxSize : 0,
+        };
       }
       response.adapterRequestOptions = adapterOptions ?? {};
       response.webgpuCanvasApi.preferredCanvasFormatSupported =
@@ -1473,12 +1624,22 @@ async function runScenario(
       const computeProjectionDirectDispatch = "generic_direct_dispatch_component";
       const computeProjectionIndirectDispatch = "generic_indirect_dispatch_component";
       const computeProjectionSourceKernel = "source_kernel_dispatch_v1";
+      const computeProjectionSourceKernelOracle = "source_kernel_dispatch_oracle_v2";
       const genericComputeWarmupSubmits = 20;
       const indirectDispatchArgumentWords = 3;
       const indirectDispatchArgumentBytes =
         indirectDispatchArgumentWords * Uint32Array.BYTES_PER_ELEMENT;
 
       const nowMs = () => performance.now();
+      async function sha256Hex(bytes) {
+        if (!globalThis.crypto?.subtle) {
+          throw new Error("Web Crypto SHA-256 unavailable for source-kernel oracle");
+        }
+        const digest = await globalThis.crypto.subtle.digest("SHA-256", bytes);
+        return [...new Uint8Array(digest)]
+          .map((value) => value.toString(16).padStart(2, "0"))
+          .join("");
+      }
       const browserSurface = apiSurface === "package-browser"
         ? await import(browserModuleUrl)
         : null;
@@ -1596,7 +1757,10 @@ async function runScenario(
 
       async function runComputeDispatch(device, dispatchIters) {
         const computeConfig = scenarioConfig?.browserWorkload ?? {};
-        if (computeConfig.computeProjection === computeProjectionSourceKernel) {
+        if ([
+          computeProjectionSourceKernel,
+          computeProjectionSourceKernelOracle,
+        ].includes(computeConfig.computeProjection)) {
           const kernelSource = scenarioConfig?.kernelSource;
           if (typeof kernelSource !== "string" || kernelSource.length === 0) {
             throw new Error(`${computeProjectionSourceKernel} missing kernelSource`);
@@ -1788,8 +1952,73 @@ async function runScenario(
           const readbackSampleBytes = Array.from(
             readbackData.slice(0, Math.min(readbackSampleByteCount, readbackData.length)),
           );
+          const readbackSha256 = await sha256Hex(readbackData);
           readback.unmap();
           result.metrics.mapReadMs = nowMs() - t0;
+
+          const outputOracle = computeConfig.outputOracle;
+          if (outputOracle) {
+            const oracleBinding = buffers.find(
+              (candidate) => candidate.group === outputOracle.bindingGroup
+                && candidate.binding === outputOracle.binding,
+            );
+            if (!oracleBinding || oracleBinding.bufferBindingType !== "storage") {
+              throw new Error(`${computeProjectionSourceKernel} output oracle binding unavailable`);
+            }
+            t0 = nowMs();
+            for (const binding of buffers) {
+              device.queue.writeBuffer(binding.buffer, 0, new Uint8Array(binding.bufferSize));
+            }
+            await device.queue.onSubmittedWorkDone();
+            result.metrics.outputOracleResetMs = nowMs() - t0;
+
+            t0 = nowMs();
+            encodeDispatches(outputOracle.dispatchCount);
+            await device.queue.onSubmittedWorkDone();
+            result.metrics.outputOracleDispatchMs = nowMs() - t0;
+
+            const oracleReadback = device.createBuffer({
+              size: oracleBinding.bufferSize,
+              usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+            });
+            t0 = nowMs();
+            const oracleEncoder = device.createCommandEncoder();
+            oracleEncoder.copyBufferToBuffer(
+              oracleBinding.buffer,
+              0,
+              oracleReadback,
+              0,
+              oracleBinding.bufferSize,
+            );
+            device.queue.submit([oracleEncoder.finish()]);
+            await device.queue.onSubmittedWorkDone();
+            await oracleReadback.mapAsync(GPUMapMode.READ);
+            const oracleData = new Uint8Array(oracleReadback.getMappedRange());
+            const oracleActualSha256 = await sha256Hex(oracleData);
+            const oracleSampleBytes = Array.from(
+              oracleData.slice(0, Math.min(readbackSampleByteCount, oracleData.length)),
+            );
+            oracleReadback.unmap();
+            oracleReadback.destroy();
+            result.metrics.outputOracleReadbackMs = nowMs() - t0;
+            result.metrics.outputOracleSchemaVersion = outputOracle.schemaVersion;
+            result.metrics.outputOracleKind = outputOracle.kind;
+            result.metrics.outputOracleInitialization = outputOracle.initialization;
+            result.metrics.outputOracleBindingGroup = outputOracle.bindingGroup;
+            result.metrics.outputOracleBinding = outputOracle.binding;
+            result.metrics.outputOracleDispatchCount = outputOracle.dispatchCount;
+            result.metrics.outputOracleExpectedSha256 = outputOracle.expectedSha256;
+            result.metrics.outputOracleActualSha256 = oracleActualSha256;
+            result.metrics.outputOracleReferenceId = outputOracle.referenceId;
+            result.metrics.outputOracleSampleBytes = oracleSampleBytes;
+            result.metrics.outputOracleMatched = oracleActualSha256 === outputOracle.expectedSha256;
+            if (!result.metrics.outputOracleMatched) {
+              throw new Error(
+                `${computeProjectionSourceKernel} output oracle mismatch: `
+                  + `expected ${outputOracle.expectedSha256}, got ${oracleActualSha256}`,
+              );
+            }
+          }
           const bindGroupLayoutEntries = storageBindings
             .map((binding) => ({
               group: binding.group,
@@ -1852,6 +2081,7 @@ async function runScenario(
           result.metrics.readbackBinding = readbackBinding.binding;
           result.metrics.readbackBytes = readbackBinding.bufferSize;
           result.metrics.readbackChecksum = readbackChecksum;
+          result.metrics.readbackSha256 = readbackSha256;
           result.metrics.readbackSampleBytes = readbackSampleBytes;
           readback.destroy();
           for (const { buffer } of buffers) {
@@ -2908,6 +3138,137 @@ function applyModeWideFailure(l1Rows, l2Rows, rowResultsById, workflowResultsByI
   }
 }
 
+function nativeMetalTraceBaseEvidence(args, selectedRuntime) {
+  const config = args.nativeMetalTraceConfig;
+  const requested = args.nativeMetalTrace;
+  const enabled = requested && selectedRuntime === "doe";
+  return {
+    requested,
+    enabled,
+    status: enabled ? "pending" : (requested ? "not_applicable" : "disabled"),
+    reason: enabled ? "" : (requested ? "selected_runtime_not_doe" : "not_requested"),
+    traceId: config.traceId,
+    traceKind: NATIVE_METAL_TRACE_KIND,
+    configPath: args.nativeMetalTraceConfigPath,
+    configSha256: fileHashHex(args.nativeMetalTraceConfigPath),
+    environmentVariable: config.environmentVariable,
+    evidenceClass: config.evidenceClass,
+    timingsPerturbed: enabled,
+    tracePath: "",
+    traceSha256: null,
+    byteCount: 0,
+    rowCount: 0,
+    malformedRowCount: 0,
+    totals: {},
+    errors: [],
+  };
+}
+
+function safeTraceFileComponent(value) {
+  return String(value)
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120) || "run";
+}
+
+function prepareNativeMetalTrace(args, selectedRuntime, traceRunId) {
+  const evidence = nativeMetalTraceBaseEvidence(args, selectedRuntime);
+  if (!evidence.enabled) return evidence;
+  const traceDir = resolve(dirname(args.outPath), "native-metal-traces");
+  const tracePath = resolve(traceDir, `${safeTraceFileComponent(traceRunId)}.jsonl`);
+  mkdirSync(traceDir, { recursive: true });
+  writeFileSync(tracePath, "", "utf8");
+  evidence.tracePath = tracePath;
+  return evidence;
+}
+
+function nativeMetalTraceLaunchEnvironment(evidence) {
+  if (!evidence.enabled) return undefined;
+  const inherited = Object.fromEntries(
+    Object.entries(process.env).filter(([, value]) => typeof value === "string"),
+  );
+  return {
+    ...inherited,
+    [evidence.environmentVariable]: evidence.tracePath,
+  };
+}
+
+function finalizeNativeMetalTrace(evidence) {
+  if (!evidence.enabled) return evidence;
+  if (!existsSync(evidence.tracePath)) {
+    return {
+      ...evidence,
+      status: "fail",
+      errors: ["native Metal trace file was not produced"],
+    };
+  }
+
+  const bytes = readFileSync(evidence.tracePath);
+  const lines = bytes
+    .toString("utf8")
+    .split(/\r?\n/)
+    .filter((line) => line.trim().length > 0);
+  const numericFields = [
+    "submissionCount",
+    "sourceCommandBufferCount",
+    "recordedCommandCount",
+    "nativeCommandBufferCount",
+    "commandBufferCreateNs",
+    "commandEncodeNs",
+    "commandCommitNs",
+    "waitCompletedNs",
+    "deferredCopyNs",
+    "deferredResolveNs",
+  ];
+  const totals = Object.fromEntries(numericFields.map((field) => [field, 0]));
+  const errors = [];
+  let validRowCount = 0;
+
+  for (const [index, line] of lines.entries()) {
+    let row;
+    try {
+      row = JSON.parse(line);
+    } catch {
+      errors.push(`row ${index + 1} is not valid JSON`);
+      continue;
+    }
+    if (
+      row.schemaVersion !== 1 ||
+      row.traceKind !== NATIVE_METAL_TRACE_KIND ||
+      row.sequence !== index + 1 ||
+      typeof row.directReadback !== "boolean"
+    ) {
+      errors.push(`row ${index + 1} has an invalid trace envelope`);
+      continue;
+    }
+    const invalidField = numericFields.find(
+      (field) => !Number.isSafeInteger(row[field]) || row[field] < 0,
+    );
+    if (invalidField) {
+      errors.push(`row ${index + 1} has invalid ${invalidField}`);
+      continue;
+    }
+    for (const field of numericFields) totals[field] += row[field];
+    validRowCount += 1;
+  }
+  if (lines.length === 0) errors.push("native Metal trace contains no flush rows");
+  if (validRowCount > 0 && totals.submissionCount === 0) {
+    errors.push("native Metal trace contains no submitted command buffers");
+  }
+
+  return {
+    ...evidence,
+    status: errors.length === 0 ? "ok" : "fail",
+    reason: "",
+    traceSha256: createHash(HASH_ALGORITHM).update(bytes).digest("hex"),
+    byteCount: bytes.length,
+    rowCount: validRowCount,
+    malformedRowCount: lines.length - validRowCount,
+    totals,
+    errors,
+  };
+}
+
 async function runMode(
   chromium,
   mode,
@@ -2917,8 +3278,14 @@ async function runMode(
   l2Rows,
   chromePath,
   scheduledSourceKernelSamples,
+  traceRunId,
 ) {
   const selection = runtimeSelectionResolution(mode, args);
+  const nativeMetalTrace = prepareNativeMetalTrace(
+    args,
+    selection.selectedRuntime,
+    traceRunId,
+  );
   const launchArgs = [
     ...baseLaunchArgs(pageTarget.port),
     ...args.chromeArgs,
@@ -2938,6 +3305,8 @@ async function runMode(
     userAgent: "",
     failureStage: null,
     failureStatusCode: null,
+    activeRuntimeProof: null,
+    nativeMetalTrace,
   };
   let runtimeProbe = {
     webgpuAvailable: false,
@@ -2955,11 +3324,13 @@ async function runMode(
       headless: args.headless,
       args: launchArgs,
       timeout: 120000,
+      env: nativeMetalTraceLaunchEnvironment(nativeMetalTrace),
     });
   } catch (error) {
     const failure = classifyModeFailure(error, "launch");
     runtimeEvidence.failureStage = failure.stage;
     runtimeEvidence.failureStatusCode = failure.statusCode;
+    runtimeEvidence.nativeMetalTrace = finalizeNativeMetalTrace(nativeMetalTrace);
     applyModeWideFailure(l1Rows, l2Rows, rowResultsById, workflowResultsById, failure);
     return {
       mode,
@@ -2988,6 +3359,17 @@ async function runMode(
     runtimeEvidence.userAgent = await page.evaluate(() => navigator.userAgent);
     runtimeProbe = await probeRuntime(page, browserSurfaceArgs);
     runtimeProbe.adapterIdentity = adapterIdentityFromProbe(runtimeProbe);
+    runtimeEvidence.activeRuntimeProof = activeRuntimeProof(
+      selection.selectedRuntime,
+      runtimeProbe,
+    );
+    if (!runtimeEvidence.activeRuntimeProof.matched) {
+      throw new Error(
+        `active WebGPU runtime proof mismatch: requested ${selection.selectedRuntime}, `
+          + `observed vendor=${runtimeEvidence.activeRuntimeProof.observed.vendor || "<empty>"} `
+          + `architecture=${runtimeEvidence.activeRuntimeProof.observed.architecture || "<empty>"}`,
+      );
+    }
 
     for (const row of l1Rows) {
       if (row.layerTarget === "l0_only") {
@@ -3085,7 +3467,11 @@ async function runMode(
       workflowResultsById,
     };
   } finally {
-    await browser.close();
+    try {
+      await browser.close();
+    } finally {
+      runtimeEvidence.nativeMetalTrace = finalizeNativeMetalTrace(nativeMetalTrace);
+    }
   }
 }
 
@@ -3151,7 +3537,10 @@ function hasRequiredFailures(summary) {
 }
 
 function isSlicedSourceKernelRow(row, minDispatchRepeat) {
-  if (row?.browserWorkload?.computeProjection !== COMPUTE_PROJECTION_SOURCE_KERNEL) {
+  if (![
+    COMPUTE_PROJECTION_SOURCE_KERNEL,
+    COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE,
+  ].includes(row?.browserWorkload?.computeProjection)) {
     return false;
   }
   return (row.browserWorkload.dispatchRepeat ?? 0) >= minDispatchRepeat;
@@ -3509,7 +3898,7 @@ async function main() {
     console.log(`[warn] ${pageTarget.warning}`);
   }
   try {
-    for (const scheduleEntry of modeScheduleEntries) {
+    for (const [scheduleIndex, scheduleEntry] of modeScheduleEntries.entries()) {
       const mode = scheduleEntry.mode;
       const modeSelection = runtimeSelectionResolution(mode, args);
       const chromePathForMode =
@@ -3584,6 +3973,20 @@ async function main() {
             userAgent: "",
             failureStage: failure.stage,
             failureStatusCode: failure.statusCode,
+            activeRuntimeProof: activeRuntimeProof(
+              modeSelection.selectedRuntime,
+              null,
+            ),
+            nativeMetalTrace: {
+              ...nativeMetalTraceBaseEvidence(args, modeSelection.selectedRuntime),
+              status: args.nativeMetalTrace && modeSelection.selectedRuntime === "doe"
+                ? "fail"
+                : nativeMetalTraceBaseEvidence(args, modeSelection.selectedRuntime).status,
+              reason: "page_target_unavailable",
+              errors: args.nativeMetalTrace && modeSelection.selectedRuntime === "doe"
+                ? ["browser launch was skipped because the page target was unavailable"]
+                : [],
+            },
           },
           modeFailure: failure,
         });
@@ -3602,6 +4005,7 @@ async function main() {
         scheduleEntry.l2Rows,
         chromePathForMode,
         scheduleEntry.sourceKernelSamples ?? args.sourceKernelSamples,
+        `${String(scheduleIndex + 1).padStart(4, "0")}-${mode}-${scheduleEntry.scheduleLayer}-${scheduleEntry.scheduleUnit}`,
       );
       modeRunDetails.push({
         mode: modeRun.mode,
@@ -3661,12 +4065,12 @@ async function main() {
   );
 
   const report = {
-    schemaVersion: 4,
+    schemaVersion: 5,
     reportKind: "browser-layered-diagnostic",
     benchmarkClass: "directional",
     comparisonStatus: "diagnostic",
     claimStatus: "diagnostic",
-    timingClass: "scenario",
+    timingClass: args.nativeMetalTrace ? "instrumented-scenario" : "scenario",
     timingSource: "browser-performance-now",
     generatedAt: new Date().toISOString(),
     outputPath: args.outPath,
@@ -3723,6 +4127,16 @@ async function main() {
       sourceKernelScheduleSliceMinDispatchRepeat:
         args.sourceKernelScheduleSliceMinDispatchRepeat,
       sourceKernelSubmitPolicy: args.sourceKernelSubmitPolicy,
+      nativeMetalTrace: {
+        requested: args.nativeMetalTrace,
+        configPath: args.nativeMetalTraceConfigPath,
+        configSha256: fileHashHex(args.nativeMetalTraceConfigPath),
+        traceId: args.nativeMetalTraceConfig.traceId,
+        environmentVariable: args.nativeMetalTraceConfig.environmentVariable,
+        evidenceClass: args.nativeMetalTraceConfig.evidenceClass,
+        timingsPerturbed: args.nativeMetalTrace,
+        scoreEligible: !args.nativeMetalTrace,
+      },
       modeSchedule: args.modeSchedule,
       modeScheduleRepetitions: args.modeScheduleRepetitions,
       browserBuildConfigurationEvidence: browserBuildConfigurationEvidence(args),

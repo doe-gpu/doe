@@ -6,6 +6,16 @@
     "y": 1,
     "z": 1,
     "repeat": 50,
+    "output_oracle": {
+      "schema_version": 1,
+      "kind": "sha256_exact_v1",
+      "initialization": "zero_fill_v1",
+      "binding_group": 0,
+      "binding": 0,
+      "dispatch_count": 1,
+      "expected_sha256": "9f1dcbc35c350d6027f98be0f5c8b43b42ca52b7604459c0c42be3aa88913d47",
+      "reference_id": "webgpu_zero_initialized_workgroup_memory_v1"
+    },
     "bindings": [
       {
         "binding": 0,

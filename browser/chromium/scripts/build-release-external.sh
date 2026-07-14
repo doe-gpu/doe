@@ -51,7 +51,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 has_local_jobs_arg=false
-for arg in "${autoninja_args[@]}"; do
+for arg in ${autoninja_args[@]+"${autoninja_args[@]}"}; do
   case "${arg}" in
     -local_jobs|--local_jobs|-local_jobs=*|--local_jobs=*|-j*)
       has_local_jobs_arg=true
@@ -83,7 +83,7 @@ esac
 RELEASE_GN_ARGS="${FAWN_CHROMIUM_RELEASE_GN_ARGS:-${DEFAULT_RELEASE_GN_ARGS}}"
 gn gen out/fawn_release "--args=${RELEASE_GN_ARGS}"
 
-autoninja -C out/fawn_release chrome "${autoninja_args[@]}"
+autoninja -C out/fawn_release chrome ${autoninja_args[@]+"${autoninja_args[@]}"}
 
 args_sha256="$(shasum -a 256 out/fawn_release/args.gn | awk '{print $1}')"
 cat > out/fawn_release/fawn-release-build.json <<EOF

@@ -463,7 +463,10 @@ def build_structural_receipts(
         browser_workload = row.get("browserWorkload")
         if not isinstance(browser_workload, dict):
             continue
-        if browser_workload.get("computeProjection") != "source_kernel_dispatch_v1":
+        if browser_workload.get("computeProjection") not in {
+            "source_kernel_dispatch_v1",
+            "source_kernel_dispatch_oracle_v2",
+        }:
             continue
         source_kernel_ids.append(workload_id)
         for path_key, hash_key, path_set in (

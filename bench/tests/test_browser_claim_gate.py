@@ -168,7 +168,7 @@ class BrowserClaimGateStructuralReceiptTests(unittest.TestCase):
             claim_rows = {
                 "source_kernel": {
                     "browserWorkload": {
-                        "computeProjection": "source_kernel_dispatch_v1",
+                        "computeProjection": "source_kernel_dispatch_oracle_v2",
                         "commandsPath": "bench/workloads/source_kernel.commands.json",
                         "commandsSha256": "a" * 64,
                         "kernelPath": "bench/workloads/source_kernel.wgsl",

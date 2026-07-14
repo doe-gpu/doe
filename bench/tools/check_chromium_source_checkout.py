@@ -24,6 +24,7 @@ REQUIRED_MARKERS = (
 REQUIRED_TOOLS = ("gclient", "gn", "autoninja")
 OPTIONAL_TOOLS = ("fetch",)
 WEBGPU_DECODER_PATH = "gpu/command_buffer/service/webgpu_decoder_impl.cc"
+GPU_PROCESS_HOST_PATH = "content/browser/gpu/gpu_process_host.cc"
 DAWN_WEBGPU_BACKEND_PATH = (
     "third_party/dawn/src/dawn/native/webgpu/BackendWGPU.cpp"
 )
@@ -37,6 +38,15 @@ IOSURFACE_IMAGE_BACKING_PATH = (
     "gpu/command_buffer/service/shared_image/iosurface_image_backing.mm"
 )
 RUNTIME_SELECTOR_MARKERS = (
+    (
+        "selector:gpu_process_switch_propagation",
+        (
+            "switches::kUseWebGPURuntime",
+            "switches::kDisableWebGPUDoe",
+            "switches::kDoeWebGPULibraryPath",
+        ),
+        (GPU_PROCESS_HOST_PATH,),
+    ),
     (
         "selector:runtime_switch",
         "use-webgpu-runtime",
@@ -112,37 +122,35 @@ RUNTIME_SELECTOR_MARKERS = (
         "selector:doe_wire_runtime_instance",
         (
             "LoadDoeWireProcTable",
-            "mExternalRuntimeLib.Open",
-            "mInnerInstance = mDawnProcs.createInstance",
+            "createInstance",
         ),
-        (DAWN_WEBGPU_BACKEND_PATH,),
+        (WEBGPU_DECODER_PATH, DAWN_WEBGPU_BACKEND_PATH),
     ),
     (
         "selector:doe_wire_runtime_lifecycle_test",
         (
-            'load_proc(&mDawnProcs.instanceRelease, "wgpuInstanceRelease")',
-            "Backend::~Backend()",
-            "mDawnProcs.instanceRelease(mInnerInstance)",
-            "mInnerInstance = nullptr",
+            "instanceRelease",
+            "= nullptr",
         ),
-        (DAWN_WEBGPU_BACKEND_PATH,),
+        (WEBGPU_DECODER_PATH, DAWN_WEBGPU_BACKEND_PATH),
     ),
     (
         "selector:doe_shared_image_iosurface_bridge",
         (
-            "if (it->second.adapterType == wgpu::AdapterType::CPU) {",
-            "AssociateMailboxDawn(mailbox, flags, device, it->second.backendType",
+            "AssociateMailboxDoeSharedImage(",
+            "GetIOSurfaceForNativeImport()",
         ),
         (WEBGPU_DECODER_PATH,),
     ),
     (
         "selector:doe_shared_image_iosurface_representation",
         (
-            "class IOSurfaceImageBacking::DawnRepresentation final",
-            "backend_type == wgpu::BackendType::WebGPU",
-            "std::make_unique<DawnRepresentation>",
+            "class DoeSharedImageRepresentationAndAccess",
+            "WGPUSharedTextureMemoryIOSurfaceDescriptor",
+            "sharedTextureMemoryBeginAccess",
+            "sharedTextureMemoryEndAccess",
         ),
-        (IOSURFACE_IMAGE_BACKING_PATH,),
+        (WEBGPU_DECODER_PATH,),
     ),
     (
         "selector:doe_shared_image_native_import",
@@ -174,11 +182,10 @@ RUNTIME_SELECTOR_MARKERS = (
     (
         "selector:doe_shared_image_iosurface_handle",
         (
-            "wgpu::SharedTextureMemoryIOSurfaceDescriptor io_surface_desc",
             "io_surface_desc.ioSurface = io_surface_.get();",
-            "device.ImportSharedTextureMemory(&desc)",
+            "ImportSharedTextureMemory",
         ),
-        (IOSURFACE_IMAGE_BACKING_PATH,),
+        (WEBGPU_DECODER_PATH, IOSURFACE_IMAGE_BACKING_PATH),
     ),
     (
         "selector:doe_shared_buffer_unsupported",
@@ -193,8 +200,7 @@ RUNTIME_SELECTOR_MARKERS = (
     (
         "selector:doe_present_shared_texture_end_access",
         (
-            "virtual void EndAccessForPresent() = 0;",
-            "it->second->EndAccessForPresent();",
+            "EndAccessForPresent()",
             "associated_shared_image_map_.erase(it);",
         ),
         ("gpu/command_buffer/service/webgpu_decoder_impl.cc",),

@@ -28,7 +28,8 @@ This module implements a layered browser benchmark superset for Chromium Track A
 3. `generated/browser_projection_manifest.json`
    - generated `L1/L0` projection rows with contract hashes, repo-relative source/rules paths, and browser workload parameters such as upload byte counts.
    - compute direct and indirect component rows carry source command hashes plus `directDispatchArgs` or `indirectDispatchArgs` so the browser runner can replay command-shaped `dispatchWorkgroups` and `dispatchWorkgroupsIndirect` rows instead of generic placeholders.
-   - layered report schema v4 requires compute component dispatch rows plus source-kernel compute rows to emit `dispatchElapsedMs`, `encodeSubmitMs`, and `waitMs` phase telemetry.
+   - layered report schema v5 requires compute component dispatch rows plus source-kernel compute rows to emit `dispatchElapsedMs`, `encodeSubmitMs`, and `waitMs` phase telemetry, and every mode to prove the observed active runtime.
+   - projection manifest schema v6 adds oracle-v2 source-kernel rows with pinned exact output oracles. Every source-kernel report retains the complete timed-output SHA-256 for Dawn/Doe parity checks; oracle-v2 rows also retain the independent oracle result.
    - macOS uses `generated/browser_projection_manifest.apple.metal.json`.
 4. `workflows/browser-workflow-manifest.json`
    - `L2` workflow definitions with required status, claim scope, and promotion approver roles.
@@ -128,7 +129,7 @@ baseline paired score. `strictComparable` is the fair browser-projection summary
 and includes only scorable rows whose projection says
 `comparabilityExpectation=strict` and whose `browserWorkload` records
 `sourceComparable=true`, `sourceClaimEligible=true`, and
-`benchmarkClass=comparable`. Projection manifest schema v5 requires every
+`benchmarkClass=comparable`. Projection manifest schema v6 requires every
 non-strict browser projection to use `benchmarkClass=directional`.
 `sourceClaimEligible` is source-workload provenance; it is not browser
 claimability unless the row is strict-comparable.
@@ -138,6 +139,13 @@ diagnostic evidence, not a release performance claim. The score sidecar carries
 source report, workload, mode order, browser executable, runtime, shader
 compiler, adapter, and trace-hash identity anchors and is covered by the
 browser artifact identity coverage gate.
+
+Every mode also records an `activeRuntimeProof` derived from explicit
+`GPUAdapter.info` fields. Requested launch arguments do not establish runtime
+identity: forced Doe must report the Doe adapter vendor and platform backend,
+while Dawn must report a non-empty, non-Doe vendor. The checker binds Metal to
+macOS, Vulkan to Linux, and D3D12 to Windows, independently recomputes the
+result, and fails closed on mismatches.
 
 `--mode-order` records which runtime runs first. `--mode-schedule grouped`
 preserves the historical behavior of running all rows for one runtime before
@@ -195,6 +203,20 @@ Focused reports remain diagnostic and carry `workloadFilter` counts. The
 superset checker validates only rows in the selected categories and rejects
 rows that leak in from outside the filter. Score sidecars copy the same
 `workloadFilter` so focused scores are self-describing.
+
+To attribute the native Doe Metal command path, run an explicitly instrumented
+diagnostic:
+
+```bash
+./browser/chromium/scripts/run-fawn-runtime-bench.sh \
+  --headless true \
+  --focus-category compute \
+  --native-metal-trace
+```
+
+This mode uses `config/browser-metal-native-trace.json`, hash-binds the emitted
+JSONL, and reports command-buffer create, encode, commit, and flush totals. The
+instrumented timings are excluded from browser scores.
 
 Default outputs are lane-local diagnostic artifacts under:
 

@@ -8,6 +8,16 @@
     "repeat": 100,
     "warmup_dispatch_count": 1,
     "initialize_buffers_on_create": true,
+    "output_oracle": {
+      "schema_version": 1,
+      "kind": "sha256_exact_v1",
+      "initialization": "zero_fill_v1",
+      "binding_group": 0,
+      "binding": 0,
+      "dispatch_count": 1,
+      "expected_sha256": "bc0c7a019fa53cc1b9f96a0e282eee1e81ed30a6f053eadc8581331831b25b07",
+      "reference_id": "cpu_workgroup_recurrence_u32_v1"
+    },
     "bindings": [
       {
         "binding": 0,

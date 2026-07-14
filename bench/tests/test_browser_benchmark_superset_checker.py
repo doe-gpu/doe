@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
+import json
+import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
@@ -10,6 +13,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 MODULE_PATH = REPO_ROOT / "browser/chromium/scripts/check-browser-benchmark-superset.py"
 HASH_A = "a" * 64
 HASH_B = "b" * 64
+HASH_C = "c" * 64
+TRACE_CONFIG_PATH = REPO_ROOT / "config/browser-metal-native-trace.json"
+TRACE_CONFIG_HASH = hashlib.sha256(TRACE_CONFIG_PATH.read_bytes()).hexdigest()
 
 
 def _browser_workload() -> dict[str, Any]:
@@ -72,6 +78,24 @@ def _runtime_selection(mode: str, selected_runtime: str | None = None) -> dict[s
 def _mode_detail(mode: str, selected_runtime: str | None = None) -> dict[str, Any]:
     runtime = selected_runtime or mode
     selection = _runtime_selection(mode, runtime)
+    adapter_info = {
+        "vendor": "Doe" if runtime == "doe" else "Apple",
+        "architecture": "metal" if runtime == "doe" else "applegpu",
+        "device": "Doe Metal Adapter" if runtime == "doe" else "Apple M3",
+        "description": "",
+    }
+    active_runtime_proof = {
+        "schemaVersion": 1,
+        "identitySource": "wgpuAdapterGetInfo",
+        "selectedRuntime": runtime,
+        "expected": (
+            {"vendor": "Doe", "architecture": "metal"}
+            if runtime == "doe"
+            else {"vendorMustNotEqual": "Doe", "vendorMustBeNonEmpty": True}
+        ),
+        "observed": dict(adapter_info),
+        "matched": True,
+    }
     compiler_surface = (
         "doe_runtime_embedded_shader_compiler"
         if runtime == "doe"
@@ -97,11 +121,25 @@ def _mode_detail(mode: str, selected_runtime: str | None = None) -> dict[str, An
             "pageTargetKind": "http",
             "browserVersion": "Chromium",
             "userAgent": "Chromium",
+            "activeRuntimeProof": active_runtime_proof,
+            "nativeMetalTrace": {
+                "requested": False,
+                "enabled": False,
+                "status": "disabled",
+                "reason": "not_requested",
+                "traceId": "doe-metal-browser-command-path-v1",
+                "traceKind": "doe_metal_browser_command_path_v1",
+                "configPath": str(TRACE_CONFIG_PATH),
+                "configSha256": TRACE_CONFIG_HASH,
+                "environmentVariable": "DOE_METAL_BROWSER_TRACE_PATH",
+                "evidenceClass": "diagnostic_only",
+                "timingsPerturbed": False,
+            },
         },
         "runtimeProbe": {
             "webgpuAvailable": True,
             "adapterAvailable": True,
-            "adapterInfo": {},
+            "adapterInfo": adapter_info,
             "adapterIdentity": {
                 "adapterInfoSha256": HASH_A,
                 "featureCount": 0,
@@ -114,6 +152,7 @@ def _mode_detail(mode: str, selected_runtime: str | None = None) -> dict[str, An
 
 def _report() -> dict[str, Any]:
     return {
+        "schemaVersion": 5,
         "reportKind": "browser-layered-diagnostic",
         "comparisonStatus": "diagnostic",
         "claimStatus": "diagnostic",
@@ -124,12 +163,25 @@ def _report() -> dict[str, Any]:
             "projectionContractHash": HASH_A,
             "workflowManifestSha256": HASH_B,
         },
+        "invocation": {
+            "platform": "darwin",
+        },
         "methodology": {
             "sourceKernelSamples": 1,
             "sourceKernelWarmupSamples": 0,
             "sourceKernelSubmitPolicy": "iteration-batch-v1",
             "adapterRequest": {
                 "powerPreference": "high-performance",
+            },
+            "nativeMetalTrace": {
+                "requested": False,
+                "configPath": str(TRACE_CONFIG_PATH),
+                "configSha256": TRACE_CONFIG_HASH,
+                "traceId": "doe-metal-browser-command-path-v1",
+                "environmentVariable": "DOE_METAL_BROWSER_TRACE_PATH",
+                "evidenceClass": "diagnostic_only",
+                "timingsPerturbed": False,
+                "scoreEligible": True,
             },
         },
         "browserEnvironmentEvidence": {},
@@ -221,7 +273,7 @@ def _projection_row(
 
 def _parseable_projection_manifest(row: dict[str, Any]) -> dict[str, Any]:
     manifest = _projection_manifest()
-    manifest["schemaVersion"] = 5
+    manifest["schemaVersion"] = 6
     manifest["generatedAt"] = "2026-07-04T00:00:00Z"
     manifest["sourceWorkloadCount"] = 1
     manifest["rows"] = [row]
@@ -251,7 +303,7 @@ def _source_kernel_manifest_row() -> dict[str, Any]:
         "sourceComparable": True,
         "sourceClaimEligible": True,
         "benchmarkClass": "comparable",
-        "computeProjection": "source_kernel_dispatch_v1",
+        "computeProjection": "source_kernel_dispatch_oracle_v2",
         "bindGroupLayoutMode": "explicit_min_binding_size_v1",
         "readbackBindingPolicy": "first_writable_storage_binding_v1",
         "commandsPath": "examples/workgroup_atomic_commands.json",
@@ -273,6 +325,16 @@ def _source_kernel_manifest_row() -> dict[str, Any]:
                 "bufferBindingType": "storage",
             }
         ],
+        "outputOracle": {
+            "schemaVersion": 1,
+            "kind": "sha256_exact_v1",
+            "initialization": "zero_fill_v1",
+            "bindingGroup": 0,
+            "binding": 0,
+            "dispatchCount": 1,
+            "expectedSha256": HASH_C,
+            "referenceId": "cpu_test_reference_v1",
+        },
     }
     return row
 
@@ -326,7 +388,22 @@ def _source_kernel_metrics() -> dict[str, Any]:
         "readbackBinding": 0,
         "readbackBytes": 1024,
         "readbackChecksum": 1234,
+        "readbackSha256": HASH_C,
         "readbackSampleBytes": [1, 2, 3, 4] * 4,
+        "outputOracleResetMs": 0.1,
+        "outputOracleDispatchMs": 0.1,
+        "outputOracleReadbackMs": 0.1,
+        "outputOracleSchemaVersion": 1,
+        "outputOracleKind": "sha256_exact_v1",
+        "outputOracleInitialization": "zero_fill_v1",
+        "outputOracleBindingGroup": 0,
+        "outputOracleBinding": 0,
+        "outputOracleDispatchCount": 1,
+        "outputOracleExpectedSha256": HASH_C,
+        "outputOracleActualSha256": HASH_C,
+        "outputOracleReferenceId": "cpu_test_reference_v1",
+        "outputOracleSampleBytes": [1, 2, 3, 4] * 4,
+        "outputOracleMatched": True,
         "createBindGroupLayoutMs": 0.1,
         "createPipelineLayoutMs": 0.1,
         "submitReadbackMs": 0.1,
@@ -402,6 +479,51 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
             errors,
         )
 
+    def test_source_kernel_runtime_evidence_rejects_oracle_mismatch(self) -> None:
+        row = _source_kernel_manifest_row()
+        metrics = _source_kernel_metrics()
+        metrics["outputOracleActualSha256"] = HASH_A
+        metrics["outputOracleMatched"] = False
+
+        errors = self.module.check_source_kernel_runtime_evidence(
+            {"status": "ok", "statusCode": "ok", "metrics": metrics},
+            row,
+            "compute_workgroup_atomic_1024",
+            "doe",
+        )
+
+        self.assertIn(
+            "compute_workgroup_atomic_1024: output oracle SHA-256 mismatch for mode 'doe'",
+            errors,
+        )
+        self.assertIn(
+            "compute_workgroup_atomic_1024: output oracle did not match for mode 'doe'",
+            errors,
+        )
+
+    def test_source_kernel_cross_runtime_parity_rejects_hash_drift(self) -> None:
+        report_row = {
+            "runtimes": {
+                "dawn": {
+                    "status": "ok",
+                    "metrics": {"readbackSha256": HASH_A},
+                },
+                "doe": {
+                    "status": "ok",
+                    "metrics": {"readbackSha256": HASH_B},
+                },
+            }
+        }
+
+        errors = self.module.check_source_kernel_cross_runtime_parity(
+            report_row,
+            _source_kernel_manifest_row(),
+            "L1:compute_workgroup_atomic_1024",
+        )
+
+        self.assertEqual(len(errors), 1)
+        self.assertIn("timed output SHA-256 differs across Dawn and Doe", errors[0])
+
     def test_report_coverage_rejects_missing_adapter_request_policy(self) -> None:
         report = _report()
         report["methodology"] = {}
@@ -435,6 +557,102 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
             "report methodology.modeScheduleRepetitions greater than 1 requires paired mode scheduling",
             errors,
         )
+
+    def test_native_metal_trace_evidence_recomputes_file_totals(self) -> None:
+        row = {
+            "schemaVersion": 1,
+            "traceKind": "doe_metal_browser_command_path_v1",
+            "sequence": 1,
+            "submissionCount": 2,
+            "sourceCommandBufferCount": 2,
+            "recordedCommandCount": 7,
+            "nativeCommandBufferCount": 2,
+            "commandBufferCreateNs": 11,
+            "commandEncodeNs": 13,
+            "commandCommitNs": 17,
+            "waitCompletedNs": 19,
+            "deferredCopyNs": 23,
+            "deferredResolveNs": 29,
+            "directReadback": True,
+        }
+        trace_bytes = (json.dumps(row, separators=(",", ":")) + "\n").encode()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            trace_path = Path(tmp_dir) / "trace.jsonl"
+            trace_path.write_bytes(trace_bytes)
+            evidence = {
+                "requested": True,
+                "enabled": True,
+                "status": "ok",
+                "reason": "",
+                "traceId": "doe-metal-browser-command-path-v1",
+                "traceKind": "doe_metal_browser_command_path_v1",
+                "configPath": str(TRACE_CONFIG_PATH),
+                "configSha256": TRACE_CONFIG_HASH,
+                "environmentVariable": "DOE_METAL_BROWSER_TRACE_PATH",
+                "evidenceClass": "diagnostic_only",
+                "timingsPerturbed": True,
+                "tracePath": str(trace_path),
+                "traceSha256": hashlib.sha256(trace_bytes).hexdigest(),
+                "byteCount": len(trace_bytes),
+                "rowCount": 1,
+                "malformedRowCount": 0,
+                "totals": {
+                    field: row[field]
+                    for field in self.module.NATIVE_METAL_TRACE_NUMERIC_FIELDS
+                },
+                "errors": [],
+            }
+
+            errors = self.module.check_native_metal_trace_evidence(
+                evidence,
+                "modeRunDetails[doe]",
+                True,
+                "doe",
+            )
+
+        self.assertEqual(errors, [])
+
+    def test_native_metal_trace_evidence_rejects_summary_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            trace_path = Path(tmp_dir) / "trace.jsonl"
+            trace_path.write_text(
+                '{"schemaVersion":1,"traceKind":"doe_metal_browser_command_path_v1",'
+                '"sequence":1,"submissionCount":1,"sourceCommandBufferCount":1,'
+                '"recordedCommandCount":1,"nativeCommandBufferCount":1,'
+                '"commandBufferCreateNs":1,"commandEncodeNs":1,"commandCommitNs":1,'
+                '"waitCompletedNs":1,"deferredCopyNs":1,"deferredResolveNs":1,'
+                '"directReadback":false}\n',
+                encoding="utf-8",
+            )
+            trace_bytes = trace_path.read_bytes()
+            totals = {field: 1 for field in self.module.NATIVE_METAL_TRACE_NUMERIC_FIELDS}
+            totals["commandEncodeNs"] = 99
+            evidence = {
+                "requested": True,
+                "enabled": True,
+                "status": "ok",
+                "traceId": "doe-metal-browser-command-path-v1",
+                "traceKind": "doe_metal_browser_command_path_v1",
+                "configSha256": TRACE_CONFIG_HASH,
+                "evidenceClass": "diagnostic_only",
+                "timingsPerturbed": True,
+                "tracePath": str(trace_path),
+                "traceSha256": hashlib.sha256(trace_bytes).hexdigest(),
+                "byteCount": len(trace_bytes),
+                "rowCount": 1,
+                "malformedRowCount": 0,
+                "totals": totals,
+                "errors": [],
+            }
+
+            errors = self.module.check_native_metal_trace_evidence(
+                evidence,
+                "modeRunDetails[doe]",
+                True,
+                "doe",
+            )
+
+        self.assertIn("modeRunDetails[doe]: nativeMetalTrace totals mismatch", errors)
 
     def test_report_coverage_accepts_category_filtered_report(self) -> None:
         manifest = _manifest()
@@ -666,6 +884,19 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
             errors,
         )
 
+    def test_report_coverage_rejects_legacy_report_schema(self) -> None:
+        report = _report()
+        report["schemaVersion"] = 4
+
+        errors = self.module.check_report_coverage(
+            report,
+            _manifest(),
+            {"rows": []},
+            ["dawn", "doe"],
+        )
+
+        self.assertIn("report schemaVersion must be 5", errors)
+
     def test_report_coverage_rejects_missing_dawn_runtime_hash(self) -> None:
         report = _report()
         selection = report["modeRunDetails"][1]["runtimeEvidence"]["runtimeSelection"]
@@ -729,6 +960,97 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
         )
 
         self.assertTrue(any("adapterIdentity missing" in error for error in errors), errors)
+
+    def test_report_coverage_rejects_doe_runtime_identity_mismatch(self) -> None:
+        report = _report()
+        detail = report["modeRunDetails"][1]
+        detail["runtimeProbe"]["adapterInfo"]["vendor"] = "Apple"
+        detail["runtimeEvidence"]["activeRuntimeProof"]["observed"]["vendor"] = "Apple"
+        detail["runtimeEvidence"]["activeRuntimeProof"]["matched"] = False
+
+        errors = self.module.check_report_coverage(
+            report,
+            _manifest(),
+            {"rows": []},
+            ["dawn", "doe"],
+        )
+
+        self.assertIn(
+            "modeRunDetails[doe]: active runtime does not match requested doe runtime",
+            errors,
+        )
+
+    def test_report_coverage_rejects_missing_active_runtime_proof(self) -> None:
+        report = _report()
+        report["modeRunDetails"][1]["runtimeEvidence"].pop("activeRuntimeProof")
+
+        errors = self.module.check_report_coverage(
+            report,
+            _manifest(),
+            {"rows": []},
+            ["dawn", "doe"],
+        )
+
+        self.assertIn("modeRunDetails[doe]: activeRuntimeProof missing", errors)
+
+    def test_report_coverage_rejects_missing_invocation_platform(self) -> None:
+        report = _report()
+        report.pop("invocation")
+
+        errors = self.module.check_report_coverage(
+            report,
+            _manifest(),
+            {"rows": []},
+            ["dawn", "doe"],
+        )
+
+        self.assertIn(
+            "report invocation.platform must be darwin, linux, or win32",
+            errors,
+        )
+
+    def test_report_coverage_rejects_active_runtime_observation_drift(self) -> None:
+        report = _report()
+        report["modeRunDetails"][1]["runtimeEvidence"]["activeRuntimeProof"][
+            "observed"
+        ]["device"] = "fabricated"
+
+        errors = self.module.check_report_coverage(
+            report,
+            _manifest(),
+            {"rows": []},
+            ["dawn", "doe"],
+        )
+
+        self.assertIn(
+            "modeRunDetails[doe]: activeRuntimeProof.observed drift",
+            errors,
+        )
+
+    def test_report_coverage_rejects_doe_backend_incompatible_with_platform(self) -> None:
+        report = _report()
+        detail = report["modeRunDetails"][1]
+        detail["runtimeProbe"]["adapterInfo"]["architecture"] = "vulkan"
+        proof = detail["runtimeEvidence"]["activeRuntimeProof"]
+        proof["expected"]["architecture"] = "vulkan"
+        proof["observed"]["architecture"] = "vulkan"
+
+        errors = self.module.check_report_coverage(
+            report,
+            _manifest(),
+            {"rows": []},
+            ["dawn", "doe"],
+        )
+
+        self.assertIn(
+            "modeRunDetails[doe]: activeRuntimeProof expected Doe architecture "
+            "must be metal on darwin",
+            errors,
+        )
+        self.assertIn(
+            "modeRunDetails[doe]: active runtime does not match requested doe runtime",
+            errors,
+        )
 
     def test_report_coverage_rejects_missing_shader_compiler_identity(self) -> None:
         report = _report()

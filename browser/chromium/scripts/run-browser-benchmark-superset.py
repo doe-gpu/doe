@@ -33,6 +33,7 @@ DEFAULT_WORKFLOWS = (
     REPO_ROOT / "browser/chromium/bench/workflows/browser-workflow-manifest.json"
 )
 DEFAULT_RUNTIME_SELECTOR_POLICY = REPO_ROOT / "config/browser-runtime-selector-policy.json"
+DEFAULT_NATIVE_METAL_TRACE_CONFIG = REPO_ROOT / "config/browser-metal-native-trace.json"
 BENCH_OUT_ROOT = REPO_ROOT / "bench/out"
 BENCH_OUT_SCRATCH_ROOT = REPO_ROOT / "bench/out/scratch"
 ARTIFACTS_ROOT = REPO_ROOT / "browser/chromium/artifacts"
@@ -345,6 +346,16 @@ def parse_args() -> argparse.Namespace:
         "--runtime-selector-profile-id",
         default="",
         help="Optional selector profileId for auto denylist checks.",
+    )
+    parser.add_argument(
+        "--native-metal-trace",
+        action="store_true",
+        help="Collect instrumented Doe Metal command-path phases; diagnostic timings are not scored.",
+    )
+    parser.add_argument(
+        "--native-metal-trace-config",
+        default=str(DEFAULT_NATIVE_METAL_TRACE_CONFIG),
+        help="Native Metal trace contract passed to the layered runner.",
     )
     parser.add_argument("--api-surface", choices=["native", "package-browser"], default="native")
     parser.add_argument(
@@ -823,6 +834,7 @@ def main() -> int:
         mode: browser_release_class(path) for mode, path in active_chrome_paths.items()
     }
     runtime_selector_policy = Path(args.runtime_selector_policy).resolve()
+    native_metal_trace_config = Path(args.native_metal_trace_config).resolve()
     promotion_approvals = Path(args.promotion_approvals).resolve()
     default_out, default_summary, default_check, default_score = default_output_paths()
     out = Path(args.out).resolve() if args.out else default_out
@@ -856,6 +868,9 @@ def main() -> int:
             return 2
         if not runtime_selector_policy.exists():
             print(f"FAIL: runtime selector policy not found: {runtime_selector_policy}")
+            return 2
+        if not native_metal_trace_config.exists():
+            print(f"FAIL: native Metal trace config not found: {native_metal_trace_config}")
             return 2
 
     generate_command = [
@@ -900,6 +915,14 @@ def main() -> int:
             "--power-preference",
             args.power_preference,
         ]
+        if args.native_metal_trace:
+            run_command.extend(
+                [
+                    "--native-metal-trace",
+                    "--native-metal-trace-config",
+                    str(native_metal_trace_config),
+                ]
+            )
         if args.allow_bench_out:
             run_command.append("--allow-bench-out")
         if args.allow_data_url_fallback:
@@ -963,7 +986,9 @@ def main() -> int:
     score_payload: dict[str, Any] = {}
     score_status = "skipped"
     score_reason = "--skip-score was set"
-    if not args.skip_score:
+    if args.native_metal_trace:
+        score_reason = "instrumented native Metal trace timings are diagnostic and not score-eligible"
+    elif not args.skip_score:
         if not report_payload:
             score_reason = "layered report was not present"
         elif args.mode != "both":
@@ -993,7 +1018,7 @@ def main() -> int:
         "benchmarkClass": "directional",
         "comparisonStatus": "diagnostic",
         "claimStatus": "diagnostic",
-        "timingClass": "scenario",
+        "timingClass": "instrumented-scenario" if args.native_metal_trace else "scenario",
         "timingSource": "browser-performance-now",
         "invocation": {
             "argv": sys.argv[1:],
@@ -1011,6 +1036,8 @@ def main() -> int:
             "doeLib": str(doe_lib),
             "runtimeSelectorPolicy": str(runtime_selector_policy),
             "runtimeSelectorProfileId": args.runtime_selector_profile_id,
+            "nativeMetalTrace": bool(args.native_metal_trace),
+            "nativeMetalTraceConfig": str(native_metal_trace_config),
             "mode": args.mode,
             "modeOrder": args.mode_order,
             "modeSchedule": args.mode_schedule,

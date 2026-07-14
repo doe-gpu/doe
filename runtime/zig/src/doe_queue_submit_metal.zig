@@ -4,6 +4,7 @@ const native_shared = @import("doe_native_shared_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_cmds = @import("doe_native_command_types.zig");
 const queue_flush_breakdown = @import("doe_queue_flush_breakdown.zig");
+const metal_browser_trace = @import("doe_metal_browser_trace.zig");
 const emit_msl = @import("doe_wgsl/emit_msl_ir.zig");
 const shared = @import("doe_queue_submit_shared.zig");
 
@@ -165,7 +166,14 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
         return;
     }
 
+    const trace_enabled = metal_browser_trace.enabled();
+    const create_started_ns = if (trace_enabled) metal_browser_trace.nowNs() else 0;
     const mtl_cmd = bridge.metal_bridge_create_command_buffer(queue) orelse return;
+    const command_buffer_create_ns = if (trace_enabled)
+        metal_browser_trace.elapsedSince(create_started_ns)
+    else
+        0;
+    const encode_started_ns = if (trace_enabled) metal_browser_trace.nowNs() else 0;
     var has_gpu_work = false;
     var active_compute_encoder: ?*anyopaque = null;
     defer end_active_compute_encoder(&active_compute_encoder);
@@ -489,7 +497,32 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
         if (q.mtl_event) |event| {
             bridge.metal_bridge_command_buffer_encode_signal_event(mtl_cmd, event, q.event_counter);
         }
+        const command_encode_ns = if (trace_enabled)
+            metal_browser_trace.elapsedSince(encode_started_ns)
+        else
+            0;
+        const commit_started_ns = if (trace_enabled) metal_browser_trace.nowNs() else 0;
         bridge.metal_bridge_command_buffer_commit(mtl_cmd);
+        const command_commit_ns = if (trace_enabled)
+            metal_browser_trace.elapsedSince(commit_started_ns)
+        else
+            0;
+        if (trace_enabled) {
+            var source_command_buffer_count: usize = 0;
+            var recorded_command_count: usize = 0;
+            for (cmd_bufs[0..count]) |raw| {
+                const cb = cast(DoeCommandBuffer, raw) orelse continue;
+                source_command_buffer_count += 1;
+                recorded_command_count += cb.cmds.items.len;
+            }
+            metal_browser_trace.recordSubmission(
+                source_command_buffer_count,
+                recorded_command_count,
+                command_buffer_create_ns,
+                command_encode_ns,
+                command_commit_ns,
+            );
+        }
         shared.finalize_submitted_metal_command_buffer(q, mtl_cmd);
     } else {
         bridge.metal_bridge_release(mtl_cmd);

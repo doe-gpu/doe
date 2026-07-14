@@ -3,6 +3,7 @@ const native_types = @import("doe_native_object_types.zig");
 const native_cmds = @import("doe_native_command_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const queue_submit_ops = @import("backend/dropin_queue_submit.zig");
+const metal_browser_trace = @import("doe_metal_browser_trace.zig");
 const bridge = queue_submit_ops.metal_bridge;
 
 const DoeBuffer = native_types.DoeBuffer;
@@ -175,6 +176,12 @@ pub fn flushPendingWorkTimed(q: *DoeQueue) QueueFlushBreakdown {
     executeDeferredResolves(q);
     out.deferredResolveNs = monotonicNowNs() - deferred_resolve_started_ns;
     releaseDeferredMetalObjects(q);
+    metal_browser_trace.recordFlush(
+        out.waitCompletedNs,
+        out.deferredCopyNs,
+        out.deferredResolveNs,
+        false,
+    );
     return out;
 }
 
@@ -226,6 +233,12 @@ pub fn flushPendingWorkTimedDirectReadback(
     executeDeferredResolves(q);
     out.breakdown.deferredResolveNs = monotonicNowNs() - deferred_resolve_started_ns;
     releaseDeferredMetalObjects(q);
+    metal_browser_trace.recordFlush(
+        out.breakdown.waitCompletedNs,
+        out.breakdown.deferredCopyNs,
+        out.breakdown.deferredResolveNs,
+        true,
+    );
     return out;
 }
 

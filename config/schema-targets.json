@@ -786,6 +786,10 @@
       "data": "config/browser-runtime-selector-policy.json"
     },
     {
+      "schema": "config/browser-metal-native-trace.schema.json",
+      "data": "config/browser-metal-native-trace.json"
+    },
+    {
       "schema": "config/browser-capture-policy.schema.json",
       "data": "config/browser-capture-policy.json"
     },

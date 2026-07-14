@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "traceId": "doe-metal-browser-command-path-v1",
+  "enabledByDefault": false,
+  "environmentVariable": "DOE_METAL_BROWSER_TRACE_PATH",
+  "format": "jsonl",
+  "scope": "doe_metal_queue_submit_and_flush",
+  "evidenceClass": "diagnostic_only",
+  "timingsPerturbed": true,
+  "phases": [
+    "command_buffer_create",
+    "command_encode",
+    "command_commit",
+    "wait_completed",
+    "deferred_copy",
+    "deferred_resolve"
+  ]
+}

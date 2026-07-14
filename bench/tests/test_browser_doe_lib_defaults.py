@@ -15,6 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SUPERSET_RUNNER = REPO_ROOT / "browser/chromium/scripts/run-browser-benchmark-superset.py"
 LANE_PATHS = REPO_ROOT / "browser/chromium/scripts/lane-paths.sh"
 BUILD_RELEASE_EXTERNAL = REPO_ROOT / "browser/chromium/scripts/build-release-external.sh"
+PATCH_CHROMIUM_APP_DOE = REPO_ROOT / "browser/chromium/scripts/patch-chromium-app-doe.sh"
 RUN_CONSUMER_BENCH = REPO_ROOT / "browser/chromium/scripts/run-consumer-bench.sh"
 RUN_FAWN_RUNTIME_BENCH = REPO_ROOT / "browser/chromium/scripts/run-fawn-runtime-bench.sh"
 RUN_WITH_LANE_DEFAULTS = REPO_ROOT / "browser/chromium/scripts/run-with-lane-defaults.sh"
@@ -412,6 +413,60 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
         self.assertGreaterEqual(len(lines), 2)
         self.assertTrue(lines[0].endswith("Fawn.app/Contents/MacOS/Chromium-real"))
         self.assertTrue(lines[1].endswith("Fawn.app/Contents/MacOS/Chromium"))
+
+    def test_app_wrapper_refreshes_real_binary_after_incremental_relink(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            app = root / "Chromium.app"
+            macos = app / "Contents/MacOS"
+            resources = app / "Contents/Resources"
+            macos.mkdir(parents=True)
+            resources.mkdir(parents=True)
+            (app / "Contents/Info.plist").write_text(
+                """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict><key>CFBundleName</key><string>Chromium</string></dict></plist>
+""",
+                encoding="utf-8",
+            )
+
+            chromium = macos / "Chromium"
+            real = macos / "Chromium-real"
+            doe_lib = root / "libwebgpu_doe_full.dylib"
+            doe_lib.write_bytes(b"doe")
+
+            fake_bin = root / "bin"
+            fake_bin.mkdir()
+            uname = fake_bin / "uname"
+            uname.write_text("#!/bin/sh\necho Darwin\n", encoding="utf-8")
+            uname.chmod(0o755)
+            env = {**os.environ, "PATH": f"{fake_bin}:{os.environ['PATH']}"}
+
+            release_one = "#!/bin/sh\necho release-one\n"
+            release_two = "#!/bin/sh\necho release-two\n"
+            chromium.write_text(release_one, encoding="utf-8")
+            chromium.chmod(0o755)
+
+            command = [
+                "bash",
+                str(PATCH_CHROMIUM_APP_DOE),
+                "--app",
+                str(app),
+                "--doe-lib",
+                str(doe_lib),
+            ]
+            subprocess.run(command, cwd=REPO_ROOT, env=env, check=True, capture_output=True)
+            self.assertEqual(real.read_text(encoding="utf-8"), release_one)
+            self.assertIn('--use-webgpu-runtime=doe', chromium.read_text(encoding="utf-8"))
+
+            chromium.write_text(release_two, encoding="utf-8")
+            chromium.chmod(0o755)
+            subprocess.run(command, cwd=REPO_ROOT, env=env, check=True, capture_output=True)
+
+            self.assertEqual(real.read_text(encoding="utf-8"), release_two)
+            wrapper = chromium.read_text(encoding="utf-8")
+            self.assertIn('REAL_BINARY="${SCRIPT_DIR}/Chromium-real"', wrapper)
+            self.assertIn('--use-webgpu-runtime=doe', wrapper)
 
     def test_python_superset_runner_prefers_real_app_binary_before_launcher(self) -> None:
         old_root = self.module.REPO_ROOT
