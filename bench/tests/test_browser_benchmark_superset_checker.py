@@ -415,6 +415,27 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
 
         self.assertIn("report methodology.adapterRequest must be an object", errors)
 
+    def test_report_methodology_accepts_repeated_paired_schedule(self) -> None:
+        methodology = _report()["methodology"]
+        methodology["modeSchedule"] = "paired-balanced"
+        methodology["modeScheduleRepetitions"] = 8
+
+        errors = self.module.check_report_methodology(methodology, "paired-balanced")
+
+        self.assertEqual(errors, [])
+
+    def test_report_methodology_rejects_repeated_grouped_schedule(self) -> None:
+        methodology = _report()["methodology"]
+        methodology["modeSchedule"] = "grouped"
+        methodology["modeScheduleRepetitions"] = 2
+
+        errors = self.module.check_report_methodology(methodology, "grouped")
+
+        self.assertIn(
+            "report methodology.modeScheduleRepetitions greater than 1 requires paired mode scheduling",
+            errors,
+        )
+
     def test_report_coverage_accepts_category_filtered_report(self) -> None:
         manifest = _manifest()
         manifest["rows"].append(

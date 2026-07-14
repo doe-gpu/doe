@@ -228,6 +228,20 @@ class BrowserLayeredScoreTests(unittest.TestCase):
         self.assertEqual(score["modeIdentities"]["comparison"]["doeRuntimeSha256"], HASH_B)
         self.assertEqual(score["modeIdentities"]["baseline"]["traceHash"], HASH_A)
 
+    def test_selected_metric_distribution_preserves_order_balanced_samples(self) -> None:
+        distribution = self.module.selected_metric_distribution(
+            {
+                "usPerOp": 11.0,
+                "orderBalancedMetricSamples": {
+                    "usPerOp": [10.0, 12.0, 9.0, 13.0],
+                },
+            },
+            "usPerOp",
+        )
+
+        self.assertEqual(distribution["orderBalancedSampleCount"], 4)
+        self.assertEqual(distribution["orderBalancedSamples"], [10.0, 12.0, 9.0, 13.0])
+
     def test_category_balanced_score_does_not_row_weight_categories(self) -> None:
         report = _report()
         report["l1"]["rows"] = [

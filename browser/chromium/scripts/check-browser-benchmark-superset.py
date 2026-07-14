@@ -1723,6 +1723,16 @@ def check_report_methodology(payload: Any, mode_schedule: str) -> list[str]:
             "report methodology.modeSchedule mismatch: "
             f"methodology={methodology_schedule} topLevel={mode_schedule}"
         )
+    mode_schedule_repetitions = payload.get("modeScheduleRepetitions", 1)
+    if (
+        not isinstance(mode_schedule_repetitions, int)
+        or mode_schedule_repetitions <= 0
+    ):
+        errors.append("report methodology.modeScheduleRepetitions must be a positive integer")
+    elif mode_schedule == "grouped" and mode_schedule_repetitions != 1:
+        errors.append(
+            "report methodology.modeScheduleRepetitions greater than 1 requires paired mode scheduling"
+        )
     source_kernel_samples = payload.get("sourceKernelSamples")
     if not isinstance(source_kernel_samples, int) or source_kernel_samples <= 0:
         errors.append("report methodology.sourceKernelSamples must be a positive integer")

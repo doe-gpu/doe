@@ -5,7 +5,8 @@ This module implements a layered browser benchmark superset for Chromium Track A
 ## Layers
 
 1. `L0 engine`
-   - core strict runtime benchmark (`bench/workloads/specialized/workloads.amd.vulkan.superset.json`).
+   - host-specific strict runtime benchmark (`workloads.apple.metal.superset.json`
+     on macOS; `workloads.amd.vulkan.superset.json` on other current lanes).
 2. `L1 browser-api`
    - Playwright-driven browser WebGPU projections derived from `L0`.
 3. `L2 browser-workflow`
@@ -28,6 +29,7 @@ This module implements a layered browser benchmark superset for Chromium Track A
    - generated `L1/L0` projection rows with contract hashes, repo-relative source/rules paths, and browser workload parameters such as upload byte counts.
    - compute direct and indirect component rows carry source command hashes plus `directDispatchArgs` or `indirectDispatchArgs` so the browser runner can replay command-shaped `dispatchWorkgroups` and `dispatchWorkgroupsIndirect` rows instead of generic placeholders.
    - layered report schema v4 requires compute component dispatch rows plus source-kernel compute rows to emit `dispatchElapsedMs`, `encodeSubmitMs`, and `waitMs` phase telemetry.
+   - macOS uses `generated/browser_projection_manifest.apple.metal.json`.
 4. `workflows/browser-workflow-manifest.json`
    - `L2` workflow definitions with required status, claim scope, and promotion approver roles.
 5. `workflows/browser-workflow-manifest.schema.json`
@@ -80,6 +82,10 @@ From `` root:
 npm --prefix browser/chromium ci
 ./browser/chromium/scripts/run-bench.sh
 ```
+
+The benchmark front door selects the Apple Metal workload and projection
+manifest on macOS. Other current hosts retain the AMD Vulkan defaults. Explicit
+`--workloads` and `--manifest-out` arguments override host selection.
 
 To run dawn/doe against different browser executables in one benchmark run:
 
@@ -142,6 +148,12 @@ row orders and averages numeric metrics per runtime, with
 when auditing order-sensitive browser results before promotion. Non-grouped
 schedules run strict-comparable `L1` rows before component diagnostics so
 component probes do not precondition strict browser evidence.
+
+Use `--mode-schedule-repetitions N` with a paired schedule when tuning a noisy
+row. The report retains each timing observation in
+`orderBalancedMetricSamples` and weights every observation equally. Startup
+rows split adapter and device request time; surface and queue rows split
+encode/submit from completion wait.
 
 The L2 workflow manifest includes optional `fawn_visual_resource` rows for the
 checked-in Fawn HTML pages under `browser/chromium/resources/`. Those rows load

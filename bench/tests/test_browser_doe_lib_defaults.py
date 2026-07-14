@@ -63,6 +63,31 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
             if old_env is not None:
                 os.environ["FAWN_DOE_LIB"] = old_env
 
+    def test_python_superset_runner_selects_host_workload_contract(self) -> None:
+        metal_workloads, metal_manifest = self.module.host_benchmark_defaults("darwin")
+        vulkan_workloads, vulkan_manifest = self.module.host_benchmark_defaults("linux")
+
+        self.assertEqual(
+            metal_workloads,
+            self.module.REPO_ROOT
+            / "bench/workloads/specialized/workloads.apple.metal.superset.json",
+        )
+        self.assertEqual(
+            metal_manifest,
+            self.module.REPO_ROOT
+            / "browser/chromium/bench/generated/browser_projection_manifest.apple.metal.json",
+        )
+        self.assertEqual(
+            vulkan_workloads,
+            self.module.REPO_ROOT
+            / "bench/workloads/specialized/workloads.amd.vulkan.superset.json",
+        )
+        self.assertEqual(
+            vulkan_manifest,
+            self.module.REPO_ROOT
+            / "browser/chromium/bench/generated/browser_projection_manifest.json",
+        )
+
     def test_build_release_external_uses_end_user_optimized_gn_profile(self) -> None:
         text = BUILD_RELEASE_EXTERNAL.read_text(encoding="utf-8")
 
@@ -476,6 +501,10 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
                     "12",
                     "--iters-texture",
                     "13",
+                    "--mode-schedule",
+                    "paired-balanced",
+                    "--mode-schedule-repetitions",
+                    "3",
                     "--dry-run",
                 ],
                 cwd=REPO_ROOT,
@@ -488,6 +517,7 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
         self.assertIn("--iters-upload 7", completed.stdout)
         self.assertIn("--iters-workflow 12", completed.stdout)
         self.assertIn("--iters-texture 13", completed.stdout)
+        self.assertIn("--mode-schedule-repetitions 3", completed.stdout)
 
     def test_shell_bench_wrapper_accepts_auto_without_doe_lib_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

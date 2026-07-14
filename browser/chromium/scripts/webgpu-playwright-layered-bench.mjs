@@ -173,6 +173,7 @@ const DEFAULT_SOURCE_KERNEL_WARMUP_SAMPLES = 0;
 const DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICES = 1;
 const DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICE_MIN_DISPATCH_REPEAT = 1;
 const DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY = "iteration-batch-v1";
+const DEFAULT_MODE_SCHEDULE_REPETITIONS = 1;
 const SOURCE_KERNEL_SUBMIT_POLICIES = new Set([
   "iteration-batch-v1",
   "sample-batch-v1",
@@ -204,6 +205,9 @@ Options:
                             paired-balanced runs both row orders and averages
                             numeric metrics per runtime
                             (default: grouped)
+  --mode-schedule-repetitions N
+                            Repeat each paired schedule N times and retain the
+                            per-runtime timing observations (default: 1)
   --chrome PATH             Chrome binary path
   --dawn-chrome PATH        Browser executable for dawn mode (defaults to --chrome)
   --doe-chrome PATH         Browser executable for doe mode (defaults to --chrome)
@@ -474,6 +478,7 @@ function parseArgs(argv) {
     focusCategories: [],
     modeOrder: null,
     modeSchedule: "grouped",
+    modeScheduleRepetitions: DEFAULT_MODE_SCHEDULE_REPETITIONS,
     strict: false,
     iterations: { ...DEFAULT_ITERATIONS },
     sourceKernelSamples: DEFAULT_SOURCE_KERNEL_SAMPLES,
@@ -503,6 +508,12 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === "--mode-schedule") {
       args.modeSchedule = parseModeSchedule(readOptionValue(argv, i, "--mode-schedule"));
+      i += 1;
+    } else if (token === "--mode-schedule-repetitions") {
+      args.modeScheduleRepetitions = parsePositiveInt(
+        readOptionValue(argv, i, "--mode-schedule-repetitions"),
+        "--mode-schedule-repetitions",
+      );
       i += 1;
     } else if (token === "--chrome") {
       args.chromePath = readOptionValue(argv, i, "--chrome");
@@ -633,6 +644,9 @@ function parseArgs(argv) {
   }
   if (args.mode !== "both" && args.modeSchedule !== "grouped") {
     throw new Error("--mode-schedule paired modes are only valid with --mode=both");
+  }
+  if (args.modeSchedule === "grouped" && args.modeScheduleRepetitions !== 1) {
+    throw new Error("--mode-schedule-repetitions greater than 1 requires paired mode scheduling");
   }
   if (args.sourceKernelScheduleSlices > 1 && args.modeSchedule === "grouped") {
     throw new Error("--source-kernel-schedule-slices greater than 1 requires paired mode scheduling");
@@ -1479,12 +1493,21 @@ async function runScenario(
         }
         const adapterOptions =
           powerPreference === "default" ? undefined : { powerPreference };
+        const adapterStart = nowMs();
         const adapter = await gpu.requestAdapter(adapterOptions);
+        const adapterEnd = nowMs();
         if (!adapter) {
           throw new Error("requestAdapter returned null");
         }
+        const deviceStart = nowMs();
         const device = await adapter.requestDevice();
-        return { adapter, device };
+        const deviceEnd = nowMs();
+        return {
+          adapter,
+          device,
+          adapterRequestMs: adapterEnd - adapterStart,
+          deviceRequestMs: deviceEnd - deviceStart,
+        };
       }
 
       function percentile(sortedValues, fraction) {
@@ -2565,9 +2588,12 @@ async function runScenario(
           pass.end();
           device.queue.submit([encoder.finish()]);
         }
+        const submitEnd = nowMs();
         await device.queue.onSubmittedWorkDone();
         const t1 = nowMs();
         result.metrics.iterations = iterations;
+        result.metrics.encodeSubmitMs = submitEnd - t0;
+        result.metrics.waitMs = t1 - submitEnd;
         result.metrics.usPerFrame = ((t1 - t0) * 1000) / iterations;
         } catch (error) {
           throw new Error(`${stage}: ${String(error)}`);
@@ -2637,10 +2663,13 @@ async function runScenario(
           pass.end();
           device.queue.submit([encoder.finish()]);
         }
+        const submitEnd = nowMs();
         await device.queue.onSubmittedWorkDone();
         const t1 = nowMs();
         result.metrics.submitCount = iterations;
         result.metrics.totalMs = t1 - t0;
+        result.metrics.encodeSubmitMs = submitEnd - t0;
+        result.metrics.waitMs = t1 - submitEnd;
         result.metrics.usPerSubmit = ((t1 - t0) * 1000) / iterations;
       }
 
@@ -2706,6 +2735,10 @@ async function runScenario(
         const deviceSetup =
           scenarioTemplate === "fawn_visual_resource" ? null : await initDevice();
         const device = deviceSetup?.device ?? null;
+        if (deviceSetup && scenarioTemplate === "startup_adapter_device") {
+          result.metrics.adapterRequestMs = deviceSetup.adapterRequestMs;
+          result.metrics.deviceRequestMs = deviceSetup.deviceRequestMs;
+        }
 
         if (scenarioTemplate === "write_buffer_upload") {
           await runWriteBuffer(device);
@@ -3135,6 +3168,7 @@ function buildModeSchedule(
   l1Rows,
   l2Rows,
   modeSchedule,
+  modeScheduleRepetitions,
   sourceKernelSamples,
   sourceKernelScheduleSlices,
   sourceKernelScheduleSliceMinDispatchRepeat,
@@ -3171,42 +3205,48 @@ function buildModeSchedule(
       row,
       sourceKernelScheduleSliceMinDispatchRepeat,
     ) ? sourceKernelScheduleSlices : 1;
-    for (let sliceIndex = 0; sliceIndex < scheduleSlices; sliceIndex += 1) {
-      const sliceSamples = sourceKernelSamplesForSlice(
-        sourceKernelSamples,
-        sliceIndex,
-        scheduleSlices,
-      );
-      for (let passIndex = 0; passIndex < rowModeOrders.length; passIndex += 1) {
-        for (const mode of rowModeOrders[passIndex]) {
-          entries.push({
-            mode,
-            l1Rows: [row],
-            l2Rows: [],
-            scheduleUnit: row.sourceWorkloadId,
-            scheduleLayer: "l1",
-            schedulePass: passIndex + 1,
-            scheduleSlice: sliceIndex + 1,
-            scheduleSlices,
-            sourceKernelSamples: sliceSamples,
-          });
+    for (let repetitionIndex = 0; repetitionIndex < modeScheduleRepetitions; repetitionIndex += 1) {
+      for (let sliceIndex = 0; sliceIndex < scheduleSlices; sliceIndex += 1) {
+        const sliceSamples = sourceKernelSamplesForSlice(
+          sourceKernelSamples,
+          sliceIndex,
+          scheduleSlices,
+        );
+        for (let passIndex = 0; passIndex < rowModeOrders.length; passIndex += 1) {
+          for (const mode of rowModeOrders[passIndex]) {
+            entries.push({
+              mode,
+              l1Rows: [row],
+              l2Rows: [],
+              scheduleUnit: row.sourceWorkloadId,
+              scheduleLayer: "l1",
+              schedulePass: (repetitionIndex * rowModeOrders.length) + passIndex + 1,
+              scheduleRepetition: repetitionIndex + 1,
+              scheduleSlice: sliceIndex + 1,
+              scheduleSlices,
+              sourceKernelSamples: sliceSamples,
+            });
+          }
         }
       }
     }
   }
 
   for (const workflow of l2Rows) {
-    for (let passIndex = 0; passIndex < rowModeOrders.length; passIndex += 1) {
-      for (const mode of rowModeOrders[passIndex]) {
-        entries.push({
-          mode,
-          l1Rows: [],
-          l2Rows: [workflow],
-          scheduleUnit: workflow.id,
-          scheduleLayer: "l2",
-          schedulePass: passIndex + 1,
-          sourceKernelSamples,
-        });
+    for (let repetitionIndex = 0; repetitionIndex < modeScheduleRepetitions; repetitionIndex += 1) {
+      for (let passIndex = 0; passIndex < rowModeOrders.length; passIndex += 1) {
+        for (const mode of rowModeOrders[passIndex]) {
+          entries.push({
+            mode,
+            l1Rows: [],
+            l2Rows: [workflow],
+            scheduleUnit: workflow.id,
+            scheduleLayer: "l2",
+            schedulePass: (repetitionIndex * rowModeOrders.length) + passIndex + 1,
+            scheduleRepetition: repetitionIndex + 1,
+            sourceKernelSamples,
+          });
+        }
       }
     }
   }
@@ -3224,9 +3264,9 @@ function requiredFailureCount(rows, mode) {
   }).length;
 }
 
-function mergeMetricValues(left, right) {
+function mergeMetricValues(left, right, leftWeight, rightWeight) {
   if (typeof left === "number" && Number.isFinite(left) && typeof right === "number" && Number.isFinite(right)) {
-    return (left + right) / 2;
+    return ((left * leftWeight) + (right * rightWeight)) / (leftWeight + rightWeight);
   }
   if (left === right) {
     return left;
@@ -3250,6 +3290,22 @@ const MERGED_CONCAT_METRICS = new Set([
   "waitMsSamples",
   "usPerOpSamples",
 ]);
+
+function isOrderBalancedTimingMetric(key) {
+  if (/(Avg|P10|P50|P95|P99|Samples|Count)$/.test(key)) {
+    return false;
+  }
+  return key.startsWith("usPer") || key.endsWith("Ms") || key.endsWith("Fps");
+}
+
+function orderBalancedSamplesFor(metrics, key) {
+  const samples = metrics?.orderBalancedMetricSamples?.[key];
+  if (Array.isArray(samples)) {
+    return samples.filter((value) => typeof value === "number" && Number.isFinite(value));
+  }
+  const value = metrics?.[key];
+  return typeof value === "number" && Number.isFinite(value) ? [value] : [];
+}
 
 function percentile(sortedValues, fraction) {
   if (sortedValues.length === 0) {
@@ -3340,15 +3396,22 @@ function sampleGroupsFor(metrics, sampleKey) {
 
 function mergeMetrics(leftMetrics, rightMetrics) {
   const merged = {};
+  const leftWeight = leftMetrics?.orderBalancedSampleCount ?? 1;
+  const rightWeight = rightMetrics?.orderBalancedSampleCount ?? 1;
   const keys = new Set([
     ...Object.keys(leftMetrics ?? {}),
     ...Object.keys(rightMetrics ?? {}),
   ]);
   for (const key of keys) {
-    if (key === "orderBalancedSampleCount" || MERGED_SUM_METRICS.has(key) || MERGED_CONCAT_METRICS.has(key)) {
+    if (key === "orderBalancedSampleCount" || key === "orderBalancedMetricSamples" || MERGED_SUM_METRICS.has(key) || MERGED_CONCAT_METRICS.has(key)) {
       continue;
     }
-    merged[key] = mergeMetricValues(leftMetrics?.[key], rightMetrics?.[key]);
+    merged[key] = mergeMetricValues(
+      leftMetrics?.[key],
+      rightMetrics?.[key],
+      leftWeight,
+      rightWeight,
+    );
   }
   merged.orderBalancedSampleCount =
     (leftMetrics?.orderBalancedSampleCount ?? 1) +
@@ -3374,6 +3437,22 @@ function mergeMetrics(leftMetrics, rightMetrics) {
     if (groups.length > 0) {
       merged[`${key}Groups`] = groups;
     }
+  }
+  const orderBalancedMetricSamples = {};
+  for (const key of keys) {
+    if (!isOrderBalancedTimingMetric(key)) {
+      continue;
+    }
+    const samples = [
+      ...orderBalancedSamplesFor(leftMetrics, key),
+      ...orderBalancedSamplesFor(rightMetrics, key),
+    ];
+    if (samples.length > 0) {
+      orderBalancedMetricSamples[key] = samples;
+    }
+  }
+  if (Object.keys(orderBalancedMetricSamples).length > 0) {
+    merged.orderBalancedMetricSamples = orderBalancedMetricSamples;
   }
   applyMergedSourceKernelStats(merged);
   return merged;
@@ -3418,6 +3497,7 @@ async function main() {
     l1Rows,
     l2Rows,
     args.modeSchedule,
+    args.modeScheduleRepetitions,
     args.sourceKernelSamples,
     args.sourceKernelScheduleSlices,
     args.sourceKernelScheduleSliceMinDispatchRepeat,
@@ -3464,6 +3544,7 @@ async function main() {
           scheduleUnit: scheduleEntry.scheduleUnit,
           scheduleLayer: scheduleEntry.scheduleLayer,
           schedulePass: scheduleEntry.schedulePass ?? 1,
+          scheduleRepetition: scheduleEntry.scheduleRepetition ?? 1,
           scheduleSlice: scheduleEntry.scheduleSlice ?? 1,
           scheduleSlices: scheduleEntry.scheduleSlices ?? 1,
           sourceKernelSamples: scheduleEntry.sourceKernelSamples ?? args.sourceKernelSamples,
@@ -3527,6 +3608,7 @@ async function main() {
         scheduleUnit: scheduleEntry.scheduleUnit,
         scheduleLayer: scheduleEntry.scheduleLayer,
         schedulePass: scheduleEntry.schedulePass ?? 1,
+        scheduleRepetition: scheduleEntry.scheduleRepetition ?? 1,
         scheduleSlice: scheduleEntry.scheduleSlice ?? 1,
         scheduleSlices: scheduleEntry.scheduleSlices ?? 1,
         sourceKernelSamples: scheduleEntry.sourceKernelSamples ?? args.sourceKernelSamples,
@@ -3618,6 +3700,7 @@ async function main() {
     mode: args.mode,
     modeOrder: modes,
     modeSchedule: args.modeSchedule,
+    modeScheduleRepetitions: args.modeScheduleRepetitions,
     headless: args.headless,
     chromeArgs: args.chromeArgs,
     powerPreference: args.powerPreference,
@@ -3641,6 +3724,7 @@ async function main() {
         args.sourceKernelScheduleSliceMinDispatchRepeat,
       sourceKernelSubmitPolicy: args.sourceKernelSubmitPolicy,
       modeSchedule: args.modeSchedule,
+      modeScheduleRepetitions: args.modeScheduleRepetitions,
       browserBuildConfigurationEvidence: browserBuildConfigurationEvidence(args),
       adapterRequest: {
         powerPreference: args.powerPreference,

@@ -15,10 +15,19 @@ from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_WORKLOADS = REPO_ROOT / "bench/workloads/specialized/workloads.amd.vulkan.superset.json"
+AMD_VULKAN_WORKLOADS = (
+    REPO_ROOT / "bench/workloads/specialized/workloads.amd.vulkan.superset.json"
+)
+APPLE_METAL_WORKLOADS = (
+    REPO_ROOT / "bench/workloads/specialized/workloads.apple.metal.superset.json"
+)
 DEFAULT_RULES = REPO_ROOT / "browser/chromium/bench/projection-rules.json"
-DEFAULT_MANIFEST = (
+AMD_VULKAN_MANIFEST = (
     REPO_ROOT / "browser/chromium/bench/generated/browser_projection_manifest.json"
+)
+APPLE_METAL_MANIFEST = (
+    REPO_ROOT
+    / "browser/chromium/bench/generated/browser_projection_manifest.apple.metal.json"
 )
 DEFAULT_WORKFLOWS = (
     REPO_ROOT / "browser/chromium/bench/workflows/browser-workflow-manifest.json"
@@ -31,6 +40,16 @@ DEFAULT_REPORT_FILE = "dawn-vs-doe.browser-layered.superset.diagnostic.json"
 DEFAULT_SUMMARY_FILE = "dawn-vs-doe.browser-layered.superset.summary.json"
 DEFAULT_CHECK_FILE = "dawn-vs-doe.browser-layered.superset.check.json"
 DEFAULT_SCORE_FILE = "dawn-vs-doe.browser-layered.superset.score.json"
+
+
+def host_benchmark_defaults(platform: str | None = None) -> tuple[Path, Path]:
+    selected_platform = sys.platform if platform is None else platform
+    if selected_platform == "darwin":
+        return APPLE_METAL_WORKLOADS, APPLE_METAL_MANIFEST
+    return AMD_VULKAN_WORKLOADS, AMD_VULKAN_MANIFEST
+
+
+DEFAULT_WORKLOADS, DEFAULT_MANIFEST = host_benchmark_defaults()
 
 
 def host_doe_lib_extension() -> str:
@@ -310,6 +329,12 @@ def parse_args() -> argparse.Namespace:
             "row; paired-balanced runs both row orders and averages numeric "
             "metrics per runtime."
         ),
+    )
+    parser.add_argument(
+        "--mode-schedule-repetitions",
+        type=positive_int,
+        default=None,
+        help="Repeat each paired runtime order and retain timing observations.",
     )
     parser.add_argument(
         "--runtime-selector-policy",
@@ -630,6 +655,7 @@ def extend_iteration_args(command: list[str], args: argparse.Namespace) -> None:
     iteration_args = [
         ("--mode-order", args.mode_order),
         ("--mode-schedule", args.mode_schedule),
+        ("--mode-schedule-repetitions", args.mode_schedule_repetitions),
         ("--iters-upload", args.iters_upload),
         ("--iters-dispatch", args.iters_dispatch),
         ("--iters-render", args.iters_render),

@@ -29,6 +29,8 @@ METRIC_PRIORITY: tuple[tuple[str, str], ...] = (
 )
 
 PHASE_METRICS: tuple[str, ...] = (
+    "adapterRequestMs",
+    "deviceRequestMs",
     "bufferInitMs",
     "createTextureMs",
     "writeTextureMs",
@@ -161,6 +163,20 @@ def selected_metric_distribution(metrics: dict[str, Any], metric: str) -> dict[s
         ]
         if len(numeric_samples) == len(samples):
             values["samples"] = numeric_samples
+    order_balanced_samples = metrics.get("orderBalancedMetricSamples")
+    if isinstance(order_balanced_samples, dict):
+        samples = order_balanced_samples.get(metric)
+        if isinstance(samples, list) and samples:
+            numeric_samples = [
+                float(value)
+                for value in samples
+                if isinstance(value, int | float)
+                and math.isfinite(float(value))
+                and float(value) > 0.0
+            ]
+            if len(numeric_samples) == len(samples):
+                values["orderBalancedSamples"] = numeric_samples
+                values["orderBalancedSampleCount"] = len(numeric_samples)
     if not values:
         return None
     return values

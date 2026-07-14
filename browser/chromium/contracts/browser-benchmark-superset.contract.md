@@ -123,8 +123,11 @@ means all rows ran for one runtime before the next runtime.
 `modeSchedule=paired` means each row records paired runtime execution in
 `modeRunDetails` before moving to the next row. `modeSchedule=paired-balanced`
 runs both row orders and averages numeric metrics per runtime, with
-`orderBalancedSampleCount` recorded in row metrics. Order-sensitive reports
-remain diagnostic until order-balanced evidence passes the same structural and
+`orderBalancedSampleCount` recorded in row metrics. Reports may set
+`modeScheduleRepetitions` above one; every repeated timing observation
+must remain available in `orderBalancedMetricSamples`, and numeric aggregation
+must weight all observations equally. Order-sensitive reports remain
+diagnostic until order-balanced evidence passes the same structural and
 score gates as the grouped report. Non-grouped schedules must execute
 strict-comparable `L1` rows before component diagnostics so component probes do
 not precondition strict browser evidence.
