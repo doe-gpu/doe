@@ -67,7 +67,6 @@ pub const FEATURE_CANDIDATES = [_]abi_feature.WGPUFeatureName{
     abi_feature.WGPUFeatureName_IndirectFirstInstance,
     abi_feature.WGPUFeatureName_Float32Filterable,
     abi_feature.WGPUFeatureName_Subgroups,
-    abi_feature.WGPUFeatureName_SubgroupsF16,
     abi_feature.WGPUFeatureName_Float32Blendable,
     abi_feature.WGPUFeatureName_ClipDistances,
     abi_feature.WGPUFeatureName_DualSourceBlending,
@@ -184,19 +183,14 @@ pub fn fill_supported_features_from_adapter(adapter_raw: abi_core.WGPUAdapter, o
 
 pub fn fill_supported_features_from_device(device_raw: abi_core.WGPUDevice, out: *p1cap.SupportedFeatures) void {
     out.* = p1cap.initSupportedFeatures();
-    var count: usize = 0;
-    for (FEATURE_CANDIDATES) |feature| {
-        if (native.doeNativeDeviceHasFeature(device_raw, feature) != 0) count += 1;
-    }
-    if (count == 0) return;
-    const owned = std.heap.c_allocator.alloc(abi_feature.WGPUFeatureName, count) catch return;
-    var write_index: usize = 0;
-    for (FEATURE_CANDIDATES) |feature| {
-        if (native.doeNativeDeviceHasFeature(device_raw, feature) == 0) continue;
-        owned[write_index] = feature;
-        write_index += 1;
-    }
-    out.featureCount = write_index;
+    const device = native.cast(native.DoeDevice, device_raw) orelse return;
+    if (device.enabled_features.len == 0) return;
+    const owned = std.heap.c_allocator.alloc(
+        abi_feature.WGPUFeatureName,
+        device.enabled_features.len,
+    ) catch return;
+    @memcpy(owned, device.enabled_features);
+    out.featureCount = owned.len;
     out.features = owned.ptr;
 }
 

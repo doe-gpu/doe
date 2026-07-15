@@ -554,7 +554,10 @@ test "doe_device_caps: all C ABI symbols exist" {
 // ============================================================
 
 test "doe_device_caps: feature constants match WebGPU spec values" {
-    try std.testing.expectEqual(@as(u32, 0x0000000E), caps.FEATURE_SUBGROUPS);
+    try std.testing.expectEqual(@as(u32, 0x00000001), types.WGPUFeatureName_CoreFeaturesAndLimits);
+    try std.testing.expectEqual(@as(u32, 0x00000002), types.WGPUFeatureName_DepthClipControl);
+    try std.testing.expectEqual(@as(u32, 0x00000012), caps.FEATURE_SUBGROUPS);
+    try std.testing.expectEqual(@as(u32, 0x00000016), types.WGPUFeatureName_TextureComponentSwizzle);
 }
 
 test "doe_device_caps: METAL_SIMD_GROUP_SIZE is 32" {
@@ -586,7 +589,7 @@ test "doeNativeDeviceHasFeature: unknown feature returns 0" {
 }
 
 test "doeNativeAdapterHasFeature: null device handle is safe" {
-    // Feature queries ignore the device handle — null is always safe.
+    // Null queries retain the platform-capability fallback used by diagnostics.
     _ = caps.doeNativeAdapterHasFeature(null, types.WGPUFeatureName_ShaderF16);
     _ = caps.doeNativeAdapterHasFeature(null, 0);
 }
@@ -594,6 +597,21 @@ test "doeNativeAdapterHasFeature: null device handle is safe" {
 test "doeNativeDeviceHasFeature: null device handle is safe" {
     _ = caps.doeNativeDeviceHasFeature(null, types.WGPUFeatureName_ShaderF16);
     _ = caps.doeNativeDeviceHasFeature(null, 0);
+}
+
+test "doeNativeDeviceHasFeature reports only enabled features for a live device" {
+    var enabled_features = [_]types.WGPUFeatureName{
+        types.WGPUFeatureName_DawnInternalUsages,
+        types.WGPUFeatureName_ShaderF16,
+    };
+    var device = native.DoeDevice{
+        .enabled_features = enabled_features[0..],
+    };
+    const raw: ?*anyopaque = @ptrCast(&device);
+
+    try std.testing.expectEqual(@as(u32, 1), caps.doeNativeDeviceHasFeature(raw, types.WGPUFeatureName_DawnInternalUsages));
+    try std.testing.expectEqual(@as(u32, 1), caps.doeNativeDeviceHasFeature(raw, types.WGPUFeatureName_ShaderF16));
+    try std.testing.expectEqual(@as(u32, 0), caps.doeNativeDeviceHasFeature(raw, types.WGPUFeatureName_Subgroups));
 }
 
 test "doeNativeAdapterHasFeature: subgroups is platform-dependent" {

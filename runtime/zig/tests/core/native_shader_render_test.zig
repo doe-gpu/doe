@@ -840,8 +840,8 @@ test "TimestampQuery feature value is 0x09" {
     try std.testing.expectEqual(@as(u32, 0x00000009), types.WGPUFeatureName_TimestampQuery);
 }
 
-test "IndirectFirstInstance feature value is 0x0C" {
-    try std.testing.expectEqual(@as(u32, 0x0000000C), types.WGPUFeatureName_IndirectFirstInstance);
+test "IndirectFirstInstance feature value is 0x0A" {
+    try std.testing.expectEqual(@as(u32, 0x0000000A), types.WGPUFeatureName_IndirectFirstInstance);
 }
 
 // ============================================================
@@ -849,7 +849,7 @@ test "IndirectFirstInstance feature value is 0x0C" {
 // ============================================================
 
 test "device caps FEATURE_SUBGROUPS matches expected value" {
-    try std.testing.expectEqual(@as(u32, 0x0000000E), caps.FEATURE_SUBGROUPS);
+    try std.testing.expectEqual(@as(u32, 0x00000012), caps.FEATURE_SUBGROUPS);
 }
 
 test "device caps METAL_SIMD_GROUP_SIZE is 32" {

@@ -2473,7 +2473,7 @@ uint32_t metal_bridge_query_device_features(void) {
             features |= METAL_FEATURE_BIT_RG11B10UFLOAT_RENDERABLE;
         }
 
-        // subgroups-f16: requires Apple family 6+ (f16 support implies subgroup f16 ops)
+        // Subgroup f16 operations require Apple family 6+.
         if ([device supportsFamily:MTLGPUFamilyApple6]) {
             features |= METAL_FEATURE_BIT_SUBGROUPS_F16;
         }

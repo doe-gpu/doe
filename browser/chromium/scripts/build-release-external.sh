@@ -51,13 +51,15 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 has_local_jobs_arg=false
-for arg in ${autoninja_args[@]+"${autoninja_args[@]}"}; do
-  case "${arg}" in
-    -local_jobs|--local_jobs|-local_jobs=*|--local_jobs=*|-j*)
-      has_local_jobs_arg=true
-      ;;
-  esac
-done
+if [[ "${#autoninja_args[@]}" -gt 0 ]]; then
+  for arg in "${autoninja_args[@]}"; do
+    case "${arg}" in
+      -local_jobs|--local_jobs|-local_jobs=*|--local_jobs=*|-j*)
+        has_local_jobs_arg=true
+        ;;
+    esac
+  done
+fi
 
 if [[ -n "${FAWN_CHROMIUM_LOCAL_JOBS:-}" && "${has_local_jobs_arg}" == false ]]; then
   if [[ ! "${FAWN_CHROMIUM_LOCAL_JOBS}" =~ ^[1-9][0-9]*$ ]]; then
@@ -83,7 +85,11 @@ esac
 RELEASE_GN_ARGS="${FAWN_CHROMIUM_RELEASE_GN_ARGS:-${DEFAULT_RELEASE_GN_ARGS}}"
 gn gen out/fawn_release "--args=${RELEASE_GN_ARGS}"
 
-autoninja -C out/fawn_release chrome ${autoninja_args[@]+"${autoninja_args[@]}"}
+if [[ "${#autoninja_args[@]}" -gt 0 ]]; then
+  autoninja -C out/fawn_release chrome "${autoninja_args[@]}"
+else
+  autoninja -C out/fawn_release chrome
+fi
 
 args_sha256="$(shasum -a 256 out/fawn_release/args.gn | awk '{print $1}')"
 cat > out/fawn_release/fawn-release-build.json <<EOF

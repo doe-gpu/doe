@@ -3,7 +3,7 @@
 // Mirrors doe_device_caps.zig for the D3D12 backend. Limits are conservative
 // D3D12 Feature Level 11.0 defaults (the minimum Doe targets). Runtime hardware
 // queries via bridge functions refine feature detection when a device handle is
-// available (ShaderF16, Subgroups, SubgroupsF16, wave lane counts).
+// available (ShaderF16, Subgroups, wave lane counts).
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -38,7 +38,6 @@ const FEATURE_PRIMITIVE_INDEX: u32 = abi_feature.WGPUFeatureName_PrimitiveIndex;
 const FEATURE_TEXTURE_COMPONENT_SWIZZLE: u32 = abi_feature.WGPUFeatureName_TextureComponentSwizzle;
 const FEATURE_SHADER_F16: u32 = abi_feature.WGPUFeatureName_ShaderF16;
 const FEATURE_SUBGROUPS: u32 = abi_feature.WGPUFeatureName_Subgroups;
-const FEATURE_SUBGROUPS_F16: u32 = abi_feature.WGPUFeatureName_SubgroupsF16;
 
 // Shader model thresholds for feature gating.
 const SM_6_0: c_int = 0x60; // Wave intrinsics (subgroups)
@@ -219,7 +218,7 @@ pub fn query_device_caps(device: ?*anyopaque) D3D12DeviceCaps {
     const subgroups = sm >= SM_6_0;
     // ShaderF16 requires both SM6.2+ and hardware native 16-bit op support.
     const shader_f16 = sm >= SM_6_2 and native_16 == 1;
-    // SubgroupsF16 requires both ShaderF16 and Subgroups.
+    // Subgroup f16 operations require both ShaderF16 and subgroup support.
     const sub_f16 = subgroups and shader_f16;
     const bc_sliced_3d = bridge.c.d3d12_bridge_device_supports_bc_sliced_3d(device) == 1;
     const float32_blendable = supports_all_color_attachment_blend_formats(device, &FLOAT32_BLENDABLE_FORMATS);
@@ -254,7 +253,7 @@ pub fn query_device_caps(device: ?*anyopaque) D3D12DeviceCaps {
 
 // D3D12 feature support — Feature Level 11.0+ unconditional capabilities.
 // Features that need runtime hardware queries (ShaderF16, Subgroups,
-// SubgroupsF16, ETC2, ASTC, Float32Blendable) are excluded from the
+// ETC2, ASTC, Float32Blendable) are excluded from the
 // static path and checked against the caps struct when available.
 fn is_feature_supported_static(feature: u32) bool {
     return switch (feature) {
@@ -278,7 +277,6 @@ fn is_feature_supported_with_caps(feature: u32, caps: D3D12DeviceCaps) bool {
     return switch (feature) {
         FEATURE_SHADER_F16 => D3D12_AVAILABLE and caps.has_shader_f16,
         FEATURE_SUBGROUPS => D3D12_AVAILABLE and caps.has_subgroups,
-        FEATURE_SUBGROUPS_F16 => D3D12_AVAILABLE and caps.has_subgroups_f16,
         FEATURE_TEXTURE_COMPRESSION_BC => D3D12_AVAILABLE,
         FEATURE_TEXTURE_COMPRESSION_BC_SLICED_3D => D3D12_AVAILABLE and caps.supports_bc_sliced_3d,
         FEATURE_TEXTURE_COMPRESSION_ETC2 => D3D12_AVAILABLE and caps.supports_etc2,
@@ -378,5 +376,4 @@ test "d3d12 runtime-probed subgroup and f16 features publish when caps allow" {
     };
     try std.testing.expectEqual(D3D12_AVAILABLE, is_feature_supported_with_caps(FEATURE_SUBGROUPS, caps));
     try std.testing.expectEqual(D3D12_AVAILABLE, is_feature_supported_with_caps(FEATURE_SHADER_F16, caps));
-    try std.testing.expectEqual(D3D12_AVAILABLE, is_feature_supported_with_caps(FEATURE_SUBGROUPS_F16, caps));
 }

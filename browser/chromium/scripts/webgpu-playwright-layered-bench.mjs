@@ -1290,6 +1290,10 @@ function startLocalServer() {
   const html =
     "<!doctype html><meta charset='utf-8'><title>doe-webgpu-layered-bench</title>";
   const server = http.createServer((req, res) => {
+    res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+    res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+    res.setHeader("Cache-Control", "no-store");
     const requestPath = new URL(req.url ?? "/", "http://127.0.0.1").pathname;
     if (requestPath !== "/") {
       const relativePath = requestPath.replace(/^\/+/, "");

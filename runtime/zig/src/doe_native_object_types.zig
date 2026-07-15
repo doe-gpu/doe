@@ -4,6 +4,7 @@ const model_compute_types = @import("model_compute_types.zig");
 const model_render_types = @import("model_render_types.zig");
 const abi_core = @import("core/abi/wgpu_core_base_types.zig");
 const abi_callback = @import("core/abi/wgpu_callback_descriptor_types.zig");
+const abi_feature = @import("core/abi/wgpu_feature_base_types.zig");
 const wgsl_compiler = @import("doe_wgsl/mod.zig");
 const error_scope = @import("error_scope.zig");
 const gpu_timeline = @import("gpu_timeline.zig");
@@ -63,6 +64,7 @@ pub const DoeDevice = struct {
     backend: shared.BackendKind = .metal,
     vk_runtime: ?*anyopaque = null,
     d3d12_runtime: ?*anyopaque = null,
+    enabled_features: []abi_feature.WGPUFeatureName = &.{},
 };
 
 pub const DoeQueue = struct {

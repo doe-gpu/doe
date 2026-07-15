@@ -5,7 +5,6 @@ const c = @import("vk_constants.zig");
 const FEATURE_SHADER_F16: u32 = abi_feature.WGPUFeatureName_ShaderF16;
 const FEATURE_FLOAT32_BLENDABLE: u32 = abi_feature.WGPUFeatureName_Float32Blendable;
 const FEATURE_SUBGROUPS: u32 = abi_feature.WGPUFeatureName_Subgroups;
-const FEATURE_SUBGROUPS_F16: u32 = abi_feature.WGPUFeatureName_SubgroupsF16;
 const FEATURE_DUAL_SOURCE_BLENDING: u32 = abi_feature.WGPUFeatureName_DualSourceBlending;
 const FEATURE_TEXTURE_FORMATS_TIER1: u32 = abi_feature.WGPUFeatureName_TextureFormatsTier1;
 const FEATURE_TEXTURE_FORMATS_TIER2: u32 = abi_feature.WGPUFeatureName_TextureFormatsTier2;
@@ -253,7 +252,6 @@ pub fn dynamic_feature_supported(feature: u32, caps: VulkanFeatureCaps) bool {
         FEATURE_SHADER_F16 => caps.shader_f16,
         FEATURE_FLOAT32_BLENDABLE => caps.float32_blendable,
         FEATURE_SUBGROUPS => caps.subgroups,
-        FEATURE_SUBGROUPS_F16 => caps.subgroups_f16,
         FEATURE_DUAL_SOURCE_BLENDING => caps.dual_source_blending,
         FEATURE_TEXTURE_FORMATS_TIER1 => caps.texture_formats_tier1,
         FEATURE_TEXTURE_FORMATS_TIER2 => caps.texture_formats_tier2,

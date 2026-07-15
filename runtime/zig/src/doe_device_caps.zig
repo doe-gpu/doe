@@ -44,7 +44,6 @@ const FEATURE_TEXTURE_COMPRESSION_BC: u32 = abi_feature.WGPUFeatureName_TextureC
 const FEATURE_TEXTURE_COMPRESSION_ETC2: u32 = abi_feature.WGPUFeatureName_TextureCompressionETC2;
 const FEATURE_RG11B10UFLOAT_RENDERABLE: u32 = abi_feature.WGPUFeatureName_RG11B10UfloatRenderable;
 const FEATURE_TIMESTAMP_QUERY: u32 = abi_feature.WGPUFeatureName_TimestampQuery;
-const FEATURE_SUBGROUPS_F16: u32 = abi_feature.WGPUFeatureName_SubgroupsF16;
 const FEATURE_CLIP_DISTANCES: u32 = abi_feature.WGPUFeatureName_ClipDistances;
 const FEATURE_DUAL_SOURCE_BLENDING: u32 = abi_feature.WGPUFeatureName_DualSourceBlending;
 const FEATURE_CORE_FEATURES_AND_LIMITS: u32 = abi_feature.WGPUFeatureName_CoreFeaturesAndLimits;
@@ -196,7 +195,6 @@ fn is_metal_feature_supported(feature: u32) bool {
         FEATURE_FLOAT32_FILTERABLE,
         FEATURE_FLOAT32_BLENDABLE,
         FEATURE_SUBGROUPS,
-        FEATURE_SUBGROUPS_F16,
         FEATURE_CLIP_DISTANCES,
         FEATURE_DUAL_SOURCE_BLENDING,
         FEATURE_CORE_FEATURES_AND_LIMITS,
@@ -223,7 +221,6 @@ fn is_vulkan_feature_supported(
         FEATURE_SHADER_F16,
         FEATURE_FLOAT32_BLENDABLE,
         FEATURE_SUBGROUPS,
-        FEATURE_SUBGROUPS_F16,
         FEATURE_DUAL_SOURCE_BLENDING,
         FEATURE_TEXTURE_FORMATS_TIER1,
         FEATURE_TEXTURE_FORMATS_TIER2,
@@ -291,19 +288,10 @@ pub export fn doeNativeAdapterHasFeature(raw: ?*anyopaque, feature: u32) callcon
 
 pub export fn doeNativeDeviceHasFeature(raw: ?*anyopaque, feature: u32) callconv(.c) u32 {
     if (native_helpers.cast(DoeDevice, raw)) |d| {
-        if (comptime has_vulkan) {
-            if (d.backend == .vulkan) {
-                const caps = vulkan_feature_cache.get_device(raw);
-                const hw_caps = vulkan_feature_cache.get_device_device_caps(raw);
-                return if (is_vulkan_feature_supported(feature, caps, hw_caps)) 1 else 0;
-            }
+        for (d.enabled_features) |enabled_feature| {
+            if (enabled_feature == feature) return 1;
         }
-        if (d.backend == .d3d12) {
-            if (d3d12_runtime(d)) |rt| {
-                return if (rt.has_feature(feature)) 1 else 0;
-            }
-            return if (d3d12_device_caps.d3d12_device_has_feature(feature)) 1 else 0;
-        }
+        return 0;
     }
     return if (is_metal_feature_supported(feature)) 1 else 0;
 }

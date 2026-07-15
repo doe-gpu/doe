@@ -10,11 +10,13 @@ const builtin = @import("builtin");
 const has_vulkan = (builtin.os.tag == .linux);
 const abi_base = @import("core/abi/wgpu_handle_types.zig");
 const abi_callback = @import("core/abi/wgpu_callback_descriptor_types.zig");
+const abi_feature = @import("core/abi/wgpu_feature_base_types.zig");
 const backend_capabilities = @import("backend/dropin_capabilities.zig");
 const backend_lifecycle = @import("backend/dropin_lifecycle.zig");
 const native_types = @import("doe_native_object_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const package_metal_pipeline_cache = @import("doe_package_metal_pipeline_cache.zig");
+const device_caps = @import("doe_device_caps.zig");
 const future_ids = @import("doe_future_ids.zig");
 
 const alloc = native_helpers.alloc;
@@ -54,6 +56,8 @@ const MSG_DEVICE_ALLOCATION_FAILED = "device allocation failed";
 const MSG_VK_RUNTIME_INIT_FAILED = "vulkan runtime init failed";
 const MSG_D3D12_RUNTIME_INIT_FAILED = "d3d12 runtime init failed";
 const MSG_RUNTIME_POLICY_INVALID = "backend runtime policy invalid";
+const MSG_DEVICE_DESCRIPTOR_INVALID = "invalid device feature descriptor";
+const MSG_REQUIRED_FEATURE_UNSUPPORTED = "required device feature unsupported";
 
 const RequestedBackend = enum {
     metal,
@@ -208,6 +212,8 @@ const CreateDeviceError = error{
     VkRuntimeInitFailed,
     D3D12RuntimeInitFailed,
     RuntimePolicyInvalid,
+    DeviceDescriptorInvalid,
+    RequiredFeatureUnsupported,
 };
 
 const CreateAdapterError = error{
@@ -222,6 +228,8 @@ fn create_device_error_message(err: CreateDeviceError) abi_base.WGPUStringView {
         error.VkRuntimeInitFailed => stringView(MSG_VK_RUNTIME_INIT_FAILED),
         error.D3D12RuntimeInitFailed => stringView(MSG_D3D12_RUNTIME_INIT_FAILED),
         error.RuntimePolicyInvalid => stringView(MSG_RUNTIME_POLICY_INVALID),
+        error.DeviceDescriptorInvalid => stringView(MSG_DEVICE_DESCRIPTOR_INVALID),
+        error.RequiredFeatureUnsupported => stringView(MSG_REQUIRED_FEATURE_UNSUPPORTED),
     };
 }
 
@@ -265,7 +273,40 @@ fn create_adapter_for_instance(inst: ?*anyopaque) CreateAdapterError!*DoeAdapter
     return adapter;
 }
 
-fn create_device_for_adapter(adapter: *DoeAdapter, adapter_raw: ?*anyopaque) CreateDeviceError!*DoeDevice {
+fn copy_enabled_features(
+    adapter_raw: ?*anyopaque,
+    desc: ?*const abi_callback.WGPUDeviceDescriptor,
+) CreateDeviceError![]abi_feature.WGPUFeatureName {
+    const descriptor = desc orelse return &.{};
+    if (descriptor.requiredFeatureCount == 0) return &.{};
+    const requested = descriptor.requiredFeatures orelse return error.DeviceDescriptorInvalid;
+    const owned = alloc.alloc(
+        abi_feature.WGPUFeatureName,
+        descriptor.requiredFeatureCount,
+    ) catch return error.DeviceAllocationFailed;
+    errdefer alloc.free(owned);
+
+    for (requested[0..descriptor.requiredFeatureCount], 0..) |feature, index| {
+        const embedder_feature = feature == abi_feature.WGPUFeatureName_DawnInternalUsages;
+        if (!embedder_feature and device_caps.doeNativeAdapterHasFeature(adapter_raw, feature) == 0) {
+            return error.RequiredFeatureUnsupported;
+        }
+        for (owned[0..index]) |enabled_feature| {
+            if (enabled_feature == feature) return error.DeviceDescriptorInvalid;
+        }
+        owned[index] = feature;
+    }
+    return owned;
+}
+
+fn create_device_for_adapter(
+    adapter: *DoeAdapter,
+    adapter_raw: ?*anyopaque,
+    desc: ?*const abi_callback.WGPUDeviceDescriptor,
+) CreateDeviceError!*DoeDevice {
+    const enabled_features = try copy_enabled_features(adapter_raw, desc);
+    errdefer if (enabled_features.len > 0) alloc.free(enabled_features);
+
     if (comptime has_vulkan) {
         if (adapter.backend == .vulkan) {
             const dev = make(DoeDevice) orelse return error.DeviceAllocationFailed;
@@ -286,7 +327,12 @@ fn create_device_for_adapter(adapter: *DoeAdapter, adapter_raw: ?*anyopaque) Cre
                 return error.VkRuntimeInitFailed;
             };
             adapter_add_ref(adapter);
-            dev.* = .{ .backend = .vulkan, .adapter = adapter, .vk_runtime = @ptrCast(rt) };
+            dev.* = .{
+                .backend = .vulkan,
+                .adapter = adapter,
+                .vk_runtime = @ptrCast(rt),
+                .enabled_features = enabled_features,
+            };
             const feature_caps: vk_feature_caps.VulkanFeatureCaps = blk: {
                 if (vulkan_feature_cache.get_adapter(adapter_raw)) |cached| break :blk cached;
                 const queried = vk_feature_caps.query(rt.physical_device).caps;
@@ -327,6 +373,7 @@ fn create_device_for_adapter(adapter: *DoeAdapter, adapter_raw: ?*anyopaque) Cre
             .mtl_device = rt.device,
             .mtl_queue = rt.queue,
             .d3d12_runtime = @ptrCast(rt),
+            .enabled_features = enabled_features,
         };
         return dev;
     }
@@ -338,7 +385,12 @@ fn create_device_for_adapter(adapter: *DoeAdapter, adapter_raw: ?*anyopaque) Cre
         return error.DeviceAllocationFailed;
     };
     adapter_add_ref(adapter);
-    dev.* = .{ .adapter = adapter, .mtl_device = adapter.mtl_device, .mtl_queue = queue };
+    dev.* = .{
+        .adapter = adapter,
+        .mtl_device = adapter.mtl_device,
+        .mtl_queue = queue,
+        .enabled_features = enabled_features,
+    };
     return dev;
 }
 
@@ -482,12 +534,11 @@ pub export fn doeNativeAdapterRequestDevice(
     desc: ?*const abi_callback.WGPUDeviceDescriptor,
     info: abi_callback.WGPURequestDeviceCallbackInfo,
 ) callconv(.c) abi_base.WGPUFuture {
-    _ = desc;
     const adapter = cast(DoeAdapter, adapter_raw) orelse {
         call_request_device_callback(info, .@"error", null, stringView(MSG_INVALID_ADAPTER));
         return .{ .id = 2 };
     };
-    const dev = create_device_for_adapter(adapter, adapter_raw) catch |err| {
+    const dev = create_device_for_adapter(adapter, adapter_raw, desc) catch |err| {
         call_request_device_callback(info, .@"error", null, create_device_error_message(err));
         return .{ .id = 2 };
     };
@@ -499,16 +550,15 @@ pub export fn doeNativeAdapterCreateDevice(
     adapter_raw: ?*anyopaque,
     desc: ?*const abi_callback.WGPUDeviceDescriptor,
 ) callconv(.c) ?*anyopaque {
-    _ = desc;
     const adapter = cast(DoeAdapter, adapter_raw) orelse return null;
-    const dev = create_device_for_adapter(adapter, adapter_raw) catch return null;
+    const dev = create_device_for_adapter(adapter, adapter_raw, desc) catch return null;
     return toOpaque(dev);
 }
 
 // Flat device request.
 pub export fn doeNativeRequestDeviceFlat(
     adapter_raw: ?*anyopaque,
-    _: ?*anyopaque,
+    descriptor_raw: ?*anyopaque,
     _: u32,
     callback: ?*const fn (u32, ?*anyopaque, abi_base.WGPUStringView, ?*anyopaque, ?*anyopaque) callconv(.c) void,
     userdata1: ?*anyopaque,
@@ -518,7 +568,11 @@ pub export fn doeNativeRequestDeviceFlat(
         if (callback) |cb| cb(WGPU_REQUEST_STATUS_ERROR, null, stringView(MSG_INVALID_ADAPTER), userdata1, userdata2);
         return .{ .id = 2 };
     };
-    const dev = create_device_for_adapter(adapter, adapter_raw) catch |err| {
+    const desc: ?*const abi_callback.WGPUDeviceDescriptor = if (descriptor_raw) |ptr|
+        @ptrCast(@alignCast(ptr))
+    else
+        null;
+    const dev = create_device_for_adapter(adapter, adapter_raw, desc) catch |err| {
         if (callback) |cb| cb(WGPU_REQUEST_STATUS_ERROR, null, create_device_error_message(err), userdata1, userdata2);
         return .{ .id = 2 };
     };
@@ -579,6 +633,7 @@ pub export fn doeNativeDeviceRelease(raw: ?*anyopaque) callconv(.c) void {
             if (d.mtl_queue) |q| metal_bridge_release(q);
             if (d.mtl_device) |dev| metal_bridge_release(dev);
         }
+        if (d.enabled_features.len > 0) alloc.free(d.enabled_features);
         const adapter = d.adapter;
         alloc.destroy(d);
         if (adapter) |adapter_ref| doeNativeAdapterRelease(toOpaque(adapter_ref));

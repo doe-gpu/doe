@@ -106,6 +106,7 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
         self.assertIn("use_clang_modules=false", text)
         self.assertIn("FAWN_CHROMIUM_LOCAL_JOBS", text)
         self.assertIn("invalid FAWN_CHROMIUM_LOCAL_JOBS", text)
+        self.assertGreaterEqual(text.count('[[ "${#autoninja_args[@]}" -gt 0 ]]'), 2)
 
     def test_sync_release_artifacts_preserves_release_args_evidence(self) -> None:
         self.assertIn(
@@ -503,6 +504,14 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
             real_index = text.index('"Fawn.app/Contents/MacOS/Chromium-real"')
             launcher_index = text.index('"Fawn.app/Contents/MacOS/Chromium"')
             self.assertLess(real_index, launcher_index, str(path))
+
+    def test_layered_runner_uses_cross_origin_isolation_for_timing_precision(self) -> None:
+        text = JS_RUNNERS[1].read_text(encoding="utf-8")
+
+        self.assertIn('"Cross-Origin-Embedder-Policy", "require-corp"', text)
+        self.assertIn('"Cross-Origin-Opener-Policy", "same-origin"', text)
+        self.assertIn('"Cross-Origin-Resource-Policy", "same-origin"', text)
+        self.assertIn('"Cache-Control", "no-store"', text)
 
     def test_python_superset_runner_accepts_auto_without_doe_lib_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
