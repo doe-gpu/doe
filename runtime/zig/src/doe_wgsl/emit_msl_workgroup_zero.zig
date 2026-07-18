@@ -12,7 +12,7 @@ pub fn canLowerWorkgroupGlobalToThread(
     if (moduleHasWorkgroupRefParam(module)) return false;
     const global = module.globals.items[global_index];
     if (global.binding != null or global.class != .var_ or global.addr_space != .workgroup) return false;
-    return !typeContainsAtomic(module, global.ty);
+    return !typeContainsAtomic(module, global.ty) and !typeContainsArray(module, global.ty);
 }
 
 pub fn singleInvocationWorkgroup(function: ir.Function) bool {
@@ -64,6 +64,20 @@ fn typeContainsAtomic(module: *const ir.Module, ty: ir.TypeId) bool {
             const struct_def = module.structs.items[struct_id];
             for (struct_def.fields.items) |field| {
                 if (typeContainsAtomic(module, field.ty)) break :blk true;
+            }
+            break :blk false;
+        },
+        else => false,
+    };
+}
+
+fn typeContainsArray(module: *const ir.Module, ty: ir.TypeId) bool {
+    return switch (module.types.get(ty)) {
+        .array => true,
+        .struct_ => |struct_id| blk: {
+            const struct_def = module.structs.items[struct_id];
+            for (struct_def.fields.items) |field| {
+                if (typeContainsArray(module, field.ty)) break :blk true;
             }
             break :blk false;
         },

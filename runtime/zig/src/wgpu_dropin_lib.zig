@@ -334,6 +334,7 @@ fn resolveLocalProc(name: abi_base.WGPUStringView) p1_capability_procs.WGPUProc 
     if (symbolViewEq(name, "wgpuCommandBufferAddRef")) return fnPtr(&dropin_ext_a.exports.wgpuCommandBufferAddRef);
     if (symbolViewEq(name, "wgpuCommandBufferSetLabel")) return fnPtr(&dropin_ext_c.wgpuCommandBufferSetLabel);
     if (symbolViewEq(name, "wgpuCommandEncoderAddRef")) return fnPtr(&dropin_ext_a.exports.wgpuCommandEncoderAddRef);
+    if (symbolViewEq(name, "wgpuShaderModuleGetCompilationInfo")) return fnPtr(&dropin_ext_b.wgpuShaderModuleGetCompilationInfo);
     if (symbolViewEq(name, "wgpuShaderModuleRelease")) return fnPtr(&P.wgpuShaderModuleRelease);
     if (symbolViewEq(name, "wgpuCommandEncoderSetLabel")) return fnPtr(&dropin_ext_c.wgpuCommandEncoderSetLabel);
     if (symbolViewEq(name, "wgpuComputePassEncoderAddRef")) return fnPtr(&dropin_ext_a.exports.wgpuComputePassEncoderAddRef);
@@ -410,6 +411,7 @@ fn resolveLocalProc(name: abi_base.WGPUStringView) p1_capability_procs.WGPUProc 
     if (symbolViewEq(name, "wgpuQueueCopyTextureForBrowser")) return fnPtr(&dropin_ext_c.wgpuQueueCopyTextureForBrowser);
     if (symbolViewEq(name, "wgpuQueueCopyExternalTextureForBrowser")) return fnPtr(&dropin_ext_c.wgpuQueueCopyExternalTextureForBrowser);
     if (symbolViewEq(name, "wgpuDeviceCreateTexture")) return fnPtr(&N.doeNativeDeviceCreateTexture);
+    if (symbolViewEq(name, "wgpuDeviceValidateTextureDescriptor")) return fnPtr(&N.doeNativeDeviceValidateTextureDescriptor);
     if (symbolViewEq(name, "wgpuTextureCreateView")) return fnPtr(&N.doeNativeTextureCreateView);
     if (symbolViewEq(name, "wgpuRenderPassEncoderAddRef")) return fnPtr(&dropin_ext_b.wgpuRenderPassEncoderAddRef);
     if (symbolViewEq(name, "wgpuRenderPassEncoderSetLabel")) return fnPtr(&dropin_ext_c.wgpuRenderPassEncoderSetLabel);
@@ -613,6 +615,29 @@ test "shared compute pass proc routes to native implementation instead of recurs
     try std.testing.expectEqual(fnPtr(&N.doeNativeCommandEncoderBeginComputePass), resolveLocalProc(view));
     try std.testing.expectEqual(fnPtr(&N.doeNativeCommandEncoderBeginComputePass), wgpuGetProcAddress(view));
     try std.testing.expect(resolveLocalProc(view) != fnPtr(&dropin_abi_procs.wgpuCommandEncoderBeginComputePass));
+}
+
+test "shader compilation info resolves to Doe instead of Dawn" {
+    const symbol: [:0]const u8 = "wgpuShaderModuleGetCompilationInfo";
+    const view = abi_base.WGPUStringView{
+        .data = symbol.ptr,
+        .length = abi_base.WGPU_STRLEN,
+    };
+
+    try std.testing.expectEqual(fnPtr(&dropin_ext_b.wgpuShaderModuleGetCompilationInfo), resolveLocalProc(view));
+    try std.testing.expectEqual(fnPtr(&dropin_ext_b.wgpuShaderModuleGetCompilationInfo), wgpuGetProcAddress(view));
+}
+
+test "texture descriptor validation resolves to Doe instead of Dawn" {
+    const N = @import("doe_wgpu_native.zig");
+    const symbol: [:0]const u8 = "wgpuDeviceValidateTextureDescriptor";
+    const view = abi_base.WGPUStringView{
+        .data = symbol.ptr,
+        .length = abi_base.WGPU_STRLEN,
+    };
+
+    try std.testing.expectEqual(fnPtr(&N.doeNativeDeviceValidateTextureDescriptor), resolveLocalProc(view));
+    try std.testing.expectEqual(fnPtr(&N.doeNativeDeviceValidateTextureDescriptor), wgpuGetProcAddress(view));
 }
 
 test "browser shared-memory procs resolve locally instead of native fallback" {

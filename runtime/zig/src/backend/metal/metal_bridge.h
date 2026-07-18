@@ -5,6 +5,7 @@
 // Opaque handle: every returned handle is +1 retained; caller owns it.
 // Call metal_bridge_release() to decrement when done.
 typedef void* MetalHandle;
+typedef void (*MetalCompletionCallback)(void* userdata);
 
 typedef struct {
     uint64_t array_stride;
@@ -18,6 +19,23 @@ typedef struct {
     uint32_t shader_location;
     uint32_t buffer_index;
 } MetalVertexAttributeDesc;
+
+typedef struct {
+    uint32_t color_load_op;
+    uint32_t color_store_op;
+    uint32_t depth_load_op;
+    uint32_t depth_store_op;
+    uint32_t stencil_load_op;
+    uint32_t stencil_store_op;
+    uint32_t depth_read_only;
+    uint32_t stencil_read_only;
+    double clear_r;
+    double clear_g;
+    double clear_b;
+    double clear_a;
+    float depth_clear_value;
+    uint32_t stencil_clear_value;
+} MetalRenderPassOps;
 
 MetalHandle metal_bridge_create_default_device(void);
 MetalHandle metal_bridge_create_surface_host(MetalHandle* layer_out);
@@ -42,6 +60,10 @@ MetalHandle metal_bridge_encode_blit_copy(
 void metal_bridge_command_buffer_commit(MetalHandle cmd_buf);
 void metal_bridge_command_buffer_wait_completed(MetalHandle cmd_buf);
 void metal_bridge_command_buffer_spin_wait(MetalHandle cmd_buf);
+// Keep an Objective-C object alive until this command buffer completes.
+int metal_bridge_command_buffer_retain_object_until_complete(
+    MetalHandle cmd_buf,
+    MetalHandle object);
 
 // === Shared Event (lightweight GPU fence) ===
 
@@ -54,6 +76,12 @@ void metal_bridge_command_buffer_encode_signal_event(
     uint64_t    value);
 // Wait until the event reaches the given value.
 void metal_bridge_shared_event_wait(MetalHandle event, uint64_t value);
+// Invoke callback on the shared-event listener queue when value is reached.
+int metal_bridge_shared_event_notify(
+    MetalHandle event,
+    uint64_t value,
+    MetalCompletionCallback callback,
+    void* userdata);
 
 // Batch-encode multiple blit copies into a single command buffer.
 // Returns the command buffer (+1 retained) ready for commit+wait.
@@ -124,6 +152,12 @@ MetalHandle metal_bridge_create_command_buffer(MetalHandle queue);
 MetalHandle metal_bridge_cmd_buf_blit_encoder(MetalHandle cmd_buf);
 // Open a compute encoder on an existing command buffer. Returns unretained encoder.
 MetalHandle metal_bridge_cmd_buf_compute_encoder(MetalHandle cmd_buf);
+// Open a compute encoder whose pass boundaries write timestamp samples.
+MetalHandle metal_bridge_cmd_buf_compute_encoder_with_timestamps(
+    MetalHandle cmd_buf,
+    MetalHandle counter_buffer,
+    uint32_t    begin_query_index,
+    uint32_t    end_query_index);
 // End the current compute encoder. Call before commit or before starting a new encoder.
 void metal_bridge_end_compute_encoding(MetalHandle encoder);
 // Encode a render pass on an existing command buffer (no commit).
@@ -143,17 +177,14 @@ void metal_bridge_cmd_buf_encode_icb_render_pass(
     MetalHandle icb,
     MetalHandle target,
     uint32_t    draw_count);
-// Create render encoder on cmd_buf (unretained). Pipeline is set.
+// Create a render encoder on cmd_buf. The returned encoder is retained.
 MetalHandle metal_bridge_cmd_buf_render_encoder(
     MetalHandle cmd_buf,
     MetalHandle pipeline,
     MetalHandle target,
+    MetalHandle resolve_target,
     MetalHandle depth_target,
-    int         use_depth_store,
-    double      clear_r,
-    double      clear_g,
-    double      clear_b,
-    double      clear_a);
+    const MetalRenderPassOps* ops);
 void metal_bridge_render_encoder_set_bind_buffer(
     MetalHandle encoder,
     uint32_t    slot,
@@ -506,8 +537,8 @@ int metal_bridge_supports_timestamp_query(MetalHandle device);
 // Returns NULL if counter sampling is unsupported or the timestamp counter set is absent.
 MetalHandle metal_bridge_create_counter_sample_buffer(MetalHandle device, uint32_t count);
 
-// Sample GPU timestamp on a blit encoder at the given query index.
-// Creates a blit encoder on cmd_buf, samples, and ends encoding.
+// Sample a standalone GPU timestamp when blit-boundary sampling is available.
+// Stage-boundary-only devices use the timestamped compute encoder above.
 void metal_bridge_sample_timestamp(
     MetalHandle cmd_buf,
     MetalHandle counter_buffer,

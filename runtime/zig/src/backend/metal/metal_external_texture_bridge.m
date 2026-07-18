@@ -17,8 +17,9 @@
 // MTLPixelFormat constants for plane import
 // ============================================================
 
-// Single-plane BGRA (camera capture, screen capture)
-#define DOE_MTL_PIXEL_FORMAT_BGRA8_UNORM   70
+// Single-plane packed color formats.
+#define DOE_MTL_PIXEL_FORMAT_RGBA8_UNORM   70
+#define DOE_MTL_PIXEL_FORMAT_BGRA8_UNORM   80
 
 // NV12 multi-plane: Y plane = R8Unorm, UV plane = RG8Unorm
 #define DOE_MTL_PIXEL_FORMAT_R8_UNORM      10
@@ -43,6 +44,16 @@ MetalHandle doe_metal_import_iosurface(
 
     MTLTextureDescriptor* desc = [[MTLTextureDescriptor alloc] init];
     desc.textureType = MTLTextureType2D;
+    if (pixel_format == 0) {
+        OSType surface_format = IOSurfaceGetPixelFormat(surface);
+        if (surface_format == kCVPixelFormatType_32RGBA) {
+            pixel_format = DOE_MTL_PIXEL_FORMAT_RGBA8_UNORM;
+        } else if (surface_format == kCVPixelFormatType_32BGRA) {
+            pixel_format = DOE_MTL_PIXEL_FORMAT_BGRA8_UNORM;
+        } else {
+            return NULL;
+        }
+    }
     desc.pixelFormat = (MTLPixelFormat)pixel_format;
     desc.width       = width;
     desc.height      = height;
@@ -98,10 +109,13 @@ MetalHandle doe_metal_import_cvpixelbuffer(
     OSType cv_format = CVPixelBufferGetPixelFormatType(pixelBuffer);
 
     if (plane_count <= 1) {
-        // Single-plane: BGRA8Unorm for 32BGRA, RGBA8Unorm for 32RGBA.
-        // Default to BGRA8Unorm for other single-plane formats.
-        (void)cv_format;
-        pixel_format = DOE_MTL_PIXEL_FORMAT_BGRA8_UNORM;
+        if (cv_format == kCVPixelFormatType_32RGBA) {
+            pixel_format = DOE_MTL_PIXEL_FORMAT_RGBA8_UNORM;
+        } else if (cv_format == kCVPixelFormatType_32BGRA) {
+            pixel_format = DOE_MTL_PIXEL_FORMAT_BGRA8_UNORM;
+        } else {
+            return NULL;
+        }
     } else {
         // Multi-plane (NV12, 420v, 420f):
         // Plane 0 = luminance (R8Unorm), Plane 1 = chrominance (RG8Unorm).

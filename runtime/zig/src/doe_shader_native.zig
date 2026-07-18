@@ -376,7 +376,17 @@ pub export fn doeNativeDeviceCreateShaderModule(dev_raw: ?*anyopaque, desc: ?*co
     const handle = result orelse blk: {
         const err_sm = make(DoeShaderModule) orelse return null;
         err_sm.* = .{};
-        err_sm.compilation_message_kind = .@"error";
+        const message = if (last_error_len > 0)
+            last_error_buf[0..last_error_len]
+        else
+            "shader module creation failed";
+        set_module_compilation_message(
+            err_sm,
+            .@"error",
+            message,
+            last_error_line,
+            last_error_col,
+        );
         break :blk toOpaque(err_sm);
     };
     label_store.set(handle, d.label.data, d.label.length);

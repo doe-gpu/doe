@@ -149,6 +149,11 @@ void metal_bridge_end_compute_encoding(MetalHandle encoder) { (void)encoder; }
 void metal_bridge_command_buffer_commit(MetalHandle cmd_buf) { (void)cmd_buf; }
 void metal_bridge_command_buffer_wait_completed(MetalHandle cmd_buf) { (void)cmd_buf; }
 void metal_bridge_command_buffer_spin_wait(MetalHandle cmd_buf) { (void)cmd_buf; }
+int metal_bridge_command_buffer_retain_object_until_complete(MetalHandle cmd_buf, MetalHandle object) {
+    (void)cmd_buf;
+    (void)object;
+    return 0;
+}
 void metal_bridge_command_buffer_setup_fast_wait(MetalHandle cmd_buf) { (void)cmd_buf; }
 void metal_bridge_command_buffer_wait_fast(void) {}
 void metal_bridge_command_buffer_encode_signal_event(MetalHandle cmd_buf, MetalHandle event, uint64_t value) {
@@ -174,6 +179,18 @@ void metal_bridge_shared_event_wait(MetalHandle event, uint64_t value) {
     (void)event;
     (void)value;
 }
+int metal_bridge_shared_event_notify(
+    MetalHandle event,
+    uint64_t value,
+    MetalCompletionCallback callback,
+    void* userdata)
+{
+    (void)event;
+    (void)value;
+    (void)callback;
+    (void)userdata;
+    return 0;
+}
 
 void metal_bridge_cmd_buf_encode_render_pass(MetalHandle cmd_buf, MetalHandle pipeline, MetalHandle target, uint32_t draw_count, uint32_t vertex_count, uint32_t instance_count, int redundant_pipeline, int redundant_bindgroup) {
     (void)cmd_buf;
@@ -192,16 +209,13 @@ void metal_bridge_cmd_buf_encode_icb_render_pass(MetalHandle cmd_buf, MetalHandl
     (void)target;
     (void)draw_count;
 }
-MetalHandle metal_bridge_cmd_buf_render_encoder(MetalHandle cmd_buf, MetalHandle pipeline, MetalHandle target, MetalHandle depth_target, int use_depth_store, double clear_r, double clear_g, double clear_b, double clear_a) {
+MetalHandle metal_bridge_cmd_buf_render_encoder(MetalHandle cmd_buf, MetalHandle pipeline, MetalHandle target, MetalHandle resolve_target, MetalHandle depth_target, const MetalRenderPassOps* ops) {
     (void)cmd_buf;
     (void)pipeline;
     (void)target;
+    (void)resolve_target;
     (void)depth_target;
-    (void)use_depth_store;
-    (void)clear_r;
-    (void)clear_g;
-    (void)clear_b;
-    (void)clear_a;
+    (void)ops;
     return NULL;
 }
 void metal_bridge_render_encoder_set_bind_buffer(MetalHandle encoder, uint32_t slot, MetalHandle buffer, uint64_t offset) {
@@ -670,6 +684,17 @@ MetalHandle metal_bridge_create_counter_sample_buffer(MetalHandle device, uint32
     (void)count;
     return NULL;
 }
+MetalHandle metal_bridge_cmd_buf_compute_encoder_with_timestamps(
+    MetalHandle cmd_buf,
+    MetalHandle counter_buffer,
+    uint32_t begin_query_index,
+    uint32_t end_query_index) {
+    (void)cmd_buf;
+    (void)counter_buffer;
+    (void)begin_query_index;
+    (void)end_query_index;
+    return NULL;
+}
 void metal_bridge_sample_timestamp(MetalHandle cmd_buf, MetalHandle counter_buffer, uint32_t query_index) {
     (void)cmd_buf;
     (void)counter_buffer;
@@ -819,6 +844,7 @@ MetalHandle doe_metal_import_iosurface(MetalHandle device, void* iosurface, uint
     (void)pixel_format;
     return NULL;
 }
+
 MetalHandle doe_metal_import_cvpixelbuffer(MetalHandle device, void* cvpixelbuffer, uint32_t plane) {
     (void)device;
     (void)cvpixelbuffer;

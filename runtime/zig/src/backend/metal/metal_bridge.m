@@ -8,6 +8,7 @@
 #include <dispatch/dispatch.h>
 #include <mach/mach_time.h>
 #include <CommonCrypto/CommonDigest.h>
+#include <os/lock.h>
 
 // CFBridging provides correct ARC-safe transfer across the void* boundary.
 // Each returned MetalHandle is +1 retained and owned by the caller.
@@ -17,10 +18,11 @@
 // MTLLibrary source cache (avoids recompiling identical MSL source)
 // ============================================================
 
-// Keyed by NSData SHA-256 hash of the MSL source bytes. Value is CFRetained id<MTLLibrary>.
+// Keyed by NSData SHA-256 hash of the MSL source bytes.
 // One dictionary per process — sufficient because MTLLibrary is device-bound and Doe uses
 // a single MTLDevice per process in the common path.
 static NSMutableDictionary<NSData*, id<MTLLibrary>>* _mslLibraryCache = nil;
+static os_unfair_lock _mslLibraryCacheLock = OS_UNFAIR_LOCK_INIT;
 
 static NSData* msl_source_hash(const char* src, size_t src_len) {
     // Use CC_SHA256 via CommonCrypto (available on all Apple platforms).
@@ -34,30 +36,105 @@ static NSData* msl_source_hash(const char* src, size_t src_len) {
 // ============================================================
 
 static MTLRenderPassDescriptor* _cachedRenderPassDesc = nil;
-static id<MTLTexture> _cachedRenderPassTarget = nil;
-static id<MTLTexture> _cachedDepthTarget = nil;
+static const MetalRenderPassOps _defaultRenderPassOps = {
+    .color_load_op = 0x00000002,
+    .color_store_op = 0x00000001,
+    .clear_a = 1.0,
+    .depth_clear_value = 1.0f,
+};
 
-static MTLRenderPassDescriptor* cachedRenderPassDescriptor(id<MTLTexture> target, id<MTLTexture> depth_target, BOOL use_depth_store) {
+static BOOL wgpu_to_mtl_load_action(uint32_t op, MTLLoadAction* action_out) {
+    switch (op) {
+        case 0x00000001:
+            *action_out = MTLLoadActionLoad;
+            return YES;
+        case 0x00000002:
+            *action_out = MTLLoadActionClear;
+            return YES;
+        default:
+            return NO;
+    }
+}
+
+static BOOL wgpu_to_mtl_store_action(uint32_t op, BOOL has_resolve, MTLStoreAction* action_out) {
+    switch (op) {
+        case 0x00000001:
+            *action_out = has_resolve ? MTLStoreActionStoreAndMultisampleResolve : MTLStoreActionStore;
+            return YES;
+        case 0x00000002:
+            *action_out = has_resolve ? MTLStoreActionMultisampleResolve : MTLStoreActionDontCare;
+            return YES;
+        default:
+            return NO;
+    }
+}
+
+static MTLRenderPassDescriptor* cachedRenderPassDescriptor(
+    id<MTLTexture> target,
+    id<MTLTexture> resolve_target,
+    id<MTLTexture> depth_target,
+    const MetalRenderPassOps* ops)
+{
+    if (ops == NULL) return nil;
     if (_cachedRenderPassDesc == nil) {
         _cachedRenderPassDesc = [MTLRenderPassDescriptor new];
-        _cachedRenderPassDesc.colorAttachments[0].loadAction  = MTLLoadActionClear;
-        _cachedRenderPassDesc.colorAttachments[0].storeAction = MTLStoreActionStore;
-        _cachedRenderPassDesc.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0);
     }
-    if (_cachedRenderPassTarget != target) {
-        _cachedRenderPassDesc.colorAttachments[0].texture = target;
-        _cachedRenderPassTarget = target;
+
+    MTLRenderPassColorAttachmentDescriptor* color = _cachedRenderPassDesc.colorAttachments[0];
+    color.texture = target;
+    color.resolveTexture = resolve_target;
+    if (target != nil) {
+        MTLLoadAction color_load;
+        MTLStoreAction color_store;
+        if (!wgpu_to_mtl_load_action(ops->color_load_op, &color_load) ||
+            !wgpu_to_mtl_store_action(ops->color_store_op, resolve_target != nil, &color_store)) {
+            return nil;
+        }
+        color.loadAction = color_load;
+        color.storeAction = color_store;
+        color.clearColor = MTLClearColorMake(ops->clear_r, ops->clear_g, ops->clear_b, ops->clear_a);
     }
-    if (_cachedDepthTarget != depth_target) {
-        _cachedRenderPassDesc.depthAttachment.texture = depth_target;
-        _cachedDepthTarget = depth_target;
-    }
+
+    MTLRenderPassDepthAttachmentDescriptor* depth = _cachedRenderPassDesc.depthAttachment;
+    depth.texture = depth_target;
     if (depth_target != nil) {
-        _cachedRenderPassDesc.depthAttachment.loadAction = MTLLoadActionClear;
-        _cachedRenderPassDesc.depthAttachment.storeAction = use_depth_store ? MTLStoreActionStore : MTLStoreActionDontCare;
-        _cachedRenderPassDesc.depthAttachment.clearDepth = 1.0;
-    } else {
-        _cachedRenderPassDesc.depthAttachment.texture = nil;
+        MTLLoadAction depth_load;
+        MTLStoreAction depth_store;
+        if (ops->depth_read_only != 0 && ops->depth_load_op == 0) {
+            depth_load = MTLLoadActionLoad;
+        } else if (!wgpu_to_mtl_load_action(ops->depth_load_op, &depth_load)) {
+            return nil;
+        }
+        if (ops->depth_read_only != 0 && ops->depth_store_op == 0) {
+            depth_store = MTLStoreActionDontCare;
+        } else if (!wgpu_to_mtl_store_action(ops->depth_store_op, NO, &depth_store)) {
+            return nil;
+        }
+        depth.loadAction = depth_load;
+        depth.storeAction = depth_store;
+        depth.clearDepth = ops->depth_clear_value;
+    }
+
+    MTLRenderPassStencilAttachmentDescriptor* stencil = _cachedRenderPassDesc.stencilAttachment;
+    const BOOL uses_stencil = depth_target != nil &&
+        (ops->stencil_read_only != 0 || ops->stencil_load_op != 0 || ops->stencil_store_op != 0);
+    stencil.texture = uses_stencil ? depth_target : nil;
+    if (uses_stencil) {
+        MTLLoadAction stencil_load;
+        MTLStoreAction stencil_store;
+        if (ops->stencil_read_only != 0 && ops->stencil_load_op == 0) {
+            stencil_load = MTLLoadActionLoad;
+        } else if (!wgpu_to_mtl_load_action(ops->stencil_load_op, &stencil_load)) {
+            return nil;
+        }
+        if (ops->stencil_read_only != 0 && ops->stencil_store_op == 0) {
+            stencil_store = MTLStoreActionDontCare;
+        } else if (!wgpu_to_mtl_store_action(ops->stencil_store_op, NO, &stencil_store)) {
+            return nil;
+        }
+        stencil.loadAction = stencil_load;
+        stencil.storeAction = stencil_store;
+        stencil.clearStencil = ops->stencil_clear_value;
     }
     return _cachedRenderPassDesc;
 }
@@ -514,6 +591,20 @@ void metal_bridge_command_buffer_spin_wait(MetalHandle cmd_buf_h) {
     }
 }
 
+int metal_bridge_command_buffer_retain_object_until_complete(
+    MetalHandle cmd_buf_h,
+    MetalHandle object_h)
+{
+    if (cmd_buf_h == NULL || object_h == NULL) return 0;
+    id<MTLCommandBuffer> cmd_buf = (__bridge id<MTLCommandBuffer>)cmd_buf_h;
+    CFRetain(object_h);
+    [cmd_buf addCompletedHandler:^(id<MTLCommandBuffer> _Nonnull cb) {
+        (void)cb;
+        CFRelease(object_h);
+    }];
+    return 1;
+}
+
 static volatile int32_t _atomic_done = 0;
 void metal_bridge_command_buffer_setup_atomic_wait(MetalHandle cmd_buf_h) {
     id<MTLCommandBuffer> cmd_buf = (__bridge id<MTLCommandBuffer>)cmd_buf_h;
@@ -739,6 +830,24 @@ void metal_bridge_shared_event_wait(MetalHandle event_h, uint64_t value) {
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 }
 
+int metal_bridge_shared_event_notify(
+    MetalHandle event_h,
+    uint64_t value,
+    MetalCompletionCallback callback,
+    void* userdata)
+{
+    id<MTLSharedEvent> event = (__bridge id<MTLSharedEvent>)event_h;
+    if (event == nil || callback == NULL) return 0;
+    MTLSharedEventListener* listener = metal_bridge_shared_event_listener();
+    if (listener == nil) return 0;
+    [event notifyListener:listener atValue:value block:^(id<MTLSharedEvent> _Nonnull shared_event, uint64_t signaled_value) {
+        (void)shared_event;
+        (void)signaled_value;
+        callback(userdata);
+    }];
+    return 1;
+}
+
 MetalHandle metal_bridge_encode_blit_batch(
     MetalHandle  queue_h,
     MetalHandle* src_bufs,
@@ -790,6 +899,33 @@ MetalHandle metal_bridge_cmd_buf_compute_encoder(MetalHandle cmd_buf_h) {
     return (__bridge MetalHandle)encoder; // unretained — lifetime tied to cmd_buf
 }
 
+MetalHandle metal_bridge_cmd_buf_compute_encoder_with_timestamps(
+    MetalHandle cmd_buf_h,
+    MetalHandle counter_buffer_h,
+    uint32_t    begin_query_index,
+    uint32_t    end_query_index)
+{
+    if (cmd_buf_h == NULL || counter_buffer_h == NULL) return NULL;
+    id<MTLCommandBuffer> cmd_buf = (__bridge id<MTLCommandBuffer>)cmd_buf_h;
+    id<MTLCounterSampleBuffer> samples =
+        (__bridge id<MTLCounterSampleBuffer>)counter_buffer_h;
+    id<MTLDevice> device = cmd_buf.commandQueue.device;
+    if (![device supportsCounterSampling:MTLCounterSamplingPointAtStageBoundary]) {
+        return NULL;
+    }
+
+    MTLComputePassDescriptor* pass = [MTLComputePassDescriptor computePassDescriptor];
+    MTLComputePassSampleBufferAttachmentDescriptor* attachment =
+        pass.sampleBufferAttachments[0];
+    attachment.sampleBuffer = samples;
+    attachment.startOfEncoderSampleIndex = begin_query_index;
+    attachment.endOfEncoderSampleIndex = end_query_index;
+    id<MTLComputeCommandEncoder> encoder =
+        [cmd_buf computeCommandEncoderWithDescriptor:pass];
+    if (encoder == nil) return NULL;
+    return (__bridge MetalHandle)encoder; // unretained — lifetime tied to cmd_buf
+}
+
 void metal_bridge_end_compute_encoding(MetalHandle encoder_h) {
     id<MTLComputeCommandEncoder> encoder = (__bridge id<MTLComputeCommandEncoder>)encoder_h;
     [encoder endEncoding];
@@ -810,7 +946,7 @@ void metal_bridge_cmd_buf_encode_render_pass(
     id<MTLRenderPipelineState>  pipeline = (__bridge id<MTLRenderPipelineState>)pipeline_h;
     id<MTLTexture>              target   = (__bridge id<MTLTexture>)target_h;
 
-    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, nil, NO);
+    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, nil, nil, &_defaultRenderPassOps);
     id<MTLRenderCommandEncoder> encoder = [cmd_buf renderCommandEncoderWithDescriptor:pass];
     [encoder setRenderPipelineState:pipeline];
 
@@ -838,7 +974,7 @@ void metal_bridge_cmd_buf_encode_icb_render_pass(
     id<MTLIndirectCommandBuffer> icb      = (__bridge id<MTLIndirectCommandBuffer>)icb_h;
     id<MTLTexture>               target   = (__bridge id<MTLTexture>)target_h;
 
-    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, nil, NO);
+    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, nil, nil, &_defaultRenderPassOps);
     id<MTLRenderCommandEncoder> encoder = [cmd_buf renderCommandEncoderWithDescriptor:pass];
     [encoder setRenderPipelineState:pipeline];
     [encoder executeCommandsInBuffer:icb withRange:NSMakeRange(0, draw_count)];
@@ -851,23 +987,21 @@ MetalHandle metal_bridge_cmd_buf_render_encoder(
     MetalHandle cmd_buf_h,
     MetalHandle pipeline_h,
     MetalHandle target_h,
+    MetalHandle resolve_target_h,
     MetalHandle depth_target_h,
-    int         use_depth_store,
-    double      clear_r,
-    double      clear_g,
-    double      clear_b,
-    double      clear_a)
+    const MetalRenderPassOps* ops)
 {
     id<MTLCommandBuffer>        cmd_buf  = (__bridge id<MTLCommandBuffer>)cmd_buf_h;
     id<MTLRenderPipelineState>  pipeline = (__bridge id<MTLRenderPipelineState>)pipeline_h;
     id<MTLTexture>              target   = (__bridge id<MTLTexture>)target_h;
+    id<MTLTexture>              resolve_target = (__bridge id<MTLTexture>)resolve_target_h;
     id<MTLTexture>              depth_target = (__bridge id<MTLTexture>)depth_target_h;
 
-    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, depth_target, use_depth_store ? YES : NO);
-    pass.colorAttachments[0].clearColor = MTLClearColorMake(clear_r, clear_g, clear_b, clear_a);
+    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, resolve_target, depth_target, ops);
+    if (pass == nil) return NULL;
     id<MTLRenderCommandEncoder> encoder = [cmd_buf renderCommandEncoderWithDescriptor:pass];
     if (encoder == nil) return NULL;
-    [encoder setRenderPipelineState:pipeline];
+    if (pipeline != nil) [encoder setRenderPipelineState:pipeline];
     return (MetalHandle)CFBridgingRetain(encoder); // +1 retained; caller must release
 }
 
@@ -1089,15 +1223,20 @@ MetalHandle metal_bridge_device_new_library_msl(
 {
     id<MTLDevice> device = (__bridge id<MTLDevice>)device_h;
 
-    // Check source cache before invoking Metal driver compilation.
+    // Retain cached values while holding the lock so a concurrent cache
+    // initialization or insertion cannot invalidate the returned object.
     NSData* key = msl_source_hash(src, src_len);
+    MetalHandle cached_handle = NULL;
+    os_unfair_lock_lock(&_mslLibraryCacheLock);
     if (_mslLibraryCache == nil) {
         _mslLibraryCache = [NSMutableDictionary new];
     }
     id<MTLLibrary> cached = _mslLibraryCache[key];
     if (cached != nil) {
-        return (MetalHandle)CFBridgingRetain(cached);
+        cached_handle = (MetalHandle)CFBridgingRetain(cached);
     }
+    os_unfair_lock_unlock(&_mslLibraryCacheLock);
+    if (cached_handle != NULL) return cached_handle;
 
     NSString* source = [[NSString alloc] initWithBytes:src length:src_len encoding:NSUTF8StringEncoding];
     if (source == nil) {
@@ -1110,8 +1249,18 @@ MetalHandle metal_bridge_device_new_library_msl(
         write_error(err, error_buf, error_cap);
         return NULL;
     }
-    _mslLibraryCache[key] = library;
-    return (MetalHandle)CFBridgingRetain(library);
+    // Another compiler may have populated this key while Metal compiled.
+    // Prefer that canonical object and retain the chosen result under lock.
+    os_unfair_lock_lock(&_mslLibraryCacheLock);
+    cached = _mslLibraryCache[key];
+    if (cached != nil) {
+        cached_handle = (MetalHandle)CFBridgingRetain(cached);
+    } else {
+        _mslLibraryCache[key] = library;
+        cached_handle = (MetalHandle)CFBridgingRetain(library);
+    }
+    os_unfair_lock_unlock(&_mslLibraryCacheLock);
+    return cached_handle;
 }
 
 MetalHandle metal_bridge_library_new_function(MetalHandle library_h, const char* name) {
@@ -2067,7 +2216,7 @@ MetalHandle metal_bridge_encode_render_pass(
     id<MTLRenderPipelineState>  pipeline = (__bridge id<MTLRenderPipelineState>)pipeline_h;
     id<MTLTexture>              target   = (__bridge id<MTLTexture>)target_h;
 
-    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, nil, NO);
+    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, nil, nil, &_defaultRenderPassOps);
 
     id<MTLCommandBuffer> cmd_buf = [queue commandBufferWithUnretainedReferences];
     if (cmd_buf == nil) return NULL;
@@ -2253,7 +2402,7 @@ MetalHandle metal_bridge_create_counter_sample_buffer(MetalHandle device_h, uint
     if (device_h == NULL || count == 0) return NULL;
     id<MTLDevice> device = (__bridge id<MTLDevice>)device_h;
 
-    if (![device supportsCounterSampling:MTLCounterSamplingPointAtBlitBoundary]) return NULL;
+    if (![device supportsCounterSampling:MTLCounterSamplingPointAtStageBoundary]) return NULL;
 
     id<MTLCounterSet> cs = findTimestampCounterSet(device);
     if (cs == nil) return NULL;
@@ -2277,6 +2426,8 @@ void metal_bridge_sample_timestamp(
 {
     if (cmd_buf_h == NULL || counter_buffer_h == NULL) return;
     id<MTLCommandBuffer> cmd_buf = (__bridge id<MTLCommandBuffer>)cmd_buf_h;
+    id<MTLDevice> device = cmd_buf.commandQueue.device;
+    if (![device supportsCounterSampling:MTLCounterSamplingPointAtBlitBoundary]) return;
     id<MTLCounterSampleBuffer> csb = (__bridge id<MTLCounterSampleBuffer>)counter_buffer_h;
     id<MTLBlitCommandEncoder> blit = [cmd_buf blitCommandEncoder];
     if (blit == nil) return;
@@ -2375,7 +2526,7 @@ MetalHandle metal_bridge_encode_icb_render_pass(
     id<MTLIndirectCommandBuffer> icb      = (__bridge id<MTLIndirectCommandBuffer>)icb_h;
     id<MTLTexture>               target   = (__bridge id<MTLTexture>)target_h;
 
-    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, nil, NO);
+    MTLRenderPassDescriptor* pass = cachedRenderPassDescriptor(target, nil, nil, &_defaultRenderPassOps);
 
     id<MTLCommandBuffer> cmd_buf = [queue commandBufferWithUnretainedReferences];
     if (cmd_buf == nil) return NULL;
@@ -2416,8 +2567,9 @@ uint32_t metal_bridge_query_device_features(void) {
             features |= METAL_FEATURE_BIT_SUBGROUPS;
         }
 
-        // timestamp-query remains unpublished until the package surface uses
-        // a supported GPU timestamp path on Apple Silicon end to end.
+        if (metal_bridge_supports_timestamp_query((__bridge MetalHandle)device)) {
+            features |= METAL_FEATURE_BIT_TIMESTAMP_QUERY;
+        }
 
         // indirect-first-instance: all Metal 2+ devices
         // Apple family 1+ (all Apple GPUs with Metal support)

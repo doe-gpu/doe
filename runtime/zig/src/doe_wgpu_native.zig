@@ -163,6 +163,7 @@ pub const doeNativeDevicePopErrorScopeFlat = m0.doeNativeDevicePopErrorScopeFlat
 pub const doeNativeDeviceSetUncapturedErrorCallback = m0.doeNativeDeviceSetUncapturedErrorCallback;
 pub const doeNativeDeviceInjectError = m0.doeNativeDeviceInjectError;
 pub const doeNativeDeviceCreateTexture = m1.doeNativeDeviceCreateTexture;
+pub const doeNativeDeviceValidateTextureDescriptor = m1.doeNativeDeviceValidateTextureDescriptor;
 pub const doeNativeTextureCreateView = m1.doeNativeTextureCreateView;
 pub const doeNativeTextureDestroy = m1.doeNativeTextureDestroy;
 pub const doeNativeTextureRelease = m1.doeNativeTextureRelease;

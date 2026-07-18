@@ -81,6 +81,7 @@ const CORE_PROC_ENTRIES = .{
 
 const HEADLESS_PROC_ENTRIES = .{
     .{ .symbol = "wgpuDeviceCreateTexture", .proc = &N.doeNativeDeviceCreateTexture },
+    .{ .symbol = "wgpuDeviceValidateTextureDescriptor", .proc = &N.doeNativeDeviceValidateTextureDescriptor },
     .{ .symbol = "wgpuTextureCreateView", .proc = &N.doeNativeTextureCreateView },
     .{ .symbol = "wgpuTextureDestroy", .proc = &N.doeNativeTextureDestroy },
     .{ .symbol = "wgpuTextureRelease", .proc = &N.doeNativeTextureRelease },

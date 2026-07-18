@@ -7,14 +7,20 @@ const abi_pipeline = @import("../core/abi/wgpu_pipeline_descriptor_types.zig");
 const abi_texture = @import("../core/abi/wgpu_texture_base_types.zig");
 const external_texture_ops = @import("../backend/dropin_external_texture.zig");
 const native = @import("../doe_wgpu_native.zig");
+const texture_sampler = @import("../doe_texture_sampler_native.zig");
+const queue_flush_breakdown = @import("../doe_queue_flush_breakdown.zig");
 
 pub const WGPUSharedBufferMemory = ?*anyopaque;
 pub const WGPUSharedFence = ?*anyopaque;
 pub const WGPUSharedTextureMemory = ?*anyopaque;
 const WGPUStatus_Error: abi_core.WGPUStatus = 2;
 const MAGIC_SHARED_TEXTURE_MEMORY: u32 = 0xD0E1_0020;
+const MAGIC_SHARED_FENCE: u32 = 0xD0E1_0021;
 const STYPE_SHARED_TEXTURE_MEMORY_IOSURFACE_DESCRIPTOR: abi_core.WGPUSType = 0x0005_0023;
-
+const STYPE_SHARED_FENCE_MTL_SHARED_EVENT_DESCRIPTOR: abi_core.WGPUSType = 0x0005_0032;
+const STYPE_SHARED_FENCE_MTL_SHARED_EVENT_EXPORT_INFO: abi_core.WGPUSType = 0x0005_0033;
+const SHARED_FENCE_TYPE_MTL_SHARED_EVENT: u32 = 5;
+const SHARED_FENCE_SIGNAL_VALUE: u64 = 1;
 pub const WGPUSharedBufferMemoryDescriptor = extern struct {
     nextInChain: ?*anyopaque,
     label: abi_core.WGPUStringView,
@@ -49,6 +55,16 @@ pub const WGPUSharedFenceDescriptor = extern struct {
 pub const WGPUSharedFenceExportInfo = extern struct {
     nextInChain: ?*anyopaque,
     type: u32,
+};
+
+const WGPUSharedFenceMTLSharedEventDescriptor = extern struct {
+    chain: abi_callback.WGPUChainedStruct,
+    sharedEvent: ?*anyopaque,
+};
+
+const WGPUSharedFenceMTLSharedEventExportInfo = extern struct {
+    chain: abi_callback.WGPUChainedStruct,
+    sharedEvent: ?*anyopaque,
 };
 
 pub const WGPUSharedTextureMemoryDescriptor = extern struct {
@@ -97,7 +113,7 @@ const DoeSharedTextureMemory = struct {
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
     backend: native.BackendKind = .metal,
-    mtl_device: ?*anyopaque = null,
+    queue: ?*native.DoeQueue = null,
     iosurface: ?*anyopaque = null,
     width: u32 = 0,
     height: u32 = 0,
@@ -105,12 +121,32 @@ const DoeSharedTextureMemory = struct {
         abi_texture.WGPUTextureUsage_RenderAttachment |
         abi_texture.WGPUTextureUsage_CopySrc |
         abi_texture.WGPUTextureUsage_CopyDst,
-    format: u32 = abi_texture.WGPUTextureFormat_BGRA8Unorm,
+    format: u32 = abi_texture.WGPUTextureFormat_Undefined,
+    access_start_event_counter: u64 = 0,
     in_access: bool = false,
+};
+
+const DoeSharedFence = struct {
+    pub const TYPE_MAGIC = MAGIC_SHARED_FENCE;
+    magic: u32 = TYPE_MAGIC,
+    ref_count: u32 = 1,
+    shared_event: ?*anyopaque = null,
+};
+
+const CompletionFence = struct {
+    fence: WGPUSharedFence,
+    signaled_value: u64,
 };
 
 extern fn CFRetain(cf: ?*anyopaque) callconv(.c) ?*anyopaque;
 extern fn CFRelease(cf: ?*anyopaque) callconv(.c) void;
+extern fn metal_bridge_device_new_shared_event(device: ?*anyopaque) callconv(.c) ?*anyopaque;
+extern fn metal_bridge_retain(object: ?*anyopaque) callconv(.c) ?*anyopaque;
+extern fn metal_bridge_create_command_buffer(queue: ?*anyopaque) callconv(.c) ?*anyopaque;
+extern fn metal_bridge_command_buffer_encode_signal_event(command_buffer: ?*anyopaque, event: ?*anyopaque, value: u64) callconv(.c) void;
+extern fn metal_bridge_command_buffer_commit(command_buffer: ?*anyopaque) callconv(.c) void;
+extern fn metal_bridge_shared_event_wait(event: ?*anyopaque, value: u64) callconv(.c) void;
+extern fn metal_bridge_release(object: ?*anyopaque) callconv(.c) void;
 
 fn logUnsupported(comptime symbol_name: []const u8) void {
     std.log.err("doe: {s} is unsupported until the Chromium shared-image bridge imports native handles through Doe", .{symbol_name});
@@ -122,6 +158,10 @@ fn labelOwnedObject(raw: ?*anyopaque, label: abi_core.WGPUStringView) void {
 
 fn sharedTextureMemoryCast(raw: WGPUSharedTextureMemory) ?*DoeSharedTextureMemory {
     return native.cast(DoeSharedTextureMemory, raw);
+}
+
+fn sharedFenceCast(raw: WGPUSharedFence) ?*DoeSharedFence {
+    return native.cast(DoeSharedFence, raw);
 }
 
 fn findIOSurfaceDescriptor(
@@ -138,6 +178,94 @@ fn findIOSurfaceDescriptor(
     return null;
 }
 
+fn findSharedFenceMTLDescriptor(
+    descriptor: *const WGPUSharedFenceDescriptor,
+) ?*const WGPUSharedFenceMTLSharedEventDescriptor {
+    var chain_raw = descriptor.nextInChain;
+    while (chain_raw) |raw| {
+        const chain: *const abi_callback.WGPUChainedStruct = @ptrCast(@alignCast(raw));
+        if (chain.sType == STYPE_SHARED_FENCE_MTL_SHARED_EVENT_DESCRIPTOR) {
+            return @ptrCast(@alignCast(raw));
+        }
+        chain_raw = chain.next;
+    }
+    return null;
+}
+
+fn enqueueSharedFenceWaits(
+    shared_memory: *DoeSharedTextureMemory,
+    descriptor: *const WGPUSharedTextureMemoryBeginAccessDescriptor,
+) bool {
+    if (descriptor.fenceCount == 0) return true;
+    _ = shared_memory.queue orelse return false;
+    const fences = descriptor.fences orelse return false;
+    const signaled_values = descriptor.signaledValues orelse return false;
+
+    for (0..descriptor.fenceCount) |index| {
+        const fence = sharedFenceCast(fences[index]) orelse return false;
+        const shared_event = fence.shared_event orelse return false;
+        // Chromium may invoke BeginAccess from a thread outside Doe's queue
+        // submission path. Complete the producer fence before exposing the
+        // IOSurface instead of creating a command buffer from that callback.
+        metal_bridge_shared_event_wait(shared_event, signaled_values[index]);
+    }
+    return true;
+}
+
+fn wrapCompletionEvent(shared_event: ?*anyopaque, signaled_value: u64) ?CompletionFence {
+    const retained_event = metal_bridge_retain(shared_event) orelse return null;
+    const fence = native.make(DoeSharedFence) orelse {
+        metal_bridge_release(retained_event);
+        return null;
+    };
+    fence.* = .{ .shared_event = retained_event };
+    return .{
+        .fence = native.toOpaque(fence),
+        .signaled_value = signaled_value,
+    };
+}
+
+fn hasNewQueueCompletion(shared_event: ?*anyopaque, event_counter: u64, access_start_event_counter: u64) bool {
+    return shared_event != null and event_counter > access_start_event_counter;
+}
+
+fn createCompletionFence(shared_memory: *DoeSharedTextureMemory) ?CompletionFence {
+    if (shared_memory.queue) |queue| {
+        queue_flush_breakdown.commitStagedWriteBlits(queue);
+        if (hasNewQueueCompletion(
+            queue.mtl_event,
+            queue.event_counter,
+            shared_memory.access_start_event_counter,
+        )) {
+            return wrapCompletionEvent(queue.mtl_event, queue.event_counter);
+        }
+    }
+    const queue = shared_memory.queue orelse return null;
+    const shared_event = metal_bridge_device_new_shared_event(queue.dev.mtl_device) orelse return null;
+    const command_buffer = metal_bridge_create_command_buffer(queue.dev.mtl_queue) orelse {
+        metal_bridge_release(shared_event);
+        return null;
+    };
+    const fence = native.make(DoeSharedFence) orelse {
+        metal_bridge_release(command_buffer);
+        metal_bridge_release(shared_event);
+        return null;
+    };
+
+    metal_bridge_command_buffer_encode_signal_event(
+        command_buffer,
+        shared_event,
+        SHARED_FENCE_SIGNAL_VALUE,
+    );
+    metal_bridge_command_buffer_commit(command_buffer);
+    metal_bridge_release(command_buffer);
+    fence.* = .{ .shared_event = shared_event };
+    return .{
+        .fence = native.toOpaque(fence),
+        .signaled_value = SHARED_FENCE_SIGNAL_VALUE,
+    };
+}
+
 fn retainCF(raw: ?*anyopaque) ?*anyopaque {
     if (comptime builtin.os.tag != .macos) return null;
     return CFRetain(raw);
@@ -147,6 +275,16 @@ fn releaseCF(raw: ?*anyopaque) void {
     if (comptime builtin.os.tag == .macos) {
         CFRelease(raw);
     }
+}
+
+fn metalPixelFormatForSharedTexture(format: u32) ?u32 {
+    return switch (format) {
+        abi_texture.WGPUTextureFormat_RGBA8Unorm => external_texture_ops.MTL_PIXEL_FORMAT_RGBA8_UNORM,
+        abi_texture.WGPUTextureFormat_RGBA8UnormSrgb => external_texture_ops.MTL_PIXEL_FORMAT_RGBA8_UNORM_SRGB,
+        abi_texture.WGPUTextureFormat_BGRA8Unorm => external_texture_ops.MTL_PIXEL_FORMAT_BGRA8_UNORM,
+        abi_texture.WGPUTextureFormat_BGRA8UnormSrgb => external_texture_ops.MTL_PIXEL_FORMAT_BGRA8_UNORM_SRGB,
+        else => null,
+    };
 }
 
 pub fn wgpuDeviceCreateErrorBuffer(
@@ -223,10 +361,23 @@ pub fn wgpuDeviceImportSharedFence(
     device: abi_core.WGPUDevice,
     descriptor: ?*const WGPUSharedFenceDescriptor,
 ) callconv(.c) WGPUSharedFence {
-    _ = device;
-    _ = descriptor;
-    logUnsupported("wgpuDeviceImportSharedFence");
-    return null;
+    if (comptime builtin.os.tag != .macos) {
+        logUnsupported("wgpuDeviceImportSharedFence(non_macos)");
+        return null;
+    }
+    const dev = native.cast(native.DoeDevice, device) orelse return null;
+    if (dev.backend != .metal) return null;
+    const desc = descriptor orelse return null;
+    const event_desc = findSharedFenceMTLDescriptor(desc) orelse return null;
+    const shared_event = metal_bridge_retain(event_desc.sharedEvent) orelse return null;
+    const fence = native.make(DoeSharedFence) orelse {
+        metal_bridge_release(shared_event);
+        return null;
+    };
+    fence.* = .{ .shared_event = shared_event };
+    const raw = native.toOpaque(fence);
+    labelOwnedObject(raw, desc.label);
+    return raw;
 }
 
 pub fn wgpuDeviceImportSharedTextureMemory(
@@ -237,33 +388,48 @@ pub fn wgpuDeviceImportSharedTextureMemory(
         logUnsupported("wgpuDeviceImportSharedTextureMemory(non_macos)");
         return null;
     }
-    const dev = native.cast(native.DoeDevice, device) orelse return null;
-    const desc = descriptor orelse return null;
+    const dev = native.cast(native.DoeDevice, device) orelse {
+        std.log.err("doe: IOSurface shared texture import rejected invalid device", .{});
+        return null;
+    };
+    const desc = descriptor orelse {
+        std.log.err("doe: IOSurface shared texture import missing descriptor", .{});
+        return null;
+    };
     const ios_desc = findIOSurfaceDescriptor(desc) orelse {
         logUnsupported("wgpuDeviceImportSharedTextureMemory(non_iosurface)");
         return null;
     };
-    const iosurface = retainCF(ios_desc.ioSurface) orelse return null;
-    const imported = external_texture_ops.importIOSurface(dev.mtl_device, iosurface) orelse {
+    const iosurface = retainCF(ios_desc.ioSurface) orelse {
+        std.log.err("doe: IOSurface shared texture import missing IOSurface handle", .{});
+        return null;
+    };
+    const layout = external_texture_ops.inspectIOSurface(iosurface) orelse {
+        std.log.err("doe: IOSurface shared texture import failed layout inspection", .{});
         releaseCF(iosurface);
         return null;
     };
-    defer external_texture_ops.releasePlanes(imported);
-    if (!imported.is_single_plane) {
+    if (layout.plane_count != 1) {
+        std.log.err("doe: IOSurface shared texture import rejected multi-plane surface", .{});
         releaseCF(iosurface);
         return null;
     }
-
+    const queue = dev.queue orelse {
+        std.log.err("doe: IOSurface shared texture import requires a live device queue", .{});
+        releaseCF(iosurface);
+        return null;
+    };
     const shared_memory = native.make(DoeSharedTextureMemory) orelse {
         releaseCF(iosurface);
         return null;
     };
+    native.doeNativeQueueAddRef(native.toOpaque(queue));
     shared_memory.* = .{
         .backend = dev.backend,
-        .mtl_device = dev.mtl_device,
+        .queue = queue,
         .iosurface = iosurface,
-        .width = imported.width,
-        .height = imported.height,
+        .width = layout.width,
+        .height = layout.height,
     };
     const raw = native.toOpaque(shared_memory);
     labelOwnedObject(raw, desc.label);
@@ -341,23 +507,40 @@ pub fn wgpuSharedBufferMemoryEndAccessStateFreeMembers(state: WGPUSharedBufferMe
 }
 
 pub fn wgpuSharedFenceExportInfo(shared_fence: WGPUSharedFence, info: ?*WGPUSharedFenceExportInfo) callconv(.c) void {
-    _ = shared_fence;
-    if (info) |out| {
-        out.type = 0;
+    const fence = sharedFenceCast(shared_fence) orelse return;
+    const out = info orelse return;
+    out.type = SHARED_FENCE_TYPE_MTL_SHARED_EVENT;
+    var chain_raw = out.nextInChain;
+    while (chain_raw) |raw| {
+        const chain: *abi_callback.WGPUChainedStruct = @ptrCast(@alignCast(raw));
+        if (chain.sType == STYPE_SHARED_FENCE_MTL_SHARED_EVENT_EXPORT_INFO) {
+            const event_info: *WGPUSharedFenceMTLSharedEventExportInfo = @ptrCast(@alignCast(raw));
+            event_info.sharedEvent = fence.shared_event;
+            return;
+        }
+        chain_raw = @constCast(chain.next);
     }
 }
 
 pub fn wgpuSharedFenceAddRef(shared_fence: WGPUSharedFence) callconv(.c) void {
-    _ = shared_fence;
+    const fence = sharedFenceCast(shared_fence) orelse return;
+    fence.ref_count +|= 1;
 }
 
 pub fn wgpuSharedFenceRelease(shared_fence: WGPUSharedFence) callconv(.c) void {
-    _ = shared_fence;
+    const fence = sharedFenceCast(shared_fence) orelse return;
+    if (!native.object_should_destroy(fence)) return;
+    native.label_store.remove(shared_fence);
+    if (fence.shared_event) |shared_event| {
+        metal_bridge_release(shared_event);
+    }
+    native.alloc.destroy(fence);
 }
 
 pub fn wgpuSharedFenceSetLabel(shared_fence: WGPUSharedFence, label: abi_core.WGPUStringView) callconv(.c) void {
-    _ = shared_fence;
-    _ = label;
+    if (sharedFenceCast(shared_fence) != null) {
+        labelOwnedObject(shared_fence, label);
+    }
 }
 
 pub fn wgpuSharedTextureMemoryBeginAccess(
@@ -365,14 +548,28 @@ pub fn wgpuSharedTextureMemoryBeginAccess(
     texture: abi_core.WGPUTexture,
     descriptor: ?*const WGPUSharedTextureMemoryBeginAccessDescriptor,
 ) callconv(.c) abi_core.WGPUStatus {
-    const shared_memory = sharedTextureMemoryCast(shared_texture_memory) orelse return WGPUStatus_Error;
-    const tex = native.cast(native.DoeTexture, texture) orelse return WGPUStatus_Error;
+    const shared_memory = sharedTextureMemoryCast(shared_texture_memory) orelse {
+        std.log.err("doe: IOSurface begin access rejected invalid shared memory", .{});
+        return WGPUStatus_Error;
+    };
+    const tex = native.cast(native.DoeTexture, texture) orelse {
+        std.log.err("doe: IOSurface begin access rejected invalid texture", .{});
+        return WGPUStatus_Error;
+    };
     if (shared_memory.in_access or tex.error_object or tex.mtl == null) {
+        std.log.err("doe: IOSurface begin access rejected state in_access={} error_object={} has_metal_texture={}", .{ shared_memory.in_access, tex.error_object, tex.mtl != null });
         return WGPUStatus_Error;
     }
     if (descriptor) |desc| {
-        if (desc.fenceCount != 0) return WGPUStatus_Error;
+        if (!enqueueSharedFenceWaits(shared_memory, desc)) {
+            std.log.err("doe: IOSurface begin access failed to enqueue shared-event waits", .{});
+            return WGPUStatus_Error;
+        }
     }
+    shared_memory.access_start_event_counter = if (shared_memory.queue) |queue|
+        queue.event_counter
+    else
+        0;
     shared_memory.in_access = true;
     return abi_core.WGPUStatus_Success;
 }
@@ -381,25 +578,19 @@ pub fn wgpuSharedTextureMemoryCreateTexture(
     shared_texture_memory: WGPUSharedTextureMemory,
     descriptor: ?*const abi_pipeline.WGPUTextureDescriptor,
 ) callconv(.c) abi_core.WGPUTexture {
-    const shared_memory = sharedTextureMemoryCast(shared_texture_memory) orelse return null;
-    const default_desc = abi_pipeline.WGPUTextureDescriptor{
-        .nextInChain = null,
-        .label = .{ .data = null, .length = 0 },
-        .usage = shared_memory.usage,
-        .dimension = abi_texture.WGPUTextureDimension_2D,
-        .size = .{
-            .width = shared_memory.width,
-            .height = shared_memory.height,
-            .depthOrArrayLayers = 1,
-        },
-        .format = shared_memory.format,
-        .mipLevelCount = 1,
-        .sampleCount = 1,
-        .viewFormatCount = 0,
-        .viewFormats = null,
+    const shared_memory = sharedTextureMemoryCast(shared_texture_memory) orelse {
+        std.log.err("doe: IOSurface texture creation rejected invalid shared memory", .{});
+        return null;
     };
-    const desc = descriptor orelse &default_desc;
-    if (desc.format != shared_memory.format or
+    const desc = descriptor orelse {
+        std.log.err("doe: IOSurface texture creation missing descriptor", .{});
+        return null;
+    };
+    const metal_pixel_format = metalPixelFormatForSharedTexture(desc.format) orelse {
+        std.log.err("doe: IOSurface texture creation rejected unsupported format={}", .{desc.format});
+        return null;
+    };
+    if ((shared_memory.format != abi_texture.WGPUTextureFormat_Undefined and desc.format != shared_memory.format) or
         desc.dimension != abi_texture.WGPUTextureDimension_2D or
         desc.size.width != shared_memory.width or
         desc.size.height != shared_memory.height or
@@ -407,12 +598,20 @@ pub fn wgpuSharedTextureMemoryCreateTexture(
         desc.mipLevelCount != 1 or
         desc.sampleCount != 1)
     {
+        std.log.err(
+            "doe: IOSurface texture descriptor mismatch format={}/{} size={}x{}/{}x{} depth={} dimension={} mips={} samples={}",
+            .{ desc.format, shared_memory.format, desc.size.width, desc.size.height, shared_memory.width, shared_memory.height, desc.size.depthOrArrayLayers, desc.dimension, desc.mipLevelCount, desc.sampleCount },
+        );
         return null;
     }
-    const imported = external_texture_ops.importIOSurface(
-        shared_memory.mtl_device,
+    const imported = external_texture_ops.importIOSurfaceWithPixelFormat(
+        (shared_memory.queue orelse return null).dev.mtl_device,
         shared_memory.iosurface,
-    ) orelse return null;
+        metal_pixel_format,
+    ) orelse {
+        std.log.err("doe: IOSurface texture creation failed Metal plane import", .{});
+        return null;
+    };
     if (!imported.is_single_plane) {
         external_texture_ops.releasePlanes(imported);
         return null;
@@ -436,9 +635,38 @@ pub fn wgpuSharedTextureMemoryCreateTexture(
         .usage = desc.usage,
         .view_format_count = desc.viewFormatCount,
     };
+    shared_memory.format = desc.format;
     const raw = native.toOpaque(texture);
+    if (!texture_sampler.registerImportedTexture(raw)) {
+        external_texture_ops.metal_bridge_release(texture.mtl);
+        native.alloc.destroy(texture);
+        return null;
+    }
     labelOwnedObject(raw, desc.label);
     return raw;
+}
+
+test "shared IOSurface formats map to the matching Metal channel order" {
+    try std.testing.expectEqual(
+        @as(?u32, external_texture_ops.MTL_PIXEL_FORMAT_RGBA8_UNORM),
+        metalPixelFormatForSharedTexture(abi_texture.WGPUTextureFormat_RGBA8Unorm),
+    );
+    try std.testing.expectEqual(
+        @as(?u32, external_texture_ops.MTL_PIXEL_FORMAT_BGRA8_UNORM),
+        metalPixelFormatForSharedTexture(abi_texture.WGPUTextureFormat_BGRA8Unorm),
+    );
+    try std.testing.expectEqual(
+        @as(?u32, null),
+        metalPixelFormatForSharedTexture(abi_texture.WGPUTextureFormat_R8Unorm),
+    );
+}
+
+test "shared IOSurface completion fences never reuse a pre-access timeline value" {
+    const event: ?*anyopaque = @ptrFromInt(1);
+    try std.testing.expect(!hasNewQueueCompletion(event, 9, 9));
+    try std.testing.expect(!hasNewQueueCompletion(event, 8, 9));
+    try std.testing.expect(!hasNewQueueCompletion(null, 10, 9));
+    try std.testing.expect(hasNewQueueCompletion(event, 10, 9));
 }
 
 pub fn wgpuSharedTextureMemoryEndAccess(
@@ -448,14 +676,25 @@ pub fn wgpuSharedTextureMemoryEndAccess(
 ) callconv(.c) abi_core.WGPUStatus {
     const shared_memory = sharedTextureMemoryCast(shared_texture_memory) orelse return WGPUStatus_Error;
     const tex = native.cast(native.DoeTexture, texture) orelse return WGPUStatus_Error;
+    if (!shared_memory.in_access or tex.error_object or tex.mtl == null) return WGPUStatus_Error;
+
     if (descriptor) |state| {
+        const fences = native.alloc.alloc(WGPUSharedFence, 1) catch return WGPUStatus_Error;
+        const signaled_values = native.alloc.alloc(u64, 1) catch {
+            native.alloc.free(fences);
+            return WGPUStatus_Error;
+        };
+        const completion = createCompletionFence(shared_memory) orelse {
+            native.alloc.free(signaled_values);
+            native.alloc.free(fences);
+            return WGPUStatus_Error;
+        };
+        fences[0] = completion.fence;
+        signaled_values[0] = completion.signaled_value;
         state.initialized = abi_core.WGPU_TRUE;
-        state.fenceCount = 0;
-        state.fences = null;
-        state.signaledValues = null;
-    }
-    if (!shared_memory.in_access or tex.error_object or tex.mtl == null) {
-        return WGPUStatus_Error;
+        state.fenceCount = 1;
+        state.fences = fences.ptr;
+        state.signaledValues = signaled_values.ptr;
     }
     shared_memory.in_access = false;
     return abi_core.WGPUStatus_Success;
@@ -503,11 +742,24 @@ pub fn wgpuSharedTextureMemoryRelease(shared_texture_memory: WGPUSharedTextureMe
     if (shared_memory.iosurface) |iosurface| {
         releaseCF(iosurface);
     }
+    if (shared_memory.queue) |queue| {
+        native.doeNativeQueueRelease(native.toOpaque(queue));
+    }
     native.alloc.destroy(shared_memory);
 }
 
 pub fn wgpuSharedTextureMemoryEndAccessStateFreeMembers(state: WGPUSharedTextureMemoryEndAccessState) callconv(.c) void {
-    _ = state;
+    if (state.fenceCount == 0) return;
+    if (state.fences) |fence_ptr| {
+        const fences = @constCast(fence_ptr)[0..state.fenceCount];
+        for (fences) |fence| {
+            wgpuSharedFenceRelease(fence);
+        }
+        native.alloc.free(fences);
+    }
+    if (state.signaledValues) |value_ptr| {
+        native.alloc.free(@constCast(value_ptr)[0..state.fenceCount]);
+    }
 }
 
 test "browser error object procs return Doe-owned releasable handles" {

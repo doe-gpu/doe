@@ -417,6 +417,19 @@ test "msl: textureSample maps to .sample()" {
     try expectHas(msl, ".sample(");
 }
 
+test "msl: external texture base-clamp sample maps to .sample()" {
+    const msl = try compile_msl(
+        \\@group(0) @binding(0) var samp: sampler;
+        \\@group(0) @binding(1) var tex: texture_external;
+        \\@fragment
+        \\fn main(@location(0) uv: vec2f) -> @location(0) vec4f {
+        \\    return textureSampleBaseClampToEdge(tex, samp, uv);
+        \\}
+    );
+    defer free_msl(msl);
+    try expectHas(msl, "tex.sample(samp, uv)");
+}
+
 test "msl: textureLoad maps to .read()" {
     const msl = try compile_msl(
         \\@group(0) @binding(0) var tex: texture_2d<f32>;
@@ -583,6 +596,34 @@ test "msl: full fragment pipeline with texture, sampler, color output" {
     try expectHas(msl, "[[sampler(1)]]");
     try expectHas(msl, "[[color(0)]]");
     try expectHas(msl, ".sample(");
+}
+
+test "msl: stage wrapper generated names do not collide with WGSL parameters" {
+    const msl = try compile_msl(
+        \\struct VsOut {
+        \\    @builtin(position) pos: vec4f,
+        \\    @location(0) uv: vec2f,
+        \\}
+        \\@vertex
+        \\fn vs(@builtin(vertex_index) index: u32) -> VsOut {
+        \\    var out: VsOut;
+        \\    out.pos = vec4f(0.0, 0.0, 0.0, 1.0);
+        \\    out.uv = vec2f(0.5, 0.5);
+        \\    return out;
+        \\}
+        \\@group(0) @binding(0) var tex: texture_2d<f32>;
+        \\@group(0) @binding(1) var samp: sampler;
+        \\@fragment
+        \\fn fs(in: VsOut) -> @location(0) vec4f {
+        \\    return textureSample(tex, samp, in.uv);
+        \\}
+    );
+    defer free_msl(msl);
+    try expectHas(msl, "fs_stage_in _doe_stage_input [[stage_in]]");
+    try expectHas(msl, "VsOut in;");
+    try expectHas(msl, "in.pos = _doe_stage_input.p0;");
+    try expectHas(msl, "in.uv = _doe_stage_input.p1;");
+    try std.testing.expect(!has(msl, "fs_stage_in in [[stage_in]]"));
 }
 
 // ============================================================

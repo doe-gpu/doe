@@ -10,6 +10,8 @@ const caps = @import("../../src/doe_device_caps.zig");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
 const buffer_ops = @import("../../src/doe_buffer_ops_native.zig");
 const texture_sampler = @import("../../src/doe_texture_sampler_native.zig");
+const abi_core = @import("../../src/core/abi/wgpu_core_base_types.zig");
+const abi_pipeline = @import("../../src/core/abi/wgpu_pipeline_descriptor_types.zig");
 const abi_texture = @import("../../src/core/abi/wgpu_texture_base_types.zig");
 
 // ============================================================
@@ -234,6 +236,12 @@ test "doe_wgpu_native: cast succeeds with correct magic" {
     const result = native.cast(native.DoeBuffer, @ptrCast(&buf));
     try std.testing.expect(result != null);
     try std.testing.expectEqual(native.DoeBuffer.TYPE_MAGIC, result.?.magic);
+}
+
+test "DoeBuffer records its owning device for Metal map completion" {
+    var dev = native.DoeDevice{};
+    const buf = native.DoeBuffer{ .dev = &dev };
+    try std.testing.expectEqual(&dev, buf.dev.?);
 }
 
 test "doe_wgpu_native: cast cross-type rejection is comprehensive" {
@@ -1094,6 +1102,89 @@ test "texture view: default full Metal view can borrow texture handle" {
         abi_texture.WGPUTextureComponentSwizzle_Blue,
         abi_texture.WGPUTextureComponentSwizzle_Alpha,
     ));
+}
+
+test "texture view: undefined counts resolve before reaching Metal" {
+    var tex = native.DoeTexture{
+        .mtl = @ptrFromInt(0x1000),
+        .format = abi_texture.WGPUTextureFormat_RGBA8Unorm,
+        .width = 128,
+        .height = 128,
+        .depth_or_array_layers = 1,
+        .dimension = abi_texture.WGPUTextureDimension_2D,
+        .mip_level_count = 1,
+        .sample_count = 1,
+        .usage = abi_texture.WGPUTextureUsage_RenderAttachment | abi_texture.WGPUTextureUsage_CopySrc,
+    };
+    const desc = abi_pipeline.WGPUTextureViewDescriptor{
+        .nextInChain = null,
+        .label = .{ .data = null, .length = 0 },
+        .format = 0,
+        .dimension = 0,
+        .baseMipLevel = 0,
+        .mipLevelCount = abi_core.WGPU_MIP_LEVEL_COUNT_UNDEFINED,
+        .baseArrayLayer = 0,
+        .arrayLayerCount = abi_core.WGPU_ARRAY_LAYER_COUNT_UNDEFINED,
+        .aspect = 0,
+        .usage = 0,
+        .swizzleR = 0,
+        .swizzleG = 0,
+        .swizzleB = 0,
+        .swizzleA = 0,
+    };
+
+    const raw_view = texture_sampler.doeNativeTextureCreateView(@ptrCast(&tex), &desc) orelse return error.TestUnexpectedResult;
+    const view = texture_sampler.registeredTextureView(raw_view) orelse return error.TestUnexpectedResult;
+    try std.testing.expectEqual(@as(u32, 1), view.mip_level_count);
+    try std.testing.expectEqual(@as(u32, 1), view.array_layer_count);
+    try std.testing.expectEqual(tex.mtl, view.handle);
+    try std.testing.expectEqual(@as(u32, 2), tex.ref_count);
+
+    texture_sampler.doeNativeTextureViewRelease(raw_view);
+    try std.testing.expectEqual(@as(u32, 1), tex.ref_count);
+}
+
+test "texture view: invalid subresource ranges fail before retaining texture" {
+    var tex = native.DoeTexture{
+        .mtl = @ptrFromInt(0x1000),
+        .format = abi_texture.WGPUTextureFormat_RGBA8Unorm,
+        .width = 128,
+        .height = 128,
+        .depth_or_array_layers = 2,
+        .dimension = abi_texture.WGPUTextureDimension_2D,
+        .mip_level_count = 2,
+        .sample_count = 1,
+        .usage = abi_texture.WGPUTextureUsage_TextureBinding,
+    };
+    var desc = abi_pipeline.WGPUTextureViewDescriptor{
+        .nextInChain = null,
+        .label = .{ .data = null, .length = 0 },
+        .format = 0,
+        .dimension = 0,
+        .baseMipLevel = 2,
+        .mipLevelCount = abi_core.WGPU_MIP_LEVEL_COUNT_UNDEFINED,
+        .baseArrayLayer = 0,
+        .arrayLayerCount = abi_core.WGPU_ARRAY_LAYER_COUNT_UNDEFINED,
+        .aspect = 0,
+        .usage = 0,
+        .swizzleR = 0,
+        .swizzleG = 0,
+        .swizzleB = 0,
+        .swizzleA = 0,
+    };
+
+    try std.testing.expect(texture_sampler.doeNativeTextureCreateView(@ptrCast(&tex), &desc) == null);
+    try std.testing.expectEqual(@as(u32, 1), tex.ref_count);
+
+    desc.baseMipLevel = 0;
+    desc.mipLevelCount = 3;
+    try std.testing.expect(texture_sampler.doeNativeTextureCreateView(@ptrCast(&tex), &desc) == null);
+    try std.testing.expectEqual(@as(u32, 1), tex.ref_count);
+
+    desc.mipLevelCount = 1;
+    desc.baseArrayLayer = 2;
+    try std.testing.expect(texture_sampler.doeNativeTextureCreateView(@ptrCast(&tex), &desc) == null);
+    try std.testing.expectEqual(@as(u32, 1), tex.ref_count);
 }
 
 test "texture view: non-default Metal view cannot borrow texture handle" {

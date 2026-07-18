@@ -667,8 +667,19 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
     const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.max(1, Math.floor(canvas.clientWidth * dpr));
     canvas.height = Math.max(1, Math.floor(canvas.clientHeight * dpr));
+    if (!context || !device || !format) return;
     context.configure({ device, format, alphaMode: 'opaque' });
     drawFpsGraph();
+  }
+
+  async function requestAdapter() {
+    const options = { powerPreference: 'high-performance' };
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const candidate = await navigator.gpu.requestAdapter(options);
+      if (candidate) return candidate;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+    return null;
   }
 
   function seedDye(grid) {
@@ -820,10 +831,18 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
 
   async function init() {
     if (!navigator.gpu) throw new Error('WebGPU unavailable');
-    adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+    adapter = await requestAdapter();
     if (!adapter) throw new Error('No adapter');
     device = await adapter.requestDevice();
+    const activeDevice = device;
+    device.lost.then((info) => {
+      if (device !== activeDevice) return;
+      running = false;
+      const detail = info.message || info.reason || 'unknown reason';
+      statusEl.textContent = `WebGPU device lost: ${detail}`;
+    });
     context = canvas.getContext('webgpu');
+    if (!context) throw new Error('WebGPU canvas context unavailable');
     format = navigator.gpu.getPreferredCanvasFormat();
 
     uniformBuffer = device.createBuffer({

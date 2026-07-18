@@ -9,6 +9,7 @@ const surface = @import("full/surface/wgpu_surface_procs.zig");
 const texture = @import("wgpu_texture_procs.zig");
 const render = @import("full/render/wgpu_render_api.zig");
 const async_procs = @import("wgpu_async_procs.zig");
+const async_pipeline = @import("wgpu_dropin_ext_a_pipeline.zig");
 const native = @import("doe_wgpu_native.zig");
 
 extern fn wgpuGetProcAddress(name: abi_core.WGPUStringView) callconv(.c) p1cap.WGPUProc;
@@ -21,12 +22,6 @@ const doeNativeRenderPassSetScissorRect = native.doeNativeRenderPassSetScissorRe
 const doeNativeRenderPassSetStencilReference = native.doeNativeRenderPassSetStencilReference;
 const doeNativeRenderPassSetViewport = native.doeNativeRenderPassSetViewport;
 const doeNativeRenderBundleEncoderSetImmediates = native.doeNativeRenderBundleEncoderSetImmediates;
-
-const CompilationInfoABI = extern struct {
-    nextInChain: ?*anyopaque,
-    messageCount: usize,
-    messages: ?*const anyopaque,
-};
 
 fn symbolView(comptime name: []const u8) abi_core.WGPUStringView {
     return .{ .data = name.ptr, .length = name.len };
@@ -187,16 +182,111 @@ pub export fn wgpuShaderModuleAddRef(a0: abi_core.WGPUShaderModule) callconv(.c)
 }
 
 pub export fn wgpuShaderModuleGetCompilationInfo(a0: abi_core.WGPUShaderModule, a1: async_procs.CompilationInfoCallbackInfo) callconv(.c) abi_core.WGPUFuture {
-    // Build a minimal WGPUCompilationInfo with zero messages and invoke the
-    // callback synchronously.  The Doe native compilation info path stores
-    // diagnostics on the shader module itself; here we surface an empty
-    // result through the standard callback ABI.
-    _ = a0;
+    const future = abi_core.WGPUFuture{ .id = async_pipeline.next_async_future_id() };
     if (a1.callback) |cb| {
-        const empty_info = CompilationInfoABI{ .nextInChain = null, .messageCount = 0, .messages = null };
-        cb(async_procs.COMPILATION_INFO_STATUS_SUCCESS, @ptrCast(&empty_info), a1.userdata1, a1.userdata2);
+        const module = native.cast(native.DoeShaderModule, a0) orelse {
+            cb(
+                async_procs.COMPILATION_INFO_STATUS_CALLBACK_CANCELLED,
+                null,
+                a1.userdata1,
+                a1.userdata2,
+            );
+            return future;
+        };
+        var message_storage: async_procs.CompilationMessageABI = undefined;
+        var info = async_procs.CompilationInfoABI{
+            .nextInChain = null,
+            .messageCount = 0,
+            .messages = null,
+        };
+        if (module.compilation_message) |message| {
+            const message_type: u32 = switch (module.compilation_message_kind) {
+                .@"error" => async_procs.COMPILATION_MESSAGE_TYPE_ERROR,
+                .warning => async_procs.COMPILATION_MESSAGE_TYPE_WARNING,
+                .info => async_procs.COMPILATION_MESSAGE_TYPE_INFO,
+                .none => 0,
+            };
+            if (message_type != 0) {
+                message_storage = .{
+                    .nextInChain = null,
+                    .message = .{ .data = message.ptr, .length = message.len },
+                    .message_type = message_type,
+                    .lineNum = module.compilation_message_line,
+                    .linePos = module.compilation_message_column,
+                    .offset = 0,
+                    .length = 0,
+                };
+                info.messageCount = 1;
+                info.messages = &message_storage;
+            }
+        }
+        cb(
+            async_procs.COMPILATION_INFO_STATUS_SUCCESS,
+            &info,
+            a1.userdata1,
+            a1.userdata2,
+        );
     }
-    return .{ .id = 0 };
+    return future;
+}
+
+const CompilationInfoCapture = struct {
+    called: bool = false,
+    status: u32 = 0,
+    message_count: usize = 0,
+    message_type: u32 = 0,
+    line: u64 = 0,
+    column: u64 = 0,
+    message_len: usize = 0,
+    message: [128]u8 = [_]u8{0} ** 128,
+};
+
+fn captureCompilationInfo(
+    status: u32,
+    info: ?*const async_procs.CompilationInfoABI,
+    userdata1: ?*anyopaque,
+    userdata2: ?*anyopaque,
+) callconv(.c) void {
+    _ = userdata2;
+    const capture: *CompilationInfoCapture = @ptrCast(@alignCast(userdata1 orelse return));
+    capture.called = true;
+    capture.status = status;
+    const compilation_info = info orelse return;
+    capture.message_count = compilation_info.messageCount;
+    const message = compilation_info.messages orelse return;
+    capture.message_type = message.message_type;
+    capture.line = message.lineNum;
+    capture.column = message.linePos;
+    const source = message.message.data orelse return;
+    capture.message_len = @min(message.message.length, capture.message.len);
+    @memcpy(capture.message[0..capture.message_len], source[0..capture.message_len]);
+}
+
+test "shader compilation info surfaces Doe module diagnostics" {
+    const diagnostic = "unknown type missing_type";
+    var module = native.DoeShaderModule{
+        .compilation_message_kind = .@"error",
+        .compilation_message = diagnostic,
+        .compilation_message_line = 4,
+        .compilation_message_column = 7,
+    };
+    var capture = CompilationInfoCapture{};
+    const future = wgpuShaderModuleGetCompilationInfo(native.toOpaque(&module), .{
+        .nextInChain = null,
+        .mode = 3,
+        .callback = captureCompilationInfo,
+        .userdata1 = &capture,
+        .userdata2 = null,
+    });
+
+    try std.testing.expect(future.id != 0);
+    try std.testing.expect(capture.called);
+    try std.testing.expectEqual(async_procs.COMPILATION_INFO_STATUS_SUCCESS, capture.status);
+    try std.testing.expectEqual(@as(usize, 1), capture.message_count);
+    try std.testing.expectEqual(async_procs.COMPILATION_MESSAGE_TYPE_ERROR, capture.message_type);
+    try std.testing.expectEqual(@as(u64, 4), capture.line);
+    try std.testing.expectEqual(@as(u64, 7), capture.column);
+    try std.testing.expectEqualStrings(diagnostic, capture.message[0..capture.message_len]);
 }
 
 pub export fn wgpuSharedBufferMemoryAddRef(a0: p2life.WGPUSharedBufferMemory) callconv(.c) void {

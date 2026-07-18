@@ -39,8 +39,8 @@ pub const WGPUSType_ShaderSourceWGSL: WGPUSType = 0x00000002;
 pub const WGPUSType_ShaderSourceMSL: WGPUSType = 0x00000003;
 pub const WGPUSType_ShaderSourceSPIRV: WGPUSType = 0x00000004;
 pub const WGPUSType_ShaderSourceHLSL: WGPUSType = 0x00000005;
-pub const WGPUSType_ExternalTextureBindingLayout: WGPUSType = 0x0000000D;
-pub const WGPUSType_ExternalTextureBindingEntry: WGPUSType = 0x0000000E;
+pub const WGPUSType_ExternalTextureBindingEntry: WGPUSType = 0x00050001;
+pub const WGPUSType_ExternalTextureBindingLayout: WGPUSType = 0x00050002;
 
 pub const WGPU_STRLEN = handles.WGPU_STRLEN;
 pub const WGPU_FALSE: WGPUBool = handles.WGPU_FALSE;

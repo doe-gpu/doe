@@ -641,6 +641,11 @@ def validate_smoke_report(
             errors.extend(validate_adapter_identity(row.get("adapterIdentity"), f"smoke mode {mode}"))
         if row.get("errors"):
             errors.append(f"smoke mode {mode} errors must be empty")
+        browser_close = row.get("browserClose")
+        if browser_close is not None and (
+            not isinstance(browser_close, dict) or browser_close.get("pass") is not True
+        ):
+            errors.append(f"smoke mode {mode} browserClose pass must be true")
         smoke = row.get("smoke")
         if not isinstance(smoke, dict):
             errors.append(f"smoke mode {mode} missing smoke object")

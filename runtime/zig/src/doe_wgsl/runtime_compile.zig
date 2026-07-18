@@ -609,18 +609,15 @@ test "compute runtime preserves written workgroup storage" {
     try std.testing.expect(std.mem.indexOf(u8, msl, "wg[") != null);
 }
 
-test "compute runtime lowers single invocation workgroup storage to thread local" {
+test "compute runtime lowers single invocation scalar workgroup storage to thread local" {
     const source =
-        \\const kBufferSize : u32 = 1024u;
-        \\@group(0) @binding(0) var<storage, read_write> data : array<u32, kBufferSize>;
-        \\var<workgroup> wg_data : array<u32, kBufferSize>;
+        \\@group(0) @binding(0) var<storage, read_write> data : array<u32, 1>;
+        \\var<workgroup> wg_data : u32;
         \\@compute @workgroup_size(1, 1, 1)
         \\fn main() {
-        \\    for (var i : u32 = 0u; i < kBufferSize; i = i + 1u) {
-        \\        wg_data[i] = data[i];
-        \\    }
+        \\    wg_data = data[0];
         \\    workgroupBarrier();
-        \\    data[0] = wg_data[0];
+        \\    data[0] = wg_data;
         \\}
     ;
     var out: [mod.MAX_OUTPUT]u8 = undefined;
@@ -635,9 +632,36 @@ test "compute runtime lowers single invocation workgroup storage to thread local
 
     const msl = out[0..result.len];
     try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup uint wg_data") == null);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "uint wg_data[1024];") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "uint wg_data;") != null);
     try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup_barrier") == null);
     try std.testing.expect(std.mem.indexOf(u8, msl, "(void)0") != null);
+}
+
+test "compute runtime preserves single invocation workgroup arrays" {
+    const source =
+        \\const kBufferSize : u32 = 1024u;
+        \\@group(0) @binding(0) var<storage, read_write> data : array<u32, kBufferSize>;
+        \\var<workgroup> wg_data : array<u32, kBufferSize>;
+        \\@compute @workgroup_size(1, 1, 1)
+        \\fn main() {
+        \\    for (var i : u32 = 0u; i < kBufferSize; i = i + 1u) {
+        \\        wg_data[i] = data[i];
+        \\    }
+        \\    data[0] = wg_data[0];
+        \\}
+    ;
+    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var result = try translateToMslForComputeRuntimeTimed(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer result.info.deinit(std.testing.allocator);
+
+    const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup uint wg_data[1024];") != null);
 }
 
 test "compute runtime elides bitmasked workgroup array clamp" {
@@ -670,6 +694,7 @@ test "compute runtime elides bitmasked workgroup array clamp" {
     defer result.info.deinit(std.testing.allocator);
 
     const msl = out[0..result.len];
+    try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup uint wg_data[1024];") != null);
     try std.testing.expect(std.mem.indexOf(u8, msl, "wg_data[min(") == null);
     try std.testing.expect(std.mem.indexOf(u8, msl, "wg_data[idx]") != null);
     try std.testing.expect(std.mem.indexOf(u8, msl, "inout_data[min(") == null);

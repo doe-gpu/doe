@@ -1,6 +1,7 @@
 const facade = @import("native/doe_native_api_render_exports.zig");
 
 pub const doeNativeDeviceCreateTexture = facade.doeNativeDeviceCreateTexture;
+pub const doeNativeDeviceValidateTextureDescriptor = facade.doeNativeDeviceValidateTextureDescriptor;
 pub const doeNativeTextureCreateView = facade.doeNativeTextureCreateView;
 pub const doeNativeTextureDestroy = facade.doeNativeTextureDestroy;
 pub const doeNativeTextureRelease = facade.doeNativeTextureRelease;

@@ -250,6 +250,21 @@ def test_validate_smoke_report_requires_timestamp_query_smoke() -> None:
     assert "smoke mode dawn timestampQuery pass must be true" in errors
 
 
+def test_validate_smoke_report_rejects_failed_browser_close_when_recorded() -> None:
+    root = Path(__file__).resolve().parents[2]
+    payload = json.loads((root / "examples/browser-smoke-report.sample.json").read_text(encoding="utf-8"))
+    payload["modeResults"][1]["browserClose"] = {
+        "attempted": True,
+        "pass": False,
+        "elapsedMs": 10000,
+        "error": "doe browser close timed out",
+    }
+
+    errors = validate_smoke_report(payload, require_hash_chain=False)
+
+    assert "smoke mode doe browserClose pass must be true" in errors
+
+
 def test_validate_smoke_report_requires_bundle_comparison() -> None:
     root = Path(__file__).resolve().parents[2]
     payload = json.loads((root / "examples/browser-smoke-report.sample.json").read_text(encoding="utf-8"))

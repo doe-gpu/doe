@@ -150,6 +150,16 @@ pub const RecordedCmd = union(CmdTag) {
         depth_slice: u32 = 0,
         depth_read_only: bool = false,
         stencil_read_only: bool = false,
+        pass_start: bool = true,
+        pass_end: bool = true,
+        color_load_op: u32 = 0,
+        color_store_op: u32 = 0,
+        depth_load_op: u32 = 0,
+        depth_store_op: u32 = 0,
+        stencil_load_op: u32 = 0,
+        stencil_store_op: u32 = 0,
+        depth_clear_value: f32 = 1,
+        stencil_clear_value: u32 = 0,
         topology: u32,
         front_face: u32,
         cull_mode: u32,
@@ -176,6 +186,16 @@ pub const RecordedCmd = union(CmdTag) {
         indirect: bool = false,
         indirect_buffer: ?*anyopaque = null,
         indirect_offset: u64 = 0,
+        viewport_x: f32 = 0,
+        viewport_y: f32 = 0,
+        viewport_width: ?f32 = null,
+        viewport_height: ?f32 = null,
+        viewport_min_depth: f32 = 0,
+        viewport_max_depth: f32 = 1,
+        scissor_x: u32 = 0,
+        scissor_y: u32 = 0,
+        scissor_width: ?u32 = null,
+        scissor_height: ?u32 = null,
         blend_constant: [4]f32 = .{ 0, 0, 0, 0 },
         stencil_reference: u32 = 0,
         depth_compare: u32 = 0,
@@ -204,6 +224,7 @@ pub const RecordedCmd = union(CmdTag) {
 };
 
 pub const RecordedDispatch = std.meta.TagPayload(RecordedCmd, .dispatch);
+pub const RecordedRender = std.meta.TagPayload(RecordedCmd, .render_pass);
 
 pub fn dispatchesCanMerge(left: *const RecordedDispatch, right: *const RecordedDispatch) bool {
     if (left.compute_pipeline != right.compute_pipeline) return false;
@@ -238,6 +259,39 @@ pub fn tryMergeDispatchIntoLast(cmds: *std.ArrayListUnmanaged(RecordedCmd), cmd:
     }
 }
 
+pub fn renderDrawsCanMerge(left: *const RecordedRender, right: *const RecordedRender) bool {
+    if (left.pass_end or right.pass_start) return false;
+    if (left.draw_count == 0 or right.draw_count == 0) return false;
+    if (left.indirect or right.indirect or left.indexed or right.indexed) return false;
+
+    var normalized_left = left.*;
+    var normalized_right = right.*;
+    normalized_left.draw_count = 1;
+    normalized_right.draw_count = 1;
+    normalized_left.pass_start = false;
+    normalized_right.pass_start = false;
+    normalized_left.pass_end = false;
+    normalized_right.pass_end = false;
+    return std.meta.eql(normalized_left, normalized_right);
+}
+
+pub fn tryMergeRenderDrawIntoLast(cmds: *std.ArrayListUnmanaged(RecordedCmd), cmd: *const RecordedCmd) bool {
+    if (cmds.items.len == 0) return false;
+    const right = switch (cmd.*) {
+        .render_pass => |render_cmd| render_cmd,
+        else => return false,
+    };
+    const last = &cmds.items[cmds.items.len - 1];
+    switch (last.*) {
+        .render_pass => |*left| {
+            if (!renderDrawsCanMerge(left, &right)) return false;
+            left.draw_count = std.math.add(u32, left.draw_count, right.draw_count) catch return false;
+            return true;
+        },
+        else => return false,
+    }
+}
+
 test "tryMergeDispatchIntoLast coalesces identical dispatch commands" {
     var cmds: std.ArrayListUnmanaged(RecordedCmd) = .{};
     defer cmds.deinit(std.testing.allocator);
@@ -265,4 +319,65 @@ test "tryMergeDispatchIntoLast coalesces identical dispatch commands" {
     try std.testing.expect(tryMergeDispatchIntoLast(&cmds, &second));
     try std.testing.expectEqual(@as(usize, 1), cmds.items.len);
     try std.testing.expectEqual(@as(u32, 2), cmds.items[0].dispatch.repeat_count);
+}
+
+test "tryMergeRenderDrawIntoLast coalesces identical draws inside one pass" {
+    var cmds: std.ArrayListUnmanaged(RecordedCmd) = .{};
+    defer cmds.deinit(std.testing.allocator);
+
+    const first = RecordedCmd{ .render_pass = .{
+        .pso = @ptrFromInt(0x1000),
+        .depth_state = null,
+        .target = @ptrFromInt(0x2000),
+        .depth_target = null,
+        .topology = 4,
+        .front_face = 1,
+        .cull_mode = 1,
+        .draw_count = 1,
+        .vertex_count = 3,
+        .instance_count = 1,
+        .first_vertex = 0,
+        .first_instance = 0,
+        .pass_start = true,
+        .pass_end = false,
+    } };
+    var second = first;
+    second.render_pass.pass_start = false;
+
+    try cmds.append(std.testing.allocator, first);
+    try std.testing.expect(tryMergeRenderDrawIntoLast(&cmds, &second));
+    try std.testing.expectEqual(@as(usize, 1), cmds.items.len);
+    try std.testing.expectEqual(@as(u32, 2), cmds.items[0].render_pass.draw_count);
+    try std.testing.expect(cmds.items[0].render_pass.pass_start);
+}
+
+test "render draw merging preserves pass and state boundaries" {
+    var cmds: std.ArrayListUnmanaged(RecordedCmd) = .{};
+    defer cmds.deinit(std.testing.allocator);
+
+    const first = RecordedCmd{ .render_pass = .{
+        .pso = @ptrFromInt(0x1000),
+        .depth_state = null,
+        .target = @ptrFromInt(0x2000),
+        .depth_target = null,
+        .topology = 4,
+        .front_face = 1,
+        .cull_mode = 1,
+        .draw_count = 1,
+        .vertex_count = 3,
+        .instance_count = 1,
+        .first_vertex = 0,
+        .first_instance = 0,
+        .pass_start = true,
+        .pass_end = false,
+    } };
+    var new_pass = first;
+    var changed_pipeline = first;
+    changed_pipeline.render_pass.pass_start = false;
+    changed_pipeline.render_pass.pso = @ptrFromInt(0x3000);
+
+    try cmds.append(std.testing.allocator, first);
+    try std.testing.expect(!tryMergeRenderDrawIntoLast(&cmds, &new_pass));
+    try std.testing.expect(!tryMergeRenderDrawIntoLast(&cmds, &changed_pipeline));
+    try std.testing.expectEqual(@as(u32, 1), cmds.items[0].render_pass.draw_count);
 }

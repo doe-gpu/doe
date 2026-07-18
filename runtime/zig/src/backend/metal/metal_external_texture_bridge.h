@@ -17,9 +17,10 @@ typedef void* MetalHandle;
 // Import a single plane from an IOSurface as a MTLTexture.
 // device: retained MTLDevice handle.
 // iosurface: IOSurfaceRef (caller retains ownership).
-// plane: plane index (0 for single-plane BGRA, 0/1 for NV12).
+// plane: plane index (0 for single-plane color, 0/1 for NV12).
 // width/height: dimensions of this plane.
-// pixel_format: MTLPixelFormat value (70=BGRA8Unorm, 10=R8Unorm, 25=RG8Unorm).
+// pixel_format: MTLPixelFormat value (0=derive from IOSurface, 70=RGBA8Unorm,
+// 80=BGRA8Unorm, 10=R8Unorm, 25=RG8Unorm).
 // Returns a +1 retained MTLTexture handle or NULL on failure.
 MetalHandle doe_metal_import_iosurface(
     MetalHandle device,

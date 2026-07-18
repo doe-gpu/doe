@@ -12,16 +12,36 @@ pub extern fn metal_bridge_blit_encoder_copy(encoder: ?*anyopaque, src: ?*anyopa
 pub extern fn metal_bridge_create_command_buffer(queue: ?*anyopaque) callconv(.c) ?*anyopaque;
 pub extern fn metal_bridge_cmd_buf_blit_encoder(cmd_buf: ?*anyopaque) callconv(.c) ?*anyopaque;
 pub extern fn metal_bridge_cmd_buf_compute_encoder(cmd_buf: ?*anyopaque) callconv(.c) ?*anyopaque;
+pub extern fn metal_bridge_cmd_buf_compute_encoder_with_timestamps(cmd_buf: ?*anyopaque, counter_buffer: ?*anyopaque, begin_query_index: u32, end_query_index: u32) callconv(.c) ?*anyopaque;
 pub extern fn metal_bridge_end_blit_encoding(encoder: ?*anyopaque) callconv(.c) void;
 pub extern fn metal_bridge_end_compute_encoding(encoder: ?*anyopaque) callconv(.c) void;
 pub extern fn metal_bridge_command_buffer_commit(cmd_buf: ?*anyopaque) callconv(.c) void;
 pub extern fn metal_bridge_command_buffer_wait_completed(cmd_buf: ?*anyopaque) callconv(.c) void;
 pub extern fn metal_bridge_command_buffer_spin_wait(cmd_buf: ?*anyopaque) callconv(.c) void;
+pub extern fn metal_bridge_command_buffer_retain_object_until_complete(cmd_buf: ?*anyopaque, object: ?*anyopaque) callconv(.c) c_int;
 pub extern fn metal_bridge_command_buffer_setup_fast_wait(cmd_buf: ?*anyopaque) callconv(.c) void;
 pub extern fn metal_bridge_command_buffer_wait_fast() callconv(.c) void;
 pub extern fn metal_bridge_cmd_buf_encode_render_pass(cmd_buf: ?*anyopaque, pipeline: ?*anyopaque, target: ?*anyopaque, draw_count: u32, vertex_count: u32, instance_count: u32, redundant_pipeline: c_int, redundant_bindgroup: c_int) callconv(.c) void;
 pub extern fn metal_bridge_cmd_buf_encode_icb_render_pass(cmd_buf: ?*anyopaque, pipeline: ?*anyopaque, icb: ?*anyopaque, target: ?*anyopaque, draw_count: u32) callconv(.c) void;
-pub extern fn metal_bridge_cmd_buf_render_encoder(cmd_buf: ?*anyopaque, pipeline: ?*anyopaque, target: ?*anyopaque, depth_target: ?*anyopaque, use_depth_store: c_int, clear_r: f64, clear_g: f64, clear_b: f64, clear_a: f64) callconv(.c) ?*anyopaque;
+pub const MetalRenderPassOps = extern struct {
+    color_load_op: u32,
+    color_store_op: u32,
+    depth_load_op: u32,
+    depth_store_op: u32,
+    stencil_load_op: u32,
+    stencil_store_op: u32,
+    depth_read_only: u32,
+    stencil_read_only: u32,
+    clear_r: f64,
+    clear_g: f64,
+    clear_b: f64,
+    clear_a: f64,
+    depth_clear_value: f32,
+    stencil_clear_value: u32,
+};
+
+pub extern fn metal_bridge_cmd_buf_render_encoder(cmd_buf: ?*anyopaque, pipeline: ?*anyopaque, target: ?*anyopaque, resolve_target: ?*anyopaque, depth_target: ?*anyopaque, ops: *const MetalRenderPassOps) callconv(.c) ?*anyopaque;
+pub extern fn metal_bridge_render_encoder_set_pipeline(encoder: ?*anyopaque, pipeline: ?*anyopaque) callconv(.c) void;
 pub extern fn metal_bridge_render_encoder_set_bind_buffer(encoder: ?*anyopaque, slot: u32, buffer: ?*anyopaque, offset: u64) callconv(.c) void;
 pub extern fn metal_bridge_render_encoder_set_bind_texture(encoder: ?*anyopaque, slot: u32, texture: ?*anyopaque) callconv(.c) void;
 pub extern fn metal_bridge_render_encoder_set_bind_sampler(encoder: ?*anyopaque, slot: u32, sampler: ?*anyopaque) callconv(.c) void;
@@ -40,6 +60,7 @@ pub extern fn metal_bridge_render_encoder_end(encoder: ?*anyopaque) callconv(.c)
 pub extern fn metal_bridge_device_new_shared_event(device: ?*anyopaque) callconv(.c) ?*anyopaque;
 pub extern fn metal_bridge_command_buffer_encode_signal_event(cmd_buf: ?*anyopaque, event: ?*anyopaque, value: u64) callconv(.c) void;
 pub extern fn metal_bridge_shared_event_wait(event: ?*anyopaque, value: u64) callconv(.c) void;
+pub extern fn metal_bridge_shared_event_notify(event: ?*anyopaque, value: u64, callback: ?*const fn (?*anyopaque) callconv(.c) void, userdata: ?*anyopaque) callconv(.c) c_int;
 pub extern fn metal_bridge_device_new_library_msl(device: ?*anyopaque, src: [*]const u8, src_len: usize, error_buf: ?[*]u8, error_cap: usize) callconv(.c) ?*anyopaque;
 pub extern fn metal_bridge_library_new_function(library: ?*anyopaque, name: [*:0]const u8) callconv(.c) ?*anyopaque;
 pub extern fn metal_bridge_device_new_compute_pipeline(device: ?*anyopaque, function: ?*anyopaque, error_buf: ?[*]u8, error_cap: usize) callconv(.c) ?*anyopaque;

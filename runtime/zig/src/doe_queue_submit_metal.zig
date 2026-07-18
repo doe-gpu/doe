@@ -1,3 +1,4 @@
+const std = @import("std");
 const queue_submit_ops = @import("backend/dropin_queue_submit.zig");
 const native_types = @import("doe_native_object_types.zig");
 const native_shared = @import("doe_native_shared_types.zig");
@@ -7,6 +8,7 @@ const queue_flush_breakdown = @import("doe_queue_flush_breakdown.zig");
 const metal_browser_trace = @import("doe_metal_browser_trace.zig");
 const emit_msl = @import("doe_wgsl/emit_msl_ir.zig");
 const shared = @import("doe_queue_submit_shared.zig");
+const render_state_native = @import("doe_render_state_native.zig");
 
 const cast = native_helpers.cast;
 const DoeBuffer = native_types.DoeBuffer;
@@ -74,6 +76,187 @@ fn end_active_compute_encoder(active_compute_encoder: *?*anyopaque) void {
         bridge.metal_bridge_end_compute_encoding(encoder);
         active_compute_encoder.* = null;
     }
+}
+
+const MetalRenderStateCache = struct {
+    pipeline: ?*anyopaque = null,
+    front_face: ?u32 = null,
+    cull_mode: ?u32 = null,
+    depth_state: ?*anyopaque = null,
+    unclipped_depth: bool = false,
+    viewport_x: f32 = 0,
+    viewport_y: f32 = 0,
+    viewport_width: ?f32 = null,
+    viewport_height: ?f32 = null,
+    viewport_min_depth: f32 = 0,
+    viewport_max_depth: f32 = 1,
+    scissor_x: u32 = 0,
+    scissor_y: u32 = 0,
+    scissor_width: ?u32 = null,
+    scissor_height: ?u32 = null,
+    blend_constant: [4]f32 = .{ 0, 0, 0, 0 },
+    stencil_reference: u32 = 0,
+    bind_buffers: [MAX_FLAT_BIND]?*anyopaque = [_]?*anyopaque{null} ** MAX_FLAT_BIND,
+    bind_buffer_offsets: [MAX_FLAT_BIND]u64 = [_]u64{0} ** MAX_FLAT_BIND,
+    bind_textures: [MAX_FLAT_BIND]?*anyopaque = [_]?*anyopaque{null} ** MAX_FLAT_BIND,
+    bind_samplers: [MAX_FLAT_BIND]?*anyopaque = [_]?*anyopaque{null} ** MAX_FLAT_BIND,
+    vertex_buffers: [native_shared.MAX_VERTEX_BUFFERS]?*anyopaque = [_]?*anyopaque{null} ** native_shared.MAX_VERTEX_BUFFERS,
+    vertex_buffer_offsets: [native_shared.MAX_VERTEX_BUFFERS]u64 = [_]u64{0} ** native_shared.MAX_VERTEX_BUFFERS,
+};
+
+fn end_active_render_encoder(active_render_encoder: *?*anyopaque, state: *MetalRenderStateCache) void {
+    if (active_render_encoder.*) |encoder| {
+        bridge.metal_bridge_render_encoder_end(encoder);
+        bridge.metal_bridge_release(encoder);
+        active_render_encoder.* = null;
+    }
+    state.* = .{};
+}
+
+fn apply_render_state(
+    encoder: ?*anyopaque,
+    state: *MetalRenderStateCache,
+    cmd: *const native_cmds.RecordedRender,
+) void {
+    if (state.pipeline != cmd.pso) {
+        bridge.metal_bridge_render_encoder_set_pipeline(encoder, cmd.pso);
+        state.pipeline = cmd.pso;
+    }
+    if (state.front_face == null or state.front_face.? != cmd.front_face) {
+        bridge.metal_bridge_render_encoder_set_front_facing(encoder, cmd.front_face);
+        state.front_face = cmd.front_face;
+    }
+    if (state.cull_mode == null or state.cull_mode.? != cmd.cull_mode) {
+        bridge.metal_bridge_render_encoder_set_cull_mode(encoder, cmd.cull_mode);
+        state.cull_mode = cmd.cull_mode;
+    }
+    if (state.unclipped_depth != cmd.unclipped_depth) {
+        bridge.metal_bridge_render_encoder_set_depth_clip_mode(encoder, @intFromBool(cmd.unclipped_depth));
+        state.unclipped_depth = cmd.unclipped_depth;
+    }
+    if (state.depth_state != cmd.depth_state) {
+        bridge.metal_bridge_render_encoder_set_depth_stencil_state(encoder, cmd.depth_state);
+        state.depth_state = cmd.depth_state;
+    }
+
+    for (cmd.bind_buffers, cmd.bind_buffer_offsets, 0..) |buffer, raw_offset, slot| {
+        const offset = if (buffer == null) 0 else raw_offset;
+        if (state.bind_buffers[slot] != buffer or state.bind_buffer_offsets[slot] != offset) {
+            bridge.metal_bridge_render_encoder_set_bind_buffer(encoder, @intCast(slot), buffer, offset);
+            state.bind_buffers[slot] = buffer;
+            state.bind_buffer_offsets[slot] = offset;
+        }
+    }
+    for (cmd.bind_textures, 0..) |texture, slot| {
+        if (state.bind_textures[slot] != texture) {
+            bridge.metal_bridge_render_encoder_set_bind_texture(encoder, @intCast(slot), texture);
+            state.bind_textures[slot] = texture;
+        }
+    }
+    for (cmd.bind_samplers, 0..) |sampler, slot| {
+        if (state.bind_samplers[slot] != sampler) {
+            bridge.metal_bridge_render_encoder_set_bind_sampler(encoder, @intCast(slot), sampler);
+            state.bind_samplers[slot] = sampler;
+        }
+    }
+    for (cmd.vertex_buffers, cmd.vertex_buffer_offsets, 0..) |buffer, raw_offset, slot| {
+        const offset = if (buffer == null) 0 else raw_offset;
+        if (state.vertex_buffers[slot] != buffer or state.vertex_buffer_offsets[slot] != offset) {
+            bridge.metal_bridge_render_encoder_set_vertex_buffer(
+                encoder,
+                VERTEX_BUFFER_SLOT_BASE + @as(u32, @intCast(slot)),
+                buffer,
+                offset,
+            );
+            state.vertex_buffers[slot] = buffer;
+            state.vertex_buffer_offsets[slot] = offset;
+        }
+    }
+
+    if (cmd.viewport_width != null and cmd.viewport_height != null and
+        (state.viewport_width == null or state.viewport_height == null or
+            state.viewport_x != cmd.viewport_x or state.viewport_y != cmd.viewport_y or
+            state.viewport_width.? != cmd.viewport_width.? or state.viewport_height.? != cmd.viewport_height.? or
+            state.viewport_min_depth != cmd.viewport_min_depth or state.viewport_max_depth != cmd.viewport_max_depth))
+    {
+        render_state_native.doeNativeRenderPassEncoderSetViewport(
+            encoder,
+            cmd.viewport_x,
+            cmd.viewport_y,
+            cmd.viewport_width.?,
+            cmd.viewport_height.?,
+            cmd.viewport_min_depth,
+            cmd.viewport_max_depth,
+        );
+        state.viewport_x = cmd.viewport_x;
+        state.viewport_y = cmd.viewport_y;
+        state.viewport_width = cmd.viewport_width;
+        state.viewport_height = cmd.viewport_height;
+        state.viewport_min_depth = cmd.viewport_min_depth;
+        state.viewport_max_depth = cmd.viewport_max_depth;
+    }
+    if (cmd.scissor_width != null and cmd.scissor_height != null and
+        (state.scissor_width == null or state.scissor_height == null or
+            state.scissor_x != cmd.scissor_x or state.scissor_y != cmd.scissor_y or
+            state.scissor_width.? != cmd.scissor_width.? or state.scissor_height.? != cmd.scissor_height.?))
+    {
+        render_state_native.doeNativeRenderPassEncoderSetScissorRect(
+            encoder,
+            cmd.scissor_x,
+            cmd.scissor_y,
+            cmd.scissor_width.?,
+            cmd.scissor_height.?,
+        );
+        state.scissor_x = cmd.scissor_x;
+        state.scissor_y = cmd.scissor_y;
+        state.scissor_width = cmd.scissor_width;
+        state.scissor_height = cmd.scissor_height;
+    }
+    if (!std.meta.eql(state.blend_constant, cmd.blend_constant)) {
+        render_state_native.doeNativeRenderPassEncoderSetBlendConstant(
+            encoder,
+            cmd.blend_constant[0],
+            cmd.blend_constant[1],
+            cmd.blend_constant[2],
+            cmd.blend_constant[3],
+        );
+        state.blend_constant = cmd.blend_constant;
+    }
+    if (state.stencil_reference != cmd.stencil_reference) {
+        render_state_native.doeNativeRenderPassEncoderSetStencilReference(encoder, cmd.stencil_reference);
+        state.stencil_reference = cmd.stencil_reference;
+    }
+}
+
+const PassTimestampEnd = struct {
+    command_index: usize,
+    query_index: u32,
+};
+
+fn findPassTimestampEnd(
+    cmds: []const native_cmds.RecordedCmd,
+    begin_command_index: usize,
+    counter_buffer: ?*anyopaque,
+    query_set: ?*anyopaque,
+) ?PassTimestampEnd {
+    if (begin_command_index + 1 >= cmds.len) return null;
+    for (cmds[begin_command_index + 1 ..], begin_command_index + 1..) |cmd, command_index| {
+        switch (cmd) {
+            .write_timestamp => |timestamp| {
+                if (timestamp.position == .pass_end and
+                    timestamp.counter_buffer == counter_buffer and
+                    timestamp.query_set == query_set)
+                {
+                    return .{
+                        .command_index = command_index,
+                        .query_index = timestamp.query_index,
+                    };
+                }
+            },
+            else => {},
+        }
+    }
+    return null;
 }
 
 fn encode_recorded_dispatch_batch(
@@ -176,13 +359,20 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
     const encode_started_ns = if (trace_enabled) metal_browser_trace.nowNs() else 0;
     var has_gpu_work = false;
     var active_compute_encoder: ?*anyopaque = null;
+    var active_render_encoder: ?*anyopaque = null;
+    var active_render_state: MetalRenderStateCache = .{};
     defer end_active_compute_encoder(&active_compute_encoder);
+    defer end_active_render_encoder(&active_render_encoder, &active_render_state);
 
     for (cmd_bufs[0..count]) |raw| {
         const cb = cast(DoeCommandBuffer, raw) orelse continue;
         var cmd_index: usize = 0;
+        var active_timestamp_end_command_index: ?usize = null;
         while (cmd_index < cb.cmds.items.len) {
             const cmd = cb.cmds.items[cmd_index];
+            if (std.meta.activeTag(cmd) != .render_pass) {
+                end_active_render_encoder(&active_render_encoder, &active_render_state);
+            }
             switch (cmd) {
                 .dispatch => |d| {
                     if (active_compute_encoder == null) {
@@ -378,48 +568,42 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
                 },
                 .render_pass => |r| {
                     end_active_compute_encoder(&active_compute_encoder);
-                    const renc = bridge.metal_bridge_cmd_buf_render_encoder(
-                        mtl_cmd,
-                        r.pso,
-                        r.target,
-                        r.depth_target,
-                        if (r.depth_write_enabled) 1 else 0,
-                        r.clear_r,
-                        r.clear_g,
-                        r.clear_b,
-                        r.clear_a,
-                    );
-                    if (renc) |e| {
-                        bridge.metal_bridge_render_encoder_set_front_facing(e, r.front_face);
-                        bridge.metal_bridge_render_encoder_set_cull_mode(e, r.cull_mode);
-                        if (r.unclipped_depth) {
-                            bridge.metal_bridge_render_encoder_set_depth_clip_mode(e, 1);
+                    if (r.pass_start) {
+                        end_active_render_encoder(&active_render_encoder, &active_render_state);
+                    }
+                    if (active_render_encoder == null) {
+                        const ops = bridge.MetalRenderPassOps{
+                            .color_load_op = r.color_load_op,
+                            .color_store_op = r.color_store_op,
+                            .depth_load_op = r.depth_load_op,
+                            .depth_store_op = r.depth_store_op,
+                            .stencil_load_op = r.stencil_load_op,
+                            .stencil_store_op = r.stencil_store_op,
+                            .depth_read_only = @intFromBool(r.depth_read_only),
+                            .stencil_read_only = @intFromBool(r.stencil_read_only),
+                            .clear_r = r.clear_r,
+                            .clear_g = r.clear_g,
+                            .clear_b = r.clear_b,
+                            .clear_a = r.clear_a,
+                            .depth_clear_value = r.depth_clear_value,
+                            .stencil_clear_value = r.stencil_clear_value,
+                        };
+                        active_render_encoder = bridge.metal_bridge_cmd_buf_render_encoder(
+                            mtl_cmd,
+                            null,
+                            r.target,
+                            r.resolve_target,
+                            r.depth_target,
+                            &ops,
+                        );
+                    }
+                    if (active_render_encoder) |e| {
+                        if (r.draw_count > 0 and r.pso != null) {
+                            apply_render_state(e, &active_render_state, &r);
                         }
-                        if (r.depth_state) |depth_state| {
-                            bridge.metal_bridge_render_encoder_set_depth_stencil_state(e, depth_state);
-                            bridge.metal_bridge_render_encoder_set_depth_stencil_values(e, r.depth_compare, if (r.depth_write_enabled) 1 else 0);
-                        }
-                        for (r.bind_buffers, r.bind_buffer_offsets, 0..) |maybe_buf, offset, slot| {
-                            if (maybe_buf) |buf| {
-                                bridge.metal_bridge_render_encoder_set_bind_buffer(e, @intCast(slot), buf, offset);
-                            }
-                        }
-                        for (r.bind_textures, 0..) |maybe_tex, slot| {
-                            if (maybe_tex) |tex| {
-                                bridge.metal_bridge_render_encoder_set_bind_texture(e, @intCast(slot), tex);
-                            }
-                        }
-                        for (r.bind_samplers, 0..) |maybe_sampler, slot| {
-                            if (maybe_sampler) |sampler| {
-                                bridge.metal_bridge_render_encoder_set_bind_sampler(e, @intCast(slot), sampler);
-                            }
-                        }
-                        for (r.vertex_buffers, r.vertex_buffer_offsets, 0..) |maybe_buf, offset, slot| {
-                            if (maybe_buf) |buf| {
-                                bridge.metal_bridge_render_encoder_set_vertex_buffer(e, VERTEX_BUFFER_SLOT_BASE + @as(u32, @intCast(slot)), buf, offset);
-                            }
-                        }
-                        if (r.indirect) {
+                        if (r.draw_count == 0 or r.pso == null) {
+                            // An empty pass still applies attachment load/store operations.
+                        } else if (r.indirect) {
                             if (r.indexed) {
                                 bridge.metal_bridge_render_encoder_draw_indexed_indirect(
                                     e,
@@ -462,18 +646,64 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
                                 r.pso,
                             );
                         }
-                        bridge.metal_bridge_render_encoder_end(e);
-                        bridge.metal_bridge_release(e);
+                        has_gpu_work = true;
+                        if (r.pass_end) {
+                            end_active_render_encoder(&active_render_encoder, &active_render_state);
+                        }
+                    } else {
+                        std.log.err("doe: Metal render encoder creation failed", .{});
                     }
-                    has_gpu_work = true;
                 },
                 .write_timestamp => |ts| {
-                    end_active_compute_encoder(&active_compute_encoder);
-                    bridge.metal_bridge_sample_timestamp(mtl_cmd, ts.counter_buffer, ts.query_index);
+                    _ = bridge.metal_bridge_command_buffer_retain_object_until_complete(
+                        mtl_cmd,
+                        ts.counter_buffer,
+                    );
+                    switch (ts.position) {
+                        .pass_begin => {
+                            end_active_compute_encoder(&active_compute_encoder);
+                            if (findPassTimestampEnd(
+                                cb.cmds.items,
+                                cmd_index,
+                                ts.counter_buffer,
+                                ts.query_set,
+                            )) |timestamp_end| {
+                                active_compute_encoder = bridge.metal_bridge_cmd_buf_compute_encoder_with_timestamps(
+                                    mtl_cmd,
+                                    ts.counter_buffer,
+                                    ts.query_index,
+                                    timestamp_end.query_index,
+                                );
+                                if (active_compute_encoder != null) {
+                                    active_timestamp_end_command_index = timestamp_end.command_index;
+                                } else {
+                                    bridge.metal_bridge_sample_timestamp(mtl_cmd, ts.counter_buffer, ts.query_index);
+                                }
+                            } else {
+                                bridge.metal_bridge_sample_timestamp(mtl_cmd, ts.counter_buffer, ts.query_index);
+                            }
+                        },
+                        .pass_end => {
+                            end_active_compute_encoder(&active_compute_encoder);
+                            if (active_timestamp_end_command_index == cmd_index) {
+                                active_timestamp_end_command_index = null;
+                            } else {
+                                bridge.metal_bridge_sample_timestamp(mtl_cmd, ts.counter_buffer, ts.query_index);
+                            }
+                        },
+                        .command => {
+                            end_active_compute_encoder(&active_compute_encoder);
+                            bridge.metal_bridge_sample_timestamp(mtl_cmd, ts.counter_buffer, ts.query_index);
+                        },
+                    }
                     has_gpu_work = true;
                 },
                 .resolve_query_set => |rs| {
                     end_active_compute_encoder(&active_compute_encoder);
+                    _ = bridge.metal_bridge_command_buffer_retain_object_until_complete(
+                        mtl_cmd,
+                        rs.counter_buffer,
+                    );
                     if (q.deferred_resolve_count < MAX_DEFERRED_RESOLVES) {
                         q.deferred_resolves[q.deferred_resolve_count] = .{
                             .counter_buffer = rs.counter_buffer,
@@ -492,6 +722,7 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
     }
 
     end_active_compute_encoder(&active_compute_encoder);
+    end_active_render_encoder(&active_render_encoder, &active_render_state);
     if (has_gpu_work) {
         q.event_counter += 1;
         if (q.mtl_event) |event| {
@@ -528,4 +759,34 @@ pub fn submit_metal_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*an
         bridge.metal_bridge_release(mtl_cmd);
         queue_flush_breakdown.executeDeferredCopies(q);
     }
+}
+
+test "compute pass timestamp markers pair by query set and counter buffer" {
+    const counter_buffer: ?*anyopaque = @ptrFromInt(0x1000);
+    const query_set: ?*anyopaque = @ptrFromInt(0x2000);
+    const commands = [_]native_cmds.RecordedCmd{
+        .{ .write_timestamp = .{
+            .counter_buffer = counter_buffer,
+            .query_set = query_set,
+            .query_index = 3,
+            .position = .pass_begin,
+        } },
+        .{ .write_timestamp = .{
+            .counter_buffer = @ptrFromInt(0x3000),
+            .query_set = query_set,
+            .query_index = 4,
+            .position = .pass_end,
+        } },
+        .{ .write_timestamp = .{
+            .counter_buffer = counter_buffer,
+            .query_set = query_set,
+            .query_index = 5,
+            .position = .pass_end,
+        } },
+    };
+
+    const timestamp_end = findPassTimestampEnd(&commands, 0, counter_buffer, query_set) orelse
+        return error.TestExpectedEqual;
+    try std.testing.expectEqual(@as(usize, 2), timestamp_end.command_index);
+    try std.testing.expectEqual(@as(u32, 5), timestamp_end.query_index);
 }

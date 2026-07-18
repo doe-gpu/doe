@@ -7,10 +7,20 @@
 const builtin = @import("builtin");
 const bridge = @import("metal_bridge_decls.zig");
 
-// MTLPixelFormat constants matching the ObjC bridge header.
-pub const MTL_PIXEL_FORMAT_BGRA8_UNORM: u32 = 70;
+// MTLPixelFormat constants matching Apple's Metal ABI.
+pub const MTL_PIXEL_FORMAT_AUTO: u32 = 0;
+pub const MTL_PIXEL_FORMAT_RGBA8_UNORM: u32 = 70;
+pub const MTL_PIXEL_FORMAT_RGBA8_UNORM_SRGB: u32 = 71;
+pub const MTL_PIXEL_FORMAT_BGRA8_UNORM: u32 = 80;
+pub const MTL_PIXEL_FORMAT_BGRA8_UNORM_SRGB: u32 = 81;
 pub const MTL_PIXEL_FORMAT_R8_UNORM: u32 = 10;
 pub const MTL_PIXEL_FORMAT_RG8_UNORM: u32 = 25;
+
+pub const IOSurfaceLayout = struct {
+    plane_count: u32,
+    width: u32,
+    height: u32,
+};
 
 pub const PlaneLayout = struct {
     plane0: ?*anyopaque,
@@ -20,30 +30,50 @@ pub const PlaneLayout = struct {
     height: u32,
 };
 
-/// Import an IOSurface as one or two MTLTexture planes.
-/// Returns PlaneLayout with retained MTLTexture handles (caller must release).
-/// Returns null on failure (non-macOS, null device, null iosurface).
-pub fn importIOSurface(device: ?*anyopaque, iosurface: ?*anyopaque) ?PlaneLayout {
+pub fn inspectIOSurface(iosurface: ?*anyopaque) ?IOSurfaceLayout {
     if (comptime builtin.os.tag != .macos) return null;
-    if (device == null or iosurface == null) return null;
+    if (iosurface == null) return null;
 
     const plane_count = bridge.doe_metal_iosurface_plane_count(iosurface);
     if (plane_count == 0) return null;
 
-    if (plane_count == 1) {
-        // Single-plane (BGRA): query dimensions from plane 0.
-        var width: u32 = 0;
-        var height: u32 = 0;
-        bridge.doe_metal_iosurface_plane_size(iosurface, 0, &width, &height);
-        if (width == 0 or height == 0) return null;
+    var width: u32 = 0;
+    var height: u32 = 0;
+    bridge.doe_metal_iosurface_plane_size(iosurface, 0, &width, &height);
+    if (width == 0 or height == 0) return null;
 
+    return .{
+        .plane_count = plane_count,
+        .width = width,
+        .height = height,
+    };
+}
+
+/// Import an IOSurface as one or two MTLTexture planes.
+/// Returns PlaneLayout with retained MTLTexture handles (caller must release).
+/// Returns null on failure (non-macOS, null device, null iosurface).
+pub fn importIOSurface(device: ?*anyopaque, iosurface: ?*anyopaque) ?PlaneLayout {
+    return importIOSurfaceWithPixelFormat(device, iosurface, MTL_PIXEL_FORMAT_AUTO);
+}
+
+pub fn importIOSurfaceWithPixelFormat(
+    device: ?*anyopaque,
+    iosurface: ?*anyopaque,
+    single_plane_pixel_format: u32,
+) ?PlaneLayout {
+    if (comptime builtin.os.tag != .macos) return null;
+    if (device == null or iosurface == null) return null;
+
+    const layout = inspectIOSurface(iosurface) orelse return null;
+
+    if (layout.plane_count == 1) {
         const plane0 = bridge.doe_metal_import_iosurface(
             device,
             iosurface,
             0,
-            width,
-            height,
-            MTL_PIXEL_FORMAT_BGRA8_UNORM,
+            layout.width,
+            layout.height,
+            single_plane_pixel_format,
         );
         if (plane0 == null) return null;
 
@@ -51,8 +81,8 @@ pub fn importIOSurface(device: ?*anyopaque, iosurface: ?*anyopaque) ?PlaneLayout
             .plane0 = plane0,
             .plane1 = null,
             .is_single_plane = true,
-            .width = width,
-            .height = height,
+            .width = layout.width,
+            .height = layout.height,
         };
     }
 

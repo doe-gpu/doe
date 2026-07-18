@@ -115,7 +115,10 @@ def test_chromium_source_checkout_can_require_runtime_selector_markers(tmp_path:
     assert "selector:doe_wire_runtime_instance" in report["missingRequired"]
     assert "selector:doe_wire_runtime_lifecycle_test" in report["missingRequired"]
     assert "selector:doe_shared_image_iosurface_bridge" in report["missingRequired"]
+    assert "selector:doe_wire_device_handle_ownership" in report["missingRequired"]
     assert "selector:doe_shared_image_iosurface_representation" in report["missingRequired"]
+    assert "selector:doe_shared_image_metal_fence_bridge" in report["missingRequired"]
+    assert "selector:doe_shared_image_iosurface_fence_propagation" in report["missingRequired"]
     assert "selector:doe_shared_image_native_import" in report["missingRequired"]
     assert "selector:doe_shared_image_native_begin_access" in report["missingRequired"]
     assert "selector:doe_shared_image_native_end_access" in report["missingRequired"]
@@ -302,12 +305,20 @@ def test_chromium_source_checkout_passes_with_runtime_selector_markers(tmp_path:
                 "runtime->procs.instanceRelease(runtime->instance)",
                 "runtime->instance = nullptr",
                 "AssociateMailboxDoeSharedImage(",
-                "GetIOSurfaceForNativeImport()",
+                "ProduceIOSurfaceForWebGPU(mailbox)",
+                "BeginScopedAccess(usage, internal_usage)",
+                "Keep a Doe device raw until after runtime selection.",
+                "AssociateMailboxDoeSharedImage(mailbox, flags, device_handle",
+                "wgpu::Device device = device_handle;",
                 "class DoeSharedImageRepresentationAndAccess",
                 "WGPUSharedTextureMemoryIOSurfaceDescriptor",
                 "deviceImportSharedTextureMemory",
                 "sharedTextureMemoryBeginAccess",
                 "sharedTextureMemoryEndAccess",
+                "WGPUSharedFenceMTLSharedEventDescriptor",
+                "deviceImportSharedFence",
+                "sharedFenceExportInfo",
+                "MTLSharedEventFence::CreateFromHandle",
                 "io_surface_desc.ioSurface = io_surface_.get();",
                 "doe_shared_buffer_unsupported",
                 "<< kDoeSharedBufferUnsupported;\n    return error::kInvalidArguments;",
@@ -354,6 +365,8 @@ def test_chromium_source_checkout_passes_with_runtime_selector_markers(tmp_path:
                 "wgpu::SharedTextureMemoryIOSurfaceDescriptor io_surface_desc",
                 "io_surface_desc.ioSurface = io_surface_.get();",
                 "device.ImportSharedTextureMemory(&desc)",
+                "ProcessSharedEventsForBeginAccess",
+                "AddSharedEventForEndAccess",
             ]
         ),
         encoding="utf-8",

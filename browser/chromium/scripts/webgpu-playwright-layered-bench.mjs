@@ -183,6 +183,7 @@ const DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICES = 1;
 const DEFAULT_SOURCE_KERNEL_SCHEDULE_SLICE_MIN_DISPATCH_REPEAT = 1;
 const DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY = "iteration-batch-v1";
 const DEFAULT_MODE_SCHEDULE_REPETITIONS = 1;
+const VISUAL_SCENARIO_CONTROLLER_DEADLINE_MS = 15000;
 const SOURCE_KERNEL_SUBMIT_POLICIES = new Set([
   "iteration-batch-v1",
   "sample-batch-v1",
@@ -1605,7 +1606,7 @@ async function runScenario(
   sourceKernelWarmupSamples = DEFAULT_SOURCE_KERNEL_WARMUP_SAMPLES,
   sourceKernelSubmitPolicy = DEFAULT_SOURCE_KERNEL_SUBMIT_POLICY,
 ) {
-  return page.evaluate(
+  const evaluation = page.evaluate(
     async ({
       scenarioTemplate,
       runIterations,
@@ -2296,6 +2297,8 @@ async function runScenario(
       async function runRenderTriangleReadback(device) {
         const width = 64;
         const height = 64;
+        const viewport = { x: 16, y: 16, width: 32, height: 32 };
+        const outsidePixel = { x: 8, y: 8 };
         const format = "rgba8unorm";
         const totalStart = nowMs();
 
@@ -2354,6 +2357,20 @@ async function runScenario(
           ],
         });
         pass.setPipeline(pipeline);
+        pass.setViewport(
+          viewport.x,
+          viewport.y,
+          viewport.width,
+          viewport.height,
+          0,
+          1,
+        );
+        pass.setScissorRect(
+          viewport.x,
+          viewport.y,
+          viewport.width,
+          viewport.height,
+        );
         pass.draw(3);
         pass.end();
 
@@ -2375,7 +2392,9 @@ async function runScenario(
         await readback.mapAsync(GPUMapMode.READ);
         const data = new Uint8Array(readback.getMappedRange());
         const centerOffset = Math.floor(height / 2) * bytesPerRow + Math.floor(width / 2) * 4;
+        const outsideOffset = outsidePixel.y * bytesPerRow + outsidePixel.x * 4;
         const centerRgba = Array.from(data.slice(centerOffset, centerOffset + 4));
+        const outsideRgba = Array.from(data.slice(outsideOffset, outsideOffset + 4));
         readback.unmap();
         result.metrics.mapReadMs = nowMs() - t0;
 
@@ -2385,12 +2404,21 @@ async function runScenario(
         result.metrics.destroyMs = nowMs() - t0;
         result.metrics.renderMs = nowMs() - totalStart;
         result.metrics.centerRgba = centerRgba;
-        result.metrics.pass =
+        result.metrics.outsideRgba = outsideRgba;
+        result.metrics.viewport = viewport;
+        result.metrics.dynamicStateOracle = "viewport_scissor_inside_red_outside_clear_v1";
+        const centerPass =
           centerRgba[0] > 100 &&
           centerRgba[0] > centerRgba[1] + 20 &&
           centerRgba[0] > centerRgba[2] + 20;
+        const outsidePass =
+          outsideRgba[0] < 20 &&
+          outsideRgba[1] < 20 &&
+          outsideRgba[2] < 20 &&
+          outsideRgba[3] > 200;
+        result.metrics.pass = centerPass && outsidePass;
         if (!result.metrics.pass) {
-          throw new Error("unexpected render readback color");
+          throw new Error("viewport/scissor render readback oracle failed");
         }
       }
 
@@ -2877,6 +2905,18 @@ async function runScenario(
 
       async function runQueueSubmitBurst(device) {
         const iterations = runIterations.workflow;
+        const coldEmptySubmitCount = 1;
+        const warmupSubmitCount = 1;
+
+        const coldEmptyStart = nowMs();
+        for (let i = 0; i < coldEmptySubmitCount; i += 1) {
+          device.queue.submit([device.createCommandEncoder().finish()]);
+        }
+        const coldEmptySubmitEnd = nowMs();
+        await device.queue.onSubmittedWorkDone();
+        const coldEmptyEnd = nowMs();
+
+        const pipelineCreateStart = nowMs();
         const module = device.createShaderModule({
           code: `
             @compute @workgroup_size(1)
@@ -2887,19 +2927,46 @@ async function runScenario(
           layout: "auto",
           compute: { module, entryPoint: "main" },
         });
+        const pipelineCreateCallEnd = nowMs();
+        await device.queue.onSubmittedWorkDone();
+        const pipelineReadyEnd = nowMs();
 
-        const t0 = nowMs();
-        for (let i = 0; i < iterations; i += 1) {
+        const createCommandBuffer = () => {
           const encoder = device.createCommandEncoder();
           const pass = encoder.beginComputePass();
           pass.setPipeline(pipeline);
           pass.dispatchWorkgroups(1);
           pass.end();
-          device.queue.submit([encoder.finish()]);
+          return encoder.finish();
+        };
+
+        const warmupStart = nowMs();
+        for (let i = 0; i < warmupSubmitCount; i += 1) {
+          device.queue.submit([createCommandBuffer()]);
+        }
+        const warmupSubmitEnd = nowMs();
+        await device.queue.onSubmittedWorkDone();
+        const warmupEnd = nowMs();
+        const warmupMs = warmupEnd - warmupStart;
+
+        const t0 = nowMs();
+        for (let i = 0; i < iterations; i += 1) {
+          device.queue.submit([createCommandBuffer()]);
         }
         const submitEnd = nowMs();
         await device.queue.onSubmittedWorkDone();
         const t1 = nowMs();
+        result.metrics.coldEmptySubmitCount = coldEmptySubmitCount;
+        result.metrics.coldEmptyMs = coldEmptyEnd - coldEmptyStart;
+        result.metrics.coldEmptyEncodeSubmitMs = coldEmptySubmitEnd - coldEmptyStart;
+        result.metrics.coldEmptyWaitMs = coldEmptyEnd - coldEmptySubmitEnd;
+        result.metrics.pipelineReadyMs = pipelineReadyEnd - pipelineCreateStart;
+        result.metrics.pipelineCreateCallMs = pipelineCreateCallEnd - pipelineCreateStart;
+        result.metrics.pipelineReadyWaitMs = pipelineReadyEnd - pipelineCreateCallEnd;
+        result.metrics.warmupSubmitCount = warmupSubmitCount;
+        result.metrics.warmupMs = warmupMs;
+        result.metrics.warmupEncodeSubmitMs = warmupSubmitEnd - warmupStart;
+        result.metrics.warmupWaitMs = warmupEnd - warmupSubmitEnd;
         result.metrics.submitCount = iterations;
         result.metrics.totalMs = t1 - t0;
         result.metrics.encodeSubmitMs = submitEnd - t0;
@@ -2915,7 +2982,20 @@ async function runScenario(
       }
 
       function nextFrame() {
-        return new Promise((resolve) => requestAnimationFrame(resolve));
+        return new Promise((resolve, reject) => {
+          let settled = false;
+          const timeout = setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            reject(new Error("fawn visual requestAnimationFrame stalled"));
+          }, 2000);
+          requestAnimationFrame((timestamp) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timeout);
+            resolve(timestamp);
+          });
+        });
       }
 
       async function waitForVisualFrameTelemetry() {
@@ -3055,6 +3135,31 @@ async function runScenario(
       sourceKernelSubmitPolicy,
     },
   );
+  if (template !== "fawn_visual_resource") {
+    return evaluation;
+  }
+
+  let controllerTimeout;
+  try {
+    return await Promise.race([
+      evaluation,
+      new Promise((resolve) => {
+        controllerTimeout = setTimeout(() => {
+          resolve({
+            apiSurface: browserSurfaceArgs.apiSurface,
+            status: "fail",
+            statusCode: "scenario_runtime_error",
+            error: "fawn visual scenario exceeded the controller deadline",
+            metrics: {
+              controllerDeadlineMs: VISUAL_SCENARIO_CONTROLLER_DEADLINE_MS,
+            },
+          });
+        }, VISUAL_SCENARIO_CONTROLLER_DEADLINE_MS);
+      }),
+    ]);
+  } finally {
+    clearTimeout(controllerTimeout);
+  }
 }
 
 function makeModeRowResult(status, statusCode, error = null, metrics = {}) {

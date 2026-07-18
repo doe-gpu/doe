@@ -392,21 +392,21 @@ test "doeNativeCommandEncoderBeginRenderPass preserves D3D12 attachment extras" 
         .view = native.toOpaque(&color_view),
         .depthSlice = 7,
         .resolveTarget = native.toOpaque(&resolve_view),
-        .loadOp = 0,
-        .storeOp = 0,
+        .loadOp = 1,
+        .storeOp = 2,
         .clearValue = .{ .r = 0.1, .g = 0.2, .b = 0.3, .a = 0.4 },
     };
     const color_attachments = [_]types.WGPURenderPassColorAttachment{color_attachment};
     const depth_attachment = types.WGPURenderPassDepthStencilAttachment{
         .view = native.toOpaque(&depth_view),
-        .depthLoadOp = 0,
-        .depthStoreOp = 0,
-        .depthClearValue = 1,
-        .depthReadOnly = 1,
-        .stencilLoadOp = 0,
-        .stencilStoreOp = 0,
-        .stencilClearValue = 0,
-        .stencilReadOnly = 1,
+        .depthLoadOp = 2,
+        .depthStoreOp = 1,
+        .depthClearValue = 0.375,
+        .depthReadOnly = 0,
+        .stencilLoadOp = 1,
+        .stencilStoreOp = 2,
+        .stencilClearValue = 7,
+        .stencilReadOnly = 0,
     };
     const desc = types.WGPURenderPassDescriptor{
         .nextInChain = null,
@@ -433,8 +433,16 @@ test "doeNativeCommandEncoderBeginRenderPass preserves D3D12 attachment extras" 
     try std.testing.expectEqual(types.WGPUTextureFormat_Depth24PlusStencil8, pass.depth_stencil_format);
     try std.testing.expectEqual(@as(u32, 4), pass.sample_count);
     try std.testing.expectEqual(@as(u32, 7), pass.depth_slice);
-    try std.testing.expect(pass.depth_read_only);
-    try std.testing.expect(pass.stencil_read_only);
+    try std.testing.expect(!pass.depth_read_only);
+    try std.testing.expect(!pass.stencil_read_only);
+    try std.testing.expectEqual(@as(u32, 1), pass.color_load_op);
+    try std.testing.expectEqual(@as(u32, 2), pass.color_store_op);
+    try std.testing.expectEqual(@as(u32, 2), pass.depth_load_op);
+    try std.testing.expectEqual(@as(u32, 1), pass.depth_store_op);
+    try std.testing.expectEqual(@as(u32, 1), pass.stencil_load_op);
+    try std.testing.expectEqual(@as(u32, 2), pass.stencil_store_op);
+    try std.testing.expectEqual(@as(f32, 0.375), pass.depth_clear_value);
+    try std.testing.expectEqual(@as(u32, 7), pass.stencil_clear_value);
 }
 
 test "doeNativeRenderPassDraw records D3D12 attachment view metadata" {
@@ -504,6 +512,71 @@ test "doeNativeRenderPassEnd with null does not crash" {
     render.doeNativeRenderPassEnd(null);
 }
 
+test "Metal render pass records one encoder boundary across multiple draws" {
+    var dev = native.DoeDevice{ .backend = .metal };
+    var enc = native.DoeCommandEncoder{ .dev = &dev };
+    defer enc.cmds.deinit(native.alloc);
+    var pipeline = native.DoeRenderPipeline{
+        .mtl_pso = @ptrFromInt(0x1111),
+        .topology = 0x00000004,
+    };
+    var pass = native.DoeRenderPass{
+        .enc = &enc,
+        .pipeline = &pipeline,
+        .target = @ptrFromInt(0x2222),
+        .color_load_op = 2,
+        .color_store_op = 1,
+    };
+
+    render.doeNativeRenderPassDraw(native.toOpaque(&pass), 3, 1, 0, 0);
+    render.doeNativeRenderPassDraw(native.toOpaque(&pass), 6, 2, 0, 0);
+    render.doeNativeRenderPassEnd(native.toOpaque(&pass));
+
+    try std.testing.expectEqual(@as(usize, 2), enc.cmds.items.len);
+    switch (enc.cmds.items[0]) {
+        .render_pass => |cmd| {
+            try std.testing.expect(cmd.pass_start);
+            try std.testing.expect(!cmd.pass_end);
+        },
+        else => return error.UnexpectedCommandTag,
+    }
+    switch (enc.cmds.items[1]) {
+        .render_pass => |cmd| {
+            try std.testing.expect(!cmd.pass_start);
+            try std.testing.expect(cmd.pass_end);
+        },
+        else => return error.UnexpectedCommandTag,
+    }
+}
+
+test "Metal empty render pass records attachment operations" {
+    var dev = native.DoeDevice{ .backend = .metal };
+    var enc = native.DoeCommandEncoder{ .dev = &dev };
+    defer enc.cmds.deinit(native.alloc);
+    var pass = native.DoeRenderPass{
+        .enc = &enc,
+        .target = @ptrFromInt(0x3333),
+        .color_load_op = 2,
+        .color_store_op = 1,
+        .clear_r = 0.25,
+    };
+
+    render.doeNativeRenderPassEnd(native.toOpaque(&pass));
+
+    try std.testing.expectEqual(@as(usize, 1), enc.cmds.items.len);
+    switch (enc.cmds.items[0]) {
+        .render_pass => |cmd| {
+            try std.testing.expect(cmd.pass_start);
+            try std.testing.expect(cmd.pass_end);
+            try std.testing.expectEqual(@as(u32, 0), cmd.draw_count);
+            try std.testing.expectEqual(@as(u32, 2), cmd.color_load_op);
+            try std.testing.expectEqual(@as(u32, 1), cmd.color_store_op);
+            try std.testing.expectEqual(@as(f64, 0.25), cmd.clear_r);
+        },
+        else => return error.UnexpectedCommandTag,
+    }
+}
+
 test "doeNativeRenderPassRelease with null does not crash" {
     render.doeNativeRenderPassRelease(null);
 }
@@ -551,6 +624,7 @@ test "doeNativeCommandEncoderWriteTimestamp records a metal timestamp command" {
     query.doeNativeCommandEncoderWriteTimestamp(native.toOpaque(&enc), native.toOpaque(&qs), 2);
 
     try std.testing.expectEqual(@as(usize, 1), enc.cmds.items.len);
+    try std.testing.expectEqual(@as(u32, 2), qs.ref_count);
     switch (enc.cmds.items[0]) {
         .write_timestamp => |cmd| {
             try std.testing.expectEqual(@as(?*anyopaque, @ptrFromInt(0x1)), cmd.counter_buffer);
@@ -558,6 +632,8 @@ test "doeNativeCommandEncoderWriteTimestamp records a metal timestamp command" {
         },
         else => return error.UnexpectedCommandTag,
     }
+    query.releaseRecordedCommandReferences(enc.cmds.items);
+    try std.testing.expectEqual(@as(u32, 1), qs.ref_count);
 }
 
 test "doeNativeCommandEncoderResolveQuerySet records a metal resolve command" {
@@ -586,6 +662,7 @@ test "doeNativeCommandEncoderResolveQuerySet records a metal resolve command" {
     );
 
     try std.testing.expectEqual(@as(usize, 1), enc.cmds.items.len);
+    try std.testing.expectEqual(@as(u32, 2), qs.ref_count);
     switch (enc.cmds.items[0]) {
         .resolve_query_set => |cmd| {
             try std.testing.expectEqual(@as(?*anyopaque, @ptrFromInt(0x2)), cmd.counter_buffer);
@@ -596,6 +673,8 @@ test "doeNativeCommandEncoderResolveQuerySet records a metal resolve command" {
         },
         else => return error.UnexpectedCommandTag,
     }
+    query.releaseRecordedCommandReferences(enc.cmds.items);
+    try std.testing.expectEqual(@as(u32, 1), qs.ref_count);
 }
 
 test "doeNativeQuerySetDestroy with null does not crash" {
@@ -605,6 +684,23 @@ test "doeNativeQuerySetDestroy with null does not crash" {
 test "doeNativeQuerySetDestroy with invalid magic does not crash" {
     var fake = native.DoeBuffer{}; // wrong magic for DoeQuerySet
     query.doeNativeQuerySetDestroy(native.toOpaque(&fake));
+}
+
+test "query set destroy is idempotent and release owns handle lifetime" {
+    const qs = native.make(query.DoeQuerySet) orelse return error.OutOfMemory;
+    qs.* = .{
+        .count = 2,
+        .query_type = types.WGPUQueryType_Timestamp,
+        .backend = .metal,
+    };
+    const raw = native.toOpaque(qs);
+
+    query.doeNativeQuerySetDestroy(raw);
+    query.doeNativeQuerySetDestroy(raw);
+    try std.testing.expect(qs.destroyed);
+    try std.testing.expectEqual(@as(u32, 1), qs.ref_count);
+
+    query.doeNativeQuerySetRelease(raw);
 }
 
 // ============================================================

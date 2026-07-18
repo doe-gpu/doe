@@ -6,7 +6,10 @@ pub const vk_feature_caps = if (builtin.os.tag == .linux) @import("vulkan/vk_fea
 pub const vk_device_caps = if (builtin.os.tag == .linux) @import("vulkan/vk_device_caps.zig") else struct {};
 pub const vk_feature_probe = if (builtin.os.tag == .linux) @import("vulkan/vk_feature_probe.zig") else struct {};
 
-
 pub fn metal_device_max_buffer_length(device: ?*anyopaque) u64 {
     return bridge.metal_bridge_device_max_buffer_length(device);
+}
+
+pub fn metal_supports_timestamp_query(device: ?*anyopaque) bool {
+    return bridge.metal_bridge_supports_timestamp_query(device) != 0;
 }

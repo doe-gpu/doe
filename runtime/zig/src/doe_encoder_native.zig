@@ -41,6 +41,7 @@ pub export fn doeNativeCommandEncoderRelease(raw: ?*anyopaque) callconv(.c) void
     if (cast(DoeCommandEncoder, raw)) |e| {
         if (!native_helpers.object_should_destroy(e)) return;
         label_store.remove(raw);
+        query_native.releaseRecordedCommandReferences(e.cmds.items);
         e.cmds.deinit(alloc);
         alloc.destroy(e);
     }
@@ -193,6 +194,7 @@ pub export fn doeNativeCommandBufferRelease(raw: ?*anyopaque) callconv(.c) void 
     if (cast(DoeCommandBuffer, raw)) |cb| {
         if (!native_helpers.object_should_destroy(cb)) return;
         label_store.remove(raw);
+        query_native.releaseRecordedCommandReferences(cb.cmds.items);
         cb.cmds.deinit(alloc);
         alloc.destroy(cb);
     }

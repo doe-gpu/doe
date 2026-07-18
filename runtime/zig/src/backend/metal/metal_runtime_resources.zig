@@ -404,16 +404,29 @@ pub fn ensure_streaming_render_encoder(self: anytype) !void {
         self.streaming_cmd_buf = bridge.metal_bridge_create_command_buffer(self.queue) orelse return error.InvalidState;
     }
 
+    const render_pass_ops = bridge.MetalRenderPassOps{
+        .color_load_op = 0x00000002,
+        .color_store_op = 0x00000001,
+        .depth_load_op = 0,
+        .depth_store_op = 0,
+        .stencil_load_op = 0,
+        .stencil_store_op = 0,
+        .depth_read_only = 0,
+        .stencil_read_only = 0,
+        .clear_r = 0,
+        .clear_g = 0,
+        .clear_b = 0,
+        .clear_a = 0,
+        .depth_clear_value = 1,
+        .stencil_clear_value = 0,
+    };
     self.streaming_render_encoder = metal_bridge_cmd_buf_render_encoder(
         self.streaming_cmd_buf,
         self.render_pipeline,
         self.render_target,
         null,
-        0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        null,
+        &render_pass_ops,
     ) orelse return error.InvalidState;
     self.streaming_has_render = true;
 }

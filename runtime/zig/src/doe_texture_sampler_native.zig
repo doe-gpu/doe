@@ -2,13 +2,16 @@
 // Sharded from doe_render_native.zig for file-size compliance.
 
 const std = @import("std");
+const abi_core = @import("core/abi/wgpu_core_base_types.zig");
 const abi_texture = @import("core/abi/wgpu_texture_base_types.zig");
 const abi_pipeline = @import("core/abi/wgpu_pipeline_descriptor_types.zig");
+const error_scope = @import("error_scope.zig");
 const resource_ops = @import("backend/dropin_resource_ops.zig");
 const native_types = @import("doe_native_object_types.zig");
 const native_shared = @import("doe_native_shared_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const native_exports = @import("doe_native_exports.zig");
+const texture_validation = @import("doe_texture_validation.zig");
 const vulkan_lifetime = @import("doe_vulkan_lifetime.zig");
 const d3d12_formats = resource_ops.d3d12_formats;
 
@@ -23,8 +26,6 @@ const DoeBuffer = native_types.DoeBuffer;
 const DoeTexture = native_types.DoeTexture;
 const DoeTextureView = native_types.DoeTextureView;
 const DoeSampler = native_types.DoeSampler;
-
-const MAX_TEXTURE_DESCRIPTOR_CHAIN_NODES: u32 = 16;
 
 // Metal bridge externs (resolved at link time from metal_bridge.m).
 extern fn metal_bridge_release(obj: ?*anyopaque) callconv(.c) void;
@@ -113,6 +114,10 @@ fn registerTexture(raw: ?*anyopaque) bool {
     return true;
 }
 
+pub fn registerImportedTexture(raw: ?*anyopaque) bool {
+    return registerTexture(raw);
+}
+
 fn registerTextureView(raw: ?*anyopaque) bool {
     texture_view_registry.insert(raw) catch return false;
     return true;
@@ -121,6 +126,16 @@ fn registerTextureView(raw: ?*anyopaque) bool {
 pub fn registeredTexture(raw: ?*anyopaque) ?*DoeTexture {
     if (!texture_registry.contains(raw)) return null;
     return cast(DoeTexture, raw);
+}
+
+test "imported textures participate in normal texture lookup" {
+    var texture: DoeTexture = .{};
+    const raw = toOpaque(&texture);
+    defer texture_registry.remove(raw);
+
+    try std.testing.expect(registeredTexture(raw) == null);
+    try std.testing.expect(registerImportedTexture(raw));
+    try std.testing.expectEqual(&texture, registeredTexture(raw).?);
 }
 
 pub fn registeredTextureView(raw: ?*anyopaque) ?*DoeTextureView {
@@ -138,6 +153,32 @@ pub fn default_texture_view_dimension(tex: *const DoeTexture) u32 {
         else
             abi_texture.WGPUTextureViewDimension_2D,
     };
+}
+
+pub fn resolveTextureViewMipLevelCount(tex: *const DoeTexture, base_mip_level: u32, requested_count: u32) ?u32 {
+    if (base_mip_level >= tex.mip_level_count) return null;
+    const remaining = tex.mip_level_count - base_mip_level;
+    const resolved = if (requested_count == 0 or requested_count == abi_core.WGPU_MIP_LEVEL_COUNT_UNDEFINED)
+        remaining
+    else
+        requested_count;
+    if (resolved == 0 or resolved > remaining) return null;
+    return resolved;
+}
+
+pub fn resolveTextureViewArrayLayerCount(tex: *const DoeTexture, base_array_layer: u32, requested_count: u32) ?u32 {
+    const full_count = if (tex.dimension == abi_texture.WGPUTextureDimension_3D)
+        1
+    else
+        tex.depth_or_array_layers;
+    if (base_array_layer >= full_count) return null;
+    const remaining = full_count - base_array_layer;
+    const resolved = if (requested_count == 0 or requested_count == abi_core.WGPU_ARRAY_LAYER_COUNT_UNDEFINED)
+        remaining
+    else
+        requested_count;
+    if (resolved == 0 or resolved > remaining) return null;
+    return resolved;
 }
 
 fn is_depth_format(format: u32) bool {
@@ -280,28 +321,6 @@ fn d3d12_register_sampler(raw: ?*anyopaque) bool {
 // Texture
 // ============================================================
 
-fn texture_usage_with_dawn_internal(d: *const abi_pipeline.WGPUTextureDescriptor) u64 {
-    var usage = d.usage;
-    var visited: u32 = 0;
-    var chain = if (d.nextInChain) |raw|
-        @as(*const abi_pipeline.WGPUChainedStruct, @ptrCast(@alignCast(raw)))
-    else
-        null;
-
-    while (chain) |node| : (visited += 1) {
-        if (visited >= MAX_TEXTURE_DESCRIPTOR_CHAIN_NODES) return usage;
-        switch (node.sType) {
-            abi_pipeline.WGPUSType_DawnTextureInternalUsageDescriptor => {
-                const internal: *const abi_pipeline.WGPUDawnTextureInternalUsageDescriptor = @ptrCast(@alignCast(node));
-                usage |= internal.internalUsage;
-            },
-            else => {},
-        }
-        chain = node.next;
-    }
-    return usage;
-}
-
 test "texture usage parser includes Dawn internal usage" {
     var internal = abi_pipeline.WGPUDawnTextureInternalUsageDescriptor{
         .chain = .{
@@ -327,14 +346,35 @@ test "texture usage parser includes Dawn internal usage" {
         abi_texture.WGPUTextureUsage_RenderAttachment |
             abi_texture.WGPUTextureUsage_CopySrc |
             abi_texture.WGPUTextureUsage_CopyDst,
-        texture_usage_with_dawn_internal(&desc),
+        texture_validation.effectiveTextureUsage(&desc),
     );
+}
+
+pub export fn doeNativeDeviceValidateTextureDescriptor(
+    dev_raw: ?*anyopaque,
+    desc: ?*const abi_pipeline.WGPUTextureDescriptor,
+) callconv(.c) void {
+    const dev = cast(DoeDevice, dev_raw) orelse return;
+    const d = desc orelse {
+        dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "texture descriptor is null");
+        return;
+    };
+    if (texture_validation.validateTextureDescriptor(dev, d)) |message| {
+        dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, message);
+    }
 }
 
 pub export fn doeNativeDeviceCreateTexture(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUTextureDescriptor) callconv(.c) ?*anyopaque {
     const dev = cast(DoeDevice, dev_raw) orelse return null;
-    const d = desc orelse return null;
-    const usage = texture_usage_with_dawn_internal(d);
+    const d = desc orelse {
+        dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, "texture descriptor is null");
+        return null;
+    };
+    if (texture_validation.validateTextureDescriptor(dev, d)) |message| {
+        dev.error_scopes.deliver(error_scope.ERROR_TYPE_VALIDATION, message);
+        return null;
+    }
+    const usage = texture_validation.effectiveTextureUsage(d);
     const tex = make(DoeTexture) orelse return null;
     tex.* = .{
         .format = d.format,
@@ -428,9 +468,7 @@ pub export fn doeNativeDeviceCreateTexture(dev_raw: ?*anyopaque, desc: ?*const a
 pub export fn doeNativeTextureCreateView(tex_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUTextureViewDescriptor) callconv(.c) ?*anyopaque {
     const tex = cast(DoeTexture, tex_raw) orelse return null;
     if (tex.error_object) return null;
-    const tv = make(DoeTextureView) orelse return null;
-    native_helpers.object_add_ref(DoeTexture, tex_raw);
-    const d = desc orelse &abi_pipeline.WGPUTextureViewDescriptor{
+    var default_desc = abi_pipeline.WGPUTextureViewDescriptor{
         .nextInChain = null,
         .label = .{ .data = null, .length = 0 },
         .format = tex.format,
@@ -446,15 +484,22 @@ pub export fn doeNativeTextureCreateView(tex_raw: ?*anyopaque, desc: ?*const abi
         .swizzleB = abi_texture.WGPUTextureComponentSwizzle_Blue,
         .swizzleA = abi_texture.WGPUTextureComponentSwizzle_Alpha,
     };
+    const requested = desc orelse &default_desc;
+    const resolved_mip_level_count = resolveTextureViewMipLevelCount(tex, requested.baseMipLevel, requested.mipLevelCount) orelse return null;
+    const resolved_array_layer_count = resolveTextureViewArrayLayerCount(tex, requested.baseArrayLayer, requested.arrayLayerCount) orelse return null;
+    var normalized_desc = requested.*;
+    normalized_desc.mipLevelCount = resolved_mip_level_count;
+    normalized_desc.arrayLayerCount = resolved_array_layer_count;
+    const d = &normalized_desc;
     const resolved_format = if (d.format != 0) d.format else tex.format;
     const resolved_dimension = if (d.dimension != 0) d.dimension else default_texture_view_dimension(tex);
-    const resolved_mip_level_count = if (d.mipLevelCount != 0) d.mipLevelCount else tex.mip_level_count - d.baseMipLevel;
-    const resolved_array_layer_count = if (d.arrayLayerCount != 0) d.arrayLayerCount else if (tex.dimension == abi_texture.WGPUTextureDimension_3D) 1 else tex.depth_or_array_layers - d.baseArrayLayer;
     const resolved_usage = if (d.usage != 0) d.usage else tex.usage;
     const resolved_swizzle_r = if (d.swizzleR != 0) d.swizzleR else abi_texture.WGPUTextureComponentSwizzle_Red;
     const resolved_swizzle_g = if (d.swizzleG != 0) d.swizzleG else abi_texture.WGPUTextureComponentSwizzle_Green;
     const resolved_swizzle_b = if (d.swizzleB != 0) d.swizzleB else abi_texture.WGPUTextureComponentSwizzle_Blue;
     const resolved_swizzle_a = if (d.swizzleA != 0) d.swizzleA else abi_texture.WGPUTextureComponentSwizzle_Alpha;
+    const tv = make(DoeTextureView) orelse return null;
+    native_helpers.object_add_ref(DoeTexture, tex_raw);
     if (tex.mtl == null and tex.vk_id != 0) {
         const vk_render = @import("doe_vulkan_render_native.zig");
         if (!vk_render.vulkan_create_texture_view(tex, tv, d)) {
@@ -562,7 +607,11 @@ pub export fn doeNativeTextureCreateView(tex_raw: ?*anyopaque, desc: ?*const abi
                 resolved_swizzle_g,
                 resolved_swizzle_b,
                 resolved_swizzle_a,
-            );
+            ) orelse {
+                native_exports.doeNativeTextureRelease(tex_raw);
+                alloc.destroy(tv);
+                return null;
+            };
         }
     }
     tv.* = .{

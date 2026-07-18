@@ -333,6 +333,12 @@ pub export fn wgpuDeviceCreateTexture(a0: abi_base.WGPUDevice, a1: ?*const abi_d
     return proc(a0, a1);
 }
 
+pub export fn wgpuDeviceValidateTextureDescriptor(a0: abi_base.WGPUDevice, a1: ?*const abi_descriptor.WGPUTextureDescriptor) callconv(.c) void {
+    const Fn = *const fn (abi_base.WGPUDevice, ?*const abi_descriptor.WGPUTextureDescriptor) callconv(.c) void;
+    const proc = loadRequiredProc(Fn, "wgpuDeviceValidateTextureDescriptor");
+    proc(a0, a1);
+}
+
 pub export fn wgpuTextureCreateView(a0: abi_base.WGPUTexture, a1: ?*const abi_descriptor.WGPUTextureViewDescriptor) callconv(.c) abi_base.WGPUTextureView {
     const proc = loadRequiredProc(ptypes.FnWgpuTextureCreateView, "wgpuTextureCreateView");
     return proc(a0, a1);

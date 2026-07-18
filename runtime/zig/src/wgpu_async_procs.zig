@@ -7,13 +7,33 @@ const loader = @import("core/abi/wgpu_loader.zig");
 pub const CREATE_PIPELINE_ASYNC_STATUS_SUCCESS: u32 = 1;
 pub const POP_ERROR_SCOPE_STATUS_SUCCESS: u32 = 1;
 pub const COMPILATION_INFO_STATUS_SUCCESS: u32 = 1;
+pub const COMPILATION_INFO_STATUS_CALLBACK_CANCELLED: u32 = 2;
+pub const COMPILATION_MESSAGE_TYPE_ERROR: u32 = 1;
+pub const COMPILATION_MESSAGE_TYPE_WARNING: u32 = 2;
+pub const COMPILATION_MESSAGE_TYPE_INFO: u32 = 3;
 pub const ERROR_FILTER_VALIDATION: u32 = 1;
 pub const ERROR_FILTER_OUT_OF_MEMORY: u32 = 2;
 pub const ERROR_FILTER_INTERNAL: u32 = 3;
 
 const CreateRenderPipelineAsyncCallback = *const fn (u32, abi_base.WGPURenderPipeline, abi_base.WGPUStringView, ?*anyopaque, ?*anyopaque) callconv(.c) void;
 const PopErrorScopeCallback = *const fn (u32, u32, abi_base.WGPUStringView, ?*anyopaque, ?*anyopaque) callconv(.c) void;
-const CompilationInfoCallback = *const fn (u32, ?*const anyopaque, ?*anyopaque, ?*anyopaque) callconv(.c) void;
+pub const CompilationMessageABI = extern struct {
+    nextInChain: ?*anyopaque,
+    message: abi_base.WGPUStringView,
+    message_type: u32,
+    lineNum: u64,
+    linePos: u64,
+    offset: u64,
+    length: u64,
+};
+
+pub const CompilationInfoABI = extern struct {
+    nextInChain: ?*anyopaque,
+    messageCount: usize,
+    messages: ?*const CompilationMessageABI,
+};
+
+const CompilationInfoCallback = *const fn (u32, ?*const CompilationInfoABI, ?*anyopaque, ?*anyopaque) callconv(.c) void;
 
 pub const CreateRenderPipelineAsyncCallbackInfo = extern struct {
     nextInChain: ?*anyopaque,
@@ -201,7 +221,7 @@ fn popErrorScopeCallback(
 
 fn compilationInfoCallback(
     status: u32,
-    compilation_info: ?*const anyopaque,
+    compilation_info: ?*const CompilationInfoABI,
     userdata1: ?*anyopaque,
     userdata2: ?*anyopaque,
 ) callconv(.c) void {

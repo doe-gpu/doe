@@ -1,5 +1,6 @@
 const render = @import("../doe_render_native.zig");
 pub const doeNativeDeviceCreateTexture = render.doeNativeDeviceCreateTexture;
+pub const doeNativeDeviceValidateTextureDescriptor = render.doeNativeDeviceValidateTextureDescriptor;
 pub const doeNativeTextureCreateView = render.doeNativeTextureCreateView;
 pub const doeNativeTextureDestroy = render.doeNativeTextureDestroy;
 pub const doeNativeTextureRelease = render.doeNativeTextureRelease;

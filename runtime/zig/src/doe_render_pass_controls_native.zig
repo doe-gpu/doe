@@ -2,13 +2,8 @@
 // Implements: setViewport, setScissorRect, setBlendConstant, setStencilReference,
 //             pushDebugGroup, popDebugGroup, insertDebugMarker.
 //
-// These exports accept an opaque render encoder handle (a +1-retained MTL render
-// command encoder returned by metal_bridge_cmd_buf_render_encoder or equivalent).
-// They forward directly to the metal_render_state_bridge functions without any
-// Zig-side state — the encoder carries all GPU state.
-
-const builtin = @import("builtin");
-const render_state_native = @import("doe_render_state_native.zig");
+// These WebGPU-facing exports receive a logical DoeRenderPass. Dynamic state is
+// recorded with each draw and applied later to the backend command encoder.
 
 extern fn doeNativeRenderPassRecordViewportState(
     pass_raw: ?*anyopaque,
@@ -51,18 +46,6 @@ pub export fn doeNativeRenderPassSetViewport(
     min_depth: f64,
     max_depth: f64,
 ) callconv(.c) void {
-    if (builtin.os.tag == .macos) {
-        render_state_native.doeNativeRenderPassEncoderSetViewport(
-            encoder_raw,
-            x,
-            y,
-            width,
-            height,
-            min_depth,
-            max_depth,
-        );
-        return;
-    }
     doeNativeRenderPassRecordViewportState(
         encoder_raw,
         x,
@@ -85,16 +68,6 @@ pub export fn doeNativeRenderPassSetScissorRect(
     width: u32,
     height: u32,
 ) callconv(.c) void {
-    if (builtin.os.tag == .macos) {
-        render_state_native.doeNativeRenderPassEncoderSetScissorRect(
-            encoder_raw,
-            x,
-            y,
-            width,
-            height,
-        );
-        return;
-    }
     doeNativeRenderPassRecordScissorState(encoder_raw, x, y, width, height);
 }
 
@@ -109,16 +82,6 @@ pub export fn doeNativeRenderPassSetBlendConstant(
     b: f64,
     a: f64,
 ) callconv(.c) void {
-    if (builtin.os.tag == .macos) {
-        render_state_native.doeNativeRenderPassEncoderSetBlendConstant(
-            encoder_raw,
-            r,
-            g,
-            b,
-            a,
-        );
-        return;
-    }
     doeNativeRenderPassRecordBlendConstantState(encoder_raw, r, g, b, a);
 }
 
@@ -130,13 +93,6 @@ pub export fn doeNativeRenderPassSetStencilReference(
     encoder_raw: ?*anyopaque,
     reference: u32,
 ) callconv(.c) void {
-    if (builtin.os.tag == .macos) {
-        render_state_native.doeNativeRenderPassEncoderSetStencilReference(
-            encoder_raw,
-            reference,
-        );
-        return;
-    }
     doeNativeRenderPassRecordStencilReferenceState(encoder_raw, reference);
 }
 
@@ -149,11 +105,11 @@ pub export fn doeNativeRenderPassPushDebugGroup(
     label_ptr: ?[*]const u8,
     label_len: usize,
 ) callconv(.c) void {
-    render_state_native.doeNativeRenderPassEncoderPushDebugGroup(
-        encoder_raw,
-        label_ptr,
-        label_len,
-    );
+    // Debug labels do not affect execution and the logical pass does not own a
+    // backend encoder until queue submission.
+    _ = encoder_raw;
+    _ = label_ptr;
+    _ = label_len;
 }
 
 // ============================================================
@@ -163,7 +119,7 @@ pub export fn doeNativeRenderPassPushDebugGroup(
 pub export fn doeNativeRenderPassPopDebugGroup(
     encoder_raw: ?*anyopaque,
 ) callconv(.c) void {
-    render_state_native.doeNativeRenderPassEncoderPopDebugGroup(encoder_raw);
+    _ = encoder_raw;
 }
 
 // ============================================================
@@ -175,9 +131,7 @@ pub export fn doeNativeRenderPassInsertDebugMarker(
     label_ptr: ?[*]const u8,
     label_len: usize,
 ) callconv(.c) void {
-    render_state_native.doeNativeRenderPassEncoderInsertDebugMarker(
-        encoder_raw,
-        label_ptr,
-        label_len,
-    );
+    _ = encoder_raw;
+    _ = label_ptr;
+    _ = label_len;
 }

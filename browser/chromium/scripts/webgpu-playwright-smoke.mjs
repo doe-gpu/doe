@@ -1297,6 +1297,7 @@ function smokeWorkloadIdentity() {
     "copy_external_image_to_texture",
     "import_external_texture",
     "gpu_canvas_context",
+    "fawn_prismatic_lifecycle",
     "write_buffer_64kb",
     "compute_dispatch",
   ];
@@ -1311,6 +1312,89 @@ function browserSurfaceModuleUrl(baseUrl) {
   return new URL("/packages/doe-gpu/src/browser.js", baseUrl).href;
 }
 
+async function runFawnPrismaticLifecycleProbe(browser, localUrl, timeoutMs) {
+  const startUrl = new URL("/browser/chromium/resources/fawn-start.html", localUrl).href;
+  const fluidUrl = new URL(
+    "/browser/chromium/resources/fawn-prismatic-fluids.html",
+    localUrl,
+  ).href;
+
+  const lifecycleContext = await browser.newContext();
+  try {
+    const page = await lifecycleContext.newPage();
+    await page.goto(startUrl, { waitUntil: "load", timeout: timeoutMs });
+    await page.waitForFunction(
+      () => document.querySelector("#gpu-status")?.textContent === "WebGPU active",
+      null,
+      { timeout: timeoutMs },
+    );
+    await page.click('a[href="./fawn-prismatic-fluids.html"]');
+    await page.waitForFunction(
+      () => document.querySelector("#status")?.textContent === "Running prismatic fluid reactor",
+      null,
+      { timeout: timeoutMs },
+    );
+  } finally {
+    await lifecycleContext.close();
+  }
+
+  const retryContext = await browser.newContext();
+  try {
+    await retryContext.addInitScript(() => {
+      const gpu = navigator.gpu;
+      if (!gpu) return;
+      let requestCount = 0;
+      Object.defineProperty(globalThis, "__fawnAdapterRequestCount", {
+        configurable: true,
+        get: () => requestCount,
+      });
+      Object.defineProperty(navigator, "gpu", {
+        configurable: true,
+        value: new Proxy(gpu, {
+          get(target, property) {
+            if (property === "requestAdapter") {
+              return async (options) => {
+                requestCount += 1;
+                if (requestCount === 1) {
+                  await new Promise((resolve) => setTimeout(resolve, 25));
+                  return null;
+                }
+                return target.requestAdapter(options);
+              };
+            }
+            const value = Reflect.get(target, property, target);
+            return typeof value === "function" ? value.bind(target) : value;
+          },
+        }),
+      });
+    });
+    const page = await retryContext.newPage();
+    const pageErrors = [];
+    page.on("pageerror", (error) => pageErrors.push(String(error)));
+    await page.goto(fluidUrl, { waitUntil: "load", timeout: timeoutMs });
+    await page.setViewportSize({ width: 1100, height: 720 });
+    await page.waitForFunction(
+      () => document.querySelector("#status")?.textContent === "Running prismatic fluid reactor",
+      null,
+      { timeout: timeoutMs },
+    );
+    const retry = await page.evaluate(() => ({
+      adapterRequestCount: globalThis.__fawnAdapterRequestCount,
+      contextAvailable: Boolean(document.querySelector("#view")?.getContext("webgpu")),
+    }));
+    if (retry.adapterRequestCount !== 2 || !retry.contextAvailable || pageErrors.length !== 0) {
+      throw new Error(`Fawn transient-adapter recovery failed: ${JSON.stringify({ retry, pageErrors })}`);
+    }
+    return {
+      pass: true,
+      splashToFluid: true,
+      transientAdapterRetry: retry,
+    };
+  } finally {
+    await retryContext.close();
+  }
+}
+
 async function runMode(chromium, mode, args, localUrl, localPort) {
   const selection = runtimeSelectionResolution(mode, args);
   const launchArgs = [
@@ -1321,6 +1405,13 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
   const startMs = Date.now();
   let browser = null;
   let browserVersion = null;
+  let result = null;
+  const browserClose = {
+    attempted: false,
+    pass: false,
+    elapsedMs: 0,
+    error: "browser_not_launched",
+  };
 
   try {
     browser = await chromium.launch({
@@ -2383,8 +2474,14 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
       `${mode} smoke suite`,
     );
 
+    const fawnPrismaticLifecycle = await runFawnPrismaticLifecycleProbe(
+      browser,
+      localUrl,
+      args.opTimeoutMs,
+    );
+
     const runtimeSelection = buildRuntimeSelection(mode, args, launchArgs);
-    return {
+    result = {
       mode,
       runtimeSelection,
       shaderCompilerIdentity: shaderCompilerIdentity(mode, args),
@@ -2393,19 +2490,31 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
       browserVersion,
       elapsedMs: Date.now() - startMs,
       ...suite,
+      fawnPrismaticLifecycle,
       adapterIdentity: adapterIdentityFromSmokeResult(suite, runtimeSelection.profile),
     };
   } catch (error) {
-    return makeFailedResult(mode, args, launchArgs, browserVersion, startMs, error);
+    result = makeFailedResult(mode, args, launchArgs, browserVersion, startMs, error);
   } finally {
     if (browser) {
+      browserClose.attempted = true;
+      browserClose.error = null;
+      const closeStartMs = Date.now();
       try {
         await withTimeout(browser.close(), DEFAULT_BROWSER_CLOSE_TIMEOUT_MS, `${mode} browser close`);
+        browserClose.pass = true;
       } catch (closeError) {
-        console.warn(`[WARN] ${mode}: browser close failed: ${String(closeError)}`);
+        browserClose.error = String(closeError);
+        console.warn(`[WARN] ${mode}: browser close failed: ${browserClose.error}`);
+      } finally {
+        browserClose.elapsedMs = Date.now() - closeStartMs;
       }
     }
   }
+
+  result.browserClose = browserClose;
+  result.elapsedMs = Date.now() - startMs;
+  return result;
 }
 
 function computeComparison(modeResults) {

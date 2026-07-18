@@ -639,6 +639,9 @@ test "inactive nested binding defaults do not classify a resource kind" {
 }
 
 test "external texture layout ignores Dawn undefined nested defaults" {
+    try std.testing.expectEqual(@as(abi_core.WGPUSType, 0x00050001), abi_core.WGPUSType_ExternalTextureBindingEntry);
+    try std.testing.expectEqual(@as(abi_core.WGPUSType, 0x00050002), abi_core.WGPUSType_ExternalTextureBindingLayout);
+
     var external_layout = abi_pipeline.WGPUExternalTextureBindingLayout{
         .chain = .{
             .next = null,

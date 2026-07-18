@@ -138,7 +138,17 @@ RUNTIME_SELECTOR_MARKERS = (
         "selector:doe_shared_image_iosurface_bridge",
         (
             "AssociateMailboxDoeSharedImage(",
-            "GetIOSurfaceForNativeImport()",
+            "ProduceIOSurfaceForWebGPU(mailbox)",
+            "BeginScopedAccess(usage, internal_usage)",
+        ),
+        (WEBGPU_DECODER_PATH,),
+    ),
+    (
+        "selector:doe_wire_device_handle_ownership",
+        (
+            "Keep a Doe device raw until after runtime selection.",
+            "AssociateMailboxDoeSharedImage(mailbox, flags, device_handle",
+            "wgpu::Device device = device_handle;",
         ),
         (WEBGPU_DECODER_PATH,),
     ),
@@ -151,6 +161,24 @@ RUNTIME_SELECTOR_MARKERS = (
             "sharedTextureMemoryEndAccess",
         ),
         (WEBGPU_DECODER_PATH,),
+    ),
+    (
+        "selector:doe_shared_image_metal_fence_bridge",
+        (
+            "WGPUSharedFenceMTLSharedEventDescriptor",
+            "deviceImportSharedFence",
+            "sharedFenceExportInfo",
+            "MTLSharedEventFence::CreateFromHandle",
+        ),
+        (WEBGPU_DECODER_PATH,),
+    ),
+    (
+        "selector:doe_shared_image_iosurface_fence_propagation",
+        (
+            "ProcessSharedEventsForBeginAccess",
+            "AddSharedEventForEndAccess",
+        ),
+        (IOSURFACE_IMAGE_BACKING_PATH,),
     ),
     (
         "selector:doe_shared_image_native_import",

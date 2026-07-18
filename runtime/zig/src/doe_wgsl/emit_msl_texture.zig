@@ -54,7 +54,9 @@ pub fn emit_builtin(self: anytype, function: ir.Function, call: @FieldType(ir.Ex
         }
         return true;
     }
-    if (std.mem.eql(u8, call.name, "textureSample")) {
+    if (std.mem.eql(u8, call.name, "textureSample") or
+        std.mem.eql(u8, call.name, "textureSampleBaseClampToEdge"))
+    {
         if (call.args.len != 3) return error.InvalidIr;
         try self.emit_expr(function, function.expr_args.items[call.args.start]);
         try self.write(".sample(");

@@ -34,6 +34,7 @@ pub const DoeQuerySet = struct {
     pub const TYPE_MAGIC = MAGIC_QUERY_SET;
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
+    destroyed: bool = false,
     count: u32 = 0,
     query_type: u32 = WGPU_QUERY_TYPE_TIMESTAMP,
     backend: native_shared.BackendKind = .metal,
@@ -112,7 +113,8 @@ pub fn doeNativeCommandEncoderWriteTimestampWithPosition(
 ) void {
     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
-    if (query_index >= qs.count) return;
+    if (qs.destroyed or query_index >= qs.count) return;
+    native_helpers.object_add_ref(DoeQuerySet, qs_raw);
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
@@ -150,13 +152,14 @@ pub export fn doeNativeCommandEncoderResolveQuerySet(
     const enc = native_helpers.cast(native_types.DoeCommandEncoder, enc_raw) orelse return;
     const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
     const dst = native_helpers.cast(native_types.DoeBuffer, dst_raw) orelse return;
-    if (dst.error_object) return;
+    if (qs.destroyed or dst.error_object) return;
 
     if (first_query + query_count > qs.count) return;
 
     const copy_bytes = @as(usize, query_count) * TIMESTAMP_BYTES;
     const d_off: usize = @intCast(dst_offset);
     if (d_off + copy_bytes > @as(usize, @intCast(dst.size))) return;
+    native_helpers.object_add_ref(DoeQuerySet, qs_raw);
 
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
@@ -267,29 +270,48 @@ pub fn vulkanCopyQueryResultsToMappedBuffer(
 // destroyQuerySet
 // ============================================================
 
-pub export fn doeNativeQuerySetDestroy(qs_raw: ?*anyopaque) callconv(.c) void {
-    const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
-    if (!native_helpers.object_should_destroy(qs)) return;
-    native_helpers.label_store.remove(qs_raw);
-
+fn releaseQuerySetResources(qs: *DoeQuerySet) void {
     if (comptime has_vulkan) {
         if (qs.backend == .vulkan) {
             vulkan_lifetime.flushBeforeDestroy(qs.vk_runtime_ref);
             if (qs.vk_query_pool != c.VK_NULL_U64) {
                 c.vkDestroyQueryPool(qs.vk_device, qs.vk_query_pool, null);
+                qs.vk_query_pool = c.VK_NULL_U64;
             }
-            native_helpers.alloc.destroy(qs);
             return;
         }
     }
 
-    // Metal path.
-    if (qs.counter_sample_buffer) |csb| bridge.metal_bridge_destroy_counter_sample_buffer(csb);
-    native_helpers.alloc.destroy(qs);
+    if (qs.counter_sample_buffer) |csb| {
+        bridge.metal_bridge_destroy_counter_sample_buffer(csb);
+        qs.counter_sample_buffer = null;
+    }
+}
+
+pub export fn doeNativeQuerySetDestroy(qs_raw: ?*anyopaque) callconv(.c) void {
+    const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
+    if (qs.destroyed) return;
+    qs.destroyed = true;
+    if (qs.ref_count == 1) releaseQuerySetResources(qs);
 }
 
 pub export fn doeNativeQuerySetRelease(qs_raw: ?*anyopaque) callconv(.c) void {
-    doeNativeQuerySetDestroy(qs_raw);
+    const qs = native_helpers.cast(DoeQuerySet, qs_raw) orelse return;
+    if (!native_helpers.object_should_destroy(qs)) return;
+    releaseQuerySetResources(qs);
+    native_helpers.label_store.remove(qs_raw);
+    native_helpers.alloc.destroy(qs);
+}
+
+pub fn releaseRecordedCommandReferences(cmds: []const native_cmds.RecordedCmd) void {
+    for (cmds) |cmd| {
+        const query_set = switch (cmd) {
+            .write_timestamp => |timestamp| timestamp.query_set,
+            .resolve_query_set => |resolve| resolve.query_set,
+            else => null,
+        };
+        if (query_set != null) doeNativeQuerySetRelease(query_set);
+    }
 }
 
 pub export fn doeNativeQuerySetGetCount(qs_raw: ?*anyopaque) callconv(.c) u32 {

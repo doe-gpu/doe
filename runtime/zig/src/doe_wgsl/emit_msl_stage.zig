@@ -93,6 +93,40 @@ fn needs_stage_in(self: anytype, function: ir.Function) bool {
     return false;
 }
 
+fn generated_name_is_taken(self: anytype, function: ir.Function, candidate: []const u8) bool {
+    for (self.module.globals.items) |global| {
+        if (std.mem.eql(u8, global.name, candidate)) return true;
+    }
+    for (function.params.items) |param| {
+        if (std.mem.eql(u8, param.name, candidate)) return true;
+        const struct_def = get_struct_def(self, param.ty) orelse continue;
+        for (struct_def.fields.items) |field| {
+            const io = field.io orelse continue;
+            if (is_stage_in_io(io)) continue;
+            var builtin_name_buf: [256]u8 = undefined;
+            const builtin_name = std.fmt.bufPrint(&builtin_name_buf, "_blt_{s}", .{field.name}) catch continue;
+            if (std.mem.eql(u8, builtin_name, candidate)) return true;
+        }
+    }
+    return false;
+}
+
+fn emit_generated_name(self: anytype, function: ir.Function, base: []const u8) !void {
+    if (!generated_name_is_taken(self, function, base)) {
+        try self.write(base);
+        return;
+    }
+    var suffix: u32 = 1;
+    while (true) : (suffix += 1) {
+        var candidate_buf: [256]u8 = undefined;
+        const candidate = std.fmt.bufPrint(&candidate_buf, "{s}_{d}", .{ base, suffix }) catch return error.InvalidIr;
+        if (!generated_name_is_taken(self, function, candidate)) {
+            try self.write(candidate);
+            return;
+        }
+    }
+}
+
 fn emit_input_io_attr(self: anytype, io: ir.IoAttr, stage: ir.ShaderStage) !void {
     if (io.location) |loc| {
         try self.write(if (stage == .vertex) "attribute(" else "user(loc");
@@ -263,7 +297,9 @@ fn emit_wrapper_function(self: anytype, function_index: ir.FunctionId, stage: ir
     if (needs_stage_in(self, function)) {
         if (need_comma) try self.write(", ");
         try self.write(function.name);
-        try self.write("_stage_in in [[stage_in]]");
+        try self.write("_stage_in ");
+        try emit_generated_name(self, function, "_doe_stage_input");
+        try self.write(" [[stage_in]]");
         need_comma = true;
     }
     // Non-stage-in builtin params (passed directly with [[builtin]] attribute)
@@ -315,7 +351,8 @@ fn emit_wrapper_function(self: anytype, function_index: ir.FunctionId, stage: ir
                 try self.write(field.name);
                 try self.write(" = ");
                 if (is_stage_in_io(io)) {
-                    try self.write("in.p");
+                    try emit_generated_name(self, function, "_doe_stage_input");
+                    try self.write(".p");
                     try self.write_u32(flat_index);
                     flat_index += 1;
                 } else {
@@ -332,7 +369,9 @@ fn emit_wrapper_function(self: anytype, function_index: ir.FunctionId, stage: ir
             try self.emit_type(param.ty);
             try self.write(" ");
             try self.write(param.name);
-            try self.write(" = in.p");
+            try self.write(" = ");
+            try emit_generated_name(self, function, "_doe_stage_input");
+            try self.write(".p");
             try self.write_u32(flat_index);
             try self.write(";\n");
             flat_index += 1;
@@ -342,16 +381,21 @@ fn emit_wrapper_function(self: anytype, function_index: ir.FunctionId, stage: ir
     // Call impl and handle return
     try self.write_indent();
     try self.write(function.name);
-    try self.write("_stage_out out;\n");
+    try self.write("_stage_out ");
+    try emit_generated_name(self, function, "_doe_stage_output");
+    try self.write(";\n");
 
     const is_struct_return = function.return_io == null and get_struct_def(self, function.return_type) != null;
     if (is_struct_return) {
         try self.write_indent();
         try self.emit_type(function.return_type);
-        try self.write(" _result = ");
+        try self.write(" ");
+        try emit_generated_name(self, function, "_doe_result");
+        try self.write(" = ");
     } else {
         try self.write_indent();
-        try self.write("out.value = ");
+        try emit_generated_name(self, function, "_doe_stage_output");
+        try self.write(".value = ");
     }
     try self.write(function.name);
     try self.write("_impl(");
@@ -383,9 +427,12 @@ fn emit_wrapper_function(self: anytype, function_index: ir.FunctionId, stage: ir
             for (struct_def.fields.items) |field| {
                 if (field.io == null) continue;
                 try self.write_indent();
-                try self.write("out.");
+                try emit_generated_name(self, function, "_doe_stage_output");
+                try self.write(".");
                 try self.write(field.name);
-                try self.write(" = _result.");
+                try self.write(" = ");
+                try emit_generated_name(self, function, "_doe_result");
+                try self.write(".");
                 try self.write(field.name);
                 try self.write(";\n");
             }
@@ -393,7 +440,9 @@ fn emit_wrapper_function(self: anytype, function_index: ir.FunctionId, stage: ir
     }
 
     try self.write_indent();
-    try self.write("return out;\n");
+    try self.write("return ");
+    try emit_generated_name(self, function, "_doe_stage_output");
+    try self.write(";\n");
     self.indent -= 4;
     try self.write("}\n");
 }

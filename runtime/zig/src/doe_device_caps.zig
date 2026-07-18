@@ -282,6 +282,9 @@ pub export fn doeNativeAdapterHasFeature(raw: ?*anyopaque, feature: u32) callcon
             }
             return if (d3d12_device_caps.d3d12_adapter_has_feature(feature)) 1 else 0;
         }
+        if (feature == FEATURE_TIMESTAMP_QUERY) {
+            return if (BRIDGE_AVAILABLE and backend_capabilities.metal_supports_timestamp_query(a.mtl_device)) 1 else 0;
+        }
     }
     return if (is_metal_feature_supported(feature)) 1 else 0;
 }

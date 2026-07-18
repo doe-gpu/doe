@@ -446,8 +446,8 @@ test "constant values: WGPUSType shader source constants" {
     try std.testing.expectEqual(@as(u32, 0x00000003), types.WGPUSType_ShaderSourceMSL);
     try std.testing.expectEqual(@as(u32, 0x00000004), types.WGPUSType_ShaderSourceSPIRV);
     try std.testing.expectEqual(@as(u32, 0x00000005), types.WGPUSType_ShaderSourceHLSL);
-    try std.testing.expectEqual(@as(u32, 0x0000000D), types.WGPUSType_ExternalTextureBindingLayout);
-    try std.testing.expectEqual(@as(u32, 0x0000000E), types.WGPUSType_ExternalTextureBindingEntry);
+    try std.testing.expectEqual(@as(u32, 0x00050002), types.WGPUSType_ExternalTextureBindingLayout);
+    try std.testing.expectEqual(@as(u32, 0x00050001), types.WGPUSType_ExternalTextureBindingEntry);
 }
 
 test "constant values: WGPUFeatureName key features" {

@@ -13,6 +13,7 @@ const native_types = @import("doe_native_object_types.zig");
 const native_helpers = @import("doe_native_object_helpers.zig");
 const runtime_helpers = @import("doe_native_runtime_helpers.zig");
 const vulkan_lifetime = @import("doe_vulkan_lifetime.zig");
+const queue_submit_shared = @import("doe_queue_submit_shared.zig");
 const d3d12_constants = resource_ops.d3d12_constants;
 const bridge = resource_ops.metal_bridge;
 const vk_resources = if (has_vulkan) resource_ops.vk_resources else struct {};
@@ -107,7 +108,7 @@ pub export fn doeNativeDeviceCreateBuffer(dev_raw: ?*anyopaque, desc: ?*const ab
     const dev = cast(DoeDevice, dev_raw) orelse return null;
     const d = desc orelse return null;
     const buf = make(DoeBuffer) orelse return null;
-    buf.* = .{ .backend = dev.backend, .size = d.size, .usage = d.usage };
+    buf.* = .{ .backend = dev.backend, .dev = dev, .size = d.size, .usage = d.usage };
     if (comptime has_vulkan) {
         if (dev.backend == .vulkan) {
             const rt = runtime_helpers.device_vk_runtime(dev) orelse {
@@ -281,6 +282,11 @@ pub export fn doeNativeBufferMapAsync(buf_raw: ?*anyopaque, mode: u64, offset: u
                     return .{ .id = 3 };
                 };
             }
+        }
+    }
+    if (b.backend == .metal and (mode & abi_core.WGPUMapMode_Read) != 0) {
+        if (b.dev) |dev| {
+            if (dev.queue) |queue| queue_submit_shared.flush_pending_work(queue);
         }
     }
     b.mapped = true;

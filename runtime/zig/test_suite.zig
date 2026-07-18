@@ -2,6 +2,7 @@ const builtin = @import("builtin");
 const metal_mod_integration_test = @import("tests/metal/metal_mod_integration_test.zig");
 const metal_render_state_test = @import("tests/metal/metal_render_state_test.zig");
 const metal_resources_test = @import("tests/metal/metal_resources_test.zig");
+const metal_library_cache_test = @import("tests/metal/metal_library_cache_test.zig");
 const metal_timing_semantics_test = @import("tests/metal/metal_timing_semantics_test.zig");
 const vulkan_mod_integration_test = if (builtin.os.tag == .linux) @import("tests/vulkan/vulkan_mod_integration_test.zig") else struct {};
 const vulkan_native_runtime_test = if (builtin.os.tag == .linux) @import("tests/vulkan/vulkan_native_runtime_test.zig") else struct {};
@@ -61,6 +62,7 @@ comptime {
     _ = metal_mod_integration_test;
     _ = metal_render_state_test;
     _ = metal_resources_test;
+    _ = metal_library_cache_test;
     _ = metal_timing_semantics_test;
     _ = metal_native_unit_test;
     _ = vulkan_mod_integration_test;

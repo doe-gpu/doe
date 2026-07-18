@@ -88,7 +88,7 @@ pub fn releaseDeferredMetalObjects(q: *DoeQueue) void {
     q.deferred_release_count = 0;
 }
 
-fn appendDeferredMetalObject(q: *DoeQueue, obj: ?*anyopaque) void {
+pub fn appendDeferredMetalObject(q: *DoeQueue, obj: ?*anyopaque) void {
     const handle = obj orelse return;
     if (q.deferred_release_count < native_cmds.MAX_DEFERRED_RELEASES) {
         q.deferred_releases[q.deferred_release_count] = handle;
@@ -169,12 +169,13 @@ pub fn flushPendingWorkTimed(q: *DoeQueue) QueueFlushBreakdown {
         metal_bridge_release(cmd);
         q.pending_cmd = null;
     }
-    const deferred_copy_started_ns = monotonicNowNs();
-    executeDeferredCopies(q);
-    out.deferredCopyNs = monotonicNowNs() - deferred_copy_started_ns;
+    // Timestamp resolves populate source buffers consumed by deferred copies.
     const deferred_resolve_started_ns = monotonicNowNs();
     executeDeferredResolves(q);
     out.deferredResolveNs = monotonicNowNs() - deferred_resolve_started_ns;
+    const deferred_copy_started_ns = monotonicNowNs();
+    executeDeferredCopies(q);
+    out.deferredCopyNs = monotonicNowNs() - deferred_copy_started_ns;
     releaseDeferredMetalObjects(q);
     metal_browser_trace.recordFlush(
         out.waitCompletedNs,
@@ -226,12 +227,13 @@ pub fn flushPendingWorkTimedDirectReadback(
         }
     }
 
-    const deferred_copy_started_ns = monotonicNowNs();
-    out.copied_direct = executeDeferredCopiesWithDirectReadback(q, readback_dst, readback_size, host_dst);
-    out.breakdown.deferredCopyNs = monotonicNowNs() - deferred_copy_started_ns;
+    // Timestamp resolves populate source buffers consumed by deferred copies.
     const deferred_resolve_started_ns = monotonicNowNs();
     executeDeferredResolves(q);
     out.breakdown.deferredResolveNs = monotonicNowNs() - deferred_resolve_started_ns;
+    const deferred_copy_started_ns = monotonicNowNs();
+    out.copied_direct = executeDeferredCopiesWithDirectReadback(q, readback_dst, readback_size, host_dst);
+    out.breakdown.deferredCopyNs = monotonicNowNs() - deferred_copy_started_ns;
     releaseDeferredMetalObjects(q);
     metal_browser_trace.recordFlush(
         out.breakdown.waitCompletedNs,

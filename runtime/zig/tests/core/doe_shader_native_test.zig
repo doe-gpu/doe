@@ -377,6 +377,8 @@ test "createShaderModule: unknown sType returns error module with error kind" {
 
     const sm = native.cast(native.DoeShaderModule, result).?;
     try std.testing.expectEqual(native.CompilationMessageKind.@"error", sm.compilation_message_kind);
+    try std.testing.expect(sm.compilation_message != null);
+    try std.testing.expect(std.mem.indexOf(u8, sm.compilation_message.?, "unsupported") != null);
 
     // Error metadata should mention "unsupported".
     var msg_buf: [512]u8 = undefined;
