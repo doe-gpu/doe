@@ -1736,50 +1736,6 @@ function buildBindGroupDescriptor(layoutPtr, entries) {
     return { desc: new Uint8Array(descBuf), _refs: [entryBufs] };
 }
 
-function canCreateBufferBindGroupLayoutFlat4(entries) {
-    if (entries.length > MAX_COMPUTE_BIND_GROUPS) {
-        return false;
-    }
-    for (const entry of entries) {
-        if (
-            !entry.buffer
-            || entry.sampler
-            || entry.texture
-            || entry.storageTexture
-            || entry.externalTexture
-            || entry.buffer.hasDynamicOffset
-            || (entry.bindingArraySize ?? 0) !== 0
-        ) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function flatBindingAt(entries, index) {
-    return entries[index]?.binding ?? 0;
-}
-
-function canCreateBufferBindGroupFlat4(entries) {
-    if (entries.length > MAX_COMPUTE_BIND_GROUPS) {
-        return false;
-    }
-    for (const entry of entries) {
-        if (!entry.buffer || entry.sampler || entry.textureView || entry.externalTexture) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function flatBindGroupBufferAt(entries, index) {
-    return entries[index]?.buffer ?? null;
-}
-
-function flatBindGroupOffsetAt(entries, index) {
-    return BigInt(entries[index]?.offset ?? 0);
-}
-
 // WGPUPipelineLayoutDescriptor: { nextInChain:ptr@0, label:sv@8, bindGroupLayoutCount:size_t@24,
 //   bindGroupLayouts:ptr@32, immediateSize:u32@40, pad@44 } = 48
 function buildPipelineLayoutDescriptor(layouts, immediateSize = 0) {
@@ -4157,7 +4113,9 @@ const fullSurfaceBackend = {
         return native;
     },
     deviceCreateBufferBindGroupLayoutFlat4(device, entryCount, b0, b1, b2, b3, _label) {
-        return undefined;
+        if (typeof wgpu.symbols.doeNativeDeviceCreateBufferBindGroupLayoutFlat4 !== "function") {
+            return undefined;
+        }
         return wgpu.symbols.doeNativeDeviceCreateBufferBindGroupLayoutFlat4(
             assertLiveResource(device, "GPUDevice.createBindGroupLayout", "GPUDevice"),
             entryCount,
@@ -4197,7 +4155,9 @@ const fullSurfaceBackend = {
         offset3,
         _label,
     ) {
-        return undefined;
+        if (typeof wgpu.symbols.doeNativeDeviceCreateBufferBindGroupFlat4 !== "function") {
+            return undefined;
+        }
         return wgpu.symbols.doeNativeDeviceCreateBufferBindGroupFlat4(
             assertLiveResource(device, "GPUDevice.createBindGroup", "GPUDevice"),
             layoutNative,

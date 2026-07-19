@@ -5,7 +5,6 @@ const bridge = @import("metal_bridge_decls.zig");
 const metal_bridge_buffer_contents = bridge.metal_bridge_buffer_contents;
 const metal_bridge_command_buffer_commit = bridge.metal_bridge_command_buffer_commit;
 const metal_bridge_command_buffer_encode_signal_event = bridge.metal_bridge_command_buffer_encode_signal_event;
-const metal_bridge_command_buffer_encode_wait_event = bridge.metal_bridge_command_buffer_encode_wait_event;
 const metal_bridge_create_command_buffer = bridge.metal_bridge_create_command_buffer;
 const metal_bridge_cmd_buf_encode_compute_dispatch = bridge.metal_bridge_cmd_buf_encode_compute_dispatch;
 const metal_bridge_cmd_buf_encode_compute_dispatch_indirect = bridge.metal_bridge_cmd_buf_encode_compute_dispatch_indirect;
@@ -29,7 +28,6 @@ pub fn run_dispatch(runtime: anytype, x: u32, y: u32, z: u32, queue_sync_mode: w
     const pipeline = try runtime.ensure_kernel_pipeline(DEFAULT_DISPATCH_KERNEL, null);
     const encode_start = common_timing.now_ns();
     const cmd_buf = metal_bridge_create_command_buffer(runtime.queue) orelse return error.InvalidState;
-    try encode_dispatch_dependencies(runtime, cmd_buf);
     metal_bridge_cmd_buf_encode_compute_dispatch(
         cmd_buf,
         pipeline,
@@ -55,7 +53,6 @@ pub fn run_dispatch_indirect(runtime: anytype, x: u32, y: u32, z: u32, queue_syn
     try write_dispatch_indirect_args(indirect_buffer, x, y, z);
     const encode_start = common_timing.now_ns();
     const cmd_buf = metal_bridge_create_command_buffer(runtime.queue) orelse return error.InvalidState;
-    try encode_dispatch_dependencies(runtime, cmd_buf);
     metal_bridge_cmd_buf_encode_compute_dispatch_indirect(
         cmd_buf,
         pipeline,
@@ -99,19 +96,6 @@ fn prepare_dispatch_submission(runtime: anytype, queue_sync_mode: webgpu.QueueSy
     }
     if (runtime.streaming_cmd_buf != null or runtime.has_deferred_submissions or runtime.outstanding_cmd_buf != null) {
         _ = try runtime.flush_queue();
-    }
-}
-
-fn encode_dispatch_dependencies(runtime: anytype, cmd_buf: ?*anyopaque) !void {
-    if (runtime.has_pending_copies) {
-        runtime.flush_copy_queue();
-    }
-    if (runtime.copy_fence_value > 0) {
-        if (runtime.shared_event) |ev| {
-            metal_bridge_command_buffer_encode_wait_event(cmd_buf, ev, runtime.copy_fence_value);
-        } else {
-            return error.UnsupportedFeature;
-        }
     }
 }
 

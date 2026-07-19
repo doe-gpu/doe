@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe workload ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "generatedAt",
+    "suiteId",
+    "suiteIdentity",
+    "summary",
+    "results"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "artifactKind": {
+      "type": "string",
+      "const": "doe-workload-ledger"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "suiteId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "suiteIdentity": {
+      "$ref": "#/$defs/hashIdentity"
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "total",
+        "passed",
+        "failed"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/result"
+      }
+    }
+  },
+  "$defs": {
+    "hashIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "hash"
+      ],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "const": "sha256"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "correctness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "firstFailingBoundary",
+        "reasonCode"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "firstFailingBoundary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reasonCode": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pass"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "firstFailingBoundary": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "firstFailingBoundary": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "evidenceExtension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "extensionType",
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "extensionType": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]+$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "executorIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executorId",
+        "executorKind",
+        "commandHash",
+        "executableHash"
+      ],
+      "properties": {
+        "executorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "executorKind": {
+          "type": "string",
+          "enum": [
+            "pure",
+            "native",
+            "browser",
+            "comparison"
+          ]
+        },
+        "commandHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "executableHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "expectedOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "oracleId",
+        "kind",
+        "expectedExitCode"
+      ],
+      "properties": {
+        "oracleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "const": "process-exit"
+        },
+        "expectedExitCode": {
+          "type": "integer"
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workloadId",
+        "inputIdentity",
+        "expectedOutcome",
+        "executorIdentity",
+        "correctness",
+        "measuredTiming",
+        "policyId",
+        "evidenceExtensions"
+      ],
+      "properties": {
+        "workloadId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputIdentity": {
+          "$ref": "#/$defs/hashIdentity"
+        },
+        "expectedOutcome": {
+          "$ref": "#/$defs/expectedOutcome"
+        },
+        "executorIdentity": {
+          "$ref": "#/$defs/executorIdentity"
+        },
+        "correctness": {
+          "$ref": "#/$defs/correctness"
+        },
+        "measuredTiming": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "elapsedNs"
+          ],
+          "properties": {
+            "elapsedNs": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "policyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceExtensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceExtension"
+          }
+        }
+      }
+    }
+  }
+}

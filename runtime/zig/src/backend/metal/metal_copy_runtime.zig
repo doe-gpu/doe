@@ -46,29 +46,19 @@ pub fn execute_copy(self: anytype, cmd: model_resource_types.CopyCommand, queue_
         null;
     const setup_ns = common_timing.ns_delta(common_timing.now_ns(), setup_start);
 
-    // Route buffer-to-buffer copies to the dedicated copy queue when available,
-    // allowing overlap with compute/render on the main queue. Texture copies
-    // stay on the main queue (they may depend on render encoder state).
-    const use_copy_queue = cmd.direction == .buffer_to_buffer and self.copy_queue != null;
-    if (use_copy_queue) {
-        try ensure_copy_blit_encoder(self);
-    } else {
-        try ensure_blit_encoder(self);
-    }
+    try ensure_blit_encoder(self);
 
     const encode_start = common_timing.now_ns();
     switch (cmd.direction) {
         .buffer_to_buffer => {
-            const encoder = if (use_copy_queue) self.copy_blit_encoder else self.streaming_blit_encoder;
             metal_bridge_blit_encoder_copy_region(
-                encoder,
+                self.streaming_blit_encoder,
                 src_buffer,
                 cmd.src.offset,
                 dst_buffer,
                 cmd.dst.offset,
                 cmd.bytes,
             );
-            if (use_copy_queue) self.has_pending_copies = true;
         },
         .buffer_to_texture => metal_bridge_blit_encoder_copy_buffer_to_texture(
             self.streaming_blit_encoder,
@@ -236,15 +226,4 @@ fn alignedStagingSize(cmd: model_resource_types.CopyCommand) u64 {
     };
     const a: u64 = if (cmd.temporary_buffer_alignment > 1) cmd.temporary_buffer_alignment else 1;
     return (raw + a - 1) / a * a;
-}
-
-fn ensure_copy_blit_encoder(self: anytype) !void {
-    if (self.copy_blit_encoder != null) return;
-    if (self.copy_cmd_buf == null) {
-        var encoder: ?*anyopaque = null;
-        self.copy_cmd_buf = metal_bridge_begin_blit_encoding(self.copy_queue, &encoder) orelse return error.InvalidState;
-        self.copy_blit_encoder = encoder;
-    } else {
-        self.copy_blit_encoder = metal_bridge_cmd_buf_blit_encoder(self.copy_cmd_buf) orelse return error.InvalidState;
-    }
 }

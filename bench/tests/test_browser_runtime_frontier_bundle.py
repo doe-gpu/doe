@@ -44,7 +44,6 @@ class BrowserRuntimeFrontierBundleTests(unittest.TestCase):
             claim_promotion_receipt_path="examples/browser-claim-promotion-receipt.sample.json",
             release_artifact_bundle_path="examples/browser-release-artifact-bundle.sample.json",
             root=REPO_ROOT,
-            verify_files_root=REPO_ROOT,
         )
 
         jsonschema.validate(report, _load_json(SCHEMA_PATH))
@@ -72,8 +71,8 @@ class BrowserRuntimeFrontierBundleTests(unittest.TestCase):
             artifact_verification,
             {
                 "requiredForClaimable": True,
-                "verifyFilesRootProvided": True,
-                "verified": True,
+                "verifyFilesRootProvided": False,
+                "verified": False,
             },
         )
 

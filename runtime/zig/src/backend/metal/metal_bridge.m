@@ -2490,24 +2490,25 @@ void metal_bridge_destroy_counter_sample_buffer(MetalHandle counter_buffer_h) {
 }
 
 // ============================================================
-// Semaphore-based completion (faster than waitUntilCompleted)
+// Command-buffer-scoped completion
 // ============================================================
 
-static dispatch_semaphore_t _completion_sem = NULL;
-
-void metal_bridge_command_buffer_setup_fast_wait(MetalHandle cmd_buf_h) {
+MetalHandle metal_bridge_command_buffer_create_completion_waiter(MetalHandle cmd_buf_h) {
+    if (cmd_buf_h == NULL) return NULL;
     id<MTLCommandBuffer> cmd_buf = (__bridge id<MTLCommandBuffer>)cmd_buf_h;
-    if (_completion_sem == NULL) {
-        _completion_sem = dispatch_semaphore_create(0);
-    }
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    if (semaphore == NULL) return NULL;
     [cmd_buf addCompletedHandler:^(id<MTLCommandBuffer> _Nonnull cb) {
-        dispatch_semaphore_signal(_completion_sem);
+        (void)cb;
+        dispatch_semaphore_signal(semaphore);
     }];
+    return (__bridge_retained void*)semaphore;
 }
 
-void metal_bridge_command_buffer_wait_fast(void) {
-    if (_completion_sem == NULL) return;
-    dispatch_semaphore_wait(_completion_sem, DISPATCH_TIME_FOREVER);
+void metal_bridge_completion_waiter_wait_and_release(MetalHandle waiter_h) {
+    if (waiter_h == NULL) return;
+    dispatch_semaphore_t semaphore = (__bridge_transfer dispatch_semaphore_t)waiter_h;
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
 }
 
 // ============================================================

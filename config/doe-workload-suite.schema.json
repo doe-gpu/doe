@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe workload suite",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "suiteId",
+    "workloads"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "suiteId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]+$"
+    },
+    "workloads": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/workload"
+      }
+    }
+  },
+  "$defs": {
+    "evidenceExtension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "extensionType",
+        "path",
+        "required"
+      ],
+      "properties": {
+        "extensionType": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]+$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "executor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executorId",
+        "executorKind",
+        "workingDirectory",
+        "command"
+      ],
+      "properties": {
+        "executorId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]+$"
+        },
+        "executorKind": {
+          "type": "string",
+          "enum": [
+            "pure",
+            "native",
+            "browser",
+            "comparison"
+          ]
+        },
+        "workingDirectory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "path"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "tree",
+            "repository-tree"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "oracleId",
+        "kind",
+        "expectedExitCode"
+      ],
+      "properties": {
+        "oracleId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_/-]+$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "process-exit"
+        },
+        "expectedExitCode": {
+          "type": "integer"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyId",
+        "kind"
+      ],
+      "properties": {
+        "policyId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_/-]+$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "correctness-only",
+            "claim-bearing"
+          ]
+        }
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workloadId",
+        "inputs",
+        "oracle",
+        "executor",
+        "policy"
+      ],
+      "properties": {
+        "workloadId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]+$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/input"
+          }
+        },
+        "oracle": {
+          "$ref": "#/$defs/oracle"
+        },
+        "executor": {
+          "$ref": "#/$defs/executor"
+        },
+        "policy": {
+          "$ref": "#/$defs/policy"
+        },
+        "evidenceExtensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceExtension"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "policy": {
+                "properties": {
+                  "kind": {
+                    "const": "claim-bearing"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "evidenceExtensions"
+            ],
+            "properties": {
+              "evidenceExtensions": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

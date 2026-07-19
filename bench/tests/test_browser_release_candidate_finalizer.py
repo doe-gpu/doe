@@ -174,6 +174,20 @@ def _finalizer_args(
 
 
 class BrowserReleaseCandidateFinalizerTests(unittest.TestCase):
+    def test_artifact_paths_outside_repository_are_canonical(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            artifact_path = Path(tmp) / "artifact.bin"
+            artifact_path.write_bytes(b"artifact")
+
+            self.assertEqual(
+                bundle_builder.repo_relative(artifact_path),
+                str(artifact_path.resolve()),
+            )
+            self.assertEqual(
+                provenance_check.repo_relative(artifact_path),
+                str(artifact_path.resolve()),
+            )
+
     def test_outputs_verified_bundle(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -242,7 +256,7 @@ class BrowserReleaseCandidateFinalizerTests(unittest.TestCase):
             )
             self.assertEqual(
                 summary["inputs"]["packageInputs"]["path"],
-                str(package_inputs_path),
+                str(package_inputs_path.resolve()),
             )
             self.assertEqual(
                 summary["inputs"]["packageInputs"]["sha256"],
@@ -254,7 +268,7 @@ class BrowserReleaseCandidateFinalizerTests(unittest.TestCase):
             )
             self.assertEqual(
                 summary["inputs"]["provenanceReport"]["path"],
-                str(provenance_path),
+                str(provenance_path.resolve()),
             )
             self.assertEqual(
                 summary["inputs"]["provenanceReport"]["sha256"],
@@ -619,7 +633,10 @@ class BrowserReleaseCandidateFinalizerTests(unittest.TestCase):
             jsonschema.validate(payload, json.loads(SCHEMA.read_text(encoding="utf-8")))
             self.assertEqual(payload["artifactKind"], "browser_release_candidate_finalizer")
             self.assertEqual(payload["status"], "pass")
-            self.assertEqual(payload["outputs"]["releaseArtifactBundle"]["path"], str(out_path))
+            self.assertEqual(
+                payload["outputs"]["releaseArtifactBundle"]["path"],
+                str(out_path.resolve()),
+            )
             self.assertEqual(
                 payload["outputs"]["releaseArtifactBundle"]["sha256"],
                 bundle_builder.sha256_file(out_path),
@@ -628,7 +645,10 @@ class BrowserReleaseCandidateFinalizerTests(unittest.TestCase):
                 payload["outputs"]["releaseArtifactBundle"]["kind"],
                 "browser_release_artifact_bundle",
             )
-            self.assertEqual(payload["outputs"]["runtimeFrontierBundle"]["path"], str(frontier_path))
+            self.assertEqual(
+                payload["outputs"]["runtimeFrontierBundle"]["path"],
+                str(frontier_path.resolve()),
+            )
             self.assertEqual(
                 payload["outputs"]["runtimeFrontierBundle"]["sha256"],
                 bundle_builder.sha256_file(frontier_path),

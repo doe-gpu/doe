@@ -48,6 +48,12 @@ incumbent stack, not as isolated feature tracks. The decomposition is:
    compiler evidence, runtime trace, browser diagnostic, proof artifact, or
    benchmark report satisfies the gate for that surface.
 
+The shared execution unit for that trust system is a correctness-bearing
+workload. Pure transforms, native runtimes, browsers, and comparisons are
+executor adapters beneath one contract. The core ledger stays executor-neutral
+and binds specialized evidence through typed extensions; see
+[`workload-system.md`](workload-system.md).
+
 ## Product boundary rules
 
 The important boundary distinctions are:
@@ -167,5 +173,7 @@ when they are tied back to those emitted contracts.
 - [`docs/numeric-stability.md`](./numeric-stability.md) for the numeric-stability integration path, claim boundary, demo bar, semantic envelope, and live runtime contract roadmap
 - [`pipeline/lean/README.md`](../pipeline/lean/README.md) for Lean proof categories and the artifact boundary
 - [`bench/README.md`](../bench/README.md) for compare and claim workflows
+- [`docs/workload-system.md`](./workload-system.md) for the shared workload,
+  executor, oracle, and ledger contract
 - [`runtime/zig/README.md`](../runtime/zig/README.md) for runtime details
 - [`browser/chromium/README.md`](../browser/chromium/README.md) for the Chromium lane

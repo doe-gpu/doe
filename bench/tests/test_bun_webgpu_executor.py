@@ -344,8 +344,18 @@ class BunWebGPUExecutorTests(unittest.TestCase):
         self.assertIn("typeof backend.queueWriteBufferBatch === 'function'", shared_surface)
         self.assertIn("__doeWriteBufferBatch", shared_surface)
 
-    def test_bun_ffi_uses_native_flat_setup_helpers(self) -> None:
+    def test_bun_ffi_uses_validated_native_flat_setup_hooks(self) -> None:
         source = BUN_FFI_PATH.read_text(encoding="utf-8")
+        shared_surface = (
+            REPO_ROOT
+            / "packages"
+            / "doe-gpu"
+            / "src"
+            / "vendor"
+            / "webgpu"
+            / "shared"
+            / "full-surface.js"
+        ).read_text(encoding="utf-8")
 
         self.assertIn("doeNativeDeviceCreateBufferFlat", source)
         self.assertIn("doeNativeDeviceCreateShaderModuleWgsl", source)
@@ -353,23 +363,23 @@ class BunWebGPUExecutorTests(unittest.TestCase):
         self.assertIn("doeNativeDeviceCreateBufferBindGroupLayoutFlat4", source)
         self.assertIn("doeNativeDeviceCreateBufferBindGroupFlat4", source)
         self.assertIn("doeNativeDeviceCreatePipelineLayoutOne", source)
-        self.assertIn("function canCreateBufferBindGroupLayoutFlat4(entries)", source)
-        self.assertIn("function canCreateBufferBindGroupFlat4(entries)", source)
         self.assertIn("preflightShaderSourceOnCreate: false", source)
+        self.assertIn("function tryCreateBufferBindGroupLayoutFast4(", shared_surface)
+        self.assertIn("function tryCreateBufferBindGroupFast4(", shared_surface)
 
         buffer_start = source.index("deviceCreateBuffer(device, validated) {")
         buffer_end = source.index("\n    },\n    deviceCreateShaderModule", buffer_start)
         buffer_block = source[buffer_start:buffer_end]
         self.assertIn("wgpu.symbols.doeNativeDeviceCreateBufferFlat(", buffer_block)
 
-        bind_group_start = source.index("deviceCreateBindGroup(device, layoutNative, entries, _label) {")
-        bind_group_end = source.index("\n    },\n    deviceCreatePipelineLayout", bind_group_start)
+        bind_group_start = source.index("deviceCreateBufferBindGroupFlat4(")
+        bind_group_end = source.index("\n    },\n    deviceCreateBindGroup(", bind_group_start)
         bind_group_block = source[bind_group_start:bind_group_end]
-        self.assertIn("canCreateBufferBindGroupFlat4(entries)", bind_group_block)
-        self.assertLess(
-            bind_group_block.index("canCreateBufferBindGroupFlat4(entries)"),
-            bind_group_block.index("const normalizedEntries = entries.map"),
+        self.assertIn(
+            'typeof wgpu.symbols.doeNativeDeviceCreateBufferBindGroupFlat4 !== "function"',
+            bind_group_block,
         )
+        self.assertIn("wgpu.symbols.doeNativeDeviceCreateBufferBindGroupFlat4(", bind_group_block)
 
     def test_bun_entry_uses_measured_platform_default(self) -> None:
         source = BUN_ENTRY_PATH.read_text(encoding="utf-8")

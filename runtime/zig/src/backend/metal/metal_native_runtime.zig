@@ -10,7 +10,6 @@ const model_async_types = @import("../../model_async_types.zig");
 const webgpu = @import("../runtime_types.zig");
 const async_runtime = @import("metal_async_runtime.zig");
 const cleanup = @import("metal_cleanup.zig");
-const copy_queue = @import("metal_copy_queue.zig");
 const copy_runtime = @import("metal_copy_runtime.zig");
 const deferred_release = @import("metal_deferred_release.zig");
 const dispatch_runtime = @import("metal_dispatch_runtime.zig");
@@ -29,7 +28,6 @@ const bridge = @import("metal_bridge_decls.zig");
 const HAS_PIPELINE_CACHE = builtin.os.tag == .macos;
 const metal_bridge_create_default_device = bridge.metal_bridge_create_default_device;
 const metal_bridge_device_new_command_queue = bridge.metal_bridge_device_new_command_queue;
-const metal_bridge_device_new_command_queue_with_priority = bridge.metal_bridge_device_new_command_queue_with_priority;
 const metal_bridge_device_new_shared_event = bridge.metal_bridge_device_new_shared_event;
 const metal_bridge_end_blit_encoding = bridge.metal_bridge_end_blit_encoding;
 const metal_bridge_release = bridge.metal_bridge_release;
@@ -90,14 +88,6 @@ pub const NativeMetalRuntime = struct {
 
     shared_event: ?*anyopaque = null,
     fence_value: u64 = 0,
-
-    // Copy queue — dedicated MTLCommandQueue for overlapping upload/copy work.
-    // Falls back to single-queue mode when null (creation failure or unsupported).
-    copy_queue: ?*anyopaque = null,
-    copy_cmd_buf: ?*anyopaque = null,
-    copy_blit_encoder: ?*anyopaque = null,
-    copy_fence_value: u64 = 0,
-    has_pending_copies: bool = false,
 
     streaming_cmd_buf: ?*anyopaque = null,
     streaming_blit_encoder: ?*anyopaque = null,
@@ -197,7 +187,6 @@ pub const NativeMetalRuntime = struct {
         cleanup.release_surfaces(self);
         cleanup.release_render_resources(self);
         self.timestamp_state.deinit();
-        self.release_copy_queue_resources();
         release_ref(&self.shared_event);
         if (builtin.os.tag == .macos) {
             if (HAS_PIPELINE_CACHE) {
@@ -370,11 +359,6 @@ pub const NativeMetalRuntime = struct {
         self.device = metal_bridge_create_default_device() orelse return error.UnsupportedFeature;
         self.queue = metal_bridge_device_new_command_queue(self.device) orelse return error.InvalidState;
         self.shared_event = metal_bridge_device_new_shared_event(self.device);
-        // Create a dedicated copy queue for overlapping blit work. Priority 0
-        // (low) avoids contending with compute/render on the main queue. Silent
-        // fallback to single-queue mode when the device cannot create a second queue.
-        const COPY_QUEUE_PRIORITY: u32 = 0;
-        self.copy_queue = metal_bridge_device_new_command_queue_with_priority(self.device, COPY_QUEUE_PRIORITY);
         self.has_device = true;
         self.timestamp_state.init_resources(self.device);
         if (builtin.os.tag == .macos) {
@@ -443,18 +427,6 @@ pub const NativeMetalRuntime = struct {
 
     pub fn ensure_icb(self: *NativeMetalRuntime, draw_count: u32, vertex_count: u32, instance_count: u32, redundant_pl: c_int) !?*anyopaque {
         return resource_runtime.ensure_icb(self, draw_count, vertex_count, instance_count, redundant_pl);
-    }
-
-    fn ensure_copy_blit_encoder(self: *NativeMetalRuntime) !void {
-        return copy_queue.ensure_copy_blit_encoder(self);
-    }
-
-    pub fn flush_copy_queue(self: *NativeMetalRuntime) void {
-        return copy_queue.flush_copy_queue(self);
-    }
-
-    pub fn release_copy_queue_resources(self: *NativeMetalRuntime) void {
-        return copy_queue.release_copy_queue_resources(self);
     }
 
     pub fn activate_gpu_timestamps(self: *NativeMetalRuntime) !void {

@@ -154,8 +154,11 @@ int metal_bridge_command_buffer_retain_object_until_complete(MetalHandle cmd_buf
     (void)object;
     return 0;
 }
-void metal_bridge_command_buffer_setup_fast_wait(MetalHandle cmd_buf) { (void)cmd_buf; }
-void metal_bridge_command_buffer_wait_fast(void) {}
+MetalHandle metal_bridge_command_buffer_create_completion_waiter(MetalHandle cmd_buf) {
+    (void)cmd_buf;
+    return NULL;
+}
+void metal_bridge_completion_waiter_wait_and_release(MetalHandle waiter) { (void)waiter; }
 void metal_bridge_command_buffer_encode_signal_event(MetalHandle cmd_buf, MetalHandle event, uint64_t value) {
     (void)cmd_buf;
     (void)event;

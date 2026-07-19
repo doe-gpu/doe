@@ -2,7 +2,22 @@ const std = @import("std");
 const builtin = @import("builtin");
 const model = @import("../../src/model.zig");
 const webgpu = @import("../../src/webgpu_ffi.zig");
+const backend_iface = @import("../../src/backend/backend_iface.zig");
+const backend_policy = @import("../../src/backend/backend_policy.zig");
 const metal_mod = @import("../../src/backend/metal/mod.zig");
+
+const FlushWorker = struct {
+    iface: *backend_iface.BackendIface,
+    result_ns: u64 = 0,
+    failed: bool = false,
+
+    fn run(self: *FlushWorker) void {
+        self.result_ns = self.iface.flush_queue() catch {
+            self.failed = true;
+            return;
+        };
+    }
+};
 
 fn test_profile() model.DeviceProfile {
     return .{
@@ -90,9 +105,90 @@ test "metal deferred upload keeps per-command submit_wait_ns at zero until final
     } });
     try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, upload_result.status);
     try std.testing.expectEqual(@as(u64, 0), upload_result.submit_wait_ns);
+    const runtime = backend.get_runtime();
+    try std.testing.expect(runtime.streaming_cmd_buf != null);
+    try std.testing.expectEqual(@as(?*anyopaque, null), runtime.outstanding_cmd_buf);
 
     const flush_ns = try iface.flush_queue();
     try std.testing.expect(flush_ns > 0);
+    try std.testing.expectEqual(@as(?*anyopaque, null), runtime.outstanding_cmd_buf);
+    try std.testing.expectEqual(@as(usize, 0), runtime.streaming_uploads.items.len);
+}
+
+test "metal staged buffer write flush proves exact destination bytes" {
+    if (builtin.os.tag != .macos) return;
+
+    const backend = metal_mod.ZigMetalBackend.init_with_selection_policy(
+        std.testing.allocator,
+        test_profile(),
+        null,
+        backend_policy.default_policy_for_lane(.metal_doe_comparable),
+    ) catch |err| {
+        if (skip_if_runtime_unavailable(err)) return;
+        return err;
+    };
+    var iface = try backend.as_iface(std.testing.allocator, "test_metal_staged_write_bytes", "test_policy_hash");
+    defer iface.deinit();
+
+    const byte_count = 2 * 1024 * 1024;
+    const expected = try std.testing.allocator.alloc(u8, byte_count);
+    defer std.testing.allocator.free(expected);
+    for (expected, 0..) |*byte, index| {
+        byte.* = @truncate((index *% 131) ^ (index >> 7) ^ 0x5a);
+    }
+
+    iface.set_queue_sync_mode(.deferred);
+    const write_result = try iface.execute_buffer_write_bytes(4101, 0, byte_count, expected);
+    try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, write_result.status);
+    try std.testing.expectEqual(@as(u64, 0), write_result.submit_wait_ns);
+    try std.testing.expect((try iface.flush_queue()) > 0);
+
+    const actual = try iface.capture_buffer(std.testing.allocator, 4101, 0, byte_count);
+    defer std.testing.allocator.free(actual);
+    try std.testing.expectEqualSlices(u8, expected, actual);
+}
+
+test "metal completion waits are isolated across concurrent runtimes" {
+    if (builtin.os.tag != .macos) return;
+
+    const backend_a = metal_mod.ZigMetalBackend.init(std.testing.allocator, test_profile(), null) catch |err| {
+        if (skip_if_runtime_unavailable(err)) return;
+        return err;
+    };
+    var iface_a = try backend_a.as_iface(std.testing.allocator, "test_metal_wait_a", "test_policy_hash");
+    defer iface_a.deinit();
+
+    const backend_b = metal_mod.ZigMetalBackend.init(std.testing.allocator, test_profile(), null) catch |err| {
+        if (skip_if_runtime_unavailable(err)) return;
+        return err;
+    };
+    var iface_b = try backend_b.as_iface(std.testing.allocator, "test_metal_wait_b", "test_policy_hash");
+    defer iface_b.deinit();
+
+    iface_a.set_upload_behavior(.copy_dst, 1);
+    iface_b.set_upload_behavior(.copy_dst, 1);
+    iface_a.set_queue_sync_mode(.deferred);
+    iface_b.set_queue_sync_mode(.deferred);
+    const command = model.Command{ .upload = .{
+        .bytes = 2 * 1024 * 1024,
+        .align_bytes = 4,
+    } };
+    _ = try iface_a.execute_command(command);
+    _ = try iface_b.execute_command(command);
+
+    var worker_a = FlushWorker{ .iface = &iface_a };
+    var worker_b = FlushWorker{ .iface = &iface_b };
+    const thread_a = try std.Thread.spawn(.{}, FlushWorker.run, .{&worker_a});
+    const thread_b = try std.Thread.spawn(.{}, FlushWorker.run, .{&worker_b});
+    thread_a.join();
+    thread_b.join();
+
+    try std.testing.expect(!worker_a.failed);
+    try std.testing.expect(!worker_b.failed);
+    try std.testing.expect(worker_a.result_ns > 0);
+    try std.testing.expect(worker_b.result_ns > 0);
+    try std.testing.expect(!backend_a.get_runtime().has_deferred_submissions);
+    try std.testing.expect(!backend_b.get_runtime().has_deferred_submissions);
 }
 
 test "metal barrier flushes deferred upload work" {

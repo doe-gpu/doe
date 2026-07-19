@@ -17,7 +17,6 @@ const metal_bridge_release = bridge.metal_bridge_release;
 const metal_bridge_render_encoder_end = bridge.metal_bridge_render_encoder_end;
 
 const metal_buffer_pool = @import("metal_buffer_pool.zig");
-const metal_copy_queue = @import("metal_copy_queue.zig");
 const metal_runtime_limits = @import("metal_runtime_limits.zig");
 
 const SMALL_UPLOAD_CAPACITY = metal_runtime_limits.SMALL_UPLOAD_CAPACITY;
@@ -38,7 +37,7 @@ pub fn upload_bytes(self: anytype, bytes: u64, mode: webgpu.UploadBufferUsageMod
             @memset(self.staging_src_ptr.?[0..len], 0);
             self.staging_src_zeroed = true;
         }
-    } else if (pooled_src == null) {
+    } else {
         const raw = metal_bridge_buffer_contents(src) orelse return error.InvalidState;
         @memset(@as([*]u8, @ptrCast(raw))[0..len], 0);
     }
@@ -58,47 +57,32 @@ pub fn upload_bytes(self: anytype, bytes: u64, mode: webgpu.UploadBufferUsageMod
         metal_buffer_pool.pool_pop(&self.private_pool, len) orelse
             (metal_bridge_device_new_buffer_private(self.device, len) orelse return error.InvalidState);
 
-    // Route upload blits to the copy queue when available; fall back
-    // to the main streaming command buffer in single-queue mode.
-    if (self.copy_queue != null) {
-        try metal_copy_queue.ensure_copy_blit_encoder(self);
-        if (!use_small_staging) {
-            try self.streaming_uploads.append(self.allocator, .{
-                .src_buffer = src,
-                .dst_buffer = dst,
-                .byte_count = len,
-            });
-        }
-        metal_bridge_blit_encoder_copy(self.copy_blit_encoder, src, dst, len);
-        self.has_pending_copies = true;
-    } else {
-        if (self.streaming_compute_encoder) |enc| {
-            metal_bridge_end_compute_encoding(enc);
-            self.streaming_compute_encoder = null;
-        }
-        if (self.streaming_render_encoder) |enc| {
-            metal_bridge_render_encoder_end(enc);
-            metal_bridge_release(enc);
-            self.streaming_render_encoder = null;
-        }
-        if (self.streaming_blit_encoder == null) {
-            if (self.streaming_cmd_buf == null) {
-                var encoder: ?*anyopaque = null;
-                self.streaming_cmd_buf = metal_bridge_begin_blit_encoding(self.queue, &encoder) orelse return error.InvalidState;
-                self.streaming_blit_encoder = encoder;
-            } else {
-                self.streaming_blit_encoder = metal_bridge_cmd_buf_blit_encoder(self.streaming_cmd_buf) orelse return error.InvalidState;
-            }
-        }
-        if (!use_small_staging) {
-            try self.streaming_uploads.append(self.allocator, .{
-                .src_buffer = src,
-                .dst_buffer = dst,
-                .byte_count = len,
-            });
-        }
-        metal_bridge_blit_encoder_copy(self.streaming_blit_encoder, src, dst, len);
+    if (self.streaming_compute_encoder) |enc| {
+        metal_bridge_end_compute_encoding(enc);
+        self.streaming_compute_encoder = null;
     }
+    if (self.streaming_render_encoder) |enc| {
+        metal_bridge_render_encoder_end(enc);
+        metal_bridge_release(enc);
+        self.streaming_render_encoder = null;
+    }
+    if (self.streaming_blit_encoder == null) {
+        if (self.streaming_cmd_buf == null) {
+            var encoder: ?*anyopaque = null;
+            self.streaming_cmd_buf = metal_bridge_begin_blit_encoding(self.queue, &encoder) orelse return error.InvalidState;
+            self.streaming_blit_encoder = encoder;
+        } else {
+            self.streaming_blit_encoder = metal_bridge_cmd_buf_blit_encoder(self.streaming_cmd_buf) orelse return error.InvalidState;
+        }
+    }
+    if (!use_small_staging) {
+        try self.streaming_uploads.append(self.allocator, .{
+            .src_buffer = src,
+            .dst_buffer = dst,
+            .byte_count = len,
+        });
+    }
+    metal_bridge_blit_encoder_copy(self.streaming_blit_encoder, src, dst, len);
     self.streaming_max_upload_bytes = @max(self.streaming_max_upload_bytes, len);
     self.has_deferred_submissions = true;
 }

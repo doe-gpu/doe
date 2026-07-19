@@ -104,6 +104,10 @@ test "metal backend upload executes natively and emits manifest telemetry" {
     } });
 
     try std.testing.expect(result.status == .ok);
+    const runtime = backend.get_runtime();
+    try std.testing.expect(!runtime.has_deferred_submissions);
+    try std.testing.expectEqual(@as(?*anyopaque, null), runtime.streaming_cmd_buf);
+    try std.testing.expectEqual(@as(usize, 0), runtime.streaming_uploads.items.len);
 }
 
 test "metal backend kernel_dispatch returns error when kernel file not found" {

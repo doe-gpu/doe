@@ -83,6 +83,8 @@ gate depend on the bundle and appendix files; do not rename.
 
 ## Performance + benchmarks
 
+- [`workload-system.md`](workload-system.md) — one correctness-bearing workload
+  law, executor adapters, receipts, and migration
 - [`benchmark-taxonomy.md`](benchmark-taxonomy.md) — canonical compare taxonomy
 - [`performance-strategy.md`](performance-strategy.md) — performance work approach
 - [`doe-support-matrix.md`](doe-support-matrix.md) — platform × surface × runtime support

@@ -27,8 +27,8 @@
       "releaseBundleIdentitySha256": "f7279a10b96a60e55bc539f5f72d881a61bbaf510713709cc6a4c51d58ae7398",
       "artifactVerification": {
         "requiredForClaimable": true,
-        "verifyFilesRootProvided": true,
-        "verified": true
+        "verifyFilesRootProvided": false,
+        "verified": false
       },
       "claimReports": [
         {

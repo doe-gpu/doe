@@ -1,0 +1,57 @@
+{
+  "artifactKind": "doe-workload-ledger",
+  "generatedAt": "2026-07-19T00:00:00+00:00",
+  "results": [
+    {
+      "correctness": {
+        "firstFailingBoundary": null,
+        "reasonCode": "oracle_passed",
+        "status": "pass"
+      },
+      "evidenceExtensions": [
+        {
+          "extensionType": "input_manifest",
+          "path": "bench/out/workloads/example/input-manifest.json",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        {
+          "extensionType": "process_result",
+          "path": "bench/out/workloads/example/process-result.json",
+          "sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+        }
+      ],
+      "executorIdentity": {
+        "commandHash": "2222222222222222222222222222222222222222222222222222222222222222",
+        "executableHash": "3333333333333333333333333333333333333333333333333333333333333333",
+        "executorId": "zig_runtime_native",
+        "executorKind": "native"
+      },
+      "expectedOutcome": {
+        "expectedExitCode": 0,
+        "kind": "process-exit",
+        "oracleId": "process/exit-zero-v1"
+      },
+      "inputIdentity": {
+        "algorithm": "sha256",
+        "hash": "4444444444444444444444444444444444444444444444444444444444444444"
+      },
+      "measuredTiming": {
+        "elapsedNs": 1
+      },
+      "policyId": "correctness-only/v1",
+      "workloadId": "zig_runtime_contracts"
+    }
+  ],
+  "schemaVersion": 1,
+  "suiteId": "doe_core_workloads",
+  "suiteIdentity": {
+    "algorithm": "sha256",
+    "hash": "5555555555555555555555555555555555555555555555555555555555555555"
+  },
+  "summary": {
+    "failed": 0,
+    "passed": 1,
+    "status": "pass",
+    "total": 1
+  }
+}

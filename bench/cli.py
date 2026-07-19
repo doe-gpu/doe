@@ -4,6 +4,7 @@ Product-based benchmark runner with isolated runs, compare reports, and claim
 reports.
 
 Usage:
+    python3 bench/cli.py workload --suite config/doe-workload-suite.json
     python3 bench/cli.py run     --product doe --executor-id doe_direct_vulkan ...
     python3 bench/cli.py run-config --config bench/native-compare/foo.json --side baseline
     python3 bench/cli.py compare <receipt1.run.json> <receipt2.run.json> ...
@@ -33,6 +34,56 @@ def _ensure_bench_imports() -> None:
     for path in (str(REPO_ROOT), str(BENCH_ROOT)):
         if path not in sys.path:
             sys.path.insert(0, path)
+
+
+# ---------------------------------------------------------------------------
+# workload subcommand
+# ---------------------------------------------------------------------------
+
+
+def _add_workload_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--suite",
+        default="config/doe-workload-suite.json",
+        help="Unified workload suite contract path",
+    )
+    parser.add_argument(
+        "--workload-id",
+        default="",
+        help="Run one workload from the suite",
+    )
+    parser.add_argument(
+        "--out",
+        default="",
+        help="Consolidated workload ledger path",
+    )
+
+
+def _cmd_workload(args: argparse.Namespace) -> int:
+    _ensure_bench_imports()
+    from workload_runner import run_suite
+
+    timestamp = _utc_timestamp()
+    output_path = Path(args.out) if args.out else Path(
+        f"bench/out/workloads/{timestamp}/doe-workload-ledger.json"
+    )
+    try:
+        ledger = run_suite(
+            REPO_ROOT / args.suite,
+            REPO_ROOT / output_path,
+            REPO_ROOT,
+            workload_id=args.workload_id,
+        )
+    except (
+        FileExistsError,
+        FileNotFoundError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(output_path)
+    return 0 if ledger["summary"]["status"] == "pass" else 1
 
 
 # ---------------------------------------------------------------------------
@@ -516,9 +567,18 @@ def main() -> int:
     argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         prog="doe-bench",
-        description="Doe benchmark CLI: run products independently, build compare reports from run receipts, then evaluate separate claim reports.",
+        description=(
+            "Doe workload and benchmark CLI: execute correctness workloads, "
+            "run products independently, compare receipts, and evaluate claims."
+        ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    workload_parser = subparsers.add_parser(
+        "workload",
+        help="Run correctness-bearing workloads and emit one ledger",
+    )
+    _add_workload_args(workload_parser)
 
     run_parser = subparsers.add_parser("run", help="Run one product on workload(s)")
     _add_run_args(run_parser)
@@ -556,6 +616,8 @@ def main() -> int:
 
     if args.command == "run":
         return _cmd_run(args)
+    if args.command == "workload":
+        return _cmd_workload(args)
     if args.command == "run-config":
         return _cmd_run_config([])
     if args.command == "compare":

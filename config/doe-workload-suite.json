@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "suiteId": "doe_core_workloads",
+  "workloads": [
+    {
+      "workloadId": "config_schema_contracts",
+      "description": "Validate registered Doe configuration contracts.",
+      "inputs": [
+        {
+          "kind": "tree",
+          "path": "config"
+        },
+        {
+          "kind": "file",
+          "path": "bench/tests/test_config_schemas.py"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "python_config_contracts",
+        "executorKind": "pure",
+        "workingDirectory": ".",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "bench.tests.test_config_schemas"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "workload_runner_contracts",
+      "description": "Validate the unified workload envelope, oracle gate, input identity, evidence extensions, and immutable output behavior.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "bench/cli.py"
+        },
+        {
+          "kind": "file",
+          "path": "bench/workload_runner.py"
+        },
+        {
+          "kind": "file",
+          "path": "bench/tests/test_workload_runner.py"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-workload-suite.schema.json"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-workload-ledger.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "workload/runner-contracts-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "python_workload_runner",
+        "executorKind": "pure",
+        "workingDirectory": ".",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "bench.tests.test_workload_runner"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "python_contracts",
+      "description": "Execute Doe's Python correctness contracts through one repository-source identity.",
+      "inputs": [
+        {
+          "kind": "repository-tree",
+          "path": "."
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "python_repository_contracts",
+        "executorKind": "pure",
+        "workingDirectory": ".",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "bench/tests",
+          "-p",
+          "test_*.py"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "metal_staged_write_exact_bytes",
+      "description": "Prove staged Metal buffer writes reach the exact destination bytes before queue completion is reported.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "runtime/zig/build.zig"
+        },
+        {
+          "kind": "tree",
+          "path": "runtime/zig/src/backend/metal"
+        },
+        {
+          "kind": "file",
+          "path": "runtime/zig/tests/metal/metal_timing_semantics_test.zig"
+        }
+      ],
+      "oracle": {
+        "oracleId": "metal/staged-write-exact-bytes-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "zig_runtime_native",
+        "executorKind": "native",
+        "workingDirectory": "runtime/zig",
+        "command": [
+          "zig",
+          "build",
+          "test",
+          "-Doptimize=ReleaseFast",
+          "-Dtest-filter=metal staged buffer write flush proves exact destination bytes",
+          "--summary",
+          "all"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "zig_runtime_contracts",
+      "description": "Execute Doe runtime contracts through the Zig build mechanism.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "runtime/zig/build.zig"
+        },
+        {
+          "kind": "tree",
+          "path": "runtime/zig/src"
+        },
+        {
+          "kind": "tree",
+          "path": "runtime/zig/tests"
+        },
+        {
+          "kind": "tree",
+          "path": "runtime/zig/tools"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "zig_runtime_native",
+        "executorKind": "native",
+        "workingDirectory": "runtime/zig",
+        "command": [
+          "zig",
+          "build",
+          "test",
+          "-Doptimize=ReleaseFast",
+          "--summary",
+          "all"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    }
+  ]
+}

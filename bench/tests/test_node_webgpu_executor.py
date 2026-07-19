@@ -1490,7 +1490,10 @@ console.log(JSON.stringify({{
         self.assertIn("function canSubmitNodeLazyCommandsBatched(commands)", source)
         self.assertIn("finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands)", source)
         self.assertIn("const nativeCommandBuffer = finishNodeLazyCommandsAsNativeCommandBuffer(encoder, commands);", source)
-        self.assertIn("return { _native: nativeCommandBuffer, _batched: false };", source)
+        self.assertIn(
+            "return { _native: nativeCommandBuffer, _batched: false, _commands: commands };",
+            source,
+        )
         self.assertIn("&& !canSubmitNodeLazyCommandsBatched(commands)", source)
         self.assertIn("addon.createComputeDispatchCopyCommandBuffer(", source)
         self.assertIn("addon.createComputeDispatchBatchCopyCommandBuffer(", source)

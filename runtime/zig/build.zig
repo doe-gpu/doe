@@ -254,6 +254,11 @@ pub fn build(b: *std.Build) void {
 
     const BuildTier = enum { compute, headless, full };
     const build_tier = b.option(BuildTier, "tier", "Build tier: compute (dispatch+buffer only), headless (full WebGPU sans presentation), full (Dawn drop-in)") orelse .headless;
+    const test_filter = b.option([]const u8, "test-filter", "Run only Zig tests whose names contain this value");
+    const test_filters: []const []const u8 = if (test_filter) |filter|
+        b.allocator.dupe([]const u8, &.{filter}) catch @panic("failed to allocate test filter")
+    else
+        &.{};
     const proof_provenance = loadProofProvenance(b.allocator);
     const shader_translation_provenance = loadShaderTranslationProvenance(b.allocator);
 
@@ -1107,6 +1112,7 @@ pub fn build(b: *std.Build) void {
                 .{ .name = "build_options", .module = build_options_module },
             },
         }),
+        .filters = test_filters,
     });
     test_exec.linkLibC();
     if (target.result.os.tag == .windows) {

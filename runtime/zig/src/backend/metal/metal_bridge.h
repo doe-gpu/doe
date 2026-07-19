@@ -566,13 +566,12 @@ int metal_bridge_resolve_timestamps_ns(
 // Release a counter sample buffer handle.
 void metal_bridge_destroy_counter_sample_buffer(MetalHandle counter_buffer);
 
-// === Semaphore-based completion (faster than waitUntilCompleted) ===
+// === Command-buffer-scoped completion ===
 
-// Register a completion handler on cmd_buf that signals an internal semaphore.
-// Must be called BEFORE commit. Only one pending wait is supported at a time.
-void metal_bridge_command_buffer_setup_fast_wait(MetalHandle cmd_buf);
-// Block until the completion handler fires. Call after commit.
-void metal_bridge_command_buffer_wait_fast(void);
+// Register a completion handler and return its retained wait token.
+MetalHandle metal_bridge_command_buffer_create_completion_waiter(MetalHandle cmd_buf);
+// Wait for and release the exact token returned above.
+void metal_bridge_completion_waiter_wait_and_release(MetalHandle waiter);
 
 // === Device capability queries ===
 

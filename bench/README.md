@@ -57,8 +57,9 @@ active A/B pass, do not prune the receipts needed to compare the current runs.
 
 ## Quick Start
 
-`bench/cli.py` is the only canonical benchmark front door. Use:
+`bench/cli.py` is the only canonical workload and benchmark front door. Use:
 
+- `workload` to execute correctness-bearing workloads and emit one ledger
 - `run` to execute one product and emit immutable run receipts
 - `run-config` to expand one side of a compare config into standalone run receipts
 - `compare` to join existing run receipts
@@ -74,6 +75,8 @@ npm --prefix bench ci
 ```
 
 ```sh
+python3 bench/cli.py workload
+
 python3 bench/cli.py run \
   --product doe \
   --executor-id doe_direct_metal \

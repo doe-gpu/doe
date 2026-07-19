@@ -3,6 +3,47 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-07-19 — Metal upload ordering and workload law corrected
+
+The native Metal runtime now records staged uploads, buffer writes, copies,
+compute, and render work on one logical command queue. The removed hidden copy
+queue could leave upload-only blits uncommitted while reporting a completed
+logical submission, and its independent shared-event counters did not preserve
+one queue-ordering contract.
+
+Completion waiting is now command-buffer scoped. The former process-global
+semaphore allowed concurrent runtime instances to consume one another's
+completion signals. The Metal tests cover concurrent runtime drains, terminal
+queue state, and exact staged-write destination bytes. Pooled synthetic upload
+sources are rewritten for every operation so the Doe side does not reuse old
+host bytes while the Dawn side performs a fresh write.
+
+The fresh native comparison is
+`bench/out/apple-metal/compare/20260719T004103Z/runtime.apple-metal.single-queue.compare.json`.
+The focused upload sweeps remain under
+`bench/out/apple-metal/sweeps/single-queue-fair-upload-16mb-final/` and
+`bench/out/apple-metal/sweeps/scoped-completion-upload-16mb-final/`.
+These artifacts do not support a new upload speed claim: the timing direction
+changes across run shapes, and the synthetic upload timing workload still has
+no output oracle. The exact-byte staged-write workload is correctness proof;
+timing promotion requires a matched upload/readback oracle on both products.
+Its consolidated result is
+`bench/out/workloads/current-doe-metal/metal-staged-write-ledger.json`.
+
+Deferred cadence and bounded multi-buffer probes were rejected. The first
+changed synchronization and omitted phase-accounted waiting; the second added
+retirement synchronization without an accepted performance result. Neither is
+part of the retained runtime.
+
+Doe's cross-depth test contract is now documented in
+[`../workload-system.md`](../workload-system.md). `bench/cli.py workload`
+registers existing mechanisms as pure, native, browser, or comparison
+executors and emits one consolidated correctness ledger with typed evidence
+extensions. The current Metal development ledger is
+`bench/out/workloads/current-doe-metal/doe-workload-ledger-v5.json`. A
+claim-bearing workload cannot attach its claim extension until its oracle
+passes.
+
 ## 2026-07-05 — Apple Metal package and release rows refreshed for 0.4.7
 
 The macOS Apple Metal Node package row is now claim-indexed against

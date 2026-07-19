@@ -35,6 +35,14 @@
   `bench/cli.py run` writes `run-receipt`,
   `bench/cli.py compare` writes `compare-report`, and
   `bench/cli.py claim` writes `claim-report`
+- the canonical cross-depth correctness front door is
+  `python3 bench/cli.py workload`; it records pure, native, browser, and
+  comparison executors under the shared contract in
+  [`workload-system.md`](workload-system.md)
+- executor output such as `zig test` is supporting evidence for a registered
+  workload, not an independent promotion verdict
+- claim-bearing workloads must pass their declared oracle before compare,
+  statistical, structural-equivalence, or promotion evidence can attach
 - workload-manifest freshness is advisory receipt metadata only; it does not
   block `run` or `compare`
 - hosted pull/push CI runs deterministic instruction, workflow, WGSL compiler,

@@ -66,6 +66,11 @@ class BaselineWitnessFreshnessTests(unittest.TestCase):
     baseline receipt drifts (Gemma 4 31B regression), this fires."""
 
     def test_baseline_receipt_present(self) -> None:
+        if not BASELINE_WITNESS.is_file() and not WEDGE_RECEIPT.is_file():
+            self.skipTest(
+                "Q4K SUMMA evidence receipts are not present; run the governed "
+                "baseline and wedge writers first"
+            )
         self.assertTrue(
             BASELINE_RECEIPT.is_file(),
             f"baseline missing: {BASELINE_RECEIPT.relative_to(REPO_ROOT)}",
@@ -80,6 +85,10 @@ class BaselineWitnessFreshnessTests(unittest.TestCase):
 
     def test_witness_pins_live_baseline_digest(self) -> None:
         witness = _load_or_skip(self, BASELINE_WITNESS)
+        self.assertTrue(
+            BASELINE_RECEIPT.is_file(),
+            f"baseline missing: {BASELINE_RECEIPT.relative_to(REPO_ROOT)}",
+        )
         live_digest = _file_sha256(BASELINE_RECEIPT)
         cited = witness.get("baselineSourceReceipt", {}).get("sha256")
         self.assertEqual(

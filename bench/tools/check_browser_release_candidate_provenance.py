@@ -89,7 +89,7 @@ def repo_relative(path: Path) -> str:
     try:
         return str(resolved.relative_to(REPO_ROOT))
     except ValueError:
-        return str(path)
+        return str(resolved)
 
 
 def sha256_file(path: Path) -> str:
