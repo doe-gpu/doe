@@ -40,8 +40,12 @@ Doe's cross-depth test contract is now documented in
 registers existing mechanisms as pure, native, browser, or comparison
 executors and emits one consolidated correctness ledger with typed evidence
 extensions. The current Metal development ledger is
-`bench/out/workloads/current-doe-metal/doe-workload-ledger-v5.json`. A
-claim-bearing workload cannot attach its claim extension until its oracle
+`bench/out/workloads/current-doe-metal/doe-workload-ledger-v11.json`. It binds
+the repository Python contract suite to nonignored source identity, including
+tracked deletions and symlink text without traversing external symlink targets.
+The same ledger rebuilds and binds the native drop-in and Node bridge before
+executing the Node and Bun package surfaces.
+A claim-bearing workload cannot attach its claim extension until its oracle
 passes.
 
 ## 2026-07-05 — Apple Metal package and release rows refreshed for 0.4.7

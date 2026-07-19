@@ -70,6 +70,12 @@ focused checks remain in place while their invocation moves behind registered
 workloads. Existing run, compare, and claim receipts become typed extensions
 for claim-bearing workloads; they are not replaced or weakened.
 
+The core suite currently wraps the repository Python contracts, rebuilt native
+drop-in and Node bridge, Node and Bun package contracts, the exact-byte Metal
+oracle, and the Zig runtime contracts. Browser and comparison workloads use the
+same envelope but remain separate until their live executor artifacts are
+available.
+
 ## Migration order
 
 1. Register existing deterministic and Zig checks without changing their

@@ -117,6 +117,228 @@
       }
     },
     {
+      "workloadId": "native_dropin_build",
+      "description": "Build the native WebGPU drop-in library from the declared Doe runtime source.",
+      "inputs": [
+        {
+          "kind": "repository-tree",
+          "path": "runtime/zig"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "zig_dropin_build",
+        "executorKind": "native",
+        "workingDirectory": "runtime/zig",
+        "command": [
+          "zig",
+          "build",
+          "dropin",
+          "-Doptimize=ReleaseFast",
+          "--summary",
+          "all"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      },
+      "evidenceExtensions": [
+        {
+          "extensionType": "native_dropin_artifact",
+          "path": "runtime/zig/zig-out/lib/libwebgpu_doe.dylib",
+          "required": true
+        }
+      ]
+    },
+    {
+      "workloadId": "node_addon_build",
+      "description": "Build the Node N-API bridge used by the package integration workload.",
+      "inputs": [
+        {
+          "kind": "repository-tree",
+          "path": "packages/doe-gpu"
+        },
+        {
+          "kind": "repository-tree",
+          "path": "runtime/bridge/webgpu-addon"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "node_addon_build",
+        "executorKind": "native",
+        "workingDirectory": "packages/doe-gpu",
+        "command": [
+          "node",
+          "scripts/build-addon.js"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      },
+      "evidenceExtensions": [
+        {
+          "extensionType": "node_addon_artifact",
+          "path": "packages/doe-gpu/build/Release/doe_napi.node",
+          "required": true
+        }
+      ]
+    },
+    {
+      "workloadId": "package_node_contracts",
+      "description": "Execute the package's small deterministic contracts through Node.",
+      "inputs": [
+        {
+          "kind": "repository-tree",
+          "path": "packages/doe-gpu"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "node_package_contracts",
+        "executorKind": "pure",
+        "workingDirectory": "packages/doe-gpu",
+        "command": [
+          "node",
+          "test/run-contracts.js"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "package_node_smoke",
+      "description": "Execute the Node package API and deterministic helper smoke contract.",
+      "inputs": [
+        {
+          "kind": "repository-tree",
+          "path": "packages/doe-gpu"
+        },
+        {
+          "kind": "file",
+          "path": "config/determinism-policy.json"
+        },
+        {
+          "kind": "file",
+          "path": "config/numeric-stability-policy.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "node_package_smoke",
+        "executorKind": "pure",
+        "workingDirectory": "packages/doe-gpu",
+        "command": [
+          "node",
+          "test/smoke/test-smoke-load.js"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "package_node_integration",
+      "description": "Execute the Node package against the exact rebuilt N-API bridge and native runtime library.",
+      "inputs": [
+        {
+          "kind": "repository-tree",
+          "path": "packages/doe-gpu"
+        },
+        {
+          "kind": "file",
+          "path": "config/determinism-policy.json"
+        },
+        {
+          "kind": "file",
+          "path": "config/numeric-stability-policy.json"
+        },
+        {
+          "kind": "file",
+          "path": "packages/doe-gpu/build/Release/doe_napi.node"
+        },
+        {
+          "kind": "file",
+          "path": "runtime/zig/zig-out/lib/libwebgpu_doe.dylib"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "node_package_integration",
+        "executorKind": "native",
+        "workingDirectory": "packages/doe-gpu",
+        "command": [
+          "node",
+          "test/integration/run-integration.js",
+          "--runtime",
+          "node"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "package_bun_integration",
+      "description": "Execute the Bun package against the exact rebuilt native runtime library.",
+      "inputs": [
+        {
+          "kind": "repository-tree",
+          "path": "packages/doe-gpu"
+        },
+        {
+          "kind": "file",
+          "path": "runtime/zig/zig-out/lib/libwebgpu_doe.dylib"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "bun_package_integration",
+        "executorKind": "native",
+        "workingDirectory": "packages/doe-gpu",
+        "command": [
+          "bun",
+          "test/integration/run-integration.js",
+          "--runtime",
+          "bun"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
       "workloadId": "metal_staged_write_exact_bytes",
       "description": "Prove staged Metal buffer writes reach the exact destination bytes before queue completion is reported.",
       "inputs": [
