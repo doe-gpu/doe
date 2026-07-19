@@ -101,6 +101,41 @@ def strict_audited_comparability() -> dict[str, object]:
 
 
 class ClaimabilityMetricScopeTests(unittest.TestCase):
+    def test_operation_total_selected_and_wall_sign_disagreement_blocks_claim(self) -> None:
+        workload = SimpleNamespace(
+            id="package_buffer_upload_readback_exact_1mb",
+            domain="upload-readback",
+            path_asymmetry=False,
+            path_asymmetry_note="",
+        )
+        claimability = assess_claimability(
+            mode="local",
+            min_timed_samples=19,
+            workload=workload,
+            baseline={"stats": make_stats(2.8, 3.2), "commandSamples": []},
+            comparison={"stats": make_stats(4.0, 4.8), "commandSamples": []},
+            delta={
+                "p50Percent": 30.0,
+                "p95Percent": 25.0,
+                "p99Percent": 25.0,
+            },
+            timing_interpretation=make_timing_interpretation(
+                headline_p50=45.0,
+                headline_p95=49.0,
+                headline_delta_p50=-8.0,
+                headline_delta_p95=-5.0,
+            ),
+            comparability={"comparable": True},
+            benchmark_policy=BENCHMARK_POLICY,
+        )
+
+        self.assertFalse(claimability["claimable"])
+        self.assertEqual(claimability["claimMetricScope"], "selectedTiming")
+        self.assertTrue(
+            any("disagree on claim sign" in reason for reason in claimability["reasons"]),
+            claimability["reasons"],
+        )
+
     def test_claim_ineligible_workload_is_not_evaluated(self) -> None:
         workload = SimpleNamespace(
             id="compute_dispatch_grid",
@@ -164,7 +199,7 @@ class ClaimabilityMetricScopeTests(unittest.TestCase):
             for i in range(19)
         ]
 
-    def test_copy_prefers_headline_when_operation_total_undercovers_end_to_end(self) -> None:
+    def test_copy_wall_metric_does_not_hide_selected_tail_sign_disagreement(self) -> None:
         workload = SimpleNamespace(
             id="copy_texture_to_texture",
             domain="copy",
@@ -192,10 +227,14 @@ class ClaimabilityMetricScopeTests(unittest.TestCase):
             benchmark_policy=BENCHMARK_POLICY,
         )
 
-        self.assertTrue(claimability["claimable"])
+        self.assertFalse(claimability["claimable"])
         self.assertEqual(claimability["claimMetricScope"], "workloadUnitWall")
+        self.assertTrue(
+            any("p95Percent" in reason and "disagree on claim sign" in reason for reason in claimability["reasons"]),
+            claimability["reasons"],
+        )
 
-    def test_surface_prefers_headline_when_operation_total_undercovers_end_to_end(self) -> None:
+    def test_surface_wall_metric_does_not_hide_selected_sign_disagreement(self) -> None:
         workload = SimpleNamespace(
             id="surface_full_presentation",
             domain="surface",
@@ -223,8 +262,12 @@ class ClaimabilityMetricScopeTests(unittest.TestCase):
             benchmark_policy=BENCHMARK_POLICY,
         )
 
-        self.assertTrue(claimability["claimable"])
+        self.assertFalse(claimability["claimable"])
         self.assertEqual(claimability["claimMetricScope"], "workloadUnitWall")
+        self.assertTrue(
+            any("disagree on claim sign" in reason for reason in claimability["reasons"]),
+            claimability["reasons"],
+        )
 
     def test_compute_prewarm_stays_on_selected_timing_when_selected_operation_loses(self) -> None:
         workload = SimpleNamespace(

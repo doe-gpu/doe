@@ -39,7 +39,7 @@ NATIVE_METAL_TRACE_NUMERIC_FIELDS = (
     "deferredCopyNs",
     "deferredResolveNs",
 )
-PROJECTION_MANIFEST_SCHEMA_VERSION = 6
+PROJECTION_MANIFEST_SCHEMA_VERSION = 7
 COMPUTE_PROJECTION_DIRECT_DISPATCH = "generic_direct_dispatch_component"
 COMPUTE_PROJECTION_EMPTY_DISPATCH = "generic_empty_dispatch_component"
 COMPUTE_PROJECTION_INDIRECT_DISPATCH = "generic_indirect_dispatch_component"
@@ -56,6 +56,7 @@ SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1"
 SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1"
 SOURCE_KERNEL_OUTPUT_ORACLE_KIND = "sha256_exact_v1"
 SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION = "zero_fill_v1"
+RENDER_OUTPUT_ORACLE_KIND = "rgba8_exact_rect_v1"
 SOURCE_KERNEL_STORAGE_BUFFER_USAGE = ["STORAGE", "COPY_DST", "COPY_SRC"]
 SOURCE_KERNEL_READBACK_SAMPLE_BYTES = 16
 UINT32_BYTES = 4
@@ -525,6 +526,11 @@ def parse_browser_workload(value: Any, label: str, domain: Any) -> dict[str, Any
                 parsed["storageBindings"],
                 f"{label}.outputOracle",
             )
+    if domain == "render":
+        parsed["renderOutputOracle"] = parse_render_output_oracle(
+            value.get("renderOutputOracle"),
+            f"{label}.renderOutputOracle",
+        )
     for key in ("textureWidth", "textureHeight", "mipLevelCount"):
         metric_value = value.get(key)
         if metric_value is not None:
@@ -536,6 +542,55 @@ def parse_browser_workload(value: Any, label: str, domain: Any) -> dict[str, Any
             if key not in parsed:
                 raise ValueError(f"{label}.{key} is required for texture-contract rows")
     return parsed
+
+
+def parse_rgba8(value: Any, label: str) -> list[int]:
+    if (
+        not isinstance(value, list)
+        or len(value) != 4
+        or any(not isinstance(channel, int) or channel < 0 or channel > 255 for channel in value)
+    ):
+        raise ValueError(f"{label} must contain four byte values")
+    return list(value)
+
+
+def parse_render_output_oracle(value: Any, label: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be an object")
+    if value.get("schemaVersion") != 1:
+        raise ValueError(f"{label}.schemaVersion must be 1")
+    if value.get("kind") != RENDER_OUTPUT_ORACLE_KIND:
+        raise ValueError(f"{label}.kind must be {RENDER_OUTPUT_ORACLE_KIND}")
+    width = require_positive_int(value.get("width"), f"{label}.width")
+    height = require_positive_int(value.get("height"), f"{label}.height")
+    bytes_per_row = require_positive_int(value.get("bytesPerRow"), f"{label}.bytesPerRow")
+    if bytes_per_row < width * 4 or bytes_per_row % 256 != 0:
+        raise ValueError(f"{label}.bytesPerRow must cover RGBA8 pixels and be 256-byte aligned")
+    rect_raw = value.get("rect")
+    if not isinstance(rect_raw, dict):
+        raise ValueError(f"{label}.rect must be an object")
+    rect = {
+        "x": require_positive_int(rect_raw.get("x"), f"{label}.rect.x", allow_zero=True),
+        "y": require_positive_int(rect_raw.get("y"), f"{label}.rect.y", allow_zero=True),
+        "width": require_positive_int(rect_raw.get("width"), f"{label}.rect.width"),
+        "height": require_positive_int(rect_raw.get("height"), f"{label}.rect.height"),
+    }
+    if rect["x"] + rect["width"] > width or rect["y"] + rect["height"] > height:
+        raise ValueError(f"{label}.rect must fit inside the render target")
+    return {
+        "schemaVersion": 1,
+        "kind": RENDER_OUTPUT_ORACLE_KIND,
+        "width": width,
+        "height": height,
+        "bytesPerRow": bytes_per_row,
+        "rect": rect,
+        "insideRgba": parse_rgba8(value.get("insideRgba"), f"{label}.insideRgba"),
+        "outsideRgba": parse_rgba8(value.get("outsideRgba"), f"{label}.outsideRgba"),
+        "expectedSha256": require_hash_hex(
+            value.get("expectedSha256"), f"{label}.expectedSha256"
+        ),
+        "referenceId": require_string(value.get("referenceId"), f"{label}.referenceId"),
+    }
 
 
 def browser_workload_strict_comparable(value: dict[str, Any]) -> bool:
@@ -1572,6 +1627,87 @@ def check_source_kernel_cross_runtime_parity(
     return []
 
 
+def check_render_runtime_evidence(
+    mode_result: dict[str, Any],
+    manifest_row: dict[str, Any],
+    row_label: str,
+    mode: str,
+) -> list[str]:
+    if manifest_row.get("domain") != "render":
+        return []
+    if mode_result.get("status") != "ok":
+        return []
+    errors: list[str] = []
+    browser_workload = manifest_row.get("browserWorkload")
+    if not isinstance(browser_workload, dict):
+        return [f"{row_label}: manifest browserWorkload missing for render row"]
+    oracle = browser_workload.get("renderOutputOracle")
+    if not isinstance(oracle, dict):
+        return [f"{row_label}: manifest renderOutputOracle missing for render row"]
+    metrics = mode_result.get("metrics")
+    if not isinstance(metrics, dict):
+        return [f"{row_label}: metrics missing for render mode '{mode}'"]
+
+    expected_metrics = {
+        "viewport": oracle["rect"],
+        "rasterOracle": oracle["kind"],
+        "rasterReferenceId": oracle["referenceId"],
+        "rasterByteLength": oracle["bytesPerRow"] * oracle["height"],
+        "expectedRasterSha256": oracle["expectedSha256"],
+        "computedExpectedRasterSha256": oracle["expectedSha256"],
+        "actualRasterSha256": oracle["expectedSha256"],
+        "rasterMismatchCount": 0,
+        "firstRasterMismatchOffset": -1,
+        "pass": True,
+    }
+    for metric_key, expected_value in expected_metrics.items():
+        if metrics.get(metric_key) != expected_value:
+            errors.append(f"{row_label}: metrics.{metric_key} drift for mode '{mode}'")
+    for metric_key in (
+        "createRenderTargetMs",
+        "shaderModuleMs",
+        "renderPipelineMs",
+        "createViewMs",
+        "submitReadbackMs",
+        "mapReadMs",
+        "destroyMs",
+        "renderMs",
+        "oracleValidationMs",
+    ):
+        if not is_nonnegative_number(metrics.get(metric_key)):
+            errors.append(
+                f"{row_label}: metrics.{metric_key} must be non-negative for mode '{mode}'"
+            )
+    return errors
+
+
+def check_render_cross_runtime_parity(
+    report_row: dict[str, Any],
+    manifest_row: dict[str, Any],
+    row_label: str,
+) -> list[str]:
+    if manifest_row.get("domain") != "render":
+        return []
+    runtimes = report_row.get("runtimes")
+    if not isinstance(runtimes, dict):
+        return []
+    hashes: dict[str, str] = {}
+    for mode in ("dawn", "doe"):
+        mode_result = runtimes.get(mode)
+        if not isinstance(mode_result, dict) or mode_result.get("status") != "ok":
+            return []
+        metrics = mode_result.get("metrics")
+        if not isinstance(metrics, dict) or not is_hash_hex(metrics.get("actualRasterSha256")):
+            return []
+        hashes[mode] = metrics["actualRasterSha256"]
+    if hashes["dawn"] != hashes["doe"]:
+        return [
+            f"{row_label}: full-raster SHA-256 differs across Dawn and Doe "
+            f"(dawn={hashes['dawn']} doe={hashes['doe']})"
+        ]
+    return []
+
+
 def check_indirect_runtime_evidence(
     mode_result: dict[str, Any],
     manifest_row: dict[str, Any],
@@ -2504,8 +2640,23 @@ def check_report_coverage(
                         mode,
                     )
                 )
+                errors.extend(
+                    check_render_runtime_evidence(
+                        mode_result,
+                        manifest_row,
+                        f"L1:{workload_id}",
+                        mode,
+                    )
+                )
             errors.extend(
                 check_source_kernel_cross_runtime_parity(
+                    report_row,
+                    manifest_row,
+                    f"L1:{workload_id}",
+                )
+            )
+            errors.extend(
+                check_render_cross_runtime_parity(
                     report_row,
                     manifest_row,
                     f"L1:{workload_id}",

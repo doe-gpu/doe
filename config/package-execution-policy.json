@@ -22,11 +22,24 @@
   ],
   "readbackMode": [
     {
+      "id": "node-package-developer-mapasync-readback-exact",
+      "runtimeHost": "node",
+      "provider": "doe",
+      "workloadId": [
+        "package_buffer_upload_readback_exact_1mb"
+      ],
+      "packagePreparedSession": false,
+      "mode": "mapAsync",
+      "evidence": "bench/out/apple-metal/package-upload-readback-exact.node.ir.compare.json",
+      "detail": "The correctness-bearing package upload row uses mapAsync on the cold Node Doe path so its full-buffer readback matches the Dawn-backed package path under strict comparability."
+    },
+    {
       "id": "bun-ffi-package-developer-mapasync-readback",
       "runtimeHost": "bun",
       "provider": "doe-ffi",
       "workloadId": [
         "package_buffer_upload_readback_1mb",
+        "package_buffer_upload_readback_exact_1mb",
         "package_image_rgba_invert_1024",
         "package_queue_submit_completion",
         "package_vector_scale_add_262k"
@@ -57,6 +70,7 @@
       "provider": "doe",
       "workloadId": [
         "package_buffer_upload_readback_1mb",
+        "package_buffer_upload_readback_exact_1mb",
         "package_image_rgba_invert_1024",
         "package_queue_submit_completion",
         "package_vector_scale_add_262k"
@@ -115,6 +129,7 @@
       "provider": "doe",
       "workloadId": [
         "package_buffer_upload_readback_1mb",
+        "package_buffer_upload_readback_exact_1mb",
         "package_image_rgba_invert_1024",
         "package_pipeline_creation_8kernels",
         "package_queue_submit_completion"

@@ -273,7 +273,7 @@ def _projection_row(
 
 def _parseable_projection_manifest(row: dict[str, Any]) -> dict[str, Any]:
     manifest = _projection_manifest()
-    manifest["schemaVersion"] = 6
+    manifest["schemaVersion"] = 7
     manifest["generatedAt"] = "2026-07-04T00:00:00Z"
     manifest["sourceWorkloadCount"] = 1
     manifest["rows"] = [row]

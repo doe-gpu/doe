@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "kind": "doe_package_upload_readback_oracle",
+  "status": "pass",
+  "mode": "exact",
+  "workloadId": "package_buffer_upload_readback_exact_1mb",
+  "planSha256": "166db30707cdf8c6aa9e83edf14541e1d90a421e9ba2d27bf27de835dd100920",
+  "expectedPayloadSha256": "77ddbb33d6d9ea7633eb24d312009bd35f6cffc0e716e09a9cb6a6ee4e367f01",
+  "captureByteLength": 1048576,
+  "providers": [
+    {
+      "provider": "doe",
+      "executionBackend": "doe_node_webgpu",
+      "exitCode": 0,
+      "executionSuccessCount": 3,
+      "executionErrorCount": 0,
+      "executionUnsupportedCount": 0,
+      "executionSkippedCount": 0,
+      "executionSetupTotalNs": 1,
+      "executionEncodeTotalNs": 1,
+      "executionSubmitWaitTotalNs": 1,
+      "executionTotalNs": 3,
+      "readbackCaptures": [
+        {
+          "byteLength": 1048576,
+          "sha256": "77ddbb33d6d9ea7633eb24d312009bd35f6cffc0e716e09a9cb6a6ee4e367f01"
+        }
+      ],
+      "traceMetaSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "stderr": ""
+    },
+    {
+      "provider": "node-webgpu",
+      "executionBackend": "node_webgpu_package",
+      "exitCode": 0,
+      "executionSuccessCount": 3,
+      "executionErrorCount": 0,
+      "executionUnsupportedCount": 0,
+      "executionSkippedCount": 0,
+      "executionSetupTotalNs": 1,
+      "executionEncodeTotalNs": 1,
+      "executionSubmitWaitTotalNs": 1,
+      "executionTotalNs": 3,
+      "readbackCaptures": [
+        {
+          "byteLength": 1048576,
+          "sha256": "77ddbb33d6d9ea7633eb24d312009bd35f6cffc0e716e09a9cb6a6ee4e367f01"
+        }
+      ],
+      "traceMetaSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "stderr": ""
+    }
+  ]
+}

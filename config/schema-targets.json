@@ -22,6 +22,22 @@
       "data": "examples/doe-metal-compute-benchmark.sample.json"
     },
     {
+      "schema": "config/doe-package-upload-readback-oracle.schema.json",
+      "data": "examples/doe-package-upload-readback-oracle.sample.json"
+    },
+    {
+      "schema": "config/doe-browser-render-oracle.schema.json",
+      "data": "examples/doe-browser-render-oracle.sample.json"
+    },
+    {
+      "schema": "browser/chromium/bench/projection-manifest.schema.json",
+      "data": "browser/chromium/bench/generated/browser_projection_manifest.json"
+    },
+    {
+      "schema": "browser/chromium/bench/projection-manifest.schema.json",
+      "data": "browser/chromium/bench/generated/browser_projection_manifest.apple.metal.json"
+    },
+    {
       "schema": "config/benchmark-cube-policy.schema.json",
       "data": "config/benchmark-cube-policy.json"
     },

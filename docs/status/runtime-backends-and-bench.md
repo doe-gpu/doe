@@ -3,6 +3,20 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-07-19 — Browser render correctness uses a full-raster oracle
+
+Projection manifest schema v7 binds browser render rows to an exact RGBA8
+viewport/scissor oracle; manifests missing that oracle fail closed.
+`bench/tools/run_browser_render_oracle.py` executes the same focused row in
+stock Chromium/Dawn and Fawn/Doe, verifies every readback byte, and records
+browser, adapter, runtime-selection, manifest, and layered-report identities.
+The paired corruption workload mutates only the expected raster digest and
+passes only when both runtimes reject it after GPU execution.
+
+Both workloads are registered in `config/doe-workload-suite.json` under the
+correctness-only policy. Their measured timing is diagnostic and does not
+support a render-performance claim.
+
 ## 2026-07-19 — Metal upload ordering and workload law corrected
 
 The native Metal runtime now records staged uploads, buffer writes, copies,
@@ -40,13 +54,28 @@ Doe's cross-depth test contract is now documented in
 registers existing mechanisms as pure, native, browser, or comparison
 executors and emits one consolidated correctness ledger with typed evidence
 extensions. The current Metal development ledger is
-`bench/out/workloads/current-doe-metal/doe-workload-ledger-v15.json`. It binds
+`bench/out/workloads/current-doe-metal/doe-workload-ledger-v17.json`. It binds
 the repository Python contract suite to nonignored source identity, including
 tracked deletions and symlink text without traversing external symlink targets.
 The same ledger rebuilds and binds the native drop-in and Node bridge before
 executing the Node and Bun package surfaces.
 A claim-bearing workload cannot attach its claim extension until its oracle
 passes.
+
+The package upload/readback comparison now uses a full-buffer SHA-256 oracle
+owned by the plan and executes it independently through Doe and the Dawn-backed
+Node provider. Its paired corruption workload requires both providers to
+reject an incorrect digest. The prior partial-capture row is no longer in the
+active package-developer catalog, but its plan remains available for replaying
+historical receipts.
+
+The strict comparison at
+`bench/out/apple-metal/package-upload-readback-exact.node.ir.compare.json`
+passes structural, readback-path, timing-phase, and payload-equivalence gates.
+Its claim sidecar remains diagnostic because selected operation timing and
+workload-unit wall disagree on direction. The claim evaluator now blocks that
+sign disagreement for operation-total workloads rather than selecting the
+faster scope.
 
 ## 2026-07-05 — Apple Metal package and release rows refreshed for 0.4.7
 

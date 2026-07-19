@@ -252,6 +252,10 @@ function rememberProcessReadbackDigest(cacheKey, digest) {
 }
 
 function digestBytes(view, cache = null, decodedU32Le = undefined) {
+  const cachedViewDigest = cache?.get(view);
+  if (cachedViewDigest) {
+    return cachedViewDigest;
+  }
   if (view instanceof Uint8Array && view.byteLength === 4) {
     const cacheKey = decodedU32Le !== undefined ? decodedU32Le : decodeU32Le(view);
     if (cacheKey !== undefined) {
@@ -278,6 +282,8 @@ function digestBytes(view, cache = null, decodedU32Le = undefined) {
   if (cacheKey) {
     cache?.set(cacheKey, digest);
     rememberProcessReadbackDigest(cacheKey, digest);
+  } else {
+    cache?.set(view, digest);
   }
   return digest;
 }
@@ -613,10 +619,23 @@ function buildValidationTemplate(expectation) {
       cachePrefix: `${expectation.kind}:${values.join(',')}:`,
     };
   }
+  if (expectation.kind === 'sha256Equals') {
+    return {
+      kind: 'sha256Equals',
+      sha256: typeof expectation.sha256 === 'string'
+        ? expectation.sha256.trim().toLowerCase()
+        : '',
+    };
+  }
   return { expectation };
 }
 
-function validatePreparedSampleExpectation(view, template, cache = null) {
+function validatePreparedSampleExpectation(
+  view,
+  template,
+  cache = null,
+  digestCache = null,
+) {
   if (!template) {
     return VALIDATION_OK;
   }
@@ -663,6 +682,16 @@ function validatePreparedSampleExpectation(view, template, cache = null) {
       }
     }
     if (cacheKey) cache.set(cacheKey, true);
+    return VALIDATION_OK;
+  }
+  if (template.kind === 'sha256Equals') {
+    const actual = digestBytes(view, digestCache);
+    if (actual !== template.sha256) {
+      return {
+        ok: false,
+        detail: `expected sha256 ${template.sha256}, got ${actual}`,
+      };
+    }
     return VALIDATION_OK;
   }
   return validateSampleExpectation(view, template.expectation);
@@ -3218,6 +3247,7 @@ async function executeSample(
         readback.bytes,
         validationTemplates[index],
         readbackValidationCache,
+        readbackDigestCache,
       );
       readback.breakdownNs.readbackValidationTotalNs += nsDelta(validationStartedAt);
       if (!validation.ok) {

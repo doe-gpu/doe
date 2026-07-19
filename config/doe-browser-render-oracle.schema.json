@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe browser full-raster render oracle receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "status",
+    "mode",
+    "workloadId",
+    "sourceManifestSha256",
+    "focusedManifestSha256",
+    "layeredReportSha256",
+    "expectedRasterSha256",
+    "effectiveExpectedRasterSha256",
+    "rasterByteLength",
+    "runnerExitCode",
+    "runnerStdout",
+    "runnerStderr",
+    "runtimes"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "doe_browser_render_oracle" },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "oracle_rejected_corruption", "fail"]
+    },
+    "mode": { "type": "string", "enum": ["exact", "corrupt"] },
+    "workloadId": { "type": "string", "const": "render_draw_state_bindings" },
+    "sourceManifestSha256": { "$ref": "#/$defs/hashHex" },
+    "focusedManifestSha256": { "$ref": "#/$defs/hashHex" },
+    "layeredReportSha256": {
+      "oneOf": [
+        { "$ref": "#/$defs/hashHex" },
+        { "type": "string", "const": "" }
+      ]
+    },
+    "expectedRasterSha256": { "$ref": "#/$defs/hashHex" },
+    "effectiveExpectedRasterSha256": { "$ref": "#/$defs/hashHex" },
+    "rasterByteLength": { "type": "integer", "minimum": 1 },
+    "runnerExitCode": { "type": "integer" },
+    "runnerStdout": { "type": "string" },
+    "runnerStderr": { "type": "string" },
+    "runtimes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        { "$ref": "#/$defs/dawnRuntime" },
+        { "$ref": "#/$defs/doeRuntime" }
+      ],
+      "items": false
+    }
+  },
+  "$defs": {
+    "hashHex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "runtimeBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "browserPath",
+        "browserVersion",
+        "adapterIdentity",
+        "activeRuntimeMatched",
+        "status",
+        "statusCode",
+        "error",
+        "expectedRasterSha256",
+        "computedExpectedRasterSha256",
+        "actualRasterSha256",
+        "rasterByteLength",
+        "rasterMismatchCount",
+        "firstRasterMismatchOffset",
+        "oraclePassed",
+        "renderMs"
+      ],
+      "properties": {
+        "mode": { "type": "string", "enum": ["dawn", "doe"] },
+        "browserPath": { "type": "string" },
+        "browserVersion": { "type": "string" },
+        "adapterIdentity": { "type": "object" },
+        "activeRuntimeMatched": { "type": "boolean" },
+        "status": { "type": "string" },
+        "statusCode": { "type": "string" },
+        "error": { "type": "string" },
+        "expectedRasterSha256": { "type": "string" },
+        "computedExpectedRasterSha256": { "type": "string" },
+        "actualRasterSha256": { "type": "string" },
+        "rasterByteLength": { "type": "integer", "minimum": 0 },
+        "rasterMismatchCount": { "type": "integer", "minimum": -1 },
+        "firstRasterMismatchOffset": { "type": "integer", "minimum": -2 },
+        "oraclePassed": { "type": "boolean" },
+        "renderMs": { "type": "number", "minimum": 0 }
+      }
+    },
+    "dawnRuntime": {
+      "allOf": [
+        { "$ref": "#/$defs/runtimeBase" },
+        { "properties": { "mode": { "const": "dawn" } } }
+      ]
+    },
+    "doeRuntime": {
+      "allOf": [
+        { "$ref": "#/$defs/runtimeBase" },
+        { "properties": { "mode": { "const": "doe" } } }
+      ]
+    }
+  }
+}

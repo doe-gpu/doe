@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "planKind": "package_developer",
+  "workloadId": "package_buffer_upload_readback_exact_1mb",
+  "domain": "upload-readback",
+  "comparable": true,
+  "description": "Package-surface buffer upload followed by a full-buffer readback with an exact SHA-256 oracle.",
+  "commandsPath": "bench/plans/package-developer/package_buffer_upload_readback_exact_1mb_commands.json",
+  "commands": [
+    {
+      "kind": "buffer_load",
+      "handle": 9301,
+      "offset": 0,
+      "bufferSize": 1048576,
+      "byteLength": 1048576,
+      "cacheNamespace": "package_developer",
+      "cacheKey": "dd0dfacfe7bf11a30fd4281f4561a6be1134ddd909e8f2f1124ddc44caf3bccc",
+      "assetKey": "upload:handle-9301",
+      "generator": "splitmix64_f32_nonzero_v1",
+      "seed": 101,
+      "scale": 0.125,
+      "captureBufferHandle": 9301,
+      "captureOffset": 0,
+      "captureSize": 1048576,
+      "captureValidate": {
+        "kind": "sha256Equals",
+        "sha256": "77ddbb33d6d9ea7633eb24d312009bd35f6cffc0e716e09a9cb6a6ee4e367f01"
+      }
+    }
+  ]
+}

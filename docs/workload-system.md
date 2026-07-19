@@ -72,11 +72,11 @@ focused checks remain in place while their invocation moves behind registered
 workloads. Existing run, compare, and claim receipts become typed extensions
 for claim-bearing workloads; they are not replaced or weakened.
 
-The core suite currently wraps the repository Python contracts, rebuilt native
-drop-in and Node bridge, Node and Bun package contracts, exact-output Metal
-transfer and compute oracles, and the Zig runtime contracts. Browser and
-comparison workloads use the same envelope but remain separate until their
-live executor artifacts are available.
+The core suite wraps the repository Python contracts, rebuilt native drop-in
+and Node bridge, Node and Bun package contracts, exact-output Metal transfer
+and compute oracles, matched package upload/readback and browser-render
+oracles, and the Zig runtime contracts. Browser identity and device evidence
+remain typed process-JSON evidence rather than fields in the core ledger.
 
 ## Correctness-bearing benchmark pilots
 
@@ -91,6 +91,27 @@ The native Metal compute slice follows the same law. It repeatedly writes an
 input buffer, dispatches the production kernel, compares the complete output
 against its CPU oracle, and records each execution phase. Its corruption
 workload proves that a dispatch receipt with altered output cannot pass.
+
+The package upload/readback slice executes one plan through Doe and the
+Dawn-backed Node provider. Each side reads the complete uploaded buffer and
+must match the plan-owned SHA-256 oracle; agreement between providers is not
+sufficient. The active catalog row supersedes the earlier partial-capture row,
+whose plan remains available only for replaying historical receipts. A paired
+corruption workload changes the expected digest and passes only when both
+providers reject it.
+
+The browser render slice executes one manifest row through stock Chromium with
+Dawn and Fawn with Doe. The projection manifest owns the render dimensions,
+viewport/scissor rectangle, inside and outside colors, row layout, and expected
+SHA-256. Each runtime must match every RGBA8 byte and prove the selected runtime
+identity. Its paired corruption workload changes only the expected digest and
+passes only when both runtimes reject the otherwise identical GPU result.
+Timing is recorded but remains correctness-only evidence.
+
+Strict comparison still separates correctness from performance promotion. A
+row becomes diagnostic when selected operation timing and workload-unit wall
+disagree on the direction of any required claim percentile. The faster scope
+cannot hide a loss in the other scope.
 
 ## Duplicate-test removal gate
 

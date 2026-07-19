@@ -1,0 +1,41 @@
+{
+  "workloads": "bench/workloads/workloads.package.developer.json",
+  "baseline": {
+    "name": "doe_gpu_node_package",
+    "executorId": "doe_node_webgpu"
+  },
+  "comparison": {
+    "name": "node_webgpu_package",
+    "executorId": "node_webgpu_package"
+  },
+  "run": {
+    "iterations": 16,
+    "warmup": 1,
+    "out": "bench/out/apple-metal/package-upload-readback-exact.node.ir.compare.json",
+    "workspace": "bench/out/apple-metal/package-upload-readback-exact.node.ir.workspace",
+    "workloadFilter": "",
+    "emitShell": false
+  },
+  "comparability": {
+    "mode": "strict",
+    "requireTimingClass": "operation",
+    "allowBaselineNoExecution": false
+  },
+  "claimability": {
+    "mode": "local",
+    "minTimedSamples": 15
+  },
+  "resource": {
+    "probe": "none",
+    "sampleMs": 100,
+    "sampleTargetCount": 0
+  },
+  "selector": {
+    "cohorts": ["node-bun-developer"],
+    "benchmarkClass": ["comparable"],
+    "claimEligibleOnly": true,
+    "domains": [],
+    "ids": ["package_buffer_upload_readback_exact_1mb"],
+    "excludeIds": []
+  }
+}

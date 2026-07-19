@@ -114,7 +114,7 @@ const DEFAULT_OUT_FILE = "dawn-vs-doe.browser-layered.diagnostic.json";
 const DEFAULT_API_SURFACE = "native";
 const DEFAULT_POWER_PREFERENCE = "high-performance";
 const HASH_ALGORITHM = "sha256";
-const PROJECTION_MANIFEST_SCHEMA_VERSION = 6;
+const PROJECTION_MANIFEST_SCHEMA_VERSION = 7;
 const RUNTIME_SELECTOR_VERSION = "browser-runtime-selector-v1";
 const NATIVE_METAL_TRACE_KIND = "doe_metal_browser_command_path_v1";
 const COMPUTE_PROJECTION_DIRECT_DISPATCH = "generic_direct_dispatch_component";
@@ -133,6 +133,7 @@ const SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1";
 const SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1";
 const SOURCE_KERNEL_OUTPUT_ORACLE_KIND = "sha256_exact_v1";
 const SOURCE_KERNEL_OUTPUT_ORACLE_INITIALIZATION = "zero_fill_v1";
+const RENDER_OUTPUT_ORACLE_KIND = "rgba8_exact_rect_v1";
 const CATEGORY_BY_DOMAIN = {
   compute: "compute",
   "p0-compute": "compute",
@@ -895,6 +896,60 @@ function parseDispatchArgs(value, label) {
   });
 }
 
+function parseRgba8(value, label) {
+  if (
+    !Array.isArray(value) ||
+    value.length !== 4 ||
+    value.some((channel) => !Number.isInteger(channel) || channel < 0 || channel > 255)
+  ) {
+    throw new Error(`${label} must contain four byte values`);
+  }
+  return [...value];
+}
+
+function parseRenderOutputOracle(value, label) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${label} must be an object`);
+  }
+  if (value.schemaVersion !== 1) {
+    throw new Error(`${label}.schemaVersion must be 1`);
+  }
+  if (value.kind !== RENDER_OUTPUT_ORACLE_KIND) {
+    throw new Error(`${label}.kind must be ${RENDER_OUTPUT_ORACLE_KIND}`);
+  }
+  const width = requirePositiveInteger(value.width, `${label}.width`);
+  const height = requirePositiveInteger(value.height, `${label}.height`);
+  const bytesPerRow = requirePositiveInteger(value.bytesPerRow, `${label}.bytesPerRow`);
+  if (bytesPerRow < width * 4 || bytesPerRow % 256 !== 0) {
+    throw new Error(`${label}.bytesPerRow must cover RGBA8 pixels and be 256-byte aligned`);
+  }
+  const rectValue = value.rect;
+  if (!rectValue || typeof rectValue !== "object" || Array.isArray(rectValue)) {
+    throw new Error(`${label}.rect must be an object`);
+  }
+  const rect = {
+    x: requirePositiveInteger(rectValue.x, `${label}.rect.x`, { allowZero: true }),
+    y: requirePositiveInteger(rectValue.y, `${label}.rect.y`, { allowZero: true }),
+    width: requirePositiveInteger(rectValue.width, `${label}.rect.width`),
+    height: requirePositiveInteger(rectValue.height, `${label}.rect.height`),
+  };
+  if (rect.x + rect.width > width || rect.y + rect.height > height) {
+    throw new Error(`${label}.rect must fit inside the render target`);
+  }
+  return {
+    schemaVersion: 1,
+    kind: RENDER_OUTPUT_ORACLE_KIND,
+    width,
+    height,
+    bytesPerRow,
+    rect,
+    insideRgba: parseRgba8(value.insideRgba, `${label}.insideRgba`),
+    outsideRgba: parseRgba8(value.outsideRgba, `${label}.outsideRgba`),
+    expectedSha256: requireHashHex(value.expectedSha256, `${label}.expectedSha256`),
+    referenceId: requireString(value.referenceId, `${label}.referenceId`),
+  };
+}
+
 function loadProjectionManifest(path) {
   const payload = loadJsonObject(path);
   if (payload.schemaVersion !== PROJECTION_MANIFEST_SCHEMA_VERSION) {
@@ -1003,6 +1058,12 @@ function parseBrowserWorkload(value, label, domain) {
   }
   if (domain === "compute" && !COMPUTE_PROJECTIONS.includes(parsed.computeProjection)) {
     throw new Error(`${label}.computeProjection is required for compute rows`);
+  }
+  if (domain === "render") {
+    parsed.renderOutputOracle = parseRenderOutputOracle(
+      value.renderOutputOracle,
+      `${label}.renderOutputOracle`,
+    );
   }
   if (parsed.computeProjection === COMPUTE_PROJECTION_DIRECT_DISPATCH) {
     parsed.commandsPath = requireString(value.commandsPath, `${label}.commandsPath`);
@@ -1638,7 +1699,7 @@ async function runScenario(
       const nowMs = () => performance.now();
       async function sha256Hex(bytes) {
         if (!globalThis.crypto?.subtle) {
-          throw new Error("Web Crypto SHA-256 unavailable for source-kernel oracle");
+          throw new Error("Web Crypto SHA-256 unavailable for browser output oracle");
         }
         const digest = await globalThis.crypto.subtle.digest("SHA-256", bytes);
         return [...new Uint8Array(digest)]
@@ -2295,10 +2356,13 @@ async function runScenario(
       }
 
       async function runRenderTriangleReadback(device) {
-        const width = 64;
-        const height = 64;
-        const viewport = { x: 16, y: 16, width: 32, height: 32 };
-        const outsidePixel = { x: 8, y: 8 };
+        const oracle = scenarioConfig?.browserWorkload?.renderOutputOracle;
+        if (!oracle || oracle.kind !== "rgba8_exact_rect_v1") {
+          throw new Error("render output oracle is missing or unsupported");
+        }
+        const width = oracle.width;
+        const height = oracle.height;
+        const viewport = oracle.rect;
         const format = "rgba8unorm";
         const totalStart = nowMs();
 
@@ -2316,9 +2380,9 @@ async function runScenario(
             @vertex
             fn vs(@builtin(vertex_index) index : u32) -> @builtin(position) vec4<f32> {
               var pos = array<vec2<f32>, 3>(
-                vec2<f32>(-0.6, -0.6),
-                vec2<f32>( 0.6, -0.6),
-                vec2<f32>( 0.0,  0.6)
+                vec2<f32>(-1.0, -1.0),
+                vec2<f32>( 3.0, -1.0),
+                vec2<f32>(-1.0,  3.0)
               );
               return vec4<f32>(pos[index], 0.0, 1.0);
             }
@@ -2374,7 +2438,7 @@ async function runScenario(
         pass.draw(3);
         pass.end();
 
-        const bytesPerRow = 256;
+        const bytesPerRow = oracle.bytesPerRow;
         const readback = device.createBuffer({
           size: bytesPerRow * height,
           usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
@@ -2390,11 +2454,7 @@ async function runScenario(
         t0 = nowMs();
         await device.queue.onSubmittedWorkDone();
         await readback.mapAsync(GPUMapMode.READ);
-        const data = new Uint8Array(readback.getMappedRange());
-        const centerOffset = Math.floor(height / 2) * bytesPerRow + Math.floor(width / 2) * 4;
-        const outsideOffset = outsidePixel.y * bytesPerRow + outsidePixel.x * 4;
-        const centerRgba = Array.from(data.slice(centerOffset, centerOffset + 4));
-        const outsideRgba = Array.from(data.slice(outsideOffset, outsideOffset + 4));
+        const actual = new Uint8Array(new Uint8Array(readback.getMappedRange()));
         readback.unmap();
         result.metrics.mapReadMs = nowMs() - t0;
 
@@ -2403,22 +2463,54 @@ async function runScenario(
         readback.destroy();
         result.metrics.destroyMs = nowMs() - t0;
         result.metrics.renderMs = nowMs() - totalStart;
-        result.metrics.centerRgba = centerRgba;
-        result.metrics.outsideRgba = outsideRgba;
+
+        const oracleValidationStart = nowMs();
+        const expected = new Uint8Array(bytesPerRow * height);
+        for (let y = 0; y < height; y += 1) {
+          for (let x = 0; x < width; x += 1) {
+            const inside =
+              x >= viewport.x &&
+              x < viewport.x + viewport.width &&
+              y >= viewport.y &&
+              y < viewport.y + viewport.height;
+            const rgba = inside ? oracle.insideRgba : oracle.outsideRgba;
+            const offset = y * bytesPerRow + x * 4;
+            expected.set(rgba, offset);
+          }
+        }
+        let mismatchCount = 0;
+        let firstMismatchOffset = -1;
+        for (let index = 0; index < expected.byteLength; index += 1) {
+          if (actual[index] !== expected[index]) {
+            mismatchCount += 1;
+            if (firstMismatchOffset < 0) firstMismatchOffset = index;
+          }
+        }
+        const [actualSha256, computedExpectedSha256] = await Promise.all([
+          sha256Hex(actual),
+          sha256Hex(expected),
+        ]);
+        result.metrics.oracleValidationMs = nowMs() - oracleValidationStart;
         result.metrics.viewport = viewport;
-        result.metrics.dynamicStateOracle = "viewport_scissor_inside_red_outside_clear_v1";
-        const centerPass =
-          centerRgba[0] > 100 &&
-          centerRgba[0] > centerRgba[1] + 20 &&
-          centerRgba[0] > centerRgba[2] + 20;
-        const outsidePass =
-          outsideRgba[0] < 20 &&
-          outsideRgba[1] < 20 &&
-          outsideRgba[2] < 20 &&
-          outsideRgba[3] > 200;
-        result.metrics.pass = centerPass && outsidePass;
+        result.metrics.rasterOracle = oracle.kind;
+        result.metrics.rasterReferenceId = oracle.referenceId;
+        result.metrics.rasterByteLength = actual.byteLength;
+        result.metrics.expectedRasterSha256 = oracle.expectedSha256;
+        result.metrics.computedExpectedRasterSha256 = computedExpectedSha256;
+        result.metrics.actualRasterSha256 = actualSha256;
+        result.metrics.rasterMismatchCount = mismatchCount;
+        result.metrics.firstRasterMismatchOffset = firstMismatchOffset;
+        result.metrics.pass =
+          actual.byteLength === expected.byteLength &&
+          mismatchCount === 0 &&
+          computedExpectedSha256 === oracle.expectedSha256 &&
+          actualSha256 === oracle.expectedSha256;
         if (!result.metrics.pass) {
-          throw new Error("viewport/scissor render readback oracle failed");
+          throw new Error(
+            `full-raster render oracle failed: expected ${oracle.expectedSha256}, ` +
+              `computed ${computedExpectedSha256}, actual ${actualSha256}, ` +
+              `mismatched bytes ${mismatchCount}`,
+          );
         }
       }
 

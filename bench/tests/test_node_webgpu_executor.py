@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -1159,6 +1160,46 @@ console.log(JSON.stringify(normalized.executionShape));
         self.assertEqual(shape["copyBufferToBufferCount"], 1)
         self.assertEqual(shape["readBufferCount"], 1)
 
+    def test_sha256_readback_expectation_validates_the_complete_payload(self) -> None:
+        expected = hashlib.sha256(bytes([1, 2, 3, 4, 5])).hexdigest()
+        script = f"""
+import {{ normalizePlan, validateSampleExpectation }} from {json.dumps((REPO_ROOT / "bench" / "executors" / "node-webgpu" / "plan.js").resolve().as_uri())};
+const expectation = {{ kind: 'sha256Equals', sha256: {json.dumps(expected)} }};
+const valid = validateSampleExpectation(Uint8Array.from([1, 2, 3, 4, 5]), expectation);
+const corrupt = validateSampleExpectation(Uint8Array.from([1, 2, 3, 4, 6]), expectation);
+let invalidPlan = '';
+try {{
+  normalizePlan({{
+    schemaVersion: 1,
+    planId: 'invalid-sha',
+    executorId: 'node_webgpu_package',
+    workloadId: 'invalid_sha',
+    domain: 'upload-readback',
+    comparable: true,
+    timing: {{ iterations: 1, warmup: 0, timingSource: 'doe-execution-total-ns', timingClass: 'operation' }},
+    buffers: [{{ id: 'dst', size: 4, usage: ['map_read'] }}],
+    modules: [],
+    steps: [{{ kind: 'readBuffer', bufferId: 'dst', validate: {{ kind: 'sha256Equals', sha256: 'bad' }} }}],
+  }});
+}} catch (error) {{
+  invalidPlan = String(error.message ?? error);
+}}
+console.log(JSON.stringify({{ valid, corrupt, invalidPlan }}));
+"""
+        result = subprocess.run(
+            ["node", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["valid"], {"ok": True})
+        self.assertFalse(payload["corrupt"]["ok"])
+        self.assertIn("expected sha256", payload["corrupt"]["detail"])
+        self.assertIn("validate.sha256", payload["invalidPlan"])
+
     def test_dry_run_command_repeat_reports_repeated_execution_shape(self) -> None:
         with tempfile.TemporaryDirectory(prefix="doe-node-webgpu-repeat-") as tmpdir:
             tmp = Path(tmpdir)
@@ -2016,6 +2057,26 @@ console.log(JSON.stringify({{ matched, missed, nodeMatched, nodeColdMatched }}))
 
         self.assertIn("package_queue_submit_completion", mapasync_entry["workloadId"])
         self.assertEqual(native_queue_entries, [])
+
+    def test_package_execution_policy_matches_exact_upload_readback_paths(self) -> None:
+        policy = json.loads(PACKAGE_EXECUTION_POLICY_PATH.read_text(encoding="utf-8"))
+        entries = policy["readbackMode"]
+        exact_id = "package_buffer_upload_readback_exact_1mb"
+        cold_entry = next(
+            entry
+            for entry in entries
+            if entry["id"] == "node-package-developer-mapasync-readback-exact"
+        )
+        native_entry = next(
+            entry
+            for entry in entries
+            if entry["id"] == "node-package-developer-native-readback-public"
+        )
+
+        self.assertEqual(cold_entry["workloadId"], [exact_id])
+        self.assertFalse(cold_entry["packagePreparedSession"])
+        self.assertEqual(cold_entry["mode"], "mapAsync")
+        self.assertNotIn(exact_id, native_entry["workloadId"])
 
     def test_package_execution_policy_keeps_prepared_inference_lanes_on_mapasync(self) -> None:
         policy = json.loads(PACKAGE_EXECUTION_POLICY_PATH.read_text(encoding="utf-8"))

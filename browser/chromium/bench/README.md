@@ -29,7 +29,8 @@ This module implements a layered browser benchmark superset for Chromium Track A
    - generated `L1/L0` projection rows with contract hashes, repo-relative source/rules paths, and browser workload parameters such as upload byte counts.
    - compute direct and indirect component rows carry source command hashes plus `directDispatchArgs` or `indirectDispatchArgs` so the browser runner can replay command-shaped `dispatchWorkgroups` and `dispatchWorkgroupsIndirect` rows instead of generic placeholders.
    - layered report schema v5 requires compute component dispatch rows plus source-kernel compute rows to emit `dispatchElapsedMs`, `encodeSubmitMs`, and `waitMs` phase telemetry, and every mode to prove the observed active runtime.
-   - projection manifest schema v6 adds oracle-v2 source-kernel rows with pinned exact output oracles. Every source-kernel report retains the complete timed-output SHA-256 for Dawn/Doe parity checks; oracle-v2 rows also retain the independent oracle result.
+   - projection manifest schema v6 added oracle-v2 source-kernel rows with pinned exact output oracles. Every source-kernel report retains the complete timed-output SHA-256 for Dawn/Doe parity checks; oracle-v2 rows also retain the independent oracle result.
+   - projection manifest schema v7 requires render rows to carry a full-raster RGBA8 oracle. The browser runner verifies every readback byte and both the manifest-owned and reconstructed SHA-256 identities; manifests without that contract fail closed.
    - macOS uses `generated/browser_projection_manifest.apple.metal.json`.
 4. `workflows/browser-workflow-manifest.json`
    - `L2` workflow definitions with required status, claim scope, and promotion approver roles.
@@ -50,6 +51,7 @@ This module implements a layered browser benchmark superset for Chromium Track A
    - emits generated manifest from core workload source.
 2. `scripts/webgpu-playwright-layered-bench.mjs`
    - runs `L1` and `L2` browser benchmark layers for dawn/doe.
+   - the render projection uses a fullscreen triangle constrained by the declared viewport and scissor, allowing an exact whole-frame oracle instead of sampled-pixel checks. Oracle validation has its own timing phase and is excluded from `renderMs`.
 3. `scripts/webgpu-playwright-ort-bench.mjs`
    - runs a repo-only same-stack browser ORT WebGPU Dawn-vs-Doe benchmark
      against the local Chromium-vendored DistilBERT sentiment model.

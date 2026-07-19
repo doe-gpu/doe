@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 6,
-  "generatedAt": "2026-07-15T20:33:54.504983Z",
+  "schemaVersion": 7,
+  "generatedAt": "2026-07-19T13:24:08.238024Z",
   "sourceWorkloadsPath": "bench/workloads/specialized/workloads.apple.metal.superset.json",
   "sourceWorkloadsSha256": "d2e7d7255270e5bc40727787771425c02349a7ae73b43ff4c5f2627c010c05cc",
   "rulesPath": "browser/chromium/bench/projection-rules.json",
   "rulesSha256": "06ac37731d70bb86652dbad5a6e7e80f1de4aad1b5020d530b500c98e54de245",
-  "projectionContractHash": "6c0582d5d78a8ad988cb2a2ae2b42ec47b78a30fcf59e8023c0ad0ab17c53b2d",
+  "projectionContractHash": "acd7805b044c2f3584697b13aa96641373fda2a973ac5c4ada5f795737e84716",
   "sourceWorkloadCount": 50,
   "rows": [
     {
@@ -270,7 +270,34 @@
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": true,
-        "benchmarkClass": "directional"
+        "benchmarkClass": "directional",
+        "renderOutputOracle": {
+          "schemaVersion": 1,
+          "kind": "rgba8_exact_rect_v1",
+          "width": 64,
+          "height": 64,
+          "bytesPerRow": 256,
+          "rect": {
+            "x": 16,
+            "y": 16,
+            "width": 32,
+            "height": 32
+          },
+          "insideRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "outsideRgba": [
+            0,
+            0,
+            0,
+            255
+          ],
+          "expectedSha256": "fc3fd335797eaf1d0e2fedbe38d29e177bbbd267a0a4d44f1918502fcf48c43b",
+          "referenceId": "fullscreen_triangle_viewport_scissor_rgba8_v1"
+        }
       }
     },
     {
@@ -288,7 +315,34 @@
       "browserWorkload": {
         "sourceComparable": false,
         "sourceClaimEligible": true,
-        "benchmarkClass": "directional"
+        "benchmarkClass": "directional",
+        "renderOutputOracle": {
+          "schemaVersion": 1,
+          "kind": "rgba8_exact_rect_v1",
+          "width": 64,
+          "height": 64,
+          "bytesPerRow": 256,
+          "rect": {
+            "x": 16,
+            "y": 16,
+            "width": 32,
+            "height": 32
+          },
+          "insideRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "outsideRgba": [
+            0,
+            0,
+            0,
+            255
+          ],
+          "expectedSha256": "fc3fd335797eaf1d0e2fedbe38d29e177bbbd267a0a4d44f1918502fcf48c43b",
+          "referenceId": "fullscreen_triangle_viewport_scissor_rgba8_v1"
+        }
       }
     },
     {
@@ -306,7 +360,34 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "directional"
+        "benchmarkClass": "directional",
+        "renderOutputOracle": {
+          "schemaVersion": 1,
+          "kind": "rgba8_exact_rect_v1",
+          "width": 64,
+          "height": 64,
+          "bytesPerRow": 256,
+          "rect": {
+            "x": 16,
+            "y": 16,
+            "width": 32,
+            "height": 32
+          },
+          "insideRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "outsideRgba": [
+            0,
+            0,
+            0,
+            255
+          ],
+          "expectedSha256": "fc3fd335797eaf1d0e2fedbe38d29e177bbbd267a0a4d44f1918502fcf48c43b",
+          "referenceId": "fullscreen_triangle_viewport_scissor_rgba8_v1"
+        }
       }
     },
     {
@@ -342,7 +423,34 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "directional"
+        "benchmarkClass": "directional",
+        "renderOutputOracle": {
+          "schemaVersion": 1,
+          "kind": "rgba8_exact_rect_v1",
+          "width": 64,
+          "height": 64,
+          "bytesPerRow": 256,
+          "rect": {
+            "x": 16,
+            "y": 16,
+            "width": 32,
+            "height": 32
+          },
+          "insideRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "outsideRgba": [
+            0,
+            0,
+            0,
+            255
+          ],
+          "expectedSha256": "fc3fd335797eaf1d0e2fedbe38d29e177bbbd267a0a4d44f1918502fcf48c43b",
+          "referenceId": "fullscreen_triangle_viewport_scissor_rgba8_v1"
+        }
       }
     },
     {
@@ -989,7 +1097,34 @@
       "browserWorkload": {
         "sourceComparable": true,
         "sourceClaimEligible": true,
-        "benchmarkClass": "directional"
+        "benchmarkClass": "directional",
+        "renderOutputOracle": {
+          "schemaVersion": 1,
+          "kind": "rgba8_exact_rect_v1",
+          "width": 64,
+          "height": 64,
+          "bytesPerRow": 256,
+          "rect": {
+            "x": 16,
+            "y": 16,
+            "width": 32,
+            "height": 32
+          },
+          "insideRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "outsideRgba": [
+            0,
+            0,
+            0,
+            255
+          ],
+          "expectedSha256": "fc3fd335797eaf1d0e2fedbe38d29e177bbbd267a0a4d44f1918502fcf48c43b",
+          "referenceId": "fullscreen_triangle_viewport_scissor_rgba8_v1"
+        }
       }
     },
     {

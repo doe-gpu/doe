@@ -17,7 +17,7 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 5
+      "const": 7
     },
     "generatedAt": {
       "type": "string",
@@ -59,6 +59,78 @@
     "hashHex": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
+    },
+    "rgba8": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      }
+    },
+    "sourceOutputOracle": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "initialization",
+        "bindingGroup",
+        "binding",
+        "dispatchCount",
+        "expectedSha256",
+        "referenceId"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "kind": { "type": "string", "const": "sha256_exact_v1" },
+        "initialization": { "type": "string", "const": "zero_fill_v1" },
+        "bindingGroup": { "type": "integer", "minimum": 0 },
+        "binding": { "type": "integer", "minimum": 0 },
+        "dispatchCount": { "type": "integer", "minimum": 1 },
+        "expectedSha256": { "$ref": "#/$defs/hashHex" },
+        "referenceId": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "renderOutputOracle": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "width",
+        "height",
+        "bytesPerRow",
+        "rect",
+        "insideRgba",
+        "outsideRgba",
+        "expectedSha256",
+        "referenceId"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "kind": { "type": "string", "const": "rgba8_exact_rect_v1" },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "bytesPerRow": { "type": "integer", "minimum": 256, "multipleOf": 256 },
+        "rect": {
+          "type": "object",
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": { "type": "integer", "minimum": 0 },
+            "y": { "type": "integer", "minimum": 0 },
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "insideRgba": { "$ref": "#/$defs/rgba8" },
+        "outsideRgba": { "$ref": "#/$defs/rgba8" },
+        "expectedSha256": { "$ref": "#/$defs/hashHex" },
+        "referenceId": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
     },
     "row": {
       "type": "object",
@@ -202,6 +274,21 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "domain": { "const": "render" }
+            },
+            "required": ["domain"]
+          },
+          "then": {
+            "properties": {
+              "browserWorkload": {
+                "required": ["renderOutputOracle"]
+              }
+            }
+          }
         }
       ],
       "additionalProperties": false
@@ -236,7 +323,8 @@
             "generic_direct_dispatch_component",
             "generic_empty_dispatch_component",
             "generic_indirect_dispatch_component",
-            "source_kernel_dispatch_v1"
+            "source_kernel_dispatch_v1",
+            "source_kernel_dispatch_oracle_v2"
           ]
         },
         "directDispatchArgs": {
@@ -386,6 +474,12 @@
             "additionalProperties": false
           }
         },
+        "outputOracle": {
+          "$ref": "#/$defs/sourceOutputOracle"
+        },
+        "renderOutputOracle": {
+          "$ref": "#/$defs/renderOutputOracle"
+        },
         "textureWidth": {
           "type": "integer",
           "minimum": 1
@@ -399,6 +493,19 @@
           "minimum": 1
         }
       },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "computeProjection": { "const": "source_kernel_dispatch_oracle_v2" }
+            },
+            "required": ["computeProjection"]
+          },
+          "then": {
+            "required": ["outputOracle"]
+          }
+        }
+      ],
       "additionalProperties": false
     }
   }

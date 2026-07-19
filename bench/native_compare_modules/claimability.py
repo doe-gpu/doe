@@ -49,6 +49,28 @@ def required_positive_percentiles(mode: str) -> list[str]:
     return []
 
 
+def assess_selected_wall_sign_agreement(
+    *,
+    selected_delta: dict[str, Any],
+    workload_unit_wall_delta: dict[str, Any],
+    required_percentiles: list[str],
+) -> list[str]:
+    disagreements: list[str] = []
+    for percentile_key in required_percentiles:
+        selected_value = safe_float(selected_delta.get(percentile_key))
+        wall_value = safe_float(workload_unit_wall_delta.get(percentile_key))
+        if selected_value is None or wall_value is None:
+            continue
+        if selected_value == 0.0 or wall_value == 0.0:
+            continue
+        if (selected_value > 0.0) != (wall_value > 0.0):
+            disagreements.append(
+                f"{percentile_key} selectedTiming={selected_value:.6f} and "
+                f"workloadUnitWall={wall_value:.6f} disagree on claim sign"
+            )
+    return disagreements
+
+
 def assess_upload_timing_scope_consistency(
     *,
     side_name: str,
@@ -620,6 +642,20 @@ def assess_claimability(
             reasons.append(
                 "copy workload selected timing is below the measurement noise floor but workloadUnitWall is incomplete"
             )
+
+    if (
+        selected_timing.get("scopeClass") == "operation-total"
+        and workload_unit_wall_available
+        and isinstance(delta, dict)
+        and isinstance(workload_unit_wall_delta, dict)
+    ):
+        reasons.extend(
+            assess_selected_wall_sign_agreement(
+                selected_delta=delta,
+                workload_unit_wall_delta=workload_unit_wall_delta,
+                required_percentiles=required_percentiles,
+            )
+        )
 
     left_count = safe_int(claim_left_stats.get("count"), default=0)
     right_count = safe_int(claim_right_stats.get("count"), default=0)

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe package upload/readback oracle receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "status",
+    "mode",
+    "workloadId",
+    "planSha256",
+    "expectedPayloadSha256",
+    "captureByteLength",
+    "providers"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "doe_package_upload_readback_oracle" },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "oracle_rejected_corruption", "fail"]
+    },
+    "mode": { "type": "string", "enum": ["exact", "corrupt"] },
+    "workloadId": {
+      "type": "string",
+      "const": "package_buffer_upload_readback_exact_1mb"
+    },
+    "planSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "expectedPayloadSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "captureByteLength": { "type": "integer", "const": 1048576 },
+    "providers": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider",
+          "executionBackend",
+          "exitCode",
+          "executionSuccessCount",
+          "executionErrorCount",
+          "executionUnsupportedCount",
+          "executionSkippedCount",
+          "executionSetupTotalNs",
+          "executionEncodeTotalNs",
+          "executionSubmitWaitTotalNs",
+          "executionTotalNs",
+          "readbackCaptures",
+          "traceMetaSha256",
+          "stderr"
+        ],
+        "properties": {
+          "provider": { "type": "string", "enum": ["doe", "node-webgpu"] },
+          "executionBackend": { "type": "string" },
+          "exitCode": { "type": "integer" },
+          "executionSuccessCount": { "type": "integer", "minimum": 0 },
+          "executionErrorCount": { "type": "integer", "minimum": 0 },
+          "executionUnsupportedCount": { "type": "integer", "minimum": 0 },
+          "executionSkippedCount": { "type": "integer", "minimum": 0 },
+          "executionSetupTotalNs": { "type": "integer", "minimum": 0 },
+          "executionEncodeTotalNs": { "type": "integer", "minimum": 0 },
+          "executionSubmitWaitTotalNs": { "type": "integer", "minimum": 0 },
+          "executionTotalNs": { "type": "integer", "minimum": 0 },
+          "readbackCaptures": { "type": "array" },
+          "traceMetaSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "stderr": { "type": "string" }
+        }
+      }
+    }
+  }
+}

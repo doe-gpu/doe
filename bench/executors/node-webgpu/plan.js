@@ -19,6 +19,7 @@ const ALLOWED_DATA_KINDS = new Set(['u8', 'u32', 'f32', 'bytes', 'utf8', 'file']
 const ALLOWED_STEP_KINDS = new Set(['writeBuffer', 'dispatch', 'copyBufferToBuffer', 'readBuffer']);
 const ALLOWED_BINDING_BUFFER_TYPES = new Set(['storage', 'read-only-storage', 'uniform']);
 const BUFFER_USAGE_ORDER = ['storage', 'copy_dst', 'copy_src', 'map_read', 'map_write', 'uniform'];
+const SHA256_HEX_PATTERN = /^[0-9a-f]{64}$/u;
 const REPO_ROOT = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 
 function isPlainObject(value) {
@@ -671,6 +672,29 @@ function normalizeSemanticMetadata(step, index, problems) {
   return metadata;
 }
 
+function normalizeReadbackExpectation(expectation, index, problems) {
+  if (expectation === undefined || expectation === null) {
+    return null;
+  }
+  if (!isPlainObject(expectation)) {
+    problems.push(`steps[${index}].validate must be an object when provided`);
+    return null;
+  }
+  if (expectation.kind !== 'sha256Equals') {
+    return expectation;
+  }
+  const sha256 = typeof expectation.sha256 === 'string'
+    ? expectation.sha256.trim().toLowerCase()
+    : '';
+  if (!SHA256_HEX_PATTERN.test(sha256)) {
+    problems.push(`steps[${index}].validate.sha256 must be 64 lowercase hexadecimal characters`);
+  }
+  return {
+    kind: 'sha256Equals',
+    sha256,
+  };
+}
+
 function normalizeStep(step, index, problems) {
   if (!isPlainObject(step)) {
     problems.push(`steps[${index}] must be an object`);
@@ -762,7 +786,7 @@ function normalizeStep(step, index, problems) {
   return {
     kind,
     bufferId,
-    validate: isPlainObject(step.validate) ? step.validate : null,
+    validate: normalizeReadbackExpectation(step.validate, index, problems),
     ...(typeof step.id === 'string' ? { id: step.id } : {}),
     ...normalizeSemanticMetadata(step, index, problems),
   };
@@ -1114,6 +1138,25 @@ export function validateSampleExpectation(view, expectation) {
           detail: `expected bytes[${index}] === ${values[index]}, got ${actual[index]}`,
         };
       }
+    }
+    return { ok: true };
+  }
+  if (expectation.kind === 'sha256Equals') {
+    const expected = typeof expectation.sha256 === 'string'
+      ? expectation.sha256.trim().toLowerCase()
+      : '';
+    if (!SHA256_HEX_PATTERN.test(expected)) {
+      return {
+        ok: false,
+        detail: 'sha256Equals requires a 64-character lowercase hexadecimal sha256 value',
+      };
+    }
+    const actual = createHash('sha256').update(view).digest('hex');
+    if (actual !== expected) {
+      return {
+        ok: false,
+        detail: `expected sha256 ${expected}, got ${actual}`,
+      };
     }
     return { ok: true };
   }

@@ -18,7 +18,7 @@ VALID_COMPARABILITY = {"strict", "component", "none"}
 VALID_REQUIRED_STATUS = {"ok", "not_applicable"}
 VALID_CLAIM_SCOPE = {"l1_strict_candidate", "l1_component_only", "l0_only_no_claim"}
 MAX_BROWSER_EXACT_UPLOAD_BYTES = 16 * 1024 * 1024
-PROJECTION_MANIFEST_SCHEMA_VERSION = 6
+PROJECTION_MANIFEST_SCHEMA_VERSION = 7
 SOURCE_KERNEL_BIND_GROUP_LAYOUT_MODE = "explicit_min_binding_size_v1"
 SOURCE_KERNEL_READBACK_BINDING_POLICY = "first_writable_storage_binding_v1"
 SOURCE_KERNEL_OUTPUT_ORACLE_KIND = "sha256_exact_v1"
@@ -28,6 +28,13 @@ COMPUTE_PROJECTION_EMPTY_DISPATCH = "generic_empty_dispatch_component"
 COMPUTE_PROJECTION_INDIRECT_DISPATCH = "generic_indirect_dispatch_component"
 COMPUTE_PROJECTION_SOURCE_KERNEL = "source_kernel_dispatch_v1"
 COMPUTE_PROJECTION_SOURCE_KERNEL_ORACLE = "source_kernel_dispatch_oracle_v2"
+RENDER_OUTPUT_ORACLE_KIND = "rgba8_exact_rect_v1"
+RENDER_OUTPUT_ORACLE_WIDTH = 64
+RENDER_OUTPUT_ORACLE_HEIGHT = 64
+RENDER_OUTPUT_ORACLE_BYTES_PER_ROW = 256
+RENDER_OUTPUT_ORACLE_RECT = {"x": 16, "y": 16, "width": 32, "height": 32}
+RENDER_OUTPUT_ORACLE_INSIDE_RGBA = [255, 0, 0, 255]
+RENDER_OUTPUT_ORACLE_OUTSIDE_RGBA = [0, 0, 0, 255]
 DIRECT_DISPATCH_COMMAND_KINDS = {"dispatch", "dispatch_workgroups"}
 SIZE_UNITS = {
     "b": 1,
@@ -91,6 +98,36 @@ def file_sha256(path: Path) -> str:
 def payload_sha256(value: Any) -> str:
     canonical = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(canonical).hexdigest()
+
+
+def render_output_oracle() -> dict[str, Any]:
+    payload = bytearray(RENDER_OUTPUT_ORACLE_BYTES_PER_ROW * RENDER_OUTPUT_ORACLE_HEIGHT)
+    rect = RENDER_OUTPUT_ORACLE_RECT
+    for y in range(RENDER_OUTPUT_ORACLE_HEIGHT):
+        for x in range(RENDER_OUTPUT_ORACLE_WIDTH):
+            inside = (
+                rect["x"] <= x < rect["x"] + rect["width"]
+                and rect["y"] <= y < rect["y"] + rect["height"]
+            )
+            rgba = (
+                RENDER_OUTPUT_ORACLE_INSIDE_RGBA
+                if inside
+                else RENDER_OUTPUT_ORACLE_OUTSIDE_RGBA
+            )
+            offset = y * RENDER_OUTPUT_ORACLE_BYTES_PER_ROW + x * 4
+            payload[offset : offset + 4] = bytes(rgba)
+    return {
+        "schemaVersion": 1,
+        "kind": RENDER_OUTPUT_ORACLE_KIND,
+        "width": RENDER_OUTPUT_ORACLE_WIDTH,
+        "height": RENDER_OUTPUT_ORACLE_HEIGHT,
+        "bytesPerRow": RENDER_OUTPUT_ORACLE_BYTES_PER_ROW,
+        "rect": dict(RENDER_OUTPUT_ORACLE_RECT),
+        "insideRgba": list(RENDER_OUTPUT_ORACLE_INSIDE_RGBA),
+        "outsideRgba": list(RENDER_OUTPUT_ORACLE_OUTSIDE_RGBA),
+        "expectedSha256": hashlib.sha256(payload).hexdigest(),
+        "referenceId": "fullscreen_triangle_viewport_scissor_rgba8_v1",
+    }
 
 
 def require_string(value: Any, label: str) -> str:
@@ -474,6 +511,8 @@ def browser_workload_metadata(workload: dict[str, Any], domain: str) -> dict[str
                     metadata.update(direct_projection)
                 else:
                     metadata["computeProjection"] = COMPUTE_PROJECTION_EMPTY_DISPATCH
+    elif domain == "render":
+        metadata["renderOutputOracle"] = render_output_oracle()
     elif domain == "texture-contract":
         workload_id = str(workload.get("id", ""))
         metadata["textureWidth"] = 128

@@ -591,6 +591,222 @@
       }
     },
     {
+      "workloadId": "package_upload_readback_exact_bytes",
+      "description": "Measure the matched Doe and Dawn package paths while proving the complete uploaded payload on each provider.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "bench/tools/run_package_upload_readback_oracle.py"
+        },
+        {
+          "kind": "file",
+          "path": "bench/plans/package-developer/package_buffer_upload_readback_exact_1mb.plan.json"
+        },
+        {
+          "kind": "file",
+          "path": "bench/executors/node-webgpu/plan.js"
+        },
+        {
+          "kind": "file",
+          "path": "bench/executors/node-webgpu/executor.js"
+        },
+        {
+          "kind": "file",
+          "path": "bench/executors/run-node-webgpu-plan.js"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-package-upload-readback-oracle.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "package/upload-readback-exact-bytes-v1",
+        "kind": "process-json",
+        "expectedExitCode": 0,
+        "schemaPath": "config/doe-package-upload-readback-oracle.schema.json",
+        "expectedStatus": "pass"
+      },
+      "executor": {
+        "executorId": "package_upload_readback_exact_oracle",
+        "executorKind": "comparison",
+        "workingDirectory": ".",
+        "command": [
+          "python3",
+          "bench/tools/run_package_upload_readback_oracle.py",
+          "--mode",
+          "exact"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "package_upload_readback_oracle_rejects_corruption",
+      "description": "Prove the matched package oracle rejects a deliberately wrong full-payload digest on both providers.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "bench/tools/run_package_upload_readback_oracle.py"
+        },
+        {
+          "kind": "file",
+          "path": "bench/plans/package-developer/package_buffer_upload_readback_exact_1mb.plan.json"
+        },
+        {
+          "kind": "file",
+          "path": "bench/executors/node-webgpu/plan.js"
+        },
+        {
+          "kind": "file",
+          "path": "bench/executors/node-webgpu/executor.js"
+        },
+        {
+          "kind": "file",
+          "path": "bench/executors/run-node-webgpu-plan.js"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-package-upload-readback-oracle.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "package/upload-readback-detects-corruption-v1",
+        "kind": "process-json",
+        "expectedExitCode": 0,
+        "schemaPath": "config/doe-package-upload-readback-oracle.schema.json",
+        "expectedStatus": "oracle_rejected_corruption"
+      },
+      "executor": {
+        "executorId": "package_upload_readback_corruption_probe",
+        "executorKind": "comparison",
+        "workingDirectory": ".",
+        "command": [
+          "python3",
+          "bench/tools/run_package_upload_readback_oracle.py",
+          "--mode",
+          "corrupt"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "browser_render_full_raster_exact_bytes",
+      "description": "Execute one manifest-owned render workload through Chromium/Dawn and Fawn/Doe and prove every RGBA output byte.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "bench/tools/run_browser_render_oracle.py"
+        },
+        {
+          "kind": "file",
+          "path": "browser/chromium/scripts/webgpu-playwright-layered-bench.mjs"
+        },
+        {
+          "kind": "file",
+          "path": "browser/chromium/bench/generated/browser_projection_manifest.json"
+        },
+        {
+          "kind": "file",
+          "path": "browser/chromium/bench/generated/browser_projection_manifest.apple.metal.json"
+        },
+        {
+          "kind": "file",
+          "path": "browser/chromium/bench/workflows/browser-workflow-manifest.json"
+        },
+        {
+          "kind": "file",
+          "path": "config/browser-runtime-selector-policy.json"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-browser-render-oracle.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "browser/render-full-raster-exact-bytes-v1",
+        "kind": "process-json",
+        "expectedExitCode": 0,
+        "schemaPath": "config/doe-browser-render-oracle.schema.json",
+        "expectedStatus": "pass"
+      },
+      "executor": {
+        "executorId": "browser_render_full_raster_oracle",
+        "executorKind": "comparison",
+        "workingDirectory": ".",
+        "command": [
+          "python3",
+          "bench/tools/run_browser_render_oracle.py",
+          "--mode",
+          "exact"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "browser_render_oracle_rejects_corruption",
+      "description": "Prove the same full-raster browser oracle rejects a deliberately mutated expected digest in Chromium/Dawn and Fawn/Doe.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "bench/tools/run_browser_render_oracle.py"
+        },
+        {
+          "kind": "file",
+          "path": "browser/chromium/scripts/webgpu-playwright-layered-bench.mjs"
+        },
+        {
+          "kind": "file",
+          "path": "browser/chromium/bench/generated/browser_projection_manifest.json"
+        },
+        {
+          "kind": "file",
+          "path": "browser/chromium/bench/generated/browser_projection_manifest.apple.metal.json"
+        },
+        {
+          "kind": "file",
+          "path": "browser/chromium/bench/workflows/browser-workflow-manifest.json"
+        },
+        {
+          "kind": "file",
+          "path": "config/browser-runtime-selector-policy.json"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-browser-render-oracle.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "browser/render-full-raster-detects-corruption-v1",
+        "kind": "process-json",
+        "expectedExitCode": 0,
+        "schemaPath": "config/doe-browser-render-oracle.schema.json",
+        "expectedStatus": "oracle_rejected_corruption"
+      },
+      "executor": {
+        "executorId": "browser_render_full_raster_corruption_probe",
+        "executorKind": "comparison",
+        "workingDirectory": ".",
+        "command": [
+          "python3",
+          "bench/tools/run_browser_render_oracle.py",
+          "--mode",
+          "corrupt"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
       "workloadId": "zig_runtime_contracts",
       "description": "Execute Doe runtime contracts through the Zig build mechanism.",
       "inputs": [

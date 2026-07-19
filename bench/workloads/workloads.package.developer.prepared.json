@@ -29,10 +29,10 @@
       "cohorts": ["node-bun-developer"]
     },
     {
-      "id": "package_buffer_upload_readback_1mb",
+      "id": "package_buffer_upload_readback_exact_1mb",
       "api": "webgpu",
       "runnerType": "zig-runtime",
-      "comparabilityNotes": "Package-surface upload/readback workload. Both sides write the same cache-backed payload and perform the same readback capture.",
+      "comparabilityNotes": "Package-surface upload/readback workload. Both sides write the same cache-backed payload, read back the complete buffer, and validate the same exact SHA-256 oracle.",
       "comparable": true,
       "benchmarkClass": "comparable",
       "claimEligible": true,
@@ -43,15 +43,15 @@
       "strictNormalizationUnit": "cycle",
       "timingNormalizationNote": "Prepared package runs repeat the full plan cycle inside each timed sample and report per-cycle normalized timing.",
       "default": true,
-      "description": "1MB queue.writeBuffer upload with readback capture.",
+      "description": "1MB queue.writeBuffer upload with full-buffer readback and exact oracle.",
       "domain": "upload-readback",
       "driver": "1.0.0",
       "family": "m3",
-      "name": "package buffer upload/readback 1MB",
+      "name": "package buffer upload/readback exact 1MB",
       "vendor": "apple",
       "workloadOrigin": "doe_package_developer_contract",
-      "planPath": "bench/plans/package-developer/package_buffer_upload_readback_1mb.plan.json",
-      "commandsPath": "bench/plans/package-developer/package_buffer_upload_readback_1mb_commands.json",
+      "planPath": "bench/plans/package-developer/package_buffer_upload_readback_exact_1mb.plan.json",
+      "commandsPath": "bench/plans/package-developer/package_buffer_upload_readback_exact_1mb_commands.json",
       "cohorts": ["node-bun-developer"]
     },
     {
