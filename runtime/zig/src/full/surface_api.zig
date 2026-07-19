@@ -1,5 +1,5 @@
 const std = @import("std");
-const model = @import("../model_commands.zig");
+const model = @import("../contracts/model/model_commands.zig");
 const core_surface = @import("../core/surface.zig");
 const command_partition = @import("command_partition.zig");
 const command_dispatch = @import("command_dispatch.zig");

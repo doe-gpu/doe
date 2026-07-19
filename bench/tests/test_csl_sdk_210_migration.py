@@ -18,13 +18,21 @@ FORBIDDEN_CSL_TOKENS = (
 SOURCE_SCAN_ROOTS = (
     REPO_ROOT / "examples" / "csl",
     REPO_ROOT / "runtime" / "zig" / "examples" / "simulator",
-    REPO_ROOT / "runtime" / "zig" / "src" / "doe_wgsl",
+    REPO_ROOT / "runtime" / "zig" / "src" / "compiler" / "wgsl" / "emit" / "csl",
 )
 
 SOURCE_SUFFIXES = {".csl", ".zig"}
 
 SOURCE_SKIP_FILES = {
-    REPO_ROOT / "runtime" / "zig" / "src" / "doe_wgsl" / "emit_csl_validate.zig",
+    REPO_ROOT
+    / "runtime"
+    / "zig"
+    / "src"
+    / "compiler"
+    / "wgsl"
+    / "emit"
+    / "csl"
+    / "emit_csl_validate.zig",
 }
 
 VERSION_SCAN_ROOTS = (

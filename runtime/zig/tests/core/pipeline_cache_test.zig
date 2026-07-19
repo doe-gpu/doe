@@ -1,5 +1,5 @@
 const std = @import("std");
-const pipeline_cache = @import("../../src/pipeline_cache.zig");
+const pipeline_cache = @import("../../src/runtime/cache/pipeline_cache.zig");
 const PipelineCacheKey = pipeline_cache.PipelineCacheKey;
 const PipelineCache = pipeline_cache.PipelineCache;
 

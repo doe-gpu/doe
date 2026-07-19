@@ -2,8 +2,8 @@
 
 pub const std = @import("std");
 pub const testing = std.testing;
-pub const ir = @import("../../src/doe_wgsl/ir.zig");
-const robustness = @import("../../src/doe_wgsl/ir_transform_robustness.zig");
+pub const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
+const robustness = @import("../../src/compiler/wgsl/ir/ir_transform_robustness.zig");
 pub const apply = robustness.apply;
 
 pub fn make_test_module(allocator: std.mem.Allocator) !ir.Module {

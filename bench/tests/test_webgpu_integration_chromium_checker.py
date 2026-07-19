@@ -69,7 +69,7 @@ def _source_smoke_report(root: Path) -> dict[str, Any]:
 def _activated_overlay() -> dict[str, Any]:
     payload = _load_overlay()
     payload["integrationPhase"] = "chromium_runtime_active"
-    payload["wireProtocolNotes"]["architecture"] = "DoeCommandDecoder source runtime active"
+    payload["wireProtocolNotes"]["architecture"] = "WebGPUDecoderImpl source runtime active"
     for row in payload["coverage"]:
         row["status"] = "passing"
         row.pop("blockedBy", None)
@@ -112,7 +112,7 @@ def test_webgpu_integration_chromium_rejects_passing_blocked_row() -> None:
     checker = _load_checker()
     payload = _load_overlay()
     payload["integrationPhase"] = "chromium_runtime_active"
-    payload["wireProtocolNotes"]["architecture"] = "DoeCommandDecoder source selector active"
+    payload["wireProtocolNotes"]["architecture"] = "WebGPUDecoderImpl source selector active"
     payload["coverage"][0]["status"] = "passing"
     payload["coverage"][0]["blockedBy"] = "unexpected-blocker"
 
@@ -143,6 +143,18 @@ def test_webgpu_integration_chromium_accepts_active_source_runtime_rows() -> Non
     checker = _load_checker()
 
     assert checker.check_overlay(_activated_overlay()) == []
+
+
+def test_webgpu_integration_chromium_rejects_abandoned_decoder_name() -> None:
+    checker = _load_checker()
+    payload = _activated_overlay()
+    payload["wireProtocolNotes"]["architecture"] = "DoeCommandDecoder source runtime active"
+
+    assert {
+        "code": "missing_decoder_architecture",
+        "path": "wireProtocolNotes.architecture",
+        "message": "architecture note must name the patched WebGPUDecoderImpl seam",
+    } in checker.check_overlay(payload)
 
 
 def test_webgpu_integration_chromium_requires_render_bundle_for_active_runtime() -> None:

@@ -1,8 +1,8 @@
 const std = @import("std");
-const model_resource_types = @import("../model_resource_types.zig");
-const model_compute_types = @import("../model_compute_types.zig");
-const model_texture_types = @import("../model_texture_types.zig");
-const model_async_types = @import("../model_async_types.zig");
+const model_resource_types = @import("../contracts/model/model_resource_types.zig");
+const model_compute_types = @import("../contracts/model/model_compute_types.zig");
+const model_texture_types = @import("../contracts/model/model_texture_types.zig");
+const model_async_types = @import("../contracts/model/model_async_types.zig");
 
 pub const CommandKind = enum(u8) {
     upload,

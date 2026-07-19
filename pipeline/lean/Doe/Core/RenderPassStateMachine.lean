@@ -1,7 +1,7 @@
 -- Doe/Core/RenderPassStateMachine.lean
 --
 -- Abstract state machine proof for the Doe render pass encoder.
--- Mirrors: runtime/zig/src/doe_render_native.zig DoeRenderPass + DoeCommandEncoder.
+-- Mirrors: runtime/zig/src/native/render/doe_render_native.zig DoeRenderPass + DoeCommandEncoder.
 --
 -- Doe follows a permissive model: all operations succeed on any live encoder;
 -- commands issued after endRenderPass are silently absorbed (no error state).

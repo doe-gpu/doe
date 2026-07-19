@@ -818,7 +818,7 @@ def main() -> int:
             "perKernelShapes": [
     {
         "pattern": "gather",
-        "emitter": "emitGatherLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:237)",
+        "emitter": "emitGatherLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:237)",
         "emitterWidened2D": True,
         "paramsShape": {
             "width": 1024,
@@ -838,7 +838,7 @@ def main() -> int:
     },
     {
         "pattern": "rope",
-        "emitter": "emitRoPELayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:263)",
+        "emitter": "emitRoPELayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:263)",
         "emitterWidened2D": False,
         "paramsShape": {
             "width": 1024,
@@ -857,7 +857,7 @@ def main() -> int:
     },
     {
         "pattern": "tiled_matmul",
-        "emitter": "emitMatmulLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:168)",
+        "emitter": "emitMatmulLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:168)",
         "emitterWidened2D": True,
         "invocations": [
             {
@@ -952,7 +952,7 @@ def main() -> int:
     },
     {
         "pattern": "attention_tiled",
-        "emitter": "emitTiledAttentionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:403)",
+        "emitter": "emitTiledAttentionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:403)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -974,7 +974,7 @@ def main() -> int:
     },
     {
         "pattern": "attention_decode",
-        "emitter": "emitDecodeAttentionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:379)",
+        "emitter": "emitDecodeAttentionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:379)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1009,7 +1009,7 @@ def main() -> int:
     },
     {
         "pattern": "dequant",
-        "emitter": "emitDequantLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:305)",
+        "emitter": "emitDequantLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:305)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1027,7 +1027,7 @@ def main() -> int:
     },
     {
         "pattern": "fused_ffn",
-        "emitter": "emitFusedFfnLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:557)",
+        "emitter": "emitFusedFfnLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:557)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1047,7 +1047,7 @@ def main() -> int:
     },
     {
         "pattern": "sample",
-        "emitter": "emitSampleLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:428)",
+        "emitter": "emitSampleLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:428)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1069,7 +1069,7 @@ def main() -> int:
     },
     {
         "pattern": "fused_gemv_dequant",
-        "emitter": "emitFusedGemvLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:448)",
+        "emitter": "emitFusedGemvLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:448)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1165,7 +1165,7 @@ def main() -> int:
     },
     {
         "pattern": "attention_streaming",
-        "emitter": "emitStreamingAttentionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:357)",
+        "emitter": "emitStreamingAttentionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:357)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1184,7 +1184,7 @@ def main() -> int:
     },
     {
         "pattern": "attention_linear",
-        "emitter": "emitLinearAttentionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:489)",
+        "emitter": "emitLinearAttentionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:489)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1204,7 +1204,7 @@ def main() -> int:
     },
     {
         "pattern": "kv_write",
-        "emitter": "emitKvWriteLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:512)",
+        "emitter": "emitKvWriteLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:512)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1237,7 +1237,7 @@ def main() -> int:
     },
     {
         "pattern": "kv_read",
-        "emitter": "emitKvReadLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:535)",
+        "emitter": "emitKvReadLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:535)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1256,7 +1256,7 @@ def main() -> int:
     },
     {
         "pattern": "reduction",
-        "emitter": "emitReductionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:112)",
+        "emitter": "emitReductionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:112)",
         "emitterWidened2D": False,
         "paramsShape": {
             "width": 1024,

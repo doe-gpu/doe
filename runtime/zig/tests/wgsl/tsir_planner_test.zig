@@ -8,8 +8,8 @@
 // capability.
 
 const std = @import("std");
-const tsir = @import("../../src/tsir/mod.zig");
-const targets = @import("../../src/targets/mod.zig");
+const tsir = @import("../../src/compiler/tsir/mod.zig");
+const targets = @import("../../src/compiler/targets/mod.zig");
 
 test "planner replicates bindings that fit the target working budget" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);

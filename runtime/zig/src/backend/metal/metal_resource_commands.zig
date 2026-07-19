@@ -6,8 +6,8 @@
 // destroys go through the deferred release pool, which batch-drains at
 // command buffer boundaries instead of per-call CFRelease.
 
-const model_render_types = @import("../../model_render_types.zig");
-const model_texture_types = @import("../../model_texture_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
+const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const bridge = @import("metal_bridge_decls.zig");
 const metal_bridge_device_new_texture = bridge.metal_bridge_device_new_texture;
 const metal_bridge_texture_depth = bridge.metal_bridge_texture_depth;

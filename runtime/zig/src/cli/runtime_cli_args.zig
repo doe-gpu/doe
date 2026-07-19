@@ -1,8 +1,8 @@
 const std = @import("std");
-const execution = @import("../execution.zig");
-const main_usage = @import("../main_usage.zig");
+const execution = @import("../runtime/execution.zig");
+const main_usage = @import("entrypoints/main_usage.zig");
 const quirk = @import("../quirk/mod.zig");
-const trace = @import("../trace.zig");
+const trace = @import("../runtime/trace/trace.zig");
 
 pub const RunOptions = struct {
     quirks_path: ?[]const u8 = null,

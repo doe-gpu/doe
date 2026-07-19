@@ -158,7 +158,7 @@ class CachingInterface {
 
 The caching interface is reached through `dawn::platform::Platform::GetCachingInterface()` (line 187-189 of the same header). Dawn's Metal backend serializes MTLLibrary / pipeline state objects through this interface when it is wired into the Dawn instance at creation time. `dawn::native::PerformIdleTasks()` (in `DawnNative.h:361-363`) is the hook Dawn uses to flush cache writes when idle.
 
-The interface is a **C++ virtual contract**, not a C ABI. `bench/vendor/dawn/include/webgpu/webgpu.h` (the standard C header Doe loads via `runtime/zig/src/wgpu_loader.zig`) does not expose cache installation. Adding the cache lane therefore requires a small in-tree C++ shim that links against `libdawn_native` and exposes a C ABI the Zig side can call.
+The interface is a **C++ virtual contract**, not a C ABI. `bench/vendor/dawn/include/webgpu/webgpu.h` (the standard C header Doe loads via `runtime/zig/src/core/abi/wgpu_loader.zig`) does not expose cache installation. Adding the cache lane therefore requires a small in-tree C++ shim that links against `libdawn_native` and exposes a C ABI the Zig side can call.
 
 ## Integration plan
 
@@ -218,7 +218,7 @@ dawn_cache_dir: ?[]const u8 = null,
 
 Parse `--dawn-cache-dir <path>`. CLI must reject the flag with a typed unsupported error (CLAUDE.md non-negotiable #4) when `dawnCachingSupported() == false`, naming the taxonomy: "dawn-delegate-cache-unavailable; either link libdawn_native into this build (non-Linux hosts) or omit --dawn-cache-dir to use the fair-cold lane".
 
-### 4. Trace schema — `runtime/zig/src/trace.zig`
+### 4. Trace schema — `runtime/zig/src/runtime/trace/trace.zig`
 
 Add nested `dawnPipelineCache` to `TraceRunSummary`, matching the shape of `pipelineCache`:
 

@@ -1,6 +1,6 @@
 const std = @import("std");
-const model_policy = @import("../model_policy.zig");
-const model_quirks = @import("../model_quirks.zig");
+const model_policy = @import("../contracts/model/model_policy.zig");
+const model_quirks = @import("../contracts/model/model_quirks.zig");
 
 const Allocator = std.mem.Allocator;
 

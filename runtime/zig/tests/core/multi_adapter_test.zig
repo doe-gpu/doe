@@ -1,5 +1,5 @@
 const std = @import("std");
-const multi_adapter = @import("../../src/multi_adapter.zig");
+const multi_adapter = @import("../../src/runtime/device/multi_adapter.zig");
 const AdapterType = multi_adapter.AdapterType;
 const BackendType = multi_adapter.BackendType;
 const DoeAdapterInfo = multi_adapter.DoeAdapterInfo;
@@ -128,8 +128,8 @@ test "select_adapter prefers integrated over CPU" {
 
 test "high performance preference boosts non-low-power adapters" {
     var items = [_]DoeAdapterInfo{
-        make_adapter(.integrated_gpu, true, false),  // low-power integrated: 50
-        make_adapter(.integrated_gpu, false, false),  // non-low-power integrated: 50 + 20 = 70
+        make_adapter(.integrated_gpu, true, false), // low-power integrated: 50
+        make_adapter(.integrated_gpu, false, false), // non-low-power integrated: 50 + 20 = 70
     };
     var list = make_list(&items, 2);
 
@@ -176,7 +176,7 @@ test "low power preference selects integrated when two integrateds differ in low
     // Two integrated GPUs: one low-power (50+20=70), one not (50).
     var items = [_]DoeAdapterInfo{
         make_adapter(.integrated_gpu, false, false), // score 50
-        make_adapter(.integrated_gpu, true, false),  // score 50 + 20 = 70
+        make_adapter(.integrated_gpu, true, false), // score 50 + 20 = 70
     };
     var list = make_list(&items, 2);
 
@@ -193,8 +193,8 @@ test "undefined power preference does not apply power boost" {
     // Two identical integrated GPUs except for low_power flag.
     // Without preference, both score 50; first one wins.
     var items = [_]DoeAdapterInfo{
-        make_adapter(.integrated_gpu, true, false),  // score 50
-        make_adapter(.integrated_gpu, false, false),  // score 50
+        make_adapter(.integrated_gpu, true, false), // score 50
+        make_adapter(.integrated_gpu, false, false), // score 50
     };
     var list = make_list(&items, 2);
 
@@ -211,8 +211,8 @@ test "undefined power preference does not apply power boost" {
 test "removable GPU gets penalty relative to non-removable" {
     // Two discrete GPUs: removable (100-10=90) vs non-removable (100).
     var items = [_]DoeAdapterInfo{
-        make_adapter(.discrete_gpu, false, true),  // removable: 90
-        make_adapter(.discrete_gpu, false, false),  // non-removable: 100
+        make_adapter(.discrete_gpu, false, true), // removable: 90
+        make_adapter(.discrete_gpu, false, false), // non-removable: 100
     };
     var list = make_list(&items, 2);
 
@@ -320,11 +320,11 @@ test "AdapterOptions default is undefined preference with no fallback" {
 
 test "select_adapter handles maximum scored ranking with mixed types" {
     var items = [_]DoeAdapterInfo{
-        make_adapter(.cpu, false, false),              // -50
-        make_adapter(.unknown, false, false),           // 0
-        make_adapter(.integrated_gpu, true, false),     // 50
-        make_adapter(.discrete_gpu, false, true),       // 90 (removable)
-        make_adapter(.discrete_gpu, false, false),      // 100
+        make_adapter(.cpu, false, false), // -50
+        make_adapter(.unknown, false, false), // 0
+        make_adapter(.integrated_gpu, true, false), // 50
+        make_adapter(.discrete_gpu, false, true), // 90 (removable)
+        make_adapter(.discrete_gpu, false, false), // 100
     };
     var list = make_list(&items, 5);
 
@@ -337,8 +337,8 @@ test "select_adapter with high performance resolves tie between discrete GPUs" {
     // Default: both score 100, first wins.
     // HIGH_PERF: non-low-power gets +20 = 120, low-power stays 100.
     var items = [_]DoeAdapterInfo{
-        make_adapter(.discrete_gpu, true, false),   // 100 (low-power discrete)
-        make_adapter(.discrete_gpu, false, false),   // 100 + 20 = 120
+        make_adapter(.discrete_gpu, true, false), // 100 (low-power discrete)
+        make_adapter(.discrete_gpu, false, false), // 100 + 20 = 120
     };
     var list = make_list(&items, 2);
 

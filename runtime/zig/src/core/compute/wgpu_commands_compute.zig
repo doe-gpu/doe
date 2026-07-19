@@ -1,7 +1,7 @@
 const std = @import("std");
-const model_resource_types = @import("../../model_resource_types.zig");
-const model_compute_types = @import("../../model_compute_types.zig");
-const model_gpu_types = @import("../../model_binding_value_types.zig");
+const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
+const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_binding_value_types.zig");
 const proc_types = @import("../abi/wgpu_proc_types.zig");
 const abi_base = proc_types.base;
 const abi_descriptor = proc_types.descriptor;
@@ -9,7 +9,7 @@ const abi_execution = @import("../abi/wgpu_execution_types.zig");
 const abi_records = @import("../abi/wgpu_runtime_records.zig");
 const runtime_state = @import("../abi/wgpu_runtime_state_defs.zig");
 const loader = @import("../abi/wgpu_loader.zig");
-const p0_procs_mod = @import("../../wgpu_p0_procs.zig");
+const p0_procs_mod = @import("../abi/procs/wgpu_p0_procs.zig");
 const resources = @import("../resource/wgpu_resources.zig");
 
 const BARRIER_SCRATCH_BUFFER_HANDLE: u64 = 0xFFFF_FFFF_FFFF_FFFB;

@@ -3,9 +3,9 @@ const builtin = @import("builtin");
 const bridge = @import("metal_bridge_decls.zig");
 const metal_buffer_pool = @import("metal_buffer_pool.zig");
 const metal_pipeline_cache = @import("metal_pipeline_cache.zig");
-const wgsl_compiler = @import("../../doe_wgsl/mod.zig");
-const emit_msl_maps = @import("../../doe_wgsl/emit_msl_maps.zig");
-const wgsl_runtime_compile = @import("../../doe_wgsl/runtime_compile.zig");
+const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
+const emit_msl_maps = @import("../../compiler/wgsl/emit/msl/emit_msl_maps.zig");
+const wgsl_runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compile.zig");
 const HAS_PIPELINE_CACHE = builtin.os.tag == .macos;
 
 const metal_bridge_cmd_buf_render_encoder = bridge.metal_bridge_cmd_buf_render_encoder;

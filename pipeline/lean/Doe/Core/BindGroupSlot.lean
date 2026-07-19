@@ -1,6 +1,6 @@
 -- Bind group → MSL buffer index mapping safety.
--- Mirrors: runtime/zig/src/doe_wgsl/emit_msl_ir.zig:msl_binding_slot
---          runtime/zig/src/doe_compute_ext_native.zig:flattenBindGroups
+-- Mirrors: runtime/zig/src/compiler/wgsl/emit/msl/emit_msl_ir.zig:msl_binding_slot
+--          runtime/zig/src/native/compute/doe_compute_ext_native.zig:flattenBindGroups
 -- Constants match Zig: BINDINGS_PER_GROUP=16, MAX_BIND_GROUPS=4, MAX_FLAT_BIND=64.
 
 /-- Bindings per group. Matches BINDINGS_PER_GROUP in emit_msl_ir.zig. -/

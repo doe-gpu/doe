@@ -20,8 +20,8 @@ Per-model evidence checklists with acceptance bars and active blocker queues:
 
 | Surface | Path |
 |---|---|
-| TSIR (semantic + planner + emitters) | `runtime/zig/src/tsir/` |
-| CSL emit (classifier/template path) | `runtime/zig/src/doe_wgsl/emit_csl_*.zig` |
+| TSIR (semantic + planner + emitters) | `runtime/zig/src/compiler/tsir/` |
+| CSL emit (classifier/template path) | `runtime/zig/src/compiler/wgsl/emit/csl/` |
 | Hardware runners (Gemma/Qwen HostPlan + bounded cells) | `bench/runners/csl-runners/` |
 | Bundle / verify / status tools | `bench/tools/cerebras_*`, `bench/tools/*evidence*`, `bench/tools/synthesize_*` |
 | TSIR architecture plan | [`docs/tsir-lowering-plan.md`](tsir-lowering-plan.md) |

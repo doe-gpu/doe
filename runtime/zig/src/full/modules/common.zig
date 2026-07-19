@@ -1,7 +1,7 @@
 const builtin = @import("builtin");
 const std = @import("std");
-const model_policy = @import("../../model_policy.zig");
-const model_profile = @import("../../model_profile.zig");
+const model_policy = @import("../../contracts/model/model_policy.zig");
+const model_profile = @import("../../contracts/model/model_profile.zig");
 const backend_policy = @import("../../backend/backend_policy.zig");
 
 extern "c" fn setenv(name: [*:0]const u8, value: [*:0]const u8, overwrite: c_int) c_int;

@@ -1,5 +1,5 @@
 const std = @import("std");
-const model = @import("../../src/model.zig");
+const model = @import("../../src/contracts/model/model.zig");
 const core_partition = @import("../../src/core/command_partition.zig");
 
 test "core command projection accepts core commands and rejects full commands" {

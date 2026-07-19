@@ -1,10 +1,10 @@
 const std = @import("std");
-const model_transfer_types = @import("../../model_compute_types.zig");
+const model_transfer_types = @import("../../contracts/model/model_compute_types.zig");
 const hash_utils = @import("../common/hash_utils.zig");
-const doe_wgsl = @import("../../doe_wgsl/mod.zig");
-const host = @import("../../doe_wgsl/emit_csl_host.zig");
-const host_plan = @import("../../doe_wgsl/emit_csl_host_plan.zig");
-const csl_spec = @import("../../doe_wgsl/csl_spec.zig");
+const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
+const host = @import("../../compiler/wgsl/emit/csl/emit_csl_host.zig");
+const host_plan = @import("../../compiler/wgsl/emit/csl/emit_csl_host_plan.zig");
+const csl_spec = @import("../../compiler/wgsl/emit/csl/csl_spec.zig");
 
 const DEFAULT_KERNEL_ROOT: []const u8 = "bench/kernels";
 const HOST_PLAN_ARTIFACT_DIR: []const u8 = "bench/out/csl-host-plans";

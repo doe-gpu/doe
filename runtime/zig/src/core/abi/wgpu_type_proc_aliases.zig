@@ -1,4 +1,4 @@
-const procs = @import("../../wgpu_types_procs.zig");
+const procs = @import("procs/wgpu_types_procs.zig");
 
 pub const FnWgpuCreateInstance = procs.FnWgpuCreateInstance;
 pub const FnWgpuInstanceRequestAdapter = procs.FnWgpuInstanceRequestAdapter;

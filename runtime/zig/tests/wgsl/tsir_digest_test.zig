@@ -1,6 +1,6 @@
 const std = @import("std");
-const digest = @import("../../src/tsir/digest.zig");
-const schema = @import("../../src/tsir/schema.zig");
+const digest = @import("../../src/compiler/tsir/digest.zig");
+const schema = @import("../../src/compiler/tsir/schema.zig");
 
 const canonicalizeManifestLoweringEntry = digest.canonicalizeManifestLoweringEntry;
 const compute = digest.compute;

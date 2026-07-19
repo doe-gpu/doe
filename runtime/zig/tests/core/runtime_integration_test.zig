@@ -5,10 +5,10 @@
 const std = @import("std");
 const testing = std.testing;
 
-const native = @import("../../src/doe_wgpu_native.zig");
+const native = @import("../../src/native/mod.zig");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
-const dispatch_preconditions = @import("../../src/dispatch_preconditions.zig");
-const compute_fast = @import("../../src/doe_compute_fast.zig");
+const dispatch_preconditions = @import("../../src/core/compute/dispatch_preconditions.zig");
+const compute_fast = @import("../../src/native/compute/doe_compute_fast.zig");
 
 // ============================================================
 // doe_buffer_native.zig — Buffer constants and map state

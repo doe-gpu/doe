@@ -1,9 +1,9 @@
 const std = @import("std");
 const testing = std.testing;
 
-const trace = @import("../../src/trace.zig");
-const model = @import("../../src/model.zig");
-const execution = @import("../../src/execution.zig");
+const trace = @import("../../src/runtime/trace/trace.zig");
+const model = @import("../../src/contracts/model/model.zig");
+const execution = @import("../../src/runtime/execution.zig");
 
 // ============================================================
 // Helper: mock dispatch result for tracePayloadHash / printTraceLine

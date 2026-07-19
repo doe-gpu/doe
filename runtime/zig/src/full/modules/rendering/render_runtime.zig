@@ -1,10 +1,10 @@
 const std = @import("std");
 const log = std.log.scoped(.render_runtime);
-const model_gpu_types = @import("../../../model_texture_value_types.zig");
-const model_render_types = @import("../../../model_render_types.zig");
+const model_gpu_types = @import("../../../contracts/model/model_texture_value_types.zig");
+const model_render_types = @import("../../../contracts/model/model_render_types.zig");
 const runtime_types = @import("../../../backend/runtime_types.zig");
 const render_commands = @import("../../render/wgpu_render_commands.zig");
-const webgpu = @import("../../../webgpu_backend.zig");
+const webgpu = @import("../../../backend/webgpu_backend.zig");
 const common = @import("../common.zig");
 
 pub const RenderRuntimeError = error{

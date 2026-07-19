@@ -1,8 +1,8 @@
 // coverage_builtin_test.zig — WGSL builtin-surface coverage tests.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const msl_maps = @import("../../src/doe_wgsl/emit_msl_maps.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const msl_maps = @import("../../src/compiler/wgsl/emit/msl/emit_msl_maps.zig");
 const translateToMsl = mod.translateToMsl;
 const translateToHlsl = mod.translateToHlsl;
 const translateToSpirv = mod.translateToSpirv;

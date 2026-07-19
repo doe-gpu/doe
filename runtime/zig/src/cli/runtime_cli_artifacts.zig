@@ -1,13 +1,13 @@
 const std = @import("std");
 const backend_ids = @import("../backend/backend_ids.zig");
 const backend_policy = @import("../backend/backend_policy.zig");
-const execution = @import("../execution.zig");
-const model_profile = @import("../model_profile.zig");
+const execution = @import("../runtime/execution.zig");
+const model_profile = @import("../contracts/model/model_profile.zig");
 const numeric_stability = @import("../experimental/numeric_stability/mod.zig");
-const operator_artifacts = @import("../operator_artifacts.zig");
+const operator_artifacts = @import("../runtime/trace/operator_artifacts.zig");
 const quirk = @import("../quirk/mod.zig");
-const trace = @import("../trace.zig");
-const trace_jsonl_emit = @import("../trace_jsonl_emit.zig");
+const trace = @import("../runtime/trace/trace.zig");
+const trace_jsonl_emit = @import("../runtime/trace/trace_jsonl_emit.zig");
 
 pub const BufferedTraceRow = trace_jsonl_emit.BufferedTraceRow;
 

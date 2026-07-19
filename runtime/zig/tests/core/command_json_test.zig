@@ -1,8 +1,8 @@
 const std = @import("std");
 const command_kind = @import("../../src/command/command_kind.zig");
-const command_json = @import("../../src/command_json.zig");
-const command_json_raw = @import("../../src/command_json_raw.zig");
-const model = @import("../../src/model.zig");
+const command_json = @import("../../src/command/command_json.zig");
+const command_json_raw = @import("../../src/command/command_json_raw.zig");
+const model = @import("../../src/contracts/model/model.zig");
 
 const parseCommands = command_json.parseCommands;
 const freeCommands = command_json.freeCommands;

@@ -154,7 +154,7 @@ def sha256(path: Path) -> str:
 # Emitter default values for dims that aren't in the layout-level
 # --params but *are* consumed by elements_per_pe. Pulled from the
 # `param <name>: i16 = <default>;` declarations in
-# runtime/zig/src/doe_wgsl/emit_csl_layout.zig and the per-kernel PE
+# runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig and the per-kernel PE
 # emitter files. Used when computing fixtureEquivalentBytesPerPe: the
 # fixture's --params string only lists overridden params, so missing
 # dims fall back to these defaults.

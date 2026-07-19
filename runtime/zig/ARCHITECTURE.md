@@ -14,41 +14,41 @@ It replaces the old `parser/dispatch/executor` module naming model.
 
 Core decision/runtime lane:
 
-- `runtime/zig/src/model.zig`
+- `runtime/zig/src/contracts/model/model.zig`
   - typed contract enums/structs for quirks, commands, and runtime status
 - `runtime/zig/src/quirk/quirk_json.zig`
   - strict quirk JSON ingestion (accessed via `quirk/mod.zig`)
-- `runtime/zig/src/command_json.zig`
+- `runtime/zig/src/command/command_json.zig`
   - strict command JSON ingestion
-- `runtime/zig/src/runtime.zig`
+- `runtime/zig/src/quirk/runtime.zig`
   - deterministic quirk matching + precedence selection
-- `runtime/zig/src/execution.zig`
+- `runtime/zig/src/runtime/execution.zig`
   - execution mode orchestration (`trace` vs `native`)
-- `runtime/zig/src/main.zig`
+- `runtime/zig/src/cli/entrypoints/main.zig`
   - CLI boundary and artifact wiring
 
 Trace/replay lane:
 
-- `runtime/zig/src/trace.zig`
+- `runtime/zig/src/runtime/trace/trace.zig`
   - trace row + trace-meta emission and hash-chain generation
-- `runtime/zig/src/replay.zig`
+- `runtime/zig/src/runtime/trace/replay.zig`
   - replay validation against row/meta contract invariants
 
 WebGPU native execution lane:
 
-- `runtime/zig/src/webgpu_ffi.zig`
+- `runtime/zig/src/compat/webgpu_ffi.zig`
   - backend lifecycle (instance/adapter/device/queue), capability probing, queue wait/sync behavior
-- `runtime/zig/src/core/abi/wgpu_types.zig`
-  - C API type/function/proc-table contracts
+- `runtime/zig/src/core/abi/`
+  - C API types, descriptors, callbacks, and proc-table contracts
 - `runtime/zig/src/core/abi/wgpu_loader.zig`
   - dynamic proc loading and callback helpers
 - `runtime/zig/src/core/resource/wgpu_resources.zig`
   - buffer/texture/shader/pipeline resource management
-- `runtime/zig/src/wgpu_commands.zig`
+- `runtime/zig/src/full/command/wgpu_commands.zig`
   - command execution glue (sandbox validation, core/full dispatch routing)
-- `runtime/zig/src/wgpu_render_*`
+- `runtime/zig/src/full/render/`
   - render pass/bundle/resource/type-specific surfaces
-- `runtime/zig/src/wgpu_*_procs.zig`
+- `runtime/zig/src/core/abi/procs/`
   - domain-specific proc tables (P0/P1/P2 surfaces, texture/surface/async/capability APIs)
 
 ## Data flow
@@ -79,7 +79,8 @@ WebGPU native execution lane:
 
 ## Extension discipline
 
-- Add new WebGPU API surfaces as dedicated `wgpu_*_procs.zig` or feature-scoped modules.
+- Add WebGPU procedure groups under `core/abi/procs/` and behavior under the
+  owning `core/` or `full/` feature directory.
 - Keep capability probing and unsupported taxonomy explicit.
 - Route all runtime-visible behavior changes through config + docs + status updates in the same change.
 

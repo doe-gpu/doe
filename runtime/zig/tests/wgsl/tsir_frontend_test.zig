@@ -8,10 +8,10 @@
 // gather. These tests lock those structural invariants.
 
 const std = @import("std");
-const tsir = @import("../../src/tsir/mod.zig");
-const parser = @import("../../src/doe_wgsl/parser.zig");
-const sema = @import("../../src/doe_wgsl/sema.zig");
-const ir_builder = @import("../../src/doe_wgsl/ir_builder.zig");
+const tsir = @import("../../src/compiler/tsir/mod.zig");
+const parser = @import("../../src/compiler/wgsl/frontend/parser.zig");
+const sema = @import("../../src/compiler/wgsl/frontend/sema.zig");
+const ir_builder = @import("../../src/compiler/wgsl/ir/ir_builder.zig");
 
 test "frontend lowers a WGSL module with one entrypoint to Semantic with one function" {
     const allocator = std.testing.allocator;

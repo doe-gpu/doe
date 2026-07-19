@@ -22,7 +22,7 @@
     {
       "id": "spirv_capability",
       "description": "Khronos SPIR-V Capability enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "Capability",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvCapability",
@@ -43,7 +43,7 @@
     {
       "id": "spirv_addressing_model",
       "description": "Khronos SPIR-V AddressingModel enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "AddressingModel",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvAddressingModel",
@@ -52,7 +52,7 @@
     {
       "id": "spirv_memory_model",
       "description": "Khronos SPIR-V MemoryModel enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "MemoryModel",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvMemoryModel",
@@ -61,7 +61,7 @@
     {
       "id": "spirv_dim",
       "description": "Khronos SPIR-V Dim enum values (Zig leading-underscore maps to digit-leading canonical).",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "Dim",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvDim",
@@ -75,7 +75,7 @@
     {
       "id": "spirv_image_format",
       "description": "Khronos SPIR-V ImageFormat enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "ImageFormat",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvImageFormat",
@@ -105,7 +105,7 @@
     {
       "id": "spirv_image_operands_mask",
       "description": "Khronos SPIR-V ImageOperands mask values (Zig names drop the Mask suffix).",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "ImageOperandsMask",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvImageOperands",
@@ -120,7 +120,7 @@
     {
       "id": "spirv_execution_model",
       "description": "Khronos SPIR-V ExecutionModel enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "ExecutionModel",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvExecutionModel",
@@ -129,7 +129,7 @@
     {
       "id": "spirv_execution_mode",
       "description": "Khronos SPIR-V ExecutionMode enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "ExecutionMode",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvExecutionMode",
@@ -138,7 +138,7 @@
     {
       "id": "spirv_scope",
       "description": "Khronos SPIR-V Scope enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "Scope",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvScope",
@@ -147,7 +147,7 @@
     {
       "id": "spirv_group_operation",
       "description": "Khronos SPIR-V GroupOperation enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "GroupOperation",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvGroupOperation",
@@ -156,7 +156,7 @@
     {
       "id": "spirv_memory_semantics",
       "description": "Khronos SPIR-V MemorySemantics mask values (Zig names drop the Mask suffix).",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "MemorySemantics",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvMemorySemantics",
@@ -174,7 +174,7 @@
     {
       "id": "spirv_storage_class",
       "description": "Khronos SPIR-V StorageClass enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "StorageClass",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvStorageClass",
@@ -192,7 +192,7 @@
     {
       "id": "spirv_decoration",
       "description": "Khronos SPIR-V Decoration enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "Decoration",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvDecoration",
@@ -219,7 +219,7 @@
     {
       "id": "spirv_builtin",
       "description": "Khronos SPIR-V BuiltIn enum values.",
-      "zigPath": "runtime/zig/src/doe_wgsl/spirv_spec.zig",
+      "zigPath": "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig",
       "zigNamespace": "Builtin",
       "header": "spirv_unified",
       "canonicalPrefix": "SpvBuiltIn",

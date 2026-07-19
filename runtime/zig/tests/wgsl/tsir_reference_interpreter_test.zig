@@ -1,7 +1,7 @@
 const std = @import("std");
-const reference = @import("../../src/tsir/reference_interpreter.zig");
-const schema = @import("../../src/tsir/schema.zig");
-const scalar = @import("../../src/tsir/reference_scalar.zig");
+const reference = @import("../../src/compiler/tsir/reference_interpreter.zig");
+const schema = @import("../../src/compiler/tsir/schema.zig");
+const scalar = @import("../../src/compiler/tsir/reference_scalar.zig");
 
 const InterpretError = reference.InterpretError;
 const Result = reference.Result;

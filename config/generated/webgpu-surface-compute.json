@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "reportKind": "webgpu-surface-report",
   "surfaceId": "doe-compute",
-  "generatedAt": "2026-05-30T17:03:31.084662+00:00",
+  "generatedAt": "2026-07-19T17:42:48.827141+00:00",
   "derivedFrom": {
     "commandCoverage": "config/webgpu-command-coverage-core.json",
     "capabilityInventory": "config/webgpu-capability-inventory.json",
@@ -132,7 +132,7 @@
         "status": "implemented",
         "priority": "p0",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/main.zig --queue-sync-mode, runtime/zig/src/webgpu_ffi.zig QueueSyncMode",
+        "contract": "runtime/zig/src/cli/entrypoints/main.zig --queue-sync-mode, runtime/zig/src/backend/runtime_types.zig QueueSyncMode",
         "notes": "per-command and deferred queue sync modes are available; trace-meta records queueSyncMode."
       },
       {
@@ -141,7 +141,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/wgpu_async_procs.zig + runtime/zig/src/wgpu_render_commands.zig async pipeline path",
+        "contract": "runtime/zig/src/core/abi/procs/wgpu_async_procs.zig + runtime/zig/src/full/render/wgpu_render_commands.zig async pipeline path",
         "notes": "render pipeline creation now uses DeviceCreateRenderPipelineAsync with explicit wait, push/pop error scopes, and shader compilation-info retrieval before pipeline cache insert."
       },
       {
@@ -168,7 +168,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/wgpu_p1_capability_procs.zig + runtime/zig/src/wgpu_capability_runtime.zig + runtime/zig/src/webgpu_ffi.zig",
+        "contract": "runtime/zig/src/core/abi/procs/wgpu_p1_capability_procs.zig + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig + runtime/zig/src/backend/webgpu_backend_support.zig",
         "notes": "instance/adapter/device capability introspection APIs are dynamically loaded and exercised with explicit status checks, including feature/limits/info/proc-address paths and related free-members contracts."
       },
       {
@@ -177,7 +177,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/wgpu_p1_resource_table_procs.zig + runtime/zig/src/wgpu_async_diagnostics_command.zig",
+        "contract": "runtime/zig/src/core/abi/procs/wgpu_p1_resource_table_procs.zig + runtime/zig/src/full/lifecycle/wgpu_async_diagnostics_command.zig",
         "notes": "ResourceTable create/update/remove/destroy/release and pass/bundle/compute set-resource-table + set-immediates APIs are implemented behind explicit feature gating; unsupported adapters return deterministic unsupported status."
       },
       {
@@ -186,7 +186,7 @@
         "status": "implemented",
         "priority": "p2",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/wgpu_p2_lifecycle_procs.zig + runtime/zig/src/wgpu_async_diagnostics_command.zig + runtime/zig/src/wgpu_capability_runtime.zig",
+        "contract": "runtime/zig/src/core/abi/procs/wgpu_p2_lifecycle_procs.zig + runtime/zig/src/full/lifecycle/wgpu_async_diagnostics_command.zig + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig",
         "notes": "all requested AddRef entry points are loaded and wired; lifecycle diagnostics execute balanced addref/release touch paths for available object classes and skip unsupported object families deterministically."
       },
       {
@@ -195,7 +195,7 @@
         "status": "implemented",
         "priority": "p0",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/wgpu_p0_procs.zig + runtime/zig/src/wgpu_resources.zig + runtime/zig/src/wgpu_commands.zig barrier lowering",
+        "contract": "runtime/zig/src/core/abi/procs/wgpu_p0_procs.zig + runtime/zig/src/core/resource/wgpu_resources.zig + runtime/zig/src/full/command/wgpu_commands.zig barrier lowering",
         "notes": "buffer replacement and teardown now call wgpuBufferDestroy before release; barrier commands lower through wgpuCommandEncoderClearBuffer with deterministic scratch-buffer sizing."
       },
       {
@@ -204,7 +204,7 @@
         "status": "implemented",
         "priority": "p0",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/wgpu_p0_procs.zig + runtime/zig/src/wgpu_resources.zig + runtime/zig/src/wgpu_commands.zig",
+        "contract": "runtime/zig/src/core/abi/procs/wgpu_p0_procs.zig + runtime/zig/src/core/resource/wgpu_resources.zig + runtime/zig/src/full/command/wgpu_commands.zig",
         "notes": "compute pipelines use wgpuDeviceCreateComputePipelineAsync when available; dispatch path stages indirect args with wgpuCommandEncoderWriteBuffer, dispatches with wgpuComputePassEncoderDispatchWorkgroupsIndirect, and uses pass timestamps with wgpuComputePassEncoderWriteTimestamp when pass timestamps are available."
       },
       {
@@ -213,7 +213,7 @@
         "status": "implemented",
         "priority": "p0",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/wgpu_p0_procs.zig querySetMatches + destroyQuerySet; compute/render query setup paths",
+        "contract": "runtime/zig/src/core/abi/procs/wgpu_p0_procs.zig querySetMatches + destroyQuerySet; compute/render query setup paths",
         "notes": "query sets now validate count/type via wgpuQuerySetGetCount/wgpuQuerySetGetType and call wgpuQuerySetDestroy before release in compute and render P0 helper paths."
       },
       {
@@ -222,7 +222,7 @@
         "status": "implemented",
         "priority": "p0",
         "owner": "runtime-core",
-        "contract": "runtime/zig/src/webgpu_ffi.zig deinit",
+        "contract": "runtime/zig/src/backend/webgpu_backend_lifecycle.zig deinit",
         "notes": "device teardown now explicitly calls wgpuDeviceDestroy before wgpuDeviceRelease."
       },
       {
@@ -231,7 +231,7 @@
         "status": "implemented",
         "priority": "p0",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -241,7 +241,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -251,7 +251,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -261,7 +261,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -271,7 +271,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -281,7 +281,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -291,7 +291,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "comparable",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -301,7 +301,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -311,7 +311,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "comparable",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -321,7 +321,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -331,7 +331,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -341,7 +341,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -351,7 +351,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "comparable",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -361,7 +361,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -371,7 +371,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -381,7 +381,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -391,7 +391,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "comparable",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -401,7 +401,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -411,7 +411,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -421,7 +421,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -431,7 +431,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -441,7 +441,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -451,7 +451,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -461,7 +461,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -471,7 +471,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -481,7 +481,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "comparable",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -491,7 +491,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "comparable",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -501,7 +501,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -511,7 +511,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -521,7 +521,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -531,7 +531,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -541,7 +541,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -551,7 +551,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "comparable",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -561,7 +561,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -571,7 +571,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -581,7 +581,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -591,7 +591,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -601,7 +601,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -611,7 +611,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -621,7 +621,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -631,7 +631,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -641,7 +641,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -651,7 +651,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -661,7 +661,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -671,7 +671,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -681,7 +681,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -691,7 +691,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -701,7 +701,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -711,7 +711,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -721,7 +721,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -731,7 +731,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -741,7 +741,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -751,7 +751,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -761,7 +761,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -771,7 +771,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -781,7 +781,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -791,7 +791,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -801,7 +801,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -811,7 +811,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -821,7 +821,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -831,7 +831,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -841,7 +841,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "comparable",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -851,7 +851,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -861,7 +861,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -871,7 +871,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -881,7 +881,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -891,7 +891,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -901,7 +901,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -911,7 +911,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -921,7 +921,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -931,7 +931,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       },
@@ -941,7 +941,7 @@
         "status": "implemented",
         "priority": "p1",
         "owner": "runtime-core",
-        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
+        "contract": "bench/vendor/dawn/src/dawn/dawn.json feature name enum + runtime/zig/src/core/runtime/wgpu_capability_runtime.zig adapter/device feature-list introspection (wgpuAdapterGetFeatures/wgpuDeviceGetFeatures) + bench/workloads/workloads.amd.vulkan.json capability_introspection",
         "benchmarkClass": "directional",
         "notes": "Inventory completion (2026-02-23): implemented via explicit Dawn feature-enum inventory contract, Zig capability introspection runtime path, and benchmark mapping contract."
       }

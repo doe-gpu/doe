@@ -1,6 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model = @import("../model_profile.zig");
+const model = @import("../contracts/model/model_profile.zig");
 const backend_ids = @import("backend_ids.zig");
 const backend_iface = @import("backend_iface.zig");
 const backend_policy = @import("backend_policy.zig");

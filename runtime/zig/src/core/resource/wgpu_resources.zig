@@ -1,16 +1,16 @@
 const std = @import("std");
-const model_resource_types = @import("../../model_resource_types.zig");
-const model_compute_types = @import("../../model_compute_types.zig");
-const model_gpu_types = @import("../../model_texture_value_types.zig");
-const model_binding_types = @import("../../model_binding_value_types.zig");
+const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
+const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
+const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
 const proc_types = @import("../abi/wgpu_proc_types.zig");
 const abi_base = proc_types.base;
 const abi_descriptor = proc_types.descriptor;
 const abi_records = @import("../abi/wgpu_runtime_records.zig");
 const normalizers = @import("wgpu_resource_normalizers.zig");
 const loader = @import("../abi/wgpu_loader.zig");
-const p0_procs_mod = @import("../../wgpu_p0_procs.zig");
-const texture_procs_mod = @import("../../wgpu_texture_procs.zig");
+const p0_procs_mod = @import("../abi/procs/wgpu_p0_procs.zig");
+const texture_procs_mod = @import("../abi/procs/wgpu_texture_procs.zig");
 const BUFFER_ZERO_INIT_CHUNK_BYTES: usize = 64 * 1024;
 const BUFFER_MIN_ALIGNMENT: u64 = 4;
 

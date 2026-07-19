@@ -147,7 +147,7 @@ surface (schema, digests, frontend, planner, reference interpreter,
 collective-synthesis pass, and five backend emitters whose realization-only
 entry points still serialize contract skeletons while their semantic-aware
 entry points emit executable bodies for the Phase A bootstrap families)
-is landed under `runtime/zig/src/tsir/`; live status is in
+is landed under `runtime/zig/src/compiler/tsir/`; live status is in
 [`docs/status/tsir.md`](./status/tsir.md). TSIR is not yet the wired
 executable compiler path for CSL or WebGPU — the live CSL lane still
 routes through the classifier/template path and the Doe IR →

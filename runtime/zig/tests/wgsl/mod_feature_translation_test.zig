@@ -1,7 +1,7 @@
 // mod_feature_translation_test.zig — Cross-backend builtin, texture, and stage feature translation tests.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 const translateToMsl = mod.translateToMsl;
 const translateToHlsl = mod.translateToHlsl;
 const translateToSpirv = mod.translateToSpirv;

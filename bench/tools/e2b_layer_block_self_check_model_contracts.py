@@ -591,8 +591,9 @@ def run_model_contracts(
     # simulator/hardware receipts bind colors through queues instead
     # of removed/ deprecated SDK-1.4-era behavior.
     try:
-        _c41_paths = list((REPO_ROOT / "runtime/zig/src/doe_wgsl").glob("emit_csl*.zig"))
-        _c41_paths += list((REPO_ROOT / "runtime/zig/src/doe_wgsl").glob("csl_spec.zig"))
+        csl_emitter_root = REPO_ROOT / "runtime/zig/src/compiler/wgsl/emit/csl"
+        _c41_paths = list(csl_emitter_root.glob("emit_csl*.zig"))
+        _c41_paths += list(csl_emitter_root.glob("csl_spec.zig"))
         _c41_paths += list(
             (REPO_ROOT / "runtime/zig/examples/simulator").glob(
                 "*/compile/*/pe_program.csl"
@@ -630,7 +631,7 @@ def run_model_contracts(
                             f"{_rel}:{_idx + 1}: fabout_dsd still uses fabric_color"
                         )
         _spec_text = (
-            REPO_ROOT / "runtime/zig/src/doe_wgsl/csl_spec.zig"
+            REPO_ROOT / "runtime/zig/src/compiler/wgsl/emit/csl/csl_spec.zig"
         ).read_text(encoding="utf-8")
         if 'CSLC_SDK_MIN_VERSION: []const u8 = "2.10.0"' not in _spec_text:
             _c41_bad.append("csl_spec.zig does not declare SDK 2.10.0 floor")

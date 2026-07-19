@@ -10,8 +10,8 @@
 
 const std = @import("std");
 
-const shader = @import("../../src/doe_shader_native.zig");
-const native = @import("../../src/doe_wgpu_native.zig");
+const shader = @import("../../src/native/shader/doe_shader_native.zig");
+const native = @import("../../src/native/mod.zig");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
 
 // ============================================================

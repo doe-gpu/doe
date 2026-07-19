@@ -1,5 +1,5 @@
 const std = @import("std");
-const model_commands = @import("../../model_commands.zig");
+const model_commands = @import("../../contracts/model/model_commands.zig");
 const runtime_types = @import("../runtime_types.zig");
 
 const model = struct {

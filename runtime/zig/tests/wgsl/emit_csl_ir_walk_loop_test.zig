@@ -14,7 +14,7 @@
 // emits the expression inline without the trailing `;\n`.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 
 const allocator = std.testing.allocator;
 

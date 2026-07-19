@@ -1,7 +1,7 @@
 // coverage_resource_test.zig — WGSL attribute, storage-class, and pointer coverage tests.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 const translateToMsl = mod.translateToMsl;
 const translateToHlsl = mod.translateToHlsl;
 const translateToSpirv = mod.translateToSpirv;

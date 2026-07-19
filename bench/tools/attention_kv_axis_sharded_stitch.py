@@ -1,7 +1,7 @@
 """Host-side stitch for the kv-axis-sharded attention partials kernel.
 
 Companion to the multi-PE TSIR-CSL emit body
-(``runtime/zig/src/tsir/emit_kernel_body_attention.zig::emitKvAxisSharded``).
+(``runtime/zig/src/compiler/tsir/emit_kernel_body_attention.zig::emitKvAxisSharded``).
 Each PE writes a ``[head_dim + 2]f32`` partials buffer:
 
     output[0..head_dim] = local_O[d]   (un-normalized: sum_k weights[k] * V_local[k, d])

@@ -4,7 +4,7 @@
 -- that ref-type address spaces are preserved through arbitrary load/member
 -- access chains of any depth.
 --
--- Mirrors: runtime/zig/src/doe_wgsl/emit_msl_ir.zig address space emission
+-- Mirrors: runtime/zig/src/compiler/wgsl/emit/msl/emit_msl_ir.zig address space emission
 -- and ir.zig AddressSpace enum.
 --
 -- Classification:

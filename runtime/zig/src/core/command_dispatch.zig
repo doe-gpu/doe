@@ -1,4 +1,4 @@
-const model = @import("../model_commands.zig");
+const model = @import("../contracts/model/model_commands.zig");
 const runtime_types = @import("../backend/runtime_types.zig");
 const copy_commands = @import("resource/wgpu_commands_copy.zig");
 const compute_commands = @import("compute/wgpu_commands_compute.zig");

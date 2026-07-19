@@ -1,6 +1,6 @@
 const std = @import("std");
-const dawn_plan_types = @import("../dawn_plan_types.zig");
-const support = @import("../webgpu_plan_executor_support.zig");
+const dawn_plan_types = @import("dawn_plan_types.zig");
+const support = @import("webgpu_plan_executor_support.zig");
 
 pub const TraceEmitDefaults = struct {
     backend_selection_reason: []const u8,

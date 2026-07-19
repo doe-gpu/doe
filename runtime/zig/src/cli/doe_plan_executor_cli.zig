@@ -1,6 +1,6 @@
 const std = @import("std");
-const execution = @import("../execution.zig");
-const doe_plan_executor = @import("../doe_plan_executor.zig");
+const execution = @import("../runtime/execution.zig");
+const doe_plan_executor = @import("../plan/doe_plan_executor.zig");
 
 const Allocator = std.mem.Allocator;
 

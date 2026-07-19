@@ -1,6 +1,6 @@
 const std = @import("std");
 const log = std.log.scoped(.d3d12_render);
-const model_render_types = @import("../../../model_render_types.zig");
+const model_render_types = @import("../../../contracts/model/model_render_types.zig");
 const common_timing = @import("../../common/timing.zig");
 const webgpu = @import("../../runtime_types.zig");
 const dc = @import("../d3d12_constants.zig");
@@ -8,7 +8,7 @@ const d3d12_formats = @import("../d3d12_formats.zig");
 const d3d12_depth_stencil = @import("../resources/d3d12_depth_stencil.zig");
 const d3d12_descriptors = @import("../d3d12_descriptors.zig");
 const d3d12_render_vertex = @import("d3d12_render_vertex.zig");
-const render_bundle = @import("../../../render_bundle.zig");
+const render_bundle = @import("../../../runtime/render/render_bundle.zig");
 const bridge = @import("../d3d12_bridge_decls.zig");
 
 const PipelineKey = d3d12_render_vertex.PipelineKey;

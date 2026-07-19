@@ -16,7 +16,7 @@
   },
   "localWireProcSurface": {
     "required": true,
-    "resolverSourcePath": "runtime/zig/src/wgpu_dropin_lib.zig",
+    "resolverSourcePath": "runtime/zig/src/dropin/wgpu_dropin_lib.zig",
     "description": "Browser interop procs that must resolve through Doe-local wgpuGetProcAddress mappings instead of Dawn/native fallback. Error-object entries return Doe-owned handles; macOS shared texture memory imports IOSurface handles through Doe; shared buffer memory and shared fences fail explicitly until a native handle source is available, and Chromium active-Doe shared-buffer mailbox association fails closed before injection.",
     "requiredSymbols": [
       { "symbol": "wgpuDeviceCreateErrorBuffer", "domain": "error_object" },

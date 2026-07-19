@@ -1,9 +1,9 @@
 // emit_hlsl_codegen_test.zig — HLSL compute, binding, and control-flow emission tests.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const dispatch_contract = @import("../../src/doe_wgsl/hlsl_dispatch_contract.zig");
-const maps = @import("../../src/doe_wgsl/emit_hlsl_maps.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const dispatch_contract = @import("../../src/compiler/wgsl/emit/hlsl/hlsl_dispatch_contract.zig");
+const maps = @import("../../src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

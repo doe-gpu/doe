@@ -363,7 +363,7 @@ it does not live in a scratch-only path.
     can link the stable path
 - structural reporter entrypoint:
   - `zig build runtime-compile-report` builds `doe-runtime-compile-report`
-  - `runtime/zig/src/doe_wgsl/runtime_compile_report.zig` is the single-shader
+  - `runtime/zig/src/compiler/wgsl/runtime/runtime_compile_report.zig` is the single-shader
     structural emitter; one invocation per shader emits the target, output
     byte count, target-specific MSL/SPIR-V byte fields, MSL-only `min(...)`
     count and `_doe_sizes` presence, `needs_sizes_buf`, dispatch
@@ -1897,7 +1897,7 @@ python3 bench/cli.py compare \
   `p1-resource-table`, `p1-capability-macro`, `p2-lifecycle`, `p2-lifecycle-macro`, `surface`), promotion
   requires `applesToApplesVetted=true` in workload config.
 - strict upload comparability now preflights the executed `doe-zig-runtime` binary:
-  it must expose `--upload-buffer-usage` and `--upload-submit-every`, reject invalid values for both flags, and not be older than key upload/runtime Zig sources (`runtime/zig/src/main.zig`, `runtime/zig/src/execution.zig`, `runtime/zig/src/wgpu_commands.zig`, `runtime/zig/src/webgpu_ffi.zig`).
+  it must expose `--upload-buffer-usage` and `--upload-submit-every`, reject invalid values for both flags, and not be older than key upload/runtime Zig sources (`runtime/zig/src/cli/entrypoints/main.zig`, `runtime/zig/src/runtime/execution.zig`, `runtime/zig/src/full/command/wgpu_commands.zig`, `runtime/zig/src/compat/webgpu_ffi.zig`).
   when a workload contract sets `--queue-wait-mode`, strict preflight also requires runtime support and validation for `--queue-wait-mode process-events|wait-any`.
 - strict render comparability now selects encode-only operation timing on the Doe side for workload domains
   `render` and `render-macro` (`timingSource=doe-execution-encode-ns`) when encode is a plausible share of total execution.

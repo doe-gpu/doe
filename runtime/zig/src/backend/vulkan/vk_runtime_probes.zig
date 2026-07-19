@@ -1,7 +1,7 @@
 const std = @import("std");
 const backend_policy = @import("../backend_policy.zig");
 const common_timing = @import("../common/timing.zig");
-const model_gpu_types = @import("../../model_texture_value_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
 const vk_async_probes = @import("vk_async_probes.zig");
 const vk_resources = @import("vk_resources.zig");
 

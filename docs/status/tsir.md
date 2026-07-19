@@ -41,11 +41,11 @@ through the same Program Bundle shape, so the next Cerebras-lane refresh-loop
 target is queued to be Qwen 3.6-27B once the gaps below are typed-rejected or
 lowered. Findings are against:
 
-- `runtime/zig/src/tsir/schema.zig`
-- `runtime/zig/src/tsir/emit_kernel_body.zig`
-- `runtime/zig/src/tsir/emit_kernel_body_attention.zig`
-- `runtime/zig/src/doe_wgsl/emit_csl_rope.zig`
-- `runtime/zig/src/doe_wgsl/emit_csl_layout.zig`
+- `runtime/zig/src/compiler/tsir/schema.zig`
+- `runtime/zig/src/compiler/tsir/emit_kernel_body.zig`
+- `runtime/zig/src/compiler/tsir/emit_kernel_body_attention.zig`
+- `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_rope.zig`
+- `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig`
 
 ### Already covered (no Doe-side change needed)
 
@@ -113,7 +113,7 @@ needs the body-emit gaps closed.
 ## 2026-04-25 — CSL RMSNorm emitters use sqrt_nr wrapper
 
 TSIR CSL RMSNorm emission no longer writes raw `math.sqrt(mean_sq + eps)` into
-the production PE body. `runtime/zig/src/tsir/emit_kernel_body.zig` now emits a
+the production PE body. `runtime/zig/src/compiler/tsir/emit_kernel_body.zig` now emits a
 `sqrt_nr` helper (`math.sqrt` seed plus one Newton refinement) and computes
 `inv_rms` through that helper. The shared WGSL-to-CSL reduction walker also has
 a configurable sqrt target; `emit_csl_reduction.zig` sets it to `sqrt_nr`, and
@@ -125,10 +125,10 @@ NR-refined wrapper.
 
 ## 2026-04-25 — KV cache CSL wrapper narrowed to TSIR body emission
 
-`runtime/zig/src/doe_wgsl/emit_csl_kv_cache.zig` is now just the WGSL-name
+`runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_kv_cache.zig` is now just the WGSL-name
 adapter for TSIR `kv_write` / `kv_read` body ops. The unused hand-maintained
 storage-pointer / compile-time export helpers were removed so the live body
-path has a single source: `runtime/zig/src/tsir/emit_kernel_body.zig`.
+path has a single source: `runtime/zig/src/compiler/tsir/emit_kernel_body.zig`.
 
 Coverage added in `emit_csl_host_compile_source.zig` locks the HostPlan compile
 source output for both KV patterns: `kv_write` must use the TSIR decode-position
@@ -284,15 +284,15 @@ how much. For iteration cadence see
 
 | Step | Artifact | State |
 | --- | --- | --- |
-| Step 1 oracle | `runtime/zig/src/tsir/reference_interpreter.zig` | Recognizes fused_gemv / gather / rms_norm across {f32, f16, bf16} with strict_ordered + associative_allowed reductions + literal/uniform epsilon. Unsupported shapes fail closed with `NotImplemented`. |
+| Step 1 oracle | `runtime/zig/src/compiler/tsir/reference_interpreter.zig` | Recognizes fused_gemv / gather / rms_norm across {f32, f16, bf16} with strict_ordered + associative_allowed reductions + literal/uniform epsilon. Unsupported shapes fail closed with `NotImplemented`. |
 | Step 1.5 bootstrap | `runtime/zig/tests/tsir/bootstrap/` | Pinned WGSL + hand-sketched `.tsir-semantic.json` + per-target realization sketches for fused_gemv, rms_norm, gather. |
-| Step 2 descriptors | `runtime/zig/src/targets/{webgpu_generic,wse3,mod}.zig` | Correctness/planner field split; `RuntimeSizedBindingPolicy`; pairwise-distinct descriptor hashes. |
-| Step 3 schema | `runtime/zig/src/tsir/schema.zig` + `config/doe-tsir-*.schema.json` | Semantic/realization split with canonical digests; RMSNorm body contract + uniform-field epsilon with binding/offset plumbing. |
-| Step 4 frontend | `runtime/zig/src/tsir/frontend.zig` | Lowers all three bootstrap families to their declared body ops; axis recovery + reduction recovery + body inference (per family) + epsilon resolution. |
-| Step 5 planner | `runtime/zig/src/tsir/planner.zig` | `planRealization` produces deterministic `RealizationFunction` records for both descriptors; residency / tile factors / PE grid / reduction tree / typed rejection. |
-| Step 6 collectives | `runtime/zig/src/tsir/collective_synthesis.zig` (planner calls in); frontend walker still owns semantic collection | Dedicated pass file isolates descriptor-backed native-capability / exactness / fabric-color-budget logic with typed rejections. Bootstrap families still have no collectives to exercise it; attention (Phase B) consumes this pass. |
-| Step 7 emitter | `runtime/zig/src/tsir/emit_{kernel_body,csl,webgpu,msl,dxil,spir_v,text_skeleton}.zig` | Realization-only skeleton entry points remain for contract inspection; semantic-aware entry points emit executable fused_gemv / rms_norm / gather bodies across WebGPU, CSL, MSL, DXIL/HLSL, and SPIR-V/GLSL surfaces. Source-backed `emitterCodeDigest()` includes shared body source and remains pairwise-distinct by test. |
-| Step 8 parity CLI | `bench/tools/doe_parity.py` + `runtime/zig/src/tsir_bootstrap_oracle.zig` + `bench/gates/nightly_tsir_parity_canary.py` + `bench/fixtures/tsir-bootstrap-inputs/*.json` | Narrow bootstrap oracle executes fused_gemv / rms_norm / gather input JSONs through the built Zig reference subprocess and writes real reference hashes. Canary pairs each manifest-entry fixture with its input-tensor fixture by kernel name; all six receipts now carry `reference=pass`. Backend execution lanes still return `not_implemented` / `deferred`; WebGPU/CSL execution wiring remains unlanded. |
+| Step 2 descriptors | `runtime/zig/src/compiler/targets/{webgpu_generic,wse3,mod}.zig` | Correctness/planner field split; `RuntimeSizedBindingPolicy`; pairwise-distinct descriptor hashes. |
+| Step 3 schema | `runtime/zig/src/compiler/tsir/schema.zig` + `config/doe-tsir-*.schema.json` | Semantic/realization split with canonical digests; RMSNorm body contract + uniform-field epsilon with binding/offset plumbing. |
+| Step 4 frontend | `runtime/zig/src/compiler/tsir/frontend.zig` | Lowers all three bootstrap families to their declared body ops; axis recovery + reduction recovery + body inference (per family) + epsilon resolution. |
+| Step 5 planner | `runtime/zig/src/compiler/tsir/planner.zig` | `planRealization` produces deterministic `RealizationFunction` records for both descriptors; residency / tile factors / PE grid / reduction tree / typed rejection. |
+| Step 6 collectives | `runtime/zig/src/compiler/tsir/collective_synthesis.zig` (planner calls in); frontend walker still owns semantic collection | Dedicated pass file isolates descriptor-backed native-capability / exactness / fabric-color-budget logic with typed rejections. Bootstrap families still have no collectives to exercise it; attention (Phase B) consumes this pass. |
+| Step 7 emitter | `runtime/zig/src/compiler/tsir/emit_{kernel_body,csl,webgpu,msl,dxil,spir_v,text_skeleton}.zig` | Realization-only skeleton entry points remain for contract inspection; semantic-aware entry points emit executable fused_gemv / rms_norm / gather bodies across WebGPU, CSL, MSL, DXIL/HLSL, and SPIR-V/GLSL surfaces. Source-backed `emitterCodeDigest()` includes shared body source and remains pairwise-distinct by test. |
+| Step 8 parity CLI | `bench/tools/doe_parity.py` + `runtime/zig/src/compiler/tsir/tools/tsir_bootstrap_oracle.zig` + `bench/gates/nightly_tsir_parity_canary.py` + `bench/fixtures/tsir-bootstrap-inputs/*.json` | Narrow bootstrap oracle executes fused_gemv / rms_norm / gather input JSONs through the built Zig reference subprocess and writes real reference hashes. Canary pairs each manifest-entry fixture with its input-tensor fixture by kernel name; all six receipts now carry `reference=pass`. Backend execution lanes still return `not_implemented` / `deferred`; WebGPU/CSL execution wiring remains unlanded. |
 | Step 9 family rewrites | `reports/parity/{fused_gemv,rms_norm,gather}.{webgpu-generic,wse3}/` | **3/3 bootstrap kernels have reference-lane-green receipts at both targets.** Backend-lane `pass` still gated on Step 8 execution wiring. Real Gemma-kernel receipts still unlanded (bootstrap proves plumbing, not family coverage). |
 | Step 10 manifest binding | `bench/tools/tsir_manifest_lowering.py` + `bench/fixtures/tsir-manifest-entries/*.json` + `bench/tools/bind_bootstrap_lowerings_to_manifest.mjs` | Schema, builder, six bootstrap fixtures; receipt ↔ fixture identity lockstep + fixture version + descriptor uniformity locked by test. Live binding shipped to two Doppler manifests — `gemma-3-270m-it-q4k-ehf16-af32` and `gemma-3-1b-it-q4k-ehf16-af32` — each carrying all six bootstrap lowering entries in `integrityExtensions.lowerings[]`; Doppler `validateManifest` and `listSupportedBackends` accept both. |
 | Step 11 AOT convert | — | Unlanded; cache-key design pending. |

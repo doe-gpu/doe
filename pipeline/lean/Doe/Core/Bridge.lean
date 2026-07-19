@@ -5,7 +5,7 @@
 -- proof-level decision the runtime consults at gate time.
 --
 -- Mirrors: runtime/zig/src/quirk/runtime.zig (finalizeBucket / is_blocking)
---          runtime/zig/src/model_policy.zig  (ProofLevel precedence rules)
+--          runtime/zig/src/contracts/model/model_policy.zig  (ProofLevel precedence rules)
 -- Classification: comptime_verified (finite enum exhaustion over SafetyClass,
 -- VerificationMode, ProofLevel).
 

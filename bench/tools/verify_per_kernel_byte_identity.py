@@ -5,7 +5,7 @@ Mitigates the attention-canary precondition from
 docs/cerebras-model-ledgers.md (Manifest-shape simfabric proof plan):
 
   > The host-plan tool already accepts `--num-layers`; verify in
-  > runtime/zig/src/csl_host_plan_tool.zig that 1-layer emission keeps
+  > runtime/zig/src/spatial/csl/csl_host_plan_tool.zig that 1-layer emission keeps
   > the per-kernel artifacts identical to the 60-layer emission
   > (kernel CSL is per-class, not per-layer-instance).
 

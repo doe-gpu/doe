@@ -19,7 +19,7 @@ IR (TSIR) between WGSL IR and backend emitters, with a parity oracle defined
 before backend-specific lowering decisions.
 
 This is a plan document, not a landed-claim document. Current code still uses
-the classifier/template path for CSL. The in-tree `runtime/zig/src/tsir/`
+the classifier/template path for CSL. The in-tree `runtime/zig/src/compiler/tsir/`
 surface is scaffolding for this plan, not a completed pipeline.
 
 Status note, 2026-04-25: the older "WS4 memory blockers choose the first real
@@ -175,7 +175,7 @@ incremental history lives in the tail of
 Deep 2026-04-24 TSIR Step 7-12 entries live in
 [`docs/status/archive/2026-04-24-tsir.md`](status/archive/2026-04-24-tsir.md).
 
-TSIR core under `runtime/zig/src/tsir/`:
+TSIR core under `runtime/zig/src/compiler/tsir/`:
 
 - `schema.zig` — two-level TSIR shape (`Semantic`, `Realization`), exactness
   classes aligned to RDRR, rejection taxonomy, and `SemanticBody` contract
@@ -224,7 +224,7 @@ distinctness across all five is locked by test so
 manifest-lowering entries cannot silently ambiguate which backend
 produced an artifact.
 
-Target descriptors under `runtime/zig/src/targets/`:
+Target descriptors under `runtime/zig/src/compiler/targets/`:
 
 - `webgpu_generic.zig` and `wse3.zig` — conservative portable WebGPU
   profile and Cerebras WSE-3 profile. Descriptor fields split into
@@ -268,12 +268,12 @@ Bench tooling + fixtures:
 - `runtime/zig/tests/tsir/bootstrap/` — pinned `.wgsl`, hand-sketched
   `.tsir-semantic.json`, and per-target `.tsir-realization.*.json`
   plus `.notes.md` for each bootstrap family.
-- `runtime/zig/src/tsir_bootstrap_manifest_inputs.zig` — build-step
+- `runtime/zig/src/compiler/tsir/tools/tsir_bootstrap_manifest_inputs.zig` — build-step
   entrypoint invoked by `bench/tools/generate_tsir_manifest_fixtures.py`
   via `zig build tsir-bootstrap-manifest-inputs` to materialize the
   canonical digest inputs the Python builder pairs with target descriptor
   hashes and emitter-code digests.
-- `runtime/zig/src/tsir_bootstrap_oracle.zig` — build-step entrypoint
+- `runtime/zig/src/compiler/tsir/tools/tsir_bootstrap_oracle.zig` — build-step entrypoint
   invoked by `bench/tools/doe_parity.py` via `zig build
   tsir-bootstrap-oracle` so the parity CLI's bootstrap reference hashes
   come from Zig `tsir.reference.run` rather than Python-local math.
@@ -323,7 +323,7 @@ path actually needs. The five re-scope moves are:
    oracle exists as a small self-contained program.
 
 2. **TSIR → CSL is the critical path; other backends are optional.** The
-   emitters under `runtime/zig/src/tsir/emit_{csl,webgpu,msl,dxil,spir_v}.zig`
+   emitters under `runtime/zig/src/compiler/tsir/emit_{csl,webgpu,msl,dxil,spir_v}.zig`
    collectively cover five targets. WS3's downstream consumer is CSL
    (the Cerebras lane WS4 owns). Doppler already produces WGSL, so
    TSIR → WebGPU is a consistency check, not a functional requirement.
@@ -422,7 +422,7 @@ Claims tightened from the previous draft:
 The parity oracle is split into two regimes under the re-scope:
 
 **Bootstrap regime (this step, as originally written).** The scalar
-reference interpreter at `runtime/zig/src/tsir/reference_interpreter.zig`
+reference interpreter at `runtime/zig/src/compiler/tsir/reference_interpreter.zig`
 is the oracle for the bootstrap catalog (`fused_gemv`, `rms_norm`,
 `gather`). It consumes WGSL-derived TSIR, not backend code, and defines
 what counts as correct before any emitter gets a vote. The interpreter

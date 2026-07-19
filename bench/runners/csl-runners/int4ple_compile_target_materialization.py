@@ -365,7 +365,7 @@ def _materialize_weight_input(
         # Q4K passthrough: ship 144-byte blocks per 256-weight chunk to
         # the fabric without host-side dequant. The PE program runs
         # `dequant_b_tile()` as a per-broadcast-step prologue (see
-        # runtime/zig/src/doe_wgsl/emit_csl_matmul_q4k.zig).
+        # runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig).
         # plannedElementCount is in BYTES for this dtype, not weights.
         raw_bytes = _materialize_weight_matrix_q4k_bytes(mapping, source_transform)
         values = _summa_b_tiles_from_q4k_bytes(raw_bytes, source_transform)

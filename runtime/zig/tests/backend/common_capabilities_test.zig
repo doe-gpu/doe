@@ -1,5 +1,5 @@
 const std = @import("std");
-const model = @import("../../src/model.zig");
+const model = @import("../../src/contracts/model/model.zig");
 const capabilities = @import("../../src/backend/common/capabilities.zig");
 
 test "empty capability set supports nothing" {

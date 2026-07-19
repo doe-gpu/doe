@@ -5,11 +5,11 @@
 -- modules one-for-one; any Zig-side change must be reflected here in the
 -- same change (per CLAUDE.md contract-update discipline).
 --
--- Mirrors: runtime/zig/src/model_policy.zig (Api, Scope, SafetyClass,
+-- Mirrors: runtime/zig/src/contracts/model/model_policy.zig (Api, Scope, SafetyClass,
 --          VerificationMode, ProofLevel, ActionKind, ToggleEffect)
---          runtime/zig/src/model_profile.zig (DeviceProfile)
---          runtime/zig/src/model_quirks.zig  (Quirk, MatchSpec)
---          runtime/zig/src/model_commands.zig (CommandKind)
+--          runtime/zig/src/contracts/model/model_profile.zig (DeviceProfile)
+--          runtime/zig/src/contracts/model/model_quirks.zig  (Quirk, MatchSpec)
+--          runtime/zig/src/contracts/model/model_commands.zig (CommandKind)
 -- Classification: tautological (enum definitions are by construction).
 
 inductive Api where

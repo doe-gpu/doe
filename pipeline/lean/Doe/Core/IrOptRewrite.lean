@@ -1,7 +1,7 @@
 -- Doe/Core/IrOptRewrite.lean
 --
 -- Proof hooks for backend-independent WGSL IR integer/bool identity rewrites.
--- Mirrors: runtime/zig/src/doe_wgsl/ir_opt_rewrite.zig
+-- Mirrors: runtime/zig/src/compiler/wgsl/ir/ir_opt_rewrite.zig
 --
 -- The Zig pass only rewrites identities that preserve the required dynamic
 -- operand: x + 0, 0 + x, x - 0, x * 1, 1 * x, x / 1, x | 0, 0 | x,

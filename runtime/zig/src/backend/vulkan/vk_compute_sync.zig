@@ -1,6 +1,6 @@
 const c = @import("vk_constants.zig");
-const model_binding_types = @import("../../model_binding_value_types.zig");
-const model_compute_types = @import("../../model_compute_types.zig");
+const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
+const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
 
 pub const MAX_TRACKED_COMPUTE_BINDINGS: usize = c.MAX_DESCRIPTOR_SETS * 16;
 

@@ -1,5 +1,5 @@
 const std = @import("std");
-const execution = @import("../../execution.zig");
+const execution = @import("../../runtime/execution.zig");
 const numeric_stability_annotation = @import("annotation.zig");
 const numeric_stability_service = @import("service/numeric_stability.zig");
 const common = @import("../../full/modules/common.zig");

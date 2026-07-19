@@ -3,7 +3,7 @@
 These are the input-tensor JSON artifacts consumed by the Zig
 `doe-tsir-bootstrap-oracle` subprocess that backs `bench/tools/doe_parity.py`.
 
-Shape contract (enforced by `runtime/zig/src/tsir_bootstrap_oracle.zig`):
+Shape contract (enforced by `runtime/zig/src/compiler/tsir/tools/tsir_bootstrap_oracle.zig`):
 
 - top-level: `{ "kernel": <name>, "inputs": { <buffer-name>: <buffer>, ... } }`
 - buffer: `{ "elem": "f32"|"f16"|"bf16"|"u32"|"u8", "shape": [<u64>, ...], "values": [<num>, ...] }`

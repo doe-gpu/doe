@@ -9,7 +9,7 @@ what to build, gate, prove, or remove. Strategy prose belongs in
 ## Task routing
 
 - Keep browser execution tasks under [`../browser/chromium/`](../browser/chromium/README.md).
-- Keep compiler work under [`../runtime/zig/src/doe_wgsl/`](../runtime/zig/src/doe_wgsl/).
+- Keep compiler work under [`../runtime/zig/src/compiler/wgsl/`](../runtime/zig/src/compiler/wgsl/).
 - Keep runtime backend work under [`../runtime/zig/src/backend/`](../runtime/zig/src/backend/).
 - Keep benchmark and claim gates under [`../bench/`](../bench/README.md).
 - Keep contracts and schemas under [`../config/`](../config/).

@@ -5,11 +5,11 @@ Source: WGSL pinned at `runtime/zig/tests/wgsl/emit_csl_matmul_q4k_test.zig`
 
 CSL emit sites:
 
-- PE program: `runtime/zig/src/doe_wgsl/emit_csl_matmul_q4k.zig`
-- Layout:     `runtime/zig/src/doe_wgsl/emit_csl_layout.zig::emitMatmulQ4kLayout`
-- Classifier: `runtime/zig/src/doe_wgsl/emit_csl_classify.zig::classify`
+- PE program: `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig`
+- Layout:     `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig::emitMatmulQ4kLayout`
+- Classifier: `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_classify.zig::classify`
               (returns `tiled_matmul_q4k_dequant_b`)
-- Validator:  `runtime/zig/src/doe_wgsl/emit_csl_validate.zig::validateTiledMatmulQ4k`
+- Validator:  `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_validate.zig::validateTiledMatmulQ4k`
 - Host plan:  `bench/runners/csl-runners/int4ple_summa_layout.py::b_tiles_from_q4k_bytes`
 - Runner:     `bench/runners/csl-runners/int4ple_compile_target_sim_runner.py`
               (dtype `q4k_block256`, transform `weight_matrix_to_summa_q4k_tiles`)

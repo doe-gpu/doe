@@ -1,7 +1,7 @@
 -- Doe/Shader/BoundsElisionMatcher.lean
 --
 -- Matcher-facing proof contract for proof-backed bounds elision.
--- Mirrors: runtime/zig/src/doe_wgsl/dispatch_proof_match.zig
+-- Mirrors: runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig
 -- Classification: lean_required.
 
 import Doe.Shader.ComputeBounds

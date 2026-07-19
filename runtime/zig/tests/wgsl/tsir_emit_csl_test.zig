@@ -5,15 +5,15 @@
 // has already rejected the target.
 
 const std = @import("std");
-const tsir = @import("../../src/tsir/mod.zig");
-const targets = @import("../../src/targets/mod.zig");
+const tsir = @import("../../src/compiler/tsir/mod.zig");
+const targets = @import("../../src/compiler/targets/mod.zig");
 
 test "tsir csl emitter exposes source-backed code digest" {
     const digest = tsir.emit_csl.emitterCodeDigest();
     var expected: [32]u8 = undefined;
     var h = std.crypto.hash.sha2.Sha256.init(.{});
-    h.update(@embedFile("../../src/tsir/emit_csl.zig"));
-    h.update(@embedFile("../../src/tsir/emit_kernel_body.zig"));
+    h.update(@embedFile("../../src/compiler/tsir/emit_csl.zig"));
+    h.update(@embedFile("../../src/compiler/tsir/emit_kernel_body.zig"));
     h.final(&expected);
     try std.testing.expectEqualSlices(u8, &expected, &digest);
     try std.testing.expect(!allZero(&digest));

@@ -5,13 +5,13 @@
 // and ir.TypeStore (type interning/equality).
 
 const std = @import("std");
-const ir = @import("../../src/doe_wgsl/ir.zig");
-const emit_msl_maps = @import("../../src/doe_wgsl/emit_msl_maps.zig");
-const emit_msl_subgroups = @import("../../src/doe_wgsl/emit_msl_subgroups.zig");
-const emit_spirv = @import("../../src/doe_wgsl/emit_spirv.zig");
-const sema_typeutils = @import("../../src/doe_wgsl/sema_typeutils.zig");
-const sema_types = @import("../../src/doe_wgsl/sema_types.zig");
-const sema_helpers = @import("../../src/doe_wgsl/sema_helpers.zig");
+const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
+const emit_msl_maps = @import("../../src/compiler/wgsl/emit/msl/emit_msl_maps.zig");
+const emit_msl_subgroups = @import("../../src/compiler/wgsl/emit/msl/emit_msl_subgroups.zig");
+const emit_spirv = @import("../../src/compiler/wgsl/emit/spirv/emit_spirv.zig");
+const sema_typeutils = @import("../../src/compiler/wgsl/frontend/sema_typeutils.zig");
+const sema_types = @import("../../src/compiler/wgsl/frontend/sema_types.zig");
+const sema_helpers = @import("../../src/compiler/wgsl/frontend/sema_helpers.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

@@ -130,9 +130,9 @@ Lean proves theorem families. It does not, by itself, prove that every Zig calle
 
 The current trusted matcher/application boundary is:
 
-- `runtime/zig/src/doe_wgsl/dispatch_proof_match.zig` decides which shader access shapes are theorem-covered.
-- `runtime/zig/src/doe_compute_preconditions_native.zig` enforces the host-side preconditions that replace per-access shader clamps.
-- `runtime/zig/src/lean_proof.zig` validates theorem presence plus artifact provenance at comptime.
+- `runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig` decides which shader access shapes are theorem-covered.
+- `runtime/zig/src/native/compute/doe_compute_preconditions_native.zig` enforces the host-side preconditions that replace per-access shader clamps.
+- `runtime/zig/src/verification/lean_proof.zig` validates theorem presence plus artifact provenance at comptime.
 
 So the strongest current Lean story is:
 
@@ -165,7 +165,7 @@ Full theorem pack (`Doe/Full/`, maps to `runtime/zig/src/full/`):
 - `Doe/Full/ComparabilityFixtures.lean` — parity fixtures (`lean_fixture`)
 - `Doe/Full/WorkloadGeometry.lean` — arbitrary-`Nat` workload-geometry theorems feeding execution-shape comparability
 
-Shader theorem pack (`Doe/Shader/`, maps to `runtime/zig/src/doe_wgsl/`):
+Shader theorem pack (`Doe/Shader/`, maps to `runtime/zig/src/compiler/wgsl/`):
 - `Doe/Shader/ComputeBounds.lean` — compute dispatch bounds safety, proving global_invocation_id < array_length under dispatch-fit preconditions. Enables bounds-check elimination in `ir_transform_robustness.zig`.
 
 Generated theorem contract:

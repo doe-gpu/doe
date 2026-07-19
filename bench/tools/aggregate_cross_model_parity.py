@@ -263,7 +263,7 @@ def _cslc_hash_from_driver(driver_path: Path, driver: dict[str, Any] | None) -> 
             {
                 "driverResult": _rel(driver_path),
                 "executable": str(hash_executable) if hash_executable else executable,
-                "sdkMinVersionSource": "runtime/zig/src/doe_wgsl/csl_spec.zig",
+                "sdkMinVersionSource": "runtime/zig/src/compiler/wgsl/emit/csl/csl_spec.zig",
             },
             sort_keys=True,
         ).encode("utf-8")
@@ -483,9 +483,9 @@ def build_receipt(required_lanes: tuple[str, ...] = DEFAULT_REQUIRED_LANES) -> d
     if git_head is None:
         issues.append("unable to resolve Doe git HEAD")
 
-    op_to_spec_path = REPO_ROOT / "runtime/zig/src/doe_wgsl/emit_csl_exec_v1.zig"
-    tsir_schema_path = REPO_ROOT / "runtime/zig/src/tsir/schema.zig"
-    csl_spec_path = REPO_ROOT / "runtime/zig/src/doe_wgsl/csl_spec.zig"
+    op_to_spec_path = REPO_ROOT / "runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig"
+    tsir_schema_path = REPO_ROOT / "runtime/zig/src/compiler/tsir/schema.zig"
+    csl_spec_path = REPO_ROOT / "runtime/zig/src/compiler/wgsl/emit/csl/csl_spec.zig"
     toolchains_path = REPO_ROOT / "config/toolchains.json"
 
     versions = {

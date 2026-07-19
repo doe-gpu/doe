@@ -1,7 +1,7 @@
 // mod_error_contract_test.zig — Public WGSL translation error-contract tests.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 const analyzeToIr = mod.analyzeToIr;
 const TranslateError = mod.TranslateError;
 const CompilationStage = mod.CompilationStage;

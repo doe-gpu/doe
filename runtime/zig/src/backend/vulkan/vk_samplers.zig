@@ -1,6 +1,6 @@
 const std = @import("std");
 const c = @import("vk_constants.zig");
-const model_render_types = @import("../../model_render_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
 
 // WebGPU filter/address mode constants for sampler translation.
 const WGPU_FILTER_LINEAR: u32 = 2;

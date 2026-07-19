@@ -1,13 +1,13 @@
 const std = @import("std");
-const model_gpu_types = @import("../../model_texture_value_types.zig");
-const model_texture_types = @import("../../model_texture_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
+const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const proc_types = @import("../abi/wgpu_proc_types.zig");
 const abi_base = proc_types.base;
 const abi_descriptor = proc_types.descriptor;
 const abi_execution = @import("../abi/wgpu_execution_types.zig");
 const loader = @import("../abi/wgpu_loader.zig");
 const resources = @import("wgpu_resources.zig");
-const texture_procs_mod = @import("../../wgpu_texture_procs.zig");
+const texture_procs_mod = @import("../abi/procs/wgpu_texture_procs.zig");
 
 pub fn executeTextureWrite(self: anytype, texture_cmd: model_texture_types.TextureWriteCommand) !abi_execution.NativeExecutionResult {
     const texture_procs = texture_procs_mod.loadTextureProcs(self.core.dyn_lib) orelse return error.TextureProcUnavailable;

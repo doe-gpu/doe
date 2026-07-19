@@ -1,5 +1,5 @@
 const std = @import("std");
-const multi_queue = @import("../../src/multi_queue.zig");
+const multi_queue = @import("../../src/runtime/queue/multi_queue.zig");
 const QueueType = multi_queue.QueueType;
 const QueueDescriptor = multi_queue.QueueDescriptor;
 const FencePoint = multi_queue.FencePoint;

@@ -1,4 +1,4 @@
-const _impl = @import("../../trace.zig");
+const _impl = @import("../../runtime/trace/trace.zig");
 pub const TraceState = _impl.TraceState;
 pub const TraceRunSummary = _impl.TraceRunSummary;
 pub const writef = _impl.writef;

@@ -387,7 +387,7 @@
         },
         {
           "kind": "file",
-          "path": "runtime/zig/src/main_metal_staged_write_bench.zig"
+          "path": "runtime/zig/bench/entrypoints/metal_staged_write_bench.zig"
         },
         {
           "kind": "file",
@@ -428,7 +428,7 @@
         },
         {
           "kind": "file",
-          "path": "runtime/zig/src/main_metal_staged_write_bench.zig"
+          "path": "runtime/zig/bench/entrypoints/metal_staged_write_bench.zig"
         },
         {
           "kind": "file",
@@ -513,7 +513,7 @@
         },
         {
           "kind": "file",
-          "path": "runtime/zig/src/main_metal_compute_bench.zig"
+          "path": "runtime/zig/bench/entrypoints/metal_compute_bench.zig"
         },
         {
           "kind": "file",
@@ -556,7 +556,7 @@
         },
         {
           "kind": "file",
-          "path": "runtime/zig/src/main_metal_compute_bench.zig"
+          "path": "runtime/zig/bench/entrypoints/metal_compute_bench.zig"
         },
         {
           "kind": "file",

@@ -1,5 +1,5 @@
 const std = @import("std");
-const command_json_raw = @import("../command_json_raw.zig");
+const command_json_raw = @import("command_json_raw.zig");
 
 pub const ParseError = command_json_raw.ParseError;
 pub const RawCommand = command_json_raw.RawCommand;

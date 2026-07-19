@@ -1,5 +1,5 @@
 const std = @import("std");
-const model = @import("../../src/model.zig");
+const model = @import("../../src/contracts/model/model.zig");
 const command_info = @import("../../src/backend/common/command_info.zig");
 
 test "manifest_module returns correct names for all commands" {

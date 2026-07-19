@@ -17,8 +17,8 @@ const vk_resources = @import("vk_resources.zig");
 // draw_call_proxy_fragment.wgsl for the source.
 const DEFAULT_VERTEX_SHADER_NAME = "draw_call_proxy_vertex";
 const DEFAULT_FRAGMENT_SHADER_NAME = "draw_call_proxy_fragment";
-const model_gpu_types = @import("../../model_texture_value_types.zig");
-const model_render_types = @import("../../model_render_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
 
 const VK_NULL_U64 = c.VK_NULL_U64;
 

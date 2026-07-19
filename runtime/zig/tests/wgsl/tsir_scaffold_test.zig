@@ -10,10 +10,10 @@
 // When each TSIR pass lands, its own test file joins `tests/wgsl/`.
 
 const std = @import("std");
-const tsir = @import("../../src/tsir/mod.zig");
-const tsir_digest = @import("../../src/tsir/digest.zig");
-const tsir_reference = @import("../../src/tsir/reference_interpreter.zig");
-const targets = @import("../../src/targets/mod.zig");
+const tsir = @import("../../src/compiler/tsir/mod.zig");
+const tsir_digest = @import("../../src/compiler/tsir/digest.zig");
+const tsir_reference = @import("../../src/compiler/tsir/reference_interpreter.zig");
+const targets = @import("../../src/compiler/targets/mod.zig");
 
 test "target descriptors have distinct stable hashes" {
     const wse3_a = targets.descriptorHash(targets.wse3.descriptor);

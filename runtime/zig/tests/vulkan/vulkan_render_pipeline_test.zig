@@ -1,7 +1,7 @@
 const std = @import("std");
 const vk_render_pipeline = @import("../../src/backend/vulkan/vk_render_pipeline.zig");
 const vk_constants = @import("../../src/backend/vulkan/vk_constants.zig");
-const model = @import("../../src/model.zig");
+const model = @import("../../src/contracts/model/model.zig");
 
 // blend_factor_to_vk
 

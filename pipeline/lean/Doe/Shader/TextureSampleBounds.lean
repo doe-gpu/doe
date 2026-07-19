@@ -1,5 +1,5 @@
 -- Texture sample-level integer coordinate bounds elimination theorems.
--- Mirrors: runtime/zig/src/doe_wgsl/ir_transform_robustness.zig
+-- Mirrors: runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig
 --
 -- Proves that integer texture coordinates derived from global_invocation_id
 -- are within texture dimensions when the dispatch grid fits, so the

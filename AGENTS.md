@@ -39,8 +39,8 @@ The repo carries five tenants under that umbrella:
 | Tenant | Role |
 |---|---|
 | Dawn replacement (Zig WebGPU runtime: `doe-zig-runtime`, `libwebgpu_doe.so`) | runtime tenant — embeddable WebGPU runtime; full Dawn-replacement thesis in [`docs/thesis.md`](docs/thesis.md) |
-| Vulkan / Metal / D3D12 / DXIL emitters | backend tenant — multi-target lowering from the WGSL compiler (`runtime/zig/src/doe_wgsl/`) |
-| Cerebras (TSIR / HostPlan / CSL) | spatial retargeting tenant — Tiled Spatial IR plus host-plan and CSL emit (`runtime/zig/src/tsir/`, `runtime/zig/src/doe_wgsl/emit_csl_*`) |
+| Vulkan / Metal / D3D12 / DXIL emitters | backend tenant — multi-target lowering from the WGSL compiler (`runtime/zig/src/compiler/wgsl/`) |
+| Cerebras (TSIR / HostPlan / CSL) | spatial retargeting tenant — Tiled Spatial IR plus host-plan and CSL emit (`runtime/zig/src/compiler/tsir/`, `runtime/zig/src/compiler/wgsl/emit/csl/`) |
 | Lean proof pipeline | verification tenant — proof-eliminated runtime branches and verified artifacts (`pipeline/lean/`) |
 | Benchmarks and evidence bundles | proof tenant — claim-discipline gates, parity receipts, hardware-validation bundles (`bench/`) |
 

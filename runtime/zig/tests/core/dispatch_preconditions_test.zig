@@ -8,8 +8,8 @@
 const std = @import("std");
 const testing = std.testing;
 
-const dispatch = @import("../../src/dispatch_preconditions.zig");
-const ir = @import("../../src/doe_wgsl/ir.zig");
+const dispatch = @import("../../src/core/compute/dispatch_preconditions.zig");
+const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
 
 const Precondition = ir.DispatchPrecondition;
 

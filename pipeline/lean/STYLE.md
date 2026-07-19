@@ -168,7 +168,7 @@ theorem applyPass_is_prefix (arr : ExprTypeArray) (pass : TransformPass) :
 -- Doe/Shader/ComputeBounds.lean
 --
 -- Bounds safety for global_invocation_id indexing into runtime-sized arrays.
--- Mirrors: runtime/zig/src/doe_wgsl/ir_transform_robustness.zig
+-- Mirrors: runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig
 -- Classification: lean_required.
 ```
 

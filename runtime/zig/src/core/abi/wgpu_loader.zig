@@ -1,6 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model_gpu_types = @import("../../model_texture_value_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
 const proc_types = @import("wgpu_proc_types.zig");
 const abi_base = proc_types.base;
 const abi_descriptor = proc_types.descriptor;

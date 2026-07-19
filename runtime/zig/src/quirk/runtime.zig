@@ -1,11 +1,11 @@
 const std = @import("std");
-const model_commands = @import("../model_commands.zig");
-const model_policy = @import("../model_policy.zig");
-const model_profile = @import("../model_profile.zig");
-const model_quirks = @import("../model_quirks.zig");
+const model_commands = @import("../contracts/model/model_commands.zig");
+const model_policy = @import("../contracts/model/model_policy.zig");
+const model_profile = @import("../contracts/model/model_profile.zig");
+const model_quirks = @import("../contracts/model/model_quirks.zig");
 const toggle_registry = @import("toggle_registry.zig");
 const quirk_actions = @import("quirk_actions.zig");
-const lean_proof = @import("../lean_proof.zig");
+const lean_proof = @import("../verification/lean_proof.zig");
 
 const model = struct {
     pub const Command = model_commands.Command;

@@ -44,7 +44,7 @@ boundary. It splits into two concerns at different levels of the stack:
    rather than against any backend. TSIR is where tiling, residency,
    collectives, and numerical exactness become explicit once — instead of
    being rediscovered per-kernel by classifier/template emitters. The
-   in-tree surface under `runtime/zig/src/tsir/` is the Phase A compiler
+   in-tree surface under `runtime/zig/src/compiler/tsir/` is the Phase A compiler
    surface for this plan (schema, digests, frontend, planner, reference
    interpreter, collective-synthesis pass, and five backend emitters
    whose realization-only entry points still serialize contract skeletons

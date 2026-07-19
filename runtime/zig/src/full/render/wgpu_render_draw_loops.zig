@@ -1,4 +1,4 @@
-const model_render_types = @import("../../model_render_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const abi_base = @import("../../core/abi/wgpu_handle_types.zig");
 const render_api_mod = @import("wgpu_render_api.zig");
 const render_resource_mod = @import("wgpu_render_resources.zig");

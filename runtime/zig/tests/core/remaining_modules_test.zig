@@ -5,10 +5,10 @@
 const std = @import("std");
 const testing = std.testing;
 
-const token = @import("../../src/doe_wgsl/token.zig");
-const replay = @import("../../src/replay.zig");
-const command_parse_helpers = @import("../../src/command_parse_helpers.zig");
-const model = @import("../../src/model.zig");
+const token = @import("../../src/compiler/wgsl/frontend/token.zig");
+const replay = @import("../../src/runtime/trace/replay.zig");
+const command_parse_helpers = @import("../../src/command/command_parse_helpers.zig");
+const model = @import("../../src/contracts/model/model.zig");
 
 // ============================================================
 // Token — Tag enum structure
@@ -634,17 +634,17 @@ test "ReplayValidationError has expected variant count" {
 // ============================================================
 
 test "DXIL spec BITCODE_MAGIC is correct" {
-    const dxil_spec = @import("../../src/doe_wgsl/dxil_spec.zig");
+    const dxil_spec = @import("../../src/compiler/wgsl/emit/dxil/dxil_spec.zig");
     try testing.expectEqual(@as(u32, 0x4243_C0DE), dxil_spec.BITCODE_MAGIC);
 }
 
 test "DXIL spec LLVM_IR_MAGIC bytes are correct" {
-    const dxil_spec = @import("../../src/doe_wgsl/dxil_spec.zig");
+    const dxil_spec = @import("../../src/compiler/wgsl/emit/dxil/dxil_spec.zig");
     try testing.expectEqualSlices(u8, &.{ 'B', 'C', 0xC0, 0xDE }, &dxil_spec.LLVM_IR_MAGIC);
 }
 
 test "DXIL BlockId constants are distinct" {
-    const BlockId = @import("../../src/doe_wgsl/dxil_spec.zig").BlockId;
+    const BlockId = @import("../../src/compiler/wgsl/emit/dxil/dxil_spec.zig").BlockId;
     try testing.expect(BlockId.MODULE != BlockId.PARAMATTR);
     try testing.expect(BlockId.CONSTANTS != BlockId.FUNCTION);
     try testing.expect(BlockId.TYPE != BlockId.METADATA);
@@ -655,7 +655,7 @@ test "DXIL BlockId constants are distinct" {
 }
 
 test "DXIL AbbrevId sentinel values" {
-    const AbbrevId = @import("../../src/doe_wgsl/dxil_spec.zig").AbbrevId;
+    const AbbrevId = @import("../../src/compiler/wgsl/emit/dxil/dxil_spec.zig").AbbrevId;
     try testing.expectEqual(@as(u32, 0), AbbrevId.END_BLOCK);
     try testing.expectEqual(@as(u32, 1), AbbrevId.ENTER_SUBBLOCK);
     try testing.expectEqual(@as(u32, 2), AbbrevId.DEFINE_ABBREV);

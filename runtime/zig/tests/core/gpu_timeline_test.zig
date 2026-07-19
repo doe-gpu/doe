@@ -1,5 +1,5 @@
 const std = @import("std");
-const gpu_timeline = @import("../../src/gpu_timeline.zig");
+const gpu_timeline = @import("../../src/runtime/queue/gpu_timeline.zig");
 const GpuTimeline = gpu_timeline.GpuTimeline;
 
 // ============================================================

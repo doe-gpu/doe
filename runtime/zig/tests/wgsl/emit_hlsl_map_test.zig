@@ -1,10 +1,10 @@
 // emit_hlsl_map_test.zig — HLSL type, builtin, intrinsic, and rename mapping tests.
 
 const std = @import("std");
-const ir = @import("../../src/doe_wgsl/ir.zig");
-const emit_hlsl = @import("../../src/doe_wgsl/emit_hlsl.zig");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const maps = @import("../../src/doe_wgsl/emit_hlsl_maps.zig");
+const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
+const emit_hlsl = @import("../../src/compiler/wgsl/emit/hlsl/emit_hlsl.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const maps = @import("../../src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

@@ -1,7 +1,7 @@
 const std = @import("std");
-const rb = @import("../../src/render_bundle.zig");
-const native = @import("../../src/doe_wgpu_native.zig");
-const doebundle = @import("../../src/doe_bundle_native.zig");
+const rb = @import("../../src/runtime/render/render_bundle.zig");
+const native = @import("../../src/native/mod.zig");
+const doebundle = @import("../../src/native/render/doe_bundle_native.zig");
 
 const TEST_DEVICE_MAGIC: u32 = 0xD0E1_0003;
 const TEST_CMD_ENCODER_MAGIC: u32 = 0xD0E1_000B;

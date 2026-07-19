@@ -3,10 +3,10 @@
   "status": "verified",
   "provenance": {
     "leanToolchainRef": "leanprover/lean4:v4.16.0",
-    "extractProgramSha256": "7c77fe2ba78c0211d89f218ff3df6581262def3253ab7e42fec156eb0f37b0ba",
-    "leanSourceTreeSha256": "4e66256c602de88c0ed35cf91d3fc3f90ac365412e00f763fc21d625758a36e0",
+    "extractProgramSha256": "671f5aaa56e676305d8ec34da50cd5f80db3d252944a41e4ae32d2bc4056ad01",
+    "leanSourceTreeSha256": "c061f297a50317b73c506e2dbd4c7fe2c31814f139116e9301615c3cb1035485",
     "generatedComparabilityContractSha256": "06041825c55a7a57d41d6d4a8f98a2eecf942129bee32e31d39513c5171b8b27",
-    "proofPatternSpecSha256": "a556746e3f77c774ac5abb4ae9a9d8e0ade26bad15137e0c179805d1bf8252ec"
+    "proofPatternSpecSha256": "0e839bfbcd0f4c5f8087c880434c9741804fb32797fc8650fe8951c00d57529d"
   },
   "contractHashes": {
     "comparabilityObligationsSha256": "20f2d04f010cac8815c545dd03b5eca9e24be40aa60214a608a96e9103895a9a"
@@ -189,7 +189,7 @@
       "pattern": "global_invocation_id.{component} indexes storage buffer",
       "precondition": "workgroup_size.{component} * num_workgroups.{component} <= buffer_element_count",
       "eliminates": "min(gid.{component}, arrayLength(&buf) - 1) -> gid.{component}",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "gid_offset_matcher_contract_sound",
@@ -198,7 +198,7 @@
       "pattern": "global_invocation_id.{component} + constant indexes storage buffer",
       "precondition": "workgroup_size.{component} * num_workgroups.{component} + constant <= buffer_element_count",
       "eliminates": "min(gid.{component} + constant, arrayLength(&buf) - 1) -> gid.{component} + constant",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "gid_stride_offset_matcher_contract_sound",
@@ -207,7 +207,7 @@
       "pattern": "matcher-accepted global_invocation_id.{component} * constant + constant indexes storage buffer",
       "precondition": "workgroup_size.{component} * num_workgroups.{component} * stride + offset <= buffer_element_count",
       "eliminates": "min(gid.{component} * stride + offset, arrayLength(&buf) - 1) -> gid.{component} * stride + offset",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "gid_loop_offset_matcher_contract_sound",
@@ -216,7 +216,7 @@
       "pattern": "canonical counted-loop local i with global_invocation_id.{component} + i + constant indexing a storage buffer",
       "precondition": "either for (var i = 0; i < limit; i = i + 1) or var i = 0; loop { if (i >= limit) { break; } ... continuing { i = i + 1; } } AND workgroup_size.{component} * num_workgroups.{component} + limit + offset <= buffer_element_count",
       "eliminates": "min(gid.{component} + i + offset, arrayLength(&buf) - 1) -> gid.{component} + i + offset",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "gid_loop_affine_matcher_contract_sound",
@@ -225,7 +225,7 @@
       "pattern": "canonical counted-loop local i with global_invocation_id.{component} * gid_stride + i * loop_stride + constant indexing a storage buffer",
       "precondition": "supported counted-loop form with i < limit, gid_stride > 0, loop_stride > 0, and workgroup_size.{component} * num_workgroups.{component} * gid_stride + limit * loop_stride + offset <= buffer_element_count",
       "eliminates": "min(gid.{component} * gid_stride + i * loop_stride + offset, arrayLength(&buf) - 1) -> gid.{component} * gid_stride + i * loop_stride + offset",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "loop_affine_matcher_contract_sound_tight",
@@ -234,7 +234,7 @@
       "pattern": "canonical counted-loop local i with i * loop_stride + constant indexing a storage buffer (no gid term)",
       "precondition": "supported counted-loop form with i < limit, loop_stride > 0, and (limit - 1) * loop_stride + offset + 1 <= buffer_element_count",
       "eliminates": "min(i * loop_stride + offset, arrayLength(&buf) - 1) -> i * loop_stride + offset",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "gid_tiled_matcher_contract_sound",
@@ -243,7 +243,7 @@
       "pattern": "(global_invocation_id.{component} / tile_width) * tile_stride + (global_invocation_id.{component} % tile_width) + constant indexes storage buffer",
       "precondition": "tile_width > 0 AND tile_width <= tile_stride AND (((workgroup_size.{component} * num_workgroups.{component} - 1) / tile_width) + 1) * tile_stride + offset <= buffer_element_count",
       "eliminates": "min(tiled_index + offset, arrayLength(&buf) - 1) -> tiled_index + offset",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "flat_2d_matcher_contract_sound",
@@ -252,7 +252,7 @@
       "pattern": "gid.y * width + gid.x indexes storage buffer",
       "precondition": "ws.x * nwg.x <= width AND ws.y * nwg.y <= height AND width * height <= buffer_element_count",
       "eliminates": "min(flat_index, arrayLength(&buf) - 1) -> flat_index",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "flat_2d_offset_matcher_contract_sound",
@@ -261,7 +261,7 @@
       "pattern": "gid.y * width + gid.x + constant indexes storage buffer",
       "precondition": "ws.x * nwg.x <= width AND ws.y * nwg.y <= height AND width * height + offset <= buffer_element_count",
       "eliminates": "min(flat_index + offset, arrayLength(&buf) - 1) -> flat_index + offset",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "flat_3d_matcher_contract_sound",
@@ -270,7 +270,7 @@
       "pattern": "gid.z * (dispatch_height * dispatch_width) + gid.y * dispatch_width + gid.x indexes storage buffer",
       "precondition": "ws.x * nwg.x <= width AND ws.y * nwg.y <= height AND ws.z * nwg.z <= depth AND width * height * depth <= buffer_element_count",
       "eliminates": "min(flat_index_3d, arrayLength(&buf) - 1) -> flat_index_3d",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "flat_3d_offset_matcher_contract_sound",
@@ -279,7 +279,7 @@
       "pattern": "gid.z * (dispatch_height * dispatch_width) + gid.y * dispatch_width + gid.x + constant indexes storage buffer",
       "precondition": "ws.x * nwg.x <= width AND ws.y * nwg.y <= height AND ws.z * nwg.z <= depth AND width * height * depth + offset <= buffer_element_count",
       "eliminates": "min(flat_index_3d + offset, arrayLength(&buf) - 1) -> flat_index_3d + offset",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "texture_1d_identity_matcher_contract_sound",
@@ -288,7 +288,7 @@
       "pattern": "global_invocation_id.x scalar texture coord on a bound 1D texture",
       "precondition": "workgroup_size.x * num_workgroups.x <= textureDimensions(tex[,level]).x",
       "eliminates": "clamp(coord, 0, textureDimensions(tex[,level]).x - 1) -> coord",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "texture_1d_affine_matcher_contract_sound",
@@ -297,7 +297,7 @@
       "pattern": "global_invocation_id.x * stride + offset scalar texture coord on a bound 1D texture",
       "precondition": "workgroup_size.x * num_workgroups.x * stride + offset <= textureDimensions(tex[,level]).x",
       "eliminates": "clamp(coord, 0, textureDimensions(tex[,level]).x - 1) -> coord",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "texture_2d_affine_matcher_contract_sound",
@@ -306,7 +306,7 @@
       "pattern": "vec2(global_invocation_id.x * stride_x + offset_x, global_invocation_id.y * stride_y + offset_y) texture coords on a bound 2D texture",
       "precondition": "ws.x * nwg.x * stride_x + offset_x <= textureDimensions(tex[,level]).x AND ws.y * nwg.y * stride_y + offset_y <= textureDimensions(tex[,level]).y",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) -> coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "texture_3d_affine_matcher_contract_sound",
@@ -315,7 +315,7 @@
       "pattern": "vec3(global_invocation_id.x * stride_x + offset_x, global_invocation_id.y * stride_y + offset_y, global_invocation_id.z * stride_z + offset_z) texture coords on a bound 3D texture",
       "precondition": "per-axis affine dispatch extents fit textureDimensions(tex[,level]).xyz",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) -> coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "texture_1d_tiled_matcher_contract_sound",
@@ -324,7 +324,7 @@
       "pattern": "(global_invocation_id.x / tile_width) * tile_stride + (global_invocation_id.x % tile_width) + offset scalar texture coord on a bound 1D texture",
       "precondition": "tile_width > 0 AND tile_width <= tile_stride AND tiled groups fit textureDimensions(tex[,level]).x",
       "eliminates": "clamp(coord, 0, textureDimensions(tex[,level]).x - 1) -> coord",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "texture_2d_tiled_matcher_contract_sound",
@@ -333,7 +333,7 @@
       "pattern": "vec2(tiled_gid_x + offset_x, tiled_gid_y + offset_y) texture coords on a bound 2D texture",
       "precondition": "per-axis tiled groups fit textureDimensions(tex[,level]).xy",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) -> coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "texture_3d_tiled_matcher_contract_sound",
@@ -342,7 +342,7 @@
       "pattern": "vec3(tiled_gid_x + offset_x, tiled_gid_y + offset_y, tiled_gid_z + offset_z) texture coords on a bound 3D texture",
       "precondition": "per-axis tiled groups fit textureDimensions(tex[,level]).xyz",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) -> coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "guarded_gid_texture_coords_2d_inbounds",
@@ -351,7 +351,7 @@
       "pattern": "global_invocation_id.xy texture coords guarded by root early-return against textureDimensions(tex[,level]).xy",
       "precondition": "if gid.x >= textureDimensions(...).x || gid.y >= textureDimensions(...).y { return; }",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) -> coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "texture_2d_identity_matcher_contract_sound",
@@ -360,7 +360,7 @@
       "pattern": "global_invocation_id.xy texture coords on a bound 2D texture",
       "precondition": "workgroup_size.x * num_workgroups.x <= textureDimensions(tex,0).x AND workgroup_size.y * num_workgroups.y <= textureDimensions(tex,0).y",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) -> coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "guarded_gid_texture_coords_3d_inbounds",
@@ -369,7 +369,7 @@
       "pattern": "global_invocation_id.xyz texture coords guarded by root early-return against textureDimensions(tex[,level]).xyz",
       "precondition": "if gid.x >= textureDimensions(...).x || gid.y >= textureDimensions(...).y || gid.z >= textureDimensions(...).z { return; }",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) -> coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     },
     {
       "theorem": "texture_3d_identity_matcher_contract_sound",
@@ -378,7 +378,7 @@
       "pattern": "global_invocation_id.xyz texture coords on a bound 3D texture",
       "precondition": "workgroup_size.x * num_workgroups.x <= textureDimensions(tex,0).x AND workgroup_size.y * num_workgroups.y <= textureDimensions(tex,0).y AND workgroup_size.z * num_workgroups.z <= textureDimensions(tex,0).z",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) -> coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     }
   ],
   "eliminationTargets": [
@@ -420,27 +420,27 @@
     {
       "theorem": "mslBindingSlot_injective_across_groups",
       "condition": "group*16+binding is injective for binding<16; flat buffer array has no collisions",
-      "runtimePath": "runtime/zig/src/doe_wgsl/emit_msl_ir.zig:msl_binding_slot,runtime/zig/src/doe_compute_ext_native.zig:flattenBindGroups"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/emit/msl/emit_msl_ir.zig:msl_binding_slot,runtime/zig/src/native/compute/doe_compute_ext_native.zig:flattenBindGroups"
     },
     {
       "theorem": "mslBindingSlot_in_bounds",
       "condition": "valid group and binding produce slot < 64; bounds check can be elided at comptime",
-      "runtimePath": "runtime/zig/src/doe_compute_ext_native.zig:flattenBindGroups"
+      "runtimePath": "runtime/zig/src/native/compute/doe_compute_ext_native.zig:flattenBindGroups"
     },
     {
       "theorem": "doe_getMappedRange_superset",
       "condition": "Doe permits all spec-valid getMappedRange calls; no false rejections",
-      "runtimePath": "runtime/zig/src/doe_wgpu_native.zig:doeBufferGetMappedRange"
+      "runtimePath": "runtime/zig/src/native/mod.zig:doeBufferGetMappedRange"
     },
     {
       "theorem": "doe_dispatch_superset",
       "condition": "Doe permits all spec-valid dispatch calls; no false rejections",
-      "runtimePath": "runtime/zig/src/doe_wgpu_native.zig:doeBufferRelease"
+      "runtimePath": "runtime/zig/src/native/mod.zig:doeBufferRelease"
     },
     {
       "theorem": "ValidatorRedundant",
       "condition": "sema-Ok + build-Ok IR satisfies all ir_validate.validate() checks; validate() call is eliminable",
-      "runtimePath": "runtime/zig/src/doe_wgsl/mod.zig:analyzeToIr"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/mod.zig:analyzeToIr"
     }
   ]
 }

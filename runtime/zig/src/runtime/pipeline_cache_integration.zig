@@ -5,7 +5,7 @@
 // telemetry for warmup-policy decisions.
 
 const std = @import("std");
-const pipeline_cache = @import("../pipeline_cache.zig");
+const pipeline_cache = @import("cache/pipeline_cache.zig");
 
 const PipelineCache = pipeline_cache.PipelineCache;
 const PipelineCacheKey = pipeline_cache.PipelineCacheKey;

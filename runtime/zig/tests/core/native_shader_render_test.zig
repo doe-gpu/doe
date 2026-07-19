@@ -9,15 +9,15 @@ const std = @import("std");
 
 const WGPU_QUERY_TYPE_OCCLUSION: u32 = 0x00000001;
 
-const shader = @import("../../src/doe_shader_native.zig");
-const render = @import("../../src/doe_render_native.zig");
-const query = @import("../../src/doe_query_native.zig");
-const instance_device = @import("../../src/doe_instance_device_native.zig");
-const native = @import("../../src/doe_wgpu_native.zig");
+const shader = @import("../../src/native/shader/doe_shader_native.zig");
+const render = @import("../../src/native/render/doe_render_native.zig");
+const query = @import("../../src/native/resource/doe_query_native.zig");
+const instance_device = @import("../../src/native/lifecycle/doe_instance_device_native.zig");
+const native = @import("../../src/native/mod.zig");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
 const vk = @import("../../src/backend/vulkan/vk_constants.zig");
-const wgsl_compiler = @import("../../src/doe_wgsl/mod.zig");
-const caps = @import("../../src/doe_device_caps.zig");
+const wgsl_compiler = @import("../../src/compiler/wgsl/mod.zig");
+const caps = @import("../../src/native/support/doe_device_caps.zig");
 
 // ============================================================
 // Comptime: exported C ABI symbol existence

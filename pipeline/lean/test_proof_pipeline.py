@@ -5,7 +5,7 @@ Pipeline flow:
   2. Extract script: pipeline/lean/extract.sh
   3. Produces: pipeline/lean/artifacts/proven-conditions.json
   4. Schema: config/proof-artifact.schema.json
-  5. Consumed by: runtime/zig/src/lean_proof.zig at comptime via build.zig
+  5. Consumed by: runtime/zig/src/verification/lean_proof.zig at comptime via build.zig
 """
 
 import json

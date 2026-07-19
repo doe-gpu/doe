@@ -1,27 +1,27 @@
 // TSIR backend skeleton emitter tests.
 
 const std = @import("std");
-const tsir = @import("../../src/tsir/mod.zig");
-const targets = @import("../../src/targets/mod.zig");
+const tsir = @import("../../src/compiler/tsir/mod.zig");
+const targets = @import("../../src/compiler/targets/mod.zig");
 
 test "tsir backend skeleton emitters expose source-backed code digests" {
     try expectDigest(
         tsir.emit_spir_v.emitterCodeDigest(),
-        @embedFile("../../src/tsir/emit_spir_v.zig"),
-        @embedFile("../../src/tsir/emit_text_skeleton.zig"),
-        @embedFile("../../src/tsir/emit_kernel_body.zig"),
+        @embedFile("../../src/compiler/tsir/emit_spir_v.zig"),
+        @embedFile("../../src/compiler/tsir/emit_text_skeleton.zig"),
+        @embedFile("../../src/compiler/tsir/emit_kernel_body.zig"),
     );
     try expectDigest(
         tsir.emit_msl.emitterCodeDigest(),
-        @embedFile("../../src/tsir/emit_msl.zig"),
-        @embedFile("../../src/tsir/emit_text_skeleton.zig"),
-        @embedFile("../../src/tsir/emit_kernel_body.zig"),
+        @embedFile("../../src/compiler/tsir/emit_msl.zig"),
+        @embedFile("../../src/compiler/tsir/emit_text_skeleton.zig"),
+        @embedFile("../../src/compiler/tsir/emit_kernel_body.zig"),
     );
     try expectDigest(
         tsir.emit_dxil.emitterCodeDigest(),
-        @embedFile("../../src/tsir/emit_dxil.zig"),
-        @embedFile("../../src/tsir/emit_text_skeleton.zig"),
-        @embedFile("../../src/tsir/emit_kernel_body.zig"),
+        @embedFile("../../src/compiler/tsir/emit_dxil.zig"),
+        @embedFile("../../src/compiler/tsir/emit_text_skeleton.zig"),
+        @embedFile("../../src/compiler/tsir/emit_kernel_body.zig"),
     );
 }
 

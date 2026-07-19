@@ -1,7 +1,7 @@
 // emit_hlsl_stage_test.zig — HLSL stage I/O, subgroup, barrier, bit, and texture emission tests.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

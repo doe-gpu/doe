@@ -6,9 +6,9 @@ const abi_core = @import("../core/abi/wgpu_core_base_types.zig");
 const abi_pipeline = @import("../core/abi/wgpu_pipeline_descriptor_types.zig");
 const abi_texture = @import("../core/abi/wgpu_texture_base_types.zig");
 const external_texture_ops = @import("../backend/dropin_external_texture.zig");
-const native = @import("../doe_wgpu_native.zig");
-const texture_sampler = @import("../doe_texture_sampler_native.zig");
-const queue_flush_breakdown = @import("../doe_queue_flush_breakdown.zig");
+const native = @import("../native/mod.zig");
+const texture_sampler = @import("../native/resource/doe_texture_sampler_native.zig");
+const queue_flush_breakdown = @import("../native/queue/doe_queue_flush_breakdown.zig");
 
 pub const WGPUSharedBufferMemory = ?*anyopaque;
 pub const WGPUSharedFence = ?*anyopaque;

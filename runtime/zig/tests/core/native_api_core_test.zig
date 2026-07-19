@@ -5,11 +5,11 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-const native = @import("../../src/doe_wgpu_native.zig");
-const caps = @import("../../src/doe_device_caps.zig");
+const native = @import("../../src/native/mod.zig");
+const caps = @import("../../src/native/support/doe_device_caps.zig");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
-const buffer_ops = @import("../../src/doe_buffer_ops_native.zig");
-const texture_sampler = @import("../../src/doe_texture_sampler_native.zig");
+const buffer_ops = @import("../../src/native/resource/doe_buffer_ops_native.zig");
+const texture_sampler = @import("../../src/native/resource/doe_texture_sampler_native.zig");
 const abi_core = @import("../../src/core/abi/wgpu_core_base_types.zig");
 const abi_pipeline = @import("../../src/core/abi/wgpu_pipeline_descriptor_types.zig");
 const abi_texture = @import("../../src/core/abi/wgpu_texture_base_types.zig");
@@ -779,12 +779,12 @@ test "doeNativeDeviceGetLimitsFromMtl: null limits pointer returns success" {
 // ============================================================
 
 test "doe_compute_fast: doeNativeComputeDispatchFlush export exists" {
-    const compute_fast = @import("../../src/doe_compute_fast.zig");
+    const compute_fast = @import("../../src/native/compute/doe_compute_fast.zig");
     try std.testing.expect(@hasDecl(compute_fast, "doeNativeComputeDispatchFlush"));
 }
 
 test "doe_compute_fast: command buffer builder exports exist" {
-    const compute_fast = @import("../../src/doe_compute_fast.zig");
+    const compute_fast = @import("../../src/native/compute/doe_compute_fast.zig");
     try std.testing.expect(@hasDecl(compute_fast, "doeNativeCreateComputeDispatchCopyCommandBuffer"));
     try std.testing.expect(@hasDecl(compute_fast, "doeNativeCreateComputeDispatchBatchCopyCommandBuffer"));
 }
@@ -794,7 +794,7 @@ test "doe_compute_fast: command buffer builder exports exist" {
 // ============================================================
 
 test "doeNativeComputeDispatchFlush: null queue is safe" {
-    const compute_fast = @import("../../src/doe_compute_fast.zig");
+    const compute_fast = @import("../../src/native/compute/doe_compute_fast.zig");
     var bg_ptrs = [_]?*anyopaque{null} ** 4;
     // Null queue → early return via cast().
     compute_fast.doeNativeComputeDispatchFlush(
@@ -814,7 +814,7 @@ test "doeNativeComputeDispatchFlush: null queue is safe" {
 }
 
 test "doeNativeComputeDispatchFlush: null pipeline is safe" {
-    const compute_fast = @import("../../src/doe_compute_fast.zig");
+    const compute_fast = @import("../../src/native/compute/doe_compute_fast.zig");
     var bg_ptrs = [_]?*anyopaque{null} ** 4;
     // Wrong magic for queue → early return via cast().
     var dev_backing = native.DoeDevice{};
@@ -837,7 +837,7 @@ test "doeNativeComputeDispatchFlush: null pipeline is safe" {
 }
 
 test "doeNativeCreateComputeDispatchCopyCommandBuffer: null inputs return null" {
-    const compute_fast = @import("../../src/doe_compute_fast.zig");
+    const compute_fast = @import("../../src/native/compute/doe_compute_fast.zig");
     var bg_ptrs = [_]?*anyopaque{null} ** 4;
     const command_buffer = compute_fast.doeNativeCreateComputeDispatchCopyCommandBuffer(
         null,
@@ -857,7 +857,7 @@ test "doeNativeCreateComputeDispatchCopyCommandBuffer: null inputs return null" 
 }
 
 test "doeNativeCreateComputeDispatchBatchCopyCommandBuffer: null inputs return null" {
-    const compute_fast = @import("../../src/doe_compute_fast.zig");
+    const compute_fast = @import("../../src/native/compute/doe_compute_fast.zig");
     var pipes = [_]?*anyopaque{null};
     var bg_ptrs = [_]?*anyopaque{null} ** 4;
     var bg_counts = [_]u32{0};
@@ -1004,7 +1004,7 @@ test "DeferredCopy: struct fields exist and are correct types" {
 // ============================================================
 
 test "BindingInfo: default kind is buffer" {
-    const wgsl_compiler = @import("../../src/doe_wgsl/mod.zig");
+    const wgsl_compiler = @import("../../src/compiler/wgsl/mod.zig");
     const bi = native.BindingInfo{
         .group = 0,
         .binding = 0,
@@ -1015,7 +1015,7 @@ test "BindingInfo: default kind is buffer" {
 }
 
 test "MAX_SHADER_BINDINGS matches WGSL compiler MAX_BINDINGS" {
-    const wgsl_compiler = @import("../../src/doe_wgsl/mod.zig");
+    const wgsl_compiler = @import("../../src/compiler/wgsl/mod.zig");
     try std.testing.expectEqual(wgsl_compiler.MAX_BINDINGS, native.MAX_SHADER_BINDINGS);
     try std.testing.expectEqual(@as(usize, 16), native.MAX_SHADER_BINDINGS);
 }
@@ -1497,6 +1497,6 @@ test "comptime: all export fn symbols are resolvable" {
         _ = caps.doeNativeDeviceSubgroupSize;
 
         // doe_compute_fast.zig
-        _ = @import("../../src/doe_compute_fast.zig").doeNativeComputeDispatchFlush;
+        _ = @import("../../src/native/compute/doe_compute_fast.zig").doeNativeComputeDispatchFlush;
     }
 }

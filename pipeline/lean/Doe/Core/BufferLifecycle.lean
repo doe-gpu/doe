@@ -1,5 +1,5 @@
 -- DoeBuffer lifecycle state machine.
--- Mirrors: runtime/zig/src/doe_wgpu_native.zig DoeBuffer struct and exported operations.
+-- Mirrors: runtime/zig/src/native/mod.zig DoeBuffer struct and exported operations.
 -- Doe is intentionally more permissive than the WebGPU spec:
 -- no precondition checks on mapAsync/unmap/getMappedRange/dispatch.
 -- This module formally documents where Doe diverges from spec.

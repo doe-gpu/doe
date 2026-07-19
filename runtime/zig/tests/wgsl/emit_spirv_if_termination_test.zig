@@ -1,6 +1,6 @@
 // emit_spirv_if_termination_test.zig — regression tests for the
 // if/else termination-propagation fix in
-// `runtime/zig/src/doe_wgsl/emit_spirv_fn.zig`.
+// `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig`.
 //
 // Before the fix, the .if_ handler unconditionally returned `false`
 // (not-terminated) from emit_stmt, even when both branches ended in a
@@ -15,8 +15,8 @@
 // binary has the SPIR-V magic header.
 
 const std = @import("std");
-const spirv = @import("../../src/doe_wgsl/spirv_builder.zig");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const spirv = @import("../../src/compiler/wgsl/emit/spirv/spirv_builder.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

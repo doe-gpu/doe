@@ -97,21 +97,21 @@ The proof artifact (`proven-conditions.json`) schema version 1 includes a
       "pattern": "global_invocation_id.{component} indexes storage buffer",
       "precondition": "workgroup_size.{component} * num_workgroups.{component} <= buffer_element_count",
       "eliminates": "min(gid.{component}, arrayLength(&buf) - 1) → gid.{component}",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "flat_index_2d_inbounds",
       "pattern": "gid.y * width + gid.x indexes storage buffer",
       "precondition": "ws.x * nwg.x <= width AND ws.y * nwg.y <= height AND width * height <= buffer_element_count",
       "eliminates": "min(flat_index, arrayLength(&buf) - 1) → flat_index",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_runtime_sized"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_runtime_sized"
     },
     {
       "theorem": "guarded_gid_texture_coords_2d_inbounds",
       "pattern": "global_invocation_id.xy texture coords guarded by root early-return against textureDimensions(tex[,level]).xy",
       "precondition": "if gid.x >= textureDimensions(...).x || gid.y >= textureDimensions(...).y { return; }",
       "eliminates": "clamp(coords, vec(0), textureDimensions(tex[,level]) - 1) → coords",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:clamp_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:clamp_texture_coords"
     }
   ]
 }
@@ -263,8 +263,8 @@ exactly matching the criterion established in `pipeline/lean/README.md`.
 | File | Role |
 |---|---|
 | `pipeline/lean/Doe/Shader/ComputeBounds.lean` | Formal proofs of compute bounds safety |
-| `runtime/zig/src/doe_wgsl/ir_transform_robustness.zig` | Layer 1 clamping + future Layer 2 pattern recognizer |
-| `runtime/zig/src/lean_proof.zig` | Comptime proof artifact validator |
+| `runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig` | Layer 1 clamping + future Layer 2 pattern recognizer |
+| `runtime/zig/src/verification/lean_proof.zig` | Comptime proof artifact validator |
 | `pipeline/lean/Doe/Extract.lean` | Proof artifact extraction (emits proven-conditions.json) |
 | `config/proof-artifact.schema.json` | Schema for proven-conditions.json |
 | `docs/lean-bounds-elimination-design.md` | This document |

@@ -6,11 +6,11 @@
 // per-kernel-family parity step owns simulator/hardware proof.
 
 const std = @import("std");
-const tsir = @import("../../src/tsir/mod.zig");
-const targets = @import("../../src/targets/mod.zig");
-const parser = @import("../../src/doe_wgsl/parser.zig");
-const sema = @import("../../src/doe_wgsl/sema.zig");
-const ir_builder = @import("../../src/doe_wgsl/ir_builder.zig");
+const tsir = @import("../../src/compiler/tsir/mod.zig");
+const targets = @import("../../src/compiler/targets/mod.zig");
+const parser = @import("../../src/compiler/wgsl/frontend/parser.zig");
+const sema = @import("../../src/compiler/wgsl/frontend/sema.zig");
+const ir_builder = @import("../../src/compiler/wgsl/ir/ir_builder.zig");
 
 const FRONTEND_VERSION = "frontend-bootstrap-pipeline-v1";
 

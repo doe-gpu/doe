@@ -1,6 +1,6 @@
 const std = @import("std");
-const ir = @import("../../src/doe_wgsl/ir.zig");
-const wgsl = @import("../../src/doe_wgsl/mod.zig");
+const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
+const wgsl = @import("../../src/compiler/wgsl/mod.zig");
 
 fn functionHasBuiltinCall(function: *const ir.Function, name: []const u8) bool {
     for (function.exprs.items) |expr| {

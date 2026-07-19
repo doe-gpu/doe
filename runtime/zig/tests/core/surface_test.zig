@@ -1,5 +1,5 @@
 const std = @import("std");
-const model = @import("../../src/model.zig");
+const model = @import("../../src/contracts/model/model.zig");
 const core_surface = @import("../../src/core/surface.zig");
 
 test "core surface ID and version" {

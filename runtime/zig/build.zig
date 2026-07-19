@@ -38,6 +38,21 @@ fn addBackendBridgeIncludePaths(artifact: *std.Build.Step.Compile, b: *std.Build
     artifact.addIncludePath(b.path("src/backend/metal"));
 }
 
+fn addSourceModuleIncludePaths(module: *std.Build.Module, b: *std.Build) void {
+    module.addIncludePath(b.path("src/backend/d3d12"));
+    module.addIncludePath(b.path("src/backend/metal"));
+    const candidates = [_][]const u8{
+        "../../bench/vendor/dawn/third_party/webgpu-headers/src",
+        "../../bench/vendor/dawn/out/Release/gen/include",
+        "../../bench/vendor/dawn/out/Release/gen/include/dawn",
+        "../../bench/vendor/node-webgpu-package/out/cmake-release/gen/include/dawn",
+        "../../bench/vendor/node-webgpu-package/out/cmake-release/gen/include/dawn/wire/client",
+    };
+    for (candidates) |candidate| {
+        if (fileExists(candidate)) module.addIncludePath(b.path(candidate));
+    }
+}
+
 fn sha256HexAlloc(allocator: std.mem.Allocator, input: []const u8) []u8 {
     var digest: [32]u8 = undefined;
     std.crypto.hash.sha2.Sha256.hash(input, &digest, .{});
@@ -144,7 +159,12 @@ fn hashLeanSourceTreeAlloc(allocator: std.mem.Allocator, root_path: []const u8) 
 }
 
 fn hashWgslCompilerSourceTreeAlloc(allocator: std.mem.Allocator) []u8 {
-    return hashSourceTreeAlloc(allocator, "src/doe_wgsl", "runtime/zig/src/doe_wgsl", ".zig");
+    return hashSourceTreeAlloc(
+        allocator,
+        "src/compiler/wgsl",
+        "runtime/zig/src/compiler/wgsl",
+        ".zig",
+    );
 }
 
 fn loadLeanToolchainRefAlloc(allocator: std.mem.Allocator) []u8 {
@@ -191,8 +211,8 @@ fn addProofProvenanceOptions(options: *std.Build.Step.Options, provenance: Proof
 fn loadShaderTranslationProvenance(allocator: std.mem.Allocator) ShaderTranslationProvenance {
     return .{
         .wgsl_compiler_source_sha256 = hashWgslCompilerSourceTreeAlloc(allocator),
-        .shader_translation_cache_source_sha256 = hashFileAlloc(allocator, "src/doe_shader_translation_cache.zig", 128 * 1024),
-        .pipeline_cache_source_sha256 = hashFileAlloc(allocator, "src/pipeline_cache.zig", 128 * 1024),
+        .shader_translation_cache_source_sha256 = hashFileAlloc(allocator, "src/native/shader/doe_shader_translation_cache.zig", 128 * 1024),
+        .pipeline_cache_source_sha256 = hashFileAlloc(allocator, "src/runtime/cache/pipeline_cache.zig", 128 * 1024),
     };
 }
 
@@ -316,16 +336,26 @@ pub fn build(b: *std.Build) void {
     }
 
     const build_options_module = build_options.createModule();
+    const doe_module = b.createModule(.{
+        .root_source_file = b.path("src/mod.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "build_options", .module = build_options_module },
+        },
+    });
+    addSourceModuleIncludePaths(doe_module, b);
 
     const dropin_lib = b.addLibrary(.{
         .name = "webgpu_doe",
         .linkage = .dynamic,
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/wgpu_dropin_lib.zig"),
+            .root_source_file = b.path("src/dropin/root.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -429,7 +459,7 @@ pub fn build(b: *std.Build) void {
         .name = "onnxruntime_doe_ep",
         .linkage = .dynamic,
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/ort_ep_anchor.zig"),
+            .root_source_file = b.path("src/integrations/onnxruntime/ort_ep_anchor.zig"),
             .target = target,
             .optimize = optimize,
         }),
@@ -461,7 +491,7 @@ pub fn build(b: *std.Build) void {
     const ort_plugin_ep_smoke = b.addExecutable(.{
         .name = "doe-ort-ep-smoke",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/ort_ep_smoke_anchor.zig"),
+            .root_source_file = b.path("src/integrations/onnxruntime/ort_ep_smoke_anchor.zig"),
             .target = target,
             .optimize = optimize,
         }),
@@ -498,7 +528,7 @@ pub fn build(b: *std.Build) void {
     const ort_plugin_ep_session_smoke = b.addExecutable(.{
         .name = "doe-ort-ep-session-smoke",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/ort_ep_session_smoke_anchor.zig"),
+            .root_source_file = b.path("src/integrations/onnxruntime/ort_ep_session_smoke_anchor.zig"),
             .target = target,
             .optimize = optimize,
         }),
@@ -535,7 +565,7 @@ pub fn build(b: *std.Build) void {
     const ort_incumbent_session_smoke = b.addExecutable(.{
         .name = "doe-ort-incumbent-session-smoke",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/ort_incumbent_session_smoke_anchor.zig"),
+            .root_source_file = b.path("src/integrations/onnxruntime/ort_incumbent_session_smoke_anchor.zig"),
             .target = target,
             .optimize = optimize,
         }),
@@ -571,11 +601,12 @@ pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{
         .name = "doe-zig-runtime",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -600,11 +631,12 @@ pub fn build(b: *std.Build) void {
     const metal_staged_write_bench = b.addExecutable(.{
         .name = "doe-metal-staged-write-bench",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_metal_staged_write_bench.zig"),
+            .root_source_file = b.path("bench/entrypoints/metal_staged_write_bench.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -630,11 +662,12 @@ pub fn build(b: *std.Build) void {
     const metal_compute_bench = b.addExecutable(.{
         .name = "doe-metal-compute-bench",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_metal_compute_bench.zig"),
+            .root_source_file = b.path("bench/entrypoints/metal_compute_bench.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -746,11 +779,12 @@ pub fn build(b: *std.Build) void {
     const module_runner = b.addExecutable(.{
         .name = "module-core-runner",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/module_runner.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/module_runner.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -774,11 +808,12 @@ pub fn build(b: *std.Build) void {
     const emit_msl_exe = b.addExecutable(.{
         .name = "doe-emit-msl",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_emit_msl.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main_emit_msl.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -791,11 +826,12 @@ pub fn build(b: *std.Build) void {
     const emit_csl_exe = b.addExecutable(.{
         .name = "doe-emit-csl",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_emit_csl.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main_emit_csl.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -808,11 +844,12 @@ pub fn build(b: *std.Build) void {
     const emit_tsir_attention_canary_exe = b.addExecutable(.{
         .name = "doe-emit-tsir-attention-canary",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_emit_tsir_attention_canary.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main_emit_tsir_attention_canary.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -831,11 +868,12 @@ pub fn build(b: *std.Build) void {
     const emit_hlsl_exe = b.addExecutable(.{
         .name = "doe-emit-hlsl",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_emit_hlsl.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main_emit_hlsl.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -848,11 +886,12 @@ pub fn build(b: *std.Build) void {
     const emit_dxil_exe = b.addExecutable(.{
         .name = "doe-emit-dxil",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_emit_dxil.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main_emit_dxil.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -865,11 +904,12 @@ pub fn build(b: *std.Build) void {
     const emit_spirv_exe = b.addExecutable(.{
         .name = "doe-emit-spirv",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_emit_spirv.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main_emit_spirv.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -882,9 +922,12 @@ pub fn build(b: *std.Build) void {
     const webgpu_plan_executor = b.addExecutable(.{
         .name = "webgpu-plan-executor",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_webgpu_plan_executor.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main_webgpu_plan_executor.zig"),
             .target = target,
             .optimize = optimize,
+            .imports = &.{
+                .{ .name = "doe", .module = doe_module },
+            },
         }),
     });
     webgpu_plan_executor.linkLibC();
@@ -904,11 +947,12 @@ pub fn build(b: *std.Build) void {
     const doe_plan_executor = b.addExecutable(.{
         .name = "doe-plan-executor",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_doe_plan_executor.zig"),
+            .root_source_file = b.path("src/cli/entrypoints/main_doe_plan_executor.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -932,9 +976,12 @@ pub fn build(b: *std.Build) void {
     const csl_sim_runner = b.addExecutable(.{
         .name = "doe-csl-sim-runner",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/csl_sim_runner.zig"),
+            .root_source_file = b.path("src/spatial/csl/csl_sim_runner.zig"),
             .target = target,
             .optimize = optimize,
+            .imports = &.{
+                .{ .name = "doe", .module = doe_module },
+            },
         }),
     });
     csl_sim_runner.linkLibC();
@@ -946,11 +993,12 @@ pub fn build(b: *std.Build) void {
     const csl_bundle_emitter = b.addExecutable(.{
         .name = "doe-csl-bundle-emitter",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/csl_bundle_emitter.zig"),
+            .root_source_file = b.path("src/spatial/csl/csl_bundle_emitter.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -962,11 +1010,12 @@ pub fn build(b: *std.Build) void {
     const csl_host_plan_tool = b.addExecutable(.{
         .name = "doe-csl-host-plan-tool",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/csl_host_plan_tool.zig"),
+            .root_source_file = b.path("src/spatial/csl/csl_host_plan_tool.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -983,11 +1032,12 @@ pub fn build(b: *std.Build) void {
     const tsir_bootstrap_manifest_inputs = b.addExecutable(.{
         .name = "doe-tsir-bootstrap-manifest-inputs",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/tsir_bootstrap_manifest_inputs.zig"),
+            .root_source_file = b.path("src/compiler/tsir/tools/tsir_bootstrap_manifest_inputs.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -1003,9 +1053,12 @@ pub fn build(b: *std.Build) void {
     const tsir_bootstrap_oracle = b.addExecutable(.{
         .name = "doe-tsir-bootstrap-oracle",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/tsir_bootstrap_oracle.zig"),
+            .root_source_file = b.path("src/compiler/tsir/tools/tsir_bootstrap_oracle.zig"),
             .target = target,
             .optimize = optimize,
+            .imports = &.{
+                .{ .name = "doe", .module = doe_module },
+            },
         }),
     });
     tsir_bootstrap_oracle.linkLibC();
@@ -1020,6 +1073,11 @@ pub fn build(b: *std.Build) void {
     const import_fence_check = b.addSystemCommand(&.{ "python3", "tools/check_core_import_fence.py" });
     const import_fence_step = b.step("import-fence", "Validate core/full one-way import boundaries");
     import_fence_step.dependOn(&import_fence_check.step);
+
+    const source_layout_check = b.addSystemCommand(&.{ "python3", "tools/check_source_layout.py" });
+    const source_layout_step = b.step("source-layout", "Validate Zig source ownership boundaries");
+    source_layout_step.dependOn(&source_layout_check.step);
+    b.getInstallStep().dependOn(&source_layout_check.step);
 
     const line_limit_check = b.addSystemCommand(&.{ "python3", "tools/check_line_limits.py" });
     const line_limit_step = b.step("line-limits", "Validate Zig source line-count policy");
@@ -1071,16 +1129,27 @@ pub fn build(b: *std.Build) void {
         defer f.close();
         compute_build_options.addOption([]const u8, "quirk_toggle_registry_json", f.readToEndAlloc(b.allocator, 64 * 1024) catch @panic("failed to read quirk-toggle-registry.json"));
     }
+    const compute_build_options_module = compute_build_options.createModule();
+    const compute_doe_module = b.createModule(.{
+        .root_source_file = b.path("src/mod.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "build_options", .module = compute_build_options_module },
+        },
+    });
+    addSourceModuleIncludePaths(compute_doe_module, b);
 
     const core_dropin_lib = b.addLibrary(.{
         .name = "webgpu_doe_compute",
         .linkage = .dynamic,
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/wgpu_dropin_lib.zig"),
+            .root_source_file = b.path("src/dropin/root.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
-                .{ .name = "build_options", .module = compute_build_options.createModule() },
+                .{ .name = "build_options", .module = compute_build_options_module },
+                .{ .name = "doe", .module = compute_doe_module },
             },
         }),
     });
@@ -1133,16 +1202,27 @@ pub fn build(b: *std.Build) void {
         defer f.close();
         full_build_options.addOption([]const u8, "quirk_toggle_registry_json", f.readToEndAlloc(b.allocator, 64 * 1024) catch @panic("failed to read quirk-toggle-registry.json"));
     }
+    const full_build_options_module = full_build_options.createModule();
+    const full_doe_module = b.createModule(.{
+        .root_source_file = b.path("src/mod.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "build_options", .module = full_build_options_module },
+        },
+    });
+    addSourceModuleIncludePaths(full_doe_module, b);
 
     const full_dropin_lib = b.addLibrary(.{
         .name = "webgpu_doe_full",
         .linkage = .dynamic,
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/wgpu_dropin_lib.zig"),
+            .root_source_file = b.path("src/dropin/root.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
-                .{ .name = "build_options", .module = full_build_options.createModule() },
+                .{ .name = "build_options", .module = full_build_options_module },
+                .{ .name = "doe", .module = full_doe_module },
             },
         }),
     });
@@ -1188,6 +1268,7 @@ pub fn build(b: *std.Build) void {
     }
     const run_tests = b.addRunArtifact(test_exec);
     test_step.dependOn(&import_fence_check.step);
+    test_step.dependOn(&source_layout_check.step);
     test_step.dependOn(&line_limit_check.step);
     test_step.dependOn(&bridge_manifest_check.step);
     test_step.dependOn(&run_tests.step);
@@ -1217,6 +1298,7 @@ pub fn build(b: *std.Build) void {
     }
     const run_core_tests = b.addRunArtifact(core_test_exec);
     core_test_step.dependOn(&import_fence_check.step);
+    core_test_step.dependOn(&source_layout_check.step);
     core_test_step.dependOn(&line_limit_check.step);
     core_test_step.dependOn(&bridge_manifest_check.step);
     core_test_step.dependOn(&run_core_tests.step);
@@ -1246,6 +1328,7 @@ pub fn build(b: *std.Build) void {
     }
     const run_full_tests = b.addRunArtifact(full_test_exec);
     full_test_step.dependOn(&import_fence_check.step);
+    full_test_step.dependOn(&source_layout_check.step);
     full_test_step.dependOn(&line_limit_check.step);
     full_test_step.dependOn(&bridge_manifest_check.step);
     full_test_step.dependOn(&run_full_tests.step);
@@ -1275,6 +1358,7 @@ pub fn build(b: *std.Build) void {
     }
     const run_d3d12_tests = b.addRunArtifact(d3d12_test_exec);
     d3d12_test_step.dependOn(&import_fence_check.step);
+    d3d12_test_step.dependOn(&source_layout_check.step);
     d3d12_test_step.dependOn(&line_limit_check.step);
     d3d12_test_step.dependOn(&run_d3d12_tests.step);
 
@@ -1291,21 +1375,23 @@ pub fn build(b: *std.Build) void {
     });
     wgsl_test_exec.linkLibC();
     const run_wgsl_tests = b.addRunArtifact(wgsl_test_exec);
+    wgsl_test_step.dependOn(&source_layout_check.step);
     wgsl_test_step.dependOn(&line_limit_check.step);
     wgsl_test_step.dependOn(&run_wgsl_tests.step);
 
     const shader_bench_exe = b.addExecutable(.{
         .name = "doe-shader-bench",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/doe_wgsl/bench.zig"),
+            .root_source_file = b.path("bench/compiler/bench.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
                 .{
                     .name = "lean_proof",
                     .module = b.createModule(.{
-                        .root_source_file = b.path("src/lean_proof.zig"),
+                        .root_source_file = b.path("src/verification/lean_proof.zig"),
                         .target = target,
                         .optimize = optimize,
                         .imports = &.{
@@ -1330,11 +1416,12 @@ pub fn build(b: *std.Build) void {
     const host_hotpath_bench_exe = b.addExecutable(.{
         .name = "doe-host-hotpath-bench",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_host_hotpath_bench.zig"),
+            .root_source_file = b.path("bench/entrypoints/host_hotpath_bench.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -1352,11 +1439,12 @@ pub fn build(b: *std.Build) void {
     const compilation_bench_exe = b.addExecutable(.{
         .name = "doe-compilation-bench",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_bench_compilation.zig"),
+            .root_source_file = b.path("bench/entrypoints/bench_compilation.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });
@@ -1374,11 +1462,12 @@ pub fn build(b: *std.Build) void {
     const runtime_compile_report_exe = b.addExecutable(.{
         .name = "doe-runtime-compile-report",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main_runtime_compile_report.zig"),
+            .root_source_file = b.path("bench/entrypoints/runtime_compile_report.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
             },
         }),
     });

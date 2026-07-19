@@ -1,6 +1,6 @@
 const std = @import("std");
 const backend_policy = @import("../../src/backend/backend_policy.zig");
-const webgpu = @import("../../src/webgpu_ffi.zig");
+const webgpu = @import("../../src/compat/webgpu_ffi.zig");
 const native_runtime = @import("../../src/backend/vulkan/native_runtime.zig");
 
 test "vulkan mapped fast upload path stays bounded when shortcuts are allowed" {

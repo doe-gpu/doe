@@ -1,5 +1,5 @@
 const std = @import("std");
-const es = @import("../../src/error_scope.zig");
+const es = @import("../../src/runtime/diagnostics/error_scope.zig");
 const wgpu_types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
 
 // ============================================================

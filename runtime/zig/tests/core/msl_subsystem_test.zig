@@ -8,7 +8,7 @@
 // then verify output contains expected Metal constructs.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 
 const translateToMsl = mod.translateToMsl;
 const MAX_OUTPUT = mod.MAX_OUTPUT;

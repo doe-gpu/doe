@@ -69,7 +69,7 @@ class TestParityScaffolding(unittest.TestCase):
         and forgets another — the taxonomy must move in lockstep or not at
         all, since it's a single wire contract shared across semantic,
         realization, manifest-lowering, and parity-receipt artifacts. The
-        Zig canonical enum `runtime/zig/src/tsir/schema.zig::RejectionReason`
+        Zig canonical enum `runtime/zig/src/compiler/tsir/schema.zig::RejectionReason`
         is verified separately by `tests/wgsl/tsir_scaffold_test.zig` test
         'rejection taxonomy is exhaustive and enumerable'.
         """

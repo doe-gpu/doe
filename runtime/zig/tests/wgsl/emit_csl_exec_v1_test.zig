@@ -1,7 +1,7 @@
 const std = @import("std");
-const exec_v1 = @import("../../src/doe_wgsl/emit_csl_exec_v1.zig");
-const host = @import("../../src/doe_wgsl/emit_csl_host.zig");
-const host_plan = @import("../../src/doe_wgsl/emit_csl_host_plan.zig");
+const exec_v1 = @import("../../src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig");
+const host = @import("../../src/compiler/wgsl/emit/csl/emit_csl_host.zig");
+const host_plan = @import("../../src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig");
 
 const TEST_ARTIFACT_CAPACITY: usize = 32 * 1024;
 

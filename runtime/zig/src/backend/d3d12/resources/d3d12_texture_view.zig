@@ -1,5 +1,5 @@
 const std = @import("std");
-const model_gpu_types = @import("../../../model_texture_value_types.zig");
+const model_gpu_types = @import("../../../contracts/model/model_texture_value_types.zig");
 const common_timing = @import("../../common/timing.zig");
 const bridge = @import("../d3d12_bridge_decls.zig");
 const d3d12_constants = @import("../d3d12_constants.zig");

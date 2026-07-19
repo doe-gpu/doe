@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 // Repo-relative root of the WGSL compiler source tree whose sha256 the
 // Zig build emits into doe-build-metadata.json. Keep in lockstep with
 // runtime/zig/build.zig hashWgslCompilerSourceTreeAlloc().
-const WGSL_COMPILER_SOURCE_REPO_REL_ROOT = 'runtime/zig/src/doe_wgsl';
+const WGSL_COMPILER_SOURCE_REPO_REL_ROOT = 'runtime/zig/src/compiler/wgsl';
 const WGSL_COMPILER_SOURCE_SUFFIX = '.zig';
 
 const LIBRARY_FILENAMES = Object.freeze({
@@ -53,7 +53,7 @@ function parseBuildMetadata(metadataPath) {
 
 // Mirror of runtime/zig/build.zig hashSourceTreeAlloc for the WGSL compiler
 // source tree. Must match byte-for-byte: file list is every `.zig` under
-// `runtime/zig/src/doe_wgsl/`, sorted lexicographically by their path
+// `runtime/zig/src/compiler/wgsl/`, sorted lexicographically by their path
 // relative to that root, then hashed as:
 //   sha256(
 //     for each relPath:
@@ -118,7 +118,8 @@ function assertBuildMetadataIsFresh(buildMetadata, workspaceRoot, packageName) {
     'runtime',
     'zig',
     'src',
-    'doe_wgsl',
+    'compiler',
+    'wgsl',
   );
   if (!existsSync(sourceRoot)) {
     throw new Error(`doe-gpu: WGSL compiler source tree not found at ${sourceRoot}.`);

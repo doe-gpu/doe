@@ -1,5 +1,5 @@
 -- Shader compute bounds safety theorems.
--- Mirrors: runtime/zig/src/doe_wgsl/ir_transform_robustness.zig
+-- Mirrors: runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig
 --
 -- Proves that global_invocation_id components are strictly less than
 -- array_length when the dispatch dimensions fit. This lets the robustness

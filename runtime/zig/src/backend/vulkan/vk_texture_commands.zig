@@ -2,9 +2,9 @@
 // commands for the NativeVulkanRuntime. Sharded from native_runtime.zig.
 
 const std = @import("std");
-const model_gpu_types = @import("../../model_texture_value_types.zig");
-const model_render_types = @import("../../model_render_types.zig");
-const model_texture_types = @import("../../model_texture_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
+const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const c = @import("vk_constants.zig");
 const vk_device = @import("vk_device.zig");
 const vk_sync = @import("vk_sync.zig");

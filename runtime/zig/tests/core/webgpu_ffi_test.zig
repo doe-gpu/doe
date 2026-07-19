@@ -15,8 +15,8 @@
 
 const std = @import("std");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
-const ffi = @import("../../src/webgpu_ffi.zig");
-const model = @import("../../src/model.zig");
+const ffi = @import("../../src/compat/webgpu_ffi.zig");
+const model = @import("../../src/contracts/model/model.zig");
 
 // ============================================================
 // 1. Type size assertions — ABI break if sizes change

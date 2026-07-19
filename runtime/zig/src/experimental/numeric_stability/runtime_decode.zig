@@ -1,7 +1,7 @@
 const std = @import("std");
-const execution = @import("../../execution.zig");
-const model_commands = @import("../../model_commands.zig");
-const model_transfer_types = @import("../../model_compute_types.zig");
+const execution = @import("../../runtime/execution.zig");
+const model_commands = @import("../../contracts/model/model_commands.zig");
+const model_transfer_types = @import("../../contracts/model/model_compute_types.zig");
 const numeric_stability_service = @import("service/numeric_stability.zig");
 const runtime_plan = @import("runtime_plan.zig");
 

@@ -2,11 +2,11 @@ const std = @import("std");
 const proc_types = @import("../core/abi/wgpu_proc_types.zig");
 const abi_base = proc_types.base;
 const abi_descriptor = proc_types.descriptor;
-const ptypes = @import("../wgpu_types_procs.zig");
-const native = @import("../doe_wgpu_native.zig");
-const native_helpers = @import("../doe_native_object_helpers.zig");
-const native_types = @import("../doe_native_object_types.zig");
-const queue_flush_breakdown = @import("../doe_queue_flush_breakdown.zig");
+const ptypes = @import("../core/abi/procs/wgpu_types_procs.zig");
+const native = @import("../native/mod.zig");
+const native_helpers = @import("../native/support/doe_native_object_helpers.zig");
+const native_types = @import("../native/support/doe_native_object_types.zig");
+const queue_flush_breakdown = @import("../native/queue/doe_queue_flush_breakdown.zig");
 
 const BUFFER_MAP_SYNC_TIMEOUT_NS = 5 * std.time.ns_per_s;
 const MAP_READ_COPY_UNMAP_BREAKDOWN_FIELD_COUNT: usize = 6;

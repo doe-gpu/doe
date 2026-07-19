@@ -5,10 +5,10 @@
 // num_workgroups dispatch contract, DXIL toolchain config, and error handling.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const dispatch_contract = @import("../../src/doe_wgsl/hlsl_dispatch_contract.zig");
-const maps = @import("../../src/doe_wgsl/emit_hlsl_maps.zig");
-const emit_dxil = @import("../../src/doe_wgsl/emit_dxil.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const dispatch_contract = @import("../../src/compiler/wgsl/emit/hlsl/hlsl_dispatch_contract.zig");
+const maps = @import("../../src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig");
+const emit_dxil = @import("../../src/compiler/wgsl/emit/dxil/emit_dxil.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

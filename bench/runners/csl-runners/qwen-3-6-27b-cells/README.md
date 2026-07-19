@@ -26,7 +26,7 @@ aggregates the per-cell receipts into a single summary at
 
 `rmsnorm`, `residual`, and `silu` ship `*_layout_patched.csl` because
 the manifest-shape host plan
-(`runtime/zig/src/doe_wgsl/emit_csl_layout.zig`) deliberately does
+(`runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig`) deliberately does
 **not** forward `hidden_size` / `chunk_size` from `layout.csl` to
 `pe_program.csl`. At manifest hidden_dim=5120 the per-PE buffers
 (60 KB) overflow the WSE-3 per-PE 38 KB working budget; the broader
@@ -103,7 +103,7 @@ summary synthesizer aggregates the current result set.
   kernel arithmetic matches the declared formulation within float32
   precision under simfabric execution.
 - The `partialRotaryFactor` wiring delta from
-  `runtime/zig/src/csl_host_plan_tool.zig`'s `compileParamsForPattern`
+  `runtime/zig/src/spatial/csl/csl_host_plan_tool.zig`'s `compileParamsForPattern`
   rope branch flows through the layout → pe_program forwarding chain
   end-to-end (rope_partial cell).
 - The deliberate non-forwarding of `hidden_size`/`chunk_size` at

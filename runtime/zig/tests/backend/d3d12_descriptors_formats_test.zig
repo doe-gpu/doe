@@ -9,7 +9,7 @@ const builtin = @import("builtin");
 const descriptors = @import("../../src/backend/d3d12/d3d12_descriptors.zig");
 const formats = @import("../../src/backend/d3d12/d3d12_formats.zig");
 const device_caps = @import("../../src/backend/d3d12/d3d12_device_caps.zig");
-const model = @import("../../src/model.zig");
+const model = @import("../../src/contracts/model/model.zig");
 const compressed_formats = @import("../../src/core/abi/wgpu_type_texture_formats.zig");
 
 // ============================================================
@@ -315,8 +315,8 @@ test "vertex: snorm8 formats" {
 test "vertex: float32 formats" {
     try testing.expectEqual(@as(u32, 41), try formats.wgpu_vertex_format_to_dxgi(0x19)); // R32_FLOAT
     try testing.expectEqual(@as(u32, 16), try formats.wgpu_vertex_format_to_dxgi(0x1A)); // R32G32_FLOAT
-    try testing.expectEqual(@as(u32, 6), try formats.wgpu_vertex_format_to_dxgi(0x1B));  // R32G32B32_FLOAT
-    try testing.expectEqual(@as(u32, 2), try formats.wgpu_vertex_format_to_dxgi(0x1C));  // R32G32B32A32_FLOAT
+    try testing.expectEqual(@as(u32, 6), try formats.wgpu_vertex_format_to_dxgi(0x1B)); // R32G32B32_FLOAT
+    try testing.expectEqual(@as(u32, 2), try formats.wgpu_vertex_format_to_dxgi(0x1C)); // R32G32B32A32_FLOAT
 }
 
 test "vertex: float16 formats" {
@@ -328,15 +328,15 @@ test "vertex: float16 formats" {
 test "vertex: uint32 formats" {
     try testing.expectEqual(@as(u32, 42), try formats.wgpu_vertex_format_to_dxgi(0x21)); // R32_UINT
     try testing.expectEqual(@as(u32, 17), try formats.wgpu_vertex_format_to_dxgi(0x22)); // R32G32_UINT
-    try testing.expectEqual(@as(u32, 7), try formats.wgpu_vertex_format_to_dxgi(0x23));  // R32G32B32_UINT
-    try testing.expectEqual(@as(u32, 3), try formats.wgpu_vertex_format_to_dxgi(0x24));  // R32G32B32A32_UINT
+    try testing.expectEqual(@as(u32, 7), try formats.wgpu_vertex_format_to_dxgi(0x23)); // R32G32B32_UINT
+    try testing.expectEqual(@as(u32, 3), try formats.wgpu_vertex_format_to_dxgi(0x24)); // R32G32B32A32_UINT
 }
 
 test "vertex: sint32 formats" {
     try testing.expectEqual(@as(u32, 43), try formats.wgpu_vertex_format_to_dxgi(0x25)); // R32_SINT
     try testing.expectEqual(@as(u32, 18), try formats.wgpu_vertex_format_to_dxgi(0x26)); // R32G32_SINT
-    try testing.expectEqual(@as(u32, 8), try formats.wgpu_vertex_format_to_dxgi(0x27));  // R32G32B32_SINT
-    try testing.expectEqual(@as(u32, 4), try formats.wgpu_vertex_format_to_dxgi(0x28));  // R32G32B32A32_SINT
+    try testing.expectEqual(@as(u32, 8), try formats.wgpu_vertex_format_to_dxgi(0x27)); // R32G32B32_SINT
+    try testing.expectEqual(@as(u32, 4), try formats.wgpu_vertex_format_to_dxgi(0x28)); // R32G32B32A32_SINT
 }
 
 test "vertex: packed formats" {

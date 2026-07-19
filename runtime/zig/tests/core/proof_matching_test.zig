@@ -12,8 +12,8 @@
 const std = @import("std");
 const testing = std.testing;
 
-const ir = @import("../../src/doe_wgsl/ir.zig");
-const layout_utils = @import("../../src/doe_wgsl/layout_utils.zig");
+const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
+const layout_utils = @import("../../src/compiler/wgsl/ir/layout_utils.zig");
 
 // Re-export private matching functions via @import — they are file-local
 // (fn, not pub fn). We test them through the module's built-in tests and
@@ -635,7 +635,7 @@ test "DispatchPreconditionKind has exactly 8 variants" {
 // ============================================================
 
 test "dispatch preconditions with loop limit contribute to byte count" {
-    const dispatch = @import("../../src/dispatch_preconditions.zig");
+    const dispatch = @import("../../src/core/compute/dispatch_preconditions.zig");
     // Tight formula: (total-1)*em + (limit-1)*lm + offset + 1.
     // total = 4*8 = 32; tight = 31*1 + 9*2 + 0 + 1 = 50 elements; *4 bytes = 200.
     // Prior over-approximation yielded 208 (the 8-byte reclaim is `em+lm-1=2` elements).
@@ -653,7 +653,7 @@ test "dispatch preconditions with loop limit contribute to byte count" {
 }
 
 test "dispatch preconditions zero loop limit adds nothing" {
-    const dispatch = @import("../../src/dispatch_preconditions.zig");
+    const dispatch = @import("../../src/core/compute/dispatch_preconditions.zig");
     const required = try dispatch.required_buffer_bytes(.{
         .kind = .gid_component,
         .gid_axis = 0,

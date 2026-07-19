@@ -4,7 +4,7 @@
 -- it appends new helper expressions but does not mutate the type of any
 -- pre-existing expression.
 --
--- Mirrors: runtime/zig/src/doe_wgsl/ir_transform_robustness.zig apply()
+-- Mirrors: runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig apply()
 --
 -- The transform iterates over exprs[0..original_count) and for each index
 -- operation appends new min/arrayLength expressions to the end of the array.

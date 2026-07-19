@@ -1,10 +1,10 @@
 const std = @import("std");
-const model_commands = @import("../model_commands.zig");
-const model_resource_types = @import("../model_resource_types.zig");
-const model_texture_types = @import("../model_texture_value_types.zig");
-const parse_helpers = @import("../command_parse_helpers.zig");
+const model_commands = @import("../contracts/model/model_commands.zig");
+const model_resource_types = @import("../contracts/model/model_resource_types.zig");
+const model_texture_types = @import("../contracts/model/model_texture_value_types.zig");
+const parse_helpers = @import("command_parse_helpers.zig");
 const command_kind = @import("command_kind.zig");
-const command_json_raw = @import("../command_json_raw.zig");
+const command_json_raw = @import("command_json_raw.zig");
 
 const RawCommand = command_json_raw.RawCommand;
 pub const ParseError = command_json_raw.ParseError;

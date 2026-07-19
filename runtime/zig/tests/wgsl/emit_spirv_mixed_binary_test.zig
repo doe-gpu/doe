@@ -1,6 +1,6 @@
 // emit_spirv_mixed_binary_test.zig — regression tests for the
 // scalar-op-vector binary coercion fix in
-// `runtime/zig/src/doe_wgsl/emit_spirv_fn.zig`.
+// `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig`.
 //
 // Before the fix, the `.binary` value-expr dispatch (around line 358)
 // unconditionally passed `binary.lhs.ty` as the operand_ty to
@@ -19,8 +19,8 @@
 // direction.
 
 const std = @import("std");
-const spirv = @import("../../src/doe_wgsl/spirv_builder.zig");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const spirv = @import("../../src/compiler/wgsl/emit/spirv/spirv_builder.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

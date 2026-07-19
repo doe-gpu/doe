@@ -2,10 +2,10 @@ const builtin = @import("builtin");
 const has_vulkan = (builtin.os.tag == .linux);
 const std = @import("std");
 
-const error_scope = @import("../error_scope.zig");
-const model_transfer_types = @import("../model_resource_types.zig");
-const native_types = @import("../doe_native_object_types.zig");
-const native_rt_helpers = @import("../doe_native_runtime_helpers.zig");
+const error_scope = @import("../runtime/diagnostics/error_scope.zig");
+const model_transfer_types = @import("../contracts/model/model_resource_types.zig");
+const native_types = @import("../native/support/doe_native_object_types.zig");
+const native_rt_helpers = @import("../native/support/doe_native_runtime_helpers.zig");
 
 pub const metal_bridge = @import("metal/metal_bridge_decls.zig");
 pub const d3d12_constants = @import("d3d12/d3d12_constants.zig");

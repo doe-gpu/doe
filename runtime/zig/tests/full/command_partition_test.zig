@@ -1,6 +1,6 @@
 const std = @import("std");
-const model = @import("../../src/model.zig");
-const ffi = @import("../../src/webgpu_ffi.zig");
+const model = @import("../../src/contracts/model/model.zig");
+const ffi = @import("../../src/compat/webgpu_ffi.zig");
 const full_partition = @import("../../src/full/command_partition.zig");
 
 comptime {

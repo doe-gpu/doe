@@ -1,4 +1,4 @@
-const model_commands = @import("../model_commands.zig");
+const model_commands = @import("../contracts/model/model_commands.zig");
 
 pub const sample_quirks =
     \\[

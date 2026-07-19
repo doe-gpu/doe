@@ -1,4 +1,4 @@
-const model = @import("../../model_commands.zig");
+const model = @import("../../contracts/model/model_commands.zig");
 const command_info = @import("command_info.zig");
 const capabilities = @import("capabilities.zig");
 

@@ -13,7 +13,7 @@
 // 6. Structs with non-nullable pointer fields cannot be zeroed via std.mem.zeroes
 
 const std = @import("std");
-const native = @import("../../src/doe_wgpu_native.zig");
+const native = @import("../../src/native/mod.zig");
 
 // ============================================================
 // Contract 1: cast rejects corrupted magic without crashing
@@ -204,7 +204,7 @@ test "C ABI null safety: queue operations" {
 }
 
 test "C ABI null safety: render lifecycle" {
-    const render = @import("../../src/doe_render_native.zig");
+    const render = @import("../../src/native/render/doe_render_native.zig");
     try std.testing.expect(render.doeNativeDeviceCreateTexture(null, null) == null);
     render.doeNativeTextureRelease(null);
     try std.testing.expect(render.doeNativeTextureCreateView(null, null) == null);
@@ -225,7 +225,7 @@ test "C ABI null safety: render lifecycle" {
 }
 
 test "C ABI null safety: shader lifecycle" {
-    const shader = @import("../../src/doe_shader_native.zig");
+    const shader = @import("../../src/native/shader/doe_shader_native.zig");
     try std.testing.expect(shader.doeNativeDeviceCreateShaderModule(null, null) == null);
     shader.doeNativeShaderModuleRelease(null);
     try std.testing.expect(shader.doeNativeDeviceCreateComputePipeline(null, null) == null);
@@ -233,7 +233,7 @@ test "C ABI null safety: shader lifecycle" {
 }
 
 test "C ABI null safety: query lifecycle" {
-    const query = @import("../../src/doe_query_native.zig");
+    const query = @import("../../src/native/resource/doe_query_native.zig");
     try std.testing.expect(query.doeNativeDeviceCreateQuerySet(null, 0, 0) == null);
     query.doeNativeQuerySetDestroy(null);
     query.doeNativeCommandEncoderWriteTimestamp(null, null, 0);
@@ -241,7 +241,7 @@ test "C ABI null safety: query lifecycle" {
 }
 
 test "C ABI null safety: instance lifecycle" {
-    const inst_dev = @import("../../src/doe_instance_device_native.zig");
+    const inst_dev = @import("../../src/native/lifecycle/doe_instance_device_native.zig");
     inst_dev.doeNativeInstanceRelease(null);
     inst_dev.doeNativeAdapterRelease(null);
     inst_dev.doeNativeDeviceRelease(null);
@@ -249,7 +249,7 @@ test "C ABI null safety: instance lifecycle" {
 }
 
 test "C ABI null safety: bind group lifecycle" {
-    const bg = @import("../../src/doe_bind_group_native.zig");
+    const bg = @import("../../src/native/resource/doe_bind_group_native.zig");
     native.doeNativeBindGroupRelease(null);
     native.doeNativeBindGroupLayoutRelease(null);
     native.doeNativePipelineLayoutRelease(null);

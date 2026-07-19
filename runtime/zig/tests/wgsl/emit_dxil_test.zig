@@ -4,12 +4,12 @@
 // from WGSL source, covering compute, vertex, and fragment shader stages.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const dxil_spec = @import("../../src/doe_wgsl/dxil_spec.zig");
-const dxil_container = @import("../../src/doe_wgsl/dxil_container.zig");
-const dxil_bitcode = @import("../../src/doe_wgsl/dxil_bitcode.zig");
-const dxil_builder = @import("../../src/doe_wgsl/dxil_builder.zig");
-const dxil_serialize = @import("../../src/doe_wgsl/dxil_serialize.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const dxil_spec = @import("../../src/compiler/wgsl/emit/dxil/dxil_spec.zig");
+const dxil_container = @import("../../src/compiler/wgsl/emit/dxil/dxil_container.zig");
+const dxil_bitcode = @import("../../src/compiler/wgsl/emit/dxil/dxil_bitcode.zig");
+const dxil_builder = @import("../../src/compiler/wgsl/emit/dxil/dxil_builder.zig");
+const dxil_serialize = @import("../../src/compiler/wgsl/emit/dxil/dxil_serialize.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

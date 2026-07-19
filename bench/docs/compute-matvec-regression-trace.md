@@ -56,7 +56,7 @@ The loop-safety variables should *slow* Tint if they mattered at codegen time --
 
 ## Is this a Doe SPV compiler issue to fix?
 
-Yes, but it is real compiler work, not a quick patch. The fix is to update Doe's WGSL-to-SPIR-V emitter (`runtime/zig/src/doe_wgsl/` + `doe-emit-spirv`) to wrap storage buffer declarations in an explicit block struct with an `inner` member, matching Tint's canonical emission shape. The WGSL contract does not dictate this wrapping; it is a SPV emission style choice.
+Yes, but it is real compiler work. The fix is to update Doe's WGSL-to-SPIR-V emitter (`runtime/zig/src/compiler/wgsl/emit/spirv/` + `doe-emit-spirv`) to wrap storage buffer declarations in an explicit block struct with an `inner` member, matching Tint's canonical emission shape. The WGSL contract does not dictate this wrapping; it is a SPV emission style choice.
 
 Landing that change would:
 
@@ -159,7 +159,7 @@ Doe's Private-variable-with-initializer shape is legal SPIR-V and functionally c
 
 Targeted change across the emitter pipeline:
 
-1. In `runtime/zig/src/doe_wgsl/emit_spirv.zig::emit_globals`, detect `global.class == .const_ or .override_` with a literal initializer and skip emitting the OpVariable. Compute the constant id via `lower_constant(initializer, global.ty)` and store it in a parallel `global_constant_ids` array.
+1. In `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv.zig::emit_globals`, detect `global.class == .const_ or .override_` with a literal initializer and skip emitting the OpVariable. Compute the constant id via `lower_constant(initializer, global.ty)` and store it in a parallel `global_constant_ids` array.
 2. In `emit_spirv_fn.zig::emit_ref_expr` (the `.global_ref` branch) and `emit_load_from_ref`, detect the const-global case and return the constant id directly instead of emitting an OpAccessChain / OpLoad.
 3. In `emit_load_from_ref`, short-circuit when the global_id is actually a constant id (constants can't be loaded via OpLoad; this would be invalid SPIR-V).
 4. Preserve the existing Private-variable path for overrides that lack a compile-time initializer (if any).

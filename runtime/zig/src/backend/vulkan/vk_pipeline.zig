@@ -13,11 +13,11 @@ const vk_compute_sync = @import("vk_compute_sync.zig");
 const vk_upload = @import("vk_upload.zig");
 const vk_resources = @import("vk_resources.zig");
 const vk_spirv_inspect = @import("vk_spirv_inspect.zig");
-const model_compute_types = @import("../../model_compute_types.zig");
-const model_texture_types = @import("../../model_texture_value_types.zig");
-const model_binding_types = @import("../../model_binding_value_types.zig");
-const hash_contract = @import("../../doe_vulkan_pipeline_hash.zig");
-const doe_wgsl = @import("../../doe_wgsl/mod.zig");
+const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const model_texture_types = @import("../../contracts/model/model_texture_value_types.zig");
+const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
+const hash_contract = @import("../../native/vulkan/vulkan_pipeline_hash.zig");
+const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
 const common_errors = @import("../common/errors.zig");
 const path_utils = @import("../common/path_utils.zig");
 

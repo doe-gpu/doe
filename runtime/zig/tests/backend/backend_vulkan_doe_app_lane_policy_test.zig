@@ -1,6 +1,6 @@
 const std = @import("std");
-const model = @import("../../src/model.zig");
-const execution = @import("../../src/execution.zig");
+const model = @import("../../src/contracts/model/model.zig");
+const execution = @import("../../src/runtime/execution.zig");
 const backend_ids = @import("../../src/backend/backend_ids.zig");
 const backend_policy = @import("../../src/backend/backend_policy.zig");
 

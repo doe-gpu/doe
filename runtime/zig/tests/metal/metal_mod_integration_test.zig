@@ -1,6 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model = @import("../../src/model.zig");
+const model = @import("../../src/contracts/model/model.zig");
 const capabilities = @import("../../src/backend/common/capabilities.zig");
 const metal_mod = @import("../../src/backend/metal/mod.zig");
 

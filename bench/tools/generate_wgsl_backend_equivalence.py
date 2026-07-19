@@ -360,7 +360,7 @@ def build_entry(kernel: dict) -> dict:
                 "reductions (softmax, sum) where PE-distributed ordering "
                 "differs from numpy reference ordering. spirv validates "
                 "statically (spirv-val) but no Vulkan runtime dispatch is "
-                "wired. The shared IR (runtime/zig/src/doe_wgsl/) is the "
+                "wired. The shared IR (runtime/zig/src/compiler/wgsl/ir/) is the "
                 "single source of truth all three backends are derived from."
             ),
         },

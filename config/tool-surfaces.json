@@ -64,7 +64,7 @@
       ],
       "entrypoints": [
         "runtime/zig/build.zig",
-        "runtime/zig/src/main.zig"
+        "runtime/zig/src/cli/entrypoints/main.zig"
       ],
       "docs": [
         "runtime/zig/README.md",

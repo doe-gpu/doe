@@ -58,7 +58,7 @@
         "required": { "type": "boolean", "const": true },
         "resolverSourcePath": {
           "type": "string",
-          "const": "runtime/zig/src/wgpu_dropin_lib.zig"
+          "const": "runtime/zig/src/dropin/wgpu_dropin_lib.zig"
         },
         "description": { "type": "string", "minLength": 1 },
         "requiredSymbols": {

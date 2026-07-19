@@ -1,9 +1,9 @@
 // NativeVulkanRuntime: top-level struct and public API for the Doe Vulkan backend.
 
 const std = @import("std");
-const model_compute_types = @import("../../model_compute_types.zig");
-const model_render_types = @import("../../model_render_types.zig");
-const model_texture_types = @import("../../model_texture_types.zig");
+const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
+const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const backend_policy = @import("../backend_policy.zig");
 const common_timing = @import("../common/timing.zig");
 const webgpu = @import("../runtime_types.zig");
@@ -22,7 +22,7 @@ const vk_dispatch_repeat = @import("vk_dispatch_repeat.zig");
 const vk_metrics = @import("vk_metrics.zig");
 const vk_command_buffers = @import("vk_command_buffers.zig");
 const surface_ops = @import("vk_runtime_surface_ops.zig");
-const render_bundle = @import("../../render_bundle.zig");
+const render_bundle = @import("../../runtime/render/render_bundle.zig");
 const vk_texture_commands = @import("vk_texture_commands.zig");
 
 const VK_NULL_U64 = c.VK_NULL_U64;

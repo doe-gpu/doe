@@ -28,7 +28,7 @@ The contract source is [threading_contract.zig](../runtime/zig/src/runtime/threa
 ## Tooling I/O contexts
 
 Tooling and orchestration paths now have a separate explicit I/O seam in
-`runtime/zig/src/tooling_io_context.zig`:
+`runtime/zig/src/tooling/tooling_io_context.zig`:
 
 1. `sync` for ordinary blocking CLI/tool runs
 2. `cooperative_same_thread` for future same-thread cooperative orchestration

@@ -1,7 +1,7 @@
 // Cross-backend bootstrap canary for the Qwen-specific gated-activation
 // op family.
 //
-// The exec-v1 opToSpec map (runtime/zig/src/doe_wgsl/emit_csl_exec_v1.zig)
+// The exec-v1 opToSpec map (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig)
 // routes four paired-gate op identifiers — `gelu_gated` (Gemma GeGLU),
 // `silu_gated` (SwiGLU FFN inner; Qwen 3.6 / Llama-style),
 // `sigmoid_gated` (attentionOutputGate), and the alias `o_gate` (also
@@ -26,10 +26,10 @@
 // back to a stand-in.
 
 const std = @import("std");
-const exec_v1 = @import("../../src/doe_wgsl/emit_csl_exec_v1.zig");
-const host = @import("../../src/doe_wgsl/emit_csl_host.zig");
-const semantic_ops = @import("../../src/doe_wgsl/emit_csl_semantic_ops.zig");
-const compile_source = @import("../../src/doe_wgsl/emit_csl_host_compile_source.zig");
+const exec_v1 = @import("../../src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig");
+const host = @import("../../src/compiler/wgsl/emit/csl/emit_csl_host.zig");
+const semantic_ops = @import("../../src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig");
+const compile_source = @import("../../src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig");
 
 fn expectPatternByteIdentical(left_pattern: []const u8, right_pattern: []const u8) !void {
     var left_buf: [65536]u8 = undefined;

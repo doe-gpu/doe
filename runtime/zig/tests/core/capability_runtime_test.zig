@@ -1,9 +1,9 @@
 const std = @import("std");
 const testing = std.testing;
 
-const capability_runtime = @import("../../src/wgpu_capability_runtime.zig");
+const capability_runtime = @import("../../src/core/runtime/wgpu_capability_runtime.zig");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
-const p1_procs = @import("../../src/wgpu_p1_capability_procs.zig");
+const p1_procs = @import("../../src/core/abi/procs/wgpu_p1_capability_procs.zig");
 
 // ============================================================
 // AdapterProbeResult — default construction and field values

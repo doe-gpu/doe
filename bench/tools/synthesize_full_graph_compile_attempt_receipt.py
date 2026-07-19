@@ -77,7 +77,7 @@ DEFAULT_BUNDLE_ROOT = (
     REPO_ROOT / "bench/out/r3-1-31b-manifest-fullgraph-compile-steps"
 )
 
-# WSE-3 per-PE budgets, mirroring runtime/zig/src/targets/wse3.zig:
+# WSE-3 per-PE budgets, mirroring runtime/zig/src/compiler/targets/wse3.zig:
 # pe_working_memory_bytes (38 KB) + pe_persistent_pool_bytes (10 KB).
 # `working` is the conservative upper bound the residency pass enforces
 # for emitted-var residency; total includes the persistent pool that
@@ -272,7 +272,7 @@ def classify_redesign(
             "Redesign: shard kv_cache by position-slot stride (each PE owns "
             "ceil(max_seq_len / num_pes) slots × head_dim × 4 B); compute() "
             "no-ops when the decode position falls outside the local stride. "
-            "Owning emitter: runtime/zig/src/tsir/emit_kernel_body.zig:emitCslKvWrite "
+            "Owning emitter: runtime/zig/src/compiler/tsir/emit_kernel_body.zig:emitCslKvWrite "
             "(plus symmetric emitCslKvRead).",
         )
     if "rmsnorm" in target_name and total_var_bytes > WSE3_PE_WORKING_BYTES:
@@ -283,7 +283,7 @@ def classify_redesign(
             "PEs (each PE owns hidden_per_pe = ceil(hidden_size / width)), "
             "compute local sum_sq, allreduce_add across the PE row, broadcast "
             "inv_rms, apply locally. Owning emitter: "
-            "runtime/zig/src/doe_wgsl/emit_csl_reduction.zig (NOT "
+            "runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_reduction.zig (NOT "
             "emit_kernel_body.zig — single-PE algorithm baked in).",
         )
     if "tiled" in target_name and total_var_bytes > WSE3_PE_WORKING_BYTES:
@@ -295,8 +295,8 @@ def classify_redesign(
             "or fold A_buf/B_buf into A_tile/B_tile via a ping-pong "
             "single-buffer. The .bss/.filters overlap is downstream of "
             "the oversize .bss. Owning emitter/planner: "
-            "runtime/zig/src/doe_wgsl/emit_csl_matmul.zig + "
-            "runtime/zig/src/csl_host_plan_tool.zig (block-size choice in "
+            "runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_matmul.zig + "
+            "runtime/zig/src/spatial/csl/csl_host_plan_tool.zig (block-size choice in "
             "the tiled_matmul compileParams branch).",
         )
     if linker_info and total_var_bytes <= WSE3_PE_WORKING_BYTES:
@@ -306,7 +306,7 @@ def classify_redesign(
             "virtual-address overlap from collectives_2d/queue static "
             "reservations. Redesign: trim collectives_2d DSR/queue counts, "
             "or shrink imported module footprint. Owning emitter: "
-            "runtime/zig/src/doe_wgsl/emit_csl_matmul.zig (layout-side "
+            "runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_matmul.zig (layout-side "
             "@set_tile_code module imports).",
         )
     return (

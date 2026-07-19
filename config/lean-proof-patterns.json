@@ -4,109 +4,109 @@
     {
       "id": "gid_1d_storage_buffer",
       "theorem": "gid_inbounds_when_dispatch_fits",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_1d_storage_buffer_offset",
       "theorem": "gid_offset_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_1d_storage_buffer_stride",
       "theorem": "gid_stride_offset_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_1d_storage_buffer_loop_offset",
       "theorem": "gid_loop_offset_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_1d_storage_buffer_loop_affine",
       "theorem": "gid_loop_affine_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_1d_storage_buffer_tiled",
       "theorem": "gid_tiled_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_2d_flat_storage_buffer",
       "theorem": "flat_2d_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_2d_flat_storage_buffer_offset",
       "theorem": "flat_2d_offset_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_3d_flat_storage_buffer",
       "theorem": "flat_3d_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_3d_flat_storage_buffer_offset",
       "theorem": "flat_3d_offset_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/dispatch_proof_match.zig:try_elide_storage_index"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/proof/dispatch_proof_match.zig:try_elide_storage_index"
     },
     {
       "id": "gid_texture_1d_dispatch_fit",
       "theorem": "texture_1d_identity_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     },
     {
       "id": "gid_texture_2d_dispatch_fit",
       "theorem": "texture_2d_identity_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     },
     {
       "id": "gid_texture_3d_dispatch_fit",
       "theorem": "texture_3d_identity_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     },
     {
       "id": "gid_texture_1d_affine_dispatch_fit",
       "theorem": "texture_1d_affine_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     },
     {
       "id": "gid_texture_2d_affine_dispatch_fit",
       "theorem": "texture_2d_affine_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     },
     {
       "id": "gid_texture_3d_affine_dispatch_fit",
       "theorem": "texture_3d_affine_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     },
     {
       "id": "gid_texture_1d_tiled_dispatch_fit",
       "theorem": "texture_1d_tiled_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     },
     {
       "id": "gid_texture_2d_tiled_dispatch_fit",
       "theorem": "texture_2d_tiled_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     },
     {
       "id": "gid_texture_3d_tiled_dispatch_fit",
       "theorem": "texture_3d_tiled_matcher_contract_sound",
-      "runtimePath": "runtime/zig/src/doe_wgsl/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig:try_elide_dispatch_fit_texture_coords"
     }
   ],
   "validatorElisions": [
     {
       "id": "wgsl_analyze_to_ir",
       "requiredTheorems": ["builder_soundness", "ValidatorRedundant"],
-      "runtimePath": "runtime/zig/src/doe_wgsl/mod.zig:analyzeToIr"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/mod.zig:analyzeToIr"
     },
     {
       "id": "wgsl_shader_bench",
       "requiredTheorems": ["builder_soundness", "ValidatorRedundant"],
-      "runtimePath": "runtime/zig/src/doe_wgsl/bench.zig:maybe_validate_module"
+      "runtimePath": "runtime/zig/bench/compiler/bench.zig:maybe_validate_module"
     }
   ]
 }

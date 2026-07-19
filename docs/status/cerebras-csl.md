@@ -209,7 +209,7 @@ and the checkpoint manifest remains at the prior launch boundary.
 
 ## 2026-05-02 — CSL emitter performance audit: scalar dot products vs fmacs+DSD
 
-A side-by-side pass over `runtime/zig/src/doe_wgsl/emit_csl_*.zig` against the
+A side-by-side pass over `runtime/zig/src/compiler/wgsl/emit/csl/` against the
 canonical SUMMA GEMM and GEMV-collectives_2d references identified a
 consistent gap: the matmul emitter uses the canonical `@fmacs` over a
 `mem1d_dsd` inner pattern, but GEMV, fused FFN, and all three attention paths
@@ -558,7 +558,7 @@ tree), which is named in the test's typed-skip pointer.
 The `feat/fused-dequant-summa` branch lands the on-PE Q4_K_M dequant SUMMA
 prototype end-to-end:
 
-1. **Emitter.** `runtime/zig/src/doe_wgsl/emit_csl_matmul_q4k.zig` produces
+1. **Emitter.** `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig` produces
    CSL where the B operand is broadcast as raw Q4K bytes and dequanted on
    each PE before the SUMMA fmac inner loop. Layout export at
    `emit_csl_layout.zig::emitMatmulQ4kLayout` types B as `[*]u8` (storage
@@ -624,9 +624,9 @@ Three landings against the manifest-shape simfabric proof plan in
 
 3. **Rung 6 partial close: attention canary head_dim=256 routes through
    TSIR-CSL emit body.** New Zig executable
-   `runtime/zig/src/main_emit_tsir_attention_canary.zig` (build via
+   `runtime/zig/src/cli/entrypoints/main_emit_tsir_attention_canary.zig` (build via
    `zig build emit-tsir-attention-canary`) emits the attention CSL via
-   `runtime/zig/src/tsir/emit_csl.zig:emitSemanticFunction`. New sim runner
+   `runtime/zig/src/compiler/tsir/emit_csl.zig:emitSemanticFunction`. New sim runner
    `bench/runners/csl-runners/attention_head256_f16kv_tsir_sim_runner.py`
    dispatches via `cs_python` against the cslc-compiled output. Bootstrap
    inputs (Q/K/V all-zero) produce sha256

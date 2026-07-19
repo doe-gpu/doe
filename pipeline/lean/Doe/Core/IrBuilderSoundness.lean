@@ -22,7 +22,7 @@
 -- builder, making the runtime validation call eliminable.
 --
 -- Integration target (not wired yet):
---   runtime/zig/src/doe_wgsl/ir_validate.zig:validate
+--   runtime/zig/src/compiler/wgsl/ir/ir_validate.zig:validate
 
 -- ---------------------------------------------------------------------------
 -- Abstract builder state

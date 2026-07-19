@@ -85,7 +85,7 @@ with a parity oracle defined against TSIR rather than against any backend.
 That architecture is documented in
 [`docs/tsir-lowering-plan.md`](./tsir-lowering-plan.md); live status is in
 [`docs/status/tsir.md`](./status/tsir.md). The in-tree
-`runtime/zig/src/tsir/` surface is the Phase A compiler surface for that
+`runtime/zig/src/compiler/tsir/` surface is the Phase A compiler surface for that
 plan — schema, digests, frontend, residency planner, reference interpreter,
 collective-synthesis pass, and five backend emitters (including a
 TSIR-to-CSL emitter). Realization-only entry points still serialize
@@ -278,7 +278,7 @@ toolchain.
 The active emitter constraints are:
 
 - *Tasks must be activated, not called.* All task invocations emitted by
-  `runtime/zig/src/doe_wgsl/emit_csl_*.zig` use `@activate(task_id)` form.
+  `runtime/zig/src/compiler/wgsl/emit/csl/` use `@activate(task_id)` form.
 - *Config-space pointer access is illegal; `@get_config` / `@set_config` are
   required.* The emitters do not construct pointers into config space.
 - *`comptime_struct` and `@concat_struct` / `@concat_structs` are removed.*
@@ -427,24 +427,24 @@ matches the question, not a nearby one:
 | Runtime/API/operational docs | This repo under `docs/` | Doe's canonical public documentation. Cross-project product framing is intentionally not kept here. |
 | CSL abstraction and contract boundary | This file (`docs/csl-architecture.md`) | Architecture only; does not enumerate individual stages, pattern-family templates, or SDK flags. |
 | Artifact contracts (host-plan, memory-plan, runtime-config, simulator-plan/result/trace, governed-lane report) | `config/*.schema.json` registered in `config/schema-targets.json` | Cross-validated by `python3 bench/gates/schema_gate.py`. Schema is authoritative even where prose disagrees. |
-| CSL target constants, fabric limits, architecture enums | `runtime/zig/src/doe_wgsl/csl_spec.zig` | Self-declared single source of truth; `emit_csl_*.zig` must consume constants from here rather than redefining them. |
+| CSL target constants, fabric limits, architecture enums | `runtime/zig/src/compiler/wgsl/emit/csl/csl_spec.zig` | Self-declared single source of truth; `emit_csl_*.zig` must consume constants from here rather than redefining them. |
 | Taxonomy: outcome codes + `laneContracts.doe_csl` | `config/shader-error-taxonomy.schema.json` and `config/shader-error-taxonomy.json` | Defines the three-outcomes contract below and the allow-list of failure-code prefixes. |
 | CSL host operation graphs | `config/csl-operation-graph.schema.json` and `examples/csl-operation-graph.*.json` | Validated by `python3 bench/gates/csl_operation_graph_gate.py`; binds compile shape, exported symbols, ordered host operations, and SdkLayout references. |
 | CSL WebGPU emulator input/result | `config/csl-webgpu-emulator-input.schema.json`, `config/csl-webgpu-emulator-result.schema.json`, `bench/tools/build_csl_webgpu_emulator_input.py`, and `bench/tools/run_csl_webgpu_emulator.mjs` | Binds `layout.csl`, `pe_program.csl`, HostPlan/runtime/simulator plans, operation graph, and optional Doppler RDRR or raw fixture source identity. The runner executes the restricted semantic subset (`gather`, `residual_add`, `elementwise_identity`, `gelu`, `rms_norm`, tiled SUMMA matmul, RoPE, tiled/decode attention, Q4K fused GEMV, KV write, sample, and no-op unblock) on the CPU semantic backend or generated WGSL/WebGPU when available, can write D2H byte artifacts, records source-defined internal state hashes, and emits a fail-closed receipt for unsupported CSL. |
-| Classifier: which WGSL kernel patterns are recognized | `runtime/zig/src/doe_wgsl/emit_csl_classify.zig` | Pattern coverage changes here, not in prose. |
-| Doppler `execution-v1` → CSL pattern mapping | `runtime/zig/src/doe_wgsl/emit_csl_exec_v1.zig` | |
-| HostPlan emission | `runtime/zig/src/doe_wgsl/emit_csl_host_plan.zig` | Schema-backed; HostPlan is the contract boundary. |
+| Classifier: which WGSL kernel patterns are recognized | `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_classify.zig` | Pattern coverage changes here, not in prose. |
+| Doppler `execution-v1` → CSL pattern mapping | `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig` | |
+| HostPlan emission | `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig` | Schema-backed; HostPlan is the contract boundary. |
 | External SDK driver seam | `runtime/zig/tools/csl_sdk_driver.py` | Fail-closed behavior; no fabricated traces. |
 | Fixture canonicity | `config/csl-fixture-mirrors.json` | Validated by `python3 bench/gates/csl_fixture_mirror_gate.py`; canonical fixture copies remain under `examples/` and schema-registered in `config/schema-targets.json`. |
 
 Related pattern and surface modules (implementation SSoT for the specific
 family they cover):
 
-- `runtime/zig/src/doe_wgsl/emit_csl_host.zig`
-- `runtime/zig/src/doe_wgsl/emit_csl_maps.zig`
-- `runtime/zig/src/doe_wgsl/emit_csl_matmul.zig`
-- `runtime/zig/src/doe_wgsl/emit_csl_host_runtime.zig`
-- `runtime/zig/src/doe_wgsl/emit_csl_attention.zig`, `emit_csl_fused_ffn.zig`,
+- `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_host.zig`
+- `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_maps.zig`
+- `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_matmul.zig`
+- `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig`
+- `runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_attention.zig`, `emit_csl_fused_ffn.zig`,
   `emit_csl_fused.zig`, `emit_csl_reduce_dist.zig`, `emit_csl_sample.zig`
 
 Related user-facing entrypoints:

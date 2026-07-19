@@ -257,12 +257,12 @@ def check_overlay(
                     )
                 )
         architecture = _text(wire_notes.get("architecture"))
-        if phase == "chromium_runtime_active" and "DoeCommandDecoder" not in architecture:
+        if phase == "chromium_runtime_active" and "WebGPUDecoderImpl" not in architecture:
             failures.append(
                 failure(
                     "missing_decoder_architecture",
                     "wireProtocolNotes.architecture",
-                    "architecture note must name DoeCommandDecoder",
+                    "architecture note must name the patched WebGPUDecoderImpl seam",
                 )
             )
         if phase != "chromium_runtime_active" and "require-runtime-selector" not in architecture:

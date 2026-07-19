@@ -1,7 +1,7 @@
 // mod_override_test.zig — Override parsing and substitution tests for the public WGSL API.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 const translateToHlsl = mod.translateToHlsl;
 const translateToHlslWithOverrides = mod.translateToHlslWithOverrides;
 const translateToMsl = mod.translateToMsl;

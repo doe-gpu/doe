@@ -13,8 +13,8 @@
 const std = @import("std");
 const testing = std.testing;
 
-const lean_proof = @import("../../src/lean_proof.zig");
-const model = @import("../../src/model.zig");
+const lean_proof = @import("../../src/verification/lean_proof.zig");
+const model = @import("../../src/contracts/model/model.zig");
 
 const ExpectedBoundsPattern = struct {
     pattern: lean_proof.BoundsPattern,

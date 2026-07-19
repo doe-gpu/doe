@@ -1,5 +1,5 @@
 const std = @import("std");
-const trace_text = @import("../../trace_text.zig");
+const trace_text = @import("../../runtime/trace/trace_text.zig");
 
 pub const TraceNumericStabilityDecisionCounts = struct {
     accept_fast: u32 = 0,

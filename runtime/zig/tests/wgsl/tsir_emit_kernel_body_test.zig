@@ -1,8 +1,8 @@
 // TSIR executable kernel-body emitter tests.
 
 const std = @import("std");
-const tsir = @import("../../src/tsir/mod.zig");
-const targets = @import("../../src/targets/mod.zig");
+const tsir = @import("../../src/compiler/tsir/mod.zig");
+const targets = @import("../../src/compiler/targets/mod.zig");
 
 test "tsir emitters produce executable fused_gemv bodies" {
     const allocator = std.testing.allocator;
@@ -465,9 +465,9 @@ test "tsir csl emitter produces executable attention_scores body" {
     // param so the same compiled artifact runs across canary-shape
     // inputs, two-pass-stable softmax, no causal masking, no softcap,
     // literal scale source. Mirrors the contract enforced by
-    // runtime/zig/src/tsir/emit_kernel_body_attention.zig and the
+    // runtime/zig/src/compiler/tsir/emit_kernel_body_attention.zig and the
     // matching host-side oracle at
-    // runtime/zig/src/tsir/reference_interpreter.zig:tryAttentionScores.
+    // runtime/zig/src/compiler/tsir/reference_interpreter.zig:tryAttentionScores.
     const allocator = std.testing.allocator;
     const semantic = attentionScoresSemantic();
 
@@ -710,7 +710,7 @@ test "tsir csl attention_scores emits causal mask conditional" {
 test "tsir csl attention_scores emits sliding-window mask with declared size" {
     // sliding_window_size=4: any K position before
     // `kv_len - 4` must be masked to -1e30. Both the kernel and the
-    // reference interpreter at runtime/zig/src/tsir/reference_interpreter.zig
+    // reference interpreter at runtime/zig/src/compiler/tsir/reference_interpreter.zig
     // use the same threshold so canary parity holds.
     const allocator = std.testing.allocator;
     var semantic = attentionScoresSemantic();

@@ -3549,7 +3549,7 @@ Touched:
 
 Verified:
 
-- `zig fmt runtime/zig/src/render_bundle.zig`
+- `zig fmt runtime/zig/src/runtime/render/render_bundle.zig`
 - `zig build dropin-full`
 - `third_party/depot_tools/clang-format -i third_party/dawn/src/dawn/native/webgpu/ExternalTextureWGPU.cpp third_party/dawn/src/dawn/native/webgpu/ExternalTextureWGPU.h`
 - `git diff --check`
@@ -4193,7 +4193,7 @@ plumbing change, not a promoted Dawn-vs-Doe performance claim.
 
 Validation:
 
-- `zig fmt runtime/zig/src/doe_native_command_types.zig runtime/zig/src/doe_vulkan_compute_native.zig runtime/zig/src/doe_compute_ext_native.zig runtime/zig/src/doe_compute_fast.zig runtime/zig/src/doe_compute_fast_vulkan.zig`
+- `zig fmt runtime/zig/src/native/support/doe_native_command_types.zig runtime/zig/src/native/vulkan/vulkan_compute_native.zig runtime/zig/src/native/compute/doe_compute_ext_native.zig runtime/zig/src/native/compute/doe_compute_fast.zig runtime/zig/src/native/compute/doe_compute_fast_vulkan.zig`
 - `zig build test` from `runtime/zig`
 - `zig build dropin-full` from `runtime/zig`
 - `zig build dropin` from `runtime/zig`
@@ -4242,7 +4242,7 @@ Artifacts:
 
 Validation:
 
-- `zig fmt runtime/zig/src/backend/vulkan/native_runtime.zig runtime/zig/src/backend/vulkan/vk_compute_sync.zig runtime/zig/src/backend/vulkan/vk_upload.zig runtime/zig/src/doe_compute_fast_vulkan.zig runtime/zig/src/doe_queue_submit_vulkan.zig`
+- `zig fmt runtime/zig/src/backend/vulkan/native_runtime.zig runtime/zig/src/backend/vulkan/vk_compute_sync.zig runtime/zig/src/backend/vulkan/vk_upload.zig runtime/zig/src/native/compute/doe_compute_fast_vulkan.zig runtime/zig/src/native/queue/doe_queue_submit_vulkan.zig`
 - `git diff --check`
 - `zig build test` from `runtime/zig`
 - `zig build dropin-full` from `runtime/zig`
@@ -6192,7 +6192,7 @@ Touched:
 - `browser/chromium/src/gpu/command_buffer/service/webgpu_decoder_impl.cc`
 - `browser/chromium/src/gpu/command_buffer/service/webgpu_decoder_impl.h`
 - `browser/chromium/src/gpu/command_buffer/service/webgpu_decoder_unittest.cc`
-- `runtime/zig/src/wgpu_dropin_lib.zig`
+- `runtime/zig/src/dropin/wgpu_dropin_lib.zig`
 - `runtime/zig/src/dropin/dropin_browser_shared_memory.zig`
 - `bench/tools/check_chromium_source_checkout.py`
 - `bench/tools/check_doe_chromium_proc_surface.py`

@@ -1,10 +1,10 @@
 const std = @import("std");
-const command_stream = @import("../command_stream.zig");
-const model_commands = @import("../model_commands.zig");
-const model_quirks = @import("../model_quirks.zig");
+const command_stream = @import("../command/command_stream.zig");
+const model_commands = @import("../contracts/model/model_commands.zig");
+const model_quirks = @import("../contracts/model/model_quirks.zig");
 const quirk = @import("../quirk/mod.zig");
-const replay = @import("../replay.zig");
-const tooling_io_context = @import("../tooling_io_context.zig");
+const replay = @import("../runtime/trace/replay.zig");
+const tooling_io_context = @import("../tooling/tooling_io_context.zig");
 const runtime_cli_args = @import("runtime_cli_args.zig");
 const samples = @import("runtime_cli_samples.zig");
 

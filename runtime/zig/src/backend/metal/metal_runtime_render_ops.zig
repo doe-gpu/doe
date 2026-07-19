@@ -1,5 +1,5 @@
 const common_timing = @import("../common/timing.zig");
-const model_render_types = @import("../../model_render_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const webgpu = @import("../runtime_types.zig");
 const bridge = @import("metal_bridge_decls.zig");
 

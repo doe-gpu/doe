@@ -5,9 +5,9 @@
 // builtin variable mapping, and error handling for unsupported features.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const spec = @import("../../src/doe_wgsl/spirv_spec.zig");
-const spirv_builder = @import("../../src/doe_wgsl/spirv_builder.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const spec = @import("../../src/compiler/wgsl/emit/spirv/spirv_spec.zig");
+const spirv_builder = @import("../../src/compiler/wgsl/emit/spirv/spirv_builder.zig");
 
 const translateToSpirv = mod.translateToSpirv;
 const MAX_SPIRV = mod.MAX_SPIRV_OUTPUT;
@@ -62,7 +62,9 @@ fn find_inst(binary: []const u8, opcode: u16) ?SpirvInst {
 fn count_insts(binary: []const u8, opcode: u16) usize {
     var it = iter_instructions(binary);
     var c: usize = 0;
-    while (it.next()) |inst| if (inst.opcode == opcode) { c += 1; };
+    while (it.next()) |inst| if (inst.opcode == opcode) {
+        c += 1;
+    };
     return c;
 }
 

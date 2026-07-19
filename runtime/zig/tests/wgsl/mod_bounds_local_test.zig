@@ -1,6 +1,6 @@
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const runtime_compile = @import("../../src/doe_wgsl/runtime_compile.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const runtime_compile = @import("../../src/compiler/wgsl/runtime/runtime_compile.zig");
 
 const analyzeToIrWithConfig = mod.analyzeToIrWithConfig;
 const ir = mod.ir;

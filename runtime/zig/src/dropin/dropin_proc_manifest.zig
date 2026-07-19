@@ -1,11 +1,11 @@
 const std = @import("std");
-const dropin_ext_b = @import("../wgpu_dropin_ext_b.zig");
-const dropin_ext_c = @import("../wgpu_dropin_ext_c.zig");
+const dropin_ext_b = @import("wgpu_dropin_ext_b.zig");
+const dropin_ext_c = @import("wgpu_dropin_ext_c.zig");
 const dropin_symbol_ownership = @import("dropin_symbol_ownership.zig");
 
 const build_options = @import("build_options");
 const TIER = build_options.build_tier;
-const N = @import("../doe_wgpu_native.zig");
+const N = @import("../native/mod.zig");
 
 const CORE_PROC_ENTRIES = .{
     .{ .symbol = "wgpuCreateInstance", .proc = &N.doeNativeCreateInstance },

@@ -23,30 +23,33 @@ STRUCTURAL_CLAIMS = [
     ("pipeline/lean/artifacts/proven-conditions.json", "Lean proof artifact"),
 
     # WGSL compiler backends
-    ("runtime/zig/src/doe_wgsl/emit_msl.zig", "MSL emitter"),
-    ("runtime/zig/src/doe_wgsl/emit_hlsl_stage.zig", "HLSL emitter"),
-    ("runtime/zig/src/doe_wgsl/emit_spirv_stages.zig", "SPIR-V emitter"),
-    ("runtime/zig/src/doe_wgsl/emit_dxil_native.zig", "native DXIL emitter"),
+    ("runtime/zig/src/compiler/wgsl/emit/msl/emit_msl.zig", "MSL emitter"),
+    ("runtime/zig/src/compiler/wgsl/emit/hlsl/emit_hlsl_stage.zig", "HLSL emitter"),
+    ("runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_stages.zig", "SPIR-V emitter"),
+    ("runtime/zig/src/compiler/wgsl/emit/dxil/emit_dxil_native.zig", "native DXIL emitter"),
 
     # Runtime backends
     ("runtime/zig/src/backend/vulkan/native_runtime.zig", "Vulkan backend"),
     ("runtime/zig/src/backend/d3d12/d3d12_native_runtime.zig", "D3D12 backend"),
 
-    # Chromium integration
-    ("browser/chromium/src/gpu/command_buffer/service/doe_command_decoder.h", "DoeCommandDecoder header"),
-    ("browser/chromium/src/gpu/command_buffer/service/doe_command_decoder.cc", "DoeCommandDecoder implementation"),
+    # Chromium integration. The Chromium checkout is external and ignored; its
+    # source markers are validated by the dedicated checkout gate.
+    ("bench/tools/check_chromium_source_checkout.py", "Chromium source integration gate"),
+    ("config/webgpu-integration-chromium.json", "Chromium integration overlay"),
+    ("config/doe-chromium-proc-surface.json", "Chromium proc-surface contract"),
+    ("config/chromium-patch-manifest.json", "Chromium patch manifest"),
 
     # Core runtime
-    ("runtime/zig/src/doe_wgpu_native.zig", "Doe WebGPU native runtime"),
-    ("runtime/zig/src/lean_proof.zig", "Lean proof comptime validator"),
-    ("runtime/zig/src/doe_wgsl/mod.zig", "WGSL compiler entry point"),
+    ("runtime/zig/src/native/mod.zig", "Doe WebGPU native runtime"),
+    ("runtime/zig/src/verification/lean_proof.zig", "Lean proof comptime validator"),
+    ("runtime/zig/src/compiler/wgsl/mod.zig", "WGSL compiler entry point"),
 
     # Benchmark contracts
     ("bench/workloads/metadata/backend-workload-catalog.json", "benchmark workload catalog"),
     ("config/backend-runtime-policy.json", "backend runtime policy"),
 
     # GPU timeline (deferred callback infrastructure)
-    ("runtime/zig/src/gpu_timeline.zig", "GPU timeline deferred callbacks"),
+    ("runtime/zig/src/runtime/queue/gpu_timeline.zig", "GPU timeline deferred callbacks"),
 ]
 
 

@@ -1,6 +1,6 @@
 const std = @import("std");
 const common_timing = @import("../common/timing.zig");
-const model_async_types = @import("../../model_async_types.zig");
+const model_async_types = @import("../../contracts/model/model_async_types.zig");
 const bridge = @import("metal_bridge_decls.zig");
 
 const metal_bridge_buffer_contents = bridge.metal_bridge_buffer_contents;

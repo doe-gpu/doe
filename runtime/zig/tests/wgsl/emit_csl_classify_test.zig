@@ -10,8 +10,8 @@
 // exp() calls — the same shape as a 3-input element-wise kernel.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const classify = @import("../../src/doe_wgsl/emit_csl_classify.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const classify = @import("../../src/compiler/wgsl/emit/csl/emit_csl_classify.zig");
 
 const allocator = std.testing.allocator;
 

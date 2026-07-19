@@ -1,9 +1,0 @@
-const _impl = @import("full/surface/wgpu_ffi_surface.zig");
-pub const createSurface = _impl.createSurface;
-pub const getSurfaceCapabilities = _impl.getSurfaceCapabilities;
-pub const freeSurfaceCapabilities = _impl.freeSurfaceCapabilities;
-pub const configureSurface = _impl.configureSurface;
-pub const getCurrentSurfaceTexture = _impl.getCurrentSurfaceTexture;
-pub const presentSurface = _impl.presentSurface;
-pub const unconfigureSurface = _impl.unconfigureSurface;
-pub const releaseSurface = _impl.releaseSurface;

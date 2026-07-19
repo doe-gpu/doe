@@ -18,10 +18,18 @@ CLI_PATH = REPO_ROOT / "bench" / "executors" / "run-node-webgpu-plan.js"
 EXECUTOR_MODULE_URL = (REPO_ROOT / "bench" / "executors" / "node-webgpu" / "executor.js").resolve().as_uri()
 PACKAGE_INDEX_PATH = REPO_ROOT / "packages" / "doe-gpu" / "src" / "vendor" / "webgpu" / "index.js"
 PACKAGE_BUN_PATH = REPO_ROOT / "packages" / "doe-gpu" / "src" / "bun.js"
-RUNTIME_ENCODER_NATIVE_PATH = REPO_ROOT / "runtime" / "zig" / "src" / "doe_encoder_native.zig"
-RUNTIME_METAL_SUBMIT_PATH = REPO_ROOT / "runtime" / "zig" / "src" / "doe_queue_submit_metal.zig"
-RUNTIME_QUEUE_SHARED_PATH = REPO_ROOT / "runtime" / "zig" / "src" / "doe_queue_submit_shared.zig"
-RUNTIME_COMPUTE_FAST_PATH = REPO_ROOT / "runtime" / "zig" / "src" / "doe_compute_fast.zig"
+RUNTIME_ENCODER_NATIVE_PATH = (
+    REPO_ROOT / "runtime" / "zig" / "src" / "native" / "command" / "doe_encoder_native.zig"
+)
+RUNTIME_METAL_SUBMIT_PATH = (
+    REPO_ROOT / "runtime" / "zig" / "src" / "native" / "queue" / "doe_queue_submit_metal.zig"
+)
+RUNTIME_QUEUE_SHARED_PATH = (
+    REPO_ROOT / "runtime" / "zig" / "src" / "native" / "queue" / "doe_queue_submit_shared.zig"
+)
+RUNTIME_COMPUTE_FAST_PATH = (
+    REPO_ROOT / "runtime" / "zig" / "src" / "native" / "compute" / "doe_compute_fast.zig"
+)
 NAPI_QUEUE_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_queue.c"
 NAPI_BUFFER_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_buffer.c"
 NAPI_INIT_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_init.c"

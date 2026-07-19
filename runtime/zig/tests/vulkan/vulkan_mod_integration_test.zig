@@ -1,7 +1,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model = @import("../../src/model.zig");
-const webgpu = @import("../../src/webgpu_ffi.zig");
+const model = @import("../../src/contracts/model/model.zig");
+const webgpu = @import("../../src/compat/webgpu_ffi.zig");
 const vulkan_mod = @import("../../src/backend/vulkan/mod.zig");
 const vulkan_test_support = @import("vulkan_mod_test_support.zig");
 

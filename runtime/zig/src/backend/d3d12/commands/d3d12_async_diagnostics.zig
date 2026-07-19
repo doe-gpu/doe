@@ -1,5 +1,5 @@
 const std = @import("std");
-const model_async_types = @import("../../../model_async_types.zig");
+const model_async_types = @import("../../../contracts/model/model_async_types.zig");
 const common_timing = @import("../../common/timing.zig");
 const bridge = @import("../d3d12_bridge_decls.zig");
 

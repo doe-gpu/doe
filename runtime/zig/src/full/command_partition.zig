@@ -1,7 +1,7 @@
 const std = @import("std");
-const model_render_types = @import("../model_render_types.zig");
-const model_surface_control_types = @import("../model_surface_control_types.zig");
-const model_async_types = @import("../model_async_types.zig");
+const model_render_types = @import("../contracts/model/model_render_types.zig");
+const model_surface_control_types = @import("../contracts/model/model_surface_control_types.zig");
+const model_async_types = @import("../contracts/model/model_async_types.zig");
 
 pub const CommandKind = enum(u8) {
     render_draw,

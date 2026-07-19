@@ -19,6 +19,8 @@ products.
 
 - `runtime/zig`
   - the Doe runtime, compiler, and backend implementation
+  - `runtime/zig/src/README.md` is the source ownership map
+  - `runtime/zig/source-layout.json` is the machine-enforced directory contract
 - `runtime/bridge`
   - shared bridge and addon-facing native code used by package surfaces
 

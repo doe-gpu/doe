@@ -1,10 +1,10 @@
 // shader_emit_test_support.zig - Shared helpers for sharded MSL emitter tests.
 
 pub const std = @import("std");
-pub const ir = @import("../../src/doe_wgsl/ir.zig");
-pub const emit_msl_vertex = @import("../../src/doe_wgsl/emit_msl_vertex.zig");
-pub const emit_msl_fragment = @import("../../src/doe_wgsl/emit_msl_fragment.zig");
-pub const emit_msl_shared = @import("../../src/doe_wgsl/emit_msl_shared.zig");
+pub const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
+pub const emit_msl_vertex = @import("../../src/compiler/wgsl/emit/msl/emit_msl_vertex.zig");
+pub const emit_msl_fragment = @import("../../src/compiler/wgsl/emit/msl/emit_msl_fragment.zig");
+pub const emit_msl_shared = @import("../../src/compiler/wgsl/emit/msl/emit_msl_shared.zig");
 
 pub const testing = std.testing;
 pub const allocator = testing.allocator;

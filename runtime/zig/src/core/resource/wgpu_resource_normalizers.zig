@@ -1,5 +1,5 @@
-const model_texture_types = @import("../../model_texture_value_types.zig");
-const model_binding_types = @import("../../model_binding_value_types.zig");
+const model_texture_types = @import("../../contracts/model/model_texture_value_types.zig");
+const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
 const proc_types = @import("../abi/wgpu_proc_types.zig");
 const abi_base = proc_types.base;
 

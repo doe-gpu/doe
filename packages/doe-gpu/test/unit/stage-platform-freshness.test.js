@@ -16,14 +16,14 @@ import {
   hashWgslCompilerSourceTree,
 } from '../../scripts/stage-platform-package.js';
 
-// Build a synthetic src/doe_wgsl/ tree and verify the collected rel paths
+// Build a synthetic compiler/wgsl tree and verify the collected rel paths
 // and hash match a hand-rolled reference computation. The reference here
 // uses the same algorithm as runtime/zig/build.zig hashSourceTreeAlloc —
 // both sides must walk, sort by byte order, and hash (repoRelRoot + '/'
 // + relPath + '\n' + contents + '\n'). If we ever change the algorithm
 // we must change both in the same commit.
 {
-  const repoRelRoot = 'runtime/zig/src/doe_wgsl';
+  const repoRelRoot = 'runtime/zig/src/compiler/wgsl';
   const root = mkdtempSync(path.join(tmpdir(), 'doe-gpu-wgsl-hash-'));
   try {
     // File ordering is deliberately not sorted on disk so the test proves the

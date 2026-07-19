@@ -357,14 +357,14 @@ claims.
 
 Touched:
 
-- `runtime/zig/src/doe_wgsl/spirv_spec.zig`
-- `runtime/zig/src/doe_wgsl/emit_spirv.zig`
-- `runtime/zig/src/doe_wgsl/emit_spirv_fn.zig`
-- `runtime/zig/src/doe_wgsl/emit_spirv_fn_helpers.zig`
-- `runtime/zig/src/doe_wgsl/emit_spirv_builtins.zig`
-- `runtime/zig/src/doe_wgsl/emit_spirv_texture.zig`
-- `runtime/zig/src/doe_wgsl/emit_spirv_stages.zig`
-- `runtime/zig/src/doe_wgsl/emit_spirv_matrix.zig`
+- `runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig`
+- `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv.zig`
+- `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig`
+- `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn_helpers.zig`
+- `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig`
+- `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig`
+- `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_stages.zig`
+- `runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_matrix.zig`
 - `runtime/zig/tests/wgsl/emit_spirv_builtin_test.zig`
 - `runtime/zig/tests/wgsl/emit_spirv_mixed_binary_test.zig`
 - `runtime/zig/tests/wgsl/emit_spirv_stage_test.zig`
@@ -753,9 +753,9 @@ named Tint phase timings as claim blockers for diagnostic reports, while
 
 Touched:
 
-- `runtime/zig/src/doe_wgsl/mod.zig`
-- `runtime/zig/src/doe_wgsl/runtime_compile.zig`
-- `runtime/zig/src/doe_wgsl/runtime_compile_report.zig`
+- `runtime/zig/src/compiler/wgsl/mod.zig`
+- `runtime/zig/src/compiler/wgsl/runtime/runtime_compile.zig`
+- `runtime/zig/src/compiler/wgsl/runtime/runtime_compile_report.zig`
 - `config/runtime-compile-report.schema.json`
 - `examples/runtime-compile-report.sample.json`
 - `bench/native-compare/compare_doe_vs_tint_compilation.py`
@@ -1007,9 +1007,9 @@ Touched:
 
 - `config/runtime-compile-report.schema.json`
 - `examples/runtime-compile-report.sample.json`
-- `runtime/zig/src/doe_wgsl/mod.zig`
-- `runtime/zig/src/doe_wgsl/runtime_compile.zig`
-- `runtime/zig/src/doe_wgsl/runtime_compile_report.zig`
+- `runtime/zig/src/compiler/wgsl/mod.zig`
+- `runtime/zig/src/compiler/wgsl/runtime/runtime_compile.zig`
+- `runtime/zig/src/compiler/wgsl/runtime/runtime_compile_report.zig`
 - `bench/native-compare/compare_doe_vs_tint_compilation.py`
 - `bench/tests/test_compare_doe_vs_tint_compilation.py`
 - `bench/tests/test_runtime_compile_report_schema.py`
@@ -1486,12 +1486,12 @@ Affects:
 - `rmsnorm.wgsl` (RMSNorm with fused residual add)
 
 Failure site (same for all three):
-`runtime/zig/src/doe_wgsl/emit_spirv.zig:303` fires `error.InvalidIr`
+`runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv.zig:303` fires `error.InvalidIr`
 because `emit_function` sees a function with non-void return type whose
 body completed without an explicit terminator.
 
 **Bug location:**
-`runtime/zig/src/doe_wgsl/emit_spirv_fn.zig:195` — the `.if_` case in
+`runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig:195` — the `.if_` case in
 `emit_stmt` unconditionally returns `false` (not-terminated), even
 when both the then-branch and else-branch are terminated. Lines
 185/190 correctly compute `then_terminated` / `else_terminated`;
@@ -1528,7 +1528,7 @@ Affects:
 - `attention_head256_f16kv.wgsl` (f16 head-256 attention, prefill)
 
 Failure site:
-`runtime/zig/src/doe_wgsl/emit_spirv_fn.zig:772` fires
+`runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig:772` fires
 `error.UnsupportedConstruct` from `emit_scalar_construct_from_type`,
 called via `coerce_binary_operand` at line 727. Target type is
 scalar; source type is not a scalar. The function unwraps
@@ -1614,7 +1614,7 @@ unless the dequant+norm kernels also compile.
   without re-running.
 - The Doe WebGPU shared-contract lane has real transcript and parity plumbing,
   but it is not green end to end.
-- The current blocker is in `runtime/zig/src/doe_wgsl/`, not Vulkan feature
+- The current blocker is in `runtime/zig/src/compiler/wgsl/`, not Vulkan feature
   discovery.
 - Vulkan-side capability bring-up has improved: the adapter now advertises
   `shader-f16` correctly, and the shared-contract runner can force subgroup

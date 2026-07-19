@@ -1,12 +1,12 @@
 const std = @import("std");
-const model = @import("../../src/model.zig");
+const model = @import("../../src/contracts/model/model.zig");
 const full_surface_api = @import("../../src/full/surface_api.zig");
 const core_surface = @import("../../src/core/surface.zig");
 const builtin = @import("builtin");
-const instance_device = @import("../../src/doe_instance_device_native.zig");
-const native_helpers = @import("../../src/doe_native_object_helpers.zig");
-const native_types = @import("../../src/doe_native_object_types.zig");
-const surface_native = @import("../../src/doe_surface_native.zig");
+const instance_device = @import("../../src/native/lifecycle/doe_instance_device_native.zig");
+const native_helpers = @import("../../src/native/support/doe_native_object_helpers.zig");
+const native_types = @import("../../src/native/support/doe_native_object_types.zig");
+const surface_native = @import("../../src/native/surface/doe_surface_native.zig");
 const surface_procs = @import("../../src/full/surface/wgpu_surface_procs.zig");
 
 test "full surface ID and version" {

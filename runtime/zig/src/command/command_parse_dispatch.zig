@@ -1,11 +1,11 @@
 const std = @import("std");
-const model_commands = @import("../model_commands.zig");
-const model_compute_types = @import("../model_compute_types.zig");
-const model_binding_types = @import("../model_binding_value_types.zig");
-const model_texture_types = @import("../model_texture_value_types.zig");
-const parse_helpers = @import("../command_parse_helpers.zig");
+const model_commands = @import("../contracts/model/model_commands.zig");
+const model_compute_types = @import("../contracts/model/model_compute_types.zig");
+const model_binding_types = @import("../contracts/model/model_binding_value_types.zig");
+const model_texture_types = @import("../contracts/model/model_texture_value_types.zig");
+const parse_helpers = @import("command_parse_helpers.zig");
 const command_kind = @import("command_kind.zig");
-const command_json_raw = @import("../command_json_raw.zig");
+const command_json_raw = @import("command_json_raw.zig");
 
 const Allocator = std.mem.Allocator;
 const RawCommand = command_json_raw.RawCommand;

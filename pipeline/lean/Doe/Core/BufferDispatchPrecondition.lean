@@ -7,7 +7,7 @@ import Doe.Core.BufferLifecycle
 -- of such operations.
 --
 -- Extends: Doe.Core.BufferLifecycle
--- Connects to: runtime/zig/src/doe_wgpu_native.zig DoeBuffer lifecycle,
+-- Connects to: runtime/zig/src/native/mod.zig DoeBuffer lifecycle,
 --              dispatch precondition checks in doe_compute_preconditions_native.zig.
 --
 -- Classification: lean_required (induction over unbounded List LiveBufferOp).

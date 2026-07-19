@@ -648,7 +648,7 @@ def _run_webgpu_backend(
 
 
 # Real-canary kernels whose body op has no CSL emit body in
-# runtime/zig/src/tsir/emit_kernel_body.zig (line 119:
+# runtime/zig/src/compiler/tsir/emit_kernel_body.zig (line 119:
 # `.unknown, .attention_scores => error.UnsupportedKernelBody` for the
 # CSL backend). These can never produce a CSL-side hash through TSIR
 # lowering; they are structurally rejected, not deferred.
@@ -675,7 +675,7 @@ _CSL_REJECTED_KERNELS: frozenset[str] = frozenset()
 # bench/out/csl-real-canary-compile-tsir/<kernel>/<kernel>/, the lane
 # prefers it over the hand-authored runner. This routes the canary
 # through the TSIR-CSL emit body
-# (runtime/zig/src/tsir/emit_kernel_body_attention.zig) instead of the
+# (runtime/zig/src/compiler/tsir/emit_kernel_body_attention.zig) instead of the
 # hand-authored bootstrap-shape CSL while preserving the hand-authored
 # compile-dir as a fallback when the TSIR compile-dir hasn't been
 # materialized yet (e.g., in environments without cslc).
@@ -737,7 +737,7 @@ def _run_csl_simfabric_backend(kernel: str, inputs_path: Path) -> ComparisonOutc
             status="rejected",
             detail=(
                 f"{kernel!r} body op (attention_scores) has no CSL emit "
-                "body in runtime/zig/src/tsir/emit_kernel_body.zig:119 "
+                "body in runtime/zig/src/compiler/tsir/emit_kernel_body.zig:119 "
                 "(emitCsl returns UnsupportedKernelBody for "
                 "attention_scores). Closing this lane requires authoring "
                 "the attention_scores CSL emit body — schema enum already "

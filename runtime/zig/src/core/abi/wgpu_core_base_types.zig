@@ -1,5 +1,5 @@
 const handles = @import("wgpu_handle_types.zig");
-const layout = @import("../../model_texture_layout_value_types.zig");
+const layout = @import("../../contracts/model/model_texture_layout_value_types.zig");
 const execution_types = @import("wgpu_execution_types.zig");
 
 pub const NativeExecutionStatus = execution_types.NativeExecutionStatus;

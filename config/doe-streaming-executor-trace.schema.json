@@ -166,7 +166,7 @@
     "notes": { "type": "string" },
     "layerBlockSmoke": {
       "type": "object",
-      "description": "Plan step-1 layer-block smoke receipt emitted by bench/tools/generate_e2b_layer_block_runner.py. Carries the plan/kernel hashes, connection graph, hostIoLayout, io_buffer sizes, send/receive counts, simulator trace paths, target mode, and per-kernel --params shape emission for every emitter in runtime/zig/src/doe_wgsl/emit_csl_layout.zig. perKernelShapes has minItems:14 so schema_gate fails if the generator regresses any pattern's coverage.",
+      "description": "Plan step-1 layer-block smoke receipt emitted by bench/tools/generate_e2b_layer_block_runner.py. Carries the plan/kernel hashes, connection graph, hostIoLayout, io_buffer sizes, send/receive counts, simulator trace paths, target mode, and per-kernel --params shape emission for every emitter in runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig. perKernelShapes has minItems:14 so schema_gate fails if the generator regresses any pattern's coverage.",
       "required": [
         "planPath",
         "planSha256",

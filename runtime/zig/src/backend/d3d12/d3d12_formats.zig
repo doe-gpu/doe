@@ -6,7 +6,7 @@
 // Mirrors the structure of vk_formats.zig for the D3D12 backend.
 
 const std = @import("std");
-const model_gpu_types = @import("../../model_texture_value_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
 const compressed_formats = @import("../../core/abi/wgpu_type_texture_formats.zig");
 const testing = std.testing;
 

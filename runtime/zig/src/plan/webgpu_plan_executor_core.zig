@@ -1,7 +1,7 @@
 const std = @import("std");
-const bench_synthetic_assets = @import("../bench_synthetic_assets.zig");
-const dawn_plan_types = @import("../dawn_plan_types.zig");
-const support = @import("../webgpu_plan_executor_support.zig");
+const synthetic_assets = @import("synthetic_assets.zig");
+const dawn_plan_types = @import("dawn_plan_types.zig");
+const support = @import("webgpu_plan_executor_support.zig");
 
 const Allocator = std.mem.Allocator;
 const c = support.c;
@@ -323,7 +323,7 @@ const Executor = struct {
         const start_ns = support.nowNs();
         const buffer = try self.ensureBuffer(command.handle);
         const spec = try self.specForHandle(command.handle);
-        const bytes = try bench_synthetic_assets.readAssetBytes(
+        const bytes = try synthetic_assets.readAssetBytes(
             self.allocator,
             command.cache_namespace,
             command.cache_key,

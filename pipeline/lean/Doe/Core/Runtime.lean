@@ -5,7 +5,7 @@
 -- that the Zig runtime uses at dispatch time.
 --
 -- Mirrors: runtime/zig/src/quirk/runtime.zig (matcher, selector, bucketing)
---          runtime/zig/src/model_profile.zig (DeviceProfile construction)
+--          runtime/zig/src/contracts/model/model_profile.zig (DeviceProfile construction)
 --          runtime/zig/src/quirk/quirk_json.zig (quirk record schema)
 -- Classification: lean_verified (quantified over unbounded quirk lists).
 

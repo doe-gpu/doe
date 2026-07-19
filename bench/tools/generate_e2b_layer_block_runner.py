@@ -1017,7 +1017,7 @@ def derive_per_kernel_shapes(
     # per-step widths based on the weight matrix / token count.
     shapes.append({
         "pattern": "gather",
-        "emitter": "emitGatherLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:237)",
+        "emitter": "emitGatherLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:237)",
         "emitterWidened2D": True,
         "paramsShape": {
             "width": smoke_size,
@@ -1052,7 +1052,7 @@ def derive_per_kernel_shapes(
     rope_num_pairs = (head_dim // 2) if head_dim else 64
     shapes.append({
         "pattern": "rope",
-        "emitter": "emitRoPELayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:263)",
+        "emitter": "emitRoPELayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:263)",
         "emitterWidened2D": False,
         "paramsShape": {
             "width": smoke_size,
@@ -1117,7 +1117,7 @@ def derive_per_kernel_shapes(
     ]
     shapes.append({
         "pattern": "tiled_matmul",
-        "emitter": "emitMatmulLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:168)",
+        "emitter": "emitMatmulLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:168)",
         "emitterWidened2D": True,
         "invocations": mm_invocations,
         "derivationSource": (
@@ -1151,7 +1151,7 @@ def derive_per_kernel_shapes(
     ]
     shapes.append({
         "pattern": "attention_tiled",
-        "emitter": "emitTiledAttentionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:403)",
+        "emitter": "emitTiledAttentionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:403)",
         "emitterWidened2D": False,
         "invocations": [
             {
@@ -1217,7 +1217,7 @@ def derive_per_kernel_shapes(
     if decode_invocations:
         shapes.append({
             "pattern": "attention_decode",
-            "emitter": "emitDecodeAttentionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:379)",
+            "emitter": "emitDecodeAttentionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:379)",
             "emitterWidened2D": False,
             "invocations": decode_invocations,
             "derivationSource": (
@@ -1238,7 +1238,7 @@ def derive_per_kernel_shapes(
     if not dequant_steps:
         shapes.append({
             "pattern": "dequant",
-            "emitter": "emitDequantLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:305)",
+            "emitter": "emitDequantLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:305)",
             "emitterWidened2D": False,
             "invocations": [{
                 "stepName": "(dormant)",
@@ -1269,7 +1269,7 @@ def derive_per_kernel_shapes(
         in_per_pe = max(1, hidden // smoke_size)
         shapes.append({
             "pattern": "fused_ffn",
-            "emitter": "emitFusedFfnLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:557)",
+            "emitter": "emitFusedFfnLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:557)",
             "emitterWidened2D": False,
             "invocations": [{
                 "stepName": "(dormant)",
@@ -1310,7 +1310,7 @@ def derive_per_kernel_shapes(
         chunk_size = max(1, vocab_size // smoke_size)
         shapes.append({
             "pattern": "sample",
-            "emitter": "emitSampleLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:428)",
+            "emitter": "emitSampleLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:428)",
             "emitterWidened2D": False,
             "invocations": [{
                 "stepName": sample_steps[0],
@@ -1384,7 +1384,7 @@ def derive_per_kernel_shapes(
     if gemv_invocations:
         shapes.append({
             "pattern": "fused_gemv_dequant",
-            "emitter": "emitFusedGemvLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:448)",
+            "emitter": "emitFusedGemvLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:448)",
             "emitterWidened2D": False,
             "invocations": gemv_invocations,
             "derivationSource": (
@@ -1409,7 +1409,7 @@ def derive_per_kernel_shapes(
     # model adds a streaming-attention variant.
     shapes.append({
         "pattern": "attention_streaming",
-        "emitter": "emitStreamingAttentionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:357)",
+        "emitter": "emitStreamingAttentionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:357)",
         "emitterWidened2D": False,
         "invocations": [{
             "stepName": "(dormant)",
@@ -1437,7 +1437,7 @@ def derive_per_kernel_shapes(
     # streaming attention — Gemma-4 doesn't use linear attention.
     shapes.append({
         "pattern": "attention_linear",
-        "emitter": "emitLinearAttentionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:489)",
+        "emitter": "emitLinearAttentionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:489)",
         "emitterWidened2D": False,
         "invocations": [{
             "stepName": "(dormant)",
@@ -1483,7 +1483,7 @@ def derive_per_kernel_shapes(
     if kv_write_invocations:
         shapes.append({
             "pattern": "kv_write",
-            "emitter": "emitKvWriteLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:512)",
+            "emitter": "emitKvWriteLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:512)",
             "emitterWidened2D": False,
             "invocations": kv_write_invocations,
             "derivationSource": (
@@ -1504,7 +1504,7 @@ def derive_per_kernel_shapes(
     # generator's shape coverage matches the 14-emitter audit.
     shapes.append({
         "pattern": "kv_read",
-        "emitter": "emitKvReadLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:535)",
+        "emitter": "emitKvReadLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:535)",
         "emitterWidened2D": False,
         "invocations": [{
             "stepName": "(dormant)",
@@ -1539,7 +1539,7 @@ def derive_per_kernel_shapes(
     reduction_manifest_ops = ("rmsnorm", "ple_norm", "softmax", "layernorm")
     shapes.append({
         "pattern": "reduction",
-        "emitter": "emitReductionLayout (runtime/zig/src/doe_wgsl/emit_csl_layout.zig:112)",
+        "emitter": "emitReductionLayout (runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig:112)",
         "emitterWidened2D": False,
         "paramsShape": {
             "width": smoke_size,

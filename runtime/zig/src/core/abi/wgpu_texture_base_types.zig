@@ -1,6 +1,6 @@
 const core = @import("wgpu_core_base_types.zig");
-const layout = @import("../../model_texture_layout_value_types.zig");
-const formats = @import("../../model_texture_format_value_types.zig");
+const layout = @import("../../contracts/model/model_texture_layout_value_types.zig");
+const formats = @import("../../contracts/model/model_texture_format_value_types.zig");
 const compressed_formats = @import("wgpu_type_texture_formats.zig");
 
 pub const WGPUTextureUsage = core.WGPUFlags;

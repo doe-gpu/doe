@@ -1,5 +1,5 @@
 const std = @import("std");
-const model_compute_types = @import("../../../model_compute_types.zig");
+const model_compute_types = @import("../../../contracts/model/model_compute_types.zig");
 const common_timing = @import("../../common/timing.zig");
 const webgpu = @import("../../runtime_types.zig");
 const dc = @import("../d3d12_constants.zig");

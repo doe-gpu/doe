@@ -189,7 +189,7 @@ def main() -> int:
             {
                 "class": "msl_spirv_canary_lanes_absent",
                 "detail": (
-                    "runtime/zig/src/tsir/emit_msl.zig and "
+                    "runtime/zig/src/compiler/tsir/emit_msl.zig and "
                     "emit_spir_v.zig exist as TSIR backend emitters. "
                     "No canary fixtures pair them with bootstrap "
                     "inputs; bench/fixtures/tsir-real-entries/ only "

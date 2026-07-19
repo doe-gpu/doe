@@ -1,8 +1,8 @@
 // emit_spirv_stage_test.zig — SPIR-V vertex and fragment stage emission tests.
 
 const std = @import("std");
-const spirv = @import("../../src/doe_wgsl/spirv_builder.zig");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const spirv = @import("../../src/compiler/wgsl/emit/spirv/spirv_builder.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 
 const testing = std.testing;
 const allocator = testing.allocator;

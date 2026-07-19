@@ -1,6 +1,6 @@
 const std = @import("std");
-const model_resource_types = @import("../../model_resource_types.zig");
-const model_gpu_types = @import("../../model_texture_value_types.zig");
+const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
 const proc_types = @import("../../core/abi/wgpu_proc_types.zig");
 const abi_base = proc_types.base;
 const abi_descriptor = proc_types.descriptor;
@@ -8,7 +8,7 @@ const abi_records = @import("../../core/abi/wgpu_runtime_records.zig");
 const loader = @import("../../core/abi/wgpu_loader.zig");
 const resources = @import("../../core/resource/wgpu_resources.zig");
 const render_assets = @import("wgpu_render_assets.zig");
-const texture_procs_mod = @import("../../wgpu_texture_procs.zig");
+const texture_procs_mod = @import("../../core/abi/procs/wgpu_texture_procs.zig");
 
 pub const RENDER_UNIFORM_BINDING_INDEX: u32 = 0;
 pub const RENDER_TEXTURE_BINDING_INDEX: u32 = 1;

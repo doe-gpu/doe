@@ -2,7 +2,7 @@
 
 Sister to ``test_attention_canary_identity.py`` (single-PE canary). The
 multi-PE kv-axis-sharded body
-(``runtime/zig/src/tsir/emit_kernel_body_attention.zig::emitKvAxisSharded``)
+(``runtime/zig/src/compiler/tsir/emit_kernel_body_attention.zig::emitKvAxisSharded``)
 emits per-PE ``[head_dim + 2]f32`` partials and relies on a host-side
 log-sum-exp stitch
 (``bench/tools/attention_kv_axis_sharded_stitch.py``) to recover the

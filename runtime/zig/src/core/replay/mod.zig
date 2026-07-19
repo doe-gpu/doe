@@ -1,4 +1,4 @@
-const _impl = @import("../../replay.zig");
+const _impl = @import("../../runtime/trace/replay.zig");
 pub const ReplayValidationError = _impl.ReplayValidationError;
 pub const ReplayExpectation = _impl.ReplayExpectation;
 pub const ReplayExpectationSet = _impl.ReplayExpectationSet;

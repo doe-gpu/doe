@@ -4,7 +4,7 @@
 // mappings, and quantizeToF16.
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 const translateToMsl = mod.translateToMsl;
 const MAX_OUTPUT = mod.MAX_OUTPUT;
 
@@ -305,7 +305,7 @@ test "builtins: dpdxFine dpdyFine fwidthFine through MSL" {
 
 test "builtins: passthrough surface coverage — every mapped name resolves" {
     // Verify the passthrough map handles all names it claims.
-    const msl_maps = @import("../../src/doe_wgsl/emit_msl_maps.zig");
+    const msl_maps = @import("../../src/compiler/wgsl/emit/msl/emit_msl_maps.zig");
     const names = [_][]const u8{
         "abs",         "acos",              "asin",               "atan",        "atan2",
         "ceil",        "cos",               "cosh",               "cross",       "determinant",

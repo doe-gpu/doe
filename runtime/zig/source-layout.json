@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "sourceRoot": "src",
+  "moduleRoot": "src/mod.zig",
+  "allowedRootFiles": [
+    "README.md",
+    "mod.zig"
+  ],
+  "topLevelOwners": {
+    "backend": "backend selection, shared backend seams, and Metal/Vulkan/D3D12 implementations",
+    "cli": "command-line orchestration and executable entrypoints",
+    "command": "command-stream parsing and normalization",
+    "compat": "explicit compatibility barrels that remain under test",
+    "compiler": "WGSL, TSIR, and compiler target descriptions",
+    "contracts": "neutral contracts shared by core and full runtime layers",
+    "core": "compute, resource, queue, replay, trace, and WebGPU ABI core",
+    "dropin": "WebGPU drop-in symbol routing and behavior policy",
+    "experimental": "runtime experiments outside promoted behavior",
+    "full": "render, surface, and full-runtime command behavior",
+    "integrations": "runtime integration anchors such as ONNX Runtime EP",
+    "native": "Doe-native WebGPU object and command implementation",
+    "plan": "direct execution-plan contracts and executors",
+    "quirk": "quirk parsing, selection, and application",
+    "runtime": "shared execution, cache, device, queue, diagnostics, and trace services",
+    "spatial": "HostPlan and CSL orchestration for spatial targets",
+    "tooling": "I/O contexts shared by command-line tools",
+    "verification": "runtime consumers of proof artifacts"
+  },
+  "wgslStageDirectories": [
+    "emit",
+    "frontend",
+    "ir",
+    "proof",
+    "runtime"
+  ],
+  "wgslRootFiles": [
+    "WGSL_SUPPORT.md",
+    "mod.zig"
+  ],
+  "nativeRootFiles": [
+    "mod.zig"
+  ],
+  "repositoryOnlyZigRoots": [
+    "bench"
+  ],
+  "compatibilityFacades": [
+    "src/compat/webgpu_ffi.zig"
+  ]
+}

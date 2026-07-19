@@ -1,7 +1,7 @@
 // emit_csl_matmul_q4k_test.zig — Wedge 2 of fused-dequant SUMMA.
 //
 // Pins the CSL string contract emitted by
-// `src/doe_wgsl/emit_csl_matmul_q4k.zig`. The new emit is callable as a
+// `src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig`. The new emit is callable as a
 // standalone function but is NOT yet wired to the WGSL classifier
 // (KernelPattern dispatch is Wedge 3+). To test it directly we
 // synthesize a minimal `ir.Module` with the three storage globals the
@@ -26,10 +26,10 @@
 //     numerical behaviour on C is preserved.
 
 const std = @import("std");
-const ir = @import("../../src/doe_wgsl/ir.zig");
-const mod = @import("../../src/doe_wgsl/mod.zig");
-const matmul_q4k = @import("../../src/doe_wgsl/emit_csl_matmul_q4k.zig");
-const classify = @import("../../src/doe_wgsl/emit_csl_classify.zig");
+const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
+const matmul_q4k = @import("../../src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig");
+const classify = @import("../../src/compiler/wgsl/emit/csl/emit_csl_classify.zig");
 
 const allocator = std.testing.allocator;
 
@@ -366,13 +366,15 @@ test "emit_csl_matmul_q4k: KernelPattern variant satisfies contract validity" {
     // — but the contract validity check must accept correctly-shaped
     // MatmulInfo (tile_k % 256 == 0 for Q4K block alignment) and
     // reject malformed shapes.
-    const ok: classify.KernelPattern = .{ .tiled_matmul_q4k_dequant_b = .{
-        .tile_a_global = 0,
-        .tile_b_global = 1,
-        .tile_m = 16,
-        .tile_n = 16,
-        .tile_k = 2560, // Gemma 4 31B Kt = 10 × 256
-    } };
+    const ok: classify.KernelPattern = .{
+        .tiled_matmul_q4k_dequant_b = .{
+            .tile_a_global = 0,
+            .tile_b_global = 1,
+            .tile_m = 16,
+            .tile_n = 16,
+            .tile_k = 2560, // Gemma 4 31B Kt = 10 × 256
+        },
+    };
     try std.testing.expect(classify.patternContractValid(ok));
 
     // Note: tile_k % 256 == 0 is enforced by the host plan at SUMMA

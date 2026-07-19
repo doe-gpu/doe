@@ -72,10 +72,10 @@ NON_APPLES_TO_APPLES_DOMAINS = {
     "surface",
 }
 FAWN_UPLOAD_RUNTIME_SOURCE_PATHS = (
-    Path("runtime/zig/src/main.zig"),
-    Path("runtime/zig/src/execution.zig"),
-    Path("runtime/zig/src/wgpu_commands.zig"),
-    Path("runtime/zig/src/webgpu_ffi.zig"),
+    Path("runtime/zig/src/cli/entrypoints/main.zig"),
+    Path("runtime/zig/src/runtime/execution.zig"),
+    Path("runtime/zig/src/full/command/wgpu_commands.zig"),
+    Path("runtime/zig/src/compat/webgpu_ffi.zig"),
 )
 NATIVE_EXECUTION_OPERATION_TIMING_SOURCES = {
     "doe-execution-total-ns",

@@ -9,7 +9,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 const abi_callback = @import("../../core/abi/wgpu_callback_descriptor_types.zig");
 const abi_feature = @import("../../core/abi/wgpu_feature_base_types.zig");
-const model_gpu_types = @import("../../model_texture_value_types.zig");
+const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
 const bridge = @import("d3d12_bridge_decls.zig");
 
 // D3D12 is only available on Windows.

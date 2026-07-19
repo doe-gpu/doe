@@ -7,7 +7,7 @@ north-star checklist. Walks
 verifies, per step:
 
   - ``op`` is registered in the WGSL→CSL exec-v1 ``opToSpec`` map
-    (``runtime/zig/src/doe_wgsl/emit_csl_exec_v1.zig``);
+    (``runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig``);
   - ``phase`` is one of ``prefill`` / ``decode``;
   - the registered op spec allows the cited phase;
   - ``kernelKey`` is one of the named compile targets the host plan
@@ -53,7 +53,7 @@ DEFAULT_SMOKE_CONFIG = (
     / "runtime/zig/examples/execution-v1/qwen-3-6-27b-smoke.json"
 )
 DEFAULT_OPTOSPEC_SOURCE = (
-    REPO_ROOT / "runtime/zig/src/doe_wgsl/emit_csl_exec_v1.zig"
+    REPO_ROOT / "runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig"
 )
 DEFAULT_OUT = (
     REPO_ROOT

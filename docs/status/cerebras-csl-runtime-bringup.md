@@ -152,10 +152,10 @@ the acceptance target by itself.
 
 The chunked-export D2H row-split pattern is established for the
 rms_norm f16 output as 21 D2H-addressable chunks in
-`runtime/zig/src/doe_wgsl/emit_csl_rmsnorm_pack.zig`. A simpler
+`runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_rmsnorm_pack.zig`. A simpler
 single-buffer f16 pack landed for the TSIR emit lane in the new
-`runtime/zig/src/tsir/emit_csl_f16_pack.zig` and is wired into
-`runtime/zig/src/tsir/emit_kernel_body.zig::emitCslRmsNorm`. For the
+`runtime/zig/src/compiler/tsir/emit_csl_f16_pack.zig` and is wired into
+`runtime/zig/src/compiler/tsir/emit_kernel_body.zig::emitCslRmsNorm`. For the
 tiled_31b Q4K projection, the current compact path is a taller f16
 row-split copyback from the GEMV sink column. Compile probes under
 `bench/out/scratch/q4k-height12-probe/` and
@@ -283,8 +283,8 @@ inference evidence gate, not promoted by the contract metadata.
 Runtime staging now accepts f16 SUMMA A/B tiling and f16 constant state without
 silently widening to af32. The Zig HostPlan tool routes af16 compile-target
 metadata to f16 bindings and moved binding metadata into
-`runtime/zig/src/csl_host_plan_bindings.zig` so
-`runtime/zig/src/csl_host_plan_tool.zig` stays under the Zig source line cap.
+`runtime/zig/src/spatial/csl/csl_host_plan_bindings.zig` so
+`runtime/zig/src/spatial/csl/csl_host_plan_tool.zig` stays under the Zig source line cap.
 
 Real-session PLE routing now records each layer's own PLE gather, projection,
 and norm buffers instead of chaining layer outputs across the PLE batch. The

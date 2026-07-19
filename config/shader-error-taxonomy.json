@@ -103,21 +103,21 @@
       "code": "csl_unsupported_shader_stage",
       "stage": "csl_classify",
       "severity": "error",
-      "description": "Shader stage is not compute; CSL lane only accepts compute entry points. Emitted at runtime/zig/src/doe_wgsl/emit_csl_classify.zig when KernelPattern.classify observes a non-compute entry.",
+      "description": "Shader stage is not compute; CSL lane only accepts compute entry points. Emitted at runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_classify.zig when KernelPattern.classify observes a non-compute entry.",
       "backendIds": ["doe_csl"]
     },
     {
       "code": "csl_unsupported_builtin",
       "stage": "csl_classify",
       "severity": "error",
-      "description": "Compute kernel references a WGSL builtin (textures, atomics, derivatives) with no CSL equivalent. Emitted at runtime/zig/src/doe_wgsl/emit_csl_classify.zig when hasUnsupportedBuiltins returns true.",
+      "description": "Compute kernel references a WGSL builtin (textures, atomics, derivatives) with no CSL equivalent. Emitted at runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_classify.zig when hasUnsupportedBuiltins returns true.",
       "backendIds": ["doe_csl"]
     },
     {
       "code": "csl_unrecognized_compute_pattern",
       "stage": "csl_classify",
       "severity": "error",
-      "description": "Compute kernel did not match any known CSL lowering pattern (gather, reduce, matmul, softmax, attention, kv-read, fused-ffn). Emitted at runtime/zig/src/doe_wgsl/emit_csl_classify.zig when no specific pattern match succeeds.",
+      "description": "Compute kernel did not match any known CSL lowering pattern (gather, reduce, matmul, softmax, attention, kv-read, fused-ffn). Emitted at runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_classify.zig when no specific pattern match succeeds.",
       "backendIds": ["doe_csl"]
     },
     {

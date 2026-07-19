@@ -1,10 +1,10 @@
-const gpu = @import("../../model_gpu_types.zig");
-const resource = @import("../../model_resource_types.zig");
-const compute = @import("../../model_compute_types.zig");
-const render = @import("../../model_render_types.zig");
-const texture = @import("../../model_texture_types.zig");
-const surface_control = @import("../../model_surface_control_types.zig");
-const async_types = @import("../../model_async_types.zig");
+const gpu = @import("../../contracts/model/model_gpu_types.zig");
+const resource = @import("../../contracts/model/model_resource_types.zig");
+const compute = @import("../../contracts/model/model_compute_types.zig");
+const render = @import("../../contracts/model/model_render_types.zig");
+const texture = @import("../../contracts/model/model_texture_types.zig");
+const surface_control = @import("../../contracts/model/model_surface_control_types.zig");
+const async_types = @import("../../contracts/model/model_async_types.zig");
 
 pub const WGPUFlags = gpu.WGPUFlags;
 pub const WGPUSType = gpu.WGPUSType;

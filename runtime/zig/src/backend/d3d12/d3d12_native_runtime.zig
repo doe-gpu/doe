@@ -2,12 +2,12 @@ const std = @import("std");
 const common_errors = @import("../common/errors.zig");
 const webgpu = @import("../runtime_types.zig");
 const abi_callback = @import("../../core/abi/wgpu_callback_descriptor_types.zig");
-const model_resource_types = @import("../../model_resource_types.zig");
-const model_compute_types = @import("../../model_compute_types.zig");
-const model_render_types = @import("../../model_render_types.zig");
-const model_texture_types = @import("../../model_texture_types.zig");
-const model_surface_control_types = @import("../../model_surface_control_types.zig");
-const model_async_types = @import("../../model_async_types.zig");
+const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
+const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
+const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
+const model_surface_control_types = @import("../../contracts/model/model_surface_control_types.zig");
+const model_async_types = @import("../../contracts/model/model_async_types.zig");
 const bridge = @import("d3d12_bridge_decls.zig");
 
 const d3d12_texture = @import("resources/d3d12_texture.zig");
@@ -26,7 +26,7 @@ const d3d12_descriptors = @import("d3d12_descriptors.zig");
 const d3d12_device_caps = @import("d3d12_device_caps.zig");
 const compute = @import("d3d12_runtime_compute.zig");
 const upload = @import("d3d12_runtime_upload.zig");
-const render_bundle = @import("../../render_bundle.zig");
+const render_bundle = @import("../../runtime/render/render_bundle.zig");
 
 pub const MAX_UPLOAD_BYTES: u64 = 64 * 1024 * 1024;
 pub const MAX_KERNEL_SOURCE_BYTES: usize = compute.MAX_KERNEL_SOURCE_BYTES;

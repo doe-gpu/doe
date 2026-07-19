@@ -11,26 +11,25 @@ This guide is the Zig style contract for `zig`.
 
 ## Repository conventions
 
-- Anchor shared command/profile contracts in `model.zig`. When they grow into
-  independent domains, shard them into feature-scoped modules and re-export
-  through `model.zig` until callers can be migrated safely.
-- Put quirk parsing in `quirk/quirk_json.zig` and command parsing in `command_json.zig`.
-- Keep deterministic selection logic in `runtime.zig`.
-- Keep execution orchestration in `execution.zig`.
-- Keep pipeline/trace/replay behavior in `trace.zig` and `replay.zig`.
-- Anchor WebGPU proc/table contracts in `wgpu_types.zig` and loader glue in
-  `wgpu_loader.zig`. When those files become broad hubs, split contracts by
-  feature and keep the old file as a compatibility re-export surface.
-- Add new API clusters as feature-scoped `wgpu_*_procs.zig` modules.
+- Anchor shared command/profile contracts in `contracts/model/`; use
+  `contracts/model/model.zig` only when a caller genuinely needs the combined
+  contract.
+- Put quirk parsing in `quirk/quirk_json.zig` and command parsing in
+  `command/command_json.zig`.
+- Keep deterministic selection logic in `quirk/runtime.zig`.
+- Keep execution orchestration in `runtime/execution.zig`.
+- Keep trace and replay behavior in `runtime/trace/`.
+- Anchor WebGPU types and proc contracts in `core/abi/`, with procedure groups
+  under `core/abi/procs/` and loader glue in `core/abi/wgpu_loader.zig`.
 
 ## Architectural decoupling
 
 - Treat directories as subsystem boundaries, not just file buckets.
 - Prefer dependency direction: contracts -> helpers -> subsystem
   implementation -> facade/orchestration.
-- Root-level `src/*.zig` files should be thin facades, entrypoints, or stable
-  contract barrels. Do not grow new feature logic there when it can live in a
-  feature subtree.
+- `src/mod.zig` is the only production Zig file allowed directly under `src/`.
+  `source-layout.json` assigns every implementation to an ownership directory,
+  and `tools/check_source_layout.py` enforces that boundary.
 - `core` must remain one-way with respect to `full`. If shared behavior is
   needed, extract it into `core`, `backend/common`, or a new contract module
   rather than importing upward.
@@ -43,44 +42,36 @@ This guide is the Zig style contract for `zig`.
   backend-owned seam modules such as `backend/dropin_*.zig`, not by importing
   `backend/metal/*`, `backend/vulkan/*`, or `backend/d3d12/*` directly. The
   import fence enforces this boundary.
-- Keep `doe_wgsl` self-contained except for explicit shared proof/contracts.
+- Keep `compiler/wgsl` self-contained except for explicit shared
+  proof/contracts.
 - Keep `quirk` limited to quirk logic plus shared contracts/proof inputs; it
   should not depend on backend execution modules.
 - Prefer narrow context/state types over monolithic runtime structs when
   crossing subsystem boundaries.
 - Avoid introducing new import cycles. If an import would create one, extract a
   smaller contract/state module and depend on that instead.
-- When splitting a high-fan-in file, move definitions first, keep a
-  compatibility re-export facade, and migrate callers incrementally rather than
-  forcing a big-bang rename.
+- When splitting a high-fan-in file, move definitions first and retain a
+  compatibility facade only when an exercised compatibility contract requires
+  it. Every retained facade must be declared in `source-layout.json`.
 - Shared types should live with the subsystem that owns their semantics, not in
   whichever orchestration file currently imports them most often.
-- New implementation code should not import compatibility barrels such as
-  `model_transfer_types.zig`,
-  `model_runtime_types.zig`, `model_webgpu_types.zig`, `wgpu_types.zig`, or
-  `webgpu_ffi.zig`. Use the narrow source modules directly; keep the
-  compatibility barrels for export and transition surfaces only.
-- `doe_native_types.zig` and `doe_native_helpers.zig` are compatibility
-  barrels only. Implementation code should import
-  `doe_native_object_types.zig`, `doe_native_shared_types.zig`,
-  `doe_native_command_types.zig`, `doe_native_object_helpers.zig`, and
-  `doe_native_runtime_helpers.zig` directly; keep `doe_native_exports.zig`
-  for cross-shard native C ABI declarations.
+- New implementation code must not import `compat/`; the compatibility surface
+  is for compatibility tests and declared consumers only.
+- Native implementation code should import the narrow modules under
+  `native/support/`; keep `native/support/doe_native_exports.zig` for
+  cross-shard native C ABI declarations.
 - When a caller only needs shared texture/layout values, import
   `model_texture_value_types.zig`. When it only needs shader-stage or
   binding/sample/access values, import `model_binding_value_types.zig`.
   Reserve `model_gpu_types.zig` for compatibility or transition callers that
   genuinely need both value families at once.
 - Prefer `model_resource_types.zig` for upload/copy/barrier payloads and
-  `model_compute_types.zig` for dispatch/kernel-binding payloads instead of
-  routing through the compatibility `model_transfer_types.zig` barrel.
+  `model_compute_types.zig` for dispatch/kernel-binding payloads.
 - Prefer `model_texture_types.zig` for texture read/write/query payloads,
   `model_surface_control_types.zig` for surface lifecycle/configuration
   payloads, and `model_async_types.zig` for async-diagnostics or map-async
-  payloads instead of routing through the compatibility `model_surface_types.zig`
-  barrel.
-- `wgpu_base_types.zig` and `wgpu_descriptor_types.zig` are broad
-  compatibility barrels. Implementation code should import
+  payloads.
+- Implementation code should import the narrow ABI modules
   `wgpu_core_base_types.zig`, `wgpu_feature_base_types.zig`,
   `wgpu_texture_base_types.zig`, `wgpu_binding_base_types.zig`,
   `wgpu_callback_descriptor_types.zig`, `wgpu_copy_descriptor_types.zig`,
@@ -106,23 +97,8 @@ This guide is the Zig style contract for `zig`.
 ## Imports
 
 - `std` and `builtin` first.
-- Then local modules, with `model.zig` before domain-specific imports.
+- Then local modules, with shared contracts before domain-specific imports.
 - Group domain imports by subsystem (e.g. backend modules together).
-
-```zig
-const std = @import("std");
-const builtin = @import("builtin");
-const model_texture = @import("model_texture_value_types.zig");
-const model_binding = @import("model_binding_value_types.zig");
-const model_compute = @import("model_compute_types.zig");
-const wgpu_core = @import("core/abi/wgpu_core_base_types.zig");
-const wgpu_texture = @import("core/abi/wgpu_texture_base_types.zig");
-const wgpu_pipeline = @import("core/abi/wgpu_pipeline_descriptor_types.zig");
-const native_object_types = @import("doe_native_object_types.zig");
-const native_object_helpers = @import("doe_native_object_helpers.zig");
-const backend_runtime = @import("backend/backend_runtime.zig");
-const backend_ids = @import("backend/backend_ids.zig");
-```
 
 - Prefer small feature-scoped modules over catch-all utility files.
 - Prefer importing feature-local contract/state modules over whole runtime

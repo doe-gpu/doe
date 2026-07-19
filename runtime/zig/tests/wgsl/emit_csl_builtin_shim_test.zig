@@ -18,7 +18,7 @@
 // as such for reduction kernels in the dual-compile evidence manifest).
 
 const std = @import("std");
-const mod = @import("../../src/doe_wgsl/mod.zig");
+const mod = @import("../../src/compiler/wgsl/mod.zig");
 
 const allocator = std.testing.allocator;
 
@@ -136,7 +136,8 @@ test "emit_csl_builtin_shim: gid.x in reduction body is substituted" {
     // (the full global_thread_id). Post-barrier gid.x still resolves
     // to `@as(u32, pe_id)`. At least one of the two forms must appear.
     const has_lane_gid = std.mem.indexOf(
-        u8, csl,
+        u8,
+        csl,
         "(@as(u32, pe_id) * @as(u32, hidden_size) + lane_idx)",
     ) != null;
     const has_pe_gid = std.mem.indexOf(u8, csl, "@as(u32, pe_id)") != null;

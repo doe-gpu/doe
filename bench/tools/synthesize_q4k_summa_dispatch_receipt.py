@@ -147,10 +147,10 @@ def _build_pending_receipt(
             "structuralPin": {
                 "classifierVariant": "tiled_matmul_q4k_dequant_b",
                 "peProgramEmitter": (
-                    "runtime/zig/src/doe_wgsl/emit_csl_matmul_q4k.zig"
+                    "runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig"
                 ),
                 "layoutEmitter": (
-                    "runtime/zig/src/doe_wgsl/emit_csl_layout.zig"
+                    "runtime/zig/src/compiler/wgsl/emit/csl/emit_csl_layout.zig"
                     "::emitMatmulQ4kLayout"
                 ),
                 "hostPlanTransform": (

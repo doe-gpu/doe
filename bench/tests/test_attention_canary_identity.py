@@ -4,7 +4,7 @@ head_dim=512 TSIR-emit sim runners.
 The runners
 (``bench/runners/csl-runners/attention_head{256,512}_f16kv_tsir_sim_runner.py``)
 dispatch the TSIR-emit ``attention_scores`` body
-(``runtime/zig/src/tsir/emit_kernel_body_attention.zig``) at
+(``runtime/zig/src/compiler/tsir/emit_kernel_body_attention.zig``) at
 manifest-shape head_dim with single-PE kv_len. The canary identity is:
 
   *for any kv_len >= 1 with zero Q/K/V, the f32 [head_dim] output is
