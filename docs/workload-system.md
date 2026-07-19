@@ -53,6 +53,8 @@ are execution mechanisms. Their raw output is not an independent source of
 truth; the workload ledger records the verdict and binds the detailed output
 through extensions. Process executors preserve the actual return code and
 stdout/stderr as typed extensions so a failed oracle remains diagnosable.
+`process-json` oracles also validate stdout against a declared schema and
+expected semantic status before attaching the structured result.
 
 ## Current front door
 
@@ -71,10 +73,33 @@ workloads. Existing run, compare, and claim receipts become typed extensions
 for claim-bearing workloads; they are not replaced or weakened.
 
 The core suite currently wraps the repository Python contracts, rebuilt native
-drop-in and Node bridge, Node and Bun package contracts, the exact-byte Metal
-oracle, and the Zig runtime contracts. Browser and comparison workloads use the
-same envelope but remain separate until their live executor artifacts are
-available.
+drop-in and Node bridge, Node and Bun package contracts, exact-output Metal
+transfer and compute oracles, and the Zig runtime contracts. Browser and
+comparison workloads use the same envelope but remain separate until their
+live executor artifacts are available.
+
+## Correctness-bearing benchmark pilots
+
+The staged Metal buffer-write slice no longer has a separate exact-byte test.
+Its benchmark executes repeated production writes, records write, flush,
+capture, and wall timing, and compares every captured byte. A second registered
+workload deliberately corrupts the device buffer and passes only when the same
+oracle rejects the result. Timing remains diagnostic under correctness-only
+policy; performance promotion still requires a declared claim-bearing policy.
+
+The native Metal compute slice follows the same law. It repeatedly writes an
+input buffer, dispatches the production kernel, compares the complete output
+against its CPU oracle, and records each execution phase. Its corruption
+workload proves that a dispatch receipt with altered output cannot pass.
+
+## Duplicate-test removal gate
+
+A standalone test body can be removed after its registered workload executes
+the same production path, preserves the assertion in a structured oracle,
+proves oracle sensitivity with a deliberate invalid outcome, and passes in the
+consolidated ledger. Keep any focused test that still owns a unique property,
+rejection path, or smaller first-failure boundary. Migration removes duplicate
+assertions; it does not trade coverage for timing.
 
 ## Migration order
 
@@ -89,6 +114,6 @@ available.
 5. Make repository and release gates consume the consolidated ledger for the
    workloads they own.
 
-Migration is monotonic: an old mechanism remains callable while being wrapped,
-but only the registered workload result is authoritative for the migrated
-contract.
+Migration is monotonic: an old mechanism remains callable while being wrapped.
+After the duplicate-test removal gate passes, the workload becomes the only
+authoritative implementation of that contract.

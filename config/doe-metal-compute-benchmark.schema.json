@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe Metal compute correctness benchmark receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "workloadId",
+    "backend",
+    "status",
+    "iterations",
+    "wordsPerIteration",
+    "totalBytes",
+    "faultInjection",
+    "performanceClaimEligible",
+    "correctness",
+    "timing"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "artifactKind": {
+      "type": "string",
+      "const": "doe_correctness_benchmark"
+    },
+    "workloadId": {
+      "type": "string",
+      "const": "metal_compute_exact_output"
+    },
+    "backend": {
+      "type": "string",
+      "const": "apple-metal"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "oracle_rejected_corruption",
+        "fail"
+      ]
+    },
+    "iterations": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "wordsPerIteration": {
+      "type": "integer",
+      "const": 1024
+    },
+    "totalBytes": {
+      "type": "integer",
+      "minimum": 4096
+    },
+    "faultInjection": {
+      "type": "boolean"
+    },
+    "performanceClaimEligible": {
+      "type": "boolean",
+      "const": false
+    },
+    "correctness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "oracleId",
+        "expectedOutcomeSatisfied",
+        "observedContentMatchesExpected",
+        "mismatchedBytes",
+        "firstMismatchByte",
+        "dispatchCount",
+        "everyDispatchCompleted",
+        "everySubmitWaitCompleted"
+      ],
+      "properties": {
+        "oracleId": {
+          "type": "string",
+          "const": "metal/compute-exact-output-v1"
+        },
+        "expectedOutcomeSatisfied": {
+          "type": "boolean"
+        },
+        "observedContentMatchesExpected": {
+          "type": "boolean"
+        },
+        "mismatchedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "firstMismatchByte": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "dispatchCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "everyDispatchCompleted": {
+          "type": "boolean"
+        },
+        "everySubmitWaitCompleted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "class",
+        "wallNs",
+        "writeSetupNs",
+        "dispatchSetupNs",
+        "dispatchEncodeNs",
+        "dispatchSubmitWaitNs",
+        "captureNs"
+      ],
+      "properties": {
+        "class": {
+          "type": "string",
+          "const": "diagnostic"
+        },
+        "wallNs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "writeSetupNs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dispatchSetupNs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dispatchEncodeNs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dispatchSubmitWaitNs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "captureNs": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "pass"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "faultInjection": {
+            "const": false
+          },
+          "correctness": {
+            "properties": {
+              "expectedOutcomeSatisfied": {
+                "const": true
+              },
+              "observedContentMatchesExpected": {
+                "const": true
+              },
+              "mismatchedBytes": {
+                "const": 0
+              },
+              "firstMismatchByte": {
+                "type": "null"
+              },
+              "everyDispatchCompleted": {
+                "const": true
+              },
+              "everySubmitWaitCompleted": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "oracle_rejected_corruption"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "faultInjection": {
+            "const": true
+          },
+          "correctness": {
+            "properties": {
+              "expectedOutcomeSatisfied": {
+                "const": true
+              },
+              "observedContentMatchesExpected": {
+                "const": false
+              },
+              "mismatchedBytes": {
+                "minimum": 1
+              },
+              "firstMismatchByte": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "everyDispatchCompleted": {
+                "const": true
+              },
+              "everySubmitWaitCompleted": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "fail"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "correctness": {
+            "properties": {
+              "expectedOutcomeSatisfied": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

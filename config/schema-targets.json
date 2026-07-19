@@ -14,6 +14,14 @@
       "data": "examples/doe-workload-ledger.sample.json"
     },
     {
+      "schema": "config/doe-metal-staged-write-benchmark.schema.json",
+      "data": "examples/doe-metal-staged-write-benchmark.sample.json"
+    },
+    {
+      "schema": "config/doe-metal-compute-benchmark.schema.json",
+      "data": "examples/doe-metal-compute-benchmark.sample.json"
+    },
+    {
       "schema": "config/benchmark-cube-policy.schema.json",
       "data": "config/benchmark-cube-policy.json"
     },

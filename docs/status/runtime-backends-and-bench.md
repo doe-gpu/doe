@@ -13,10 +13,10 @@ one queue-ordering contract.
 
 Completion waiting is now command-buffer scoped. The former process-global
 semaphore allowed concurrent runtime instances to consume one another's
-completion signals. The Metal tests cover concurrent runtime drains, terminal
-queue state, and exact staged-write destination bytes. Pooled synthetic upload
-sources are rewritten for every operation so the Doe side does not reuse old
-host bytes while the Dawn side performs a fresh write.
+completion signals. Metal correctness workloads cover concurrent runtime
+drains, terminal queue state, and exact staged-write destination bytes. Pooled
+synthetic upload sources are rewritten for every operation so the Doe side does
+not reuse old host bytes while the Dawn side performs a fresh write.
 
 The fresh native comparison is
 `bench/out/apple-metal/compare/20260719T004103Z/runtime.apple-metal.single-queue.compare.json`.
@@ -25,10 +25,10 @@ The focused upload sweeps remain under
 `bench/out/apple-metal/sweeps/scoped-completion-upload-16mb-final/`.
 These artifacts do not support a new upload speed claim: the timing direction
 changes across run shapes, and the synthetic upload timing workload still has
-no output oracle. The exact-byte staged-write workload is correctness proof;
-timing promotion requires a matched upload/readback oracle on both products.
-Its consolidated result is
-`bench/out/workloads/current-doe-metal/metal-staged-write-ledger.json`.
+no output oracle. The staged-write and native-compute benchmarks now record
+timing while checking every captured byte, and their paired corruption
+workloads must reject altered device contents. Timing promotion still requires
+a matched oracle on both products.
 
 Deferred cadence and bounded multi-buffer probes were rejected. The first
 changed synchronization and omitted phase-accounted waiting; the second added
@@ -40,7 +40,7 @@ Doe's cross-depth test contract is now documented in
 registers existing mechanisms as pure, native, browser, or comparison
 executors and emits one consolidated correctness ledger with typed evidence
 extensions. The current Metal development ledger is
-`bench/out/workloads/current-doe-metal/doe-workload-ledger-v11.json`. It binds
+`bench/out/workloads/current-doe-metal/doe-workload-ledger-v15.json`. It binds
 the repository Python contract suite to nonignored source identity, including
 tracked deletions and symlink text without traversing external symlink targets.
 The same ledger rebuilds and binds the native drop-in and Node bridge before

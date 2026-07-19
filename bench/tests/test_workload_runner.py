@@ -39,6 +39,7 @@ class WorkloadRunnerTests(unittest.TestCase):
         command: list[str],
         *,
         inputs: list[dict[str, str]] | None = None,
+        oracle: dict[str, object] | None = None,
         policy_kind: str = "correctness-only",
         evidence_extensions: list[dict[str, object]] | None = None,
     ) -> Path:
@@ -50,7 +51,7 @@ class WorkloadRunnerTests(unittest.TestCase):
                     "path": self._relative(self.input_path),
                 }
             ],
-            "oracle": {
+            "oracle": oracle or {
                 "oracleId": "process/exit-zero-v1",
                 "kind": "process-exit",
                 "expectedExitCode": 0,
@@ -139,6 +140,91 @@ class WorkloadRunnerTests(unittest.TestCase):
         self.assertEqual(
             json.loads((REPO_ROOT / process_result["path"]).read_text()),
             {"returnCode": 3},
+        )
+
+    def test_process_json_oracle_validates_schema_and_status(self) -> None:
+        schema_path = self.root / "receipt.schema.json"
+        schema_path.write_text(
+            json.dumps(
+                {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["status"],
+                    "properties": {"status": {"type": "string"}},
+                }
+            ),
+            encoding="utf-8",
+        )
+        oracle = {
+            "oracleId": "fixture/process-json-v1",
+            "kind": "process-json",
+            "expectedExitCode": 0,
+            "schemaPath": self._relative(schema_path),
+            "expectedStatus": "pass",
+        }
+        suite_path = self._suite(
+            [sys.executable, "-c", "print('{\"status\":\"pass\"}')"],
+            inputs=[
+                {"kind": "file", "path": self._relative(self.input_path)},
+                {"kind": "file", "path": self._relative(schema_path)},
+            ],
+            oracle=oracle,
+        )
+
+        ledger = run_suite(suite_path, self.root / "process-json.json", REPO_ROOT)
+
+        result = ledger["results"][0]
+        self.assertEqual(result["correctness"]["status"], "pass")
+        self.assertEqual(result["expectedOutcome"], oracle)
+        self.assertIn(
+            "process_json",
+            [item["extensionType"] for item in result["evidenceExtensions"]],
+        )
+
+    def test_process_json_oracle_rejects_unexpected_status(self) -> None:
+        schema_path = self.root / "receipt.schema.json"
+        schema_path.write_text(
+            json.dumps(
+                {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "required": ["status"],
+                    "properties": {"status": {"type": "string"}},
+                }
+            ),
+            encoding="utf-8",
+        )
+        suite_path = self._suite(
+            [sys.executable, "-c", "print('{\"status\":\"fail\"}')"],
+            inputs=[
+                {"kind": "file", "path": self._relative(self.input_path)},
+                {"kind": "file", "path": self._relative(schema_path)},
+            ],
+            oracle={
+                "oracleId": "fixture/process-json-v1",
+                "kind": "process-json",
+                "expectedExitCode": 0,
+                "schemaPath": self._relative(schema_path),
+                "expectedStatus": "pass",
+            },
+        )
+
+        ledger = run_suite(suite_path, self.root / "wrong-status.json", REPO_ROOT)
+
+        result = ledger["results"][0]
+        self.assertEqual(result["correctness"]["status"], "fail")
+        self.assertEqual(
+            result["correctness"]["firstFailingBoundary"],
+            "output_contract",
+        )
+        self.assertEqual(
+            result["correctness"]["reasonCode"],
+            "unexpected_process_json_status",
+        )
+        self.assertNotIn(
+            "process_json",
+            [item["extensionType"] for item in result["evidenceExtensions"]],
         )
 
     def test_input_identity_changes_when_input_changes(self) -> None:

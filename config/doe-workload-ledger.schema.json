@@ -215,12 +215,40 @@
         },
         "kind": {
           "type": "string",
-          "const": "process-exit"
+          "enum": [
+            "process-exit",
+            "process-json"
+          ]
         },
         "expectedExitCode": {
           "type": "integer"
+        },
+        "schemaPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedStatus": {
+          "type": "string",
+          "minLength": 1
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "process-json"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "schemaPath",
+              "expectedStatus"
+            ]
+          }
+        }
+      ]
     },
     "result": {
       "type": "object",

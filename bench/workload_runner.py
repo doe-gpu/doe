@@ -269,6 +269,29 @@ def _extension_dir(output_path: Path) -> Path:
     return output_path.parent / f"{output_path.stem}.extensions"
 
 
+def _validate_process_json(
+    repo_root: Path,
+    stdout_path: Path,
+    oracle: dict[str, Any],
+) -> tuple[str | None, str]:
+    try:
+        payload = json.loads(stdout_path.read_text(encoding="utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return "output_contract", "invalid_process_json"
+    if not isinstance(payload, dict):
+        return "output_contract", "process_json_not_object"
+
+    schema_path = _resolve_inside(repo_root, oracle["schemaPath"])
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    try:
+        jsonschema.Draft202012Validator(schema).validate(payload)
+    except jsonschema.ValidationError:
+        return "output_contract", "process_json_schema_mismatch"
+    if payload.get("status") != oracle["expectedStatus"]:
+        return "output_contract", "unexpected_process_json_status"
+    return None, "oracle_passed"
+
+
 def _run_workload(
     repo_root: Path,
     output_path: Path,
@@ -352,9 +375,23 @@ def _run_workload(
     if not oracle_passed:
         first_failing_boundary = "oracle"
         reason_code = "unexpected_process_exit"
+    elif oracle["kind"] == "process-json":
+        first_failing_boundary, reason_code = _validate_process_json(
+            repo_root,
+            stdout_path,
+            oracle,
+        )
+        if first_failing_boundary is None:
+            evidence_extensions.append(
+                _extension_ref(
+                    repo_root,
+                    stdout_path,
+                    "process_json",
+                )
+            )
 
     declared_extensions: list[dict[str, str]] = []
-    if oracle_passed:
+    if first_failing_boundary is None:
         for extension in workload.get("evidenceExtensions", []):
             extension_path = _resolve_inside(repo_root, extension["path"])
             if not extension_path.is_file():
@@ -373,6 +410,15 @@ def _run_workload(
     evidence_extensions.extend(declared_extensions)
 
     correctness_status = "pass" if first_failing_boundary is None else "fail"
+    expected_outcome = {
+        "expectedExitCode": oracle["expectedExitCode"],
+        "kind": oracle["kind"],
+        "oracleId": oracle["oracleId"],
+    }
+    if oracle["kind"] == "process-json":
+        expected_outcome["schemaPath"] = oracle["schemaPath"]
+        expected_outcome["expectedStatus"] = oracle["expectedStatus"]
+
     return {
         "correctness": {
             "firstFailingBoundary": first_failing_boundary,
@@ -381,11 +427,7 @@ def _run_workload(
         },
         "evidenceExtensions": evidence_extensions,
         "executorIdentity": executor_identity,
-        "expectedOutcome": {
-            "expectedExitCode": oracle["expectedExitCode"],
-            "kind": oracle["kind"],
-            "oracleId": oracle["oracleId"],
-        },
+        "expectedOutcome": expected_outcome,
         "inputIdentity": {
             "algorithm": "sha256",
             "hash": input_manifest["sha256"],

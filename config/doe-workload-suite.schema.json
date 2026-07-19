@@ -107,7 +107,7 @@
         }
       }
     },
-    "oracle": {
+    "processExitOracle": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -128,6 +128,48 @@
           "type": "integer"
         }
       }
+    },
+    "processJsonOracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "oracleId",
+        "kind",
+        "expectedExitCode",
+        "schemaPath",
+        "expectedStatus"
+      ],
+      "properties": {
+        "oracleId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_/-]+$"
+        },
+        "kind": {
+          "type": "string",
+          "const": "process-json"
+        },
+        "expectedExitCode": {
+          "type": "integer"
+        },
+        "schemaPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedStatus": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "oracle": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/processExitOracle"
+        },
+        {
+          "$ref": "#/$defs/processJsonOracle"
+        }
+      ]
     },
     "policy": {
       "type": "object",

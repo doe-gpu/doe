@@ -3,7 +3,6 @@ const builtin = @import("builtin");
 const model = @import("../../src/model.zig");
 const webgpu = @import("../../src/webgpu_ffi.zig");
 const backend_iface = @import("../../src/backend/backend_iface.zig");
-const backend_policy = @import("../../src/backend/backend_policy.zig");
 const metal_mod = @import("../../src/backend/metal/mod.zig");
 
 const FlushWorker = struct {
@@ -113,39 +112,6 @@ test "metal deferred upload keeps per-command submit_wait_ns at zero until final
     try std.testing.expect(flush_ns > 0);
     try std.testing.expectEqual(@as(?*anyopaque, null), runtime.outstanding_cmd_buf);
     try std.testing.expectEqual(@as(usize, 0), runtime.streaming_uploads.items.len);
-}
-
-test "metal staged buffer write flush proves exact destination bytes" {
-    if (builtin.os.tag != .macos) return;
-
-    const backend = metal_mod.ZigMetalBackend.init_with_selection_policy(
-        std.testing.allocator,
-        test_profile(),
-        null,
-        backend_policy.default_policy_for_lane(.metal_doe_comparable),
-    ) catch |err| {
-        if (skip_if_runtime_unavailable(err)) return;
-        return err;
-    };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_staged_write_bytes", "test_policy_hash");
-    defer iface.deinit();
-
-    const byte_count = 2 * 1024 * 1024;
-    const expected = try std.testing.allocator.alloc(u8, byte_count);
-    defer std.testing.allocator.free(expected);
-    for (expected, 0..) |*byte, index| {
-        byte.* = @truncate((index *% 131) ^ (index >> 7) ^ 0x5a);
-    }
-
-    iface.set_queue_sync_mode(.deferred);
-    const write_result = try iface.execute_buffer_write_bytes(4101, 0, byte_count, expected);
-    try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, write_result.status);
-    try std.testing.expectEqual(@as(u64, 0), write_result.submit_wait_ns);
-    try std.testing.expect((try iface.flush_queue()) > 0);
-
-    const actual = try iface.capture_buffer(std.testing.allocator, 4101, 0, byte_count);
-    defer std.testing.allocator.free(actual);
-    try std.testing.expectEqualSlices(u8, expected, actual);
 }
 
 test "metal completion waits are isolated across concurrent runtimes" {

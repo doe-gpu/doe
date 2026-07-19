@@ -597,6 +597,66 @@ pub fn build(b: *std.Build) void {
     runtime_step.dependOn(&install_exe.step);
     b.getInstallStep().dependOn(&install_exe.step);
 
+    const metal_staged_write_bench = b.addExecutable(.{
+        .name = "doe-metal-staged-write-bench",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main_metal_staged_write_bench.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "build_options", .module = build_options_module },
+            },
+        }),
+    });
+    metal_staged_write_bench.linkLibC();
+    if (target.result.os.tag == .windows) {
+        metal_staged_write_bench.addCSourceFile(.{
+            .file = b.path("src/backend/metal/metal_bridge_stubs.c"),
+            .flags = &.{},
+        });
+    } else {
+        configure_non_windows_graphics(metal_staged_write_bench, b, target);
+    }
+    const install_metal_staged_write_bench = b.addInstallArtifact(
+        metal_staged_write_bench,
+        .{},
+    );
+    const metal_staged_write_bench_step = b.step(
+        "bench-metal-staged-write",
+        "Build the correctness-bearing Metal staged-write benchmark",
+    );
+    metal_staged_write_bench_step.dependOn(&install_metal_staged_write_bench.step);
+
+    const metal_compute_bench = b.addExecutable(.{
+        .name = "doe-metal-compute-bench",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main_metal_compute_bench.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "build_options", .module = build_options_module },
+            },
+        }),
+    });
+    metal_compute_bench.linkLibC();
+    if (target.result.os.tag == .windows) {
+        metal_compute_bench.addCSourceFile(.{
+            .file = b.path("src/backend/metal/metal_bridge_stubs.c"),
+            .flags = &.{},
+        });
+    } else {
+        configure_non_windows_graphics(metal_compute_bench, b, target);
+    }
+    const install_metal_compute_bench = b.addInstallArtifact(
+        metal_compute_bench,
+        .{},
+    );
+    const metal_compute_bench_step = b.step(
+        "bench-metal-compute",
+        "Build the correctness-bearing Metal compute benchmark",
+    );
+    metal_compute_bench_step.dependOn(&install_metal_compute_bench.step);
+
     const app_step = b.step("app", "Build macOS Doe Runtime .app bundle with generated icon");
     if (target.result.os.tag == .macos) {
         const app_info_plist =

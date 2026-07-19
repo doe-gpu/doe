@@ -339,39 +339,250 @@
       }
     },
     {
-      "workloadId": "metal_staged_write_exact_bytes",
-      "description": "Prove staged Metal buffer writes reach the exact destination bytes before queue completion is reported.",
+      "workloadId": "metal_staged_write_benchmark_build",
+      "description": "Build the correctness-bearing Metal staged-write benchmark executable.",
       "inputs": [
         {
-          "kind": "file",
-          "path": "runtime/zig/build.zig"
-        },
-        {
-          "kind": "tree",
-          "path": "runtime/zig/src/backend/metal"
-        },
-        {
-          "kind": "file",
-          "path": "runtime/zig/tests/metal/metal_timing_semantics_test.zig"
+          "kind": "repository-tree",
+          "path": "runtime/zig"
         }
       ],
       "oracle": {
-        "oracleId": "metal/staged-write-exact-bytes-v1",
+        "oracleId": "process/exit-zero-v1",
         "kind": "process-exit",
         "expectedExitCode": 0
       },
       "executor": {
-        "executorId": "zig_runtime_native",
+        "executorId": "zig_metal_staged_write_benchmark_build",
         "executorKind": "native",
         "workingDirectory": "runtime/zig",
         "command": [
           "zig",
           "build",
-          "test",
+          "bench-metal-staged-write",
           "-Doptimize=ReleaseFast",
-          "-Dtest-filter=metal staged buffer write flush proves exact destination bytes",
           "--summary",
           "all"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      },
+      "evidenceExtensions": [
+        {
+          "extensionType": "metal_staged_write_benchmark",
+          "path": "runtime/zig/zig-out/bin/doe-metal-staged-write-bench",
+          "required": true
+        }
+      ]
+    },
+    {
+      "workloadId": "metal_staged_write_exact_bytes",
+      "description": "Measure staged Metal writes while proving exact destination bytes on every iteration.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "runtime/zig/zig-out/bin/doe-metal-staged-write-bench"
+        },
+        {
+          "kind": "file",
+          "path": "runtime/zig/src/main_metal_staged_write_bench.zig"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-metal-staged-write-benchmark.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "metal/staged-write-exact-bytes-v2",
+        "kind": "process-json",
+        "expectedExitCode": 0,
+        "schemaPath": "config/doe-metal-staged-write-benchmark.schema.json",
+        "expectedStatus": "pass"
+      },
+      "executor": {
+        "executorId": "metal_staged_write_correctness_benchmark",
+        "executorKind": "native",
+        "workingDirectory": "runtime/zig",
+        "command": [
+          "./zig-out/bin/doe-metal-staged-write-bench",
+          "--iterations",
+          "8",
+          "--bytes",
+          "2097152"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "metal_staged_write_oracle_rejects_corruption",
+      "description": "Prove the staged-write benchmark rejects deliberately corrupted device-buffer contents.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "runtime/zig/zig-out/bin/doe-metal-staged-write-bench"
+        },
+        {
+          "kind": "file",
+          "path": "runtime/zig/src/main_metal_staged_write_bench.zig"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-metal-staged-write-benchmark.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "metal/staged-write-detects-corruption-v1",
+        "kind": "process-json",
+        "expectedExitCode": 2,
+        "schemaPath": "config/doe-metal-staged-write-benchmark.schema.json",
+        "expectedStatus": "oracle_rejected_corruption"
+      },
+      "executor": {
+        "executorId": "metal_staged_write_corruption_probe",
+        "executorKind": "native",
+        "workingDirectory": "runtime/zig",
+        "command": [
+          "./zig-out/bin/doe-metal-staged-write-bench",
+          "--iterations",
+          "2",
+          "--bytes",
+          "2097152",
+          "--inject-corruption"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "metal_compute_benchmark_build",
+      "description": "Build the correctness-bearing Metal compute benchmark executable.",
+      "inputs": [
+        {
+          "kind": "repository-tree",
+          "path": "runtime/zig"
+        },
+        {
+          "kind": "file",
+          "path": "bench/kernels/concurrent_execution_runsingle_u32.metal"
+        }
+      ],
+      "oracle": {
+        "oracleId": "process/exit-zero-v1",
+        "kind": "process-exit",
+        "expectedExitCode": 0
+      },
+      "executor": {
+        "executorId": "zig_metal_compute_benchmark_build",
+        "executorKind": "native",
+        "workingDirectory": "runtime/zig",
+        "command": [
+          "zig",
+          "build",
+          "bench-metal-compute",
+          "-Doptimize=ReleaseFast",
+          "--summary",
+          "all"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      },
+      "evidenceExtensions": [
+        {
+          "extensionType": "metal_compute_benchmark",
+          "path": "runtime/zig/zig-out/bin/doe-metal-compute-bench",
+          "required": true
+        }
+      ]
+    },
+    {
+      "workloadId": "metal_compute_exact_output",
+      "description": "Measure native Metal compute while proving the exact output buffer after every dispatch.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "runtime/zig/zig-out/bin/doe-metal-compute-bench"
+        },
+        {
+          "kind": "file",
+          "path": "runtime/zig/src/main_metal_compute_bench.zig"
+        },
+        {
+          "kind": "file",
+          "path": "bench/kernels/concurrent_execution_runsingle_u32.metal"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-metal-compute-benchmark.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "metal/compute-exact-output-v1",
+        "kind": "process-json",
+        "expectedExitCode": 0,
+        "schemaPath": "config/doe-metal-compute-benchmark.schema.json",
+        "expectedStatus": "pass"
+      },
+      "executor": {
+        "executorId": "metal_compute_correctness_benchmark",
+        "executorKind": "native",
+        "workingDirectory": "runtime/zig",
+        "command": [
+          "./zig-out/bin/doe-metal-compute-bench",
+          "--iterations",
+          "3"
+        ]
+      },
+      "policy": {
+        "policyId": "correctness-only/v1",
+        "kind": "correctness-only"
+      }
+    },
+    {
+      "workloadId": "metal_compute_oracle_rejects_corruption",
+      "description": "Prove the compute benchmark rejects deliberately corrupted device-buffer output.",
+      "inputs": [
+        {
+          "kind": "file",
+          "path": "runtime/zig/zig-out/bin/doe-metal-compute-bench"
+        },
+        {
+          "kind": "file",
+          "path": "runtime/zig/src/main_metal_compute_bench.zig"
+        },
+        {
+          "kind": "file",
+          "path": "bench/kernels/concurrent_execution_runsingle_u32.metal"
+        },
+        {
+          "kind": "file",
+          "path": "config/doe-metal-compute-benchmark.schema.json"
+        }
+      ],
+      "oracle": {
+        "oracleId": "metal/compute-detects-corruption-v1",
+        "kind": "process-json",
+        "expectedExitCode": 2,
+        "schemaPath": "config/doe-metal-compute-benchmark.schema.json",
+        "expectedStatus": "oracle_rejected_corruption"
+      },
+      "executor": {
+        "executorId": "metal_compute_corruption_probe",
+        "executorKind": "native",
+        "workingDirectory": "runtime/zig",
+        "command": [
+          "./zig-out/bin/doe-metal-compute-bench",
+          "--iterations",
+          "1",
+          "--inject-corruption"
         ]
       },
       "policy": {

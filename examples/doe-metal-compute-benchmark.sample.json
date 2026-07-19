@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe_correctness_benchmark",
+  "workloadId": "metal_compute_exact_output",
+  "backend": "apple-metal",
+  "status": "pass",
+  "iterations": 1,
+  "wordsPerIteration": 1024,
+  "totalBytes": 4096,
+  "faultInjection": false,
+  "performanceClaimEligible": false,
+  "correctness": {
+    "oracleId": "metal/compute-exact-output-v1",
+    "expectedOutcomeSatisfied": true,
+    "observedContentMatchesExpected": true,
+    "mismatchedBytes": 0,
+    "firstMismatchByte": null,
+    "dispatchCount": 1,
+    "everyDispatchCompleted": true,
+    "everySubmitWaitCompleted": true
+  },
+  "timing": {
+    "class": "diagnostic",
+    "wallNs": 8,
+    "writeSetupNs": 1,
+    "dispatchSetupNs": 1,
+    "dispatchEncodeNs": 1,
+    "dispatchSubmitWaitNs": 3,
+    "captureNs": 1
+  }
+}

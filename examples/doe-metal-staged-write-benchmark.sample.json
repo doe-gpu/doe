@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe_correctness_benchmark",
+  "workloadId": "metal_staged_write_exact_bytes",
+  "backend": "apple-metal",
+  "status": "pass",
+  "iterations": 3,
+  "bytesPerIteration": 1024,
+  "totalBytes": 3072,
+  "faultInjection": false,
+  "performanceClaimEligible": false,
+  "correctness": {
+    "oracleId": "metal/staged-write-exact-bytes-v2",
+    "expectedOutcomeSatisfied": true,
+    "observedContentMatchesExpected": true,
+    "mismatchedBytes": 0,
+    "firstMismatchByte": null,
+    "deferredSubmitWaitNs": 0,
+    "everyFlushCompleted": true
+  },
+  "timing": {
+    "class": "diagnostic",
+    "wallNs": 8,
+    "writeSetupNs": 2,
+    "flushNs": 3,
+    "captureNs": 1
+  }
+}
