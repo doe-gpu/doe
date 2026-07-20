@@ -35,12 +35,11 @@
       "runtimeHost": "node",
       "backend": "amd-vulkan",
       "comparison": "doe-vs-node-webgpu",
-      "metricDirection": "lower-is-better",
-      "claimState": "claim-indexed",
-      "comparisonStatus": "comparable",
-      "claimStatus": "claimable",
-      "reportPath": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
-      "claimPath": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.claim.json"
+      "metricDirection": "status-only",
+      "claimState": "scaffolded",
+      "comparisonStatus": "not-evaluated",
+      "claimStatus": "not-evaluated",
+      "blocker": "AMD Vulkan Node package evidence was removed from checkout; this lane is scaffolded until the new package compare artifacts are regenerated."
     },
     {
       "id": "package-bun-amd-vulkan",
@@ -48,12 +47,11 @@
       "runtimeHost": "bun",
       "backend": "amd-vulkan",
       "comparison": "doe-vs-bun-webgpu",
-      "metricDirection": "lower-is-better",
-      "claimState": "claim-indexed",
-      "comparisonStatus": "comparable",
-      "claimStatus": "claimable",
-      "reportPath": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
-      "claimPath": "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.claim.json"
+      "metricDirection": "status-only",
+      "claimState": "scaffolded",
+      "comparisonStatus": "not-evaluated",
+      "claimStatus": "not-evaluated",
+      "blocker": "AMD Vulkan Bun package evidence was removed from checkout; this lane is scaffolded until the new package compare artifacts are regenerated."
     },
     {
       "id": "native-strict-apple-metal",
@@ -165,11 +163,10 @@
       "backend": "amd-vulkan",
       "comparison": "doe-vs-dawn",
       "metricDirection": "status-only",
-      "claimState": "claim-indexed",
-      "comparisonStatus": "comparable",
-      "claimStatus": "claimable",
-      "reportPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json",
-      "claimPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json"
+      "claimState": "scaffolded",
+      "comparisonStatus": "not-evaluated",
+      "claimStatus": "not-evaluated",
+      "blocker": "Drop-in cutover rehearsal artifacts were not present in checkout; this lane is scaffolded until a fresh drop-in rehearsal receipt and claim sidecar are published."
     },
     {
       "id": "native-d3d12",

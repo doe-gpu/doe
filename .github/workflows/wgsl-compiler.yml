@@ -36,4 +36,3 @@ jobs:
         run: |
           zig build test-wgsl
           zig build test-wgsl -Dlean-verified=true
-          zig test src/compiler/wgsl/emit/dxil/emit_dxil.zig

@@ -215,7 +215,7 @@
   },
   "runtimeFrontierBundle": {
     "path": "examples/browser-runtime-frontier-bundle.sample.json",
-    "sha256": "d5b3a1a83cb1a6a1afc8b2b9d1361741e9c0fc0655b11655fbe5fc5a4d8fd61f",
+    "sha256": "003bb84b3c23067f15fa18899e6d11435dfc5a7884453fea4cb28f1c704aa46a",
     "kind": "browser_runtime_frontier_bundle"
   }
 }

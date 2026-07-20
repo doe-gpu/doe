@@ -799,7 +799,7 @@
             "path": "examples/browser-release-artifact-bundle.sample.json",
             "releaseBundleIdentitySha256": "f7279a10b96a60e55bc539f5f72d881a61bbaf510713709cc6a4c51d58ae7398",
             "releaseStatus": "diagnostic",
-            "sha256": "e63260d71669a86765287fd1e58a286234cff23855bb6cb05332ce0d3fea6648",
+            "sha256": "71d84d4ee4477cd2b78f21a25d2fe5c3dc762161f69e180696ef519a6f57d025",
             "status": "pass"
           },
           "runtimeIdentity": {
@@ -1437,7 +1437,7 @@
             ]
           }
         },
-        "sha256": "d5b3a1a83cb1a6a1afc8b2b9d1361741e9c0fc0655b11655fbe5fc5a4d8fd61f",
+        "sha256": "003bb84b3c23067f15fa18899e6d11435dfc5a7884453fea4cb28f1c704aa46a",
         "status": "pass",
         "summary": {
           "claimBlockerCount": 1,

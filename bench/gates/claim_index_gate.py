@@ -21,7 +21,7 @@ from bench.gates.claim_index_browser_release import validate_browser_release_art
 from bench.lib.bench_utils import detect_repo_root, load_json_object
 
 
-OPTIONAL_ARTIFACT_PREFIXES = ("bench/out/",)
+OPTIONAL_ARTIFACT_PREFIXES: tuple[str, ...] = ()
 VALID_REPORT_KIND = "compare-report"
 VALID_DROPIN_REHEARSAL_KIND = "dropin-cutover-rehearsal-receipt"
 VALID_REPORT_KINDS = {VALID_REPORT_KIND, VALID_DROPIN_REHEARSAL_KIND}
