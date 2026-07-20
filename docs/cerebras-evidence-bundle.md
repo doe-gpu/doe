@@ -440,7 +440,7 @@ its shared Q4K weight pack:
 - upstream page: <https://huggingface.co/google/gemma-4-31B-it>
 - pinned upstream revision:
   `439edf5652646a0d1bd8b46bfdc1d3645761a445`
-- hosted RDRR repo: `Clocksmith/rdrr`
+- hosted RDRR repo: `clocksmith/rdrr`
 - hosted af16 revision:
   `e6f36589da5f860d9da9b10efdc945434f1f1be2`
 - hosted af16 path:
@@ -462,7 +462,7 @@ The Qwen companion hardware lane starts from the Doppler af16 manifest and
 its shared Q4K weight pack:
 
 - upstream model id: `Qwen/Qwen3.6-27B`
-- hosted RDRR repo: `Clocksmith/rdrr`
+- hosted RDRR repo: `clocksmith/rdrr`
 - hosted af16 revision:
   `3dee21b3b12d65ac7fef9b24cbf759cacc953a67`
 - hosted af16 path:
@@ -519,7 +519,7 @@ af16 manifest references the af32 primary weight pack through
 `weightsRef`, so both paths must be present under the same local root:
 
 ```bash
-hf download Clocksmith/rdrr \
+hf download clocksmith/rdrr \
   --repo-type model \
   --revision e6f36589da5f860d9da9b10efdc945434f1f1be2 \
   --include "models/gemma-4-31b-it-text-q4k-ehf16-af16/*" \
@@ -532,7 +532,7 @@ manifest references the ehaf16 shared Q4K primary weight pack through
 `weightsRef`:
 
 ```bash
-hf download Clocksmith/rdrr \
+hf download clocksmith/rdrr \
   --repo-type model \
   --revision 3dee21b3b12d65ac7fef9b24cbf759cacc953a67 \
   --include "models/qwen-3-6-27b-q4k-eaf16/*" \
@@ -708,7 +708,7 @@ Cerebras-provided endpoint:
 runs the same commands internally and returns the receipt artifacts:
 
 1. **Clone Doe at the archive commit** and verify the archive.
-2. **Fetch the Doppler RDRR artifact** from `Clocksmith/rdrr`, or mount an
+2. **Fetch the Doppler RDRR artifact** from `clocksmith/rdrr`, or mount an
    already-validated copy.
 3. **Build generated CSL, compile it with cslc, run the full-prompt
    HostPlan runner, and return the trace artifacts.**
@@ -745,7 +745,7 @@ bench/tools/run_gemma4_31b_af16_hardware_path.sh \
   --cmaddr "$CMADDR"
 ```
 
-`Clocksmith/rdrr` is publicly fetchable. Pass `--hf-token <token>` only if the
+`clocksmith/rdrr` is publicly fetchable. Pass `--hf-token <token>` only if the
 host wants authenticated Hugging Face access. The default path does not require
 `zig`; use `--rebuild-hostplan` only when regenerating HostPlan/CSL from the
 execution-v1 input:
@@ -766,7 +766,7 @@ bench/tools/run_qwen3_6_27b_af16_hardware_path.sh \
   --cmaddr "$CMADDR"
 ```
 
-That wrapper fetches `Clocksmith/rdrr` revision
+That wrapper fetches `clocksmith/rdrr` revision
 `3dee21b3b12d65ac7fef9b24cbf759cacc953a67`, model path
 `models/qwen-3-6-27b-q4k-eaf16`, and the shared weight pack
 `models/qwen-3-6-27b-q4k-ehaf16`. It uses the bundled HostPlan source under
@@ -791,7 +791,7 @@ export DOE_RDRR_ROOT="${DOE_RDRR_ROOT:-$PWD/../rdrr-cache/Clocksmith-rdrr}"
 
 hf auth login --token <token> --add-to-git-credential false
 
-hf download Clocksmith/rdrr \
+hf download clocksmith/rdrr \
   --repo-type model \
   --revision e6f36589da5f860d9da9b10efdc945434f1f1be2 \
   --include "models/gemma-4-31b-it-text-q4k-ehf16-af16/*" \

@@ -81,7 +81,7 @@ or passed with `--cslc-executable`, and a Python environment that can import
 `cerebras.sdk.runtime.sdkruntimepybind`.
 
 The full-prompt wrappers fetch hosted Doppler RDRR artifacts from
-`Clocksmith/rdrr`; no safetensors conversion is part of the HostPlan hardware
+`clocksmith/rdrr`; no safetensors conversion is part of the HostPlan hardware
 path. The Gemma manual fetch is:
 
 ```bash
@@ -92,7 +92,7 @@ export DOE_RDRR_ROOT="${DOE_RDRR_ROOT:-$PWD/../rdrr-cache/Clocksmith-rdrr}"
 
 hf auth login --token <token> --add-to-git-credential false
 
-hf download Clocksmith/rdrr \
+hf download clocksmith/rdrr \
   --repo-type model \
   --revision e6f36589da5f860d9da9b10efdc945434f1f1be2 \
   --include "models/gemma-4-31b-it-text-q4k-ehf16-af16/*" \
@@ -151,7 +151,7 @@ bench/tools/run_gemma4_31b_af16_hardware_path.sh \
   --cmaddr "$CMADDR"
 ```
 
-`Clocksmith/rdrr` is publicly fetchable. Pass `--hf-token <token>` only if the
+`clocksmith/rdrr` is publicly fetchable. Pass `--hf-token <token>` only if the
 host wants authenticated Hugging Face access.
 
 The default path does not require `zig`; it uses the bundled HostPlan source
@@ -181,7 +181,7 @@ bench/tools/run_qwen3_6_27b_af16_hardware_path.sh \
   --cmaddr "$CMADDR"
 ```
 
-`Clocksmith/rdrr` is publicly fetchable. Pass `--hf-token <token>` only if the
+`clocksmith/rdrr` is publicly fetchable. Pass `--hf-token <token>` only if the
 host wants authenticated Hugging Face access.
 
 The default path does not require `zig`; it uses the bundled HostPlan source
@@ -373,7 +373,7 @@ export HUGGINGFACE_HUB_CACHE="${HUGGINGFACE_HUB_CACHE:-$HF_HOME/hub}"
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$HF_HOME/hub}"
 export DOE_RDRR_ROOT="${DOE_RDRR_ROOT:-$PWD/../rdrr-cache/Clocksmith-rdrr}"
 
-hf download Clocksmith/rdrr \
+hf download clocksmith/rdrr \
   --repo-type model \
   --revision 3dee21b3b12d65ac7fef9b24cbf759cacc953a67 \
   --include "models/qwen-3-6-27b-q4k-eaf16/*" \
@@ -574,7 +574,7 @@ and verdict line. Example body:
 > WSE/WSC.
 >
 > The command path is: clone Doe at the bundle commit, fetch the hosted Doppler
-> Gemma 4 31B af16 RDRR artifact from `Clocksmith/rdrr`, build the generated
+> Gemma 4 31B af16 RDRR artifact from `clocksmith/rdrr`, build the generated
 > HostPlan/CSL bundle, compile with cslc, then run
 > `gemma4_31b_af16_hostplan_streaming_runner.py` against `<bos>The color of
 > the sky is`.

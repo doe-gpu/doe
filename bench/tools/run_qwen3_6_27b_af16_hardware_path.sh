@@ -3,7 +3,7 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-readonly RDRR_REPO="Clocksmith/rdrr"
+readonly RDRR_REPO="clocksmith/rdrr"
 readonly RDRR_REVISION="3dee21b3b12d65ac7fef9b24cbf759cacc953a67"
 readonly AF16_MODEL_PATH="models/qwen-3-6-27b-q4k-eaf16"
 readonly SHARED_WEIGHT_PATH="models/qwen-3-6-27b-q4k-ehaf16"
@@ -41,14 +41,14 @@ Required for hardware execution:
 Common options:
   --archive <path>           Verify this archive before running.
                              Default: archive named by the bundle pointer.
-  --hf-token <token>         Optional token for fetching Clocksmith/rdrr.
-  --rdrr-root <path>         Local root for the Clocksmith/rdrr checkout.
+  --hf-token <token>         Optional token for fetching clocksmith/rdrr.
+  --rdrr-root <path>         Local root for the clocksmith/rdrr checkout.
                              Default: ../rdrr-cache/Clocksmith-rdrr.
   --out-root <path>          Output root. Default: bench/out/hardware-run.
   --cslc-executable <path>   cslc executable. Default: cslc.
   --python <path>            Python executable. Default: python3.
   --skip-archive-verify      Do not verify --archive.
-  --skip-fetch               Do not fetch Clocksmith/rdrr; validate local files.
+  --skip-fetch               Do not fetch clocksmith/rdrr; validate local files.
   --skip-hf-login            Do not call hf auth login.
   --dry-run                  Print the runner command without launching it.
   --session-embed-roi-hidden-per-pe <n>

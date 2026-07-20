@@ -3,7 +3,7 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-readonly RDRR_REPO="Clocksmith/rdrr"
+readonly RDRR_REPO="clocksmith/rdrr"
 readonly RDRR_REVISION="e6f36589da5f860d9da9b10efdc945434f1f1be2"
 readonly AF16_MODEL_PATH="models/gemma-4-31b-it-text-q4k-ehf16-af16"
 readonly AF32_WEIGHT_PATH="models/gemma-4-31b-it-text-q4k-ehf16-af32"
@@ -38,14 +38,14 @@ Required for hardware execution:
 Common options:
   --archive <path>           Verify this archive before running.
                              Default: archive named by the bundle pointer.
-  --hf-token <token>         Login token for fetching Clocksmith/rdrr.
-  --rdrr-root <path>         Local root for the Clocksmith/rdrr checkout.
+  --hf-token <token>         Login token for fetching clocksmith/rdrr.
+  --rdrr-root <path>         Local root for the clocksmith/rdrr checkout.
                              Default: ../rdrr-cache/Clocksmith-rdrr.
   --out-root <path>          Output root. Default: bench/out/hardware-run.
   --cslc-executable <path>   cslc executable. Default: cslc.
   --python <path>            Python executable. Default: python3.
   --skip-archive-verify      Do not verify --archive.
-  --skip-fetch               Do not fetch Clocksmith/rdrr; validate local files.
+  --skip-fetch               Do not fetch clocksmith/rdrr; validate local files.
   --skip-hf-login            Do not call hf auth login.
 
 HostPlan options:
