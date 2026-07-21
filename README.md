@@ -74,8 +74,6 @@ node packages/doe-gpu/test/smoke/test-smoke-load.js
 ```
 
 The smoke command checks load and export wiring without requiring a GPU.
-Legacy package names `@simulatte/webgpu` and `@simulatte/webgpu-doe` redirect to
-`doe-gpu`.
 
 ## Evidence
 
