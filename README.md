@@ -16,17 +16,10 @@ model-program bodies visible as it validates, lowers, and runs them. Hash-linked
 receipts bind the input program to the selected lowering, backend, and result,
 giving parity and benchmark gates an execution path they can replay.
 
-Doppler owns the portable Program Bundle. Doe accepts that closed, versioned
-bundle and preserves its declared identity through normalization, execution,
-and backend receipts. Normalized execution and HostPlan operate today. The TSIR
-compiler surface has landed, but the live CSL lane still uses its
-classifier/template path; end-to-end TSIR remains target work in the
-[ingest status](docs/doppler-ingest.md).
-
 ## Objective
 
 Doe has two targets: replace Dawn and Tint in Chromium-family WebGPU, and
-retarget Doppler Program Bundles to Cerebras without losing program identity.
+retarget Program Bundles to other backends such as SPIR-V and CSL (Cerebras) without losing program identity.
 The runtime hoists stable validation and lowering decisions out of execution,
 keeps remaining dynamic checks explicit in Zig, and promotes performance claims
 only after comparable receipts pass their gates. The
