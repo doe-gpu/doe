@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_fallback_explanations",
+  "explanationSetId": "browser-fallback-smoke",
+  "taxonomyPath": "config/browser-unsupported-reason-taxonomy.json",
+  "runtimeIdentity": {
+    "runtimeIdentityPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+    "selectedRuntime": "doe",
+    "fallbackApplied": false
+  },
+  "explanations": [
+    {
+      "explanationId": "fallback:webgpu-runtime",
+      "capability": "webgpu_runtime",
+      "surface": "navigator.gpu",
+      "status": "supported",
+      "reasonCode": "runtime_available",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "developerAction": "attach the runtimeSelection block from the browser smoke report",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].runtimeSelection",
+      "evidenceBlockerCode": "none"
+    },
+    {
+      "explanationId": "fallback:canvas-fusion",
+      "capability": "canvas_fusion",
+      "surface": "GPUCanvasContext",
+      "status": "supported",
+      "reasonCode": "canvas_fusion_probe_attached",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "developerAction": "inspect the canvas/WebGPU fusion probe fallbackReasons",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/browser-canvas-webgpu-fusion.json",
+      "evidenceBlockerCode": "none"
+    },
+    {
+      "explanationId": "fallback:external-texture",
+      "capability": "external_texture",
+      "surface": "GPUExternalTexture",
+      "status": "supported",
+      "reasonCode": "media_path_probe_attached",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "developerAction": "inspect media path probe rows for unsupported reason codes",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/browser-media-path-probe.json",
+      "evidenceBlockerCode": "none"
+    },
+    {
+      "explanationId": "fallback:scheduler",
+      "capability": "scheduler",
+      "surface": "browser GPU scheduler",
+      "status": "supported",
+      "reasonCode": "scheduler_probe_attached",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "developerAction": "inspect scheduler probe rows for diagnostic scheduler coverage",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/browser-gpu-scheduler.json",
+      "evidenceBlockerCode": "none"
+    },
+    {
+      "explanationId": "fallback:webgpu-effect",
+      "capability": "webgpu_effect",
+      "surface": "WebGPU-backed visual effect",
+      "status": "supported",
+      "reasonCode": "webgpu_effect_probe_attached",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "developerAction": "inspect WebGPU effect experiment output and fallback probes",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/browser-webgpu-effect-experiment.json",
+      "evidenceBlockerCode": "none"
+    },
+    {
+      "explanationId": "fallback:local-ai",
+      "capability": "local_ai",
+      "surface": "browser local AI workload set",
+      "status": "supported",
+      "reasonCode": "local_ai_workloads_attached",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "developerAction": "inspect local AI workload fallbackStatus rows",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/browser-local-ai-workloads.json",
+      "evidenceBlockerCode": "none"
+    },
+    {
+      "explanationId": "fallback:pipeline-cache",
+      "capability": "pipeline_cache",
+      "surface": "browser pipeline cache",
+      "status": "supported",
+      "reasonCode": "pipeline_cache_receipts_attached",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "developerAction": "inspect pipeline cache receipt failureCodes",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/browser-pipeline-cache-receipts.json",
+      "evidenceBlockerCode": "none"
+    },
+    {
+      "explanationId": "fallback:shader-link",
+      "capability": "shader_link",
+      "surface": "developer shader links",
+      "status": "supported",
+      "reasonCode": "shader_links_attached",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "developerAction": "inspect shader link failureCodes",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/browser-shader-links.json",
+      "evidenceBlockerCode": "none"
+    }
+  ],
+  "privacy": {
+    "originScoped": true,
+    "rawPageDataIncluded": false
+  },
+  "evidenceBlockerTaxonomyPath": "config/evidence-blocker-taxonomy.json"
+}

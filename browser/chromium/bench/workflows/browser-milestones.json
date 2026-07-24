@@ -108,7 +108,7 @@
         {
           "id": "layered_summary_artifact",
           "kind": "artifact",
-          "path": "browser/chromium/artifacts/20260525T163954Z/dawn-vs-doe.browser-layered.superset.summary.json",
+          "path": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser-layered.superset.summary.json",
           "description": "Latest local browser-layered summary artifact showing Doe vs Dawn execution in the lane.",
           "required": false,
           "mustExist": true
@@ -116,7 +116,7 @@
         {
           "id": "fresh_smoke_artifact",
           "kind": "artifact",
-          "path": "browser/chromium/artifacts/20260525T163954Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+          "path": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
           "description": "Fresh promoted-browser-gate smoke artifact showing Dawn and Doe both pass browser WebGPU smoke.",
           "required": false,
           "mustExist": true
@@ -140,7 +140,7 @@
         {
           "id": "browser_gate_report",
           "kind": "artifact",
-          "path": "bench/out/browser-promotion/20260525T163954Z/browser_gate.json",
+          "path": "bench/out/browser-promotion/20260724T204526Z/browser_gate.json",
           "description": "Fresh Track A browser gate report proving governed preflight and smoke execution on this host.",
           "required": false,
           "mustExist": true
@@ -202,7 +202,7 @@
         {
           "id": "latest_check_artifact",
           "kind": "artifact",
-          "path": "browser/chromium/artifacts/20260525T163954Z/dawn-vs-doe.browser-layered.superset.check.json",
+          "path": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser-layered.superset.check.json",
           "description": "Latest strict promoted-browser-gate checker artifact for the current 80-row projection.",
           "required": false,
           "mustExist": true
@@ -226,7 +226,7 @@
         {
           "id": "browser_gate_report_m2",
           "kind": "artifact",
-          "path": "bench/out/browser-promotion/20260525T163954Z/browser_gate.json",
+          "path": "bench/out/browser-promotion/20260724T204526Z/browser_gate.json",
           "description": "Core Track A browser gate report covering fresh strict layered validation.",
           "required": false,
           "mustExist": true
@@ -280,7 +280,7 @@
         {
           "id": "latest_benchmark_summary",
           "kind": "artifact",
-          "path": "browser/chromium/artifacts/20260525T163954Z/dawn-vs-doe.browser-layered.superset.summary.json",
+          "path": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser-layered.superset.summary.json",
           "description": "Latest promoted-browser-gate layered performance summary; still diagnostic by contract.",
           "required": false,
           "mustExist": true
@@ -288,7 +288,7 @@
         {
           "id": "latest_smoke_summary",
           "kind": "artifact",
-          "path": "browser/chromium/artifacts/20260525T163954Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+          "path": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
           "description": "Fresh promoted-browser-gate smoke performance proxy artifact; still diagnostic by contract.",
           "required": false,
           "mustExist": true
@@ -296,7 +296,7 @@
         {
           "id": "browser_gate_report_m3",
           "kind": "artifact",
-          "path": "bench/out/browser-promotion/20260525T163954Z/browser_gate.json",
+          "path": "bench/out/browser-promotion/20260724T204526Z/browser_gate.json",
           "description": "Core Track A browser gate report proving fresh smoke and layered performance artifacts were generated under governance.",
           "required": false,
           "mustExist": true

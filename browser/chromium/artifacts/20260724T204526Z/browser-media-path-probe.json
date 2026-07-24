@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_media_path_probe",
+  "probeSetId": "browser-media-path-smoke",
+  "runtimeIdentity": {
+    "runtimeIdentityPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+    "selectedRuntime": "doe",
+    "fallbackApplied": false
+  },
+  "capturePolicy": {
+    "capturePolicyPath": "config/browser-capture-policy.json",
+    "surfaceId": "media_path_probe"
+  },
+  "mediaSources": [
+    {
+      "mediaSourceId": "media:video-frame",
+      "sourceKind": "video_frame",
+      "sourcePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.importExternalTexture.source",
+      "sourceDigest": {
+        "algorithm": "sha256",
+        "value": "18b5b855f4132d498e3010b824d197526e81365acf45a757029736a34617c8ce"
+      }
+    },
+    {
+      "mediaSourceId": "media:image-bitmap",
+      "sourceKind": "image_bitmap",
+      "sourcePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.copyExternalImageToTexture.source",
+      "sourceDigest": {
+        "algorithm": "sha256",
+        "value": "1c72ca7a781202ce9915a778fda5ba407af232bdf00b20a6ecdf586b8fa05683"
+      }
+    },
+    {
+      "mediaSourceId": "media:shared-texture",
+      "sourceKind": "shared_texture",
+      "sourcePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.sharedTextureImport",
+      "sourceDigest": {
+        "algorithm": "sha256",
+        "value": "3994b96c1ad84a44b0df9a76b28c3a817367dd89843022760af48246c90a96e7"
+      }
+    }
+  ],
+  "probes": [
+    {
+      "probeId": "probe:gpu-external-texture",
+      "probeKind": "gpu_external_texture",
+      "mediaSourceIds": [
+        "media:video-frame"
+      ],
+      "status": "pass",
+      "outputDigest": {
+        "algorithm": "sha256",
+        "value": "de22f1f9fa5b5059fbaddccf8c31c3996162cb26e55aab8ac5759dece69c6a77"
+      },
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.importExternalTexture"
+    },
+    {
+      "probeId": "probe:copy-external-image",
+      "probeKind": "copy_external_image_to_texture",
+      "mediaSourceIds": [
+        "media:image-bitmap"
+      ],
+      "status": "pass",
+      "outputDigest": {
+        "algorithm": "sha256",
+        "value": "c6b392b85b8b52fb2e73d3cf5dfbb226d758cf7ac4c99fea60919de7c404e50d"
+      },
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.copyExternalImageToTexture"
+    },
+    {
+      "probeId": "probe:shared-texture-import",
+      "probeKind": "shared_texture_import",
+      "mediaSourceIds": [
+        "media:shared-texture"
+      ],
+      "status": "unsupported",
+      "outputDigest": {
+        "algorithm": "sha256",
+        "value": "b33a3784566f859ad7bfaaeb159adf1b3b1072654006b23ba3b18b54e9c52ba8"
+      },
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false,
+      "reasonCode": "not_reported_by_smoke",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke"
+    }
+  ],
+  "fallbackPolicy": {
+    "hiddenFallbackAllowed": false,
+    "reasonCodeRequired": true
+  },
+  "privacy": {
+    "originScoped": true,
+    "rawMediaIncluded": false
+  }
+}

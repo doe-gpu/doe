@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_canvas_webgpu_fusion_probe",
+  "probeId": "canvas-webgpu-fusion-smoke",
+  "runtimeIdentity": {
+    "runtimeIdentityPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+    "selectedRuntime": "doe",
+    "fallbackApplied": false
+  },
+  "surfaces": [
+    {
+      "surfaceId": "surface:canvas2d",
+      "kind": "canvas_2d",
+      "responsibilityMapEntry": "canvas_2d"
+    },
+    {
+      "surfaceId": "surface:webgpu",
+      "kind": "webgpu",
+      "responsibilityMapEntry": "webgpu"
+    },
+    {
+      "surfaceId": "surface:filter",
+      "kind": "image_filter",
+      "responsibilityMapEntry": "image_filters"
+    },
+    {
+      "surfaceId": "surface:present",
+      "kind": "presentation",
+      "responsibilityMapEntry": "swapchain_surface_presentation"
+    }
+  ],
+  "graph": {
+    "graphSha256": "eb9acbca50db7ed6e46287a26b5db71d11fb76fbd1a14b9ab7f0b8d87095a75f",
+    "nodes": [
+      {
+        "nodeId": "node:canvas_draw",
+        "surfaceId": "surface:canvas2d",
+        "op": "canvas_draw"
+      },
+      {
+        "nodeId": "node:webgpu_render",
+        "surfaceId": "surface:webgpu",
+        "op": "webgpu_render"
+      },
+      {
+        "nodeId": "node:filter",
+        "surfaceId": "surface:filter",
+        "op": "image_filter"
+      },
+      {
+        "nodeId": "node:present",
+        "surfaceId": "surface:present",
+        "op": "present"
+      }
+    ],
+    "edges": [
+      {
+        "fromNodeId": "node:canvas_draw",
+        "toNodeId": "node:webgpu_render",
+        "edgeKind": "feeds"
+      },
+      {
+        "fromNodeId": "node:webgpu_render",
+        "toNodeId": "node:filter",
+        "edgeKind": "feeds"
+      },
+      {
+        "fromNodeId": "node:filter",
+        "toNodeId": "node:present",
+        "edgeKind": "presents"
+      }
+    ]
+  },
+  "outputHashes": [
+    {
+      "surfaceId": "surface:present",
+      "outputSha256": "328a8a7043c580a37bc33d203c66d1f867719d7aea24b9b3386549f9f8a5554a"
+    }
+  ],
+  "timingScopes": [
+    {
+      "surfaceId": "surface:canvas2d",
+      "phase": "canvas_2d",
+      "durationNs": 0
+    },
+    {
+      "surfaceId": "surface:webgpu",
+      "phase": "webgpu",
+      "durationNs": 30500
+    },
+    {
+      "surfaceId": "surface:filter",
+      "phase": "filter",
+      "durationNs": 0
+    },
+    {
+      "surfaceId": "surface:present",
+      "phase": "present",
+      "durationNs": 7599
+    }
+  ],
+  "fallbackReasons": [],
+  "privacy": {
+    "originScoped": true,
+    "rawPageDataIncluded": false
+  }
+}

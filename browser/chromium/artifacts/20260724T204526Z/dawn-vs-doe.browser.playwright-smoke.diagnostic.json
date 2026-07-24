@@ -1,0 +1,782 @@
+{
+  "schemaVersion": 1,
+  "reportKind": "chromium-webgpu-playwright-smoke",
+  "benchmarkClass": "diagnostic",
+  "comparisonStatus": "diagnostic",
+  "claimStatus": "diagnostic",
+  "timingClass": "browser-operation-proxy",
+  "timingSource": "performance.now",
+  "generatedAt": "2026-07-24T21:06:17.813Z",
+  "hashAlgorithm": "sha256",
+  "runtimeSelectorPolicyPath": "/Users/xyz/deco/doe/config/browser-runtime-selector-policy.json",
+  "workloadIdentity": {
+    "kind": "browser_smoke_suite",
+    "workloadIds": [
+      "compute_increment",
+      "render_triangle",
+      "request_adapter_xr_compatible",
+      "copy_external_image_to_texture",
+      "import_external_texture",
+      "gpu_canvas_context",
+      "fawn_prismatic_lifecycle",
+      "write_buffer_64kb",
+      "compute_dispatch"
+    ],
+    "workloadHash": "6fafedf67e877f6bfea9610bead3a3424abb2d7bf4f3777e0fcd6d308f0162c6"
+  },
+  "invocation": {
+    "argv": [
+      "--chrome",
+      "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+      "--doe-lib",
+      "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.dylib",
+      "--mode",
+      "both",
+      "--strict",
+      "--runtime-selector-policy",
+      "/Users/xyz/deco/doe/config/browser-runtime-selector-policy.json",
+      "--out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+      "--cts-subset-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-cts-subset.json",
+      "--recovery-parity-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-recovery-parity.json",
+      "--canvas-webgpu-fusion-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-canvas-webgpu-fusion.json",
+      "--media-path-probe-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-media-path-probe.json",
+      "--media-path-probe-capture-policy",
+      "/Users/xyz/deco/doe/config/browser-capture-policy.json",
+      "--gpu-scheduler-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-gpu-scheduler.json",
+      "--webgpu-effect-experiment-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-webgpu-effect-experiment.json",
+      "--flight-recorder-components",
+      "/Users/xyz/deco/doe/examples/browser-gpu-flight-recorder.sample.json",
+      "--flight-recorder-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-gpu-flight-recorder.json",
+      "--flight-recorder-mode",
+      "doe",
+      "--shader-links-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-shader-links.json",
+      "--local-ai-workloads-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-local-ai-workloads.json",
+      "--pipeline-cache-receipts-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-pipeline-cache-receipts.json",
+      "--fallback-explanations-out",
+      "/Users/xyz/deco/doe/browser/chromium/artifacts/20260724T204526Z/browser-fallback-explanations.json",
+      "--fallback-explanations-taxonomy",
+      "/Users/xyz/deco/doe/config/browser-unsupported-reason-taxonomy.json"
+    ],
+    "cwd": "/Users/xyz/deco/doe",
+    "nodeVersion": "v22.20.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "chromePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+  "headless": true,
+  "chromeArgs": [],
+  "mode": "both",
+  "methodology": {
+    "uploadIterations": 500,
+    "dispatchIterations": 200,
+    "uploadWarmupIterations": 50,
+    "dispatchWarmupIterations": 20,
+    "suiteTimeoutMs": 120000,
+    "operationTimeoutMs": 30000,
+    "strictMode": true,
+    "notes": [
+      "Browser harness output is diagnostic and not a strict L0 apples-to-apples claim artifact."
+    ]
+  },
+  "runtimeSelections": [
+    {
+      "selectionMode": "dawn",
+      "selectedRuntime": "dawn",
+      "forcedMode": "dawn",
+      "fallbackApplied": false,
+      "fallbackReasonCode": "",
+      "hiddenFallbackAllowed": false,
+      "profile": {
+        "profileId": "",
+        "vendor": "unknown",
+        "api": "unknown",
+        "deviceFamily": "unknown",
+        "driver": "unknown"
+      },
+      "adapterDenylist": {
+        "matched": false,
+        "reasonCode": "",
+        "profileId": "",
+        "vendor": "",
+        "api": "",
+        "deviceFamily": "",
+        "driverPattern": ""
+      },
+      "selectorVersion": "browser-runtime-selector-v1",
+      "artifactIdentity": {
+        "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+        "browserExecutableSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+        "dawnRuntimePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+        "dawnRuntimeSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+        "doeLibPath": null,
+        "doeLibSha256": null
+      },
+      "launchArgsHash": "ccfeae1767db81fad9592dc13489bf66d4317f6bbad80240e9aac3661adfe431"
+    },
+    {
+      "selectionMode": "doe",
+      "selectedRuntime": "doe",
+      "forcedMode": "doe",
+      "fallbackApplied": false,
+      "fallbackReasonCode": "",
+      "hiddenFallbackAllowed": false,
+      "profile": {
+        "profileId": "",
+        "vendor": "unknown",
+        "api": "unknown",
+        "deviceFamily": "unknown",
+        "driver": "unknown"
+      },
+      "adapterDenylist": {
+        "matched": false,
+        "reasonCode": "",
+        "profileId": "",
+        "vendor": "",
+        "api": "",
+        "deviceFamily": "",
+        "driverPattern": ""
+      },
+      "selectorVersion": "browser-runtime-selector-v1",
+      "artifactIdentity": {
+        "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+        "browserExecutableSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+        "dawnRuntimePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+        "dawnRuntimeSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+        "doeLibPath": "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.dylib",
+        "doeLibSha256": "19f31e145d8e8234dd456d8fc52131c75a67e8cf291fdfdf4c625c01ed94b0f4"
+      },
+      "launchArgsHash": "4e1686d870d278aa8782ceccd10e54b325824577efc10d2d19a2993f44fe2b04"
+    }
+  ],
+  "modeResults": [
+    {
+      "mode": "dawn",
+      "runtimeSelection": {
+        "selectionMode": "dawn",
+        "selectedRuntime": "dawn",
+        "forcedMode": "dawn",
+        "fallbackApplied": false,
+        "fallbackReasonCode": "",
+        "hiddenFallbackAllowed": false,
+        "profile": {
+          "profileId": "",
+          "vendor": "unknown",
+          "api": "unknown",
+          "deviceFamily": "unknown",
+          "driver": "unknown"
+        },
+        "adapterDenylist": {
+          "matched": false,
+          "reasonCode": "",
+          "profileId": "",
+          "vendor": "",
+          "api": "",
+          "deviceFamily": "",
+          "driverPattern": ""
+        },
+        "selectorVersion": "browser-runtime-selector-v1",
+        "artifactIdentity": {
+          "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+          "browserExecutableSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+          "dawnRuntimePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+          "dawnRuntimeSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+          "doeLibPath": null,
+          "doeLibSha256": null
+        },
+        "launchArgsHash": "ccfeae1767db81fad9592dc13489bf66d4317f6bbad80240e9aac3661adfe431"
+      },
+      "shaderCompilerIdentity": {
+        "compilerSurface": "dawn_runtime_embedded_shader_compiler",
+        "compilerArtifactPath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+        "compilerArtifactSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+        "identitySource": "runtime_artifact_identity"
+      },
+      "runtimeArgs": [
+        "--use-webgpu-runtime=dawn"
+      ],
+      "launchArgs": [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--ignore-gpu-blocklist",
+        "--enable-unsafe-webgpu",
+        "--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:63539",
+        "--use-webgpu-runtime=dawn"
+      ],
+      "browserVersion": "148.0.7741.0",
+      "elapsedMs": 2183,
+      "apiSurface": "native",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/148.0.0.0 Safari/537.36",
+      "webgpuAvailable": true,
+      "adapterAvailable": true,
+      "adapterInfo": {},
+      "features": [
+        "bgra8unorm-storage",
+        "chromium-experimental-subgroup-matrix",
+        "clip-distances",
+        "core-features-and-limits",
+        "depth-clip-control",
+        "depth32float-stencil8",
+        "dual-source-blending",
+        "float32-blendable",
+        "float32-filterable",
+        "indirect-first-instance",
+        "primitive-index",
+        "rg11b10ufloat-renderable",
+        "shader-f16",
+        "subgroups",
+        "texture-component-swizzle",
+        "texture-compression-astc",
+        "texture-compression-astc-sliced-3d",
+        "texture-compression-bc",
+        "texture-compression-bc-sliced-3d",
+        "texture-compression-etc2",
+        "texture-formats-tier1",
+        "texture-formats-tier2",
+        "timestamp-query"
+      ],
+      "limits": {
+        "maxTextureDimension1D": 16384,
+        "maxTextureDimension2D": 16384,
+        "maxTextureDimension3D": 2048,
+        "maxTextureArrayLayers": 2048,
+        "maxBindGroups": 4,
+        "maxBindingsPerBindGroup": 1000,
+        "maxDynamicUniformBuffersPerPipelineLayout": 10,
+        "maxDynamicStorageBuffersPerPipelineLayout": 8,
+        "maxSampledTexturesPerShaderStage": 48,
+        "maxSamplersPerShaderStage": 16,
+        "maxStorageBuffersPerShaderStage": 10,
+        "maxStorageTexturesPerShaderStage": 8,
+        "maxUniformBuffersPerShaderStage": 12,
+        "maxUniformBufferBindingSize": 65536,
+        "maxStorageBufferBindingSize": 4294967292,
+        "maxBufferSize": 4294967292,
+        "maxComputeInvocationsPerWorkgroup": 1024,
+        "maxComputeWorkgroupSizeX": 1024,
+        "maxComputeWorkgroupSizeY": 1024,
+        "maxComputeWorkgroupSizeZ": 64,
+        "maxComputeWorkgroupsPerDimension": 65535,
+        "maxComputeWorkgroupStorageSize": 32768
+      },
+      "wgslLanguageFeatures": [
+        "linear_indexing",
+        "packed_4x8_integer_dot_product",
+        "pointer_composite_access",
+        "readonly_and_readwrite_storage_textures",
+        "subgroup_id",
+        "subgroup_uniformity",
+        "swizzle_assignment",
+        "texture_and_sampler_let",
+        "uniform_buffer_standard_layout",
+        "unrestricted_pointer_parameters"
+      ],
+      "smoke": {
+        "computeIncrement": {
+          "pass": true,
+          "actual": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "expected": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "error": null
+        },
+        "renderTriangle": {
+          "pass": true,
+          "centerRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "error": null
+        },
+        "requestAdapterXrCompatible": {
+          "pass": true,
+          "returnedAdapter": true,
+          "forwarded": null,
+          "observedOptions": null,
+          "error": null
+        },
+        "copyExternalImageToTexture": {
+          "pass": true,
+          "topLeftRgba": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "sourceType": "ImageBitmap",
+          "attempts": [
+            {
+              "sourceType": "ImageBitmap",
+              "pass": true,
+              "topLeftRgba": [
+                0,
+                255,
+                0,
+                255
+              ]
+            }
+          ],
+          "error": null
+        },
+        "importExternalTexture": {
+          "pass": true,
+          "centerRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "error": null
+        },
+        "renderBundle": {
+          "pass": true,
+          "centerRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "error": null
+        },
+        "renderIndirect": {
+          "pass": true,
+          "centerRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "error": null
+        },
+        "timestampQuery": {
+          "pass": true,
+          "actual": [
+            "3025592456830375",
+            "3025592456833208"
+          ],
+          "error": null
+        },
+        "recovery": {
+          "validationError": {
+            "pass": true,
+            "captured": true,
+            "messageCount": 1,
+            "error": null
+          },
+          "deviceLost": {
+            "pass": true,
+            "promiseAvailable": true,
+            "error": null
+          },
+          "postValidationCompute": {
+            "pass": true,
+            "actual": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "expected": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "error": null
+          }
+        }
+      },
+      "webgpuCanvasApi": {
+        "offscreenCanvasAvailable": true,
+        "webgpuContextAvailable": true,
+        "webgpuContextHasConfigure": true,
+        "webgpuContextHasGetCurrentTexture": true,
+        "preferredCanvasFormatSupported": true,
+        "preferredCanvasFormat": "bgra8unorm"
+      },
+      "webgpuDeviceApi": {
+        "hasImportExternalTexture": true,
+        "hasCopyExternalImageToTexture": true
+      },
+      "benches": {
+        "writeBuffer64kbUsPerOp": 15.600000381469727,
+        "computeDispatchUsPerOp": 27.999999523162842,
+        "iterations": {
+          "upload": 500,
+          "dispatch": 200
+        },
+        "errors": []
+      },
+      "diagnostics": {
+        "uncapturedErrors": [
+          {
+            "device": "primary",
+            "error": {
+              "name": "",
+              "message": "Error while parsing WGSL: :4:28 error: unresolved type 'missing_type'\n                let value: missing_type = 1;\n                           ^^^^^^^^^^^^\n\n\n - While calling [Device].CreateShaderModule([ShaderModuleDescriptor]).\n",
+              "string": "[object GPUValidationError]"
+            }
+          }
+        ],
+        "deviceLostEvents": [
+          {
+            "device": "timestamp",
+            "reason": "destroyed",
+            "message": "Device was destroyed."
+          }
+        ]
+      },
+      "errors": [],
+      "fawnPrismaticLifecycle": {
+        "pass": true,
+        "splashToFluid": true,
+        "transientAdapterRetry": {
+          "adapterRequestCount": 2,
+          "contextAvailable": true
+        }
+      },
+      "adapterIdentity": {
+        "adapterInfoSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "featuresSha256": "63992bff836e55a58e2872f880e368cac153a66c61add6ce1d3ef5fd9368fad0",
+        "limitsSha256": "7b3269129689cf84fb126a4df19c0c36fa4d58e5da56d564718892853d8bacfb",
+        "featureCount": 23,
+        "limitCount": 22
+      },
+      "browserClose": {
+        "attempted": true,
+        "pass": true,
+        "elapsedMs": 140,
+        "error": null
+      },
+      "previousHash": null,
+      "hash": "c395f444621676b8b62347aafc40cedcfdcbe54269feea728c6c826133dc0e0c"
+    },
+    {
+      "mode": "doe",
+      "runtimeSelection": {
+        "selectionMode": "doe",
+        "selectedRuntime": "doe",
+        "forcedMode": "doe",
+        "fallbackApplied": false,
+        "fallbackReasonCode": "",
+        "hiddenFallbackAllowed": false,
+        "profile": {
+          "profileId": "",
+          "vendor": "unknown",
+          "api": "unknown",
+          "deviceFamily": "unknown",
+          "driver": "unknown"
+        },
+        "adapterDenylist": {
+          "matched": false,
+          "reasonCode": "",
+          "profileId": "",
+          "vendor": "",
+          "api": "",
+          "deviceFamily": "",
+          "driverPattern": ""
+        },
+        "selectorVersion": "browser-runtime-selector-v1",
+        "artifactIdentity": {
+          "browserExecutablePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+          "browserExecutableSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+          "dawnRuntimePath": "/Users/xyz/deco/doe/browser/chromium/out/fawn_release_local/Fawn.app/Contents/MacOS/Chromium-real",
+          "dawnRuntimeSha256": "4309f473b6d3414692dbef2a60a89c3a8eea432b5df6646053d4c83ecace6021",
+          "doeLibPath": "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.dylib",
+          "doeLibSha256": "19f31e145d8e8234dd456d8fc52131c75a67e8cf291fdfdf4c625c01ed94b0f4"
+        },
+        "launchArgsHash": "4e1686d870d278aa8782ceccd10e54b325824577efc10d2d19a2993f44fe2b04"
+      },
+      "shaderCompilerIdentity": {
+        "compilerSurface": "doe_runtime_embedded_shader_compiler",
+        "compilerArtifactPath": "/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.dylib",
+        "compilerArtifactSha256": "19f31e145d8e8234dd456d8fc52131c75a67e8cf291fdfdf4c625c01ed94b0f4",
+        "identitySource": "runtime_artifact_identity"
+      },
+      "runtimeArgs": [
+        "--use-webgpu-runtime=doe",
+        "--doe-webgpu-library-path=/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.dylib"
+      ],
+      "launchArgs": [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--ignore-gpu-blocklist",
+        "--enable-unsafe-webgpu",
+        "--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:63539",
+        "--use-webgpu-runtime=doe",
+        "--doe-webgpu-library-path=/Users/xyz/deco/doe/runtime/zig/zig-out/lib/libwebgpu_doe_full.dylib"
+      ],
+      "browserVersion": "148.0.7741.0",
+      "elapsedMs": 1995,
+      "apiSurface": "native",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/148.0.0.0 Safari/537.36",
+      "webgpuAvailable": true,
+      "adapterAvailable": true,
+      "adapterInfo": {},
+      "features": [
+        "bgra8unorm-storage",
+        "clip-distances",
+        "core-features-and-limits",
+        "depth-clip-control",
+        "depth32float-stencil8",
+        "dual-source-blending",
+        "float32-blendable",
+        "float32-filterable",
+        "indirect-first-instance",
+        "primitive-index",
+        "rg11b10ufloat-renderable",
+        "shader-f16",
+        "subgroups",
+        "texture-component-swizzle",
+        "texture-compression-astc",
+        "texture-compression-bc",
+        "texture-compression-etc2",
+        "texture-formats-tier1",
+        "texture-formats-tier2",
+        "timestamp-query"
+      ],
+      "limits": {
+        "maxTextureDimension1D": 16384,
+        "maxTextureDimension2D": 16384,
+        "maxTextureDimension3D": 2048,
+        "maxTextureArrayLayers": 2048,
+        "maxBindGroups": 4,
+        "maxBindingsPerBindGroup": 1000,
+        "maxDynamicUniformBuffersPerPipelineLayout": 8,
+        "maxDynamicStorageBuffersPerPipelineLayout": 4,
+        "maxSampledTexturesPerShaderStage": 16,
+        "maxSamplersPerShaderStage": 16,
+        "maxStorageBuffersPerShaderStage": 8,
+        "maxStorageTexturesPerShaderStage": 4,
+        "maxUniformBuffersPerShaderStage": 12,
+        "maxUniformBufferBindingSize": 65536,
+        "maxStorageBufferBindingSize": 268435456,
+        "maxBufferSize": 268435456,
+        "maxComputeInvocationsPerWorkgroup": 1024,
+        "maxComputeWorkgroupSizeX": 1024,
+        "maxComputeWorkgroupSizeY": 1024,
+        "maxComputeWorkgroupSizeZ": 64,
+        "maxComputeWorkgroupsPerDimension": 65535,
+        "maxComputeWorkgroupStorageSize": 32768
+      },
+      "wgslLanguageFeatures": [
+        "linear_indexing",
+        "packed_4x8_integer_dot_product",
+        "pointer_composite_access",
+        "readonly_and_readwrite_storage_textures",
+        "subgroup_id",
+        "subgroup_uniformity",
+        "swizzle_assignment",
+        "texture_and_sampler_let",
+        "uniform_buffer_standard_layout",
+        "unrestricted_pointer_parameters"
+      ],
+      "smoke": {
+        "computeIncrement": {
+          "pass": true,
+          "actual": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "expected": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "error": null
+        },
+        "renderTriangle": {
+          "pass": true,
+          "centerRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "error": null
+        },
+        "requestAdapterXrCompatible": {
+          "pass": true,
+          "returnedAdapter": true,
+          "forwarded": null,
+          "observedOptions": null,
+          "error": null
+        },
+        "copyExternalImageToTexture": {
+          "pass": true,
+          "topLeftRgba": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "sourceType": "ImageBitmap",
+          "attempts": [
+            {
+              "sourceType": "ImageBitmap",
+              "pass": true,
+              "topLeftRgba": [
+                0,
+                255,
+                0,
+                255
+              ]
+            }
+          ],
+          "error": null
+        },
+        "importExternalTexture": {
+          "pass": true,
+          "centerRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "error": null
+        },
+        "renderBundle": {
+          "pass": true,
+          "centerRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "error": null
+        },
+        "renderIndirect": {
+          "pass": true,
+          "centerRgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "error": null
+        },
+        "timestampQuery": {
+          "pass": true,
+          "actual": [
+            "3025594404854041",
+            "3025594404860958"
+          ],
+          "error": null
+        },
+        "recovery": {
+          "validationError": {
+            "pass": true,
+            "captured": true,
+            "messageCount": 1,
+            "error": null
+          },
+          "deviceLost": {
+            "pass": true,
+            "promiseAvailable": true,
+            "error": null
+          },
+          "postValidationCompute": {
+            "pass": true,
+            "actual": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "expected": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "error": null
+          }
+        }
+      },
+      "webgpuCanvasApi": {
+        "offscreenCanvasAvailable": true,
+        "webgpuContextAvailable": true,
+        "webgpuContextHasConfigure": true,
+        "webgpuContextHasGetCurrentTexture": true,
+        "preferredCanvasFormatSupported": true,
+        "preferredCanvasFormat": "bgra8unorm"
+      },
+      "webgpuDeviceApi": {
+        "hasImportExternalTexture": true,
+        "hasCopyExternalImageToTexture": true
+      },
+      "benches": {
+        "writeBuffer64kbUsPerOp": 7.59999942779541,
+        "computeDispatchUsPerOp": 30.500001907348633,
+        "iterations": {
+          "upload": 500,
+          "dispatch": 200
+        },
+        "errors": []
+      },
+      "diagnostics": {
+        "uncapturedErrors": [],
+        "deviceLostEvents": []
+      },
+      "errors": [],
+      "fawnPrismaticLifecycle": {
+        "pass": true,
+        "splashToFluid": true,
+        "transientAdapterRetry": {
+          "adapterRequestCount": 2,
+          "contextAvailable": true
+        }
+      },
+      "adapterIdentity": {
+        "adapterInfoSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "featuresSha256": "dea60a6e3bf09f469526c9c64e3e097318519bd5a6b1cc3e480a800826cf28f1",
+        "limitsSha256": "77118cbd93eded78783207a80628e175118223bd16f03d94121b2006e2b2eb35",
+        "featureCount": 20,
+        "limitCount": 22
+      },
+      "browserClose": {
+        "attempted": true,
+        "pass": true,
+        "elapsedMs": 163,
+        "error": null
+      },
+      "previousHash": "c395f444621676b8b62347aafc40cedcfdcbe54269feea728c6c826133dc0e0c",
+      "hash": "9d8d74e34536d71f67c97f7e3795eed393685b1e85d42ab1879f8f0475efd987"
+    }
+  ],
+  "comparison": {
+    "writeBuffer64kbDeltaPercent": 51.28205614133844,
+    "computeDispatchDeltaPercent": -8.928580095573494,
+    "bothComputeSmokePass": true,
+    "bothRenderSmokePass": true,
+    "bothRenderBundleSmokePass": true,
+    "bothRenderIndirectSmokePass": true,
+    "bothTimestampQuerySmokePass": true
+  },
+  "reportHash": "910860ff04e96390eb8b3c6940dbe3ac88c490885b75a3ed730c259550d864bb"
+}

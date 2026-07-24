@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_shader_links",
+  "captureId": "webgpu-playwright-smoke-doe",
+  "sourceFlightRecorderPath": "browser/chromium/artifacts/20260724T204526Z/browser-gpu-flight-recorder.json",
+  "selectedRuntime": "doe",
+  "linkStatus": "pass",
+  "shaders": [
+    {
+      "shaderId": "shader:webgpu_prefix_sum",
+      "sourceLanguage": "wgsl",
+      "sourcePath": "bench/fixtures/wgsl-corpus/webgpu/sample-prefix-sum.wgsl",
+      "sourceSha256": "a8a642a54aaca908b707d20666566db8db62dbb5c9bfd518fbe98925da22c416",
+      "irPath": "bench/out/browser-flight-recorder/prefix-sum.ir.json",
+      "irSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "loweringReceiptPath": "examples/wgsl-lowering-link-receipt.sample.json",
+      "loweringReceiptRowId": "webgpu-prefix-sum",
+      "backendTarget": "spirv",
+      "backendOutputPath": "bench/out/browser-flight-recorder/prefix-sum.spv",
+      "backendOutputSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "diagnosticStatus": "ok"
+    }
+  ],
+  "failureCodes": []
+}

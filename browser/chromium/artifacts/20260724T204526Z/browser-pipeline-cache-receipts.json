@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_pipeline_cache_receipts",
+  "sourceWorkloadsPath": "browser/chromium/artifacts/20260724T204526Z/browser-local-ai-workloads.json",
+  "sourceWorkloadSetId": "browser-local-ai-smoke",
+  "runtimeIdentity": {
+    "runtimeIdentityPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+    "selectedRuntime": "doe",
+    "fallbackApplied": false
+  },
+  "receiptStatus": "pass",
+  "receipts": [
+    {
+      "receiptId": "cache:local-ai:embedding",
+      "workloadId": "local-ai:embedding",
+      "workloadKind": "embedding",
+      "shaderId": "shader:embedding",
+      "sourceSha256": "30a56d3711dc73a92d8aadb0d76078800613da17aff5eff685f82f2ac5638e77",
+      "irSha256": "a87f6c77257fb6d978a85ddf303a0dc9afa1451c5a355f8cdf3510e86bf0ce81",
+      "backendOutputSha256": "9944b844525e6e2ebe69746152a2b054462f6c05e20fe0ada19170e8d222da50",
+      "cacheKey": "cache:embedding:smoke:doe",
+      "cacheState": "created",
+      "pipelineCreationPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].benches.computeDispatchUsPerOp",
+      "creationStatus": "created",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false
+    },
+    {
+      "receiptId": "cache:local-ai:ranking",
+      "workloadId": "local-ai:ranking",
+      "workloadKind": "ranking",
+      "shaderId": "shader:ranking",
+      "sourceSha256": "a7a10415626023f6a15d937df440b3ab98a36d701961bba879534e9689f7550a",
+      "irSha256": "47b4ebccaecfba3eee94945456f25123f449d685051cc479f1975462db076109",
+      "backendOutputSha256": "323d6a4c433769a4de52c91f57a7402e37cb3e8db70f74b7ce9b7c3b39ed4d65",
+      "cacheKey": "cache:ranking:smoke:doe",
+      "cacheState": "created",
+      "pipelineCreationPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].benches.computeDispatchUsPerOp",
+      "creationStatus": "created",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false
+    },
+    {
+      "receiptId": "cache:local-ai:image-transform",
+      "workloadId": "local-ai:image-transform",
+      "workloadKind": "image_transform",
+      "shaderId": "shader:image-transform",
+      "sourceSha256": "fdfdf9af0100f2dad5612acb10470fbea01f57c63661c87187deec8736ee9b64",
+      "irSha256": "e9b43b7cf1435833b93d9e5d0dbfb003a2dec5a0945683c980323d41fad439dc",
+      "backendOutputSha256": "fde5bb3dcc284eb5f889d42ba4edf5d556e8f3c230e197d2767a3e9167c17d24",
+      "cacheKey": "cache:image-transform:smoke:doe",
+      "cacheState": "created",
+      "pipelineCreationPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].benches.computeDispatchUsPerOp",
+      "creationStatus": "created",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false
+    },
+    {
+      "receiptId": "cache:local-ai:video-transform",
+      "workloadId": "local-ai:video-transform",
+      "workloadKind": "video_transform",
+      "shaderId": "shader:video-transform",
+      "sourceSha256": "5bf2152c13cc1fd36ca2c03eb109cebe3ea97a3d7f5334b754180d2e6a23ab14",
+      "irSha256": "e2625dfced14d70f2515b5dd50cad99688d3d299c8f5b0740e2a56c2c9f589ba",
+      "backendOutputSha256": "274203b16e35a95f4fffd18dc7aa7c1fadda66afb6ca115a459d72c428ea09e3",
+      "cacheKey": "cache:video-transform:smoke:doe",
+      "cacheState": "created",
+      "pipelineCreationPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].benches.computeDispatchUsPerOp",
+      "creationStatus": "created",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false
+    },
+    {
+      "receiptId": "cache:local-ai:model-inference",
+      "workloadId": "local-ai:model-inference",
+      "workloadKind": "model_inference",
+      "shaderId": "shader:model-inference",
+      "sourceSha256": "18ded6f476cd1d5fa2d623be4bfed21e38d389861b5563c88cb6c62091bd9dad",
+      "irSha256": "07cba755084cc84310052256c00a21353e865625f0d04f903c87a67bb55d5723",
+      "backendOutputSha256": "7aba7d8cd918ab2a29f459cfb70134aa3436e69d97e923cd577b292e19e385fc",
+      "cacheKey": "cache:model-inference:smoke:doe",
+      "cacheState": "created",
+      "pipelineCreationPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].benches.computeDispatchUsPerOp",
+      "creationStatus": "created",
+      "fallbackApplied": false,
+      "hiddenFallbackAllowed": false
+    }
+  ],
+  "failureCodes": []
+}

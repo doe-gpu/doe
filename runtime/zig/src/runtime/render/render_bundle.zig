@@ -68,6 +68,11 @@ pub const BundleBindGroup = struct {
 pub const BundleCmd = union(BundleCmdTag) {
     set_pipeline: struct {
         pipeline_handle: ?*anyopaque,
+        // Retain the owning DoeRenderPipeline separately from the backend
+        // handle. Native replay needs pipeline metadata (topology, depth
+        // state, root signature), while direct backend replay still consumes
+        // pipeline_handle.
+        pipeline_object_handle: ?*anyopaque = null,
     },
     set_bind_group: struct {
         group: u32,

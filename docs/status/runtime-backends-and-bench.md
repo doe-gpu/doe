@@ -3,6 +3,30 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-07-24 — Browser render-bundle replay and evidence durability restored
+
+The macOS Chromium gate exposed a Doe-only render-bundle failure that the
+previous milestone manifest could not reproduce because its aggregate
+`browser_gate.json` path was gitignored and absent. Metal bundle replay had
+dropped the enclosing render pass load/store operations and the owning render
+pipeline metadata, leaving the render encoder invalid without surfacing a
+browser validation error. Bundle replay now preserves those fields, with Zig
+regression coverage.
+
+The app refresh wrapper also rebuilt the legacy `dropin` target while the
+browser lane selected `libwebgpu_doe_full.dylib`. It now builds
+`dropin-full`, so the refreshed app and the lane resolve the same artifact.
+
+The regenerated browser gate passes with zero required smoke or layered
+failures for both Dawn and Doe. The 42 scored diagnostic rows favor Doe 56.50
+to Dawn 43.50; that score remains diagnostic and does not create a browser
+performance claim. Durable evidence is under:
+
+- `browser/chromium/artifacts/20260724T204526Z/`
+- `bench/out/browser-promotion/20260724T204526Z/browser_gate.json`
+
+The browser milestone manifest now references this tracked evidence set.
+
 ## 2026-07-19 — Browser render correctness uses a full-raster oracle
 
 Projection manifest schema v7 binds browser render rows to an exact RGBA8

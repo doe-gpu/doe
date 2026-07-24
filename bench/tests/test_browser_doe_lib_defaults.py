@@ -398,6 +398,14 @@ class BrowserDoeLibDefaultTests(unittest.TestCase):
 
         self.assertIn("libwebgpu_doe_full.", proc.stdout.strip())
 
+    def test_app_refresh_rebuilds_the_full_dropin_selected_by_the_lane(self) -> None:
+        refresh_script = (
+            REPO_ROOT / "browser/chromium/scripts/refresh-doe-app.sh"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("zig build dropin-full", refresh_script)
+        self.assertNotIn('zig build dropin "-Doptimize=', refresh_script)
+
     def test_shell_lane_candidates_prefer_real_app_binary_before_launcher(self) -> None:
         proc = subprocess.run(
             [

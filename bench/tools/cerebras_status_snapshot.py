@@ -195,7 +195,12 @@ def per_kernel_rows(model: str, dir_rel: str) -> list[dict]:
     summary_rel = f"{dir_rel}/summary.json"
     summary = _load_json(summary_rel)
     if summary is None:
-        rows.append(_row(f"{model}.per_kernel.summary", summary_rel, "missing", None))
+        rows.append(_row(
+            f"{model}.per_kernel.summary",
+            summary_rel,
+            "missing",
+            "per_kernel_summary_receipt_absent",
+        ))
     else:
         kernels = summary.get("kernels") or []
         bound = sum(1 for k in kernels if k.get("verdict") == "bound")
@@ -372,7 +377,12 @@ def qwen_frozen_reference_validation_row() -> dict:
 def qwen_multi_token_decode_row() -> dict:
     d = _load_json(QWEN_MULTI_TOKEN_DECODE)
     if d is None:
-        return _row("qwen.multi_token_decode", QWEN_MULTI_TOKEN_DECODE, "missing", None)
+        return _row(
+            "qwen.multi_token_decode",
+            QWEN_MULTI_TOKEN_DECODE,
+            "missing",
+            "multi_token_decode_receipt_absent",
+        )
     bound = d.get("boundKernelCount")
     total = len(d.get("kernelCompileDirs") or [])
     if bound is None:

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_cts_subset",
+  "subsetId": "browser-cts-subset-smoke",
+  "ctsSource": "browser/chromium/scripts/webgpu-playwright-smoke.mjs",
+  "ctsRevision": "smoke-derived",
+  "browserArtifacts": {
+    "dawnArtifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[dawn]",
+    "forcedDoeArtifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe]"
+  },
+  "rows": [
+    {
+      "query": "webgpu:api,operation,adapter,requestAdapter:*",
+      "bucket": "adapter",
+      "dawnStatus": "pass",
+      "forcedDoeStatus": "pass",
+      "parityStatus": "match",
+      "hiddenFallbackAllowed": false,
+      "artifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#ctsBucket.adapter"
+    },
+    {
+      "query": "webgpu:api,operation,buffers,map:*",
+      "bucket": "buffer",
+      "dawnStatus": "pass",
+      "forcedDoeStatus": "pass",
+      "parityStatus": "match",
+      "hiddenFallbackAllowed": false,
+      "artifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#ctsBucket.buffer"
+    },
+    {
+      "query": "webgpu:api,operation,command_buffer,basic:*",
+      "bucket": "command_buffer",
+      "dawnStatus": "pass",
+      "forcedDoeStatus": "pass",
+      "parityStatus": "match",
+      "hiddenFallbackAllowed": false,
+      "artifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#ctsBucket.command_buffer"
+    },
+    {
+      "query": "webgpu:api,operation,queue,writeBuffer:*",
+      "bucket": "queue",
+      "dawnStatus": "pass",
+      "forcedDoeStatus": "pass",
+      "parityStatus": "match",
+      "hiddenFallbackAllowed": false,
+      "artifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#ctsBucket.queue"
+    },
+    {
+      "query": "webgpu:api,validation,error_scope:*",
+      "bucket": "validation",
+      "dawnStatus": "pass",
+      "forcedDoeStatus": "pass",
+      "parityStatus": "match",
+      "hiddenFallbackAllowed": false,
+      "artifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#ctsBucket.validation"
+    },
+    {
+      "query": "webgpu:shader,execution,expression,call,builtin,textureDimensions:*",
+      "bucket": "shader_execution",
+      "dawnStatus": "pass",
+      "forcedDoeStatus": "pass",
+      "parityStatus": "match",
+      "hiddenFallbackAllowed": false,
+      "artifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#ctsBucket.shader_execution"
+    }
+  ],
+  "fallbackPolicy": {
+    "hiddenFallbackAllowed": false,
+    "reasonCodeRequired": true
+  }
+}

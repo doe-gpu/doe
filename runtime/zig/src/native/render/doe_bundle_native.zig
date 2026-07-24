@@ -71,7 +71,10 @@ pub export fn doeNativeRenderBundleEncoderSetPipeline(
     const enc = bundle.cast_bundle_encoder(enc_raw) orelse return;
     const pip = cast(DoeRenderPipeline, pip_raw) orelse return;
     const pipeline_handle = if (enc.backend == .vulkan) toOpaque(pip) else pip.mtl_pso;
-    bundle.bundle_encoder_push(enc, .{ .set_pipeline = .{ .pipeline_handle = pipeline_handle } });
+    bundle.bundle_encoder_push(enc, .{ .set_pipeline = .{
+        .pipeline_handle = pipeline_handle,
+        .pipeline_object_handle = toOpaque(pip),
+    } });
 }
 
 pub export fn doeNativeRenderBundleEncoderSetBindGroup(
@@ -382,10 +385,25 @@ fn bundleRenderPassCmd(
         .depth_target_view_handle = pass.depth_target_view_handle,
         .target_format = pass.target_format,
         .depth_stencil_format = pass.depth_stencil_format,
-        .sample_count = pass.sample_count,
+        .sample_count = if (pass.sample_count != 0)
+            pass.sample_count
+        else if (pipeline) |p|
+            p.sample_count
+        else
+            1,
         .depth_slice = pass.depth_slice,
         .depth_read_only = pass.depth_read_only,
         .stencil_read_only = pass.stencil_read_only,
+        .pass_start = pass.enc.cmds.items.len == pass.recorded_command_start,
+        .pass_end = false,
+        .color_load_op = pass.color_load_op,
+        .color_store_op = pass.color_store_op,
+        .depth_load_op = pass.depth_load_op,
+        .depth_store_op = pass.depth_store_op,
+        .stencil_load_op = pass.stencil_load_op,
+        .stencil_store_op = pass.stencil_store_op,
+        .depth_clear_value = pass.depth_clear_value,
+        .stencil_clear_value = pass.stencil_clear_value,
         .topology = if (pipeline) |p| p.topology else 0,
         .front_face = if (pipeline) |p| p.front_face else 0,
         .cull_mode = if (pipeline) |p| p.cull_mode else 0,
@@ -398,10 +416,21 @@ fn bundleRenderPassCmd(
         .bind_buffer_offsets = state.bind_buffer_offsets,
         .vertex_buffers = state.vertex_buffers,
         .vertex_buffer_offsets = state.vertex_buffer_offsets,
+        .vertex_buffer_sizes = state.vertex_buffer_sizes,
+        .viewport_x = pass.viewport_x,
+        .viewport_y = pass.viewport_y,
+        .viewport_width = pass.viewport_width,
+        .viewport_height = pass.viewport_height,
+        .viewport_min_depth = pass.viewport_min_depth,
+        .viewport_max_depth = pass.viewport_max_depth,
+        .scissor_x = pass.scissor_x,
+        .scissor_y = pass.scissor_y,
+        .scissor_width = pass.scissor_width,
+        .scissor_height = pass.scissor_height,
         .blend_constant = pass.blend_constant,
         .stencil_reference = pass.stencil_reference,
-        .depth_compare = pass.depth_compare,
-        .depth_write_enabled = pass.depth_write_enabled,
+        .depth_compare = if (pipeline) |p| p.depth_compare else pass.depth_compare,
+        .depth_write_enabled = if (pipeline) |p| p.depth_write_enabled else pass.depth_write_enabled,
         .unclipped_depth = if (pipeline) |p| p.unclipped_depth else false,
         .clear_r = pass.clear_r,
         .clear_g = pass.clear_g,
@@ -448,8 +477,12 @@ pub export fn doeNativeRenderPassExecuteBundles(
         for (b.cmds) |cmd| {
             switch (cmd) {
                 .set_pipeline => |p| {
-                    state.pso = p.pipeline_handle;
-                    state.pipeline = if (is_vulkan) cast(DoeRenderPipeline, p.pipeline_handle) else state.pipeline;
+                    state.pipeline = cast(DoeRenderPipeline, p.pipeline_object_handle) orelse
+                        if (is_vulkan) cast(DoeRenderPipeline, p.pipeline_handle) else null;
+                    state.pso = if (state.pipeline) |pipeline|
+                        pipeline.mtl_pso
+                    else
+                        p.pipeline_handle;
                 },
                 .set_bind_group => |bg_cmd| {
                     if (is_vulkan and bg_cmd.group < native_shared.MAX_RENDER_BIND_GROUPS) {

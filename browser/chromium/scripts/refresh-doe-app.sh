@@ -10,8 +10,8 @@ usage() {
 Usage:
   ./scripts/refresh-doe-app.sh [--app PATH] [--doe-lib PATH] [--optimize MODE] [--skip-build]
 
-Rebuilds the Doe drop-in library and reapplies the Chromium.app/Fawn.app wrapper
-so direct macOS launches use the latest Doe runtime by default.
+Rebuilds the full Doe drop-in library and reapplies the Chromium.app/Fawn.app
+wrapper so direct macOS launches use the latest Doe runtime by default.
 EOF
 }
 
@@ -94,7 +94,7 @@ fi
 if [[ "${SKIP_BUILD}" -eq 0 ]]; then
   (
     cd "${FAWN_REPO_ROOT}/runtime/zig"
-    zig build dropin "-Doptimize=${OPTIMIZE_MODE}"
+    zig build dropin-full "-Doptimize=${OPTIMIZE_MODE}"
   )
 fi
 

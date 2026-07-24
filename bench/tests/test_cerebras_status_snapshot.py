@@ -300,6 +300,25 @@ class CerebrasStatusSnapshotTests(unittest.TestCase):
         )
         self.assertEqual(row["scope"], "memcpy_d2h_start")
 
+    def test_missing_qwen_local_receipts_have_typed_blockers(self) -> None:
+        with mock.patch.object(self.module, "REPO_ROOT", self.tmp):
+            per_kernel = self.module.per_kernel_rows(
+                "qwen",
+                self.module.QWEN_PER_KERNEL_DIR,
+            )[0]
+            multi_token = self.module.qwen_multi_token_decode_row()
+
+        self.assertEqual(per_kernel["verdict"], "missing")
+        self.assertEqual(
+            per_kernel["blocker"],
+            "per_kernel_summary_receipt_absent",
+        )
+        self.assertEqual(multi_token["verdict"], "missing")
+        self.assertEqual(
+            multi_token["blocker"],
+            "multi_token_decode_receipt_absent",
+        )
+
     def test_qwen_no_hardware_readiness_classified(self) -> None:
         rows = [
             {

@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_gpu_scheduler_probe",
+  "schedulerId": "browser-gpu-scheduler-smoke",
+  "runtimeIdentity": {
+    "runtimeIdentityPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+    "selectedRuntime": "doe",
+    "fallbackApplied": false
+  },
+  "workClasses": [
+    {
+      "workClassId": "work:webgpu",
+      "surface": "webgpu",
+      "priorityClass": "interactive"
+    },
+    {
+      "workClassId": "work:canvas",
+      "surface": "canvas",
+      "priorityClass": "frame"
+    },
+    {
+      "workClassId": "work:video",
+      "surface": "video",
+      "priorityClass": "frame"
+    },
+    {
+      "workClassId": "work:css_effects",
+      "surface": "css_effects",
+      "priorityClass": "frame"
+    },
+    {
+      "workClassId": "work:local_ai",
+      "surface": "local_ai",
+      "priorityClass": "background"
+    },
+    {
+      "workClassId": "work:compositor",
+      "surface": "compositor_adjacent",
+      "priorityClass": "frame"
+    }
+  ],
+  "probes": [
+    {
+      "probeId": "probe:priority",
+      "probeKind": "priority",
+      "workClassIds": [
+        "work:webgpu",
+        "work:canvas",
+        "work:local_ai"
+      ],
+      "status": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].benches",
+      "reasonCode": "not_measured_by_smoke"
+    },
+    {
+      "probeId": "probe:fairness",
+      "probeKind": "fairness",
+      "workClassIds": [
+        "work:webgpu",
+        "work:local_ai"
+      ],
+      "status": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].benches",
+      "reasonCode": "not_measured_by_smoke"
+    },
+    {
+      "probeId": "probe:frame_deadline",
+      "probeKind": "frame_deadline",
+      "workClassIds": [
+        "work:canvas",
+        "work:css_effects",
+        "work:compositor"
+      ],
+      "status": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.renderTriangle",
+      "reasonCode": "frame_deadline_not_measured_by_smoke"
+    },
+    {
+      "probeId": "probe:origin_quota",
+      "probeKind": "origin_quota",
+      "workClassIds": [
+        "work:webgpu",
+        "work:local_ai"
+      ],
+      "status": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].runtimeSelection",
+      "reasonCode": "origin_quota_not_measured_by_smoke"
+    },
+    {
+      "probeId": "probe:device_loss",
+      "probeKind": "device_loss",
+      "workClassIds": [
+        "work:webgpu",
+        "work:canvas",
+        "work:video"
+      ],
+      "status": "pass",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.recovery.deviceLost"
+    },
+    {
+      "probeId": "probe:fallback_behavior",
+      "probeKind": "fallback_behavior",
+      "workClassIds": [
+        "work:webgpu",
+        "work:canvas",
+        "work:video",
+        "work:css_effects",
+        "work:local_ai",
+        "work:compositor"
+      ],
+      "status": "pass",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].runtimeSelection",
+      "reasonCode": "hidden_fallback_disabled"
+    }
+  ],
+  "fallbackPolicy": {
+    "hiddenFallbackAllowed": false,
+    "reasonCodeRequired": true
+  },
+  "privacy": {
+    "originScoped": true,
+    "rawPageDataIncluded": false
+  }
+}

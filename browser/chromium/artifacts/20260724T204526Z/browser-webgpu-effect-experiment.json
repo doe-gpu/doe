@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_webgpu_effect_experiment",
+  "experimentId": "webgpu-effect-smoke",
+  "runtimeIdentity": {
+    "runtimeIdentityPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json",
+    "selectedRuntime": "doe",
+    "fallbackApplied": false
+  },
+  "surfaces": [
+    {
+      "surfaceId": "surface:canvas-overlay",
+      "sourceKind": "canvas_overlay",
+      "webgpuBacked": true,
+      "doeBoundary": "visual_effect_only",
+      "layoutOwner": "browser",
+      "accessibilityOwner": "browser",
+      "securityOwner": "browser",
+      "sourcePath": "browser/chromium/scripts/webgpu-playwright-smoke.mjs#renderTriangle"
+    },
+    {
+      "surfaceId": "surface:presentation-filter",
+      "sourceKind": "presentation_filter",
+      "webgpuBacked": true,
+      "doeBoundary": "visual_effect_only",
+      "layoutOwner": "browser",
+      "accessibilityOwner": "browser",
+      "securityOwner": "browser",
+      "sourcePath": "browser/chromium/scripts/webgpu-playwright-smoke.mjs#renderTriangle"
+    }
+  ],
+  "pipelines": [
+    {
+      "pipelineId": "pipeline:smoke-visual-effect",
+      "surfaceIds": [
+        "surface:canvas-overlay",
+        "surface:presentation-filter"
+      ],
+      "shaderLanguage": "wgsl",
+      "shaderSourcePath": "browser/chromium/scripts/webgpu-playwright-smoke.mjs#renderTriangle.wgsl",
+      "backendTarget": "wgsl",
+      "backendOutputPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.renderTriangle"
+    }
+  ],
+  "probes": [
+    {
+      "probeId": "probe:output-hash",
+      "probeKind": "output_hash",
+      "surfaceIds": [
+        "surface:canvas-overlay",
+        "surface:presentation-filter"
+      ],
+      "status": "pass",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].smoke.renderTriangle.centerRgba"
+    },
+    {
+      "probeId": "probe:semantics-boundary",
+      "probeKind": "semantics_boundary",
+      "surfaceIds": [
+        "surface:canvas-overlay",
+        "surface:presentation-filter"
+      ],
+      "status": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].webgpuCanvasApi",
+      "reasonCode": "browser_ownership_declared_not_proven_by_smoke"
+    },
+    {
+      "probeId": "probe:fallback-behavior",
+      "probeKind": "fallback_behavior",
+      "surfaceIds": [
+        "surface:canvas-overlay",
+        "surface:presentation-filter"
+      ],
+      "status": "pass",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].runtimeSelection",
+      "reasonCode": "hidden_fallback_disabled"
+    },
+    {
+      "probeId": "probe:frame-timing",
+      "probeKind": "frame_timing",
+      "surfaceIds": [
+        "surface:canvas-overlay",
+        "surface:presentation-filter"
+      ],
+      "status": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe].benches",
+      "reasonCode": "frame_timing_not_measured_by_smoke"
+    },
+    {
+      "probeId": "probe:security-policy",
+      "probeKind": "security_policy",
+      "surfaceIds": [
+        "surface:canvas-overlay",
+        "surface:presentation-filter"
+      ],
+      "status": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#privacy",
+      "reasonCode": "origin_scoped_no_raw_dom"
+    }
+  ],
+  "fallbackPolicy": {
+    "hiddenFallbackAllowed": false,
+    "reasonCodeRequired": true
+  },
+  "privacy": {
+    "originScoped": true,
+    "rawDomIncluded": false,
+    "rawPageDataIncluded": false
+  }
+}

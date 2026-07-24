@@ -416,6 +416,58 @@ test "executeBundles skips indexed indirect draws without an index buffer" {
     try std.testing.expectEqual(@as(usize, 0), cmd_enc.cmds.items.len);
 }
 
+test "executeBundles preserves render pass ops and bundle pipeline metadata" {
+    var dev = make_native_device();
+    var cmd_enc = make_native_command_encoder(&dev);
+    defer cmd_enc.cmds.deinit(native.alloc);
+
+    var render_pass = make_native_render_pass(&cmd_enc);
+    render_pass.color_load_op = 0x00000002;
+    render_pass.color_store_op = 0x00000001;
+    render_pass.clear_a = 1;
+    render_pass.viewport_width = 64;
+    render_pass.viewport_height = 64;
+    render_pass.scissor_width = 64;
+    render_pass.scissor_height = 64;
+
+    var pso_token: u8 = 0;
+    var pipeline: native.DoeRenderPipeline = .{
+        .mtl_pso = @ptrCast(&pso_token),
+        .topology = 0x00000004,
+        .front_face = 0x00000002,
+        .cull_mode = 0x00000003,
+        .depth_compare = 0x00000004,
+        .depth_write_enabled = true,
+    };
+
+    var bundle_enc = make_test_encoder(std.testing.allocator);
+    defer bundle_enc.cmds.deinit(bundle_enc.allocator);
+    rb.bundle_encoder_push(&bundle_enc, BundleCmd{ .set_pipeline = .{
+        .pipeline_handle = pipeline.mtl_pso,
+        .pipeline_object_handle = @ptrCast(&pipeline),
+    } });
+    push_draw(&bundle_enc, 3, 1);
+    const bundle = finish_to_bundle(&bundle_enc);
+    defer std.testing.allocator.free(bundle.cmds);
+
+    const bundles = [_]?*anyopaque{@ptrCast(@constCast(&bundle))};
+    doebundle.doeNativeRenderPassExecuteBundles(@ptrCast(&render_pass), bundles.len, &bundles);
+
+    try std.testing.expectEqual(@as(usize, 1), cmd_enc.cmds.items.len);
+    const recorded = cmd_enc.cmds.items[0].render_pass;
+    try std.testing.expect(recorded.pass_start);
+    try std.testing.expectEqual(@as(u32, 0x00000002), recorded.color_load_op);
+    try std.testing.expectEqual(@as(u32, 0x00000001), recorded.color_store_op);
+    try std.testing.expectEqual(@as(?*anyopaque, @ptrCast(&pso_token)), recorded.pso);
+    try std.testing.expectEqual(@as(u32, 0x00000004), recorded.topology);
+    try std.testing.expectEqual(@as(u32, 0x00000002), recorded.front_face);
+    try std.testing.expectEqual(@as(u32, 0x00000003), recorded.cull_mode);
+    try std.testing.expectEqual(@as(u32, 0x00000004), recorded.depth_compare);
+    try std.testing.expect(recorded.depth_write_enabled);
+    try std.testing.expectEqual(@as(?f32, 64), recorded.viewport_width);
+    try std.testing.expectEqual(@as(?u32, 64), recorded.scissor_width);
+}
+
 // ============================================================
 // Compatibility check tests
 // ============================================================

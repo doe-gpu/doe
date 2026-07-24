@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_gpu_flight_replay",
+  "captureId": "webgpu-playwright-smoke-doe",
+  "sourcePath": "browser/chromium/artifacts/20260724T204526Z/browser-gpu-flight-recorder.json",
+  "sourceArtifactKind": "browser_gpu_flight_recorder",
+  "policyPath": "config/browser-capture-policy.json",
+  "graphSha256": "5555555555555555555555555555555555555555555555555555555555555555",
+  "replayStatus": "pass",
+  "nodeOrder": [
+    "node:create_shader",
+    "node:dispatch",
+    "node:present"
+  ],
+  "failureCodes": []
+}

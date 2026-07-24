@@ -49,6 +49,10 @@ bench/compare_dawn_vs_doe.config.local.*.json
 bench/out/**
 !bench/out/
 !bench/out/README.local.md
+!bench/out/browser-promotion/
+bench/out/browser-promotion/*
+!bench/out/browser-promotion/20260724T204526Z/
+!bench/out/browser-promotion/20260724T204526Z/browser_gate.json
 !bench/out/amd-vulkan/
 !bench/out/amd-vulkan/20260702T163200Z/
 !bench/out/amd-vulkan/20260702T163200Z/**
@@ -146,6 +150,8 @@ browser/chromium/artifacts/*
 !browser/chromium/artifacts/fawn-icon-main.svg
 !browser/chromium/artifacts/fawn-icon-main.*
 !browser/chromium/artifacts/fawn-icon-main.*/**
+!browser/chromium/artifacts/20260724T204526Z/
+!browser/chromium/artifacts/20260724T204526Z/**
 browser/chromium/.external-macos.env
 browser/chromium/.external-lane.env
 

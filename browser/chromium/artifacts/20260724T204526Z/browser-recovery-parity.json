@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_recovery_parity",
+  "paritySetId": "browser-recovery-parity-smoke",
+  "runtimeSelector": {
+    "selectorVersion": "browser-runtime-selector-v1",
+    "doeMode": "forced_doe",
+    "hiddenFallbackAllowed": false
+  },
+  "dawnArtifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[dawn]",
+  "doeArtifactPath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults[doe]",
+  "cases": [
+    {
+      "caseId": "case:crash",
+      "caseKind": "crash",
+      "dawnStatus": "diagnostic",
+      "doeStatus": "diagnostic",
+      "parityStatus": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults.crash",
+      "reasonCode": "not_exercised_by_smoke"
+    },
+    {
+      "caseId": "case:hang",
+      "caseKind": "hang",
+      "dawnStatus": "diagnostic",
+      "doeStatus": "diagnostic",
+      "parityStatus": "diagnostic",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults.hang",
+      "reasonCode": "not_exercised_by_smoke"
+    },
+    {
+      "caseId": "case:device-loss",
+      "caseKind": "device_loss",
+      "dawnStatus": "pass",
+      "doeStatus": "pass",
+      "parityStatus": "match",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults.device_loss"
+    },
+    {
+      "caseId": "case:validation-error",
+      "caseKind": "validation_error",
+      "dawnStatus": "pass",
+      "doeStatus": "pass",
+      "parityStatus": "match",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults.validation_error"
+    },
+    {
+      "caseId": "case:recovery",
+      "caseKind": "recovery",
+      "dawnStatus": "pass",
+      "doeStatus": "pass",
+      "parityStatus": "match",
+      "evidencePath": "browser/chromium/artifacts/20260724T204526Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json#modeResults.recovery"
+    }
+  ],
+  "fallbackPolicy": {
+    "hiddenFallbackAllowed": false,
+    "reasonCodeRequired": true
+  }
+}
