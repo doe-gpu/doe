@@ -19,9 +19,7 @@ TRACE_DIR = Path(__file__).resolve().parent
 REPLAY_SCRIPT = TRACE_DIR / "replay.py"
 COMPARE_SCRIPT = TRACE_DIR / "compare_dispatch_traces.py"
 
-# Import compare module directly for unit tests
-sys.path.insert(0, str(TRACE_DIR))
-import compare_dispatch_traces as compare_mod
+from pipeline.trace import compare_dispatch_traces as compare_mod
 
 REPLAY_SEED = "0x9e3779b97f4a7c15"
 

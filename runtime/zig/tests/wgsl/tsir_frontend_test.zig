@@ -109,6 +109,51 @@ test "frontend extracts buffer bindings from module globals" {
     try std.testing.expectEqual(tsir.ScalarKind.f32, output_binding.elem);
 }
 
+test "frontend rejects a referenced storage struct instead of inventing an f32 binding" {
+    const allocator = std.testing.allocator;
+    const wgsl_source =
+        \\struct Payload { value: f32 }
+        \\@group(0) @binding(0) var<storage, read> input: Payload;
+        \\@group(0) @binding(1) var<storage, read_write> output: array<f32>;
+        \\
+        \\@compute @workgroup_size(1, 1, 1)
+        \\fn main() {
+        \\    output[0] = input.value;
+        \\}
+    ;
+
+    var arena = std.heap.ArenaAllocator.init(allocator);
+    defer arena.deinit();
+    const arena_allocator = arena.allocator();
+
+    var tree = try parser.parseSource(arena_allocator, wgsl_source);
+    defer tree.deinit();
+    var semantic_module = try sema.analyze(arena_allocator, &tree);
+    defer semantic_module.deinit();
+    var module = try ir_builder.build(arena_allocator, &tree, &semantic_module);
+    defer module.deinit();
+
+    const semantic = try tsir.frontend.lowerIrToTsir(
+        arena_allocator,
+        &module,
+        [_]u8{0} ** 32,
+        "frontend-0.0.37",
+    );
+
+    try std.testing.expectEqual(@as(usize, 1), semantic.functions[0].bindings.len);
+    try std.testing.expectEqualStrings("output", semantic.functions[0].bindings[0].name);
+    try std.testing.expectEqual(@as(usize, 1), semantic.rejections.len);
+    try std.testing.expectEqual(
+        tsir.RejectionReason.tsir_binding_type_unlowerable,
+        semantic.rejections[0].reason,
+    );
+    try std.testing.expectEqualStrings(
+        "functions[0].bindings[0:0]",
+        semantic.rejections[0].node_path,
+    );
+    try std.testing.expectEqualStrings("storage_struct_", semantic.rejections[0].detail);
+}
+
 fn findBinding(
     bindings: []const tsir.schema.BufferBinding,
     name: []const u8,

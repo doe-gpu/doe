@@ -252,7 +252,9 @@ Do not bypass earlier stages to satisfy later-stage outcomes.
 
 ## Constants and thresholds
 
-- no bare magic numbers in runtime code; use named constants or config values
+- inline `0`, `1`, simple indexing values, and language-level sentinels when
+  they express local mechanics clearly
+- name domain, ABI, policy, threshold, size, retry, and timing values
 - centralize thresholds in config or module-level constants, not inline literals
 - if a value appears in more than one place, it must have a single source of truth
 - fallbacks must reference named constants or config getters, never bare literals

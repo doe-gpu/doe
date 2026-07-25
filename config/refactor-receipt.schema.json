@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe refactor receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "refactorId",
+    "classification",
+    "before",
+    "after",
+    "characterization",
+    "status"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "artifactKind": {
+      "type": "string",
+      "const": "doe_refactor_receipt"
+    },
+    "refactorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["behavior_preserving", "contract_tightening", "intentional_behavior_change"]
+    },
+    "before": {
+      "$ref": "#/$defs/SourceState"
+    },
+    "after": {
+      "$ref": "#/$defs/SourceState"
+    },
+    "characterization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publicExportsPreserved", "cases"],
+      "properties": {
+        "publicExportsPreserved": {
+          "type": "boolean"
+        },
+        "cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "before", "after", "expectedRelationship", "status"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "before": {},
+              "after": {},
+              "expectedRelationship": {
+                "type": "string",
+                "enum": ["equal", "tightened"]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["pass", "fail"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "fail"]
+    }
+  },
+  "$defs": {
+    "SourceState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "publicExports"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "publicExports": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

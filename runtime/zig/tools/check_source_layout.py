@@ -5,6 +5,7 @@ import re
 import sys
 from pathlib import Path
 
+from generate_source_layout_docs import render_source_map
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "source-layout.json"
@@ -19,6 +20,13 @@ def main() -> int:
     config = json.loads(CONFIG_PATH.read_text())
     source_root = ROOT / config["sourceRoot"]
     errors: list[str] = []
+    generated_readme = source_root / "README.md"
+    expected_readme = render_source_map(config)
+    if generated_readme.read_text(encoding="utf-8") != expected_readme:
+        errors.append(
+            "src/README.md is stale; run "
+            "python3 tools/generate_source_layout_docs.py --write"
+        )
 
     module_root = ROOT / config["moduleRoot"]
     if not module_root.is_file():

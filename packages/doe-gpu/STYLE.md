@@ -97,6 +97,10 @@ function failValidation(path, message) {
 ## Validation
 
 - Validate at API boundaries using runtime type checks.
+- Keep JSON schema, runtime validator field tables, and `.d.ts` declarations in
+  parity. `npm run check:plan-schema` is the plan/capture contract check.
+- Validation failures expose stable `code`, `path`, `expected`, and `received`
+  fields in addition to a readable message.
 - Use helper functions (`assertObject`, `assertArray`, `assertBoolean`,
   `assertNonEmptyString`, `assertIntegerInRange`, `assertOptionalIntegerInRange`,
   `normalizeEnumKey`, and the format-specific normalizers in `validation.js`)

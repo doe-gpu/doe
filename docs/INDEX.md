@@ -11,7 +11,8 @@ the shards under [`docs/status/`](status/).
 
 - [`thesis.md`](thesis.md) — what Doe is and why it exists
 - [`architecture.md`](architecture.md) — high-level shape of the runtime + compiler + bench surfaces
-- [`process.md`](process.md) — gate modes, blocking vs advisory, release rules
+- [`process.md`](process.md) — normative stage, gate, evidence, and release law
+- [`operator-runbook.md`](operator-runbook.md) — command and platform procedures
 - [`status.md`](status.md) — concise status front door; shard policy under `docs/status/README.md`
 - [`problems-addressed.md`](problems-addressed.md) — practitioner pain points the runtime targets
 - [`glossary.md`](glossary.md) — terminology used across docs

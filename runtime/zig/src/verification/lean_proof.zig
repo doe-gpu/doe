@@ -285,6 +285,15 @@ comptime {
         if (!comptimeContains(json, "\"provenance\""))
             @compileError("lean proof artifact: provenance section missing");
 
+        if (!comptimeContains(json, "\"theoremMetadata\""))
+            @compileError("lean proof artifact: theorem metadata registry missing");
+
+        if (!comptimeContains(json, "\"theoremMetadataGeneratorSha256\""))
+            @compileError("lean proof artifact: theorem metadata generator provenance missing");
+
+        if (!comptimeContains(json, "\"runtime_branch_eliminated\""))
+            @compileError("lean proof artifact: no hash-bound runtime elimination metadata");
+
         requireFieldValue(json, "leanToolchainRef", lean_toolchain_ref, "provenance");
         requireFieldValue(json, "extractProgramSha256", lean_extract_program_sha256, "provenance");
         requireFieldValue(json, "leanSourceTreeSha256", lean_source_tree_sha256, "provenance");

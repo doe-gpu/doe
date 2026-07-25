@@ -18,6 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 ARTIFACT_PATH = REPO_ROOT / "pipeline" / "lean" / "artifacts" / "proven-conditions.json"
 SCHEMA_PATH = REPO_ROOT / "config" / "proof-artifact.schema.json"
 PATTERN_SPEC_PATH = REPO_ROOT / "config" / "lean-proof-patterns.json"
+METADATA_GENERATOR_PATH = REPO_ROOT / "pipeline" / "lean" / "finalize_proof_artifact.py"
 EXTRACT_SCRIPT = REPO_ROOT / "pipeline" / "lean" / "extract.sh"
 LEAN_SOURCE_DIR = REPO_ROOT / "pipeline" / "lean" / "Doe"
 
@@ -311,6 +312,7 @@ class TestProvenance(unittest.TestCase):
             "leanSourceTreeSha256",
             "generatedComparabilityContractSha256",
             "proofPatternSpecSha256",
+            "theoremMetadataGeneratorSha256",
         ):
             self.assertIn(key, self.provenance, f"Missing provenance field '{key}'")
             self.assertRegex(
@@ -318,6 +320,42 @@ class TestProvenance(unittest.TestCase):
                 hex_pattern,
                 f"provenance['{key}'] is not a 64-char lowercase hex string",
             )
+
+    def test_metadata_generator_hash_matches(self):
+        self.assertEqual(
+            self.provenance["theoremMetadataGeneratorSha256"],
+            _sha256_file(METADATA_GENERATOR_PATH),
+        )
+
+
+class TestTheoremMetadata(unittest.TestCase):
+    """Every theorem has one generated metadata row and valid mirrors."""
+
+    def setUp(self):
+        self.artifact = _load_artifact()
+        self.provenance = self.artifact.get("provenance", {})
+
+    def test_registry_covers_theorems_exactly_once(self):
+        theorem_ids = [
+            f"{theorem['module']}.{theorem['name']}"
+            for theorem in self.artifact["theorems"]
+        ]
+        metadata_ids = [
+            metadata["theoremId"]
+            for metadata in self.artifact["theoremMetadata"]
+        ]
+        self.assertEqual(sorted(theorem_ids), sorted(metadata_ids))
+        self.assertEqual(len(metadata_ids), len(set(metadata_ids)))
+
+    def test_runtime_mirrors_match_sources(self):
+        for metadata in self.artifact["theoremMetadata"]:
+            for mirror in metadata["mirrorSources"]:
+                source = REPO_ROOT / mirror["path"]
+                self.assertTrue(source.is_file())
+                self.assertEqual(mirror["sourceSha256"], _sha256_file(source))
+                content = source.read_text(encoding="utf-8")
+                for symbol in mirror["symbols"]:
+                    self.assertIn(symbol, content)
 
     def test_lean_toolchain_ref_matches_current_config(self):
         self.assertEqual(

@@ -3,159 +3,736 @@
   "status": "verified",
   "provenance": {
     "leanToolchainRef": "leanprover/lean4:v4.16.0",
-    "extractProgramSha256": "671f5aaa56e676305d8ec34da50cd5f80db3d252944a41e4ae32d2bc4056ad01",
-    "leanSourceTreeSha256": "c061f297a50317b73c506e2dbd4c7fe2c31814f139116e9301615c3cb1035485",
+    "extractProgramSha256": "be23888c64ea12e4c483817025ad9bf68344e59e14e9067b25ce8d83fb6ea791",
+    "leanSourceTreeSha256": "dfd72493b3b4883eb420f5b234481e10f7c33951f75262e2c5b8b7f36a89c2be",
     "generatedComparabilityContractSha256": "06041825c55a7a57d41d6d4a8f98a2eecf942129bee32e31d39513c5171b8b27",
-    "proofPatternSpecSha256": "0e839bfbcd0f4c5f8087c880434c9741804fb32797fc8650fe8951c00d57529d"
+    "proofPatternSpecSha256": "0e839bfbcd0f4c5f8087c880434c9741804fb32797fc8650fe8951c00d57529d",
+    "theoremMetadataGeneratorSha256": "6c2182cfdc876f63ff6b91c39e3b47275f467c91e718adec0a560e3380256335"
   },
   "contractHashes": {
     "comparabilityObligationsSha256": "20f2d04f010cac8815c545dd03b5eca9e24be40aa60214a608a96e9103895a9a"
   },
   "theorems": [
-    { "name": "critical_is_max_rank", "module": "Doe.Core.Model", "category": "comptime_verified" },
-    { "name": "requiredProof_forbidden_reject_from_rank", "module": "Doe.Core.Model", "category": "comptime_verified" },
-    { "name": "toggleAlwaysSupported", "module": "Doe.Core.Dispatch", "category": "tautological" },
-    { "name": "strongerSafetyRaisesProofDemand", "module": "Doe.Core.Dispatch", "category": "comptime_verified" },
-    { "name": "betterMatch_prefers_higher_score", "module": "Doe.Core.Runtime", "category": "tautological" },
-    { "name": "stableTokenChoose_mem_tiedMaxIndices", "module": "Doe.Core.DeterminismPolicy", "category": "lean_verified" },
-    { "name": "stableTokenChoose_le_all_tiedMaxIndices", "module": "Doe.Core.DeterminismPolicy", "category": "lean_verified" },
-    { "name": "exactMaxTieTriggered_iff_two_or_more_candidates", "module": "Doe.Core.DeterminismPolicy", "category": "lean_verified" },
-    { "name": "candidateMarginBandTriggered_iff_gap_within_epsilon", "module": "Doe.Core.DeterminismPolicy", "category": "lean_verified" },
-    { "name": "fixedPriorityBetter_true_implies_lexicographic_preference", "module": "Doe.Core.DeterminismPolicy", "category": "lean_verified" },
-    { "name": "reviewedChoiceSelect_uses_review_token_when_present", "module": "Doe.Core.DeterminismPolicy", "category": "lean_verified" },
-    { "name": "selectedTokenReferenceImprovementTriggered_iff_all_checks", "module": "Doe.Core.NumericStabilityPolicy", "category": "lean_verified" },
-    { "name": "routeDecisionForTrigger_prefers_triggered_decision_when_true", "module": "Doe.Core.NumericStabilityPolicy", "category": "lean_verified" },
-    { "name": "routeDecisionForTrigger_prefers_fallback_decision_when_false", "module": "Doe.Core.NumericStabilityPolicy", "category": "lean_verified" },
-    { "name": "selectedValueForRoute_acceptFast_returns_fast", "module": "Doe.Core.NumericStabilityPolicy", "category": "lean_verified" },
-    { "name": "selectedValueForRoute_preferStable_returns_stable", "module": "Doe.Core.NumericStabilityPolicy", "category": "lean_verified" },
-    { "name": "selectedValueForRoute_abstain_returns_none", "module": "Doe.Core.NumericStabilityPolicy", "category": "lean_verified" },
-    { "name": "comparableFromObligations_eq_noFailed", "module": "Doe.Full.Comparability", "category": "lean_verified" },
-    { "name": "comparableFromFacts_eq_noFailed", "module": "Doe.Full.Comparability", "category": "lean_verified" },
-    { "name": "comparableFromObligations_true_iff_failedBlockingNil", "module": "Doe.Full.Comparability", "category": "lean_verified" },
-    { "name": "comparableFromObligations_false_iff_failedBlockingNonEmpty", "module": "Doe.Full.Comparability", "category": "lean_verified" },
-    { "name": "comparableFromFacts_true_iff_failedBlockingNil", "module": "Doe.Full.Comparability", "category": "lean_verified" },
-    { "name": "comparableFromFacts_false_iff_failedBlockingNonEmpty", "module": "Doe.Full.Comparability", "category": "lean_verified" },
-    { "name": "structurallyEquivalentGeometry_refl", "module": "Doe.Full.WorkloadGeometry", "category": "lean_verified" },
-    { "name": "structurallyEquivalentGeometry_forall_components", "module": "Doe.Full.WorkloadGeometry", "category": "lean_verified" },
-    { "name": "equalGeometrySetsExecutionShapeFacts", "module": "Doe.Full.WorkloadGeometry", "category": "lean_verified" },
-    { "name": "strictHappyPathExpectedBlocking_exact", "module": "Doe.Full.ComparabilityFixtures", "category": "lean_fixture" },
-    { "name": "strictHappyPathComparable", "module": "Doe.Full.ComparabilityFixtures", "category": "lean_fixture" },
-    { "name": "strictMissingLeftSamplesExpectedBlocking_exact", "module": "Doe.Full.ComparabilityFixtures", "category": "lean_fixture" },
-    { "name": "strictMissingLeftSamplesComparable", "module": "Doe.Full.ComparabilityFixtures", "category": "lean_fixture" },
-    { "name": "allowLeftNoExecutionDensityFailureExpectedBlocking_exact", "module": "Doe.Full.ComparabilityFixtures", "category": "lean_fixture" },
-    { "name": "allowLeftNoExecutionDensityFailureComparable", "module": "Doe.Full.ComparabilityFixtures", "category": "lean_fixture" },
-    { "name": "noOpActionIdentity", "module": "Doe.Core.Dispatch", "category": "tautological" },
-    { "name": "informationalToggleIdentity", "module": "Doe.Core.Dispatch", "category": "tautological" },
-    { "name": "unhandledToggleIdentity", "module": "Doe.Core.Dispatch", "category": "tautological" },
-    { "name": "behavioralToggleNotIdentity", "module": "Doe.Core.Dispatch", "category": "tautological" },
-    { "name": "identityActionComplete", "module": "Doe.Core.Dispatch", "category": "comptime_verified" },
-    { "name": "scopeCommandTableComplete", "module": "Doe.Core.Dispatch", "category": "tautological" },
-    { "name": "identityActionPreservesCommand", "module": "Doe.Core.Dispatch", "category": "tautological" },
-    { "name": "mslBindingSlot_injective_within_group", "module": "Doe.Core.BindGroupSlot", "category": "lean_required" },
-    { "name": "mslBindingSlot_injective_across_groups", "module": "Doe.Core.BindGroupSlot", "category": "lean_required" },
-    { "name": "mslBindingSlot_in_bounds", "module": "Doe.Core.BindGroupSlot", "category": "lean_verified" },
-    { "name": "mslBindingSlot_distinct_groups", "module": "Doe.Core.BindGroupSlot", "category": "lean_required" },
-    { "name": "doeRelease_terminal", "module": "Doe.Core.BufferLifecycle", "category": "tautological" },
-    { "name": "released_absorbs_all", "module": "Doe.Core.BufferLifecycle", "category": "tautological" },
-    { "name": "doeMapAsync_idempotent", "module": "Doe.Core.BufferLifecycle", "category": "lean_verified" },
-    { "name": "doeUnmap_idempotent", "module": "Doe.Core.BufferLifecycle", "category": "lean_verified" },
-    { "name": "doeMapUnmap_roundtrip", "module": "Doe.Core.BufferLifecycle", "category": "lean_verified" },
-    { "name": "doe_getMappedRange_gap", "module": "Doe.Core.BufferLifecycle", "category": "lean_verified" },
-    { "name": "doe_dispatch_gap", "module": "Doe.Core.BufferLifecycle", "category": "lean_verified" },
-    { "name": "doe_getMappedRange_superset", "module": "Doe.Core.BufferLifecycle", "category": "lean_verified" },
-    { "name": "doe_dispatch_superset", "module": "Doe.Core.BufferLifecycle", "category": "lean_verified" },
-    { "name": "ExprIdValid_mono", "module": "Doe.Core.IrBuilderSoundness", "category": "lean_required" },
-    { "name": "ExprArgRangeValid_mono", "module": "Doe.Core.IrBuilderSoundness", "category": "lean_required" },
-    { "name": "StmtIdValid_mono", "module": "Doe.Core.IrBuilderSoundness", "category": "lean_required" },
-    { "name": "StmtChildRangeValid_mono", "module": "Doe.Core.IrBuilderSoundness", "category": "lean_required" },
-    { "name": "SwitchCaseRangeValid_mono", "module": "Doe.Core.IrBuilderSoundness", "category": "lean_required" },
-    { "name": "builder_soundness", "module": "Doe.Core.IrBuilderSoundness", "category": "lean_required" },
-    { "name": "TypesCompatible_refl", "module": "Doe.Core.IrSemanticContract", "category": "lean_required" },
-    { "name": "IsBoolType_not_integer", "module": "Doe.Core.IrSemanticContract", "category": "lean_required" },
-    { "name": "builder_load_inner_is_ref", "module": "Doe.Core.IrSemanticContract", "category": "lean_required" },
-    { "name": "builder_assign_lhs_is_ref", "module": "Doe.Core.IrSemanticContract", "category": "lean_required" },
-    { "name": "bounds_checks_pre_satisfied", "module": "Doe.Core.IrValidatorRedundancy", "category": "lean_required" },
-    { "name": "semantic_checks_pre_satisfied", "module": "Doe.Core.IrValidatorRedundancy", "category": "lean_required" },
-    { "name": "ValidatorRedundant", "module": "Doe.Core.IrValidatorRedundancy", "category": "lean_required" },
-    { "name": "ended_absorbs_all_ops", "module": "Doe.Core.RenderPassStateMachine", "category": "lean_required" },
-    { "name": "finished_absorbs_all_ops", "module": "Doe.Core.RenderPassStateMachine", "category": "lean_required" },
-    { "name": "chain_preserves_addr_space", "module": "Doe.Core.MslAddressSpace", "category": "lean_required" },
-    { "name": "chain_msl_qualifier_invariant", "module": "Doe.Core.MslAddressSpace", "category": "lean_required" },
-    { "name": "storage_ref_chain_emits_device", "module": "Doe.Core.MslAddressSpace", "category": "lean_required" },
-    { "name": "uniform_ref_chain_emits_constant", "module": "Doe.Core.MslAddressSpace", "category": "lean_required" },
-    { "name": "liveOps_preserve_live", "module": "Doe.Core.BufferDispatchPrecondition", "category": "lean_required" },
-    { "name": "liveOps_dispatch_always_ready", "module": "Doe.Core.BufferDispatchPrecondition", "category": "lean_required" },
-    { "name": "nPasses_preserve_original_types", "module": "Doe.Core.IrTypePreserved", "category": "lean_required" },
-    { "name": "robustClampIndex_inbounds_when_nonempty", "module": "Doe.Core.IrTypePreserved", "category": "lean_required" },
-    { "name": "robustClampIndex_noop_when_inbounds", "module": "Doe.Core.IrTypePreserved", "category": "lean_required" },
-    { "name": "robustClampRead_noop_under_bounds", "module": "Doe.Core.IrTypePreserved", "category": "lean_required" },
-    { "name": "applyRobustClamp_index_safe_when_nonempty", "module": "Doe.Core.IrTypePreserved", "category": "lean_required" },
-    { "name": "intAddZeroRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intZeroAddLeft", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intSubZeroRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intMulOneRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intOneMulLeft", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intMulZeroRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intZeroMulLeft", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intDivOneRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intOrZeroRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intZeroOrLeft", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intAndZeroRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intZeroAndLeft", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intXorZeroRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intZeroXorLeft", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intShiftLeftZeroRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "intShiftRightZeroRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "boolAndTrueRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "boolTrueAndLeft", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "boolOrFalseRight", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "boolFalseOrLeft", "module": "Doe.Core.IrOptRewrite", "category": "lean_verified" },
-    { "name": "gid_component_lt_total", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_inbounds_when_dispatch_fits", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_plus_offset_inbounds_when_dispatch_fits", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_times_stride_plus_offset_inbounds_when_dispatch_fits", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_offset_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "gid_stride_offset_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "gid_plus_bounded_loop_index_inbounds_when_dispatch_fits", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits_tight", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_tiled_index_plus_offset_inbounds_when_dispatch_fits", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_loop_offset_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "gid_loop_affine_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "gid_loop_affine_matcher_contract_sound_tight", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "loop_index_affine_inbounds_when_loop_fits_tight", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "loop_affine_matcher_contract_sound_tight", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "gid_tiled_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "clamp_noop_when_inbounds", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_2d_inbounds", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "flat_index_2d_inbounds", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "flat_index_2d_plus_offset_inbounds", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "flat_index_3d_inbounds", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "flat_index_3d_plus_offset_inbounds", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "flat_2d_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "flat_2d_offset_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "flat_3d_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "flat_3d_offset_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "gid_texture_coord_1d_inbounds_when_dispatch_fits", "module": "Doe.Shader.TextureSampleBounds", "category": "lean_required" },
-    { "name": "gid_texture_coords_2d_inbounds_when_dispatch_fits", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_texture_coord_1d_affine_inbounds_when_dispatch_fits", "module": "Doe.Shader.TextureSampleBounds", "category": "lean_required" },
-    { "name": "gid_texture_coords_2d_affine_inbounds_when_dispatch_fits", "module": "Doe.Shader.TextureSampleBounds", "category": "lean_required" },
-    { "name": "gid_texture_coords_3d_affine_inbounds_when_dispatch_fits", "module": "Doe.Shader.TextureSampleBounds", "category": "lean_required" },
-    { "name": "gid_texture_coord_1d_tiled_inbounds_when_dispatch_fits", "module": "Doe.Shader.TextureSampleBounds", "category": "lean_required" },
-    { "name": "gid_texture_coords_2d_tiled_inbounds_when_dispatch_fits", "module": "Doe.Shader.TextureSampleBounds", "category": "lean_required" },
-    { "name": "gid_texture_coords_3d_tiled_inbounds_when_dispatch_fits", "module": "Doe.Shader.TextureSampleBounds", "category": "lean_required" },
-    { "name": "texture_1d_identity_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "texture_2d_identity_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "texture_3d_identity_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "texture_1d_affine_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "texture_2d_affine_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "texture_3d_affine_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "texture_1d_tiled_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "texture_2d_tiled_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "texture_3d_tiled_matcher_contract_sound", "module": "Doe.Shader.BoundsElisionMatcher", "category": "lean_required" },
-    { "name": "guarded_gid_texture_coords_2d_inbounds", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "gid_texture_coords_3d_inbounds_when_dispatch_fits", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" },
-    { "name": "guarded_gid_texture_coords_3d_inbounds", "module": "Doe.Shader.ComputeBounds", "category": "lean_required" }
+    {
+      "name": "critical_is_max_rank",
+      "module": "Doe.Core.Model",
+      "category": "comptime_verified"
+    },
+    {
+      "name": "requiredProof_forbidden_reject_from_rank",
+      "module": "Doe.Core.Model",
+      "category": "comptime_verified"
+    },
+    {
+      "name": "toggleAlwaysSupported",
+      "module": "Doe.Core.Dispatch",
+      "category": "tautological"
+    },
+    {
+      "name": "strongerSafetyRaisesProofDemand",
+      "module": "Doe.Core.Dispatch",
+      "category": "comptime_verified"
+    },
+    {
+      "name": "betterMatch_prefers_higher_score",
+      "module": "Doe.Core.Runtime",
+      "category": "tautological"
+    },
+    {
+      "name": "stableTokenChoose_mem_tiedMaxIndices",
+      "module": "Doe.Core.DeterminismPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "stableTokenChoose_le_all_tiedMaxIndices",
+      "module": "Doe.Core.DeterminismPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "exactMaxTieTriggered_iff_two_or_more_candidates",
+      "module": "Doe.Core.DeterminismPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "candidateMarginBandTriggered_iff_gap_within_epsilon",
+      "module": "Doe.Core.DeterminismPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "fixedPriorityBetter_true_implies_lexicographic_preference",
+      "module": "Doe.Core.DeterminismPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "reviewedChoiceSelect_uses_review_token_when_present",
+      "module": "Doe.Core.DeterminismPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "selectedTokenReferenceImprovementTriggered_iff_all_checks",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "routeDecisionForTrigger_prefers_triggered_decision_when_true",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "routeDecisionForTrigger_prefers_fallback_decision_when_false",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "selectedValueForRoute_acceptFast_returns_fast",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "selectedValueForRoute_preferStable_returns_stable",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "selectedValueForRoute_abstain_returns_none",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "category": "lean_verified"
+    },
+    {
+      "name": "comparableFromObligations_eq_noFailed",
+      "module": "Doe.Full.Comparability",
+      "category": "lean_verified"
+    },
+    {
+      "name": "comparableFromFacts_eq_noFailed",
+      "module": "Doe.Full.Comparability",
+      "category": "lean_verified"
+    },
+    {
+      "name": "comparableFromObligations_true_iff_failedBlockingNil",
+      "module": "Doe.Full.Comparability",
+      "category": "lean_verified"
+    },
+    {
+      "name": "comparableFromObligations_false_iff_failedBlockingNonEmpty",
+      "module": "Doe.Full.Comparability",
+      "category": "lean_verified"
+    },
+    {
+      "name": "comparableFromFacts_true_iff_failedBlockingNil",
+      "module": "Doe.Full.Comparability",
+      "category": "lean_verified"
+    },
+    {
+      "name": "comparableFromFacts_false_iff_failedBlockingNonEmpty",
+      "module": "Doe.Full.Comparability",
+      "category": "lean_verified"
+    },
+    {
+      "name": "structurallyEquivalentGeometry_refl",
+      "module": "Doe.Full.WorkloadGeometry",
+      "category": "lean_verified"
+    },
+    {
+      "name": "structurallyEquivalentGeometry_forall_components",
+      "module": "Doe.Full.WorkloadGeometry",
+      "category": "lean_verified"
+    },
+    {
+      "name": "equalGeometrySetsExecutionShapeFacts",
+      "module": "Doe.Full.WorkloadGeometry",
+      "category": "lean_verified"
+    },
+    {
+      "name": "strictHappyPathExpectedBlocking_exact",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "category": "lean_fixture"
+    },
+    {
+      "name": "strictHappyPathComparable",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "category": "lean_fixture"
+    },
+    {
+      "name": "strictMissingLeftSamplesExpectedBlocking_exact",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "category": "lean_fixture"
+    },
+    {
+      "name": "strictMissingLeftSamplesComparable",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "category": "lean_fixture"
+    },
+    {
+      "name": "allowLeftNoExecutionDensityFailureExpectedBlocking_exact",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "category": "lean_fixture"
+    },
+    {
+      "name": "allowLeftNoExecutionDensityFailureComparable",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "category": "lean_fixture"
+    },
+    {
+      "name": "noOpActionIdentity",
+      "module": "Doe.Core.Dispatch",
+      "category": "tautological"
+    },
+    {
+      "name": "informationalToggleIdentity",
+      "module": "Doe.Core.Dispatch",
+      "category": "tautological"
+    },
+    {
+      "name": "unhandledToggleIdentity",
+      "module": "Doe.Core.Dispatch",
+      "category": "tautological"
+    },
+    {
+      "name": "behavioralToggleNotIdentity",
+      "module": "Doe.Core.Dispatch",
+      "category": "tautological"
+    },
+    {
+      "name": "identityActionComplete",
+      "module": "Doe.Core.Dispatch",
+      "category": "comptime_verified"
+    },
+    {
+      "name": "scopeCommandTableComplete",
+      "module": "Doe.Core.Dispatch",
+      "category": "tautological"
+    },
+    {
+      "name": "identityActionPreservesCommand",
+      "module": "Doe.Core.Dispatch",
+      "category": "tautological"
+    },
+    {
+      "name": "mslBindingSlot_injective_within_group",
+      "module": "Doe.Core.BindGroupSlot",
+      "category": "lean_required"
+    },
+    {
+      "name": "mslBindingSlot_injective_across_groups",
+      "module": "Doe.Core.BindGroupSlot",
+      "category": "lean_required"
+    },
+    {
+      "name": "mslBindingSlot_in_bounds",
+      "module": "Doe.Core.BindGroupSlot",
+      "category": "lean_verified"
+    },
+    {
+      "name": "mslBindingSlot_distinct_groups",
+      "module": "Doe.Core.BindGroupSlot",
+      "category": "lean_required"
+    },
+    {
+      "name": "doeRelease_terminal",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "tautological"
+    },
+    {
+      "name": "released_absorbs_all",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "tautological"
+    },
+    {
+      "name": "doeMapAsync_idempotent",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "lean_verified"
+    },
+    {
+      "name": "doeUnmap_idempotent",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "lean_verified"
+    },
+    {
+      "name": "doeMapUnmap_roundtrip",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "lean_verified"
+    },
+    {
+      "name": "doe_getMappedRange_gap",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "lean_verified"
+    },
+    {
+      "name": "doe_dispatch_gap",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "lean_verified"
+    },
+    {
+      "name": "doe_getMappedRange_superset",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "lean_verified"
+    },
+    {
+      "name": "doe_dispatch_superset",
+      "module": "Doe.Core.BufferLifecycle",
+      "category": "lean_verified"
+    },
+    {
+      "name": "ExprIdValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "category": "lean_required"
+    },
+    {
+      "name": "ExprArgRangeValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "category": "lean_required"
+    },
+    {
+      "name": "StmtIdValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "category": "lean_required"
+    },
+    {
+      "name": "StmtChildRangeValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "category": "lean_required"
+    },
+    {
+      "name": "SwitchCaseRangeValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "category": "lean_required"
+    },
+    {
+      "name": "builder_soundness",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "category": "lean_required"
+    },
+    {
+      "name": "TypesCompatible_refl",
+      "module": "Doe.Core.IrSemanticContract",
+      "category": "lean_required"
+    },
+    {
+      "name": "IsBoolType_not_integer",
+      "module": "Doe.Core.IrSemanticContract",
+      "category": "lean_required"
+    },
+    {
+      "name": "builder_load_inner_is_ref",
+      "module": "Doe.Core.IrSemanticContract",
+      "category": "lean_required"
+    },
+    {
+      "name": "builder_assign_lhs_is_ref",
+      "module": "Doe.Core.IrSemanticContract",
+      "category": "lean_required"
+    },
+    {
+      "name": "bounds_checks_pre_satisfied",
+      "module": "Doe.Core.IrValidatorRedundancy",
+      "category": "lean_required"
+    },
+    {
+      "name": "semantic_checks_pre_satisfied",
+      "module": "Doe.Core.IrValidatorRedundancy",
+      "category": "lean_required"
+    },
+    {
+      "name": "ValidatorRedundant",
+      "module": "Doe.Core.IrValidatorRedundancy",
+      "category": "lean_required"
+    },
+    {
+      "name": "ended_absorbs_all_ops",
+      "module": "Doe.Core.RenderPassStateMachine",
+      "category": "lean_required"
+    },
+    {
+      "name": "finished_absorbs_all_ops",
+      "module": "Doe.Core.RenderPassStateMachine",
+      "category": "lean_required"
+    },
+    {
+      "name": "chain_preserves_addr_space",
+      "module": "Doe.Core.MslAddressSpace",
+      "category": "lean_required"
+    },
+    {
+      "name": "chain_msl_qualifier_invariant",
+      "module": "Doe.Core.MslAddressSpace",
+      "category": "lean_required"
+    },
+    {
+      "name": "storage_ref_chain_emits_device",
+      "module": "Doe.Core.MslAddressSpace",
+      "category": "lean_required"
+    },
+    {
+      "name": "uniform_ref_chain_emits_constant",
+      "module": "Doe.Core.MslAddressSpace",
+      "category": "lean_required"
+    },
+    {
+      "name": "liveOps_preserve_live",
+      "module": "Doe.Core.BufferDispatchPrecondition",
+      "category": "lean_required"
+    },
+    {
+      "name": "liveOps_dispatch_always_ready",
+      "module": "Doe.Core.BufferDispatchPrecondition",
+      "category": "lean_required"
+    },
+    {
+      "name": "nPasses_preserve_original_types",
+      "module": "Doe.Core.IrTypePreserved",
+      "category": "lean_required"
+    },
+    {
+      "name": "robustClampIndex_inbounds_when_nonempty",
+      "module": "Doe.Core.IrTypePreserved",
+      "category": "lean_required"
+    },
+    {
+      "name": "robustClampIndex_noop_when_inbounds",
+      "module": "Doe.Core.IrTypePreserved",
+      "category": "lean_required"
+    },
+    {
+      "name": "robustClampRead_noop_under_bounds",
+      "module": "Doe.Core.IrTypePreserved",
+      "category": "lean_required"
+    },
+    {
+      "name": "applyRobustClamp_index_safe_when_nonempty",
+      "module": "Doe.Core.IrTypePreserved",
+      "category": "lean_required"
+    },
+    {
+      "name": "intAddZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intZeroAddLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intSubZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intMulOneRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intOneMulLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intMulZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intZeroMulLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intDivOneRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intOrZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intZeroOrLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intAndZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intZeroAndLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intXorZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intZeroXorLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intShiftLeftZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "intShiftRightZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "boolAndTrueRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "boolTrueAndLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "boolOrFalseRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "boolFalseOrLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "category": "lean_verified"
+    },
+    {
+      "name": "gid_component_lt_total",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_plus_offset_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_times_stride_plus_offset_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_stride_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_plus_bounded_loop_index_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits_tight",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_tiled_index_plus_offset_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_loop_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_loop_affine_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_loop_affine_matcher_contract_sound_tight",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "loop_index_affine_inbounds_when_loop_fits_tight",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "loop_affine_matcher_contract_sound_tight",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_tiled_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "clamp_noop_when_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_2d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "flat_index_2d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "flat_index_2d_plus_offset_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "flat_index_3d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "flat_index_3d_plus_offset_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "flat_2d_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "flat_2d_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "flat_3d_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "flat_3d_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coord_1d_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coords_2d_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coord_1d_affine_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coords_2d_affine_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coords_3d_affine_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coord_1d_tiled_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coords_2d_tiled_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coords_3d_tiled_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_1d_identity_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_2d_identity_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_3d_identity_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_1d_affine_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_2d_affine_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_3d_affine_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_1d_tiled_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_2d_tiled_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "texture_3d_tiled_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "category": "lean_required"
+    },
+    {
+      "name": "guarded_gid_texture_coords_2d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "gid_texture_coords_3d_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    },
+    {
+      "name": "guarded_gid_texture_coords_3d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "category": "lean_required"
+    }
   ],
   "evaluatedConditions": {
     "comparability.strictHappyPath.comparable": true,
@@ -385,7 +962,7 @@
     {
       "theorem": "toggleAlwaysSupported",
       "condition": "scope == driver_toggle implies supports all commands",
-      "runtimePath": "quirk/runtime.zig:supportsScope"
+      "runtimePath": "quirk/runtime.zig:supportsCommand"
     },
     {
       "theorem": "requiredProof_forbidden_reject_from_rank",
@@ -404,7 +981,7 @@
     },
     {
       "theorem": "scopeCommandTableComplete",
-      "condition": "comptime scope×command table matches supportsScope for all pairs; subsumes toggleAlwaysSupported",
+      "condition": "comptime scope\u00d7command table matches supportsScope for all pairs; subsumes toggleAlwaysSupported",
       "runtimePath": "quirk/runtime.zig:buildDispatchContext,buildProfileDispatchContext"
     },
     {
@@ -420,27 +997,1607 @@
     {
       "theorem": "mslBindingSlot_injective_across_groups",
       "condition": "group*16+binding is injective for binding<16; flat buffer array has no collisions",
-      "runtimePath": "runtime/zig/src/compiler/wgsl/emit/msl/emit_msl_ir.zig:msl_binding_slot,runtime/zig/src/native/compute/doe_compute_ext_native.zig:flattenBindGroups"
+      "runtimePath": "runtime/zig/src/compiler/wgsl/emit/msl/emit_msl_ir.zig:msl_binding_slot,runtime/zig/src/native/compute/doe_compute_bind_groups.zig:flatBindSlot,populateFlatBindings"
     },
     {
       "theorem": "mslBindingSlot_in_bounds",
       "condition": "valid group and binding produce slot < 64; bounds check can be elided at comptime",
-      "runtimePath": "runtime/zig/src/native/compute/doe_compute_ext_native.zig:flattenBindGroups"
+      "runtimePath": "runtime/zig/src/native/compute/doe_compute_bind_groups.zig:flatBindSlot,populateFlatBindings"
     },
     {
       "theorem": "doe_getMappedRange_superset",
       "condition": "Doe permits all spec-valid getMappedRange calls; no false rejections",
-      "runtimePath": "runtime/zig/src/native/mod.zig:doeBufferGetMappedRange"
+      "runtimePath": "runtime/zig/src/native/resource/doe_buffer_ops_native.zig:doeNativeBufferGetMappedRange"
     },
     {
       "theorem": "doe_dispatch_superset",
       "condition": "Doe permits all spec-valid dispatch calls; no false rejections",
-      "runtimePath": "runtime/zig/src/native/mod.zig:doeBufferRelease"
+      "runtimePath": "runtime/zig/src/native/resource/doe_buffer_ops_native.zig:doeNativeBufferRelease"
     },
     {
       "theorem": "ValidatorRedundant",
       "condition": "sema-Ok + build-Ok IR satisfies all ir_validate.validate() checks; validate() call is eliminable",
       "runtimePath": "runtime/zig/src/compiler/wgsl/mod.zig:analyzeToIr"
+    }
+  ],
+  "theoremMetadata": [
+    {
+      "theoremId": "Doe.Core.Model.critical_is_max_rank",
+      "name": "critical_is_max_rank",
+      "module": "Doe.Core.Model",
+      "classification": "comptime_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.Model.requiredProof_forbidden_reject_from_rank",
+      "name": "requiredProof_forbidden_reject_from_rank",
+      "module": "Doe.Core.Model",
+      "classification": "comptime_verified",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/quirk/runtime.zig",
+          "symbols": [
+            "finalizeBucket"
+          ],
+          "sourceSha256": "ef979687720770e01b44c64cc8c4061f0b87e78513dc7f89310ebaf5d8f0bb9c"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.toggleAlwaysSupported",
+      "name": "toggleAlwaysSupported",
+      "module": "Doe.Core.Dispatch",
+      "classification": "tautological",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/quirk/runtime.zig",
+          "symbols": [
+            "supportsCommand"
+          ],
+          "sourceSha256": "ef979687720770e01b44c64cc8c4061f0b87e78513dc7f89310ebaf5d8f0bb9c"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.strongerSafetyRaisesProofDemand",
+      "name": "strongerSafetyRaisesProofDemand",
+      "module": "Doe.Core.Dispatch",
+      "classification": "comptime_verified",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/quirk/runtime.zig",
+          "symbols": [
+            "finalizeBucket"
+          ],
+          "sourceSha256": "ef979687720770e01b44c64cc8c4061f0b87e78513dc7f89310ebaf5d8f0bb9c"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.Runtime.betterMatch_prefers_higher_score",
+      "name": "betterMatch_prefers_higher_score",
+      "module": "Doe.Core.Runtime",
+      "classification": "tautological",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.DeterminismPolicy.stableTokenChoose_mem_tiedMaxIndices",
+      "name": "stableTokenChoose_mem_tiedMaxIndices",
+      "module": "Doe.Core.DeterminismPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.DeterminismPolicy.stableTokenChoose_le_all_tiedMaxIndices",
+      "name": "stableTokenChoose_le_all_tiedMaxIndices",
+      "module": "Doe.Core.DeterminismPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.DeterminismPolicy.exactMaxTieTriggered_iff_two_or_more_candidates",
+      "name": "exactMaxTieTriggered_iff_two_or_more_candidates",
+      "module": "Doe.Core.DeterminismPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.DeterminismPolicy.candidateMarginBandTriggered_iff_gap_within_epsilon",
+      "name": "candidateMarginBandTriggered_iff_gap_within_epsilon",
+      "module": "Doe.Core.DeterminismPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.DeterminismPolicy.fixedPriorityBetter_true_implies_lexicographic_preference",
+      "name": "fixedPriorityBetter_true_implies_lexicographic_preference",
+      "module": "Doe.Core.DeterminismPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.DeterminismPolicy.reviewedChoiceSelect_uses_review_token_when_present",
+      "name": "reviewedChoiceSelect_uses_review_token_when_present",
+      "module": "Doe.Core.DeterminismPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.NumericStabilityPolicy.selectedTokenReferenceImprovementTriggered_iff_all_checks",
+      "name": "selectedTokenReferenceImprovementTriggered_iff_all_checks",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.NumericStabilityPolicy.routeDecisionForTrigger_prefers_triggered_decision_when_true",
+      "name": "routeDecisionForTrigger_prefers_triggered_decision_when_true",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.NumericStabilityPolicy.routeDecisionForTrigger_prefers_fallback_decision_when_false",
+      "name": "routeDecisionForTrigger_prefers_fallback_decision_when_false",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.NumericStabilityPolicy.selectedValueForRoute_acceptFast_returns_fast",
+      "name": "selectedValueForRoute_acceptFast_returns_fast",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.NumericStabilityPolicy.selectedValueForRoute_preferStable_returns_stable",
+      "name": "selectedValueForRoute_preferStable_returns_stable",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.NumericStabilityPolicy.selectedValueForRoute_abstain_returns_none",
+      "name": "selectedValueForRoute_abstain_returns_none",
+      "module": "Doe.Core.NumericStabilityPolicy",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.Comparability.comparableFromObligations_eq_noFailed",
+      "name": "comparableFromObligations_eq_noFailed",
+      "module": "Doe.Full.Comparability",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.Comparability.comparableFromFacts_eq_noFailed",
+      "name": "comparableFromFacts_eq_noFailed",
+      "module": "Doe.Full.Comparability",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.Comparability.comparableFromObligations_true_iff_failedBlockingNil",
+      "name": "comparableFromObligations_true_iff_failedBlockingNil",
+      "module": "Doe.Full.Comparability",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.Comparability.comparableFromObligations_false_iff_failedBlockingNonEmpty",
+      "name": "comparableFromObligations_false_iff_failedBlockingNonEmpty",
+      "module": "Doe.Full.Comparability",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.Comparability.comparableFromFacts_true_iff_failedBlockingNil",
+      "name": "comparableFromFacts_true_iff_failedBlockingNil",
+      "module": "Doe.Full.Comparability",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.Comparability.comparableFromFacts_false_iff_failedBlockingNonEmpty",
+      "name": "comparableFromFacts_false_iff_failedBlockingNonEmpty",
+      "module": "Doe.Full.Comparability",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.WorkloadGeometry.structurallyEquivalentGeometry_refl",
+      "name": "structurallyEquivalentGeometry_refl",
+      "module": "Doe.Full.WorkloadGeometry",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.WorkloadGeometry.structurallyEquivalentGeometry_forall_components",
+      "name": "structurallyEquivalentGeometry_forall_components",
+      "module": "Doe.Full.WorkloadGeometry",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.WorkloadGeometry.equalGeometrySetsExecutionShapeFacts",
+      "name": "equalGeometrySetsExecutionShapeFacts",
+      "module": "Doe.Full.WorkloadGeometry",
+      "classification": "lean_verified",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "bench/native_compare_modules/comparability.py",
+          "symbols": [
+            "evaluate_comparability_from_facts"
+          ],
+          "sourceSha256": "1a1e26603ed42a3c70ca05248040e36287e6688920940a07b7aabb6c85518449"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Full.ComparabilityFixtures.strictHappyPathExpectedBlocking_exact",
+      "name": "strictHappyPathExpectedBlocking_exact",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "classification": "lean_fixture",
+      "obligationCategory": "fixture_obligation",
+      "extractionStatus": "fixture_evaluated",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.ComparabilityFixtures.strictHappyPathComparable",
+      "name": "strictHappyPathComparable",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "classification": "lean_fixture",
+      "obligationCategory": "fixture_obligation",
+      "extractionStatus": "fixture_evaluated",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.ComparabilityFixtures.strictMissingLeftSamplesExpectedBlocking_exact",
+      "name": "strictMissingLeftSamplesExpectedBlocking_exact",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "classification": "lean_fixture",
+      "obligationCategory": "fixture_obligation",
+      "extractionStatus": "fixture_evaluated",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.ComparabilityFixtures.strictMissingLeftSamplesComparable",
+      "name": "strictMissingLeftSamplesComparable",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "classification": "lean_fixture",
+      "obligationCategory": "fixture_obligation",
+      "extractionStatus": "fixture_evaluated",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.ComparabilityFixtures.allowLeftNoExecutionDensityFailureExpectedBlocking_exact",
+      "name": "allowLeftNoExecutionDensityFailureExpectedBlocking_exact",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "classification": "lean_fixture",
+      "obligationCategory": "fixture_obligation",
+      "extractionStatus": "fixture_evaluated",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Full.ComparabilityFixtures.allowLeftNoExecutionDensityFailureComparable",
+      "name": "allowLeftNoExecutionDensityFailureComparable",
+      "module": "Doe.Full.ComparabilityFixtures",
+      "classification": "lean_fixture",
+      "obligationCategory": "fixture_obligation",
+      "extractionStatus": "fixture_evaluated",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.noOpActionIdentity",
+      "name": "noOpActionIdentity",
+      "module": "Doe.Core.Dispatch",
+      "classification": "tautological",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.informationalToggleIdentity",
+      "name": "informationalToggleIdentity",
+      "module": "Doe.Core.Dispatch",
+      "classification": "tautological",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.unhandledToggleIdentity",
+      "name": "unhandledToggleIdentity",
+      "module": "Doe.Core.Dispatch",
+      "classification": "tautological",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.behavioralToggleNotIdentity",
+      "name": "behavioralToggleNotIdentity",
+      "module": "Doe.Core.Dispatch",
+      "classification": "tautological",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.identityActionComplete",
+      "name": "identityActionComplete",
+      "module": "Doe.Core.Dispatch",
+      "classification": "comptime_verified",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/quirk/runtime.zig",
+          "symbols": [
+            "dispatch"
+          ],
+          "sourceSha256": "ef979687720770e01b44c64cc8c4061f0b87e78513dc7f89310ebaf5d8f0bb9c"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.scopeCommandTableComplete",
+      "name": "scopeCommandTableComplete",
+      "module": "Doe.Core.Dispatch",
+      "classification": "tautological",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/quirk/runtime.zig",
+          "symbols": [
+            "buildDispatchContext",
+            "buildProfileDispatchContext"
+          ],
+          "sourceSha256": "ef979687720770e01b44c64cc8c4061f0b87e78513dc7f89310ebaf5d8f0bb9c"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.Dispatch.identityActionPreservesCommand",
+      "name": "identityActionPreservesCommand",
+      "module": "Doe.Core.Dispatch",
+      "classification": "tautological",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/quirk/runtime.zig",
+          "symbols": [
+            "dispatch"
+          ],
+          "sourceSha256": "ef979687720770e01b44c64cc8c4061f0b87e78513dc7f89310ebaf5d8f0bb9c"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.BindGroupSlot.mslBindingSlot_injective_within_group",
+      "name": "mslBindingSlot_injective_within_group",
+      "module": "Doe.Core.BindGroupSlot",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BindGroupSlot.mslBindingSlot_injective_across_groups",
+      "name": "mslBindingSlot_injective_across_groups",
+      "module": "Doe.Core.BindGroupSlot",
+      "classification": "lean_required",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
+          "symbols": [
+            "msl_binding_slot"
+          ],
+          "sourceSha256": "922888a79c6700702028c72b0ef0cd1f177d2477635578187411afe72a02ba5e"
+        },
+        {
+          "path": "runtime/zig/src/native/compute/doe_compute_bind_groups.zig",
+          "symbols": [
+            "flatBindSlot",
+            "populateFlatBindings"
+          ],
+          "sourceSha256": "c5e4ace6a28fc811aa6e15d515912f49b0ba00c2bd2ebe0e696ef4cf54768ce9"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.BindGroupSlot.mslBindingSlot_in_bounds",
+      "name": "mslBindingSlot_in_bounds",
+      "module": "Doe.Core.BindGroupSlot",
+      "classification": "lean_verified",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/native/compute/doe_compute_bind_groups.zig",
+          "symbols": [
+            "flatBindSlot",
+            "populateFlatBindings"
+          ],
+          "sourceSha256": "c5e4ace6a28fc811aa6e15d515912f49b0ba00c2bd2ebe0e696ef4cf54768ce9"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.BindGroupSlot.mslBindingSlot_distinct_groups",
+      "name": "mslBindingSlot_distinct_groups",
+      "module": "Doe.Core.BindGroupSlot",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.doeRelease_terminal",
+      "name": "doeRelease_terminal",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "tautological",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.released_absorbs_all",
+      "name": "released_absorbs_all",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "tautological",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.doeMapAsync_idempotent",
+      "name": "doeMapAsync_idempotent",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.doeUnmap_idempotent",
+      "name": "doeUnmap_idempotent",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.doeMapUnmap_roundtrip",
+      "name": "doeMapUnmap_roundtrip",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.doe_getMappedRange_gap",
+      "name": "doe_getMappedRange_gap",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.doe_dispatch_gap",
+      "name": "doe_dispatch_gap",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.doe_getMappedRange_superset",
+      "name": "doe_getMappedRange_superset",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "lean_verified",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/native/resource/doe_buffer_ops_native.zig",
+          "symbols": [
+            "doeNativeBufferGetMappedRange"
+          ],
+          "sourceSha256": "1973771475cee6a37be984025b4f8ac9d77175c9334348f5a742282ee375b704"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.BufferLifecycle.doe_dispatch_superset",
+      "name": "doe_dispatch_superset",
+      "module": "Doe.Core.BufferLifecycle",
+      "classification": "lean_verified",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/native/resource/doe_buffer_ops_native.zig",
+          "symbols": [
+            "doeNativeBufferRelease"
+          ],
+          "sourceSha256": "1973771475cee6a37be984025b4f8ac9d77175c9334348f5a742282ee375b704"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.IrBuilderSoundness.ExprIdValid_mono",
+      "name": "ExprIdValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrBuilderSoundness.ExprArgRangeValid_mono",
+      "name": "ExprArgRangeValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrBuilderSoundness.StmtIdValid_mono",
+      "name": "StmtIdValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrBuilderSoundness.StmtChildRangeValid_mono",
+      "name": "StmtChildRangeValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrBuilderSoundness.SwitchCaseRangeValid_mono",
+      "name": "SwitchCaseRangeValid_mono",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrBuilderSoundness.builder_soundness",
+      "name": "builder_soundness",
+      "module": "Doe.Core.IrBuilderSoundness",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrSemanticContract.TypesCompatible_refl",
+      "name": "TypesCompatible_refl",
+      "module": "Doe.Core.IrSemanticContract",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrSemanticContract.IsBoolType_not_integer",
+      "name": "IsBoolType_not_integer",
+      "module": "Doe.Core.IrSemanticContract",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrSemanticContract.builder_load_inner_is_ref",
+      "name": "builder_load_inner_is_ref",
+      "module": "Doe.Core.IrSemanticContract",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrSemanticContract.builder_assign_lhs_is_ref",
+      "name": "builder_assign_lhs_is_ref",
+      "module": "Doe.Core.IrSemanticContract",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrValidatorRedundancy.bounds_checks_pre_satisfied",
+      "name": "bounds_checks_pre_satisfied",
+      "module": "Doe.Core.IrValidatorRedundancy",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrValidatorRedundancy.semantic_checks_pre_satisfied",
+      "name": "semantic_checks_pre_satisfied",
+      "module": "Doe.Core.IrValidatorRedundancy",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrValidatorRedundancy.ValidatorRedundant",
+      "name": "ValidatorRedundant",
+      "module": "Doe.Core.IrValidatorRedundancy",
+      "classification": "lean_required",
+      "obligationCategory": "runtime_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/mod.zig",
+          "symbols": [
+            "analyzeToIr"
+          ],
+          "sourceSha256": "d23459d696de21602bae3ad801f180c07991c02b6c0b7f1e389967fcdd5734af"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Core.RenderPassStateMachine.ended_absorbs_all_ops",
+      "name": "ended_absorbs_all_ops",
+      "module": "Doe.Core.RenderPassStateMachine",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.RenderPassStateMachine.finished_absorbs_all_ops",
+      "name": "finished_absorbs_all_ops",
+      "module": "Doe.Core.RenderPassStateMachine",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.MslAddressSpace.chain_preserves_addr_space",
+      "name": "chain_preserves_addr_space",
+      "module": "Doe.Core.MslAddressSpace",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.MslAddressSpace.chain_msl_qualifier_invariant",
+      "name": "chain_msl_qualifier_invariant",
+      "module": "Doe.Core.MslAddressSpace",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.MslAddressSpace.storage_ref_chain_emits_device",
+      "name": "storage_ref_chain_emits_device",
+      "module": "Doe.Core.MslAddressSpace",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.MslAddressSpace.uniform_ref_chain_emits_constant",
+      "name": "uniform_ref_chain_emits_constant",
+      "module": "Doe.Core.MslAddressSpace",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferDispatchPrecondition.liveOps_preserve_live",
+      "name": "liveOps_preserve_live",
+      "module": "Doe.Core.BufferDispatchPrecondition",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.BufferDispatchPrecondition.liveOps_dispatch_always_ready",
+      "name": "liveOps_dispatch_always_ready",
+      "module": "Doe.Core.BufferDispatchPrecondition",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrTypePreserved.nPasses_preserve_original_types",
+      "name": "nPasses_preserve_original_types",
+      "module": "Doe.Core.IrTypePreserved",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrTypePreserved.robustClampIndex_inbounds_when_nonempty",
+      "name": "robustClampIndex_inbounds_when_nonempty",
+      "module": "Doe.Core.IrTypePreserved",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrTypePreserved.robustClampIndex_noop_when_inbounds",
+      "name": "robustClampIndex_noop_when_inbounds",
+      "module": "Doe.Core.IrTypePreserved",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrTypePreserved.robustClampRead_noop_under_bounds",
+      "name": "robustClampRead_noop_under_bounds",
+      "module": "Doe.Core.IrTypePreserved",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrTypePreserved.applyRobustClamp_index_safe_when_nonempty",
+      "name": "applyRobustClamp_index_safe_when_nonempty",
+      "module": "Doe.Core.IrTypePreserved",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intAddZeroRight",
+      "name": "intAddZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intZeroAddLeft",
+      "name": "intZeroAddLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intSubZeroRight",
+      "name": "intSubZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intMulOneRight",
+      "name": "intMulOneRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intOneMulLeft",
+      "name": "intOneMulLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intMulZeroRight",
+      "name": "intMulZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intZeroMulLeft",
+      "name": "intZeroMulLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intDivOneRight",
+      "name": "intDivOneRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intOrZeroRight",
+      "name": "intOrZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intZeroOrLeft",
+      "name": "intZeroOrLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intAndZeroRight",
+      "name": "intAndZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intZeroAndLeft",
+      "name": "intZeroAndLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intXorZeroRight",
+      "name": "intXorZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intZeroXorLeft",
+      "name": "intZeroXorLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intShiftLeftZeroRight",
+      "name": "intShiftLeftZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.intShiftRightZeroRight",
+      "name": "intShiftRightZeroRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.boolAndTrueRight",
+      "name": "boolAndTrueRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.boolTrueAndLeft",
+      "name": "boolTrueAndLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.boolOrFalseRight",
+      "name": "boolOrFalseRight",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Core.IrOptRewrite.boolFalseOrLeft",
+      "name": "boolFalseOrLeft",
+      "module": "Doe.Core.IrOptRewrite",
+      "classification": "lean_verified",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_component_lt_total",
+      "name": "gid_component_lt_total",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_inbounds_when_dispatch_fits",
+      "name": "gid_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_plus_offset_inbounds_when_dispatch_fits",
+      "name": "gid_plus_offset_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_times_stride_plus_offset_inbounds_when_dispatch_fits",
+      "name": "gid_times_stride_plus_offset_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.gid_offset_matcher_contract_sound",
+      "name": "gid_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.gid_stride_offset_matcher_contract_sound",
+      "name": "gid_stride_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_plus_bounded_loop_index_inbounds_when_dispatch_fits",
+      "name": "gid_plus_bounded_loop_index_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits",
+      "name": "gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits_tight",
+      "name": "gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits_tight",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_tiled_index_plus_offset_inbounds_when_dispatch_fits",
+      "name": "gid_tiled_index_plus_offset_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.gid_loop_offset_matcher_contract_sound",
+      "name": "gid_loop_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.gid_loop_affine_matcher_contract_sound",
+      "name": "gid_loop_affine_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.gid_loop_affine_matcher_contract_sound_tight",
+      "name": "gid_loop_affine_matcher_contract_sound_tight",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.loop_index_affine_inbounds_when_loop_fits_tight",
+      "name": "loop_index_affine_inbounds_when_loop_fits_tight",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.loop_affine_matcher_contract_sound_tight",
+      "name": "loop_affine_matcher_contract_sound_tight",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.gid_tiled_matcher_contract_sound",
+      "name": "gid_tiled_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.clamp_noop_when_inbounds",
+      "name": "clamp_noop_when_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_2d_inbounds",
+      "name": "gid_2d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.flat_index_2d_inbounds",
+      "name": "flat_index_2d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.flat_index_2d_plus_offset_inbounds",
+      "name": "flat_index_2d_plus_offset_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.flat_index_3d_inbounds",
+      "name": "flat_index_3d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.flat_index_3d_plus_offset_inbounds",
+      "name": "flat_index_3d_plus_offset_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.flat_2d_matcher_contract_sound",
+      "name": "flat_2d_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.flat_2d_offset_matcher_contract_sound",
+      "name": "flat_2d_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.flat_3d_matcher_contract_sound",
+      "name": "flat_3d_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.flat_3d_offset_matcher_contract_sound",
+      "name": "flat_3d_offset_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_runtime_sized"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.TextureSampleBounds.gid_texture_coord_1d_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coord_1d_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_texture_coords_2d_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coords_2d_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.TextureSampleBounds.gid_texture_coord_1d_affine_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coord_1d_affine_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.TextureSampleBounds.gid_texture_coords_2d_affine_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coords_2d_affine_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.TextureSampleBounds.gid_texture_coords_3d_affine_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coords_3d_affine_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.TextureSampleBounds.gid_texture_coord_1d_tiled_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coord_1d_tiled_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.TextureSampleBounds.gid_texture_coords_2d_tiled_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coords_2d_tiled_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.TextureSampleBounds.gid_texture_coords_3d_tiled_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coords_3d_tiled_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.TextureSampleBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_1d_identity_matcher_contract_sound",
+      "name": "texture_1d_identity_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_2d_identity_matcher_contract_sound",
+      "name": "texture_2d_identity_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_3d_identity_matcher_contract_sound",
+      "name": "texture_3d_identity_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_1d_affine_matcher_contract_sound",
+      "name": "texture_1d_affine_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_2d_affine_matcher_contract_sound",
+      "name": "texture_2d_affine_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_3d_affine_matcher_contract_sound",
+      "name": "texture_3d_affine_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_1d_tiled_matcher_contract_sound",
+      "name": "texture_1d_tiled_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_2d_tiled_matcher_contract_sound",
+      "name": "texture_2d_tiled_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.BoundsElisionMatcher.texture_3d_tiled_matcher_contract_sound",
+      "name": "texture_3d_tiled_matcher_contract_sound",
+      "module": "Doe.Shader.BoundsElisionMatcher",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.guarded_gid_texture_coords_2d_inbounds",
+      "name": "guarded_gid_texture_coords_2d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.gid_texture_coords_3d_inbounds_when_dispatch_fits",
+      "name": "gid_texture_coords_3d_inbounds_when_dispatch_fits",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "proof_contract",
+      "extractionStatus": "verified",
+      "mirrorSources": []
+    },
+    {
+      "theoremId": "Doe.Shader.ComputeBounds.guarded_gid_texture_coords_3d_inbounds",
+      "name": "guarded_gid_texture_coords_3d_inbounds",
+      "module": "Doe.Shader.ComputeBounds",
+      "classification": "lean_required",
+      "obligationCategory": "bounds_elimination",
+      "extractionStatus": "runtime_branch_eliminated",
+      "mirrorSources": [
+        {
+          "path": "runtime/zig/src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "symbols": [
+            "clamp_texture_coords"
+          ],
+          "sourceSha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+        }
+      ]
     }
   ]
 }

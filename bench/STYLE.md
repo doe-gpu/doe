@@ -40,6 +40,11 @@ and Python helper tooling under `runtime/zig/tools/`.
   when present.
 - Standard library first, then third-party, then local.
 - Use absolute imports. No relative imports.
+- Package modules and canonical front doors must not mutate `sys.path`.
+  `bench` and `pipeline` are importable packages; invoke their canonical
+  entrypoints with `python3 -m ...`.
+  `config/python-import-boundaries.json` isolates legacy directly executed
+  scripts, and the blocking schema gate enforces protected paths.
 - Prefer `pathlib.Path` for new code; legacy files still use `os.path` in a
   few places.
 
@@ -169,6 +174,11 @@ path.write_text(
 
 ## Testing
 
+- Workloads are the promotion and evidence category; focused module tests remain
+  valid executor mechanisms when they provide a smaller first-failure boundary
+  or unique oracle sensitivity.
+- Remove a focused test only after the workload duplicate-removal gate proves
+  equivalent sensitivity.
 - Use `unittest.TestCase` class-based tests.
 - Test naming: `test_<what_is_being_tested>` (descriptive, snake_case).
 - Dynamic test generation with `setattr` for schema fuzz tests.

@@ -3,7 +3,7 @@
   "ownership": "generated",
   "generatorId": "bench.tools.generate_backend_workloads:materialize_lane",
   "generatorInputHash": "2b54bfaefbe2197259bddcf52616d611ee5a963b5057fab817c2b097c9c4e3e8",
-  "generatedAt": "2026-05-25T19:07:21.779234+00:00",
+  "generatedAt": "2026-06-04T21:50:48.048578+00:00",
   "workloads": [
     {
       "id": "compute_kernel_dispatch_100",

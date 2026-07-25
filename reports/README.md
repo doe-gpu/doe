@@ -7,6 +7,10 @@ Use `bench/out/` for generated run workspaces, large benchmark outputs, and
 machine-local evidence. Keep files here only when they are stable reference
 artifacts that tests, docs, or reviews may inspect directly.
 
+- `refactors/` contains schema-backed characterization receipts for structural
+  changes. A receipt distinguishes preserved cases from explicit contract
+  tightening and binds the before/after source identities.
+
 - `claim-index.json` lists the benchmark receipt paths that support the public
   README claim charts without requiring broad historical `bench/out` retention.
   `claim-indexed` entries must carry `comparisonStatus=comparable`,

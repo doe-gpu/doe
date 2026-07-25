@@ -4,6 +4,7 @@ const APP_ICON_BASENAME = "DoeRuntime";
 const APP_ICON_SOURCE_SVG = "../../assets/doe-logo.svg";
 const APP_ICON_PRECOMPILED_ICNS = "../../assets/doe-logo.icns";
 const ABSENT_PROOF_ARTIFACT_SHA256 = "0000000000000000000000000000000000000000000000000000000000000000";
+const MAX_LEAN_PROOF_ARTIFACT_BYTES: usize = 1024 * 1024;
 
 fn fileExists(path: []const u8) bool {
     std.fs.cwd().access(path, .{}) catch return false;
@@ -303,7 +304,7 @@ pub fn build(b: *std.Build) void {
         const proof_artifact = std.fs.cwd().openFile("../../pipeline/lean/artifacts/proven-conditions.json", .{}) catch
             @panic("lean-verified=true but pipeline/lean/artifacts/proven-conditions.json not found. Run pipeline/lean/extract.sh first.");
         defer proof_artifact.close();
-        proof_json = proof_artifact.readToEndAlloc(b.allocator, 64 * 1024) catch
+        proof_json = proof_artifact.readToEndAlloc(b.allocator, MAX_LEAN_PROOF_ARTIFACT_BYTES) catch
             @panic("failed to read lean proof artifact");
         build_options.addOption([]const u8, "lean_proof_json", proof_json.?);
         proof_artifact_sha256 = sha256HexAlloc(b.allocator, proof_json.?);

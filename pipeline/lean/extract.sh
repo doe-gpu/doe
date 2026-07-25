@@ -56,4 +56,8 @@ LEAN_PATH="${BUILD_DIR}:${ROOT_DIR}/pipeline/lean" \
   DOE_LEAN_PROOF_PATTERN_SPEC_SHA256="${DOE_LEAN_PROOF_PATTERN_SPEC_SHA256}" \
   "${LEAN_BIN}" "+${TOOLCHAIN_REF}" --run "${ROOT_DIR}/pipeline/lean/Doe/Extract.lean" > "${ARTIFACT_PATH}"
 
+python3 "${ROOT_DIR}/pipeline/lean/finalize_proof_artifact.py" \
+  --root "${ROOT_DIR}" \
+  --artifact "${ARTIFACT_PATH}"
+
 echo "lean-extract: artifact written to ${ARTIFACT_PATH} (${TOOLCHAIN_REF})"

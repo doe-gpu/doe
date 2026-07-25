@@ -63,6 +63,7 @@
     "stage:prebuilds": "node scripts/stage-prebuilds.js",
     "test": "npm run test:contracts && npm run test:smoke && npm run test:integration",
     "test:contracts": "node test/run-contracts.js",
+    "check:plan-schema": "node scripts/check-plan-schema-parity.js",
     "test:smoke": "node test/smoke/test-smoke-load.js",
     "test:integration": "node test/integration/run-integration.js --runtime node",
     "test:integration:bun": "bun test/integration/run-integration.js --runtime bun",

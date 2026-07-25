@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Fawn Proof Artifact",
+  "title": "Doe Proof Artifact",
   "description": "Machine-readable artifact emitted by Lean proof extraction. Compilation of the extraction module verifies all listed theorems. Decidable propositions are additionally evaluated at runtime.",
   "type": "object",
-  "required": ["schemaVersion", "status", "provenance", "contractHashes", "theorems", "evaluatedConditions", "eliminationTargets", "boundsEliminations"],
+  "required": ["schemaVersion", "status", "provenance", "contractHashes", "theorems", "theoremMetadata", "evaluatedConditions", "eliminationTargets", "boundsEliminations"],
   "additionalProperties": false,
   "properties": {
     "schemaVersion": {
@@ -22,7 +22,8 @@
         "extractProgramSha256",
         "leanSourceTreeSha256",
         "generatedComparabilityContractSha256",
-        "proofPatternSpecSha256"
+        "proofPatternSpecSha256",
+        "theoremMetadataGeneratorSha256"
       ],
       "additionalProperties": false,
       "properties": {
@@ -50,6 +51,11 @@
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
           "description": "SHA-256 of config/lean-proof-patterns.json, the canonical proof-application pattern contract."
+        },
+        "theoremMetadataGeneratorSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the fail-closed theorem metadata finalizer."
         }
       }
     },
@@ -84,6 +90,67 @@
             "type": "string",
             "enum": ["tautological", "comptime_verified", "lean_verified", "lean_fixture", "lean_required"],
             "description": "Verification tier. tautological: correct by construction or definitional (nothing to verify). comptime_verified: finite-enum property verifiable by Zig comptime exhaustion. lean_verified: quantified over unbounded domains (Lean is necessary). lean_fixture: specific test case exercising a lean_verified theorem. lean_required: theorem that requires Lean proof and blocks release gates."
+          }
+        }
+      }
+    },
+    "theoremMetadata": {
+      "type": "array",
+      "description": "Generated executable registry joining every verified theorem to its classification, obligation, extraction state, and hash-bound runtime mirrors.",
+      "items": {
+        "type": "object",
+        "required": ["theoremId", "name", "module", "classification", "obligationCategory", "extractionStatus", "mirrorSources"],
+        "additionalProperties": false,
+        "properties": {
+          "theoremId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "module": {
+            "type": "string",
+            "minLength": 1
+          },
+          "classification": {
+            "type": "string",
+            "enum": ["tautological", "comptime_verified", "lean_verified", "lean_fixture", "lean_required"]
+          },
+          "obligationCategory": {
+            "type": "string",
+            "enum": ["proof_contract", "fixture_obligation", "runtime_elimination", "bounds_elimination"]
+          },
+          "extractionStatus": {
+            "type": "string",
+            "enum": ["verified", "fixture_evaluated", "runtime_branch_eliminated"]
+          },
+          "mirrorSources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["path", "symbols", "sourceSha256"],
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "symbols": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "sourceSha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
           }
         }
       }

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "protectedPaths": [
+    "bench/cli.py",
+    "bench/lib",
+    "bench/native_compare_modules",
+    "bench/workload_runner.py",
+    "pipeline"
+  ],
+  "legacyDirectScriptRoots": [
+    "bench/browser",
+    "bench/drop-in",
+    "bench/gates",
+    "bench/native-compare",
+    "bench/runners",
+    "bench/single-runtime",
+    "bench/tests",
+    "bench/tools"
+  ]
+}

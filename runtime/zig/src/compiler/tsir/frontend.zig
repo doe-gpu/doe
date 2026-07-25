@@ -1,25 +1,13 @@
-// TSIR frontend — minimal WGSL IR → TSIR.Semantic lowering.
+// TSIR frontend — WGSL IR → semantic TSIR lowering.
 //
-// This is the first committable increment of Step 4. Scope intentionally
-// narrow: walk a `doe_wgsl.ir.Module`, emit one `SemanticFunction` per
-// non-builtin function in the module, carry the function name and source
-// digest, leave axes / bindings / reductions / collectives empty for now.
-// Subsequent iterations add:
-//   - buffer-binding extraction from `module.globals`
-//   - SSA-friendly control-flow normalization + induction-variable recovery
-//   - affine dependence analysis → `IterationAxis` population
-//   - reduction-region identification → `ReductionRegion` population
-//   - subgroup canonicalization → `CollectiveSemanticNode` population
-//   - kernel-family hint inference from IR shape
-//
-// The minimal lowering here proves the pipeline exists end-to-end: a
-// WGSL source string can be parsed, analyzed, built into IR, and then
-// lowered to a `Semantic` whose digest participates in the lowering
-// identity contract. Every future Step 4 increment adds one pass to
-// the body of this function.
+// The frontend recovers per-function bindings, iteration axes, reductions,
+// collectives, family hints, and typed semantic bodies. Source constructs that
+// cannot be represented are recorded as typed rejections; they never survive
+// as plausible placeholder values.
 
 const std = @import("std");
 const ir = @import("../wgsl/ir/ir.zig");
+const layout_utils = @import("../wgsl/ir/layout_utils.zig");
 const family_hint = @import("family_hint.zig");
 const frontend_body = @import("frontend_body.zig");
 const tsir = @import("mod.zig");
@@ -50,7 +38,13 @@ pub fn lowerIrToTsir(
         // expression list actually references. Two entry points
         // that touch disjoint binding sets therefore no longer
         // collide in the semantic digest's binding portion.
-        const per_fn = try extractFunctionBindings(allocator, module, &ir_func);
+        const per_fn = try extractFunctionBindings(
+            allocator,
+            module,
+            &ir_func,
+            @intCast(i),
+            &rejections,
+        );
         const axes = try recoverIterationAxes(allocator, module, &ir_func);
         const reductions = try recoverReductions(
             allocator,
@@ -103,17 +97,12 @@ const PerFunctionBindings = struct {
 /// index-for-index, so `bindings[i]` is the TSIR encoding of the
 /// global at `module.globals[global_indices[i]]`.
 ///
-/// Globals whose type the extractor cannot represent are still
-/// kept (as `(shape=[], elem=.f32)` placeholder) so the binding
-/// slot survives; the per-function reachability filter is about
-/// "is this binding used by this function" not "can we fully
-/// encode it yet". A future iteration that adds struct /
-/// texture / sampler encodings narrows the placeholder without
-/// touching the reachability walk.
 fn extractFunctionBindings(
     allocator: std.mem.Allocator,
     module: *const ir.Module,
     function: *const ir.Function,
+    function_index: u32,
+    rejections: *std.ArrayList(tsir.schema.RejectionEntry),
 ) FrontendError!PerFunctionBindings {
     var referenced = std.AutoHashMap(u32, void).init(allocator);
     defer referenced.deinit();
@@ -123,39 +112,47 @@ fn extractFunctionBindings(
         }
     }
 
-    var count: usize = 0;
-    for (module.globals.items, 0..) |g, gi| {
-        if (g.binding == null) continue;
-        if (!referenced.contains(@intCast(gi))) continue;
-        count += 1;
-    }
-    const out = try allocator.alloc(tsir.schema.BufferBinding, count);
-    errdefer allocator.free(out);
-    const indices = try allocator.alloc(u32, count);
-    errdefer allocator.free(indices);
+    var out = std.ArrayList(tsir.schema.BufferBinding){};
+    defer out.deinit(allocator);
+    var indices = std.ArrayList(u32){};
+    defer indices.deinit(allocator);
 
-    var written: usize = 0;
     for (module.globals.items, 0..) |g, gi| {
         const bp = g.binding orelse continue;
         if (!referenced.contains(@intCast(gi))) continue;
-        const name_copy = try allocator.dupe(u8, g.name);
-        const shape_and_elem = try extractElemAndShape(allocator, module, g.ty);
+        const shape_and_elem = try extractElemAndShape(allocator, module, g);
+        if (shape_and_elem == null) {
+            const node_path = try std.fmt.allocPrint(
+                allocator,
+                "functions[{d}].bindings[{d}:{d}]",
+                .{ function_index, bp.group, bp.binding },
+            );
+            try rejections.append(allocator, .{
+                .reason = .tsir_binding_type_unlowerable,
+                .node_path = node_path,
+                .detail = try bindingTypeDetail(allocator, module, g),
+            });
+            continue;
+        }
+        const resolved = shape_and_elem.?;
         const read_write = blk: {
             if (g.access) |a| break :blk (a == .read_write);
             break :blk false;
         };
-        out[written] = .{
-            .name = name_copy,
+        try out.append(allocator, .{
+            .name = try allocator.dupe(u8, g.name),
             .group = bp.group,
             .binding = bp.binding,
-            .logical_shape = shape_and_elem.shape,
-            .elem = shape_and_elem.elem,
+            .logical_shape = resolved.shape,
+            .elem = resolved.elem,
             .read_write = read_write,
-        };
-        indices[written] = @intCast(gi);
-        written += 1;
+        });
+        try indices.append(allocator, @intCast(gi));
     }
-    return .{ .bindings = out, .global_indices = indices };
+    return .{
+        .bindings = try out.toOwnedSlice(allocator),
+        .global_indices = try indices.toOwnedSlice(allocator),
+    };
 }
 
 const ShapeAndElem = struct {
@@ -163,20 +160,18 @@ const ShapeAndElem = struct {
     elem: tsir.schema.ScalarKind,
 };
 
-/// Map a Doe IR type onto a TSIR `(logical_shape, elem)` pair.
-/// Supported today: bare scalars (shape = empty), `array<T>` of a
-/// scalar (shape = `[len]` if known, `[0]` if runtime-sized), and
-/// `ref<storage, array<T>>` style indirections. Vectors and matrices
-/// are flattened to `[vec_len]` / `[rows, cols]` with the scalar's
-/// element type. Structs and textures are not yet lowered; the
-/// fallback is `(shape=[], elem=.f32)` so the binding slot is still
-/// captured but the shape is clearly placeholder.
+/// Map a Doe IR binding type onto a TSIR `(logical_shape, elem)` pair.
+/// Numeric aggregates are flattened without changing their scalar type.
+/// Uniform structs use their exact ABI size as a u32 word view because TSIR
+/// consumes their named members through separately recovered byte offsets.
+/// Resource handles, atomics, and storage structs have no BufferBinding
+/// representation and return null so the caller emits a typed rejection.
 fn extractElemAndShape(
     allocator: std.mem.Allocator,
     module: *const ir.Module,
-    ty: ir.TypeId,
-) FrontendError!ShapeAndElem {
-    var cursor = ty;
+    global: ir.Global,
+) FrontendError!?ShapeAndElem {
+    var cursor = global.ty;
     // Unwrap `ref` if the global carries one.
     const maybe_ref = module.types.get(cursor);
     if (maybe_ref == .ref) cursor = maybe_ref.ref.elem;
@@ -187,44 +182,67 @@ fn extractElemAndShape(
             return .{ .shape = &.{}, .elem = scalarKindFromIr(s) };
         },
         .array => |arr| {
-            const elem_ty = module.types.get(arr.elem);
-            const kind = switch (elem_ty) {
-                .scalar => |s| scalarKindFromIr(s),
-                else => .f32,
-            };
-            const shape = try allocator.alloc(u64, 1);
+            const nested = (try extractNumericShape(allocator, module, arr.elem)) orelse return null;
+            defer if (nested.shape.len > 0) allocator.free(nested.shape);
+            const shape = try allocator.alloc(u64, nested.shape.len + 1);
             shape[0] = if (arr.len) |n| n else 0;
-            return .{ .shape = shape, .elem = kind };
+            @memcpy(shape[1..], nested.shape);
+            return .{ .shape = shape, .elem = nested.elem };
         },
         .vector => |vec| {
-            const elem_ty = module.types.get(vec.elem);
-            const kind = switch (elem_ty) {
-                .scalar => |s| scalarKindFromIr(s),
-                else => .f32,
-            };
+            const nested = (try extractNumericShape(allocator, module, vec.elem)) orelse return null;
+            if (nested.shape.len != 0) return null;
             const shape = try allocator.alloc(u64, 1);
             shape[0] = @as(u64, vec.len);
-            return .{ .shape = shape, .elem = kind };
+            return .{ .shape = shape, .elem = nested.elem };
         },
         .matrix => |mat| {
-            const elem_ty = module.types.get(mat.elem);
-            const kind = switch (elem_ty) {
-                .scalar => |s| scalarKindFromIr(s),
-                else => .f32,
-            };
+            const nested = (try extractNumericShape(allocator, module, mat.elem)) orelse return null;
+            if (nested.shape.len != 0) return null;
             const shape = try allocator.alloc(u64, 2);
             shape[0] = @as(u64, mat.rows);
             shape[1] = @as(u64, mat.columns);
-            return .{ .shape = shape, .elem = kind };
+            return .{ .shape = shape, .elem = nested.elem };
         },
-        else => {
-            // Structs, textures, samplers, atomics, and unhandled
-            // composites fall back to an empty shape with an f32
-            // placeholder so the binding slot survives. A future
-            // iteration replaces each with the right TSIR encoding.
-            return .{ .shape = &.{}, .elem = .f32 };
+        .struct_ => {
+            if (global.addr_space != .uniform) return null;
+            const byte_size = layout_utils.type_size(module, cursor);
+            if (byte_size == 0 or byte_size % @sizeOf(u32) != 0) return null;
+            const shape = try allocator.alloc(u64, 1);
+            shape[0] = byte_size / @sizeOf(u32);
+            return .{ .shape = shape, .elem = .u32 };
         },
+        else => return null,
     }
+}
+
+fn extractNumericShape(
+    allocator: std.mem.Allocator,
+    module: *const ir.Module,
+    ty: ir.TypeId,
+) FrontendError!?ShapeAndElem {
+    const synthetic = ir.Global{
+        .name = "",
+        .ty = ty,
+        .class = .var_,
+    };
+    return extractElemAndShape(allocator, module, synthetic);
+}
+
+fn bindingTypeDetail(
+    allocator: std.mem.Allocator,
+    module: *const ir.Module,
+    global: ir.Global,
+) FrontendError![]const u8 {
+    var cursor = global.ty;
+    const maybe_ref = module.types.get(cursor);
+    if (maybe_ref == .ref) cursor = maybe_ref.ref.elem;
+    const tag = @tagName(std.meta.activeTag(module.types.get(cursor)));
+    if (module.types.get(cursor) == .struct_) {
+        const address_space = if (global.addr_space) |space| @tagName(space) else "none";
+        return std.fmt.allocPrint(allocator, "{s}_{s}", .{ address_space, tag });
+    }
+    return allocator.dupe(u8, tag);
 }
 
 /// Walk the function body recursively and emit one

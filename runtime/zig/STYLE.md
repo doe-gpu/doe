@@ -11,16 +11,13 @@ This guide is the Zig style contract for `zig`.
 
 ## Repository conventions
 
-- Anchor shared command/profile contracts in `contracts/model/`; use
-  `contracts/model/model.zig` only when a caller genuinely needs the combined
-  contract.
-- Put quirk parsing in `quirk/quirk_json.zig` and command parsing in
-  `command/command_json.zig`.
-- Keep deterministic selection logic in `quirk/runtime.zig`.
-- Keep execution orchestration in `runtime/execution.zig`.
-- Keep trace and replay behavior in `runtime/trace/`.
-- Anchor WebGPU types and proc contracts in `core/abi/`, with procedure groups
-  under `core/abi/procs/` and loader glue in `core/abi/wgpu_loader.zig`.
+- Shared command/profile contracts belong to `contracts/`; parsing belongs to
+  the subsystem that owns the input language.
+- Quirk selection belongs to `quirk/`; execution orchestration, trace, and
+  replay belong to `runtime/`; WebGPU ABI contracts belong to `core/abi/`.
+- The current ownership directories and compatibility facades are generated in
+  `src/README.md` from `source-layout.json`. Do not duplicate that changing
+  module inventory in this guide.
 
 ## Architectural decoupling
 
@@ -57,26 +54,10 @@ This guide is the Zig style contract for `zig`.
   whichever orchestration file currently imports them most often.
 - New implementation code must not import `compat/`; the compatibility surface
   is for compatibility tests and declared consumers only.
-- Native implementation code should import the narrow modules under
-  `native/support/`; keep `native/support/doe_native_exports.zig` for
-  cross-shard native C ABI declarations.
-- When a caller only needs shared texture/layout values, import
-  `model_texture_value_types.zig`. When it only needs shader-stage or
-  binding/sample/access values, import `model_binding_value_types.zig`.
-  Reserve `model_gpu_types.zig` for compatibility or transition callers that
-  genuinely need both value families at once.
-- Prefer `model_resource_types.zig` for upload/copy/barrier payloads and
-  `model_compute_types.zig` for dispatch/kernel-binding payloads.
-- Prefer `model_texture_types.zig` for texture read/write/query payloads,
-  `model_surface_control_types.zig` for surface lifecycle/configuration
-  payloads, and `model_async_types.zig` for async-diagnostics or map-async
-  payloads.
-- Implementation code should import the narrow ABI modules
-  `wgpu_core_base_types.zig`, `wgpu_feature_base_types.zig`,
-  `wgpu_texture_base_types.zig`, `wgpu_binding_base_types.zig`,
-  `wgpu_callback_descriptor_types.zig`, `wgpu_copy_descriptor_types.zig`,
-  `wgpu_pipeline_descriptor_types.zig`, `wgpu_execution_types.zig`,
-  `wgpu_record_types.zig`, and `wgpu_state_types.zig` directly as needed.
+- Native implementation code should import the narrowest support, contract,
+  value-type, or ABI shard that owns the required symbols. Broad aggregation
+  modules are compatibility/facade surfaces, not default implementation
+  dependencies.
 
 ## File size
 
@@ -118,7 +99,9 @@ This guide is the Zig style contract for `zig`.
 
 ## Constants and magic numbers
 
-- No bare numeric literals in runtime code.
+- Inline `0`, `1`, simple index arithmetic, and language-level sentinels when
+  they are the clearest expression of local mechanics.
+- Name domain, ABI, policy, threshold, size, retry, and timing values.
 - Use named `UPPER_SNAKE_CASE` comptime constants or config values.
 - Place constants at file top, after imports.
 - Domain-shared constants belong in the narrow contract module that owns their
@@ -143,6 +126,11 @@ pub const TIMESTAMP_BUFFER_SIZE: u64 = 16;
 
 ## Errors and diagnostics
 
+- Compiler lowering must emit either a valid typed semantic value or a typed
+  rejection with source/node location and reason. Placeholder scalar types,
+  shapes, or handles are forbidden in promotable semantic artifacts.
+- Artifacts carrying semantic rejections are diagnostic-only and cannot enter
+  code generation, parity promotion, or claim-bearing workloads.
 - Return explicit error unions (`!T`) for recoverable failures.
 - Keep unsupported behavior explicit (`unsupported` taxonomy), never silent no-op.
 - Include actionable context: what was expected, what was received.

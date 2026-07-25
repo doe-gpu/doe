@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shlex
 import sys
 from datetime import datetime, timezone
@@ -23,18 +24,24 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-BENCH_ROOT = Path(__file__).resolve().parent
+
+if __name__ == "__main__" and not __package__:
+    environment = os.environ.copy()
+    existing_python_path = environment.get("PYTHONPATH")
+    environment["PYTHONPATH"] = (
+        f"{REPO_ROOT}{os.pathsep}{existing_python_path}"
+        if existing_python_path
+        else str(REPO_ROOT)
+    )
+    os.execve(
+        sys.executable,
+        [sys.executable, "-m", "bench.cli", *sys.argv[1:]],
+        environment,
+    )
 
 
 def _utc_timestamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-
-def _ensure_bench_imports() -> None:
-    for path in (str(REPO_ROOT), str(BENCH_ROOT)):
-        if path not in sys.path:
-            sys.path.insert(0, path)
-
 
 # ---------------------------------------------------------------------------
 # workload subcommand
@@ -60,8 +67,7 @@ def _add_workload_args(parser: argparse.ArgumentParser) -> None:
 
 
 def _cmd_workload(args: argparse.Namespace) -> int:
-    _ensure_bench_imports()
-    from workload_runner import run_suite
+    from bench.workload_runner import run_suite
 
     timestamp = _utc_timestamp()
     output_path = Path(args.out) if args.out else Path(
@@ -115,13 +121,12 @@ def _add_run_args(parser: argparse.ArgumentParser) -> None:
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
-    _ensure_bench_imports()
-    from native_compare_modules.artifact_benchmarking import run_product_bundle
-    from native_compare_modules.config_support import (
+    from bench.native_compare_modules.artifact_benchmarking import run_product_bundle
+    from bench.native_compare_modules.config_support import (
         load_benchmark_methodology_policy,
         load_workloads,
     )
-    from native_compare_modules.executor_registry import resolve_executor_command_template
+    from bench.native_compare_modules.executor_registry import resolve_executor_command_template
 
     template = resolve_executor_command_template(args.executor_id)
     benchmark_policy = load_benchmark_methodology_policy(args.benchmark_policy)
@@ -265,7 +270,6 @@ def _cmd_compare(
     *,
     raw_compare_argv: list[str] | None = None,
 ) -> int:
-    _ensure_bench_imports()
     raw_compare_argv = list(raw_compare_argv or [])
 
     if args.config:
@@ -299,7 +303,7 @@ def _cmd_compare(
         or args.preset
         or args.workload
     ):
-        from native_compare_modules import promoted_compare as promoted_compare_mod
+        from bench.native_compare_modules import promoted_compare as promoted_compare_mod
 
         catalog_path = Path(args.catalog)
         entries = promoted_compare_mod.load_catalog(catalog_path)
@@ -367,14 +371,14 @@ def _cmd_compare(
         )
         return 1
 
-    from native_compare_modules.compare_from_artifacts import (
+    from bench.native_compare_modules.compare_from_artifacts import (
         build_compare_report,
         compare_workload_from_artifacts,
         group_run_artifacts_by_workload,
         write_compare_report,
     )
-    from native_compare_modules.config_support import load_benchmark_methodology_policy
-    from native_compare_modules.run_artifact import load_run_artifact
+    from bench.native_compare_modules.config_support import load_benchmark_methodology_policy
+    from bench.native_compare_modules.run_artifact import load_run_artifact
 
     benchmark_policy = load_benchmark_methodology_policy(args.benchmark_policy)
     artifact_paths = list(args.artifacts)
@@ -476,15 +480,13 @@ def _cmd_compare(
 
 
 def _cmd_run_config(raw_run_config_argv: list[str] | None = None) -> int:
-    _ensure_bench_imports()
-    from native_compare_modules import run_receipts_from_config as run_receipts_from_config_mod
+    from bench.native_compare_modules import run_receipts_from_config as run_receipts_from_config_mod
 
     return run_receipts_from_config_mod.main(raw_run_config_argv)
 
 
 def _cmd_claim(args: argparse.Namespace) -> int:
-    _ensure_bench_imports()
-    from native_compare_modules import claim_from_config as claim_from_config_mod
+    from bench.native_compare_modules import claim_from_config as claim_from_config_mod
 
     argv = [args.report]
     if args.config:
@@ -514,8 +516,6 @@ def _add_list_args(parser: argparse.ArgumentParser) -> None:
 
 
 def _cmd_list(args: argparse.Namespace) -> int:
-    _ensure_bench_imports()
-
     if args.products or args.surfaces:
         taxonomy_path = Path("config/compare-taxonomy.json")
         if not taxonomy_path.exists():
@@ -533,7 +533,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
         return 0
 
     if args.executors:
-        from native_compare_modules.executor_registry import _REGISTRY
+        from bench.native_compare_modules.executor_registry import _REGISTRY
         print("Executors:")
         for eid, spec in sorted(_REGISTRY.items()):
             print(f"  {eid:40s}  boundary={spec.execution_boundary}")

@@ -4,6 +4,8 @@ const contracts = [
   './unit/browser-runtime-identity.test.js',
   './unit/full-surface-lifecycle.test.js',
   './unit/stage-platform-freshness.test.js',
+  './unit/plan-contracts.test.js',
+  './unit/plan-refactor-receipt.test.js',
 ];
 
 for (const contract of contracts) {

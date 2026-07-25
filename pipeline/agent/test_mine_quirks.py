@@ -10,14 +10,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-import sys
 import unittest
 from pathlib import Path
 
-# Ensure the module under test is importable
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-import mine_upstream_quirks as miner
+from pipeline.agent import mine_upstream_quirks as miner
 
 SCHEMA_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "quirks.schema.json"
 

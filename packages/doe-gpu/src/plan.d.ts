@@ -1,6 +1,9 @@
 export type DoePlanValidationError = {
+  code: "type_mismatch" | "required_field" | "unknown_field" | "const_mismatch" | "enum_mismatch" | "min_items" | "pattern_mismatch" | "contains_mismatch";
   path: string;
   message: string;
+  expected: string | number;
+  received: string;
 };
 
 export type DoeCommandStreamValidationResult = {
@@ -29,42 +32,157 @@ export type DoeNormalizedPlan = {
   schemaVersion: typeof DOE_NORMALIZED_PLAN_SCHEMA_VERSION;
   planKind: string;
   workloadId: string;
+  irPath: string;
+  irScenario: string;
+  description?: string;
+  planPath?: string;
+  commandsPath?: string;
+  matmulGemvVariant?: "row2_helper_exact";
+  commandCount: number;
+  bufferWriteCount: number;
+  bufferLoadCount?: number;
+  dispatchCount: number;
+  sourceIrSha256: string;
+  compatibilityCommandsSha256: string;
+  planSha256?: string;
   commands: DoeCommandStream;
+};
+
+export type DoeWebgpuCaptureEvidenceArtifact = {
+  schemaVersion: typeof DOE_WEBGPU_CAPTURE_EVIDENCE_SCHEMA_VERSION;
+  artifactKind: typeof DOE_WEBGPU_CAPTURE_EVIDENCE_ARTIFACT_KIND;
+  generatedAt?: string;
+  modelId: string;
+  sourceProgram: Record<string, unknown>;
+  destinations: Array<Record<string, unknown>>;
+  loweringStages: Array<Record<string, unknown>>;
+  verdict: Record<string, unknown>;
+};
+
+export type DoeStreamGraphArtifact = {
+  schemaVersion: 1;
+  artifactKind: typeof DOE_STREAM_GRAPH_ARTIFACT_KIND;
+  target: "wse3";
+  modelId: string;
+  residencyMode: "layer_streaming";
+  codeRegions: Array<Record<string, unknown>>;
+  streams: Array<Record<string, unknown>>;
+  prefetchSchedule: Record<string, unknown>;
+  kvPolicy: Record<string, unknown>;
+  compileArtifactCache: Record<string, unknown>;
+  validation?: Record<string, unknown>;
   [key: string]: unknown;
 };
 
-export type DoePlanArtifact = {
-  schemaVersion: number;
-  artifactKind: string;
+export type DoeStreamExecutionPlanArtifact = {
+  schemaVersion: 1;
+  artifactKind: typeof DOE_STREAM_EXECUTION_PLAN_ARTIFACT_KIND;
+  target: "wse3";
+  modelId: string;
+  numTransformerLayers: number;
+  setupPhase: Array<Record<string, unknown>>;
+  perLayerSchedule: Array<Record<string, unknown>>;
+  prefetchPolicy: Record<string, unknown>;
+  kvPolicy: Record<string, unknown>;
+  steadyStatePayloadBytesPerLayer: number;
+  executorStatus: "plan_only" | "executor_ready" | "executed";
+  executorStatusReason?: string;
+  source?: Record<string, unknown>;
   [key: string]: unknown;
+};
+
+export type DoeCslHostPlanArtifact = {
+  schemaVersion: 2;
+  artifactKind: typeof DOE_CSL_HOST_PLAN_ARTIFACT_KIND;
+  target: "wse3";
+  contract: "explicit_host_plan";
+  hostPlan: Record<string, unknown>;
+  compileTargets: Array<Record<string, unknown>>;
+  cslc?: Record<string, unknown>;
+};
+
+export type DoePlanArtifact =
+  | DoeCaptureGraph
+  | DoeWebgpuCaptureEvidenceArtifact
+  | DoeStreamGraphArtifact
+  | DoeStreamExecutionPlanArtifact
+  | DoeCslHostPlanArtifact;
+
+export type DoeCaptureProviderIdentity = {
+  name: string;
+  mode: "capture";
+  contract: "webgpu-capture-provider";
+};
+
+export type DoeCaptureRecord = {
+  id: number;
+  [key: string]: unknown;
+};
+
+export type DoeCaptureBufferRecord = DoeCaptureRecord & {
+  label?: string | null;
+  size: number;
+  usage: number;
+  mappedAtCreation: boolean;
+  descriptor: Record<string, unknown>;
+};
+
+export type DoeCaptureBufferWrite = DoeCaptureRecord & {
+  buffer: number;
+  bufferOffset: number;
+  byteLength: number;
+  dataSha256: string;
+};
+
+export type DoeCaptureShaderModule = DoeCaptureRecord & {
+  label?: string | null;
+  code: string;
+  wgslSha256: string;
+};
+
+export type DoeCaptureComputePipeline = DoeCaptureRecord & {
+  label?: string | null;
+  module: number;
+  entryPoint: string;
+};
+
+export type DoeCaptureCommandBuffer = DoeCaptureRecord & {
+  encoder: number;
+  commands: Array<Record<string, unknown>>;
+};
+
+export type DoeCaptureSubmission = DoeCaptureRecord & {
+  commandBuffers: number[];
 };
 
 export type DoeCaptureGraph = {
   schemaVersion: typeof DOE_WEBGPU_CAPTURE_GRAPH_SCHEMA_VERSION;
   artifactKind: typeof DOE_WEBGPU_CAPTURE_GRAPH_ARTIFACT_KIND;
-  graphSha256?: string;
-  provider: Record<string, unknown>;
+  graphSha256: string;
+  provider: DoeCaptureProviderIdentity;
   metadata: Record<string, unknown>;
   supportedWebgpuMethods: string[];
   unsupportedCslFeatures: string[];
-  buffers: Record<string, unknown>[];
-  bufferEvents: Record<string, unknown>[];
-  bufferWrites: Record<string, unknown>[];
-  shaderModules: Record<string, unknown>[];
-  bindGroupLayouts: Record<string, unknown>[];
-  pipelineLayouts: Record<string, unknown>[];
-  computePipelines: Record<string, unknown>[];
-  bindGroups: Record<string, unknown>[];
-  commandEncoders: Record<string, unknown>[];
-  commandBuffers: Record<string, unknown>[];
-  submissions: Record<string, unknown>[];
-  readbacks: Record<string, unknown>[];
-  unsupported: Record<string, unknown>[];
+  buffers: DoeCaptureBufferRecord[];
+  bufferEvents: DoeCaptureRecord[];
+  bufferWrites: DoeCaptureBufferWrite[];
+  shaderModules: DoeCaptureShaderModule[];
+  bindGroupLayouts: DoeCaptureRecord[];
+  pipelineLayouts: DoeCaptureRecord[];
+  computePipelines: DoeCaptureComputePipeline[];
+  bindGroups: DoeCaptureRecord[];
+  commandEncoders: DoeCaptureRecord[];
+  commandBuffers: DoeCaptureCommandBuffer[];
+  submissions: DoeCaptureSubmission[];
+  readbacks: DoeCaptureRecord[];
+  unsupported: DoeCaptureRecord[];
 };
+
+export type DoeCaptureGraphDraft = Omit<DoeCaptureGraph, "graphSha256">;
 
 export type DoeCaptureProvider = {
   kind: "doe_capture_provider";
-  graph(): DoeCaptureGraph;
+  graph(): DoeCaptureGraphDraft;
   snapshot(): Promise<DoeCaptureGraph>;
   requestAdapter(options?: unknown): Promise<DoeCaptureAdapter>;
   requestDevice(options?: unknown): Promise<DoeCaptureDevice>;
@@ -147,6 +265,29 @@ export type DoeCaptureGpu = {
   requestAdapter: DoeCaptureProvider["requestAdapter"];
 };
 
+export type DoeCaptureDispatchShaderEvidence = Readonly<{
+  shaderModules: Array<{
+    moduleId: string;
+    sourcePath: null;
+    sourceSha256: string | null;
+    entryPoint: null;
+    workgroupSize: number[] | null;
+  }>;
+  dispatches: Array<{
+    dispatchIndex: number;
+    pipelineId: string | null;
+    shaderModuleId: string | null;
+    entryPoint: string | null;
+    workgroups: number[];
+  }>;
+  outputDigest: string | null;
+  missing?: Array<{
+    field: string;
+    reason: string;
+    moduleId?: number;
+  }>;
+}>;
+
 export declare const DOE_COMMAND_STREAM_KIND: "doe_command_stream";
 export declare const DOE_NORMALIZED_PLAN_SCHEMA_VERSION: 1;
 export declare const DOE_WEBGPU_CAPTURE_GRAPH_ARTIFACT_KIND: "doe_webgpu_capture_graph";
@@ -183,6 +324,9 @@ export declare function assertPlanArtifact(artifact: unknown): DoePlanArtifact;
 export declare function validateCaptureGraph(graph: unknown): DoePlanValidationResult;
 export declare function assertCaptureGraph(graph: unknown): DoeCaptureGraph;
 export declare function classifyPlan(value: unknown): DoeCommandStreamValidationResult | DoePlanValidationResult;
+export declare function collectCaptureDispatchShaderEvidence(
+  graph: DoeCaptureGraph,
+): DoeCaptureDispatchShaderEvidence;
 export declare function createCaptureProvider(options?: {
   metadata?: Record<string, unknown>;
   deviceLabel?: string;

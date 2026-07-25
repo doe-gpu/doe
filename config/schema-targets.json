@@ -6,6 +6,18 @@
       "data": "config/schema-targets.json"
     },
     {
+      "schema": "config/python-import-boundaries.schema.json",
+      "data": "config/python-import-boundaries.json"
+    },
+    {
+      "schema": "config/refactor-receipt.schema.json",
+      "data": "reports/refactors/doe-gpu-plan-contract-split-v1.json"
+    },
+    {
+      "schema": "config/proof-artifact.schema.json",
+      "data": "pipeline/lean/artifacts/proven-conditions.json"
+    },
+    {
       "schema": "config/doe-workload-suite.schema.json",
       "data": "config/doe-workload-suite.json"
     },

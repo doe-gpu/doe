@@ -296,6 +296,11 @@ if (plan) {
   const evidenceArtifactValidation = plan.validatePlanArtifact({
     schemaVersion: 1,
     artifactKind: plan.DOE_WEBGPU_CAPTURE_EVIDENCE_ARTIFACT_KIND,
+    modelId: 'smoke',
+    sourceProgram: {},
+    destinations: [],
+    loweringStages: [],
+    verdict: {},
   });
   check('plan recognizes capture evidence artifact kind', evidenceArtifactValidation.ok === true);
   check('plan exposes lowering stages', plan.DOE_CAPTURE_LOWERING_STAGES.includes('parity'));

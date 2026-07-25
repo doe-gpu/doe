@@ -174,8 +174,11 @@ theorem applyPass_is_prefix (arr : ExprTypeArray) (pass : TransformPass) :
 
 ## Runtime mirror contract
 
-- Every definition that models runtime behavior must reference the Zig source
-  it mirrors in a comment.
+- Every extracted theorem has one generated `theoremMetadata` row.
+- Runtime-elimination metadata binds the Zig source path, mirrored symbol, and
+  source SHA-256. Extraction fails when a source or symbol is absent.
+- Comments may explain the model, but they are not the runtime mirror
+  authority.
 - When the Zig source changes, the Lean model must be updated in the same
   change or flagged as stale in the status log (`docs/status.md`, with dated
   entries in the current `docs/status/*.md` shard).
@@ -185,7 +188,7 @@ theorem applyPass_is_prefix (arr : ExprTypeArray) (pass : TransformPass) :
 - Theorems are extracted to `pipeline/lean/artifacts/proven-conditions.json`
   via `Doe/Extract.lean` and `pipeline/lean/extract.sh`.
 - The artifact includes provenance: toolchain ref, source tree hash,
-  generated contract hash.
+  generated contract hash, and theorem-metadata generator hash.
 - The artifact schema is `config/proof-artifact.schema.json`.
 - Zig consumes the artifact at compile time via `-Dlean-verified=true`.
 

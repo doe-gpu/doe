@@ -77,6 +77,7 @@ pub const Exactness = struct {
 // ============================================================
 
 pub const RejectionReason = enum {
+    tsir_binding_type_unlowerable,
     tsir_subgroup_unlowerable,
     tsir_pe_budget_exhausted,
     tsir_collective_not_representable,
