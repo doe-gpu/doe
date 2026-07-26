@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "generatedAtUtc": "2026-02-23T00:00:00Z",
   "sourceRepo": "dawn/main",
   "sourceCommit": "example-commit",
@@ -20,6 +20,9 @@
   "toggleContextCounts": {
     "reference": 1
   },
+  "promotedToggleCount": 0,
+  "workaroundHitCount": 0,
+  "workaroundCategoryCounts": {},
   "candidateCount": 1,
   "hashChain": {
     "algorithm": "sha256",
@@ -43,5 +46,6 @@
       "toggleContext": "reference"
     }
   ],
+  "workaroundHits": [],
   "candidateOutputPath": "examples/quirks/mined_toggle_sample.json"
 }

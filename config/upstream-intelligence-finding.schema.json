@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe normalized upstream finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "findingId",
+    "kind",
+    "title",
+    "status",
+    "updatedAt",
+    "relevance",
+    "evidence",
+    "inputHash"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "findingId": {
+      "type": "string",
+      "pattern": "^dawn-cl-[0-9]+$"
+    },
+    "kind": {
+      "type": "string",
+      "const": "dawn_change"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "merged"
+      ]
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relevance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "score",
+        "threshold",
+        "included",
+        "termHits",
+        "vendorHits",
+        "backendHits",
+        "fileHits"
+      ],
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "threshold": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "included": {
+          "type": "boolean"
+        },
+        "termHits": {
+          "$ref": "#/$defs/strings"
+        },
+        "vendorHits": {
+          "$ref": "#/$defs/strings"
+        },
+        "backendHits": {
+          "$ref": "#/$defs/strings"
+        },
+        "fileHits": {
+          "$ref": "#/$defs/strings"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gerritChange",
+        "gerritUrl",
+        "revision",
+        "files",
+        "issueIds",
+        "issues",
+        "sourceCorroboration"
+      ],
+      "properties": {
+        "gerritChange": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gerritUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "files": {
+          "$ref": "#/$defs/strings"
+        },
+        "issueIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "sourceCorroboration": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "manifest",
+              "sourcePath",
+              "kind"
+            ],
+            "properties": {
+              "manifest": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourcePath": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "inputHash": {
+      "$ref": "#/$defs/hash"
+    }
+  },
+  "$defs": {
+    "strings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

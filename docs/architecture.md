@@ -79,9 +79,10 @@ and browser integration from getting blurred together in docs or benchmarks.
 
 At a high level, Doe works like this:
 
-1. `pipeline/agent`
-   Mines upstream quirk/workaround signals and normalizes them into structured
-   records.
+1. `pipeline/upstream_intelligence` and `pipeline/agent`
+   Preserve versioned Gerrit and issue evidence, produce constrained review
+   packets, and independently mine checked-out source for quirk/workaround
+   signals.
 2. `config`
    Holds schemas, policies, workload contracts, and versioned control data.
 3. `pipeline/lean`

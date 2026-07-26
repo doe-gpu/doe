@@ -12,9 +12,11 @@ The BSD 3-Clause license (`bench/vendor/dawn/LICENSE`) governs all Dawn source i
 
 ### What BSD 3-Clause permits
 
-1. **Mining Gerrit commit history** (`dawn-research/`): Public commit metadata on a
-   public Gerrit instance are facts. Facts are not copyrightable. No license governs
-   reading public API metadata.
+1. **Mining Gerrit and public issue metadata**
+   (`pipeline/upstream_intelligence/`; archived predecessor
+   `dawn-research/`): Public commit and issue metadata are used as factual
+   evidence. Review packets retain source URLs and do not copy upstream code
+   into Doe runtime paths.
 
 2. **Vendoring Dawn as benchmark oracle** (`bench/vendor/dawn/`): Permitted. Attribution
    is satisfied by the vendored LICENSE file retained in the source tree.

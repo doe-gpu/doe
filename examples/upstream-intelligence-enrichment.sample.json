@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "findingId": "dawn-cl-123456",
+  "inputHash": "1111111111111111111111111111111111111111111111111111111111111111",
+  "provider": "openai-compatible",
+  "model": "gpt-5-mini",
+  "promptVersion": "doe-dawn-tint-triage-v1",
+  "output": {
+    "summary": "The change fixes a Tint alias-analysis regression.",
+    "doeImpact": "The same WGSL pattern should be added to Doe compiler parity coverage.",
+    "failureMechanism": "Aliased pointer accesses were classified independently.",
+    "recommendedAction": "test",
+    "confidence": "medium",
+    "citations": [
+      "https://dawn-review.googlesource.com/c/dawn/+/123456"
+    ]
+  }
+}

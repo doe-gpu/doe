@@ -3,7 +3,10 @@
 `pipeline/` contains the supporting platform pipeline around the Doe runtime:
 
 - `pipeline/agent/`
-  - quirk mining and normalization
+  - checked-out source quirk mining and normalization
+- `pipeline/upstream_intelligence/`
+  - update-aware Dawn Gerrit and Chromium issue synchronization
+  - deterministic relevance, versioned LLM review, and promotion receipts
 - `pipeline/lean/`
   - proof artifacts and eliminations
 - `pipeline/trace/`

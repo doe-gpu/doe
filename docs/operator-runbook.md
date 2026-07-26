@@ -10,9 +10,20 @@ if prose here conflicts with them, the executable contract wins.
 1. Intake
 - pull upstream sources
 - extract candidate driver/workaround deltas
+- synchronize versioned Gerrit changes, referenced Chromium issues, and
+  constrained review packets:
+  `python3 -m pipeline.upstream_intelligence sync`
+- rebuild a historical interval:
+  `python3 -m pipeline.upstream_intelligence backfill --after <YYYY-MM-DD> --before <YYYY-MM-DD>`
+- scheduled model-bearing lanes use
+  `python3 -m pipeline.upstream_intelligence --require-llm sync`; a missing
+  model credential is a failure, not an implicit non-model run
 - canonical miner entrypoint:
   `python3 pipeline/agent/mine_upstream_quirks.py --source-root <upstream-root> --source-repo <repo> --source-commit <commit> --vendor <vendor> --api <api> --output bench/out/mined-quirks.json --manifest-output bench/out/mined-quirks.manifest.json`
   miner output is deterministic and hash-linked (`config/quirk-mining-manifest.schema.json`).
+- upstream findings and model recommendations remain intake evidence until a
+  maintainer records a hash-bound review receipt and the normal workload,
+  verification, bind, and gate stages succeed
 
 2. Normalize
 - convert deltas into structured quirk records
@@ -52,10 +63,12 @@ if prose here conflicts with them, the executable contract wins.
   block `run` or `compare`
 - hosted pull/push CI runs deterministic instruction, workflow, WGSL compiler,
   Lean typecheck/extraction, package, and native-freshness contract checks.
-- hardware- or vendor-state-dependent AMD Vulkan, drop-in, browser,
-  quirk-mining, release, and claim-trend workflows are explicit
+- hardware- or vendor-state-dependent AMD Vulkan, drop-in, browser, release,
+  and claim-trend workflows are explicit
   `workflow_dispatch` lanes. They do not occupy required push/PR status while
   the matching self-hosted runner is unavailable.
+- Dawn/Tint upstream intelligence and source quirk mining run on the scheduled
+  `nightly-quirk-mining.yml` lane and remain manually dispatchable.
 - Lean proof artifact extraction, validation, and proof-enabled WGSL
   integration is a blocking hosted check.
 - run schema hard gate:

@@ -83,8 +83,14 @@ python3 pipeline/agent/mine_upstream_quirks.py \
   --manifest-output bench/out/mined-quirks.manifest.json
 ```
 
-## Relationship to dawn-research/
+## Relationship to upstream intelligence and dawn-research
 
-`dawn-research/` is a separate Gerrit CL history analysis pipeline (fetch/analyze/trends/hotspots/candidates) for research and discovery. It produces human-review packets from Gerrit API metadata.
+`pipeline/upstream_intelligence/` is the active Gerrit and Chromium issue
+history pipeline. It preserves updates, resolves current-revision commit/file
+metadata, produces schema-backed human review packets, and records review
+receipts.
 
-This module (`pipeline/agent/`) is the production quirk pipeline — it reads checked-out Dawn source files and emits machine-consumable quirk records that feed directly into the Zig runtime via `--quirks`.
+This module (`pipeline/agent/`) is the independent source corroboration lane:
+it reads checked-out Dawn source files and emits machine-consumable quirk
+records that feed the Zig runtime via `--quirks`. `dawn-research/` is retained
+only as a deprecated archive and replay corpus.

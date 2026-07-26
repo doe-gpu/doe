@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe upstream intelligence run receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runId",
+    "mode",
+    "query",
+    "startedAt",
+    "completedAt",
+    "policyId",
+    "coverageComplete",
+    "operationalSuccess",
+    "sourceCoverageComplete",
+    "enrichmentComplete",
+    "counts",
+    "issueFetchFailures",
+    "issueFetchDeferred",
+    "issueUnavailable",
+    "inputRejections",
+    "enrichmentDeferred",
+    "enrichmentFailures",
+    "inputHash"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "sync",
+        "backfill",
+        "replay"
+      ]
+    },
+    "query": {
+      "type": "string"
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policyId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "coverageComplete": {
+      "type": "boolean"
+    },
+    "operationalSuccess": {
+      "type": "boolean"
+    },
+    "sourceCoverageComplete": {
+      "type": "boolean"
+    },
+    "enrichmentComplete": {
+      "type": "boolean"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gerritObserved",
+        "eventsInserted",
+        "issuesRequested",
+        "issuesFetched",
+        "relevantFindings",
+        "findingsEnriched"
+      ],
+      "properties": {
+        "gerritObserved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "eventsInserted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "issuesRequested": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "issuesFetched": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "relevantFindings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "findingsEnriched": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "issueFetchFailures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "issueId",
+          "code",
+          "error"
+        ],
+        "properties": {
+          "issueId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "transport_error",
+              "parse_error"
+            ]
+          },
+          "error": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "issueFetchDeferred": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "issueUnavailable": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "inputRejections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "line",
+          "lineHash",
+          "error"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "lineHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "error": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "enrichmentDeferred": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^dawn-cl-[0-9]+$"
+      }
+    },
+    "enrichmentFailures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "findingId",
+          "error"
+        ],
+        "properties": {
+          "findingId": {
+            "type": "string",
+            "pattern": "^dawn-cl-[0-9]+$"
+          },
+          "error": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "inputHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

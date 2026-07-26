@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "policyId": "doe/dawn-tint-upstream-intelligence-v1",
+  "transport": {
+    "timeoutSeconds": 30,
+    "retryCount": 4,
+    "retryBackoffSeconds": 1,
+    "userAgent": "doerun-doe-upstream-intelligence/1"
+  },
+  "sources": {
+    "gerrit": {
+      "baseUrl": "https://dawn-review.googlesource.com",
+      "project": "dawn",
+      "statuses": [
+        "NEW",
+        "MERGED"
+      ],
+      "pageSize": 100,
+      "maxPages": 500,
+      "overlapSeconds": 86400,
+      "initialAfter": "2026-01-14T00:00:00Z"
+    },
+    "chromiumIssues": {
+      "baseUrl": "https://issues.chromium.org/issues",
+      "maxIssuesPerRun": 500,
+      "maxDescriptionCharacters": 12000,
+      "unavailableRetryDays": 7
+    }
+  },
+  "relevance": {
+    "minimumScore": 5,
+    "termWeight": 3,
+    "vendorWeight": 2,
+    "backendWeight": 2,
+    "fileWeight": 4,
+    "linkedIssueWeight": 2,
+    "terms": [
+      "workaround",
+      "regression",
+      "crash",
+      "validation",
+      "incorrect",
+      "failure",
+      "bug",
+      "race",
+      "overflow",
+      "alignment",
+      "alias analysis",
+      "codegen"
+    ],
+    "vendors": [
+      "amd",
+      "intel",
+      "nvidia",
+      "apple",
+      "qualcomm",
+      "arm",
+      "mesa"
+    ],
+    "backends": [
+      "tint",
+      "wgsl",
+      "vulkan",
+      "metal",
+      "d3d12",
+      "spir-v",
+      "msl",
+      "hlsl",
+      "glsl",
+      "webgpu"
+    ],
+    "filePrefixes": [
+      "src/dawn/native/",
+      "src/tint/",
+      "test/tint/",
+      "webgpu-cts/"
+    ]
+  },
+  "enrichment": {
+    "mode": "optional",
+    "provider": "openai-compatible",
+    "endpoint": "https://api.openai.com/v1/chat/completions",
+    "apiKeyEnv": "OPENAI_API_KEY",
+    "model": "gpt-5-mini",
+    "promptVersion": "doe-dawn-tint-triage-v1",
+    "maxFindingsPerRun": 100
+  },
+  "storage": {
+    "databasePath": "bench/out/upstream-intelligence/state.sqlite3",
+    "outputRoot": "bench/out/upstream-intelligence/runs"
+  }
+}

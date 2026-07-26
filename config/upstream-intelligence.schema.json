@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe Dawn/Tint upstream intelligence policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "policyId",
+    "transport",
+    "sources",
+    "relevance",
+    "enrichment",
+    "storage"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "policyId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeoutSeconds",
+        "retryCount",
+        "retryBackoffSeconds",
+        "userAgent"
+      ],
+      "properties": {
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retryCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "retryBackoffSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "userAgent": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gerrit",
+        "chromiumIssues"
+      ],
+      "properties": {
+        "gerrit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "baseUrl",
+            "project",
+            "statuses",
+            "pageSize",
+            "maxPages",
+            "overlapSeconds",
+            "initialAfter"
+          ],
+          "properties": {
+            "baseUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "project": {
+              "type": "string",
+              "minLength": 1
+            },
+            "statuses": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "NEW",
+                  "MERGED",
+                  "ABANDONED"
+                ]
+              }
+            },
+            "pageSize": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "maxPages": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "overlapSeconds": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "initialAfter": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "chromiumIssues": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "baseUrl",
+            "maxIssuesPerRun",
+            "maxDescriptionCharacters",
+            "unavailableRetryDays"
+          ],
+          "properties": {
+            "baseUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "maxIssuesPerRun": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "maxDescriptionCharacters": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "unavailableRetryDays": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "relevance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimumScore",
+        "termWeight",
+        "vendorWeight",
+        "backendWeight",
+        "fileWeight",
+        "linkedIssueWeight",
+        "terms",
+        "vendors",
+        "backends",
+        "filePrefixes"
+      ],
+      "properties": {
+        "minimumScore": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "termWeight": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "vendorWeight": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "backendWeight": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fileWeight": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "linkedIssueWeight": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "terms": {
+          "$ref": "#/$defs/terms"
+        },
+        "vendors": {
+          "$ref": "#/$defs/terms"
+        },
+        "backends": {
+          "$ref": "#/$defs/terms"
+        },
+        "filePrefixes": {
+          "$ref": "#/$defs/terms"
+        }
+      }
+    },
+    "enrichment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "provider",
+        "endpoint",
+        "apiKeyEnv",
+        "model",
+        "promptVersion",
+        "maxFindingsPerRun"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "optional",
+            "required"
+          ]
+        },
+        "provider": {
+          "type": "string",
+          "const": "openai-compatible"
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "apiKeyEnv": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]+$"
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promptVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maxFindingsPerRun": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "databasePath",
+        "outputRoot"
+      ],
+      "properties": {
+        "databasePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputRoot": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "terms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

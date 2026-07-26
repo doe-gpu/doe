@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "runId": "20260725T120000Z-example",
+  "mode": "sync",
+  "query": "project:dawn after:2026-07-24",
+  "startedAt": "2026-07-25T12:00:00Z",
+  "completedAt": "2026-07-25T12:01:00Z",
+  "policyId": "doe/dawn-tint-upstream-intelligence-v1",
+  "coverageComplete": true,
+  "operationalSuccess": true,
+  "sourceCoverageComplete": true,
+  "enrichmentComplete": true,
+  "counts": {
+    "gerritObserved": 10,
+    "eventsInserted": 8,
+    "issuesRequested": 2,
+    "issuesFetched": 2,
+    "relevantFindings": 3,
+    "findingsEnriched": 3
+  },
+  "issueFetchFailures": [],
+  "issueFetchDeferred": [],
+  "issueUnavailable": [],
+  "inputRejections": [],
+  "enrichmentDeferred": [],
+  "enrichmentFailures": [],
+  "inputHash": "2222222222222222222222222222222222222222222222222222222222222222"
+}

@@ -204,18 +204,20 @@
       "kind": "contributor_guide",
       "stability": "repo_only",
       "shipped": false,
-      "summary": "Repo-only pipeline, proof, and trace tooling.",
+      "summary": "Repo-only source mining, update-aware Dawn/Tint intelligence, proof, and trace tooling.",
       "rootPaths": [
         "pipeline"
       ],
       "entrypoints": [
         "pipeline/agent/mine_upstream_quirks.py",
+        "pipeline/upstream_intelligence/__main__.py",
         "pipeline/trace/replay.py",
         "pipeline/lean/generate_comparability_contract.py"
       ],
       "docs": [
         "pipeline/README.md",
         "pipeline/agent/README.md",
+        "pipeline/upstream_intelligence/README.md",
         "pipeline/trace/README.md",
         "pipeline/lean/README.md"
       ]

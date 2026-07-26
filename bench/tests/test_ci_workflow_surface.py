@@ -15,6 +15,7 @@ AUTOMATIC_WORKFLOWS = {
     "agent-sync.yml": {"pull_request", "push", "workflow_dispatch"},
     "doe-gpu-native-freshness.yml": {"pull_request", "push", "workflow_dispatch"},
     "lean-check.yml": {"pull_request", "push", "workflow_dispatch"},
+    "nightly-quirk-mining.yml": {"schedule", "workflow_dispatch"},
     "publication-hygiene.yml": {"pull_request", "push"},
     "webgpu-package-surface.yml": {"pull_request", "push", "workflow_dispatch"},
     "wgsl-compiler.yml": {"pull_request", "push", "workflow_dispatch"},
@@ -24,7 +25,6 @@ MANUAL_WORKFLOWS = {
     "amd-vulkan-smoke.yml",
     "dropin-compat.yml",
     "macos-browser-refresh.yml",
-    "nightly-quirk-mining.yml",
     "release-claim-trends.yml",
     "release-gates.yml",
 }
@@ -57,6 +57,7 @@ WORKFLOW_ENTRYPOINTS = {
     "packages/doe-gpu",
     "pipeline/lean/extract.sh",
     "pipeline/lean/test_proof_pipeline.py",
+    "pipeline/upstream_intelligence/__main__.py",
     "runtime/zig",
 }
 
@@ -121,6 +122,7 @@ class CiWorkflowSurfaceTests(unittest.TestCase):
     def test_official_actions_use_node_24_compatible_majors(self) -> None:
         combined = "\n".join(workflow_text(path.name) for path in WORKFLOW_ROOT.glob("*.yml"))
         expected_majors = {
+            "actions/cache": "v4",
             "actions/checkout": "v7",
             "actions/setup-node": "v6",
             "actions/upload-artifact": "v7",

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "findingId": "dawn-cl-123456",
+  "kind": "dawn_change",
+  "title": "tint: fix alias analysis regression",
+  "status": "merged",
+  "updatedAt": "2026-07-25T12:00:00Z",
+  "relevance": {
+    "score": 14,
+    "threshold": 5,
+    "included": true,
+    "termHits": [
+      "alias analysis",
+      "regression"
+    ],
+    "vendorHits": [],
+    "backendHits": [
+      "tint"
+    ],
+    "fileHits": [
+      "src/tint/lang/wgsl/resolver/validator.cc"
+    ]
+  },
+  "evidence": {
+    "gerritChange": "123456",
+    "gerritUrl": "https://dawn-review.googlesource.com/c/dawn/+/123456",
+    "revision": "abc123",
+    "files": [
+      "src/tint/lang/wgsl/resolver/validator.cc"
+    ],
+    "issueIds": [
+      538691038
+    ],
+    "issues": [],
+    "sourceCorroboration": [
+      {
+        "manifest": "bench/out/mined-quirks/example/quirks.intel.vulkan.manifest.json",
+        "sourcePath": "src/tint/lang/wgsl/resolver/validator.cc",
+        "kind": "feature_guard"
+      }
+    ]
+  },
+  "inputHash": "1111111111111111111111111111111111111111111111111111111111111111"
+}

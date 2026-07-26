@@ -190,6 +190,26 @@
       "data": "examples/quirk-mining.manifest.sample.json"
     },
     {
+      "schema": "config/upstream-intelligence.schema.json",
+      "data": "config/upstream-intelligence.json"
+    },
+    {
+      "schema": "config/upstream-intelligence-finding.schema.json",
+      "data": "examples/upstream-intelligence-finding.sample.json"
+    },
+    {
+      "schema": "config/upstream-intelligence-enrichment.schema.json",
+      "data": "examples/upstream-intelligence-enrichment.sample.json"
+    },
+    {
+      "schema": "config/upstream-intelligence-run.schema.json",
+      "data": "examples/upstream-intelligence-run.sample.json"
+    },
+    {
+      "schema": "config/upstream-intelligence-promotion.schema.json",
+      "data": "examples/upstream-intelligence-promotion.sample.json"
+    },
+    {
       "schema": "config/backend-runtime-policy.schema.json",
       "data": "config/backend-runtime-policy.json"
     },

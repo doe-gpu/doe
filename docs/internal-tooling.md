@@ -81,13 +81,19 @@ In practice:
 - overlapping helpers are allowed, but repo workflows are still owned by the
   repo tooling, not by the npm package
 
+The active upstream discovery entrypoint is
+`python3 -m pipeline.upstream_intelligence`. It owns durable Gerrit history,
+referenced Chromium issue enrichment, versioned LLM review, and review
+receipts. `pipeline/agent/mine_upstream_quirks.py` independently corroborates
+those reports against checked-out Dawn source.
+
 ## Archive and deprecated areas
 
 These areas exist for migration, reference, or research and should not be read
 as active public product surfaces:
 
 - legacy npm names `@simulatte/webgpu` and `@simulatte/webgpu-doe`
-- `dawn-research/`
+- `dawn-research/` (deprecated Gerrit archive and replay corpus)
 - `nursery/`
 
 Experimental demo applications stay under `demos/`, but they are still

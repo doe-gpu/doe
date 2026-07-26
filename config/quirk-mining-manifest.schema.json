@@ -15,13 +15,17 @@
     "allowedSuffixes",
     "scannedFileCount",
     "toggleHitCount",
+    "promotedToggleCount",
+    "workaroundHitCount",
+    "workaroundCategoryCounts",
     "candidateCount",
     "hashChain",
     "toggleHits",
+    "workaroundHits",
     "candidateOutputPath"
   ],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 1 },
+    "schemaVersion": { "type": "integer", "const": 2 },
     "generatedAtUtc": { "type": "string", "format": "date-time" },
     "sourceRepo": { "type": "string", "minLength": 1 },
     "sourceCommit": { "type": "string", "minLength": 1 },
@@ -43,7 +47,13 @@
     },
     "scannedFileCount": { "type": "integer", "minimum": 0 },
     "toggleHitCount": { "type": "integer", "minimum": 0 },
+    "promotedToggleCount": { "type": "integer", "minimum": 0 },
+    "workaroundHitCount": { "type": "integer", "minimum": 0 },
     "toggleContextCounts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "workaroundCategoryCounts": {
       "type": "object",
       "additionalProperties": { "type": "integer", "minimum": 0 }
     },
@@ -86,6 +96,53 @@
           "toggleContext": {
             "type": "string",
             "enum": ["reference", "default_on", "default_off", "force_on", "force_off"]
+          }
+        }
+      }
+    },
+    "workaroundHits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "category",
+          "vendor",
+          "detail",
+          "sourcePath",
+          "line",
+          "bugRef"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "limit_override",
+              "alignment",
+              "feature_guard"
+            ]
+          },
+          "vendor": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourcePath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "bugRef": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       }

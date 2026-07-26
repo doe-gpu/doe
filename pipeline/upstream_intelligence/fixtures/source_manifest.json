@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 2,
+  "generatedAtUtc": "2026-07-25T00:00:00Z",
+  "sourceRepo": "dawn/main",
+  "sourceCommit": "fixture",
+  "sourceRoots": [
+    "src/tint"
+  ],
+  "vendor": "all",
+  "api": "webgpu",
+  "deviceFamily": "",
+  "driverRange": "",
+  "observedAt": "2026-07-25T00:00:00Z",
+  "allowedSuffixes": [
+    ".cc"
+  ],
+  "scannedFileCount": 1,
+  "toggleHitCount": 0,
+  "toggleContextCounts": {},
+  "promotedToggleCount": 0,
+  "workaroundHitCount": 1,
+  "workaroundCategoryCounts": {
+    "feature_guard": 1
+  },
+  "candidateCount": 1,
+  "hashChain": {
+    "algorithm": "sha256",
+    "seedHash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "finalHash": "1111111111111111111111111111111111111111111111111111111111111111",
+    "rowCount": 1,
+    "rows": [
+      {
+        "index": 0,
+        "quirkId": "fixture.tint.feature",
+        "hash": "1111111111111111111111111111111111111111111111111111111111111111",
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "toggleHits": [],
+  "workaroundHits": [
+    {
+      "category": "feature_guard",
+      "vendor": "all",
+      "detail": "fixture feature guard",
+      "sourcePath": "src/tint/lang/wgsl/resolver/validator.cc",
+      "line": 1,
+      "bugRef": null
+    }
+  ],
+  "candidateOutputPath": "fixture.json"
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe upstream finding enrichment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "findingId",
+    "inputHash",
+    "provider",
+    "model",
+    "promptVersion",
+    "output"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "findingId": {
+      "type": "string",
+      "pattern": "^dawn-cl-[0-9]+$"
+    },
+    "inputHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "openai-compatible",
+        "deterministic"
+      ]
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "promptVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "doeImpact",
+        "failureMechanism",
+        "recommendedAction",
+        "confidence",
+        "citations"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "doeImpact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "failureMechanism": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recommendedAction": {
+          "type": "string",
+          "enum": [
+            "triage",
+            "ignore",
+            "monitor",
+            "investigate",
+            "test",
+            "candidate_quirk"
+          ]
+        },
+        "confidence": {
+          "type": "string",
+          "enum": [
+            "unassessed",
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "citations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

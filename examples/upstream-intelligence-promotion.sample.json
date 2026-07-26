@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "upstream-review-33333333333333333333",
+  "findingId": "dawn-cl-123456",
+  "findingInputHash": "1111111111111111111111111111111111111111111111111111111111111111",
+  "decision": "approved",
+  "reviewer": "doe-maintainer",
+  "reason": "Reproduced against a governed Doe CTS workload.",
+  "reviewedAt": "2026-07-25T12:02:00Z",
+  "runtimeMutationAuthorized": false
+}
