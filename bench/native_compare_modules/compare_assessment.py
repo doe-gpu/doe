@@ -664,6 +664,8 @@ def compare_assessment(
         is_dawn_vs_doe=is_dawn_vs_doe,
         left_execution_backends=left_execution_backends,
         right_execution_backends=right_execution_backends,
+        left_command_samples=left_samples,
+        right_command_samples=right_samples,
     )
     _record_obligation(
         obligations,

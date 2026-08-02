@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "config/csl-webgpu-emulator-result.schema.json",
+  "$id": "https://schemas.doe.deco/csl-webgpu-emulator-result.schema.json",
   "title": "CSL WebGPU emulator result",
   "description": "Receipt emitted by the restricted CSL-source-to-WebGPU semantic emulator. A succeeded receipt means the declared subset executed; a blocked receipt records the first unsupported or invalid contract boundary.",
   "type": "object",

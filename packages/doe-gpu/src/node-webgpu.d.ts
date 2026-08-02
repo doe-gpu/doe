@@ -1,24 +1,123 @@
-export interface NodeWebGPUBootstrapResult {
+export const NODE_WEBGPU_PROVIDER_SCHEMA: 'doe.webgpu-provider/v1';
+export const NODE_WEBGPU_PROVIDER_RECEIPT_SCHEMA: 'doe.webgpu-provider-receipt/v1';
+export const NODE_WEBGPU_PROVIDER_ERROR_CODES: readonly string[];
+
+export type NodeWebGPUGlobalMode = 'none' | 'install-missing' | 'replace';
+
+export interface NodeWebGPUGlobalProvider {
+  id: string;
+  kind: 'global';
+}
+
+export interface NodeWebGPUModuleProvider {
+  id: string;
+  kind: 'module';
+  module: string;
+  gpu: {
+    kind: 'export' | 'factory';
+    path: string;
+    args?: unknown[];
+    resultPath?: string | null;
+  };
+  globals: {
+    GPUBufferUsage: string;
+    GPUShaderStage: string;
+    GPUMapMode: string;
+    GPUTextureUsage: string;
+  };
+}
+
+export type NodeWebGPUProvider = NodeWebGPUGlobalProvider | NodeWebGPUModuleProvider;
+
+export interface NodeWebGPUProviderOptions {
+  providers: NodeWebGPUProvider[];
+  adapterOptions: GPURequestAdapterOptions | null;
+  globals: { mode: NodeWebGPUGlobalMode };
+}
+
+export interface NodeWebGPUProviderAttemptReceipt {
+  providerId: string;
+  kind: 'global' | 'module';
+  module: string | null;
   ok: boolean;
-  provider: string | null;
-  detail?: string | null;
+  stage: string;
+  code: string | null;
+  detail: string | null;
 }
 
-export interface NodeWebGPUProviderBootstrapResult {
-  ok: true;
-  provider: string;
+export interface NodeWebGPUProviderReceipt {
+  schema: 'doe.webgpu-provider-receipt/v1';
+  contract: 'doe.webgpu-provider/v1';
+  providers: NodeWebGPUProvider[];
+  providerOrder: string[];
+  adapterOptions: unknown;
+  globals: {
+    mode: NodeWebGPUGlobalMode;
+    installed: string[];
+    restored: boolean;
+  };
+  attempts: NodeWebGPUProviderAttemptReceipt[];
+  selectedProviderId: string | null;
+  ok: boolean;
+}
+
+export interface NodeWebGPUProviderSession {
+  gpu: GPU;
+  adapter: GPUAdapter;
   module: unknown;
+  receipt: NodeWebGPUProviderReceipt;
+  close(): Promise<void>;
 }
 
-export interface NodeWebGPUBootstrapOptions {
-  force?: boolean;
+export class NodeWebGPUProviderError extends Error {
+  readonly code: string;
+  readonly stage: string;
+  readonly providerId: string | null;
+  readonly receipt: NodeWebGPUProviderReceipt | null;
+}
+
+export interface NodeWebGPUProbeSuccess {
+  ok: true;
+  session: NodeWebGPUProviderSession;
+  receipt: NodeWebGPUProviderReceipt;
+  error: null;
+}
+
+export interface NodeWebGPUProbeFailure {
+  ok: false;
+  session: null;
+  receipt: NodeWebGPUProviderReceipt | null;
+  error: NodeWebGPUProviderError;
 }
 
 export function hasNavigatorGpu(): boolean;
 export function hasGpuEnums(): boolean;
-export function installNavigatorGpu(gpu: unknown, options?: NodeWebGPUBootstrapOptions): boolean;
-export function bootstrapNodeWebGPU(): Promise<NodeWebGPUBootstrapResult>;
+export function installNavigatorGpu(gpu: GPU, options?: { force?: boolean }): boolean;
+export function openNodeWebGPU(options: NodeWebGPUProviderOptions): Promise<NodeWebGPUProviderSession>;
+export function probeNodeWebGPU(options: NodeWebGPUProviderOptions): Promise<NodeWebGPUProbeSuccess | NodeWebGPUProbeFailure>;
+
+export interface NodeWebGPUCompatibilityBootstrapOptions {
+  force?: boolean;
+  adapterOptions?: GPURequestAdapterOptions | null;
+  provider?: NodeWebGPUProvider;
+}
+
+export function bootstrapNodeWebGPU(options?: NodeWebGPUCompatibilityBootstrapOptions): Promise<{
+  ok: boolean;
+  provider: string | null;
+  detail: string | null;
+  session?: NodeWebGPUProviderSession;
+  receipt: NodeWebGPUProviderReceipt | null;
+  error?: NodeWebGPUProviderError;
+}>;
+
 export function bootstrapNodeWebGPUProvider(
   providerSpecifier: string,
-  options?: NodeWebGPUBootstrapOptions,
-): Promise<NodeWebGPUProviderBootstrapResult>;
+  options?: NodeWebGPUCompatibilityBootstrapOptions,
+): Promise<{
+  ok: true;
+  provider: string;
+  module: unknown;
+  session: NodeWebGPUProviderSession;
+  receipt: NodeWebGPUProviderReceipt;
+}>;

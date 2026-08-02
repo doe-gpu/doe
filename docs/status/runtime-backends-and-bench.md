@@ -3,6 +3,42 @@
 This is a live topical status shard. Follow the shared shard policy in
 [`README.md`](README.md).
 
+## 2026-08-02 — Tiger Lake compute comparison is source- and output-bound
+
+Strict native Vulkan compute comparison now rejects stale WGSL-to-SPIR-V
+artifacts, missing or failed output oracles, and oracle dispatch counts that do
+not equal the timed command repeat. The governed atomic and non-atomic
+workgroup commands use the independent CPU reference at
+`bench/oracles/workgroup_recurrence_u32_v1.py` over the full repeated state
+transition. Oracle execution remains outside timed samples.
+
+The local Tiger Lake receipt is
+`bench/out/scratch/intel-tiger-lake/20260802T181500Z/compare.json`, with claim
+evaluation in the adjacent `claim.json`. Its compute rows pass strict
+comparability and local claim evaluation. The render-bundle row remains
+diagnostic because submit-count shape differs and is excluded from the compute
+result.
+
+## 2026-08-02 — Intel Tiger Lake Vulkan host profile is explicit and fail-closed
+
+The benchmark host preflight no longer assumes every Linux Vulkan machine is
+AMD. `config/vulkan-host-profiles.json` now owns schema-backed adapter
+contracts, and `preflight_bench_host.py --strict-vulkan-profile` resolves the
+runtime profile, PCI vendor/device allowlist, cube host identity, and governed
+backend lane from that config. The existing `--strict-amd-vulkan` interface is
+retained as an alias rather than a second implementation path.
+
+The current Intel Tiger Lake machine is registered as
+`linux_intel_tiger_lake_vulkan` and is eligible to carry governed Vulkan cube
+evidence once a matching workload/config exists. Registration is not positive
+hardware evidence. The local strict preflight now passes with the Intel ICD,
+render-node access, the Doe runtime, `dawn_perf_tests`, `libwebgpu_dawn.so`, and
+matching Doe/Dawn identity for Intel `0x8086:0x9a78` on Mesa `24.2.8`. Until a
+new login refreshes the current shell's supplementary groups, the same check
+runs under `sg render`. The preflight pins both Vulkan ICD environment variable
+forms, rejects software or wrong-driver adapters, and does not reuse AMD
+workload contracts. The profile alone is not performance evidence.
+
 ## 2026-07-24 — Browser render-bundle replay and evidence durability restored
 
 The macOS Chromium gate exposed a Doe-only render-bundle failure that the

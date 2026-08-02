@@ -12,6 +12,7 @@ pub fn printUsage(stdout: anytype) !void {
         \\ [--kernel-root <path>]
         \\ [--replay <path>]
         \\ [--execute]
+        \\ [--validate-output-oracles]
         \\commands file examples:
         \\  upload | buffer_upload
         \\  buffer_write | write_buffer | queue_write_buffer
@@ -38,6 +39,7 @@ pub fn printUsage(stdout: anytype) !void {
         \\  command can be expressed as "kind", "command", or "command_kind"
         \\  kernel can be expressed as "kernel" or "kernel_name"
         \\  kernel_dispatch repeatSynchronization can be dependent or independent; default is dependent.
+        \\  kernel_dispatch output_oracle is verified only with --validate-output-oracles.
         \\--quirk-mode controls how quirks affect command execution.
         \\  off: no quirk processing; commands pass through unmodified.
         \\  trace: quirks are matched and traced, but commands are not modified for execution (default).

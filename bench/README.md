@@ -1812,14 +1812,23 @@ binary built from source (`dawn_perf_tests`) and a filter mapping by workload.
 Build Dawn in this repo:
 
 ```bash
+mkdir -p .tooling
+git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git .tooling/depot_tools
 python3 bench/tools/bootstrap_dawn.py \
   --source-dir bench/vendor/dawn \
   --build-dir bench/vendor/dawn/out/Release \
   --build-system gn \
   --branch main \
-  --targets dawn_perf_tests \
+  --targets dawn_perf_tests webgpu_dawn_shared \
+  --sync-deps \
+  --gn-bin .tooling/depot_tools/gn \
+  --gclient-bin .tooling/depot_tools/gclient \
   --parallel 8
 ```
+
+The `--sync-deps` step is required for GN builds. Dawn's
+`tools/fetch_dawn_dependencies.py` fetches its embedder dependency subset, but
+does not populate Chromium's `build/` tree used by `gn gen`.
 
 If `bench/vendor/dawn` already exists only as an ignored build-output holder,
 preserve it and initialize the source checkout in place:
@@ -2098,23 +2107,28 @@ Prerequisites:
 - `depot_tools` (`gn`, `autoninja`) when using `--build-system gn`
 - working C/C++ compiler + linker
 
-If `gn` is missing, install depot_tools and re-run:
+If `gn` is missing, install depot_tools inside this repo and re-run:
 
 ```bash
-git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ~/depot_tools
-export PATH="$HOME/depot_tools:$PATH"
+mkdir -p .tooling
+git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git .tooling/depot_tools
 ```
 
 Or point scripts at explicit binaries:
 
 ```bash
-python3 bench/bootstrap_dawn.py --build-system gn --gn-bin /path/to/gn --ninja-bin /path/to/ninja ...
+python3 bench/tools/bootstrap_dawn.py --build-system gn --gn-bin /path/to/gn --ninja-bin /path/to/ninja ...
 ```
 
 Preferred bootstrap flow (run from this repo):
 
 ```bash
-python3 bench/bootstrap_dawn.py --build-system gn --targets dawn_perf_tests
+python3 bench/tools/bootstrap_dawn.py \
+  --build-system gn \
+  --targets dawn_perf_tests webgpu_dawn_shared \
+  --sync-deps \
+  --gn-bin .tooling/depot_tools/gn \
+  --gclient-bin .tooling/depot_tools/gclient
 ```
 
 If bootstrap fails with:
@@ -2140,7 +2154,7 @@ this usually means the `depot_tools` wrapper cannot initialize itself. Use a ded
 
 ```bash
 brew install gn ninja
-python3 bench/bootstrap_dawn.py \
+python3 bench/tools/bootstrap_dawn.py \
   --build-system gn \
   --gn-bin $(which gn) \
   --ninja-bin $(which ninja) \
@@ -2150,22 +2164,23 @@ python3 bench/bootstrap_dawn.py \
   --parallel 8
 ```
 
-Then rerun with the normal command (explicit gn args are optional once cache is warm):
+Then rerun with the normal command (explicit paths are optional once the
+dependency tree and tool cache are populated):
 
 ```bash
-python3 bench/bootstrap_dawn.py --build-system gn --targets dawn_perf_tests
+python3 bench/tools/bootstrap_dawn.py --build-system gn --targets dawn_perf_tests webgpu_dawn_shared
 ```
 
 For an already checked-out Dawn tree, you can also run manifest-only after a successful first bootstrap:
 
 ```bash
-python3 bench/bootstrap_dawn.py --manifest-only --build-system gn --targets dawn_perf_tests
+python3 bench/tools/bootstrap_dawn.py --manifest-only --build-system gn --targets dawn_perf_tests
 ```
 
 You can disable bootstrap of Dawn buildtools if you prefer:
 
 ```bash
-python3 bench/bootstrap_dawn.py --build-system gn --skip-gn-bootstrap ...
+python3 bench/tools/bootstrap_dawn.py --build-system gn --skip-gn-bootstrap ...
 ```
 
 That produces `bench/vendor/dawn/out/Release/dawn_perf_tests` (or your configured build dir)
@@ -2372,13 +2387,24 @@ Quick host preflight (recommended before strict runs):
 
 ```bash
 python3 bench/runners/preflight_bench_host.py --strict-amd-vulkan
+python3 bench/runners/preflight_bench_host.py \
+  --strict-vulkan-profile linux_intel_tiger_lake_vulkan \
+  --json
 ```
 
-Strict AMD preflight now includes a Dawn adapter probe (`dawn_perf_tests --gtest_list_tests`
-with `--backend=vulkan --adapter-vendor-id=0x1002`) plus a Doe-side adapter probe resolved
-through `vulkaninfo --summary`. Strict runs fail early unless Doe and Dawn agree on the same
-AMD vendor/device identity. This catches cases where `/dev/dri/renderD128` appears readable
-via OS-level checks but the two runtimes would land on different effective adapters.
+Named Vulkan host profiles live in `config/vulkan-host-profiles.json`. The
+legacy `--strict-amd-vulkan` flag resolves to the `linux_amd_vulkan` profile.
+Strict profile preflight includes a Dawn adapter probe plus a Doe-side adapter
+probe resolved through `vulkaninfo --summary`. It fails early unless the host
+OS/architecture, render-node access, vendor/device identity, and Doe/Dawn
+adapter identity all match the selected profile. This catches cases where
+`/dev/dri/renderD128` appears readable but the two runtimes would land on
+different effective adapters. Every subprocess is pinned with both
+`VK_DRIVER_FILES` and the compatibility variable `VK_ICD_FILENAMES`; Dawn's
+bundled Vulkan loader requires the latter on hosts where a modern system loader
+would accept only the former. A registered host profile is not benchmark or
+claim evidence; the selected workload/config must independently match that
+vendor and device contract.
 
 ## Apples-to-apples timing configuration
 

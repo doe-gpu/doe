@@ -1,89 +1,168 @@
 {
-  "artifactKind": "doppler_program_bundle",
-  "artifacts": [
-    {
-      "path": "bench/out/doppler-reference/example/manifest.json",
-      "role": "manifest",
-      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "sizeBytes": 1024
-    },
-    {
-      "path": "bench/out/doppler-reference/example/execution_graph.json",
-      "role": "execution_graph",
-      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "sizeBytes": 2048
-    },
-    {
-      "path": "bench/out/doppler-reference/example/shard_00000.bin",
-      "role": "weight_shard",
-      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-      "sizeBytes": 4096
-    }
-  ],
-  "captureProfile": {
-    "profileId": "profiles/production",
-    "provider": "webgpu"
-  },
-  "dopplerExecutionGraphVersion": "execution-v1",
-  "executionGraph": {
-    "path": "bench/out/doppler-reference/example/execution_graph.json",
-    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    "source": "manifest.inference.execution"
-  },
-  "hostEntrypoint": {
-    "exportName": "exportReference",
-    "path": "bench/tools/export_doppler_int4ple_reference.mjs",
-    "role": "reference_exporter",
-    "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
-  },
-  "jsSubset": "deterministic-webgpu-host-v1",
-  "manifest": {
-    "path": "bench/out/doppler-reference/example/manifest.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-  },
-  "modelId": "gemma-4-e2b-it-q4k-ehf16-af32-int4ple",
-  "programContractVersion": "doppler-program-bundle/v1",
-  "referenceTranscript": {
-    "actualDecodeSteps": 3,
-    "generatedTokenIdsSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    "logitsDigestSha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-    "path": "bench/out/doppler-reference/example/decode_transcript.json",
-    "requestedDecodeSteps": 8,
-    "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
-    "status": "output_ready",
-    "stopReason": "eos_token"
-  },
-  "runtimeProfile": {
-    "id": "profiles/production",
-    "producer": "doppler_node_webgpu"
-  },
+  "schema": "doppler.program-bundle/v1",
   "schemaVersion": 1,
-  "sourcePackage": {
-    "path": "src/config/source-packages/litert/gemma-4-e2b-it.json",
-    "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+  "bundleId": "doe-gemma-4-e2b-closed-sample",
+  "modelId": "gemma-4-e2b-it-q4k-ehf16-af32-int4ple",
+  "createdAtUtc": "2026-08-02T00:00:00.000Z",
+  "package": {
+    "schema": "doppler.program-bundle-package/v1",
+    "root": ".",
+    "files": [
+      {
+        "role": "host-source",
+        "path": "program/host/sample-entrypoint.mjs",
+        "hash": "sha256:9471e372c1783cba45268601779781917de5de00d8beaafa143758c3a7dce33d",
+        "sizeBytes": 143
+      },
+      {
+        "role": "wgsl-source",
+        "path": "program/wgsl/sample-compute.wgsl",
+        "hash": "sha256:0e88698096320b7a1e81a4ebe37897aebb71c3e6c9cfd085624e287e3c673073",
+        "sizeBytes": 41
+      }
+    ],
+    "fileSetHash": "sha256:6787cc6996c90bf585d9cefdc3d932b18dd158549e6a565550e93160c7065301"
   },
-  "tokenizerInput": {
-    "inputSetSha256": "3333333333333333333333333333333333333333333333333333333333333333",
-    "prompt": {
-      "path": "bench/out/doppler-reference/example/prompt.txt",
-      "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+  "sources": {
+    "manifest": {
+      "path": "model/manifest.json",
+      "hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
     },
-    "tokenizedPrompt": {
-      "dtype": "uint32",
-      "path": "bench/out/doppler-reference/example/tokenized_prompt.u32",
-      "sha256": "5555555555555555555555555555555555555555555555555555555555555555",
-      "tokenCount": 24
+    "conversionConfig": null,
+    "executionGraph": {
+      "schema": "doppler.execution/v1",
+      "hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "expandedStepHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "weightSetHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "artifactSetHash": "sha256:6787cc6996c90bf585d9cefdc3d932b18dd158549e6a565550e93160c7065301"
+  },
+  "host": {
+    "schema": "doppler.host-js/v1",
+    "jsSubset": "doppler-webgpu-host/v1",
+    "entrypoints": [
+      {
+        "id": "text-generation",
+        "module": "program/host/sample-entrypoint.mjs",
+        "export": "createTextGenerationProgram",
+        "role": "model-orchestration",
+        "sourceHash": "sha256:9471e372c1783cba45268601779781917de5de00d8beaafa143758c3a7dce33d",
+        "validation": {
+          "dynamicImport": "none-detected",
+          "staticImport": "none-detected",
+          "dom": "none-detected",
+          "runtimeGlobals": "none-detected",
+          "network": "none-detected",
+          "dynamicCode": "none-detected"
+        }
+      }
+    ],
+    "constraints": {
+      "dynamicImport": "disallowed",
+      "staticImport": "disallowed",
+      "dom": "disallowed-in-model-path",
+      "runtimeGlobals": "disallowed",
+      "dynamicCode": "disallowed",
+      "filesystem": "declared-artifacts-only",
+      "network": "declared-artifacts-only"
     }
   },
-  "unsupportedFeaturePolicy": "fail",
-  "webgpuSubset": "webgpu-command-producing-v1",
   "wgslModules": [
     {
-      "entryPoint": "main",
-      "moduleId": "embed",
-      "path": "src/gpu/kernels/gather.wgsl",
-      "sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      "id": "sample-compute",
+      "file": "sample-compute.wgsl",
+      "entry": "main",
+      "digest": "sha256:0e88698096320b7a1e81a4ebe37897aebb71c3e6c9cfd085624e287e3c673073",
+      "sourcePath": "program/wgsl/sample-compute.wgsl",
+      "sourceHash": "sha256:0e88698096320b7a1e81a4ebe37897aebb71c3e6c9cfd085624e287e3c673073",
+      "reachable": true,
+      "metadata": {
+        "entry": "main",
+        "sourceMetadataHash": "sha256:0e88698096320b7a1e81a4ebe37897aebb71c3e6c9cfd085624e287e3c673073",
+        "bindings": [],
+        "overrides": [],
+        "workgroupSize": [
+          "1"
+        ],
+        "requiresSubgroups": false
+      }
     }
   ],
-  "wgslSubset": "execution-v1-declared-wgsl-v1"
+  "execution": {
+    "graphHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "stepMetadataHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "kernelClosure": {
+      "declaredKernelIds": [
+        "sample-compute"
+      ],
+      "reachableKernelIds": [
+        "sample-compute"
+      ]
+    },
+    "steps": [
+      {
+        "phase": "decode",
+        "kernelId": "sample-compute"
+      }
+    ]
+  },
+  "captureProfile": {
+    "schema": "doppler.capture-profile/v1",
+    "deterministic": true,
+    "phases": [
+      "decode"
+    ],
+    "surfaces": [
+      "node:doe-gpu"
+    ],
+    "adapter": {
+      "provider": "explicit-provider-v1"
+    },
+    "hashPolicy": {
+      "algorithm": "sha256"
+    },
+    "captureHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "artifacts": [
+    {
+      "role": "host-source",
+      "path": "program/host/sample-entrypoint.mjs",
+      "hash": "sha256:9471e372c1783cba45268601779781917de5de00d8beaafa143758c3a7dce33d",
+      "sizeBytes": 143
+    },
+    {
+      "role": "wgsl-source",
+      "path": "program/wgsl/sample-compute.wgsl",
+      "hash": "sha256:0e88698096320b7a1e81a4ebe37897aebb71c3e6c9cfd085624e287e3c673073",
+      "sizeBytes": 41
+    }
+  ],
+  "referenceTranscript": {
+    "schema": "doppler.reference-transcript/v1",
+    "source": {
+      "kind": "sample"
+    },
+    "executionGraphHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "surface": "node:doe-gpu",
+    "prompt": {
+      "identity": "The color of the sky is",
+      "hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "output": {
+      "textHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "tokensGenerated": 1,
+      "stopReason": "max_tokens"
+    },
+    "tokens": {
+      "generatedTokenIdsHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    "phase": {},
+    "kvCache": {
+      "stateHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    },
+    "logits": {},
+    "tolerance": {
+      "tokenPolicy": "exact"
+    }
+  }
 }

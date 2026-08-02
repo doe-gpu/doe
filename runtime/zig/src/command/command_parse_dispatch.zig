@@ -10,6 +10,7 @@ const command_json_raw = @import("command_json_raw.zig");
 const Allocator = std.mem.Allocator;
 const RawCommand = command_json_raw.RawCommand;
 const RawKernelBinding = command_json_raw.RawKernelBinding;
+const RawKernelDispatchOutputOracle = command_json_raw.RawKernelDispatchOutputOracle;
 pub const ParseError = command_json_raw.ParseError;
 
 const model = struct {
@@ -71,6 +72,39 @@ fn parseKernelBindings(allocator: Allocator, raw_bindings: []const RawKernelBind
     return bindings.toOwnedSlice(allocator);
 }
 
+fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !model_compute_types.KernelDispatchOutputOracle {
+    const schema_version = raw.schema_version orelse raw.schemaVersion orelse return ParseError.InvalidCommandPayload;
+    const kind = raw.kind orelse return ParseError.InvalidCommandPayload;
+    const initialization = raw.initialization orelse return ParseError.InvalidCommandPayload;
+    const binding_group = raw.binding_group orelse raw.bindingGroup orelse return ParseError.InvalidCommandPayload;
+    const binding = raw.binding orelse return ParseError.InvalidCommandPayload;
+    const dispatch_count = raw.dispatch_count orelse raw.dispatchCount orelse return ParseError.InvalidCommandPayload;
+    const expected_sha256 = raw.expected_sha256 orelse raw.expectedSha256 orelse return ParseError.InvalidCommandPayload;
+    const reference_id = raw.reference_id orelse raw.referenceId orelse return ParseError.InvalidCommandPayload;
+    if (schema_version != 1 or dispatch_count == 0 or expected_sha256.len != 64) return ParseError.InvalidCommandPayload;
+    if (!std.mem.eql(u8, kind, "sha256_exact_v1") or !std.mem.eql(u8, initialization, "zero_fill_v1")) {
+        return ParseError.InvalidCommandPayload;
+    }
+    const owned_kind = try allocator.dupe(u8, kind);
+    errdefer allocator.free(owned_kind);
+    const owned_initialization = try allocator.dupe(u8, initialization);
+    errdefer allocator.free(owned_initialization);
+    const owned_expected = try allocator.dupe(u8, expected_sha256);
+    errdefer allocator.free(owned_expected);
+    const owned_reference = try allocator.dupe(u8, reference_id);
+    errdefer allocator.free(owned_reference);
+    return .{
+        .schema_version = schema_version,
+        .kind = owned_kind,
+        .initialization = owned_initialization,
+        .binding_group = binding_group,
+        .binding = binding,
+        .dispatch_count = dispatch_count,
+        .expected_sha256 = owned_expected,
+        .reference_id = owned_reference,
+    };
+}
+
 pub fn parseDispatchCommand(allocator: Allocator, kind: command_kind.NormalizedKind, raw: RawCommand) !model.Command {
     const dispatch = try parseDispatchDimensions(raw);
     if (kind == .kernel_dispatch) {
@@ -90,6 +124,16 @@ pub fn parseDispatchCommand(allocator: Allocator, kind: command_kind.NormalizedK
         const repeat_synchronization = parse_helpers.parseKernelDispatchRepeatSynchronization(
             raw.repeat_synchronization orelse raw.repeatSynchronization,
         ) catch return ParseError.InvalidCommandPayload;
+        const output_oracle = if (raw.output_oracle orelse raw.outputOracle) |oracle|
+            try parseOutputOracle(allocator, oracle)
+        else
+            null;
+        errdefer if (output_oracle) |oracle| {
+            allocator.free(oracle.kind);
+            allocator.free(oracle.initialization);
+            allocator.free(oracle.expected_sha256);
+            allocator.free(oracle.reference_id);
+        };
         return .{
             .kernel_dispatch = .{
                 .kernel = kernel_name,
@@ -102,6 +146,7 @@ pub fn parseDispatchCommand(allocator: Allocator, kind: command_kind.NormalizedK
                 .warmup_dispatch_count = raw.warmup_dispatch_count orelse raw.warmupDispatchCount orelse 0,
                 .initialize_buffers_on_create = raw.initialize_buffers_on_create orelse raw.initializeBuffersOnCreate orelse false,
                 .bindings = kernel_bindings,
+                .output_oracle = output_oracle,
             },
         };
     }

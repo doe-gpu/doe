@@ -16,6 +16,13 @@ function currentGpuNamespace() {
 
 export const createGpuNamespace = createDoeNamespace;
 
+// Explicit names remove the historical ambiguity between the root raw-device
+// function and gpu.requestDevice(), which returns a helper bound to its device.
+export const requestRawDevice = full.requestDevice;
+export async function requestBoundDevice(options = {}) {
+  return currentGpuNamespace().requestDevice(options);
+}
+
 export const gpu = new Proxy({}, {
   get(_target, property, receiver) {
     return Reflect.get(currentGpuNamespace(), property, receiver);
@@ -45,4 +52,6 @@ export default {
   ...full,
   gpu,
   createGpuNamespace: createDoeNamespace,
+  requestRawDevice,
+  requestBoundDevice,
 };

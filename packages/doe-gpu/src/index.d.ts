@@ -247,7 +247,14 @@ export interface CanvasLike {
 
 export const globals: Record<string, unknown>;
 export function create(createArgs?: string[] | null): GPU;
+export function createNativeDirect(createArgs?: string[] | null): GPU;
 export function createCanvasContext(canvas: CanvasLike): GPUCanvasContext;
+export function createBrowserSurfaceClasses(
+  options: import("./browser.js").BrowserSurfaceFactoryOptions
+): Record<string, unknown>;
+export function createNativeBrowserCanvasBackend(options?: {
+  contextFactory?: (canvas: unknown, context: unknown) => unknown;
+}): import("./browser.js").NativeBrowserCanvasBackend;
 export function createInstance(createArgs?: string[] | null): GPU;
 export function setupGlobals(target?: object, createArgs?: string[] | null): GPU;
 export function requestAdapter(
@@ -255,6 +262,10 @@ export function requestAdapter(
   createArgs?: string[] | null
 ): Promise<GPUAdapter | null>;
 export function requestDevice(options?: RequestDeviceOptions): Promise<GPUDevice>;
+/** Explicit raw-device alias for the compatibility `requestDevice` export. */
+export const requestRawDevice: typeof requestDevice;
+/** Request a device and return Doe's helper API bound to it. */
+export function requestBoundDevice(options?: RequestDeviceOptions): Promise<FullBoundDoeNamespace>;
 export function providerInfo(): ProviderInfo;
 export function nativeFastPathInfo(): NativeFastPathInfo | null;
 export function prewarmPreparedDispatches(
@@ -321,6 +332,9 @@ declare const _default: {
   CANVAS_TONE_MAPPING_MODES: typeof CANVAS_TONE_MAPPING_MODES;
   CANVAS_COLOR_SPACES: typeof CANVAS_COLOR_SPACES;
   create: typeof create;
+  createNativeDirect: typeof createNativeDirect;
+  createBrowserSurfaceClasses: typeof createBrowserSurfaceClasses;
+  createNativeBrowserCanvasBackend: typeof createNativeBrowserCanvasBackend;
   createCanvasContext: typeof createCanvasContext;
   createInstance: typeof createInstance;
   globals: typeof globals;
@@ -329,6 +343,8 @@ declare const _default: {
   setupGlobals: typeof setupGlobals;
   requestAdapter: typeof requestAdapter;
   requestDevice: typeof requestDevice;
+  requestRawDevice: typeof requestRawDevice;
+  requestBoundDevice: typeof requestBoundDevice;
   providerInfo: typeof providerInfo;
   nativeFastPathInfo: typeof nativeFastPathInfo;
   prewarmPreparedDispatches: typeof prewarmPreparedDispatches;

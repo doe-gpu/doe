@@ -6,23 +6,145 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import platform
 import re
 import shlex
+import shutil
 import subprocess
+import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 
-ADAPTER_HEADER_RE = re.compile(r'^\s*-\s+"(?P<name>[^"]+)"\s+-\s+"(?P<driver>.+)"\s*$')
+ADAPTER_HEADER_RE = re.compile(r'^\s*-\s+"(?P<name>[^"]+)"\s+-\s+"(?P<driver>.*)"\s*$')
 ADAPTER_FIELD_RE = re.compile(r'^\s*(?P<key>\w+):\s*(?P<value>.+?)\s*$')
 INCOMPATIBLE_DRIVER_RE = re.compile(r"Could not open device (?P<device>/dev/dri/[^:]+): Permission denied")
 VULKANINFO_GPU_RE = re.compile(r"^GPU(?P<ordinal>\d+):\s*$")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_VULKAN_PROFILE_POLICY = REPO_ROOT / "config" / "vulkan-host-profiles.json"
+
+
+@dataclass(frozen=True)
+class VulkanHostProfile:
+    """Resolved config contract for one strict Vulkan benchmark host."""
+
+    id: str
+    display_name: str
+    cube_host_profile: str
+    os: str
+    arch: str
+    vendor_id: str
+    icd_path: Path
+    device_ids: tuple[str, ...]
+    driver_versions: tuple[str, ...]
+    runtime_vendor: str
+    runtime_api: str
+    runtime_family: str
+    runtime_driver: str
+    backend_lane: str
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--strict-amd-vulkan", action="store_true")
+    strict_group = parser.add_mutually_exclusive_group()
+    strict_group.add_argument(
+        "--strict-amd-vulkan",
+        action="store_true",
+        help="Compatibility alias for --strict-vulkan-profile linux_amd_vulkan.",
+    )
+    strict_group.add_argument(
+        "--strict-vulkan-profile",
+        default="",
+        help="Named profile from config/vulkan-host-profiles.json.",
+    )
+    parser.add_argument(
+        "--vulkan-profile-policy",
+        type=Path,
+        default=DEFAULT_VULKAN_PROFILE_POLICY,
+        help="Schema-backed Vulkan host-profile policy path.",
+    )
     parser.add_argument("--json", action="store_true", dest="emit_json")
     return parser.parse_args()
+
+
+def normalize_pci_id(value: object) -> str:
+    """Normalize a Vulkan or Dawn PCI identifier to lower-case hexadecimal."""
+
+    text = str(value).strip().lower()
+    try:
+        return f"0x{int(text, 0):04x}"
+    except ValueError:
+        return text
+
+
+def normalize_arch(value: str) -> str:
+    normalized = value.strip().lower()
+    if normalized in {"x86_64", "amd64"}:
+        return "x64"
+    if normalized in {"aarch64", "arm64"}:
+        return "arm64"
+    return normalized
+
+
+def load_vulkan_host_profiles(path: Path) -> dict[str, VulkanHostProfile]:
+    """Load named Vulkan host profiles from the versioned policy."""
+
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except OSError as error:
+        raise ValueError(f"unable to read Vulkan host-profile policy {path}: {error}") from error
+    except json.JSONDecodeError as error:
+        raise ValueError(f"invalid Vulkan host-profile policy JSON {path}: {error}") from error
+
+    rows = payload.get("profiles") if isinstance(payload, dict) else None
+    if not isinstance(rows, list):
+        raise ValueError(f"Vulkan host-profile policy has no profiles array: {path}")
+
+    profiles: dict[str, VulkanHostProfile] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError(f"Vulkan host-profile row must be an object: {row!r}")
+        runtime = row.get("runtimeProfile")
+        if not isinstance(runtime, dict):
+            raise ValueError(f"Vulkan host profile {row.get('id', '<missing>')} has no runtimeProfile")
+        profile_id = str(row.get("id", "")).strip()
+        if not profile_id:
+            raise ValueError("Vulkan host profile id must be non-empty")
+        if profile_id in profiles:
+            raise ValueError(f"duplicate Vulkan host profile id: {profile_id}")
+        profiles[profile_id] = VulkanHostProfile(
+            id=profile_id,
+            display_name=str(row.get("displayName", "")).strip(),
+            cube_host_profile=str(row.get("cubeHostProfile", "")).strip(),
+            os=str(row.get("os", "")).strip(),
+            arch=str(row.get("arch", "")).strip(),
+            vendor_id=normalize_pci_id(row.get("vendorId", "")),
+            icd_path=Path(str(row.get("icdPath", "")).strip()),
+            device_ids=tuple(normalize_pci_id(value) for value in row.get("deviceIds", [])),
+            driver_versions=tuple(
+                str(value).strip() for value in row.get("driverVersions", [])
+            ),
+            runtime_vendor=str(runtime.get("vendor", "")).strip(),
+            runtime_api=str(runtime.get("api", "")).strip(),
+            runtime_family=str(runtime.get("family", "")).strip(),
+            runtime_driver=str(runtime.get("driver", "")).strip(),
+            backend_lane=str(row.get("backendLane", "")).strip(),
+        )
+    return profiles
+
+
+def resolve_vulkan_host_profile(
+    path: Path,
+    profile_id: str,
+) -> VulkanHostProfile:
+    profiles = load_vulkan_host_profiles(path)
+    try:
+        return profiles[profile_id]
+    except KeyError as error:
+        available = ", ".join(sorted(profiles))
+        raise ValueError(
+            f"unknown Vulkan host profile {profile_id!r}; available: {available}"
+        ) from error
 
 
 def check_file(path: Path) -> tuple[bool, str]:
@@ -75,10 +197,12 @@ def parse_dawn_adapters(output: str) -> list[dict[str, str]]:
 
 def find_matching_adapter(adapters: list[dict[str, str]], backend: str, vendor_id: str) -> bool:
     backend_norm = backend.lower()
-    vendor_norm = vendor_id.lower()
+    vendor_norm = normalize_pci_id(vendor_id)
     for adapter in adapters:
         adapter_backend = str(adapter.get("backend", "")).strip().lower()
-        adapter_vendor = str(adapter.get("vendorId", "")).split(",")[0].strip().lower()
+        adapter_vendor = normalize_pci_id(
+            str(adapter.get("vendorId", "")).split(",")[0]
+        )
         if adapter_backend == backend_norm and adapter_vendor == vendor_norm:
             return True
     return False
@@ -98,6 +222,20 @@ def format_adapter_summary(adapters: list[dict[str, str]]) -> str:
             f"architecture={adapter.get('architecture', '')})"
         )
     return "\n".join(lines)
+
+
+def vulkan_device_matches_profile(
+    device: dict[str, str],
+    profile: VulkanHostProfile,
+) -> bool:
+    vendor_matches = normalize_pci_id(device.get("vendorID", "")) == profile.vendor_id
+    device_id = normalize_pci_id(device.get("deviceID", ""))
+    device_matches = not profile.device_ids or device_id in profile.device_ids
+    driver_version = str(device.get("driverVersion", "")).strip()
+    driver_matches = (
+        not profile.driver_versions or driver_version in profile.driver_versions
+    )
+    return vendor_matches and device_matches and driver_matches
 
 
 def parse_vulkaninfo_summary(output: str) -> list[dict[str, str]]:
@@ -121,10 +259,27 @@ def parse_vulkaninfo_summary(output: str) -> list[dict[str, str]]:
     return gpus
 
 
-def probe_vulkaninfo_gpus() -> tuple[list[dict[str, str]], str]:
+def profile_environment(profile: VulkanHostProfile) -> dict[str, str]:
+    """Return an environment pinned to the profile's Vulkan ICD."""
+
+    environment = os.environ.copy()
+    environment["VK_DRIVER_FILES"] = str(profile.icd_path)
+    environment["VK_ICD_FILENAMES"] = str(profile.icd_path)
+    return environment
+
+
+def probe_vulkaninfo_gpus(
+    profile: VulkanHostProfile,
+) -> tuple[list[dict[str, str]], str]:
     command = ["vulkaninfo", "--summary"]
     try:
-        completed = subprocess.run(command, text=True, capture_output=True, check=False)
+        completed = subprocess.run(
+            command,
+            text=True,
+            capture_output=True,
+            check=False,
+            env=profile_environment(profile),
+        )
     except OSError as error:
         return [], f"failed to execute vulkaninfo: {error}"
     if completed.returncode != 0:
@@ -132,7 +287,10 @@ def probe_vulkaninfo_gpus() -> tuple[list[dict[str, str]], str]:
     return parse_vulkaninfo_summary(completed.stdout), "ok"
 
 
-def probe_doe_adapter(runtime_bin: Path) -> tuple[dict[str, object] | None, str]:
+def probe_doe_adapter(
+    runtime_bin: Path,
+    profile: VulkanHostProfile,
+) -> tuple[dict[str, object] | None, str]:
     if not runtime_bin.exists():
         return None, f"missing Doe runtime: {runtime_bin}"
 
@@ -147,21 +305,23 @@ def probe_doe_adapter(runtime_bin: Path) -> tuple[dict[str, object] | None, str]
         command = [
             "env",
             "LD_LIBRARY_PATH=bench/vendor/dawn/out/Release:" + os.environ.get("LD_LIBRARY_PATH", ""),
+            f"VK_DRIVER_FILES={profile.icd_path}",
+            f"VK_ICD_FILENAMES={profile.icd_path}",
             str(runtime_bin),
             "--commands",
             str(commands_path),
             "--vendor",
-            "amd",
+            profile.runtime_vendor,
             "--api",
-            "vulkan",
+            profile.runtime_api,
             "--family",
-            "gfx11",
+            profile.runtime_family,
             "--driver",
-            "24.0.0",
+            profile.runtime_driver,
             "--backend",
             "native",
             "--backend-lane",
-            "vulkan_doe_comparable",
+            profile.backend_lane,
             "--execute",
             "--trace-meta",
             str(trace_meta_path),
@@ -183,8 +343,9 @@ def probe_doe_adapter(runtime_bin: Path) -> tuple[dict[str, object] | None, str]
 
 def resolve_doe_vulkan_identity(
     runtime_bin: Path,
+    profile: VulkanHostProfile,
 ) -> tuple[dict[str, str] | None, dict[str, object] | None, str]:
-    trace_meta, probe_message = probe_doe_adapter(runtime_bin)
+    trace_meta, probe_message = probe_doe_adapter(runtime_bin, profile)
     if trace_meta is None:
         return None, None, probe_message
 
@@ -192,7 +353,7 @@ def resolve_doe_vulkan_identity(
     if not isinstance(adapter_ordinal, int) or adapter_ordinal < 0:
         return None, trace_meta, "Doe adapter probe did not emit adapterOrdinal"
 
-    gpus, vulkaninfo_message = probe_vulkaninfo_gpus()
+    gpus, vulkaninfo_message = probe_vulkaninfo_gpus(profile)
     if not gpus:
         return None, trace_meta, vulkaninfo_message
 
@@ -203,7 +364,12 @@ def resolve_doe_vulkan_identity(
     return None, trace_meta, f"vulkaninfo did not report GPU ordinal {adapter_ordinal}"
 
 
-def probe_dawn_adapter(dawn_binary: Path, backend: str, vendor_id: str) -> tuple[bool, str]:
+def probe_dawn_adapter(
+    dawn_binary: Path,
+    backend: str,
+    vendor_id: str,
+    profile: VulkanHostProfile,
+) -> tuple[bool, str]:
     if not dawn_binary.exists():
         return False, f"missing dawn binary: {dawn_binary}"
     command = [
@@ -213,7 +379,13 @@ def probe_dawn_adapter(dawn_binary: Path, backend: str, vendor_id: str) -> tuple
         f"--adapter-vendor-id={vendor_id}",
     ]
     try:
-        completed = subprocess.run(command, text=True, capture_output=True, check=False)
+        completed = subprocess.run(
+            command,
+            text=True,
+            capture_output=True,
+            check=False,
+            env=profile_environment(profile),
+        )
     except OSError as error:
         return False, f"failed to execute Dawn adapter probe: {error}"
 
@@ -241,7 +413,12 @@ def probe_dawn_adapter(dawn_binary: Path, backend: str, vendor_id: str) -> tuple
     return False, reason
 
 
-def probe_dawn_adapters(dawn_binary: Path, backend: str, vendor_id: str) -> tuple[list[dict[str, str]], str]:
+def probe_dawn_adapters(
+    dawn_binary: Path,
+    backend: str,
+    vendor_id: str,
+    profile: VulkanHostProfile,
+) -> tuple[list[dict[str, str]], str]:
     if not dawn_binary.exists():
         return [], f"missing dawn binary: {dawn_binary}"
     command = [
@@ -251,7 +428,13 @@ def probe_dawn_adapters(dawn_binary: Path, backend: str, vendor_id: str) -> tupl
         f"--adapter-vendor-id={vendor_id}",
     ]
     try:
-        completed = subprocess.run(command, text=True, capture_output=True, check=False)
+        completed = subprocess.run(
+            command,
+            text=True,
+            capture_output=True,
+            check=False,
+            env=profile_environment(profile),
+        )
     except OSError as error:
         return [], f"failed to execute Dawn adapter probe: {error}"
     if completed.returncode != 0:
@@ -261,6 +444,20 @@ def probe_dawn_adapters(dawn_binary: Path, backend: str, vendor_id: str) -> tupl
 
 def main() -> int:
     args = parse_args()
+
+    selected_profile_id = (
+        "linux_amd_vulkan" if args.strict_amd_vulkan else args.strict_vulkan_profile.strip()
+    )
+    selected_profile: VulkanHostProfile | None = None
+    if selected_profile_id:
+        try:
+            selected_profile = resolve_vulkan_host_profile(
+                args.vulkan_profile_policy,
+                selected_profile_id,
+            )
+        except ValueError as error:
+            print(f"FAIL: {error}")
+            return 2
 
     checks: list[dict[str, object]] = []
 
@@ -308,28 +505,141 @@ def main() -> int:
         }
     )
 
-    if args.strict_amd_vulkan:
-        amd_vendor_id = "0x1002"
-        amd_backend = "vulkan"
-        ok_adapter_probe, msg_adapter_probe = probe_dawn_adapter(dawn_bin, amd_backend, amd_vendor_id)
-        dawn_adapters, dawn_adapters_message = probe_dawn_adapters(dawn_bin, amd_backend, amd_vendor_id)
-        doe_identity, doe_trace_meta, doe_probe_message = resolve_doe_vulkan_identity(runtime_bin)
-        doe_matches_amd = (
+    if selected_profile is not None:
+        host_os = "linux" if sys.platform.startswith("linux") else sys.platform
+        host_arch = normalize_arch(platform.machine())
+        checks.append(
+            {
+                "name": "strictVulkanHostOperatingSystem",
+                "ok": host_os == selected_profile.os,
+                "message": (
+                    "ok"
+                    if host_os == selected_profile.os
+                    else f"host os {host_os} does not match {selected_profile.os}"
+                ),
+            }
+        )
+        checks.append(
+            {
+                "name": "strictVulkanHostArchitecture",
+                "ok": host_arch == selected_profile.arch,
+                "message": (
+                    "ok"
+                    if host_arch == selected_profile.arch
+                    else f"host architecture {host_arch} does not match {selected_profile.arch}"
+                ),
+            }
+        )
+
+        vulkaninfo_path = shutil.which("vulkaninfo")
+        checks.append(
+            {
+                "name": "strictVulkanInfoAvailable",
+                "ok": vulkaninfo_path is not None,
+                "message": "ok" if vulkaninfo_path else "missing vulkaninfo binary",
+            }
+        )
+        icd_exists = selected_profile.icd_path.is_file()
+        checks.append(
+            {
+                "name": "strictVulkanIcdFile",
+                "ok": icd_exists,
+                "message": (
+                    "ok"
+                    if icd_exists
+                    else f"missing Vulkan ICD file: {selected_profile.icd_path}"
+                ),
+            }
+        )
+        profile_devices: list[dict[str, str]] = []
+        profile_probe_message = "vulkaninfo or configured ICD is unavailable"
+        if vulkaninfo_path is not None and icd_exists:
+            profile_devices, profile_probe_message = probe_vulkaninfo_gpus(
+                selected_profile
+            )
+        profile_hardware_matches = any(
+            vulkan_device_matches_profile(device, selected_profile)
+            for device in profile_devices
+        )
+        checks.append(
+            {
+                "name": "strictVulkanProfileAdapter",
+                "ok": profile_hardware_matches,
+                "message": (
+                    "ok"
+                    if profile_hardware_matches
+                    else (
+                        "configured ICD did not expose an adapter matching "
+                        f"vendorId={selected_profile.vendor_id}, "
+                        f"deviceIds={list(selected_profile.device_ids)}, "
+                        f"driverVersions={list(selected_profile.driver_versions)}: "
+                        f"{profile_probe_message}"
+                    )
+                ),
+            }
+        )
+
+        backend = "vulkan"
+        vendor_id = selected_profile.vendor_id
+        ok_adapter_probe, msg_adapter_probe = probe_dawn_adapter(
+            dawn_bin,
+            backend,
+            vendor_id,
+            selected_profile,
+        )
+        dawn_adapters, dawn_adapters_message = probe_dawn_adapters(
+            dawn_bin,
+            backend,
+            vendor_id,
+            selected_profile,
+        )
+        doe_identity, _, doe_probe_message = resolve_doe_vulkan_identity(
+            runtime_bin,
+            selected_profile,
+        )
+        doe_vendor_matches = (
             doe_identity is not None
-            and str(doe_identity.get("vendorID", "")).strip().lower() == amd_vendor_id
+            and normalize_pci_id(doe_identity.get("vendorID", "")) == vendor_id
+        )
+        doe_device_id = (
+            normalize_pci_id(doe_identity.get("deviceID", ""))
+            if doe_identity is not None
+            else ""
+        )
+        doe_device_matches = (
+            doe_identity is not None
+            and (
+                not selected_profile.device_ids
+                or doe_device_id in selected_profile.device_ids
+            )
+        )
+        doe_driver_version = (
+            str(doe_identity.get("driverVersion", "")).strip()
+            if doe_identity is not None
+            else ""
+        )
+        doe_driver_matches = (
+            doe_identity is not None
+            and (
+                not selected_profile.driver_versions
+                or doe_driver_version in selected_profile.driver_versions
+            )
+        )
+        doe_profile_matches = (
+            doe_vendor_matches and doe_device_matches and doe_driver_matches
         )
         dawn_identity_match = False
         dawn_identity_message = dawn_adapters_message
         checks.append(
             {
-                "name": "strictAmdDawnAdapterProbe",
+                "name": "strictVulkanDawnAdapterProbe",
                 "ok": ok_adapter_probe,
                 "message": msg_adapter_probe,
             }
         )
         checks.append(
             {
-                "name": "strictAmdDoeAdapterProbe",
+                "name": "strictVulkanDoeAdapterProbe",
                 "ok": doe_identity is not None,
                 "message": (
                     "ok"
@@ -340,13 +650,15 @@ def main() -> int:
         )
         checks.append(
             {
-                "name": "strictAmdDoeAdapterIdentity",
-                "ok": doe_matches_amd,
+                "name": "strictVulkanDoeAdapterIdentity",
+                "ok": doe_profile_matches,
                 "message": (
                     "ok"
-                    if doe_matches_amd
+                    if doe_profile_matches
                     else (
-                        "Doe selected a non-AMD Vulkan adapter"
+                        "Doe selected a Vulkan adapter outside the named profile "
+                        f"(vendorId={vendor_id}, deviceIds={list(selected_profile.device_ids)}, "
+                        f"driverVersions={list(selected_profile.driver_versions)})"
                         if doe_identity is not None
                         else "Doe adapter identity unavailable"
                     )
@@ -354,41 +666,54 @@ def main() -> int:
             }
         )
         if doe_identity is not None and dawn_adapters:
-            doe_vendor = str(doe_identity.get("vendorID", "")).strip().lower()
-            doe_device = str(doe_identity.get("deviceID", "")).strip().lower()
+            doe_vendor = normalize_pci_id(doe_identity.get("vendorID", ""))
+            doe_device = normalize_pci_id(doe_identity.get("deviceID", ""))
             doe_name = str(doe_identity.get("deviceName", "")).strip()
             dawn_identity_match = any(
-                str(adapter.get("backend", "")).strip().lower() == amd_backend
-                and str(adapter.get("vendorId", "")).split(",")[0].strip().lower() == doe_vendor
-                and str(adapter.get("deviceId", "")).split(",")[0].strip().lower() == doe_device
+                str(adapter.get("backend", "")).strip().lower() == backend
+                and normalize_pci_id(str(adapter.get("vendorId", "")).split(",")[0])
+                == doe_vendor
+                and normalize_pci_id(str(adapter.get("deviceId", "")).split(",")[0])
+                == doe_device
                 for adapter in dawn_adapters
             )
             dawn_identity_message = (
-                "ok"
-                if dawn_identity_match
-                else (
-                    "strict AMD Vulkan comparability requires Doe and Dawn to resolve to the same "
+                    "ok"
+                    if dawn_identity_match
+                    else (
+                    "strict Vulkan comparability requires Doe and Dawn to resolve to the same "
                     f"vendor/device identity; Doe selected {doe_name} "
                     f"(vendorId={doe_vendor}, deviceId={doe_device})"
                 )
             )
             checks.append(
                 {
-                    "name": "strictAmdDoeDawnIdentityMatch",
+                    "name": "strictVulkanDoeDawnIdentityMatch",
                     "ok": dawn_identity_match,
                     "message": dawn_identity_message,
                 }
             )
+        strict_identity_ok = (
+            ok_render
+            and in_render_group
+            and vulkaninfo_path is not None
+            and icd_exists
+            and profile_hardware_matches
+            and ok_adapter_probe
+            and doe_profile_matches
+            and dawn_identity_match
+        )
         checks.append(
             {
-                "name": "strictAmdIdentityRequirement",
-                "ok": ok_render and in_render_group and ok_adapter_probe and doe_matches_amd and dawn_identity_match,
+                "name": "strictVulkanIdentityRequirement",
+                "ok": strict_identity_ok,
                 "message": (
                     "ok"
-                    if ok_render and in_render_group and ok_adapter_probe and doe_matches_amd and dawn_identity_match
+                    if strict_identity_ok
                     else (
-                        "strict AMD Vulkan runs require accessible render node, render group, and "
-                        f"matching Doe/Dawn {amd_backend} vendor/device identity for vendor {amd_vendor_id}"
+                        "strict Vulkan runs require vulkaninfo, accessible render node, render group, "
+                        "the configured ICD, and matching Doe/Dawn adapter identity for profile "
+                        f"{selected_profile.id}"
                     )
                 ),
             }
@@ -399,11 +724,32 @@ def main() -> int:
         "ok": len(failed) == 0,
         "checkCount": len(checks),
         "failedCount": len(failed),
+        "profile": (
+            {
+                "id": selected_profile.id,
+                "displayName": selected_profile.display_name,
+                "cubeHostProfile": selected_profile.cube_host_profile,
+                "vendorId": selected_profile.vendor_id,
+                "icdPath": str(selected_profile.icd_path),
+                "deviceIds": list(selected_profile.device_ids),
+                "driverVersions": list(selected_profile.driver_versions),
+                "runtimeProfile": {
+                    "vendor": selected_profile.runtime_vendor,
+                    "api": selected_profile.runtime_api,
+                    "family": selected_profile.runtime_family,
+                    "driver": selected_profile.runtime_driver,
+                },
+                "backendLane": selected_profile.backend_lane,
+            }
+            if selected_profile is not None
+            else None
+        ),
         "checks": checks,
         "recommendations": [
             "Set LD_LIBRARY_PATH=bench/vendor/dawn/out/Release:$LD_LIBRARY_PATH for native Fawn runs.",
             "If /dev/dri/renderD128 is denied, add your user to group render and re-login.",
-            "Use bench/native-compare/compare.config.amd.vulkan.compare.json on matching AMD hosts; use frontier/explore presets only for diagnostics when governed AMD constraints are unavailable.",
+            "Install vulkan-tools so strict Vulkan profiles can bind Doe adapter ordinals to PCI identities.",
+            "Use only workload/config lanes whose declared vendor and adapter contract matches the selected host profile.",
         ],
     }
 

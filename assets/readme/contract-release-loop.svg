@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="430" viewBox="0 0 1400 430" role="img" aria-labelledby="title desc">
+  <title id="title">Doe contract-driven implementation and release loop</title>
+  <desc id="desc">A black and white diagram showing human intent flowing through an executable contract, human or AI implementation, deterministic gates, bounded Lean proofs, content-addressed evidence, and capability-based release promotion.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#111111" />
+    </marker>
+    <style>
+      text { fill: #111111; font-family: Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+      .title { font-size: 29px; font-weight: 800; letter-spacing: -.01em; }
+      .subtitle { font-size: 15px; font-weight: 500; fill: #444444; }
+      .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+      .step { font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+      .label { font-size: 16px; font-weight: 760; }
+      .detail { font-size: 12.5px; font-weight: 500; fill: #333333; }
+      .box { fill: #ffffff; stroke: #111111; stroke-width: 1.5; }
+      .soft { fill: #f3f3f3; stroke: #111111; stroke-width: 1.5; }
+      .line { fill: none; stroke: #111111; stroke-width: 1.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1400" height="430" fill="#ffffff" />
+  <rect x="18" y="18" width="1364" height="394" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.3" />
+
+  <text x="50" y="60" class="eyebrow">DEVELOPMENT AND RELEASE</text>
+  <text x="50" y="96" class="title">Contracts make automated contribution bounded and reviewable</text>
+  <text x="50" y="124" class="subtitle">AI may propose implementation; deterministic gates, bounded proofs, evidence, and human approval control promotion.</text>
+
+  <rect x="50" y="174" width="185" height="112" rx="6" class="soft" />
+  <text x="68" y="198" class="step">01</text>
+  <text x="142.5" y="226" text-anchor="middle" class="label">Human intent</text>
+  <text x="142.5" y="250" text-anchor="middle" class="detail">product boundary</text>
+  <text x="142.5" y="269" text-anchor="middle" class="detail">risk + approval</text>
+
+  <rect x="273" y="174" width="185" height="112" rx="6" class="box" />
+  <text x="291" y="198" class="step">02</text>
+  <text x="365.5" y="226" text-anchor="middle" class="label">Contract</text>
+  <text x="365.5" y="250" text-anchor="middle" class="detail">schema + obligations</text>
+  <text x="365.5" y="269" text-anchor="middle" class="detail">definition of done</text>
+
+  <rect x="496" y="174" width="185" height="112" rx="6" class="box" />
+  <text x="514" y="198" class="step">03</text>
+  <text x="588.5" y="226" text-anchor="middle" class="label">Implementation</text>
+  <text x="588.5" y="250" text-anchor="middle" class="detail">human or AI agent</text>
+  <text x="588.5" y="269" text-anchor="middle" class="detail">bounded patch + tests</text>
+
+  <rect x="719" y="174" width="185" height="112" rx="6" class="box" />
+  <text x="737" y="198" class="step">04</text>
+  <text x="811.5" y="226" text-anchor="middle" class="label">Verification</text>
+  <text x="811.5" y="250" text-anchor="middle" class="detail">gates + replay</text>
+  <text x="811.5" y="269" text-anchor="middle" class="detail">Lean where applicable</text>
+
+  <rect x="942" y="174" width="185" height="112" rx="6" class="box" />
+  <text x="960" y="198" class="step">05</text>
+  <text x="1034.5" y="226" text-anchor="middle" class="label">Evidence</text>
+  <text x="1034.5" y="250" text-anchor="middle" class="detail">proof + execution</text>
+  <text x="1034.5" y="269" text-anchor="middle" class="detail">content-addressed</text>
+
+  <rect x="1165" y="174" width="185" height="112" rx="6" class="soft" />
+  <text x="1183" y="198" class="step">06</text>
+  <text x="1257.5" y="226" text-anchor="middle" class="label">Promotion</text>
+  <text x="1257.5" y="250" text-anchor="middle" class="detail">capability release</text>
+  <text x="1257.5" y="269" text-anchor="middle" class="detail">unsupported stays explicit</text>
+
+  <path d="M 235 230 L 273 230" class="line" />
+  <path d="M 458 230 L 496 230" class="line" />
+  <path d="M 681 230 L 719 230" class="line" />
+  <path d="M 904 230 L 942 230" class="line" />
+  <path d="M 1127 230 L 1165 230" class="line" />
+
+  <path d="M 1258 286 L 1258 342 L 366 342 L 366 286" class="line" />
+  <text x="811" y="367" text-anchor="middle" class="detail">Evidence and release findings become the next explicit contract.</text>
+  <text x="811" y="390" text-anchor="middle" class="detail">No missing proof, failed comparison, or hidden fallback is promoted by confidence alone.</text>
+</svg>

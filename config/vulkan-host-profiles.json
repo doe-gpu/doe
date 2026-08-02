@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {
+      "id": "linux_amd_vulkan",
+      "displayName": "AMD Linux Vulkan",
+      "cubeHostProfile": "linux_amd_vulkan",
+      "os": "linux",
+      "arch": "x64",
+      "vendorId": "0x1002",
+      "icdPath": "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json",
+      "runtimeProfile": {
+        "vendor": "amd",
+        "api": "vulkan",
+        "family": "gfx11",
+        "driver": "24.0.0"
+      },
+      "backendLane": "vulkan_doe_comparable"
+    },
+    {
+      "id": "linux_intel_tiger_lake_vulkan",
+      "displayName": "Intel Tiger Lake Linux Vulkan",
+      "cubeHostProfile": "linux_intel_tiger_lake_vulkan",
+      "os": "linux",
+      "arch": "x64",
+      "vendorId": "0x8086",
+      "icdPath": "/usr/share/vulkan/icd.d/intel_icd.x86_64.json",
+      "deviceIds": [
+        "0x9a78"
+      ],
+      "driverVersions": [
+        "24.2.8"
+      ],
+      "runtimeProfile": {
+        "vendor": "intel",
+        "api": "vulkan",
+        "family": "gen12",
+        "driver": "24.2.8"
+      },
+      "backendLane": "vulkan_doe_comparable"
+    }
+  ]
+}

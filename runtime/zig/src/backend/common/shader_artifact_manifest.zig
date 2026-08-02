@@ -132,7 +132,10 @@ pub fn emit_shader_artifact_manifest_for_signature_with_artifacts(
 
     var taxonomy_buffer: [TAXONOMY_CODE_CAPACITY]u8 = undefined;
     const taxonomy_code = normalize_taxonomy_code(&taxonomy_buffer, status_code);
-    const wgsl_hash = hash_utils.sha256_hex(module);
+    const wgsl_hash = if (@hasDecl(@TypeOf(self.*), "shader_source_hash_for_module"))
+        self.shader_source_hash_for_module(module) orelse hash_utils.sha256_hex(module)
+    else
+        hash_utils.sha256_hex(module);
 
     std.fs.cwd().makePath(SHADER_ARTIFACT_DIR) catch return common_errors.BackendNativeError.ShaderCompileFailed;
 

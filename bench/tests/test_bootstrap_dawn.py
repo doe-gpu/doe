@@ -58,6 +58,62 @@ class TestBootstrapDawnRepoSetup(unittest.TestCase):
 
 
 class TestBootstrapDawnGnSetup(unittest.TestCase):
+    def test_find_binaries_maps_shared_target_to_platform_library(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            build_dir = Path(tmpdir)
+            if bootstrap_dawn.os.name == "nt":
+                library = build_dir / "webgpu_dawn.dll"
+            elif bootstrap_dawn.sys.platform == "darwin":
+                library = build_dir / "libwebgpu_dawn.dylib"
+            else:
+                library = build_dir / "libwebgpu_dawn.so"
+            library.write_bytes(b"dawn")
+
+            binaries = bootstrap_dawn.find_binaries(
+                build_dir,
+                ["webgpu_dawn_shared"],
+            )
+
+            self.assertEqual(binaries["webgpu_dawn_shared"], str(library))
+
+    def test_sync_repairs_fetch_helper_checkout_without_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            source = Path(tmpdir) / "dawn"
+            dependency = source / "third_party" / "example"
+            dependency.mkdir(parents=True)
+            _run(["git", "init"], dependency)
+            fetch_head = dependency / ".git" / "FETCH_HEAD"
+            fetch_head.write_text(
+                "0123456789abcdef\t\t'0123456789abcdef' of https://example.invalid/repo\n",
+                encoding="utf-8",
+            )
+
+            repaired = bootstrap_dawn.repair_originless_dependency_remotes(source)
+
+            self.assertEqual(repaired, [dependency])
+            remote = subprocess.run(
+                ["git", "-C", str(dependency), "remote", "get-url", "origin"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(remote.stdout.strip(), "https://example.invalid/repo")
+
+    def test_gn_configure_requires_full_gclient_dependency_tree(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            source = Path(tmpdir) / "dawn"
+            source.mkdir()
+
+            with self.assertRaisesRegex(RuntimeError, "--sync-deps"):
+                bootstrap_dawn.configure_build_gn(
+                    source,
+                    source / "out" / "Release",
+                    "Release",
+                    "is_debug=false",
+                    None,
+                    False,
+                )
+
     def test_depot_tools_wrapper_runs_sibling_bootstrap(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             depot_tools = Path(tmpdir) / "depot_tools"

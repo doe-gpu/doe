@@ -542,6 +542,36 @@ def resolve_gclient_binary(
     )
 
 
+def repair_originless_dependency_remotes(source_dir: Path) -> list[Path]:
+    """Make Dawn's lightweight dependency checkouts consumable by gclient."""
+    repaired: list[Path] = []
+    git_exe = check_dependency("git")
+    for git_dir in sorted(path for path in source_dir.rglob(".git") if path.is_dir()):
+        checkout = git_dir.parent
+        remote = subprocess.run(
+            [git_exe, "-C", str(checkout), "remote", "get-url", "origin"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if remote.returncode == 0:
+            continue
+
+        fetch_head = git_dir / "FETCH_HEAD"
+        if not fetch_head.is_file():
+            continue
+        first_line = fetch_head.read_text(encoding="utf-8").splitlines()[0]
+        separator = " of "
+        if separator not in first_line:
+            continue
+        origin_url = first_line.rpartition(separator)[2].strip()
+        if not origin_url:
+            continue
+        run([git_exe, "-C", str(checkout), "remote", "add", "origin", origin_url])
+        repaired.append(checkout)
+    return repaired
+
+
 def sync_dawn_deps(
     source_dir: Path,
     gclient_path: str | None,
@@ -557,6 +587,10 @@ def sync_dawn_deps(
                 f"standalone gclient template not found: {template}"
             )
         gclient_file.write_text(template.read_text(encoding="utf-8"), encoding="utf-8")
+
+    repaired = repair_originless_dependency_remotes(source_dir)
+    for checkout in repaired:
+        print(f"info: restored origin remote for {checkout.relative_to(source_dir)}")
 
     gclient = resolve_gclient_binary(gclient_path, depot_tools_dir)
     env = os.environ.copy()
@@ -623,6 +657,15 @@ def configure_build_gn(
     gn_path: str | None,
     skip_gn_bootstrap: bool,
 ) -> None:
+    build_config = source_dir / "build" / "config" / "BUILDCONFIG.gn"
+    if not build_config.is_file():
+        raise RuntimeError(
+            f"required Dawn GN dependency missing: {build_config}. "
+            "Run this bootstrap with --sync-deps and a working gclient binary. "
+            "Dawn's tools/fetch_dawn_dependencies.py only fetches the embedder "
+            "dependency subset and does not populate Chromium's GN build tree."
+        )
+
     depot_tools_dir = depot_tools_dir_for_gn(gn_path)
     cipd_path = None
     if depot_tools_dir is not None:
@@ -714,16 +757,24 @@ def build_targets_gn(build_dir: Path, targets: list[str], parallel: int, ninja_p
 def find_binaries(build_dir: Path, targets: Iterable[str]) -> dict[str, str]:
     binaries: dict[str, str] = {}
     for target in targets:
-        candidate = build_dir / target
-        if candidate.exists():
-            binaries[target] = str(candidate)
-            continue
-        if os.name == "nt":
-            ext = candidate.with_suffix(".exe")
-            if ext.exists():
-                binaries[target] = str(ext)
-                continue
-        raise FileNotFoundError(f"build target not found: {candidate}")
+        candidates = [build_dir / target]
+        if target == "webgpu_dawn_shared":
+            if os.name == "nt":
+                candidates.append(build_dir / "webgpu_dawn.dll")
+            elif sys.platform == "darwin":
+                candidates.append(build_dir / "libwebgpu_dawn.dylib")
+            else:
+                candidates.append(build_dir / "libwebgpu_dawn.so")
+        elif os.name == "nt":
+            candidates.append((build_dir / target).with_suffix(".exe"))
+
+        for candidate in candidates:
+            if candidate.exists():
+                binaries[target] = str(candidate)
+                break
+        else:
+            expected = ", ".join(str(candidate) for candidate in candidates)
+            raise FileNotFoundError(f"build target output not found; checked: {expected}")
     return binaries
 
 

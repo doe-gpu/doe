@@ -75,6 +75,22 @@ pub const RawNumericStability = struct {
     candidates: ?[]RawNumericStabilityCandidate = null,
 };
 
+pub const RawKernelDispatchOutputOracle = struct {
+    schema_version: ?u32 = null,
+    schemaVersion: ?u32 = null,
+    kind: ?[]const u8 = null,
+    initialization: ?[]const u8 = null,
+    binding_group: ?u32 = null,
+    bindingGroup: ?u32 = null,
+    binding: ?u32 = null,
+    dispatch_count: ?u32 = null,
+    dispatchCount: ?u32 = null,
+    expected_sha256: ?[]const u8 = null,
+    expectedSha256: ?[]const u8 = null,
+    reference_id: ?[]const u8 = null,
+    referenceId: ?[]const u8 = null,
+};
+
 pub const RawCommand = struct {
     kind: ?[]const u8 = null,
     command: ?[]const u8 = null,
@@ -164,6 +180,8 @@ pub const RawCommand = struct {
     warmupDispatchCount: ?u32 = null,
     initialize_buffers_on_create: ?bool = null,
     initializeBuffersOnCreate: ?bool = null,
+    output_oracle: ?RawKernelDispatchOutputOracle = null,
+    outputOracle: ?RawKernelDispatchOutputOracle = null,
     iterations: ?u32 = null,
     feature_policy: ?[]const u8 = null,
     featurePolicy: ?[]const u8 = null,

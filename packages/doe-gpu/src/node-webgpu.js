@@ -1,59 +1,517 @@
-// doe-gpu/node-webgpu - explicit Node WebGPU provider bootstrap.
+// doe-gpu/node-webgpu - strict, receipt-backed Node WebGPU provider contract.
 
-import { existsSync, readFileSync, statSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const DEFAULT_PROVIDER_CREATE_ARGS = Object.freeze([
-  'enable-dawn-features=allow_unsafe_apis',
-]);
-const DEFAULT_WEBGPU_PROVIDER_SPECIFIERS = Object.freeze([
-  new URL('./native.js', import.meta.url).href,
-  'webgpu',
-]);
-const ADAPTER_PROBE_OPTIONS = Object.freeze([
-  { powerPreference: 'high-performance' },
-  { powerPreference: 'low-power' },
-  null,
-]);
-const PROVIDER_FAILURE_REASONS = Object.freeze([
-  'native_webgpu_unavailable',
-  'native_addon_unavailable',
-  'runtime_library_unavailable',
-  'provider_unavailable',
-  'adapter_unavailable',
-  'provider_import_failed',
-  'unsupported_runtime_host',
-  'runner_error',
-]);
-const PROVIDER_FAILURE_REASON_SET = new Set(PROVIDER_FAILURE_REASONS);
+export const NODE_WEBGPU_PROVIDER_SCHEMA = 'doe.webgpu-provider/v1';
+export const NODE_WEBGPU_PROVIDER_RECEIPT_SCHEMA = 'doe.webgpu-provider-receipt/v1';
 
-function normalizeProviderFailureReason(reason) {
-  return PROVIDER_FAILURE_REASON_SET.has(reason) ? reason : 'runner_error';
+export const NODE_WEBGPU_PROVIDER_ERROR_CODES = Object.freeze([
+  'DOE_PROVIDER_INVALID_CONFIGURATION',
+  'DOE_PROVIDER_IMPORT_FAILED',
+  'DOE_PROVIDER_BINDING_MISSING',
+  'DOE_PROVIDER_FACTORY_FAILED',
+  'DOE_PROVIDER_GPU_INVALID',
+  'DOE_PROVIDER_GLOBAL_MISSING',
+  'DOE_PROVIDER_GLOBAL_CONFLICT',
+  'DOE_PROVIDER_ADAPTER_UNAVAILABLE',
+  'DOE_PROVIDER_ALL_FAILED',
+  'DOE_PROVIDER_RESTORE_FAILED',
+]);
+
+const REQUIRED_WEBGPU_GLOBALS = Object.freeze([
+  'GPUBufferUsage',
+  'GPUShaderStage',
+  'GPUMapMode',
+  'GPUTextureUsage',
+]);
+const PROVIDER_KEYS = new Set(['id', 'kind', 'module', 'gpu', 'globals']);
+const GPU_BINDING_KEYS = new Set(['kind', 'path', 'args', 'resultPath']);
+const GLOBAL_POLICY_KEYS = new Set(['mode']);
+const OPEN_OPTIONS_KEYS = new Set(['providers', 'adapterOptions', 'globals']);
+const SAFE_PATH_SEGMENT = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+
+function own(object, key) {
+  return Object.prototype.hasOwnProperty.call(object, key);
 }
 
-function providerAvailabilityFailure({
-  reason,
-  provider = '',
-  stage = '',
-  detail = '',
-}) {
+function assertPlainObject(value, label) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      `${label} must be an object.`,
+      { stage: 'configuration' },
+    );
+  }
+  return value;
+}
+
+function assertKnownKeys(value, allowed, label) {
+  for (const key of Object.keys(value)) {
+    if (!allowed.has(key)) {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_INVALID_CONFIGURATION',
+        `${label} contains unsupported field "${key}".`,
+        { stage: 'configuration' },
+      );
+    }
+  }
+}
+
+function normalizePath(path, label) {
+  if (typeof path !== 'string' || path.length === 0) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      `${label} must be a non-empty dotted export path.`,
+      { stage: 'configuration' },
+    );
+  }
+  const segments = path.split('.');
+  if (segments.some((segment) => !SAFE_PATH_SEGMENT.test(segment))) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      `${label} contains an invalid path segment.`,
+      { stage: 'configuration' },
+    );
+  }
+  return segments;
+}
+
+function resolvePath(root, path, label) {
+  const segments = normalizePath(path, label);
+  let parent = null;
+  let value = root;
+  for (const segment of segments) {
+    if (value == null || !(segment in Object(value))) {
+      return { found: false, parent: null, value: undefined };
+    }
+    parent = value;
+    value = value[segment];
+  }
+  return { found: true, parent, value };
+}
+
+function normalizeModuleSpecifier(specifier) {
+  if (typeof specifier !== 'string' || specifier.trim().length === 0) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      'provider.module must be a non-empty module specifier.',
+      { stage: 'configuration' },
+    );
+  }
+  const trimmed = specifier.trim();
+  if (trimmed.startsWith('file:') || trimmed.startsWith('node:') || trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+  if (isAbsolute(trimmed) || trimmed.startsWith('./') || trimmed.startsWith('../')) {
+    return pathToFileURL(isAbsolute(trimmed) ? trimmed : resolve(process.cwd(), trimmed)).href;
+  }
+  return trimmed;
+}
+
+function cloneReceiptValue(value) {
+  if (value === undefined) return null;
+  if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : String(value);
+  if (Array.isArray(value)) return value.map(cloneReceiptValue);
+  if (typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, cloneReceiptValue(item)]));
+  }
+  return String(value);
+}
+
+function normalizeProvider(provider, index) {
+  assertPlainObject(provider, `providers[${index}]`);
+  assertKnownKeys(provider, PROVIDER_KEYS, `providers[${index}]`);
+  if (typeof provider.id !== 'string' || provider.id.trim().length === 0) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      `providers[${index}].id must be a non-empty string.`,
+      { stage: 'configuration' },
+    );
+  }
+  if (provider.kind !== 'global' && provider.kind !== 'module') {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      `providers[${index}].kind must be "global" or "module".`,
+      { stage: 'configuration', providerId: provider.id },
+    );
+  }
+  if (provider.kind === 'global') {
+    if (provider.module !== undefined || provider.gpu !== undefined || provider.globals !== undefined) {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_INVALID_CONFIGURATION',
+        `global provider "${provider.id}" must not declare module, gpu, or globals.`,
+        { stage: 'configuration', providerId: provider.id },
+      );
+    }
+    return Object.freeze({ id: provider.id, kind: 'global' });
+  }
+
+  const gpu = assertPlainObject(provider.gpu, `provider "${provider.id}" gpu`);
+  assertKnownKeys(gpu, GPU_BINDING_KEYS, `provider "${provider.id}" gpu`);
+  if (gpu.kind !== 'export' && gpu.kind !== 'factory') {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      `provider "${provider.id}" gpu.kind must be "export" or "factory".`,
+      { stage: 'configuration', providerId: provider.id },
+    );
+  }
+  normalizePath(gpu.path, `provider "${provider.id}" gpu.path`);
+  if (gpu.kind === 'export' && (gpu.args !== undefined || gpu.resultPath !== undefined)) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      `export provider "${provider.id}" must not declare args or resultPath.`,
+      { stage: 'configuration', providerId: provider.id },
+    );
+  }
+  if (gpu.kind === 'factory' && gpu.args !== undefined && !Array.isArray(gpu.args)) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      `factory provider "${provider.id}" gpu.args must be an array.`,
+      { stage: 'configuration', providerId: provider.id },
+    );
+  }
+  if (gpu.resultPath !== undefined && gpu.resultPath !== null) {
+    normalizePath(gpu.resultPath, `provider "${provider.id}" gpu.resultPath`);
+  }
+
+  const globals = assertPlainObject(provider.globals, `provider "${provider.id}" globals`);
+  for (const name of REQUIRED_WEBGPU_GLOBALS) {
+    normalizePath(globals[name], `provider "${provider.id}" globals.${name}`);
+  }
+  for (const name of Object.keys(globals)) {
+    if (!REQUIRED_WEBGPU_GLOBALS.includes(name)) {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_INVALID_CONFIGURATION',
+        `provider "${provider.id}" globals contains unsupported binding "${name}".`,
+        { stage: 'configuration', providerId: provider.id },
+      );
+    }
+  }
+
   return Object.freeze({
-    ok: false,
-    reason: normalizeProviderFailureReason(reason),
-    provider,
-    stage,
-    detail: String(detail ?? ''),
+    id: provider.id,
+    kind: 'module',
+    module: normalizeModuleSpecifier(provider.module),
+    gpu: Object.freeze({
+      kind: gpu.kind,
+      path: gpu.path,
+      args: Object.freeze([...(gpu.args ?? [])]),
+      resultPath: gpu.resultPath ?? null,
+    }),
+    globals: Object.freeze({ ...globals }),
   });
 }
 
-function attachProviderAvailability(error, failure) {
-  if (!error || !failure) {
-    return error;
+function normalizeOpenOptions(options) {
+  assertPlainObject(options, 'provider-v1 options');
+  assertKnownKeys(options, OPEN_OPTIONS_KEYS, 'provider-v1 options');
+  if (!Array.isArray(options.providers) || options.providers.length === 0) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      'provider-v1 options.providers must be a non-empty ordered array.',
+      { stage: 'configuration' },
+    );
   }
-  error.providerAvailability = failure;
-  error.providerFailureReason = failure.reason;
-  return error;
+  const providers = options.providers.map(normalizeProvider);
+  const providerIds = new Set();
+  for (const provider of providers) {
+    if (providerIds.has(provider.id)) {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_INVALID_CONFIGURATION',
+        `provider id "${provider.id}" is duplicated.`,
+        { stage: 'configuration', providerId: provider.id },
+      );
+    }
+    providerIds.add(provider.id);
+  }
+
+  const globalPolicy = assertPlainObject(options.globals, 'provider-v1 options.globals');
+  assertKnownKeys(globalPolicy, GLOBAL_POLICY_KEYS, 'provider-v1 options.globals');
+  if (!['none', 'install-missing', 'replace'].includes(globalPolicy.mode)) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_INVALID_CONFIGURATION',
+      'provider-v1 options.globals.mode must be "none", "install-missing", or "replace".',
+      { stage: 'configuration' },
+    );
+  }
+  if (options.adapterOptions !== null) {
+    assertPlainObject(options.adapterOptions, 'provider-v1 options.adapterOptions');
+  }
+  return Object.freeze({
+    providers: Object.freeze(providers),
+    adapterOptions: options.adapterOptions,
+    globals: Object.freeze({ mode: globalPolicy.mode }),
+  });
+}
+
+function errorDetail(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function createReceipt(options) {
+  return {
+    schema: NODE_WEBGPU_PROVIDER_RECEIPT_SCHEMA,
+    contract: NODE_WEBGPU_PROVIDER_SCHEMA,
+    providers: options.providers.map((provider) => cloneReceiptValue(provider)),
+    providerOrder: options.providers.map((provider) => provider.id),
+    adapterOptions: cloneReceiptValue(options.adapterOptions),
+    globals: {
+      mode: options.globals.mode,
+      installed: [],
+      restored: false,
+    },
+    attempts: [],
+    selectedProviderId: null,
+    ok: false,
+  };
+}
+
+function attemptFailure(provider, error) {
+  const normalized = error instanceof NodeWebGPUProviderError
+    ? error
+    : new NodeWebGPUProviderError('DOE_PROVIDER_GPU_INVALID', errorDetail(error), {
+      stage: 'provider',
+      providerId: provider.id,
+      cause: error,
+    });
+  return {
+    providerId: provider.id,
+    kind: provider.kind,
+    module: provider.kind === 'module' ? provider.module : null,
+    ok: false,
+    stage: normalized.stage,
+    code: normalized.code,
+    detail: normalized.message,
+  };
+}
+
+function snapshotProperty(target, key) {
+  return {
+    target,
+    key,
+    descriptor: Object.getOwnPropertyDescriptor(target, key),
+  };
+}
+
+function defineRestorable(target, key, value, mode, snapshots, installedNames, receiptName = key) {
+  const current = target[key];
+  if (mode === 'install-missing' && current !== undefined) {
+    if (current !== value) {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_GLOBAL_CONFLICT',
+        `global "${key}" already exists and differs from the selected provider.`,
+        { stage: 'globals.install' },
+      );
+    }
+    return;
+  }
+  snapshots.push(snapshotProperty(target, key));
+  try {
+    Object.defineProperty(target, key, {
+      value,
+      writable: true,
+      configurable: true,
+      enumerable: false,
+    });
+    installedNames.push(receiptName);
+  } catch (cause) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_GLOBAL_CONFLICT',
+      `global "${key}" cannot be installed.`,
+      { stage: 'globals.install', cause },
+    );
+  }
+}
+
+function installProviderGlobals(gpu, enumValues, mode) {
+  const snapshots = [];
+  const installedNames = [];
+  if (mode === 'none') {
+    return { snapshots, installedNames };
+  }
+
+  try {
+    let navigatorObject = globalThis.navigator;
+    if (navigatorObject === undefined) {
+      snapshots.push(snapshotProperty(globalThis, 'navigator'));
+      navigatorObject = {};
+      Object.defineProperty(globalThis, 'navigator', {
+        value: navigatorObject,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      });
+      installedNames.push('navigator');
+    }
+    defineRestorable(navigatorObject, 'gpu', gpu, mode, snapshots, installedNames, 'navigator.gpu');
+    for (const name of REQUIRED_WEBGPU_GLOBALS) {
+      defineRestorable(globalThis, name, enumValues[name], mode, snapshots, installedNames);
+    }
+    return { snapshots, installedNames };
+  } catch (error) {
+    restoreSnapshots(snapshots);
+    throw error;
+  }
+}
+
+function restoreSnapshots(snapshots) {
+  const failures = [];
+  for (let index = snapshots.length - 1; index >= 0; index -= 1) {
+    const snapshot = snapshots[index];
+    try {
+      if (snapshot.descriptor) {
+        Object.defineProperty(snapshot.target, snapshot.key, snapshot.descriptor);
+      } else {
+        delete snapshot.target[snapshot.key];
+      }
+    } catch (error) {
+      failures.push(`${snapshot.key}: ${errorDetail(error)}`);
+    }
+  }
+  if (failures.length > 0) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_RESTORE_FAILED',
+      `failed to restore provider globals: ${failures.join('; ')}`,
+      { stage: 'globals.restore' },
+    );
+  }
+}
+
+async function loadProvider(provider) {
+  if (provider.kind === 'global') {
+    const gpu = globalThis.navigator?.gpu;
+    if (!gpu || typeof gpu.requestAdapter !== 'function') {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_GPU_INVALID',
+        'global navigator.gpu.requestAdapter is unavailable.',
+        { stage: 'provider.resolve', providerId: provider.id },
+      );
+    }
+    const enums = {};
+    for (const name of REQUIRED_WEBGPU_GLOBALS) {
+      if (globalThis[name] === undefined) {
+        throw new NodeWebGPUProviderError(
+          'DOE_PROVIDER_GLOBAL_MISSING',
+          `global provider is missing ${name}.`,
+          { stage: 'provider.resolveGlobals', providerId: provider.id },
+        );
+      }
+      enums[name] = globalThis[name];
+    }
+    return { gpu, enums, module: null };
+  }
+
+  let moduleNamespace;
+  try {
+    moduleNamespace = await import(provider.module);
+  } catch (cause) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_IMPORT_FAILED',
+      `failed to import "${provider.module}": ${errorDetail(cause)}`,
+      { stage: 'provider.import', providerId: provider.id, cause },
+    );
+  }
+
+  const binding = resolvePath(moduleNamespace, provider.gpu.path, `provider "${provider.id}" gpu.path`);
+  if (!binding.found) {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_BINDING_MISSING',
+      `provider "${provider.id}" does not export "${provider.gpu.path}".`,
+      { stage: 'provider.resolveGpu', providerId: provider.id },
+    );
+  }
+
+  let gpu = binding.value;
+  if (provider.gpu.kind === 'factory') {
+    if (typeof gpu !== 'function') {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_BINDING_MISSING',
+        `provider "${provider.id}" binding "${provider.gpu.path}" is not a factory.`,
+        { stage: 'provider.resolveGpu', providerId: provider.id },
+      );
+    }
+    try {
+      gpu = await gpu.apply(binding.parent, provider.gpu.args);
+    } catch (cause) {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_FACTORY_FAILED',
+        `provider "${provider.id}" factory failed: ${errorDetail(cause)}`,
+        { stage: 'provider.createGpu', providerId: provider.id, cause },
+      );
+    }
+    if (provider.gpu.resultPath !== null) {
+      const result = resolvePath(gpu, provider.gpu.resultPath, `provider "${provider.id}" gpu.resultPath`);
+      if (!result.found) {
+        throw new NodeWebGPUProviderError(
+          'DOE_PROVIDER_BINDING_MISSING',
+          `provider "${provider.id}" factory result is missing "${provider.gpu.resultPath}".`,
+          { stage: 'provider.createGpu', providerId: provider.id },
+        );
+      }
+      gpu = result.value;
+    }
+  }
+  if (!gpu || typeof gpu.requestAdapter !== 'function') {
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_GPU_INVALID',
+      `provider "${provider.id}" did not resolve a GPU object with requestAdapter().`,
+      { stage: 'provider.resolveGpu', providerId: provider.id },
+    );
+  }
+
+  const enums = {};
+  for (const name of REQUIRED_WEBGPU_GLOBALS) {
+    const bindingValue = resolvePath(
+      moduleNamespace,
+      provider.globals[name],
+      `provider "${provider.id}" globals.${name}`,
+    );
+    if (!bindingValue.found || bindingValue.value == null) {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_GLOBAL_MISSING',
+        `provider "${provider.id}" is missing ${name} at "${provider.globals[name]}".`,
+        { stage: 'provider.resolveGlobals', providerId: provider.id },
+      );
+    }
+    enums[name] = bindingValue.value;
+  }
+  return { gpu, enums, module: moduleNamespace };
+}
+
+async function requestDeclaredAdapter(provider, gpu, adapterOptions) {
+  try {
+    const adapter = adapterOptions === null
+      ? await gpu.requestAdapter()
+      : await gpu.requestAdapter(adapterOptions);
+    if (!adapter) {
+      throw new NodeWebGPUProviderError(
+        'DOE_PROVIDER_ADAPTER_UNAVAILABLE',
+        `provider "${provider.id}" returned no adapter for the declared adapterOptions.`,
+        { stage: 'provider.requestAdapter', providerId: provider.id },
+      );
+    }
+    return adapter;
+  } catch (cause) {
+    if (cause instanceof NodeWebGPUProviderError) throw cause;
+    throw new NodeWebGPUProviderError(
+      'DOE_PROVIDER_ADAPTER_UNAVAILABLE',
+      `provider "${provider.id}" requestAdapter failed: ${errorDetail(cause)}`,
+      { stage: 'provider.requestAdapter', providerId: provider.id, cause },
+    );
+  }
+}
+
+export class NodeWebGPUProviderError extends Error {
+  constructor(code, message, options = {}) {
+    super(message, options.cause === undefined ? undefined : { cause: options.cause });
+    this.name = 'NodeWebGPUProviderError';
+    this.code = code;
+    this.stage = options.stage ?? 'provider';
+    this.providerId = options.providerId ?? null;
+    this.receipt = options.receipt ?? null;
+  }
 }
 
 export function hasNavigatorGpu() {
@@ -63,381 +521,179 @@ export function hasNavigatorGpu() {
 }
 
 export function hasGpuEnums() {
-  return typeof globalThis.GPUBufferUsage !== 'undefined'
-    && typeof globalThis.GPUShaderStage !== 'undefined'
-    && typeof globalThis.GPUMapMode !== 'undefined'
-    && typeof globalThis.GPUTextureUsage !== 'undefined';
+  return REQUIRED_WEBGPU_GLOBALS.every((name) => globalThis[name] !== undefined);
 }
 
-function setGlobalIfMissing(name, value) {
-  if (value === undefined || value === null) return;
-  if (globalThis[name] !== undefined) return;
-  Object.defineProperty(globalThis, name, {
-    value,
-    writable: true,
-    configurable: true,
-    enumerable: false,
-  });
-}
-
-function installGlobalsFromModule(mod) {
-  const globals = mod?.globals || mod?.default?.globals;
-  if (!globals || typeof globals !== 'object') return;
-  for (const [name, value] of Object.entries(globals)) {
-    setGlobalIfMissing(name, value);
-  }
-}
-
-function resolveExportsPath(exportsField, rootPath) {
-  if (!exportsField) return null;
-  if (typeof exportsField === 'string') {
-    const candidate = resolve(rootPath, exportsField);
-    return existsSync(candidate) ? candidate : null;
-  }
-  if (typeof exportsField !== 'object' || Array.isArray(exportsField)) {
-    return null;
-  }
-
-  const nodeWebgpu = exportsField['./node-webgpu'];
-  if (typeof nodeWebgpu === 'string') {
-    const nodeWebgpuPath = resolve(rootPath, nodeWebgpu);
-    if (existsSync(nodeWebgpuPath)) return nodeWebgpuPath;
-  } else if (nodeWebgpu && typeof nodeWebgpu === 'object') {
-    const preferred = nodeWebgpu.default || nodeWebgpu.node || nodeWebgpu.import;
-    if (typeof preferred === 'string') {
-      const preferredPath = resolve(rootPath, preferred);
-      if (existsSync(preferredPath)) return preferredPath;
-    }
-  }
-
-  const dot = exportsField['.'];
-  if (typeof dot === 'string') {
-    const dotPath = resolve(rootPath, dot);
-    if (existsSync(dotPath)) return dotPath;
-  } else if (dot && typeof dot === 'object') {
-    const preferred = dot.default || dot.node || dot.import;
-    if (typeof preferred === 'string') {
-      const preferredPath = resolve(rootPath, preferred);
-      if (existsSync(preferredPath)) return preferredPath;
-    }
-  }
-  return null;
-}
-
-function resolveNodeModuleFilePath(candidatePath) {
-  if (!existsSync(candidatePath)) return null;
-  const stat = statSync(candidatePath);
-  if (stat.isFile()) return candidatePath;
-  if (!stat.isDirectory()) return null;
-
-  const packageJsonPath = resolve(candidatePath, 'package.json');
-  if (existsSync(packageJsonPath)) {
-    try {
-      const pkg = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
-      const exportedPath = resolveExportsPath(pkg.exports, candidatePath);
-      if (exportedPath) return exportedPath;
-      if (typeof pkg.main === 'string' && pkg.main.trim()) {
-        const mainPath = resolve(candidatePath, pkg.main);
-        if (existsSync(mainPath)) return mainPath;
-      }
-    } catch {
-      // Malformed package metadata should not hide the fallback probes.
-    }
-  }
-
-  const fallbackPaths = [
-    resolve(candidatePath, 'src/node-webgpu.js'),
-    resolve(candidatePath, 'index.js'),
-    resolve(candidatePath, 'src/index.js'),
-  ];
-  for (const fallbackPath of fallbackPaths) {
-    if (existsSync(fallbackPath)) return fallbackPath;
-  }
-  return null;
-}
-
-function looksLikePathSpecifier(candidate) {
-  if (candidate.startsWith('.') || candidate.startsWith('/')) return true;
-  if (candidate.startsWith('file://')) return true;
-  const cwdRelative = resolve(process.cwd(), candidate);
-  return candidate.includes('/') && existsSync(cwdRelative);
-}
-
-function resolveCandidateModuleSpecifier(candidate) {
-  if (candidate.startsWith('file://')) return candidate;
-  if (looksLikePathSpecifier(candidate)) {
-    const normalizedPath = isAbsolute(candidate)
-      ? candidate
-      : resolve(process.cwd(), candidate);
-    const resolvedFilePath = resolveNodeModuleFilePath(normalizedPath);
-    if (resolvedFilePath) return pathToFileURL(resolvedFilePath).href;
-  }
-  return candidate;
-}
-
-function resolveExplicitWebgpuModuleSpecifier() {
-  const fromEnv = process.env.DOE_NODE_WEBGPU_MODULE;
-  if (typeof fromEnv === 'string' && fromEnv.trim().length > 0) {
-    return resolveCandidateModuleSpecifier(fromEnv.trim());
-  }
-  return null;
-}
-
-function resolveGpuFromModule(mod) {
-  if (!mod) return null;
-
-  const fromModule = mod.gpu || mod.webgpu || mod.default?.gpu || mod.default?.webgpu;
-  if (fromModule && typeof fromModule.requestAdapter === 'function') {
-    return fromModule;
-  }
-
-  const tryCreateFactory = (factory) => {
-    if (typeof factory !== 'function') return null;
-    try {
-      return factory([...DEFAULT_PROVIDER_CREATE_ARGS]);
-    } catch {
-      try {
-        return factory([]);
-      } catch {
-        try {
-          return factory();
-        } catch {
-          return null;
-        }
-      }
-    }
-  };
-
-  const instanceFactory = mod.createInstance || mod.default?.createInstance;
-  const createdFromInstanceFactory = tryCreateFactory(instanceFactory);
-  if (createdFromInstanceFactory) {
-    if (typeof createdFromInstanceFactory.requestAdapter === 'function') {
-      return createdFromInstanceFactory;
-    }
-    if (createdFromInstanceFactory.gpu && typeof createdFromInstanceFactory.gpu.requestAdapter === 'function') {
-      return createdFromInstanceFactory.gpu;
-    }
-  }
-
-  const factory = mod.create || mod.default?.create;
-  const created = tryCreateFactory(factory);
-  if (created) {
-    if (typeof created.requestAdapter === 'function') return created;
-    if (created.gpu && typeof created.gpu.requestAdapter === 'function') {
-      return created.gpu;
-    }
-  }
-
-  if (mod.default && typeof mod.default.requestAdapter === 'function') {
-    return mod.default;
-  }
-  return null;
-}
-
+// Compatibility helper. New code should use openNodeWebGPU() so restoration is owned.
 export function installNavigatorGpu(gpu, options = {}) {
   if (!gpu || typeof gpu.requestAdapter !== 'function') return false;
-  if (typeof globalThis.navigator === 'undefined') {
-    Object.defineProperty(globalThis, 'navigator', {
-      value: { gpu },
-      writable: true,
-      configurable: true,
-      enumerable: false,
-    });
-    return true;
-  }
-
-  if (!globalThis.navigator.gpu || options.force === true) {
-    Object.defineProperty(globalThis.navigator, 'gpu', {
+  const mode = options.force === true ? 'replace' : 'install-missing';
+  try {
+    let navigatorObject = globalThis.navigator;
+    if (navigatorObject === undefined) {
+      Object.defineProperty(globalThis, 'navigator', {
+        value: {},
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      });
+      navigatorObject = globalThis.navigator;
+    }
+    if (mode === 'install-missing' && navigatorObject.gpu !== undefined) {
+      return navigatorObject.gpu === gpu;
+    }
+    Object.defineProperty(navigatorObject, 'gpu', {
       value: gpu,
       writable: true,
       configurable: true,
       enumerable: false,
     });
+  } catch {
+    return false;
   }
   return true;
 }
 
-function installWebgpuFromModule(mod, options = {}) {
-  const gpu = resolveGpuFromModule(mod);
-  if (!installNavigatorGpu(gpu, options)) return false;
+export async function openNodeWebGPU(options) {
+  const normalized = normalizeOpenOptions(options);
+  const receipt = createReceipt(normalized);
 
-  installGlobalsFromModule(mod);
-  setGlobalIfMissing('GPUBufferUsage', mod.GPUBufferUsage || mod.default?.GPUBufferUsage || mod.globals?.GPUBufferUsage);
-  setGlobalIfMissing('GPUShaderStage', mod.GPUShaderStage || mod.default?.GPUShaderStage || mod.globals?.GPUShaderStage);
-  setGlobalIfMissing('GPUMapMode', mod.GPUMapMode || mod.default?.GPUMapMode || mod.globals?.GPUMapMode);
-  setGlobalIfMissing('GPUTextureUsage', mod.GPUTextureUsage || mod.default?.GPUTextureUsage || mod.globals?.GPUTextureUsage);
-
-  return hasNavigatorGpu() && hasGpuEnums();
-}
-
-function formatAdapterProbeDetail(error) {
-  if (!error) {
-    return 'requestAdapter returned null for high-performance, low-power, and default options.';
-  }
-  const message = error?.message || String(error);
-  return `requestAdapter failed: ${message}`;
-}
-
-async function probeInstalledGpuAdapter() {
-  if (!hasNavigatorGpu()) {
-    const detail = 'navigator.gpu.requestAdapter is unavailable after provider installation.';
-    return {
-      ok: false,
-      detail,
-      failure: providerAvailabilityFailure({
-        reason: 'native_webgpu_unavailable',
-        stage: 'probeInstalledGpuAdapter',
-        detail,
-      }),
-    };
-  }
-  if (!hasGpuEnums()) {
-    const detail = 'WebGPU enum globals are unavailable after provider installation.';
-    return {
-      ok: false,
-      detail,
-      failure: providerAvailabilityFailure({
-        reason: 'native_webgpu_unavailable',
-        stage: 'probeInstalledGpuAdapter',
-        detail,
-      }),
-    };
-  }
-
-  let lastError = null;
-  for (const adapterOptions of ADAPTER_PROBE_OPTIONS) {
+  for (const provider of normalized.providers) {
+    let installed = null;
     try {
-      const adapter = adapterOptions
-        ? await globalThis.navigator.gpu.requestAdapter(adapterOptions)
-        : await globalThis.navigator.gpu.requestAdapter();
-      if (adapter) return { ok: true, detail: null };
+      const resolved = await loadProvider(provider);
+      const adapter = await requestDeclaredAdapter(provider, resolved.gpu, normalized.adapterOptions);
+      installed = installProviderGlobals(
+        resolved.gpu,
+        resolved.enums,
+        normalized.globals.mode,
+      );
+      receipt.attempts.push({
+        providerId: provider.id,
+        kind: provider.kind,
+        module: provider.kind === 'module' ? provider.module : null,
+        ok: true,
+        stage: 'complete',
+        code: null,
+        detail: null,
+      });
+      receipt.selectedProviderId = provider.id;
+      receipt.ok = true;
+      receipt.globals.installed = [...installed.installedNames];
+
+      let closed = false;
+      return Object.freeze({
+        gpu: resolved.gpu,
+        adapter,
+        module: resolved.module,
+        receipt,
+        async close() {
+          if (closed) return;
+          restoreSnapshots(installed.snapshots);
+          receipt.globals.restored = true;
+          closed = true;
+        },
+      });
     } catch (error) {
-      lastError = error;
+      if (installed?.snapshots?.length > 0) {
+        restoreSnapshots(installed.snapshots);
+      }
+      receipt.attempts.push(attemptFailure(provider, error));
     }
   }
 
-  const detail = formatAdapterProbeDetail(lastError);
+  throw new NodeWebGPUProviderError(
+    'DOE_PROVIDER_ALL_FAILED',
+    `all declared Node WebGPU providers failed: ${receipt.attempts.map((attempt) => `${attempt.providerId}:${attempt.code}`).join(', ')}`,
+    { stage: 'provider.select', receipt },
+  );
+}
+
+export async function probeNodeWebGPU(options) {
+  try {
+    const session = await openNodeWebGPU(options);
+    return { ok: true, session, receipt: session.receipt, error: null };
+  } catch (error) {
+    if (!(error instanceof NodeWebGPUProviderError)) throw error;
+    return { ok: false, session: null, receipt: error.receipt, error };
+  }
+}
+
+function compatibilityGlobals() {
   return {
-    ok: false,
-    detail,
-    failure: providerAvailabilityFailure({
-      reason: 'adapter_unavailable',
-      stage: 'probeInstalledGpuAdapter',
-      detail,
-    }),
+    GPUBufferUsage: 'globals.GPUBufferUsage',
+    GPUShaderStage: 'globals.GPUShaderStage',
+    GPUMapMode: 'globals.GPUMapMode',
+    GPUTextureUsage: 'globals.GPUTextureUsage',
   };
 }
 
-async function tryInstallAndProbeProvider(providerSpecifier, options = {}) {
-  const specifier = resolveCandidateModuleSpecifier(providerSpecifier);
-  let mod;
-  try {
-    mod = await import(specifier);
-  } catch (error) {
-    const detail = `import failed: ${error?.message || String(error)}`;
-    return {
-      ok: false,
-      provider: providerSpecifier,
-      detail,
-      failure: providerAvailabilityFailure({
-        reason: 'provider_import_failed',
-        provider: providerSpecifier,
-        stage: 'provider.import',
-        detail,
-      }),
-      module: null,
-    };
-  }
-
-  if (!installWebgpuFromModule(mod, { force: options.force === true })) {
-    const detail = 'failed to install WebGPU provider globals.';
-    return {
-      ok: false,
-      provider: providerSpecifier,
-      detail,
-      failure: providerAvailabilityFailure({
-        reason: 'native_webgpu_unavailable',
-        provider: providerSpecifier,
-        stage: 'provider.installGlobals',
-        detail,
-      }),
-      module: mod,
-    };
-  }
-
-  const probe = await probeInstalledGpuAdapter();
-  if (!probe.ok) {
-    return {
-      ok: false,
-      provider: providerSpecifier,
-      detail: probe.detail,
-      failure: providerAvailabilityFailure({
-        reason: probe.failure?.reason ?? 'adapter_unavailable',
-        provider: providerSpecifier,
-        stage: probe.failure?.stage ?? 'provider.probeAdapter',
-        detail: probe.detail,
-      }),
-      module: mod,
-    };
-  }
-
+function compatibilityProvider(providerSpecifier, id = 'explicit') {
   return {
-    ok: true,
-    provider: providerSpecifier,
-    detail: null,
-    module: mod,
+    id,
+    kind: 'module',
+    module: providerSpecifier,
+    gpu: {
+      kind: 'factory',
+      path: 'create',
+      args: [['enable-dawn-features=allow_unsafe_apis']],
+    },
+    globals: compatibilityGlobals(),
   };
 }
 
 export async function bootstrapNodeWebGPUProvider(providerSpecifier, options = {}) {
-  const attempt = await tryInstallAndProbeProvider(providerSpecifier, {
-    force: options.force === true,
+  const provider = options.provider ?? compatibilityProvider(providerSpecifier);
+  const session = await openNodeWebGPU({
+    providers: [provider],
+    adapterOptions: options.adapterOptions ?? null,
+    globals: { mode: options.force === false ? 'install-missing' : 'replace' },
   });
-  if (!attempt.ok) {
-    throw attachProviderAvailability(
-      new Error(
-        `failed to install Doe Node WebGPU provider "${providerSpecifier}": ${attempt.detail}`,
-      ),
-      attempt.failure,
-    );
-  }
   return {
     ok: true,
-    provider: providerSpecifier,
-    module: attempt.module,
+    provider: session.receipt.selectedProviderId,
+    module: session.module,
+    session,
+    receipt: session.receipt,
   };
 }
 
-export async function bootstrapNodeWebGPU() {
-  const explicitSpecifier = resolveExplicitWebgpuModuleSpecifier();
-  if (explicitSpecifier) {
-    const attempt = await tryInstallAndProbeProvider(explicitSpecifier, { force: true });
+export async function bootstrapNodeWebGPU(options = {}) {
+  const explicitModule = typeof process.env.DOE_NODE_WEBGPU_MODULE === 'string'
+    ? process.env.DOE_NODE_WEBGPU_MODULE.trim()
+    : '';
+  const providers = explicitModule
+    ? [compatibilityProvider(explicitModule, 'environment')]
+    : [
+      { id: 'pre-installed', kind: 'global' },
+      {
+        id: 'doe-native',
+        kind: 'module',
+        module: new URL('./native.js', import.meta.url).href,
+        gpu: { kind: 'factory', path: 'createNativeDirect', args: [['enable-dawn-features=allow_unsafe_apis']] },
+        globals: compatibilityGlobals(),
+      },
+      compatibilityProvider('webgpu', 'webgpu'),
+    ];
+  const result = await probeNodeWebGPU({
+    providers,
+    adapterOptions: options.adapterOptions ?? null,
+    globals: { mode: 'replace' },
+  });
+  if (!result.ok) {
     return {
-      ok: attempt.ok,
-      provider: explicitSpecifier,
-      detail: attempt.detail,
+      ok: false,
+      provider: null,
+      detail: result.error.message,
+      receipt: result.receipt,
+      error: result.error,
     };
   }
-
-  if (hasNavigatorGpu() && hasGpuEnums()) {
-    const preinstalledProbe = await probeInstalledGpuAdapter();
-    if (preinstalledProbe.ok) {
-      return { ok: true, provider: 'pre-installed', detail: null };
-    }
-  }
-
-  let lastFailure = null;
-  for (const specifier of DEFAULT_WEBGPU_PROVIDER_SPECIFIERS) {
-    const attempt = await tryInstallAndProbeProvider(specifier, { force: true });
-    if (attempt.ok) {
-      return { ok: true, provider: specifier, detail: null };
-    }
-    lastFailure = attempt;
-  }
-
   return {
-    ok: false,
-    provider: lastFailure?.provider ?? null,
-    detail: lastFailure?.detail ?? null,
+    ok: true,
+    provider: result.receipt.selectedProviderId,
+    detail: null,
+    session: result.session,
+    receipt: result.receipt,
   };
 }

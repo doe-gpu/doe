@@ -124,8 +124,15 @@ def validate_public_docs(errors: list[str]) -> None:
                 fail(errors, f"{rel} hardcodes package benchmark percentage: {match.group(0)}")
 
     readme = read_text(ROOT / "README.md")
-    if "assets/readme/backend-evidence-summary.svg" not in readme:
-        fail(errors, "README.md must reference assets/readme/backend-evidence-summary.svg")
+    evidence_table_header = (
+        "| Backend | Surface or workload | Comparator | Result | Evidence state | Evidence |"
+    )
+    if evidence_table_header not in readme:
+        fail(errors, "README.md must contain the native Markdown backend evidence table")
+    if "Intel Tiger Lake Vulkan" not in readme:
+        fail(errors, "README.md backend evidence table must include Intel Tiger Lake Vulkan")
+    if "assets/readme/backend-evidence-summary.svg" in readme:
+        fail(errors, "README.md must use the native Markdown evidence table, not the legacy SVG")
     if "reports/claim-index.json" not in readme:
         fail(errors, "README.md must reference reports/claim-index.json")
 

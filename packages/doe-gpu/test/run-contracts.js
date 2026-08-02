@@ -2,6 +2,9 @@
 
 const contracts = [
   './unit/browser-runtime-identity.test.js',
+  './unit/node-webgpu-provider-v1.test.js',
+  './unit/root-export-parity.test.js',
+  './unit/program-bundle-runner.test.js',
   './unit/full-surface-lifecycle.test.js',
   './unit/stage-platform-freshness.test.js',
   './unit/plan-contracts.test.js',

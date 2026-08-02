@@ -99,12 +99,27 @@ const adapter = await gpu.requestAdapter();
 const device = await adapter.requestDevice();
 ```
 
+For one-step device acquisition, prefer the explicit names:
+
+```js
+import { requestRawDevice, requestBoundDevice } from "doe-gpu";
+
+const rawDevice = await requestRawDevice();
+const boundDoe = await requestBoundDevice();
+// boundDoe.device is the underlying raw GPUDevice.
+```
+
+The older root `requestDevice()` remains a raw-device compatibility alias.
+`gpu.requestDevice()` returns the bound helper; the explicit names avoid that
+historical root-versus-namespace ambiguity.
+
 ## Entry Points
 
 - `doe-gpu`: default runtime surface
 - `doe-gpu/compute`: compute-focused helper surface
 - `doe-gpu/native`: explicit Zig-backed native WebGPU provider
-- `doe-gpu/node-webgpu`: Node WebGPU provider bootstrap
+- `doe-gpu/node-webgpu`: strict provider-v1 acquisition and lifecycle
+- `doe-gpu/program-bundle`: closed Doppler Program Bundle validation/execution
 - `doe-gpu/api`: provider-neutral helpers and types
 - `doe-gpu/plan`: JSON command-stream and execution-plan contracts
 - `doe-gpu/capture`: record-only WebGPU capture provider
@@ -128,6 +143,19 @@ Native loading checks these paths:
 
 If the native addon or shared library is missing, the package fails explicitly
 instead of silently falling back to another runtime.
+
+Provider-v1 callers declare an ordered provider list, exact factory/export
+bindings, adapter options, and global-installation mode. `openNodeWebGPU(...)`
+returns a receipt-bearing session whose `close()` restores changed globals.
+Doe's Program Bundle runner additionally requires a canonical closed bundle and
+explicit provider options; host execution occurs only when a host bridge is
+provided.
+
+Publishing is fail-closed. `prepublishOnly` requires an authenticated npm
+account, exact-version platform packages already present in the selected
+registry with matching CPU/OS metadata and integrity, and the complete package
+test suite. Platform packages therefore publish before the main wrapper; an
+unauthenticated host cannot publish accidentally.
 
 ## Evidence
 

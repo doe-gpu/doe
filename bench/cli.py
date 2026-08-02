@@ -28,11 +28,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if __name__ == "__main__" and not __package__:
     environment = os.environ.copy()
     existing_python_path = environment.get("PYTHONPATH")
-    environment["PYTHONPATH"] = (
-        f"{REPO_ROOT}{os.pathsep}{existing_python_path}"
-        if existing_python_path
-        else str(REPO_ROOT)
-    )
+    python_path_entries = [str(REPO_ROOT), str(REPO_ROOT / "bench")]
+    if existing_python_path:
+        python_path_entries.append(existing_python_path)
+    environment["PYTHONPATH"] = os.pathsep.join(python_path_entries)
     os.execve(
         sys.executable,
         [sys.executable, "-m", "bench.cli", *sys.argv[1:]],

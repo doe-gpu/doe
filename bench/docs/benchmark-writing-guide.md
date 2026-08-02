@@ -62,7 +62,7 @@ Applies to:
   - `config/dropin_abi.symbols.txt`
 
 Required checkpoints for benchmark contract changes:
-- `python3 bench/comparability_obligation_parity_gate.py`
+- `python3 bench/gates/comparability_obligation_parity_gate.py`
 - `python3 bench/gates/schema_gate.py`
 - targeted compare run for the modified workload set / surface config
 - timing policy gate on that report (`bench/gates/timing_policy_gate.py --backend vulkan` for Vulkan timing-policy-bound benchmark surfaces)

@@ -38,6 +38,17 @@ pub const KernelDispatchRepeatSynchronization = enum(u8) {
     independent,
 };
 
+pub const KernelDispatchOutputOracle = struct {
+    schema_version: u32,
+    kind: []const u8,
+    initialization: []const u8,
+    binding_group: u32,
+    binding: u32,
+    dispatch_count: u32,
+    expected_sha256: []const u8,
+    reference_id: []const u8,
+};
+
 pub const KernelDispatchCommand = struct {
     kernel: []const u8,
     entry_point: ?[]const u8 = null,
@@ -49,4 +60,5 @@ pub const KernelDispatchCommand = struct {
     warmup_dispatch_count: u32 = 0,
     initialize_buffers_on_create: bool = false,
     bindings: ?[]const KernelBinding = null,
+    output_oracle: ?KernelDispatchOutputOracle = null,
 };

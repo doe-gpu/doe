@@ -23,7 +23,7 @@ the kernels or execution behavior that Doppler already owns.
 
 | Artifact | Owner | Meaning |
 | --- | --- | --- |
-| Doppler Program Bundle | Doppler | Manifest reference, execution graph reference, deterministic JS entrypoint, WGSL refs and digests, runtime/capture profile, artifact IDs, and reference transcript. |
+| Doppler Program Bundle | Doppler | Manifest and execution identity, packaged hash-bound WGSL and constrained host-JS bytes, runtime/capture profile, artifact IDs, and reference transcript. |
 | WebGPU capture graph | Doe | Observed GPU command graph from running the declared program under a supported provider/capture profile. |
 | TSIR semantic + realization | Doe | Two-level lowering contract between WGSL IR and backend emitters; semantic is target-independent, realization pins target + planner choices. Both are hashable; digests bind into `integrityExtensions.lowerings[]`. See `docs/tsir-lowering-plan.md` + `docs/status/tsir.md`. |
 | HostPlan | Doe | Runtime orchestration contract for launches, tensors, scheduling, streams, and receipts derived from the declared/captured program surface. It is not the planned long-term place where kernel meaning, residency, or collective semantics are rediscovered. |
@@ -190,18 +190,19 @@ the portable-program boundary stays intact.
 Doe ingest must reject unsupported bundles early. A portable-program ingest
 receipt should bind these fields before lowering:
 
-- `programContractVersion`
-- `dopplerExecutionGraphVersion`
-- `webgpuSubset`
-- `wgslSubset`
-- `jsSubset`
-- `hostPlanVersion`
-- `unsupportedFeaturePolicy`
+- `schema` and `schemaVersion`
+- `package.schema` and `package.fileSetHash`
+- every `package.files[]` path, role, SHA-256, and byte size
+- `sources.executionGraph.hash`
+- `host.schema`, `host.jsSubset`, and packaged entrypoint source hashes
+- every reachable `wgslModules[]` source path, source hash, and exact entrypoint
+- `captureProfile.captureHash`
+- `referenceTranscript.executionGraphHash`
 
-For the Cerebras lane, `unsupportedFeaturePolicy` must be `fail`. A bundle that
-requires undeclared dynamic imports, undeclared WGSL modules, hidden provider
-fallbacks, or runtime behavior outside the selected subset is not eligible for
-CSL promotion.
+The contract is fail-closed. A bundle that requires undeclared imports,
+undeclared WGSL modules, hidden provider fallback, source paths outside the
+bundle root, or runtime behavior outside the selected subset is not eligible
+for CSL promotion.
 
 ## JavaScript boundary
 

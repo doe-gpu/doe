@@ -264,6 +264,20 @@ pub const ZigVulkanBackend = struct {
         }
     }
 
+    pub fn shader_source_hash_for_module(self: *ZigVulkanBackend, module: []const u8) ?[HASH_HEX_SIZE]u8 {
+        const direct = std.fs.cwd().readFileAlloc(self.allocator, module, 16 * 1024 * 1024) catch null;
+        if (direct) |bytes| {
+            defer self.allocator.free(bytes);
+            return hash_utils.sha256_hex(bytes);
+        }
+        const root = self.kernel_root_owned orelse "bench/kernels";
+        const path = std.fs.path.join(self.allocator, &.{ root, module }) catch return null;
+        defer self.allocator.free(path);
+        const bytes = std.fs.cwd().readFileAlloc(self.allocator, path, 16 * 1024 * 1024) catch return null;
+        defer self.allocator.free(bytes);
+        return hash_utils.sha256_hex(bytes);
+    }
+
     pub fn annotate_result(self: *ZigVulkanBackend, command: model.Command, result: webgpu.NativeExecutionResult) webgpu.NativeExecutionResult {
         var out = result;
         const meta = artifact_meta.classify(

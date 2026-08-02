@@ -7,6 +7,7 @@ import statistics
 from pathlib import Path
 from typing import Any
 
+from bench.lib.hash_utils import file_sha256
 from native_compare_modules.comparability import (
     _PHASE_ASYMMETRY_THRESHOLD,
     _PHASE_MATERIAL_FLOOR_FRACTION,
@@ -252,11 +253,27 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
 
     kernels: list[str] = []
     seen: set[str] = set()
+    output_oracle_count = 0
+    output_oracle_dispatch_mismatches: list[dict[str, int]] = []
     for index, command in enumerate(payload):
         if not isinstance(command, dict):
             continue
         if str(command.get("kind", "")).strip() != "kernel_dispatch":
             continue
+        output_oracle = command.get("output_oracle") or command.get("outputOracle")
+        if isinstance(output_oracle, dict):
+            output_oracle_count += 1
+            timed_dispatch_count = safe_int(command.get("repeat"), default=1)
+            oracle_dispatch_count = safe_int(
+                output_oracle.get("dispatch_count", output_oracle.get("dispatchCount")),
+                default=0,
+            )
+            if oracle_dispatch_count != timed_dispatch_count:
+                output_oracle_dispatch_mismatches.append({
+                    "commandIndex": index,
+                    "timedDispatchCount": timed_dispatch_count,
+                    "oracleDispatchCount": oracle_dispatch_count,
+                })
         kernel = str(command.get("kernel", "")).strip()
         if not kernel:
             return [], details, f"kernel_dispatch command at index {index} is missing kernel"
@@ -264,6 +281,8 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
             seen.add(kernel)
             kernels.append(kernel)
     details["kernelDispatchCount"] = len(kernels)
+    details["kernelDispatchOutputOracleCount"] = output_oracle_count
+    details["kernelDispatchOutputOracleDispatchMismatches"] = output_oracle_dispatch_mismatches
     details["kernelDispatchKernels"] = kernels
     return kernels, details, ""
 
@@ -285,6 +304,8 @@ def assess_native_shader_artifact_equivalence(
     is_dawn_vs_doe: bool,
     left_execution_backends: set[str],
     right_execution_backends: set[str],
+    left_command_samples: list[dict[str, Any]],
+    right_command_samples: list[dict[str, Any]],
 ) -> tuple[bool, bool, dict[str, Any], str]:
     details: dict[str, Any] = {
         "comparabilityMode": comparability_mode,
@@ -314,29 +335,148 @@ def assess_native_shader_artifact_equivalence(
         return False, True, details, ""
 
     resolved_artifacts: list[dict[str, str]] = []
-    missing_artifacts: list[dict[str, str]] = []
+    artifact_failures: list[dict[str, str]] = []
+    doe_samples = (
+        left_command_samples
+        if "doe_vulkan" in left_execution_backends
+        else right_command_samples
+    )
+    manifest_paths = sorted({
+        str(sample.get("traceMeta", {}).get("shaderArtifactManifestPath", "")).strip()
+        for sample in doe_samples
+        if isinstance(sample, dict) and isinstance(sample.get("traceMeta"), dict)
+        and str(sample.get("traceMeta", {}).get("executionBackend", "")) == "doe_vulkan"
+    } - {""})
+    manifests: list[tuple[Path, dict[str, Any]]] = []
+    for raw_path in manifest_paths:
+        manifest_path = _resolve_repo_relative_path(raw_path)
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            artifact_failures.append({
+                "kernel": "<manifest>",
+                "reason": f"failed to load shader artifact manifest {manifest_path}: {exc}",
+            })
+            continue
+        if not isinstance(manifest, dict):
+            artifact_failures.append({
+                "kernel": "<manifest>",
+                "reason": f"shader artifact manifest is not an object: {manifest_path}",
+            })
+            continue
+        manifests.append((manifest_path, manifest))
+
+    declared_oracle_count = int(command_details.get("kernelDispatchOutputOracleCount", 0) or 0)
+    oracle_failures: list[dict[str, str]] = []
+    if declared_oracle_count != len(kernels):
+        oracle_failures.append({
+            "kernel": "<commands>",
+            "reason": (
+                "every strict native kernel_dispatch requires an output oracle: "
+                f"kernels={len(kernels)} oracles={declared_oracle_count}"
+            ),
+        })
+    oracle_dispatch_mismatches = command_details.get(
+        "kernelDispatchOutputOracleDispatchMismatches", []
+    )
+    if oracle_dispatch_mismatches:
+        oracle_failures.append({
+            "kernel": "<commands>",
+            "reason": (
+                "strict native output oracle dispatch count must equal the timed command repeat: "
+                f"{oracle_dispatch_mismatches}"
+            ),
+        })
+    for side_name, samples in (("baseline", left_command_samples), ("comparison", right_command_samples)):
+        for sample in samples:
+            if not isinstance(sample, dict):
+                continue
+            trace_meta = sample.get("traceMeta", {})
+            if not isinstance(trace_meta, dict):
+                continue
+            count = safe_int(trace_meta.get("outputOracleCount"), default=0)
+            matched = safe_int(trace_meta.get("outputOracleMatchedCount"), default=0)
+            failed = safe_int(trace_meta.get("outputOracleFailedCount"), default=0)
+            expected = str(trace_meta.get("outputOracleExpectedSha256", ""))
+            actual = str(trace_meta.get("outputOracleActualSha256", ""))
+            if count != declared_oracle_count or matched != declared_oracle_count or failed != 0 or expected != actual:
+                oracle_failures.append({
+                    "kernel": "<output-oracle>",
+                    "reason": (
+                        f"{side_name} output oracle evidence is missing or failed: "
+                        f"count={count} matched={matched} failed={failed} hashesMatch={bool(expected) and expected == actual}"
+                    ),
+                })
+
     for kernel in kernels:
         artifact_path = _expected_spirv_artifact_path(kernel)
+        source_path = _DEFAULT_COMPARE_KERNEL_ROOT / kernel
         artifact_entry = {
             "kernel": kernel,
             "expectedSpirvPath": str(artifact_path),
+            "expectedWgslPath": str(source_path),
         }
-        if artifact_path.exists():
-            resolved_artifacts.append(artifact_entry)
-        else:
-            missing_artifacts.append(artifact_entry)
+        if not source_path.exists():
+            artifact_failures.append({**artifact_entry, "reason": "WGSL source is missing"})
+            continue
+        if not artifact_path.exists():
+            artifact_failures.append({**artifact_entry, "reason": "SPIR-V artifact is missing"})
+            continue
+        source_hash = file_sha256(source_path)
+        spirv_hash = file_sha256(artifact_path)
+        matching_manifests = [
+            (path, manifest)
+            for path, manifest in manifests
+            if str(manifest.get("module", "")).strip() == kernel
+        ]
+        if not matching_manifests:
+            artifact_failures.append({
+                **artifact_entry,
+                "reason": "Doe receipt has no shader manifest for this kernel",
+            })
+            continue
+        manifest_mismatch = False
+        for manifest_path, manifest in matching_manifests:
+            if manifest.get("wgslSha256") != source_hash:
+                artifact_failures.append({
+                    **artifact_entry,
+                    "manifestPath": str(manifest_path),
+                    "reason": (
+                        "shader manifest WGSL hash is stale: "
+                        f"manifest={manifest.get('wgslSha256')!r} current={source_hash}"
+                    ),
+                })
+                manifest_mismatch = True
+            if manifest.get("spirvSha256") != spirv_hash:
+                artifact_failures.append({
+                    **artifact_entry,
+                    "manifestPath": str(manifest_path),
+                    "reason": (
+                        "shader manifest SPIR-V hash does not match executed artifact: "
+                        f"manifest={manifest.get('spirvSha256')!r} current={spirv_hash}"
+                    ),
+                })
+                manifest_mismatch = True
+        if not manifest_mismatch:
+            resolved_artifacts.append({
+                **artifact_entry,
+                "wgslSha256": source_hash,
+                "spirvSha256": spirv_hash,
+            })
     details["resolvedSpirvArtifacts"] = resolved_artifacts
-    details["missingSpirvArtifacts"] = missing_artifacts
-    details["nativeShaderArtifactMismatchCount"] = len(missing_artifacts)
-    if not missing_artifacts:
+    artifact_failures.extend(oracle_failures)
+    details["shaderArtifactFailures"] = artifact_failures
+    details["nativeShaderArtifactMismatchCount"] = len(artifact_failures)
+    if not artifact_failures:
         return True, True, details, ""
-    missing_summary = ", ".join(
-        f"{entry['kernel']} -> {entry['expectedSpirvPath']}" for entry in missing_artifacts
+    failure_summary = "; ".join(
+        f"{entry.get('kernel', '<unknown>')}: {entry.get('reason', 'artifact mismatch')}"
+        for entry in artifact_failures
     )
     return (
         True,
         False,
         details,
-        "strict native Vulkan compare requires explicit SPIR-V artifacts for kernel_dispatch workloads; "
-        f"missing {missing_summary}",
+        "strict native Vulkan compare requires source-bound SPIR-V artifacts for kernel_dispatch workloads; "
+        f"{failure_summary}",
     )

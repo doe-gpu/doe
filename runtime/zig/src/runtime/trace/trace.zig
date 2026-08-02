@@ -60,6 +60,12 @@ pub const TraceRunSummary = struct {
     host_artifact_trace_jsonl_serialize_total_ns: u64 = 0,
     host_artifact_trace_jsonl_write_total_ns: u64 = 0,
     host_artifact_operator_manifest_finalize_total_ns: u64 = 0,
+    output_oracle_count: u64 = 0,
+    output_oracle_matched_count: u64 = 0,
+    output_oracle_failed_count: u64 = 0,
+    output_oracle_expected_sha256: ?[]const u8 = null,
+    output_oracle_actual_sha256: ?[]const u8 = null,
+    output_oracle_reference_id: ?[]const u8 = null,
     execution_gpu_timestamp_total_ns: u64,
     execution_gpu_timestamp_attempted_count: u64,
     execution_gpu_timestamp_valid_count: u64,
@@ -650,6 +656,26 @@ pub fn writeTraceMeta(path: []const u8, summary: TraceRunSummary) !void {
         summary.final_hash,
         summary.final_previous_hash,
     });
+    try writef(writer, "\"outputOracleCount\":{},\"outputOracleMatchedCount\":{},\"outputOracleFailedCount\":{},", .{
+        summary.output_oracle_count,
+        summary.output_oracle_matched_count,
+        summary.output_oracle_failed_count,
+    });
+    if (summary.output_oracle_expected_sha256) |value| {
+        try writer.writeAll("\"outputOracleExpectedSha256\":");
+        try writeJsonString(&writer, value);
+        try writer.writeAll(",");
+    }
+    if (summary.output_oracle_actual_sha256) |value| {
+        try writer.writeAll("\"outputOracleActualSha256\":");
+        try writeJsonString(&writer, value);
+        try writer.writeAll(",");
+    }
+    if (summary.output_oracle_reference_id) |value| {
+        try writer.writeAll("\"outputOracleReferenceId\":");
+        try writeJsonString(&writer, value);
+        try writer.writeAll(",");
+    }
     if (summary.execution_backend) |backend| {
         try writer.writeAll("\"executionBackend\":");
         try writeJsonString(&writer, backend);

@@ -54,6 +54,10 @@
       "data": "config/benchmark-cube-policy.json"
     },
     {
+      "schema": "config/vulkan-host-profiles.schema.json",
+      "data": "config/vulkan-host-profiles.json"
+    },
+    {
       "schema": "config/governed-lanes.schema.json",
       "data": "config/governed-lanes.json"
     },

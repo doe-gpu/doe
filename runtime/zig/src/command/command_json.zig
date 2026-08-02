@@ -60,6 +60,12 @@ fn freeCommandPayload(allocator: Allocator, command: model.Command) void {
             allocator.free(kernel_command.kernel);
             if (kernel_command.entry_point) |entry_point| allocator.free(entry_point);
             if (kernel_command.bindings) |bindings| allocator.free(bindings);
+            if (kernel_command.output_oracle) |oracle| {
+                allocator.free(oracle.kind);
+                allocator.free(oracle.initialization);
+                allocator.free(oracle.expected_sha256);
+                allocator.free(oracle.reference_id);
+            }
         },
         .buffer_write => |buffer_write| allocator.free(buffer_write.data),
         .render_draw, .draw_indirect, .draw_indexed_indirect, .render_pass => |render_command| {

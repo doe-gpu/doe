@@ -24,6 +24,10 @@
       "types": "./src/node-webgpu.d.ts",
       "default": "./src/node-webgpu.js"
     },
+    "./program-bundle": {
+      "types": "./src/program-bundle-runner.d.ts",
+      "default": "./src/program-bundle-runner.js"
+    },
     "./plan": {
       "types": "./src/plan.d.ts",
       "default": "./src/plan.js"
@@ -64,10 +68,12 @@
     "test": "npm run test:contracts && npm run test:smoke && npm run test:integration",
     "test:contracts": "node test/run-contracts.js",
     "check:plan-schema": "node scripts/check-plan-schema-parity.js",
+    "sync:program-bundle-schema": "node scripts/sync-program-bundle-schema.js",
     "test:smoke": "node test/smoke/test-smoke-load.js",
     "test:integration": "node test/integration/run-integration.js --runtime node",
     "test:integration:bun": "bun test/integration/run-integration.js --runtime bun",
     "test:integration:deno": "deno run --allow-all test/integration/run-integration.js --runtime deno",
+    "prepublishOnly": "node scripts/verify-publish-readiness.js && npm test",
     "sync-vendor": "node scripts/sync-vendor.js"
   },
   "optionalDependencies": {

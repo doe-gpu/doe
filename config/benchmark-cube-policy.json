@@ -41,6 +41,14 @@
     },
     {
       "arch": "x64",
+      "backend": "vulkan",
+      "displayName": "Intel Tiger Lake Linux Vulkan",
+      "gpuVendor": "intel",
+      "id": "linux_intel_tiger_lake_vulkan",
+      "os": "linux"
+    },
+    {
+      "arch": "x64",
       "displayName": "Linux x64",
       "id": "linux_x64",
       "os": "linux"
@@ -121,6 +129,7 @@
       "expectedHostProfiles": [
         "mac_apple_silicon",
         "linux_amd_vulkan",
+        "linux_intel_tiger_lake_vulkan",
         "windows_d3d12"
       ],
       "id": "backend_native",

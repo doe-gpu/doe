@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe Vulkan host profiles",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "profiles"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/profile"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyStringArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "displayName",
+        "cubeHostProfile",
+        "os",
+        "arch",
+        "vendorId",
+        "icdPath",
+        "runtimeProfile",
+        "backendLane"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cubeHostProfile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "os": {
+          "const": "linux"
+        },
+        "arch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "vendorId": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{4}$"
+        },
+        "icdPath": {
+          "type": "string",
+          "pattern": "^/[^\\u0000]+\\.json$"
+        },
+        "deviceIds": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "driverVersions": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "runtimeProfile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["vendor", "api", "family", "driver"],
+          "properties": {
+            "vendor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "api": {
+              "const": "vulkan"
+            },
+            "family": {
+              "type": "string",
+              "minLength": 1
+            },
+            "driver": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "backendLane": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

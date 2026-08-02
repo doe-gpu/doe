@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "config/csl-webgpu-emulator-input.schema.json",
+  "$id": "https://schemas.doe.deco/csl-webgpu-emulator-input.schema.json",
   "title": "CSL WebGPU emulator input",
   "description": "Source-preserving input bundle for a future CSL-source-to-WebGPU semantic emulator. This is an emulator input contract only; it is not a WebGPU execution receipt.",
   "type": "object",

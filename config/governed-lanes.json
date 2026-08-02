@@ -95,7 +95,8 @@
       "displayName": "Vulkan Doe app",
       "governanceKind": "backend_runtime",
       "hostProfiles": [
-        "linux_amd_vulkan"
+        "linux_amd_vulkan",
+        "linux_intel_tiger_lake_vulkan"
       ],
       "id": "vulkan_doe_app",
       "notes": "Controlled Vulkan app lane.",
@@ -113,7 +114,8 @@
       "displayName": "Vulkan Doe comparable",
       "governanceKind": "backend_runtime",
       "hostProfiles": [
-        "linux_amd_vulkan"
+        "linux_amd_vulkan",
+        "linux_intel_tiger_lake_vulkan"
       ],
       "id": "vulkan_doe_comparable",
       "notes": "Strict apples-to-apples comparable Vulkan lane.",
@@ -131,7 +133,8 @@
       "displayName": "Vulkan Doe release",
       "governanceKind": "backend_runtime",
       "hostProfiles": [
-        "linux_amd_vulkan"
+        "linux_amd_vulkan",
+        "linux_intel_tiger_lake_vulkan"
       ],
       "id": "vulkan_doe_release",
       "notes": "Strict Vulkan release lane.",
@@ -152,7 +155,8 @@
       "displayName": "Vulkan Dawn baseline",
       "governanceKind": "backend_runtime",
       "hostProfiles": [
-        "linux_amd_vulkan"
+        "linux_amd_vulkan",
+        "linux_intel_tiger_lake_vulkan"
       ],
       "id": "vulkan_dawn_release",
       "notes": "Canonical Vulkan Dawn delegate baseline lane; legacy Dawn directional alias now resolves here.",

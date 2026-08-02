@@ -701,6 +701,7 @@ def run_workload(
         and required_timing_class != "process-wall"
         and is_doe_runtime
     )
+    preflight_oracle_evidence: dict[str, Any] = {}
     if strict_runtime_preflight:
         preflight_trace_jsonl = out_dir / f"{name}.preflight.ndjson"
         preflight_trace_meta = out_dir / f"{name}.preflight.meta.json"
@@ -718,6 +719,7 @@ def run_workload(
             extra_args=effective_extra_args,
             command_repeat=command_repeat,
         )
+        preflight_command.append("--validate-output-oracles")
         run_once(
             preflight_command,
             gpu_memory_probe=gpu_memory_probe,
@@ -726,6 +728,18 @@ def run_workload(
             trace_meta_path=preflight_trace_meta,
         )
         preflight_meta = parse_trace_meta(preflight_trace_meta)
+        preflight_oracle_evidence = {
+            key: preflight_meta[key]
+            for key in (
+                "outputOracleCount",
+                "outputOracleMatchedCount",
+                "outputOracleFailedCount",
+                "outputOracleExpectedSha256",
+                "outputOracleActualSha256",
+                "outputOracleReferenceId",
+            )
+            if key in preflight_meta
+        }
         preflight_meta_patched = ensure_doe_runtime_trace_meta_fields(
             preflight_meta,
             queue_sync_mode=queue_sync_mode,
@@ -804,6 +818,7 @@ def run_workload(
             trace_meta_path=trace_meta,
         )
         sample_meta = parse_trace_meta(trace_meta)
+        sample_meta.update(preflight_oracle_evidence)
         trace_meta_wall_ms = workload_unit_wall_from_trace_meta(sample_meta)
         if trace_meta_wall_ms is not None:
             resource["subprocessWallMs"] = resource.get("processWallMs", elapsed_ms)

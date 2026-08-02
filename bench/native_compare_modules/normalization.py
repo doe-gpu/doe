@@ -40,8 +40,6 @@ def derive_counter_derived_divisor(
         derived_divisor = float(command_repeat)
     elif workload_domain == "upload" and trace_submit_every > 0:
         derived_divisor = float(trace_row_count)
-    elif trace_dispatch_count > 0:
-        derived_divisor = float(trace_dispatch_count)
     elif trace_success_count > 0 or trace_row_count > 0:
         derived_divisor = float(max(trace_success_count, trace_row_count))
 

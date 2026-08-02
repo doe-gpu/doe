@@ -29,6 +29,7 @@ pub const RunOptions = struct {
     // runtime/zig/src/backend/metal/metal_native_runtime.zig:380-402 and
     // bench/lib/metal_pipeline_cache_manifest.py for context).
     no_pipeline_cache: bool = false,
+    validate_output_oracles: bool = false,
     /// Optional override for the pipeline-cache directory. Empty slice means
     /// "no disk-backed persistence"; runtime stays in-memory for the process.
     /// Respected on platforms where Doe operates a persistent pipeline cache
@@ -230,6 +231,8 @@ pub fn parseArgs(argv: [][:0]u8, stdout: anytype) !ParseOutcome {
             options.execute = true;
         } else if (std.mem.eql(u8, argv[i], "--no-pipeline-cache")) {
             options.no_pipeline_cache = true;
+        } else if (std.mem.eql(u8, argv[i], "--validate-output-oracles")) {
+            options.validate_output_oracles = true;
         } else if (std.mem.eql(u8, argv[i], "--pipeline-cache-dir") and i + 1 < argv.len) {
             i += 1;
             options.pipeline_cache_dir = argv[i];
