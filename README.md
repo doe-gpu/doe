@@ -13,12 +13,9 @@
 
 **A contract-driven WebGPU runtime and compiler designed to replace the implementation _beneath_ WebGPU**
 
-Doe is an independent implementation of the WebGPU runtime and compiler stack. Its goal is not to invent another graphics API or ask developers to rewrite applications. Instead, Doe targets the implementation seam currently occupied by Dawn (runtime) and Tint (WGSL compiler), while preserving the existing public WebGPU contract.
+Doe is an independent implementation of the WebGPU runtime and compiler stack. Doe targets the implementation seam currently occupied by Dawn (runtime) and Tint (WGSL compiler) in Chromium browsers and runtimes.
 
-Applications continue to use `navigator.gpu`, WGSL, and the WebGPU specification. The browser, renderer, sandbox, and application-facing API remain unchanged. Doe replaces only the implementation beneath that boundary.
-
-The project is intentionally evidence-driven. Every technical claim is tied to deterministic workloads, reproducible artifacts, and explicit promotion gates rather than repository size, benchmark screenshots, or implementation volume.
-
+The project is intentionally evidence-driven. Every technical claim is tied to deterministic workloads
 ---
 
 # Vision
@@ -79,14 +76,6 @@ Those targets include conventional GPU backends such as:
 
 and longer-term spatial-compute paths, including the Doppler Program Bundle → HostPlan → Cerebras execution lane.
 
-The objective is not "compile once everywhere."
-
-The objective is:
-
-> preserve one program's identity while allowing backend-specific realization without losing provenance.
-
-Source, lowering, runtime artifacts, execution receipts, traces, and results remain explicitly linked.
-
 ---
 
 ## 3. Demonstrate contract-driven development
@@ -111,10 +100,6 @@ Lean proofs are used where explicitly required, but they are one component of a 
 
 # Why Doe Exists
 
-Doe is not primarily a "Zig project."
-
-It is a systems architecture project.
-
 Its central hypothesis is that one focused runtime/compiler/evidence system can:
 
 * preserve source-to-result identity
@@ -129,10 +114,6 @@ Zig enables this architecture through explicit memory management, predictable co
 ---
 
 # Strategy
-
-Doe intentionally attacks a narrow engineering seam.
-
-Rather than replacing an entire browser, operating system, or graphics ecosystem, it focuses on the implementation beneath WebGPU.
 
 Development proceeds one product surface at a time.
 
