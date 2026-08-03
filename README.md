@@ -11,7 +11,7 @@
   <a href="https://github.com/doerun/doe/pulls"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" /></a>
 </p>
 
-**A contract-driven WebGPU runtime and compiler designed to replace the implementation beneath WebGPU—not the API above it.**
+**A contract-driven WebGPU runtime and compiler designed to replace the implementation _beneath_ WebGPU**
 
 Doe is an independent implementation of the WebGPU runtime and compiler stack. Its goal is not to invent another graphics API or ask developers to rewrite applications. Instead, Doe targets the implementation seam currently occupied by Dawn (runtime) and Tint (WGSL compiler), while preserving the existing public WebGPU contract.
 
