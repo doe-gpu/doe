@@ -18,6 +18,7 @@
         "packages/doe-gpu/src/bun.js",
         "packages/doe-gpu/src/deno.js",
         "packages/doe-gpu/src/node-webgpu.js",
+        "packages/doe-gpu/src/program-bundle-runner.js",
         "packages/doe-gpu/src/plan.js",
         "packages/doe-gpu/src/capture.js",
         "packages/doe-gpu/src/compute.js",

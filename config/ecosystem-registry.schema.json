@@ -1,0 +1,303 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe ecosystem registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "registryRevision",
+    "scoringPolicyVersion",
+    "actors"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "registryRevision": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "scoringPolicyVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "actors": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/actor" }
+    }
+  },
+  "$defs": {
+    "repoPath": {
+      "type": "string",
+      "pattern": "^(bench/external-projects|reports/ecosystem)/[a-z0-9][a-z0-9-]*/[^/].*$"
+    },
+    "observationReference": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "source",
+        "engagementStatus",
+        "evidenceMaturity",
+        "observations",
+        "scoreHistory",
+        "harnesses",
+        "reviewedReports",
+        "claimIndexRefs",
+        "lastReviewedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "type": {
+          "type": "string",
+          "enum": ["project", "package", "company", "foundation", "runtime"]
+        },
+        "organization": { "type": "string", "minLength": 1 },
+        "source": { "$ref": "#/$defs/source" },
+        "engagementStatus": {
+          "type": "string",
+          "enum": [
+            "discovered",
+            "researched",
+            "harness-ready",
+            "measured",
+            "outreach-ready",
+            "integrated",
+            "retired"
+          ]
+        },
+        "evidenceMaturity": {
+          "type": "string",
+          "enum": ["source-only", "diagnostic", "comparable", "claimable"]
+        },
+        "observations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/observation" }
+        },
+        "scoreHistory": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/scoreRevision" }
+        },
+        "harnesses": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/harnessReference" }
+        },
+        "reviewedReports": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/reviewedReport" }
+        },
+        "claimIndexRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/claimIndexReference" }
+        },
+        "lastReviewedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repositoryUrl",
+        "upstreamCommit",
+        "commitVerifiedAt",
+        "license"
+      ],
+      "properties": {
+        "repositoryUrl": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://github\\.com/"
+        },
+        "packagePath": { "type": "string", "minLength": 1 },
+        "upstreamCommit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "commitVerifiedAt": { "type": "string", "format": "date-time" },
+        "license": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["identifier", "evidenceUrl", "verifiedAt"],
+          "properties": {
+            "identifier": { "type": "string", "minLength": 1 },
+            "evidenceUrl": { "type": "string", "format": "uri" },
+            "verifiedAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "summary", "evidenceUrl", "observedAt"],
+      "properties": {
+        "id": { "$ref": "#/$defs/observationReference" },
+        "summary": { "type": "string", "minLength": 1 },
+        "evidenceUrl": { "type": "string", "format": "uri" },
+        "observedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "scoreReason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "observationRefs"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "observationRefs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/observationReference" }
+        }
+      }
+    },
+    "axisScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "reasons"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/scoreReason" }
+        }
+      }
+    },
+    "scoreRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revisionId",
+        "recordedAt",
+        "reviewer",
+        "reviewStatus",
+        "registryRevision",
+        "scoringPolicyVersion",
+        "changedByObservationRefs",
+        "doeLeverage",
+        "existingCapabilityCoverage"
+      ],
+      "properties": {
+        "revisionId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "recordedAt": { "type": "string", "format": "date-time" },
+        "reviewer": { "type": "string", "minLength": 1 },
+        "reviewStatus": {
+          "type": "string",
+          "enum": ["provisional", "reviewed"]
+        },
+        "registryRevision": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*$"
+        },
+        "scoringPolicyVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "changedByObservationRefs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/observationReference" }
+        },
+        "doeLeverage": { "$ref": "#/$defs/axisScore" },
+        "existingCapabilityCoverage": { "$ref": "#/$defs/axisScore" }
+      }
+    },
+    "harnessReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "proofTargets", "oracle"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["proposed", "ready", "measured", "retired"]
+        },
+        "manifestPath": { "$ref": "#/$defs/repoPath" },
+        "proofTargets": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "correctness",
+              "reliability",
+              "performance",
+              "installation",
+              "diagnosis",
+              "determinism",
+              "compatibility"
+            ]
+          }
+        },
+        "oracle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "observationRefs"],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["upstream-existing", "replacement-required", "reviewed"]
+            },
+            "observationRefs": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/observationReference" }
+            }
+          }
+        }
+      }
+    },
+    "reviewedReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reportId", "path", "sha256", "reviewedAt", "reviewer"],
+      "properties": {
+        "reportId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "path": { "$ref": "#/$defs/repoPath" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "reviewedAt": { "type": "string", "format": "date-time" },
+        "reviewer": { "type": "string", "minLength": 1 }
+      }
+    },
+    "claimIndexReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entryId", "reviewedReportId"],
+      "properties": {
+        "entryId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "reviewedReportId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        }
+      }
+    }
+  }
+}

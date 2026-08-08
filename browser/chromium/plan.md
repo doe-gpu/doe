@@ -1,124 +1,61 @@
-# Chromium browser integration plan
+# Chromium integration acceptance plan
 
-This file is the browser-lane acceptance plan. The actual Chromium WebGPU task
-list lives in
-[`../../docs/chromium-webgpu-task-list.md`](../../docs/chromium-webgpu-task-list.md).
-Live milestone state lives in
-[`bench/workflows/browser-milestones.json`](bench/workflows/browser-milestones.json)
-and is checked by [`scripts/check-browser-milestones.py`](scripts/check-browser-milestones.py).
-
-Do not add parallel strategy prose here. Add new work to the canonical task
-list, then update this plan only when the acceptance gate or browser-lane
-artifact route changes.
+This file defines milestone acceptance. Tasks live in
+[`../../docs/chromium-webgpu-task-list.md`](../../docs/chromium-webgpu-task-list.md)
+and state lives in [`bench/workflows/browser-milestones.json`](bench/workflows/browser-milestones.json).
 
 ## Scope
 
-- Own forced-Doe Chromium WebGPU integration at the `navigator.gpu` seam.
-- Preserve Chromium process, sandbox, layout, media, and accessibility policy.
-- Keep Dawn available as explicit fallback until replacement gates say
-  otherwise.
-- Disable hidden fallback in claim mode.
-- Emit deterministic artifacts for runtime selection, fallback state, trace
-  continuity, and workload evidence.
+- Integrate Doe at Chromium's WebGPU implementation seam.
+- Preserve browser-owned process, sandbox, API, media, and security behavior.
+- Keep fallback explicit and disable it in forced-Doe evidence.
+- Bind source, runtime, browser, output, and receipt identity.
 
-## Milestone acceptance gates
+## Milestones
 
-### M0. Contracts
+### M0: contracts
 
-- Runtime selector contract exists.
-- Browser benchmark and claim methodology contracts exist.
-- Ownership, rollback, and artifact routes are schema-backed.
-- Browser responsibility boundaries are schema-backed.
-- Browser GPU flight-recorder artifact shape is schema-backed.
-- Milestone state is represented in the manifest.
+- Runtime selector, fallback, benchmark, claim, responsibility, and release
+  contracts exist with schemas and checkers.
+- The milestone manifest names required artifacts and checks.
 
-### M1. Forced runtime selection
+### M1: forced runtime
 
-- Chromium launches in explicit `dawn`, `doe`, and `auto` modes.
-- Forced `doe` mode fails closed when Doe cannot initialize.
-- `auto` mode falls back with typed reason codes.
-- Runtime selection fields appear in browser artifacts.
+- Chromium launches in declared `dawn`, `doe`, and governed `auto` modes.
+- Forced Doe fails closed.
+- Runtime identity and fallback state appear in artifacts.
 
-### M2. Compatibility
+### M2: correctness and reliability
 
-- Drop-in ABI and symbol gates pass for required browser-lane artifacts.
-- Browser WebGPU smoke and layered rows run under both Dawn and forced Doe.
-- CTS subset artifacts are linked when available.
-- Trace and replay artifacts pass hash-chain checks.
-- Hidden runtime switches are rejected.
+- Dawn and forced Doe run the same browser workload set.
+- Independent output oracles, CTS coverage, crash, hang, recovery, device-loss,
+  concurrency, and memory checks pass for the promoted platform.
+- Trace and replay identity is complete.
 
-### M3. Claim qualification
+### M3: end-to-end performance
 
-- Browser reports explicitly classify `diagnostic` vs `claimable`.
-- Claimable rows pass strict timing-scope and structural-equivalence checks.
-- Repeated browser claim artifacts pass the browser claim policy.
-- Browser claim reports stay separate from native/package claims.
+- Both runtimes execute equivalent application work.
+- Cold and warm user-visible operations report p50, p95, p99, memory, failures,
+  retries, and fallback state.
+- A practical winning threshold larger than noise is release-blocking for any
+  promoted speed claim.
 
-## Release-Candidate Browser Bar
+### M4: published release
 
-The credible public browser artifact is a downloadable Chromium-family build
-with Doe integrated into the WebGPU path. The release-candidate route is
-defined in
-[`contracts/browser-published-release.contract.md`](contracts/browser-published-release.contract.md).
+- A public HTTPS archive binds the browser, Doe runtime, Dawn fallback, and
+  compiler bytes.
+- Download, proof-page, gallery, comparison, launch, finalizer, and candidate
+  receipts all pass their contracts.
+- Installation and launch instructions work on the declared clean system.
 
-Acceptance requires:
+## Promotion rule
 
-- a hosted browser zip with a public HTTPS download URL on release
-  infrastructure plus SHA-256 for the zip and browser executable member inside
-  it, app metadata binding the same product identity, plus hash-matched Doe and
-  Dawn runtime members inside it, starting with macOS arm64
-- browser product identity naming Doe Browser or Fawn Doe, with the same
-  product identity in the public download receipt
-- browser release and runtime-frontier bundle receipts with verified file
-  hashes, including the Dawn fallback runtime hash
-- a public download receipt proving the hosted archive served bytes matching
-  the release archive SHA-256
-- per-run WebGPU receipts that bind shader source, lowering path, backend,
-  driver/device identity, output hash, timing, runtime selector state, fallback
-  state, and receipt ID
-- a Dawn-vs-Doe comparison mode that emits side-by-side receipts for the same
-  page workload and exposes the comparison artifact plus both receipt payloads
-  from one gallery page
-- hosted gallery page URLs on non-special-use hosts for compute, rendering,
-  tensors, shader edge cases, and benchmark traces
-- public gallery receipts proving those hosted pages served bytes matching the
-  hash-bound gallery artifacts
-- a local proof page, such as `about:doe`, showing active runtime, backend,
-  compiler path, TSIR/HostPlan/CSL status, fallback policy, and recent receipts
-  including paired Dawn/Doe comparison receipt links plus release provenance
-  for the downloadable browser archive
-- a proof-page diagnostic receipt proving the local diagnostics URL loaded the
-  hash-bound proof page with matching diagnostics, release provenance, and
-  recent receipt IDs
+Milestones are cumulative. Missing M2 evidence cannot be offset by M3 timing,
+and local M3 evidence cannot substitute for M4 distribution proof.
 
-The public browser claim is: download the browser, run a WebGPU workload,
-inspect the source-preserving Doe execution receipt, and compare it against
-Dawn. Until that route exists, browser output stays diagnostic.
+Until M4 passes for a declared platform, the browser lane remains diagnostic.
 
-## Current task source
+## Archived work
 
-Use the canonical task list for all new work:
-
-- compiler tasks against Tint
-- runtime tasks against Dawn
-- Chromium seam tasks
-- browser responsibility map tasks
-- browser capability tasks beyond current Chrome behavior
-- security and fork-maintenance tasks
-
-See
-[`../../docs/chromium-webgpu-task-list.md`](../../docs/chromium-webgpu-task-list.md).
-
-## Archived module references
-
-The old Track B module contracts are archived and inactive:
-
-- `fawn_2d_sdf_renderer`
-- `fawn_path_engine`
-- `fawn_effects_pipeline`
-- `fawn_compute_services`
-- `fawn_resource_scheduler`
-
-Use those files only as historical contract references. New browser work must
-start from the canonical task list and promote through schema, trace, gate, and
-artifact contracts before runtime behavior changes.
+Track B internal-module proposals are retired. Historical contracts may remain
+for reference, but they are not active milestones or product surfaces.

@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe ecosystem scoring policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "policyVersion",
+    "scoreRange",
+    "bands",
+    "derivedLabels",
+    "engagementStatuses",
+    "evidenceMaturity"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "policyVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "scoreRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum", "maximum", "axes"],
+      "properties": {
+        "minimum": { "type": "integer", "const": 0 },
+        "maximum": { "type": "integer", "const": 5 },
+        "axes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["doeLeverage", "existingCapabilityCoverage"],
+          "properties": {
+            "doeLeverage": { "$ref": "#/$defs/axis" },
+            "existingCapabilityCoverage": { "$ref": "#/$defs/axis" }
+          }
+        }
+      }
+    },
+    "bands": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/band" }
+    },
+    "derivedLabels": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/derivedLabel" }
+    },
+    "engagementStatuses": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "discovered",
+          "researched",
+          "harness-ready",
+          "measured",
+          "outreach-ready",
+          "integrated",
+          "retired"
+        ]
+      }
+    },
+    "evidenceMaturity": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["source-only", "diagnostic", "comparable", "claimable"]
+      }
+    }
+  },
+  "$defs": {
+    "axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "question", "anchors"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "question": { "type": "string", "minLength": 1 },
+        "anchors": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["score", "name", "description"],
+            "properties": {
+              "score": { "type": "integer", "minimum": 0, "maximum": 5 },
+              "name": { "type": "string", "minLength": 1 },
+              "description": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "band": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "minimum", "maximum"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "minimum": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "maximum": { "type": "integer", "minimum": 0, "maximum": 5 }
+      }
+    },
+    "derivedLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["doeLeverageBand", "existingCapabilityCoverageBand", "label"],
+      "properties": {
+        "doeLeverageBand": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "existingCapabilityCoverageBand": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "label": {
+          "type": "string",
+          "enum": [
+            "ecosystem-watch",
+            "adjacent-reference",
+            "reference-baseline",
+            "validation-workload",
+            "ecosystem-adjacent",
+            "capability-peer",
+            "adoption-candidate",
+            "design-partner",
+            "integration-peer"
+          ]
+        }
+      }
+    }
+  }
+}

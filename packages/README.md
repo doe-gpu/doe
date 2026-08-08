@@ -11,10 +11,11 @@ contract is the package exports plus
 [`packages/doe-gpu/README.md`](./doe-gpu/README.md), not the scripts under
 `bench/`, `browser/`, or `pipeline/`.
 
-Within `doe-gpu`, subpaths such as `api`, `native`, `node-webgpu`, `plan`,
-`capture`, `compute`, `browser`, and `hybrid` are subpath entrypoints of one
-package, not separate products. The `csl` runtime surface is intentionally not
-exported yet.
+Within `doe-gpu`, subpaths such as `api`, `native`, `node-webgpu`,
+`program-bundle`, `plan`, `capture`, `compute`, `browser`, and `hybrid` are
+entrypoints of one package, not separate products. The `csl` runtime surface is
+intentionally not exported yet. `packages/doe-gpu/package.json` owns the exact
+list.
 
 ## Boundary rules
 

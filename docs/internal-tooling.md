@@ -1,103 +1,40 @@
-# Internal tooling
+# Public and internal tooling
 
-This document separates Doe's repo-only tooling from its public package
-surface.
+The machine-readable boundary is `config/tool-surfaces.json`. When prose and
+the manifest disagree, the manifest wins.
 
-The canonical machine-readable contract is [`config/tool-surfaces.json`](../config/tool-surfaces.json).
-If prose and tooling metadata disagree, treat the schema-backed manifest as the
-source of truth.
+## Public surface
 
-## Public package surface
+`packages/doe-gpu/` is the public npm package. Its `package.json` owns exports
+and packaged files; its README owns user-facing installation and examples.
 
-The current public package contract is:
+Advanced JavaScript helpers remain public when exported by the manifest, even
+when their primary use is repository evidence. That is semver surface, not
+authorization to describe repo-only CLIs as npm product features.
 
-- `doe-gpu`
-- its documented subpath exports, including `api`, `native`, `node-webgpu`,
-  `plan`, `capture`, `compute`, `browser`, and compatibility `hybrid`
-- the package docs in [`packages/doe-gpu/README.md`](../packages/doe-gpu/README.md)
+## Repo-only surface
 
-Advanced helper exports such as `createDoeRuntime()` and
-`runDawnVsDoeCompare()` are still part of the package surface, but they are
-repo-adjacent helpers, not the canonical operator front doors for benchmark or
-release work.
+Unless the manifest says otherwise, these are contributor/operator tooling:
 
-The npm package does not ship compare, bench, or release pipeline CLIs.
-It also does not ship a public `doe-gpu/csl` subpath until the CSL HostPlan and
-receipt contracts are stable enough to treat as semver package surface.
+- `bench/` compare, claim, release, and reporting commands;
+- `runtime/zig/` build and compiler tools;
+- `browser/chromium/` browser contracts, scripts, and diagnostics;
+- `pipeline/` trace, proof, and upstream-intelligence tooling;
+- top-level `scripts/`, `examples/`, `demos/`, and `nursery/`.
 
-## Claim and reporting boundary
+Repo-only tooling may produce public evidence. The tool itself does not become
+a supported package interface.
 
-Human-facing performance claims must come from current claim metadata, not from
-stale README prose, old SVGs, or local scratch artifacts.
+## Claim boundary
 
-Public README claim rows are indexed in
-[`reports/claim-index.json`](../reports/claim-index.json). A public claim row
-must state its backend, surface, comparator, metric direction, result, claim
-state, evidence path, and claimable sidecar path. Diagnostic rows may stay
-visible, but they must be described as diagnostic or status-only rather than
-claimable speed evidence.
+Public measured claims come from `reports/claim-index.json` and referenced
+artifacts. Package docs must not hardcode benchmark percentages or promote
+diagnostic rows.
 
-Package-local docs may point to the claim index or a package-local evidence
-artifact, but they must not hardcode benchmark percentages without an explicit
-claim state and current artifact path.
-
-Run the public claim checker before publishing README/reporting changes:
+Run:
 
 ```bash
 python3 scripts/check-public-claim-surfaces.py
 ```
 
-The checker validates the claim index shape and scans public docs for stale
-chart references or hardcoded package-performance percentages. It is
-intentionally narrow and does not replace benchmark gates, schema gates, or
-runtime tests.
-
-## Internal operator tooling
-
-These are repo-only contributor/operator surfaces:
-
-- [`bench/cli.py`](../bench/cli.py)
-- [`bench/runners/run_release_pipeline.py`](../bench/runners/run_release_pipeline.py)
-- [`bench/runners/run_blocking_gates.py`](../bench/runners/run_blocking_gates.py)
-- [`bench/tools/generate_backend_workloads.py`](../bench/tools/generate_backend_workloads.py)
-- TSIR parity tooling ([`bench/tools/doe_parity.py`](../bench/tools/doe_parity.py),
-  [`bench/tools/tsir_manifest_lowering.py`](../bench/tools/tsir_manifest_lowering.py),
-  [`bench/gates/nightly_tsir_parity_canary.py`](../bench/gates/nightly_tsir_parity_canary.py));
-  full surface + fixtures enumerated in
-  [`bench/README.md`](../bench/README.md) §TSIR parity tooling
-- [`runtime/zig/README.md`](../runtime/zig/README.md) and `doe-zig-runtime`
-- browser benchmark scripts under [`browser/chromium`](../browser/chromium/README.md)
-
-Repo-only directories should not be treated as public product commitments unless
-`config/tool-surfaces.json` marks them `audience=public`.
-
-In practice:
-
-- `bench/` (including `bench/cts/`), `browser/chromium/`, `examples/`,
-  `pipeline/`, top-level `scripts/`, and `demos/` are internal
-- `packages/doe-gpu/` is the public npm surface
-- `packages/doe-gpu/src/browser.js` is public API compatibility over incumbent
-  browser WebGPU, not the Chromium runtime replacement lane
-- overlapping helpers are allowed, but repo workflows are still owned by the
-  repo tooling, not by the npm package
-
-The active upstream discovery entrypoint is
-`python3 -m pipeline.upstream_intelligence`. It owns durable Gerrit history,
-referenced Chromium issue enrichment, versioned LLM review, and review
-receipts. `pipeline/agent/mine_upstream_quirks.py` independently corroborates
-those reports against checked-out Dawn source.
-
-## Archive and deprecated areas
-
-These areas exist for migration, reference, or research and should not be read
-as active public product surfaces:
-
-- legacy npm names `@simulatte/webgpu` and `@simulatte/webgpu-doe`
-- `dawn-research/` (deprecated Gerrit archive and replay corpus)
-- `nursery/`
-
-Experimental demo applications stay under `demos/`, but they are still
-repo-only/internal unless the surface manifest explicitly marks them public.
-
-When a question is about public package behavior, ignore archive and repo-only
-tooling unless the user explicitly asks about them.
+Historical npm names and archived research are not active product surfaces.

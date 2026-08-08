@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "1.0.0",
+  "scoreRange": {
+    "minimum": 0,
+    "maximum": 5,
+    "axes": {
+      "doeLeverage": {
+        "name": "Doe Leverage",
+        "question": "How materially could Doe improve this actor's correctness, reliability, performance, installation, or diagnosis?",
+        "anchors": [
+          { "score": 0, "name": "none", "description": "Doe does not affect the actor's workflow." },
+          { "score": 1, "name": "incidental", "description": "Doe could improve a minor or optional workflow." },
+          { "score": 2, "name": "useful", "description": "Doe could improve a secondary workflow." },
+          { "score": 3, "name": "material", "description": "Doe could improve an important workflow." },
+          { "score": 4, "name": "core", "description": "Doe could materially improve a core workflow." },
+          { "score": 5, "name": "critical", "description": "Doe directly addresses an observed blocker or central constraint." }
+        ]
+      },
+      "existingCapabilityCoverage": {
+        "name": "Existing Capability Coverage",
+        "question": "How much runtime-adjacent work does this actor already own?",
+        "anchors": [
+          { "score": 0, "name": "consumer", "description": "Consumes WebGPU without owning runtime-adjacent machinery." },
+          { "score": 1, "name": "workload", "description": "Owns shaders or GPU algorithms." },
+          { "score": 2, "name": "adapter", "description": "Owns provider setup, fallback, output checks, or integration tests." },
+          { "score": 3, "name": "runtime-adjacent", "description": "Owns orchestration, diagnostics, code generation, or execution abstractions." },
+          { "score": 4, "name": "runtime-platform", "description": "Owns substantial runtime or compiler infrastructure." },
+          { "score": 5, "name": "runtime-peer", "description": "Implements the same provider or execution boundary as Doe." }
+        ]
+      }
+    }
+  },
+  "bands": [
+    { "id": "low", "minimum": 0, "maximum": 1 },
+    { "id": "medium", "minimum": 2, "maximum": 3 },
+    { "id": "high", "minimum": 4, "maximum": 5 }
+  ],
+  "derivedLabels": [
+    { "doeLeverageBand": "low", "existingCapabilityCoverageBand": "low", "label": "ecosystem-watch" },
+    { "doeLeverageBand": "low", "existingCapabilityCoverageBand": "medium", "label": "adjacent-reference" },
+    { "doeLeverageBand": "low", "existingCapabilityCoverageBand": "high", "label": "reference-baseline" },
+    { "doeLeverageBand": "medium", "existingCapabilityCoverageBand": "low", "label": "validation-workload" },
+    { "doeLeverageBand": "medium", "existingCapabilityCoverageBand": "medium", "label": "ecosystem-adjacent" },
+    { "doeLeverageBand": "medium", "existingCapabilityCoverageBand": "high", "label": "capability-peer" },
+    { "doeLeverageBand": "high", "existingCapabilityCoverageBand": "low", "label": "adoption-candidate" },
+    { "doeLeverageBand": "high", "existingCapabilityCoverageBand": "medium", "label": "design-partner" },
+    { "doeLeverageBand": "high", "existingCapabilityCoverageBand": "high", "label": "integration-peer" }
+  ],
+  "engagementStatuses": [
+    "discovered",
+    "researched",
+    "harness-ready",
+    "measured",
+    "outreach-ready",
+    "integrated",
+    "retired"
+  ],
+  "evidenceMaturity": [
+    "source-only",
+    "diagnostic",
+    "comparable",
+    "claimable"
+  ]
+}
