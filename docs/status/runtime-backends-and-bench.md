@@ -15,6 +15,10 @@ file only names the promoted boundary and open admission gates.
 - D3D12 still lacks a current Windows evidence run.
 - Chromium results remain a separate browser lane and do not inherit package or
   native claim status.
+- External-project harnesses now have a manifest-driven prepare/reproduce
+  entrypoint with exact source pinning and separate hash-bound preparation and
+  execution receipts. Promotion remains downstream of reviewed application
+  evidence and a claim-eligible physical support target.
 
 ## Admission blockers
 
@@ -26,6 +30,8 @@ file only names the promoted boundary and open admission gates.
 - Installation must pass from clean npm environments on every supported
   runtime, operating system, and architecture tuple.
 - Performance is still advisory in `config/gates.json`.
+- The AMD Vulkan application lane still needs returned physical-host artifacts;
+  the checked-in handoff is an execution contract, not hardware evidence.
 
 ## Ground truth
 

@@ -11,11 +11,18 @@ python3 bench/cli.py --help
 python3 bench/cli.py workload --help
 python3 bench/cli.py compare --help
 python3 bench/cli.py claim --help
+python3 bench/cli.py external --help
 ```
 
 Use [`docs/operator-runbook.md`](../docs/operator-runbook.md) for platform
 procedures and [`bench/docs/benchmark-writing-guide.md`](docs/benchmark-writing-guide.md)
 for adding workloads.
+
+External application reproduction starts at
+[`external-projects/README.md`](external-projects/README.md). The
+`external reproduce` command owns source preparation, host admission, Doe
+build identity, policy gates, workload execution, and receipt routing; a
+passing command is still not a public claim.
 
 ## Evidence flow
 

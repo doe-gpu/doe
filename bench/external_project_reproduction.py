@@ -490,6 +490,7 @@ def _ensure_upstream(
 ) -> tuple[str, str, bool]:
     timeout_seconds = int(selection.policy["sourceCommandTimeoutSeconds"])
     upstream = selection.manifest["upstream"]
+    new_checkout = False
     if not selection.upstream_root.exists():
         if offline:
             raise ReproductionError(
@@ -514,6 +515,7 @@ def _ensure_upstream(
         )
         steps.append(clone.receipt)
         _require_process(clone, "source")
+        new_checkout = True
     if not (selection.upstream_root / ".git").exists():
         raise ReproductionError(
             "source", f"upstream path is not a Git checkout: {selection.upstream_root}"
@@ -531,13 +533,17 @@ def _ensure_upstream(
         steps.append(result.receipt)
         return result
 
-    status = git("verify-upstream-clean-before-checkout", "status", "--porcelain")
-    _require_process(status, "source")
-    if status.stdout.strip():
-        raise ReproductionError(
-            "source",
-            "upstream checkout has local changes; preserve or remove them before reproduction",
+    if not new_checkout:
+        status = git(
+            "verify-upstream-clean-before-checkout", "status", "--porcelain"
         )
+        _require_process(status, "source")
+        if status.stdout.strip():
+            raise ReproductionError(
+                "source",
+                "upstream checkout has local changes; preserve or remove them "
+                "before reproduction",
+            )
     origin = git("verify-upstream-origin", "remote", "get-url", "origin")
     _require_process(origin, "source")
     actual_origin = origin.stdout.strip()

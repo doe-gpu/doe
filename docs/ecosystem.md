@@ -91,6 +91,20 @@ they are not rewritten to erase earlier outcomes. Registry score changes point
 to the observation that changed the score and preserve earlier revisions in
 `scoreHistory`.
 
+Prepare or execute a registered harness through the stable benchmark CLI:
+
+```bash
+python3 bench/cli.py external prepare --actor <actor-id> --harness <harness-id>
+python3 bench/cli.py external reproduce --actor <actor-id> --harness <harness-id>
+```
+
+The preparation receipt binds the exact upstream commit, clean-source state,
+host and hardware identity, tool versions, contracts, and built provider
+artifacts. The reproduction receipt verifies and binds that preparation before
+running policy gates and workload evidence. A reviewed report proposed for
+promotion must reference a passing, hash-valid, claim-eligible preparation
+receipt for the same actor, harness, and upstream commit.
+
 ## Validation and views
 
 Run the blocking semantic checker:

@@ -53,6 +53,11 @@ classified and cannot be promoted by benchmark results.
   after the workload duplicate-removal gate proves equivalent sensitivity.
 - Public claims bind to receipts, source/config identities, execution boundary,
   toolchain identity, and comparability status.
+- A claim-bearing external-project report must reference a passing preparation
+  receipt that binds the same actor, harness, upstream commit, clean checkout,
+  physical support target, toolchain, and Doe/provider artifacts. The release
+  gate opens and verifies that receipt; a manifest declaration alone is not
+  evidence.
 
 ## Gate policy and failure precedence
 
