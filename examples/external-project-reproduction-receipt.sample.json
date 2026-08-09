@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-reproduction-receipt",
+  "generatedAt": "2026-08-09T00:00:00Z",
+  "actorId": "sample-actor",
+  "harnessId": "sample-workload",
+  "runId": "sample-run",
+  "status": "passed",
+  "evidenceMaturity": "diagnostic",
+  "failure": null,
+  "contracts": [
+    {
+      "id": "ecosystem-registry",
+      "path": "config/ecosystem-registry.json",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sizeBytes": 1
+    },
+    {
+      "id": "harness-manifest",
+      "path": "bench/external-projects/sample-actor/sample.harness.json",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sizeBytes": 1
+    },
+    {
+      "id": "reproduction-policy",
+      "path": "config/external-project-reproduction-policy.json",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "sizeBytes": 1
+    }
+  ],
+  "preparation": {
+    "path": "bench/out/external-projects/sample-actor/sample-run/preparation.json",
+    "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "status": "passed",
+    "claimEligible": false
+  },
+  "workload": null,
+  "evidence": [],
+  "gates": [],
+  "receiptSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+}
