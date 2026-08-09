@@ -92,7 +92,7 @@ export type DoeStreamExecutionPlanArtifact = {
 };
 
 export type DoeCslHostPlanArtifact = {
-  schemaVersion: 2;
+  schemaVersion: 3;
   artifactKind: typeof DOE_CSL_HOST_PLAN_ARTIFACT_KIND;
   target: "wse3";
   contract: "explicit_host_plan";

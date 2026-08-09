@@ -90,7 +90,7 @@ assert.equal(
 );
 assert.equal(
   validatePlanArtifact({
-    schemaVersion: 2,
+    schemaVersion: 3,
     artifactKind: 'csl_host_plan',
     target: 'wse3',
     contract: 'explicit_host_plan',

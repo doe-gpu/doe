@@ -1,13 +1,11 @@
 {
   "approval": {
-    "categories": [
-      "abi-surface"
-    ],
-    "reason": "Approve the additive doeNativeShaderModuleGetBindingsForEntryPoint export consumed by the Node auto-layout integration; all normalized commands, errors, canonical WGSL IR, target outputs, traces, replay results, and other ABI symbols remain equivalent."
+    "categories": [],
+    "reason": null
   },
   "baselineCommit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
-  "candidateCommit": "WORKTREE:29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410",
-  "classification": "approved-contract-change",
+  "candidateCommit": "WORKTREE:f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5",
+  "classification": "failure",
   "differences": [
     {
       "baselineSha256": "6397dec652765917af9a5fb11ec2002fb5bbb4915d85489ea74fc23076132565",
@@ -16,5 +14,6 @@
       "path": "abi/libwebgpu_doe.so.symbols.txt"
     }
   ],
+  "failureBoundary": "abi-surface",
   "schemaVersion": 1
 }
