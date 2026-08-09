@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -20,6 +21,7 @@ PREFLIGHT = BENCH_DIR / "runners" / "preflight_d3d12_host.py"
 CLI = BENCH_DIR / "cli.py"
 BLOCKING_GATES = BENCH_DIR / "runners" / "run_blocking_gates.py"
 CUBE = BENCH_DIR / "tools" / "build_benchmark_cube.py"
+RECEIPT_LINE = re.compile(r"^\s*(bench/out/\S+\.run\.json)\s*$")
 
 
 def parse_args() -> argparse.Namespace:
@@ -69,41 +71,157 @@ def config_report_path(config_path: Path) -> Path:
     return REPO_ROOT / out_path
 
 
-def run_step(name: str, command: list[str], *, dry_run: bool) -> None:
+def run_step(
+    name: str,
+    command: list[str],
+    *,
+    dry_run: bool,
+    capture: bool = False,
+) -> str:
     printable = " ".join(command)
     print(f"[{name}] {printable}")
     if dry_run:
+        return ""
+    result = subprocess.run(
+        command,
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=capture,
+        text=True,
+    )
+    if capture and result.stdout:
+        print(result.stdout, end="")
+    if capture and result.stderr:
+        print(result.stderr, file=sys.stderr, end="")
+    return result.stdout if capture else ""
+
+
+def receipt_paths(output: str, side: str) -> list[Path]:
+    paths = [
+        REPO_ROOT / match.group(1)
+        for line in output.splitlines()
+        if (match := RECEIPT_LINE.match(line))
+    ]
+    if not paths:
+        raise ValueError(f"{side} run emitted no receipt paths")
+    missing = [str(path) for path in paths if not path.is_file()]
+    if missing:
+        raise ValueError(f"{side} run receipts are missing: {', '.join(missing)}")
+    return paths
+
+
+def run_receipt_compare(
+    name: str,
+    config: Path,
+    report: Path,
+    *,
+    dry_run: bool,
+) -> None:
+    commands = {
+        side: [
+            sys.executable,
+            str(CLI),
+            "run-config",
+            "--config",
+            str(config),
+            "--side",
+            side,
+        ]
+        for side in ("baseline", "comparison")
+    }
+    if dry_run:
+        for side, command in commands.items():
+            run_step(f"{name}-{side}", command, dry_run=True)
+        print(
+            f"[{name}-compare] {sys.executable} {CLI} compare "
+            "<baseline.run.json...> <comparison.run.json...> "
+            f"--out {report}"
+        )
         return
-    subprocess.run(command, cwd=REPO_ROOT, check=True)
+    baseline = receipt_paths(
+        run_step(
+            f"{name}-baseline",
+            commands["baseline"],
+            dry_run=False,
+            capture=True,
+        ),
+        "baseline",
+    )
+    comparison = receipt_paths(
+        run_step(
+            f"{name}-comparison",
+            commands["comparison"],
+            dry_run=False,
+            capture=True,
+        ),
+        "comparison",
+    )
+    report.parent.mkdir(parents=True, exist_ok=True)
+    run_step(
+        f"{name}-compare",
+        [
+            sys.executable,
+            str(CLI),
+            "compare",
+            *(str(path.relative_to(REPO_ROOT)) for path in baseline),
+            *(str(path.relative_to(REPO_ROOT)) for path in comparison),
+            "--comparability",
+            "strict",
+            "--require-timing-class",
+            "operation",
+            "--baseline-product",
+            "doe",
+            "--comparison-product",
+            "dawn_delegate",
+            "--out",
+            str(report),
+        ],
+        dry_run=False,
+    )
 
 
 def main() -> int:
     args = parse_args()
     smoke_config = REPO_ROOT / args.smoke_config
     compare_config = REPO_ROOT / args.compare_config
+    smoke_report = config_report_path(smoke_config)
     compare_report = config_report_path(compare_config)
 
-    steps: list[tuple[str, list[str]]] = [
-        ("preflight", [sys.executable, str(PREFLIGHT), "--json"]),
-        ("smoke", [sys.executable, str(CLI), "compare", "--config", str(smoke_config)]),
-        ("compare", [sys.executable, str(CLI), "compare", "--config", str(compare_config)]),
-        (
-            "blocking-gates",
-            [
-                sys.executable,
-                str(BLOCKING_GATES),
-                "--report",
-                str(compare_report),
-                "--trace-semantic-parity-mode",
-                args.trace_semantic_parity_mode,
-            ],
-        ),
-    ]
+    run_step(
+        "preflight",
+        [sys.executable, str(PREFLIGHT), "--json"],
+        dry_run=args.dry_run,
+    )
+    run_receipt_compare(
+        "smoke",
+        smoke_config,
+        smoke_report,
+        dry_run=args.dry_run,
+    )
+    run_receipt_compare(
+        "compare",
+        compare_config,
+        compare_report,
+        dry_run=args.dry_run,
+    )
+    run_step(
+        "blocking-gates",
+        [
+            sys.executable,
+            str(BLOCKING_GATES),
+            "--report",
+            str(compare_report),
+            "--trace-semantic-parity-mode",
+            args.trace_semantic_parity_mode,
+        ],
+        dry_run=args.dry_run,
+    )
     if not args.skip_cube:
-        steps.append(("cube", [sys.executable, str(CUBE)]))
-
-    for name, command in steps:
-        run_step(name, command, dry_run=args.dry_run)
+        run_step(
+            "cube",
+            [sys.executable, str(CUBE)],
+            dry_run=args.dry_run,
+        )
     return 0
 
 

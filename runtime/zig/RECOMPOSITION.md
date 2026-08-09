@@ -645,18 +645,21 @@ universal ideals.
     matching command from the repository root:
 
     ```bash
-    python3 runtime/zig/tools/capture_backend_evidence.py \
-      --metal-output-report <bench/out/.../report.json> \
-      --metal-output-workload-id compute_workgroup_atomic_1024
+    python3 bench/runners/run_recomposition_backend_evidence.py \
+      --backend vulkan
 
-    python3 runtime/zig/tools/capture_backend_evidence.py \
-      --d3d12-output-report <bench/out/.../report.json> \
-      --d3d12-output-workload-id compute_workgroup_atomic_1024
+    python3 bench/runners/run_recomposition_backend_evidence.py \
+      --backend metal
+
+    python3 bench/runners/run_recomposition_backend_evidence.py \
+      --backend d3d12
     ```
 
-    Each command verifies the physical adapter, host/API/backend identities,
-    fallback status, receipt hashes, dispatch shape, and output oracles before
-    merging its backend into the canonical receipt.
+    Each command preflights the host, runs Doe and Dawn separately through the
+    promoted smoke contract, compares their receipts strictly, verifies the
+    physical adapter, host/API/backend identities, fallback status, receipt
+    hashes, dispatch shape, and output oracles, then merges its backend into
+    the canonical receipt.
 - [x] Capture clean and incremental compilation measurements, promoted hot-path benchmark medians, and binary sizes without turning them into universal claims.
 - [x] Add one baseline verifier that classifies a structural result as exact equivalence, approved contract change, or failure.
 - [x] Extend `runtime/zig/source-layout.json` to version 2 instead of creating another architecture policy file.

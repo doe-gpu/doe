@@ -24,6 +24,27 @@ External application reproduction starts at
 build identity, policy gates, workload execution, and receipt routing; a
 passing command is still not a public claim.
 
+## First benchmark matrix
+
+Use the physical backend runner matching the host. It performs host preflight,
+separate Doe and Dawn runs, strict receipt comparison, output-oracle checks,
+and cumulative recomposition evidence capture:
+
+| Host/backend | Command |
+| --- | --- |
+| Linux / AMD Vulkan | `python3 bench/runners/run_recomposition_backend_evidence.py --backend vulkan` |
+| macOS / Apple Metal | `python3 bench/runners/run_recomposition_backend_evidence.py --backend metal` |
+| Windows / D3D12 | `python3 bench/runners/run_recomposition_backend_evidence.py --backend d3d12` |
+
+Inspect the full promoted surface before choosing a broader run:
+
+```bash
+python3 bench/cli.py compare --list-promoted
+```
+
+The runner requires built Doe and Dawn native artifacts. It fails preflight
+with the missing dependency instead of substituting another backend.
+
 ## Evidence flow
 
 The required order is:
