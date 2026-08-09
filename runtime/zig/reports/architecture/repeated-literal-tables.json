@@ -1,5 +1,5 @@
 {
-  "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
+  "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "candidates": [
     {
       "literalTokenSha256": "064774b851a99fd3cd766abb558e324be11f6de53c354107283942e805edf862",
@@ -148,11 +148,11 @@
           "startLine": 304
         },
         {
-          "endLine": 503,
+          "endLine": 524,
           "literalCount": 4,
           "name": "destroy_descriptor_state",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 481
+          "startLine": 502
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -374,11 +374,11 @@
           "startLine": 88
         },
         {
-          "endLine": 517,
+          "endLine": 538,
           "literalCount": 4,
           "name": "bind_descriptor_sets",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 505
+          "startLine": 526
         },
         {
           "endLine": 379,
@@ -1132,11 +1132,11 @@
           "startLine": 54
         },
         {
-          "endLine": 364,
+          "endLine": 365,
           "literalCount": 4,
           "name": "rebuild_compute_shader_spirv",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 360
+          "startLine": 361
         },
         {
           "endLine": 389,
@@ -2217,6 +2217,13 @@
           "name": "dispatchesCanMerge",
           "path": "src/native/support/doe_native_command_types.zig",
           "startLine": 229
+        },
+        {
+          "endLine": 98,
+          "literalCount": 6,
+          "name": "BufferedTraceRow",
+          "path": "src/runtime/trace/trace_jsonl_emit.zig",
+          "startLine": 32
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2292,11 +2299,11 @@
       "literalTokenSha256": "d5b433c332bc31a15b072ccbd714b47bb5025df6307cfbca5cd9f27fa295ed8c",
       "locations": [
         {
-          "endLine": 632,
+          "endLine": 644,
           "literalCount": 14,
           "name": "writeJsonString",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 615
+          "startLine": 627
         },
         {
           "endLine": 533,
@@ -2683,11 +2690,11 @@
           "startLine": 178
         },
         {
-          "endLine": 475,
+          "endLine": 487,
           "literalCount": 11,
           "name": "validateHostPlan",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 447
+          "startLine": 459
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2863,10 +2870,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "9037b20ed39e1c9dd34a34ccec441e862108bf984dfab7057484b26f3f0b93ce",
-  "reportGeneratorSha256": "c9a5822fa36f9aa454043318d3f54a124ba28f1d7e671aa94a3e32c381ded857",
+  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
+  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
   "schemaVersion": 1,
-  "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410",
+  "sourceLayoutVersion": 3,
+  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3",
   "status": "captured"
 }

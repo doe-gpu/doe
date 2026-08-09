@@ -161,6 +161,29 @@ class ShaderArtifactGateTests(unittest.TestCase):
             self.assertEqual(validated, 0)
             self.assertTrue(any("spirv-val failed" in item for item in failures))
 
+    def test_backend_bootstrap_manifest_has_no_executed_spirv_to_validate(self) -> None:
+        manifest = {
+            "backendId": "doe_vulkan",
+            "module": "bootstrap",
+            "taxonomyCode": "backend_initialized",
+            "spirvSha256": "0" * 64,
+            "stages": [
+                {
+                    "stage": "ir_to_spirv",
+                    "implementation": "native_zig",
+                    "artifactSha256": "0" * 64,
+                }
+            ],
+        }
+        failures, validated = self.module.validate_spirv_artifacts(
+            Path("bootstrap.json"),
+            manifest,
+            "/usr/bin/spirv-val",
+            True,
+        )
+        self.assertEqual(failures, [])
+        self.assertEqual(validated, 0)
+
     def test_spirv_hash_mismatch_fails(self) -> None:
         with tempfile.TemporaryDirectory(prefix="fawn-shader-artifact-gate-") as tmpdir:
             root = Path(tmpdir)

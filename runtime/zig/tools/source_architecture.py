@@ -60,6 +60,17 @@ class ImportEdge:
 
 
 @dataclass(frozen=True)
+class ReachabilityView:
+    """One named product or tooling view over the source import graph."""
+
+    name: str
+    description: str
+    root_patterns: tuple[str, ...]
+    roots: tuple[str, ...]
+    reachable: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Analysis:
     """Deterministic architecture analysis for one source tree."""
 
@@ -67,6 +78,7 @@ class Analysis:
     edges: tuple[ImportEdge, ...]
     cycles: tuple[tuple[str, ...], ...]
     unreachable: tuple[str, ...]
+    reachability_views: tuple[ReachabilityView, ...]
     forbidden_edges: tuple[dict[str, Any], ...]
     unresolved_imports: tuple[dict[str, Any], ...]
     manifest_errors: tuple[str, ...]
@@ -153,11 +165,11 @@ def load_manifest(config_path: Path) -> dict[str, Any]:
 
 
 def validate_manifest(config: dict[str, Any]) -> list[str]:
-    """Validate the architecture-specific version-2 manifest contract."""
+    """Validate the architecture-specific version-3 manifest contract."""
 
     errors: list[str] = []
-    if config.get("version") != 2:
-        errors.append("source-layout version must be 2")
+    if config.get("version") != 3:
+        errors.append("source-layout version must be 3")
     architecture = config.get("architecture")
     if not isinstance(architecture, dict):
         return errors + ["source-layout architecture must be an object"]
@@ -193,6 +205,33 @@ def validate_manifest(config: dict[str, Any]) -> list[str]:
     roots = architecture.get("productionRoots")
     if not _is_nonempty_string_list(roots):
         errors.append("architecture.productionRoots must be a non-empty list")
+    reachability_views = architecture.get("reachabilityViews")
+    if not isinstance(reachability_views, dict) or not reachability_views:
+        errors.append("architecture.reachabilityViews must be a non-empty object")
+    else:
+        for name, contract in reachability_views.items():
+            if not _is_nonempty_string(name) or not isinstance(contract, dict):
+                errors.append(
+                    "reachability views require non-empty name/object entries"
+                )
+                continue
+            required = {"description", "roots"}
+            missing = sorted(required - set(contract))
+            if missing:
+                errors.append(
+                    f"reachability view {name!r} missing: " + ", ".join(missing)
+                )
+                continue
+            if not _is_nonempty_string(contract["description"]):
+                errors.append(
+                    f"reachability view {name!r} requires a description"
+                )
+            if not _is_nonempty_string_list(contract["roots"]):
+                errors.append(
+                    f"reachability view {name!r} requires non-empty roots"
+                )
+            elif len(contract["roots"]) != len(set(contract["roots"])):
+                errors.append(f"reachability view {name!r} repeats a root")
     roles = architecture.get("specialRoles")
     if not isinstance(roles, dict):
         errors.append("architecture.specialRoles must be an object")
@@ -580,13 +619,13 @@ def _tree_digest(modules: list[dict[str, Any]]) -> str:
 
 
 def analyze(root: Path, config: dict[str, Any]) -> Analysis:
-    """Analyze the source tree described by a validated version-2 manifest."""
+    """Analyze the source tree described by a validated version-3 manifest."""
 
     root = root.resolve()
     manifest_errors = validate_manifest(config)
     if manifest_errors:
         return Analysis(
-            (), (), (), (), (), (), tuple(manifest_errors), "", (), (), ()
+            (), (), (), (), (), (), (), tuple(manifest_errors), "", (), (), ()
         )
     source_root = (root / config["sourceRoot"]).resolve()
     architecture = config["architecture"]
@@ -672,6 +711,35 @@ def analyze(root: Path, config: dict[str, Any]) -> Analysis:
             errors.append(f"production root glob matches no Zig source: {pattern}")
     reached = _reachable(adjacency, roots)
     unreachable = sorted(set(module_paths) - reached)
+    reachability_views: list[ReachabilityView] = []
+    view_names_by_path = {path: [] for path in module_paths}
+    view_roots_by_path = {path: [] for path in module_paths}
+    for name, contract in sorted(architecture["reachabilityViews"].items()):
+        view_roots: set[str] = set()
+        for pattern in contract["roots"]:
+            matches = {
+                path for path in module_paths if matches_glob(path, pattern)
+            }
+            if not matches:
+                errors.append(
+                    f"reachability view {name!r} root matches no Zig source: "
+                    f"{pattern}"
+                )
+            view_roots.update(matches)
+        view_reached = _reachable(adjacency, view_roots)
+        for path in view_reached:
+            view_names_by_path[path].append(name)
+        for path in view_roots:
+            view_roots_by_path[path].append(name)
+        reachability_views.append(
+            ReachabilityView(
+                name=name,
+                description=contract["description"],
+                root_patterns=tuple(contract["roots"]),
+                roots=tuple(sorted(view_roots)),
+                reachable=tuple(sorted(view_reached)),
+            )
+        )
     for module in modules:
         path = module["path"]
         module["fanIn"] = len(reverse_adjacency[path])
@@ -680,6 +748,8 @@ def analyze(root: Path, config: dict[str, Any]) -> Analysis:
         module["reverseImports"] = sorted(reverse_adjacency[path])
         module["reachable"] = path in reached
         module["isProductionRoot"] = path in roots
+        module["reachabilityViews"] = sorted(view_names_by_path[path])
+        module["reachabilityViewRoots"] = sorted(view_roots_by_path[path])
     generated_paths = {
         module["path"] for module in modules if "generated" in module["roles"]
     }
@@ -772,6 +842,7 @@ def analyze(root: Path, config: dict[str, Any]) -> Analysis:
         edges=tuple(edges),
         cycles=tuple(cycles),
         unreachable=tuple(unreachable),
+        reachability_views=tuple(reachability_views),
         forbidden_edges=tuple(forbidden),
         unresolved_imports=tuple(unresolved),
         manifest_errors=tuple(errors),

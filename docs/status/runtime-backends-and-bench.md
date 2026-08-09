@@ -31,18 +31,20 @@ file only names the promoted boundary and open admission gates.
 - Strict comparison now rejects workload-unit normalization that makes selected
   operation timing exceed its containing workload wall. Trace row and success
   counts are not implicit workload-unit divisors without a declared unit.
+- Shader-artifact validation treats the exact backend-initialization manifest
+  as structural bootstrap evidence with no executed binary to validate. Any
+  manifest produced by actual shader execution still requires its emitted
+  backend artifact under strict validation.
 - The fresh AMD Vulkan release matrix at
-  `bench/out/amd-vulkan/20260809T221600Z/dawn-vs-doe.amd.vulkan.release.json`
+  `bench/out/amd-vulkan/20260809T224800Z/dawn-vs-doe.amd.vulkan.release.json`
   validates source-bound receipts and independent output oracles for the
   single-stage release workloads. The multi-stage Monte Carlo and stable-fluids
   rows exposed borrowed per-command telemetry and prewarm-to-execution SPIR-V
   binding defects. Buffered trace rows now own their telemetry, cached pipeline
   execution refreshes the pending binary receipt, and strict comparison reads
-  every dispatch manifest from the trace. Focused physical reruns at
-  `bench/out/amd-vulkan/trace-snapshot-v3/dawn-vs-doe.monte-carlo.json` and
-  `bench/out/amd-vulkan/trace-snapshot-v3/dawn-vs-doe.stable-fluids.json`
-  resolve every source-bound shader artifact. Both rows remain diagnostic only
-  because their command graphs do not yet declare per-dispatch output oracles.
+  every dispatch manifest from the trace. The fresh full matrix resolves every
+  source-bound shader artifact in both rows; they remain diagnostic only because
+  their command graphs do not yet declare per-dispatch output oracles.
 - `reports/claim-index.json` therefore scaffolds the AMD Vulkan native release,
   AMD package, browser ORT, and Linux Vulkan drop-in rows instead of borrowing
   older measured status after stricter evidence checks or artifact pruning.

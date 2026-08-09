@@ -292,7 +292,7 @@ def parse_args() -> argparse.Namespace:
         "--config",
         type=Path,
         default=CONFIG_PATH,
-        help="version-2 source-layout manifest",
+        help="version-3 source-layout manifest",
     )
     parser.add_argument(
         "--skip-generated-readme",

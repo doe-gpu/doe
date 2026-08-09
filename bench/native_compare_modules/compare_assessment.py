@@ -681,7 +681,7 @@ def compare_assessment(
         applicable=native_shader_artifact_match_applies,
         passes=native_shader_artifact_match,
         failure_reason=(
-            "baseline/comparison native shader artifact mismatch: "
+            "baseline/comparison native shader/output receipt mismatch: "
             + native_shader_artifact_failure_reason
             if native_shader_artifact_failure_reason
             else ""

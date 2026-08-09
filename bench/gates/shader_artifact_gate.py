@@ -22,6 +22,9 @@ from typing import Any
 from bench.lib.bench_utils import load_json_object as load_json
 from native_compare_modules import contracts
 
+BACKEND_BOOTSTRAP_MODULE = "bootstrap"
+BACKEND_BOOTSTRAP_TAXONOMY_CODE = "backend_initialized"
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -127,6 +130,13 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def is_backend_bootstrap_manifest(manifest: dict[str, Any]) -> bool:
+    return (
+        manifest.get("module") == BACKEND_BOOTSTRAP_MODULE
+        and manifest.get("taxonomyCode") == BACKEND_BOOTSTRAP_TAXONOMY_CODE
+    )
+
+
 def main() -> int:
     args = parse_args()
     try:
@@ -219,6 +229,8 @@ def validate_spirv_artifacts(
     spirv_val: str,
     require_spirv_validation: bool,
 ) -> tuple[list[str], int]:
+    if is_backend_bootstrap_manifest(manifest):
+        return [], 0
     stages = manifest.get("stages")
     if not isinstance(stages, list):
         return [], 0

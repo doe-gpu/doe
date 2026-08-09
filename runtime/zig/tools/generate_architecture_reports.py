@@ -29,14 +29,18 @@ CONFIG_PATH = ROOT / "source-layout.json"
 OUTPUT_ROOT = ROOT / "reports" / "architecture"
 
 
-def _provenance(analysis: Analysis, config_path: Path) -> dict[str, Any]:
+def _provenance(
+    analysis: Analysis,
+    config: dict[str, Any],
+    config_path: Path,
+) -> dict[str, Any]:
     analyzer_path = Path(__file__).with_name("source_architecture.py")
     return {
         "architectureAnalyzerSha256": sha256_file(analyzer_path),
         "manifestPath": "runtime/zig/source-layout.json",
         "manifestSha256": sha256_file(config_path),
         "reportGeneratorSha256": sha256_file(Path(__file__)),
-        "sourceLayoutVersion": 2,
+        "sourceLayoutVersion": config["version"],
         "sourceTreeSha256": analysis.source_tree_sha256,
     }
 
@@ -75,6 +79,49 @@ def _unreachable_records(
             record["removalCondition"] = exception["removalCondition"]
         records.append(record)
     return records
+
+
+def _reachability_view_report(analysis: Analysis) -> dict[str, Any]:
+    module_by_path = {module["path"]: module for module in analysis.modules}
+    classified: set[str] = set()
+    views: list[dict[str, Any]] = []
+    for view in analysis.reachability_views:
+        classified.update(view.reachable)
+        views.append(
+            {
+                "description": view.description,
+                "name": view.name,
+                "reachableLineCount": sum(
+                    module_by_path[path]["lineCount"] for path in view.reachable
+                ),
+                "reachableModuleCount": len(view.reachable),
+                "rootPatterns": list(view.root_patterns),
+                "roots": list(view.roots),
+            }
+        )
+    unclassified = [
+        {
+            "aggregateProductionRoot": module["isProductionRoot"],
+            "layer": module["layer"],
+            "lineCount": module["lineCount"],
+            "path": module["path"],
+        }
+        for module in analysis.modules
+        if module["path"] not in classified
+    ]
+    return {
+        "classifiedLineCount": sum(
+            module["lineCount"]
+            for module in analysis.modules
+            if module["path"] in classified
+        ),
+        "classifiedModuleCount": len(classified),
+        "unclassifiedFiles": unclassified,
+        "unclassifiedLineCount": sum(
+            record["lineCount"] for record in unclassified
+        ),
+        "views": views,
+    }
 
 
 def _merge_candidates(analysis: Analysis) -> list[dict[str, Any]]:
@@ -552,7 +599,7 @@ def build_reports(
 ) -> dict[str, str]:
     """Build every tracked architecture report as canonical text."""
 
-    provenance = _provenance(analysis, config_path)
+    provenance = _provenance(analysis, config, config_path)
     cochange = cochange or {
         "commitsConsidered": 0,
         "commitsExcludedAsMassChange": 0,
@@ -627,6 +674,11 @@ def build_reports(
                 observation_baseline,
                 build_measurements,
             ),
+            "schemaVersion": 1,
+        },
+        "reachability-views.json": {
+            **provenance,
+            **_reachability_view_report(analysis),
             "schemaVersion": 1,
         },
         "repeated-literal-tables.json": {

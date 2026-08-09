@@ -1,4 +1,4 @@
-"""Focused tests for the version-2 Doe Zig architecture analyzer."""
+"""Focused tests for the version-3 Doe Zig architecture analyzer."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from source_architecture import analyze, load_manifest, matches_glob
 
 def _manifest() -> dict[str, Any]:
     return {
-        "version": 2,
+        "version": 3,
         "sourceRoot": "src",
         "moduleRoot": "src/mod.zig",
         "compatibilityFacades": [],
@@ -44,6 +44,12 @@ def _manifest() -> dict[str, Any]:
                 },
             },
             "productionRoots": ["src/mod.zig"],
+            "reachabilityViews": {
+                "shipped-runtime": {
+                    "description": "fixture shipped runtime",
+                    "roots": ["src/mod.zig"],
+                }
+            },
             "specialRoles": {
                 "compatibility-facade": {"globs": []},
                 "entrypoint": {"globs": ["src/mod.zig"]},
@@ -155,6 +161,46 @@ class SourceArchitectureTests(unittest.TestCase):
                 (("src/runtime/a.zig", "src/runtime/b.zig"),),
             )
             self.assertEqual(analysis.unreachable, ("src/runtime/orphan.zig",))
+
+    def test_named_reachability_views_do_not_change_aggregate_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            _write(root, "src/mod.zig", 'const a = @import("runtime/a.zig");\n')
+            _write(root, "src/runtime/a.zig", "pub const value = 1;\n")
+            _write(root, "src/runtime/tool.zig", "pub const tool = true;\n")
+            config = _manifest()
+            config["architecture"]["productionRoots"].append(
+                "src/runtime/tool.zig"
+            )
+            config["architecture"]["reachabilityViews"]["tooling"] = {
+                "description": "fixture tooling",
+                "roots": ["src/runtime/tool.zig"],
+            }
+            analysis = analyze(root, config)
+            self.assertEqual(analysis.unreachable, ())
+            self.assertEqual(
+                analysis.modules[1]["reachabilityViews"],
+                ["shipped-runtime"],
+            )
+            self.assertEqual(
+                analysis.modules[2]["reachabilityViews"],
+                ["tooling"],
+            )
+
+    def test_reachability_view_root_must_match_source(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            _write(root, "src/mod.zig", "pub const value = 1;\n")
+            config = _manifest()
+            config["architecture"]["reachabilityViews"]["shipped-runtime"][
+                "roots"
+            ] = ["src/missing.zig"]
+            analysis = analyze(root, config)
+            self.assertIn(
+                "reachability view 'shipped-runtime' root matches no Zig source: "
+                "src/missing.zig",
+                analysis.manifest_errors,
+            )
 
     def test_overlapping_layer_globs_fail_manifest_analysis(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

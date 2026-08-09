@@ -1,17 +1,17 @@
 {
-  "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
-  "commitsConsidered": 145,
+  "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
+  "commitsConsidered": 149,
   "commitsExcludedAsMassChange": 1,
   "commitsExcludedAsPureRename": 0,
-  "historyHead": "4d5c54e533760593a3f475823994595219b44a7b",
+  "historyHead": "5fe0e8fcf05384a9ec07b0544a5807e7f95b57ec",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "9037b20ed39e1c9dd34a34ccec441e862108bf984dfab7057484b26f3f0b93ce",
+  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
   "minimumPairCount": 3,
   "pairTruncationLimit": 1000,
   "pairs": [
     {
       "coChangeCount": 23,
-      "coupling": 0.766667,
+      "coupling": 0.741935,
       "left": "src/backend/vulkan/native_runtime.zig",
       "right": "src/backend/vulkan/vk_pipeline.zig"
     },
@@ -41,7 +41,7 @@
     },
     {
       "coChangeCount": 15,
-      "coupling": 0.5,
+      "coupling": 0.483871,
       "left": "src/backend/vulkan/mod.zig",
       "right": "src/backend/vulkan/native_runtime.zig"
     },
@@ -227,7 +227,7 @@
     },
     {
       "coChangeCount": 10,
-      "coupling": 0.333333,
+      "coupling": 0.322581,
       "left": "src/backend/vulkan/mod.zig",
       "right": "src/backend/vulkan/vk_pipeline.zig"
     },
@@ -281,15 +281,15 @@
     },
     {
       "coChangeCount": 9,
-      "coupling": 0.6,
-      "left": "src/backend/vulkan/mod.zig",
-      "right": "src/cli/runtime_cli.zig"
+      "coupling": 0.5625,
+      "left": "src/backend/metal/metal_bridge_decls.zig",
+      "right": "src/backend/metal/metal_native_runtime.zig"
     },
     {
       "coChangeCount": 9,
       "coupling": 0.5625,
-      "left": "src/backend/metal/metal_bridge_decls.zig",
-      "right": "src/backend/metal/metal_native_runtime.zig"
+      "left": "src/backend/vulkan/mod.zig",
+      "right": "src/cli/runtime_cli.zig"
     },
     {
       "coChangeCount": 9,
@@ -1307,15 +1307,15 @@
     },
     {
       "coChangeCount": 6,
-      "coupling": 0.4,
-      "left": "src/backend/metal/mod.zig",
-      "right": "src/cli/runtime_cli.zig"
+      "coupling": 0.375,
+      "left": "src/backend/metal/metal_bridge_decls.zig",
+      "right": "src/backend/metal/metal_runtime_resources.zig"
     },
     {
       "coChangeCount": 6,
       "coupling": 0.375,
-      "left": "src/backend/metal/metal_bridge_decls.zig",
-      "right": "src/backend/metal/metal_runtime_resources.zig"
+      "left": "src/backend/metal/mod.zig",
+      "right": "src/cli/runtime_cli.zig"
     },
     {
       "coChangeCount": 6,
@@ -6010,9 +6010,9 @@
       "right": "src/backend/metal/metal_dispatch_runtime.zig"
     }
   ],
-  "reportGeneratorSha256": "c9a5822fa36f9aa454043318d3f54a124ba28f1d7e671aa94a3e32c381ded857",
+  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
   "schemaVersion": 1,
-  "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410",
+  "sourceLayoutVersion": 3,
+  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3",
   "status": "diagnostic-only"
 }

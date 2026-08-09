@@ -1,11 +1,11 @@
 {
-  "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
+  "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "cycles": [],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "9037b20ed39e1c9dd34a34ccec441e862108bf984dfab7057484b26f3f0b93ce",
-  "reportGeneratorSha256": "c9a5822fa36f9aa454043318d3f54a124ba28f1d7e671aa94a3e32c381ded857",
+  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
+  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
   "schemaVersion": 1,
-  "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410",
+  "sourceLayoutVersion": 3,
+  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3",
   "staleExceptions": []
 }

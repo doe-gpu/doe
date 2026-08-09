@@ -1,6 +1,6 @@
 {
   "analysisStatus": "captured",
-  "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
+  "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "candidates": [
     {
       "locations": [
@@ -329,11 +329,11 @@
     {
       "locations": [
         {
-          "endLine": 644,
+          "endLine": 656,
           "kind": "function",
           "name": "writeInt",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 640,
+          "startLine": 652,
           "tokenCount": 68
         },
         {
@@ -1877,11 +1877,11 @@
           "tokenCount": 70
         },
         {
-          "endLine": 638,
+          "endLine": 650,
           "kind": "function",
           "name": "write",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 634,
+          "startLine": 646,
           "tokenCount": 70
         },
         {
@@ -2163,11 +2163,11 @@
           "tokenCount": 37
         },
         {
-          "endLine": 351,
+          "endLine": 358,
           "kind": "function",
           "name": "manifest_path_from_context",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 347,
+          "startLine": 354,
           "tokenCount": 37
         }
       ],
@@ -2591,11 +2591,11 @@
           "tokenCount": 4
         },
         {
-          "endLine": 30,
+          "endLine": 31,
           "kind": "constant",
           "name": "BOOTSTRAP_MANIFEST_STATUS_CODE",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 30,
+          "startLine": 31,
           "tokenCount": 4
         }
       ],
@@ -4249,11 +4249,11 @@
           "tokenCount": 26
         },
         {
-          "endLine": 355,
+          "endLine": 362,
           "kind": "function",
           "name": "manifest_hash_from_context",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 353,
+          "startLine": 360,
           "tokenCount": 26
         }
       ],
@@ -4279,11 +4279,11 @@
           "tokenCount": 23
         },
         {
-          "endLine": 494,
+          "endLine": 501,
           "kind": "function",
           "name": "set_webgpu_ffi_queue_wait_timeout_ns",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 491,
+          "startLine": 498,
           "tokenCount": 23
         }
       ],
@@ -8933,11 +8933,11 @@
           "tokenCount": 35
         },
         {
-          "endLine": 485,
+          "endLine": 492,
           "kind": "function",
           "name": "set_upload_behavior",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 483,
+          "startLine": 490,
           "tokenCount": 35
         }
       ],
@@ -9333,11 +9333,11 @@
           "tokenCount": 54
         },
         {
-          "endLine": 530,
+          "endLine": 537,
           "kind": "function",
           "name": "capture_buffer",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 528,
+          "startLine": 535,
           "tokenCount": 54
         }
       ],
@@ -13159,11 +13159,11 @@
           "tokenCount": 73
         },
         {
-          "endLine": 546,
+          "endLine": 553,
           "kind": "constant",
           "name": "VTABLE",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 532,
+          "startLine": 539,
           "tokenCount": 73
         }
       ],
@@ -13755,11 +13755,11 @@
           "tokenCount": 4
         },
         {
-          "endLine": 29,
+          "endLine": 30,
           "kind": "constant",
           "name": "BOOTSTRAP_MANIFEST_MODULE",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 29,
+          "startLine": 30,
           "tokenCount": 4
         }
       ],
@@ -15035,11 +15035,11 @@
           "tokenCount": 24
         },
         {
-          "endLine": 282,
+          "endLine": 356,
           "kind": "function",
           "name": "nowNs",
           "path": "src/runtime/trace/trace_jsonl_emit.zig",
-          "startLine": 280,
+          "startLine": 354,
           "tokenCount": 24
         }
       ],
@@ -16901,11 +16901,11 @@
           "tokenCount": 30
         },
         {
-          "endLine": 510,
+          "endLine": 517,
           "kind": "function",
           "name": "prewarm_upload_path",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 508,
+          "startLine": 515,
           "tokenCount": 30
         }
       ],
@@ -17119,11 +17119,11 @@
           "tokenCount": 24
         },
         {
-          "endLine": 506,
+          "endLine": 513,
           "kind": "function",
           "name": "flush_queue",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 504,
+          "startLine": 511,
           "tokenCount": 24
         }
       ],
@@ -18533,11 +18533,11 @@
     {
       "locations": [
         {
-          "endLine": 632,
+          "endLine": 644,
           "kind": "function",
           "name": "writeJsonString",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 615,
+          "startLine": 627,
           "tokenCount": 155
         },
         {
@@ -18763,11 +18763,11 @@
           "tokenCount": 29
         },
         {
-          "endLine": 498,
+          "endLine": 505,
           "kind": "function",
           "name": "set_queue_sync_mode",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 496,
+          "startLine": 503,
           "tokenCount": 29
         }
       ],
@@ -26587,11 +26587,11 @@
           "tokenCount": 29
         },
         {
-          "endLine": 502,
+          "endLine": 509,
           "kind": "function",
           "name": "set_gpu_timestamp_mode",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 500,
+          "startLine": 507,
           "tokenCount": 29
         }
       ],
@@ -28647,11 +28647,11 @@
     {
       "locations": [
         {
-          "endLine": 502,
+          "endLine": 514,
           "kind": "function",
           "name": "isPhaseSpecializedKernel",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 497,
+          "startLine": 509,
           "tokenCount": 43
         },
         {
@@ -28723,11 +28723,11 @@
           "tokenCount": 29
         },
         {
-          "endLine": 489,
+          "endLine": 496,
           "kind": "function",
           "name": "set_queue_wait_mode",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 487,
+          "startLine": 494,
           "tokenCount": 29
         }
       ],
@@ -28905,11 +28905,11 @@
           "tokenCount": 13
         },
         {
-          "endLine": 46,
+          "endLine": 47,
           "kind": "constant",
           "name": "UPLOAD_BATCH_LAZY",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 46,
+          "startLine": 47,
           "tokenCount": 13
         }
       ],
@@ -29687,11 +29687,11 @@
           "tokenCount": 17
         },
         {
-          "endLine": 286,
+          "endLine": 360,
           "kind": "function",
           "name": "elapsedSince",
           "path": "src/runtime/trace/trace_jsonl_emit.zig",
-          "startLine": 284,
+          "startLine": 358,
           "tokenCount": 17
         }
       ],
@@ -30915,11 +30915,11 @@
           "tokenCount": 63
         },
         {
-          "endLine": 526,
+          "endLine": 533,
           "kind": "function",
           "name": "prewarm_kernel_dispatch",
           "path": "src/backend/vulkan/mod.zig",
-          "startLine": 512,
+          "startLine": 519,
           "tokenCount": 63
         }
       ],
@@ -34089,9 +34089,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "9037b20ed39e1c9dd34a34ccec441e862108bf984dfab7057484b26f3f0b93ce",
-  "reportGeneratorSha256": "c9a5822fa36f9aa454043318d3f54a124ba28f1d7e671aa94a3e32c381ded857",
+  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
+  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
   "schemaVersion": 1,
-  "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410"
+  "sourceLayoutVersion": 3,
+  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3"
 }

@@ -1,4 +1,4 @@
-"""Freeze the completed recomposition module review into source-layout v2."""
+"""Freeze the completed recomposition module review into source-layout v3."""
 
 from __future__ import annotations
 

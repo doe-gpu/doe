@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "sourceRoot": "src",
   "moduleRoot": "src/mod.zig",
   "allowedRootFiles": [
@@ -325,6 +325,53 @@
       "src/spatial/csl/csl_sim_runner.zig",
       "src/verification/lean_proof.zig"
     ],
+    "reachabilityViews": {
+      "shipped-native-package-runtime": {
+        "description": "Implementation roots selected by the shipped runtime CLI and libwebgpu_doe package artifact",
+        "roots": [
+          "src/cli/entrypoints/main.zig",
+          "src/cli/runtime_cli.zig",
+          "src/dropin/root.zig",
+          "src/dropin/wgpu_dropin_lib.zig"
+        ]
+      },
+      "dropin-compatibility": {
+        "description": "Drop-in WebGPU ABI routing and the declared legacy flat compatibility facade",
+        "roots": [
+          "src/dropin/root.zig",
+          "src/dropin/wgpu_dropin_lib.zig",
+          "src/compat/webgpu_ffi.zig"
+        ]
+      },
+      "module-incubation-evidence-tools": {
+        "description": "Module incubation, plan comparison, and repo-only integration executables used for evidence rather than shipped runtime claims",
+        "roots": [
+          "src/cli/entrypoints/module_runner.zig",
+          "src/cli/module_runner_cli.zig",
+          "src/cli/entrypoints/main_doe_plan_executor.zig",
+          "src/cli/doe_plan_executor_cli.zig",
+          "src/cli/entrypoints/main_webgpu_plan_executor.zig",
+          "src/plan/webgpu_plan_executor_cli.zig",
+          "src/plan/webgpu_plan_executor.zig",
+          "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+          "src/integrations/onnxruntime/*_anchor.zig"
+        ]
+      },
+      "compiler-tsir-spatial-toolchains": {
+        "description": "WGSL compiler, TSIR, CSL, proof-consumer, and spatial toolchain roots selected by repository build targets",
+        "roots": [
+          "src/cli/entrypoints/main_emit*.zig",
+          "src/compiler/wgsl/mod.zig",
+          "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
+          "src/compiler/tsir/mod.zig",
+          "src/compiler/tsir/tools/*.zig",
+          "src/spatial/csl/csl_bundle_emitter.zig",
+          "src/spatial/csl/csl_host_plan_tool.zig",
+          "src/spatial/csl/csl_sim_runner.zig",
+          "src/verification/lean_proof.zig"
+        ]
+      }
+    },
     "specialRoles": {
       "compatibility-facade": {
         "globs": [

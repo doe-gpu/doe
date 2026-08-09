@@ -275,6 +275,13 @@ class ArchitectureReportTests(unittest.TestCase):
             self.assertEqual(decisions["totalCount"], 1)
             self.assertEqual(decisions["pendingCount"], 1)
             self.assertEqual(decisions["entries"][0]["suggestedDecision"], "Keep")
+            reachability = json.loads(reports["reachability-views.json"])
+            self.assertEqual(reachability["classifiedModuleCount"], 1)
+            self.assertEqual(reachability["unclassifiedFiles"], [])
+            self.assertEqual(
+                reachability["views"][0]["name"],
+                "shipped-runtime",
+            )
             output_root = runtime_root / "reports" / "architecture"
             self.assertEqual(
                 write_or_check(reports, output_root, check=False),

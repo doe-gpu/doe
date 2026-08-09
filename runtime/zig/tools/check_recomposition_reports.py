@@ -41,6 +41,7 @@ def _architecture_errors(
         "module-decisions.json",
         "modules.json",
         "observations.json",
+        "reachability-views.json",
         "repeated-literal-tables.json",
         "split-candidates.json",
         "unreachable-files.json",
@@ -80,6 +81,31 @@ def _architecture_errors(
         errors.append(f"build measurements are not current: {build.get('status')}")
     elif build.get("sourceTreeSha256") not in source_hashes:
         errors.append("build measurement source does not match architecture reports")
+    reachability = reports["reachability-views.json"]
+    classified_paths = {
+        module["path"]
+        for module in modules
+        if module["reachabilityViews"]
+    }
+    unclassified_paths = {
+        entry["path"] for entry in reachability["unclassifiedFiles"]
+    }
+    if classified_paths | unclassified_paths != module_paths:
+        errors.append(
+            "reachability view classification does not cover module inventory"
+        )
+    if classified_paths & unclassified_paths:
+        errors.append(
+            "reachability view classified and unclassified paths overlap"
+        )
+    if reachability["classifiedModuleCount"] != len(classified_paths):
+        errors.append("reachability view classifiedModuleCount is inconsistent")
+    view_names = {view["name"] for view in reachability["views"]}
+    module_view_names = {
+        name for module in modules for name in module["reachabilityViews"]
+    }
+    if module_view_names - view_names:
+        errors.append("module inventory references an unknown reachability view")
     cycles = reports["cycles.json"]
     if cycles["staleExceptions"]:
         errors.append("cycle report contains stale exceptions")
