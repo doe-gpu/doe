@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe recomposition kernel-dispatch equivalence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifactKind",
+    "baseline",
+    "candidate",
+    "classification",
+    "comparisons",
+    "excludedVolatileFields",
+    "generatedAt",
+    "host",
+    "schemaVersion",
+    "status",
+    "toolchain",
+    "workload"
+  ],
+  "properties": {
+    "artifactKind": {
+      "type": "string",
+      "const": "recomposition-kernel-dispatch-equivalence"
+    },
+    "baseline": { "$ref": "#/$defs/executionEvidence" },
+    "candidate": { "$ref": "#/$defs/executionEvidence" },
+    "classification": {
+      "type": "string",
+      "enum": ["exact-equivalence", "failure"]
+    },
+    "comparisons": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactDigests",
+        "errorSemantics",
+        "normalizedCommand",
+        "normalizedOutput",
+        "receiptIdentity",
+        "traceIdentity"
+      ],
+      "properties": {
+        "artifactDigests": { "$ref": "#/$defs/digestComparison" },
+        "errorSemantics": { "$ref": "#/$defs/errorComparison" },
+        "normalizedCommand": { "$ref": "#/$defs/digestComparison" },
+        "normalizedOutput": { "$ref": "#/$defs/outputComparison" },
+        "receiptIdentity": { "$ref": "#/$defs/digestComparison" },
+        "traceIdentity": { "$ref": "#/$defs/traceComparison" }
+      }
+    },
+    "excludedVolatileFields": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "architecture",
+        "deviceName",
+        "deviceType",
+        "driverInfo",
+        "driverName",
+        "operatingSystem",
+        "release",
+        "vulkanIcdPath",
+        "vulkanIcdSha256"
+      ],
+      "properties": {
+        "architecture": { "type": "string", "minLength": 1 },
+        "deviceName": { "type": "string", "minLength": 1 },
+        "deviceType": {
+          "type": "string",
+          "pattern": "^PHYSICAL_DEVICE_TYPE_(INTEGRATED|DISCRETE)_GPU$"
+        },
+        "driverInfo": { "type": "string", "minLength": 1 },
+        "driverName": { "type": "string", "minLength": 1 },
+        "operatingSystem": { "type": "string", "const": "Linux" },
+        "release": { "type": "string", "minLength": 1 },
+        "vulkanIcdPath": { "type": "string", "pattern": "^/[^/].*\\.json$" },
+        "vulkanIcdSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "status": { "type": "string", "enum": ["failed", "passed"] },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "version"],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commandPath",
+        "commandSha256",
+        "kernelPath",
+        "kernelSha256",
+        "workloadId"
+      ],
+      "properties": {
+        "commandPath": { "type": "string", "const": "examples/workgroup_atomic_commands.json" },
+        "commandSha256": { "$ref": "#/$defs/sha256" },
+        "kernelPath": { "type": "string", "const": "bench/kernels/workgroup_atomic.wgsl" },
+        "kernelSha256": { "$ref": "#/$defs/sha256" },
+        "workloadId": { "type": "string", "const": "compute_workgroup_atomic_1024" }
+      }
+    }
+  },
+  "$defs": {
+    "digestComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baselineSha256", "candidateSha256", "equal"],
+      "properties": {
+        "baselineSha256": { "$ref": "#/$defs/sha256" },
+        "candidateSha256": { "$ref": "#/$defs/sha256" },
+        "equal": { "type": "boolean" }
+      }
+    },
+    "errorComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baselineStatus",
+        "baselineStatusCode",
+        "baselineStatusMessage",
+        "candidateStatus",
+        "candidateStatusCode",
+        "candidateStatusMessage",
+        "equal"
+      ],
+      "properties": {
+        "baselineStatus": { "type": "string", "minLength": 1 },
+        "baselineStatusCode": { "type": "string", "minLength": 1 },
+        "baselineStatusMessage": { "type": "string" },
+        "candidateStatus": { "type": "string", "minLength": 1 },
+        "candidateStatusCode": { "type": "string", "minLength": 1 },
+        "candidateStatusMessage": { "type": "string" },
+        "equal": { "type": "boolean" }
+      }
+    },
+    "evidenceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^bench/out/recomposition/kernel-dispatch-equivalence/[^/].*$"
+        },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "executionEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binarySha256",
+        "commit",
+        "runtimeSourceTreeHash",
+        "shaderArtifactManifest",
+        "spirvArtifact",
+        "trace",
+        "traceMeta"
+      ],
+      "properties": {
+        "binarySha256": { "$ref": "#/$defs/sha256" },
+        "commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "runtimeSourceTreeHash": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "shaderArtifactManifest": { "$ref": "#/$defs/evidenceFile" },
+        "spirvArtifact": { "$ref": "#/$defs/evidenceFile" },
+        "trace": { "$ref": "#/$defs/evidenceFile" },
+        "traceMeta": { "$ref": "#/$defs/evidenceFile" }
+      }
+    },
+    "outputComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baselineActualSha256",
+        "candidateActualSha256",
+        "equal",
+        "expectedSha256"
+      ],
+      "properties": {
+        "baselineActualSha256": { "$ref": "#/$defs/sha256" },
+        "candidateActualSha256": { "$ref": "#/$defs/sha256" },
+        "equal": { "type": "boolean" },
+        "expectedSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "traceComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baselineHash",
+        "baselinePreviousHash",
+        "candidateHash",
+        "candidatePreviousHash",
+        "equal"
+      ],
+      "properties": {
+        "baselineHash": { "type": "string", "pattern": "^0x[a-f0-9]{16}$" },
+        "baselinePreviousHash": { "type": "string", "pattern": "^0x[a-f0-9]{16}$" },
+        "candidateHash": { "type": "string", "pattern": "^0x[a-f0-9]{16}$" },
+        "candidatePreviousHash": { "type": "string", "pattern": "^0x[a-f0-9]{16}$" },
+        "equal": { "type": "boolean" }
+      }
+    }
+  }
+}

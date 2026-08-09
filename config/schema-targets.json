@@ -106,6 +106,10 @@
       "data": "runtime/zig/reports/recomposition/backend-evidence.json"
     },
     {
+      "schema": "config/recomposition-kernel-dispatch-equivalence.schema.json",
+      "data": "runtime/zig/reports/recomposition/kernel-dispatch-equivalence.json"
+    },
+    {
       "schema": "config/governed-lanes.schema.json",
       "data": "config/governed-lanes.json"
     },
