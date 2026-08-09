@@ -31,6 +31,15 @@ file only names the promoted boundary and open admission gates.
 - Strict comparison now rejects workload-unit normalization that makes selected
   operation timing exceed its containing workload wall. Trace row and success
   counts are not implicit workload-unit divisors without a declared unit.
+- External-project harness schema version 4 replaces one inferred installation
+  command with ordered named steps, each owning its working-directory scope and
+  timeout. The pinned vGPU workspace and isolated ORT experiment now prepare
+  without modifying upstream source.
+- The pinned vGPU Node/ORT workload passes its physical AMD Vulkan diagnostic
+  matrix on Dawn and Doe after closing native callback export, TypeScript-loader,
+  and post-destroy event-handler lifecycle gaps. Its governed receipts remain
+  diagnostic until support-target, replay, reliability, and promotion floors
+  are independently satisfied.
 - The AMD Vulkan external-project handoff has returned a reviewed diagnostic
   report with physical-adapter, native-output, and GPU-resource evidence at
   `reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic.json`.
@@ -63,7 +72,11 @@ file only names the promoted boundary and open admission gates.
 
 - Every promoted workload needs an independent output oracle on both products.
 - Node and Bun need downstream-project compatibility evidence, not only package
-  harness coverage.
+  harness coverage. The vGPU Node/ORT lane now supplies one diagnostic Node
+  application result; it is not yet a promoted release dependency.
+- Doe's Node adapter receipt still exposes a generic Vulkan adapter label. The
+  physical host probe binds the selected Radeon ICD for diagnostics, but exact
+  runtime adapter/driver provenance remains required before promotion.
 - End-to-end application latency, memory, concurrency, crash, hang, and leak
   evidence must become release-blocking for the promoted developer wedge.
 - Installation must pass from clean npm environments on every supported

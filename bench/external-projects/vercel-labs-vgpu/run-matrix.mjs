@@ -23,6 +23,7 @@ function parseArgs(argv) {
     cleanProcessRuns: 3,
     timeoutMs: 120_000,
     requireAllPass: false,
+    preparationReceipt: null,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
@@ -32,6 +33,8 @@ function parseArgs(argv) {
       options.cleanProcessRuns = Number.parseInt(argv[++index], 10);
     } else if (value === '--timeout-ms') {
       options.timeoutMs = Number.parseInt(argv[++index], 10);
+    } else if (value === '--preparation-receipt') {
+      options.preparationReceipt = resolve(argv[++index]);
     } else if (value === '--require-all-pass') options.requireAllPass = true;
     else throw new Error(`unknown argument: ${value}`);
   }
@@ -49,6 +52,45 @@ function parseArgs(argv) {
 
 async function sha256(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex');
+}
+
+async function readPreparationEvidence(path) {
+  if (path === null) return null;
+  const relativePath = path.startsWith(`${repoRoot}/`)
+    ? path.slice(repoRoot.length + 1)
+    : null;
+  if (relativePath === null) {
+    throw new Error(`preparation receipt escapes repository root: ${path}`);
+  }
+  const receipt = JSON.parse(await readFile(path, 'utf8'));
+  if (receipt.artifactKind !== 'external-project-preparation-receipt') {
+    throw new Error('preparation receipt has the wrong artifact kind');
+  }
+  if (receipt.actorId !== 'vercel-labs-vgpu' || receipt.harnessId !== 'node-ort-snapshot') {
+    throw new Error('preparation receipt actor or harness identity does not match');
+  }
+  if (receipt.status !== 'passed' || receipt.hardware?.status !== 'passed') {
+    throw new Error('preparation receipt does not prove a passing physical hardware probe');
+  }
+  if (receipt.source?.actualCommit !== expectedCommit) {
+    throw new Error('preparation receipt upstream commit does not match');
+  }
+  return {
+    path: relativePath,
+    sha256: await sha256(path),
+    receiptSha256: receipt.receiptSha256,
+    sourceCommit: receipt.source.actualCommit,
+    hardwareStatus: receipt.hardware.status,
+    hardwareProbe: {
+      id: receipt.hardware.probe.id,
+      stdoutPath: receipt.hardware.probe.stdoutPath,
+      stdoutSha256: receipt.hardware.probe.stdoutSha256,
+      stderrPath: receipt.hardware.probe.stderrPath,
+      stderrSha256: receipt.hardware.probe.stderrSha256,
+    },
+    supportTarget: receipt.supportTarget,
+    runtimeArtifacts: receipt.artifacts,
+  };
 }
 
 function sha256Text(value) {
@@ -333,6 +375,7 @@ async function main() {
       sha256: await sha256(resolve(harnessDir, 'repro-onuncapturederror.mjs')),
     },
   };
+  const preparationEvidence = await readPreparationEvidence(options.preparationReceipt);
   const modules = {
     dawn: resolve(experimentRoot, 'node_modules/webgpu/index.js'),
     doe: resolve(repoRoot, 'packages/doe-gpu/src/index.js'),
@@ -385,6 +428,7 @@ async function main() {
       modules,
     },
     immutableInputs,
+    preparationReceipt: preparationEvidence,
     providers,
   };
   raw.sha256 = sha256Text(JSON.stringify(raw));
@@ -416,6 +460,7 @@ async function main() {
       reliability: providers[provider].summary,
     }])),
     shader: immutableInputs.shader,
+    preparationReceipt: preparationEvidence,
     dispatchShape: {
       workgroupSize: [16, 1, 1],
       workgroups: [1, 1, 1],

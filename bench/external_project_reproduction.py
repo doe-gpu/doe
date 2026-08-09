@@ -260,6 +260,15 @@ def _render_template(template: str, values: dict[str, str]) -> str:
     return TEMPLATE_PATTERN.sub(lambda match: values[match.group(1)], template)
 
 
+def _validate_install_steps(manifest: dict[str, Any]) -> None:
+    install_steps = manifest.get("installation", {}).get("installSteps", [])
+    step_ids = [step.get("id") for step in install_steps if isinstance(step, dict)]
+    if len(step_ids) != len(set(step_ids)):
+        raise ReproductionError(
+            "contract", "installation step ids must be unique within a harness"
+        )
+
+
 def resolve_selection(
     root: Path,
     actor_id: str,
@@ -331,6 +340,7 @@ def resolve_selection(
         )
     else:
         manifest = load_json_object(manifest_path)
+    _validate_install_steps(manifest)
     if manifest.get("actorId") != actor_id or manifest.get("harnessId") != harness_id:
         raise ReproductionError(
             "contract", "registry selection does not match manifest actor/harness identity"

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "post-destroy-uncaptured-error-handler",
+  "actorId": "vercel-labs-vgpu",
+  "harnessId": "node-ort-snapshot",
+  "upstreamCommit": "86f2cadbd7a087f1695d736a12e218ab1ea2fc63",
+  "category": "compatibility",
+  "status": "fixed-regression-protected",
+  "summary": "ONNX Runtime clears GPUDevice.onuncapturederror during asynchronous teardown after destroying the device; Doe now updates the JavaScript event-handler slot without dereferencing the released native device.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-loader-smoke/raw-matrix.json",
+      "sha256": "ec84ee3f8bca3f9629a94bb037c990a05c10fde3b9e1dac67ce561ed49f3aa6b"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/unit/full-surface-lifecycle.test.js"
+  ],
+  "implementationPaths": [
+    "packages/doe-gpu/src/vendor/webgpu/index.js",
+    "packages/doe-gpu/src/vendor/webgpu/shared/full-surface.js"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/unit/full-surface-lifecycle.test.js"
+  ],
+  "verifiedAt": "2026-08-09T21:59:38Z"
+}

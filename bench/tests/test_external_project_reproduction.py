@@ -12,6 +12,7 @@ import unittest
 from pathlib import Path
 
 from bench.external_project_reproduction import (
+    ReproductionError,
     Selection,
     _payload_sha256,
     prepare_external_project,
@@ -59,6 +60,27 @@ class ExternalProjectReproductionPlanTests(unittest.TestCase):
         self.assertEqual(
             plan["workloadCommand"][-2:],
             ["--run-id", "portable-plan-test"],
+        )
+
+    def test_vgpu_plan_binds_preparation_receipt_to_workload(self) -> None:
+        selection = resolve_selection(
+            REPO_ROOT,
+            "vercel-labs-vgpu",
+            "node-ort-snapshot",
+            run_id="receipt-binding-plan-test",
+        )
+
+        plan = reproduction_plan(selection)
+
+        self.assertEqual(
+            plan["workloadCommand"][-2:],
+            [
+                "--preparation-receipt",
+                (
+                    "bench/out/external-projects/vercel-labs-vgpu/"
+                    "receipt-binding-plan-test/preparation.json"
+                ),
+            ],
         )
 
 
@@ -114,7 +136,7 @@ class ExternalProjectReproductionExecutionTests(unittest.TestCase):
         source_root = self.root / "fixture-source"
         source_root.mkdir()
         self._run_git(source_root, "init")
-        (source_root / ".gitignore").write_text("installed.txt\n", encoding="utf-8")
+        (source_root / ".gitignore").write_text("installed*.txt\n", encoding="utf-8")
         (source_root / "README.md").write_text("fixture\n", encoding="utf-8")
         self._run_git(source_root, "add", ".gitignore", "README.md")
         self._run_git(
@@ -150,6 +172,23 @@ class ExternalProjectReproductionExecutionTests(unittest.TestCase):
                             (
                                 "from pathlib import Path; "
                                 "Path('installed.txt').write_text('ok')"
+                            ),
+                        ],
+                        "workingDirectory": {
+                            "scope": "upstream",
+                            "path": ".",
+                        },
+                        "timeoutSeconds": 30,
+                    },
+                    {
+                        "id": "fixture-verification",
+                        "command": [
+                            sys.executable,
+                            "-c",
+                            (
+                                "from pathlib import Path; "
+                                "assert Path('installed.txt').read_text() == 'ok'; "
+                                "Path('installed-second.txt').write_text('ok')"
                             ),
                         ],
                         "workingDirectory": {
@@ -304,6 +343,31 @@ class ExternalProjectReproductionExecutionTests(unittest.TestCase):
         self.assertEqual(preparation["receiptSha256"], _payload_sha256(preparation))
         self.assertTrue(preparation["source"]["clean"])
         self.assertTrue(preparation["supportTarget"]["claimEligible"])
+        install_step_ids = [
+            step["id"]
+            for step in preparation["steps"]
+            if step["id"].startswith("install-")
+        ]
+        self.assertEqual(
+            install_step_ids,
+            ["install-fixture-dependencies", "install-fixture-verification"],
+        )
+
+    def test_duplicate_install_step_ids_are_rejected(self) -> None:
+        manifest_path = (
+            self.root
+            / "bench/external-projects/sample-actor/sample.harness.json"
+        )
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["installation"]["installSteps"][1]["id"] = (
+            manifest["installation"]["installSteps"][0]["id"]
+        )
+        self._write_json(manifest_path, manifest)
+
+        with self.assertRaisesRegex(
+            ReproductionError, "installation step ids must be unique"
+        ):
+            self._selection("integration-duplicate-install-step")
 
     def test_dirty_existing_checkout_fails_before_repinning(self) -> None:
         first_selection = self._selection("integration-first")
