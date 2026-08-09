@@ -30,6 +30,7 @@ IR_DIGEST_OBSERVER_PATHS = (
     "src/cli/entrypoints/main_emit_ir_digest.zig",
     "src/compiler/wgsl/ir/ir_digest.zig",
 )
+WEBGPU_ABI_SOURCE_CONFIG = "config/webgpu-abi-source.json"
 
 
 def _run(
@@ -93,6 +94,19 @@ def _materialize_runtime(
     with tarfile.open(archive_path, mode="r:") as tar:
         tar.extractall(temporary_root, filter="data")
     archive_path.unlink()
+    abi_source_config = json.loads(
+        (repository_root / WEBGPU_ABI_SOURCE_CONFIG).read_text(encoding="utf-8")
+    )
+    abi_source = abi_source_config["source"]
+    header_relative = Path(abi_source["path"])
+    header_source = repository_root / header_relative
+    if not header_source.is_file():
+        raise RuntimeError(f"pinned WebGPU ABI header is missing: {header_source}")
+    if sha256_file(header_source) != abi_source["sha256"]:
+        raise RuntimeError("pinned WebGPU ABI header hash does not match config")
+    header_destination = temporary_root / header_relative
+    header_destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(header_source, header_destination)
     snapshot = temporary_root / relative_runtime
     if not (snapshot / "build.zig").is_file():
         raise RuntimeError("materialized runtime snapshot has no build.zig")

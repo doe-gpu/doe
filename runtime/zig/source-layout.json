@@ -2103,8 +2103,8 @@
       },
       "src/compiler/wgsl/ir/ir_digest.zig": {
         "decision": "Keep",
-        "moduleSha256": "6470ebe184a20539a299a673b58f8ae2c7e8151bf9d42d93504b9d530a46f86c",
-        "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "moduleSha256": "f1809e1fd75b5d94087ae0187ffc418c4dcfb9082ac9ce05038e97e71983f031",
+        "reason": "Keep: canonical schema-value WGSL IR digest shared by semantic fixture and equivalence receipts, with private stability tests.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/compiler/wgsl/ir/ir_opt_rewrite.zig": {

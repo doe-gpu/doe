@@ -15,7 +15,7 @@ pub const Digest = [Sha256.digest_length]u8;
 
 pub fn compute(module: *const ir.Module) Digest {
     var hasher = Sha256.init(.{});
-    hasher.update("doe-wgsl-ir-v1\x00");
+    hasher.update("doe-wgsl-ir-v2\x00");
     hashValue(ir.Module, &hasher, module.*);
     var output: Digest = undefined;
     hasher.final(&output);
@@ -46,7 +46,6 @@ fn hashInt(comptime T: type, hasher: *Sha256, value: T) void {
 }
 
 fn hashValue(comptime T: type, hasher: *Sha256, value: T) void {
-    frame(hasher, @typeName(T));
     switch (@typeInfo(T)) {
         .bool => hasher.update(if (value) "\x01" else "\x00"),
         .int => hashInt(T, hasher, value),
@@ -119,4 +118,26 @@ test "canonical IR digest is allocation independent and semantic" {
     first.types.items.items[0] = .{ .scalar = .f32 };
     const after = compute(&first);
     try std.testing.expect(!std.mem.eql(u8, &before, &after));
+}
+
+test "canonical IR digest excludes compiler-generated anonymous type names" {
+    const First = struct {
+        elem: u32,
+        len: ?u32,
+    };
+    const Second = struct {
+        elem: u32,
+        len: ?u32,
+    };
+    const first = First{ .elem = 6, .len = null };
+    const second = Second{ .elem = 6, .len = null };
+    var first_hasher = Sha256.init(.{});
+    var second_hasher = Sha256.init(.{});
+    hashValue(First, &first_hasher, first);
+    hashValue(Second, &second_hasher, second);
+    var first_digest: Digest = undefined;
+    var second_digest: Digest = undefined;
+    first_hasher.final(&first_digest);
+    second_hasher.final(&second_digest);
+    try std.testing.expectEqualSlices(u8, &first_digest, &second_digest);
 }
