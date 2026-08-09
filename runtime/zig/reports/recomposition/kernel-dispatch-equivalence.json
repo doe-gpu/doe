@@ -1,7 +1,7 @@
 {
   "artifactKind": "recomposition-kernel-dispatch-equivalence",
   "baseline": {
-    "binarySha256": "6867cf05d885acdd924ae839fe2c3779537a6dce3c5e1155372983c393e8b8f4",
+    "binarySha256": "7b0deff66261c531276610ed8058663bdefe62666eceeb756945a6bb9ce214aa",
     "commit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
     "runtimeSourceTreeHash": "15e3ffccb2f242bcff0ff75eb5a7eb3273821d1e",
     "shaderArtifactManifest": {
@@ -14,17 +14,17 @@
     },
     "trace": {
       "path": "bench/out/recomposition/kernel-dispatch-equivalence/amd-vulkan-workgroup-atomic-v1/baseline/trace.jsonl",
-      "sha256": "8d4d16b91944c5a66f52f91eb514226d0099e1f23c7e08ad21bcb3fdd9863b11"
+      "sha256": "823cf7d49dc06a8df4bbc0626aa730f6142c183d89ae6d5f97c1607902f08461"
     },
     "traceMeta": {
       "path": "bench/out/recomposition/kernel-dispatch-equivalence/amd-vulkan-workgroup-atomic-v1/baseline/trace-meta.json",
-      "sha256": "65bc1eb7443fed3654f0a7dc66527659c79b5d13c2579cf7ced0312c738633ac"
+      "sha256": "16f3612795fe77edf72850a51cc020b208d580928cad78fcc331fb40dd37d855"
     }
   },
   "candidate": {
-    "binarySha256": "0990d56e12e7259f5571be9cd645264e28b06a11459e0eb24dda04336495269e",
-    "commit": "a1c58871db3b6d650719f6d86dda910c90bb3eab",
-    "runtimeSourceTreeHash": "787d11fb65011c256a8853b06aeed27c2c2b4b80",
+    "binarySha256": "e028d93442941712f149635f71a3c10d96f03acabb4b2f2d9c0f01605f274670",
+    "commit": "64b74e9aaed0e9fb939c77300d9c70a46595ca0d",
+    "runtimeSourceTreeHash": "8ecf2adfe44b142cbb5aeeebe82b02dc6b7fb52c",
     "shaderArtifactManifest": {
       "path": "bench/out/recomposition/kernel-dispatch-equivalence/amd-vulkan-workgroup-atomic-v1/candidate/shader-artifact-manifest.json",
       "sha256": "c00fb64b688bd0617a648d7c1d4a93d3fa36e09a0b5aa4df8f2625d1250739cf"
@@ -35,11 +35,11 @@
     },
     "trace": {
       "path": "bench/out/recomposition/kernel-dispatch-equivalence/amd-vulkan-workgroup-atomic-v1/candidate/trace.jsonl",
-      "sha256": "9ab045a9adff9c747f8321164509562ca4ea7309bec27c715aed67815167135a"
+      "sha256": "f40ee188c04f97ac24c5570515a1fa6bc3d458cfcc908543ad9d68ee53c6ec28"
     },
     "traceMeta": {
       "path": "bench/out/recomposition/kernel-dispatch-equivalence/amd-vulkan-workgroup-atomic-v1/candidate/trace-meta.json",
-      "sha256": "72d0aa44b9f6fe8af82d40a94343c73fabcac758d59376c1f01fd3a618eb6806"
+      "sha256": "e17667d6be9f1e48c31b46cbd1572176575e543792e459f34df58ad3bf796aa3"
     }
   },
   "classification": "exact-equivalence",
@@ -85,7 +85,7 @@
   "excludedVolatileFields": [
     "JSON object keys ending in Ns"
   ],
-  "generatedAt": "2026-08-09T03:11:30.596317Z",
+  "generatedAt": "2026-08-09T03:54:51.354510Z",
   "host": {
     "architecture": "x86_64",
     "deviceName": "Radeon 8060S Graphics (RADV STRIX_HALO)",
