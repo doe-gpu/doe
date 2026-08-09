@@ -18,7 +18,11 @@ from capture_semantic_fixtures import (
     _publish_fixture_set,
 )
 from check_recomposition_reports import _candidate_errors
-from generate_architecture_reports import build_reports, write_or_check
+from generate_architecture_reports import (
+    _cochange_report,
+    build_reports,
+    write_or_check,
+)
 from generate_recomposition_baseline import (
     _baseline_manifest,
     _semantic_artifact_records,
@@ -32,6 +36,51 @@ from verify_semantic_fixtures import load_verified_fixture_set
 
 
 class ArchitectureReportTests(unittest.TestCase):
+    def test_cochange_history_head_ignores_report_only_commits(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repository = Path(temporary_directory) / "doe"
+            runtime_root = repository / "runtime" / "zig"
+            _write(runtime_root, "src/mod.zig", "pub const value = 1;\n")
+            subprocess.run(["git", "init", "-q"], cwd=repository, check=True)
+            subprocess.run(
+                ["git", "config", "user.email", "test@example.com"],
+                cwd=repository,
+                check=True,
+            )
+            subprocess.run(
+                ["git", "config", "user.name", "Test"],
+                cwd=repository,
+                check=True,
+            )
+            subprocess.run(["git", "add", "."], cwd=repository, check=True)
+            subprocess.run(
+                ["git", "commit", "-qm", "source"],
+                cwd=repository,
+                check=True,
+            )
+            source_commit = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=repository,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            _write(
+                runtime_root,
+                "reports/architecture/co-change.json",
+                "{}\n",
+            )
+            subprocess.run(["git", "add", "."], cwd=repository, check=True)
+            subprocess.run(
+                ["git", "commit", "-qm", "report"],
+                cwd=repository,
+                check=True,
+            )
+            config = _manifest()
+            analysis = analyze(runtime_root, config)
+            report = _cochange_report(runtime_root, analysis)
+            self.assertEqual(report["historyHead"], source_commit)
+
     def test_frozen_snapshot_ir_observer_is_explicitly_instrumented(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)

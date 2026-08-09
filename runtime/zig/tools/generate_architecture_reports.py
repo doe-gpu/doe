@@ -208,17 +208,7 @@ def _cochange_report(root: Path, analysis: Analysis) -> dict[str, Any]:
     if result.returncode != 0:
         detail = result.stderr.strip() or result.stdout.strip()
         raise RuntimeError(f"git co-change scan failed: {detail}")
-    head_result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=repository_root,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    if head_result.returncode != 0:
-        detail = head_result.stderr.strip() or head_result.stdout.strip()
-        raise RuntimeError(f"git history identity failed: {detail}")
-    history_head = head_result.stdout.strip()
+    history_head = None
     current_modules = {module["path"] for module in analysis.modules}
     generated_modules = {
         module["path"] for module in analysis.modules if "generated" in module["roles"]
@@ -227,6 +217,8 @@ def _cochange_report(root: Path, analysis: Analysis) -> dict[str, Any]:
     current: list[tuple[str, str]] = []
     for line in result.stdout.splitlines():
         if line.startswith("COMMIT "):
+            if history_head is None:
+                history_head = line.removeprefix("COMMIT ").strip()
             if current:
                 commits.append(current)
             current = []
