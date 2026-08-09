@@ -34,7 +34,7 @@ class VulkanHostProfile:
     os: str
     arch: str
     vendor_id: str
-    icd_path: Path
+    icd_paths: tuple[Path, ...]
     device_ids: tuple[str, ...]
     driver_versions: tuple[str, ...]
     runtime_vendor: str
@@ -42,6 +42,15 @@ class VulkanHostProfile:
     runtime_family: str
     runtime_driver: str
     backend_lane: str
+
+    @property
+    def icd_path(self) -> Path:
+        """Return the first configured ICD candidate installed on this host."""
+
+        for candidate in self.icd_paths:
+            if candidate.is_file():
+                return candidate
+        return self.icd_paths[0]
 
 
 def parse_args() -> argparse.Namespace:
@@ -112,6 +121,13 @@ def load_vulkan_host_profiles(path: Path) -> dict[str, VulkanHostProfile]:
             raise ValueError("Vulkan host profile id must be non-empty")
         if profile_id in profiles:
             raise ValueError(f"duplicate Vulkan host profile id: {profile_id}")
+        icd_paths = tuple(
+            Path(str(value).strip()) for value in row.get("icdPaths", [])
+        )
+        if not icd_paths or any(not str(path) for path in icd_paths):
+            raise ValueError(
+                f"Vulkan host profile {profile_id} has no ICD path candidates"
+            )
         profiles[profile_id] = VulkanHostProfile(
             id=profile_id,
             display_name=str(row.get("displayName", "")).strip(),
@@ -119,7 +135,7 @@ def load_vulkan_host_profiles(path: Path) -> dict[str, VulkanHostProfile]:
             os=str(row.get("os", "")).strip(),
             arch=str(row.get("arch", "")).strip(),
             vendor_id=normalize_pci_id(row.get("vendorId", "")),
-            icd_path=Path(str(row.get("icdPath", "")).strip()),
+            icd_paths=icd_paths,
             device_ids=tuple(normalize_pci_id(value) for value in row.get("deviceIds", [])),
             driver_versions=tuple(
                 str(value).strip() for value in row.get("driverVersions", [])
@@ -547,7 +563,12 @@ def main() -> int:
                 "message": (
                     "ok"
                     if icd_exists
-                    else f"missing Vulkan ICD file: {selected_profile.icd_path}"
+                    else (
+                        "missing Vulkan ICD file; tried: "
+                        + ", ".join(
+                            str(path) for path in selected_profile.icd_paths
+                        )
+                    )
                 ),
             }
         )

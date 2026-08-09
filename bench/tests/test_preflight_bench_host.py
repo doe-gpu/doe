@@ -44,8 +44,11 @@ class VulkanHostProfileTests(unittest.TestCase):
 
         self.assertEqual(profile.vendor_id, "0x8086")
         self.assertEqual(
-            profile.icd_path,
-            Path("/usr/share/vulkan/icd.d/intel_icd.x86_64.json"),
+            profile.icd_paths,
+            (
+                Path("/usr/share/vulkan/icd.d/intel_icd.x86_64.json"),
+                Path("/usr/share/vulkan/icd.d/intel_icd.json"),
+            ),
         )
         self.assertEqual(profile.device_ids, ("0x9a78",))
         self.assertEqual(profile.driver_versions, ("24.2.8",))
@@ -63,8 +66,11 @@ class VulkanHostProfileTests(unittest.TestCase):
 
         self.assertEqual(profile.vendor_id, "0x1002")
         self.assertEqual(
-            profile.icd_path,
-            Path("/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"),
+            profile.icd_paths,
+            (
+                Path("/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"),
+                Path("/usr/share/vulkan/icd.d/radeon_icd.json"),
+            ),
         )
         self.assertEqual(profile.device_ids, ())
         self.assertEqual(profile.driver_versions, ())
@@ -103,13 +109,14 @@ class VulkanHostProfileTests(unittest.TestCase):
         self.assertEqual(message, "ok")
         self.assertEqual(payload, {"adapterOrdinal": 0})
         command = run.call_args.args[0]
+        selected_icd_path = str(profile.icd_path)
         self.assertEqual(command[command.index("--vendor") + 1], "intel")
         self.assertIn(
-            "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/intel_icd.x86_64.json",
+            f"VK_DRIVER_FILES={selected_icd_path}",
             command,
         )
         self.assertIn(
-            "VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/intel_icd.x86_64.json",
+            f"VK_ICD_FILENAMES={selected_icd_path}",
             command,
         )
         self.assertEqual(command[command.index("--family") + 1], "gen12")
@@ -148,11 +155,11 @@ GPU0:
         environment = run.call_args.kwargs["env"]
         self.assertEqual(
             environment["VK_DRIVER_FILES"],
-            "/usr/share/vulkan/icd.d/intel_icd.x86_64.json",
+            str(profile.icd_path),
         )
         self.assertEqual(
             environment["VK_ICD_FILENAMES"],
-            "/usr/share/vulkan/icd.d/intel_icd.x86_64.json",
+            str(profile.icd_path),
         )
 
     def test_software_or_wrong_driver_device_cannot_match_intel_profile(self) -> None:

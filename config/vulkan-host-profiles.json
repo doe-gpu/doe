@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "profiles": [
     {
       "id": "linux_amd_vulkan",
@@ -8,7 +8,10 @@
       "os": "linux",
       "arch": "x64",
       "vendorId": "0x1002",
-      "icdPath": "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json",
+      "icdPaths": [
+        "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json",
+        "/usr/share/vulkan/icd.d/radeon_icd.json"
+      ],
       "runtimeProfile": {
         "vendor": "amd",
         "api": "vulkan",
@@ -24,7 +27,10 @@
       "os": "linux",
       "arch": "x64",
       "vendorId": "0x8086",
-      "icdPath": "/usr/share/vulkan/icd.d/intel_icd.x86_64.json",
+      "icdPaths": [
+        "/usr/share/vulkan/icd.d/intel_icd.x86_64.json",
+        "/usr/share/vulkan/icd.d/intel_icd.json"
+      ],
       "deviceIds": [
         "0x9a78"
       ],

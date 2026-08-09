@@ -19,6 +19,9 @@ file only names the promoted boundary and open admission gates.
   entrypoint with exact source pinning and separate hash-bound preparation and
   execution receipts. Promotion remains downstream of reviewed application
   evidence and a claim-eligible physical support target.
+- Strict Linux Vulkan profiles declare ordered distro-specific ICD path
+  candidates. Preflight selects only the first installed declared candidate;
+  it does not scan for or fall back to an undeclared software ICD.
 
 ## Admission blockers
 

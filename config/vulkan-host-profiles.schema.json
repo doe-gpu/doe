@@ -7,7 +7,7 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 1
+      "const": 2
     },
     "profiles": {
       "type": "array",
@@ -37,7 +37,7 @@
         "os",
         "arch",
         "vendorId",
-        "icdPath",
+        "icdPaths",
         "runtimeProfile",
         "backendLane"
       ],
@@ -65,9 +65,14 @@
           "type": "string",
           "pattern": "^0x[0-9a-fA-F]{4}$"
         },
-        "icdPath": {
-          "type": "string",
-          "pattern": "^/[^\\u0000]+\\.json$"
+        "icdPaths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^/[^\\u0000]+\\.json$"
+          }
         },
         "deviceIds": {
           "$ref": "#/$defs/nonEmptyStringArray"
