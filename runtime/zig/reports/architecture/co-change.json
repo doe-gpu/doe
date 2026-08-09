@@ -1,11 +1,11 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
-  "commitsConsidered": 149,
+  "commitsConsidered": 146,
   "commitsExcludedAsMassChange": 1,
   "commitsExcludedAsPureRename": 0,
-  "historyHead": "5fe0e8fcf05384a9ec07b0544a5807e7f95b57ec",
+  "historyHead": "3867678e8aed7284d7b62c1c78be7bfdced0f8cb",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
+  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
   "minimumPairCount": 3,
   "pairTruncationLimit": 1000,
   "pairs": [
@@ -859,19 +859,7 @@
       "coChangeCount": 6,
       "coupling": 1.0,
       "left": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 6,
-      "coupling": 1.0,
-      "left": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
       "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
-    },
-    {
-      "coChangeCount": 6,
-      "coupling": 1.0,
-      "left": "src/full/modules/rendering/render_runtime.zig",
-      "right": "src/full/render/wgpu_render_commands.zig"
     },
     {
       "coChangeCount": 6,
@@ -1638,18 +1626,6 @@
     {
       "coChangeCount": 5,
       "coupling": 0.833333,
-      "left": "src/backend/d3d12/resources/d3d12_texture.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/backend/d3d12/surface/d3d12_surface.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
       "left": "src/backend/metal/metal_native_runtime.zig",
       "right": "src/backend/vulkan/vk_async_probes.zig"
     },
@@ -1662,18 +1638,6 @@
     {
       "coChangeCount": 5,
       "coupling": 0.833333,
-      "left": "src/backend/metal/mod.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/backend/vulkan/mod.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
       "left": "src/backend/vulkan/native_runtime.zig",
       "right": "src/backend/vulkan/vk_async_probes.zig"
     },
@@ -1682,12 +1646,6 @@
       "coupling": 0.833333,
       "left": "src/backend/vulkan/native_runtime.zig",
       "right": "src/backend/vulkan/vk_compute_sync.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/backend/vulkan/native_runtime.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 5,
@@ -1740,18 +1698,6 @@
     {
       "coChangeCount": 5,
       "coupling": 0.833333,
-      "left": "src/backend/vulkan/vk_render.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/core/abi/wgpu_loader.zig",
-      "right": "src/core/mod.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
       "left": "src/core/abi/wgpu_loader.zig",
       "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
     },
@@ -1796,30 +1742,6 @@
       "coupling": 0.833333,
       "left": "src/core/compute/wgpu_commands_compute.zig",
       "right": "src/full/render/wgpu_render_indexing.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/core/mod.zig",
-      "right": "src/core/resource/wgpu_resources.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/core/mod.zig",
-      "right": "src/dropin/dropin_abi_procs.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/core/mod.zig",
-      "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/core/mod.zig",
-      "right": "src/full/render/wgpu_render_resources.zig"
     },
     {
       "coChangeCount": 5,
@@ -1970,12 +1892,6 @@
       "coupling": 0.833333,
       "left": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
       "right": "src/full/render/wgpu_render_indexing.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.833333,
-      "left": "src/full/modules/rendering/render_runtime.zig",
-      "right": "src/full/surface/wgpu_surface_commands.zig"
     },
     {
       "coChangeCount": 5,
@@ -2965,12 +2881,6 @@
       "coChangeCount": 4,
       "coupling": 1.0,
       "left": "src/backend/d3d12/commands/d3d12_async_diagnostics.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 1.0,
-      "left": "src/backend/d3d12/commands/d3d12_async_diagnostics.zig",
       "right": "src/full/render/wgpu_render_commands.zig"
     },
     {
@@ -3044,12 +2954,6 @@
       "coupling": 1.0,
       "left": "src/backend/d3d12/commands/d3d12_map_async.zig",
       "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 1.0,
-      "left": "src/backend/d3d12/commands/d3d12_map_async.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -3181,12 +3085,6 @@
       "coChangeCount": 4,
       "coupling": 1.0,
       "left": "src/backend/d3d12/resources/d3d12_sampler.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 1.0,
-      "left": "src/backend/d3d12/resources/d3d12_sampler.zig",
       "right": "src/full/render/wgpu_render_commands.zig"
     },
     {
@@ -3300,12 +3198,6 @@
     {
       "coChangeCount": 4,
       "coupling": 1.0,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/full/render/wgpu_render_draw_loops.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 1.0,
       "left": "src/core/abi/wgpu_loader.zig",
       "right": "src/full/render/wgpu_render_draw_loops.zig"
     },
@@ -3349,12 +3241,6 @@
       "coChangeCount": 4,
       "coupling": 1.0,
       "left": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
-      "right": "src/full/render/wgpu_render_draw_loops.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 1.0,
-      "left": "src/full/modules/rendering/render_runtime.zig",
       "right": "src/full/render/wgpu_render_draw_loops.zig"
     },
     {
@@ -3530,12 +3416,6 @@
       "coupling": 0.8,
       "left": "src/backend/d3d12/commands/d3d12_streaming_copy.zig",
       "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.8,
-      "left": "src/backend/d3d12/commands/d3d12_streaming_copy.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -3780,18 +3660,6 @@
     {
       "coChangeCount": 4,
       "coupling": 0.8,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/full/render/wgpu_render_constants.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.8,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/full/render/wgpu_sampler_commands.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.8,
       "left": "src/core/abi/wgpu_loader.zig",
       "right": "src/full/render/wgpu_render_types.zig"
     },
@@ -3824,12 +3692,6 @@
       "coupling": 0.8,
       "left": "src/core/compute/wgpu_commands_compute.zig",
       "right": "src/full/render/wgpu_render_types.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.8,
-      "left": "src/core/mod.zig",
-      "right": "src/full/render/wgpu_render_constants.zig"
     },
     {
       "coChangeCount": 4,
@@ -3926,18 +3788,6 @@
       "coupling": 0.8,
       "left": "src/full/command_dispatch.zig",
       "right": "src/full/surface/wgpu_ffi_surface.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.8,
-      "left": "src/full/modules/rendering/render_runtime.zig",
-      "right": "src/full/render/wgpu_render_constants.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.8,
-      "left": "src/full/modules/rendering/render_runtime.zig",
-      "right": "src/full/render/wgpu_sampler_commands.zig"
     },
     {
       "coChangeCount": 4,
@@ -4044,12 +3894,6 @@
     {
       "coChangeCount": 4,
       "coupling": 0.666667,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
       "left": "src/backend/backend_runtime.zig",
       "right": "src/backend/d3d12/commands/d3d12_dispatch.zig"
     },
@@ -4064,12 +3908,6 @@
       "coupling": 0.666667,
       "left": "src/backend/backend_runtime.zig",
       "right": "src/full/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/backend_runtime.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4141,12 +3979,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/backend/d3d12/commands/d3d12_dispatch.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/d3d12/commands/d3d12_dispatch.zig",
       "right": "src/full/render/wgpu_render_commands.zig"
     },
     {
@@ -4183,12 +4015,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/backend/d3d12/commands/d3d12_native_render_pass.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/d3d12/commands/d3d12_native_render_pass.zig",
       "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
     },
     {
@@ -4196,12 +4022,6 @@
       "coupling": 0.666667,
       "left": "src/backend/d3d12/commands/d3d12_native_render_pass.zig",
       "right": "src/runtime/callback_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/d3d12/commands/d3d12_render.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4273,12 +4093,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/backend/d3d12/d3d12_native_runtime.zig",
-      "right": "src/core/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/d3d12/d3d12_native_runtime.zig",
       "right": "src/core/resource/wgpu_resource_normalizers.zig"
     },
     {
@@ -4286,12 +4100,6 @@
       "coupling": 0.666667,
       "left": "src/backend/d3d12/d3d12_native_runtime.zig",
       "right": "src/full/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/d3d12/d3d12_native_runtime.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4321,12 +4129,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/backend/d3d12/mod.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/d3d12/mod.zig",
       "right": "src/full/render/wgpu_render_indexing.zig"
     },
     {
@@ -4346,12 +4148,6 @@
       "coupling": 0.666667,
       "left": "src/backend/d3d12/resources/d3d12_texture_view.zig",
       "right": "src/backend/vulkan/vk_formats.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/d3d12/resources/d3d12_texture_view.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4376,12 +4172,6 @@
       "coupling": 0.666667,
       "left": "src/backend/dawn_delegate_backend.zig",
       "right": "src/full/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/dawn_delegate_backend.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4423,12 +4213,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/backend/metal/metal_copy_runtime.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/metal/metal_copy_runtime.zig",
       "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
     },
     {
@@ -4454,12 +4238,6 @@
       "coupling": 0.666667,
       "left": "src/backend/metal/metal_native_runtime.zig",
       "right": "src/core/resource/wgpu_resource_normalizers.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/metal/metal_native_runtime.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4603,12 +4381,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/backend/vulkan/vk_pipeline.zig",
-      "right": "src/core/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/vulkan/vk_pipeline.zig",
       "right": "src/core/resource/wgpu_resource_normalizers.zig"
     },
     {
@@ -4616,12 +4388,6 @@
       "coupling": 0.666667,
       "left": "src/backend/vulkan/vk_pipeline.zig",
       "right": "src/full/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/vulkan/vk_pipeline.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4644,20 +4410,8 @@
     {
       "coChangeCount": 4,
       "coupling": 0.666667,
-      "left": "src/backend/vulkan/vk_render_pipeline.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
       "left": "src/backend/vulkan/vk_resources.zig",
       "right": "src/core/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/vulkan/vk_resources.zig",
-      "right": "src/core/mod.zig"
     },
     {
       "coChangeCount": 4,
@@ -4675,12 +4429,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/backend/vulkan/vk_resources.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/vulkan/vk_resources.zig",
       "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
     },
     {
@@ -4688,12 +4436,6 @@
       "coupling": 0.666667,
       "left": "src/backend/vulkan/vulkan_surface.zig",
       "right": "src/core/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/vulkan/vulkan_surface.zig",
-      "right": "src/core/mod.zig"
     },
     {
       "coChangeCount": 4,
@@ -4711,36 +4453,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/backend/vulkan/vulkan_surface.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/backend/vulkan/vulkan_surface.zig",
-      "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/core/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/core/resource/wgpu_resource_normalizers.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/abi/mod.zig",
       "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
     },
     {
@@ -4760,12 +4472,6 @@
       "coupling": 0.666667,
       "left": "src/core/abi/wgpu_loader.zig",
       "right": "src/full/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/abi/wgpu_loader.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4825,43 +4531,7 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/core/compute/wgpu_commands_compute.zig",
-      "right": "src/core/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/compute/wgpu_commands_compute.zig",
       "right": "src/full/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/compute/wgpu_commands_compute.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/mod.zig",
-      "right": "src/core/resource/wgpu_resource_normalizers.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/mod.zig",
-      "right": "src/core/resource/wgpu_texture_commands.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/mod.zig",
-      "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/mod.zig",
-      "right": "src/full/render/wgpu_render_commands.zig"
     },
     {
       "coChangeCount": 4,
@@ -4909,12 +4579,6 @@
       "coChangeCount": 4,
       "coupling": 0.666667,
       "left": "src/core/resource/wgpu_resource_normalizers.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/resource/wgpu_resource_normalizers.zig",
       "right": "src/full/render/wgpu_render_indexing.zig"
     },
     {
@@ -4932,26 +4596,8 @@
     {
       "coChangeCount": 4,
       "coupling": 0.666667,
-      "left": "src/core/resource/wgpu_resources.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
       "left": "src/core/resource/wgpu_texture_commands.zig",
       "right": "src/full/command_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/core/resource/wgpu_texture_commands.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/dropin/dropin_abi_procs.zig",
-      "right": "src/full/modules/rendering/render_runtime.zig"
     },
     {
       "coChangeCount": 4,
@@ -4982,18 +4628,6 @@
       "coupling": 0.666667,
       "left": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
       "right": "src/runtime/callback_dispatch.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/full/modules/rendering/render_runtime.zig",
-      "right": "src/full/render/wgpu_pipeline_layout_pls.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.666667,
-      "left": "src/full/modules/rendering/render_runtime.zig",
-      "right": "src/full/render/wgpu_render_resources.zig"
     },
     {
       "coChangeCount": 4,
@@ -5101,12 +4735,6 @@
       "coChangeCount": 4,
       "coupling": 0.571429,
       "left": "src/backend/d3d12/d3d12_native_runtime.zig",
-      "right": "src/core/abi/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/d3d12/d3d12_native_runtime.zig",
       "right": "src/core/compute/wgpu_commands_compute.zig"
     },
     {
@@ -5203,12 +4831,6 @@
       "coChangeCount": 4,
       "coupling": 0.571429,
       "left": "src/backend/d3d12/resources/d3d12_texture.zig",
-      "right": "src/core/abi/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/d3d12/resources/d3d12_texture.zig",
       "right": "src/core/abi/wgpu_loader.zig"
     },
     {
@@ -5287,12 +4909,6 @@
       "coChangeCount": 4,
       "coupling": 0.571429,
       "left": "src/backend/d3d12/surface/d3d12_surface.zig",
-      "right": "src/core/abi/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/d3d12/surface/d3d12_surface.zig",
       "right": "src/core/abi/wgpu_loader.zig"
     },
     {
@@ -5341,19 +4957,7 @@
       "coChangeCount": 4,
       "coupling": 0.571429,
       "left": "src/backend/metal/metal_copy_runtime.zig",
-      "right": "src/core/abi/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/metal/metal_copy_runtime.zig",
       "right": "src/core/compute/wgpu_commands_compute.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/metal/metal_native_runtime.zig",
-      "right": "src/core/abi/mod.zig"
     },
     {
       "coChangeCount": 4,
@@ -5401,12 +5005,6 @@
       "coChangeCount": 4,
       "coupling": 0.571429,
       "left": "src/backend/vulkan/native_runtime.zig",
-      "right": "src/core/abi/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/vulkan/native_runtime.zig",
       "right": "src/core/compute/wgpu_commands_compute.zig"
     },
     {
@@ -5437,19 +5035,7 @@
       "coChangeCount": 4,
       "coupling": 0.571429,
       "left": "src/backend/vulkan/vk_pipeline.zig",
-      "right": "src/core/abi/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/vulkan/vk_pipeline.zig",
       "right": "src/core/compute/wgpu_commands_compute.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/vulkan/vk_render.zig",
-      "right": "src/core/abi/mod.zig"
     },
     {
       "coChangeCount": 4,
@@ -5467,67 +5053,13 @@
       "coChangeCount": 4,
       "coupling": 0.571429,
       "left": "src/backend/vulkan/vk_resources.zig",
-      "right": "src/core/abi/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/vulkan/vk_resources.zig",
       "right": "src/core/compute/wgpu_commands_compute.zig"
     },
     {
       "coChangeCount": 4,
       "coupling": 0.571429,
       "left": "src/backend/vulkan/vulkan_surface.zig",
-      "right": "src/core/abi/mod.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/backend/vulkan/vulkan_surface.zig",
       "right": "src/core/compute/wgpu_commands_compute.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/core/abi/wgpu_loader.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/core/compute/wgpu_commands_compute.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/core/resource/wgpu_resources.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/core/resource/wgpu_texture_commands.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/full/render/wgpu_render_commands.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.571429,
-      "left": "src/core/abi/mod.zig",
-      "right": "src/full/render/wgpu_render_resources.zig"
     },
     {
       "coChangeCount": 4,
@@ -6008,11 +5540,479 @@
       "coupling": 0.444444,
       "left": "src/backend/metal/metal_bridge_decls.zig",
       "right": "src/backend/metal/metal_dispatch_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_copy_runtime.zig",
+      "right": "src/backend/metal/metal_kernel_dispatch.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_dispatch_runtime.zig",
+      "right": "src/backend/metal/metal_runtime_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_dispatch_runtime.zig",
+      "right": "src/backend/vulkan/mod.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_dispatch_runtime.zig",
+      "right": "src/backend/vulkan/vk_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_dispatch_runtime.zig",
+      "right": "src/backend/vulkan/vk_render.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_dispatch_runtime.zig",
+      "right": "src/backend/vulkan/vulkan_surface.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_kernel_dispatch.zig",
+      "right": "src/backend/vulkan/mod.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_kernel_dispatch.zig",
+      "right": "src/backend/vulkan/vk_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/backend/d3d12/d3d12_native_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/backend/metal/metal_native_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/backend/vulkan/vk_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/backend/vulkan/vk_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/backend/vulkan/vk_upload.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/backend/vulkan/vulkan_surface.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/core/resource/wgpu_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/dropin/dropin_abi_procs.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/full/render/wgpu_render_commands.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_policy.zig",
+      "right": "src/backend/dawn_delegate_backend.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_policy.zig",
+      "right": "src/backend/metal/mod.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_policy.zig",
+      "right": "src/backend/vulkan/vk_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_runtime.zig",
+      "right": "src/core/resource/wgpu_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/backend_runtime.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/commands/d3d12_render.zig",
+      "right": "src/backend/metal/metal_native_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/commands/d3d12_render.zig",
+      "right": "src/backend/vulkan/vk_constants.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/commands/d3d12_render.zig",
+      "right": "src/backend/vulkan/vk_functions.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/commands/d3d12_render.zig",
+      "right": "src/backend/vulkan/vk_render_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/commands/d3d12_render.zig",
+      "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/commands/d3d12_render.zig",
+      "right": "src/full/render/wgpu_render_commands.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/d3d12_device_caps.zig",
+      "right": "src/backend/vulkan/vk_render_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/d3d12_device_caps.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/d3d12_native_runtime.zig",
+      "right": "src/backend/vulkan/vk_render_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/d3d12_native_runtime.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/mod.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/d3d12/mod.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/dawn_delegate_backend.zig",
+      "right": "src/backend/vulkan/backend_execute.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/dawn_delegate_backend.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/dawn_delegate_backend.zig",
+      "right": "src/core/resource/wgpu_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/dawn_delegate_backend.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/metal/metal_copy_runtime.zig",
+      "right": "src/backend/vulkan/vk_render_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/metal/metal_copy_runtime.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/metal/metal_copy_runtime.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/metal/metal_native_runtime.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/metal/metal_native_runtime.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/metal/mod.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/metal/mod.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/backend_execute.zig",
+      "right": "src/backend/vulkan/mod.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/backend_execute.zig",
+      "right": "src/backend/vulkan/vk_upload.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/backend_execute.zig",
+      "right": "src/cli/runtime_cli.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/native_runtime.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/native_runtime.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/vk_functions.zig",
+      "right": "src/backend/vulkan/vk_render_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/vk_pipeline.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/vk_render.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/vk_render_pipeline.zig",
+      "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/vk_render_pipeline.zig",
+      "right": "src/full/render/wgpu_render_commands.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/vk_resources.zig",
+      "right": "src/core/resource/wgpu_commands_copy.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/backend/vulkan/vk_upload.zig",
+      "right": "src/core/resource/wgpu_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.4,
+      "left": "src/core/resource/wgpu_commands_copy.zig",
+      "right": "src/dropin/dropin_abi_procs.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/backend_runtime.zig",
+      "right": "src/backend/metal/metal_copy_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/backend_runtime.zig",
+      "right": "src/backend/vulkan/vulkan_surface.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/d3d12/d3d12_device_caps.zig",
+      "right": "src/backend/vulkan/vulkan_surface.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/d3d12/d3d12_native_runtime.zig",
+      "right": "src/backend/metal/metal_copy_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/dawn_delegate_backend.zig",
+      "right": "src/backend/metal/metal_copy_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/dawn_delegate_backend.zig",
+      "right": "src/backend/vulkan/vulkan_surface.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/metal/metal_copy_runtime.zig",
+      "right": "src/backend/metal/metal_runtime_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/metal/metal_copy_runtime.zig",
+      "right": "src/backend/vulkan/vk_functions.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/metal/metal_copy_runtime.zig",
+      "right": "src/backend/vulkan/vulkan_surface.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/metal/metal_copy_runtime.zig",
+      "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/vulkan/vk_constants.zig",
+      "right": "src/backend/vulkan/vulkan_surface.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/vulkan/vk_functions.zig",
+      "right": "src/backend/vulkan/vulkan_surface.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.363636,
+      "left": "src/backend/vulkan/vulkan_surface.zig",
+      "right": "src/full/render/wgpu_render_commands.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.307692,
+      "left": "src/backend/backend_runtime.zig",
+      "right": "src/full/render/wgpu_render_commands.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.307692,
+      "left": "src/backend/d3d12/d3d12_device_caps.zig",
+      "right": "src/backend/d3d12/mod.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.307692,
+      "left": "src/backend/d3d12/d3d12_device_caps.zig",
+      "right": "src/backend/vulkan/vk_constants.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.307692,
+      "left": "src/backend/d3d12/d3d12_device_caps.zig",
+      "right": "src/backend/vulkan/vk_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.307692,
+      "left": "src/backend/dawn_delegate_backend.zig",
+      "right": "src/full/render/wgpu_render_commands.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.307692,
+      "left": "src/backend/vulkan/vk_functions.zig",
+      "right": "src/full/render/wgpu_render_commands.zig"
     }
   ],
-  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
+  "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3",
+  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5",
   "status": "diagnostic-only"
 }

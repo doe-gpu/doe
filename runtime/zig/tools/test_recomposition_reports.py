@@ -277,6 +277,7 @@ class ArchitectureReportTests(unittest.TestCase):
             self.assertEqual(decisions["entries"][0]["suggestedDecision"], "Keep")
             reachability = json.loads(reports["reachability-views.json"])
             self.assertEqual(reachability["classifiedModuleCount"], 1)
+            self.assertEqual(reachability["facadeOnlyFiles"], [])
             self.assertEqual(reachability["unclassifiedFiles"], [])
             self.assertEqual(
                 reachability["views"][0]["name"],

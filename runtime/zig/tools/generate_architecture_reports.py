@@ -99,7 +99,7 @@ def _reachability_view_report(analysis: Analysis) -> dict[str, Any]:
                 "roots": list(view.roots),
             }
         )
-    unclassified = [
+    absent_from_views = [
         {
             "aggregateProductionRoot": module["isProductionRoot"],
             "layer": module["layer"],
@@ -109,6 +109,16 @@ def _reachability_view_report(analysis: Analysis) -> dict[str, Any]:
         for module in analysis.modules
         if module["path"] not in classified
     ]
+    facade_only = [
+        record
+        for record in absent_from_views
+        if "package-root" in module_by_path[record["path"]]["roles"]
+    ]
+    unclassified = [
+        record
+        for record in absent_from_views
+        if "package-root" not in module_by_path[record["path"]]["roles"]
+    ]
     return {
         "classifiedLineCount": sum(
             module["lineCount"]
@@ -116,6 +126,10 @@ def _reachability_view_report(analysis: Analysis) -> dict[str, Any]:
             if module["path"] in classified
         ),
         "classifiedModuleCount": len(classified),
+        "facadeOnlyFiles": facade_only,
+        "facadeOnlyLineCount": sum(
+            record["lineCount"] for record in facade_only
+        ),
         "unclassifiedFiles": unclassified,
         "unclassifiedLineCount": sum(
             record["lineCount"] for record in unclassified

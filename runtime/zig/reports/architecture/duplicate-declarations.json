@@ -3087,28 +3087,6 @@
     {
       "locations": [
         {
-          "endLine": 7,
-          "kind": "constant",
-          "name": "command_dispatch",
-          "path": "src/core/mod.zig",
-          "startLine": 7,
-          "tokenCount": 8
-        },
-        {
-          "endLine": 1,
-          "kind": "constant",
-          "name": "command_dispatch",
-          "path": "src/full/mod.zig",
-          "startLine": 1,
-          "tokenCount": 8
-        }
-      ],
-      "normalizedTokenSha256": "136d3d57973e9eface0f3bb1250e611d456205b47c9f5094512821176af4ed4e",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 3,
           "kind": "constant",
           "name": "model_async_types",
@@ -6056,14 +6034,6 @@
           "name": "model_render_types",
           "path": "src/backend/d3d12/resources/d3d12_sampler.zig",
           "startLine": 2,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "model_render_types",
-          "path": "src/full/modules/rendering/render_runtime.zig",
-          "startLine": 4,
           "tokenCount": 7
         }
       ],
@@ -14277,14 +14247,6 @@
           "path": "src/backend/vulkan/mod.zig",
           "startLine": 4,
           "tokenCount": 7
-        },
-        {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "model_profile",
-          "path": "src/full/modules/common.zig",
-          "startLine": 4,
-          "tokenCount": 7
         }
       ],
       "normalizedTokenSha256": "6f359f93084749c456c66474f7ff4a8fb759d4426ded16a735a1d8228e7b9d1b",
@@ -16530,14 +16492,6 @@
           "endLine": 1,
           "kind": "constant",
           "name": "builtin",
-          "path": "src/full/modules/common.zig",
-          "startLine": 1,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 1,
-          "kind": "constant",
-          "name": "builtin",
           "path": "src/full/surface/wgpu_surface_macos.zig",
           "startLine": 1,
           "tokenCount": 7
@@ -16978,28 +16932,6 @@
         }
       ],
       "normalizedTokenSha256": "8538c0e71fbda0cad6742ff44aa0048a376420ce6980406a244c5881221ae200",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 5,
-          "kind": "constant",
-          "name": "backend_policy",
-          "path": "src/full/modules/common.zig",
-          "startLine": 5,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 38,
-          "kind": "constant",
-          "name": "backend_policy",
-          "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 38,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "8545358cf1e1dd9b70d06207a113d1f4b088041c2820b44e72ce22098a0071cc",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -21681,28 +21613,6 @@
     {
       "locations": [
         {
-          "endLine": 3,
-          "kind": "constant",
-          "name": "model_policy",
-          "path": "src/full/modules/common.zig",
-          "startLine": 3,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "model_policy",
-          "path": "src/runtime/trace/trace.zig",
-          "startLine": 4,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "b6183e7db4e838423a02c48be4b4c0facd6b7b1bd3e86f8ce8e8fa61b61c59d7",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 30,
           "kind": "constant",
           "name": "QUEUE_SYNC_RETRY_LIMIT",
@@ -22898,14 +22808,6 @@
           "name": "model_gpu_types",
           "path": "src/backend/d3d12/surface/d3d12_surface.zig",
           "startLine": 2,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 3,
-          "kind": "constant",
-          "name": "model_gpu_types",
-          "path": "src/full/modules/rendering/render_runtime.zig",
-          "startLine": 3,
           "tokenCount": 7
         }
       ],
@@ -25141,14 +25043,6 @@
           "tokenCount": 7
         },
         {
-          "endLine": 2,
-          "kind": "constant",
-          "name": "std",
-          "path": "src/full/modules/common.zig",
-          "startLine": 2,
-          "tokenCount": 7
-        },
-        {
           "endLine": 1,
           "kind": "constant",
           "name": "std",
@@ -25161,14 +25055,6 @@
           "kind": "constant",
           "name": "std",
           "path": "src/full/modules/rendering/path_engine.zig",
-          "startLine": 1,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 1,
-          "kind": "constant",
-          "name": "std",
-          "path": "src/full/modules/rendering/render_runtime.zig",
           "startLine": 1,
           "tokenCount": 7
         },
@@ -34089,9 +33975,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
-  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
+  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
+  "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3"
+  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5"
 }

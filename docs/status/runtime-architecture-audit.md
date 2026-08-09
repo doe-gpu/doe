@@ -5,6 +5,27 @@ architecture review, not a claim that every line is promoted product code.
 The import fence and source-layout gates are the structural authority; this
 page records the lifecycle interpretation and follow-up decisions.
 
+## Current reachability correction
+
+`runtime/zig/source-layout.json` now defines named reachability views for the
+shipped native/package runtime, drop-in compatibility, module-incubation and
+evidence tools, compiler/TSIR/spatial toolchains, and test-only compatibility.
+The aggregate production-root graph remains the blocking import/reachability
+gate. The named views are classification evidence and do not weaken that gate.
+
+See
+`runtime/zig/reports/architecture/reachability-views.json` for current module
+and line coverage, overlap, facade-only files, and any files absent from every
+view. This is the version-3 source-layout contract; version 2 reports do not
+carry named-view evidence.
+
+The first corrected pass removed disconnected `core` and `full` aggregation
+barrels plus the unconsumed full-module render-runtime chain. Their only
+source import path was the broad barrel policy itself; shipped, toolchain,
+integration, benchmark, and test roots did not consume them. Test-only legacy
+type aggregators and surface contracts remain explicit in their own view rather
+than being presented as shipped runtime.
+
 ## Verdict
 
 The runtime is layered and its declared import topology is currently green:
@@ -27,7 +48,7 @@ production-shaped roots.
 | `src/contracts/` | Canonical | Shared semantic contracts. New consumers should import these rather than backend or model-specific copies. |
 | `src/compiler/wgsl/` | Canonical | WGSL parsing, IR, transforms, proofs, and target emission. Keep lowering separate from native execution. |
 | `src/compiler/tsir/` | Diagnostic/canonical research path | Doe-owned portability path with real contracts, but broad target execution is not yet promoted. |
-| `src/backend/common/` | Canonical shared implementation | The current six helpers import canonical contracts and are reused by backend paths; no merge is justified from this audit. |
+| `src/backend/common/` | Canonical shared implementation | The current helpers import canonical contracts and are reused by backend paths; no merge is justified from this audit. |
 | `src/backend/metal/`, `vulkan/`, `d3d12/` | Canonical platform components | Keep separate because the native APIs, synchronization, memory, and failure models differ. Reuse policy, contracts, tracing, and common helpers. |
 | `src/native/` | Canonical runtime | Doe-native WebGPU objects, resource ownership, commands, and lifecycle. Backend mechanics should remain below shared runtime contracts. |
 | `src/runtime/` | Canonical shared services | Queues, cache, device, lifecycle, diagnostics, execution policy, and trace services shared by runtime paths. |
@@ -44,23 +65,19 @@ production-shaped roots.
 
 ### Reachability accounting caveat
 
-The current architecture report marks the whole `runtime/zig/src` tree
-reachable. This is expected from the current root policy: `productionRoots`
-includes `src/**/mod.zig`, the module runner, compiler tools, integration
-anchors, spatial tools, and proof consumers. Barrel modules intentionally
-re-export large surfaces, so “reachable” currently means “reachable from a
-declared source root,” not “required by the shipped native runtime.”
-
-The report therefore cannot yet answer the reduction question by itself. The
-next measurement must produce separate graphs for:
+The aggregate architecture graph still means “reachable from a declared source
+root,” not “required by the shipped native runtime.” Named view evidence now
+separates:
 
 - shipped native/package runtime;
 - drop-in and compatibility surfaces;
 - module-incubation and benchmark tools;
 - compiler/TSIR/spatial toolchains.
 
-Until those graphs exist, deleting an apparently reachable module would mix
-runtime, package, and evidence-tool contracts.
+Modules absent from all named views are not deleted automatically. Package
+facades are reported separately because build-module alias selection is lazy
+and cannot be inferred from relative-import edges alone. Any remaining
+unclassified implementation requires an exact consumer audit before removal.
 
 The source-layout manifest records the important canonicalization decisions:
 
@@ -85,12 +102,12 @@ identity, timing, trace, and error taxonomy.
 
 ## Architecture follow-up
 
-1. Add separate runtime/tool reachability views without weakening the existing
-   import fence.
-2. Keep the forbidden legacy paths guarded and verify new code imports the
+1. Keep the forbidden legacy paths guarded and verify new code imports the
    canonical contracts.
-3. Keep `src/full/modules/` classified as module incubation and ensure its
+2. Keep `src/full/modules/` classified as module incubation and ensure its
    deterministic contract results are never promoted as physical GPU evidence.
+3. Move test-only compatibility aggregators out of production source after
+   their consumers import narrow canonical contracts.
 4. Consolidate high-confidence repeated helpers in backend artifact/timing,
    TSIR/CSL emission, and module request parsing only when semantic tests cover
    both consumers.
@@ -99,6 +116,8 @@ identity, timing, trace, and error taxonomy.
 6. Re-run import-fence, source-layout, core tests, WGSL tests, and package tests
    after each migration.
 
-No implementation has been deleted in this audit. The evidence currently
-supports “layered with module-incubation separation and targeted file review,”
-not “rewrite the runtime” or “everything is already optimally abstracted.”
+The correction deletes only the disconnected barrels and unconsumed
+render-runtime chain named above; it does not change a shipped execution path.
+The evidence currently supports “layered with module-incubation separation and
+targeted file review,” not “rewrite the runtime” or “everything is already
+optimally abstracted.”

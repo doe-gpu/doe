@@ -323,7 +323,11 @@
       "src/spatial/csl/csl_bundle_emitter.zig",
       "src/spatial/csl/csl_host_plan_tool.zig",
       "src/spatial/csl/csl_sim_runner.zig",
-      "src/verification/lean_proof.zig"
+      "src/verification/lean_proof.zig",
+      "src/contracts/model/model_gpu_types.zig",
+      "src/core/abi/wgpu_runtime_abi.zig",
+      "src/core/surface.zig",
+      "src/full/surface_api.zig"
     ],
     "reachabilityViews": {
       "shipped-native-package-runtime": {
@@ -369,6 +373,15 @@
           "src/spatial/csl/csl_host_plan_tool.zig",
           "src/spatial/csl/csl_sim_runner.zig",
           "src/verification/lean_proof.zig"
+        ]
+      },
+      "test-only-compatibility": {
+        "description": "Legacy aggregate type facades and surface contracts exercised by Zig tests but absent from shipped and repository-tool build roots",
+        "roots": [
+          "src/contracts/model/model_gpu_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/surface.zig",
+          "src/full/surface_api.zig"
         ]
       }
     },
@@ -2406,18 +2419,6 @@
         "reason": "Keep: isolated C/OS FFI boundary at src/core/abi/generated/webgpu_upstream.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
-      "src/core/abi/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "fe4f6bdc36d14b2f3f62412f020ce3718e0778ce752f63a6c12f5b837a4bf526",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/core/abi/model_exports.zig": {
-        "decision": "Keep",
-        "moduleSha256": "2ea3377cf28acabb710cb54267116a857ef62d258f9bc0f4f7c467baf43fae1b",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
       "src/core/abi/procs/wgpu_async_procs.zig": {
         "decision": "Keep",
         "moduleSha256": "57500cb686aef7bacf5d79f01408760f88342bb2bea1fc9528908b4668005574",
@@ -2488,12 +2489,6 @@
         "decision": "Keep",
         "moduleSha256": "da6fe2560e1a0ff0ca2904a8c8a1eb37c0fa98e2573ceaa14cded72829323eaf",
         "reason": "Keep: reachable core implementation shared by 11 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/core/abi/wgpu_exports.zig": {
-        "decision": "Keep",
-        "moduleSha256": "82c4d8da6c56de160d55988a21baf8bf620190ae3ace7d52e8e9ca06191de7c7",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/core/abi/wgpu_feature_base_types.zig": {
@@ -2598,28 +2593,10 @@
         "reason": "Keep: reachable core implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
-      "src/core/compute/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "52f2a3d9018f9815a76f5ca59e02ac244868d6769f3544ba33428c48876d5153",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
       "src/core/compute/wgpu_commands_compute.zig": {
         "decision": "Keep",
         "moduleSha256": "f91dca6cc24dc11eeb3133b9055dbc806a1c6328c3cc30c991f587f876959087",
         "reason": "Keep: reachable core implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/core/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "c890c98bb926602046b035b98d61102b1cfd644ae1b90891543c910272c96a6d",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/core/queue/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "aabc2dcb1095007103fc9a91c16210f62c1780b73876d095266bb66733392698",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/core/queue/wgpu_ffi_capture.zig": {
@@ -2632,18 +2609,6 @@
         "decision": "Keep",
         "moduleSha256": "b802671f81d3caa7f58c270e4be3f2b8201e1d32a95d9735c72c4424fbbf627b",
         "reason": "Keep: reachable core implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/core/replay/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "1b4f5b4b4c15cf3aafd1ce7974ad60195326594313997b6b2e753c45e1509a4d",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/core/resource/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "13b2c13ebaa1ed14b65d2ecb22d5d2737c3d42f157d5028598212cf9175df591",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/core/resource/wgpu_commands_copy.zig": {
@@ -2680,12 +2645,6 @@
         "decision": "Keep",
         "moduleSha256": "c965f854bffeffe486721fb9e52c679c4b18cf7d6a42579f09c238f6ffbc0852",
         "reason": "Keep: reachable core implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/core/trace/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "95e46142f887c05a767990f9931e41e01bbaee1d16ad24fab593f2e346b1e7ad",
-        "reason": "Keep: reachable core implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/dropin/dropin_abi_procs.zig": {
@@ -2796,12 +2755,6 @@
         "reason": "Keep: reachable full implementation shared by 3 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
-      "src/full/lifecycle/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "125eb312d8074620e02560ff7e95d7373b4899f2836c6c47679ea3eeb24d62cc",
-        "reason": "Keep: reachable full implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
       "src/full/lifecycle/wgpu_async_diagnostics_command.zig": {
         "decision": "Keep",
         "moduleSha256": "4022ca3a31562064f9c4ebc935b4e63c2efd95a3f6c23021b7c6ca3be81f8d86",
@@ -2811,24 +2764,6 @@
       "src/full/lifecycle/wgpu_async_pixel_local_storage.zig": {
         "decision": "Keep",
         "moduleSha256": "dfc38050c7f232af6f63107b27e534436e0144f8a76895b7b357cf8915b3d518",
-        "reason": "Keep: reachable full implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/full/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "7f30cd504f8e9af3446759742b56f3cdd9bf90c43fe09b00be3d8f7665ac970b",
-        "reason": "Keep: reachable full implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/full/modules/common.zig": {
-        "decision": "Keep",
-        "moduleSha256": "5a6c38b0900e3aa74fbcf5604a81cd19bb32ccb80792e32ab29ac5c3bce2587b",
-        "reason": "Keep: reachable full implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/full/modules/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "b61faf10f0c374ff133b34abd2f523f109dc2edf7c8a90d1c34b292203aed900",
         "reason": "Keep: reachable full implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
@@ -2842,12 +2777,6 @@
         "decision": "Keep",
         "moduleSha256": "2bbddf3a021c7240bdccce8d6d11f5d591507af9f73d527f07a7f0c146a93c2c",
         "reason": "Keep: reachable full implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/full/modules/rendering/render_runtime.zig": {
-        "decision": "Keep",
-        "moduleSha256": "0ef45eb95df500c5644ec35ce051f4686827cefb0eda4c7d000dcd9ba6fbd4dc",
-        "reason": "Keep: reachable full implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/full/modules/rendering/sdf_renderer.zig": {
@@ -2866,12 +2795,6 @@
         "decision": "Keep",
         "moduleSha256": "939aed4253b237c5a19bf71c4d9fe9b4d5005e94e610d73bfeab93ceb3f51ac8",
         "reason": "Keep: reachable full implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/full/render/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "e56910478766a26e2e0d383b4db96ee1aaee07f3fa29abb812f83fd6011cd72e",
-        "reason": "Keep: reachable full implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/full/render/wgpu_pipeline_layout_pls.zig": {
@@ -2944,12 +2867,6 @@
         "decision": "Keep",
         "moduleSha256": "b146f49d3aa0fedeae29c9a3c06b7ced8bdc2e3d1e17e33b618dfe71dbce4c10",
         "reason": "Keep: reachable full implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/full/surface/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "98bf106d5f9a2a4f2595d8465a19fdd28c501884436ffc092b8b9998ff2ed17e",
-        "reason": "Keep: reachable full implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/full/surface/wgpu_ffi_surface.zig": {

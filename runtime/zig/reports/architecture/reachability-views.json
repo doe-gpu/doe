@@ -1,14 +1,8 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
-  "classifiedLineCount": 141224,
-  "classifiedModuleCount": 516,
-  "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
-  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
-  "schemaVersion": 1,
-  "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3",
-  "unclassifiedFiles": [
+  "classifiedLineCount": 142038,
+  "classifiedModuleCount": 520,
+  "facadeOnlyFiles": [
     {
       "aggregateProductionRoot": true,
       "layer": "backend-interface",
@@ -26,126 +20,6 @@
       "layer": "contracts",
       "lineCount": 75,
       "path": "src/contracts/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "contracts",
-      "lineCount": 164,
-      "path": "src/contracts/model/model_gpu_types.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "core",
-      "lineCount": 34,
-      "path": "src/core/abi/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "core",
-      "lineCount": 15,
-      "path": "src/core/abi/model_exports.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "core",
-      "lineCount": 16,
-      "path": "src/core/abi/wgpu_exports.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "core",
-      "lineCount": 435,
-      "path": "src/core/abi/wgpu_runtime_abi.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "core",
-      "lineCount": 1,
-      "path": "src/core/compute/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "core",
-      "lineCount": 18,
-      "path": "src/core/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "core",
-      "lineCount": 1,
-      "path": "src/core/queue/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "core",
-      "lineCount": 10,
-      "path": "src/core/replay/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "core",
-      "lineCount": 3,
-      "path": "src/core/resource/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "core",
-      "lineCount": 104,
-      "path": "src/core/surface.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "core",
-      "lineCount": 15,
-      "path": "src/core/trace/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "full",
-      "lineCount": 1,
-      "path": "src/full/lifecycle/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "full",
-      "lineCount": 6,
-      "path": "src/full/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "full",
-      "lineCount": 92,
-      "path": "src/full/modules/common.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "full",
-      "lineCount": 7,
-      "path": "src/full/modules/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "full",
-      "lineCount": 69,
-      "path": "src/full/modules/rendering/render_runtime.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "full",
-      "lineCount": 10,
-      "path": "src/full/render/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": true,
-      "layer": "full",
-      "lineCount": 3,
-      "path": "src/full/surface/mod.zig"
-    },
-    {
-      "aggregateProductionRoot": false,
-      "layer": "full",
-      "lineCount": 111,
-      "path": "src/full/surface_api.zig"
     },
     {
       "aggregateProductionRoot": true,
@@ -166,7 +40,15 @@
       "path": "src/runtime/mod.zig"
     }
   ],
-  "unclassifiedLineCount": 1355,
+  "facadeOnlyLineCount": 240,
+  "manifestPath": "runtime/zig/source-layout.json",
+  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
+  "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
+  "schemaVersion": 1,
+  "sourceLayoutVersion": 3,
+  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5",
+  "unclassifiedFiles": [],
+  "unclassifiedLineCount": 0,
   "views": [
     {
       "description": "WGSL compiler, TSIR, CSL, proof-consumer, and spatial toolchain roots selected by repository build targets",
@@ -266,6 +148,24 @@
         "src/cli/runtime_cli.zig",
         "src/dropin/root.zig",
         "src/dropin/wgpu_dropin_lib.zig"
+      ]
+    },
+    {
+      "description": "Legacy aggregate type facades and surface contracts exercised by Zig tests but absent from shipped and repository-tool build roots",
+      "name": "test-only-compatibility",
+      "reachableLineCount": 13752,
+      "reachableModuleCount": 78,
+      "rootPatterns": [
+        "src/contracts/model/model_gpu_types.zig",
+        "src/core/abi/wgpu_runtime_abi.zig",
+        "src/core/surface.zig",
+        "src/full/surface_api.zig"
+      ],
+      "roots": [
+        "src/contracts/model/model_gpu_types.zig",
+        "src/core/abi/wgpu_runtime_abi.zig",
+        "src/core/surface.zig",
+        "src/full/surface_api.zig"
       ]
     }
   ]

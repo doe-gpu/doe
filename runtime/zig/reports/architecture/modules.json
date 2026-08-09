@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
+  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
   "modules": [
     {
       "containsCImport": false,
@@ -59,7 +59,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 16,
+      "fanIn": 15,
       "fanOut": 2,
       "imports": [
         "src/backend/runtime_types.zig",
@@ -149,7 +149,6 @@
         "src/cli/runtime_cli.zig",
         "src/cli/runtime_cli_artifacts.zig",
         "src/dropin/dropin_runtime_config.zig",
-        "src/full/modules/common.zig",
         "src/native/lifecycle/doe_instance_device_native.zig",
         "src/plan/doe_plan_executor.zig",
         "src/runtime/execution.zig"
@@ -634,7 +633,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -3493,7 +3493,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -3732,7 +3733,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -5558,7 +5560,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 37,
+      "fanIn": 36,
       "fanOut": 2,
       "imports": [
         "src/contracts/backend.zig",
@@ -5622,7 +5624,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -5660,7 +5663,6 @@
         "src/core/command_dispatch.zig",
         "src/full/command/wgpu_commands.zig",
         "src/full/command_dispatch.zig",
-        "src/full/modules/rendering/render_runtime.zig",
         "src/native/lifecycle/doe_instance_device_native.zig",
         "src/runtime/execution.zig"
       ],
@@ -11823,7 +11825,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -11991,7 +11994,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -12271,7 +12275,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -12290,7 +12295,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 2,
       "fanOut": 19,
       "imports": [
         "src/backend/runtime_types.zig",
@@ -12381,8 +12386,7 @@
       "reachable": true,
       "reverseImports": [
         "src/backend/dawn_delegate_backend.zig",
-        "src/compat/webgpu_ffi.zig",
-        "src/full/modules/rendering/render_runtime.zig"
+        "src/compat/webgpu_ffi.zig"
       ],
       "roles": [],
       "sha256": "193a716cd5ede4961c327e8e2a076d1f34126c04635c9ce2e10b53f47c83fb67",
@@ -25292,7 +25296,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -25421,7 +25426,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -25441,7 +25447,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 39,
+      "fanIn": 38,
       "fanOut": 7,
       "imports": [
         "src/contracts/capability.zig",
@@ -25645,7 +25651,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -25670,7 +25677,6 @@
         "src/command/command_parse_render.zig",
         "src/command/command_stream.zig",
         "src/contracts/mod.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/command_dispatch.zig",
         "src/core/surface.zig",
         "src/full/command/wgpu_commands.zig",
@@ -25870,7 +25876,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -26028,7 +26035,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 18,
+      "fanIn": 17,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_texture_value_types.zig"
@@ -26071,7 +26078,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -26090,7 +26098,6 @@
         "src/command/command_json_extra.zig",
         "src/command/command_json_raw.zig",
         "src/contracts/command.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/resource/wgpu_commands_copy.zig",
         "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
       ],
@@ -26102,7 +26109,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 17,
+      "fanIn": 16,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -26209,7 +26216,8 @@
         "compiler-tsir-spatial-toolchains",
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -26222,7 +26230,6 @@
         "src/contracts/model/model_compute_types.zig",
         "src/contracts/model/model_gpu_types.zig",
         "src/contracts/texture.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/abi/wgpu_binding_base_types.zig",
         "src/core/compute/wgpu_commands_compute.zig",
         "src/core/resource/wgpu_resource_normalizers.zig",
@@ -26239,7 +26246,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 36,
+      "fanIn": 35,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
@@ -26293,7 +26300,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -26321,7 +26329,6 @@
         "src/contracts/command.zig",
         "src/contracts/compute.zig",
         "src/contracts/mod.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/compute/wgpu_commands_compute.zig",
         "src/core/resource/wgpu_resources.zig",
         "src/native/support/doe_native_command_types.zig",
@@ -26342,14 +26349,14 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
+      "fanIn": 0,
       "fanOut": 3,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
         "src/contracts/model/model_texture_format_value_types.zig",
         "src/contracts/model/model_texture_layout_value_types.zig"
       ],
-      "isProductionRoot": false,
+      "isProductionRoot": true,
       "layer": "contracts",
       "lineCount": 164,
       "onlyReexports": true,
@@ -27103,12 +27110,14 @@
           "name": "WGPUStorageTextureAccess_ReadWrite"
         }
       ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/abi/model_exports.zig"
+      "reachabilityViewRoots": [
+        "test-only-compatibility"
       ],
+      "reachabilityViews": [
+        "test-only-compatibility"
+      ],
+      "reachable": true,
+      "reverseImports": [],
       "roles": [],
       "sha256": "483a68577148b6948f1271ec8ab32f637dbd42933cbce39726f87ca8fa7b48ba",
       "testBlockCount": 0,
@@ -27117,7 +27126,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 11,
+      "fanIn": 9,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -27223,15 +27232,14 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/cli/runtime_cli.zig",
         "src/contracts/model/model_profile.zig",
         "src/contracts/model/model_quirks.zig",
-        "src/core/abi/model_exports.zig",
-        "src/full/modules/common.zig",
         "src/plan/doe_plan_executor.zig",
         "src/quirk/mod.zig",
         "src/quirk/quirk_actions.zig",
@@ -27247,7 +27255,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 18,
+      "fanIn": 16,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_policy.zig"
@@ -27275,7 +27283,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -27291,8 +27300,6 @@
         "src/cli/runtime_cli_artifacts.zig",
         "src/contracts/backend.zig",
         "src/contracts/mod.zig",
-        "src/core/abi/model_exports.zig",
-        "src/full/modules/common.zig",
         "src/plan/doe_plan_executor.zig",
         "src/quirk/mod.zig",
         "src/quirk/runtime.zig",
@@ -27306,7 +27313,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 7,
+      "fanIn": 6,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_policy.zig"
@@ -27363,7 +27370,6 @@
       "reachable": true,
       "reverseImports": [
         "src/cli/runtime_cli_inputs.zig",
-        "src/core/abi/model_exports.zig",
         "src/quirk/mod.zig",
         "src/quirk/quirk_actions.zig",
         "src/quirk/quirk_json.zig",
@@ -27378,7 +27384,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 33,
+      "fanIn": 31,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_texture_value_types.zig"
@@ -27521,7 +27527,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -27548,8 +27555,6 @@
         "src/command/command_parse_helpers.zig",
         "src/command/command_parse_render.zig",
         "src/contracts/command.zig",
-        "src/core/abi/model_exports.zig",
-        "src/full/modules/rendering/render_runtime.zig",
         "src/full/render/wgpu_render_commands.zig",
         "src/full/render/wgpu_render_draw_loops.zig",
         "src/full/render/wgpu_render_indexing.zig",
@@ -27567,7 +27572,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 23,
+      "fanIn": 22,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_texture_value_types.zig"
@@ -27620,7 +27625,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -27640,7 +27646,6 @@
         "src/command/command_parse_helpers.zig",
         "src/contracts/command.zig",
         "src/contracts/model/model_texture_types.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/compute/wgpu_commands_compute.zig",
         "src/core/resource/wgpu_commands_copy.zig",
         "src/core/resource/wgpu_resources.zig",
@@ -27656,7 +27661,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 12,
+      "fanIn": 11,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_texture_value_types.zig"
@@ -27719,7 +27724,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -27732,7 +27738,6 @@
         "src/backend/vulkan/vk_runtime_surface_ops.zig",
         "src/command/command_json_extra.zig",
         "src/contracts/command.zig",
-        "src/core/abi/model_exports.zig",
         "src/full/surface/wgpu_surface_commands.zig",
         "src/native/surface/doe_surface_native.zig"
       ],
@@ -27744,7 +27749,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 5,
+      "fanIn": 4,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_texture_layout_value_types.zig",
@@ -28288,13 +28293,13 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/contracts/model/model_gpu_types.zig",
         "src/contracts/model/model_texture_value_types.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/abi/wgpu_texture_base_types.zig",
         "src/native/lifecycle/doe_canvas_event_native.zig"
       ],
@@ -28306,7 +28311,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 6,
+      "fanIn": 5,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -28452,14 +28457,14 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/contracts/model/model_gpu_types.zig",
         "src/contracts/model/model_texture_format_value_types.zig",
         "src/contracts/model/model_texture_value_types.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/abi/wgpu_core_base_types.zig",
         "src/core/abi/wgpu_texture_base_types.zig"
       ],
@@ -28471,7 +28476,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 13,
+      "fanIn": 12,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_resource_types.zig",
@@ -28505,7 +28510,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -28520,7 +28526,6 @@
         "src/backend/vulkan/vk_texture_commands.zig",
         "src/command/command_json_extra.zig",
         "src/contracts/command.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/resource/wgpu_texture_commands.zig"
       ],
       "roles": [],
@@ -28531,7 +28536,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 46,
+      "fanIn": 44,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_texture_format_value_types.zig",
@@ -29205,7 +29210,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -29240,14 +29246,12 @@
         "src/contracts/model/model_surface_control_types.zig",
         "src/contracts/model/model_texture_types.zig",
         "src/contracts/texture.zig",
-        "src/core/abi/model_exports.zig",
         "src/core/abi/wgpu_loader.zig",
         "src/core/resource/wgpu_resource_normalizers.zig",
         "src/core/resource/wgpu_resources.zig",
         "src/core/resource/wgpu_texture_commands.zig",
         "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
         "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
-        "src/full/modules/rendering/render_runtime.zig",
         "src/full/render/wgpu_render_commands.zig",
         "src/full/render/wgpu_render_constants.zig",
         "src/full/render/wgpu_render_resources.zig",
@@ -29984,7 +29988,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -30558,7 +30563,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -30579,309 +30585,6 @@
       "sha256": "01127b0c039ffc3e0b69f02c47197014621a903433e9eb833136b5e7c617c036",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 108
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 2,
-      "imports": [
-        "src/core/abi/model_exports.zig",
-        "src/core/abi/wgpu_exports.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "core",
-      "lineCount": 34,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/abi/mod.zig",
-      "publicDeclarationCount": 31,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "model_commands"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "model_policy"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "model_profile"
-        },
-        {
-          "kind": "const",
-          "line": 7,
-          "name": "model_quirks"
-        },
-        {
-          "kind": "const",
-          "line": 8,
-          "name": "model_texture_layout_value_types"
-        },
-        {
-          "kind": "const",
-          "line": 9,
-          "name": "model_texture_format_value_types"
-        },
-        {
-          "kind": "const",
-          "line": 10,
-          "name": "model_texture_value_types"
-        },
-        {
-          "kind": "const",
-          "line": 11,
-          "name": "model_binding_value_types"
-        },
-        {
-          "kind": "const",
-          "line": 12,
-          "name": "model_gpu_types"
-        },
-        {
-          "kind": "const",
-          "line": 13,
-          "name": "model_resource_types"
-        },
-        {
-          "kind": "const",
-          "line": 14,
-          "name": "model_compute_types"
-        },
-        {
-          "kind": "const",
-          "line": 15,
-          "name": "model_render_types"
-        },
-        {
-          "kind": "const",
-          "line": 16,
-          "name": "model_texture_types"
-        },
-        {
-          "kind": "const",
-          "line": 17,
-          "name": "model_surface_control_types"
-        },
-        {
-          "kind": "const",
-          "line": 18,
-          "name": "model_async_types"
-        },
-        {
-          "kind": "const",
-          "line": 19,
-          "name": "wgpu_handle_types"
-        },
-        {
-          "kind": "const",
-          "line": 20,
-          "name": "wgpu_core_base_types"
-        },
-        {
-          "kind": "const",
-          "line": 21,
-          "name": "wgpu_feature_base_types"
-        },
-        {
-          "kind": "const",
-          "line": 22,
-          "name": "wgpu_texture_base_types"
-        },
-        {
-          "kind": "const",
-          "line": 23,
-          "name": "wgpu_binding_base_types"
-        },
-        {
-          "kind": "const",
-          "line": 24,
-          "name": "wgpu_callback_descriptor_types"
-        },
-        {
-          "kind": "const",
-          "line": 25,
-          "name": "wgpu_copy_descriptor_types"
-        },
-        {
-          "kind": "const",
-          "line": 26,
-          "name": "wgpu_pipeline_descriptor_types"
-        },
-        {
-          "kind": "const",
-          "line": 27,
-          "name": "wgpu_execution_types"
-        },
-        {
-          "kind": "const",
-          "line": 28,
-          "name": "wgpu_loader"
-        },
-        {
-          "kind": "const",
-          "line": 29,
-          "name": "wgpu_record_types"
-        },
-        {
-          "kind": "const",
-          "line": 30,
-          "name": "wgpu_proc_types"
-        },
-        {
-          "kind": "const",
-          "line": 31,
-          "name": "wgpu_runtime_records"
-        },
-        {
-          "kind": "const",
-          "line": 32,
-          "name": "wgpu_runtime_abi"
-        },
-        {
-          "kind": "const",
-          "line": 33,
-          "name": "wgpu_runtime_state_defs"
-        },
-        {
-          "kind": "const",
-          "line": 34,
-          "name": "wgpu_state_types"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "fe4f6bdc36d14b2f3f62412f020ce3718e0778ce752f63a6c12f5b837a4bf526",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 33
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 15,
-      "imports": [
-        "src/contracts/command.zig",
-        "src/contracts/model/model_async_types.zig",
-        "src/contracts/model/model_binding_value_types.zig",
-        "src/contracts/model/model_compute_types.zig",
-        "src/contracts/model/model_gpu_types.zig",
-        "src/contracts/model/model_policy.zig",
-        "src/contracts/model/model_profile.zig",
-        "src/contracts/model/model_quirks.zig",
-        "src/contracts/model/model_render_types.zig",
-        "src/contracts/model/model_resource_types.zig",
-        "src/contracts/model/model_surface_control_types.zig",
-        "src/contracts/model/model_texture_format_value_types.zig",
-        "src/contracts/model/model_texture_layout_value_types.zig",
-        "src/contracts/model/model_texture_types.zig",
-        "src/contracts/model/model_texture_value_types.zig"
-      ],
-      "isProductionRoot": false,
-      "layer": "core",
-      "lineCount": 15,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/abi/model_exports.zig",
-      "publicDeclarationCount": 15,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "model_commands"
-        },
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "model_policy"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "model_profile"
-        },
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "model_quirks"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "model_texture_layout_value_types"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "model_texture_format_value_types"
-        },
-        {
-          "kind": "const",
-          "line": 7,
-          "name": "model_texture_value_types"
-        },
-        {
-          "kind": "const",
-          "line": 8,
-          "name": "model_binding_value_types"
-        },
-        {
-          "kind": "const",
-          "line": 9,
-          "name": "model_gpu_types"
-        },
-        {
-          "kind": "const",
-          "line": 10,
-          "name": "model_resource_types"
-        },
-        {
-          "kind": "const",
-          "line": 11,
-          "name": "model_compute_types"
-        },
-        {
-          "kind": "const",
-          "line": 12,
-          "name": "model_render_types"
-        },
-        {
-          "kind": "const",
-          "line": 13,
-          "name": "model_texture_types"
-        },
-        {
-          "kind": "const",
-          "line": 14,
-          "name": "model_surface_control_types"
-        },
-        {
-          "kind": "const",
-          "line": 15,
-          "name": "model_async_types"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/abi/mod.zig"
-      ],
-      "roles": [],
-      "sha256": "2ea3377cf28acabb710cb54267116a857ef62d258f9bc0f4f7c467baf43fae1b",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 15
     },
     {
       "containsCImport": false,
@@ -31027,7 +30730,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -31197,7 +30901,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -31728,7 +31433,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -31946,7 +31652,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -32007,7 +31714,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -32391,7 +32099,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -32406,7 +32115,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 4,
+      "fanIn": 3,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
@@ -32565,11 +32274,11 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_proc_types.zig",
         "src/native/resource/doe_bind_group_native.zig",
         "src/native/support/doe_native_shared_types.zig"
@@ -32582,7 +32291,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 30,
+      "fanIn": 29,
       "fanOut": 4,
       "imports": [
         "src/core/abi/generated/webgpu_upstream.zig",
@@ -32763,7 +32472,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -32778,7 +32488,6 @@
         "src/core/abi/procs/wgpu_p0_procs.zig",
         "src/core/abi/procs/wgpu_p1_capability_procs.zig",
         "src/core/abi/wgpu_copy_descriptor_types.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_pipeline_descriptor_types.zig",
         "src/core/abi/wgpu_proc_types.zig",
         "src/dropin/dropin_browser_shared_memory.zig",
@@ -32806,7 +32515,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 7,
+      "fanIn": 6,
       "fanOut": 4,
       "imports": [
         "src/core/abi/generated/webgpu_upstream.zig",
@@ -32867,12 +32576,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/core/abi/procs/wgpu_texture_procs.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_proc_types.zig",
         "src/dropin/wgpu_dropin_ext_b.zig",
         "src/dropin/wgpu_dropin_ext_c.zig",
@@ -32887,7 +32596,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 35,
+      "fanIn": 34,
       "fanOut": 4,
       "imports": [
         "src/contracts/model/model_texture_layout_value_types.zig",
@@ -33238,7 +32947,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -33251,7 +32961,6 @@
         "src/core/abi/wgpu_binding_base_types.zig",
         "src/core/abi/wgpu_callback_descriptor_types.zig",
         "src/core/abi/wgpu_copy_descriptor_types.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_pipeline_descriptor_types.zig",
         "src/core/abi/wgpu_proc_types.zig",
         "src/core/abi/wgpu_texture_base_types.zig",
@@ -33286,7 +32995,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 11,
+      "fanIn": 9,
       "fanOut": 1,
       "imports": [
         "src/contracts/execution.zig"
@@ -33314,15 +33023,14 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/backend/runtime_types.zig",
         "src/core/abi/wgpu_core_base_types.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/compute/wgpu_commands_compute.zig",
-        "src/core/mod.zig",
         "src/core/resource/wgpu_commands_copy.zig",
         "src/core/resource/wgpu_texture_commands.zig",
         "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
@@ -33338,130 +33046,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 16,
-      "imports": [
-        "src/core/abi/wgpu_binding_base_types.zig",
-        "src/core/abi/wgpu_callback_descriptor_types.zig",
-        "src/core/abi/wgpu_copy_descriptor_types.zig",
-        "src/core/abi/wgpu_core_base_types.zig",
-        "src/core/abi/wgpu_execution_types.zig",
-        "src/core/abi/wgpu_feature_base_types.zig",
-        "src/core/abi/wgpu_handle_types.zig",
-        "src/core/abi/wgpu_loader.zig",
-        "src/core/abi/wgpu_pipeline_descriptor_types.zig",
-        "src/core/abi/wgpu_proc_types.zig",
-        "src/core/abi/wgpu_record_types.zig",
-        "src/core/abi/wgpu_runtime_abi.zig",
-        "src/core/abi/wgpu_runtime_records.zig",
-        "src/core/abi/wgpu_runtime_state_defs.zig",
-        "src/core/abi/wgpu_state_types.zig",
-        "src/core/abi/wgpu_texture_base_types.zig"
-      ],
-      "isProductionRoot": false,
-      "layer": "core",
-      "lineCount": 16,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/abi/wgpu_exports.zig",
-      "publicDeclarationCount": 16,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "wgpu_handle_types"
-        },
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "wgpu_core_base_types"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "wgpu_feature_base_types"
-        },
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "wgpu_texture_base_types"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "wgpu_binding_base_types"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "wgpu_callback_descriptor_types"
-        },
-        {
-          "kind": "const",
-          "line": 7,
-          "name": "wgpu_copy_descriptor_types"
-        },
-        {
-          "kind": "const",
-          "line": 8,
-          "name": "wgpu_pipeline_descriptor_types"
-        },
-        {
-          "kind": "const",
-          "line": 9,
-          "name": "wgpu_execution_types"
-        },
-        {
-          "kind": "const",
-          "line": 10,
-          "name": "wgpu_loader"
-        },
-        {
-          "kind": "const",
-          "line": 11,
-          "name": "wgpu_record_types"
-        },
-        {
-          "kind": "const",
-          "line": 12,
-          "name": "wgpu_proc_types"
-        },
-        {
-          "kind": "const",
-          "line": 13,
-          "name": "wgpu_runtime_records"
-        },
-        {
-          "kind": "const",
-          "line": 14,
-          "name": "wgpu_runtime_abi"
-        },
-        {
-          "kind": "const",
-          "line": 15,
-          "name": "wgpu_runtime_state_defs"
-        },
-        {
-          "kind": "const",
-          "line": 16,
-          "name": "wgpu_state_types"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/abi/mod.zig"
-      ],
-      "roles": [],
-      "sha256": "82c4d8da6c56de160d55988a21baf8bf620190ae3ace7d52e8e9ca06191de7c7",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 16
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 15,
+      "fanIn": 14,
       "fanOut": 1,
       "imports": [
         "src/core/abi/generated/webgpu_upstream.zig"
@@ -33634,7 +33219,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -33645,7 +33231,6 @@
         "src/backend/webgpu_backend_lifecycle.zig",
         "src/core/abi/procs/wgpu_p1_capability_procs.zig",
         "src/core/abi/wgpu_callback_descriptor_types.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_proc_types.zig",
         "src/core/runtime/wgpu_capability_runtime.zig",
         "src/dropin/wgpu_dropin_ext_a_core.zig",
@@ -33662,7 +33247,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 20,
+      "fanIn": 18,
       "fanOut": 1,
       "imports": [
         "src/core/abi/generated/webgpu_upstream.zig"
@@ -33820,7 +33405,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -33831,8 +33417,6 @@
         "src/core/abi/procs/wgpu_p1_resource_table_procs.zig",
         "src/core/abi/procs/wgpu_p2_lifecycle_procs.zig",
         "src/core/abi/wgpu_core_base_types.zig",
-        "src/core/abi/wgpu_exports.zig",
-        "src/core/mod.zig",
         "src/dropin/dropin_runtime_config.zig",
         "src/dropin/wgpu_dropin_lib.zig",
         "src/full/render/wgpu_pipeline_layout_pls.zig",
@@ -33853,7 +33437,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 27,
+      "fanIn": 25,
       "fanOut": 5,
       "imports": [
         "src/contracts/model/model_texture_value_types.zig",
@@ -33985,7 +33569,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -33997,9 +33582,7 @@
         "src/core/abi/procs/wgpu_async_procs.zig",
         "src/core/abi/procs/wgpu_p0_procs.zig",
         "src/core/abi/procs/wgpu_p1_resource_table_procs.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/compute/wgpu_commands_compute.zig",
-        "src/core/mod.zig",
         "src/core/queue/wgpu_ffi_capture.zig",
         "src/core/queue/wgpu_ffi_sync.zig",
         "src/core/resource/wgpu_commands_copy.zig",
@@ -34025,7 +33608,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 18,
+      "fanIn": 17,
       "fanOut": 4,
       "imports": [
         "src/core/abi/generated/webgpu_upstream.zig",
@@ -34231,12 +33814,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/core/abi/procs/wgpu_p0_procs.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_proc_types.zig",
         "src/dropin/dropin_browser_shared_memory.zig",
         "src/dropin/wgpu_dropin_ext_a_core.zig",
@@ -34262,7 +33845,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 18,
+      "fanIn": 17,
       "fanOut": 7,
       "imports": [
         "src/core/abi/wgpu_binding_base_types.zig",
@@ -34296,12 +33879,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/core/abi/procs/wgpu_types_procs.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_loader.zig",
         "src/core/abi/wgpu_record_types.zig",
         "src/core/abi/wgpu_runtime_abi.zig",
@@ -34327,7 +33910,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 1,
       "imports": [
         "src/core/abi/wgpu_proc_types.zig"
@@ -34430,11 +34013,11 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_runtime_records.zig"
       ],
       "roles": [],
@@ -34445,7 +34028,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 0,
       "fanOut": 4,
       "imports": [
         "src/core/abi/wgpu_proc_types.zig",
@@ -34453,7 +34036,7 @@
         "src/core/abi/wgpu_runtime_state_defs.zig",
         "src/core/abi/wgpu_type_proc_aliases.zig"
       ],
-      "isProductionRoot": false,
+      "isProductionRoot": true,
       "layer": "core",
       "lineCount": 435,
       "onlyReexports": true,
@@ -36592,13 +36175,14 @@
           "name": "Procs"
         }
       ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/abi/wgpu_exports.zig",
-        "src/core/mod.zig"
+      "reachabilityViewRoots": [
+        "test-only-compatibility"
       ],
+      "reachabilityViews": [
+        "test-only-compatibility"
+      ],
+      "reachable": true,
+      "reverseImports": [],
       "roles": [],
       "sha256": "6bd3bd102ae5a0c96dbcb1340894747352e39292c39d34e3e3d3adac6360829d",
       "testBlockCount": 0,
@@ -36607,7 +36191,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 8,
+      "fanIn": 7,
       "fanOut": 2,
       "imports": [
         "src/core/abi/wgpu_record_types.zig",
@@ -36666,13 +36250,13 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/backend/webgpu_backend_lifecycle.zig",
         "src/backend/webgpu_backend_types.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_loader.zig",
         "src/core/abi/wgpu_runtime_abi.zig",
         "src/core/compute/wgpu_commands_compute.zig",
@@ -36687,7 +36271,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 7,
+      "fanIn": 6,
       "fanOut": 2,
       "imports": [
         "src/core/abi/wgpu_state_contract_types.zig",
@@ -36736,12 +36320,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/backend/webgpu_backend_types.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_loader.zig",
         "src/core/abi/wgpu_runtime_abi.zig",
         "src/core/compute/wgpu_commands_compute.zig",
@@ -36799,7 +36383,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -36813,7 +36398,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 1,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -36834,13 +36419,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/core/abi/wgpu_exports.zig",
-        "src/core/abi/wgpu_runtime_state_defs.zig",
-        "src/core/mod.zig"
+        "src/core/abi/wgpu_runtime_state_defs.zig"
       ],
       "roles": [],
       "sha256": "1b85877abc71bdf2fb71c71a84ae24ab5d61c13ef3e7e5233df4fc7187b00741",
@@ -36850,7 +36434,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 24,
+      "fanIn": 23,
       "fanOut": 5,
       "imports": [
         "src/contracts/model/model_texture_format_value_types.zig",
@@ -37617,7 +37201,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -37625,7 +37210,6 @@
         "src/core/abi/procs/wgpu_p1_capability_procs.zig",
         "src/core/abi/procs/wgpu_texture_procs.zig",
         "src/core/abi/wgpu_copy_descriptor_types.zig",
-        "src/core/abi/wgpu_exports.zig",
         "src/core/abi/wgpu_pipeline_descriptor_types.zig",
         "src/core/abi/wgpu_proc_types.zig",
         "src/dropin/dropin_browser_shared_memory.zig",
@@ -37675,7 +37259,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -38052,7 +37637,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -38098,7 +37684,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -38112,7 +37699,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 2,
       "fanOut": 5,
       "imports": [
         "src/backend/runtime_types.zig",
@@ -38139,11 +37726,11 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/core/mod.zig",
         "src/core/surface.zig",
         "src/full/command/wgpu_commands.zig"
       ],
@@ -38206,42 +37793,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 1,
-      "imports": [
-        "src/core/compute/wgpu_commands_compute.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "core",
-      "lineCount": 1,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/compute/mod.zig",
-      "publicDeclarationCount": 1,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "wgpu_commands_compute"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "52f2a3d9018f9815a76f5ca59e02ac244868d6769f3544ba33428c48876d5153",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 1
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 4,
+      "fanIn": 2,
       "fanOut": 10,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
@@ -38353,189 +37905,18 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/backend/webgpu_backend_ops.zig",
-        "src/core/command_dispatch.zig",
-        "src/core/compute/mod.zig",
-        "src/core/mod.zig"
+        "src/core/command_dispatch.zig"
       ],
       "roles": [],
       "sha256": "f91dca6cc24dc11eeb3133b9055dbc806a1c6328c3cc30c991f587f876959087",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 36
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 0,
-      "fanOut": 18,
-      "imports": [
-        "src/core/abi/mod.zig",
-        "src/core/abi/wgpu_execution_types.zig",
-        "src/core/abi/wgpu_handle_types.zig",
-        "src/core/abi/wgpu_loader.zig",
-        "src/core/abi/wgpu_runtime_abi.zig",
-        "src/core/abi/wgpu_state_types.zig",
-        "src/core/command_dispatch.zig",
-        "src/core/compute/mod.zig",
-        "src/core/compute/wgpu_commands_compute.zig",
-        "src/core/queue/mod.zig",
-        "src/core/queue/wgpu_ffi_sync.zig",
-        "src/core/replay/mod.zig",
-        "src/core/resource/mod.zig",
-        "src/core/resource/wgpu_commands_copy.zig",
-        "src/core/resource/wgpu_resources.zig",
-        "src/core/resource/wgpu_texture_commands.zig",
-        "src/core/surface.zig",
-        "src/core/trace/mod.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "core",
-      "lineCount": 18,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/mod.zig",
-      "publicDeclarationCount": 18,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "abi"
-        },
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "compute"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "queue"
-        },
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "replay"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "resource"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "trace"
-        },
-        {
-          "kind": "const",
-          "line": 7,
-          "name": "command_dispatch"
-        },
-        {
-          "kind": "const",
-          "line": 8,
-          "name": "surface"
-        },
-        {
-          "kind": "const",
-          "line": 9,
-          "name": "wgpu_handle_types"
-        },
-        {
-          "kind": "const",
-          "line": 10,
-          "name": "wgpu_execution_types"
-        },
-        {
-          "kind": "const",
-          "line": 11,
-          "name": "wgpu_loader"
-        },
-        {
-          "kind": "const",
-          "line": 12,
-          "name": "wgpu_runtime_abi"
-        },
-        {
-          "kind": "const",
-          "line": 13,
-          "name": "wgpu_state_types"
-        },
-        {
-          "kind": "const",
-          "line": 14,
-          "name": "wgpu_commands_compute"
-        },
-        {
-          "kind": "const",
-          "line": 15,
-          "name": "wgpu_commands_copy"
-        },
-        {
-          "kind": "const",
-          "line": 16,
-          "name": "wgpu_resources"
-        },
-        {
-          "kind": "const",
-          "line": 17,
-          "name": "wgpu_texture_commands"
-        },
-        {
-          "kind": "const",
-          "line": 18,
-          "name": "wgpu_ffi_sync"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "c890c98bb926602046b035b98d61102b1cfd644ae1b90891543c910272c96a6d",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 18
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 1,
-      "imports": [
-        "src/core/queue/wgpu_ffi_sync.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "core",
-      "lineCount": 1,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/queue/mod.zig",
-      "publicDeclarationCount": 1,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "wgpu_ffi_sync"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "aabc2dcb1095007103fc9a91c16210f62c1780b73876d095266bb66733392698",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 1
     },
     {
       "containsCImport": false,
@@ -38582,7 +37963,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 1,
       "fanOut": 4,
       "imports": [
         "src/core/abi/wgpu_loader.zig",
@@ -38677,9 +38058,7 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/backend/webgpu_backend_ops.zig",
-        "src/core/mod.zig",
-        "src/core/queue/mod.zig"
+        "src/backend/webgpu_backend_ops.zig"
       ],
       "roles": [
         "ffi-boundary"
@@ -38691,129 +38070,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 1,
-      "imports": [
-        "src/runtime/trace/replay.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "core",
-      "lineCount": 10,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/replay/mod.zig",
-      "publicDeclarationCount": 9,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "ReplayValidationError"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "ReplayExpectation"
-        },
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "ReplayExpectationSet"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "RawReplayRow"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "parseTraceHash"
-        },
-        {
-          "kind": "const",
-          "line": 7,
-          "name": "parseReplayLine"
-        },
-        {
-          "kind": "const",
-          "line": 8,
-          "name": "loadReplayExpectations"
-        },
-        {
-          "kind": "const",
-          "line": 9,
-          "name": "freeReplayExpectations"
-        },
-        {
-          "kind": "const",
-          "line": 10,
-          "name": "matchOptionalText"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "1b4f5b4b4c15cf3aafd1ce7974ad60195326594313997b6b2e753c45e1509a4d",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 10
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 3,
-      "imports": [
-        "src/core/resource/wgpu_commands_copy.zig",
-        "src/core/resource/wgpu_resources.zig",
-        "src/core/resource/wgpu_texture_commands.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "core",
-      "lineCount": 3,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/resource/mod.zig",
-      "publicDeclarationCount": 3,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "wgpu_commands_copy"
-        },
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "wgpu_resources"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "wgpu_texture_commands"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "13b2c13ebaa1ed14b65d2ecb22d5d2737c3d42f157d5028598212cf9175df591",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 3
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 4,
+      "fanIn": 2,
       "fanOut": 6,
       "imports": [
         "src/contracts/model/model_async_types.zig",
@@ -38861,14 +38118,13 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/backend/webgpu_backend.zig",
-        "src/core/command_dispatch.zig",
-        "src/core/mod.zig",
-        "src/core/resource/mod.zig"
+        "src/core/command_dispatch.zig"
       ],
       "roles": [],
       "sha256": "ac46d78e89ab09c494264e674301eea052ffdf2edeee9e746f76a2076636b70a",
@@ -38948,7 +38204,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -38962,7 +38219,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 14,
+      "fanIn": 12,
       "fanOut": 10,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
@@ -39064,14 +38321,13 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/backend/webgpu_backend_ops.zig",
         "src/core/compute/wgpu_commands_compute.zig",
-        "src/core/mod.zig",
-        "src/core/resource/mod.zig",
         "src/core/resource/wgpu_commands_copy.zig",
         "src/core/resource/wgpu_texture_commands.zig",
         "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
@@ -39091,7 +38347,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 1,
       "fanOut": 7,
       "imports": [
         "src/contracts/model/model_texture_types.zig",
@@ -39130,13 +38386,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/core/command_dispatch.zig",
-        "src/core/mod.zig",
-        "src/core/resource/mod.zig"
+        "src/core/command_dispatch.zig"
       ],
       "roles": [],
       "sha256": "a47f4f8270f8f49b74a8dbd42dcc2296165b1e206b626d2627fee8f2ef828d0e",
@@ -39213,13 +38468,13 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 2,
       "imports": [
         "src/contracts/command.zig",
         "src/core/command_dispatch.zig"
       ],
-      "isProductionRoot": false,
+      "isProductionRoot": true,
       "layer": "core",
       "lineCount": 104,
       "onlyReexports": false,
@@ -39288,117 +38543,20 @@
           "name": "coverage_ledger"
         }
       ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
+      "reachabilityViewRoots": [
+        "test-only-compatibility"
+      ],
+      "reachabilityViews": [
+        "test-only-compatibility"
+      ],
       "reachable": true,
       "reverseImports": [
-        "src/core/mod.zig",
         "src/full/surface_api.zig"
       ],
       "roles": [],
       "sha256": "c965f854bffeffe486721fb9e52c679c4b18cf7d6a42579f09c238f6ffbc0852",
       "testBlockCount": 3,
       "topLevelDeclarationCount": 18
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 1,
-      "imports": [
-        "src/runtime/trace/trace.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "core",
-      "lineCount": 15,
-      "onlyReexports": true,
-      "owner": "core",
-      "path": "src/core/trace/mod.zig",
-      "publicDeclarationCount": 14,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "TraceState"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "TraceRunSummary"
-        },
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "writef"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "writeJsonString"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "actionName"
-        },
-        {
-          "kind": "const",
-          "line": 7,
-          "name": "scopeName"
-        },
-        {
-          "kind": "const",
-          "line": 8,
-          "name": "safetyClassName"
-        },
-        {
-          "kind": "const",
-          "line": 9,
-          "name": "proofLevelName"
-        },
-        {
-          "kind": "const",
-          "line": 10,
-          "name": "verificationModeName"
-        },
-        {
-          "kind": "const",
-          "line": 11,
-          "name": "apiName"
-        },
-        {
-          "kind": "const",
-          "line": 12,
-          "name": "commandToTag"
-        },
-        {
-          "kind": "const",
-          "line": 13,
-          "name": "tracePayloadHash"
-        },
-        {
-          "kind": "const",
-          "line": 14,
-          "name": "printTraceLine"
-        },
-        {
-          "kind": "const",
-          "line": 15,
-          "name": "writeTraceMeta"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/core/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "95e46142f887c05a767990f9931e41e01bbaee1d16ad24fab593f2e346b1e7ad",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 15
     },
     {
       "containsCImport": false,
@@ -40818,7 +39976,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 2,
       "fanOut": 6,
       "imports": [
         "src/backend/runtime_types.zig",
@@ -40846,12 +40004,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/full/command/wgpu_commands.zig",
-        "src/full/mod.zig",
         "src/full/surface_api.zig"
       ],
       "roles": [],
@@ -40863,41 +40021,6 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 1,
-      "imports": [
-        "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "full",
-      "lineCount": 1,
-      "onlyReexports": true,
-      "owner": "full",
-      "path": "src/full/lifecycle/mod.zig",
-      "publicDeclarationCount": 1,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "wgpu_async_diagnostics_command"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/full/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "125eb312d8074620e02560ff7e95d7373b4899f2836c6c47679ea3eeb24d62cc",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 1
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 2,
       "fanOut": 18,
       "imports": [
         "src/contracts/model/model_async_types.zig",
@@ -40937,12 +40060,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/command_dispatch.zig",
-        "src/full/lifecycle/mod.zig"
+        "src/full/command_dispatch.zig"
       ],
       "roles": [],
       "sha256": "4022ca3a31562064f9c4ebc935b4e63c2efd95a3f6c23021b7c6ca3be81f8d86",
@@ -40992,7 +40115,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -41006,207 +40130,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 0,
-      "fanOut": 6,
-      "imports": [
-        "src/full/command_dispatch.zig",
-        "src/full/lifecycle/mod.zig",
-        "src/full/modules/mod.zig",
-        "src/full/render/mod.zig",
-        "src/full/surface/mod.zig",
-        "src/full/surface_api.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "full",
-      "lineCount": 6,
-      "onlyReexports": true,
-      "owner": "full",
-      "path": "src/full/mod.zig",
-      "publicDeclarationCount": 6,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "command_dispatch"
-        },
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "surface_api"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "render"
-        },
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "surface"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "lifecycle"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "modules"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "7f30cd504f8e9af3446759742b56f3cdd9bf90c43fe09b00be3d8f7665ac970b",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 6
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 2,
-      "fanOut": 3,
-      "imports": [
-        "src/backend/backend_policy.zig",
-        "src/contracts/model/model_policy.zig",
-        "src/contracts/model/model_profile.zig"
-      ],
-      "isProductionRoot": false,
-      "layer": "full",
-      "lineCount": 92,
-      "onlyReexports": false,
-      "owner": "full",
-      "path": "src/full/modules/common.zig",
-      "publicDeclarationCount": 7,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 9,
-          "name": "HostRuntimeError"
-        },
-        {
-          "kind": "fn",
-          "line": 13,
-          "name": "hostProfile"
-        },
-        {
-          "kind": "fn",
-          "line": 37,
-          "name": "duplicateString"
-        },
-        {
-          "kind": "fn",
-          "line": 41,
-          "name": "ensureLocalLibrarySearchPath"
-        },
-        {
-          "kind": "fn",
-          "line": 72,
-          "name": "runtimePolicyPath"
-        },
-        {
-          "kind": "fn",
-          "line": 79,
-          "name": "kernelRootPath"
-        },
-        {
-          "kind": "fn",
-          "line": 86,
-          "name": "hostBackendLane"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/full/modules/mod.zig",
-        "src/full/modules/rendering/render_runtime.zig"
-      ],
-      "roles": [],
-      "sha256": "5a6c38b0900e3aa74fbcf5604a81cd19bb32ccb80792e32ab29ac5c3bce2587b",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 12
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
       "fanIn": 1,
-      "fanOut": 7,
-      "imports": [
-        "src/full/modules/common.zig",
-        "src/full/modules/rendering/effects_pipeline.zig",
-        "src/full/modules/rendering/path_engine.zig",
-        "src/full/modules/rendering/render_runtime.zig",
-        "src/full/modules/rendering/sdf_renderer.zig",
-        "src/full/modules/services/compute_services.zig",
-        "src/full/modules/services/resource_scheduler.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "full",
-      "lineCount": 7,
-      "onlyReexports": true,
-      "owner": "full",
-      "path": "src/full/modules/mod.zig",
-      "publicDeclarationCount": 7,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "common"
-        },
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "compute_services"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "resource_scheduler"
-        },
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "render_runtime"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "effects_pipeline"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "path_engine"
-        },
-        {
-          "kind": "const",
-          "line": 7,
-          "name": "sdf_renderer"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/full/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "b61faf10f0c374ff133b34abd2f523f109dc2edf7c8a90d1c34b292203aed900",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 7
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 2,
       "fanOut": 1,
       "imports": [
         "src/contracts/artifact.zig"
@@ -41321,8 +40245,7 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/cli/module_runner_cli.zig",
-        "src/full/modules/mod.zig"
+        "src/cli/module_runner_cli.zig"
       ],
       "roles": [],
       "sha256": "57aad4b93182d146677ba340d2bd4547b1b7453cbe9a15bd62ee6f9002977947",
@@ -41332,7 +40255,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 1,
       "imports": [
         "src/contracts/artifact.zig"
@@ -41447,8 +40370,7 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/cli/module_runner_cli.zig",
-        "src/full/modules/mod.zig"
+        "src/cli/module_runner_cli.zig"
       ],
       "roles": [],
       "sha256": "2bbddf3a021c7240bdccce8d6d11f5d591507af9f73d527f07a7f0c146a93c2c",
@@ -41459,59 +40381,6 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 6,
-      "imports": [
-        "src/backend/runtime_types.zig",
-        "src/backend/webgpu_backend.zig",
-        "src/contracts/model/model_render_types.zig",
-        "src/contracts/model/model_texture_value_types.zig",
-        "src/full/modules/common.zig",
-        "src/full/render/wgpu_render_commands.zig"
-      ],
-      "isProductionRoot": false,
-      "layer": "full",
-      "lineCount": 69,
-      "onlyReexports": false,
-      "owner": "full",
-      "path": "src/full/modules/rendering/render_runtime.zig",
-      "publicDeclarationCount": 4,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 10,
-          "name": "RenderRuntimeError"
-        },
-        {
-          "kind": "const",
-          "line": 15,
-          "name": "RenderExecutionConfig"
-        },
-        {
-          "kind": "fn",
-          "line": 30,
-          "name": "textureFormatFromString"
-        },
-        {
-          "kind": "fn",
-          "line": 37,
-          "name": "execute"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/full/modules/mod.zig"
-      ],
-      "roles": [],
-      "sha256": "0ef45eb95df500c5644ec35ce051f4686827cefb0eda4c7d000dcd9ba6fbd4dc",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 12
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 2,
       "fanOut": 1,
       "imports": [
         "src/contracts/artifact.zig"
@@ -41636,8 +40505,7 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/cli/module_runner_cli.zig",
-        "src/full/modules/mod.zig"
+        "src/cli/module_runner_cli.zig"
       ],
       "roles": [],
       "sha256": "07a253103eba356f6811af8fb22fa404ad6ccb5dcd397bc2b4b3e7286b51ed95",
@@ -41647,7 +40515,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 1,
       "imports": [
         "src/contracts/artifact.zig"
@@ -41757,8 +40625,7 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/cli/module_runner_cli.zig",
-        "src/full/modules/mod.zig"
+        "src/cli/module_runner_cli.zig"
       ],
       "roles": [],
       "sha256": "44833f669a1a87cf4aa9b1e078afd8d98dd9a7a3f1d82b734e34aca6414b25e5",
@@ -41768,7 +40635,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 1,
       "imports": [
         "src/contracts/artifact.zig"
@@ -41883,8 +40750,7 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/cli/module_runner_cli.zig",
-        "src/full/modules/mod.zig"
+        "src/cli/module_runner_cli.zig"
       ],
       "roles": [],
       "sha256": "939aed4253b237c5a19bf71c4d9fe9b4d5005e94e610d73bfeab93ceb3f51ac8",
@@ -41895,95 +40761,6 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 10,
-      "imports": [
-        "src/full/render/wgpu_pipeline_layout_pls.zig",
-        "src/full/render/wgpu_render_api.zig",
-        "src/full/render/wgpu_render_assets.zig",
-        "src/full/render/wgpu_render_commands.zig",
-        "src/full/render/wgpu_render_draw_loops.zig",
-        "src/full/render/wgpu_render_indexing.zig",
-        "src/full/render/wgpu_render_p0.zig",
-        "src/full/render/wgpu_render_resources.zig",
-        "src/full/render/wgpu_render_types.zig",
-        "src/full/render/wgpu_sampler_commands.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "full",
-      "lineCount": 10,
-      "onlyReexports": true,
-      "owner": "full",
-      "path": "src/full/render/mod.zig",
-      "publicDeclarationCount": 10,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "wgpu_render_assets"
-        },
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "wgpu_render_api"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "wgpu_render_commands"
-        },
-        {
-          "kind": "const",
-          "line": 4,
-          "name": "wgpu_render_draw_loops"
-        },
-        {
-          "kind": "const",
-          "line": 5,
-          "name": "wgpu_render_indexing"
-        },
-        {
-          "kind": "const",
-          "line": 6,
-          "name": "wgpu_render_p0"
-        },
-        {
-          "kind": "const",
-          "line": 7,
-          "name": "wgpu_render_resources"
-        },
-        {
-          "kind": "const",
-          "line": 8,
-          "name": "wgpu_render_types"
-        },
-        {
-          "kind": "const",
-          "line": 9,
-          "name": "wgpu_sampler_commands"
-        },
-        {
-          "kind": "const",
-          "line": 10,
-          "name": "wgpu_pipeline_layout_pls"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/full/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "e56910478766a26e2e0d383b4db96ee1aaee07f3fa29abb812f83fd6011cd72e",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 10
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 2,
       "fanOut": 4,
       "imports": [
         "src/core/abi/wgpu_handle_types.zig",
@@ -42009,12 +40786,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
-        "src/full/render/mod.zig"
+        "src/full/lifecycle/wgpu_async_pixel_local_storage.zig"
       ],
       "roles": [],
       "sha256": "c22aa5030842fc1f7c44083217cdce0afd9ff9e1175f75d64f09789497fd6c3f",
@@ -42024,7 +40801,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 8,
+      "fanIn": 7,
       "fanOut": 4,
       "imports": [
         "src/core/abi/procs/wgpu_p0_procs.zig",
@@ -42070,7 +40847,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -42078,7 +40856,6 @@
         "src/dropin/wgpu_dropin_ext_b.zig",
         "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
         "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
-        "src/full/render/mod.zig",
         "src/full/render/wgpu_render_commands.zig",
         "src/full/render/wgpu_render_draw_loops.zig",
         "src/full/render/wgpu_render_p0.zig"
@@ -42091,7 +40868,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 2,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -42142,11 +40919,11 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/render/mod.zig",
         "src/full/render/wgpu_render_commands.zig",
         "src/full/render/wgpu_render_resources.zig"
       ],
@@ -42158,7 +40935,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 1,
       "fanOut": 17,
       "imports": [
         "src/contracts/model/model_render_types.zig",
@@ -42197,13 +40974,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/command_dispatch.zig",
-        "src/full/modules/rendering/render_runtime.zig",
-        "src/full/render/mod.zig"
+        "src/full/command_dispatch.zig"
       ],
       "roles": [],
       "sha256": "4384b734269947365ba65d780a7185f8bb8568651e75dfe798f6c1a1cceef765",
@@ -42438,7 +41214,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -42455,7 +41232,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 4,
       "imports": [
         "src/contracts/model/model_render_types.zig",
@@ -42496,11 +41273,11 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/render/mod.zig",
         "src/full/render/wgpu_render_commands.zig"
       ],
       "roles": [],
@@ -42511,7 +41288,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 3,
       "imports": [
         "src/contracts/model/model_render_types.zig",
@@ -42556,11 +41333,11 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/render/mod.zig",
         "src/full/render/wgpu_render_commands.zig"
       ],
       "roles": [],
@@ -42571,7 +41348,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 6,
       "imports": [
         "src/core/abi/procs/wgpu_p0_procs.zig",
@@ -42619,11 +41396,11 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/render/mod.zig",
         "src/full/render/wgpu_render_commands.zig"
       ],
       "roles": [],
@@ -42634,7 +41411,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 6,
+      "fanIn": 5,
       "fanOut": 8,
       "imports": [
         "src/contracts/model/model_resource_types.zig",
@@ -42709,12 +41486,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
-        "src/full/render/mod.zig",
         "src/full/render/wgpu_render_commands.zig",
         "src/full/render/wgpu_render_constants.zig",
         "src/full/render/wgpu_render_draw_loops.zig",
@@ -42768,7 +41545,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -42782,7 +41560,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 9,
+      "fanIn": 8,
       "fanOut": 4,
       "imports": [
         "src/core/abi/wgpu_callback_descriptor_types.zig",
@@ -42928,13 +41706,13 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
         "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
         "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
-        "src/full/render/mod.zig",
         "src/full/render/wgpu_pipeline_layout_pls.zig",
         "src/full/render/wgpu_render_api.zig",
         "src/full/render/wgpu_render_commands.zig",
@@ -42950,7 +41728,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 5,
       "imports": [
         "src/contracts/model/model_render_types.zig",
@@ -42982,12 +41760,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/command_dispatch.zig",
-        "src/full/render/mod.zig"
+        "src/full/command_dispatch.zig"
       ],
       "roles": [],
       "sha256": "b146f49d3aa0fedeae29c9a3c06b7ced8bdc2e3d1e17e33b618dfe71dbce4c10",
@@ -42998,53 +41776,6 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 3,
-      "imports": [
-        "src/full/surface/wgpu_ffi_surface.zig",
-        "src/full/surface/wgpu_surface_commands.zig",
-        "src/full/surface/wgpu_surface_procs.zig"
-      ],
-      "isProductionRoot": true,
-      "layer": "full",
-      "lineCount": 3,
-      "onlyReexports": true,
-      "owner": "full",
-      "path": "src/full/surface/mod.zig",
-      "publicDeclarationCount": 3,
-      "publicDeclarations": [
-        {
-          "kind": "const",
-          "line": 1,
-          "name": "wgpu_ffi_surface"
-        },
-        {
-          "kind": "const",
-          "line": 2,
-          "name": "wgpu_surface_procs"
-        },
-        {
-          "kind": "const",
-          "line": 3,
-          "name": "wgpu_surface_commands"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/full/mod.zig"
-      ],
-      "roles": [
-        "package-root"
-      ],
-      "sha256": "98bf106d5f9a2a4f2595d8465a19fdd28c501884436ffc092b8b9998ff2ed17e",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 3
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 2,
       "fanOut": 3,
       "imports": [
         "src/core/abi/wgpu_core_base_types.zig",
@@ -43108,8 +41839,7 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/backend/webgpu_backend_ops.zig",
-        "src/full/surface/mod.zig"
+        "src/backend/webgpu_backend_ops.zig"
       ],
       "roles": [
         "ffi-boundary"
@@ -43121,7 +41851,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 8,
       "imports": [
         "src/backend/common/timing.zig",
@@ -43181,12 +41911,12 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/full/command_dispatch.zig",
-        "src/full/surface/mod.zig"
+        "src/full/command_dispatch.zig"
       ],
       "roles": [],
       "sha256": "a7f2d68d73e6e23753b49108aa6d3a2037223d891cad92c5f78a4652713c1a8f",
@@ -43234,7 +41964,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -43250,7 +41981,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 10,
+      "fanIn": 9,
       "fanOut": 2,
       "imports": [
         "src/core/abi/wgpu_core_base_types.zig",
@@ -43359,7 +42090,8 @@
       "reachabilityViews": [
         "dropin-compatibility",
         "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "shipped-native-package-runtime",
+        "test-only-compatibility"
       ],
       "reachable": true,
       "reverseImports": [
@@ -43369,7 +42101,6 @@
         "src/dropin/wgpu_dropin_ext_b.zig",
         "src/dropin/wgpu_dropin_ext_c.zig",
         "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
-        "src/full/surface/mod.zig",
         "src/full/surface/wgpu_ffi_surface.zig",
         "src/full/surface/wgpu_surface_commands.zig",
         "src/native/surface/doe_surface_native.zig"
@@ -43382,14 +42113,14 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
+      "fanIn": 0,
       "fanOut": 3,
       "imports": [
         "src/contracts/command.zig",
         "src/core/surface.zig",
         "src/full/command_dispatch.zig"
       ],
-      "isProductionRoot": false,
+      "isProductionRoot": true,
       "layer": "full",
       "lineCount": 111,
       "onlyReexports": false,
@@ -43468,12 +42199,14 @@
           "name": "combined_coverage_ledger"
         }
       ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [],
-      "reachable": true,
-      "reverseImports": [
-        "src/full/mod.zig"
+      "reachabilityViewRoots": [
+        "test-only-compatibility"
       ],
+      "reachabilityViews": [
+        "test-only-compatibility"
+      ],
+      "reachable": true,
+      "reverseImports": [],
       "roles": [],
       "sha256": "bf1372e999111bc1be90f87eeb5e892d338e7a23f17cc706b94fd35315b714ee",
       "testBlockCount": 3,
@@ -54005,7 +52738,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 2,
       "fanOut": 1,
       "imports": [
         "src/tooling/tooling_io_context.zig"
@@ -54076,8 +52809,7 @@
       "reachable": true,
       "reverseImports": [
         "src/cli/runtime_cli.zig",
-        "src/cli/runtime_cli_inputs.zig",
-        "src/core/replay/mod.zig"
+        "src/cli/runtime_cli_inputs.zig"
       ],
       "roles": [],
       "sha256": "83f452bd4b3d74edcfc405d8641d35a621afcb902cbe18cd48553fe84422c7b5",
@@ -54087,7 +52819,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 7,
+      "fanIn": 6,
       "fanOut": 8,
       "imports": [
         "src/contracts/command.zig",
@@ -54203,7 +52935,6 @@
         "src/cli/runtime_cli.zig",
         "src/cli/runtime_cli_args.zig",
         "src/cli/runtime_cli_artifacts.zig",
-        "src/core/trace/mod.zig",
         "src/plan/doe_plan_executor.zig",
         "src/runtime/trace/operator_artifacts.zig",
         "src/runtime/trace/trace_jsonl_emit.zig"
@@ -54875,8 +53606,8 @@
       "topLevelDeclarationCount": 18
     }
   ],
-  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
+  "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3"
+  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5"
 }

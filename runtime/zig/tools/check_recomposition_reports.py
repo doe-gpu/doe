@@ -90,13 +90,20 @@ def _architecture_errors(
     unclassified_paths = {
         entry["path"] for entry in reachability["unclassifiedFiles"]
     }
-    if classified_paths | unclassified_paths != module_paths:
+    facade_only_paths = {
+        entry["path"] for entry in reachability["facadeOnlyFiles"]
+    }
+    if classified_paths | facade_only_paths | unclassified_paths != module_paths:
         errors.append(
             "reachability view classification does not cover module inventory"
         )
-    if classified_paths & unclassified_paths:
+    if (
+        classified_paths & facade_only_paths
+        or classified_paths & unclassified_paths
+        or facade_only_paths & unclassified_paths
+    ):
         errors.append(
-            "reachability view classified and unclassified paths overlap"
+            "reachability view path classifications overlap"
         )
     if reachability["classifiedModuleCount"] != len(classified_paths):
         errors.append("reachability view classifiedModuleCount is inconsistent")

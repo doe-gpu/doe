@@ -15926,11 +15926,6 @@
           "startLine": 3
         },
         {
-          "name": "backend_policy",
-          "path": "src/full/modules/common.zig",
-          "startLine": 5
-        },
-        {
           "name": "backend_capabilities",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 14
@@ -16339,18 +16334,8 @@
         },
         {
           "name": "command_dispatch",
-          "path": "src/core/mod.zig",
-          "startLine": 7
-        },
-        {
-          "name": "command_dispatch",
           "path": "src/core/surface.zig",
           "startLine": 3
-        },
-        {
-          "name": "command_dispatch",
-          "path": "src/full/mod.zig",
-          "startLine": 1
         },
         {
           "name": "command_dispatch",
@@ -16764,11 +16749,6 @@
           "name": "compute_fast",
           "path": "src/dropin/wgpu_dropin_lib.zig",
           "startLine": 15
-        },
-        {
-          "name": "compute_services",
-          "path": "src/full/modules/mod.zig",
-          "startLine": 2
         },
         {
           "name": "compute_ext",
@@ -20171,156 +20151,6 @@
           "startLine": 5
         },
         {
-          "name": "model_commands",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 4
-        },
-        {
-          "name": "model_policy",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 5
-        },
-        {
-          "name": "model_profile",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 6
-        },
-        {
-          "name": "model_quirks",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 7
-        },
-        {
-          "name": "model_texture_layout_value_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 8
-        },
-        {
-          "name": "model_texture_format_value_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 9
-        },
-        {
-          "name": "model_texture_value_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 10
-        },
-        {
-          "name": "model_binding_value_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 11
-        },
-        {
-          "name": "model_gpu_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 12
-        },
-        {
-          "name": "model_resource_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 13
-        },
-        {
-          "name": "model_compute_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 14
-        },
-        {
-          "name": "model_render_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 15
-        },
-        {
-          "name": "model_texture_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 16
-        },
-        {
-          "name": "model_surface_control_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 17
-        },
-        {
-          "name": "model_async_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 18
-        },
-        {
-          "name": "model_commands",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 1
-        },
-        {
-          "name": "model_policy",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 2
-        },
-        {
-          "name": "model_profile",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 3
-        },
-        {
-          "name": "model_quirks",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 4
-        },
-        {
-          "name": "model_texture_layout_value_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 5
-        },
-        {
-          "name": "model_texture_format_value_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 6
-        },
-        {
-          "name": "model_texture_value_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 7
-        },
-        {
-          "name": "model_binding_value_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 8
-        },
-        {
-          "name": "model_gpu_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 9
-        },
-        {
-          "name": "model_resource_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 10
-        },
-        {
-          "name": "model_compute_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 11
-        },
-        {
-          "name": "model_render_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 12
-        },
-        {
-          "name": "model_texture_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 13
-        },
-        {
-          "name": "model_surface_control_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 14
-        },
-        {
-          "name": "model_async_types",
-          "path": "src/core/abi/model_exports.zig",
-          "startLine": 15
-        },
-        {
           "name": "model_gpu_types",
           "path": "src/core/abi/wgpu_loader.zig",
           "startLine": 3
@@ -20404,26 +20234,6 @@
           "name": "model_gpu_types",
           "path": "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
           "startLine": 2
-        },
-        {
-          "name": "model_policy",
-          "path": "src/full/modules/common.zig",
-          "startLine": 3
-        },
-        {
-          "name": "model_profile",
-          "path": "src/full/modules/common.zig",
-          "startLine": 4
-        },
-        {
-          "name": "model_gpu_types",
-          "path": "src/full/modules/rendering/render_runtime.zig",
-          "startLine": 3
-        },
-        {
-          "name": "model_render_types",
-          "path": "src/full/modules/rendering/render_runtime.zig",
-          "startLine": 4
         },
         {
           "name": "model_resource_types",
@@ -21848,11 +21658,6 @@
           "name": "path_engine",
           "path": "src/cli/module_runner_cli.zig",
           "startLine": 5
-        },
-        {
-          "name": "path_engine",
-          "path": "src/full/modules/mod.zig",
-          "startLine": 6
         }
       ],
       "prefix": "path",
@@ -22329,16 +22134,6 @@
           "startLine": 13
         },
         {
-          "name": "render_runtime",
-          "path": "src/full/modules/mod.zig",
-          "startLine": 4
-        },
-        {
-          "name": "render_commands",
-          "path": "src/full/modules/rendering/render_runtime.zig",
-          "startLine": 6
-        },
-        {
           "name": "render_types_mod",
           "path": "src/full/render/wgpu_pipeline_layout_pls.zig",
           "startLine": 4
@@ -22541,11 +22336,6 @@
           "startLine": 6
         },
         {
-          "name": "resource_scheduler",
-          "path": "src/full/modules/mod.zig",
-          "startLine": 3
-        },
-        {
           "name": "resource_ops",
           "path": "src/native/command/doe_encoder_native.zig",
           "startLine": 11
@@ -22740,11 +22530,6 @@
           "name": "runtime_types",
           "path": "src/full/command_dispatch.zig",
           "startLine": 2
-        },
-        {
-          "name": "runtime_types",
-          "path": "src/full/modules/rendering/render_runtime.zig",
-          "startLine": 5
         },
         {
           "name": "runtime_helpers",
@@ -23065,11 +22850,6 @@
           "name": "surface_procs_mod",
           "path": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
           "startLine": 20
-        },
-        {
-          "name": "surface_api",
-          "path": "src/full/mod.zig",
-          "startLine": 2
         },
         {
           "name": "surface_procs_mod",
@@ -24044,327 +23824,6 @@
     {
       "members": [
         {
-          "name": "wgpu_loader",
-          "path": "src/cli/runtime_cli.zig",
-          "startLine": 18
-        },
-        {
-          "name": "wgpu_handle_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 19
-        },
-        {
-          "name": "wgpu_core_base_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 20
-        },
-        {
-          "name": "wgpu_feature_base_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 21
-        },
-        {
-          "name": "wgpu_texture_base_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 22
-        },
-        {
-          "name": "wgpu_binding_base_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 23
-        },
-        {
-          "name": "wgpu_callback_descriptor_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 24
-        },
-        {
-          "name": "wgpu_copy_descriptor_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 25
-        },
-        {
-          "name": "wgpu_pipeline_descriptor_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 26
-        },
-        {
-          "name": "wgpu_execution_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 27
-        },
-        {
-          "name": "wgpu_loader",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 28
-        },
-        {
-          "name": "wgpu_record_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 29
-        },
-        {
-          "name": "wgpu_proc_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 30
-        },
-        {
-          "name": "wgpu_runtime_records",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 31
-        },
-        {
-          "name": "wgpu_runtime_abi",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 32
-        },
-        {
-          "name": "wgpu_runtime_state_defs",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 33
-        },
-        {
-          "name": "wgpu_state_types",
-          "path": "src/core/abi/mod.zig",
-          "startLine": 34
-        },
-        {
-          "name": "wgpu_handle_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 1
-        },
-        {
-          "name": "wgpu_core_base_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 2
-        },
-        {
-          "name": "wgpu_feature_base_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 3
-        },
-        {
-          "name": "wgpu_texture_base_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 4
-        },
-        {
-          "name": "wgpu_binding_base_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 5
-        },
-        {
-          "name": "wgpu_callback_descriptor_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 6
-        },
-        {
-          "name": "wgpu_copy_descriptor_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 7
-        },
-        {
-          "name": "wgpu_pipeline_descriptor_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 8
-        },
-        {
-          "name": "wgpu_execution_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 9
-        },
-        {
-          "name": "wgpu_loader",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 10
-        },
-        {
-          "name": "wgpu_record_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 11
-        },
-        {
-          "name": "wgpu_proc_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 12
-        },
-        {
-          "name": "wgpu_runtime_records",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 13
-        },
-        {
-          "name": "wgpu_runtime_abi",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 14
-        },
-        {
-          "name": "wgpu_runtime_state_defs",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 15
-        },
-        {
-          "name": "wgpu_state_types",
-          "path": "src/core/abi/wgpu_exports.zig",
-          "startLine": 16
-        },
-        {
-          "name": "wgpu_commands_compute",
-          "path": "src/core/compute/mod.zig",
-          "startLine": 1
-        },
-        {
-          "name": "wgpu_handle_types",
-          "path": "src/core/mod.zig",
-          "startLine": 9
-        },
-        {
-          "name": "wgpu_execution_types",
-          "path": "src/core/mod.zig",
-          "startLine": 10
-        },
-        {
-          "name": "wgpu_loader",
-          "path": "src/core/mod.zig",
-          "startLine": 11
-        },
-        {
-          "name": "wgpu_runtime_abi",
-          "path": "src/core/mod.zig",
-          "startLine": 12
-        },
-        {
-          "name": "wgpu_state_types",
-          "path": "src/core/mod.zig",
-          "startLine": 13
-        },
-        {
-          "name": "wgpu_commands_compute",
-          "path": "src/core/mod.zig",
-          "startLine": 14
-        },
-        {
-          "name": "wgpu_commands_copy",
-          "path": "src/core/mod.zig",
-          "startLine": 15
-        },
-        {
-          "name": "wgpu_resources",
-          "path": "src/core/mod.zig",
-          "startLine": 16
-        },
-        {
-          "name": "wgpu_texture_commands",
-          "path": "src/core/mod.zig",
-          "startLine": 17
-        },
-        {
-          "name": "wgpu_ffi_sync",
-          "path": "src/core/mod.zig",
-          "startLine": 18
-        },
-        {
-          "name": "wgpu_ffi_sync",
-          "path": "src/core/queue/mod.zig",
-          "startLine": 1
-        },
-        {
-          "name": "wgpu_commands_copy",
-          "path": "src/core/resource/mod.zig",
-          "startLine": 1
-        },
-        {
-          "name": "wgpu_resources",
-          "path": "src/core/resource/mod.zig",
-          "startLine": 2
-        },
-        {
-          "name": "wgpu_texture_commands",
-          "path": "src/core/resource/mod.zig",
-          "startLine": 3
-        },
-        {
-          "name": "wgpu_async_diagnostics_command",
-          "path": "src/full/lifecycle/mod.zig",
-          "startLine": 1
-        },
-        {
-          "name": "wgpu_render_assets",
-          "path": "src/full/render/mod.zig",
-          "startLine": 1
-        },
-        {
-          "name": "wgpu_render_api",
-          "path": "src/full/render/mod.zig",
-          "startLine": 2
-        },
-        {
-          "name": "wgpu_render_commands",
-          "path": "src/full/render/mod.zig",
-          "startLine": 3
-        },
-        {
-          "name": "wgpu_render_draw_loops",
-          "path": "src/full/render/mod.zig",
-          "startLine": 4
-        },
-        {
-          "name": "wgpu_render_indexing",
-          "path": "src/full/render/mod.zig",
-          "startLine": 5
-        },
-        {
-          "name": "wgpu_render_p0",
-          "path": "src/full/render/mod.zig",
-          "startLine": 6
-        },
-        {
-          "name": "wgpu_render_resources",
-          "path": "src/full/render/mod.zig",
-          "startLine": 7
-        },
-        {
-          "name": "wgpu_render_types",
-          "path": "src/full/render/mod.zig",
-          "startLine": 8
-        },
-        {
-          "name": "wgpu_sampler_commands",
-          "path": "src/full/render/mod.zig",
-          "startLine": 9
-        },
-        {
-          "name": "wgpu_pipeline_layout_pls",
-          "path": "src/full/render/mod.zig",
-          "startLine": 10
-        },
-        {
-          "name": "wgpu_ffi_surface",
-          "path": "src/full/surface/mod.zig",
-          "startLine": 1
-        },
-        {
-          "name": "wgpu_surface_procs",
-          "path": "src/full/surface/mod.zig",
-          "startLine": 2
-        },
-        {
-          "name": "wgpu_surface_commands",
-          "path": "src/full/surface/mod.zig",
-          "startLine": 3
-        },
-        {
-          "name": "wgpu_loader",
-          "path": "src/runtime/execution.zig",
-          "startLine": 12
-        }
-      ],
-      "prefix": "wgpu",
-      "reason": "shared constant-name prefix; ownership and value similarity require review"
-    },
-    {
-      "members": [
-        {
           "name": "wgsl_compiler",
           "path": "src/backend/metal/metal_runtime_resources.zig",
           "startLine": 6
@@ -24425,10 +23884,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "450741f69cee80f449beaa1d10d3b2f494135a2c8391ef9dc9cf49c43242e23a",
-  "reportGeneratorSha256": "fb797a0cec3d7d1fd848b5af45b70fea9603fa295b8c36d6e1b770a78db36c2f",
+  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
+  "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "6e1282a2d726dd2068a32ebfb1fb9e243281a17e8c5b007e5d7079e476667cd3",
+  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5",
   "status": "captured"
 }
