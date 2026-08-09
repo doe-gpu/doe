@@ -11,6 +11,7 @@ const backend_telemetry = @import("../backend/backend_telemetry.zig");
 const runtime_types = @import("../backend/runtime_types.zig");
 const wgpu_loader = @import("../core/abi/wgpu_loader.zig");
 const semantic_trace = @import("../contracts/semantic.zig");
+const execution_receipt = @import("execution_receipt.zig");
 
 const model = struct {
     pub const Command = model_commands.Command;
@@ -19,10 +20,23 @@ const model = struct {
     pub const SemVer = model_profile.SemVer;
 };
 
-fn executeBackendCommand(backend: *backend_runtime.BackendRuntime, command: model.Command) !execution_contract.NativeExecutionResult {
-    return switch (command) {
-        .kernel_dispatch => |dispatch| (try backend.execute_dispatch(compute_contract.DispatchRequest.fromCommand(dispatch))).execution,
-        else => try backend.execute_command(command),
+const NativeOperation = union(enum) {
+    command: model.Command,
+    buffer_write_bytes: struct {
+        handle: u64,
+        offset: u64,
+        buffer_size: u64,
+        data: []const u8,
+    },
+};
+
+fn executeBackendOperation(backend: *backend_runtime.BackendRuntime, operation: NativeOperation) !execution_contract.NativeExecutionResult {
+    return switch (operation) {
+        .command => |command| switch (command) {
+            .kernel_dispatch => |dispatch| (try backend.execute_dispatch(compute_contract.DispatchRequest.fromCommand(dispatch))).execution,
+            else => try backend.execute_command(command),
+        },
+        .buffer_write_bytes => |write| try backend.execute_buffer_write_bytes(write.handle, write.offset, write.buffer_size, write.data),
     };
 }
 
@@ -34,38 +48,7 @@ pub const BackendMode = enum {
 pub const DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS: u64 = wgpu_loader.QUEUE_WAIT_TIMEOUT_NS;
 
 pub const ExecutionStatus = execution_contract.ExecutionStatus;
-
-pub const ExecutionResult = struct {
-    backend: []const u8,
-    status: ExecutionStatus,
-    status_code: []const u8,
-    duration_ns: u64,
-    setup_ns: u64,
-    encode_ns: u64,
-    submit_wait_ns: u64,
-    dispatch_count: u32,
-    submit_count: u32,
-    gpu_timestamp_ns: u64,
-    gpu_timestamp_attempted: bool,
-    gpu_timestamp_valid: bool,
-    backend_selection_reason: ?[]const u8,
-    fallback_used: ?bool,
-    selection_policy_hash: ?[]const u8,
-    shader_artifact_manifest_path: ?[]const u8,
-    shader_artifact_manifest_hash: ?[]const u8,
-    host_plan_artifact_path: ?[]const u8,
-    host_plan_artifact_hash: ?[]const u8,
-    backend_lane: ?[]const u8,
-    adapter_ordinal: ?u32,
-    queue_family_index: ?u32,
-    present_capable: ?bool,
-    queue_family_policy: ?[]const u8 = null,
-    queue_family_kind: ?[]const u8 = null,
-    queue_family_queue_count: ?u32 = null,
-    queue_family_timestamp_valid_bits: ?u32 = null,
-    queue_family_supports_graphics: ?bool = null,
-    semantic: semantic_trace.SemanticContext = .{},
-};
+pub const ExecutionResult = execution_receipt.ExecutionResult;
 
 pub const ExecutionContext = struct {
     allocator: std.mem.Allocator,
@@ -128,173 +111,14 @@ pub const ExecutionContext = struct {
         data: []const u8,
         semantic: semantic_trace.SemanticContext,
     ) !ExecutionResult {
-        const mode_name = executionModeName(self.mode);
-        if (self.mode == .trace) {
-            return .{
-                .backend = mode_name,
-                .status = .skipped,
-                .status_code = "disabled",
-                .duration_ns = 0,
-                .setup_ns = 0,
-                .encode_ns = 0,
-                .submit_wait_ns = 0,
-                .dispatch_count = 0,
-                .submit_count = 0,
-                .gpu_timestamp_ns = 0,
-                .gpu_timestamp_attempted = false,
-                .gpu_timestamp_valid = false,
-                .backend_selection_reason = null,
-                .fallback_used = null,
-                .selection_policy_hash = null,
-                .shader_artifact_manifest_path = null,
-                .shader_artifact_manifest_hash = null,
-                .host_plan_artifact_path = null,
-                .host_plan_artifact_hash = null,
-                .backend_lane = null,
-                .adapter_ordinal = null,
-                .queue_family_index = null,
-                .present_capable = null,
-                .semantic = semantic,
-            };
-        }
-        if (self.backend == null) {
-            return .{
-                .backend = mode_name,
-                .status = .@"error",
-                .status_code = "missing-backend",
-                .duration_ns = 0,
-                .setup_ns = 0,
-                .encode_ns = 0,
-                .submit_wait_ns = 0,
-                .dispatch_count = 0,
-                .submit_count = 0,
-                .gpu_timestamp_ns = 0,
-                .gpu_timestamp_attempted = false,
-                .gpu_timestamp_valid = false,
-                .backend_selection_reason = null,
-                .fallback_used = null,
-                .selection_policy_hash = null,
-                .shader_artifact_manifest_path = null,
-                .shader_artifact_manifest_hash = null,
-                .host_plan_artifact_path = null,
-                .host_plan_artifact_hash = null,
-                .backend_lane = backendLaneName(self.backend_lane),
-                .adapter_ordinal = null,
-                .queue_family_index = null,
-                .present_capable = null,
-                .semantic = semantic,
-            };
-        }
-
-        if (self.backend) |*backend| {
-            const backend_telemetry_snapshot = backend.telemetry();
-            const command_start = std.time.nanoTimestamp();
-            const status = backend.execute_buffer_write_bytes(handle, offset, buffer_size, data) catch |err| {
-                const command_end = std.time.nanoTimestamp();
-                const elapsed_ns = if (command_end > command_start)
-                    @as(u64, @intCast(command_end - command_start))
-                else
-                    0;
-                const command_telemetry = backend.telemetry();
-                return .{
-                    .backend = backend_id_name(backend_telemetry_snapshot.backend_id),
-                    .status = .@"error",
-                    .status_code = @errorName(err),
-                    .duration_ns = elapsed_ns,
-                    .setup_ns = 0,
-                    .encode_ns = 0,
-                    .submit_wait_ns = 0,
-                    .dispatch_count = 0,
-                    .submit_count = 0,
-                    .gpu_timestamp_ns = 0,
-                    .gpu_timestamp_attempted = false,
-                    .gpu_timestamp_valid = false,
-                    .backend_selection_reason = command_telemetry.backend_selection_reason,
-                    .fallback_used = command_telemetry.fallback_used,
-                    .selection_policy_hash = command_telemetry.selection_policy_hash,
-                    .shader_artifact_manifest_path = command_telemetry.shader_artifact_manifest_path,
-                    .shader_artifact_manifest_hash = command_telemetry.shader_artifact_manifest_hash,
-                    .host_plan_artifact_path = command_telemetry.host_plan_artifact_path,
-                    .host_plan_artifact_hash = command_telemetry.host_plan_artifact_hash,
-                    .backend_lane = backendLaneName(self.backend_lane),
-                    .adapter_ordinal = command_telemetry.adapter_ordinal,
-                    .queue_family_index = command_telemetry.queue_family_index,
-                    .present_capable = command_telemetry.present_capable,
-                    .queue_family_policy = command_telemetry.queue_family_policy,
-                    .queue_family_kind = command_telemetry.queue_family_kind,
-                    .queue_family_queue_count = command_telemetry.queue_family_queue_count,
-                    .queue_family_timestamp_valid_bits = command_telemetry.queue_family_timestamp_valid_bits,
-                    .queue_family_supports_graphics = command_telemetry.queue_family_supports_graphics,
-                    .semantic = semantic,
-                };
-            };
-            const command_end = std.time.nanoTimestamp();
-            const elapsed_ns = if (command_end > command_start)
-                @as(u64, @intCast(command_end - command_start))
-            else
-                0;
-            const command_telemetry = backend.telemetry();
-            const submit_count = command_telemetry.last_submit_count orelse 0;
-
-            return .{
-                .backend = backend_id_name(backend_telemetry_snapshot.backend_id),
-                .status = execution_contract.fromNativeStatus(status.status),
-                .status_code = status.status_message,
-                .duration_ns = elapsed_ns,
-                .setup_ns = status.setup_ns,
-                .encode_ns = status.encode_ns,
-                .submit_wait_ns = status.submit_wait_ns,
-                .dispatch_count = status.dispatch_count,
-                .submit_count = submit_count,
-                .gpu_timestamp_ns = status.gpu_timestamp_ns,
-                .gpu_timestamp_attempted = status.gpu_timestamp_attempted,
-                .gpu_timestamp_valid = status.gpu_timestamp_valid,
-                .backend_selection_reason = command_telemetry.backend_selection_reason,
-                .fallback_used = command_telemetry.fallback_used,
-                .selection_policy_hash = command_telemetry.selection_policy_hash,
-                .shader_artifact_manifest_path = command_telemetry.shader_artifact_manifest_path,
-                .shader_artifact_manifest_hash = command_telemetry.shader_artifact_manifest_hash,
-                .host_plan_artifact_path = command_telemetry.host_plan_artifact_path,
-                .host_plan_artifact_hash = command_telemetry.host_plan_artifact_hash,
-                .backend_lane = backendLaneName(self.backend_lane),
-                .adapter_ordinal = command_telemetry.adapter_ordinal,
-                .queue_family_index = command_telemetry.queue_family_index,
-                .present_capable = command_telemetry.present_capable,
-                .queue_family_policy = command_telemetry.queue_family_policy,
-                .queue_family_kind = command_telemetry.queue_family_kind,
-                .queue_family_queue_count = command_telemetry.queue_family_queue_count,
-                .queue_family_timestamp_valid_bits = command_telemetry.queue_family_timestamp_valid_bits,
-                .queue_family_supports_graphics = command_telemetry.queue_family_supports_graphics,
-                .semantic = semantic,
-            };
-        }
-
-        return .{
-            .backend = mode_name,
-            .status = .@"error",
-            .status_code = "missing-backend",
-            .duration_ns = 0,
-            .setup_ns = 0,
-            .encode_ns = 0,
-            .submit_wait_ns = 0,
-            .dispatch_count = 0,
-            .submit_count = 0,
-            .gpu_timestamp_ns = 0,
-            .gpu_timestamp_attempted = false,
-            .gpu_timestamp_valid = false,
-            .backend_selection_reason = null,
-            .fallback_used = null,
-            .selection_policy_hash = null,
-            .shader_artifact_manifest_path = null,
-            .shader_artifact_manifest_hash = null,
-            .host_plan_artifact_path = null,
-            .host_plan_artifact_hash = null,
-            .backend_lane = backendLaneName(self.backend_lane),
-            .adapter_ordinal = null,
-            .queue_family_index = null,
-            .present_capable = null,
-            .semantic = semantic,
-        };
+        return self.executeOperation(.{
+            .buffer_write_bytes = .{
+                .handle = handle,
+                .offset = offset,
+                .buffer_size = buffer_size,
+                .data = data,
+            },
+        }, semantic);
     }
 
     pub fn execute_with_semantic(
@@ -302,173 +126,51 @@ pub const ExecutionContext = struct {
         command: model.Command,
         semantic: semantic_trace.SemanticContext,
     ) !ExecutionResult {
+        return self.executeOperation(.{ .command = command }, semantic);
+    }
+
+    fn executeOperation(
+        self: *ExecutionContext,
+        operation: NativeOperation,
+        semantic: semantic_trace.SemanticContext,
+    ) ExecutionResult {
         const mode_name = executionModeName(self.mode);
-        const mode_result = ExecutionResult{
-            .backend = mode_name,
-            .status = .skipped,
-            .status_code = "disabled",
-            .duration_ns = 0,
-            .setup_ns = 0,
-            .encode_ns = 0,
-            .submit_wait_ns = 0,
-            .dispatch_count = 0,
-            .submit_count = 0,
-            .gpu_timestamp_ns = 0,
-            .gpu_timestamp_attempted = false,
-            .gpu_timestamp_valid = false,
-            .backend_selection_reason = null,
-            .fallback_used = null,
-            .selection_policy_hash = null,
-            .shader_artifact_manifest_path = null,
-            .shader_artifact_manifest_hash = null,
-            .host_plan_artifact_path = null,
-            .host_plan_artifact_hash = null,
-            .backend_lane = null,
-            .adapter_ordinal = null,
-            .queue_family_index = null,
-            .present_capable = null,
-            .semantic = semantic,
-        };
-
-        if (self.mode == .trace) return mode_result;
-        if (self.backend == null) {
-            return .{
+        if (self.mode == .trace) {
+            return execution_receipt.skipped(.{
                 .backend = mode_name,
-                .status = .@"error",
-                .status_code = "missing-backend",
-                .duration_ns = 0,
-                .setup_ns = 0,
-                .encode_ns = 0,
-                .submit_wait_ns = 0,
-                .dispatch_count = 0,
-                .submit_count = 0,
-                .gpu_timestamp_ns = 0,
-                .gpu_timestamp_attempted = false,
-                .gpu_timestamp_valid = false,
-                .backend_selection_reason = null,
-                .fallback_used = null,
-                .selection_policy_hash = null,
-                .shader_artifact_manifest_path = null,
-                .shader_artifact_manifest_hash = null,
-                .host_plan_artifact_path = null,
-                .host_plan_artifact_hash = null,
-                .backend_lane = backendLaneName(self.backend_lane),
-                .adapter_ordinal = null,
-                .queue_family_index = null,
-                .present_capable = null,
+                .backend_lane = null,
                 .semantic = semantic,
-            };
+            });
         }
 
-        if (self.backend) |*backend| {
-            const backend_telemetry_snapshot = backend.telemetry();
-            const command_start = std.time.nanoTimestamp();
-            const status = executeBackendCommand(backend, command) catch |err| {
-                const command_end = std.time.nanoTimestamp();
-                const elapsed_ns = if (command_end > command_start)
-                    @as(u64, @intCast(command_end - command_start))
-                else
-                    0;
-                const command_telemetry = backend.telemetry();
-                return .{
-                    .backend = backend_id_name(backend_telemetry_snapshot.backend_id),
-                    .status = .@"error",
-                    .status_code = @errorName(err),
-                    .duration_ns = elapsed_ns,
-                    .setup_ns = 0,
-                    .encode_ns = 0,
-                    .submit_wait_ns = 0,
-                    .dispatch_count = 0,
-                    .submit_count = 0,
-                    .gpu_timestamp_ns = 0,
-                    .gpu_timestamp_attempted = false,
-                    .gpu_timestamp_valid = false,
-                    .backend_selection_reason = command_telemetry.backend_selection_reason,
-                    .fallback_used = command_telemetry.fallback_used,
-                    .selection_policy_hash = command_telemetry.selection_policy_hash,
-                    .shader_artifact_manifest_path = command_telemetry.shader_artifact_manifest_path,
-                    .shader_artifact_manifest_hash = command_telemetry.shader_artifact_manifest_hash,
-                    .host_plan_artifact_path = command_telemetry.host_plan_artifact_path,
-                    .host_plan_artifact_hash = command_telemetry.host_plan_artifact_hash,
-                    .backend_lane = backendLaneName(self.backend_lane),
-                    .adapter_ordinal = command_telemetry.adapter_ordinal,
-                    .queue_family_index = command_telemetry.queue_family_index,
-                    .present_capable = command_telemetry.present_capable,
-                    .queue_family_policy = command_telemetry.queue_family_policy,
-                    .queue_family_kind = command_telemetry.queue_family_kind,
-                    .queue_family_queue_count = command_telemetry.queue_family_queue_count,
-                    .queue_family_timestamp_valid_bits = command_telemetry.queue_family_timestamp_valid_bits,
-                    .queue_family_supports_graphics = command_telemetry.queue_family_supports_graphics,
-                    .semantic = semantic,
-                };
-            };
-            const command_end = std.time.nanoTimestamp();
-            const elapsed_ns = if (command_end > command_start)
-                @as(u64, @intCast(command_end - command_start))
-            else
-                0;
-            const command_telemetry = backend.telemetry();
-            const submit_count = command_telemetry.last_submit_count orelse 0;
-
-            return .{
-                .backend = backend_id_name(backend_telemetry_snapshot.backend_id),
-                .status = execution_contract.fromNativeStatus(status.status),
-                .status_code = status.status_message,
-                .duration_ns = elapsed_ns,
-                .setup_ns = status.setup_ns,
-                .encode_ns = status.encode_ns,
-                .submit_wait_ns = status.submit_wait_ns,
-                .dispatch_count = status.dispatch_count,
-                .submit_count = submit_count,
-                .gpu_timestamp_ns = status.gpu_timestamp_ns,
-                .gpu_timestamp_attempted = status.gpu_timestamp_attempted,
-                .gpu_timestamp_valid = status.gpu_timestamp_valid,
-                .backend_selection_reason = command_telemetry.backend_selection_reason,
-                .fallback_used = command_telemetry.fallback_used,
-                .selection_policy_hash = command_telemetry.selection_policy_hash,
-                .shader_artifact_manifest_path = command_telemetry.shader_artifact_manifest_path,
-                .shader_artifact_manifest_hash = command_telemetry.shader_artifact_manifest_hash,
-                .host_plan_artifact_path = command_telemetry.host_plan_artifact_path,
-                .host_plan_artifact_hash = command_telemetry.host_plan_artifact_hash,
+        const backend = if (self.backend) |*value| value else {
+            return execution_receipt.missingBackend(.{
+                .backend = mode_name,
                 .backend_lane = backendLaneName(self.backend_lane),
-                .adapter_ordinal = command_telemetry.adapter_ordinal,
-                .queue_family_index = command_telemetry.queue_family_index,
-                .present_capable = command_telemetry.present_capable,
-                .queue_family_policy = command_telemetry.queue_family_policy,
-                .queue_family_kind = command_telemetry.queue_family_kind,
-                .queue_family_queue_count = command_telemetry.queue_family_queue_count,
-                .queue_family_timestamp_valid_bits = command_telemetry.queue_family_timestamp_valid_bits,
-                .queue_family_supports_graphics = command_telemetry.queue_family_supports_graphics,
                 .semantic = semantic,
-            };
-        }
-
-        return .{
-            .backend = mode_name,
-            .status = .@"error",
-            .status_code = "missing-backend",
-            .duration_ns = 0,
-            .setup_ns = 0,
-            .encode_ns = 0,
-            .submit_wait_ns = 0,
-            .dispatch_count = 0,
-            .submit_count = 0,
-            .gpu_timestamp_ns = 0,
-            .gpu_timestamp_attempted = false,
-            .gpu_timestamp_valid = false,
-            .backend_selection_reason = null,
-            .fallback_used = null,
-            .selection_policy_hash = null,
-            .shader_artifact_manifest_path = null,
-            .shader_artifact_manifest_hash = null,
-            .host_plan_artifact_path = null,
-            .host_plan_artifact_hash = null,
+            });
+        };
+        const telemetry_snapshot = backend.telemetry();
+        const identity = execution_receipt.Identity{
+            .backend = backend_id_name(telemetry_snapshot.backend_id),
             .backend_lane = backendLaneName(self.backend_lane),
-            .adapter_ordinal = null,
-            .queue_family_index = null,
-            .present_capable = null,
             .semantic = semantic,
         };
+        const command_start = std.time.nanoTimestamp();
+        const native = executeBackendOperation(backend, operation) catch |err| {
+            return execution_receipt.failure(
+                identity,
+                backend.telemetry(),
+                elapsedSince(command_start),
+                @errorName(err),
+            );
+        };
+        return execution_receipt.success(
+            identity,
+            backend.telemetry(),
+            elapsedSince(command_start),
+            native,
+        );
     }
 
     pub fn configureUploadBehavior(
