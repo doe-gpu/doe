@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-project-harness",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/cpp-ml-intro",
+    "commit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+    "license": {
+      "identifier": "LicenseRef-EA-BSD-3-Clause-With-Marks",
+      "evidenceUrl": "https://github.com/electronicarts/cpp-ml-intro/blob/c46a47b4fcee5ec48dbda7321210b1287b262b06/LICENSE.txt"
+    }
+  },
+  "providerSubstitution": {
+    "baselineProvider": "dawn-node-webgpu",
+    "comparisonProvider": "doe-gpu",
+    "seam": "A Node ESM loader redirects only the generated workload's exact webgpu package imports to the selected provider wrapper; the external driver supplies the generated entrypoint's documented TODO resources and adds readback usage before output allocation without changing upstream application or shader files.",
+    "patchPaths": []
+  },
+  "fallbackPolicy": {
+    "requireHardware": true,
+    "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],
+    "providerIdentityAssertion": "The selected wrapper and child-process provider probe must name the requested module, expose an adapter identity, reject software renderers, and bind an accessible physical render node before evidence is comparable."
+  },
+  "workload": {
+    "command": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"],
+    "immutableInputRefs": [
+      "bench/external-projects/electronicarts-cpp-ml-intro/oracle.md",
+      "bench/external-projects/electronicarts-cpp-ml-intro/mnist-oracle.mjs",
+      "bench/external-projects/electronicarts-cpp-ml-intro/provider-loader.mjs"
+    ],
+    "oracle": {
+      "kind": "independent-replacement",
+      "path": "bench/external-projects/electronicarts-cpp-ml-intro/oracle.md",
+      "reviewStatus": "reviewed"
+    },
+    "sameWorkPolicy": "Both providers execute the same pinned generated six-pass WebGPU graph over the same weights and ten PNG inputs, read back the same ten output activations, and compare them with the same independent CPU network.",
+    "completionBoundary": "A clean-process sample ends only after all ten generated graphs submit, synchronize, read back, pass CPU vector and argmax comparison, pop the validation scope, and destroy the device without a timeout or signal."
+  },
+  "requiredMeasurements": [
+    "clean-process-success",
+    "crashes",
+    "hangs",
+    "timeouts",
+    "peak-memory-bytes",
+    "cold-p50",
+    "cold-p95",
+    "cold-p99",
+    "warm-p50",
+    "warm-p95",
+    "warm-p99",
+    "receipt-overhead"
+  ],
+  "requiredReceiptFields": [
+    "provider-identity",
+    "adapter-identity",
+    "driver-identity",
+    "shader-hashes",
+    "dispatch-shape",
+    "synchronization",
+    "readback",
+    "output-identity"
+  ],
+  "installation": {
+    "substitutionMode": "other",
+    "productionStatus": "harness-only",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "installCommand": [
+      "npm",
+      "install",
+      "--prefix",
+      "bench",
+      "--no-save",
+      "--no-package-lock",
+      "webgpu@0.4.0",
+      "pngjs@7.0.0"
+    ],
+    "validationCommand": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"]
+  },
+  "supportTargets": [],
+  "reliabilityPolicy": {
+    "cleanProcessRunsPerProvider": 3,
+    "concurrencyLevel": 1,
+    "concurrencyRunsPerProvider": 0,
+    "teardownCyclesPerProvider": 0,
+    "stressIterationsPerProvider": 0,
+    "processTimeoutSeconds": 120,
+    "memoryGrowthBoundaryBytes": 0,
+    "requireZeroCrashes": true,
+    "requireZeroHangs": true,
+    "requireZeroTimeouts": true
+  },
+  "performancePolicy": {
+    "timingScope": "complete clean-process execution, synchronization, readback, and CPU comparison for all ten MNIST inputs",
+    "coldSamplesPerProvider": 3,
+    "warmupSamplesPerProvider": 0,
+    "warmSamplesPerProvider": 1,
+    "requiredPercentiles": ["p50", "p95", "p99"],
+    "throughputMetric": "oracle-passing ten-image MNIST suites per second",
+    "minimumMaterialSpeedupRatio": 1.1,
+    "maximumRegressionRatio": 1.05
+  },
+  "receiptPolicy": {
+    "captureRequired": true,
+    "replayRequired": false,
+    "runtimeBuildIdentityRequired": true
+  },
+  "releasePolicy": {
+    "promotionState": "not-promoted",
+    "blocking": false,
+    "command": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"],
+    "promotionReportIds": []
+  }
+}
