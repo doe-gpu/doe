@@ -25,6 +25,9 @@ file only names the promoted boundary and open admission gates.
 - GPU smoke configs that select claim-eligible catalog workloads use the full
   comparability sample floor. The lower diagnostic smoke floor applies only to
   workloads that are not claim-eligible.
+- GPU smoke verification resolves current compare-report receipt references,
+  verifies their file hashes and identities, and checks every bound sample for
+  successful GPU resource evidence. Legacy inline samples remain readable.
 
 ## Admission blockers
 
