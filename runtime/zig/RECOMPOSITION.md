@@ -640,6 +640,23 @@ universal ideals.
 - [x] Capture trace rows, terminal trace hashes, replay results, receipt identities, and first failure boundaries for the promoted paths.
 - [ ] Capture backend capability reports and representative Metal, Vulkan, and D3D12 compute outputs with explicit hardware/runtime identity.
   - Vulkan is captured and receipt-bound in `runtime/zig/reports/recomposition/backend-evidence.json`; Metal and D3D12 remain separate host obligations.
+  - Schema version 3 preserves already captured backends while a Darwin or
+    Windows operator adds a comparable, hash-bound native report. Run the
+    matching command from the repository root:
+
+    ```bash
+    python3 runtime/zig/tools/capture_backend_evidence.py \
+      --metal-output-report <bench/out/.../report.json> \
+      --metal-output-workload-id compute_workgroup_atomic_1024
+
+    python3 runtime/zig/tools/capture_backend_evidence.py \
+      --d3d12-output-report <bench/out/.../report.json> \
+      --d3d12-output-workload-id compute_workgroup_atomic_1024
+    ```
+
+    Each command verifies the physical adapter, host/API/backend identities,
+    fallback status, receipt hashes, dispatch shape, and output oracles before
+    merging its backend into the canonical receipt.
 - [x] Capture clean and incremental compilation measurements, promoted hot-path benchmark medians, and binary sizes without turning them into universal claims.
 - [x] Add one baseline verifier that classifies a structural result as exact equivalence, approved contract change, or failure.
 - [x] Extend `runtime/zig/source-layout.json` to version 2 instead of creating another architecture policy file.

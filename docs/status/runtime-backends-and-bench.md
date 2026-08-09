@@ -36,6 +36,10 @@ file only names the promoted boundary and open admission gates.
   and identities, successful dispatches, and output-oracle matches. Version 1
   evidence remains an unbound capability snapshot; Metal and D3D12 remain
   separate physical-host obligations.
+- Recomposition backend evidence schema version 3 supports cumulative
+  cross-host capture. Darwin and Windows operators can add receipt-bound Metal
+  or D3D12 output without replacing the existing Vulkan evidence; each captured
+  backend owns its physical device and host identity.
 - The recomposition kernel-dispatch receipt rebuilds the frozen baseline and
   current runtime, runs the same output-oracled kernel on the AMD-only Vulkan
   ICD, and requires exact normalized command, output, error, trace, receipt,
