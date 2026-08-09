@@ -23,7 +23,7 @@
     "releasePolicy"
   ],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 3 },
+    "schemaVersion": { "type": "integer", "const": 4 },
     "artifactKind": { "type": "string", "const": "external-project-harness" },
     "actorId": { "$ref": "#/$defs/id" },
     "harnessId": { "$ref": "#/$defs/id" },
@@ -196,9 +196,8 @@
         "productionStatus",
         "applicationSourceUnchanged",
         "shaderSourceUnchanged",
-        "installCommand",
+        "installSteps",
         "validationCommand",
-        "workingDirectory",
         "timeoutSeconds"
       ],
       "properties": {
@@ -212,17 +211,16 @@
         },
         "applicationSourceUnchanged": { "type": "boolean" },
         "shaderSourceUnchanged": { "type": "boolean" },
-        "installCommand": {
+        "installSteps": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string" }
+          "items": { "$ref": "#/$defs/installStep" }
         },
         "validationCommand": {
           "type": "array",
           "minItems": 1,
           "items": { "type": "string" }
         },
-        "workingDirectory": { "$ref": "#/$defs/workingDirectory" },
         "timeoutSeconds": { "type": "integer", "minimum": 1 }
       }
     },
@@ -377,6 +375,21 @@
           "type": "string",
           "pattern": "^(?:\\.|(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^{}]+)$"
         }
+      }
+    },
+    "installStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "command", "workingDirectory", "timeoutSeconds"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "workingDirectory": { "$ref": "#/$defs/workingDirectory" },
+        "timeoutSeconds": { "type": "integer", "minimum": 1 }
       }
     },
     "supportTarget": {

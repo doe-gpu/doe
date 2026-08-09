@@ -43,7 +43,13 @@
     "linux": {
       "command": {
         "id": "linux-vulkan-physical-adapter",
-        "command": ["vulkaninfo", "--summary"],
+        "command": [
+          "python3",
+          "-m",
+          "bench.runners.probe_vulkan_host_profile",
+          "--profile",
+          "linux_amd_vulkan"
+        ],
         "workingDirectory": ".",
         "timeoutSeconds": 60
       },

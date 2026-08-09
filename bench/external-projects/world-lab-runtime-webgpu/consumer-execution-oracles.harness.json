@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "artifactKind": "external-project-harness",
   "actorId": "world-lab-runtime-webgpu",
   "harnessId": "consumer-execution-oracles",
@@ -65,9 +65,15 @@
     "productionStatus": "harness-only",
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
-    "installCommand": ["npm", "ci"],
+    "installSteps": [
+      {
+        "id": "upstream-dependencies",
+        "command": ["npm", "ci"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      }
+    ],
     "validationCommand": ["node", "bench/external-projects/world-lab-runtime-webgpu/run-suite.mjs", "--require-all-pass"],
-    "workingDirectory": { "scope": "upstream", "path": "." },
     "timeoutSeconds": 1800
   },
   "reproduction": {

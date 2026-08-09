@@ -1316,7 +1316,7 @@ function createFullSurfaceClasses({
     }
 
     get onuncapturederror() {
-      if (typeof backend.deviceGetOnUncapturedError === 'function') {
+      if (!this._destroyed && typeof backend.deviceGetOnUncapturedError === 'function') {
         const native = assertLiveResource(this, 'GPUDevice.onuncapturederror', 'GPUDevice');
         return backend.deviceGetOnUncapturedError(this, native);
       }
@@ -1328,7 +1328,7 @@ function createFullSurfaceClasses({
         failValidation('GPUDevice.onuncapturederror', 'handler must be a function or null');
       }
       this._onuncapturederror = handler ?? null;
-      if (typeof backend.deviceSetOnUncapturedError === 'function') {
+      if (!this._destroyed && typeof backend.deviceSetOnUncapturedError === 'function') {
         const native = assertLiveResource(this, 'GPUDevice.onuncapturederror', 'GPUDevice');
         backend.deviceSetOnUncapturedError(this, native, handler ?? null);
         return;

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "artifactKind": "external-project-harness",
   "actorId": "electronicarts-gigi",
   "harnessId": "generated-webgpu-suite",
@@ -64,16 +64,22 @@
     "productionStatus": "harness-only",
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
-    "installCommand": [
-      "npm",
-      "install",
-      "--no-save",
-      "--no-package-lock",
-      "webgpu",
-      "pngjs"
+    "installSteps": [
+      {
+        "id": "upstream-dependencies",
+        "command": [
+          "npm",
+          "install",
+          "--no-save",
+          "--no-package-lock",
+          "webgpu",
+          "pngjs"
+        ],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      }
     ],
     "validationCommand": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--require-all-pass"],
-    "workingDirectory": { "scope": "upstream", "path": "." },
     "timeoutSeconds": 1800
   },
   "reproduction": {

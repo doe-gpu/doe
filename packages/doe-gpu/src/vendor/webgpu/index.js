@@ -645,11 +645,11 @@ function installNodeDeviceCallbacks(device) {
         return this._onuncapturederror ?? null;
       },
       set(handler) {
-        assertLiveResource(this, 'GPUDevice.onuncapturederror', 'GPUDevice');
         if (handler !== null && handler !== undefined && typeof handler !== 'function') {
           failValidation('GPUDevice.onuncapturederror', 'handler must be a function or null');
         }
         this._onuncapturederror = handler ?? null;
+        if (this._destroyed) return;
         if (typeof addon?.deviceSetUncapturedErrorCallback !== 'function') {
           if (handler) {
             throw unsupportedNodeDeviceCapability('GPUDevice.onuncapturederror');

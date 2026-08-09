@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "artifactKind": "external-project-harness",
   "actorId": "holoscript-snn-webgpu",
   "harnessId": "tropical-spmv",
@@ -64,9 +64,15 @@
     "productionStatus": "harness-only",
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
-    "installCommand": ["npm", "install"],
+    "installSteps": [
+      {
+        "id": "upstream-dependencies",
+        "command": ["npm", "install"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      }
+    ],
     "validationCommand": ["node", "bench/external-projects/holoscript-snn-webgpu/run-matrix.mjs"],
-    "workingDirectory": { "scope": "upstream", "path": "." },
     "timeoutSeconds": 1800
   },
   "reproduction": {

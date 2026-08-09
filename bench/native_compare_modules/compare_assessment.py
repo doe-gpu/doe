@@ -46,6 +46,12 @@ from native_compare_modules.reporting import parse_int, safe_float, safe_int
 from native_compare_modules.timing_selection import canonical_timing_source, classify_timing_source
 
 
+_PLAUSIBILITY_MIN_WALL_RATIO = 0.01
+_PLAUSIBILITY_MIN_WALL_MS = 5.0
+_PLAUSIBILITY_MAX_RATIO_ASYMMETRY = 128.0
+_PLAUSIBILITY_CONTAINMENT_EPSILON_MS = 1e-6
+
+
 def compare_assessment(
     *,
     workload_id: str,
@@ -895,10 +901,6 @@ def compare_assessment(
     # from workload-unit wall time. Symmetric low coverage can be legitimate
     # operation timing for package workloads; asymmetric low coverage means one
     # side is likely measuring a different scope.
-    _PLAUSIBILITY_MIN_WALL_RATIO = 0.01
-    _PLAUSIBILITY_MIN_WALL_MS = 5.0  # skip check for sub-5ms wall (noise)
-    _PLAUSIBILITY_MAX_RATIO_ASYMMETRY = 128.0
-
     left_traced, left_wall, left_ratio, left_process_wall = median_timing_wall_ratio(
         left_samples,
         _sample_normalized_wall_ms,
@@ -909,7 +911,17 @@ def compare_assessment(
     )
     plausibility_ratio_asymmetry = ratio_asymmetry(left_ratio, right_ratio)
 
-    plausibility_applies = (
+    left_exceeds_wall = (
+        left_traced is not None
+        and left_wall is not None
+        and left_traced > left_wall + _PLAUSIBILITY_CONTAINMENT_EPSILON_MS
+    )
+    right_exceeds_wall = (
+        right_traced is not None
+        and right_wall is not None
+        and right_traced > right_wall + _PLAUSIBILITY_CONTAINMENT_EPSILON_MS
+    )
+    plausibility_applies = left_exceeds_wall or right_exceeds_wall or (
         left_wall is not None
         and right_wall is not None
         and (left_wall >= _PLAUSIBILITY_MIN_WALL_MS or right_wall >= _PLAUSIBILITY_MIN_WALL_MS)
@@ -917,6 +929,18 @@ def compare_assessment(
     plausibility_failures: list[str] = []
     low_coverage_sides: list[str] = []
     if plausibility_applies:
+        if left_exceeds_wall:
+            plausibility_failures.append(
+                "baseline selected timing "
+                f"({left_traced:.4f}ms) exceeds normalized workload-unit wall "
+                f"({left_wall:.4f}ms); workload-unit normalization is invalid"
+            )
+        if right_exceeds_wall:
+            plausibility_failures.append(
+                "comparison selected timing "
+                f"({right_traced:.4f}ms) exceeds normalized workload-unit wall "
+                f"({right_wall:.4f}ms); workload-unit normalization is invalid"
+            )
         left_low_coverage = left_ratio is not None and left_ratio < _PLAUSIBILITY_MIN_WALL_RATIO
         right_low_coverage = right_ratio is not None and right_ratio < _PLAUSIBILITY_MIN_WALL_RATIO
         left_wall_checked = left_wall is not None and left_wall >= _PLAUSIBILITY_MIN_WALL_MS
@@ -959,6 +983,9 @@ def compare_assessment(
             "minWallRatio": _PLAUSIBILITY_MIN_WALL_RATIO,
             "minWallMs": _PLAUSIBILITY_MIN_WALL_MS,
             "maxRatioAsymmetry": _PLAUSIBILITY_MAX_RATIO_ASYMMETRY,
+            "containmentEpsilonMs": _PLAUSIBILITY_CONTAINMENT_EPSILON_MS,
+            "baselineSelectedTimingExceedsWall": left_exceeds_wall,
+            "comparisonSelectedTimingExceedsWall": right_exceeds_wall,
             "lowCoverageSides": low_coverage_sides,
             "medianRatioAsymmetry": plausibility_ratio_asymmetry,
             "baselineMedianTracedMs": left_traced,

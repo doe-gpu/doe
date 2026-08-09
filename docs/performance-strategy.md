@@ -55,6 +55,9 @@ Both products must use the same:
 Skipped work, zero-dispatch asymmetry, missing timing phases, different
 readback paths, or hardware-specific shortcuts make a row diagnostic unless
 the workload explicitly declares the asymmetry and forbids generalization.
+Normalized workload-unit wall must contain the selected operation timing for
+each side. A negative wall-minus-operation gap is a normalization or scope
+failure and makes the comparison diagnostic.
 
 ## Statistical requirements
 

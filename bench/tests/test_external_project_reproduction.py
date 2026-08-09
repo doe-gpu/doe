@@ -141,13 +141,24 @@ class ExternalProjectReproductionExecutionTests(unittest.TestCase):
             "harnessId": self.harness_id,
             "upstream": {"repositoryUrl": source_url, "commit": self.commit},
             "installation": {
-                "installCommand": [
-                    sys.executable,
-                    "-c",
-                    "from pathlib import Path; Path('installed.txt').write_text('ok')",
+                "installSteps": [
+                    {
+                        "id": "fixture-dependencies",
+                        "command": [
+                            sys.executable,
+                            "-c",
+                            (
+                                "from pathlib import Path; "
+                                "Path('installed.txt').write_text('ok')"
+                            ),
+                        ],
+                        "workingDirectory": {
+                            "scope": "upstream",
+                            "path": ".",
+                        },
+                        "timeoutSeconds": 30,
+                    }
                 ],
-                "workingDirectory": {"scope": "upstream", "path": "."},
-                "timeoutSeconds": 30,
             },
             "reproduction": {
                 "providerModulePath": "provider.node",

@@ -43,15 +43,16 @@ when the operator needs only the pinned source, host/tool identity, dependency
 installation, Doe build, and preparation receipt. `--offline` forbids a clone
 or fetch and requires the pinned commit to exist in the local upstream clone.
 
-Harnesses using the former contract must migrate by declaring the installation
-working-directory scope and timeout, reproduction provider-module path,
-argument templates, evidence files, and a required preparation receipt. The
-CLI schema-validates these fields and does not infer legacy defaults.
+Harness schema version 4 declares installation as an ordered list of named,
+shell-free steps. Every step owns its working-directory scope and timeout so a
+pinned monorepo can install and build its workspace before installing an
+isolated application fixture. The CLI schema-validates these fields and does
+not infer legacy defaults.
 
 The orchestration is manifest-driven. It bootstraps declared tools, captures
 tool versions, verifies physical hardware, clones or reuses the registry URL,
-checks out the exact registry commit, rejects local source changes, installs in
-the manifest-declared working directory, builds Doe, hashes required runtime
+checks out the exact registry commit, rejects local source changes, executes
+the manifest-declared installation steps in order, builds Doe, hashes required runtime
 and provider artifacts, runs policy gates, executes the workload command, and
 hashes every declared evidence file. Commands are argument arrays rather than
 shell strings, and each process has a declared working directory and timeout.

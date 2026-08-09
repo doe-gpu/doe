@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "artifactKind": "external-project-harness",
   "actorId": "umap-gpu",
   "harnessId": "sgd-output-correctness",
@@ -65,9 +65,15 @@
     "productionStatus": "harness-only",
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
-    "installCommand": ["npm", "ci"],
+    "installSteps": [
+      {
+        "id": "upstream-dependencies",
+        "command": ["npm", "ci"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      }
+    ],
     "validationCommand": ["node", "bench/external-projects/umap-gpu/run-suite.mjs", "--require-all-pass"],
-    "workingDirectory": { "scope": "upstream", "path": "." },
     "timeoutSeconds": 1800
   },
   "reproduction": {

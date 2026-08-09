@@ -14,6 +14,10 @@ if str(BENCH_ROOT) not in sys.path:
     sys.path.insert(0, str(BENCH_ROOT))
 
 from native_compare_modules.timing_interpretation import build_timing_interpretation
+from native_compare_modules.normalization import (
+    derive_workload_unit_normalization_divisor,
+    sample_normalized_elapsed_ms,
+)
 
 
 def make_side(timing_source: str) -> dict[str, object]:
@@ -118,6 +122,52 @@ def make_single_divisor_side() -> dict[str, object]:
 
 
 class TimingInterpretationNamingTests(unittest.TestCase):
+    def test_compute_trace_rows_do_not_implicitly_divide_workload_wall(self) -> None:
+        divisor, source = derive_workload_unit_normalization_divisor(
+            workload_domain="compute",
+            strict_normalization_unit="",
+            trace_meta={
+                "executionDispatchCount": 1170,
+                "executionRowCount": 1585,
+                "executionSuccessCount": 1585,
+            },
+            command_repeat=1,
+            configured_timing_divisor=1.0,
+            required_timing_class="operation",
+        )
+
+        self.assertEqual(divisor, 1.0)
+        self.assertEqual(source, "identity")
+        self.assertEqual(
+            sample_normalized_elapsed_ms(
+                {
+                    "elapsedMs": 148.0,
+                    "commandRepeat": 1,
+                    "timingClass": "operation",
+                    "timingNormalizationDivisor": 1.0,
+                    "workloadDomain": "compute",
+                    "traceMeta": {
+                        "executionRowCount": 1585,
+                        "executionSuccessCount": 1585,
+                    },
+                }
+            ),
+            148.0,
+        )
+
+    def test_declared_dispatch_unit_divides_workload_wall(self) -> None:
+        divisor, source = derive_workload_unit_normalization_divisor(
+            workload_domain="compute",
+            strict_normalization_unit="dispatch",
+            trace_meta={"executionDispatchCount": 100},
+            command_repeat=1,
+            configured_timing_divisor=100.0,
+            required_timing_class="operation",
+        )
+
+        self.assertEqual(divisor, 100.0)
+        self.assertEqual(source, "declared-dispatch-count")
+
     def test_emits_workload_unit_wall_with_legacy_alias(self) -> None:
         interpretation = build_timing_interpretation(
             baseline=make_side("doe-execution-total-ns"),

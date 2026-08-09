@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "artifactKind": "external-project-harness",
   "actorId": "electronicarts-cpp-ml-intro",
   "harnessId": "mnist-webgpu-demo",
@@ -66,18 +66,24 @@
     "productionStatus": "harness-only",
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
-    "installCommand": [
-      "npm",
-      "install",
-      "--prefix",
-      "bench",
-      "--no-save",
-      "--no-package-lock",
-      "webgpu@0.4.0",
-      "pngjs@7.0.0"
+    "installSteps": [
+      {
+        "id": "harness-dependencies",
+        "command": [
+          "npm",
+          "install",
+          "--prefix",
+          "bench",
+          "--no-save",
+          "--no-package-lock",
+          "webgpu@0.4.0",
+          "pngjs@7.0.0"
+        ],
+        "workingDirectory": { "scope": "repo", "path": "." },
+        "timeoutSeconds": 1800
+      }
     ],
     "validationCommand": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"],
-    "workingDirectory": { "scope": "repo", "path": "." },
     "timeoutSeconds": 1800
   },
   "reproduction": {

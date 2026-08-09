@@ -27,6 +27,7 @@ napi_value doe_adapter_get_info(napi_env env, napi_callback_info info);
 napi_value doe_request_device(napi_env env, napi_callback_info info);
 napi_value doe_device_release(napi_env env, napi_callback_info info);
 napi_value doe_device_get_queue(napi_env env, napi_callback_info info);
+napi_value doe_device_set_uncaptured_error_callback(napi_env env, napi_callback_info info);
 napi_value doe_device_register_lost_callback(napi_env env, napi_callback_info info);
 
 /* Buffer */
@@ -211,6 +212,7 @@ napi_value doe_module_init(napi_env env, napi_value exports) {
         EXPORT_FN("requestDevice",                            doe_request_device),
         EXPORT_FN("deviceRelease",                            doe_device_release),
         EXPORT_FN("deviceGetQueue",                           doe_device_get_queue),
+        EXPORT_FN("deviceSetUncapturedErrorCallback",         doe_device_set_uncaptured_error_callback),
         EXPORT_FN("deviceRegisterLostCallback",               doe_device_register_lost_callback),
         EXPORT_FN("createBuffer",                             doe_create_buffer),
         EXPORT_FN("bufferRelease",                            doe_buffer_release),

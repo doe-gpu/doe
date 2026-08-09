@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "artifactKind": "external-project-harness",
   "actorId": "sample-actor",
   "harnessId": "sample-workload",
@@ -71,9 +71,15 @@
     "productionStatus": "validated",
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
-    "installCommand": ["npm", "install", "doe-gpu"],
+    "installSteps": [
+      {
+        "id": "upstream-dependencies",
+        "command": ["npm", "install", "doe-gpu"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      }
+    ],
     "validationCommand": ["npm", "test", "--", "sample-workload"],
-    "workingDirectory": { "scope": "upstream", "path": "." },
     "timeoutSeconds": 1800
   },
   "reproduction": {

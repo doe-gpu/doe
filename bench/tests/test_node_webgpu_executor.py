@@ -32,6 +32,7 @@ RUNTIME_COMPUTE_FAST_PATH = (
 )
 NAPI_QUEUE_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_queue.c"
 NAPI_BUFFER_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_buffer.c"
+NAPI_CAPS_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_caps.c"
 NAPI_INIT_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_init.c"
 NAPI_INTERNAL_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_internal.h"
 NAPI_ND_IMMEDIATES_PATH = REPO_ROOT / "runtime" / "bridge" / "webgpu-addon" / "doe_napi_nd_immediates.c"
@@ -439,6 +440,20 @@ class NodeWebGPUExecutorTests(unittest.TestCase):
         self.assertIn("DECL_PFN(uint32_t, doeNativeQueueSyncInfo", header_source)
         self.assertIn("DECL_PFN(uint32_t, doeNativeQueueFamilyPolicyCode", header_source)
         self.assertIn("DECL_PFN(uint32_t, doeNativeQueueDeferredSubmissionSyncPolicyCode", header_source)
+
+    def test_napi_package_exports_uncaptured_error_callback_bridge(self) -> None:
+        caps_source = NAPI_CAPS_PATH.read_text(encoding="utf-8")
+        init_source = NAPI_INIT_PATH.read_text(encoding="utf-8")
+
+        self.assertIn(
+            "napi_value doe_device_set_uncaptured_error_callback",
+            caps_source,
+        )
+        self.assertIn(
+            'EXPORT_FN("deviceSetUncapturedErrorCallback",         '
+            "doe_device_set_uncaptured_error_callback)",
+            init_source,
+        )
 
     def test_napi_readback_map_prefers_doe_native_map_symbol(self) -> None:
         for path in (NAPI_BUFFER_PATH, NAPI_QUEUE_PATH, NAPI_ND_IMMEDIATES_PATH):

@@ -93,9 +93,9 @@
   "claimable": false,
   "evidenceMaturity": "diagnostic",
   "host": {
-    "machine": "arm64",
-    "operatingSystem": "Darwin",
-    "release": "25.3.0"
+    "machine": "x86_64",
+    "operatingSystem": "Linux",
+    "release": "7.0.0-28-generic"
   },
   "policy": {
     "physicalHardwareRequired": true,

@@ -423,7 +423,7 @@ def reproduction_plan(selection: Selection, *, offline: bool = False) -> dict[st
         ],
         "versionCommands": [item["command"] for item in selection.policy["versionCommands"]],
         "hardwareProbe": selection.policy["hardwareProbes"][platform_id]["command"]["command"],
-        "installCommand": install["installCommand"],
+        "installSteps": install["installSteps"],
         "doeCommands": [
             item["command"]
             for item in (
@@ -588,8 +588,9 @@ def _ensure_upstream(
     return actual_commit, actual_origin, clean
 
 
-def _installation_root(selection: Selection) -> Path:
-    working = selection.manifest["installation"]["workingDirectory"]
+def _installation_root(
+    selection: Selection, working: dict[str, Any]
+) -> Path:
     base = selection.root if working["scope"] == "repo" else selection.upstream_root
     path = str(working["path"])
     candidate = (base / path).resolve()
@@ -787,17 +788,20 @@ def prepare_external_project(
         )
 
         install = selection.manifest["installation"]
-        install_result = recorder.run(
-            _command_spec(
-                "install-upstream-dependencies",
-                [str(item) for item in install["installCommand"]],
-                ".",
-                int(install["timeoutSeconds"]),
-            ),
-            working_directory=_installation_root(selection),
-        )
-        steps.append(install_result.receipt)
-        _require_process(install_result, "installation")
+        for install_step in install["installSteps"]:
+            install_result = recorder.run(
+                _command_spec(
+                    f"install-{install_step['id']}",
+                    [str(item) for item in install_step["command"]],
+                    ".",
+                    int(install_step["timeoutSeconds"]),
+                ),
+                working_directory=_installation_root(
+                    selection, install_step["workingDirectory"]
+                ),
+            )
+            steps.append(install_result.receipt)
+            _require_process(install_result, "installation")
 
         source_timeout = int(selection.policy["sourceCommandTimeoutSeconds"])
         clean_after_install = recorder.run(

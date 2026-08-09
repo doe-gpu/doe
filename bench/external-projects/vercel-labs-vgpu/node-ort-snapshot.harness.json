@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "artifactKind": "external-project-harness",
   "actorId": "vercel-labs-vgpu",
   "harnessId": "node-ort-snapshot",
@@ -26,6 +26,7 @@
     "command": ["node", "bench/external-projects/vercel-labs-vgpu/run-matrix.mjs", "--require-all-pass"],
     "immutableInputRefs": [
       "bench/external-projects/vercel-labs-vgpu/oracle.md",
+      "bench/external-projects/vercel-labs-vgpu/provider-loader.mjs",
       "bench/external-projects/vercel-labs-vgpu/repro-onuncapturederror.mjs"
     ],
     "oracle": {
@@ -65,9 +66,27 @@
     "productionStatus": "harness-only",
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
-    "installCommand": ["npm", "ci"],
+    "installSteps": [
+      {
+        "id": "workspace-dependencies",
+        "command": ["corepack", "pnpm", "install", "--frozen-lockfile"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      },
+      {
+        "id": "workspace-build",
+        "command": ["corepack", "pnpm", "run", "build"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      },
+      {
+        "id": "ort-experiment-dependencies",
+        "command": ["npm", "ci"],
+        "workingDirectory": { "scope": "upstream", "path": "experiments/ort-init-device" },
+        "timeoutSeconds": 1800
+      }
+    ],
     "validationCommand": ["node", "bench/external-projects/vercel-labs-vgpu/run-matrix.mjs", "--require-all-pass"],
-    "workingDirectory": { "scope": "upstream", "path": "." },
     "timeoutSeconds": 1800
   },
   "reproduction": {

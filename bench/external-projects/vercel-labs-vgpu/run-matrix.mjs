@@ -121,12 +121,13 @@ async function inspectHostHardware() {
   };
 }
 
-function providerEnvironment(provider, dawnModule, doeModule) {
+function providerEnvironment(provider, modules) {
   return {
     ...process.env,
     DOE_EXTERNAL_WEBGPU_PROVIDER: provider,
-    DOE_EXTERNAL_DAWN_MODULE: dawnModule,
-    DOE_EXTERNAL_DOE_MODULE: doeModule,
+    DOE_EXTERNAL_DAWN_MODULE: modules.dawn,
+    DOE_EXTERNAL_DOE_MODULE: modules.doe,
+    DOE_EXTERNAL_TYPESCRIPT_MODULE: modules.typescript,
   };
 }
 
@@ -141,7 +142,7 @@ async function probeProvider(options, experimentRoot, provider, modules, hostHar
     ],
     {
       cwd: experimentRoot,
-      env: providerEnvironment(provider, modules.dawn, modules.doe),
+      env: providerEnvironment(provider, modules),
       timeoutMs: options.timeoutMs,
     },
   );
@@ -180,7 +181,7 @@ async function runCompatibilityRepro(options, experimentRoot, provider, modules)
     ],
     {
       cwd: experimentRoot,
-      env: providerEnvironment(provider, modules.dawn, modules.doe),
+      env: providerEnvironment(provider, modules),
       timeoutMs: options.timeoutMs,
     },
   );
@@ -231,13 +232,12 @@ async function runWorkload(options, experimentRoot, outDir, provider, index, mod
       '--no-warnings',
       '--experimental-loader',
       resolve(harnessDir, 'provider-loader.mjs'),
-      '--experimental-strip-types',
       resolve(experimentRoot, 'node/run.ts'),
     ],
     {
       cwd: experimentRoot,
       env: {
-        ...providerEnvironment(provider, modules.dawn, modules.doe),
+        ...providerEnvironment(provider, modules),
         ORT_EVIDENCE_DIR: evidenceDir,
         VGPU_CACHE_DIR: cacheDir,
         XDG_RUNTIME_DIR: runtimeDir,
@@ -336,8 +336,9 @@ async function main() {
   const modules = {
     dawn: resolve(experimentRoot, 'node_modules/webgpu/index.js'),
     doe: resolve(repoRoot, 'packages/doe-gpu/src/index.js'),
+    typescript: resolve(experimentRoot, 'node_modules/typescript/lib/typescript.js'),
   };
-  await Promise.all([access(modules.dawn), access(modules.doe)]);
+  await Promise.all(Object.values(modules).map((modulePath) => access(modulePath)));
 
   const hostHardware = await inspectHostHardware();
   const providerIds = ['dawn-node-webgpu', 'doe-gpu'];

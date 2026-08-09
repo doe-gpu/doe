@@ -84,19 +84,21 @@ def derive_workload_unit_normalization_divisor(
     if required_timing_class == "process-wall":
         return 1.0, "selected-process-wall"
 
-    (
-        counter_derived_divisor,
-        _trace_success_count,
-        _trace_row_count,
-        _trace_dispatch_count,
-    ) = derive_counter_derived_divisor(
-        workload_domain=workload_domain,
-        strict_normalization_unit=strict_normalization_unit,
-        trace_meta=trace_meta,
-        command_repeat=command_repeat,
-    )
-    if counter_derived_divisor > 1.0:
-        return counter_derived_divisor, "trace-counter-derived"
+    normalized_unit = strict_normalization_unit.strip().lower()
+    normalized_domain = workload_domain.strip().lower()
+    if normalized_unit == "cycle" and command_repeat > 1:
+        return float(command_repeat), "declared-cycle-count"
+    if normalized_unit == "dispatch":
+        dispatch_count = parse_int(trace_meta.get("executionDispatchCount", 0)) or 0
+        if dispatch_count > 1:
+            return float(dispatch_count), "declared-dispatch-count"
+    if normalized_domain == "surface" and command_repeat > 1:
+        return float(command_repeat), "declared-surface-repeat"
+    if normalized_domain == "upload":
+        submit_every = parse_int(trace_meta.get("uploadSubmitEvery", 0)) or 0
+        row_count = parse_int(trace_meta.get("executionRowCount", 0)) or 0
+        if submit_every > 0 and row_count > 1:
+            return float(row_count), "declared-upload-row-count"
 
     if configured_timing_divisor > 1.0 and command_repeat > 1:
         return max(configured_timing_divisor, float(command_repeat)), "normalization-fallback-max"
@@ -120,18 +122,18 @@ def sample_workload_unit_normalization_divisor(sample: dict[str, Any]) -> float:
         trace_meta = {}
     workload_domain = str(sample.get("workloadDomain", "")).strip().lower()
     strict_normalization_unit = str(sample.get("strictNormalizationUnit", "")).strip().lower()
-    if workload_domain or strict_normalization_unit:
-        counter_derived_divisor, _, _, _ = derive_counter_derived_divisor(
-            workload_domain=workload_domain,
-            strict_normalization_unit=strict_normalization_unit,
-            trace_meta=trace_meta,
-            command_repeat=int(sample_command_repeat(sample)),
-        )
-        if counter_derived_divisor > 1.0:
-            return counter_derived_divisor
-
     configured_timing_divisor = sample_configured_timing_divisor(sample)
     command_repeat = sample_command_repeat(sample)
+    derived_divisor, _ = derive_workload_unit_normalization_divisor(
+        workload_domain=workload_domain,
+        strict_normalization_unit=strict_normalization_unit,
+        trace_meta=trace_meta,
+        command_repeat=int(command_repeat),
+        configured_timing_divisor=configured_timing_divisor,
+        required_timing_class=str(sample.get("timingClass", "")).strip(),
+    )
+    if derived_divisor > 1.0:
+        return derived_divisor
     if configured_timing_divisor > 1.0 and command_repeat > 1.0:
         return max(configured_timing_divisor, command_repeat)
     if configured_timing_divisor > 1.0:

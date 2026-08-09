@@ -204,6 +204,57 @@ class CompareAssessmentTests(unittest.TestCase):
             result["blockingFailedObligations"],
         )
 
+    def test_timing_plausibility_blocks_selected_timing_above_normalized_wall(self) -> None:
+        result = compare_assessment(
+            workload_id="inference_gemma3_270m_prefill_64tok_decode_64tok",
+            workload_comparable=True,
+            workload_domain="compute",
+            workload_api="webgpu",
+            workload_commands_path="",
+            workload_path_asymmetry=False,
+            workload_path_asymmetry_note="",
+            baseline_command_repeat=1,
+            comparison_command_repeat=1,
+            baseline={
+                "commandSamples": [
+                    _wall_coverage_sample(
+                        backend="doe_node_webgpu",
+                        measured_ms=105.0,
+                        elapsed_ms=0.09,
+                    )
+                    for _ in range(7)
+                ],
+            },
+            comparison={
+                "commandSamples": [
+                    _wall_coverage_sample(
+                        backend="node_webgpu_package",
+                        measured_ms=125.0,
+                        elapsed_ms=0.11,
+                    )
+                    for _ in range(7)
+                ],
+            },
+            required_timing_class="operation",
+            allow_baseline_no_execution=False,
+            resource_probe="none",
+            comparability_mode="strict",
+            resource_sample_target_count=0,
+        )
+
+        self.assertFalse(result["comparable"])
+        self.assertIn(
+            "baseline_comparison_timing_plausibility",
+            result["blockingFailedObligations"],
+        )
+        obligation = next(
+            item
+            for item in result["obligations"]
+            if item["id"] == "baseline_comparison_timing_plausibility"
+        )
+        self.assertTrue(obligation["details"]["baselineSelectedTimingExceedsWall"])
+        self.assertTrue(obligation["details"]["comparisonSelectedTimingExceedsWall"])
+
     def test_submit_count_mismatch_blocks_execution_shape_match(self) -> None:
         baseline_sample = _sample(backend="doe_vulkan", command_replay_ns=0)
         comparison_sample = _sample(backend="dawn_delegate", command_replay_ns=0)
