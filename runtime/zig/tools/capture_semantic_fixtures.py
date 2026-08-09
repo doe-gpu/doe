@@ -31,6 +31,9 @@ IR_DIGEST_OBSERVER_PATHS = (
     "src/compiler/wgsl/ir/ir_digest.zig",
 )
 WEBGPU_ABI_SOURCE_CONFIG = "config/webgpu-abi-source.json"
+LEGACY_WEBGPU_HEADER_PATH = Path(
+    "bench/vendor/dawn/third_party/webgpu-headers/src/webgpu.h"
+)
 
 
 def _run(
@@ -107,6 +110,9 @@ def _materialize_runtime(
     header_destination = temporary_root / header_relative
     header_destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(header_source, header_destination)
+    legacy_header_destination = temporary_root / LEGACY_WEBGPU_HEADER_PATH
+    legacy_header_destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(header_source, legacy_header_destination)
     snapshot = temporary_root / relative_runtime
     if not (snapshot / "build.zig").is_file():
         raise RuntimeError("materialized runtime snapshot has no build.zig")

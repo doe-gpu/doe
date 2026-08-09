@@ -6,7 +6,6 @@ import argparse
 import hashlib
 import json
 import re
-import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -48,18 +47,6 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _git_output(directory: Path, *arguments: str) -> str:
-    result = subprocess.run(
-        ["git", "-C", str(directory), *arguments],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(result.stderr.strip() or "git command failed")
-    return result.stdout.strip()
-
-
 def _symbol_contract(path: Path) -> list[str]:
     return sorted(
         line.strip()
@@ -75,13 +62,9 @@ def audit(root: Path, policy_path: Path) -> dict[str, Any]:
     if not header_path.is_file():
         raise RuntimeError(f"pinned WebGPU header is missing: {header_path}")
     actual_header_sha = _sha256(header_path)
-    dawn_root = REPOSITORY_ROOT / "bench" / "vendor" / "dawn"
-    actual_dawn_commit = _git_output(dawn_root, "rev-parse", "HEAD")
-    deps = (dawn_root / "DEPS").read_text(encoding="utf-8")
-    deps_match = re.search(
-        r"webgpu-headers@([0-9a-f]{40})", deps
-    )
-    actual_headers_commit = deps_match.group(1) if deps_match else None
+    license_path = REPOSITORY_ROOT / source["licensePath"]
+    if not license_path.is_file():
+        raise RuntimeError(f"pinned WebGPU header license is missing: {license_path}")
 
     header_text = header_path.read_text(encoding="utf-8")
     header_names = set(HEADER_NAME.findall(header_text))
@@ -125,10 +108,6 @@ def audit(root: Path, policy_path: Path) -> dict[str, Any]:
     pin_errors = []
     if actual_header_sha != source["sha256"]:
         pin_errors.append("header-sha256")
-    if actual_dawn_commit != source["dawnCommit"]:
-        pin_errors.append("dawn-commit")
-    if actual_headers_commit != source["webgpuHeadersCommit"]:
-        pin_errors.append("webgpu-headers-commit")
     missing_symbols = sorted(set(symbols) - header_procs)
     generated_path = root / "src" / "core" / "abi" / "generated" / "webgpu_upstream.zig"
     rendered_generated = generate_webgpu_abi(root, policy_path, symbol_path)
@@ -157,11 +136,12 @@ def audit(root: Path, policy_path: Path) -> dict[str, Any]:
             "status": "complete" if not manual and generated_current else "required",
         },
         "pin": {
-            "actualDawnCommit": actual_dawn_commit,
             "actualHeaderSha256": actual_header_sha,
-            "actualWebgpuHeadersCommit": actual_headers_commit,
+            "commit": source["commit"],
             "errors": pin_errors,
+            "licensePath": source["licensePath"],
             "path": source["path"],
+            "repository": source["repository"],
             "status": "verified" if not pin_errors else "failure",
         },
         "schemaVersion": 1,

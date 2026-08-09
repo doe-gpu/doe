@@ -1686,11 +1686,12 @@
     "status": "complete"
   },
   "pin": {
-    "actualDawnCommit": "36cf1fae0cd8a81a4fb4580751648b80b2e6255c",
     "actualHeaderSha256": "7691d76ceb67056f89e97b9ff0b62163eacf19a8e0e09a8fa7dbb32069b7978c",
-    "actualWebgpuHeadersCommit": "01addc4ba8a2915a061b7095a6768b512071ab96",
+    "commit": "01addc4ba8a2915a061b7095a6768b512071ab96",
     "errors": [],
-    "path": "bench/vendor/dawn/third_party/webgpu-headers/src/webgpu.h",
+    "licensePath": "runtime/zig/vendor/webgpu-headers/LICENSE",
+    "path": "runtime/zig/vendor/webgpu-headers/webgpu.h",
+    "repository": "https://chromium.googlesource.com/external/github.com/webgpu-native/webgpu-headers",
     "status": "verified"
   },
   "schemaVersion": 1,

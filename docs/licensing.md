@@ -59,6 +59,17 @@ wgpu is referenced as a baseline comparison target. No wgpu source is vendored o
 linked. If wgpu source is vendored in the future, its license (MIT/Apache 2.0) must
 be retained and the same attribution discipline applied.
 
+## WebGPU native headers (BSD 3-Clause)
+
+Doe vendors the public WebGPU C header at
+`runtime/zig/vendor/webgpu-headers/webgpu.h` as the deterministic source for
+generated runtime ABI aliases and loader metadata. Its exact upstream commit
+and content hash are declared in `config/webgpu-abi-source.json`; the upstream
+license is retained at `runtime/zig/vendor/webgpu-headers/LICENSE`.
+
+This header is an interface definition only. It is intentionally independent
+of the mutable Dawn benchmark checkout under `bench/vendor/dawn/`.
+
 ## ONNX Runtime plugin EP headers (MIT)
 
 Doe vendors ONNX Runtime public plugin-EP headers under:

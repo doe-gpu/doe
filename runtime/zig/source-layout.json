@@ -438,7 +438,7 @@
           "tools/generate_webgpu_abi.py",
           "../../config/webgpu-abi-source.json",
           "../../config/dropin_abi.symbols.txt",
-          "../../bench/vendor/dawn/third_party/webgpu-headers/src/webgpu.h"
+          "vendor/webgpu-headers/webgpu.h"
         ],
         "owner": "core/abi",
         "reason": "derive upstream WebGPU types, procedure types, procedure table fields, and loader metadata from the pinned webgpu.h"

@@ -48,6 +48,9 @@ file only names the promoted boundary and open admission gates.
   type names and binds schema field names, union tags, and semantic values.
   Frozen and current fixtures use the same observer and remain identical across
   all supported Zig optimization modes; target-output bytes remain unchanged.
+- WebGPU ABI source policy version 2 uses the licensed, SHA-pinned header under
+  `runtime/zig/vendor/webgpu-headers/`. Runtime builds and ABI generation no
+  longer inherit header state from the mutable Dawn benchmark checkout.
 
 ## Admission blockers
 

@@ -6,17 +6,18 @@
   "additionalProperties": false,
   "required": ["schemaVersion", "source", "ownership", "generationPolicy"],
   "properties": {
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": { "const": 2 },
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "path", "sha256", "dawnCommit", "webgpuHeadersCommit"],
+      "required": ["kind", "path", "sha256", "repository", "commit", "licensePath"],
       "properties": {
-        "kind": { "const": "pinned-header" },
-        "path": { "const": "bench/vendor/dawn/third_party/webgpu-headers/src/webgpu.h" },
+        "kind": { "const": "vendored-pinned-header" },
+        "path": { "const": "runtime/zig/vendor/webgpu-headers/webgpu.h" },
         "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-        "dawnCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
-        "webgpuHeadersCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+        "repository": { "const": "https://chromium.googlesource.com/external/github.com/webgpu-native/webgpu-headers" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "licensePath": { "const": "runtime/zig/vendor/webgpu-headers/LICENSE" }
       }
     },
     "ownership": {
@@ -24,7 +25,7 @@
       "additionalProperties": false,
       "required": ["upstreamDefinitions", "doeExtensions", "exportedSymbolContract"],
       "properties": {
-        "upstreamDefinitions": { "const": "pinned-header" },
+        "upstreamDefinitions": { "const": "vendored-pinned-header" },
         "doeExtensions": { "type": "string", "minLength": 1 },
         "exportedSymbolContract": { "type": "string", "minLength": 1 }
       }

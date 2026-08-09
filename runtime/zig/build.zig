@@ -42,8 +42,8 @@ fn addBackendBridgeIncludePaths(artifact: *std.Build.Step.Compile, b: *std.Build
 fn addSourceModuleIncludePaths(module: *std.Build.Module, b: *std.Build) void {
     module.addIncludePath(b.path("src/backend/d3d12"));
     module.addIncludePath(b.path("src/backend/metal"));
+    module.addIncludePath(b.path("vendor/webgpu-headers"));
     const candidates = [_][]const u8{
-        "../../bench/vendor/dawn/third_party/webgpu-headers/src",
         "../../bench/vendor/dawn/out/Release/gen/include",
         "../../bench/vendor/dawn/out/Release/gen/include/dawn",
         "../../bench/vendor/node-webgpu-package/out/cmake-release/gen/include/dawn",
@@ -950,7 +950,7 @@ pub fn build(b: *std.Build) void {
     });
     webgpu_plan_executor.linkLibC();
     const dawn_shared_include_candidates = [_][]const u8{
-        "../../bench/vendor/dawn/third_party/webgpu-headers/src",
+        "vendor/webgpu-headers",
         "../../bench/vendor/dawn/out/Release/gen/include",
         "../../bench/vendor/dawn/out/Release/gen/include/dawn",
         "../../bench/vendor/node-webgpu-package/out/cmake-release/gen/include/dawn",
