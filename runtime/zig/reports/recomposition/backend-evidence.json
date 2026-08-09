@@ -7,9 +7,40 @@
       "requiredHostOs": "Windows"
     },
     "metal": {
-      "availability": "not-available-host-os",
-      "physicalGpuEligible": false,
-      "representativeOutput": "not-captured",
+      "availability": "physical-adapter-accessible",
+      "device": {
+        "deviceName": "Apple M3",
+        "driverInfo": null,
+        "driverName": "Metal"
+      },
+      "evidenceHost": {
+        "machine": "arm64",
+        "operatingSystem": "Darwin",
+        "release": "25.3.0"
+      },
+      "physicalGpuEligible": true,
+      "representativeOutput": "captured",
+      "representativeOutputEvidence": {
+        "baseline": {
+          "dispatchCount": 100,
+          "executionBackend": "doe_metal",
+          "outputOracleCount": 1,
+          "outputOracleMatchedCount": 1,
+          "product": "doe",
+          "sampleCount": 7
+        },
+        "comparison": {
+          "dispatchCount": 100,
+          "executionBackend": "dawn_delegate",
+          "outputOracleCount": 1,
+          "outputOracleMatchedCount": 1,
+          "product": "dawn_delegate",
+          "sampleCount": 7
+        },
+        "reportPath": "bench/out/recomposition/backend-evidence-inputs/metal.json",
+        "reportSha256": "79202e582b84d7de28d386e2e314e903cfa9653cd758a3e86a5f327fef73e895",
+        "workloadId": "compute_workgroup_atomic_1024"
+      },
       "requiredHostOs": "Darwin"
     },
     "vulkan": {
@@ -62,9 +93,9 @@
   "claimable": false,
   "evidenceMaturity": "diagnostic",
   "host": {
-    "machine": "x86_64",
-    "operatingSystem": "Linux",
-    "release": "7.0.0-28-generic"
+    "machine": "arm64",
+    "operatingSystem": "Darwin",
+    "release": "25.3.0"
   },
   "policy": {
     "physicalHardwareRequired": true,
