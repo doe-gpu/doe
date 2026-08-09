@@ -12,6 +12,9 @@ evidence boundaries are clear.
 - [`thesis.md`](thesis.md): the single Doe-first product strategy; verifiable
   local compute vision, owned tracks, supporting-project roles, Node/Bun wedge,
   downstream portfolio, browser path, and expansion boundaries
+- [Cross-project documentation authority](../../ouroboros/docs/authority/README.md):
+  registry and routing rules for Doe goals, programs, plans, and evidence;
+  Doe remains canonical for Doe behavior and measurements
 
 ## Product and project contracts
 
