@@ -1005,9 +1005,9 @@
       },
       "src/backend/vulkan/vk_pipeline.zig": {
         "decision": "Keep",
-        "moduleSha256": "f1c06b34c57d7a8652e535156de64a84369c6fa208530eae3a4016decc4f23ac",
+        "moduleSha256": "85099c62a20e0f80df068c1d01558571dcb4bbad2992f81ac160659d697c6bfd",
         "reason": "Keep: independently tested Vulkan compute-pipeline and descriptor-cache capsule shared by six production consumers.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-recomposition-review/2026-08-09"
       },
       "src/backend/vulkan/vk_pipeline_cache.zig": {
         "decision": "Keep",

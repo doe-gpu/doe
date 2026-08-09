@@ -356,6 +356,7 @@ pub fn set_compute_shader_spirv_with_hashes(
     }
     try prepare_descriptor_sets(self, bindings, initialize_buffers_on_create, descriptor_bindings_hash);
     vk_compute_sync.capture_current_compute_bindings(self, bindings);
+    stage_spirv_for_artifact(self, words);
 }
 pub fn rebuild_compute_shader_spirv(self: anytype, words: []const u32) !void {
     if (words.len == 0 or words[0] != SPIRV_MAGIC) return error.ShaderCompileFailed;
@@ -398,14 +399,6 @@ pub fn build_pipeline_for_words(
     try c.check_vk(c.vkCreateShaderModule(self.device, &shader_info, null, &self.shader_module));
     self.has_shader_module = true;
 
-    // Persist SPIR-V bytes for the next shader artifact manifest emission so
-    // `shader_artifact_gate.py --require-spirv-validation` can run spirv-val
-    // against the real binary. The backend pulls these bytes at manifest
-    // emit time, writes a sibling .spv file, records its path in the
-    // ir_to_spirv stage record, then frees the allocation.
-    if (self.pending_spirv_bytes_owned) |stale| self.allocator.free(stale);
-    self.pending_spirv_bytes_owned = self.allocator.dupe(u8, std.mem.sliceAsBytes(words)) catch null;
-
     var required_subgroup_size_info = c.VkPipelineShaderStageRequiredSubgroupSizeCreateInfo{
         .sType = c.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO,
         .pNext = null,
@@ -422,6 +415,34 @@ pub fn build_pipeline_for_words(
     self.has_pipeline = true;
     self.current_entry_point_owned = owned_entry;
     self.current_pipeline_hash = pipeline_hash;
+}
+
+fn stage_spirv_for_artifact(self: anytype, words: []const u32) void {
+    if (self.pending_spirv_bytes_owned) |stale| self.allocator.free(stale);
+    self.pending_spirv_bytes_owned = self.allocator.dupe(
+        u8,
+        std.mem.sliceAsBytes(words),
+    ) catch null;
+}
+
+test "staged SPIR-V receipt replaces prewarm bytes" {
+    const Fixture = struct {
+        allocator: std.mem.Allocator,
+        pending_spirv_bytes_owned: ?[]u8 = null,
+    };
+    var fixture = Fixture{ .allocator = std.testing.allocator };
+    defer if (fixture.pending_spirv_bytes_owned) |bytes| fixture.allocator.free(bytes);
+    const prewarm_words = [_]u32{ SPIRV_MAGIC, 1, 2 };
+    const executed_words = [_]u32{ SPIRV_MAGIC, 3, 4 };
+
+    stage_spirv_for_artifact(&fixture, &prewarm_words);
+    stage_spirv_for_artifact(&fixture, &executed_words);
+
+    try std.testing.expectEqualSlices(
+        u8,
+        std.mem.sliceAsBytes(&executed_words),
+        fixture.pending_spirv_bytes_owned.?,
+    );
 }
 
 fn required_subgroup_size_for_pipeline(self: anytype, words: []const u32) ?u32 {
