@@ -31,6 +31,20 @@ file only names the promoted boundary and open admission gates.
 - Strict comparison now rejects workload-unit normalization that makes selected
   operation timing exceed its containing workload wall. Trace row and success
   counts are not implicit workload-unit divisors without a declared unit.
+- The fresh AMD Vulkan release matrix at
+  `bench/out/amd-vulkan/20260809T221600Z/dawn-vs-doe.amd.vulkan.release.json`
+  validates source-bound receipts and independent output oracles for the
+  single-stage release workloads. The multi-stage Monte Carlo and stable-fluids
+  rows remain diagnostic because the current receipt exposes only the final
+  shader manifest and those command graphs do not yet declare per-dispatch
+  output oracles.
+- `reports/claim-index.json` therefore scaffolds the AMD Vulkan native release,
+  AMD package, browser ORT, and Linux Vulkan drop-in rows instead of borrowing
+  older measured status after stricter evidence checks or artifact pruning.
+- `config/dawn-replacement-frontier.json` keeps claimable Apple slices visible
+  but marks their mixed-platform product rows diagnostic while the AMD slices
+  are unindexed; the generated readiness report now passes its coherence gate
+  without treating scaffolded entries as claim evidence.
 - External-project harness schema version 4 replaces one inferred installation
   command with ordered named steps, each owning its working-directory scope and
   timeout. The pinned vGPU workspace and isolated ORT experiment now prepare

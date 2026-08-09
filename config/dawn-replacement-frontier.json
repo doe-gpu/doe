@@ -156,6 +156,33 @@
         "config/webgpu-cts-evidence.json",
         "docs/doe-support-matrix.md"
       ]
+    },
+    {
+      "code": "fresh_strict_source_and_output_oracle_evidence",
+      "exitCriteria": "Publish a fresh strict AMD Vulkan release matrix in which every dispatch binds the executed WGSL/SPIR-V artifacts and passes its declared output oracle.",
+      "evidencePaths": [
+        "bench/native-compare/compare.config.amd.vulkan.release.json",
+        "bench/workloads/workloads.amd.vulkan.json",
+        "docs/status/runtime-backends-and-bench.md"
+      ]
+    },
+    {
+      "code": "amd_vulkan_package_evidence_regeneration",
+      "exitCriteria": "Retain and index fresh AMD Vulkan Node and Bun application-package comparison receipts after strict fairness and reliability gates pass.",
+      "evidencePaths": [
+        "reports/claim-index.json",
+        "packages/doe-gpu/README.md",
+        "docs/status/runtime-backends-and-bench.md"
+      ]
+    },
+    {
+      "code": "fresh_dropin_cutover_rehearsal_evidence",
+      "exitCriteria": "Retain and index a fresh Linux Vulkan drop-in cutover rehearsal with symbol, behavior, benchmark, rollback, and claim-sidecar evidence.",
+      "evidencePaths": [
+        "config/backend-cutover-policy.json",
+        "config/dropin-cutover-rehearsal-receipt.schema.json",
+        "reports/claim-index.json"
+      ]
     }
   ],
   "rows": [
@@ -301,11 +328,9 @@
       "surface": "package_runtime",
       "dawnComparator": "dawn_node_webgpu",
       "doeTarget": "doe-gpu-node",
-      "currentState": "claimable",
-      "claimAllowed": true,
-      "claimIndexEntryIds": [
-        "package-node-apple-metal"
-      ],
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
       "evidencePaths": [
         "reports/claim-index.json",
         "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
@@ -361,7 +386,9 @@
           "notes": "The Node package Linux AMD Vulkan slice is diagnostic until fresh package evidence is retained and indexed."
         }
       ],
-      "blockers": [],
+      "blockers": [
+        "amd_vulkan_package_evidence_regeneration"
+      ],
       "notes": "Node package claims are currently constrained to the claim-indexed Apple Metal package receipt; Linux AMD Vulkan remains diagnostic."
     },
     {
@@ -369,11 +396,9 @@
       "surface": "package_runtime",
       "dawnComparator": "dawn_bun_webgpu",
       "doeTarget": "doe-gpu-bun",
-      "currentState": "claimable",
-      "claimAllowed": true,
-      "claimIndexEntryIds": [
-        "package-bun-apple-metal"
-      ],
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
       "evidencePaths": [
         "reports/claim-index.json",
         "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
@@ -429,7 +454,9 @@
           "notes": "The Bun package Linux AMD Vulkan slice is diagnostic until fresh package evidence is retained and indexed."
         }
       ],
-      "blockers": [],
+      "blockers": [
+        "amd_vulkan_package_evidence_regeneration"
+      ],
       "notes": "Bun package claims are currently constrained to the claim-indexed Apple Metal package receipt; Linux AMD Vulkan remains diagnostic."
     },
     {
@@ -791,11 +818,9 @@
       "surface": "drop_in_runtime",
       "dawnComparator": "libwebgpu_dawn",
       "doeTarget": "libwebgpu_doe",
-      "currentState": "claimable",
-      "claimAllowed": true,
-      "claimIndexEntryIds": [
-        "dropin-cutover-linux-vulkan"
-      ],
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
       "evidencePaths": [
         "config/backend-cutover-policy.json",
         "config/dropin-cutover-rehearsal-receipt.schema.json",
@@ -819,11 +844,9 @@
           "gpuApi": "vulkan",
           "gpuVendor": "amd",
           "runtimeHost": "drop-in",
-          "currentState": "claimable",
-          "claimAllowed": true,
-          "claimIndexEntryIds": [
-            "dropin-cutover-linux-vulkan"
-          ],
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
           "evidencePaths": [
             "config/backend-cutover-policy.json",
             "config/dropin-cutover-rehearsal-receipt.schema.json",
@@ -838,12 +861,16 @@
             "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
             "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json"
           ],
-          "blockers": [],
-          "notes": "The drop-in ABI Linux AMD Vulkan slice is claimable through the indexed cutover rehearsal receipt and AMD Vulkan delegate release claim."
+          "blockers": [
+            "fresh_dropin_cutover_rehearsal_evidence"
+          ],
+          "notes": "The drop-in ABI Linux AMD Vulkan slice is diagnostic until fresh cutover rehearsal evidence is retained and indexed."
         }
       ],
-      "blockers": [],
-      "notes": "Drop-in ABI replacement claims are allowed through the indexed Linux Vulkan cutover rehearsal receipt: the ReleaseFast libwebgpu_doe.so passed symbol, behavior, proc-resolution, and benchmark gates, and the rollback side is hash-bound to the AMD Vulkan Dawn delegate release claim."
+      "blockers": [
+        "fresh_dropin_cutover_rehearsal_evidence"
+      ],
+      "notes": "Drop-in ABI replacement remains diagnostic until a fresh Linux Vulkan cutover rehearsal and its rollback-side evidence are retained and indexed."
     },
     {
       "id": "release-claim-index",

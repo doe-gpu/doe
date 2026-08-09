@@ -150,12 +150,11 @@
       "surface": "native",
       "backend": "amd-vulkan",
       "comparison": "doe-vs-dawn",
-      "metricDirection": "lower-is-better",
-      "claimState": "claim-indexed",
-      "comparisonStatus": "comparable",
-      "claimStatus": "claimable",
-      "reportPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
-      "claimPath": "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.claim.json"
+      "metricDirection": "status-only",
+      "claimState": "scaffolded",
+      "comparisonStatus": "not-evaluated",
+      "claimStatus": "not-evaluated",
+      "blocker": "The fresh AMD Vulkan strict matrix is diagnostic under current source-bound shader and output-oracle checks; this lane remains scaffolded until every release workload satisfies those checks."
     },
     {
       "id": "dropin-cutover-linux-vulkan",

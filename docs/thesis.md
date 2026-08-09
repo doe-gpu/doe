@@ -225,10 +225,10 @@ external application
 -> supported commercial relationship
 ```
 
-This is the moat. Doe accumulates maintained application dependencies,
-hardware evidence, regression history, runtime policy, and explainable
-execution knowledge. Individual features can be reproduced; the governed body
-of real-application behavior and evidence is harder to reproduce.
+This creates compounding defensibility. Doe accumulates maintained application
+dependencies, hardware evidence, regression history, runtime policy, and
+explainable execution knowledge. Individual features can be reproduced; the
+governed body of real-application behavior and evidence is harder to reproduce.
 
 ## Adoption and commercial journey
 
