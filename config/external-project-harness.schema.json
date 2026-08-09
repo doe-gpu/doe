@@ -15,6 +15,7 @@
     "requiredMeasurements",
     "requiredReceiptFields",
     "installation",
+    "reproduction",
     "supportTargets",
     "reliabilityPolicy",
     "performancePolicy",
@@ -22,7 +23,7 @@
     "releasePolicy"
   ],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 2 },
+    "schemaVersion": { "type": "integer", "const": 3 },
     "artifactKind": { "type": "string", "const": "external-project-harness" },
     "actorId": { "$ref": "#/$defs/id" },
     "harnessId": { "$ref": "#/$defs/id" },
@@ -196,7 +197,9 @@
         "applicationSourceUnchanged",
         "shaderSourceUnchanged",
         "installCommand",
-        "validationCommand"
+        "validationCommand",
+        "workingDirectory",
+        "timeoutSeconds"
       ],
       "properties": {
         "substitutionMode": {
@@ -218,6 +221,36 @@
           "type": "array",
           "minItems": 1,
           "items": { "type": "string" }
+        },
+        "workingDirectory": { "$ref": "#/$defs/workingDirectory" },
+        "timeoutSeconds": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "reproduction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerModulePath", "arguments", "evidenceFiles"],
+      "properties": {
+        "providerModulePath": { "$ref": "#/$defs/workspacePath" },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?:[^{}]|\\{(?:actorId|harnessId|runId|runRoot|upstreamRoot|preparationReceipt)\\})*$"
+          }
+        },
+        "evidenceFiles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "path"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "path": { "$ref": "#/$defs/runRelativePath" }
+            }
+          }
         }
       }
     },
@@ -281,11 +314,17 @@
     "receiptPolicy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["captureRequired", "replayRequired", "runtimeBuildIdentityRequired"],
+      "required": [
+        "captureRequired",
+        "replayRequired",
+        "runtimeBuildIdentityRequired",
+        "preparationReceiptRequired"
+      ],
       "properties": {
         "captureRequired": { "type": "boolean", "const": true },
         "replayRequired": { "type": "boolean" },
-        "runtimeBuildIdentityRequired": { "type": "boolean", "const": true }
+        "runtimeBuildIdentityRequired": { "type": "boolean", "const": true },
+        "preparationReceiptRequired": { "type": "boolean", "const": true }
       }
     },
     "releasePolicy": {
@@ -319,6 +358,26 @@
     "repoPath": {
       "type": "string",
       "pattern": "^bench/external-projects/[a-z0-9][a-z0-9-]*/[^/].*$"
+    },
+    "workspacePath": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^{}]+$"
+    },
+    "runRelativePath": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^{}]+$"
+    },
+    "workingDirectory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "path"],
+      "properties": {
+        "scope": { "type": "string", "enum": ["repo", "upstream"] },
+        "path": {
+          "type": "string",
+          "pattern": "^(?:\\.|(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^{}]+)$"
+        }
+      }
     },
     "supportTarget": {
       "type": "object",

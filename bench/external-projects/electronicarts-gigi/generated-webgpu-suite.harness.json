@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "artifactKind": "external-project-harness",
   "actorId": "electronicarts-gigi",
   "harnessId": "generated-webgpu-suite",
@@ -23,7 +23,7 @@
     "providerIdentityAssertion": "A provider probe records the exact selected module and adapter identity before any case; software adapters make the run diagnostic and promotion-ineligible."
   },
   "workload": {
-    "command": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs"],
+    "command": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--require-all-pass"],
     "immutableInputRefs": [
       "bench/external-projects/electronicarts-gigi/oracle.md"
     ],
@@ -65,7 +65,16 @@
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
     "installCommand": ["npm", "install", "webgpu", "pngjs"],
-    "validationCommand": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs"]
+    "validationCommand": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--require-all-pass"],
+    "workingDirectory": { "scope": "upstream", "path": "." },
+    "timeoutSeconds": 1800
+  },
+  "reproduction": {
+    "providerModulePath": "packages/doe-gpu/src/vendor/webgpu/index.js",
+    "arguments": ["--run-id", "{runId}"],
+    "evidenceFiles": [
+      { "id": "raw-suite", "path": "raw-suite.json" }
+    ]
   },
   "supportTargets": [],
   "reliabilityPolicy": {
@@ -93,7 +102,8 @@
   "receiptPolicy": {
     "captureRequired": true,
     "replayRequired": false,
-    "runtimeBuildIdentityRequired": true
+    "runtimeBuildIdentityRequired": true,
+    "preparationReceiptRequired": true
   },
   "releasePolicy": {
     "promotionState": "not-promoted",

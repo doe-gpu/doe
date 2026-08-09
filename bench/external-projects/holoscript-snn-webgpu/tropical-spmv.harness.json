@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "artifactKind": "external-project-harness",
   "actorId": "holoscript-snn-webgpu",
   "harnessId": "tropical-spmv",
@@ -65,7 +65,17 @@
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
     "installCommand": ["npm", "install"],
-    "validationCommand": ["node", "bench/external-projects/holoscript-snn-webgpu/run-matrix.mjs"]
+    "validationCommand": ["node", "bench/external-projects/holoscript-snn-webgpu/run-matrix.mjs"],
+    "workingDirectory": { "scope": "upstream", "path": "." },
+    "timeoutSeconds": 1800
+  },
+  "reproduction": {
+    "providerModulePath": "packages/doe-gpu/src/index.js",
+    "arguments": ["{runRoot}/raw-matrix.json"],
+    "evidenceFiles": [
+      { "id": "raw-matrix", "path": "raw-matrix.json" },
+      { "id": "receipt-summary", "path": "receipt-summary.json" }
+    ]
   },
   "supportTargets": [],
   "reliabilityPolicy": {
@@ -93,7 +103,8 @@
   "receiptPolicy": {
     "captureRequired": true,
     "replayRequired": false,
-    "runtimeBuildIdentityRequired": true
+    "runtimeBuildIdentityRequired": true,
+    "preparationReceiptRequired": true
   },
   "releasePolicy": {
     "promotionState": "not-promoted",

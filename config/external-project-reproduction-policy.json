@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "policyId": "external-project-reproduction/v1",
+  "upstreamRootTemplate": "bench/out/external-projects/{actorId}/upstream",
+  "runRootTemplate": "bench/out/external-projects/{actorId}/{runId}",
+  "sourceCommandTimeoutSeconds": 600,
+  "workloadCommandTimeoutSeconds": 7200,
+  "versionCommands": [
+    {
+      "id": "git",
+      "command": ["git", "--version"],
+      "workingDirectory": ".",
+      "timeoutSeconds": 30
+    },
+    {
+      "id": "node",
+      "command": ["node", "--version"],
+      "workingDirectory": ".",
+      "timeoutSeconds": 30
+    },
+    {
+      "id": "npm",
+      "command": ["npm", "--version"],
+      "workingDirectory": ".",
+      "timeoutSeconds": 30
+    },
+    {
+      "id": "zig",
+      "command": ["zig", "version"],
+      "workingDirectory": ".",
+      "timeoutSeconds": 30
+    }
+  ],
+  "hardwareProbes": {
+    "linux": {
+      "command": {
+        "id": "linux-vulkan-physical-adapter",
+        "command": ["vulkaninfo", "--summary"],
+        "workingDirectory": ".",
+        "timeoutSeconds": 60
+      },
+      "requiredPatterns": [
+        "PHYSICAL_DEVICE_TYPE_(?:INTEGRATED|DISCRETE)_GPU"
+      ],
+      "prohibitedPatterns": []
+    },
+    "darwin": {
+      "command": {
+        "id": "darwin-metal-physical-adapter",
+        "command": ["system_profiler", "SPDisplaysDataType"],
+        "workingDirectory": ".",
+        "timeoutSeconds": 60
+      },
+      "requiredPatterns": [
+        "(?:Metal Support|Metal Family)"
+      ],
+      "prohibitedPatterns": []
+    },
+    "win32": {
+      "command": {
+        "id": "windows-d3d12-physical-adapter",
+        "command": [
+          "powershell",
+          "-NoProfile",
+          "-Command",
+          "Get-CimInstance Win32_VideoController | Select-Object Name,DriverVersion,AdapterCompatibility | ConvertTo-Json"
+        ],
+        "workingDirectory": ".",
+        "timeoutSeconds": 60
+      },
+      "requiredPatterns": [
+        "\\\"Name\\\"\\s*:"
+      ],
+      "prohibitedPatterns": [
+        "Microsoft Basic Render Driver"
+      ]
+    }
+  },
+  "doePreparation": {
+    "commonCommands": [
+      {
+        "id": "build-doe-dropin",
+        "command": ["zig", "build", "dropin", "-Doptimize=ReleaseFast"],
+        "workingDirectory": "runtime/zig",
+        "timeoutSeconds": 1800
+      }
+    ],
+    "platformCommands": {
+      "linux": [
+        {
+          "id": "build-doe-node-addon-linux",
+          "command": ["npm", "run", "build:addon"],
+          "workingDirectory": "packages/doe-gpu",
+          "timeoutSeconds": 600
+        }
+      ],
+      "darwin": [
+        {
+          "id": "build-doe-node-addon-darwin",
+          "command": ["npm", "run", "build:addon"],
+          "workingDirectory": "packages/doe-gpu",
+          "timeoutSeconds": 600
+        }
+      ],
+      "win32": [
+        {
+          "id": "build-doe-node-addon-win32",
+          "command": ["npx", "node-gyp", "rebuild"],
+          "workingDirectory": "packages/doe-gpu",
+          "timeoutSeconds": 900
+        }
+      ]
+    },
+    "commonArtifacts": [
+      {
+        "id": "doe-package-module",
+        "path": "packages/doe-gpu/src/index.js"
+      },
+      {
+        "id": "doe-build-metadata",
+        "path": "runtime/zig/zig-out/share/doe-build-metadata.json"
+      },
+      {
+        "id": "doe-node-addon",
+        "path": "packages/doe-gpu/build/Release/doe_napi.node"
+      }
+    ],
+    "platformArtifacts": {
+      "linux": [
+        {
+          "id": "doe-native-library-linux",
+          "path": "runtime/zig/zig-out/lib/libwebgpu_doe.so"
+        }
+      ],
+      "darwin": [
+        {
+          "id": "doe-native-library-darwin",
+          "path": "runtime/zig/zig-out/lib/libwebgpu_doe.dylib"
+        }
+      ],
+      "win32": [
+        {
+          "id": "doe-native-library-win32",
+          "path": "runtime/zig/zig-out/lib/webgpu_doe.dll"
+        }
+      ]
+    }
+  },
+  "gateCommands": [
+    {
+      "id": "ecosystem-registry-gate",
+      "command": ["python3", "bench/gates/ecosystem_registry_gate.py"],
+      "workingDirectory": ".",
+      "timeoutSeconds": 300
+    },
+    {
+      "id": "external-project-release-gate",
+      "command": ["python3", "bench/gates/external_project_release_gate.py"],
+      "workingDirectory": ".",
+      "timeoutSeconds": 300
+    }
+  ]
+}

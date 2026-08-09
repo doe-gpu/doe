@@ -557,6 +557,72 @@ def _cmd_list(args: argparse.Namespace) -> int:
     return 0
 
 
+def _add_external_action_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--actor", required=True, help="Ecosystem registry actor ID")
+    parser.add_argument("--harness", required=True, help="Actor harness ID")
+    parser.add_argument(
+        "--registry",
+        default="config/ecosystem-registry.json",
+        help="Ecosystem registry path relative to the repository root",
+    )
+    parser.add_argument(
+        "--policy",
+        default="config/external-project-reproduction-policy.json",
+        help="External-project reproduction policy path",
+    )
+    parser.add_argument(
+        "--run-id",
+        default="",
+        help="Stable output run ID; a UTC identifier is generated when omitted",
+    )
+    parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="Forbid network fetches and require the pinned commit locally",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the exact plan without cloning, building, installing, or writing receipts",
+    )
+
+
+def _cmd_external(args: argparse.Namespace) -> int:
+    from bench.external_project_reproduction import (
+        ReproductionError,
+        prepare_external_project,
+        reproduction_plan,
+        reproduce_external_project,
+        resolve_selection,
+    )
+
+    try:
+        selection = resolve_selection(
+            REPO_ROOT,
+            args.actor,
+            args.harness,
+            registry_path=Path(args.registry),
+            policy_path=Path(args.policy),
+            run_id=args.run_id or None,
+        )
+        if args.dry_run:
+            print(json.dumps(reproduction_plan(selection, offline=args.offline), indent=2, sort_keys=True))
+            return 0
+        if args.external_command == "prepare":
+            payload, receipt_path = prepare_external_project(
+                selection, offline=args.offline
+            )
+        else:
+            payload, receipt_path = reproduce_external_project(
+                selection, offline=args.offline
+            )
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, ReproductionError) as exc:
+        print(f"error: external-project {args.external_command} failed: {exc}", file=sys.stderr)
+        return 1
+    print(receipt_path.relative_to(REPO_ROOT))
+    return 0 if payload["status"] == "passed" else 1
+
+
 # ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
@@ -599,6 +665,22 @@ def main() -> int:
     list_parser = subparsers.add_parser("list", help="List products, executors, workloads, or surfaces")
     _add_list_args(list_parser)
 
+    external_parser = subparsers.add_parser(
+        "external",
+        help="Prepare or reproduce a pinned external-project harness",
+    )
+    external_subparsers = external_parser.add_subparsers(
+        dest="external_command", required=True
+    )
+    external_prepare_parser = external_subparsers.add_parser(
+        "prepare", help="Clone, pin, install, build Doe, and emit a preparation receipt"
+    )
+    _add_external_action_args(external_prepare_parser)
+    external_reproduce_parser = external_subparsers.add_parser(
+        "reproduce", help="Prepare, gate, run the harness, and emit a reproduction receipt"
+    )
+    _add_external_action_args(external_reproduce_parser)
+
     if argv and argv[0] == "compare":
         compare_parser = argparse.ArgumentParser(
             prog="doe-bench compare",
@@ -625,6 +707,8 @@ def main() -> int:
         return _cmd_claim(args)
     if args.command == "list":
         return _cmd_list(args)
+    if args.command == "external":
+        return _cmd_external(args)
     return 1
 
 

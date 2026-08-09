@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "artifactKind": "external-project-harness",
   "actorId": "electronicarts-cpp-ml-intro",
   "harnessId": "mnist-webgpu-demo",
@@ -76,7 +76,17 @@
       "webgpu@0.4.0",
       "pngjs@7.0.0"
     ],
-    "validationCommand": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"]
+    "validationCommand": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"],
+    "workingDirectory": { "scope": "repo", "path": "." },
+    "timeoutSeconds": 1800
+  },
+  "reproduction": {
+    "providerModulePath": "packages/doe-gpu/src/index.js",
+    "arguments": ["--run-id", "{runId}"],
+    "evidenceFiles": [
+      { "id": "raw-suite", "path": "raw-suite.json" },
+      { "id": "receipt-summary", "path": "receipt-summary.json" }
+    ]
   },
   "supportTargets": [],
   "reliabilityPolicy": {
@@ -104,7 +114,8 @@
   "receiptPolicy": {
     "captureRequired": true,
     "replayRequired": false,
-    "runtimeBuildIdentityRequired": true
+    "runtimeBuildIdentityRequired": true,
+    "preparationReceiptRequired": true
   },
   "releasePolicy": {
     "promotionState": "not-promoted",

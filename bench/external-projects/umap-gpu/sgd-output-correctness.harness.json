@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "artifactKind": "external-project-harness",
   "actorId": "umap-gpu",
   "harnessId": "sgd-output-correctness",
@@ -66,7 +66,17 @@
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
     "installCommand": ["npm", "ci"],
-    "validationCommand": ["node", "bench/external-projects/umap-gpu/run-suite.mjs", "--require-all-pass"]
+    "validationCommand": ["node", "bench/external-projects/umap-gpu/run-suite.mjs", "--require-all-pass"],
+    "workingDirectory": { "scope": "upstream", "path": "." },
+    "timeoutSeconds": 1800
+  },
+  "reproduction": {
+    "providerModulePath": "packages/doe-gpu/src/index.js",
+    "arguments": ["--run-id", "{runId}"],
+    "evidenceFiles": [
+      { "id": "raw-suite", "path": "raw-suite.json" },
+      { "id": "receipt-summary", "path": "receipt-summary.json" }
+    ]
   },
   "supportTargets": [],
   "reliabilityPolicy": {
@@ -94,7 +104,8 @@
   "receiptPolicy": {
     "captureRequired": true,
     "replayRequired": false,
-    "runtimeBuildIdentityRequired": true
+    "runtimeBuildIdentityRequired": true,
+    "preparationReceiptRequired": true
   },
   "releasePolicy": {
     "promotionState": "not-promoted",

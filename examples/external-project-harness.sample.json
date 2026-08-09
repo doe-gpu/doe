@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "artifactKind": "external-project-harness",
   "actorId": "sample-actor",
   "harnessId": "sample-workload",
@@ -72,7 +72,17 @@
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
     "installCommand": ["npm", "install", "doe-gpu"],
-    "validationCommand": ["npm", "test", "--", "sample-workload"]
+    "validationCommand": ["npm", "test", "--", "sample-workload"],
+    "workingDirectory": { "scope": "upstream", "path": "." },
+    "timeoutSeconds": 1800
+  },
+  "reproduction": {
+    "providerModulePath": "packages/doe-gpu/src/index.js",
+    "arguments": ["--run-id", "{runId}"],
+    "evidenceFiles": [
+      { "id": "raw-suite", "path": "raw-suite.json" },
+      { "id": "receipt-summary", "path": "receipt-summary.json" }
+    ]
   },
   "supportTargets": [
     {
@@ -110,7 +120,8 @@
   "receiptPolicy": {
     "captureRequired": true,
     "replayRequired": true,
-    "runtimeBuildIdentityRequired": true
+    "runtimeBuildIdentityRequired": true,
+    "preparationReceiptRequired": true
   },
   "releasePolicy": {
     "promotionState": "candidate",
