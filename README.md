@@ -4,13 +4,32 @@
   <img src="assets/doe-logo.svg" alt="Doe logo" width="96" />
 </p>
 
-Doe is a native WebGPU compute runtime and compiler for applications that
-control their GPU provider. The promoted developer wedge is deliberately
+Doe is a source-preserving WebGPU compute runtime and compiler for applications
+that control their GPU provider. The promoted developer wedge is deliberately
 narrow: Node and Bun workloads that Doe can run correctly, reliably, and
 materially faster than a declared incumbent on a declared support matrix.
 
 Receipts, replay, deterministic artifacts, and runtime policy prove those
 properties. They do not substitute for them.
+
+## What Doe is
+
+The long-term product is a receipt-backed local compute plane for AI workloads
+and autonomous software. A versioned workload enters under explicit policy;
+Doe selects or enforces the provider, executes it, independently validates the
+result, and returns a receipt describing what actually ran.
+
+Doe is the strategy driver. Doppler, Dream, Columbo/Valera, Reploid/Poolday,
+Cerebras, Chromium/Fawn, and outside projects are collaborators, workload
+sources, design partners, proofs, hosts, baselines, or competitors. Doe owns
+the runtime, compiler, workload contract, execution policy, evidence, and
+release decision. The full Doe-first strategy is in
+[`docs/thesis.md`](docs/thesis.md).
+
+Node, Bun, Electron, and controlled CI are the first execution surfaces.
+Chromium is a future Doe-led browser substrate: begin beneath the WebGPU/Dawn
+seam, then earn adjacent GPU-heavy browser work with separate evidence. Doe
+is not an agent SDK, browser automation framework, or general Chromium fork.
 
 The complete product strategy lives in
 [`docs/thesis.md`](docs/thesis.md). Other documentation defines contracts,
@@ -42,6 +61,19 @@ performance claims.
 
 Read the claim index and sidecar before repeating any measured result.
 
+The latest physical backend evidence is cumulative and remains diagnostic:
+
+- Metal: Doe and Dawn separately ran an output-oracled workload on a physical
+  Apple M3; see [`bench/out/recomposition/backend-evidence-inputs/metal.json`](bench/out/recomposition/backend-evidence-inputs/metal.json).
+- Vulkan: the corresponding AMD host capture is in
+  [`reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic.json`](reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic.json).
+- D3D12: no physical Windows capture yet.
+
+The merged evidence is
+[`runtime/zig/reports/recomposition/backend-evidence.json`](runtime/zig/reports/recomposition/backend-evidence.json).
+Do not interpret one Metal or Vulkan capture as a general Doe performance
+claim.
+
 ## Repository map
 
 - `packages/doe-gpu/`: public npm package
@@ -60,6 +92,26 @@ Read the claim index and sidecar before repeating any measured result.
 - [Support matrix](docs/doe-support-matrix.md)
 - [Current status](docs/status.md)
 - [Documentation index](docs/INDEX.md)
+
+## How to iterate
+
+1. Choose one named workload and one correctness or performance question.
+2. Change `runtime/zig/` or `packages/doe-gpu/`; keep provider selection
+   explicit and do not add fallback just to make a lane pass.
+3. Run the smallest relevant correctness test, then the physical backend lane:
+
+   ```bash
+   python3 bench/runners/run_recomposition_backend_evidence.py --backend metal
+   python3 bench/runners/run_recomposition_backend_evidence.py --backend vulkan
+   python3 bench/runners/run_recomposition_backend_evidence.py --backend d3d12
+   ```
+
+4. Inspect the raw receipt and merged classification. Correctness and
+   equivalent work come before timing.
+5. Run the gates for the changed surface and update its live status page.
+
+The governing order is `Mine -> Normalize -> Verify -> Bind -> Gate ->
+Benchmark -> Release`, defined in [`docs/process.md`](docs/process.md).
 
 Browser replacement and spatial-compute targets remain expansion lanes. They do
 not broaden the current Node/Bun support claim.

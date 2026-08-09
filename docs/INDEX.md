@@ -3,11 +3,15 @@
 Use this page to find the owner of a subject. Live measurements and mutable
 state belong in artifacts, schemas, and status front doors—not copied prose.
 
+The root [`README.md`](../README.md) is the project orientation and first
+entry point. This index is for finding detail after the project shape and
+evidence boundaries are clear.
+
 ## Canonical strategy
 
-- [`thesis.md`](thesis.md): the single product strategy; objective, priorities,
-  Node/Bun wedge, downstream portfolio and flywheel, commercial journey, and
-  expansion boundaries
+- [`thesis.md`](thesis.md): the single Doe-first product strategy; verifiable
+  local compute vision, owned tracks, supporting-project roles, Node/Bun wedge,
+  downstream portfolio, browser path, and expansion boundaries
 
 ## Product and project contracts
 
