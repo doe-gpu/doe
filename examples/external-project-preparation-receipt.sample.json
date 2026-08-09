@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-preparation-receipt",
+  "generatedAt": "2026-08-09T00:00:00Z",
+  "actorId": "sample-actor",
+  "harnessId": "sample-workload",
+  "runId": "sample-run",
+  "status": "passed",
+  "failure": null,
+  "source": {
+    "repositoryUrl": "https://github.com/example/sample",
+    "requestedCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "actualCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "originUrl": "https://github.com/example/sample",
+    "upstreamRoot": "bench/out/external-projects/sample-actor/upstream",
+    "clean": true
+  },
+  "contracts": [
+    {
+      "id": "ecosystem-registry",
+      "path": "config/ecosystem-registry.json",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sizeBytes": 1
+    },
+    {
+      "id": "harness-manifest",
+      "path": "bench/external-projects/sample-actor/sample.harness.json",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sizeBytes": 1
+    },
+    {
+      "id": "reproduction-policy",
+      "path": "config/external-project-reproduction-policy.json",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "sizeBytes": 1
+    }
+  ],
+  "host": {
+    "platform": "linux",
+    "operatingSystem": "Linux",
+    "machine": "x86_64",
+    "release": "sample",
+    "python": "3.12.0"
+  },
+  "toolVersions": [],
+  "hardware": {
+    "status": "passed",
+    "requiredPatterns": ["PHYSICAL_DEVICE_TYPE_DISCRETE_GPU"],
+    "prohibitedPatterns": [],
+    "probe": null
+  },
+  "supportTarget": {
+    "status": "unmatched",
+    "targetId": null,
+    "claimEligible": false
+  },
+  "steps": [],
+  "artifacts": [],
+  "receiptSha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+}

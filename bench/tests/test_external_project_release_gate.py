@@ -3,9 +3,16 @@
 from __future__ import annotations
 
 import unittest
+import hashlib
+import json
+import tempfile
 from pathlib import Path
 
-from bench.gates.external_project_release_gate import _floor_failures, evaluate
+from bench.gates.external_project_release_gate import (
+    _floor_failures,
+    _preparation_receipt_failures,
+    evaluate,
+)
 from bench.lib.ecosystem_registry import load_json_object
 
 
@@ -35,6 +42,7 @@ class ExternalProjectReleaseGateTests(unittest.TestCase):
     def test_diagnostic_harness_cannot_satisfy_promotion_floor(self) -> None:
         actor = self.registry["actors"][0]
         failures = _floor_failures(
+            REPO_ROOT,
             actor,
             self.holo_manifest,
             {},
@@ -49,6 +57,92 @@ class ExternalProjectReleaseGateTests(unittest.TestCase):
         self.assertIn("replay_not_required", codes)
         self.assertIn("release_command_not_blocking", codes)
         self.assertIn("missing_promotion_report", codes)
+
+    def test_promotion_requires_preparation_receipt(self) -> None:
+        actor = self.registry["actors"][0]
+        manifest = dict(self.holo_manifest)
+        manifest["receiptPolicy"] = dict(manifest["receiptPolicy"])
+        manifest["receiptPolicy"]["preparationReceiptRequired"] = False
+
+        failures = _floor_failures(
+            REPO_ROOT,
+            actor,
+            manifest,
+            {},
+            self.policy["promotionFloor"],
+            "actors[0].harnesses[0]",
+        )
+
+        self.assertIn(
+            "preparation_receipt_not_required",
+            {item["code"] for item in failures},
+        )
+
+    def test_promotion_report_requires_valid_claim_eligible_preparation(self) -> None:
+        actor = {"id": "sample-actor"}
+        manifest = {"harnessId": "sample-harness"}
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            receipt_path = (
+                root
+                / "bench/out/external-projects/sample-actor/run/preparation.json"
+            )
+            receipt_path.parent.mkdir(parents=True)
+            receipt = {
+                "artifactKind": "external-project-preparation-receipt",
+                "actorId": "sample-actor",
+                "harnessId": "sample-harness",
+                "status": "passed",
+                "source": {"actualCommit": "a" * 40},
+                "supportTarget": {"claimEligible": True},
+            }
+            receipt["receiptSha256"] = hashlib.sha256(
+                json.dumps(
+                    receipt,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest()
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            relative_path = receipt_path.relative_to(root).as_posix()
+            report = {
+                "reportId": "sample-report",
+                "upstream": {"commit": "a" * 40},
+                "receipts": [
+                    {
+                        "path": relative_path,
+                        "sha256": hashlib.sha256(receipt_path.read_bytes()).hexdigest(),
+                    }
+                ],
+            }
+
+            self.assertEqual(
+                _preparation_receipt_failures(
+                    root,
+                    actor,
+                    manifest,
+                    report,
+                    "reports.sample-report",
+                ),
+                [],
+            )
+
+            receipt["supportTarget"]["claimEligible"] = False
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            report["receipts"][0]["sha256"] = hashlib.sha256(
+                receipt_path.read_bytes()
+            ).hexdigest()
+            failures = _preparation_receipt_failures(
+                root,
+                actor,
+                manifest,
+                report,
+                "reports.sample-report",
+            )
+            self.assertIn(
+                "invalid_preparation_receipt",
+                {item["code"] for item in failures},
+            )
 
 
 if __name__ == "__main__":

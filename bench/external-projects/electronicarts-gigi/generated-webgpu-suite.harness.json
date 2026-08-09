@@ -64,7 +64,14 @@
     "productionStatus": "harness-only",
     "applicationSourceUnchanged": true,
     "shaderSourceUnchanged": true,
-    "installCommand": ["npm", "install", "webgpu", "pngjs"],
+    "installCommand": [
+      "npm",
+      "install",
+      "--no-save",
+      "--no-package-lock",
+      "webgpu",
+      "pngjs"
+    ],
     "validationCommand": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--require-all-pass"],
     "workingDirectory": { "scope": "upstream", "path": "." },
     "timeoutSeconds": 1800

@@ -34,6 +34,18 @@
       "data": "examples/external-project-harness.sample.json"
     },
     {
+      "schema": "config/external-project-reproduction-policy.schema.json",
+      "data": "config/external-project-reproduction-policy.json"
+    },
+    {
+      "schema": "config/external-project-preparation-receipt.schema.json",
+      "data": "examples/external-project-preparation-receipt.sample.json"
+    },
+    {
+      "schema": "config/external-project-reproduction-receipt.schema.json",
+      "data": "examples/external-project-reproduction-receipt.sample.json"
+    },
+    {
       "schema": "config/ecosystem-report.schema.json",
       "data": "examples/ecosystem-report.sample.json"
     },
@@ -1244,6 +1256,16 @@
     {
       "schema": "config/external-project-harness.schema.json",
       "glob": "bench/external-projects/*/*.harness.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/external-project-preparation-receipt.schema.json",
+      "glob": "bench/out/external-projects/*/*/preparation.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/external-project-reproduction-receipt.schema.json",
+      "glob": "bench/out/external-projects/*/*/reproduction.json",
       "allowEmpty": true
     },
     {

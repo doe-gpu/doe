@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -46,7 +47,109 @@ def _failure(code: str, path: str, message: str) -> dict[str, str]:
     return {"code": code, "path": path, "message": message}
 
 
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _payload_sha256(payload: dict[str, Any]) -> str:
+    normalized = dict(payload)
+    normalized.pop("receiptSha256", None)
+    content = json.dumps(
+        normalized,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(content).hexdigest()
+
+
+def _preparation_receipt_failures(
+    root: Path,
+    actor: dict[str, Any],
+    manifest: dict[str, Any],
+    report: dict[str, Any],
+    path: str,
+) -> list[dict[str, str]]:
+    references = [
+        reference
+        for reference in report.get("receipts", [])
+        if isinstance(reference, dict)
+        and isinstance(reference.get("path"), str)
+        and reference["path"].endswith("/preparation.json")
+    ]
+    if not references:
+        return [
+            _failure(
+                "promotion_report_missing_preparation_receipt",
+                path,
+                f"report {report.get('reportId')} must reference preparation.json",
+            )
+        ]
+
+    invalid_references: list[dict[str, str]] = []
+    resolved_root = root.resolve()
+    for index, reference in enumerate(references):
+        reference_path = f"{path}.receipts[{index}]"
+        receipt_path = (resolved_root / reference["path"]).resolve()
+        try:
+            receipt_path.relative_to(resolved_root)
+        except ValueError:
+            invalid_references.append(
+                _failure(
+                    "preparation_receipt_path_escape",
+                    reference_path,
+                    "preparation receipt path escapes the repository root",
+                )
+            )
+            continue
+        try:
+            file_sha256 = _sha256_file(receipt_path)
+            receipt = load_json_object(receipt_path)
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+            invalid_references.append(
+                _failure(
+                    "invalid_preparation_receipt",
+                    reference_path,
+                    str(exc),
+                )
+            )
+            continue
+        errors: list[str] = []
+        if file_sha256 != reference.get("sha256"):
+            errors.append("referenced file hash does not match")
+        if receipt.get("receiptSha256") != _payload_sha256(receipt):
+            errors.append("embedded receipt hash does not match")
+        if receipt.get("artifactKind") != "external-project-preparation-receipt":
+            errors.append("artifact kind is not a preparation receipt")
+        if receipt.get("status") != "passed":
+            errors.append("preparation status is not passed")
+        if receipt.get("actorId") != actor.get("id"):
+            errors.append("actor identity does not match")
+        if receipt.get("harnessId") != manifest.get("harnessId"):
+            errors.append("harness identity does not match")
+        if receipt.get("source", {}).get("actualCommit") != report.get(
+            "upstream", {}
+        ).get("commit"):
+            errors.append("upstream commit does not match the report")
+        if receipt.get("supportTarget", {}).get("claimEligible") is not True:
+            errors.append("support target is not claim eligible")
+        if not errors:
+            return []
+        invalid_references.append(
+            _failure(
+                "invalid_preparation_receipt",
+                reference_path,
+                "; ".join(errors),
+            )
+        )
+    return invalid_references
+
+
 def _floor_failures(
+    root: Path,
     actor: dict[str, Any],
     manifest: dict[str, Any],
     reports_by_id: dict[str, dict[str, Any]],
@@ -101,6 +204,14 @@ def _floor_failures(
         failures.append(_failure("replay_not_required", path, "promoted workloads must require receipt replay"))
     if not receipt_policy.get("runtimeBuildIdentityRequired"):
         failures.append(_failure("runtime_identity_not_required", path, "promoted workloads must bind the runtime build identity"))
+    if not receipt_policy.get("preparationReceiptRequired"):
+        failures.append(
+            _failure(
+                "preparation_receipt_not_required",
+                path,
+                "promoted workloads must require a matching preparation receipt",
+            )
+        )
 
     release_policy = manifest.get("releasePolicy", {})
     if not release_policy.get("blocking") or not release_policy.get("command"):
@@ -123,6 +234,15 @@ def _floor_failures(
             failures.append(_failure("promotion_report_not_claimable", path, f"report {report_id} does not meet evidence maturity floor"))
         if assessment.get("eligibility") != "eligible" or failed_gates:
             failures.append(_failure("promotion_report_ineligible", path, f"report {report_id} has non-passing gates: {', '.join(failed_gates)}"))
+        failures.extend(
+            _preparation_receipt_failures(
+                root,
+                actor,
+                manifest,
+                report,
+                f"{path}.releasePolicy.promotionReportIds[{report_id}]",
+            )
+        )
     return failures
 
 
@@ -163,6 +283,7 @@ def evaluate(root: Path, registry: dict[str, Any], policy: dict[str, Any]) -> di
             promoted_harness_count += 1
             failures.extend(
                 _floor_failures(
+                    root,
                     actor,
                     manifest,
                     reports_by_id,
