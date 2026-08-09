@@ -1,6 +1,6 @@
 {
   "approval": {
-    "reason": "Approve the architecture recomposition surface plus the pinned-header WebGPU ABI generation boundary and upstream record/callback/opaque-handle aliases. The only exported C symbol change remains the additive doeNativeShaderModuleGetBindingsForEntryPoint extension, while normalized commands, errors, WGSL outputs, traces, and replay remain equivalent.",
+    "reason": "Approve the architecture recomposition surface plus the pinned-header WebGPU ABI generation boundary and upstream record/callback/opaque-handle aliases. The only exported C symbol change remains the additive doeNativeShaderModuleGetBindingsForEntryPoint extension, while normalized commands, errors, canonical WGSL IR, target outputs, traces, and replay remain equivalent.",
     "surfaces": [
       "exported-symbols",
       "public-api"
@@ -1722,7 +1722,7 @@
         ]
       ],
       "baselineSha256": "e339715917b0d5c7c72602696160687f2a6ee4839b4146eadcf7f9e4a5147ef8",
-      "currentSha256": "68b4f24113b70fef77cb9b80719ef683f450470f25073e732ef7a738bded8e37",
+      "currentSha256": "24118f5604b12ad69dd39abee8e402593499551a808cb3626854c806d0545a02",
       "removed": [
         [
           "src/backend/backend_runtime.zig",
@@ -2176,7 +2176,7 @@
         "doeNativeShaderModuleGetBindingsForEntryPoint"
       ],
       "baselineSha256": "bf78d77ef41320140333ed1cba66025443cbc0574a8a904ff98a01703ffa3c17",
-      "currentSha256": "46fc902f62e6bb6cd5747e5ffcc495f8d5379e70bd955ab926ad5fdb3cb947f3",
+      "currentSha256": "d0685766440bd96cc06dbe9b975d48375bdc177f9a0bb249947cf9fffa21ebc4",
       "removed": [],
       "surface": "exported-symbols"
     }

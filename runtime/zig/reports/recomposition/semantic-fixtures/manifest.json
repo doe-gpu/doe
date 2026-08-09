@@ -172,7 +172,7 @@
       },
       {
         "path": "src/compiler/wgsl/ir/ir_digest.zig",
-        "sha256": "6470ebe184a20539a299a673b58f8ae2c7e8151bf9d42d93504b9d530a46f86c"
+        "sha256": "f1809e1fd75b5d94087ae0187ffc418c4dcfb9082ac9ce05038e97e71983f031"
       }
     ],
     "status": "installed"
@@ -214,7 +214,7 @@
   },
   "wgsl": {
     "input": "wgsl-input.wgsl",
-    "irDigest": "6285d665501c6e717ed3b9dbb28886ac027b21b17e2411a835ba52956b04f47f",
+    "irDigest": "efe442933b781cbfa0a7e38f7381b21ec210de00888ee829150d89e002c062d0",
     "outputs": [
       "wgsl-output.csl",
       "wgsl-output.hlsl",

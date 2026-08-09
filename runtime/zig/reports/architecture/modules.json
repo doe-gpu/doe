@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "ccdef4b5f309705f29bf987b85e4230ed63b54d5ebbf7244f02683119233e377",
+  "manifestSha256": "ddcd15a86a77b56548b6638ed85dd34d0b70fa0b98cbab0fe57fd13d3b694cbf",
   "modules": [
     {
       "containsCImport": false,
@@ -22218,7 +22218,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 122,
+      "lineCount": 143,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_digest.zig",
@@ -22245,9 +22245,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "6470ebe184a20539a299a673b58f8ae2c7e8151bf9d42d93504b9d530a46f86c",
-      "testBlockCount": 1,
-      "topLevelDeclarationCount": 10
+      "sha256": "f1809e1fd75b5d94087ae0187ffc418c4dcfb9082ac9ce05038e97e71983f031",
+      "testBlockCount": 2,
+      "topLevelDeclarationCount": 11
     },
     {
       "containsCImport": false,
@@ -51914,5 +51914,5 @@
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c"
+  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410"
 }

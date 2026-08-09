@@ -118322,12 +118322,12 @@
           "contractTokenSha256": "5c0fefe5a9a93ad600fd17574d3d21dc8a1b124bdacc5a5260b020c47c1772c8",
           "endLine": 23,
           "kind": "function",
-          "literalTokenSha256": "1e8ad4d5d51b5e661eee493ee3819416a023f3715bf9680b6cb2491bbfb577b7",
+          "literalTokenSha256": "12723d9e9636960058a034878c4361e5862425c099aa321413b1d580cbbcc22c",
           "literalTokens": [
-            "\"doe-wgsl-ir-v1\\x00\""
+            "\"doe-wgsl-ir-v2\\x00\""
           ],
           "name": "compute",
-          "normalizedTokenSha256": "44d77d414d5f059808c72b111199cf56a73709f6b91fe2e2f9af40ce59aa480c",
+          "normalizedTokenSha256": "8744e6d6f5023c6a544daba9a2c144f6b3b119ec0fbaa83d83d708e84e0e0b23",
           "public": true,
           "startLine": 16,
           "switchTags": [],
@@ -118380,7 +118380,7 @@
         },
         {
           "contractTokenSha256": "516ce5d88a09eda7ee52086c061f4373fb4cabfd2823d06cbca54d861c20a1a4",
-          "endLine": 107,
+          "endLine": 106,
           "kind": "function",
           "literalTokenSha256": "9b094b6ec51dea7e15b5ee85c95a4c2a193deedb51647207725fec3e4b6226ca",
           "literalTokens": [
@@ -118394,7 +118394,7 @@
             "\"WGSL IR digest has no semantic encoding for \""
           ],
           "name": "hashValue",
-          "normalizedTokenSha256": "27b031563f87e7d057acb792f84bf1128010a83bd4d917bdacfb5127117c95a7",
+          "normalizedTokenSha256": "a9b564d32f818d50ca6be1cd25d41a5aa2f34526935b4c6d6d8e39fc8334c536",
           "public": false,
           "startLine": 48,
           "switchTags": [
@@ -118414,11 +118414,11 @@
             "update",
             "void"
           ],
-          "tokenCount": 506
+          "tokenCount": 496
         },
         {
           "contractTokenSha256": "61ac85c87eb0560640c3167c5c6e344f8cc1d513c9c5e4525cad581bd08fa087",
-          "endLine": 122,
+          "endLine": 121,
           "kind": "test",
           "literalTokenSha256": "1fb80193da2161a8d04a7bce26b17246ef43405012f269163d9ca826f7835c83",
           "literalTokens": [
@@ -118428,9 +118428,26 @@
           "name": null,
           "normalizedTokenSha256": "61ac85c87eb0560640c3167c5c6e344f8cc1d513c9c5e4525cad581bd08fa087",
           "public": false,
-          "startLine": 109,
+          "startLine": 108,
           "switchTags": [],
           "tokenCount": 186
+        },
+        {
+          "contractTokenSha256": "52080e1d899008fbf20bb70650238694154a279e389479c987d763c0f17dfa5e",
+          "endLine": 143,
+          "kind": "test",
+          "literalTokenSha256": "00cf3608cb56488ea6cac4e0fda0ac0598c9c0174b6aed9f9171da900cbcfdbb",
+          "literalTokens": [
+            "\"canonical IR digest excludes compiler-generated anonymous type names\"",
+            "6",
+            "6"
+          ],
+          "name": null,
+          "normalizedTokenSha256": "52080e1d899008fbf20bb70650238694154a279e389479c987d763c0f17dfa5e",
+          "public": false,
+          "startLine": 123,
+          "switchTags": [],
+          "tokenCount": 158
         }
       ],
       "parseErrorCount": 0,
@@ -246965,11 +246982,11 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "ccdef4b5f309705f29bf987b85e4230ed63b54d5ebbf7244f02683119233e377",
+  "manifestSha256": "ddcd15a86a77b56548b6638ed85dd34d0b70fa0b98cbab0fe57fd13d3b694cbf",
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c",
+  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410",
   "status": "captured",
   "tool": "tools/source_ast_inventory.zig",
   "toolSha256": "df0a1d5a086cf2191cdda3f252de5109fcdac9075c8fe0e9487e690787ab8a7c"

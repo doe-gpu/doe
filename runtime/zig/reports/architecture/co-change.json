@@ -1,11 +1,11 @@
 {
   "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
-  "commitsConsidered": 143,
+  "commitsConsidered": 145,
   "commitsExcludedAsMassChange": 1,
   "commitsExcludedAsPureRename": 0,
-  "historyHead": "9d3a1553f1d3fea131ba7b6cb09aba1082314974",
+  "historyHead": "4d5c54e533760593a3f475823994595219b44a7b",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "ccdef4b5f309705f29bf987b85e4230ed63b54d5ebbf7244f02683119233e377",
+  "manifestSha256": "ddcd15a86a77b56548b6638ed85dd34d0b70fa0b98cbab0fe57fd13d3b694cbf",
   "minimumPairCount": 3,
   "pairTruncationLimit": 1000,
   "pairs": [
@@ -233,31 +233,31 @@
     },
     {
       "coChangeCount": 9,
-      "coupling": 1.0,
+      "coupling": 0.9,
       "left": "src/backend/backend_iface.zig",
       "right": "src/backend/backend_runtime.zig"
     },
     {
       "coChangeCount": 9,
-      "coupling": 1.0,
+      "coupling": 0.9,
       "left": "src/backend/backend_iface.zig",
       "right": "src/backend/d3d12/mod.zig"
     },
     {
       "coChangeCount": 9,
-      "coupling": 1.0,
+      "coupling": 0.9,
       "left": "src/backend/backend_iface.zig",
       "right": "src/backend/dawn_delegate_backend.zig"
     },
     {
       "coChangeCount": 9,
-      "coupling": 1.0,
+      "coupling": 0.9,
       "left": "src/backend/backend_iface.zig",
       "right": "src/backend/metal/mod.zig"
     },
     {
       "coChangeCount": 9,
-      "coupling": 1.0,
+      "coupling": 0.9,
       "left": "src/backend/backend_iface.zig",
       "right": "src/backend/vulkan/mod.zig"
     },
@@ -2358,18 +2358,6 @@
     {
       "coChangeCount": 5,
       "coupling": 0.555556,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/backend/vulkan/native_runtime.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.555556,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
-    },
-    {
-      "coChangeCount": 5,
-      "coupling": 0.555556,
       "left": "src/backend/backend_telemetry.zig",
       "right": "src/backend/metal/mod.zig"
     },
@@ -2468,6 +2456,18 @@
       "coupling": 0.555556,
       "left": "src/backend/metal/metal_kernel_dispatch.zig",
       "right": "src/backend/metal/metal_runtime_resources.zig"
+    },
+    {
+      "coChangeCount": 5,
+      "coupling": 0.5,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/backend/vulkan/native_runtime.zig"
+    },
+    {
+      "coChangeCount": 5,
+      "coupling": 0.5,
+      "left": "src/backend/backend_iface.zig",
+      "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
     },
     {
       "coChangeCount": 5,
@@ -5862,66 +5862,6 @@
     {
       "coChangeCount": 4,
       "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/backend/d3d12/d3d12_native_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/backend/metal/metal_native_runtime.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/backend/vulkan/vk_pipeline.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/backend/vulkan/vk_resources.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/backend/vulkan/vk_upload.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/backend/vulkan/vulkan_surface.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/core/resource/wgpu_resources.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/dropin/dropin_abi_procs.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/full/render/wgpu_render_commands.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
-      "left": "src/backend/backend_iface.zig",
-      "right": "src/full/render/wgpu_render_resources.zig"
-    },
-    {
-      "coChangeCount": 4,
-      "coupling": 0.444444,
       "left": "src/backend/backend_telemetry.zig",
       "right": "src/backend/dawn_delegate_backend.zig"
     },
@@ -6008,11 +5948,71 @@
       "coupling": 0.444444,
       "left": "src/backend/d3d12/d3d12_formats.zig",
       "right": "src/backend/d3d12/d3d12_native_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/d3d12_formats.zig",
+      "right": "src/backend/metal/metal_native_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/d3d12_formats.zig",
+      "right": "src/backend/metal/mod.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/d3d12_formats.zig",
+      "right": "src/backend/vulkan/native_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/d3d12_formats.zig",
+      "right": "src/backend/vulkan/vk_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/d3d12_formats.zig",
+      "right": "src/backend/vulkan/vk_render_pipeline.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/d3d12_formats.zig",
+      "right": "src/core/resource/wgpu_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/d3d12_formats.zig",
+      "right": "src/full/lifecycle/wgpu_async_diagnostics_command.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/d3d12_formats.zig",
+      "right": "src/full/render/wgpu_render_resources.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/d3d12/mod.zig",
+      "right": "src/backend/metal/metal_dispatch_runtime.zig"
+    },
+    {
+      "coChangeCount": 4,
+      "coupling": 0.444444,
+      "left": "src/backend/metal/metal_bridge_decls.zig",
+      "right": "src/backend/metal/metal_dispatch_runtime.zig"
     }
   ],
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c",
+  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410",
   "status": "diagnostic-only"
 }

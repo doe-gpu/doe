@@ -18,7 +18,7 @@
     "sourceBinding": "verified-git-snapshot",
     "status": "captured"
   },
-  "baselineId": "120cf1eb772141464de0eea2fd269305ddc0a042eeca63513e5444d4f2687af1",
+  "baselineId": "04de37870ef1bd89da1e0e76ae0f10e8322db02859ec7188734dd0f79c025590",
   "baselineKind": "structural-recomposition",
   "behaviorCapture": {
     "backendCapabilities": "not-captured",
@@ -72,12 +72,12 @@
         },
         {
           "path": "src/compiler/wgsl/ir/ir_digest.zig",
-          "sha256": "6470ebe184a20539a299a673b58f8ae2c7e8151bf9d42d93504b9d530a46f86c"
+          "sha256": "f1809e1fd75b5d94087ae0187ffc418c4dcfb9082ac9ce05038e97e71983f031"
         }
       ],
       "status": "installed"
     },
-    "manifestSha256": "558e7924388f6accdebf847e11527358f2dbdd2368fa84d9651507d9aa2e9b2a",
+    "manifestSha256": "fe19def943581962cdb4a89f12fb3dda11bc1f9e833b5c79f14a9588f7833db5",
     "replayStatus": "passed",
     "sharedLibraries": [
       {
@@ -96,7 +96,7 @@
       }
     ],
     "status": "captured",
-    "wgslIrDigest": "6285d665501c6e717ed3b9dbb28886ac027b21b17e2411a835ba52956b04f47f"
+    "wgslIrDigest": "efe442933b781cbfa0a7e38f7381b21ec210de00888ee829150d89e002c062d0"
   },
   "sourceTreeSha256": "7d4857fdf9d8c0107426915fef3f283107f335cea713d37ad8b5cff8813d671d",
   "toolchain": {

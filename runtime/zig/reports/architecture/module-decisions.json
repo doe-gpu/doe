@@ -3340,9 +3340,9 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "6470ebe184a20539a299a673b58f8ae2c7e8151bf9d42d93504b9d530a46f86c",
+      "moduleSha256": "f1809e1fd75b5d94087ae0187ffc418c4dcfb9082ac9ce05038e97e71983f031",
       "path": "src/compiler/wgsl/ir/ir_digest.zig",
-      "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+      "reason": "Keep: canonical schema-value WGSL IR digest shared by semantic fixture and equivalence receipts, with private stability tests.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-recomposition-review/2026-08-08",
       "suggestedDecision": "Keep"
@@ -6555,13 +6555,13 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "ccdef4b5f309705f29bf987b85e4230ed63b54d5ebbf7244f02683119233e377",
+  "manifestSha256": "ddcd15a86a77b56548b6638ed85dd34d0b70fa0b98cbab0fe57fd13d3b694cbf",
   "pendingCount": 0,
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
   "reviewedCount": 542,
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c",
+  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410",
   "status": "complete",
   "totalCount": 542
 }

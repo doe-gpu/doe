@@ -2,7 +2,7 @@
   "artifacts": [
     {
       "path": "$MEASUREMENT_ROOT/prefix/bin/doe-zig-runtime",
-      "sha256": "97048b11939e3ddd37e52be6447066fb676035c4686112788d4286d5c2d39d8c",
+      "sha256": "6052f1b2b6c35072b68cd1241ea298856ef6e3f1418f4766f1deac625811ee95",
       "sizeBytes": 11194208
     }
   ],
@@ -10,7 +10,7 @@
   "captureToolChangedDuringCapture": false,
   "captureToolSha256": "897fe525b858db9269d5b8bc624d6a42b07e1283f7bfa26cf0d12ef9152a2c66",
   "cleanCompile": {
-    "elapsedNs": 62745648823,
+    "elapsedNs": 63727835261,
     "exitCode": 0,
     "stderr": "",
     "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -40,7 +40,7 @@
     "release": "7.0.0-28-generic"
   },
   "incrementalCompile": {
-    "elapsedNs": 45972611,
+    "elapsedNs": 50600914,
     "exitCode": 0,
     "stderr": "",
     "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -52,7 +52,7 @@
   "schemaVersion": 2,
   "sourceChangedBeforeIncremental": false,
   "sourceChangedDuringCapture": false,
-  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c",
+  "sourceTreeSha256": "29dd076f7d97ab83a7e6cd0455839636194d31d5b2b2438d2f308e25c336d410",
   "status": "captured",
   "toolchain": {
     "path": "/home/x/.local/zig/zig-x86_64-linux-0.15.2/zig",

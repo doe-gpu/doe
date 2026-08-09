@@ -44,6 +44,10 @@ file only names the promoted boundary and open admission gates.
   mock and benchmark executable were removed. Build-measurement schema version
   2 now captures only source-bound clean/incremental builds and artifacts; the
   retired seam timing remains immutable in the recomposition approval receipt.
+- WGSL IR digest encoding version 2 excludes Zig compiler-generated anonymous
+  type names and binds schema field names, union tags, and semantic values.
+  Frozen and current fixtures use the same observer and remain identical across
+  all supported Zig optimization modes; target-output bytes remain unchanged.
 
 ## Admission blockers
 
