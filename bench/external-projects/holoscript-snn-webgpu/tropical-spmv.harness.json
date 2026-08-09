@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-project-harness",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "tropical-spmv",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "license": {
+      "identifier": "MIT",
+      "evidenceUrl": "https://github.com/brianonbased-dev/HoloScript/blob/337a39a869a552c814933c587fe65b34a0a2c95d/LICENSE"
+    }
+  },
+  "providerSubstitution": {
+    "baselineProvider": "dawn-node-webgpu",
+    "comparisonProvider": "doe-gpu",
+    "seam": "A Node ESM loader resolves only the upstream package's dynamic import of webgpu to the selected provider module; upstream workload source is unchanged.",
+    "patchPaths": []
+  },
+  "fallbackPolicy": {
+    "requireHardware": true,
+    "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],
+    "providerIdentityAssertion": "The provider wrapper ID and adapter vendor must match the requested provider, and adapter plus host Vulkan evidence must reject software rendering before evidence can become comparable."
+  },
+  "workload": {
+    "command": ["node", "bench/external-projects/holoscript-snn-webgpu/run-matrix.mjs"],
+    "immutableInputRefs": [
+      "bench/external-projects/holoscript-snn-webgpu/inputs.json"
+    ],
+    "oracle": {
+      "kind": "upstream",
+      "path": "bench/external-projects/holoscript-snn-webgpu/oracle.md",
+      "reviewStatus": "reviewed"
+    },
+    "sameWorkPolicy": "Both providers execute the same pinned HoloScript TropicalShortestPaths.tropicalSpmv implementation over the same seeded graph sequence, source vector, tolerance, warmup count, and measured iteration count.",
+    "completionBoundary": "Each sample includes command encoding, submit, queue.onSubmittedWorkDone, staging-buffer copy, mapAsync readback, and Float32Array materialization before timing stops."
+  },
+  "requiredMeasurements": [
+    "clean-process-success",
+    "crashes",
+    "hangs",
+    "timeouts",
+    "peak-memory-bytes",
+    "cold-p50",
+    "cold-p95",
+    "cold-p99",
+    "warm-p50",
+    "warm-p95",
+    "warm-p99",
+    "receipt-overhead"
+  ],
+  "requiredReceiptFields": [
+    "provider-identity",
+    "adapter-identity",
+    "driver-identity",
+    "shader-hashes",
+    "dispatch-shape",
+    "synchronization",
+    "readback",
+    "output-identity"
+  ],
+  "installation": {
+    "substitutionMode": "esm-loader",
+    "productionStatus": "harness-only",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "installCommand": ["npm", "install"],
+    "validationCommand": ["node", "bench/external-projects/holoscript-snn-webgpu/run-matrix.mjs"]
+  },
+  "supportTargets": [],
+  "reliabilityPolicy": {
+    "cleanProcessRunsPerProvider": 3,
+    "concurrencyLevel": 1,
+    "concurrencyRunsPerProvider": 0,
+    "teardownCyclesPerProvider": 0,
+    "stressIterationsPerProvider": 192,
+    "processTimeoutSeconds": 120,
+    "memoryGrowthBoundaryBytes": 0,
+    "requireZeroCrashes": true,
+    "requireZeroHangs": true,
+    "requireZeroTimeouts": true
+  },
+  "performancePolicy": {
+    "timingScope": "GPU command encoding through completed readback and Float32Array materialization",
+    "coldSamplesPerProvider": 12,
+    "warmupSamplesPerProvider": 48,
+    "warmSamplesPerProvider": 576,
+    "requiredPercentiles": ["p50", "p95", "p99"],
+    "throughputMetric": "completed tropical SpMV dispatches per second",
+    "minimumMaterialSpeedupRatio": 1.1,
+    "maximumRegressionRatio": 1.05
+  },
+  "receiptPolicy": {
+    "captureRequired": true,
+    "replayRequired": false,
+    "runtimeBuildIdentityRequired": true
+  },
+  "releasePolicy": {
+    "promotionState": "not-promoted",
+    "blocking": false,
+    "command": ["node", "bench/external-projects/holoscript-snn-webgpu/run-matrix.mjs"],
+    "promotionReportIds": []
+  }
+}

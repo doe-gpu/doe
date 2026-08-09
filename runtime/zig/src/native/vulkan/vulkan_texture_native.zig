@@ -57,7 +57,7 @@ pub fn vulkan_destroy_texture(tex: *shared.DoeTexture) void {
     tex.vk_runtime_ref = null;
 }
 
-pub fn vulkan_create_texture_view(tex: *shared.DoeTexture, tv: *shared.DoeTextureView, desc: *const abi_pipeline.WGPUTextureViewDescriptor) bool {
+pub fn vulkan_create_texture_view(tex: *shared.DoeTexture, tv: *shared.DoeTextureView, desc: *const abi_pipeline.WGPUTextureViewDescriptor, swizzle_r: u32, swizzle_g: u32, swizzle_b: u32, swizzle_a: u32) bool {
     if (comptime !shared.has_vulkan) return false;
     if (tex.vk_id == 0) return false;
     const rt_ptr = tex.vk_runtime_ref orelse return false;
@@ -77,10 +77,10 @@ pub fn vulkan_create_texture_view(tex: *shared.DoeTexture, tv: *shared.DoeTextur
         desc.baseArrayLayer,
         resolved_array_layer_count,
         desc.aspect,
-        desc.swizzleR,
-        desc.swizzleG,
-        desc.swizzleB,
-        desc.swizzleA,
+        swizzle_r,
+        swizzle_g,
+        swizzle_b,
+        swizzle_a,
     ) catch {
         return false;
     };

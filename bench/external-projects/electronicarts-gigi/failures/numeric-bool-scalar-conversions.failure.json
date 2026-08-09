@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "numeric-bool-scalar-conversions",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "upstreamCommit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+  "category": "compatibility",
+  "status": "fixed-regression-protected",
+  "summary": "Gigi's generated buffer workload exposed unsupported explicit scalar conversions between numeric values and bool; Doe now validates and emits those WGSL conversions.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run1/raw-suite.json",
+      "sha256": "02d5c8c0f61223630975966de83e7b3c27fac2fecfa4ea2edf6722cfb05ed46d"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/tests/wgsl/mod_feature_translation_test.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/compiler/wgsl/frontend/sema_expr.zig",
+    "runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
+    "runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn_helpers.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/tests/wgsl/mod_feature_translation_test.zig"
+  ],
+  "verifiedAt": "2026-08-08T22:02:53Z"
+}

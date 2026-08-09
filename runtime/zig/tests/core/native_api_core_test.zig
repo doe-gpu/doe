@@ -1127,10 +1127,6 @@ test "texture view: undefined counts resolve before reaching Metal" {
         .arrayLayerCount = abi_core.WGPU_ARRAY_LAYER_COUNT_UNDEFINED,
         .aspect = 0,
         .usage = 0,
-        .swizzleR = 0,
-        .swizzleG = 0,
-        .swizzleB = 0,
-        .swizzleA = 0,
     };
 
     const raw_view = texture_sampler.doeNativeTextureCreateView(@ptrCast(&tex), &desc) orelse return error.TestUnexpectedResult;
@@ -1167,10 +1163,6 @@ test "texture view: invalid subresource ranges fail before retaining texture" {
         .arrayLayerCount = abi_core.WGPU_ARRAY_LAYER_COUNT_UNDEFINED,
         .aspect = 0,
         .usage = 0,
-        .swizzleR = 0,
-        .swizzleG = 0,
-        .swizzleB = 0,
-        .swizzleA = 0,
     };
 
     try std.testing.expect(texture_sampler.doeNativeTextureCreateView(@ptrCast(&tex), &desc) == null);
@@ -1347,7 +1339,7 @@ test "wgpu_types: WGPULimits struct size is stable" {
 
 test "wgpu_types: initLimits returns zeroed limits" {
     const limits = types.initLimits();
-    try std.testing.expectEqual(@as(?*anyopaque, null), limits.nextInChain);
+    try std.testing.expect(limits.nextInChain == null);
     try std.testing.expectEqual(@as(u32, 0), limits.maxTextureDimension1D);
     try std.testing.expectEqual(@as(u32, 0), limits.maxBindGroups);
     try std.testing.expectEqual(@as(u64, 0), limits.maxBufferSize);

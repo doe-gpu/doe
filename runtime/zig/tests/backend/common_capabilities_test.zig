@@ -1,6 +1,7 @@
 const std = @import("std");
-const model = @import("../../src/contracts/model/model.zig");
-const capabilities = @import("../../src/backend/common/capabilities.zig");
+const model = @import("../../src/contracts/command.zig");
+const capabilities = @import("../../src/contracts/capability.zig");
+const command = @import("../../src/contracts/command.zig");
 
 test "empty capability set supports nothing" {
     const set = capabilities.CapabilitySet{};
@@ -55,28 +56,28 @@ test "required_capabilities for kernel_dispatch" {
         .y = 1,
         .z = 1,
     } };
-    const required = capabilities.required_capabilities(kernel);
+    const required = command.requiredCapabilities(kernel);
     try std.testing.expect(required.supports(.kernel_dispatch));
     try std.testing.expect(!required.supports(.buffer_upload));
 }
 
 test "required_capabilities for upload" {
     const upload = model.Command{ .upload = .{ .bytes = 1024, .align_bytes = 256 } };
-    const required = capabilities.required_capabilities(upload);
+    const required = command.requiredCapabilities(upload);
     try std.testing.expect(required.supports(.buffer_upload));
     try std.testing.expect(!required.supports(.kernel_dispatch));
 }
 
 test "required_capabilities for dispatch_indirect includes both caps" {
     const cmd = model.Command{ .dispatch_indirect = .{ .x = 1, .y = 1, .z = 1 } };
-    const required = capabilities.required_capabilities(cmd);
+    const required = command.requiredCapabilities(cmd);
     try std.testing.expect(required.supports(.compute_dispatch));
     try std.testing.expect(required.supports(.compute_dispatch_indirect));
 }
 
 test "required_capabilities for surface_present includes lifecycle" {
     const cmd = model.Command{ .surface_present = .{ .handle = 1 } };
-    const required = capabilities.required_capabilities(cmd);
+    const required = command.requiredCapabilities(cmd);
     try std.testing.expect(required.supports(.surface_lifecycle));
     try std.testing.expect(required.supports(.surface_present));
 }

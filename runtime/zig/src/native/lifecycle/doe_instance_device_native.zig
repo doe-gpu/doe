@@ -193,7 +193,7 @@ fn call_request_adapter_callback(
     message: abi_base.WGPUStringView,
 ) void {
     const callback = info.callback orelse return;
-    callback(status, adapter, message, info.userdata1, info.userdata2);
+    callback(status, @ptrCast(adapter), message, info.userdata1, info.userdata2);
 }
 
 fn call_request_device_callback(
@@ -203,7 +203,7 @@ fn call_request_device_callback(
     message: abi_base.WGPUStringView,
 ) void {
     const callback = info.callback orelse return;
-    callback(status, device, message, info.userdata1, info.userdata2);
+    callback(status, @ptrCast(device), message, info.userdata1, info.userdata2);
 }
 
 const CreateDeviceError = error{

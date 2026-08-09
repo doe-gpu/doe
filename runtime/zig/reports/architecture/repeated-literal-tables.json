@@ -1,0 +1,2872 @@
+{
+  "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
+  "candidates": [
+    {
+      "literalTokenSha256": "064774b851a99fd3cd766abb558e324be11f6de53c354107283942e805edf862",
+      "locations": [
+        {
+          "endLine": 63,
+          "literalCount": 4,
+          "name": "ModelConfig",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
+          "startLine": 27
+        },
+        {
+          "endLine": 45,
+          "literalCount": 4,
+          "name": "BundleConfigJson",
+          "path": "src/spatial/csl/csl_host_plan_tool_config.zig",
+          "startLine": 9
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "0a41164fcad042b7b539901669ef3578f652ca5beea16b038342f14a736e7c63",
+      "locations": [
+        {
+          "endLine": 86,
+          "literalCount": 7,
+          "name": "wgpu_compare_to_vk",
+          "path": "src/backend/vulkan/vk_render_pipeline.zig",
+          "startLine": 75
+        },
+        {
+          "endLine": 79,
+          "literalCount": 7,
+          "name": "wgpu_compare_to_vk",
+          "path": "src/native/vulkan/vulkan_render_shared.zig",
+          "startLine": 68
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "0f169355d5a8b04bcee563dbc414586bfbb92a7871a83e64d8c86fa60e9f1cca",
+      "locations": [
+        {
+          "endLine": 431,
+          "literalCount": 7,
+          "name": "doeNativeDeviceCreateRenderPipelineFull",
+          "path": "src/backend/metal/render_state.zig",
+          "startLine": 344
+        },
+        {
+          "endLine": 107,
+          "literalCount": 7,
+          "name": "FallbackReasonHistogram",
+          "path": "src/full/modules/rendering/sdf_renderer.zig",
+          "startLine": 99
+        },
+        {
+          "endLine": 14,
+          "literalCount": 7,
+          "name": "TraceAccumulator",
+          "path": "src/native/diagnostics/doe_metal_browser_trace.zig",
+          "startLine": 6
+        },
+        {
+          "endLine": 287,
+          "literalCount": 7,
+          "name": "doeNativeShaderModuleGetBindingsForEntryPoint",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 265
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "1140449875975a0d6d349dfa9374918abdf95e57ed46436270da0f5f3df12ad2",
+      "locations": [
+        {
+          "endLine": 251,
+          "literalCount": 9,
+          "name": "writeResidency",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 233
+        },
+        {
+          "endLine": 148,
+          "literalCount": 9,
+          "name": "writeResidency",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 130
+        },
+        {
+          "endLine": 155,
+          "literalCount": 9,
+          "name": "writeResidency",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 137
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "19997f8e66fb77759387e7c2a56448b768a42727cd6227e436254383954f7dbd",
+      "locations": [
+        {
+          "endLine": 34,
+          "literalCount": 4,
+          "name": "make_prior_transfer_writes_visible",
+          "path": "src/backend/vulkan/vk_compute_sync.zig",
+          "startLine": 13
+        },
+        {
+          "endLine": 59,
+          "literalCount": 4,
+          "name": "make_prior_transfer_writes_visible_for_indirect_dispatch",
+          "path": "src/backend/vulkan/vk_compute_sync.zig",
+          "startLine": 36
+        },
+        {
+          "endLine": 82,
+          "literalCount": 4,
+          "name": "make_prior_transfer_writes_visible_for_transfer_read",
+          "path": "src/backend/vulkan/vk_compute_sync.zig",
+          "startLine": 61
+        },
+        {
+          "endLine": 109,
+          "literalCount": 4,
+          "name": "make_prior_compute_writes_visible_for_transfer_read",
+          "path": "src/backend/vulkan/vk_compute_sync.zig",
+          "startLine": 89
+        },
+        {
+          "endLine": 227,
+          "literalCount": 4,
+          "name": "make_transfer_writes_visible_for_host_read",
+          "path": "src/backend/vulkan/vk_compute_sync.zig",
+          "startLine": 208
+        },
+        {
+          "endLine": 324,
+          "literalCount": 4,
+          "name": "emit_compute_write_visibility_barrier",
+          "path": "src/backend/vulkan/vk_compute_sync.zig",
+          "startLine": 304
+        },
+        {
+          "endLine": 503,
+          "literalCount": 4,
+          "name": "destroy_descriptor_state",
+          "path": "src/backend/vulkan/vk_pipeline.zig",
+          "startLine": 481
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "1fc56c6bebe4944cd519565788dcdd9d437e535734bab91bd703bb22a85d7503",
+      "locations": [
+        {
+          "endLine": 394,
+          "literalCount": 5,
+          "name": "parse_address_space",
+          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
+          "startLine": 387
+        },
+        {
+          "endLine": 80,
+          "literalCount": 5,
+          "name": "parse_address_space",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
+          "startLine": 73
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "29f76147f688172751e9f7bd6e084906598f5c6a042b50c52b9701d3a1aeecfd",
+      "locations": [
+        {
+          "endLine": 109,
+          "literalCount": 7,
+          "name": "execute_buffer_write",
+          "path": "src/backend/metal/backend_execute.zig",
+          "startLine": 79
+        },
+        {
+          "endLine": 141,
+          "literalCount": 7,
+          "name": "execute_buffer_write_bytes",
+          "path": "src/backend/metal/backend_execute.zig",
+          "startLine": 111
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "36fc03b31437b5178e82d15372a381848d7d1a45d0938b75f7ddba38fb9cdc29",
+      "locations": [
+        {
+          "endLine": 305,
+          "literalCount": 6,
+          "name": "execute_async_diagnostics",
+          "path": "src/backend/metal/backend_execute.zig",
+          "startLine": 290
+        },
+        {
+          "endLine": 67,
+          "literalCount": 6,
+          "name": "run_dispatch_indirect",
+          "path": "src/backend/metal/metal_dispatch_runtime.zig",
+          "startLine": 45
+        },
+        {
+          "endLine": 800,
+          "literalCount": 6,
+          "name": "create_texture_view",
+          "path": "src/backend/vulkan/vk_resources.zig",
+          "startLine": 753
+        },
+        {
+          "endLine": 864,
+          "literalCount": 6,
+          "name": "transition_texture_layout",
+          "path": "src/backend/vulkan/vk_resources.zig",
+          "startLine": 824
+        },
+        {
+          "endLine": 156,
+          "literalCount": 6,
+          "name": "emitZeroValue",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn_helpers.zig",
+          "startLine": 136
+        },
+        {
+          "endLine": 231,
+          "literalCount": 6,
+          "name": "wgpuShaderModuleGetCompilationInfo",
+          "path": "src/dropin/wgpu_dropin_ext_b.zig",
+          "startLine": 184
+        },
+        {
+          "endLine": 84,
+          "literalCount": 6,
+          "name": "bindGroupIdentityKey",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 71
+        },
+        {
+          "endLine": 336,
+          "literalCount": 6,
+          "name": "doeNativeAdapterGetInfoStruct",
+          "path": "src/runtime/device/multi_adapter.zig",
+          "startLine": 316
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "39d503ec2784a41196531acd2ad4d0ab5fb87ad6cb0d39bdb48369fddf1fb81c",
+      "locations": [
+        {
+          "endLine": 203,
+          "literalCount": 4,
+          "name": "bind_vertex_buffers",
+          "path": "src/backend/d3d12/commands/d3d12_native_render_pass.zig",
+          "startLine": 190
+        },
+        {
+          "endLine": 219,
+          "literalCount": 4,
+          "name": "resolve_vertex_buffer_stride",
+          "path": "src/backend/d3d12/commands/d3d12_render_vertex.zig",
+          "startLine": 206
+        },
+        {
+          "endLine": 82,
+          "literalCount": 4,
+          "name": "replaceAllInPlace",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_rewrite.zig",
+          "startLine": 62
+        },
+        {
+          "endLine": 656,
+          "literalCount": 4,
+          "name": "row_param_guarded_by_uniform_rows",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 627
+        },
+        {
+          "endLine": 72,
+          "literalCount": 4,
+          "name": "try_execute_copy_only_deferred",
+          "path": "src/native/queue/doe_queue_submit_metal.zig",
+          "startLine": 45
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "3f5d2b1e98af005dbb0b0009c9b800fc81455934e6bac688869ad8622fb2fef6",
+      "locations": [
+        {
+          "endLine": 68,
+          "literalCount": 4,
+          "name": "RenderMetrics",
+          "path": "src/backend/d3d12/commands/d3d12_render.zig",
+          "startLine": 63
+        },
+        {
+          "endLine": 25,
+          "literalCount": 4,
+          "name": "RenderBindResult",
+          "path": "src/backend/d3d12/commands/d3d12_render_bind_groups.zig",
+          "startLine": 19
+        },
+        {
+          "endLine": 144,
+          "literalCount": 4,
+          "name": "resolve_vertex_buffer_count",
+          "path": "src/backend/d3d12/commands/d3d12_render_vertex.zig",
+          "startLine": 138
+        },
+        {
+          "endLine": 466,
+          "literalCount": 4,
+          "name": "flush_pending_uploads_if_required",
+          "path": "src/backend/d3d12/mod.zig",
+          "startLine": 455
+        },
+        {
+          "endLine": 536,
+          "literalCount": 4,
+          "name": "execute_native_command",
+          "path": "src/backend/d3d12/mod.zig",
+          "startLine": 468
+        },
+        {
+          "endLine": 332,
+          "literalCount": 4,
+          "name": "flush_pending_uploads_if_required",
+          "path": "src/backend/metal/backend_execute.zig",
+          "startLine": 313
+        },
+        {
+          "endLine": 28,
+          "literalCount": 4,
+          "name": "execute_map_async",
+          "path": "src/backend/metal/metal_async_runtime.zig",
+          "startLine": 11
+        },
+        {
+          "endLine": 658,
+          "literalCount": 4,
+          "name": "doeNativeMetalPipelineCacheTelemetryExt",
+          "path": "src/backend/metal/metal_pipeline_cache.zig",
+          "startLine": 640
+        },
+        {
+          "endLine": 429,
+          "literalCount": 4,
+          "name": "flush_pending_uploads_if_required",
+          "path": "src/backend/vulkan/backend_execute.zig",
+          "startLine": 420
+        },
+        {
+          "endLine": 106,
+          "literalCount": 4,
+          "name": "select_physical_device",
+          "path": "src/backend/vulkan/vk_device.zig",
+          "startLine": 88
+        },
+        {
+          "endLine": 517,
+          "literalCount": 4,
+          "name": "bind_descriptor_sets",
+          "path": "src/backend/vulkan/vk_pipeline.zig",
+          "startLine": 505
+        },
+        {
+          "endLine": 379,
+          "literalCount": 4,
+          "name": "ensure_buffer_write_staging_buffer",
+          "path": "src/backend/vulkan/vk_resources.zig",
+          "startLine": 360
+        },
+        {
+          "endLine": 404,
+          "literalCount": 4,
+          "name": "query_surface_capabilities",
+          "path": "src/backend/vulkan/vulkan_surface.zig",
+          "startLine": 344
+        },
+        {
+          "endLine": 28,
+          "literalCount": 4,
+          "name": "ArtifactFinalizeTotals",
+          "path": "src/cli/runtime_cli_artifacts.zig",
+          "startLine": 23
+        },
+        {
+          "endLine": 431,
+          "literalCount": 4,
+          "name": "writeValue",
+          "path": "src/compiler/tsir/tools/tsir_bootstrap_oracle.zig",
+          "startLine": 412
+        },
+        {
+          "endLine": 77,
+          "literalCount": 4,
+          "name": "emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
+          "startLine": 42
+        },
+        {
+          "endLine": 160,
+          "literalCount": 4,
+          "name": "clearLastError",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 153
+        },
+        {
+          "endLine": 107,
+          "literalCount": 4,
+          "name": "mapReadbackBytes",
+          "path": "src/core/queue/wgpu_ffi_capture.zig",
+          "startLine": 71
+        },
+        {
+          "endLine": 21,
+          "literalCount": 4,
+          "name": "DiagnosticRecord",
+          "path": "src/dropin/dropin_diagnostics.zig",
+          "startLine": 14
+        },
+        {
+          "endLine": 182,
+          "literalCount": 4,
+          "name": "symbolNameSlice",
+          "path": "src/dropin/dropin_runtime_config.zig",
+          "startLine": 174
+        },
+        {
+          "endLine": 48,
+          "literalCount": 4,
+          "name": "wgpuBufferReadMappedRange",
+          "path": "src/dropin/wgpu_dropin_ext_c.zig",
+          "startLine": 42
+        },
+        {
+          "endLine": 60,
+          "literalCount": 4,
+          "name": "wgpuBufferWriteMappedRange",
+          "path": "src/dropin/wgpu_dropin_ext_c.zig",
+          "startLine": 54
+        },
+        {
+          "endLine": 47,
+          "literalCount": 4,
+          "name": "executeDeferredCopies",
+          "path": "src/native/queue/doe_queue_flush_breakdown.zig",
+          "startLine": 42
+        },
+        {
+          "endLine": 82,
+          "literalCount": 4,
+          "name": "d3d12_bridge_device_create_graphics_pipeline_hlsl",
+          "path": "src/native/render/doe_render_pipeline_native.zig",
+          "startLine": 70
+        },
+        {
+          "endLine": 243,
+          "literalCount": 4,
+          "name": "doeNativeDeviceCreateBindGroupLayout",
+          "path": "src/native/resource/doe_bind_group_native.zig",
+          "startLine": 219
+        },
+        {
+          "endLine": 74,
+          "literalCount": 4,
+          "name": "d3d12_buffer_heap_type",
+          "path": "src/native/resource/doe_buffer_ops_native.zig",
+          "startLine": 59
+        },
+        {
+          "endLine": 96,
+          "literalCount": 4,
+          "name": "metalBufferUsageEligibleForPrivateStorage",
+          "path": "src/native/resource/doe_buffer_ops_native.zig",
+          "startLine": 83
+        },
+        {
+          "endLine": 263,
+          "literalCount": 4,
+          "name": "resolveTextureViewSwizzle",
+          "path": "src/native/resource/doe_texture_sampler_native.zig",
+          "startLine": 243
+        },
+        {
+          "endLine": 777,
+          "literalCount": 4,
+          "name": "buildOverrideEntries",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 758
+        },
+        {
+          "endLine": 269,
+          "literalCount": 4,
+          "name": "reset_pipeline_static_hashes",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 262
+        },
+        {
+          "endLine": 23,
+          "literalCount": 4,
+          "name": "TraceNumericStabilitySummary",
+          "path": "src/runtime/numeric_stability/trace_meta.zig",
+          "startLine": 10
+        },
+        {
+          "endLine": 57,
+          "literalCount": 4,
+          "name": "Parsed",
+          "path": "src/spatial/csl/csl_pe_program_metadata.zig",
+          "startLine": 48
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "460fb4ec671799b0ec6b13cdab38b366a548221b054fdccbcc6d967c4d382ba0",
+      "locations": [
+        {
+          "endLine": 284,
+          "literalCount": 8,
+          "name": "write_semantic_fields",
+          "path": "src/runtime/trace/operator_artifacts.zig",
+          "startLine": 259
+        },
+        {
+          "endLine": 669,
+          "literalCount": 8,
+          "name": "append_semantic_extras",
+          "path": "src/runtime/trace/operator_artifacts.zig",
+          "startLine": 644
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "464ee231a420fa5c0f456d2b7a8bdbd6604c47b0850b02f07134e7709d27d87b",
+      "locations": [
+        {
+          "endLine": 181,
+          "literalCount": 4,
+          "name": "ensure_texture",
+          "path": "src/backend/metal/metal_copy_runtime.zig",
+          "startLine": 164
+        },
+        {
+          "endLine": 276,
+          "literalCount": 4,
+          "name": "renderDrawsCanMerge",
+          "path": "src/native/support/doe_native_command_types.zig",
+          "startLine": 262
+        },
+        {
+          "endLine": 334,
+          "literalCount": 4,
+          "name": "selectedIndex",
+          "path": "src/runtime/numeric_stability/runtime_decode.zig",
+          "startLine": 320
+        },
+        {
+          "endLine": 515,
+          "literalCount": 4,
+          "name": "clampUnitInterval",
+          "path": "src/runtime/numeric_stability/runtime_decode.zig",
+          "startLine": 511
+        },
+        {
+          "endLine": 578,
+          "literalCount": 4,
+          "name": "selectedIndex",
+          "path": "src/runtime/numeric_stability/runtime_eval.zig",
+          "startLine": 568
+        },
+        {
+          "endLine": 83,
+          "literalCount": 4,
+          "name": "selectedIndex",
+          "path": "src/runtime/numeric_stability/service/numeric_stability_eval.zig",
+          "startLine": 73
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "4bc6f80182e4468af704a73b30c8907b9949aa974c32d7f0a218cf48deaa0047",
+      "locations": [
+        {
+          "endLine": 418,
+          "literalCount": 18,
+          "name": "parse_matrix_shape",
+          "path": "src/compiler/wgsl/frontend/sema_expr.zig",
+          "startLine": 403
+        },
+        {
+          "endLine": 110,
+          "literalCount": 18,
+          "name": "parse_matrix_shape",
+          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
+          "startLine": 95
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "4c18c5ffa17b33e897d2bb96824e3b2d837edee6cc2d8abd145b87a4e018bb17",
+      "locations": [
+        {
+          "endLine": 158,
+          "literalCount": 10,
+          "name": "DepthStencilState",
+          "path": "src/backend/d3d12/resources/d3d12_depth_stencil.zig",
+          "startLine": 75
+        },
+        {
+          "endLine": 287,
+          "literalCount": 10,
+          "name": "create_compute_buffer_with_kind",
+          "path": "src/backend/vulkan/vk_resources.zig",
+          "startLine": 217
+        },
+        {
+          "endLine": 72,
+          "literalCount": 10,
+          "name": "configure_surface",
+          "path": "src/backend/vulkan/vk_runtime_surface_ops.zig",
+          "startLine": 41
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "5051f5921595cf432a4bb05791fd2105e8f363977b6abe515aa1518b399fbadf",
+      "locations": [
+        {
+          "endLine": 33,
+          "literalCount": 18,
+          "name": "binary_op_text",
+          "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig",
+          "startLine": 12
+        },
+        {
+          "endLine": 105,
+          "literalCount": 18,
+          "name": "binary_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
+          "startLine": 84
+        },
+        {
+          "endLine": 666,
+          "literalCount": 18,
+          "name": "binary_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
+          "startLine": 645
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "53ce7dffe77149987ec3ebdeb0cc24c48278865d38a9b06f4b4df2a9d9c66bd0",
+      "locations": [
+        {
+          "endLine": 37,
+          "literalCount": 6,
+          "name": "GELU_BINDINGS",
+          "path": "src/spatial/csl/csl_host_plan_bindings.zig",
+          "startLine": 34
+        },
+        {
+          "endLine": 46,
+          "literalCount": 6,
+          "name": "L2_NORMALIZE_BINDINGS",
+          "path": "src/spatial/csl/csl_host_plan_bindings.zig",
+          "startLine": 43
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "54fbb1dd8d0324fda022a9f984b04fbe450522fd40455f414664f72e5fe3c4f5",
+      "locations": [
+        {
+          "endLine": 120,
+          "literalCount": 4,
+          "name": "FunctionInfo",
+          "path": "src/compiler/wgsl/frontend/sema_types.zig",
+          "startLine": 103
+        },
+        {
+          "endLine": 507,
+          "literalCount": 4,
+          "name": "workgroup_size_for_function",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 502
+        },
+        {
+          "endLine": 426,
+          "literalCount": 4,
+          "name": "compute_workgroup_size",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 421
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "5991e4605f9e8555e46d4620d64843057feb4cb6a23dbac083664d5d24731a39",
+      "locations": [
+        {
+          "endLine": 210,
+          "literalCount": 5,
+          "name": "set_render_pass_descriptor_tables",
+          "path": "src/backend/d3d12/commands/d3d12_render_bind_groups.zig",
+          "startLine": 177
+        },
+        {
+          "endLine": 88,
+          "literalCount": 5,
+          "name": "upload_bytes",
+          "path": "src/backend/metal/metal_upload.zig",
+          "startLine": 24
+        },
+        {
+          "endLine": 68,
+          "literalCount": 5,
+          "name": "clear_active_compute_state",
+          "path": "src/backend/vulkan/vk_pipeline_cache.zig",
+          "startLine": 48
+        },
+        {
+          "endLine": 54,
+          "literalCount": 5,
+          "name": "RenderState",
+          "path": "src/backend/vulkan/vk_render.zig",
+          "startLine": 35
+        },
+        {
+          "endLine": 286,
+          "literalCount": 5,
+          "name": "bind_existing_render_target",
+          "path": "src/backend/vulkan/vk_render.zig",
+          "startLine": 253
+        },
+        {
+          "endLine": 358,
+          "literalCount": 5,
+          "name": "stage_compute_buffer_write",
+          "path": "src/backend/vulkan/vk_resources.zig",
+          "startLine": 317
+        },
+        {
+          "endLine": 472,
+          "literalCount": 5,
+          "name": "create_host_visible_buffer",
+          "path": "src/backend/vulkan/vk_resources.zig",
+          "startLine": 427
+        },
+        {
+          "endLine": 962,
+          "literalCount": 5,
+          "name": "image_usage_for_texture",
+          "path": "src/backend/vulkan/vk_resources.zig",
+          "startLine": 949
+        },
+        {
+          "endLine": 441,
+          "literalCount": 5,
+          "name": "ensure_fast_upload_buffer",
+          "path": "src/backend/vulkan/vk_upload.zig",
+          "startLine": 407
+        },
+        {
+          "endLine": 571,
+          "literalCount": 5,
+          "name": "map_composite_alpha",
+          "path": "src/backend/vulkan/vulkan_surface.zig",
+          "startLine": 560
+        },
+        {
+          "endLine": 39,
+          "literalCount": 5,
+          "name": "Stats",
+          "path": "src/compiler/wgsl/ir/ir_opt_rewrite.zig",
+          "startLine": 29
+        },
+        {
+          "endLine": 123,
+          "literalCount": 5,
+          "name": "CompilePhaseTimingsNs",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 117
+        },
+        {
+          "endLine": 52,
+          "literalCount": 5,
+          "name": "NativeExecutionResult",
+          "path": "src/contracts/execution.zig",
+          "startLine": 42
+        },
+        {
+          "endLine": 216,
+          "literalCount": 5,
+          "name": "initAdapterInfo",
+          "path": "src/core/abi/procs/wgpu_p1_capability_procs.zig",
+          "startLine": 202
+        },
+        {
+          "endLine": 69,
+          "literalCount": 5,
+          "name": "captureBuffer",
+          "path": "src/core/queue/wgpu_ffi_capture.zig",
+          "startLine": 11
+        },
+        {
+          "endLine": 505,
+          "literalCount": 5,
+          "name": "dispatchPassLayoutEntry",
+          "path": "src/core/resource/wgpu_resources.zig",
+          "startLine": 447
+        },
+        {
+          "endLine": 85,
+          "literalCount": 5,
+          "name": "FallbackReasonHistogram",
+          "path": "src/full/modules/rendering/effects_pipeline.zig",
+          "startLine": 79
+        },
+        {
+          "endLine": 90,
+          "literalCount": 5,
+          "name": "FallbackReasonHistogram",
+          "path": "src/full/modules/services/resource_scheduler.zig",
+          "startLine": 84
+        },
+        {
+          "endLine": 300,
+          "literalCount": 5,
+          "name": "copy_enabled_features",
+          "path": "src/native/lifecycle/doe_instance_device_native.zig",
+          "startLine": 276
+        },
+        {
+          "endLine": 149,
+          "literalCount": 5,
+          "name": "clear_last_error",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 143
+        },
+        {
+          "endLine": 338,
+          "literalCount": 5,
+          "name": "decodePayload",
+          "path": "src/native/shader/doe_shader_translation_cache.zig",
+          "startLine": 286
+        },
+        {
+          "endLine": 108,
+          "literalCount": 5,
+          "name": "clearPreparedBindingCacheSlot",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 98
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "5c7cf99fb926f68097520e38ca07172b86c268cdb4c92d82632410a8bea19fd7",
+      "locations": [
+        {
+          "endLine": 73,
+          "literalCount": 8,
+          "name": "TimestampState",
+          "path": "src/backend/metal/metal_gpu_timestamps.zig",
+          "startLine": 12
+        },
+        {
+          "endLine": 383,
+          "literalCount": 8,
+          "name": "record_direct_upload",
+          "path": "src/backend/vulkan/vk_upload.zig",
+          "startLine": 306
+        },
+        {
+          "endLine": 29,
+          "literalCount": 8,
+          "name": "DispatchBatchCopyFlushTimings",
+          "path": "src/native/compute/doe_compute_fast_vulkan.zig",
+          "startLine": 20
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "5e41c9cf84b1db2bac40330ab7f28c276c14b1ad822c5e28f57f7cbe91c7f707",
+      "locations": [
+        {
+          "endLine": 56,
+          "literalCount": 4,
+          "name": "KernelPipeline",
+          "path": "src/backend/metal/metal_native_runtime.zig",
+          "startLine": 52
+        },
+        {
+          "endLine": 100,
+          "literalCount": 4,
+          "name": "CompiledKernelLibrary",
+          "path": "src/backend/metal/metal_runtime_resources.zig",
+          "startLine": 97
+        },
+        {
+          "endLine": 172,
+          "literalCount": 4,
+          "name": "get_kernel_workgroup_size",
+          "path": "src/backend/metal/metal_runtime_resources.zig",
+          "startLine": 167
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "5f84be6e37fd4365c29f24374bfe29b5769ecdfdea5a7a1f84cd21b2d12683cf",
+      "locations": [
+        {
+          "endLine": 562,
+          "literalCount": 6,
+          "name": "updateDecisionCounts",
+          "path": "src/runtime/numeric_stability/runtime.zig",
+          "startLine": 551
+        },
+        {
+          "endLine": 23,
+          "literalCount": 6,
+          "name": "buildDecisionCounts",
+          "path": "src/runtime/numeric_stability/service/numeric_stability_io.zig",
+          "startLine": 13
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "608e99bac0b9f364e94120de633a58ceb6efb8da441f7e24965c8c1aca0f3d6d",
+      "locations": [
+        {
+          "endLine": 126,
+          "literalCount": 7,
+          "name": "execute_render_draw",
+          "path": "src/backend/vulkan/vk_render.zig",
+          "startLine": 84
+        },
+        {
+          "endLine": 117,
+          "literalCount": 7,
+          "name": "resolve_entry_point_name",
+          "path": "src/backend/vulkan/vk_render_pipeline.zig",
+          "startLine": 111
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "631b0fd5bbebfad8c15e8a1fd8b067b5bae8a1365857fab1c0b701d0c4eb03c5",
+      "locations": [
+        {
+          "endLine": 145,
+          "literalCount": 6,
+          "name": "splitUniformPath",
+          "path": "src/compiler/tsir/frontend_body.zig",
+          "startLine": 135
+        },
+        {
+          "endLine": 588,
+          "literalCount": 6,
+          "name": "splitUniformFieldPath",
+          "path": "src/compiler/tsir/reference_interpreter.zig",
+          "startLine": 578
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "64732bdefb1f7637641a89768cc112ac21302a755fb5a7343c15d648064ee84a",
+      "locations": [
+        {
+          "endLine": 57,
+          "literalCount": 9,
+          "name": "assignOpText",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_maps.zig",
+          "startLine": 45
+        },
+        {
+          "endLine": 47,
+          "literalCount": 9,
+          "name": "assign_op_text",
+          "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig",
+          "startLine": 35
+        },
+        {
+          "endLine": 119,
+          "literalCount": 9,
+          "name": "assign_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
+          "startLine": 107
+        },
+        {
+          "endLine": 680,
+          "literalCount": 9,
+          "name": "assign_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
+          "startLine": 668
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "653219891ff37244fff722bfbb526267841b117e2e3974cfb82c5817b601778b",
+      "locations": [
+        {
+          "endLine": 53,
+          "literalCount": 7,
+          "name": "doeNativeDeviceCreateRenderBundleEncoder",
+          "path": "src/native/render/doe_bundle_native.zig",
+          "startLine": 31
+        },
+        {
+          "endLine": 353,
+          "literalCount": 7,
+          "name": "collectBindGroupBindings",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 302
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "665af59e6ae330f0712b1d395acd2094e4b0d1b6eff05759bf7664038ba8a43f",
+      "locations": [
+        {
+          "endLine": 77,
+          "literalCount": 5,
+          "name": "serialize",
+          "path": "src/compiler/wgsl/emit/dxil/dxil_serialize.zig",
+          "startLine": 31
+        },
+        {
+          "endLine": 114,
+          "literalCount": 5,
+          "name": "DoeBuffer",
+          "path": "src/native/support/doe_native_object_types.zig",
+          "startLine": 96
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "6fc1b3c937e68c6826cab291699925a4b33a8f78e3b3687738acd388f0cec657",
+      "locations": [
+        {
+          "endLine": 140,
+          "literalCount": 21,
+          "name": "RunSummary",
+          "path": "src/plan/webgpu_plan_executor_support.zig",
+          "startLine": 116
+        },
+        {
+          "endLine": 306,
+          "literalCount": 21,
+          "name": "ensureValidRegistry",
+          "path": "src/runtime/numeric_stability/policy.zig",
+          "startLine": 228
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "797e2247380c635aad488384dc287f217400a7e58d675953ef52f30a9f292e81",
+      "locations": [
+        {
+          "endLine": 329,
+          "literalCount": 12,
+          "name": "writeQuoted",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 316
+        },
+        {
+          "endLine": 226,
+          "literalCount": 12,
+          "name": "writeQuoted",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 213
+        },
+        {
+          "endLine": 233,
+          "literalCount": 12,
+          "name": "writeQuoted",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 220
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "7b874f3542e4955d362d33ce46cdd4e4341086917d1bb9925388924fd82b9e20",
+      "locations": [
+        {
+          "endLine": 89,
+          "literalCount": 4,
+          "name": "flush_pending_artifact",
+          "path": "src/backend/common/shader_artifact_manifest.zig",
+          "startLine": 63
+        },
+        {
+          "endLine": 82,
+          "literalCount": 4,
+          "name": "flushQueue",
+          "path": "src/backend/d3d12/d3d12_runtime_upload.zig",
+          "startLine": 54
+        },
+        {
+          "endLine": 364,
+          "literalCount": 4,
+          "name": "rebuild_compute_shader_spirv",
+          "path": "src/backend/vulkan/vk_pipeline.zig",
+          "startLine": 360
+        },
+        {
+          "endLine": 389,
+          "literalCount": 4,
+          "name": "parseInputsFrom",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig",
+          "startLine": 374
+        },
+        {
+          "endLine": 23,
+          "literalCount": 4,
+          "name": "main",
+          "path": "src/integrations/onnxruntime/ort_ep_session_smoke_anchor.zig",
+          "startLine": 5
+        },
+        {
+          "endLine": 23,
+          "literalCount": 4,
+          "name": "main",
+          "path": "src/integrations/onnxruntime/ort_ep_smoke_anchor.zig",
+          "startLine": 5
+        },
+        {
+          "endLine": 23,
+          "literalCount": 4,
+          "name": "main",
+          "path": "src/integrations/onnxruntime/ort_incumbent_session_smoke_anchor.zig",
+          "startLine": 5
+        },
+        {
+          "endLine": 107,
+          "literalCount": 4,
+          "name": "required_uniform_extent_bytes",
+          "path": "src/native/compute/doe_compute_preconditions_native.zig",
+          "startLine": 87
+        },
+        {
+          "endLine": 42,
+          "literalCount": 4,
+          "name": "ensureInitialized",
+          "path": "src/native/diagnostics/doe_metal_browser_trace.zig",
+          "startLine": 23
+        },
+        {
+          "endLine": 444,
+          "literalCount": 4,
+          "name": "doeNativeInstanceWaitAny",
+          "path": "src/native/lifecycle/doe_instance_device_native.zig",
+          "startLine": 430
+        },
+        {
+          "endLine": 149,
+          "literalCount": 4,
+          "name": "commitStagedWriteBlits",
+          "path": "src/native/queue/doe_queue_flush_breakdown.zig",
+          "startLine": 116
+        },
+        {
+          "endLine": 278,
+          "literalCount": 4,
+          "name": "doeNativeAdapterListGetInfo",
+          "path": "src/runtime/device/multi_adapter.zig",
+          "startLine": 266
+        },
+        {
+          "endLine": 491,
+          "literalCount": 4,
+          "name": "survivingCountForTopP",
+          "path": "src/runtime/numeric_stability/runtime_decode.zig",
+          "startLine": 479
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "7c8da323ed235641ea827b4c2f6361ee006c68e379a3bc30b61b763f0251519d",
+      "locations": [
+        {
+          "endLine": 131,
+          "literalCount": 5,
+          "name": "choosePEGrid",
+          "path": "src/compiler/tsir/planner.zig",
+          "startLine": 122
+        },
+        {
+          "endLine": 68,
+          "literalCount": 5,
+          "name": "resolve_constant_int_depth",
+          "path": "src/compiler/wgsl/ir/ir_const_eval.zig",
+          "startLine": 38
+        },
+        {
+          "endLine": 172,
+          "literalCount": 5,
+          "name": "resolve_constant_bool_depth",
+          "path": "src/compiler/wgsl/ir/ir_const_eval.zig",
+          "startLine": 142
+        },
+        {
+          "endLine": 76,
+          "literalCount": 5,
+          "name": "encode_render_bundle_draw_nonindexed",
+          "path": "src/full/render/wgpu_render_draw_loops.zig",
+          "startLine": 9
+        },
+        {
+          "endLine": 150,
+          "literalCount": 5,
+          "name": "encode_render_bundle_draw_indexed",
+          "path": "src/full/render/wgpu_render_draw_loops.zig",
+          "startLine": 78
+        },
+        {
+          "endLine": 219,
+          "literalCount": 5,
+          "name": "encode_render_pass_draw_nonindexed",
+          "path": "src/full/render/wgpu_render_draw_loops.zig",
+          "startLine": 152
+        },
+        {
+          "endLine": 293,
+          "literalCount": 5,
+          "name": "encode_render_pass_draw_indexed",
+          "path": "src/full/render/wgpu_render_draw_loops.zig",
+          "startLine": 221
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "802b3b1f10ef600f774e7258c9fb77d1d911f32882f21284b03e26ba39e75e99",
+      "locations": [
+        {
+          "endLine": 262,
+          "literalCount": 4,
+          "name": "writeTiles",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 253
+        },
+        {
+          "endLine": 159,
+          "literalCount": 4,
+          "name": "writeTiles",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 150
+        },
+        {
+          "endLine": 166,
+          "literalCount": 4,
+          "name": "writeTiles",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 157
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "8699851c442ea970321f9b5c69e92b131a62b8cde55642384a5d2c1abfeaf2af",
+      "locations": [
+        {
+          "endLine": 29,
+          "literalCount": 9,
+          "name": "isSemanticPattern",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 19
+        },
+        {
+          "endLine": 43,
+          "literalCount": 9,
+          "name": "emitLayout",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 31
+        },
+        {
+          "endLine": 57,
+          "literalCount": 9,
+          "name": "emitPeProgram",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 45
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "88d3c8fcc66b8b7fc91bcb35c5feb807bf0990c561937ad3f66b0d99381445b0",
+      "locations": [
+        {
+          "endLine": 277,
+          "literalCount": 7,
+          "name": "writeCollectives",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 264
+        },
+        {
+          "endLine": 174,
+          "literalCount": 7,
+          "name": "writeCollectives",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 161
+        },
+        {
+          "endLine": 181,
+          "literalCount": 7,
+          "name": "writeCollectives",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 168
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "8a5ae43791e57afd20801158155667bcfa133c6bb65ed0a5b365dfdbfb82cc10",
+      "locations": [
+        {
+          "endLine": 248,
+          "literalCount": 7,
+          "name": "query_device_caps",
+          "path": "src/backend/d3d12/d3d12_device_caps.zig",
+          "startLine": 205
+        },
+        {
+          "endLine": 185,
+          "literalCount": 7,
+          "name": "emit_constants_block",
+          "path": "src/compiler/wgsl/emit/dxil/dxil_serialize.zig",
+          "startLine": 155
+        },
+        {
+          "endLine": 74,
+          "literalCount": 7,
+          "name": "ensureInit",
+          "path": "src/quirk/toggle_registry.zig",
+          "startLine": 35
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "8b51e81e3ca32c84bd68707aac4aba8d87393da3dfcf08c5ccfd56e7fe09745b",
+      "locations": [
+        {
+          "endLine": 77,
+          "literalCount": 6,
+          "name": "execute_upload",
+          "path": "src/backend/metal/backend_execute.zig",
+          "startLine": 48
+        },
+        {
+          "endLine": 223,
+          "literalCount": 6,
+          "name": "DoeBindGroup",
+          "path": "src/native/support/doe_native_object_types.zig",
+          "startLine": 205
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "8d7515a5b123d1cdb5ba64b21f30152f57bb50916893d63f0a1b9fc436901e6e",
+      "locations": [
+        {
+          "endLine": 261,
+          "literalCount": 6,
+          "name": "ShaderKind",
+          "path": "src/compiler/wgsl/emit/dxil/dxil_spec.zig",
+          "startLine": 254
+        },
+        {
+          "endLine": 24,
+          "literalCount": 6,
+          "name": "LayoutResourceKind",
+          "path": "src/contracts/binding.zig",
+          "startLine": 17
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "929c6104398e068eac38dd4bcad6287b8ba97f4c129b05a78aae3a3c5aa18ff0",
+      "locations": [
+        {
+          "endLine": 155,
+          "literalCount": 5,
+          "name": "resolve_vertex_attribute_count",
+          "path": "src/backend/d3d12/commands/d3d12_render_vertex.zig",
+          "startLine": 146
+        },
+        {
+          "endLine": 174,
+          "literalCount": 5,
+          "name": "buildComputeKey",
+          "path": "src/native/shader/doe_shader_translation_cache.zig",
+          "startLine": 164
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "96487df72e75804a497c855190e64d9fa679ce7cb61452685a5f46ab538cf0fb",
+      "locations": [
+        {
+          "endLine": 36,
+          "literalCount": 4,
+          "name": "AbbrevId",
+          "path": "src/compiler/wgsl/emit/dxil/dxil_spec.zig",
+          "startLine": 31
+        },
+        {
+          "endLine": 214,
+          "literalCount": 4,
+          "name": "WaveOp",
+          "path": "src/compiler/wgsl/emit/dxil/dxil_spec.zig",
+          "startLine": 209
+        },
+        {
+          "endLine": 285,
+          "literalCount": 4,
+          "name": "ResourceClass",
+          "path": "src/compiler/wgsl/emit/dxil/dxil_spec.zig",
+          "startLine": 280
+        },
+        {
+          "endLine": 43,
+          "literalCount": 4,
+          "name": "Dim",
+          "path": "src/compiler/wgsl/emit/spirv/spirv_spec.zig",
+          "startLine": 38
+        },
+        {
+          "endLine": 35,
+          "literalCount": 4,
+          "name": "AdapterType",
+          "path": "src/runtime/device/multi_adapter.zig",
+          "startLine": 30
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "971571cb58f761fce53e553a043a34e7a3bb67068bf6cd3638261573ec6b7c85",
+      "locations": [
+        {
+          "endLine": 209,
+          "literalCount": 5,
+          "name": "applyDeferredFlushToTraceRows",
+          "path": "src/cli/runtime_cli.zig",
+          "startLine": 189
+        },
+        {
+          "endLine": 106,
+          "literalCount": 5,
+          "name": "BodyAnalyzer",
+          "path": "src/compiler/wgsl/frontend/sema.zig",
+          "startLine": 68
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "9dd77ca398a9a5d5558cba042e43005b5e2281ad5b312d34fb56956281cda793",
+      "locations": [
+        {
+          "endLine": 188,
+          "literalCount": 4,
+          "name": "maybe_record_resolve",
+          "path": "src/backend/d3d12/commands/d3d12_native_render_pass.zig",
+          "startLine": 155
+        },
+        {
+          "endLine": 96,
+          "literalCount": 4,
+          "name": "build_pipeline_key",
+          "path": "src/backend/d3d12/commands/d3d12_render_vertex.zig",
+          "startLine": 53
+        },
+        {
+          "endLine": 32,
+          "literalCount": 4,
+          "name": "pipeline_async_probe",
+          "path": "src/backend/vulkan/vk_runtime_probe_ops.zig",
+          "startLine": 21
+        },
+        {
+          "endLine": 765,
+          "literalCount": 4,
+          "name": "containsAliasLoad",
+          "path": "src/compiler/tsir/frontend.zig",
+          "startLine": 723
+        },
+        {
+          "endLine": 170,
+          "literalCount": 4,
+          "name": "walkCollectivesInExpr",
+          "path": "src/compiler/tsir/frontend_collectives.zig",
+          "startLine": 135
+        },
+        {
+          "endLine": 151,
+          "literalCount": 4,
+          "name": "stmtMutatesOrEscapesGlobal",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_workgroup_zero.zig",
+          "startLine": 88
+        },
+        {
+          "endLine": 195,
+          "literalCount": 4,
+          "name": "exprStoresOrPassesGlobalRef",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_workgroup_zero.zig",
+          "startLine": 153
+        },
+        {
+          "endLine": 237,
+          "literalCount": 4,
+          "name": "exprContainsEscapingGlobalRef",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_workgroup_zero.zig",
+          "startLine": 197
+        },
+        {
+          "endLine": 243,
+          "literalCount": 4,
+          "name": "match_simple_exclusive_limit",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 215
+        },
+        {
+          "endLine": 703,
+          "literalCount": 4,
+          "name": "createDiagnosticTextureView",
+          "path": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
+          "startLine": 684
+        },
+        {
+          "endLine": 453,
+          "literalCount": 4,
+          "name": "createRenderAttachmentTextureView",
+          "path": "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
+          "startLine": 434
+        },
+        {
+          "endLine": 474,
+          "literalCount": 4,
+          "name": "createStorageAttachmentTextureView",
+          "path": "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
+          "startLine": 455
+        },
+        {
+          "endLine": 334,
+          "literalCount": 4,
+          "name": "getOrCreateCachedRenderTextureView",
+          "path": "src/full/render/wgpu_render_resources.zig",
+          "startLine": 287
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "9ec527082b05553ed8f15c8caa917f5249881e6e6f5a91f8ce52040c1126a0be",
+      "locations": [
+        {
+          "endLine": 242,
+          "literalCount": 6,
+          "name": "chooseSliceAxis",
+          "path": "src/compiler/tsir/planner.zig",
+          "startLine": 230
+        },
+        {
+          "endLine": 191,
+          "literalCount": 6,
+          "name": "validatePlanCounts",
+          "path": "src/plan/doe_plan_executor.zig",
+          "startLine": 173
+        },
+        {
+          "endLine": 118,
+          "literalCount": 6,
+          "name": "validatePlanCounts",
+          "path": "src/plan/webgpu_plan_executor.zig",
+          "startLine": 100
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "a1a37be46194b8ce0c54108572d10ae05413fdce44b4a4e2d777f5ba688d8f8c",
+      "locations": [
+        {
+          "endLine": 143,
+          "literalCount": 4,
+          "name": "emitPtrTyped",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
+          "startLine": 135
+        },
+        {
+          "endLine": 271,
+          "literalCount": 4,
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+          "startLine": 263
+        },
+        {
+          "endLine": 140,
+          "literalCount": 4,
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+          "startLine": 132
+        },
+        {
+          "endLine": 141,
+          "literalCount": 4,
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+          "startLine": 133
+        },
+        {
+          "endLine": 99,
+          "literalCount": 4,
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
+          "startLine": 91
+        },
+        {
+          "endLine": 699,
+          "literalCount": 4,
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 691
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "a2198d6d76a452fe2604dacc3e5d3b57a69bcad9307ada599ea3acd51363da93",
+      "locations": [
+        {
+          "endLine": 191,
+          "literalCount": 8,
+          "name": "execute_render_clear",
+          "path": "src/backend/vulkan/vk_render.zig",
+          "startLine": 128
+        },
+        {
+          "endLine": 155,
+          "literalCount": 8,
+          "name": "enumerate_all",
+          "path": "src/runtime/device/multi_adapter.zig",
+          "startLine": 109
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "a2fccfbc9b5eb0d34fc03c64bef842485ac32ccbfe381667771f5ab6a49a0210",
+      "locations": [
+        {
+          "endLine": 164,
+          "literalCount": 6,
+          "name": "collectRecordedBindings",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 114
+        },
+        {
+          "endLine": 499,
+          "literalCount": 6,
+          "name": "collect_recorded_bindings",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 455
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "a31b343180240fd82a90ccac28d3820c49470720d3541597c871a353eb8c6f0a",
+      "locations": [
+        {
+          "endLine": 353,
+          "literalCount": 7,
+          "name": "extract_vertex_inputs",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 313
+        },
+        {
+          "endLine": 401,
+          "literalCount": 7,
+          "name": "extract_inter_stage_vars",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 357
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "a56d54b66078b5746406123aaba2bb757f26aeda1316037a4a1c6b477b49fd06",
+      "locations": [
+        {
+          "endLine": 155,
+          "literalCount": 6,
+          "name": "emit_texture_sample_grad",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig",
+          "startLine": 142
+        },
+        {
+          "endLine": 190,
+          "literalCount": 6,
+          "name": "emit_texture_sample_level_offset",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig",
+          "startLine": 171
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "a89786e4df746619d69d06f6a32d1807b724c9553ededbb2d6fb13412bb12cff",
+      "locations": [
+        {
+          "endLine": 130,
+          "literalCount": 6,
+          "name": "emitComptime",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_linear_attn.zig",
+          "startLine": 116
+        },
+        {
+          "endLine": 712,
+          "literalCount": 6,
+          "name": "emitComptime",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 701
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "a951a5de2168c18022dc56d3147a933a049ae7081f36662bef5ca82f554c4add",
+      "locations": [
+        {
+          "endLine": 140,
+          "literalCount": 5,
+          "name": "emit_texture_gather_compare",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig",
+          "startLine": 128
+        },
+        {
+          "endLine": 169,
+          "literalCount": 5,
+          "name": "emit_texture_sample_offset",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig",
+          "startLine": 157
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "a9f99296f3d9cb3d30db690cd9c75f8ea0546543cdc6a6a0f206964da3f3c997",
+      "locations": [
+        {
+          "endLine": 540,
+          "literalCount": 6,
+          "name": "ensure_texture_resource",
+          "path": "src/backend/vulkan/vk_resources.zig",
+          "startLine": 514
+        },
+        {
+          "endLine": 238,
+          "literalCount": 6,
+          "name": "loadRequiredProc",
+          "path": "src/dropin/wgpu_dropin_lib.zig",
+          "startLine": 189
+        },
+        {
+          "endLine": 50,
+          "literalCount": 6,
+          "name": "populateFlatBindings",
+          "path": "src/native/compute/doe_compute_bind_groups.zig",
+          "startLine": 27
+        },
+        {
+          "endLine": 51,
+          "literalCount": 6,
+          "name": "workerMain",
+          "path": "src/runtime/task_pool.zig",
+          "startLine": 32
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "acf42d3af077d85e0ec4b49323eb59000c78a749f3a9ff33885dc306735fbb7f",
+      "locations": [
+        {
+          "endLine": 418,
+          "literalCount": 4,
+          "name": "build_input_elements",
+          "path": "src/backend/d3d12/commands/d3d12_render.zig",
+          "startLine": 399
+        },
+        {
+          "endLine": 225,
+          "literalCount": 4,
+          "name": "find_memory_type_index",
+          "path": "src/backend/vulkan/vk_device.zig",
+          "startLine": 215
+        },
+        {
+          "endLine": 434,
+          "literalCount": 4,
+          "name": "texture_pattern_is_identity",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 426
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "adf15b39ca4cb61b4f2568813677f90a74ae41294ddff7117a198101f0a9db92",
+      "locations": [
+        {
+          "endLine": 73,
+          "literalCount": 6,
+          "name": "doeNativeAdapterGetInfo",
+          "path": "src/native/support/doe_adapter_info_native.zig",
+          "startLine": 41
+        },
+        {
+          "endLine": 260,
+          "literalCount": 6,
+          "name": "tryMergeDispatchIntoLast",
+          "path": "src/native/support/doe_native_command_types.zig",
+          "startLine": 243
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "ae1a4ebab96d27d47f5e6d69a704da1394f0ecb0dc154b6660b1592a318358d3",
+      "locations": [
+        {
+          "endLine": 108,
+          "literalCount": 5,
+          "name": "Scope",
+          "path": "src/compiler/wgsl/emit/spirv/spirv_spec.zig",
+          "startLine": 102
+        },
+        {
+          "endLine": 62,
+          "literalCount": 5,
+          "name": "DropinErrorCode",
+          "path": "src/dropin/wgpu_dropin_lib.zig",
+          "startLine": 56
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "af612406a17f73daca71f7c9cf4573a14f32d3414c148d4f09fc1b7c58c26393",
+      "locations": [
+        {
+          "endLine": 133,
+          "literalCount": 4,
+          "name": "walkCollectivesInStmt",
+          "path": "src/compiler/tsir/frontend_collectives.zig",
+          "startLine": 79
+        },
+        {
+          "endLine": 218,
+          "literalCount": 4,
+          "name": "register_acquired_surface_texture",
+          "path": "src/native/surface/doe_surface_native.zig",
+          "startLine": 185
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "af766062ee86baac410db4f49e9be7b93d0f9fcae7c333f6c02d259da9dbe62b",
+      "locations": [
+        {
+          "endLine": 182,
+          "literalCount": 7,
+          "name": "fill_supported_features_from_adapter",
+          "path": "src/dropin/wgpu_dropin_ext_a_core.zig",
+          "startLine": 166
+        },
+        {
+          "endLine": 336,
+          "literalCount": 7,
+          "name": "doeNativeComputePipelineGetBindGroupLayout",
+          "path": "src/native/compute/doe_compute_ext_native.zig",
+          "startLine": 301
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "b1210b1a0e85e942c2b1128bde0406f8d69f4b1530692f222b4f100d50278d6b",
+      "locations": [
+        {
+          "endLine": 25,
+          "literalCount": 4,
+          "name": "DIRECT_UPLOAD_BUFFER_MAX_BYTES",
+          "path": "src/backend/vulkan/vk_upload.zig",
+          "startLine": 25
+        },
+        {
+          "endLine": 26,
+          "literalCount": 4,
+          "name": "DIRECT_UPLOAD_REUSE_SKIP_ZERO_FILL_MIN_BYTES",
+          "path": "src/backend/vulkan/vk_upload.zig",
+          "startLine": 26
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "b202e7261de277516792e09dfabb6e8100f3fcad842ffe21819588f5e11669e1",
+      "locations": [
+        {
+          "endLine": 523,
+          "literalCount": 6,
+          "name": "execute_command",
+          "path": "src/backend/vulkan/backend_execute.zig",
+          "startLine": 508
+        },
+        {
+          "endLine": 541,
+          "literalCount": 6,
+          "name": "execute_dispatch",
+          "path": "src/backend/vulkan/backend_execute.zig",
+          "startLine": 525
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "b9d27b129ae29e7a7f73cb25db1a7e8b50e6066fc8f2096695a96236b266bdaa",
+      "locations": [
+        {
+          "endLine": 94,
+          "literalCount": 9,
+          "name": "DoeQueue",
+          "path": "src/native/support/doe_native_object_types.zig",
+          "startLine": 71
+        },
+        {
+          "endLine": 295,
+          "literalCount": 9,
+          "name": "DoeTextureView",
+          "path": "src/native/support/doe_native_object_types.zig",
+          "startLine": 280
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "ba68babaa7ed3bd96693b3916cecb9599d89ecfb702f2ddfd286942917a7f472",
+      "locations": [
+        {
+          "endLine": 482,
+          "literalCount": 17,
+          "name": "parse_builtin_attr",
+          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
+          "startLine": 458
+        },
+        {
+          "endLine": 71,
+          "literalCount": 17,
+          "name": "parse_builtin_attr",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
+          "startLine": 47
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "bd8850f38272a166af7307ed4400c5dde9bb5d1ace2562ee9e578f884a3c17ac",
+      "locations": [
+        {
+          "endLine": 43,
+          "literalCount": 5,
+          "name": "run_dispatch",
+          "path": "src/backend/metal/metal_dispatch_runtime.zig",
+          "startLine": 22
+        },
+        {
+          "endLine": 206,
+          "literalCount": 5,
+          "name": "Parser",
+          "path": "src/compiler/wgsl/frontend/parser.zig",
+          "startLine": 61
+        },
+        {
+          "endLine": 81,
+          "literalCount": 5,
+          "name": "countSubstring",
+          "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+          "startLine": 68
+        },
+        {
+          "endLine": 264,
+          "literalCount": 5,
+          "name": "loadOptionalProc",
+          "path": "src/dropin/wgpu_dropin_lib.zig",
+          "startLine": 240
+        },
+        {
+          "endLine": 388,
+          "literalCount": 5,
+          "name": "doeNativePipelineCacheGetData",
+          "path": "src/runtime/cache/pipeline_cache.zig",
+          "startLine": 368
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "c56438522cb822e2dfbc6a51691f650087615d2d86cc4187d5c3b725e7ade96d",
+      "locations": [
+        {
+          "endLine": 426,
+          "literalCount": 19,
+          "name": "writeJsonString",
+          "path": "src/plan/webgpu_plan_executor_support.zig",
+          "startLine": 412
+        },
+        {
+          "endLine": 45,
+          "literalCount": 19,
+          "name": "writeJsonString",
+          "path": "src/runtime/trace/trace_determinism.zig",
+          "startLine": 31
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "c6ae422b2a11d1f3e58c525624de67e033221296623b8d3a530d17ebd3992c44",
+      "locations": [
+        {
+          "endLine": 399,
+          "literalCount": 8,
+          "name": "detect_instance_extension",
+          "path": "src/backend/vulkan/vk_device.zig",
+          "startLine": 379
+        },
+        {
+          "endLine": 422,
+          "literalCount": 8,
+          "name": "detect_device_extension",
+          "path": "src/backend/vulkan/vk_device.zig",
+          "startLine": 402
+        },
+        {
+          "endLine": 213,
+          "literalCount": 8,
+          "name": "detect_device_extension",
+          "path": "src/backend/vulkan/vk_device_caps.zig",
+          "startLine": 193
+        },
+        {
+          "endLine": 157,
+          "literalCount": 8,
+          "name": "doeNativeCommandEncoderBeginRenderPass",
+          "path": "src/native/render/doe_render_native.zig",
+          "startLine": 96
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "cd0d7f345c5a494c7246d3194679861ff2d901bab76d0e22726394a432f8c1a7",
+      "locations": [
+        {
+          "endLine": 50,
+          "literalCount": 6,
+          "name": "inspectIOSurface",
+          "path": "src/backend/metal/metal_external_texture.zig",
+          "startLine": 33
+        },
+        {
+          "endLine": 90,
+          "literalCount": 6,
+          "name": "CacheTelemetry",
+          "path": "src/backend/metal/metal_pipeline_cache.zig",
+          "startLine": 83
+        },
+        {
+          "endLine": 32,
+          "literalCount": 6,
+          "name": "SurfaceState",
+          "path": "src/backend/metal/metal_surface_runtime.zig",
+          "startLine": 20
+        },
+        {
+          "endLine": 183,
+          "literalCount": 6,
+          "name": "unconfigure_surface",
+          "path": "src/backend/metal/metal_surface_runtime.zig",
+          "startLine": 162
+        },
+        {
+          "endLine": 269,
+          "literalCount": 6,
+          "name": "select_queue_family_for_device",
+          "path": "src/backend/vulkan/vk_device.zig",
+          "startLine": 244
+        },
+        {
+          "endLine": 36,
+          "literalCount": 6,
+          "name": "CachedComputeState",
+          "path": "src/backend/vulkan/vk_pipeline_cache.zig",
+          "startLine": 16
+        },
+        {
+          "endLine": 225,
+          "literalCount": 6,
+          "name": "VulkanSurface",
+          "path": "src/backend/vulkan/vulkan_surface.zig",
+          "startLine": 194
+        },
+        {
+          "endLine": 596,
+          "literalCount": 6,
+          "name": "map_surface_usage_flags",
+          "path": "src/backend/vulkan/vulkan_surface.zig",
+          "startLine": 588
+        },
+        {
+          "endLine": 21,
+          "literalCount": 6,
+          "name": "HostTimingTotals",
+          "path": "src/cli/runtime_cli_artifacts.zig",
+          "startLine": 14
+        },
+        {
+          "endLine": 40,
+          "literalCount": 6,
+          "name": "DispatchMetrics",
+          "path": "src/contracts/execution.zig",
+          "startLine": 31
+        },
+        {
+          "endLine": 87,
+          "literalCount": 6,
+          "name": "FallbackReasonHistogram",
+          "path": "src/full/modules/rendering/path_engine.zig",
+          "startLine": 80
+        },
+        {
+          "endLine": 67,
+          "literalCount": 6,
+          "name": "executeDeferredCopiesWithDirectReadback",
+          "path": "src/native/queue/doe_queue_flush_breakdown.zig",
+          "startLine": 49
+        },
+        {
+          "endLine": 83,
+          "literalCount": 6,
+          "name": "preparedDispatchStateMatches",
+          "path": "src/native/queue/doe_queue_submit_vulkan.zig",
+          "startLine": 66
+        },
+        {
+          "endLine": 39,
+          "literalCount": 6,
+          "name": "d3d12TextureViewSwizzleMode",
+          "path": "src/native/render/doe_render_native.zig",
+          "startLine": 23
+        },
+        {
+          "endLine": 560,
+          "literalCount": 6,
+          "name": "layout_entry_for_kind_test",
+          "path": "src/native/resource/doe_bind_group_native.zig",
+          "startLine": 531
+        },
+        {
+          "endLine": 241,
+          "literalCount": 6,
+          "name": "dispatchesCanMerge",
+          "path": "src/native/support/doe_native_command_types.zig",
+          "startLine": 229
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "cf02607498749410127fb5111ef8bab8f05cb0b6f4ad6f4c89566ea32aa7969e",
+      "locations": [
+        {
+          "endLine": 82,
+          "literalCount": 8,
+          "name": "spirv_has_entry_point",
+          "path": "src/backend/vulkan/vk_pipeline.zig",
+          "startLine": 66
+        },
+        {
+          "endLine": 54,
+          "literalCount": 8,
+          "name": "has_workgroup_storage",
+          "path": "src/backend/vulkan/vk_spirv_inspect.zig",
+          "startLine": 38
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "d336bcbbe6bd4ef965654e68955fed76662f6728412cf4d05679ed3666b37366",
+      "locations": [
+        {
+          "endLine": 481,
+          "literalCount": 7,
+          "name": "match_dispatch_height",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 460
+        },
+        {
+          "endLine": 177,
+          "literalCount": 7,
+          "name": "addFallbackReason",
+          "path": "src/full/modules/rendering/sdf_renderer.zig",
+          "startLine": 167
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "d39f2812bd1f28b2a22a58f4a038f8b4ab97c98e4ad2f9133ea92d8add4b375b",
+      "locations": [
+        {
+          "endLine": 188,
+          "literalCount": 6,
+          "name": "buildAutoMatmulObservation",
+          "path": "src/runtime/numeric_stability/runtime_plan.zig",
+          "startLine": 138
+        },
+        {
+          "endLine": 240,
+          "literalCount": 6,
+          "name": "buildAutoDecodeFinalLogitsObservation",
+          "path": "src/runtime/numeric_stability/runtime_plan.zig",
+          "startLine": 190
+        },
+        {
+          "endLine": 302,
+          "literalCount": 6,
+          "name": "buildAutoRmsnormObservation",
+          "path": "src/runtime/numeric_stability/runtime_plan.zig",
+          "startLine": 242
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "d5b433c332bc31a15b072ccbd714b47bb5025df6307cfbca5cd9f27fa295ed8c",
+      "locations": [
+        {
+          "endLine": 632,
+          "literalCount": 14,
+          "name": "writeJsonString",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+          "startLine": 615
+        },
+        {
+          "endLine": 533,
+          "literalCount": 14,
+          "name": "writeJsonString",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
+          "startLine": 516
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "d6f0b562cf108071f5db614ef1f8598ac1cafb1ffc6ab4119a565ef905274d04",
+      "locations": [
+        {
+          "endLine": 61,
+          "literalCount": 14,
+          "name": "main",
+          "path": "src/cli/entrypoints/main_emit_dxil.zig",
+          "startLine": 6
+        },
+        {
+          "endLine": 61,
+          "literalCount": 14,
+          "name": "main",
+          "path": "src/cli/entrypoints/main_emit_hlsl.zig",
+          "startLine": 6
+        },
+        {
+          "endLine": 61,
+          "literalCount": 14,
+          "name": "main",
+          "path": "src/cli/entrypoints/main_emit_msl.zig",
+          "startLine": 6
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "d7561126347e0d78739504a56a14a1c25531a877a638dc7772e9ec5297f3e6ae",
+      "locations": [
+        {
+          "endLine": 156,
+          "literalCount": 5,
+          "name": "tiled_group_count",
+          "path": "src/core/compute/dispatch_preconditions.zig",
+          "startLine": 150
+        },
+        {
+          "endLine": 154,
+          "literalCount": 5,
+          "name": "tiled_group_count",
+          "path": "src/native/compute/doe_compute_preconditions_native.zig",
+          "startLine": 148
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "d7ee9c647ef7bd9149a862c7fa360e1d5d74c26c5e8aef8a2be25c5c1f37bcf2",
+      "locations": [
+        {
+          "endLine": 682,
+          "literalCount": 6,
+          "name": "getOrCreateDiagnosticTexture",
+          "path": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
+          "startLine": 660
+        },
+        {
+          "endLine": 432,
+          "literalCount": 6,
+          "name": "getOrCreateDiagnosticRenderTexture",
+          "path": "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
+          "startLine": 410
+        },
+        {
+          "endLine": 71,
+          "literalCount": 6,
+          "name": "setupTempRenderTexture",
+          "path": "src/full/render/wgpu_render_temp_texture.zig",
+          "startLine": 21
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "d84953ead5ce15e96a78bc8af113fec861d6c885d116fab23fc1e14cfb0d9dac",
+      "locations": [
+        {
+          "endLine": 312,
+          "literalCount": 4,
+          "name": "execute_barrier",
+          "path": "src/backend/d3d12/mod.zig",
+          "startLine": 297
+        },
+        {
+          "endLine": 101,
+          "literalCount": 4,
+          "name": "string_view_slice",
+          "path": "src/dropin/wgpu_dropin_ext_a_core.zig",
+          "startLine": 95
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "da5324ad0a5f8087b1c82f32a0803f5a61a283ae605793523805220579062690",
+      "locations": [
+        {
+          "endLine": 190,
+          "literalCount": 4,
+          "name": "processEventsUntil",
+          "path": "src/core/abi/procs/wgpu_async_procs.zig",
+          "startLine": 175
+        },
+        {
+          "endLine": 178,
+          "literalCount": 4,
+          "name": "processEventsUntil",
+          "path": "src/core/abi/procs/wgpu_p0_procs.zig",
+          "startLine": 163
+        },
+        {
+          "endLine": 247,
+          "literalCount": 4,
+          "name": "processEventsUntil",
+          "path": "src/core/queue/wgpu_ffi_sync.zig",
+          "startLine": 235
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "db80484e7a53d13e1ba921513863209ed75329ff4067cb3a7778e15f0d788b8c",
+      "locations": [
+        {
+          "endLine": 201,
+          "literalCount": 7,
+          "name": "doeNativeCopyLastErrorMessage",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 194
+        },
+        {
+          "endLine": 210,
+          "literalCount": 7,
+          "name": "doeNativeCopyLastErrorStage",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 203
+        },
+        {
+          "endLine": 219,
+          "literalCount": 7,
+          "name": "doeNativeCopyLastErrorKind",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 212
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "dc543ae52bebb39fdb2a880239ee846c1bd3e56e5823ad04cc5213957b581afa",
+      "locations": [
+        {
+          "endLine": 306,
+          "literalCount": 8,
+          "name": "emit_stage_spirv_words",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 281
+        },
+        {
+          "endLine": 993,
+          "literalCount": 8,
+          "name": "assignSpirvWords",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 977
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "ddbdd8dce3c63d170cdd1b872e45d80751019dc391bf72f4b0cdcfe1a632f258",
+      "locations": [
+        {
+          "endLine": 547,
+          "literalCount": 4,
+          "name": "doeNativeAdapterRequestDevice",
+          "path": "src/native/lifecycle/doe_instance_device_native.zig",
+          "startLine": 532
+        },
+        {
+          "endLine": 581,
+          "literalCount": 4,
+          "name": "doeNativeRequestDeviceFlat",
+          "path": "src/native/lifecycle/doe_instance_device_native.zig",
+          "startLine": 559
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "e1f122d3817638fc03df5f67b384ebf3b331fb78fab06fe4c1a5f2beba6384ba",
+      "locations": [
+        {
+          "endLine": 133,
+          "literalCount": 4,
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
+          "startLine": 125
+        },
+        {
+          "endLine": 249,
+          "literalCount": 4,
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+          "startLine": 241
+        },
+        {
+          "endLine": 261,
+          "literalCount": 4,
+          "name": "emitBufForElem",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+          "startLine": 251
+        },
+        {
+          "endLine": 130,
+          "literalCount": 4,
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+          "startLine": 122
+        },
+        {
+          "endLine": 131,
+          "literalCount": 4,
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+          "startLine": 123
+        },
+        {
+          "endLine": 89,
+          "literalCount": 4,
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
+          "startLine": 81
+        },
+        {
+          "endLine": 689,
+          "literalCount": 4,
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 681
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "e2cf205c230f886e6f629e1d89ca0946d82768dbbc47abeaa9c7382ab365ff17",
+      "locations": [
+        {
+          "endLine": 377,
+          "literalCount": 10,
+          "name": "evaluateRmsnormSerialF32",
+          "path": "src/runtime/numeric_stability/runtime_eval.zig",
+          "startLine": 349
+        },
+        {
+          "endLine": 405,
+          "literalCount": 10,
+          "name": "evaluateRmsnormSerialF64",
+          "path": "src/runtime/numeric_stability/runtime_eval.zig",
+          "startLine": 379
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "e463970d1a718f94689644b6489f93d3d905d26e129d3283415c222041f1e13b",
+      "locations": [
+        {
+          "endLine": 12,
+          "literalCount": 6,
+          "name": "PHASE_SPECIALIZED_KERNELS",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+          "startLine": 12
+        },
+        {
+          "endLine": 28,
+          "literalCount": 6,
+          "name": "PHASE_SPECIALIZED_KERNELS",
+          "path": "src/spatial/csl/csl_host_plan_tool.zig",
+          "startLine": 28
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "e64042b16a06a84731b1077af892dc73bdda7ab6f22a7bf020c428fe349af97f",
+      "locations": [
+        {
+          "endLine": 156,
+          "literalCount": 5,
+          "name": "flush_queue_timed",
+          "path": "src/backend/metal/metal_runtime_queue_ops.zig",
+          "startLine": 84
+        },
+        {
+          "endLine": 67,
+          "literalCount": 5,
+          "name": "execute",
+          "path": "src/backend/vulkan/vk_async_dispatch.zig",
+          "startLine": 16
+        },
+        {
+          "endLine": 115,
+          "literalCount": 5,
+          "name": "transform_function",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 30
+        },
+        {
+          "endLine": 445,
+          "literalCount": 5,
+          "name": "buildDispatchPassGroups",
+          "path": "src/core/resource/wgpu_resources.zig",
+          "startLine": 354
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "e755285730055197773e079c62586deee5de362806f4c48d00cb378b57bd6ced",
+      "locations": [
+        {
+          "endLine": 46,
+          "literalCount": 14,
+          "name": "DIAGNOSTIC_SHADER_SOURCE",
+          "path": "src/full/lifecycle/wgpu_async_diagnostics_command.zig",
+          "startLine": 32
+        },
+        {
+          "endLine": 61,
+          "literalCount": 14,
+          "name": "DIAGNOSTIC_PIXEL_LOCAL_EMULATED_SHADER_SOURCE",
+          "path": "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
+          "startLine": 47
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "e7e7a1f0053a160e21361d403b39d874141e37ef025d53840776fb74670821dd",
+      "locations": [
+        {
+          "endLine": 840,
+          "literalCount": 8,
+          "name": "submit_and_wait",
+          "path": "src/backend/vulkan/vk_render.zig",
+          "startLine": 815
+        },
+        {
+          "endLine": 301,
+          "literalCount": 8,
+          "name": "submit_and_wait_timeline",
+          "path": "src/backend/vulkan/vk_texture_commands.zig",
+          "startLine": 276
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "e8e013435a76a28d27ba09138d7bc623717da4176d652b570bcbe8645e990a82",
+      "locations": [
+        {
+          "endLine": 290,
+          "literalCount": 11,
+          "name": "allocate_staged_upload",
+          "path": "src/backend/vulkan/vk_upload.zig",
+          "startLine": 213
+        },
+        {
+          "endLine": 193,
+          "literalCount": 11,
+          "name": "SurfaceCapabilities",
+          "path": "src/backend/vulkan/vulkan_surface.zig",
+          "startLine": 178
+        },
+        {
+          "endLine": 475,
+          "literalCount": 11,
+          "name": "validateHostPlan",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+          "startLine": 447
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "e8e5c21bbde82ea343a5bb21136772ae7a4c549f39e0ace51ba39b6c813e230a",
+      "locations": [
+        {
+          "endLine": 314,
+          "literalCount": 4,
+          "name": "createTransientDispatchInfoBinding",
+          "path": "src/backend/d3d12/d3d12_runtime_compute.zig",
+          "startLine": 281
+        },
+        {
+          "endLine": 127,
+          "literalCount": 4,
+          "name": "DoeSharedTextureMemory",
+          "path": "src/dropin/dropin_browser_shared_memory.zig",
+          "startLine": 111
+        },
+        {
+          "endLine": 294,
+          "literalCount": 4,
+          "name": "canBorrowMetalTextureForFullView",
+          "path": "src/native/resource/doe_texture_sampler_native.zig",
+          "startLine": 265
+        },
+        {
+          "endLine": 156,
+          "literalCount": 4,
+          "name": "set_last_error",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 151
+        },
+        {
+          "endLine": 171,
+          "literalCount": 4,
+          "name": "set_last_error_meta",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 166
+        },
+        {
+          "endLine": 61,
+          "literalCount": 4,
+          "name": "DoeSurface",
+          "path": "src/native/surface/doe_surface_native.zig",
+          "startLine": 46
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "f0cd9c8b43dd79fc1a600bab744bb7440d36fb622cb8a9f3b770055cf5c9ada7",
+      "locations": [
+        {
+          "endLine": 275,
+          "literalCount": 4,
+          "name": "map_topology",
+          "path": "src/backend/d3d12/commands/d3d12_native_render_pass.zig",
+          "startLine": 267
+        },
+        {
+          "endLine": 432,
+          "literalCount": 4,
+          "name": "map_topology",
+          "path": "src/backend/d3d12/commands/d3d12_render.zig",
+          "startLine": 424
+        },
+        {
+          "endLine": 127,
+          "literalCount": 4,
+          "name": "topology_to_vk",
+          "path": "src/backend/vulkan/vk_render_pipeline.zig",
+          "startLine": 119
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "f65d81869864adca2f2a227937eb5a90e1981cc07d2d4fbd01b77c1f4ff07737",
+      "locations": [
+        {
+          "endLine": 289,
+          "literalCount": 5,
+          "name": "writeReductions",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 279
+        },
+        {
+          "endLine": 186,
+          "literalCount": 5,
+          "name": "writeReductions",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 176
+        },
+        {
+          "endLine": 193,
+          "literalCount": 5,
+          "name": "writeReductions",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 183
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "fce4f3bdbf9d1f10ed04c692209b59d08e493bb053cab5ebd638f91ccf5921c0",
+      "locations": [
+        {
+          "endLine": 586,
+          "literalCount": 19,
+          "name": "doeBufferMapReadCopyUnmapFlat",
+          "path": "src/dropin/dropin_abi_procs.zig",
+          "startLine": 483
+        },
+        {
+          "endLine": 121,
+          "literalCount": 19,
+          "name": "TraceRunSummary",
+          "path": "src/runtime/trace/trace.zig",
+          "startLine": 31
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "ffd5200cbdcf1cb48a357aa7b716b77f2d194b5041a746edd477959b14813111",
+      "locations": [
+        {
+          "endLine": 948,
+          "literalCount": 6,
+          "name": "classify_builtin_component",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 926
+        },
+        {
+          "endLine": 788,
+          "literalCount": 6,
+          "name": "classify_builtin_component",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 766
+        },
+        {
+          "endLine": 629,
+          "literalCount": 6,
+          "name": "classify_local_invocation_axis",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 611
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    },
+    {
+      "literalTokenSha256": "ffff44d9cb315ac3347d6e162f4235eabbbb1365dba1c3251a2bbcada46098e2",
+      "locations": [
+        {
+          "endLine": 481,
+          "literalCount": 4,
+          "name": "discoveryLabel",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_validate.zig",
+          "startLine": 474
+        },
+        {
+          "endLine": 344,
+          "literalCount": 4,
+          "name": "discoveryLabel",
+          "path": "src/compiler/wgsl/emit/dxil/emit_dxil.zig",
+          "startLine": 337
+        }
+      ],
+      "reason": "identical ordered sequence of at least four literal tokens"
+    }
+  ],
+  "manifestPath": "runtime/zig/source-layout.json",
+  "manifestSha256": "4fdc9c9135cca2d61214c511611b8b9b565010bba72ec41bcd9124f3434febc4",
+  "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
+  "schemaVersion": 1,
+  "sourceLayoutVersion": 2,
+  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e",
+  "status": "captured"
+}

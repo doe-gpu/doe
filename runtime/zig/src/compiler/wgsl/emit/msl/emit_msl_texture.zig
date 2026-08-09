@@ -3,9 +3,27 @@ const ir = @import("../../ir/ir.zig");
 
 pub fn emit_builtin(self: anytype, function: ir.Function, call: @FieldType(ir.Expr, "call")) !bool {
     if (std.mem.eql(u8, call.name, "textureLoad")) {
-        if (call.args.len != 3) return error.InvalidIr;
+        if (call.args.len < 2 or call.args.len > 3) return error.InvalidIr;
         const texture_expr = function.expr_args.items[call.args.start];
         const coord_expr = function.expr_args.items[call.args.start + 1];
+        if (is_storage_texture_2d(self.module, function, texture_expr)) {
+            if (call.args.len != 2) return error.InvalidIr;
+            try self.write("((all(int2(");
+            try self.emit_expr(function, coord_expr);
+            try self.write(") >= int2(0)) && all(uint2(int2(");
+            try self.emit_expr(function, coord_expr);
+            try self.write(")) < uint2(");
+            try self.emit_expr(function, texture_expr);
+            try self.write(".get_width(), ");
+            try self.emit_expr(function, texture_expr);
+            try self.write(".get_height()))) ? ");
+            try self.emit_expr(function, texture_expr);
+            try self.write(".read(uint2(int2(");
+            try self.emit_expr(function, coord_expr);
+            try self.write("))) : float4(0.0))");
+            return true;
+        }
+        if (call.args.len != 3) return error.InvalidIr;
         const level_expr = function.expr_args.items[call.args.start + 2];
         if (is_texture_1d(self.module, function, texture_expr)) {
             // 1D texture: scalar coord bounds check

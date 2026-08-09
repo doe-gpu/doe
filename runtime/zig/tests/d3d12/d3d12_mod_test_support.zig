@@ -1,9 +1,10 @@
 const builtin = @import("builtin");
 const std = @import("std");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/command.zig");
+const profile = @import("../../src/contracts/model/model_profile.zig");
 const webgpu = @import("../../src/compat/webgpu_ffi.zig");
-const common_errors = @import("../../src/backend/common/errors.zig");
-const command_info = @import("../../src/backend/common/command_info.zig");
+const common_errors = @import("../../src/contracts/execution.zig");
+const command_info = @import("../../src/contracts/command.zig");
 const d3d12_mod = @import("../../src/backend/d3d12/mod.zig");
 
 const STATUS_MESSAGE_RING_SLOTS: usize = 32;
@@ -12,7 +13,7 @@ threadlocal var status_message_storage: [STATUS_MESSAGE_RING_SLOTS][STATUS_MESSA
 threadlocal var status_message_storage_len: [STATUS_MESSAGE_RING_SLOTS]usize = [_]usize{0} ** STATUS_MESSAGE_RING_SLOTS;
 threadlocal var status_message_slot_next: usize = 0;
 
-fn test_profile() model.DeviceProfile {
+fn test_profile() profile.DeviceProfile {
     return .{
         .vendor = "amd",
         .api = .d3d12,

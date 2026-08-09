@@ -1,10 +1,11 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model = @import("../../src/contracts/model/model.zig");
-const capabilities = @import("../../src/backend/common/capabilities.zig");
+const model = @import("../../src/contracts/command.zig");
+const profile = @import("../../src/contracts/model/model_profile.zig");
+const capabilities = @import("../../src/contracts/capability.zig");
 const metal_mod = @import("../../src/backend/metal/mod.zig");
 
-fn test_profile() model.DeviceProfile {
+fn test_profile() profile.DeviceProfile {
     return .{
         .vendor = "apple",
         .api = .metal,

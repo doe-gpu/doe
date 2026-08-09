@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schema/webgpu-abi-source.schema.json",
+  "title": "Doe WebGPU ABI source policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "source", "ownership", "generationPolicy"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "sha256", "dawnCommit", "webgpuHeadersCommit"],
+      "properties": {
+        "kind": { "const": "pinned-header" },
+        "path": { "const": "bench/vendor/dawn/third_party/webgpu-headers/src/webgpu.h" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "dawnCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "webgpuHeadersCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["upstreamDefinitions", "doeExtensions", "exportedSymbolContract"],
+      "properties": {
+        "upstreamDefinitions": { "const": "pinned-header" },
+        "doeExtensions": { "type": "string", "minLength": 1 },
+        "exportedSymbolContract": { "type": "string", "minLength": 1 }
+      }
+    },
+    "generationPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "generatedDomains", "manualUpstreamDefinitionsAllowed"],
+      "properties": {
+        "status": { "const": "required-for-upstream-definitions" },
+        "generatedDomains": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["callbacks", "capabilities", "enums", "loader-metadata", "proc-tables", "proc-types", "records"]
+          }
+        },
+        "manualUpstreamDefinitionsAllowed": { "const": false }
+      }
+    }
+  }
+}

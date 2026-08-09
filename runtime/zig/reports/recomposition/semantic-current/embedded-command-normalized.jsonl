@@ -1,0 +1,5 @@
+{"seq":0,"kind":"copy_buffer_to_texture","direction":"buffer_to_texture","srcHandle":4096,"dstHandle":8192,"bytes":4096,"usesTemporaryBuffer":false,"temporaryBufferAlignment":0}
+{"seq":1,"kind":"upload","bytes":4096,"alignBytes":4}
+{"seq":2,"kind":"buffer_write","handle":12288,"offset":0,"bufferSize":16,"data":{ 1, 2, 3, 4 }}
+{"seq":3,"kind":"kernel_dispatch","kernel":"bench/kernels/shader_compile_pipeline_stress.wgsl","x":2,"y":1,"z":1,"repeat":1,"repeatSynchronization":"dependent"}
+{"seq":4,"kind":"barrier","dependencyCount":3}

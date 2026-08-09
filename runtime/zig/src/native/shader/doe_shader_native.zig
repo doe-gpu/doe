@@ -9,6 +9,7 @@ const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
 const wgsl_ir = @import("../../compiler/wgsl/ir/ir.zig");
 const wgsl_runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compile.zig");
 const shader_translation_cache = @import("doe_shader_translation_cache.zig");
+const shader_binding_reflection = @import("shader_binding_reflection.zig");
 const package_metal_pipeline_cache = @import("../cache/doe_package_metal_pipeline_cache.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
@@ -261,6 +262,30 @@ pub export fn doeNativeShaderModuleGetBindings(raw: ?*anyopaque, out_ptr: ?[*]na
     return count;
 }
 
+pub export fn doeNativeShaderModuleGetBindingsForEntryPoint(
+    raw: ?*anyopaque,
+    entry_ptr: ?[*]const u8,
+    entry_len: usize,
+    out_ptr: ?[*]native_shared.BindingInfo,
+    out_len: usize,
+) callconv(.c) usize {
+    const sm = cast(DoeShaderModule, raw) orelse return 0;
+    const wgsl = sm.wgsl_source orelse return 0;
+    const entry_point = (entry_ptr orelse return 0)[0..entry_len];
+    var metadata: [native_shared.MAX_SHADER_BINDINGS]wgsl_compiler.BindingMeta = undefined;
+    const count = wgsl_compiler.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch return 0;
+    if (out_ptr) |out| for (metadata[0..@min(count, out_len)], 0..) |binding, index| {
+        out[index] = .{
+            .group = binding.group,
+            .binding = binding.binding,
+            .kind = @intFromEnum(binding.kind),
+            .addr_space = @intFromEnum(binding.addr_space),
+            .access = @intFromEnum(binding.access),
+        };
+    };
+    return count;
+}
+
 // ============================================================
 // Shader Module — sType dispatch
 // ============================================================
@@ -319,44 +344,13 @@ fn set_module_info_from_diagnostic_directive(sm: *DoeShaderModule, wgsl: []const
     set_module_compilation_message(sm, .info, DIAGNOSTIC_DIRECTIVE_INFO, loc.line, loc.column);
 }
 
-fn set_module_warning_from_compiler_state(
-    sm: *DoeShaderModule,
-    fallback_message: []const u8,
-) void {
-    const detail = wgsl_compiler.lastErrorMessage();
-    const line = wgsl_compiler.lastErrorLine();
-    const column = wgsl_compiler.lastErrorColumn();
-    const message = if (detail.len > 0) detail else fallback_message;
-    set_module_compilation_message(sm, .warning, message, line, column);
-}
-
-pub fn ensureShaderBindings(sm: *DoeShaderModule) void {
-    if (sm.bindings_ready) return;
-    const wgsl = sm.wgsl_source orelse return;
-    sm.bindings_ready = true;
-    sm.binding_count = 0;
-    var bind_meta: [native_shared.MAX_SHADER_BINDINGS]wgsl_compiler.BindingMeta = undefined;
-    const bind_count = wgsl_compiler.extractBindings(alloc, wgsl, &bind_meta) catch |bind_err| blk: {
-        std.log.warn("doe: createShaderModule: lazy binding extraction failed ({s}); proceeding with 0 bindings", .{@errorName(bind_err)});
-        set_module_warning_from_compiler_state(sm, "binding extraction failed after successful shader compilation");
-        break :blk 0;
-    };
-    for (0..bind_count) |i| {
-        sm.bindings[i] = .{
-            .group = bind_meta[i].group,
-            .binding = bind_meta[i].binding,
-            .kind = @intFromEnum(bind_meta[i].kind),
-            .addr_space = @intFromEnum(bind_meta[i].addr_space),
-            .access = @intFromEnum(bind_meta[i].access),
-        };
-    }
-    sm.binding_count = @intCast(bind_count);
-}
+pub const ensureShaderBindings = shader_binding_reflection.ensureShaderBindings;
 pub export fn doeNativeDeviceCreateShaderModule(dev_raw: ?*anyopaque, desc: ?*const abi_pipeline.WGPUShaderModuleDescriptor) callconv(.c) ?*anyopaque {
     clear_last_error();
     const dev = cast(DoeDevice, dev_raw) orelse return null;
     const d = desc orelse return null;
-    const chain = d.nextInChain orelse return null;
+    if (d.nextInChain == null) return null;
+    const chain: *const abi_callback.WGPUChainedStruct = @ptrCast(d.nextInChain);
 
     const result = switch (chain.sType) {
         abi_core.WGPUSType_ShaderSourceWGSL => createFromWGSL(dev, chain),
@@ -584,14 +578,14 @@ fn createFromMSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct) 
 fn createFromSPIRV(chain: *const abi_callback.WGPUChainedStruct) ?*anyopaque {
     const spirv_chain: *const abi_pipeline.WGPUShaderSourceSPIRV = @ptrCast(@alignCast(chain));
 
-    if (spirv_chain.code_size == 0 or spirv_chain.code_size % 4 != 0) {
+    if (spirv_chain.codeSize == 0 or spirv_chain.code == null) {
         set_last_error_stage_name("native_shader_create");
         set_last_error_kind("InvalidSPIRV");
-        set_last_error("SPIR-V code_size must be a positive multiple of 4");
+        set_last_error("SPIR-V codeSize and code must describe at least one word");
         return null;
     }
 
-    const word_count = spirv_chain.code_size / 4;
+    const word_count = spirv_chain.codeSize;
     const spirv_copy = alloc.alloc(u32, word_count) catch {
         set_last_error_stage_name("native_shader_create");
         set_last_error_kind("OutOfMemory");
@@ -608,9 +602,9 @@ fn createFromSPIRV(chain: *const abi_callback.WGPUChainedStruct) ?*anyopaque {
     sm.spirv_data = spirv_copy;
     sm.binding_count = 0;
     sm.needs_sizes_buf = false;
-    sm.wg_x = normalizeWorkgroupDim(spirv_chain.workgroup_size_x);
-    sm.wg_y = normalizeWorkgroupDim(spirv_chain.workgroup_size_y);
-    sm.wg_z = normalizeWorkgroupDim(spirv_chain.workgroup_size_z);
+    sm.wg_x = 1;
+    sm.wg_y = 1;
+    sm.wg_z = 1;
     return toOpaque(sm);
 }
 
@@ -944,10 +938,10 @@ pub export fn doeNativeDeviceCreateComputePipelineMain(dev_raw: ?*anyopaque, sha
     var desc = abi_pipeline.WGPUComputePipelineDescriptor{
         .nextInChain = null,
         .label = .{ .data = null, .length = 0 },
-        .layout = layout_raw,
+        .layout = @ptrCast(layout_raw),
         .compute = .{
             .nextInChain = null,
-            .module = shader_raw,
+            .module = @ptrCast(shader_raw),
             .entryPoint = .{ .data = main_entry.ptr, .length = main_entry.len },
             .constantCount = 0,
             .constants = null,

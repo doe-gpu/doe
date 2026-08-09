@@ -52,10 +52,10 @@ test "WGPUShaderSourceMSL: has chain, code, and workgroup fields" {
     try std.testing.expectEqual(@as(u32, 0), desc.workgroup_size_z);
 }
 
-test "WGPUShaderSourceSPIRV: code_size zero is valid default" {
+test "WGPUShaderSourceSPIRV: codeSize zero is valid default" {
     const desc = std.mem.zeroes(types.WGPUShaderSourceSPIRV);
-    try std.testing.expectEqual(@as(u32, 0), desc.code_size);
-    try std.testing.expectEqual(@as(u32, 0), desc.workgroup_size_x);
+    try std.testing.expectEqual(@as(u32, 0), desc.codeSize);
+    try std.testing.expect(desc.code == null);
 }
 
 test "WGPUShaderSourceHLSL: has chain, code, and workgroup fields" {
@@ -136,18 +136,14 @@ test "doeNativeDeviceCreateShaderModule: unknown sType returns null" {
 // 6. SPIR-V creation — validation and storage
 // ============================================================
 
-test "SPIR-V shader module: invalid code_size (not multiple of 4) is rejected" {
+test "SPIR-V shader module: null code with nonzero codeSize is rejected" {
     // Create a fake device handle to pass device validation.
     // The SPIR-V path does not touch the device, so we need a valid magic.
     var dev = native.DoeDevice{};
-    var spirv_words = [_]u32{ 0x07230203, 0x00010000, 0, 0 }; // minimal SPIR-V header
     var spirv_desc = types.WGPUShaderSourceSPIRV{
         .chain = .{ .next = null, .sType = types.WGPUSType_ShaderSourceSPIRV },
-        .code = &spirv_words,
-        .code_size = 5, // not a multiple of 4
-        .workgroup_size_x = 1,
-        .workgroup_size_y = 1,
-        .workgroup_size_z = 1,
+        .code = null,
+        .codeSize = 1,
     };
     const desc = types.WGPUShaderModuleDescriptor{
         .nextInChain = @ptrCast(&spirv_desc.chain),
@@ -162,16 +158,13 @@ test "SPIR-V shader module: invalid code_size (not multiple of 4) is rejected" {
     }
 }
 
-test "SPIR-V shader module: zero code_size is rejected" {
+test "SPIR-V shader module: zero codeSize is rejected" {
     var dev = native.DoeDevice{};
     var spirv_words = [_]u32{0x07230203};
     var spirv_desc = types.WGPUShaderSourceSPIRV{
         .chain = .{ .next = null, .sType = types.WGPUSType_ShaderSourceSPIRV },
         .code = &spirv_words,
-        .code_size = 0,
-        .workgroup_size_x = 0,
-        .workgroup_size_y = 0,
-        .workgroup_size_z = 0,
+        .codeSize = 0,
     };
     const desc = types.WGPUShaderModuleDescriptor{
         .nextInChain = @ptrCast(&spirv_desc.chain),
@@ -190,10 +183,7 @@ test "SPIR-V shader module: valid input creates module with stored binary" {
     var spirv_desc = types.WGPUShaderSourceSPIRV{
         .chain = .{ .next = null, .sType = types.WGPUSType_ShaderSourceSPIRV },
         .code = &spirv_words,
-        .code_size = 16, // 4 words * 4 bytes
-        .workgroup_size_x = 8,
-        .workgroup_size_y = 4,
-        .workgroup_size_z = 2,
+        .codeSize = 4,
     };
     const desc = types.WGPUShaderModuleDescriptor{
         .nextInChain = @ptrCast(&spirv_desc.chain),
@@ -204,9 +194,9 @@ test "SPIR-V shader module: valid input creates module with stored binary" {
 
     // Verify module fields via cast.
     const sm = native.cast(native.DoeShaderModule, result).?;
-    try std.testing.expectEqual(@as(u32, 8), sm.wg_x);
-    try std.testing.expectEqual(@as(u32, 4), sm.wg_y);
-    try std.testing.expectEqual(@as(u32, 2), sm.wg_z);
+    try std.testing.expectEqual(@as(u32, 1), sm.wg_x);
+    try std.testing.expectEqual(@as(u32, 1), sm.wg_y);
+    try std.testing.expectEqual(@as(u32, 1), sm.wg_z);
     try std.testing.expectEqual(@as(u32, 0), sm.binding_count);
     try std.testing.expect(!sm.needs_sizes_buf);
     try std.testing.expectEqual(@as(?*anyopaque, null), sm.mtl_library);
@@ -221,16 +211,13 @@ test "SPIR-V shader module: valid input creates module with stored binary" {
     native.doeNativeShaderModuleRelease(result);
 }
 
-test "SPIR-V shader module: workgroup size 0 normalizes to 1" {
+test "SPIR-V shader module: upstream descriptors use default workgroup size" {
     var dev = native.DoeDevice{};
     var spirv_words = [_]u32{ 0x07230203, 0x00010000 };
     var spirv_desc = types.WGPUShaderSourceSPIRV{
         .chain = .{ .next = null, .sType = types.WGPUSType_ShaderSourceSPIRV },
         .code = &spirv_words,
-        .code_size = 8,
-        .workgroup_size_x = 0,
-        .workgroup_size_y = 0,
-        .workgroup_size_z = 0,
+        .codeSize = 2,
     };
     const desc = types.WGPUShaderModuleDescriptor{
         .nextInChain = @ptrCast(&spirv_desc.chain),

@@ -1,5 +1,5 @@
 const std = @import("std");
-const common = @import("../common.zig");
+const artifact = @import("../../../contracts/artifact.zig");
 
 pub const MODULE_ID = "fawn_compute_services";
 
@@ -98,7 +98,7 @@ pub const Result = struct {
     executionStats: ExecutionStats,
     timingStats: TimingStats,
     failureDetails: FailureDetails,
-    traceLink: common.TraceLink,
+    traceLink: artifact.TraceLink,
 };
 
 pub fn parseRequest(allocator: std.mem.Allocator, bytes: []const u8) !std.json.Parsed(Request) {
@@ -176,9 +176,9 @@ pub fn execute(allocator: std.mem.Allocator, request: Request, policy: Policy) !
     try ensureValidRequest(request);
     try ensureValidPolicy(policy);
 
-    const request_hash = try common.stableHashJsonAlloc(allocator, request);
+    const request_hash = try artifact.stableHashJsonAlloc(allocator, request);
     errdefer allocator.free(request_hash);
-    const policy_hash = try common.stableHashJsonAlloc(allocator, policy);
+    const policy_hash = try artifact.stableHashJsonAlloc(allocator, policy);
     errdefer allocator.free(policy_hash);
 
     const bytes_moved = totalInputBytes(request);
@@ -210,7 +210,7 @@ pub fn execute(allocator: std.mem.Allocator, request: Request, policy: Policy) !
         .timingStats = deterministicTiming(request),
         .failureDetails = .{ .code = failureCodeFor(fallback_reason) },
     };
-    const result_hash = try common.stableHashJsonAlloc(allocator, payload);
+    const result_hash = try artifact.stableHashJsonAlloc(allocator, payload);
     return .{
         .schemaVersion = payload.schemaVersion,
         .moduleId = payload.moduleId,

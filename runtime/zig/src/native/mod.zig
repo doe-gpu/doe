@@ -80,6 +80,7 @@ pub const doeNativeDeviceCreateBufferFlat = m0.doeNativeDeviceCreateBufferFlat;
 pub const doeNativeDeviceCreateShaderModule = m0.doeNativeDeviceCreateShaderModule;
 pub const doeNativeDeviceCreateShaderModuleWgsl = m0.doeNativeDeviceCreateShaderModuleWgsl;
 pub const doeNativeShaderModuleRelease = m0.doeNativeShaderModuleRelease;
+pub const doeNativeShaderModuleGetBindingsForEntryPoint = m0.doeNativeShaderModuleGetBindingsForEntryPoint;
 pub const doeNativeDeviceCreateComputePipeline = m0.doeNativeDeviceCreateComputePipeline;
 pub const doeNativeDeviceCreateComputePipelineMain = m0.doeNativeDeviceCreateComputePipelineMain;
 pub const doeNativeComputePipelineRelease = m0.doeNativeComputePipelineRelease;

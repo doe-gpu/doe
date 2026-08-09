@@ -1,14 +1,18 @@
 # Doe performance contract
 
+This page defines measurement and comparison mechanics only. Performance's
+place in the product priority order and downstream-application strategy lives
+only in [`thesis.md`](thesis.md).
+
 ## Purpose
 
 Performance is part of the promoted Node/Bun product contract. A speed claim is
 eligible only after correctness, structural equivalence, runtime identity, and
 failure checks pass.
 
-`config/gates.json` still classifies performance as advisory repository-wide.
-That is not sufficient for a developer-wedge release marketed as faster; the
-promoted workload set needs a blocking performance decision.
+`config/gates.json` classifies performance as advisory repository-wide. Each
+promoted developer-wedge workload must additionally declare a blocking
+performance decision in its promotion contract.
 
 ## Measurement order
 

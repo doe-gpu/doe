@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import fnmatch
+import json
 import sys
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[2]
-ZIG_SRC = ROOT / "zig" / "src"
-LINE_LIMIT = 999
-ALLOWLIST: dict[str, str] = {}
+ROOT = Path(__file__).resolve().parents[1]
+ZIG_SRC = ROOT / "src"
+MANIFEST = ROOT / "source-layout.json"
 
 
 def count_lines(path: Path) -> int:
@@ -16,30 +17,56 @@ def count_lines(path: Path) -> int:
 
 
 def main() -> int:
+    config = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    architecture = config["architecture"]
+    policy = architecture["linePolicy"]
+    generated_globs = architecture["specialRoles"]["generated"]
+    justifications = {
+        entry["path"]: entry
+        for entry in architecture["cohesiveModuleJustifications"]
+    }
     errors: list[str] = []
-    allowlisted: list[str] = []
+    advisories: list[str] = []
 
     for path in sorted(ZIG_SRC.rglob("*.zig")):
+        manifest_path = path.relative_to(ROOT).as_posix()
+        if any(fnmatch.fnmatchcase(manifest_path, glob) for glob in generated_globs):
+            continue
         line_count = count_lines(path)
-        if line_count <= LINE_LIMIT:
+        if policy["mode"] == "transition":
+            if line_count > policy["transitionMaximumLines"]:
+                errors.append(
+                    f"{manifest_path}: {line_count} lines exceeds transition maximum "
+                    f"{policy['transitionMaximumLines']}"
+                )
             continue
-        rel_path = path.relative_to(ZIG_SRC).as_posix()
-        if rel_path in ALLOWLIST:
-            allowlisted.append(
-                f"{path}: {line_count} lines exceeds {LINE_LIMIT} (allowlisted: {ALLOWLIST[rel_path]})"
+        if line_count > policy["futureHardMaximumLines"]:
+            errors.append(
+                f"{manifest_path}: {line_count} lines exceeds handwritten hard maximum "
+                f"{policy['futureHardMaximumLines']}"
             )
-            continue
-        errors.append(f"{path}: {line_count} lines exceeds {LINE_LIMIT}")
+        elif (
+            line_count > policy["futureJustificationAboveLines"]
+            and manifest_path not in justifications
+        ):
+            errors.append(
+                f"{manifest_path}: {line_count} lines requires a cohesive-module justification"
+            )
+        elif line_count > policy["advisoryReviewLines"]:
+            advisories.append(
+                f"{manifest_path}: {line_count} lines exceeds advisory review signal "
+                f"{policy['advisoryReviewLines']}"
+            )
 
-    if allowlisted:
-        print("allowlisted Zig source files still exceed the line limit:", file=sys.stderr)
-        for entry in allowlisted:
+    if advisories:
+        print("Zig source architecture review signals:", file=sys.stderr)
+        for entry in advisories:
             print(entry, file=sys.stderr)
 
     if not errors:
         return 0
 
-    print("Zig source line-limit violations detected:", file=sys.stderr)
+    print("Zig source architecture line-policy violations detected:", file=sys.stderr)
     for entry in errors:
         print(entry, file=sys.stderr)
     return 1

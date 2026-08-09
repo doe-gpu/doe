@@ -1,12 +1,13 @@
 const std = @import("std");
 const abi_base = @import("../wgpu_handle_types.zig");
+const upstream = @import("../generated/webgpu_upstream.zig");
 
-pub const WGPUExternalTexture = ?*anyopaque;
+pub const WGPUExternalTexture = upstream.WGPUExternalTexture;
 pub const WGPUResourceTable = ?*anyopaque;
 pub const WGPUSharedBufferMemory = ?*anyopaque;
 pub const WGPUSharedFence = ?*anyopaque;
 pub const WGPUSharedTextureMemory = ?*anyopaque;
-pub const WGPUSurface = ?*anyopaque;
+pub const WGPUSurface = upstream.WGPUSurface;
 pub const WGPUTexelBufferView = ?*anyopaque;
 
 pub const FnAdapterAddRef = *const fn (abi_base.WGPUAdapter) callconv(.c) void;

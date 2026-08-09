@@ -49,6 +49,7 @@ napi_value doe_check_shader_source(napi_env env, napi_callback_info info);
 napi_value doe_create_shader_module(napi_env env, napi_callback_info info);
 napi_value doe_shader_module_release(napi_env env, napi_callback_info info);
 napi_value doe_shader_module_get_bindings(napi_env env, napi_callback_info info);
+napi_value doe_shader_module_get_bindings_for_entry_point(napi_env env, napi_callback_info info);
 napi_value doe_shader_module_get_compilation_info(napi_env env, napi_callback_info info);
 
 /* Compute pipeline */
@@ -228,6 +229,7 @@ napi_value doe_module_init(napi_env env, napi_value exports) {
         EXPORT_FN("createShaderModule",                       doe_create_shader_module),
         EXPORT_FN("shaderModuleRelease",                      doe_shader_module_release),
         EXPORT_FN("shaderModuleGetBindings",                  doe_shader_module_get_bindings),
+        EXPORT_FN("shaderModuleGetBindingsForEntryPoint",     doe_shader_module_get_bindings_for_entry_point),
         EXPORT_FN("shaderModuleGetCompilationInfo",           doe_shader_module_get_compilation_info),
         EXPORT_FN("createComputePipeline",                    doe_create_compute_pipeline),
         EXPORT_FN("computePipelineRelease",                   doe_compute_pipeline_release),

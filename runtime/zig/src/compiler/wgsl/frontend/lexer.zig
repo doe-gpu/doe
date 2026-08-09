@@ -1,7 +1,7 @@
 // doe_wgsl/lexer.zig — WGSL tokenizer.
 
 const std = @import("std");
-const byte_scan = @import("../../../runtime/simd/byte_scan.zig");
+const byte_scan = @import("../../../contracts/primitives/byte_scan.zig");
 const token = @import("token.zig");
 const Token = token.Token;
 const Tag = token.Tag;

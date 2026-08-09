@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-project-harness",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "license": {
+      "identifier": "MIT",
+      "evidenceUrl": "https://github.com/saabi/world-lab/blob/4ef19794501d565586a73b991ea569834c54afad/LICENSE"
+    }
+  },
+  "providerSubstitution": {
+    "baselineProvider": "dawn-node-webgpu",
+    "comparisonProvider": "doe-gpu",
+    "seam": "An external Vitest config aliases only the existing webgpu package import to the selected provider module; upstream tests, graph fixtures, generated WGSL, CPU references, tolerances, synchronization, and readback are unchanged.",
+    "patchPaths": []
+  },
+  "fallbackPolicy": {
+    "requireHardware": true,
+    "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],
+    "providerIdentityAssertion": "The selected module path and child-process provider probe must name the requested provider, expose an adapter identity, reject software renderers, and bind an accessible physical render node before evidence is comparable."
+  },
+  "workload": {
+    "command": ["node", "bench/external-projects/world-lab-runtime-webgpu/run-suite.mjs", "--require-all-pass"],
+    "immutableInputRefs": [
+      "bench/external-projects/world-lab-runtime-webgpu/oracle.md",
+      "bench/external-projects/world-lab-runtime-webgpu/vitest-provider.config.mjs"
+    ],
+    "oracle": {
+      "kind": "upstream",
+      "path": "bench/external-projects/world-lab-runtime-webgpu/oracle.md",
+      "reviewStatus": "reviewed"
+    },
+    "sameWorkPolicy": "Both providers execute the same pinned 16-assertion upstream workload covering representative shader validation, CPU/GPU vegetation parity, overflow and zero-output cases, fullscreen render execution, RGBA8 readback, and independent first-pixel validation.",
+    "completionBoundary": "A clean-process sample ends only after all selected compute, render, shader-compilation, queue-completion, mapping, readback, negative-validation, and output-oracle assertions have completed with REQUIRE_WEBGPU=1."
+  },
+  "requiredMeasurements": [
+    "clean-process-success",
+    "crashes",
+    "hangs",
+    "timeouts",
+    "peak-memory-bytes",
+    "cold-p50",
+    "cold-p95",
+    "cold-p99",
+    "warm-p50",
+    "warm-p95",
+    "warm-p99",
+    "receipt-overhead"
+  ],
+  "requiredReceiptFields": [
+    "provider-identity",
+    "adapter-identity",
+    "driver-identity",
+    "shader-hashes",
+    "dispatch-shape",
+    "synchronization",
+    "readback",
+    "output-identity"
+  ],
+  "installation": {
+    "substitutionMode": "other",
+    "productionStatus": "harness-only",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "installCommand": ["npm", "ci"],
+    "validationCommand": ["node", "bench/external-projects/world-lab-runtime-webgpu/run-suite.mjs", "--require-all-pass"]
+  },
+  "supportTargets": [],
+  "reliabilityPolicy": {
+    "cleanProcessRunsPerProvider": 3,
+    "concurrencyLevel": 1,
+    "concurrencyRunsPerProvider": 0,
+    "teardownCyclesPerProvider": 0,
+    "stressIterationsPerProvider": 0,
+    "processTimeoutSeconds": 120,
+    "memoryGrowthBoundaryBytes": 0,
+    "requireZeroCrashes": true,
+    "requireZeroHangs": true,
+    "requireZeroTimeouts": true
+  },
+  "performancePolicy": {
+    "timingScope": "complete clean-process Vitest execution of the selected 16 upstream consumer assertions",
+    "coldSamplesPerProvider": 3,
+    "warmupSamplesPerProvider": 0,
+    "warmSamplesPerProvider": 1,
+    "requiredPercentiles": ["p50", "p95", "p99"],
+    "throughputMetric": "oracle-passing selected consumer suites per second",
+    "minimumMaterialSpeedupRatio": 1.1,
+    "maximumRegressionRatio": 1.05
+  },
+  "receiptPolicy": {
+    "captureRequired": true,
+    "replayRequired": false,
+    "runtimeBuildIdentityRequired": true
+  },
+  "releasePolicy": {
+    "promotionState": "not-promoted",
+    "blocking": false,
+    "command": ["node", "bench/external-projects/world-lab-runtime-webgpu/run-suite.mjs", "--require-all-pass"],
+    "promotionReportIds": []
+  }
+}

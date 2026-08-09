@@ -1,10 +1,8 @@
 # Node/Bun developer wedge
 
-## Product sentence
-
-Drop Doe into a supported Node or Bun GPU application and get the same correct
-result, fewer operational failures, and materially better end-to-end
-performance. The receipt proves the runtime path.
+This page is the implementation and promotion contract for the initial wedge.
+The objective, priority order, downstream flywheel, commercial journey, and
+expansion boundaries live only in [`thesis.md`](thesis.md).
 
 ## Supported boundary
 
@@ -43,9 +41,6 @@ must record:
 - unsupported APIs;
 - runtime, adapter, driver, and native binary identity;
 - installation and execution receipt.
-
-Several deeply supported applications are more valuable than a broad surface
-that no downstream project exercises.
 
 ## Reliability gate
 

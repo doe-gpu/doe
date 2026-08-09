@@ -1,20 +1,21 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model_commands = @import("../../contracts/model/model_commands.zig");
+const model_commands = @import("../../contracts/command.zig");
 const model_profile = @import("../../contracts/model/model_profile.zig");
 const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const compute_contract = @import("../../contracts/compute.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
 const webgpu = @import("../runtime_types.zig");
 const backend_iface = @import("../backend_iface.zig");
 const backend_policy = @import("../backend_policy.zig");
-const common_errors = @import("../common/errors.zig");
-const command_info = @import("../common/command_info.zig");
-const capabilities = @import("../common/capabilities.zig");
-const artifact_meta = @import("../common/artifact_meta.zig");
+const common_errors = @import("../../contracts/execution.zig");
+const command_info = @import("../../contracts/command.zig");
+const capabilities = @import("../../contracts/capability.zig");
+const artifact_meta = @import("../../contracts/artifact.zig");
 const artifact_policy = @import("../common/artifact_policy.zig");
-const hash_utils = @import("../common/hash_utils.zig");
+const hash_utils = @import("../../contracts/artifact.zig");
 const artifact_emit = @import("artifact_emit.zig");
 const backend_execute = @import("backend_execute.zig");
 const native_runtime = @import("native_runtime.zig");
@@ -466,6 +467,13 @@ fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.Nati
     return backend_execute.execute_command(self, command);
 }
 
+fn execute_dispatch(context: compute_contract.ComputeContext, request: compute_contract.DispatchRequest) anyerror!compute_contract.DispatchReport {
+    const self = cast(context.state);
+    self.reset_last_submit_count();
+    const result = try backend_execute.execute_dispatch(ZigVulkanBackend, self, request);
+    return .{ .execution = result };
+}
+
 fn execute_buffer_write_bytes_iface(ctx: *anyopaque, handle: u64, offset: u64, buffer_size: u64, data: []const u8) anyerror!webgpu.NativeExecutionResult {
     const self = cast(ctx);
     self.reset_last_submit_count();
@@ -524,6 +532,7 @@ fn capture_buffer(ctx: *anyopaque, allocator: std.mem.Allocator, handle: u64, of
 const VTABLE = backend_iface.BackendVTable{
     .deinit = deinit,
     .execute_command = execute_command,
+    .execute_dispatch = execute_dispatch,
     .execute_buffer_write_bytes = execute_buffer_write_bytes_iface,
     .set_upload_behavior = set_upload_behavior,
     .set_queue_wait_mode = set_queue_wait_mode,

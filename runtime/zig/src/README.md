@@ -14,7 +14,6 @@ is the single module root; every other Zig file belongs to one owner below.
 | `contracts/` | neutral contracts shared by core and full runtime layers |
 | `core/` | compute, resource, queue, replay, trace, and WebGPU ABI core |
 | `dropin/` | WebGPU drop-in symbol routing and behavior policy |
-| `experimental/` | runtime experiments outside promoted behavior |
 | `full/` | render, surface, and full-runtime command behavior |
 | `integrations/` | runtime integration anchors such as ONNX Runtime EP |
 | `native/` | Doe-native WebGPU object and command implementation |

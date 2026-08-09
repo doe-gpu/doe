@@ -12,6 +12,7 @@ const vulkan_compute = @import("../vulkan/vulkan_compute_native.zig");
 const shader_native = @import("../shader/doe_shader_native.zig");
 const query_native = @import("../resource/doe_query_native.zig");
 const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
+const binding_contract = @import("../../contracts/binding.zig");
 const resource_ops = @import("../../backend/dropin_resource_ops.zig");
 const bridge = resource_ops.metal_bridge;
 
@@ -34,11 +35,11 @@ const MAX_COMPUTE_BIND_GROUPS = compute_bind_groups.MAX_COMPUTE_BIND_GROUPS;
 const MAX_FLAT_BIND = compute_bind_groups.MAX_FLAT_BIND;
 const MAX_SHADER_BINDINGS = native_shared.MAX_SHADER_BINDINGS;
 
-const RESOURCE_KIND_NONE: u32 = 0;
-const RESOURCE_KIND_BUFFER: u32 = 1;
-const RESOURCE_KIND_SAMPLER: u32 = 2;
-const RESOURCE_KIND_TEXTURE: u32 = 3;
-const RESOURCE_KIND_STORAGE_TEXTURE: u32 = 4;
+const RESOURCE_KIND_NONE = binding_contract.layoutResourceKindCode(.none);
+const RESOURCE_KIND_BUFFER = binding_contract.layoutResourceKindCode(.buffer);
+const RESOURCE_KIND_SAMPLER = binding_contract.layoutResourceKindCode(.sampler);
+const RESOURCE_KIND_TEXTURE = binding_contract.layoutResourceKindCode(.texture);
+const RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.storage_texture);
 
 fn validate_dispatch_preconditions(pass: *const DoeComputePass, pip: *const DoeComputePipeline, dispatch: [3]u32) bool {
     compute_preconditions.validate_bind_groups(
@@ -214,11 +215,9 @@ fn appendRecordedDispatch(pass: *DoeComputePass, pip: *DoeComputePipeline, x: u3
         &cmd.dispatch.buf_sizes,
     );
     if (pip.spirv_data != null) {
-        cmd.dispatch.vulkan_binding_state = vulkan_compute.vulkan_collect_recorded_binding_state(
+        cmd.dispatch.vulkan_binding_state = vulkan_compute.vulkan_collect_recorded_bind_group_state(
             pip,
-            cmd.dispatch.bufs[0..cmd.dispatch.buf_count],
-            cmd.dispatch.buf_offsets[0..cmd.dispatch.buf_count],
-            cmd.dispatch.buf_sizes[0..cmd.dispatch.buf_count],
+            pass.bind_groups[0..],
         );
     }
     if (native_cmds.tryMergeDispatchIntoLast(&pass.enc.cmds, &cmd)) {
@@ -373,11 +372,9 @@ pub export fn doeNativeComputePassDispatchIndirect(pass_raw: ?*anyopaque, buf_ra
         &cmd.dispatch_indirect.buf_sizes,
     );
     if (pip.spirv_data != null) {
-        cmd.dispatch_indirect.vulkan_binding_state = vulkan_compute.vulkan_collect_recorded_binding_state(
+        cmd.dispatch_indirect.vulkan_binding_state = vulkan_compute.vulkan_collect_recorded_bind_group_state(
             pip,
-            cmd.dispatch_indirect.bufs[0..cmd.dispatch_indirect.buf_count],
-            cmd.dispatch_indirect.buf_offsets[0..cmd.dispatch_indirect.buf_count],
-            cmd.dispatch_indirect.buf_sizes[0..cmd.dispatch_indirect.buf_count],
+            pass.bind_groups[0..],
         );
     }
     pass.enc.cmds.append(alloc, cmd) catch

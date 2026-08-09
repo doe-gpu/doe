@@ -5,7 +5,7 @@ const object_helpers = @import("../support/doe_native_object_helpers.zig");
 const runtime_helpers = @import("../support/doe_native_runtime_helpers.zig");
 
 pub const alloc = object_helpers.alloc;
-pub const BackendKind = shared.BackendKind;
+pub const BackendKind = @import("../../contracts/backend.zig").NativeBackendKind;
 pub const NativeVulkanRuntime = shared.NativeVulkanRuntime;
 pub const NativeD3D12Runtime = shared.NativeD3D12Runtime;
 pub const MAX_BIND = shared.MAX_BIND;
@@ -86,6 +86,7 @@ const shader = @import("../shader/doe_shader_native.zig");
 pub const doeNativeDeviceCreateShaderModule = shader.doeNativeDeviceCreateShaderModule;
 pub const doeNativeDeviceCreateShaderModuleWgsl = shader.doeNativeDeviceCreateShaderModuleWgsl;
 pub const doeNativeShaderModuleRelease = shader.doeNativeShaderModuleRelease;
+pub const doeNativeShaderModuleGetBindingsForEntryPoint = shader.doeNativeShaderModuleGetBindingsForEntryPoint;
 pub const doeNativeDeviceCreateComputePipeline = shader.doeNativeDeviceCreateComputePipeline;
 pub const doeNativeDeviceCreateComputePipelineMain = shader.doeNativeDeviceCreateComputePipelineMain;
 pub const doeNativeComputePipelineRelease = shader.doeNativeComputePipelineRelease;

@@ -7,7 +7,7 @@ const vk_constants = @import("../../src/backend/vulkan/vk_constants.zig");
 const backend_policy = @import("../../src/backend/backend_policy.zig");
 const native_runtime = @import("../../src/backend/vulkan/native_runtime.zig");
 const webgpu = @import("../../src/compat/webgpu_ffi.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/model/model_gpu_types.zig");
 
 // ============================================================
 // Upload path classification — pure logic

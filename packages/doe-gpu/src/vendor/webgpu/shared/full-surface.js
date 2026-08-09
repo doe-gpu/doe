@@ -1435,6 +1435,7 @@ function createFullSurfaceClasses({
             shader,
             globals.GPUShaderStage.COMPUTE,
             'GPUDevice.createComputePipeline',
+            entryPoint,
           );
         const constants = compute.constants ?? null;
         const label = pipelineDescriptor.label || undefined;
@@ -1467,6 +1468,7 @@ function createFullSurfaceClasses({
             shader,
             globals.GPUShaderStage.COMPUTE,
             'GPUDevice.createComputePipelineAsync',
+            entryPoint,
           );
         const constants = compute.constants ?? null;
         const label = pipelineDescriptor.label || undefined;

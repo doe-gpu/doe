@@ -1,5 +1,5 @@
 const std = @import("std");
-const artifact_meta = @import("../../src/backend/common/artifact_meta.zig");
+const artifact_meta = @import("../../src/contracts/artifact.zig");
 
 test "native backends are claimable" {
     try std.testing.expect(artifact_meta.BackendKind.native_vulkan.is_claimable());

@@ -27,7 +27,7 @@
 
 const std = @import("std");
 const schema = @import("schema.zig");
-const body_emit = @import("emit_kernel_body.zig");
+const body_emit = @import("emit_kernel_context.zig");
 
 pub fn emitCslConv1DDepthwise(
     writer: anytype,

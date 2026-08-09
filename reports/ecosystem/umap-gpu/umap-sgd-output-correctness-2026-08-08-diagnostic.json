@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "umap-sgd-output-correctness-2026-08-08-diagnostic",
+  "actorId": "umap-gpu",
+  "harnessId": "sgd-output-correctness",
+  "generatedAt": "2026-08-09T01:17:23.420Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-09T01:19:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "6",
+  "upstream": {
+    "repositoryUrl": "https://github.com/Achuttarsing/umap-gpu",
+    "commit": "7884b287f49bc057df7e0856c5539f130a20e0ad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "unchanged-upstream-output-oracle",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "Dawn and Doe each passed all eight assertions in three clean executions of the unchanged upstream WebGPU output suite, covering finite output, embedding spread, cluster topology, nearest-neighbor labels, deferred epoch-zero work, and epoch-one movement.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/2026-08-08T-run2/raw-suite.json",
+          "sha256": "4b91840fef592f8ba005e63eb82131a254289f23e03094c0a9f820df6ae8923d"
+        },
+        {
+          "path": "bench/out/external-projects/umap-gpu/2026-08-08T-run2/receipt-summary.json",
+          "sha256": "71386ff34d121389e7d8ba22cb523fbe6bfa90e954dca4bd5aab3f94989a1586"
+        }
+      ]
+    },
+    {
+      "id": "provider-alias-compatibility",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "A Vitest resolve alias changed only the webgpu package provider; the application TypeScript, both WGSL shaders, fixtures, thresholds, synchronization, and readback remained pinned and unchanged.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/2026-08-08T-run2/raw-suite.json",
+          "sha256": "4b91840fef592f8ba005e63eb82131a254289f23e03094c0a9f820df6ae8923d"
+        }
+      ]
+    },
+    {
+      "id": "hardware-performance-ineligible",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "Dawn selected llvmpipe after the physical render node denied access, the suite did not separate warm samples, and exact embedding bytes were not emitted, so process durations are diagnostic only.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/2026-08-08T-run2/receipt-summary.json",
+          "sha256": "71386ff34d121389e7d8ba22cb523fbe6bfa90e954dca4bd5aab3f94989a1586"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The host denied access to /dev/dri/renderD128 and Dawn selected llvmpipe, so the run is not hardware-comparable.",
+    "The upstream oracle validates structural properties but does not emit exact embedding bytes for cross-provider identity.",
+    "The primary fixture's runtime graph edge count is not emitted, so the exact first-pass workgroup count remains unrecorded.",
+    "The full-process samples do not separate cold and warm execution or receipt overhead.",
+    "The result covers the pinned upstream SGD output suite, not the package's full UMAP pipeline or published installation path."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "software-renderer-detected",
+      "render-node-inaccessible",
+      "exact-output-identity-unavailable",
+      "primary-edge-count-unrecorded",
+      "driver-identity-incomplete",
+      "hardware-performance-ineligible"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 118181888
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 157425664
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The diagnostic suite captured clean-process wall times but did not provide physical hardware, exact output identity, or separate cold and warm samples."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched traced and untraced workload pair was executed."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The external Vitest alias is a controlled harness substitution, not a validated production package installation."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "The physical render node was inaccessible and Dawn selected llvmpipe."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic matrix ran sequential clean processes only."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Clean process exit exercised basic teardown, but no promotion-scale repeated device and process teardown lane ran."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Three clean processes per provider do not satisfy the promotion stress floor."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak parent-process RSS was captured, but no process-tree bounded-growth leak test ran."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "Provider, adapter, shader, synchronization, readback, and assertion identities were captured, but underlying Doe driver identity, concrete primary dispatch count, and exact output bytes remain unavailable."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "Software rendering, missing exact output identity, and incomplete timing classes prohibit a performance result."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness remains diagnostic and is not a blocking release dependency."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/umap-gpu/2026-08-08T-run2/receipt-summary.json",
+      "sha256": "71386ff34d121389e7d8ba22cb523fbe6bfa90e954dca4bd5aab3f94989a1586"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/umap-gpu/2026-08-08T-run2/raw-suite.json",
+      "sha256": "4b91840fef592f8ba005e63eb82131a254289f23e03094c0a9f820df6ae8923d"
+    }
+  ]
+}

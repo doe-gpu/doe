@@ -1,0 +1,28 @@
+#include <metal_stdlib>
+using namespace metal;
+
+struct Uniforms {
+    uint size;
+    uint _pad0;
+    uint _pad1;
+    uint _pad2;
+};
+
+float gelu(float x, constant Uniforms& u [[buffer(0)]], const device float* input [[buffer(1)]], device float* output [[buffer(2)]], constant uint* _doe_sizes [[buffer(30)]]) {
+    const float inner = (0.7978845608 * (x + (((0.044715 * x) * x) * x)));
+    const float inner_clamped = clamp(inner, float((-15.0)), float(15.0));
+    return ((0.5 * x) * (1.0 + tanh(inner_clamped)));
+}
+
+[[max_total_threads_per_threadgroup(256)]]
+[[kernel]]
+void main_kernel(constant Uniforms& u [[buffer(0)]], const device float* input [[buffer(1)]], device float* output [[buffer(2)]], constant uint* _doe_sizes [[buffer(30)]], uint3 gid [[thread_position_in_grid]]) {
+    const uint _doe_len_1 = uint(_doe_sizes[1] / sizeof(float));
+    const uint _doe_len_2 = uint(_doe_sizes[2] / sizeof(float));
+    const uint idx = gid.x;
+    if ((idx >= u.size)) {
+        return;
+    }
+    const float x = input[min(idx, (_doe_len_1 - 1))];
+    output[min(idx, (_doe_len_2 - 1))] = gelu(x, u, input, output, _doe_sizes);
+}

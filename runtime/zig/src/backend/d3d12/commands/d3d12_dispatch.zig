@@ -1,5 +1,6 @@
 const std = @import("std");
 const model_compute_types = @import("../../../contracts/model/model_compute_types.zig");
+const execution_contract = @import("../../../contracts/execution.zig");
 const common_timing = @import("../../common/timing.zig");
 const webgpu = @import("../../runtime_types.zig");
 const dc = @import("../d3d12_constants.zig");
@@ -7,11 +8,7 @@ const bridge = @import("../d3d12_bridge_decls.zig");
 
 const DISPATCH_INDIRECT_ARG_BYTES: usize = 12;
 
-pub const DispatchMetrics = struct {
-    encode_ns: u64 = 0,
-    submit_wait_ns: u64 = 0,
-    dispatch_count: u32 = 0,
-};
+pub const DispatchMetrics = execution_contract.DispatchMetrics;
 
 pub const DispatchSubmission = struct {
     metrics: DispatchMetrics = .{},

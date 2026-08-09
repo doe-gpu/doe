@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe reviewed external ecosystem report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "reportId",
+    "actorId",
+    "harnessId",
+    "generatedAt",
+    "review",
+    "registryRevision",
+    "upstream",
+    "evidenceMaturity",
+    "outcome",
+    "equivalence",
+    "reliability",
+    "performance",
+    "receiptOverhead",
+    "promotionAssessment",
+    "receipts",
+    "rawEvidence"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "external-ecosystem-report" },
+    "reportId": { "$ref": "#/$defs/id" },
+    "actorId": { "$ref": "#/$defs/id" },
+    "harnessId": { "$ref": "#/$defs/id" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewedAt", "reviewer"],
+      "properties": {
+        "status": { "type": "string", "const": "reviewed" },
+        "reviewedAt": { "type": "string", "format": "date-time" },
+        "reviewer": { "type": "string", "minLength": 1 }
+      }
+    },
+    "registryRevision": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repositoryUrl", "commit", "licenseIdentifier"],
+      "properties": {
+        "repositoryUrl": { "type": "string", "format": "uri" },
+        "commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "licenseIdentifier": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidenceMaturity": {
+      "type": "string",
+      "enum": ["diagnostic", "comparable", "claimable"]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "reproducible-win",
+        "receipt-explained-failure",
+        "no-material-result"
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "category", "status", "summary", "evidence"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "category": {
+            "type": "string",
+            "enum": [
+              "correctness",
+              "compatibility",
+              "reliability",
+              "performance",
+              "diagnosis"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["discovered", "fixed", "verified", "ineligible"]
+          },
+          "summary": { "type": "string", "minLength": 1 },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/evidenceRef" }
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "equivalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "oracleStatus",
+        "providerIdentityStatus",
+        "hiddenFallbackStatus",
+        "dispatchShapeStatus",
+        "synchronizationStatus",
+        "readbackStatus",
+        "outputIdentityStatus"
+      ],
+      "properties": {
+        "status": { "$ref": "#/$defs/passFail" },
+        "oracleStatus": { "$ref": "#/$defs/passFail" },
+        "providerIdentityStatus": { "$ref": "#/$defs/passFail" },
+        "hiddenFallbackStatus": { "$ref": "#/$defs/passFail" },
+        "dispatchShapeStatus": { "$ref": "#/$defs/passFail" },
+        "synchronizationStatus": { "$ref": "#/$defs/passFail" },
+        "readbackStatus": { "$ref": "#/$defs/passFail" },
+        "outputIdentityStatus": { "$ref": "#/$defs/passFail" },
+        "failureCodes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "reliability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline", "comparison"],
+      "properties": {
+        "baseline": { "$ref": "#/$defs/reliabilityStats" },
+        "comparison": { "$ref": "#/$defs/reliabilityStats" }
+      }
+    },
+    "performance": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["unit", "baseline", "comparison"],
+          "properties": {
+            "unit": { "type": "string", "enum": ["ns", "us", "ms", "s"] },
+            "baseline": { "$ref": "#/$defs/performanceStats" },
+            "comparison": { "$ref": "#/$defs/performanceStats" }
+          }
+        },
+        { "$ref": "#/$defs/measurementNotRun" }
+      ]
+    },
+    "receiptOverhead": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["unit", "untracedP50", "receiptEnabledP50"],
+          "properties": {
+            "unit": { "type": "string", "enum": ["ns", "us", "ms", "s"] },
+            "untracedP50": { "type": "number", "minimum": 0 },
+            "receiptEnabledP50": { "type": "number", "minimum": 0 }
+          }
+        },
+        { "$ref": "#/$defs/measurementNotRun" }
+      ]
+    },
+    "promotionAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyVersion",
+        "eligibility",
+        "installation",
+        "supportHardware",
+        "concurrency",
+        "teardown",
+        "stress",
+        "memory",
+        "receipts",
+        "replay",
+        "performance",
+        "release"
+      ],
+      "properties": {
+        "policyVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "eligibility": { "type": "string", "enum": ["eligible", "ineligible"] },
+        "installation": { "$ref": "#/$defs/promotionGateResult" },
+        "supportHardware": { "$ref": "#/$defs/promotionGateResult" },
+        "concurrency": { "$ref": "#/$defs/promotionGateResult" },
+        "teardown": { "$ref": "#/$defs/promotionGateResult" },
+        "stress": { "$ref": "#/$defs/promotionGateResult" },
+        "memory": { "$ref": "#/$defs/promotionGateResult" },
+        "receipts": { "$ref": "#/$defs/promotionGateResult" },
+        "replay": { "$ref": "#/$defs/promotionGateResult" },
+        "performance": { "$ref": "#/$defs/promotionGateResult" },
+        "release": { "$ref": "#/$defs/promotionGateResult" }
+      }
+    },
+    "receipts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidenceRef" }
+    },
+    "rawEvidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidenceRef" }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "passFail": {
+      "type": "string",
+      "enum": ["pass", "fail"]
+    },
+    "promotionGateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "summary"],
+      "properties": {
+        "status": { "type": "string", "enum": ["pass", "fail", "not-run", "ineligible"] },
+        "summary": { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceRef" }
+        }
+      }
+    },
+    "reliabilityStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cleanProcessRuns",
+        "successes",
+        "failures",
+        "crashes",
+        "hangs",
+        "timeouts",
+        "peakMemoryBytes"
+      ],
+      "properties": {
+        "cleanProcessRuns": { "type": "integer", "minimum": 1 },
+        "successes": { "type": "integer", "minimum": 0 },
+        "failures": { "type": "integer", "minimum": 0 },
+        "crashes": { "type": "integer", "minimum": 0 },
+        "hangs": { "type": "integer", "minimum": 0 },
+        "timeouts": { "type": "integer", "minimum": 0 },
+        "peakMemoryBytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "percentiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["p50", "p95", "p99"],
+      "properties": {
+        "p50": { "type": "number", "minimum": 0 },
+        "p95": { "type": "number", "minimum": 0 },
+        "p99": { "type": "number", "minimum": 0 }
+      }
+    },
+    "performanceStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cold", "warm"],
+      "properties": {
+        "cold": { "$ref": "#/$defs/percentiles" },
+        "warm": { "$ref": "#/$defs/percentiles" }
+      }
+    },
+    "measurementNotRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": { "type": "string", "const": "not-run" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^bench/out/external-projects/[a-z0-9][a-z0-9-]*/[^/]+/[^/].*$"
+        },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

@@ -71,7 +71,6 @@ pub fn resolve_type_parameterized(self: anytype, node: Node) !ir.TypeId {
         const access_node = self.module.tree.nodes.items[self.module.tree.extra_data.items[params_start + 1]];
         if (access_node.tag != .type_name) return error.InvalidType;
         const access = try parse_access(self.module.tree.tokenSlice(access_node.main_token));
-        if (access != .write) return error.InvalidType;
         return try self.module.types.intern(.{ .storage_texture_2d = .{
             .format = try parse_storage_texture_format(self.module.tree.tokenSlice(format_node.main_token)),
             .access = access,

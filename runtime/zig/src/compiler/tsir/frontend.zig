@@ -10,7 +10,7 @@ const ir = @import("../wgsl/ir/ir.zig");
 const layout_utils = @import("../wgsl/ir/layout_utils.zig");
 const family_hint = @import("family_hint.zig");
 const frontend_body = @import("frontend_body.zig");
-const tsir = @import("mod.zig");
+const tsir = @import("schema.zig");
 
 const frontend_collectives = @import("frontend_collectives.zig");
 const frontend_expr = @import("frontend_expr.zig");

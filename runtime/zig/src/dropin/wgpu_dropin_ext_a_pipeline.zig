@@ -450,7 +450,7 @@ pub fn run_compute_pipeline_async(ctx_raw: ?*anyopaque) void {
     const entry: *ComputeInflightEntry = @ptrCast(@alignCast(ctx_raw orelse return));
     const head = g_compute_inflight.take(entry) orelse return;
     const lead = head;
-    lead.pipeline = native.doeNativeDeviceCreateComputePipeline(lead.device, &lead.descriptor);
+    lead.pipeline = @ptrCast(native.doeNativeDeviceCreateComputePipeline(lead.device, &lead.descriptor));
     pipeline_cache_integration.recordComputePipelineCreation(if (lead.entry_point_bytes) |ep| ep else null);
     if (lead.pipeline == null) {
         set_compute_pipeline_request_error(lead, "pipeline creation failed");
@@ -479,7 +479,7 @@ pub fn run_render_pipeline_async(ctx_raw: ?*anyopaque) void {
     const entry: *RenderInflightEntry = @ptrCast(@alignCast(ctx_raw orelse return));
     const head = g_render_inflight.take(entry) orelse return;
     const lead = head;
-    lead.pipeline = native.doeNativeDeviceCreateRenderPipeline(lead.device, @ptrCast(&lead.descriptor));
+    lead.pipeline = @ptrCast(native.doeNativeDeviceCreateRenderPipeline(lead.device, @ptrCast(&lead.descriptor)));
     pipeline_cache_integration.recordRenderPipelineCreation();
     if (lead.pipeline == null) {
         set_render_pipeline_request_error(lead, "render pipeline creation failed");

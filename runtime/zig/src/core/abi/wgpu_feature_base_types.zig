@@ -1,4 +1,6 @@
-pub const WGPUFeatureName = u32;
+const upstream = @import("generated/webgpu_upstream.zig");
+
+pub const WGPUFeatureName = upstream.WGPUFeatureName;
 
 pub const WGPUFeatureName_CoreFeaturesAndLimits: WGPUFeatureName = 0x00000001;
 pub const WGPUFeatureName_DepthClipControl: WGPUFeatureName = 0x00000002;

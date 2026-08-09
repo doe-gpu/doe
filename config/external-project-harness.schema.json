@@ -1,0 +1,338 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe external project harness",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "actorId",
+    "harnessId",
+    "upstream",
+    "providerSubstitution",
+    "fallbackPolicy",
+    "workload",
+    "requiredMeasurements",
+    "requiredReceiptFields",
+    "installation",
+    "supportTargets",
+    "reliabilityPolicy",
+    "performancePolicy",
+    "receiptPolicy",
+    "releasePolicy"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 2 },
+    "artifactKind": { "type": "string", "const": "external-project-harness" },
+    "actorId": { "$ref": "#/$defs/id" },
+    "harnessId": { "$ref": "#/$defs/id" },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repositoryUrl", "commit", "license"],
+      "properties": {
+        "repositoryUrl": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://github\\.com/"
+        },
+        "commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "license": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["identifier", "evidenceUrl"],
+          "properties": {
+            "identifier": { "type": "string", "minLength": 1 },
+            "evidenceUrl": { "type": "string", "format": "uri" }
+          }
+        }
+      }
+    },
+    "providerSubstitution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baselineProvider", "comparisonProvider", "seam", "patchPaths"],
+      "properties": {
+        "baselineProvider": { "type": "string", "const": "dawn-node-webgpu" },
+        "comparisonProvider": { "type": "string", "const": "doe-gpu" },
+        "seam": { "type": "string", "minLength": 1 },
+        "patchPaths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/repoPath" }
+        }
+      }
+    },
+    "fallbackPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requireHardware", "prohibitedFallbacks", "providerIdentityAssertion"],
+      "properties": {
+        "requireHardware": { "type": "boolean", "const": true },
+        "prohibitedFallbacks": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["cpu", "mock", "software-renderer", "unknown-provider"]
+          },
+          "allOf": [
+            { "contains": { "const": "cpu" } },
+            { "contains": { "const": "mock" } },
+            { "contains": { "const": "software-renderer" } }
+          ]
+        },
+        "providerIdentityAssertion": { "type": "string", "minLength": 1 }
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "immutableInputRefs",
+        "oracle",
+        "sameWorkPolicy",
+        "completionBoundary"
+      ],
+      "properties": {
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "immutableInputRefs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/repoPath" }
+        },
+        "oracle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "path", "reviewStatus"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["upstream", "independent-replacement"]
+            },
+            "path": { "$ref": "#/$defs/repoPath" },
+            "reviewStatus": { "type": "string", "const": "reviewed" }
+          }
+        },
+        "sameWorkPolicy": { "type": "string", "minLength": 1 },
+        "completionBoundary": { "type": "string", "minLength": 1 }
+      }
+    },
+    "requiredMeasurements": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "clean-process-success",
+          "crashes",
+          "hangs",
+          "timeouts",
+          "peak-memory-bytes",
+          "cold-p50",
+          "cold-p95",
+          "cold-p99",
+          "warm-p50",
+          "warm-p95",
+          "warm-p99",
+          "receipt-overhead"
+        ]
+      },
+      "allOf": [
+        { "contains": { "const": "clean-process-success" } },
+        { "contains": { "const": "crashes" } },
+        { "contains": { "const": "hangs" } },
+        { "contains": { "const": "timeouts" } },
+        { "contains": { "const": "peak-memory-bytes" } },
+        { "contains": { "const": "cold-p50" } },
+        { "contains": { "const": "cold-p95" } },
+        { "contains": { "const": "cold-p99" } },
+        { "contains": { "const": "warm-p50" } },
+        { "contains": { "const": "warm-p95" } },
+        { "contains": { "const": "warm-p99" } },
+        { "contains": { "const": "receipt-overhead" } }
+      ]
+    },
+    "requiredReceiptFields": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "provider-identity",
+          "adapter-identity",
+          "driver-identity",
+          "shader-hashes",
+          "dispatch-shape",
+          "synchronization",
+          "readback",
+          "output-identity"
+        ]
+      },
+      "allOf": [
+        { "contains": { "const": "provider-identity" } },
+        { "contains": { "const": "adapter-identity" } },
+        { "contains": { "const": "driver-identity" } },
+        { "contains": { "const": "shader-hashes" } },
+        { "contains": { "const": "dispatch-shape" } },
+        { "contains": { "const": "synchronization" } },
+        { "contains": { "const": "readback" } },
+        { "contains": { "const": "output-identity" } }
+      ]
+    },
+    "installation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "substitutionMode",
+        "productionStatus",
+        "applicationSourceUnchanged",
+        "shaderSourceUnchanged",
+        "installCommand",
+        "validationCommand"
+      ],
+      "properties": {
+        "substitutionMode": {
+          "type": "string",
+          "enum": ["package-alias", "provider-factory", "esm-loader", "native-library", "other"]
+        },
+        "productionStatus": {
+          "type": "string",
+          "enum": ["unvalidated", "harness-only", "validated"]
+        },
+        "applicationSourceUnchanged": { "type": "boolean" },
+        "shaderSourceUnchanged": { "type": "boolean" },
+        "installCommand": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "validationCommand": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "supportTargets": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/supportTarget" }
+    },
+    "reliabilityPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cleanProcessRunsPerProvider",
+        "concurrencyLevel",
+        "concurrencyRunsPerProvider",
+        "teardownCyclesPerProvider",
+        "stressIterationsPerProvider",
+        "processTimeoutSeconds",
+        "memoryGrowthBoundaryBytes",
+        "requireZeroCrashes",
+        "requireZeroHangs",
+        "requireZeroTimeouts"
+      ],
+      "properties": {
+        "cleanProcessRunsPerProvider": { "type": "integer", "minimum": 1 },
+        "concurrencyLevel": { "type": "integer", "minimum": 1 },
+        "concurrencyRunsPerProvider": { "type": "integer", "minimum": 0 },
+        "teardownCyclesPerProvider": { "type": "integer", "minimum": 0 },
+        "stressIterationsPerProvider": { "type": "integer", "minimum": 0 },
+        "processTimeoutSeconds": { "type": "integer", "minimum": 1 },
+        "memoryGrowthBoundaryBytes": { "type": "integer", "minimum": 0 },
+        "requireZeroCrashes": { "type": "boolean", "const": true },
+        "requireZeroHangs": { "type": "boolean", "const": true },
+        "requireZeroTimeouts": { "type": "boolean", "const": true }
+      }
+    },
+    "performancePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timingScope",
+        "coldSamplesPerProvider",
+        "warmupSamplesPerProvider",
+        "warmSamplesPerProvider",
+        "requiredPercentiles",
+        "throughputMetric",
+        "minimumMaterialSpeedupRatio",
+        "maximumRegressionRatio"
+      ],
+      "properties": {
+        "timingScope": { "type": "string", "minLength": 1 },
+        "coldSamplesPerProvider": { "type": "integer", "minimum": 1 },
+        "warmupSamplesPerProvider": { "type": "integer", "minimum": 0 },
+        "warmSamplesPerProvider": { "type": "integer", "minimum": 1 },
+        "requiredPercentiles": { "type": "array", "const": ["p50", "p95", "p99"] },
+        "throughputMetric": { "type": "string", "minLength": 1 },
+        "minimumMaterialSpeedupRatio": { "type": "number", "exclusiveMinimum": 1 },
+        "maximumRegressionRatio": { "type": "number", "minimum": 1 }
+      }
+    },
+    "receiptPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["captureRequired", "replayRequired", "runtimeBuildIdentityRequired"],
+      "properties": {
+        "captureRequired": { "type": "boolean", "const": true },
+        "replayRequired": { "type": "boolean" },
+        "runtimeBuildIdentityRequired": { "type": "boolean", "const": true }
+      }
+    },
+    "releasePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promotionState", "blocking", "command", "promotionReportIds"],
+      "properties": {
+        "promotionState": {
+          "type": "string",
+          "enum": ["not-promoted", "candidate", "promoted", "suspended", "retired"]
+        },
+        "blocking": { "type": "boolean" },
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "promotionReportIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "repoPath": {
+      "type": "string",
+      "pattern": "^bench/external-projects/[a-z0-9][a-z0-9-]*/[^/].*$"
+    },
+    "supportTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "os", "arch", "runtime", "adapter", "driver", "status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "os": { "type": "string", "minLength": 1 },
+        "arch": { "type": "string", "minLength": 1 },
+        "runtime": { "type": "string", "minLength": 1 },
+        "adapter": { "type": "string", "minLength": 1 },
+        "driver": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "enum": ["planned", "validated", "promoted", "suspended"] }
+      }
+    }
+  }
+}

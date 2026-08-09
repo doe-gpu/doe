@@ -1,5 +1,5 @@
 const std = @import("std");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/command.zig");
 const full_surface_api = @import("../../src/full/surface_api.zig");
 const core_surface = @import("../../src/core/surface.zig");
 const builtin = @import("builtin");
@@ -55,19 +55,19 @@ test "full surface accepts all commands" {
 
 test "full surface classify distinguishes core vs full-only" {
     const upload = model.Command{ .upload = .{ .bytes = 64, .align_bytes = 4 } };
-    const class_upload = try full_surface_api.classify(upload);
+    const class_upload = full_surface_api.classify(upload);
     try std.testing.expect(class_upload == .core);
 
     const dispatch = model.Command{ .dispatch = .{ .x = 1, .y = 1, .z = 1 } };
-    const class_dispatch = try full_surface_api.classify(dispatch);
+    const class_dispatch = full_surface_api.classify(dispatch);
     try std.testing.expect(class_dispatch == .core);
 
     const render = model.Command{ .render_draw = .{ .draw_count = 1 } };
-    const class_render = try full_surface_api.classify(render);
+    const class_render = full_surface_api.classify(render);
     try std.testing.expect(class_render == .full_only);
 
     const surface = model.Command{ .surface_create = .{ .handle = 1 } };
-    const class_surface = try full_surface_api.classify(surface);
+    const class_surface = full_surface_api.classify(surface);
     try std.testing.expect(class_surface == .full_only);
 }
 
@@ -135,8 +135,15 @@ test "full surface is strict superset of core surface" {
     const core_ledger = core_surface.coverage_ledger();
     const combined_ledger = full_surface_api.combined_coverage_ledger();
 
-    for (core_ledger, 0..) |core_entry, i| {
-        try std.testing.expectEqualStrings(core_entry.command_kind, combined_ledger[i].command_kind);
-        try std.testing.expectEqualStrings(core_entry.domain, combined_ledger[i].domain);
+    for (core_ledger) |core_entry| {
+        var found = false;
+        for (combined_ledger) |combined_entry| {
+            if (std.mem.eql(u8, core_entry.command_kind, combined_entry.command_kind)) {
+                try std.testing.expectEqualStrings(core_entry.domain, combined_entry.domain);
+                found = true;
+                break;
+            }
+        }
+        try std.testing.expect(found);
     }
 }

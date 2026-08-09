@@ -3,9 +3,10 @@ const abi_core = @import("../wgpu_core_base_types.zig");
 const abi_feature = @import("../wgpu_feature_base_types.zig");
 const abi_texture = @import("../wgpu_texture_base_types.zig");
 const abi_callback = @import("../wgpu_callback_descriptor_types.zig");
+const upstream = @import("../generated/webgpu_upstream.zig");
 
-pub const WGPUInstanceFeatureName = u32;
-pub const WGPUWGSLLanguageFeatureName = u32;
+pub const WGPUInstanceFeatureName = upstream.WGPUInstanceFeatureName;
+pub const WGPUWGSLLanguageFeatureName = upstream.WGPUWGSLLanguageFeatureName;
 pub const WGPUProc = ?*const fn () callconv(.c) void;
 
 pub const WGPUInstanceFeatureName_TimedWaitAny: WGPUInstanceFeatureName = 0x00000001;

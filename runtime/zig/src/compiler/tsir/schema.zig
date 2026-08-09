@@ -15,6 +15,10 @@
 
 const std = @import("std");
 
+// Preserve the `schema.Type` spelling for narrow internal imports without
+// forcing those modules through the aggregate `tsir/mod.zig` registry.
+pub const schema = @This();
+
 pub const CONTRACT_VERSION: u32 = 1;
 
 // ============================================================

@@ -1,5 +1,5 @@
 const std = @import("std");
-const byte_scan = @import("../simd/byte_scan.zig");
+const byte_scan = @import("../../contracts/primitives/byte_scan.zig");
 
 pub fn writef(writer: anytype, comptime format: []const u8, args: anytype) !void {
     try writer.print(format, args);

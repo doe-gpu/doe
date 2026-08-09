@@ -28,13 +28,15 @@ pub const DispatchBatchCopyFlushTimings = struct {
     queue_submit_driver_submit_ns: u64 = 0,
 };
 
-pub fn populateRecordedDispatchBindingState(pipe: *DoeComputePipeline, dispatch: anytype) void {
+pub fn populateRecordedDispatchBindingState(
+    pipe: *DoeComputePipeline,
+    bind_groups: []const ?*DoeBindGroup,
+    dispatch: anytype,
+) void {
     if (pipe.spirv_data == null) return;
-    dispatch.vulkan_binding_state = vulkan_compute.vulkan_collect_recorded_binding_state(
+    dispatch.vulkan_binding_state = vulkan_compute.vulkan_collect_recorded_bind_group_state(
         pipe,
-        dispatch.bufs[0..dispatch.buf_count],
-        dispatch.buf_offsets[0..dispatch.buf_count],
-        dispatch.buf_sizes[0..dispatch.buf_count],
+        bind_groups,
     );
 }
 

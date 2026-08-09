@@ -1,5 +1,5 @@
 const std = @import("std");
-const model_commands = @import("../contracts/model/model_commands.zig");
+const model_commands = @import("../contracts/command.zig");
 const model_policy = @import("../contracts/model/model_policy.zig");
 const model_quirks = @import("../contracts/model/model_quirks.zig");
 const toggle_registry = @import("toggle_registry.zig");

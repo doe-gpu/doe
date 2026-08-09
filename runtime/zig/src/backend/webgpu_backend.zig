@@ -1,5 +1,5 @@
 const std = @import("std");
-const model_commands = @import("../contracts/model/model_commands.zig");
+const model_commands = @import("../contracts/command.zig");
 const model_profile = @import("../contracts/model/model_profile.zig");
 const model_transfer_types = @import("../contracts/model/model_compute_types.zig");
 const abi_callback = @import("../core/abi/wgpu_callback_descriptor_types.zig");

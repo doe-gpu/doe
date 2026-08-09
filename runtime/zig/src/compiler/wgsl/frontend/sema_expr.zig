@@ -426,7 +426,6 @@ fn construct_scalar_compatible(self: anytype, target_ty: ir.TypeId, actual_ty: i
         .scalar => |scalar| scalar,
         else => return false,
     };
-    if (target_scalar == .bool or actual_scalar == .bool) return target_scalar == .bool and actual_scalar == .bool;
     if (target_scalar == .void or actual_scalar == .void) return false;
     return true;
 }

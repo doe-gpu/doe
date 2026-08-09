@@ -84,7 +84,7 @@ pub const DoeAdapterList = struct {
 };
 
 // ============================================================
-// Metal bridge declarations — populated by metal_multi_device.zig (ObjC side).
+// Metal bridge declarations — implemented by the ObjC metal_bridge.m unit.
 
 extern fn metal_bridge_release(obj: ?*anyopaque) callconv(.c) void;
 

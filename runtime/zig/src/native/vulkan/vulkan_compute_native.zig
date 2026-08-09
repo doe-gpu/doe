@@ -16,9 +16,11 @@ const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const bind_group_native = @import("../resource/doe_bind_group_native.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
 const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
-const shader_native = @import("../shader/doe_shader_native.zig");
+const binding_contract = @import("../../contracts/binding.zig");
+const shader_binding_reflection = @import("../shader/shader_binding_reflection.zig");
 const resource_ops = @import("../../backend/dropin_resource_ops.zig");
 const pipeline_hash = @import("vulkan_pipeline_hash.zig");
+const compute_bindings = @import("vulkan_compute_bindings.zig");
 
 const c = if (has_vulkan) resource_ops.vk_constants else struct {};
 const vk_dispatch_indirect = if (has_vulkan) resource_ops.vk_dispatch_indirect else struct {};
@@ -34,6 +36,12 @@ const DoeShaderModule = native_types.DoeShaderModule;
 const DoeComputePipeline = native_types.DoeComputePipeline;
 const DoeBuffer = native_types.DoeBuffer;
 const DoeBindGroup = native_types.DoeBindGroup;
+const DoeBindGroupLayout = native_types.DoeBindGroupLayout;
+const DoePipelineLayout = native_types.DoePipelineLayout;
+const DoeTexture = native_types.DoeTexture;
+const DoeTextureView = native_types.DoeTextureView;
+const DoeSampler = native_types.DoeSampler;
+const DoeBindGroupLayoutEntry = native_shared.DoeBindGroupLayoutEntry;
 // Maximum KernelBinding slots: groups × bindings per group.
 const MAX_KERNEL_BINDINGS: usize = MAX_COMPUTE_BIND_GROUPS * MAX_BIND;
 const MAX_FLAT_BIND: usize = native_shared.MAX_FLAT_BIND;
@@ -43,16 +51,15 @@ const ADDRESS_SPACE_STORAGE: u32 = @intFromEnum(doe_wgsl.ir.AddressSpace.storage
 const ADDRESS_SPACE_UNIFORM: u32 = @intFromEnum(doe_wgsl.ir.AddressSpace.uniform);
 const ACCESS_READ: u32 = @intFromEnum(doe_wgsl.ir.AccessMode.read);
 const ACCESS_READ_WRITE: u32 = @intFromEnum(doe_wgsl.ir.AccessMode.read_write);
-const BIND_GROUP_LAYOUT_RESOURCE_KIND_BUFFER: u32 = 1;
+const BIND_GROUP_LAYOUT_RESOURCE_KIND_BUFFER = binding_contract.layoutResourceKindCode(.buffer);
+const BIND_GROUP_LAYOUT_RESOURCE_KIND_SAMPLER = binding_contract.layoutResourceKindCode(.sampler);
+const BIND_GROUP_LAYOUT_RESOURCE_KIND_TEXTURE = binding_contract.layoutResourceKindCode(.texture);
+const BIND_GROUP_LAYOUT_RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.storage_texture);
 const SPIRV_MAGIC: u32 = 0x07230203;
 const DISPATCH_INDIRECT_ARGS_BYTES: u64 = @sizeOf([3]u32);
 const DISPATCH_INDIRECT_ARGS_ALIGNMENT: u64 = @alignOf(u32);
 
-const BindingCollection = struct {
-    count: usize,
-    flat_mask: u64,
-    descriptor_hash: u64,
-};
+const BindingCollection = compute_bindings.BindingCollection;
 
 pub const VulkanDispatchBindingState = struct {
     count: usize = 0,
@@ -208,35 +215,46 @@ test "prepared binding cache retains identity and reloads state" {
     try std.testing.expectEqual(@as(u32, 1), bg.ref_count);
 }
 
-fn shader_buffer_binding_type(
-    shader_module: ?*DoeShaderModule,
-    group: u32,
-    binding: u32,
-) u32 {
+fn reflected_buffer_binding_type(meta: doe_wgsl.BindingMeta) u32 {
+    if (meta.kind != .buffer) return model_binding_types.WGPUBufferBindingType_Storage;
+    if (meta.addr_space == .uniform) return model_binding_types.WGPUBufferBindingType_Uniform;
+    if (meta.addr_space == .storage and meta.access == .read) return model_binding_types.WGPUBufferBindingType_ReadOnlyStorage;
+    return model_binding_types.WGPUBufferBindingType_Storage;
+}
+
+fn shader_buffer_binding_type(shader_module: ?*DoeShaderModule, group: u32, binding: u32) u32 {
     const sm = shader_module orelse return model_binding_types.WGPUBufferBindingType_Storage;
-    shader_native.ensureShaderBindings(sm);
-    const binding_count: usize = @min(
-        @as(usize, @intCast(sm.binding_count)),
-        native_shared.MAX_SHADER_BINDINGS,
-    );
-    for (sm.bindings[0..binding_count]) |meta| {
-        if (meta.group != group or meta.binding != binding) continue;
-        if (meta.kind != BINDING_KIND_BUFFER) break;
+    shader_binding_reflection.ensureShaderBindings(sm);
+    const count: usize = @min(@as(usize, @intCast(sm.binding_count)), native_shared.MAX_SHADER_BINDINGS);
+    for (sm.bindings[0..count]) |meta| {
+        if (meta.group != group or meta.binding != binding or meta.kind != BINDING_KIND_BUFFER) continue;
         if (meta.addr_space == ADDRESS_SPACE_UNIFORM) return model_binding_types.WGPUBufferBindingType_Uniform;
-        if (meta.addr_space == ADDRESS_SPACE_STORAGE and
-            meta.access == ACCESS_READ) return model_binding_types.WGPUBufferBindingType_ReadOnlyStorage;
-        if (meta.addr_space == ADDRESS_SPACE_STORAGE and
-            meta.access == ACCESS_READ_WRITE) return model_binding_types.WGPUBufferBindingType_Storage;
-        return model_binding_types.WGPUBufferBindingType_Storage;
+        if (meta.addr_space == ADDRESS_SPACE_STORAGE and meta.access == ACCESS_READ) return model_binding_types.WGPUBufferBindingType_ReadOnlyStorage;
+        if (meta.addr_space == ADDRESS_SPACE_STORAGE and meta.access == ACCESS_READ_WRITE) return model_binding_types.WGPUBufferBindingType_Storage;
     }
     return model_binding_types.WGPUBufferBindingType_Storage;
 }
 
 fn populate_pipeline_buffer_binding_types(pip: *DoeComputePipeline, shader_module: ?*DoeShaderModule) void {
-    for (0..MAX_FLAT_BIND) |slot| {
-        const group_u32: u32 = @intCast(slot / MAX_BIND);
-        const binding_u32: u32 = @intCast(slot % MAX_BIND);
-        pip.vk_flat_buffer_binding_types[slot] = shader_buffer_binding_type(shader_module, group_u32, binding_u32);
+    @memset(&pip.vk_flat_buffer_binding_types, model_binding_types.WGPUBufferBindingType_Storage);
+    const sm = shader_module orelse {
+        pip.vk_flat_buffer_binding_types_ready = true;
+        return;
+    };
+    const wgsl = sm.wgsl_source orelse {
+        pip.vk_flat_buffer_binding_types_ready = true;
+        return;
+    };
+    const entry_point = pipeline_entry_point(pip) orelse {
+        pip.vk_flat_buffer_binding_types_ready = true;
+        return;
+    };
+    var metadata: [native_shared.MAX_SHADER_BINDINGS]doe_wgsl.BindingMeta = undefined;
+    const count = doe_wgsl.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch 0;
+    for (metadata[0..count]) |meta| {
+        if (meta.group >= MAX_COMPUTE_BIND_GROUPS or meta.binding >= MAX_BIND) continue;
+        const slot = (meta.group * MAX_BIND) + meta.binding;
+        pip.vk_flat_buffer_binding_types[slot] = reflected_buffer_binding_type(meta);
     }
     pip.vk_flat_buffer_binding_types_ready = true;
 }
@@ -509,35 +527,114 @@ fn append_bind_group_binding_at_slot(
     if (group_index >= bind_groups.len) return;
     const bg = bind_groups[group_index] orelse return;
     if (binding_index >= bg.count) return;
-    const binding_bit = @as(u64, 1) << @intCast(binding_index);
-    const resource_handle = if ((bg.vk_buffer_binding_mask & binding_bit) != 0)
-        bg.vk_buffer_handles[binding_index]
-    else blk: {
-        const raw_ptr = bg.buffers[binding_index] orelse return;
-        const buf = cast(DoeBuffer, raw_ptr) orelse return;
-        if (buf.error_object) return;
-        break :blk buf.vk_id;
-    };
-    if (resource_handle == 0) return;
     if (count.* >= out_bindings.len) return;
     const group_u32: u32 = @intCast(group_index);
     const binding_u32: u32 = @intCast(binding_index);
-    const binding = model_compute_types.KernelBinding{
-        .group = group_u32,
-        .binding = binding_u32,
-        .resource_kind = .buffer,
-        .resource_handle = resource_handle,
-        .buffer_offset = bg.offsets[binding_index],
-        .buffer_size = bg.buffer_sizes[binding_index],
-        .buffer_type = if (pip.vk_flat_buffer_binding_types_ready)
-            pip.vk_flat_buffer_binding_types[slot]
-        else
-            shader_buffer_binding_type(pip.shader_module, group_u32, binding_u32),
+    const layout_entry = pipeline_layout_entry(pip, group_index, binding_u32);
+    const binding = blk: {
+        const binding_bit = @as(u64, 1) << @intCast(binding_index);
+        if ((bg.vk_buffer_binding_mask & binding_bit) != 0 or bg.buffers[binding_index] != null) {
+            const resource_handle = if ((bg.vk_buffer_binding_mask & binding_bit) != 0)
+                bg.vk_buffer_handles[binding_index]
+            else buffer_handle: {
+                const raw_ptr = bg.buffers[binding_index] orelse return;
+                const buf = cast(DoeBuffer, raw_ptr) orelse return;
+                if (buf.error_object) return;
+                break :buffer_handle buf.vk_id;
+            };
+            if (resource_handle == 0) return;
+            break :blk model_compute_types.KernelBinding{
+                .group = group_u32,
+                .binding = binding_u32,
+                .resource_kind = .buffer,
+                .resource_handle = resource_handle,
+                .buffer_offset = bg.offsets[binding_index],
+                .buffer_size = bg.buffer_sizes[binding_index],
+                .buffer_type = if (pip.vk_flat_buffer_binding_types_ready)
+                    pip.vk_flat_buffer_binding_types[slot]
+                else
+                    shader_buffer_binding_type(pip.shader_module, group_u32, binding_u32),
+            };
+        }
+        if (bg.texture_views[binding_index]) |raw_view| {
+            const view = cast(DoeTextureView, raw_view) orelse return;
+            if (view.tex.error_object or view.tex.vk_id == 0) return;
+            const entry = layout_entry orelse return;
+            const resource_kind: model_compute_types.KernelBindingResourceKind = switch (entry.resource_kind) {
+                BIND_GROUP_LAYOUT_RESOURCE_KIND_TEXTURE => .texture,
+                BIND_GROUP_LAYOUT_RESOURCE_KIND_STORAGE_TEXTURE => .storage_texture,
+                else => return,
+            };
+            break :blk model_compute_types.KernelBinding{
+                .group = group_u32,
+                .binding = binding_u32,
+                .resource_kind = resource_kind,
+                .resource_handle = view.tex.vk_id,
+                .texture_sample_type = if (resource_kind == .texture)
+                    entry.texture_sample_type
+                else
+                    model_binding_types.WGPUTextureSampleType_Undefined,
+                .texture_view_dimension = if (view.dimension != 0)
+                    view.dimension
+                else
+                    entry.texture_view_dimension,
+                .storage_texture_access = if (resource_kind == .storage_texture)
+                    entry.texture_sample_type
+                else
+                    model_binding_types.WGPUStorageTextureAccess_Undefined,
+                .texture_aspect = view.aspect,
+                .texture_format = if (view.format != 0) view.format else view.tex.format,
+                .texture_multisampled = view.tex.sample_count > 1,
+            };
+        }
+        if (bg.samplers[binding_index]) |raw_sampler| {
+            const sampler = cast(DoeSampler, raw_sampler) orelse return;
+            if (layout_entry) |entry| {
+                if (entry.resource_kind != BIND_GROUP_LAYOUT_RESOURCE_KIND_SAMPLER) return;
+            }
+            break :blk model_compute_types.KernelBinding{
+                .group = group_u32,
+                .binding = binding_u32,
+                .resource_kind = .sampler,
+                .resource_handle = @intFromPtr(sampler),
+            };
+        }
+        return;
     };
     out_bindings[count.*] = binding;
     descriptor_hasher.update(binding);
     flat_mask.* |= @as(u64, 1) << @intCast(slot);
     count.* += 1;
+}
+
+fn pipeline_layout_entry(
+    pip: *const DoeComputePipeline,
+    group_index: usize,
+    binding: u32,
+) ?DoeBindGroupLayoutEntry {
+    const layout = pip.layout orelse return null;
+    if (group_index >= layout.bind_group_layout_count) return null;
+    const bind_group_layout = layout.bind_group_layouts[group_index] orelse return null;
+    const entries = bind_group_layout.entries orelse return null;
+    for (entries) |entry| {
+        if (entry.binding == binding) return entry;
+    }
+    return null;
+}
+
+fn bind_groups_have_non_buffer_resources(
+    bind_groups: []const ?*DoeBindGroup,
+) bool {
+    for (bind_groups) |maybe_group| {
+        const group = maybe_group orelse continue;
+        for (group.texture_views) |view| {
+            if (view != null) return true;
+        }
+        for (group.samplers) |sampler| {
+            if (sampler != null) return true;
+        }
+    }
+    return false;
 }
 
 fn collect_bind_group_bindings(
@@ -548,7 +645,10 @@ fn collect_bind_group_bindings(
     var count: usize = 0;
     var flat_mask: u64 = 0;
     var descriptor_hasher = pipeline_hash.DescriptorBindingsHasher{};
-    if (pip.vk_static_pipeline_hash_ready and pip.vk_static_buffer_binding_mask != 0) {
+    if (pip.vk_static_pipeline_hash_ready and
+        pip.vk_static_buffer_binding_mask != 0 and
+        !bind_groups_have_non_buffer_resources(bind_groups))
+    {
         var mask = pip.vk_static_buffer_binding_mask;
         while (mask != 0 and count < out_bindings.len) {
             const slot: usize = @intCast(@ctz(mask));
@@ -598,79 +698,6 @@ fn collect_bind_group_bindings(
         }
     }
     return .{ .count = count, .flat_mask = flat_mask, .descriptor_hash = descriptor_hasher.final() };
-}
-
-test "collect_bind_group_bindings cached handles match fallback slots" {
-    var pip = DoeComputePipeline{ .vk_flat_buffer_binding_types_ready = true };
-    pip.vk_flat_buffer_binding_types[1] = model_binding_types.WGPUBufferBindingType_Uniform;
-    pip.vk_flat_buffer_binding_types[MAX_BIND + 2] = model_binding_types.WGPUBufferBindingType_Storage;
-
-    var buffer_a = DoeBuffer{ .vk_id = 11, .size = 128 };
-    var buffer_b = DoeBuffer{ .vk_id = 22, .size = 256 };
-
-    var fallback_group0 = DoeBindGroup{ .count = 2 };
-    fallback_group0.buffers[1] = native_helpers.toOpaque(&buffer_a);
-    fallback_group0.offsets[1] = 4;
-    fallback_group0.buffer_sizes[1] = 64;
-    var fallback_group1 = DoeBindGroup{ .count = 3 };
-    fallback_group1.buffers[2] = native_helpers.toOpaque(&buffer_b);
-    fallback_group1.offsets[2] = 8;
-    fallback_group1.buffer_sizes[2] = 128;
-
-    var cached_group0 = fallback_group0;
-    cached_group0.vk_buffer_handles[1] = buffer_a.vk_id;
-    cached_group0.vk_buffer_binding_mask = @as(u64, 1) << 1;
-    cached_group0.vk_buffer_binding_cache_complete = true;
-    var cached_group1 = fallback_group1;
-    cached_group1.vk_buffer_handles[2] = buffer_b.vk_id;
-    cached_group1.vk_buffer_binding_mask = @as(u64, 1) << 2;
-    cached_group1.vk_buffer_binding_cache_complete = true;
-
-    var fallback_groups = [_]?*DoeBindGroup{ &fallback_group0, &fallback_group1 };
-    var cached_groups = [_]?*DoeBindGroup{ &cached_group0, &cached_group1 };
-    var fallback_storage: [MAX_KERNEL_BINDINGS]model_compute_types.KernelBinding = undefined;
-    var cached_storage: [MAX_KERNEL_BINDINGS]model_compute_types.KernelBinding = undefined;
-
-    const fallback_result = collect_bind_group_bindings(&pip, fallback_groups[0..], &fallback_storage);
-    const cached_result = collect_bind_group_bindings(&pip, cached_groups[0..], &cached_storage);
-
-    try std.testing.expectEqual(fallback_result.count, cached_result.count);
-    try std.testing.expectEqual(fallback_result.flat_mask, cached_result.flat_mask);
-    try std.testing.expectEqual(fallback_result.descriptor_hash, cached_result.descriptor_hash);
-    try std.testing.expectEqualSlices(
-        model_compute_types.KernelBinding,
-        fallback_storage[0..fallback_result.count],
-        cached_storage[0..cached_result.count],
-    );
-    try std.testing.expectEqual((@as(u64, 1) << 1) | (@as(u64, 1) << (MAX_BIND + 2)), cached_result.flat_mask);
-}
-
-test "collect_bind_group_bindings partial cache scans uncached buffers" {
-    var pip = DoeComputePipeline{ .vk_flat_buffer_binding_types_ready = true };
-    pip.vk_flat_buffer_binding_types[1] = model_binding_types.WGPUBufferBindingType_Uniform;
-    pip.vk_flat_buffer_binding_types[2] = model_binding_types.WGPUBufferBindingType_Storage;
-
-    var buffer_a = DoeBuffer{ .vk_id = 31, .size = 128 };
-    var buffer_b = DoeBuffer{ .vk_id = 32, .size = 256 };
-
-    var group = DoeBindGroup{ .count = 3 };
-    group.buffers[1] = native_helpers.toOpaque(&buffer_a);
-    group.offsets[1] = 4;
-    group.buffer_sizes[1] = 64;
-    group.vk_buffer_handles[1] = buffer_a.vk_id;
-    group.vk_buffer_binding_mask = @as(u64, 1) << 1;
-    group.buffers[2] = native_helpers.toOpaque(&buffer_b);
-    group.offsets[2] = 8;
-    group.buffer_sizes[2] = 128;
-
-    var groups = [_]?*DoeBindGroup{&group};
-    var storage: [MAX_KERNEL_BINDINGS]model_compute_types.KernelBinding = undefined;
-    const result = collect_bind_group_bindings(&pip, groups[0..], &storage);
-
-    try std.testing.expectEqual(@as(usize, 2), result.count);
-    try std.testing.expectEqual((@as(u64, 1) << 1) | (@as(u64, 1) << 2), result.flat_mask);
-    try std.testing.expectEqual(@as(u64, 31), storage[0].resource_handle);
-    try std.testing.expectEqual(@as(u64, 32), storage[1].resource_handle);
 }
 
 fn use_static_pipeline_hash(
@@ -775,7 +802,11 @@ pub fn vulkan_prepare_dispatch_bind_groups(
     if (comptime !has_vulkan) return false;
     const spirv = pipeline_spirv_or_log(pip) orelse return false;
     var binding_storage: [MAX_KERNEL_BINDINGS]model_compute_types.KernelBinding = undefined;
-    const binding_result = collect_bind_group_bindings(pip, bind_groups, &binding_storage);
+    const binding_result = compute_bindings.collectBindGroupBindings(
+        pip,
+        bind_groups,
+        &binding_storage,
+    );
     return prepare_pipeline_bindings(rt, pip, spirv, binding_result, &binding_storage);
 }
 
@@ -785,11 +816,32 @@ pub fn vulkan_collect_dispatch_binding_state(
 ) VulkanDispatchBindingState {
     if (loadPreparedBindingCache(pip, bind_groups)) |cached| return cached;
     var state = VulkanDispatchBindingState{};
-    const binding_result = collect_bind_group_bindings(pip, bind_groups, &state.bindings);
+    const binding_result = compute_bindings.collectBindGroupBindings(
+        pip,
+        bind_groups,
+        &state.bindings,
+    );
     state.count = binding_result.count;
     state.flat_mask = binding_result.flat_mask;
     state.descriptor_hash = binding_result.descriptor_hash;
     storePreparedBindingCache(pip, bind_groups, &state);
+    return state;
+}
+
+pub fn vulkan_collect_recorded_bind_group_state(
+    pip: *DoeComputePipeline,
+    bind_groups: []const ?*DoeBindGroup,
+) native_cmds.RecordedVulkanBindingState {
+    const collected = vulkan_collect_dispatch_binding_state(pip, bind_groups);
+    var state = native_cmds.RecordedVulkanBindingState{};
+    state.valid = true;
+    state.count = collected.count;
+    state.flat_mask = collected.flat_mask;
+    state.descriptor_hash = collected.descriptor_hash;
+    @memcpy(
+        state.bindings[0..collected.count],
+        collected.bindings[0..collected.count],
+    );
     return state;
 }
 

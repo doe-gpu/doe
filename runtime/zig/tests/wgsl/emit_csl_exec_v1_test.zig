@@ -2,8 +2,23 @@ const std = @import("std");
 const exec_v1 = @import("../../src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig");
 const host = @import("../../src/compiler/wgsl/emit/csl/emit_csl_host.zig");
 const host_plan = @import("../../src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig");
+const artifact = @import("../../src/contracts/artifact.zig");
 
 const TEST_ARTIFACT_CAPACITY: usize = 32 * 1024;
+
+fn expectHostPlanEqual(allocator: std.mem.Allocator, expected_artifact: []const u8, actual_artifact: []const u8) !void {
+    const expected = try std.json.parseFromSlice(std.json.Value, allocator, expected_artifact, .{});
+    defer expected.deinit();
+    const actual = try std.json.parseFromSlice(std.json.Value, allocator, actual_artifact, .{});
+    defer actual.deinit();
+    const expected_host_plan = expected.value.object.get("hostPlan") orelse return error.TestUnexpectedResult;
+    const actual_host_plan = actual.value.object.get("hostPlan") orelse return error.TestUnexpectedResult;
+    const expected_json = try artifact.jsonStringifyAlloc(allocator, expected_host_plan);
+    defer allocator.free(expected_json);
+    const actual_json = try artifact.jsonStringifyAlloc(allocator, actual_host_plan);
+    defer allocator.free(actual_json);
+    try std.testing.expectEqualStrings(expected_json, actual_json);
+}
 
 test "opToPattern maps known ops" {
     try std.testing.expectEqualStrings("gather", exec_v1.opToPattern("embed").?);
@@ -48,6 +63,7 @@ test "lowerToHostPlan builds valid plan" {
         .{ .phase = .prefill, .kind = .compute, .op = "embed", .kernel_key = "embed_gather" },
         .{ .phase = .prefill, .kind = .compute, .op = "rmsnorm", .kernel_key = "norm_0" },
         .{ .phase = .decode, .kind = .compute, .op = "attention", .kernel_key = "attn_0" },
+        .{ .phase = .decode, .kind = .compute, .name = "lm_head", .op = "matmul", .kernel_key = "lm_head", .weights_key = "lm_head" },
         .{ .phase = .decode, .kind = .sample, .op = "sample", .kernel_key = "sampler" },
     };
 
@@ -59,9 +75,9 @@ test "lowerToHostPlan builds valid plan" {
 
     try std.testing.expectEqual(@as(u32, 32), plan.pe_grid_width);
     try std.testing.expectEqual(@as(u32, 4), plan.pe_grid_height);
-    try std.testing.expect(plan.kernels.len == 4);
+    try std.testing.expect(plan.kernels.len == 5);
     try std.testing.expect(plan.prefill_launches.len == 2);
-    try std.testing.expect(plan.decode_launches.len == 2);
+    try std.testing.expect(plan.decode_launches.len == 3);
 }
 
 test "lowerToHostPlan rejects decode before prefill" {
@@ -88,6 +104,7 @@ test "lowerJsonToHostPlan builds valid plan from object steps" {
         \\    { "phase": "prefill", "op": "embed", "kernelKey": "embed_gather" },
         \\    { "phase": "prefill", "op": "rmsnorm", "kernelKey": "norm_0" },
         \\    { "phase": "decode", "op": "attention", "kernelKey": "attn_0" },
+        \\    { "name": "lm_head", "phase": "decode", "op": "matmul", "kernelKey": "lm_head", "weightsKey": "lm_head" },
         \\    { "phase": "decode", "op": "sample", "kernelKey": "sampler", "kind": "sample" }
         \\  ]
         \\}
@@ -104,9 +121,9 @@ test "lowerJsonToHostPlan builds valid plan from object steps" {
     try std.testing.expectEqual(@as(u32, 16), plan.pe_grid_width);
     try std.testing.expectEqual(@as(u32, 2), plan.pe_grid_height);
     try std.testing.expectEqual(@as(?u32, 7), plan.eos_token_id);
-    try std.testing.expect(plan.kernels.len == 4);
+    try std.testing.expect(plan.kernels.len == 5);
     try std.testing.expect(plan.prefill_launches.len == 2);
-    try std.testing.expect(plan.decode_launches.len == 2);
+    try std.testing.expect(plan.decode_launches.len == 3);
 }
 
 test "lowerJsonToHostPlan accepts tuple steps" {
@@ -116,6 +133,7 @@ test "lowerJsonToHostPlan accepts tuple steps" {
         \\  "steps": [
         \\    ["prefill", "embed", "embed_gather"],
         \\    ["decode", "attention", "attn_0"],
+        \\    ["decode", "matmul", "lm_head"],
         \\    ["decode", "sample", "sampler", null, "sample"]
         \\  ]
         \\}
@@ -133,7 +151,7 @@ test "lowerJsonToHostPlan accepts tuple steps" {
     try std.testing.expectEqual(@as(u32, 1), plan.pe_grid_height);
     try std.testing.expectEqual(@as(?u32, null), plan.eos_token_id);
     try std.testing.expect(plan.prefill_launches.len == 1);
-    try std.testing.expect(plan.decode_launches.len == 2);
+    try std.testing.expect(plan.decode_launches.len == 3);
 }
 
 test "lowerJsonToHostPlan rejects mismatched explicit kind" {
@@ -205,6 +223,7 @@ test "lowerJsonToHostPlan derives Gemma 4 routing from layerPattern and decode p
         \\    { "phase": "decode", "op": "attention", "kernelKey": "attn_local" },
         \\    { "phase": "decode", "op": "kv_write", "kernelKey": "kv_write" },
         \\    { "phase": "decode", "op": "attention", "kernelKey": "attn_global" },
+        \\    { "name": "lm_head", "phase": "decode", "op": "matmul", "kernelKey": "lm_head", "weightsKey": "lm_head" },
         \\    { "phase": "decode", "op": "sample", "kernelKey": "sampler", "kind": "sample" }
         \\  ]
         \\}
@@ -219,7 +238,7 @@ test "lowerJsonToHostPlan derives Gemma 4 routing from layerPattern and decode p
     const plan = try exec_v1.lowerJsonToHostPlan(arena.allocator(), json_payload, &kernels, &prefill, &decode);
 
     try std.testing.expectEqual(@as(usize, 1), plan.prefill_launches.len);
-    try std.testing.expectEqual(@as(usize, 4), plan.decode_launches.len);
+    try std.testing.expectEqual(@as(usize, 5), plan.decode_launches.len);
     try std.testing.expect(plan.decode_launches[0].attention_type.? == .sliding);
     try std.testing.expectEqual(@as(?u32, 512), plan.decode_launches[0].sliding_window_size);
     try std.testing.expect(plan.decode_launches[0].current_pos_source.? == .decode_position);
@@ -249,6 +268,7 @@ test "lowerJsonToHostPlan derives grid from model config when grid is omitted" {
         \\    { "phase": "prefill", "op": "embed", "kernelKey": "embed_gather" },
         \\    { "phase": "decode", "op": "attention_sliding", "kernelKey": "attn_local", "attentionType": "sliding" },
         \\    { "phase": "decode", "op": "kv_write", "kernelKey": "kv_write" },
+        \\    { "name": "lm_head", "phase": "decode", "op": "matmul", "kernelKey": "lm_head", "weightsKey": "lm_head" },
         \\    { "phase": "decode", "op": "sample", "kernelKey": "sampler", "kind": "sample" }
         \\  ]
         \\}
@@ -261,8 +281,8 @@ test "lowerJsonToHostPlan derives grid from model config when grid is omitted" {
     defer arena.deinit();
 
     const plan = try exec_v1.lowerJsonToHostPlan(arena.allocator(), json_payload, &kernels, &prefill, &decode);
-    try std.testing.expectEqual(@as(u32, 149), plan.pe_grid_width);
-    try std.testing.expectEqual(@as(u32, 117), plan.pe_grid_height);
+    try std.testing.expectEqual(@as(u32, 141), plan.pe_grid_width);
+    try std.testing.expectEqual(@as(u32, 120), plan.pe_grid_height);
 }
 
 test "lowerJsonToHostPlan lowers shared kv launch metadata" {
@@ -275,6 +295,7 @@ test "lowerJsonToHostPlan lowers shared kv launch metadata" {
         \\    { "phase": "prefill", "op": "embed", "kernelKey": "embed_gather" },
         \\    { "phase": "decode", "op": "attention_sliding", "kernelKey": "attn_local", "attentionType": "sliding" },
         \\    { "phase": "decode", "op": "kv_write_shared", "kernelKey": "kv_shared", "kvCacheAlias": "layer.0.kv" },
+        \\    { "name": "lm_head", "phase": "decode", "op": "matmul", "kernelKey": "lm_head", "weightsKey": "lm_head" },
         \\    { "phase": "decode", "op": "sample", "kernelKey": "sampler", "kind": "sample" }
         \\  ]
         \\}
@@ -288,9 +309,9 @@ test "lowerJsonToHostPlan lowers shared kv launch metadata" {
 
     const plan = try exec_v1.lowerJsonToHostPlan(arena.allocator(), json_payload, &kernels, &prefill, &decode);
 
-    try std.testing.expectEqual(@as(usize, 4), plan.kernels.len);
+    try std.testing.expectEqual(@as(usize, 5), plan.kernels.len);
     try std.testing.expectEqual(@as(usize, 1), plan.prefill_launches.len);
-    try std.testing.expectEqual(@as(usize, 3), plan.decode_launches.len);
+    try std.testing.expectEqual(@as(usize, 4), plan.decode_launches.len);
     try std.testing.expect(plan.decode_launches[0].attention_type.? == .sliding);
     try std.testing.expectEqual(@as(?u32, 512), plan.decode_launches[0].sliding_window_size);
     try std.testing.expect(plan.decode_launches[0].current_pos_source.? == .decode_position);
@@ -330,6 +351,7 @@ test "lowerManifestExecutionToHostPlan accepts Gemma 4 launch metadata" {
         \\    { "phase": "prefill", "op": "embed", "kernelKey": "embed" },
         \\    { "phase": "decode", "op": "attention_sliding", "kernelKey": "attn_decode_sliding", "attentionType": "sliding" },
         \\    { "phase": "decode", "op": "kv_write_shared", "kernelKey": "kv_write_shared", "kvCacheAlias": "layer.0.kv" },
+        \\    { "name": "lm_head", "phase": "decode", "op": "matmul", "kernelKey": "lm_head", "weightsKey": "lm_head" },
         \\    { "phase": "decode", "op": "sample", "kernelKey": "sample", "kind": "sample" }
         \\  ]
         \\}
@@ -343,7 +365,7 @@ test "lowerManifestExecutionToHostPlan accepts Gemma 4 launch metadata" {
 
     const plan = try exec_v1.lowerManifestExecutionToHostPlan(arena.allocator(), json_payload, &kernels, &prefill, &decode);
     try std.testing.expectEqual(@as(usize, 1), plan.prefill_launches.len);
-    try std.testing.expectEqual(@as(usize, 3), plan.decode_launches.len);
+    try std.testing.expectEqual(@as(usize, 4), plan.decode_launches.len);
     try std.testing.expect(plan.decode_launches[0].attention_type.? == .sliding);
     try std.testing.expectEqual(@as(?u32, 512), plan.decode_launches[0].sliding_window_size);
     try std.testing.expectEqualStrings("layer.0.kv", plan.decode_launches[1].kv_cache_alias.?);
@@ -362,16 +384,22 @@ test "Gemma 3 smoke fixture lowers to golden host plan artifact" {
     const plan = try exec_v1.lowerJsonToHostPlan(arena.allocator(), fixture_json, &kernels, &prefill, &decode);
 
     const targets = [_]host_plan.CompileTarget{
-        .{ .kernel_name = "embed", .layout_path = "embed/layout.csl", .pe_program_path = "embed/pe_program.csl" },
-        .{ .kernel_name = "rmsnorm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
-        .{ .kernel_name = "tiled", .layout_path = "tiled/layout.csl", .pe_program_path = "tiled/pe_program.csl" },
-        .{ .kernel_name = "rope", .layout_path = "rope/layout.csl", .pe_program_path = "rope/pe_program.csl" },
-        .{ .kernel_name = "attn_small", .layout_path = "attn_small/layout.csl", .pe_program_path = "attn_small/pe_program.csl" },
-        .{ .kernel_name = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
-        .{ .kernel_name = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
-        .{ .kernel_name = "gemv", .layout_path = "gemv/layout.csl", .pe_program_path = "gemv/pe_program.csl" },
-        .{ .kernel_name = "attn_decode", .layout_path = "attn_decode/layout.csl", .pe_program_path = "attn_decode/pe_program.csl" },
-        .{ .kernel_name = "sample", .layout_path = "sample/layout.csl", .pe_program_path = "sample/pe_program.csl" },
+        .{ .kernel_name = "embed", .pattern = "gather", .layout_path = "embed/layout.csl", .pe_program_path = "embed/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm_prefill", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm_decode", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "tiled", .pattern = "tiled_matmul", .layout_path = "tiled/layout.csl", .pe_program_path = "tiled/pe_program.csl" },
+        .{ .kernel_name = "rope", .pattern = "rope", .layout_path = "rope/layout.csl", .pe_program_path = "rope/pe_program.csl" },
+        .{ .kernel_name = "attn_small", .pattern = "attention_tiled", .layout_path = "attn_small/layout.csl", .pe_program_path = "attn_small/pe_program.csl" },
+        .{ .kernel_name = "residual", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "residual_prefill", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "residual_decode", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "gelu", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gelu_prefill", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gelu_decode", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gemv", .pattern = "fused_gemv_dequant", .layout_path = "gemv/layout.csl", .pe_program_path = "gemv/pe_program.csl" },
+        .{ .kernel_name = "attn_decode", .pattern = "attention_decode", .layout_path = "attn_decode/layout.csl", .pe_program_path = "attn_decode/pe_program.csl" },
+        .{ .kernel_name = "sample", .pattern = "sample", .layout_path = "sample/layout.csl", .pe_program_path = "sample/pe_program.csl" },
     };
     const cslc_plan = try host_plan.makeCslcPlan(null);
 
@@ -379,7 +407,8 @@ test "Gemma 3 smoke fixture lowers to golden host plan artifact" {
     var artifact_pos: usize = 0;
     try host_plan.emitHostPlanArtifactJson(&artifact_buf, &artifact_pos, plan, &targets, cslc_plan);
     try host_plan.validateHostPlanArtifactJson(std.testing.allocator, artifact_buf[0..artifact_pos]);
-    try std.testing.expectEqualStrings(golden_artifact, artifact_buf[0..artifact_pos]);
+    try host_plan.validateHostPlanArtifactJson(std.testing.allocator, golden_artifact);
+    try expectHostPlanEqual(std.testing.allocator, golden_artifact, artifact_buf[0..artifact_pos]);
 }
 
 test "Gemma 3 manifest fixture lowers to the same golden host plan artifact" {
@@ -395,16 +424,22 @@ test "Gemma 3 manifest fixture lowers to the same golden host plan artifact" {
     const plan = try exec_v1.lowerManifestExecutionToHostPlan(arena.allocator(), fixture_json, &kernels, &prefill, &decode);
 
     const targets = [_]host_plan.CompileTarget{
-        .{ .kernel_name = "embed", .layout_path = "embed/layout.csl", .pe_program_path = "embed/pe_program.csl" },
-        .{ .kernel_name = "rmsnorm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
-        .{ .kernel_name = "tiled", .layout_path = "tiled/layout.csl", .pe_program_path = "tiled/pe_program.csl" },
-        .{ .kernel_name = "rope", .layout_path = "rope/layout.csl", .pe_program_path = "rope/pe_program.csl" },
-        .{ .kernel_name = "attn_small", .layout_path = "attn_small/layout.csl", .pe_program_path = "attn_small/pe_program.csl" },
-        .{ .kernel_name = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
-        .{ .kernel_name = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
-        .{ .kernel_name = "gemv", .layout_path = "gemv/layout.csl", .pe_program_path = "gemv/pe_program.csl" },
-        .{ .kernel_name = "attn_decode", .layout_path = "attn_decode/layout.csl", .pe_program_path = "attn_decode/pe_program.csl" },
-        .{ .kernel_name = "sample", .layout_path = "sample/layout.csl", .pe_program_path = "sample/pe_program.csl" },
+        .{ .kernel_name = "embed", .pattern = "gather", .layout_path = "embed/layout.csl", .pe_program_path = "embed/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm_prefill", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm_decode", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "tiled", .pattern = "tiled_matmul", .layout_path = "tiled/layout.csl", .pe_program_path = "tiled/pe_program.csl" },
+        .{ .kernel_name = "rope", .pattern = "rope", .layout_path = "rope/layout.csl", .pe_program_path = "rope/pe_program.csl" },
+        .{ .kernel_name = "attn_small", .pattern = "attention_tiled", .layout_path = "attn_small/layout.csl", .pe_program_path = "attn_small/pe_program.csl" },
+        .{ .kernel_name = "residual", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "residual_prefill", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "residual_decode", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "gelu", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gelu_prefill", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gelu_decode", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gemv", .pattern = "fused_gemv_dequant", .layout_path = "gemv/layout.csl", .pe_program_path = "gemv/pe_program.csl" },
+        .{ .kernel_name = "attn_decode", .pattern = "attention_decode", .layout_path = "attn_decode/layout.csl", .pe_program_path = "attn_decode/pe_program.csl" },
+        .{ .kernel_name = "sample", .pattern = "sample", .layout_path = "sample/layout.csl", .pe_program_path = "sample/pe_program.csl" },
     };
     const cslc_plan = try host_plan.makeCslcPlan(null);
 
@@ -412,7 +447,8 @@ test "Gemma 3 manifest fixture lowers to the same golden host plan artifact" {
     var artifact_pos: usize = 0;
     try host_plan.emitHostPlanArtifactJson(&artifact_buf, &artifact_pos, plan, &targets, cslc_plan);
     try host_plan.validateHostPlanArtifactJson(std.testing.allocator, artifact_buf[0..artifact_pos]);
-    try std.testing.expectEqualStrings(golden_artifact, artifact_buf[0..artifact_pos]);
+    try host_plan.validateHostPlanArtifactJson(std.testing.allocator, golden_artifact);
+    try expectHostPlanEqual(std.testing.allocator, golden_artifact, artifact_buf[0..artifact_pos]);
 }
 
 test "Gemma 4 smoke fixture lowers to golden host plan artifact" {
@@ -428,23 +464,29 @@ test "Gemma 4 smoke fixture lowers to golden host plan artifact" {
     const plan = try exec_v1.lowerJsonToHostPlan(arena.allocator(), fixture_json, &kernels, &prefill, &decode);
 
     const targets = [_]host_plan.CompileTarget{
-        .{ .kernel_name = "embed", .layout_path = "embed/layout.csl", .pe_program_path = "embed/pe_program.csl" },
-        .{ .kernel_name = "ple_embed", .layout_path = "ple_embed/layout.csl", .pe_program_path = "ple_embed/pe_program.csl" },
-        .{ .kernel_name = "ple_proj", .layout_path = "ple_proj/layout.csl", .pe_program_path = "ple_proj/pe_program.csl" },
-        .{ .kernel_name = "ple_rmsnorm", .layout_path = "ple_rmsnorm/layout.csl", .pe_program_path = "ple_rmsnorm/pe_program.csl" },
-        .{ .kernel_name = "ple_residual", .layout_path = "ple_residual/layout.csl", .pe_program_path = "ple_residual/pe_program.csl" },
-        .{ .kernel_name = "rmsnorm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
-        .{ .kernel_name = "tiled", .layout_path = "tiled/layout.csl", .pe_program_path = "tiled/pe_program.csl" },
-        .{ .kernel_name = "rope", .layout_path = "rope/layout.csl", .pe_program_path = "rope/pe_program.csl" },
-        .{ .kernel_name = "attn_small", .layout_path = "attn_small/layout.csl", .pe_program_path = "attn_small/pe_program.csl" },
-        .{ .kernel_name = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
-        .{ .kernel_name = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
-        .{ .kernel_name = "gemv", .layout_path = "gemv/layout.csl", .pe_program_path = "gemv/pe_program.csl" },
-        .{ .kernel_name = "kv_write", .layout_path = "kv_write/layout.csl", .pe_program_path = "kv_write/pe_program.csl" },
-        .{ .kernel_name = "attn_decode_sliding", .layout_path = "attn_decode_sliding/layout.csl", .pe_program_path = "attn_decode_sliding/pe_program.csl" },
-        .{ .kernel_name = "kv_write_shared", .layout_path = "kv_write_shared/layout.csl", .pe_program_path = "kv_write_shared/pe_program.csl" },
-        .{ .kernel_name = "attn_decode", .layout_path = "attn_decode/layout.csl", .pe_program_path = "attn_decode/pe_program.csl" },
-        .{ .kernel_name = "sample", .layout_path = "sample/layout.csl", .pe_program_path = "sample/pe_program.csl" },
+        .{ .kernel_name = "embed", .pattern = "gather", .layout_path = "embed/layout.csl", .pe_program_path = "embed/pe_program.csl" },
+        .{ .kernel_name = "ple_embed", .pattern = "gather", .layout_path = "ple_embed/layout.csl", .pe_program_path = "ple_embed/pe_program.csl" },
+        .{ .kernel_name = "ple_proj", .pattern = "tiled_matmul", .layout_path = "ple_proj/layout.csl", .pe_program_path = "ple_proj/pe_program.csl" },
+        .{ .kernel_name = "ple_rmsnorm", .pattern = "reduction", .layout_path = "ple_rmsnorm/layout.csl", .pe_program_path = "ple_rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "ple_residual", .pattern = "element_wise", .layout_path = "ple_residual/layout.csl", .pe_program_path = "ple_residual/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm_prefill", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "rmsnorm_decode", .pattern = "rms_norm", .layout_path = "rmsnorm/layout.csl", .pe_program_path = "rmsnorm/pe_program.csl" },
+        .{ .kernel_name = "tiled", .pattern = "tiled_matmul", .layout_path = "tiled/layout.csl", .pe_program_path = "tiled/pe_program.csl" },
+        .{ .kernel_name = "rope", .pattern = "rope", .layout_path = "rope/layout.csl", .pe_program_path = "rope/pe_program.csl" },
+        .{ .kernel_name = "attn_small", .pattern = "attention_tiled", .layout_path = "attn_small/layout.csl", .pe_program_path = "attn_small/pe_program.csl" },
+        .{ .kernel_name = "residual", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "residual_prefill", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "residual_decode", .pattern = "residual", .layout_path = "residual/layout.csl", .pe_program_path = "residual/pe_program.csl" },
+        .{ .kernel_name = "gelu", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gelu_prefill", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gelu_decode", .pattern = "gelu", .layout_path = "gelu/layout.csl", .pe_program_path = "gelu/pe_program.csl" },
+        .{ .kernel_name = "gemv", .pattern = "fused_gemv_dequant", .layout_path = "gemv/layout.csl", .pe_program_path = "gemv/pe_program.csl" },
+        .{ .kernel_name = "kv_write", .pattern = "kv_write", .layout_path = "kv_write/layout.csl", .pe_program_path = "kv_write/pe_program.csl" },
+        .{ .kernel_name = "attn_decode_sliding", .pattern = "attention_decode", .layout_path = "attn_decode_sliding/layout.csl", .pe_program_path = "attn_decode_sliding/pe_program.csl" },
+        .{ .kernel_name = "kv_write_shared", .pattern = "kv_write", .layout_path = "kv_write_shared/layout.csl", .pe_program_path = "kv_write_shared/pe_program.csl" },
+        .{ .kernel_name = "attn_decode", .pattern = "attention_decode", .layout_path = "attn_decode/layout.csl", .pe_program_path = "attn_decode/pe_program.csl" },
+        .{ .kernel_name = "sample", .pattern = "sample", .layout_path = "sample/layout.csl", .pe_program_path = "sample/pe_program.csl" },
     };
     const cslc_plan = try host_plan.makeCslcPlan(null);
 
@@ -452,5 +494,6 @@ test "Gemma 4 smoke fixture lowers to golden host plan artifact" {
     var artifact_pos: usize = 0;
     try host_plan.emitHostPlanArtifactJson(&artifact_buf, &artifact_pos, plan, &targets, cslc_plan);
     try host_plan.validateHostPlanArtifactJson(std.testing.allocator, artifact_buf[0..artifact_pos]);
-    try std.testing.expectEqualStrings(golden_artifact, artifact_buf[0..artifact_pos]);
+    try host_plan.validateHostPlanArtifactJson(std.testing.allocator, golden_artifact);
+    try expectHostPlanEqual(std.testing.allocator, golden_artifact, artifact_buf[0..artifact_pos]);
 }

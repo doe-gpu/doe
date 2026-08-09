@@ -389,16 +389,16 @@ test "doeNativeCommandEncoderBeginRenderPass preserves D3D12 attachment extras" 
 
     const color_attachment = types.WGPURenderPassColorAttachment{
         .nextInChain = null,
-        .view = native.toOpaque(&color_view),
+        .view = @ptrCast(native.toOpaque(&color_view)),
         .depthSlice = 7,
-        .resolveTarget = native.toOpaque(&resolve_view),
+        .resolveTarget = @ptrCast(native.toOpaque(&resolve_view)),
         .loadOp = 1,
         .storeOp = 2,
         .clearValue = .{ .r = 0.1, .g = 0.2, .b = 0.3, .a = 0.4 },
     };
     const color_attachments = [_]types.WGPURenderPassColorAttachment{color_attachment};
     const depth_attachment = types.WGPURenderPassDepthStencilAttachment{
-        .view = native.toOpaque(&depth_view),
+        .view = @ptrCast(native.toOpaque(&depth_view)),
         .depthLoadOp = 2,
         .depthStoreOp = 1,
         .depthClearValue = 0.375,
@@ -416,7 +416,6 @@ test "doeNativeCommandEncoderBeginRenderPass preserves D3D12 attachment extras" 
         .depthStencilAttachment = &depth_attachment,
         .occlusionQuerySet = null,
         .timestampWrites = null,
-        .maxDrawCount = 0,
     };
 
     const pass_raw = render.doeNativeCommandEncoderBeginRenderPass(native.toOpaque(&enc), &desc) orelse return error.UnexpectedNull;

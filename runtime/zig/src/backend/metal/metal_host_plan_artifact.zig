@@ -1,6 +1,6 @@
 const std = @import("std");
 const model_transfer_types = @import("../../contracts/model/model_compute_types.zig");
-const hash_utils = @import("../common/hash_utils.zig");
+const hash_utils = @import("../../contracts/artifact.zig");
 const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
 const host = @import("../../compiler/wgsl/emit/csl/emit_csl_host.zig");
 const host_plan = @import("../../compiler/wgsl/emit/csl/emit_csl_host_plan.zig");

@@ -282,6 +282,20 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--with-external-project-release-suite",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Run every promoted external-project harness after blocking gates. "
+            "Enabled by default; zero promoted harnesses is valid until promotion occurs."
+        ),
+    )
+    parser.add_argument(
+        "--external-project-release-suite-out",
+        default="bench/out/external-projects/release-suite.json",
+        help="Output receipt for the promoted external-project release suite.",
+    )
+    parser.add_argument(
         "--cycle-contract",
         default="config/claim-cycle.active.json",
         help="Cycle contract path passed to cycle_gate.py.",
@@ -679,6 +693,9 @@ def main() -> int:
     visualize = compare_dir / "visualize_dawn_vs_doe.py"
     smoke_verify = gates_dir / "verify_smoke_gpu_usage.py"
     gates = runners_dir / "run_blocking_gates.py"
+    external_project_release_suite = (
+        runners_dir / "run_external_project_release_suite.py"
+    )
     claim_rehearsal = tools_dir / "build_claim_rehearsal_artifacts.py"
     cycle_gate = gates_dir / "cycle_gate.py"
     preflight_ran = False
@@ -686,6 +703,7 @@ def main() -> int:
     compare_html_ran = False
     smoke_verify_ran = False
     gates_ran = False
+    external_project_release_suite_ran = False
     claim_rehearsal_ran = False
     cycle_gate_ran = False
     claim_rehearsal_manifest_path: Path | None = None
@@ -898,6 +916,23 @@ def main() -> int:
                     )
             run_step("gates", gates_cmd, dry_run=args.dry_run)
 
+        if (
+            args.with_external_project_release_suite
+            and gates_ran
+        ):
+            external_project_release_suite_ran = True
+            current_step = "external-project-release-suite"
+            run_step(
+                "external-project-release-suite",
+                [
+                    python_exe,
+                    str(external_project_release_suite),
+                    "--out",
+                    args.external_project_release_suite_out,
+                ],
+                dry_run=args.dry_run,
+            )
+
         if args.with_claim_rehearsal_artifacts and args.with_claim_gate and gates_ran:
             claim_rehearsal_ran = True
             current_step = "claim-rehearsal-artifacts"
@@ -1006,6 +1041,7 @@ def main() -> int:
                 "preflightRan": preflight_ran,
                 "compareRan": compare_ran,
                 "gatesRan": gates_ran,
+                "externalProjectReleaseSuiteRan": external_project_release_suite_ran,
                 "smokeVerifyRan": smoke_verify_ran,
                 "claimRehearsalRan": claim_rehearsal_ran,
                 "cycleGateRan": cycle_gate_ran,
@@ -1069,6 +1105,7 @@ def main() -> int:
             "preflightRan": preflight_ran,
             "compareRan": compare_ran,
             "gatesRan": gates_ran,
+            "externalProjectReleaseSuiteRan": external_project_release_suite_ran,
             "smokeVerifyRan": smoke_verify_ran,
             "claimRehearsalRan": claim_rehearsal_ran,
             "cycleGateRan": cycle_gate_ran,

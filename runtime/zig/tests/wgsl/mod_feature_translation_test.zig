@@ -9,6 +9,30 @@ const MAX_OUTPUT = mod.MAX_OUTPUT;
 const MAX_HLSL_OUTPUT = mod.MAX_HLSL_OUTPUT;
 const MAX_SPIRV_OUTPUT = mod.MAX_SPIRV_OUTPUT;
 
+test "translate explicit numeric and bool scalar conversions" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    let enabled = bool(data[0]);
+        \\    let integer = u32(!enabled);
+        \\    let signed = i32(enabled);
+        \\    let decimal = f32(enabled);
+        \\    data[0] = integer + u32(signed) + u32(decimal);
+        \\}
+    ;
+
+    var msl_out: [MAX_OUTPUT]u8 = undefined;
+    try std.testing.expect(try translateToMsl(std.testing.allocator, source, &msl_out) > 0);
+
+    var hlsl_out: [MAX_HLSL_OUTPUT]u8 = undefined;
+    try std.testing.expect(try translateToHlsl(std.testing.allocator, source, &hlsl_out) > 0);
+
+    var spirv_out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    try std.testing.expect(try translateToSpirv(std.testing.allocator, source, &spirv_out) > 0);
+}
+
 test "translate workgroupBarrier builtin to MSL SPIR-V and HLSL" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<f32>;
@@ -283,6 +307,66 @@ test "translate textureDimensions builtin to MSL HLSL and SPIR-V" {
     try std.testing.expect(hlsl_len > 0);
     try std.testing.expect(std.mem.indexOf(u8, hlsl_out[0..hlsl_len], "doe_textureDimensions_tex(uint(0))") != null);
     try std.testing.expect(std.mem.indexOf(u8, hlsl_out[0..hlsl_len], "doe_textureDimensions_out_data()") != null);
+
+    var spirv_out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const spirv_len = try translateToSpirv(std.testing.allocator, source, &spirv_out);
+    try std.testing.expect(spirv_len > 0);
+}
+
+test "translate readonly storage texture through MSL HLSL and SPIR-V" {
+    const source =
+        \\@group(0) @binding(0) var input_tex: texture_storage_2d<rgba8unorm, read>;
+        \\@group(0) @binding(1) var<storage, read_write> out_data: array<f32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main(@builtin(global_invocation_id) id: vec3u) {
+        \\    out_data[id.x] = textureLoad(input_tex, vec2i(0, 0)).x;
+        \\}
+    ;
+
+    var msl_out: [MAX_OUTPUT]u8 = undefined;
+    const msl_len = try translateToMsl(std.testing.allocator, source, &msl_out);
+    try std.testing.expect(msl_len > 0);
+    try std.testing.expect(
+        std.mem.indexOf(u8, msl_out[0..msl_len], "access::read") != null,
+    );
+
+    var hlsl_out: [MAX_HLSL_OUTPUT]u8 = undefined;
+    const hlsl_len = try translateToHlsl(std.testing.allocator, source, &hlsl_out);
+    try std.testing.expect(hlsl_len > 0);
+    try std.testing.expect(
+        std.mem.indexOf(u8, hlsl_out[0..hlsl_len], "Texture2D<float4> input_tex") != null,
+    );
+
+    var spirv_out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const spirv_len = try translateToSpirv(std.testing.allocator, source, &spirv_out);
+    try std.testing.expect(spirv_len > 0);
+}
+
+test "translate readwrite storage texture through MSL HLSL and SPIR-V" {
+    const source =
+        \\@group(0) @binding(0) var image: texture_storage_2d<rgba8unorm, read_write>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main(@builtin(global_invocation_id) id: vec3u) {
+        \\    let value = textureLoad(image, vec2i(0, 0));
+        \\    textureStore(image, vec2i(0, 0), value);
+        \\}
+    ;
+
+    var msl_out: [MAX_OUTPUT]u8 = undefined;
+    const msl_len = try translateToMsl(std.testing.allocator, source, &msl_out);
+    try std.testing.expect(msl_len > 0);
+    try std.testing.expect(
+        std.mem.indexOf(u8, msl_out[0..msl_len], "access::read_write") != null,
+    );
+
+    var hlsl_out: [MAX_HLSL_OUTPUT]u8 = undefined;
+    const hlsl_len = try translateToHlsl(std.testing.allocator, source, &hlsl_out);
+    try std.testing.expect(hlsl_len > 0);
+    try std.testing.expect(
+        std.mem.indexOf(u8, hlsl_out[0..hlsl_len], "RWTexture2D<float4> image") != null,
+    );
 
     var spirv_out: [MAX_SPIRV_OUTPUT]u8 = undefined;
     const spirv_len = try translateToSpirv(std.testing.allocator, source, &spirv_out);

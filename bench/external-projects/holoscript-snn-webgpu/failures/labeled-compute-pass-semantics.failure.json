@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "labeled-compute-pass-semantics",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "tropical-spmv",
+  "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "A label-only compute-pass descriptor selected a different execution route and zero-dispatched; labels now remain metadata and cannot alter dispatch semantics.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run1/raw-matrix.json",
+      "sha256": "5a6b5ed3c73074579aa730b42c402c1b0c5c0257ae59cb9fa6275742a53e58d9"
+    }
+  ],
+  "minimizedReproPaths": [
+    "bench/repros/doe-runtime-zero-dispatch/repro.mjs"
+  ],
+  "implementationPaths": [
+    "packages/doe-gpu/src/vendor/webgpu/shared/full-surface.js",
+    "packages/doe-gpu/src/vendor/webgpu/index.js"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-labeled-compute-pass.js"
+  ],
+  "verifiedAt": "2026-08-08T19:35:30Z"
+}

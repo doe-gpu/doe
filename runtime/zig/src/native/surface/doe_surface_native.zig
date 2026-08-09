@@ -15,6 +15,7 @@ const builtin = @import("builtin");
 const has_vulkan = (builtin.os.tag == .linux);
 const backend_surface_ops = @import("../../backend/dropin_surface_ops.zig");
 const backend_resource_ops = @import("../../backend/dropin_resource_ops.zig");
+const backend_contract = @import("../../contracts/backend.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
@@ -46,7 +47,7 @@ pub const DoeSurface = struct {
     pub const TYPE_MAGIC = MAGIC_SURFACE;
     magic: u32 = TYPE_MAGIC,
     ref_count: u32 = 1,
-    backend: native_shared.BackendKind = .metal,
+    backend: backend_contract.NativeBackendKind = .metal,
     handle: u64 = 0,
     instance_ref: ?*DoeInstance = null,
     vk_runtime_ref: ?*anyopaque = null,
@@ -539,7 +540,7 @@ pub fn doeAbiBridgeSurfaceGetCurrentTexture(
     var suboptimal: u32 = 0;
     var status: u32 = 0;
     doeNativeSurfaceGetCurrentTexture(surf_raw, &tex_ptr, &suboptimal, &status);
-    out.texture = tex_ptr;
+    out.texture = @ptrCast(tex_ptr);
     out.status = status;
 }
 

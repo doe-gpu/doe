@@ -2,7 +2,7 @@
 
 const std = @import("std");
 const mod = @import("../../src/compiler/wgsl/mod.zig");
-const dispatch_contract = @import("../../src/compiler/wgsl/emit/hlsl/hlsl_dispatch_contract.zig");
+const dispatch_contract = @import("../../src/contracts/shader_abi/dispatch_info.zig");
 const maps = @import("../../src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig");
 
 const testing = std.testing;

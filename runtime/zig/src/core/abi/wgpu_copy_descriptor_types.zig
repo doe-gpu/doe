@@ -1,41 +1,19 @@
 const core = @import("wgpu_core_base_types.zig");
 const texture = @import("wgpu_texture_base_types.zig");
 const callbacks = @import("wgpu_callback_descriptor_types.zig");
+const upstream = @import("generated/webgpu_upstream.zig");
 
-pub const WGPUExtent3D = extern struct {
-    width: u32,
-    height: u32,
-    depthOrArrayLayers: u32,
-};
+pub const WGPUExtent3D = upstream.WGPUExtent3D;
 
 pub const WGPUExtent2D = extern struct {
     width: u32,
     height: u32,
 };
 
-pub const WGPUOrigin3D = extern struct {
-    x: u32,
-    y: u32,
-    z: u32,
-};
-
-pub const WGPUTexelCopyBufferLayout = extern struct {
-    offset: u64,
-    bytesPerRow: u32,
-    rowsPerImage: u32,
-};
-
-pub const WGPUTexelCopyBufferInfo = extern struct {
-    layout: WGPUTexelCopyBufferLayout,
-    buffer: core.WGPUBuffer,
-};
-
-pub const WGPUTexelCopyTextureInfo = extern struct {
-    texture: core.WGPUTexture,
-    mipLevel: u32,
-    origin: WGPUOrigin3D,
-    aspect: texture.WGPUTextureAspect,
-};
+pub const WGPUOrigin3D = upstream.WGPUOrigin3D;
+pub const WGPUTexelCopyBufferLayout = upstream.WGPUTexelCopyBufferLayout;
+pub const WGPUTexelCopyBufferInfo = upstream.WGPUTexelCopyBufferInfo;
+pub const WGPUTexelCopyTextureInfo = upstream.WGPUTexelCopyTextureInfo;
 
 pub const WGPUCopyTextureForBrowserOptions = extern struct {
     nextInChain: ?*callbacks.WGPUChainedStruct,

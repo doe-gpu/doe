@@ -1,5 +1,5 @@
 const std = @import("std");
-const common = @import("../common.zig");
+const artifact = @import("../../../contracts/artifact.zig");
 
 pub const MODULE_ID = "fawn_path_engine";
 
@@ -107,7 +107,7 @@ pub const Result = struct {
     geometryStats: GeometryStats,
     rasterStats: RasterStats,
     fallbackStats: FallbackStats,
-    traceLink: common.TraceLink,
+    traceLink: artifact.TraceLink,
 };
 
 pub fn parseRequest(allocator: std.mem.Allocator, bytes: []const u8) !std.json.Parsed(Request) {
@@ -150,9 +150,9 @@ pub fn execute(allocator: std.mem.Allocator, request: Request, policy: Policy) !
     try ensureValidRequest(request);
     try ensureValidPolicy(policy);
 
-    const request_hash = try common.stableHashJsonAlloc(allocator, request);
+    const request_hash = try artifact.stableHashJsonAlloc(allocator, request);
     errdefer allocator.free(request_hash);
-    const policy_hash = try common.stableHashJsonAlloc(allocator, policy);
+    const policy_hash = try artifact.stableHashJsonAlloc(allocator, policy);
     errdefer allocator.free(policy_hash);
 
     var fallback_histogram = FallbackReasonHistogram{};
@@ -198,7 +198,7 @@ pub fn execute(allocator: std.mem.Allocator, request: Request, policy: Policy) !
             .fallbackReasonHistogram = fallback_histogram,
         },
     };
-    const result_hash = try common.stableHashJsonAlloc(allocator, payload);
+    const result_hash = try artifact.stableHashJsonAlloc(allocator, payload);
     return .{
         .schemaVersion = payload.schemaVersion,
         .moduleId = payload.moduleId,

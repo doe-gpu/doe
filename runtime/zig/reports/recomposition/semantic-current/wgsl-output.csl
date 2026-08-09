@@ -1,0 +1,90 @@
+
+//--- layout.csl ---
+// Layout: element-wise kernel distributed across a width x height PE grid.
+// Each PE processes a contiguous chunk of the input array.
+
+// Grid width and height are set at compile time via
+// --params=width:<W>,height:<H>. height defaults to 1 for 1-D layouts.
+param width: u16;
+param height: u16;
+
+const memcpy = @import_module("<memcpy/get_params>", .{
+    .width = width,
+    .height = height,
+});
+
+layout {
+    @set_rectangle(width, height);
+
+    for (@range(u16, height)) |pe_y| {
+        for (@range(u16, width)) |pe_x| {
+            @set_tile_code(pe_x, pe_y, "pe_program.csl", .{
+                .memcpy_params = memcpy.get_params(pe_x),
+                .width = width,
+                .height = height,
+            });
+        }
+    }
+
+    @export_name("u", [*]u32, true);
+    @export_name("input", [*]f32, true);
+    @export_name("output", [*]f32, true);
+    @export_name("compute", fn()void);
+}
+
+//--- pe_program.csl ---
+// PE program: element-wise kernel (auto-generated from WGSL)
+// Each PE processes chunk_size elements with no fabric routing.
+
+param memcpy_params;
+param width: u16;
+param height: u16;
+
+const sys_mod = @import_module("<memcpy/memcpy>", memcpy_params);
+const layout_mod = @import_module("<layout>");
+const math = @import_module("<math>");
+
+// Uniforms (loaded from host before compute): a single
+// [N]u32 buffer rather than per-field vars so `&<uniform>`
+// yields `[*]u32` that matches `layout.csl @export_name(..., [*]u32)`.
+// Earlier per-field emission produced `&size: *u32` which cslc
+// rejected as a pointer-element-count mismatch. Per-field access
+// in the body is handled by the IR walker's `.member` case,
+// which maps struct field names to array indices via the field
+// index stored on the IR member expression.
+var u: [4]u32 = @zeros([4]u32);
+var u_ptr: [*]u32 = &u;
+
+// Storage buffers — each PE holds its local data.
+param chunk_size: i16 = 1024;
+
+var input: [chunk_size]f32 = @zeros([chunk_size]f32);
+var input_ptr: [*]f32 = &input;
+var output: [chunk_size]f32 = @zeros([chunk_size]f32);
+var output_ptr: [*]f32 = &output;
+
+fn gelu(x: f32) f32 {
+    const inner: f32 = (0.7978845608 * (x + (((0.044715 * x) * x) * x)));
+    const inner_clamped: f32 = (if ((if (inner > -(15.0)) inner else -(15.0)) < 15.0) (if (inner > -(15.0)) inner else -(15.0)) else 15.0);
+    return ((0.5 * x) * (1.0 + math.tanh(inner_clamped)));
+}
+
+fn compute() void {
+    const pe_x = layout_mod.get_x_coord();
+    const pe_y = layout_mod.get_y_coord();
+    const pe_id = @as(u16, pe_y) * width + @as(u16, pe_x);
+    const num_pes = width * height;
+    for (@range(i16, chunk_size)) |_idx| {
+        const idx = @as(u32, _idx);
+        const x: f32 = input[(if (idx < (@as(u32, chunk_size) - 1)) idx else (@as(u32, chunk_size) - 1))];
+        output[(if (idx < (@as(u32, chunk_size) - 1)) idx else (@as(u32, chunk_size) - 1))] = gelu(x);
+    }
+    sys_mod.unblock_cmd_stream();
+}
+
+comptime {
+    @export_symbol(u_ptr, "u");
+    @export_symbol(input_ptr, "input");
+    @export_symbol(output_ptr, "output");
+    @export_symbol(compute);
+}

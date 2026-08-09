@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "recorded-storage-texture-bindings",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "upstreamCommit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Recorded Vulkan compute dispatches preserved buffer bindings but dropped texture views and samplers, producing a zero storage-texture result; recorded bind-group state now covers every compute resource kind.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-bool-readback/raw-suite.json",
+      "sha256": "0c59d07826e5ab2a8ec36ebf847cc516769dc50683d09ade2698e603927712dc"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/native/vulkan/vulkan_compute_bindings.zig",
+    "runtime/zig/src/native/compute/doe_compute_ext_native.zig",
+    "runtime/zig/src/native/compute/doe_compute_fast.zig",
+    "runtime/zig/src/native/compute/doe_compute_fast_vulkan.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/src/native/vulkan/vulkan_compute_bindings.zig",
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "verifiedAt": "2026-08-08T22:02:53Z"
+}

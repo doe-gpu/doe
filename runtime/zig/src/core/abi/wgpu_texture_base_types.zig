@@ -1,14 +1,16 @@
 const core = @import("wgpu_core_base_types.zig");
+const upstream = @import("generated/webgpu_upstream.zig");
 const layout = @import("../../contracts/model/model_texture_layout_value_types.zig");
 const formats = @import("../../contracts/model/model_texture_format_value_types.zig");
-const compressed_formats = @import("wgpu_type_texture_formats.zig");
+const compressed_formats = @import("../../contracts/texture_format.zig");
 
 pub const WGPUTextureUsage = core.WGPUFlags;
 pub const WGPUTextureFormat = layout.WGPUTextureFormat;
-pub const WGPUTextureDimension = u32;
-pub const WGPUTextureAspect = u32;
-pub const WGPUTextureComponentSwizzle = u32;
-pub const WGPUTextureViewDimension = u32;
+pub const WGPUTextureDimension = upstream.WGPUTextureDimension;
+pub const WGPUTextureAspect = upstream.WGPUTextureAspect;
+pub const WGPUComponentSwizzle = upstream.WGPUComponentSwizzle;
+pub const WGPUTextureComponentSwizzle = WGPUComponentSwizzle;
+pub const WGPUTextureViewDimension = upstream.WGPUTextureViewDimension;
 
 pub const WGPUTextureUsage_None: WGPUTextureUsage = layout.WGPUTextureUsage_None;
 pub const WGPUTextureUsage_CopySrc: WGPUTextureUsage = layout.WGPUTextureUsage_CopySrc;
@@ -138,13 +140,13 @@ pub const WGPUTextureAspect_All: u32 = layout.WGPUTextureAspect_All;
 pub const WGPUTextureAspect_StencilOnly: u32 = layout.WGPUTextureAspect_StencilOnly;
 pub const WGPUTextureAspect_DepthOnly: u32 = layout.WGPUTextureAspect_DepthOnly;
 
-pub const WGPUTextureComponentSwizzle_Undefined: u32 = 0;
-pub const WGPUTextureComponentSwizzle_Zero: u32 = 1;
-pub const WGPUTextureComponentSwizzle_One: u32 = 2;
-pub const WGPUTextureComponentSwizzle_Red: u32 = 3;
-pub const WGPUTextureComponentSwizzle_Green: u32 = 4;
-pub const WGPUTextureComponentSwizzle_Blue: u32 = 5;
-pub const WGPUTextureComponentSwizzle_Alpha: u32 = 6;
+pub const WGPUTextureComponentSwizzle_Undefined: WGPUComponentSwizzle = 0;
+pub const WGPUTextureComponentSwizzle_Zero: WGPUComponentSwizzle = 1;
+pub const WGPUTextureComponentSwizzle_One: WGPUComponentSwizzle = 2;
+pub const WGPUTextureComponentSwizzle_Red: WGPUComponentSwizzle = 3;
+pub const WGPUTextureComponentSwizzle_Green: WGPUComponentSwizzle = 4;
+pub const WGPUTextureComponentSwizzle_Blue: WGPUComponentSwizzle = 5;
+pub const WGPUTextureComponentSwizzle_Alpha: WGPUComponentSwizzle = 6;
 
 pub const WGPUTextureViewDimension_Undefined: u32 = layout.WGPUTextureViewDimension_Undefined;
 pub const WGPUTextureViewDimension_1D: u32 = layout.WGPUTextureViewDimension_1D;

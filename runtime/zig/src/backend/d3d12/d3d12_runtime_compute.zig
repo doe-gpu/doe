@@ -4,7 +4,8 @@ const common_timing = @import("../common/timing.zig");
 const path_utils = @import("../common/path_utils.zig");
 const webgpu = @import("../runtime_types.zig");
 const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
-const hlsl_dispatch_contract = @import("../../compiler/wgsl/emit/hlsl/hlsl_dispatch_contract.zig");
+const dispatch_info = @import("../../contracts/shader_abi/dispatch_info.zig");
+const execution_contract = @import("../../contracts/execution.zig");
 const d3d12_descriptors = @import("d3d12_descriptors.zig");
 const dc = @import("d3d12_constants.zig");
 const bridge = @import("d3d12_bridge_decls.zig");
@@ -18,18 +19,7 @@ pub const DXC_ENTRYPOINT: []const u8 = "main";
 
 const D3D12_DESCRIPTOR_RANGE_TYPE_CBV = dc.DESCRIPTOR_RANGE_TYPE_CBV;
 
-const DispatchInfoWords = extern struct {
-    x: u32,
-    y: u32,
-    z: u32,
-    _pad: u32,
-};
-
-pub const DispatchMetrics = struct {
-    encode_ns: u64 = 0,
-    submit_wait_ns: u64 = 0,
-    dispatch_count: u32 = 0,
-};
+pub const DispatchMetrics = execution_contract.DispatchMetrics;
 
 pub fn loadKernelCso(self: anytype, alloc: std.mem.Allocator, kernel_name: []const u8) ![]u8 {
     if (kernel_name.len == 0) return error.InvalidArgument;
@@ -201,8 +191,8 @@ fn buildComputePipeline(self: anytype, bytecode: []const u8, shader_hash: u64) !
         const range = d3d12_descriptors.DescriptorRangeDesc{
             .range_type = D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
             .num_descriptors = 1,
-            .base_shader_register = hlsl_dispatch_contract.DISPATCH_INFO_REGISTER_SLOT,
-            .register_space = hlsl_dispatch_contract.DISPATCH_INFO_REGISTER_SPACE,
+            .base_shader_register = dispatch_info.DISPATCH_INFO_REGISTER_SLOT,
+            .register_space = dispatch_info.DISPATCH_INFO_REGISTER_SPACE,
         };
         self.root_signature = bridge.c.d3d12_bridge_device_create_root_signature_with_tables(self.device, @ptrCast(&range), 1, 0) orelse return error.InvalidState;
         self.has_root_signature = true;
@@ -258,7 +248,7 @@ fn bindDispatchInfo(
     );
     bridge.c.d3d12_bridge_command_list_set_compute_root_descriptor_table(
         cmd_list,
-        hlsl_dispatch_contract.DISPATCH_INFO_ROOT_PARAMETER_INDEX,
+        dispatch_info.DISPATCH_INFO_ROOT_PARAMETER_INDEX,
         binding.heap,
         binding.descriptor_index,
     );
@@ -268,7 +258,7 @@ fn ensureSharedDispatchInfoBinding(self: anytype, x: u32, y: u32, z: u32) !Trans
     if (self.dispatch_info_buffer == null) {
         self.dispatch_info_buffer = bridge.c.d3d12_bridge_device_create_buffer(
             self.device,
-            @intCast(hlsl_dispatch_contract.DISPATCH_INFO_BUFFER_BYTES),
+            @intCast(dispatch_info.DISPATCH_INFO_BUFFER_BYTES),
             dc.HEAP_TYPE_UPLOAD,
         ) orelse return error.InvalidState;
     }
@@ -276,7 +266,7 @@ fn ensureSharedDispatchInfoBinding(self: anytype, x: u32, y: u32, z: u32) !Trans
         self.dispatch_info_cbv_index = try self.descriptor_state.allocate_cbv(
             self.device,
             self.dispatch_info_buffer,
-            hlsl_dispatch_contract.DISPATCH_INFO_BUFFER_BYTES,
+            dispatch_info.DISPATCH_INFO_BUFFER_BYTES,
         );
         self.has_dispatch_info_cbv = true;
     }
@@ -297,7 +287,7 @@ fn createTransientDispatchInfoBinding(
 ) !TransientDispatchInfoBinding {
     const buffer = bridge.c.d3d12_bridge_device_create_buffer(
         self.device,
-        @intCast(hlsl_dispatch_contract.DISPATCH_INFO_BUFFER_BYTES),
+        @intCast(dispatch_info.DISPATCH_INFO_BUFFER_BYTES),
         dc.HEAP_TYPE_UPLOAD,
     ) orelse return error.InvalidState;
     errdefer bridge.c.d3d12_bridge_release(buffer);
@@ -312,7 +302,7 @@ fn createTransientDispatchInfoBinding(
         0,
         buffer,
         0,
-        @intCast(hlsl_dispatch_contract.DISPATCH_INFO_BUFFER_BYTES),
+        @intCast(dispatch_info.DISPATCH_INFO_BUFFER_BYTES),
     );
     try retained_handles.append(self.allocator, buffer);
     try retained_handles.append(self.allocator, heap);
@@ -325,7 +315,7 @@ fn createTransientDispatchInfoBinding(
 
 fn writeDispatchInfoWords(buffer: ?*anyopaque, x: u32, y: u32, z: u32) !void {
     const mapped = bridge.c.d3d12_bridge_resource_map(buffer) orelse return error.InvalidState;
-    const words: *DispatchInfoWords = @ptrCast(@alignCast(mapped));
+    const words: *dispatch_info.Words = @ptrCast(@alignCast(mapped));
     words.* = .{ .x = x, .y = y, .z = z, ._pad = 0 };
     bridge.c.d3d12_bridge_resource_unmap(buffer);
 }

@@ -1,5 +1,6 @@
 const std = @import("std");
 const common_timing = @import("../common/timing.zig");
+const execution_contract = @import("../../contracts/execution.zig");
 const webgpu = @import("../runtime_types.zig");
 const bridge = @import("metal_bridge_decls.zig");
 const metal_bridge_buffer_contents = bridge.metal_bridge_buffer_contents;
@@ -16,11 +17,7 @@ const DEFAULT_DISPATCH_KERNEL = "dispatch_noop.metal";
 const DISPATCH_INDIRECT_ARGS_BYTES = @sizeOf([3]u32);
 const DEFAULT_WORKGROUP_SIZE: u32 = 0;
 
-pub const DispatchRunMetrics = struct {
-    encode_ns: u64,
-    submit_wait_ns: u64,
-    dispatch_count: u32,
-};
+pub const DispatchRunMetrics = execution_contract.DispatchMetrics;
 
 pub fn run_dispatch(runtime: anytype, x: u32, y: u32, z: u32, queue_sync_mode: webgpu.QueueSyncMode) !DispatchRunMetrics {
     if (x == 0 or y == 0 or z == 0) return error.InvalidArgument;

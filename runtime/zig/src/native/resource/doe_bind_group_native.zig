@@ -11,6 +11,8 @@ const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
 const abi_binding = @import("../../core/abi/wgpu_binding_base_types.zig");
 const abi_callback = @import("../../core/abi/wgpu_callback_descriptor_types.zig");
 const abi_pipeline = @import("../../core/abi/wgpu_pipeline_descriptor_types.zig");
+const binding_contract = @import("../../contracts/binding.zig");
+const texture_contract = @import("../../contracts/texture.zig");
 const texture_sampler = @import("doe_texture_sampler_native.zig");
 
 const alloc = native_helpers.alloc;
@@ -32,12 +34,12 @@ const DoePipelineLayout = native_types.DoePipelineLayout;
 const DoeTextureView = native_types.DoeTextureView;
 const DoeExternalTexture = @import("doe_external_texture_native.zig").DoeExternalTexture;
 
-const RESOURCE_KIND_NONE: u32 = 0;
-const RESOURCE_KIND_BUFFER: u32 = 1;
-const RESOURCE_KIND_SAMPLER: u32 = 2;
-const RESOURCE_KIND_TEXTURE: u32 = 3;
-const RESOURCE_KIND_STORAGE_TEXTURE: u32 = 4;
-const RESOURCE_KIND_EXTERNAL_TEXTURE: u32 = 5;
+const RESOURCE_KIND_NONE = binding_contract.layoutResourceKindCode(.none);
+const RESOURCE_KIND_BUFFER = binding_contract.layoutResourceKindCode(.buffer);
+const RESOURCE_KIND_SAMPLER = binding_contract.layoutResourceKindCode(.sampler);
+const RESOURCE_KIND_TEXTURE = binding_contract.layoutResourceKindCode(.texture);
+const RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.storage_texture);
+const RESOURCE_KIND_EXTERNAL_TEXTURE = binding_contract.layoutResourceKindCode(.external_texture);
 const FLAT_BUFFER_BIND_GROUP_ENTRY_LIMIT: u32 = 4;
 
 fn chained_struct(raw: ?*anyopaque) ?*const abi_callback.WGPUChainedStruct {
@@ -116,70 +118,22 @@ fn classify_layout_entry(entry: abi_pipeline.WGPUBindGroupLayoutEntry) DoeBindGr
 }
 
 fn infer_texture_sample_type(tex: *DoeTexture) u32 {
-    return switch (tex.format) {
-        abi_texture.WGPUTextureFormat_Depth16Unorm,
-        abi_texture.WGPUTextureFormat_Depth24Plus,
-        abi_texture.WGPUTextureFormat_Depth24PlusStencil8,
-        abi_texture.WGPUTextureFormat_Depth32Float,
-        abi_texture.WGPUTextureFormat_Depth32FloatStencil8,
-        => abi_binding.WGPUTextureSampleType_Depth,
-        abi_texture.WGPUTextureFormat_R8Uint,
-        abi_texture.WGPUTextureFormat_R16Uint,
-        abi_texture.WGPUTextureFormat_RG8Uint,
-        abi_texture.WGPUTextureFormat_R32Uint,
-        abi_texture.WGPUTextureFormat_RG16Uint,
-        abi_texture.WGPUTextureFormat_RGBA8Uint,
-        abi_texture.WGPUTextureFormat_RGB10A2Uint,
-        abi_texture.WGPUTextureFormat_RG32Uint,
-        abi_texture.WGPUTextureFormat_RGBA16Uint,
-        abi_texture.WGPUTextureFormat_RGBA32Uint,
-        => abi_binding.WGPUTextureSampleType_Uint,
-        abi_texture.WGPUTextureFormat_R8Sint,
-        abi_texture.WGPUTextureFormat_R16Sint,
-        abi_texture.WGPUTextureFormat_RG8Sint,
-        abi_texture.WGPUTextureFormat_R32Sint,
-        abi_texture.WGPUTextureFormat_RG16Sint,
-        abi_texture.WGPUTextureFormat_RGBA8Sint,
-        abi_texture.WGPUTextureFormat_RG32Sint,
-        abi_texture.WGPUTextureFormat_RGBA16Sint,
-        abi_texture.WGPUTextureFormat_RGBA32Sint,
-        => abi_binding.WGPUTextureSampleType_Sint,
-        else => abi_binding.WGPUTextureSampleType_Float,
-    };
+    return texture_contract.inferSampleType(tex.format);
 }
 
 fn resolve_view_dimension(view: *DoeTextureView) u32 {
     if (view.dimension != 0) return view.dimension;
     if (view.tex.texture_binding_view_dimension != 0) return view.tex.texture_binding_view_dimension;
-    return switch (view.tex.dimension) {
-        abi_texture.WGPUTextureDimension_1D => abi_texture.WGPUTextureViewDimension_1D,
-        abi_texture.WGPUTextureDimension_3D => abi_texture.WGPUTextureViewDimension_3D,
-        else => abi_texture.WGPUTextureViewDimension_2D,
-    };
+    return texture_contract.defaultViewDimension(view.tex.dimension);
 }
 
 fn texture_aspect_matches(tex: *DoeTexture, view: *DoeTextureView) bool {
     const aspect = if (view.aspect != 0) view.aspect else abi_texture.WGPUTextureAspect_All;
-    return switch (aspect) {
-        abi_texture.WGPUTextureAspect_All => true,
-        abi_texture.WGPUTextureAspect_DepthOnly => switch (tex.format) {
-            abi_texture.WGPUTextureFormat_Stencil8 => false,
-            abi_texture.WGPUTextureFormat_Depth16Unorm, abi_texture.WGPUTextureFormat_Depth24Plus, abi_texture.WGPUTextureFormat_Depth24PlusStencil8, abi_texture.WGPUTextureFormat_Depth32Float, abi_texture.WGPUTextureFormat_Depth32FloatStencil8 => true,
-            else => false,
-        },
-        abi_texture.WGPUTextureAspect_StencilOnly => switch (tex.format) {
-            abi_texture.WGPUTextureFormat_Stencil8, abi_texture.WGPUTextureFormat_Depth24PlusStencil8, abi_texture.WGPUTextureFormat_Depth32FloatStencil8 => true,
-            else => false,
-        },
-        else => false,
-    };
+    return texture_contract.aspectMatches(tex.format, aspect);
 }
 
 fn storage_texture_access_supported(access: u32) bool {
-    return switch (access) {
-        abi_binding.WGPUStorageTextureAccess_Undefined, abi_binding.WGPUStorageTextureAccess_WriteOnly, abi_binding.WGPUStorageTextureAccess_ReadOnly, abi_binding.WGPUStorageTextureAccess_ReadWrite => true,
-        else => false,
-    };
+    return binding_contract.storageTextureAccessSupported(access);
 }
 
 fn texture_view_matches_layout(layout_entry: DoeBindGroupLayoutEntry, view: *DoeTextureView) bool {
@@ -275,7 +229,7 @@ pub export fn doeNativeDeviceCreateBindGroupLayout(dev_raw: ?*anyopaque, desc: ?
             alloc.destroy(bgl);
             return null;
         };
-        for (d.entries.?[0..d.entryCount], 0..) |entry, i| {
+        for (d.entries[0..d.entryCount], 0..) |entry, i| {
             stored_entries.?[i] = classify_layout_entry(entry);
         }
     }

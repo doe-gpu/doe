@@ -1,0 +1,8 @@
+[
+  {
+    "kind": "copy_buffer_to_buffer",
+    "bytes": 4096,
+    "src_handle": 44010,
+    "dst_handle": 44011
+  }
+]

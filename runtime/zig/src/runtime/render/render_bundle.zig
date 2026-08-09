@@ -19,7 +19,7 @@
 
 const std = @import("std");
 const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
-const native_shared = @import("../../native/support/doe_native_shared_types.zig");
+const backend_contract = @import("../../contracts/backend.zig");
 
 // ============================================================
 // Constants
@@ -122,7 +122,7 @@ pub const DoeBundleEncoder = struct {
     pub const TYPE_MAGIC = MAGIC_BUNDLE_ENCODER;
     magic: u32 = TYPE_MAGIC,
     allocator: std.mem.Allocator,
-    backend: native_shared.BackendKind = .metal,
+    backend: backend_contract.NativeBackendKind = .metal,
     // Compatibility signature — validated against render pass at executeBundles time.
     color_format: abi_texture.WGPUTextureFormat,
     depth_stencil_format: abi_texture.WGPUTextureFormat,
@@ -141,7 +141,7 @@ pub const DoeRenderBundle = struct {
     pub const TYPE_MAGIC = MAGIC_BUNDLE;
     magic: u32 = TYPE_MAGIC,
     allocator: std.mem.Allocator,
-    backend: native_shared.BackendKind = .metal,
+    backend: backend_contract.NativeBackendKind = .metal,
     color_format: abi_texture.WGPUTextureFormat,
     depth_stencil_format: abi_texture.WGPUTextureFormat,
     sample_count: u32,

@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "sample-actor-sample-workload-1",
+  "actorId": "sample-actor",
+  "harnessId": "sample-workload",
+  "generatedAt": "2026-08-08T00:00:00Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-08T00:00:00Z",
+    "reviewer": "sample-reviewer"
+  },
+  "registryRevision": "1",
+  "upstream": {
+    "repositoryUrl": "https://github.com/example/sample-actor",
+    "commit": "1111111111111111111111111111111111111111",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 1
+    },
+    "comparison": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 1
+    }
+  },
+  "performance": {
+    "unit": "ms",
+    "baseline": {
+      "cold": { "p50": 1, "p95": 1, "p99": 1 },
+      "warm": { "p50": 1, "p95": 1, "p99": 1 }
+    },
+    "comparison": {
+      "cold": { "p50": 1, "p95": 1, "p99": 1 },
+      "warm": { "p50": 1, "p95": 1, "p99": 1 }
+    }
+  },
+  "receiptOverhead": {
+    "unit": "ms",
+    "untracedP50": 1,
+    "receiptEnabledP50": 1
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": { "status": "pass", "summary": "The provider substitution was installed and validated." },
+    "supportHardware": { "status": "pass", "summary": "The run used the declared physical GPU target." },
+    "concurrency": { "status": "not-run", "summary": "Concurrency promotion coverage was not run." },
+    "teardown": { "status": "not-run", "summary": "Teardown promotion coverage was not run." },
+    "stress": { "status": "not-run", "summary": "Stress promotion coverage was not run." },
+    "memory": { "status": "not-run", "summary": "Bounded memory-growth coverage was not run." },
+    "receipts": { "status": "pass", "summary": "Receipt capture passed." },
+    "replay": { "status": "not-run", "summary": "Receipt replay was not run." },
+    "performance": { "status": "not-run", "summary": "Promotion performance coverage was not run." },
+    "release": { "status": "ineligible", "summary": "The sample is not a promoted release workload." }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/sample-actor/sample-run/receipt.json",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/sample-actor/sample-run/run-manifest.json",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ]
+}

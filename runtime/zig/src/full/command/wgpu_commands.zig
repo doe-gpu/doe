@@ -1,4 +1,4 @@
-const model = @import("../../contracts/model/model_commands.zig");
+const model = @import("../../contracts/command.zig");
 const runtime_types = @import("../../backend/runtime_types.zig");
 const backend_support = @import("../../backend/webgpu_backend_support.zig");
 const sandbox = @import("../../runtime/security/wgpu_sandbox_guard.zig");
@@ -32,13 +32,9 @@ pub fn executeCommand(self: anytype, command: model.Command) !runtime_types.Nati
     };
 
     self.clearUncapturedError();
-    if (model.as_core_command(command)) |core_command| {
-        switch (core_command) {
-            .upload, .buffer_write => {},
-            else => try flushPendingUploads(self),
-        }
-    } else {
-        try flushPendingUploads(self);
+    switch (command) {
+        .upload, .buffer_write => {},
+        else => try flushPendingUploads(self),
     }
     const result = if (try core_dispatch.execute(self, command)) |core_result|
         core_result

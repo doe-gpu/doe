@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "seed": 42,
+  "nodeCount": 512,
+  "warmupRuns": 1,
+  "measuredRuns": 16,
+  "cleanProcessRuns": 3,
+  "tolerance": 0.001,
+  "topologies": [
+    { "id": "erdos-renyi-002", "kind": "erdos-renyi", "probability": 0.02 },
+    { "id": "erdos-renyi-005", "kind": "erdos-renyi", "probability": 0.05 },
+    { "id": "barabasi-albert-4", "kind": "barabasi-albert", "edgesPerVertex": 4 },
+    { "id": "layered-neural-8-012", "kind": "layered-neural", "layers": 8, "skipProbability": 0.12 }
+  ]
+}

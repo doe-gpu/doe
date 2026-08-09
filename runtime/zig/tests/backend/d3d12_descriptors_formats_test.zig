@@ -9,8 +9,8 @@ const builtin = @import("builtin");
 const descriptors = @import("../../src/backend/d3d12/d3d12_descriptors.zig");
 const formats = @import("../../src/backend/d3d12/d3d12_formats.zig");
 const device_caps = @import("../../src/backend/d3d12/d3d12_device_caps.zig");
-const model = @import("../../src/contracts/model/model.zig");
-const compressed_formats = @import("../../src/core/abi/wgpu_type_texture_formats.zig");
+const model = @import("../../src/contracts/model/model_gpu_types.zig");
+const compressed_formats = @import("../../src/contracts/texture_format.zig");
 
 // ============================================================
 // Section 1: DXGI format mapping — pin exact WebGPU->DXGI values

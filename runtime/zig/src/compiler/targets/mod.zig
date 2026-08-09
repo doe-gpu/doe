@@ -22,90 +22,21 @@
 //     so existing manifests need refreshed lowerings.
 
 const std = @import("std");
+const types = @import("types.zig");
 
 pub const wse3 = @import("wse3.zig");
 pub const webgpu_generic = @import("webgpu_generic.zig");
 pub const msl = @import("msl.zig");
 pub const spir_v = @import("spir_v.zig");
 
-pub const NumericalMode = enum { f32, f16, bf16, int8_quant, int4_quant };
-
-pub const CollectiveCapability = struct {
-    /// Must match tsir.schema.CollectiveKind. Kept as a string here to
-    /// avoid a cyclic import between targets/ and tsir/; callers
-    /// lookup the enum by name.
-    kind_name: []const u8,
-    /// Exactness this target can honor natively. Callers compare
-    /// against the TSIR-declared exactness; non-match triggers either
-    /// tree-shape search or TSIR_COLLECTIVE_NOT_REPRESENTABLE.
-    exactness_name: []const u8,
-};
-
-pub const FusedIntrinsic = enum {
-    q4k_dequant,
-    q4k_dequant_then_gemv,
-    rms_norm_fast,
-    rope_pair,
-};
-
-pub const StreamingGemmPrimitive = enum {
-    none,
-    mpi_x_allreduce,
-    mpi_y_allreduce,
-    summa,
-};
-
-pub const RuntimeSizedBindingPolicy = enum {
-    reject,
-    host_copied,
-    fabric_streamed_with_loader,
-};
-
-/// Correctness-affecting fields. These determine whether a kernel can
-/// be represented on this target and what byte-for-byte output a
-/// realization must produce. Every field here participates in the
-/// descriptor hash that binds into `tsir.Realization.target_descriptor_hash`.
-pub const CorrectnessFields = struct {
-    name: []const u8,
-    /// Free bytes on each PE that a kernel's locals can occupy. The
-    /// residency pass refuses to place a tensor beyond this bound
-    /// with TSIR_PE_BUDGET_EXHAUSTED.
-    pe_working_memory_bytes: u64,
-    /// Persistent pool per PE available across launches.
-    pe_persistent_pool_bytes: u64,
-    /// Number of independent fabric colors available for collective
-    /// synthesis to allocate onto.
-    fabric_color_count: u32,
-    max_collective_group_size: u32,
-    /// Sub-tile lane width for subgroup-style SIMD. WSE-3 uses this
-    /// for in-PE reductions; WebGPU's native subgroup size.
-    sub_tile_lane_width: u32,
-    native_numerical_modes: []const NumericalMode,
-    native_collectives: []const CollectiveCapability,
-    fused_intrinsics: []const FusedIntrinsic,
-    streaming_gemm: StreamingGemmPrimitive,
-    /// How the target can legally realize storage bindings whose WGSL
-    /// type has runtime-sized extents. This is correctness-affecting:
-    /// choosing host-backed buffers versus fabric streaming changes the
-    /// emitted lowering contract.
-    runtime_sized_binding_policy: RuntimeSizedBindingPolicy,
-};
-
-/// Planner-only fields. These inform search quality (which plan is
-/// preferred among multiple fitting plans) but do NOT define what is
-/// representable or what byte-for-byte output must be. Changes to
-/// planner fields must NOT invalidate existing manifests.
-pub const PlannerFields = struct {
-    /// Approximate per-hop fabric latency in nanoseconds. Used by the
-    /// collective-synthesis pass to bias tree shape among equally-
-    /// feasible realizations; it never forces rejection.
-    fabric_per_hop_latency_ns: u32,
-};
-
-pub const TargetDescriptor = struct {
-    correctness: CorrectnessFields,
-    planner: PlannerFields,
-};
+pub const NumericalMode = types.NumericalMode;
+pub const CollectiveCapability = types.CollectiveCapability;
+pub const FusedIntrinsic = types.FusedIntrinsic;
+pub const StreamingGemmPrimitive = types.StreamingGemmPrimitive;
+pub const RuntimeSizedBindingPolicy = types.RuntimeSizedBindingPolicy;
+pub const CorrectnessFields = types.CorrectnessFields;
+pub const PlannerFields = types.PlannerFields;
+pub const TargetDescriptor = types.TargetDescriptor;
 
 /// Compute the SHA-256 hash of the correctness fields only. The
 /// planner fields are deliberately excluded: tuning a latency hint

@@ -1,0 +1,156 @@
+{
+  "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
+  "manifestPath": "runtime/zig/source-layout.json",
+  "manifestSha256": "4fdc9c9135cca2d61214c511611b8b9b565010bba72ec41bcd9124f3434febc4",
+  "observations": {
+    "baselineComparison": {
+      "moduleCountDelta": -4,
+      "oneConsumerModuleCountDelta": 11,
+      "reexportOnlyModuleCountDelta": -1,
+      "sourceTreeSha256": "7d4857fdf9d8c0107426915fef3f283107f335cea713d37ad8b5cff8813d671d",
+      "status": "diagnostic-only"
+    },
+    "buildMeasurements": {
+      "artifacts": [
+        {
+          "path": "$MEASUREMENT_ROOT/prefix/bin/doe-dispatch-seam-bench",
+          "sha256": "8f9bc2a06166b8c769cc9d7f381139ee3d81a937510c293c8be2071c9cc6d53c",
+          "sizeBytes": 2270184
+        },
+        {
+          "path": "$MEASUREMENT_ROOT/prefix/bin/doe-zig-runtime",
+          "sha256": "4474c32dc719a61958e5e4c3e2408f05bff39c222f097a73f71083ab67a58131",
+          "sizeBytes": 11105312
+        }
+      ],
+      "buildStep": "doe-runtime",
+      "captureToolChangedDuringCapture": false,
+      "captureToolSha256": "37b48bc73a3c3402051a2c7985214f794b4d2e1c41cc0d07d375953020c91cc8",
+      "cleanCompile": {
+        "elapsedNs": 68406532604,
+        "exitCode": 0,
+        "stderr": "",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout": "",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "/home/clocksmith/deco/doe/.tooling/zig-0.15.2/zig",
+        "build",
+        "doe-runtime",
+        "dispatch-seam-bench",
+        "-Doptimize=ReleaseSafe",
+        "-j1",
+        "--seed",
+        "0",
+        "--summary",
+        "none",
+        "--cache-dir",
+        "$MEASUREMENT_ROOT/cache",
+        "--global-cache-dir",
+        "$MEASUREMENT_ROOT/global-cache",
+        "--prefix",
+        "$MEASUREMENT_ROOT/prefix"
+      ],
+      "dispatchSeamBenchmark": {
+        "callsPerSample": 200000,
+        "characterizedLegacyMedianNs": 391172,
+        "measurementClass": "diagnostic-only",
+        "promotedMedianNs": 391151,
+        "sampleCount": 21,
+        "schemaVersion": 1,
+        "stateCalls": 8400002,
+        "status": "captured"
+      },
+      "host": {
+        "machine": "x86_64",
+        "operatingSystem": "Linux",
+        "release": "6.8.0-90-generic"
+      },
+      "incrementalCompile": {
+        "elapsedNs": 66960325,
+        "exitCode": 0,
+        "stderr": "",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout": "",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "measurementClass": "diagnostic-only",
+      "optimize": "ReleaseSafe",
+      "schemaVersion": 1,
+      "sourceChangedBeforeIncremental": false,
+      "sourceChangedDuringCapture": false,
+      "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e",
+      "status": "captured",
+      "toolchain": {
+        "path": "/home/clocksmith/deco/doe/.tooling/zig-0.15.2/zig",
+        "sha256": "2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51",
+        "version": "0.15.2"
+      }
+    },
+    "coChange": {
+      "commitsConsidered": 142,
+      "reportedPairCount": 1000,
+      "status": "diagnostic-only"
+    },
+    "fanInDistribution": {
+      "maximum": 79,
+      "mean": 4.125,
+      "median": 2,
+      "minimum": 0,
+      "p25": 1.0,
+      "p75": 4.0,
+      "populationStdDev": 7.221
+    },
+    "fanOutDistribution": {
+      "maximum": 48,
+      "mean": 4.125,
+      "median": 3,
+      "minimum": 0,
+      "p25": 1.0,
+      "p75": 5.0,
+      "populationStdDev": 4.812
+    },
+    "fileSizeDistribution": {
+      "maximum": 1055,
+      "mean": 262.685,
+      "median": 169,
+      "minimum": 1,
+      "p25": 67.5,
+      "p75": 382.5,
+      "populationStdDev": 258.144
+    },
+    "moduleCount": 543,
+    "oneConsumerModuleCount": 218,
+    "publicDeclarationsByLayer": {
+      "backend-common": 20,
+      "backend-d3d12": 253,
+      "backend-interface": 159,
+      "backend-metal": 207,
+      "backend-vulkan": 1036,
+      "cli": 35,
+      "command": 60,
+      "compatibility": 12,
+      "compiler": 1073,
+      "contracts": 730,
+      "core": 1492,
+      "dropin": 158,
+      "full": 299,
+      "integrations": 4,
+      "native": 826,
+      "package-root": 8,
+      "plan": 118,
+      "quirk": 28,
+      "runtime": 328,
+      "spatial": 27,
+      "tooling": 2,
+      "verification": 11
+    },
+    "reexportOnlyModuleCount": 48,
+    "status": "diagnostic-only"
+  },
+  "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
+  "schemaVersion": 1,
+  "sourceLayoutVersion": 2,
+  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e"
+}

@@ -1,50 +1,14 @@
 const std = @import("std");
-const backend_ids = @import("backend_ids.zig");
+const backend_ids = @import("../contracts/backend.zig");
+const backend_contract = @import("../contracts/backend.zig");
 const runtime_types = @import("runtime_types.zig");
 
-pub const BackendLane = enum {
-    metal_doe_app,
-    metal_doe_directional,
-    metal_doe_comparable,
-    metal_doe_release,
-    metal_dawn_release,
-    metal_webkit_release,
-    metal_webkit_comparable,
-    vulkan_doe_app,
-    vulkan_doe_comparable,
-    vulkan_doe_compute_only_diagnostic,
-    vulkan_doe_compute_only_fence_diagnostic,
-    vulkan_doe_release,
-    vulkan_dawn_release,
-    d3d12_doe_app,
-    d3d12_doe_directional,
-    d3d12_doe_comparable,
-    d3d12_doe_release,
-    d3d12_dawn_release,
-};
-
-pub const UploadPathPolicy = enum {
-    allow_mapped_shortcuts,
-    staged_copy_only,
-};
-
-pub const VulkanSubgroupSizePolicy = enum {
-    fixed_32_when_supported,
-    suppress_for_workgroup_memory_256,
-    suppress_for_workgroup_memory_256_or_single_invocation,
-};
-
-pub const SelectionPolicy = struct {
-    lane: BackendLane,
-    default_backend: backend_ids.BackendId,
-    allow_fallback: bool,
-    strict_no_fallback: bool,
-    policy_hash: []const u8,
-    upload_path_policy: UploadPathPolicy,
-    queue_family_policy: runtime_types.QueueFamilyPolicy,
-    deferred_submission_sync_policy: runtime_types.DeferredSubmissionSyncPolicy,
-    vulkan_subgroup_size_policy: VulkanSubgroupSizePolicy,
-};
+pub const BackendLane = backend_contract.BackendLane;
+pub const UploadPathPolicy = backend_contract.UploadPathPolicy;
+pub const VulkanSubgroupSizePolicy = backend_contract.VulkanSubgroupSizePolicy;
+pub const SelectionPolicy = backend_contract.SelectionPolicy;
+pub const lane_name = backend_contract.laneName;
+pub const parse_lane = backend_contract.parseLane;
 
 pub const LoadedSelectionPolicy = struct {
     policy: SelectionPolicy,
@@ -60,77 +24,6 @@ const DEFAULT_POLICY_HASH = "backend-runtime-policy-v7";
 pub const PolicyLoadError = error{
     InvalidRuntimePolicy,
 };
-
-const LaneSpec = struct {
-    lane: BackendLane,
-    name: []const u8,
-    aliases: []const []const u8 = &.{},
-};
-
-const LANE_SPECS = [_]LaneSpec{
-    .{ .lane = .metal_doe_app, .name = "metal_doe_app" },
-    .{ .lane = .metal_doe_directional, .name = "metal_doe_directional" },
-    .{ .lane = .metal_doe_comparable, .name = "metal_doe_comparable" },
-    .{ .lane = .metal_doe_release, .name = "metal_doe_release" },
-    .{ .lane = .metal_dawn_release, .name = "metal_dawn_release" },
-    .{ .lane = .metal_webkit_release, .name = "metal_webkit_release" },
-    .{ .lane = .metal_webkit_comparable, .name = "metal_webkit_comparable" },
-    .{ .lane = .vulkan_doe_app, .name = "vulkan_doe_app" },
-    .{ .lane = .vulkan_doe_comparable, .name = "vulkan_doe_comparable" },
-    .{ .lane = .vulkan_doe_compute_only_diagnostic, .name = "vulkan_doe_compute_only_diagnostic" },
-    .{ .lane = .vulkan_doe_compute_only_fence_diagnostic, .name = "vulkan_doe_compute_only_fence_diagnostic" },
-    .{ .lane = .vulkan_doe_release, .name = "vulkan_doe_release" },
-    .{
-        .lane = .vulkan_dawn_release,
-        .name = "vulkan_dawn_release",
-        .aliases = &.{"vulkan_dawn_directional"},
-    },
-    .{ .lane = .d3d12_doe_app, .name = "d3d12_doe_app" },
-    .{ .lane = .d3d12_doe_directional, .name = "d3d12_doe_directional" },
-    .{ .lane = .d3d12_doe_comparable, .name = "d3d12_doe_comparable" },
-    .{ .lane = .d3d12_doe_release, .name = "d3d12_doe_release" },
-    .{ .lane = .d3d12_dawn_release, .name = "d3d12_dawn_release" },
-};
-
-const MAX_LANE_NAME_BYTES = blk: {
-    var max_len: usize = 0;
-    for (LANE_SPECS) |spec| {
-        if (spec.name.len > max_len) max_len = spec.name.len;
-        for (spec.aliases) |alias| {
-            if (alias.len > max_len) max_len = alias.len;
-        }
-    }
-    break :blk max_len;
-};
-
-fn normalizedLaneToken(raw: []const u8, buffer: *[MAX_LANE_NAME_BYTES]u8) ?[]const u8 {
-    if (raw.len == 0 or raw.len > buffer.len) return null;
-    for (raw, 0..) |char, index| {
-        const normalized_char = if (char == '-') '_' else std.ascii.toLower(char);
-        buffer[index] = normalized_char;
-    }
-    return buffer[0..raw.len];
-}
-
-pub fn lane_name(lane: BackendLane) []const u8 {
-    inline for (LANE_SPECS) |spec| {
-        if (spec.lane == lane) return spec.name;
-    }
-    unreachable;
-}
-
-pub fn parse_lane(raw: []const u8) ?BackendLane {
-    var normalized_buffer: [MAX_LANE_NAME_BYTES]u8 = undefined;
-    const normalized = normalizedLaneToken(raw, &normalized_buffer) orelse return null;
-
-    inline for (LANE_SPECS) |spec| {
-        if (std.mem.eql(u8, normalized, spec.name)) return spec.lane;
-        inline for (spec.aliases) |alias| {
-            if (std.mem.eql(u8, normalized, alias)) return spec.lane;
-        }
-    }
-    return null;
-}
 
 pub fn load_policy_for_lane(
     allocator: std.mem.Allocator,

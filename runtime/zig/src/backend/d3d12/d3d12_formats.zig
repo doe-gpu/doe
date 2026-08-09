@@ -7,7 +7,7 @@
 
 const std = @import("std");
 const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
-const compressed_formats = @import("../../core/abi/wgpu_type_texture_formats.zig");
+const compressed_formats = @import("../../contracts/texture_format.zig");
 const testing = std.testing;
 
 // --- DXGI_FORMAT constants (Microsoft DXGI 1.0+ spec values) ---

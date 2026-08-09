@@ -1,4 +1,4 @@
-const backend_ids = @import("backend_ids.zig");
+const backend_ids = @import("../contracts/backend.zig");
 
 pub const BackendTelemetry = struct {
     backend_id: backend_ids.BackendId,

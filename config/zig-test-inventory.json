@@ -1,0 +1,817 @@
+{
+  "schemaVersion": 2,
+  "suites": {
+    "aggregate": {
+      "output": "test_suite.zig",
+      "entries": [
+        {
+          "path": "tests/metal/metal_mod_integration_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/metal/metal_render_state_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/metal/metal_resources_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/metal/metal_library_cache_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/metal/metal_timing_semantics_test.zig",
+          "kind": "characterization"
+        },
+        {
+          "path": "tests/vulkan/vulkan_mod_integration_test.zig",
+          "platforms": [
+            "linux"
+          ],
+          "kind": "backend"
+        },
+        {
+          "path": "tests/vulkan/vulkan_native_runtime_test.zig",
+          "platforms": [
+            "linux"
+          ],
+          "kind": "backend"
+        },
+        {
+          "path": "tests/vulkan/vulkan_native_unit_test.zig",
+          "platforms": [
+            "linux"
+          ],
+          "kind": "backend"
+        },
+        {
+          "path": "tests/vulkan/vulkan_render_pipeline_test.zig",
+          "platforms": [
+            "linux"
+          ],
+          "kind": "backend"
+        },
+        {
+          "path": "tests/vulkan/vulkan_timing_semantics_test.zig",
+          "platforms": [
+            "linux"
+          ],
+          "kind": "characterization"
+        },
+        {
+          "path": "tests/backend/common_artifact_meta_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_capabilities_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_command_info_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_errors_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_timing_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/vulkan_upload_test.zig",
+          "platforms": [
+            "linux"
+          ],
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/metal_pipeline_cache_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/d3d12/d3d12_mod_integration_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/d3d12/d3d12_timing_semantics_test.zig",
+          "kind": "characterization"
+        },
+        {
+          "path": "tests/dropin/dropin_loader_test.zig",
+          "kind": "abi"
+        },
+        {
+          "path": "tests/core/webgpu_generated_abi_test.zig",
+          "kind": "abi"
+        },
+        {
+          "path": "tests/modules/module_promotions_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "src/quirk/mod.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/quirk/runtime.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/quirk/quirk_actions.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/quirk/toggle_registry.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/full/render/wgpu_render_constants.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/native/support/doe_device_caps.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/runtime/trace/trace.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/core/resource/wgpu_resource_normalizers.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/command/command_json.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/contracts/artifact.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/backend/common/artifact_state.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/runtime/task_pool.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/runtime/pipeline_singleflight.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/contracts/primitives/byte_scan.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/runtime/simd/f32_ops.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "tests/core/gpu_timeline_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/multi_queue_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/render_bundle_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/error_scope_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/metal/metal_native_unit_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/core/native_shader_render_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/execution_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/multi_adapter_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/pipeline_cache_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/native_api_core_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/capability_runtime_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/handle_safety_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/precompiled_shader_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/command_json_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/trace_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/doe_shader_native_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/model_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/lean_proof_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/dispatch_preconditions_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/runtime_integration_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/backend/d3d12_descriptors_formats_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/core/wgpu_resources_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/backend/backend_telemetry_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/d3d12/d3d12_native_unit_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/dropin/dropin_behavior_policy_test.zig",
+          "kind": "abi"
+        },
+        {
+          "path": "tests/dropin/dropin_proc_manifest_test.zig",
+          "kind": "abi"
+        },
+        {
+          "path": "tests/dropin/dropin_router_test.zig",
+          "kind": "abi"
+        },
+        {
+          "path": "tests/dropin/dropin_symbol_ownership_test.zig",
+          "kind": "abi"
+        }
+      ]
+    },
+    "core": {
+      "output": "test_suite_core.zig",
+      "entries": [
+        {
+          "path": "tests/backend/common_artifact_meta_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_capabilities_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_command_info_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_errors_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_timing_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/core/command_scope_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/surface_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "src/core/resource/wgpu_resource_normalizers.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/command/command_json.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/contracts/artifact.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/backend/common/artifact_state.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "tests/core/gpu_timeline_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/multi_queue_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/error_scope_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/native_shader_render_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/execution_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/multi_adapter_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/pipeline_cache_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/render_bundle_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/native_api_core_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/capability_runtime_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/handle_safety_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/precompiled_shader_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/command_json_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/webgpu_ffi_test.zig",
+          "kind": "abi"
+        },
+        {
+          "path": "tests/core/webgpu_generated_abi_test.zig",
+          "kind": "abi"
+        },
+        {
+          "path": "tests/core/trace_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/doe_shader_native_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/model_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/lean_proof_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/dispatch_preconditions_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/runtime_integration_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/remaining_modules_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/wgpu_resources_test.zig",
+          "kind": "integration"
+        }
+      ]
+    },
+    "d3d12": {
+      "output": "test_suite_d3d12.zig",
+      "entries": [
+        {
+          "path": "tests/backend/backend_registry_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/backend_runtime_config_policy_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/backend_runtime_policy_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/backend_selection_policy_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/backend_vulkan_doe_app_lane_policy_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_artifact_meta_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_capabilities_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_command_info_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_errors_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/backend/common_timing_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/d3d12/d3d12_mod_integration_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/d3d12/d3d12_timing_semantics_test.zig",
+          "kind": "characterization"
+        },
+        {
+          "path": "tests/backend/d3d12_descriptors_formats_test.zig",
+          "kind": "backend"
+        },
+        {
+          "path": "tests/d3d12/d3d12_native_unit_test.zig",
+          "kind": "backend"
+        }
+      ]
+    },
+    "full": {
+      "output": "test_suite_full.zig",
+      "entries": [
+        {
+          "path": "tests/core/command_scope_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/full/command_scope_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/surface_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/full/surface_api_test.zig",
+          "kind": "integration"
+        }
+      ],
+      "includes": [
+        "aggregate"
+      ]
+    },
+    "wgsl": {
+      "output": "test_suite_wgsl.zig",
+      "entries": [
+        {
+          "path": "tests/wgsl/emit_hlsl_map_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_hlsl_codegen_test.zig",
+          "kind": "golden"
+        },
+        {
+          "path": "tests/wgsl/emit_hlsl_stage_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_spirv_builder_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_spirv_stage_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_spirv_if_termination_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_spirv_mixed_binary_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_spirv_builtin_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/shader_emit_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/shader_sema_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/coverage_type_decl_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/coverage_expr_stmt_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/coverage_builtin_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/coverage_builtin_spec_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/coverage_resource_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/coverage_stage_texture_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/mod_api_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/ir_transform_robustness_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/mod_bounds_local_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/mod_bounds_loop_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/mod_bounds_tiled_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/mod_error_contract_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/mod_backend_translation_test.zig",
+          "kind": "golden"
+        },
+        {
+          "path": "tests/wgsl/mod_dxil_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/mod_cslc_validate_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/mod_feature_translation_test.zig",
+          "kind": "golden"
+        },
+        {
+          "path": "tests/wgsl/mod_override_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_dxil_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_csl_classify_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_csl_classify_reduction_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_csl_ir_walk_loop_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_csl_builtin_shim_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_csl_reduction_layout_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_csl_matmul_q4k_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "src/compiler/wgsl/emit/dxil/dxil_validate.zig",
+          "kind": "inline"
+        },
+        {
+          "path": "tests/core/wgsl_cross_backend_test.zig",
+          "kind": "cross-backend"
+        },
+        {
+          "path": "tests/core/msl_subsystem_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/hlsl_subsystem_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/spirv_subsystem_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/wgsl_parser_ir_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/proof_matching_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/lean_proof_application_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_scaffold_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_digest_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_frontend_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_planner_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_pipeline_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_reference_interpreter_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_emit_csl_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_emit_backend_skeleton_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_emit_webgpu_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/tsir_emit_kernel_body_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/exec_v1_paired_gate_canary_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/wgsl/emit_csl_exec_v1_test.zig",
+          "kind": "integration"
+        }
+      ]
+    }
+  },
+  "supportFiles": [
+    {
+      "path": "tests/d3d12/d3d12_mod_test_support.zig",
+      "kind": "domain-fixture",
+      "consumers": [
+        "tests/d3d12/d3d12_mod_integration_test.zig",
+        "tests/d3d12/d3d12_timing_semantics_test.zig"
+      ]
+    },
+    {
+      "path": "tests/vulkan/vulkan_mod_test_support.zig",
+      "kind": "domain-fixture",
+      "consumers": [
+        "tests/vulkan/vulkan_mod_integration_test.zig",
+        "tests/vulkan/vulkan_timing_semantics_test.zig"
+      ]
+    },
+    {
+      "path": "tests/wgsl/ir_transform_robustness_guard_alias_test.zig",
+      "kind": "test-shard",
+      "consumers": [
+        "tests/wgsl/ir_transform_robustness_test.zig"
+      ]
+    },
+    {
+      "path": "tests/wgsl/ir_transform_robustness_resource_test.zig",
+      "kind": "test-shard",
+      "consumers": [
+        "tests/wgsl/ir_transform_robustness_test.zig"
+      ]
+    },
+    {
+      "path": "tests/wgsl/ir_transform_robustness_test_support.zig",
+      "kind": "domain-fixture",
+      "consumers": [
+        "tests/wgsl/ir_transform_robustness_guard_alias_test.zig",
+        "tests/wgsl/ir_transform_robustness_resource_test.zig",
+        "tests/wgsl/ir_transform_robustness_test.zig"
+      ]
+    },
+    {
+      "path": "tests/wgsl/mod_api_proof_preconditions_test.zig",
+      "kind": "test-shard",
+      "consumers": [
+        "tests/wgsl/mod_api_test.zig"
+      ]
+    },
+    {
+      "path": "tests/wgsl/mod_api_stage_and_pointer_test.zig",
+      "kind": "test-shard",
+      "consumers": [
+        "tests/wgsl/mod_api_test.zig"
+      ]
+    },
+    {
+      "path": "tests/wgsl/mod_api_test_support.zig",
+      "kind": "domain-fixture",
+      "consumers": [
+        "tests/wgsl/mod_api_proof_preconditions_test.zig",
+        "tests/wgsl/mod_api_stage_and_pointer_test.zig",
+        "tests/wgsl/mod_api_translation_basics_test.zig"
+      ]
+    },
+    {
+      "path": "tests/wgsl/mod_api_translation_basics_test.zig",
+      "kind": "test-shard",
+      "consumers": [
+        "tests/wgsl/mod_api_test.zig"
+      ]
+    },
+    {
+      "path": "tests/wgsl/shader_emit_test_support.zig",
+      "kind": "domain-fixture",
+      "consumers": [
+        "tests/wgsl/shader_emit_test.zig"
+      ]
+    }
+  ]
+}

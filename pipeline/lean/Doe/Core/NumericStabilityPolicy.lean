@@ -4,7 +4,7 @@
 -- disagreement occurs, which route does the policy choose? This mirrors the
 -- named policies routed by the runtime (prefer-stable, abstain, etc.).
 --
--- Mirrors: runtime/zig/src/experimental/numeric_stability/policy.zig
+-- Mirrors: runtime/zig/src/runtime/numeric_stability/policy.zig
 --          (route selection + NumericInstabilityChecks fields)
 -- Classification: comptime_verified (finite boolean-tuple exhaustion) plus
 -- lean_verified (quantified over NumericInstabilityChecks records).

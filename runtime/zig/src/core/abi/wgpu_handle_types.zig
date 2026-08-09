@@ -1,37 +1,30 @@
 const std = @import("std");
+const upstream = @import("generated/webgpu_upstream.zig");
 
-pub const WGPUInstance = ?*anyopaque;
-pub const WGPUAdapter = ?*anyopaque;
-pub const WGPUDevice = ?*anyopaque;
-pub const WGPUQueue = ?*anyopaque;
-pub const WGPUBuffer = ?*anyopaque;
-pub const WGPUTexture = ?*anyopaque;
-pub const WGPUTextureView = ?*anyopaque;
-pub const WGPUExternalTexture = ?*anyopaque;
-pub const WGPUShaderModule = ?*anyopaque;
-pub const WGPUSampler = ?*anyopaque;
-pub const WGPUComputePipeline = ?*anyopaque;
-pub const WGPURenderPipeline = ?*anyopaque;
-pub const WGPUComputePassEncoder = ?*anyopaque;
-pub const WGPURenderPassEncoder = ?*anyopaque;
-pub const WGPUBindGroupLayout = ?*anyopaque;
-pub const WGPUBindGroup = ?*anyopaque;
-pub const WGPUPipelineLayout = ?*anyopaque;
-pub const WGPUCommandEncoder = ?*anyopaque;
-pub const WGPUCommandBuffer = ?*anyopaque;
-pub const WGPUQuerySet = ?*anyopaque;
-
-pub const WGPUFuture = extern struct {
-    id: u64,
-};
-
-pub const WGPUStringView = extern struct {
-    data: ?[*]const u8,
-    length: usize,
-};
-
-pub const WGPUBool = u32;
-pub const WGPUStatus = u32;
+pub const WGPUInstance = upstream.WGPUInstance;
+pub const WGPUAdapter = upstream.WGPUAdapter;
+pub const WGPUDevice = upstream.WGPUDevice;
+pub const WGPUQueue = upstream.WGPUQueue;
+pub const WGPUBuffer = upstream.WGPUBuffer;
+pub const WGPUTexture = upstream.WGPUTexture;
+pub const WGPUTextureView = upstream.WGPUTextureView;
+pub const WGPUExternalTexture = upstream.WGPUExternalTexture;
+pub const WGPUShaderModule = upstream.WGPUShaderModule;
+pub const WGPUSampler = upstream.WGPUSampler;
+pub const WGPUComputePipeline = upstream.WGPUComputePipeline;
+pub const WGPURenderPipeline = upstream.WGPURenderPipeline;
+pub const WGPUComputePassEncoder = upstream.WGPUComputePassEncoder;
+pub const WGPURenderPassEncoder = upstream.WGPURenderPassEncoder;
+pub const WGPUBindGroupLayout = upstream.WGPUBindGroupLayout;
+pub const WGPUBindGroup = upstream.WGPUBindGroup;
+pub const WGPUPipelineLayout = upstream.WGPUPipelineLayout;
+pub const WGPUCommandEncoder = upstream.WGPUCommandEncoder;
+pub const WGPUCommandBuffer = upstream.WGPUCommandBuffer;
+pub const WGPUQuerySet = upstream.WGPUQuerySet;
+pub const WGPUFuture = upstream.WGPUFuture;
+pub const WGPUStringView = upstream.WGPUStringView;
+pub const WGPUBool = upstream.WGPUBool;
+pub const WGPUStatus = upstream.WGPUStatus;
 
 pub const WGPU_STRLEN = std.math.maxInt(usize);
 pub const WGPU_FALSE: WGPUBool = 0;

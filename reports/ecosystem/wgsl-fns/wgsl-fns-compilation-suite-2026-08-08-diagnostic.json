@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "wgsl-fns-compilation-suite-2026-08-08-diagnostic",
+  "actorId": "wgsl-fns",
+  "harnessId": "wgsl-compilation-suite",
+  "generatedAt": "2026-08-09T01:39:40.783Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-09T01:37:10Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "8",
+  "upstream": {
+    "repositoryUrl": "https://github.com/koole/wgsl-fns",
+    "commit": "e1068da8c1ad213842c6332440fe1308def091cc",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "pinned-dawn-native-worker-crash",
+      "category": "reliability",
+      "status": "discovered",
+      "summary": "The pinned upstream webgpu 0.3.0 provider crashed before completing the WebGPU suite in all three clean processes, with SIGABRT or SIGSEGV worker signals around getWgslLanguageFeatures; an isolated provider probe also ended with SIGSEGV.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/raw-suite.json",
+          "sha256": "d5b36fc398a4fe5a48084209ff1bec1f8979d38b74b55a8c600726ffd68abe19"
+        },
+        {
+          "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/receipt-summary.json",
+          "sha256": "c6e64fbd2922970adabc737b6bf23e867318842c49bc45fd182ccbe86698004a"
+        }
+      ]
+    },
+    {
+      "id": "doe-native-wgsl-translation-failures",
+      "category": "compatibility",
+      "status": "discovered",
+      "summary": "Doe completed the unchanged 13-assertion test process without a crash, but each clean process emitted 16 WGSL-to-SPIR-V translation failures and 16 createShaderModule failures, beginning with vector-plus-scalar compound assignment in hash22.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/raw-suite.json",
+          "sha256": "d5b36fc398a4fe5a48084209ff1bec1f8979d38b74b55a8c600726ffd68abe19"
+        },
+        {
+          "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/receipt-summary.json",
+          "sha256": "c6e64fbd2922970adabc737b6bf23e867318842c49bc45fd182ccbe86698004a"
+        }
+      ]
+    },
+    {
+      "id": "doe-compilation-info-false-positive",
+      "category": "correctness",
+      "status": "discovered",
+      "summary": "Doe's getCompilationInfo path returned no error-severity messages for native shader compilation failures, causing all 13 unchanged upstream assertions to report passed until the reviewed parent oracle rejected the native diagnostics.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/raw-suite.json",
+          "sha256": "d5b36fc398a4fe5a48084209ff1bec1f8979d38b74b55a8c600726ffd68abe19"
+        }
+      ]
+    },
+    {
+      "id": "no-qualified-provider-baseline",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "The incumbent crashes and Doe fails the strengthened compilation oracle, so this run cannot establish provider equivalence, a reliability winner, or a public adoption claim.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/receipt-summary.json",
+          "sha256": "c6e64fbd2922970adabc737b6bf23e867318842c49bc45fd182ccbe86698004a"
+        }
+      ]
+    },
+    {
+      "id": "hardware-performance-ineligible",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "The physical render node was inaccessible, neither provider passed the reviewed oracle, and this is a compilation-only workload, so the observed process durations cannot support a speed claim.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/receipt-summary.json",
+          "sha256": "c6e64fbd2922970adabc737b6bf23e867318842c49bc45fd182ccbe86698004a"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The pinned incumbent provider crashes before its adapter identity can be captured or any WebGPU compilation assertion can complete.",
+    "The workload compiles generated shaders but does not dispatch them, read back values, or test semantic output equivalence.",
+    "The unchanged upstream test does not emit each dynamically generated shader hash, so the receipt records source-owner and generated bundle hashes instead.",
+    "The host denied access to /dev/dri/renderD128, so the result is not physical-hardware evidence."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "fail",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "pinned-dawn-worker-crash",
+      "dawn-provider-identity-incomplete",
+      "doe-native-wgsl-translation-failure",
+      "doe-compilation-info-false-positive",
+      "no-qualified-baseline",
+      "render-node-inaccessible",
+      "compilation-only-no-output-oracle",
+      "dynamic-shader-identity-incomplete"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 0,
+      "crashes": 3,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 57139200
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 3,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 58195968
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Neither provider passed the reviewed oracle, the workload is compilation-only, and the physical render node was inaccessible."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The harness did not run matched traced and untraced samples, and neither provider produced a qualifying completion."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The Node loader is a controlled harness substitution, not a validated production installation path."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "The physical render node was inaccessible, and the incumbent crashed before adapter identity was available."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic matrix used sequential clean processes rather than concurrent workload execution."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Doe reached upstream cleanup, but the incumbent crashed and no promotion-scale teardown lane ran."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Three clean processes per provider establish diagnostic repeatability but do not satisfy the promotion stress policy."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS was captured, but no bounded-growth leak test ran."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "The harness captured source hashes, provider failure boundaries, TAP identities, and native diagnostics, but lacks incumbent adapter identity, dynamic shader hashes, dispatch, readback, and output identity."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "Neither provider passed the reviewed oracle and no physical GPU was accessible."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is not promoted and has no qualifying provider baseline."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/receipt-summary.json",
+      "sha256": "c6e64fbd2922970adabc737b6bf23e867318842c49bc45fd182ccbe86698004a"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/raw-suite.json",
+      "sha256": "d5b36fc398a4fe5a48084209ff1bec1f8979d38b74b55a8c600726ffd68abe19"
+    }
+  ]
+}

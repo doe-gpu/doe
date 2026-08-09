@@ -3,6 +3,8 @@
 const builtin = @import("builtin");
 const std = @import("std");
 const mod = @import("../../src/compiler/wgsl/mod.zig");
+const dxil_container = @import("../../src/compiler/wgsl/emit/dxil/dxil_container.zig");
+const dxil_spec = @import("../../src/compiler/wgsl/emit/dxil/dxil_spec.zig");
 const translateToDxil = mod.translateToDxil;
 const translateToDxilWithToolchainConfig = mod.translateToDxilWithToolchainConfig;
 const TranslateError = mod.TranslateError;
@@ -30,7 +32,7 @@ fn writeFakeDxcScript(dir: std.fs.Dir, sub_path: []const u8) !void {
         \\  echo "missing -Fo output path" >&2
         \\  exit 91
         \\fi
-        \\printf 'FAKE-DXIL' > "$out"
+        \\cp "$(dirname "$0")/fixture.dxil" "$out"
         \\
     );
     try file.chmod(0o755);
@@ -50,6 +52,17 @@ test "translate DXIL with explicit fake toolchain config" {
 
     var tmp_dir = std.testing.tmpDir(.{});
     defer tmp_dir.cleanup();
+    var program_part: [256]u8 = undefined;
+    const program_part_len = try dxil_container.write_dxil_program_part(.{
+        .shader_kind = dxil_spec.ShaderKind.COMPUTE,
+        .bitcode = &dxil_spec.LLVM_IR_MAGIC,
+    }, &program_part);
+    const parts = [_]dxil_container.Part{
+        .{ .fourcc = dxil_spec.PartFourCC.DXIL, .data = program_part[0..program_part_len] },
+    };
+    var expected_dxil: [512]u8 = undefined;
+    const expected_dxil_len = try dxil_container.write_container(&parts, &expected_dxil);
+    try tmp_dir.dir.writeFile(.{ .sub_path = "fixture.dxil", .data = expected_dxil[0..expected_dxil_len] });
     try writeFakeDxcScript(tmp_dir.dir, "fake_dxc.sh");
 
     const script_path = try std.fs.path.join(std.testing.allocator, &.{
@@ -65,7 +78,7 @@ test "translate DXIL with explicit fake toolchain config" {
         .executable = script_path,
         .discovery = .explicit_config,
     });
-    try std.testing.expectEqualStrings("FAKE-DXIL", out[0..len]);
+    try std.testing.expectEqualSlices(u8, expected_dxil[0..expected_dxil_len], out[0..len]);
 }
 
 test "translate DXIL reports explicit missing toolchain config path" {

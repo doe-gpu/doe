@@ -4,7 +4,7 @@ const model_compute_types = @import("../contracts/model/model_compute_types.zig"
 const model_texture_types = @import("../contracts/model/model_texture_value_types.zig");
 const model_binding_types = @import("../contracts/model/model_binding_value_types.zig");
 const model_render_types = @import("../contracts/model/model_render_types.zig");
-const compressed_formats = @import("../core/abi/wgpu_type_texture_formats.zig");
+const compressed_formats = @import("../contracts/texture_format.zig");
 
 pub const ParseError = error{
     InvalidCommandPayload,

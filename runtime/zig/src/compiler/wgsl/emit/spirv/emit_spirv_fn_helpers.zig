@@ -180,6 +180,43 @@ pub fn scalar_construct_kind(scalar: ir.ScalarType) ScalarKind {
     };
 }
 
+pub fn emitBoolScalarConstruct(
+    self: anytype,
+    target_ty: ir.TypeId,
+    source_ty: ir.TypeId,
+    target_scalar: ir.ScalarType,
+    source_scalar: ir.ScalarType,
+    source_id: u32,
+) !?u32 {
+    const target_kind = scalar_construct_kind(target_scalar);
+    const source_kind = scalar_construct_kind(source_scalar);
+    if (target_kind == .bool) {
+        const opcode: u16 = switch (source_kind) {
+            .bool => return source_id,
+            .signed, .unsigned => spirv.Opcode.INotEqual,
+            .float => spirv.Opcode.FOrdNotEqual,
+        };
+        return try self.emit_result_inst(
+            opcode,
+            try self.emitter.lower_type(target_ty),
+            &.{ source_id, try emitZeroValue(self, source_ty) },
+        );
+    }
+    if (source_kind != .bool) return null;
+    const one = switch (target_scalar) {
+        .i32, .abstract_int => try self.emitter.builder.const_i32_bits(1),
+        .u32 => try self.emitter.builder.const_u32(1),
+        .f16 => try self.emitter.builder.const_f16_bits(@as(u16, @bitCast(@as(f16, 1.0)))),
+        .f32, .abstract_float => try self.emitter.builder.const_f32_bits(@as(u32, @bitCast(@as(f32, 1.0)))),
+        .bool, .void => return error.UnsupportedConstruct,
+    };
+    return try self.emit_result_inst(
+        spirv.Opcode.Select,
+        try self.emitter.lower_type(target_ty),
+        &.{ source_id, one, try emitZeroValue(self, target_ty) },
+    );
+}
+
 pub fn assign_op_to_binary(op: ir.AssignOp) ir.BinaryOp {
     return switch (op) {
         .assign => .add,

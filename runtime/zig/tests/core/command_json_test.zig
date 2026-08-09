@@ -2,7 +2,11 @@ const std = @import("std");
 const command_kind = @import("../../src/command/command_kind.zig");
 const command_json = @import("../../src/command/command_json.zig");
 const command_json_raw = @import("../../src/command/command_json_raw.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const command = @import("../../src/contracts/command.zig");
+const resource = @import("../../src/contracts/model/model_resource_types.zig");
+const compute = @import("../../src/contracts/model/model_compute_types.zig");
+const render = @import("../../src/contracts/model/model_render_types.zig");
+const async_types = @import("../../src/contracts/model/model_async_types.zig");
 
 const parseCommands = command_json.parseCommands;
 const freeCommands = command_json.freeCommands;
@@ -97,7 +101,7 @@ test "parseKind recognizes copy aliases" {
     };
     for (aliases) |alias| {
         const raw = RawCommand{ .command = alias };
-        try std.testing.expectEqual(NormalizedKind.copy, try command_kind.parseKind(raw));
+        try std.testing.expectEqual(NormalizedKind.copy_buffer_to_texture, try command_kind.parseKind(raw));
     }
 }
 
@@ -180,7 +184,7 @@ test "parse dispatch_indirect command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "dispatch_indirect", "x": 2, "y": 3, "z": 1}]
     );
-    try std.testing.expectEqual(model.CommandKind.dispatch_indirect, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.dispatch_indirect, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(u32, 2), cmds[0].dispatch_indirect.x);
 }
 
@@ -190,13 +194,13 @@ test "parse kernel_dispatch command with minimal fields" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "kernel_dispatch", "kernel": "my_shader.wgsl", "x": 4}]
     );
-    try std.testing.expectEqual(model.CommandKind.kernel_dispatch, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.kernel_dispatch, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqualStrings("my_shader.wgsl", cmds[0].kernel_dispatch.kernel);
     try std.testing.expectEqual(@as(u32, 4), cmds[0].kernel_dispatch.x);
     try std.testing.expectEqual(@as(u32, 1), cmds[0].kernel_dispatch.y);
     try std.testing.expectEqual(@as(u32, 1), cmds[0].kernel_dispatch.z);
     try std.testing.expectEqual(@as(u32, 1), cmds[0].kernel_dispatch.repeat);
-    try std.testing.expectEqual(model.KernelDispatchRepeatSynchronization.dependent, cmds[0].kernel_dispatch.repeat_synchronization);
+    try std.testing.expectEqual(compute.KernelDispatchRepeatSynchronization.dependent, cmds[0].kernel_dispatch.repeat_synchronization);
     try std.testing.expect(cmds[0].kernel_dispatch.entry_point == null);
     try std.testing.expect(cmds[0].kernel_dispatch.bindings == null);
 }
@@ -217,7 +221,7 @@ test "parse kernel_dispatch independent repeat synchronization" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "kernel_dispatch", "kernel": "compute.wgsl", "repeat": 5, "repeatSynchronization": "independent"}]
     );
-    try std.testing.expectEqual(model.KernelDispatchRepeatSynchronization.independent, cmds[0].kernel_dispatch.repeat_synchronization);
+    try std.testing.expectEqual(compute.KernelDispatchRepeatSynchronization.independent, cmds[0].kernel_dispatch.repeat_synchronization);
 }
 
 test "parse kernel_dispatch repeat_synchronization alias" {
@@ -226,7 +230,7 @@ test "parse kernel_dispatch repeat_synchronization alias" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "kernel_dispatch", "kernel": "compute.wgsl", "repeat": 5, "repeat_synchronization": "dependent"}]
     );
-    try std.testing.expectEqual(model.KernelDispatchRepeatSynchronization.dependent, cmds[0].kernel_dispatch.repeat_synchronization);
+    try std.testing.expectEqual(compute.KernelDispatchRepeatSynchronization.dependent, cmds[0].kernel_dispatch.repeat_synchronization);
 }
 
 test "parse kernel_dispatch rejects unknown repeat synchronization" {
@@ -248,7 +252,7 @@ test "parse kernel_dispatch with bindings" {
     try std.testing.expectEqual(@as(usize, 1), bindings.len);
     try std.testing.expectEqual(@as(u32, 0), bindings[0].binding);
     try std.testing.expectEqual(@as(u64, 42), bindings[0].resource_handle);
-    try std.testing.expectEqual(model.KernelBindingResourceKind.buffer, bindings[0].resource_kind);
+    try std.testing.expectEqual(compute.KernelBindingResourceKind.buffer, bindings[0].resource_kind);
 }
 
 test "parse copy_buffer_to_texture command" {
@@ -257,11 +261,11 @@ test "parse copy_buffer_to_texture command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "copy_buffer_to_texture", "bytes": 1024, "src_handle": 1, "dst_handle": 2}]
     );
-    try std.testing.expectEqual(model.CommandKind.copy_buffer_to_texture, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.copy_buffer_to_texture, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(usize, 1024), cmds[0].copy_buffer_to_texture.bytes);
     try std.testing.expectEqual(@as(u64, 1), cmds[0].copy_buffer_to_texture.src.handle);
     try std.testing.expectEqual(@as(u64, 2), cmds[0].copy_buffer_to_texture.dst.handle);
-    try std.testing.expectEqual(model.CopyDirection.buffer_to_texture, cmds[0].copy_buffer_to_texture.direction);
+    try std.testing.expectEqual(resource.CopyDirection.buffer_to_texture, cmds[0].copy_buffer_to_texture.direction);
 }
 
 test "parse copy_buffer_to_buffer command" {
@@ -270,9 +274,9 @@ test "parse copy_buffer_to_buffer command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "copy_buffer_to_buffer", "bytes": 256, "src_handle": 10, "dst_handle": 20}]
     );
-    try std.testing.expectEqual(model.CopyDirection.buffer_to_buffer, cmds[0].copy_buffer_to_texture.direction);
-    try std.testing.expectEqual(model.CopyResourceKind.buffer, cmds[0].copy_buffer_to_texture.src.kind);
-    try std.testing.expectEqual(model.CopyResourceKind.buffer, cmds[0].copy_buffer_to_texture.dst.kind);
+    try std.testing.expectEqual(resource.CopyDirection.buffer_to_buffer, cmds[0].copy_buffer_to_texture.direction);
+    try std.testing.expectEqual(resource.CopyResourceKind.buffer, cmds[0].copy_buffer_to_texture.src.kind);
+    try std.testing.expectEqual(resource.CopyResourceKind.buffer, cmds[0].copy_buffer_to_texture.dst.kind);
 }
 
 test "parse render_draw command with minimal fields" {
@@ -281,7 +285,7 @@ test "parse render_draw command with minimal fields" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "render_draw", "draw_count": 10}]
     );
-    try std.testing.expectEqual(model.CommandKind.render_draw, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.render_draw, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(u32, 10), cmds[0].render_draw.draw_count);
     try std.testing.expectEqual(@as(u32, 3), cmds[0].render_draw.vertex_count);
     try std.testing.expectEqual(@as(u32, 1), cmds[0].render_draw.instance_count);
@@ -293,7 +297,7 @@ test "parse render_pass command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "render_pass", "draw_count": 5, "vertex_count": 6}]
     );
-    try std.testing.expectEqual(model.CommandKind.render_pass, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.render_pass, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(u32, 5), cmds[0].render_pass.draw_count);
     try std.testing.expectEqual(@as(u32, 6), cmds[0].render_pass.vertex_count);
 }
@@ -304,7 +308,7 @@ test "parse draw_indirect command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "draw_indirect", "draw_count": 1}]
     );
-    try std.testing.expectEqual(model.CommandKind.draw_indirect, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.draw_indirect, std.meta.activeTag(cmds[0]));
 }
 
 test "parse map_async command with default write mode" {
@@ -314,7 +318,7 @@ test "parse map_async command with default write mode" {
         \\[{"command": "map_async", "bytes": 8192}]
     );
     try std.testing.expectEqual(@as(usize, 8192), cmds[0].map_async.bytes);
-    try std.testing.expectEqual(model.MapAsyncMode.write, cmds[0].map_async.mode);
+    try std.testing.expectEqual(async_types.MapAsyncMode.write, cmds[0].map_async.mode);
 }
 
 test "parse map_async command with read mode" {
@@ -323,7 +327,7 @@ test "parse map_async command with read mode" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "map_async", "bytes": 4096, "map_mode": "read"}]
     );
-    try std.testing.expectEqual(model.MapAsyncMode.read, cmds[0].map_async.mode);
+    try std.testing.expectEqual(async_types.MapAsyncMode.read, cmds[0].map_async.mode);
 }
 
 test "parse sampler_create command" {
@@ -332,7 +336,7 @@ test "parse sampler_create command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "sampler_create", "handle": 99}]
     );
-    try std.testing.expectEqual(model.CommandKind.sampler_create, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.sampler_create, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(u64, 99), cmds[0].sampler_create.handle);
 }
 
@@ -342,7 +346,7 @@ test "parse sampler_destroy command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "sampler_destroy", "handle": 42}]
     );
-    try std.testing.expectEqual(model.CommandKind.sampler_destroy, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.sampler_destroy, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(u64, 42), cmds[0].sampler_destroy.handle);
 }
 
@@ -352,7 +356,7 @@ test "parse surface_create command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "surface_create", "handle": 7}]
     );
-    try std.testing.expectEqual(model.CommandKind.surface_create, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.surface_create, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(u64, 7), cmds[0].surface_create.handle);
 }
 
@@ -362,7 +366,7 @@ test "parse surface_configure command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "surface_configure", "handle": 1, "width": 800, "height": 600}]
     );
-    try std.testing.expectEqual(model.CommandKind.surface_configure, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.surface_configure, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(u64, 1), cmds[0].surface_configure.handle);
     try std.testing.expectEqual(@as(u32, 800), cmds[0].surface_configure.width);
     try std.testing.expectEqual(@as(u32, 600), cmds[0].surface_configure.height);
@@ -374,7 +378,7 @@ test "parse texture_destroy command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "texture_destroy", "handle": 55}]
     );
-    try std.testing.expectEqual(model.CommandKind.texture_destroy, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.texture_destroy, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(u64, 55), cmds[0].texture_destroy.handle);
 }
 
@@ -387,7 +391,7 @@ test "buffer_upload alias resolves to upload command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "buffer_upload", "bytes": 64}]
     );
-    try std.testing.expectEqual(model.CommandKind.upload, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.upload, std.meta.activeTag(cmds[0]));
     try std.testing.expectEqual(@as(usize, 64), cmds[0].upload.bytes);
 }
 
@@ -397,7 +401,7 @@ test "draw alias resolves to render_draw command" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "draw", "draw_count": 1}]
     );
-    try std.testing.expectEqual(model.CommandKind.render_draw, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.render_draw, std.meta.activeTag(cmds[0]));
 }
 
 test "kind field is accepted as command name source" {
@@ -406,7 +410,7 @@ test "kind field is accepted as command name source" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"kind": "barrier"}]
     );
-    try std.testing.expectEqual(model.CommandKind.barrier, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.barrier, std.meta.activeTag(cmds[0]));
 }
 
 test "command_kind field is accepted as command name source" {
@@ -415,7 +419,7 @@ test "command_kind field is accepted as command name source" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command_kind": "dispatch"}]
     );
-    try std.testing.expectEqual(model.CommandKind.dispatch, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.dispatch, std.meta.activeTag(cmds[0]));
 }
 
 test "command kind is case-insensitive" {
@@ -424,7 +428,7 @@ test "command kind is case-insensitive" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "UPLOAD", "bytes": 32}]
     );
-    try std.testing.expectEqual(model.CommandKind.upload, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.upload, std.meta.activeTag(cmds[0]));
 }
 
 test "camelCase copy alias resolves correctly" {
@@ -433,7 +437,7 @@ test "camelCase copy alias resolves correctly" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "copyBufferToTexture", "bytes": 128, "src_handle": 1, "dst_handle": 2}]
     );
-    try std.testing.expectEqual(model.CommandKind.copy_buffer_to_texture, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.copy_buffer_to_texture, std.meta.activeTag(cmds[0]));
 }
 
 test "dispatch_workgroups alias resolves to dispatch" {
@@ -442,7 +446,7 @@ test "dispatch_workgroups alias resolves to dispatch" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "dispatch_workgroups"}]
     );
-    try std.testing.expectEqual(model.CommandKind.dispatch, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.dispatch, std.meta.activeTag(cmds[0]));
 }
 
 test "create_sampler alias resolves to sampler_create" {
@@ -451,7 +455,7 @@ test "create_sampler alias resolves to sampler_create" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "create_sampler", "handle": 1}]
     );
-    try std.testing.expectEqual(model.CommandKind.sampler_create, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.sampler_create, std.meta.activeTag(cmds[0]));
 }
 
 test "destroy_texture alias resolves to texture_destroy" {
@@ -460,7 +464,7 @@ test "destroy_texture alias resolves to texture_destroy" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "destroy_texture", "handle": 1}]
     );
-    try std.testing.expectEqual(model.CommandKind.texture_destroy, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.texture_destroy, std.meta.activeTag(cmds[0]));
 }
 
 // ============================================================
@@ -622,7 +626,7 @@ test "kernel_dispatch binding without kind defaults to buffer" {
         \\ "bindings": [{"binding": 0, "handle": 1}]}]
     );
     const bindings = cmds[0].kernel_dispatch.bindings.?;
-    try std.testing.expectEqual(model.KernelBindingResourceKind.buffer, bindings[0].resource_kind);
+    try std.testing.expectEqual(compute.KernelBindingResourceKind.buffer, bindings[0].resource_kind);
 }
 
 test "kernel_dispatch binding with invalid kind returns InvalidCommandPayload" {
@@ -815,9 +819,9 @@ test "parse multiple heterogeneous commands preserves order" {
         \\ {"command": "dispatch", "x": 8}]
     );
     try std.testing.expectEqual(@as(usize, 3), cmds.len);
-    try std.testing.expectEqual(model.CommandKind.upload, std.meta.activeTag(cmds[0]));
-    try std.testing.expectEqual(model.CommandKind.barrier, std.meta.activeTag(cmds[1]));
-    try std.testing.expectEqual(model.CommandKind.dispatch, std.meta.activeTag(cmds[2]));
+    try std.testing.expectEqual(command.CommandKind.upload, std.meta.activeTag(cmds[0]));
+    try std.testing.expectEqual(command.CommandKind.barrier, std.meta.activeTag(cmds[1]));
+    try std.testing.expectEqual(command.CommandKind.dispatch, std.meta.activeTag(cmds[2]));
     try std.testing.expectEqual(@as(usize, 100), cmds[0].upload.bytes);
     try std.testing.expectEqual(@as(u32, 2), cmds[1].barrier.dependency_count);
     try std.testing.expectEqual(@as(u32, 8), cmds[2].dispatch.x);
@@ -932,7 +936,7 @@ test "camelCase mapMode is accepted for map_async" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "map_async", "bytes": 1024, "mapMode": "read"}]
     );
-    try std.testing.expectEqual(model.MapAsyncMode.read, cmds[0].map_async.mode);
+    try std.testing.expectEqual(async_types.MapAsyncMode.read, cmds[0].map_async.mode);
 }
 
 // ============================================================
@@ -968,10 +972,10 @@ test "render_draw uses default target dimensions and format" {
     const cmds = try parseCommands(arena.allocator(),
         \\[{"command": "render_draw", "draw_count": 1}]
     );
-    try std.testing.expectEqual(model.DEFAULT_RENDER_TARGET_HANDLE, cmds[0].render_draw.target_handle);
-    try std.testing.expectEqual(model.DEFAULT_RENDER_TARGET_WIDTH, cmds[0].render_draw.target_width);
-    try std.testing.expectEqual(model.DEFAULT_RENDER_TARGET_HEIGHT, cmds[0].render_draw.target_height);
-    try std.testing.expectEqual(model.DEFAULT_RENDER_TARGET_FORMAT, cmds[0].render_draw.target_format);
+    try std.testing.expectEqual(render.DEFAULT_RENDER_TARGET_HANDLE, cmds[0].render_draw.target_handle);
+    try std.testing.expectEqual(render.DEFAULT_RENDER_TARGET_WIDTH, cmds[0].render_draw.target_width);
+    try std.testing.expectEqual(render.DEFAULT_RENDER_TARGET_HEIGHT, cmds[0].render_draw.target_height);
+    try std.testing.expectEqual(render.DEFAULT_RENDER_TARGET_FORMAT, cmds[0].render_draw.target_format);
 }
 
 test "render_draw uses default viewport depth range 0..1" {

@@ -1,4 +1,4 @@
-pub const model_commands = @import("../../contracts/model/model_commands.zig");
+pub const model_commands = @import("../../contracts/command.zig");
 pub const model_policy = @import("../../contracts/model/model_policy.zig");
 pub const model_profile = @import("../../contracts/model/model_profile.zig");
 pub const model_quirks = @import("../../contracts/model/model_quirks.zig");

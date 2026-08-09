@@ -12,6 +12,10 @@ materially faster than a declared incumbent on a declared support matrix.
 Receipts, replay, deterministic artifacts, and runtime policy prove those
 properties. They do not substitute for them.
 
+The complete product strategy lives in
+[`docs/thesis.md`](docs/thesis.md). Other documentation defines contracts,
+procedures, support state, or evidence; it does not define a second strategy.
+
 ## Install
 
 ```bash
@@ -21,21 +25,6 @@ node node_modules/doe-gpu/examples/node-first-kernel.mjs
 
 Package usage and supported entrypoints are documented in
 [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md).
-
-## Admission contract
-
-A surface is promoted only when it has:
-
-- independent output oracles for every promoted workload;
-- explicit crash, hang, timeout, ordering, concurrency, and memory behavior;
-- compatibility with named downstream applications;
-- end-to-end latency and memory evidence for user-visible operations;
-- clean installation on every declared runtime, operating system, and
-  architecture tuple;
-- structured runtime identity, fallback decisions, diagnostics, and receipts.
-
-Unsupported systems and operations must fail explicitly. Diagnostic and
-scaffolded lanes are not promoted product support.
 
 ## Evidence boundary
 
@@ -65,12 +54,10 @@ Read the claim index and sidecar before repeating any measured result.
 
 ## Read next
 
-- [Product thesis](docs/thesis.md)
+- [Canonical product strategy](docs/thesis.md)
 - [Architecture](docs/architecture.md)
 - [Process and release law](docs/process.md)
-- [Node/Bun developer wedge](docs/node-bun-developer-wedge.md)
 - [Support matrix](docs/doe-support-matrix.md)
-- [Performance contract](docs/performance-strategy.md)
 - [Current status](docs/status.md)
 - [Documentation index](docs/INDEX.md)
 

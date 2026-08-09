@@ -3,6 +3,7 @@
 // Render Pipeline ops sharded to doe_render_pipeline_native.zig.
 
 const std = @import("std");
+const abi_core = @import("../../core/abi/wgpu_core_base_types.zig");
 const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
 const abi_pipeline = @import("../../core/abi/wgpu_pipeline_descriptor_types.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
@@ -66,6 +67,19 @@ pub const doeNativeRenderPipelineRelease = render_pipeline.doeNativeRenderPipeli
 
 const DEFAULT_MAX_DRAW_COUNT: u64 = 50_000_000;
 
+fn renderPassMaxDrawCount(desc: *const abi_pipeline.WGPURenderPassDescriptor) u64 {
+    var chain = desc.nextInChain;
+    while (chain != null) {
+        const item: *const abi_pipeline.WGPUChainedStruct = @ptrCast(chain);
+        if (item.sType == abi_core.WGPUSType_RenderPassMaxDrawCount) {
+            const extension: *const abi_pipeline.WGPURenderPassMaxDrawCount = @ptrCast(item);
+            return if (extension.maxDrawCount == 0) DEFAULT_MAX_DRAW_COUNT else extension.maxDrawCount;
+        }
+        chain = item.next;
+    }
+    return DEFAULT_MAX_DRAW_COUNT;
+}
+
 fn reserve_render_draw(pass: *DoeRenderPass) bool {
     if (pass.recorded_draw_count >= pass.max_draw_count) {
         std.log.err("doe: render pass draw rejected: maxDrawCount={} exhausted", .{pass.max_draw_count});
@@ -87,7 +101,7 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
         .recorded_command_start = enc.cmds.items.len,
     };
     if (desc) |d| {
-        pass.max_draw_count = if (d.maxDrawCount == 0) DEFAULT_MAX_DRAW_COUNT else d.maxDrawCount;
+        pass.max_draw_count = renderPassMaxDrawCount(d);
         pass.occlusion_query_set = d.occlusionQuerySet;
         if (d.colorAttachmentCount > 0) {
             if (d.colorAttachments) |attachments| {
@@ -117,7 +131,8 @@ pub export fn doeNativeCommandEncoderBeginRenderPass(enc_raw: ?*anyopaque, desc:
                 pass.clear_a = att.clearValue.a;
             }
         }
-        if (d.depthStencilAttachment) |depth_att| {
+        if (d.depthStencilAttachment != null) {
+            const depth_att: *const abi_pipeline.WGPURenderPassDepthStencilAttachment = @ptrCast(d.depthStencilAttachment);
             if (cast(DoeTextureView, depth_att.view)) |v| {
                 pass.depth_target = if (texture_sampler.d3d12_texture_view_registry.contains(depth_att.view))
                     v.tex.mtl

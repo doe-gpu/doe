@@ -1,9 +1,10 @@
 const std = @import("std");
-const model_commands = @import("../contracts/model/model_commands.zig");
+const model_commands = @import("../contracts/command.zig");
 const model_profile = @import("../contracts/model/model_profile.zig");
 const model_transfer_types = @import("../contracts/model/model_compute_types.zig");
+const compute_contract = @import("../contracts/compute.zig");
 const webgpu = @import("webgpu_backend.zig");
-const backend_ids = @import("backend_ids.zig");
+const backend_ids = @import("../contracts/backend.zig");
 const backend_iface = @import("backend_iface.zig");
 const backend_telemetry = @import("backend_telemetry.zig");
 const submit_count_policy = @import("common/submit_count_policy.zig");
@@ -70,12 +71,20 @@ fn deinit(ctx: *anyopaque) void {
     allocator.destroy(self);
 }
 
-fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.NativeExecutionResult {
-    const self = cast(ctx);
+fn execute_command_typed(self: *DawnDelegateBackend, command: model.Command) anyerror!webgpu.NativeExecutionResult {
     self.last_submit_count = null;
     const result = try self.inner.executeCommand(command);
     self.last_submit_count = submit_count_policy.selectedCommandSubmitCount(command, result);
     return result;
+}
+
+fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.NativeExecutionResult {
+    return execute_command_typed(cast(ctx), command);
+}
+
+fn execute_dispatch(context: compute_contract.ComputeContext, request: compute_contract.DispatchRequest) anyerror!compute_contract.DispatchReport {
+    const result = try execute_command_typed(cast(context.state), .{ .kernel_dispatch = request.toCommand() });
+    return .{ .execution = result };
 }
 
 fn execute_buffer_write_bytes(ctx: *anyopaque, handle: u64, offset: u64, buffer_size: u64, data: []const u8) anyerror!webgpu.NativeExecutionResult {
@@ -150,6 +159,7 @@ fn capture_buffer(ctx: *anyopaque, allocator: std.mem.Allocator, handle: u64, of
 const VTABLE = backend_iface.BackendVTable{
     .deinit = deinit,
     .execute_command = execute_command,
+    .execute_dispatch = execute_dispatch,
     .execute_buffer_write_bytes = execute_buffer_write_bytes,
     .set_upload_behavior = set_upload_behavior,
     .set_queue_wait_mode = set_queue_wait_mode,

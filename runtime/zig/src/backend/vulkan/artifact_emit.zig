@@ -1,5 +1,5 @@
-const artifact_meta = @import("../common/artifact_meta.zig");
-const common_errors = @import("../common/errors.zig");
+const artifact_meta = @import("../../contracts/artifact.zig");
+const common_errors = @import("../../contracts/execution.zig");
 const shared_manifest = @import("../common/shader_artifact_manifest.zig");
 
 const SPEC = shared_manifest.ManifestSpec{

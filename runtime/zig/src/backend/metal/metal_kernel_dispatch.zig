@@ -1,4 +1,5 @@
 const common_timing = @import("../common/timing.zig");
+const execution_contract = @import("../../contracts/execution.zig");
 const model_transfer_types = @import("../../contracts/model/model_compute_types.zig");
 const webgpu = @import("../runtime_types.zig");
 const bridge = @import("metal_bridge_decls.zig");
@@ -20,12 +21,7 @@ const model = struct {
 pub const MAX_BINDING_SLOTS: usize = 32;
 const MAX_STREAMING_COMPUTE_DISPATCHES_BEFORE_COMMIT: u32 = 256;
 
-pub const DispatchMetrics = struct {
-    setup_ns: u64,
-    encode_ns: u64,
-    submit_wait_ns: u64,
-    dispatch_count: u32,
-};
+pub const DispatchMetrics = execution_contract.DispatchMetrics;
 
 pub const KernelDispatchResult = struct {
     metrics: DispatchMetrics,

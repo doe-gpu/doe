@@ -1,9 +1,10 @@
 const std = @import("std");
 const abi_base = @import("../wgpu_handle_types.zig");
 const loader = @import("../wgpu_loader.zig");
+const upstream = @import("../generated/webgpu_upstream.zig");
 
 pub const WGPUResourceTable = ?*anyopaque;
-pub const WGPURenderBundleEncoder = ?*anyopaque;
+pub const WGPURenderBundleEncoder = upstream.WGPURenderBundleEncoder;
 
 pub const ResourceTableDescriptor = extern struct {
     nextInChain: ?*anyopaque,

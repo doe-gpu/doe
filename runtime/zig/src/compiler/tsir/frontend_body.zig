@@ -1,7 +1,7 @@
 const std = @import("std");
 const ir = @import("../wgsl/ir/ir.zig");
 const layout_utils = @import("../wgsl/ir/layout_utils.zig");
-const tsir = @import("mod.zig");
+const tsir = @import("schema.zig");
 
 const FrontendBodyError = error{
     OutOfMemory,

@@ -1,5 +1,5 @@
 const std = @import("std");
-const backend_ids = @import("../../src/backend/backend_ids.zig");
+const backend_ids = @import("../../src/contracts/backend.zig");
 
 test "backend id names are stable" {
     try std.testing.expectEqualStrings("dawn_delegate", backend_ids.backend_id_name(.dawn_delegate));

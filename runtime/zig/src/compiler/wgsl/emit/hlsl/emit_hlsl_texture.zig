@@ -21,9 +21,36 @@ pub fn emit_texture_builtin(
     var ctx = WriteCtx{ .module = module, .buf = buf, .pos = pos };
 
     if (std.mem.eql(u8, call_name, "textureLoad")) {
-        if (args.len != 3) return error.InvalidIr;
+        if (args.len < 2 or args.len > 3) return error.InvalidIr;
         const texture_expr = function.expr_args.items[args.start];
         const coord_expr = function.expr_args.items[args.start + 1];
+        const is_storage_texture = switch (module.types.get(function.exprs.items[texture_expr].ty)) {
+            .storage_texture_2d => true,
+            else => false,
+        };
+        if (is_storage_texture) {
+            if (args.len != 2) return error.InvalidIr;
+            if (texture_global_name(module, function, texture_expr)) |global_name| {
+                try ctx.write("((all(int2(");
+                try ctx.emit_expr(function, coord_expr);
+                try ctx.write(") >= int2(0, 0)) && all(uint2(int2(");
+                try ctx.emit_expr(function, coord_expr);
+                try ctx.write(")) < doe_textureDimensions_");
+                try ctx.write(global_name);
+                try ctx.write("())) ? ");
+                try ctx.emit_expr(function, texture_expr);
+                try ctx.write(".Load(int3(int2(");
+                try ctx.emit_expr(function, coord_expr);
+                try ctx.write("), 0)) : float4(0.0, 0.0, 0.0, 0.0))");
+            } else {
+                try ctx.emit_expr(function, texture_expr);
+                try ctx.write(".Load(int3(");
+                try ctx.emit_expr(function, coord_expr);
+                try ctx.write(", 0))");
+            }
+            return true;
+        }
+        if (args.len != 3) return error.InvalidIr;
         const level_expr = function.expr_args.items[args.start + 2];
         if (texture_global_name(module, function, texture_expr)) |global_name| {
             if (is_texture_1d(module, function, texture_expr)) {

@@ -1,11 +1,11 @@
 const std = @import("std");
 const compute_services = @import("../full/modules/services/compute_services.zig");
 const effects_pipeline = @import("../full/modules/rendering/effects_pipeline.zig");
-const numeric_stability = @import("../experimental/numeric_stability/mod.zig");
+const numeric_stability = @import("../runtime/numeric_stability/mod.zig");
 const path_engine = @import("../full/modules/rendering/path_engine.zig");
 const resource_scheduler = @import("../full/modules/services/resource_scheduler.zig");
 const sdf_renderer = @import("../full/modules/rendering/sdf_renderer.zig");
-const common = @import("../full/modules/common.zig");
+const artifact = @import("../contracts/artifact.zig");
 
 const Allocator = std.mem.Allocator;
 const ModuleRunFn = *const fn (Allocator, []const u8, []const u8, []const u8) anyerror![]u8;
@@ -62,7 +62,7 @@ fn simpleModuleRunner(comptime Module: type) ModuleRunFn {
             var parsed_policy = try Module.parsePolicy(allocator, policy_bytes);
             defer parsed_policy.deinit();
             const result = try Module.execute(allocator, parsed_request.value, parsed_policy.value);
-            return try common.jsonStringifyAlloc(allocator, result);
+            return try artifact.jsonStringifyAlloc(allocator, result);
         }
     }.run;
 }
@@ -78,7 +78,7 @@ fn runNumericStabilityModule(
     var parsed_policy = try numeric_stability.service.parsePolicy(allocator, policy_path, policy_bytes);
     defer parsed_policy.deinit(allocator);
     const result = try numeric_stability.service.execute(allocator, parsed_request.value, parsed_policy.value);
-    return try common.jsonStringifyAlloc(allocator, result);
+    return try artifact.jsonStringifyAlloc(allocator, result);
 }
 
 const MODULE_ADAPTERS = [_]ModuleAdapter{

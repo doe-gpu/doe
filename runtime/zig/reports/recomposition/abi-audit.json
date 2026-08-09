@@ -1,0 +1,1704 @@
+{
+  "declarations": {
+    "doeExtensionCount": 46,
+    "duplicateNames": [
+      {
+        "name": "WGPUAdapter",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUAlphaMode",
+        "paths": [
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBackendType",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBindGroup",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBindGroupDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBindGroupEntry",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBindGroupLayout",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBindGroupLayoutDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBindGroupLayoutEntry",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBool",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBuffer",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBufferBindingLayout",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBufferDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBufferMapAsyncStatus",
+        "paths": [
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBufferMapAsyncStatus_Success",
+        "paths": [
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBufferMapCallback",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBufferMapCallbackInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUBufferUsage",
+        "paths": [
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCallbackMode",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCallbackMode_AllowProcessEvents",
+        "paths": [
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCallbackMode_AllowSpontaneous",
+        "paths": [
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCallbackMode_WaitAnyOnly",
+        "paths": [
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUChainedStruct",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUColor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCommandBuffer",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCommandBufferDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCommandEncoder",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCommandEncoderDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUComponentSwizzle",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUComputePassDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUComputePassEncoder",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUComputePipeline",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_state_contract_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUComputePipelineDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUComputeState",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUConstantEntry",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUCopyTextureForBrowserOptions",
+        "paths": [
+          "src/core/abi/wgpu_copy_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUDevice",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUDeviceDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUDeviceLostCallback",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUDeviceLostCallbackInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUDeviceLostReason",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUErrorType",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_state_contract_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUExtent2D",
+        "paths": [
+          "src/core/abi/wgpu_copy_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUExtent3D",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_copy_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUExternalTexture",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/procs/wgpu_p2_lifecycle_procs.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUExternalTextureBindingEntry",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUExternalTextureBindingLayout",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUFeatureLevel",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUFeatureName",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_feature_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUFlags",
+        "paths": [
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUFuture",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUFutureWaitInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUImageCopyExternalTexture",
+        "paths": [
+          "src/core/abi/wgpu_copy_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUInstance",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUInstanceFeatureName",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/procs/wgpu_p1_capability_procs.zig"
+        ]
+      },
+      {
+        "name": "WGPULimits",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUMapAsyncStatus",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_state_contract_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUMapMode",
+        "paths": [
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUOrigin3D",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_copy_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUPassTimestampWrites",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUPipelineLayout",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUPipelineLayoutDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUPowerPreference",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUQuerySet",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUQuerySetDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUQueryType",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUQueue",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUQueueDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUQueueWorkDoneCallback",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUQueueWorkDoneCallbackInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUQueueWorkDoneStatus",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_state_contract_types.zig"
+        ]
+      },
+      {
+        "name": "WGPURenderBundleEncoder",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/procs/wgpu_p1_resource_table_procs.zig"
+        ]
+      },
+      {
+        "name": "WGPURenderPassColorAttachment",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURenderPassDepthStencilAttachment",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURenderPassDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURenderPassEncoder",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURenderPassMaxDrawCount",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig"
+        ]
+      },
+      {
+        "name": "WGPURenderPipeline",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURequestAdapterCallback",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURequestAdapterCallbackInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURequestAdapterOptions",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURequestAdapterStatus",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURequestDeviceCallback",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURequestDeviceCallbackInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPURequestDeviceStatus",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUResourceTable",
+        "paths": [
+          "src/core/abi/procs/wgpu_p1_resource_table_procs.zig",
+          "src/core/abi/procs/wgpu_p2_lifecycle_procs.zig"
+        ]
+      },
+      {
+        "name": "WGPUSType",
+        "paths": [
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUSampler",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUSamplerBindingLayout",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUSamplerDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUShaderModule",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_state_contract_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUShaderModuleDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUShaderSourceHLSL",
+        "paths": [
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUShaderSourceMSL",
+        "paths": [
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUShaderSourceSPIRV",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUShaderSourceWGSL",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUShaderStageFlags",
+        "paths": [
+          "src/core/abi/wgpu_binding_base_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUStatus",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUStorageTextureBindingLayout",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUStringView",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUSurface",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/procs/wgpu_p2_lifecycle_procs.zig"
+        ]
+      },
+      {
+        "name": "WGPUTexelCopyBufferInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_copy_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUTexelCopyBufferLayout",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_copy_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUTexelCopyTextureInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_copy_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUTexture",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureAspect",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureBindingLayout",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureComponentSwizzle",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureComponentSwizzleDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureDimension",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat",
+        "paths": [
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC10x10Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC10x10UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC10x5Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC10x5UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC10x6Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC10x6UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC10x8Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC10x8UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC12x10Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC12x10UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC12x12Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC12x12UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC4x4Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC4x4UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC5x4Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC5x4UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC5x5Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC5x5UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC6x5Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC6x5UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC6x6Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC6x6UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC8x5Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC8x5UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC8x6Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC8x6UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC8x8Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ASTC8x8UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC1RGBAUnorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC1RGBAUnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC2RGBAUnorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC2RGBAUnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC3RGBAUnorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC3RGBAUnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC4RSnorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC4RUnorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC5RGSnorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC5RGUnorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC6HRGBFloat",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC6HRGBUfloat",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC7RGBAUnorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BC7RGBAUnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BGRA8Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_BGRA8UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_Depth16Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_Depth24Plus",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_Depth24PlusStencil8",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_Depth32Float",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_Depth32FloatStencil8",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_EACR11Snorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_EACR11Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_EACRG11Snorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_EACRG11Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ETC2RGB8A1Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ETC2RGB8A1UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ETC2RGB8Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ETC2RGB8UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ETC2RGBA8Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_ETC2RGBA8UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R16Float",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R16Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R16Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R32Float",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R32Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R32Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R8Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R8Snorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R8Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_R8Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG11B10Ufloat",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG16Float",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG16Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG16Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG32Float",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG32Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG32Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG8Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG8Snorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG8Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RG8Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGB10A2Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGB10A2Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGB9E5Ufloat",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA16Float",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA16Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA16Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA32Float",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA32Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA32Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA8Sint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA8Snorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA8Uint",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA8Unorm",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_RGBA8UnormSrgb",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_Stencil8",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureFormat_Undefined",
+        "paths": [
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureUsage",
+        "paths": [
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureView",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_record_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureViewDescriptor",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_pipeline_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUTextureViewDimension",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_runtime_abi.zig",
+          "src/core/abi/wgpu_texture_base_types.zig"
+        ]
+      },
+      {
+        "name": "WGPUUncapturedErrorCallback",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUUncapturedErrorCallbackInfo",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPUWGSLLanguageFeatureName",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/procs/wgpu_p1_capability_procs.zig"
+        ]
+      },
+      {
+        "name": "WGPUWaitStatus",
+        "paths": [
+          "src/core/abi/generated/webgpu_upstream.zig",
+          "src/core/abi/wgpu_callback_descriptor_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      },
+      {
+        "name": "WGPU_STRLEN",
+        "paths": [
+          "src/core/abi/wgpu_core_base_types.zig",
+          "src/core/abi/wgpu_handle_types.zig",
+          "src/core/abi/wgpu_runtime_abi.zig"
+        ]
+      }
+    ],
+    "manualUpstreamDefinitionCount": 0,
+    "manualUpstreamDefinitions": [],
+    "totalCount": 699,
+    "upstreamAliasCount": 653
+  },
+  "generation": {
+    "domains": [
+      "callbacks",
+      "capabilities",
+      "enums",
+      "loader-metadata",
+      "proc-tables",
+      "proc-types",
+      "records"
+    ],
+    "generatedPath": "src/core/abi/generated/webgpu_upstream.zig",
+    "outputCurrent": true,
+    "required": false,
+    "status": "complete"
+  },
+  "pin": {
+    "actualDawnCommit": "36cf1fae0cd8a81a4fb4580751648b80b2e6255c",
+    "actualHeaderSha256": "7691d76ceb67056f89e97b9ff0b62163eacf19a8e0e09a8fa7dbb32069b7978c",
+    "actualWebgpuHeadersCommit": "01addc4ba8a2915a061b7095a6768b512071ab96",
+    "errors": [],
+    "path": "bench/vendor/dawn/third_party/webgpu-headers/src/webgpu.h",
+    "status": "verified"
+  },
+  "schemaVersion": 1,
+  "status": "audited-generated",
+  "symbolContract": {
+    "count": 199,
+    "missingFromPinnedHeader": [],
+    "path": "config/dropin_abi.symbols.txt",
+    "status": "verified"
+  }
+}

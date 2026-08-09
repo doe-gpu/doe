@@ -6,6 +6,34 @@
       "data": "config/schema-targets.json"
     },
     {
+      "schema": "config/zig-test-inventory.schema.json",
+      "data": "config/zig-test-inventory.json"
+    },
+    {
+      "schema": "config/webgpu-abi-source.schema.json",
+      "data": "config/webgpu-abi-source.json"
+    },
+    {
+      "schema": "config/ecosystem-scoring-policy.schema.json",
+      "data": "config/ecosystem-scoring-policy.json"
+    },
+    {
+      "schema": "config/external-project-promotion-policy.schema.json",
+      "data": "config/external-project-promotion-policy.json"
+    },
+    {
+      "schema": "config/ecosystem-registry.schema.json",
+      "data": "config/ecosystem-registry.json"
+    },
+    {
+      "schema": "config/external-project-harness.schema.json",
+      "data": "examples/external-project-harness.sample.json"
+    },
+    {
+      "schema": "config/ecosystem-report.schema.json",
+      "data": "examples/ecosystem-report.sample.json"
+    },
+    {
       "schema": "config/python-import-boundaries.schema.json",
       "data": "config/python-import-boundaries.json"
     },
@@ -1207,6 +1235,21 @@
     {
       "schema": "config/doe-provenance.schema.json",
       "glob": "bench/out/r3-1-*/PROVENANCE.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/external-project-harness.schema.json",
+      "glob": "bench/external-projects/*/*.harness.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/external-project-failure.schema.json",
+      "glob": "bench/external-projects/*/failures/*.failure.json",
+      "allowEmpty": true
+    },
+    {
+      "schema": "config/ecosystem-report.schema.json",
+      "glob": "reports/ecosystem/*/*.json",
       "allowEmpty": true
     }
   ]

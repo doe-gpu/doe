@@ -1,0 +1,227 @@
+{
+  "build": {
+    "optimize": "ReleaseSafe",
+    "steps": [
+      "doe-runtime",
+      "dropin",
+      "emit-ir-digest",
+      "emit-csl",
+      "emit-hlsl",
+      "emit-msl",
+      "emit-spirv",
+      "ort-plugin-ep"
+    ]
+  },
+  "captureToolSha256": "70573f602f7432f75c9aebff0d20c571c27fc53992f4cfc9d40d3b23176afc7d",
+  "commandNormalization": {
+    "input": "command-input.json",
+    "output": "command-normalized.jsonl"
+  },
+  "errorClassifications": {
+    "invalidCommandArguments": {
+      "exitCode": 0,
+      "failureBoundary": "argument-validation",
+      "stdout": "invalid --command-repeat value: must be >= 1\n"
+    },
+    "invalidCommandJson": {
+      "exitCode": 1,
+      "failureBoundary": "command-json-parse",
+      "stderr": "error: UnknownCommandKind\n",
+      "stdout": ""
+    },
+    "invalidWgslByEmitter": {
+      "doe-emit-csl": {
+        "exitCode": 1,
+        "failureBoundary": "wgsl-parser",
+        "stderrSha256": "adcdb87ef8308d5a9d1401da686466982c27301750d3c63f3bcec3e369624423",
+        "stderrText": "UnexpectedToken: parser: UnexpectedToken\nerror: UnexpectedToken\n"
+      },
+      "doe-emit-hlsl": {
+        "exitCode": 1,
+        "failureBoundary": "wgsl-parser",
+        "stderrSha256": "adcdb87ef8308d5a9d1401da686466982c27301750d3c63f3bcec3e369624423",
+        "stderrText": "UnexpectedToken: parser: UnexpectedToken\nerror: UnexpectedToken\n"
+      },
+      "doe-emit-msl": {
+        "exitCode": 1,
+        "failureBoundary": "wgsl-parser",
+        "stderrSha256": "adcdb87ef8308d5a9d1401da686466982c27301750d3c63f3bcec3e369624423",
+        "stderrText": "UnexpectedToken: parser: UnexpectedToken\nerror: UnexpectedToken\n"
+      },
+      "doe-emit-spirv": {
+        "exitCode": 1,
+        "failureBoundary": "wgsl-parser",
+        "stderrSha256": "adcdb87ef8308d5a9d1401da686466982c27301750d3c63f3bcec3e369624423",
+        "stderrText": "UnexpectedToken: parser: UnexpectedToken\nerror: UnexpectedToken\n"
+      }
+    },
+    "unsupportedWgslByEmitter": {
+      "doe-emit-csl": {
+        "errorName": "UnsupportedBuiltin",
+        "exitCode": 1,
+        "failureBoundary": "wgsl-sema",
+        "stderrSha256": "4e5ffe6a4f157549d103f23d6d1f6b6860f318b4bee10ad95b81c74f2c7ecc21",
+        "stderrText": "UnsupportedBuiltin: sema: UnsupportedBuiltin at 3:27 near `    let value = transpose(1.0);`\nerror: UnsupportedBuiltin\n"
+      },
+      "doe-emit-hlsl": {
+        "errorName": "UnsupportedBuiltin",
+        "exitCode": 1,
+        "failureBoundary": "wgsl-sema",
+        "stderrSha256": "4e5ffe6a4f157549d103f23d6d1f6b6860f318b4bee10ad95b81c74f2c7ecc21",
+        "stderrText": "UnsupportedBuiltin: sema: UnsupportedBuiltin at 3:27 near `    let value = transpose(1.0);`\nerror: UnsupportedBuiltin\n"
+      },
+      "doe-emit-msl": {
+        "errorName": "UnsupportedBuiltin",
+        "exitCode": 1,
+        "failureBoundary": "wgsl-sema",
+        "stderrSha256": "4e5ffe6a4f157549d103f23d6d1f6b6860f318b4bee10ad95b81c74f2c7ecc21",
+        "stderrText": "UnsupportedBuiltin: sema: UnsupportedBuiltin at 3:27 near `    let value = transpose(1.0);`\nerror: UnsupportedBuiltin\n"
+      },
+      "doe-emit-spirv": {
+        "errorName": "UnsupportedBuiltin",
+        "exitCode": 1,
+        "failureBoundary": "wgsl-sema",
+        "stderrSha256": "4e5ffe6a4f157549d103f23d6d1f6b6860f318b4bee10ad95b81c74f2c7ecc21",
+        "stderrText": "UnsupportedBuiltin: sema: UnsupportedBuiltin at 3:27 near `    let value = transpose(1.0);`\nerror: UnsupportedBuiltin\n"
+      }
+    }
+  },
+  "files": [
+    {
+      "path": "abi/libonnxruntime_doe_ep.so.symbols.txt",
+      "sha256": "e237087ac2d50e752bd714bb338719e3e1559b306d056461ebe890b87bf4231b",
+      "sizeBytes": 7988
+    },
+    {
+      "path": "abi/libwebgpu_doe.so.symbols.txt",
+      "sha256": "6397dec652765917af9a5fb11ec2002fb5bbb4915d85489ea74fc23076132565",
+      "sizeBytes": 24463
+    },
+    {
+      "path": "command-input.json",
+      "sha256": "6312e2ef358172f374cc233de52e1551fc7018b7e9a9d69f3551cd6e969f23b7",
+      "sizeBytes": 117
+    },
+    {
+      "path": "command-normalized.jsonl",
+      "sha256": "6442af9c78da973dad9cd7f6ed8a95f37419e516bdecd5ac5d1b90175f558e18",
+      "sizeBytes": 179
+    },
+    {
+      "path": "embedded-command-normalized.jsonl",
+      "sha256": "1ad2960dc39b7639028843d26a32a66738729eb8b873d82aaaf519fbc4c40c6b",
+      "sizeBytes": 536
+    },
+    {
+      "path": "trace-meta-normalized.json",
+      "sha256": "e1d5838fd4c6afef82ec6f5d35985f5b94b52e1a21fa226187dbf0aa72b4a755",
+      "sizeBytes": 1668
+    },
+    {
+      "path": "trace-normalized.jsonl",
+      "sha256": "583a561d7922487018a13b060a9cc276b2255abca608e92dbbf401f1284c1679",
+      "sizeBytes": 2096
+    },
+    {
+      "path": "wgsl-input.wgsl",
+      "sha256": "0c3fec72aa66c43c71b921b3efda23e378e2efc690c6c35ec714515a6ee699bc",
+      "sizeBytes": 640
+    },
+    {
+      "path": "wgsl-output.csl",
+      "sha256": "83472a49a2865372f9bd78403b5cc8e231f720565b9cfc8a0d76342bb8c784c8",
+      "sizeBytes": 3087
+    },
+    {
+      "path": "wgsl-output.hlsl",
+      "sha256": "7c63b99bd092f8bd0e85067410a0d7f7a3ffa5725588c049d21252b88a7836a7",
+      "sizeBytes": 3676
+    },
+    {
+      "path": "wgsl-output.msl",
+      "sha256": "b2f56239166459d967c02f04fa908ab6d81fc23b2dcd0cdbbb32c45115614a5a",
+      "sizeBytes": 1128
+    },
+    {
+      "path": "wgsl-output.spv",
+      "sha256": "22c1218c13eba037dfdbbf07ab72268a3e46a0cf663017edeebae0eca95c2a5c",
+      "sizeBytes": 1772
+    },
+    {
+      "path": "wgsl-unsupported-input.wgsl",
+      "sha256": "a7a89be5ad3543210a3a348cf530fd0ca2479133214fd01343f96909600f998c",
+      "sizeBytes": 74
+    }
+  ],
+  "git": {
+    "baseCommit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
+    "requestedRef": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
+    "snapshotKind": "git-archive"
+  },
+  "host": {
+    "machine": "x86_64",
+    "operatingSystem": "Linux",
+    "release": "6.8.0-90-generic"
+  },
+  "irDigestInstrumentation": {
+    "kind": "post-hoc-pure-observer",
+    "observers": [
+      {
+        "path": "src/cli/entrypoints/main_emit_ir_digest.zig",
+        "sha256": "e176fc51781e5f55ae76015a0669cefcb1f42c85b07750a17a6a61cf015ac4b1"
+      },
+      {
+        "path": "src/compiler/wgsl/ir/ir_digest.zig",
+        "sha256": "6470ebe184a20539a299a673b58f8ae2c7e8151bf9d42d93504b9d530a46f86c"
+      }
+    ],
+    "status": "installed"
+  },
+  "replay": {
+    "exitCode": 0,
+    "status": "passed",
+    "stderrBytes": 0,
+    "stdoutBytes": 0
+  },
+  "schemaVersion": 1,
+  "sharedLibraries": [
+    {
+      "path": "libonnxruntime_doe_ep.so",
+      "sha256": "e7be513c0834198cb33013672b1da8ae53305bef2dc130fd28e2b9ba28d2777c",
+      "sizeBytes": 6055192,
+      "symbolCount": 100,
+      "symbols": "abi/libonnxruntime_doe_ep.so.symbols.txt"
+    },
+    {
+      "path": "libwebgpu_doe.so",
+      "sha256": "e6148f2ed8e1682ff0c41235b197ff2bc058c29b7c20428a9541e2e4e198523c",
+      "sizeBytes": 9474800,
+      "symbolCount": 730,
+      "symbols": "abi/libwebgpu_doe.so.symbols.txt"
+    }
+  ],
+  "status": "captured",
+  "trace": {
+    "normalizedOutput": "trace-normalized.jsonl",
+    "previousHash": "0x932455c45a37ada4",
+    "rawStdoutMatchesTraceFile": true,
+    "rowCount": 5,
+    "terminalHash": "0xfe241c2a680fa89c",
+    "volatileFieldsExcluded": [
+      "timestampMonoNs",
+      "host*Ns"
+    ]
+  },
+  "wgsl": {
+    "input": "wgsl-input.wgsl",
+    "irDigest": "6285d665501c6e717ed3b9dbb28886ac027b21b17e2411a835ba52956b04f47f",
+    "outputs": [
+      "wgsl-output.csl",
+      "wgsl-output.hlsl",
+      "wgsl-output.msl",
+      "wgsl-output.spv"
+    ]
+  },
+  "zigExecutableSha256": "2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51",
+  "zigVersion": "0.15.2"
+}

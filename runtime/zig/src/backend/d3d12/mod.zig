@@ -1,22 +1,23 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model_commands = @import("../../contracts/model/model_commands.zig");
+const model_commands = @import("../../contracts/command.zig");
 const model_profile = @import("../../contracts/model/model_profile.zig");
 const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const compute_contract = @import("../../contracts/compute.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
 const webgpu = @import("../runtime_types.zig");
 const backend_iface = @import("../backend_iface.zig");
-const common_errors = @import("../common/errors.zig");
+const common_errors = @import("../../contracts/execution.zig");
 const common_timing = @import("../common/timing.zig");
-const command_info = @import("../common/command_info.zig");
-const command_requirements = @import("../common/command_requirements.zig");
-const capabilities = @import("../common/capabilities.zig");
-const artifact_meta = @import("../common/artifact_meta.zig");
+const command_info = @import("../../contracts/command.zig");
+const command_requirements = @import("../../contracts/command.zig");
+const capabilities = @import("../../contracts/capability.zig");
+const artifact_meta = @import("../../contracts/artifact.zig");
 const artifact_policy = @import("../common/artifact_policy.zig");
-const hash_utils = @import("../common/hash_utils.zig");
+const hash_utils = @import("../../contracts/artifact.zig");
 const artifact_emit = @import("artifact_emit.zig");
 const native_runtime = @import("d3d12_native_runtime.zig");
 
@@ -464,7 +465,11 @@ fn flush_pending_uploads_if_required(self: *ZigD3D12Backend, command: model.Comm
     return try rt.flush_queue();
 }
 
-fn execute_native_command(self: *ZigD3D12Backend, command: model.Command) !webgpu.NativeExecutionResult {
+fn execute_native_command(
+    self: *ZigD3D12Backend,
+    command: model.Command,
+    promoted_dispatch: ?compute_contract.DispatchRequest,
+) !webgpu.NativeExecutionResult {
     const requirements = command_requirements.requirements(command);
     if (self.capability_set.missing(requirements.required_capabilities)) |missing_cap| {
         return .{
@@ -489,7 +494,11 @@ fn execute_native_command(self: *ZigD3D12Backend, command: model.Command) !webgp
         .upload => |upload| try execute_upload(self, setup_ns, upload),
         .buffer_write => return error.UnsupportedFeature,
         .barrier => try execute_barrier(self, setup_ns),
-        .kernel_dispatch => |kd| try execute_kernel_dispatch(self, setup_ns, kd),
+        .kernel_dispatch => try execute_kernel_dispatch(
+            self,
+            setup_ns,
+            (promoted_dispatch orelse return error.InvalidArgument).toCommand(),
+        ),
         .dispatch => |cmd| try execute_compute_dispatch_cmd(self, setup_ns, cmd),
         .dispatch_indirect => |cmd| try execute_dispatch_indirect_cmd(self, setup_ns, cmd),
         .copy_buffer_to_texture => |cmd| try execute_copy_cmd(self, setup_ns, cmd),
@@ -526,9 +535,12 @@ fn execute_native_command(self: *ZigD3D12Backend, command: model.Command) !webgp
     return result;
 }
 
-fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.NativeExecutionResult {
-    const self = cast(ctx);
-    return execute_native_command(self, command) catch |err| {
+fn execute_command_typed(
+    self: *ZigD3D12Backend,
+    command: model.Command,
+    promoted_dispatch: ?compute_contract.DispatchRequest,
+) anyerror!webgpu.NativeExecutionResult {
+    return execute_native_command(self, command, promoted_dispatch) catch |err| {
         const requirements = command_requirements.requirements(command);
         return .{
             .status = common_errors.map_error_status(err),
@@ -538,6 +550,19 @@ fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.Nati
             .gpu_timestamp_valid = false,
         };
     };
+}
+
+fn execute_command(ctx: *anyopaque, command: model.Command) anyerror!webgpu.NativeExecutionResult {
+    return execute_command_typed(cast(ctx), command, null);
+}
+
+fn execute_dispatch(context: compute_contract.ComputeContext, request: compute_contract.DispatchRequest) anyerror!compute_contract.DispatchReport {
+    const result = try execute_command_typed(
+        cast(context.state),
+        .{ .kernel_dispatch = request.toCommand() },
+        request,
+    );
+    return .{ .execution = result };
 }
 
 fn execute_buffer_write_bytes(ctx: *anyopaque, handle: u64, offset: u64, buffer_size: u64, data: []const u8) anyerror!webgpu.NativeExecutionResult {
@@ -623,6 +648,7 @@ fn capture_buffer(ctx: *anyopaque, allocator: std.mem.Allocator, handle: u64, of
 const VTABLE = backend_iface.BackendVTable{
     .deinit = deinit,
     .execute_command = execute_command,
+    .execute_dispatch = execute_dispatch,
     .execute_buffer_write_bytes = execute_buffer_write_bytes,
     .set_upload_behavior = set_upload_behavior,
     .set_queue_wait_mode = set_queue_wait_mode,

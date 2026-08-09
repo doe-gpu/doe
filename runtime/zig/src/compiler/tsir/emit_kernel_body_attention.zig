@@ -45,7 +45,7 @@
 
 const std = @import("std");
 const schema = @import("schema.zig");
-const body_emit = @import("emit_kernel_body.zig");
+const body_emit = @import("emit_kernel_context.zig");
 
 /// Emit a CSL `attention_scores` kernel body. Dispatches on
 /// `Config.attention_pe_strategy` to pick the single-PE or kv-axis

@@ -9,7 +9,7 @@
 // manifests.
 
 const std = @import("std");
-const common = @import("mod.zig");
+const common = @import("types.zig");
 
 const native_numerical_modes = &[_]common.NumericalMode{
     .f32, .f16, .bf16, .int8_quant, .int4_quant,

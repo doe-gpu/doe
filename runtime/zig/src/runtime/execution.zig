@@ -1,14 +1,16 @@
 const std = @import("std");
-const model_commands = @import("../contracts/model/model_commands.zig");
+const execution_contract = @import("../contracts/execution.zig");
+const model_commands = @import("../contracts/command.zig");
 const model_profile = @import("../contracts/model/model_profile.zig");
 const model_transfer_types = @import("../contracts/model/model_compute_types.zig");
+const compute_contract = @import("../contracts/compute.zig");
 const backend_runtime = @import("../backend/backend_runtime.zig");
-const backend_ids = @import("../backend/backend_ids.zig");
+const backend_ids = @import("../contracts/backend.zig");
 const backend_policy = @import("../backend/backend_policy.zig");
 const backend_telemetry = @import("../backend/backend_telemetry.zig");
 const runtime_types = @import("../backend/runtime_types.zig");
 const wgpu_loader = @import("../core/abi/wgpu_loader.zig");
-const semantic_trace = @import("trace/semantic_trace.zig");
+const semantic_trace = @import("../contracts/semantic.zig");
 
 const model = struct {
     pub const Command = model_commands.Command;
@@ -17,6 +19,13 @@ const model = struct {
     pub const SemVer = model_profile.SemVer;
 };
 
+fn executeBackendCommand(backend: *backend_runtime.BackendRuntime, command: model.Command) !execution_contract.NativeExecutionResult {
+    return switch (command) {
+        .kernel_dispatch => |dispatch| (try backend.execute_dispatch(compute_contract.DispatchRequest.fromCommand(dispatch))).execution,
+        else => try backend.execute_command(command),
+    };
+}
+
 pub const BackendMode = enum {
     trace,
     native,
@@ -24,12 +33,7 @@ pub const BackendMode = enum {
 
 pub const DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS: u64 = wgpu_loader.QUEUE_WAIT_TIMEOUT_NS;
 
-pub const ExecutionStatus = enum {
-    skipped,
-    ok,
-    unsupported,
-    @"error",
-};
+pub const ExecutionStatus = execution_contract.ExecutionStatus;
 
 pub const ExecutionResult = struct {
     backend: []const u8,
@@ -234,7 +238,7 @@ pub const ExecutionContext = struct {
 
             return .{
                 .backend = backend_id_name(backend_telemetry_snapshot.backend_id),
-                .status = if (status.status == .ok) .ok else if (status.status == .@"error") .@"error" else .unsupported,
+                .status = execution_contract.fromNativeStatus(status.status),
                 .status_code = status.status_message,
                 .duration_ns = elapsed_ns,
                 .setup_ns = status.setup_ns,
@@ -359,7 +363,7 @@ pub const ExecutionContext = struct {
         if (self.backend) |*backend| {
             const backend_telemetry_snapshot = backend.telemetry();
             const command_start = std.time.nanoTimestamp();
-            const status = backend.execute_command(command) catch |err| {
+            const status = executeBackendCommand(backend, command) catch |err| {
                 const command_end = std.time.nanoTimestamp();
                 const elapsed_ns = if (command_end > command_start)
                     @as(u64, @intCast(command_end - command_start))
@@ -408,7 +412,7 @@ pub const ExecutionContext = struct {
 
             return .{
                 .backend = backend_id_name(backend_telemetry_snapshot.backend_id),
-                .status = if (status.status == .ok) .ok else if (status.status == .@"error") .@"error" else .unsupported,
+                .status = execution_contract.fromNativeStatus(status.status),
                 .status_code = status.status_message,
                 .duration_ns = elapsed_ns,
                 .setup_ns = status.setup_ns,
@@ -648,7 +652,7 @@ pub fn executionModeName(mode: BackendMode) []const u8 {
 }
 
 pub fn executionStatusName(status: ExecutionStatus) []const u8 {
-    return @tagName(status);
+    return execution_contract.statusName(status);
 }
 
 // --- Inline tests ---

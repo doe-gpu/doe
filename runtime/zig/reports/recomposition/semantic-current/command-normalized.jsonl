@@ -1,0 +1,1 @@
+{"seq":0,"kind":"copy_buffer_to_texture","direction":"buffer_to_buffer","srcHandle":44010,"dstHandle":44011,"bytes":4096,"usesTemporaryBuffer":false,"temporaryBufferAlignment":0}

@@ -73,6 +73,7 @@
     { "name": "ffn_residual", "phase": "decode", "op": "residual", "kernelKey": "residual" },
     { "name": "kv_write_shared", "phase": "decode", "op": "kv_write_shared", "kernelKey": "kv_write_shared", "kvCacheAlias": "layer.0.kv" },
     { "name": "attention_global", "phase": "decode", "op": "attention", "kernelKey": "attn_decode", "attentionType": "global" },
+    { "name": "lm_head", "phase": "decode", "op": "matmul_q4k", "kernelKey": "gemv", "weightsKey": "lm_head" },
     { "name": "sample", "phase": "decode", "op": "sample", "kernelKey": "sample" }
   ]
 }

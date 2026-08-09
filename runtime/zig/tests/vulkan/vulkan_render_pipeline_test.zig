@@ -1,7 +1,8 @@
 const std = @import("std");
 const vk_render_pipeline = @import("../../src/backend/vulkan/vk_render_pipeline.zig");
 const vk_constants = @import("../../src/backend/vulkan/vk_constants.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const model_render_types = @import("../../src/contracts/model/model_render_types.zig");
+const model_texture_formats = @import("../../src/contracts/model/model_texture_format_value_types.zig");
 
 // blend_factor_to_vk
 
@@ -170,27 +171,27 @@ test "vulkan: wgpu_stencil_op_to_vk maps Invert correctly" {
 // format_has_stencil
 
 test "vulkan: format_has_stencil returns true for Stencil8" {
-    try std.testing.expect(vk_render_pipeline.format_has_stencil(model.WGPUTextureFormat_Stencil8));
+    try std.testing.expect(vk_render_pipeline.format_has_stencil(model_texture_formats.WGPUTextureFormat_Stencil8));
 }
 
 test "vulkan: format_has_stencil returns true for Depth24PlusStencil8" {
-    try std.testing.expect(vk_render_pipeline.format_has_stencil(model.WGPUTextureFormat_Depth24PlusStencil8));
+    try std.testing.expect(vk_render_pipeline.format_has_stencil(model_texture_formats.WGPUTextureFormat_Depth24PlusStencil8));
 }
 
 test "vulkan: format_has_stencil returns true for Depth32FloatStencil8" {
-    try std.testing.expect(vk_render_pipeline.format_has_stencil(model.WGPUTextureFormat_Depth32FloatStencil8));
+    try std.testing.expect(vk_render_pipeline.format_has_stencil(model_texture_formats.WGPUTextureFormat_Depth32FloatStencil8));
 }
 
 test "vulkan: format_has_stencil returns false for Depth24Plus" {
-    try std.testing.expect(!vk_render_pipeline.format_has_stencil(model.WGPUTextureFormat_Depth24Plus));
+    try std.testing.expect(!vk_render_pipeline.format_has_stencil(model_texture_formats.WGPUTextureFormat_Depth24Plus));
 }
 
 test "vulkan: format_has_stencil returns false for Depth32Float" {
-    try std.testing.expect(!vk_render_pipeline.format_has_stencil(model.WGPUTextureFormat_Depth32Float));
+    try std.testing.expect(!vk_render_pipeline.format_has_stencil(model_texture_formats.WGPUTextureFormat_Depth32Float));
 }
 
 test "vulkan: format_has_stencil returns false for Undefined" {
-    try std.testing.expect(!vk_render_pipeline.format_has_stencil(model.WGPUTextureFormat_Undefined));
+    try std.testing.expect(!vk_render_pipeline.format_has_stencil(model_texture_formats.WGPUTextureFormat_Undefined));
 }
 
 // resolve_entry_point_name
@@ -216,11 +217,11 @@ test "vulkan: resolve_entry_point_name truncates to buffer size" {
 // vertex_step_mode_to_vk
 
 test "vulkan: vertex_step_mode_to_vk maps Vertex as default" {
-    try std.testing.expectEqual(@as(u32, 0), vk_render_pipeline.vertex_step_mode_to_vk(model.WGPUVertexStepMode_Vertex));
+    try std.testing.expectEqual(@as(u32, 0), vk_render_pipeline.vertex_step_mode_to_vk(model_render_types.WGPUVertexStepMode_Vertex));
 }
 
 test "vulkan: vertex_step_mode_to_vk maps Instance correctly" {
-    try std.testing.expectEqual(@as(u32, 1), vk_render_pipeline.vertex_step_mode_to_vk(model.WGPUVertexStepMode_Instance));
+    try std.testing.expectEqual(@as(u32, 1), vk_render_pipeline.vertex_step_mode_to_vk(model_render_types.WGPUVertexStepMode_Instance));
 }
 
 test "vulkan: vertex_step_mode_to_vk returns Vertex for unknown" {

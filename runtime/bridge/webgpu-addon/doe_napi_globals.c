@@ -106,6 +106,7 @@ PFN_doeNativeGetLastErrorLine pfn_doeNativeGetLastErrorLine = NULL;
 PFN_doeNativeGetLastErrorColumn pfn_doeNativeGetLastErrorColumn = NULL;
 PFN_doeNativeCheckShaderSource pfn_doeNativeCheckShaderSource = NULL;
 PFN_doeNativeShaderModuleGetBindings pfn_doeNativeShaderModuleGetBindings = NULL;
+PFN_doeNativeShaderModuleGetBindingsForEntryPoint pfn_doeNativeShaderModuleGetBindingsForEntryPoint = NULL;
 PFN_doeNativeAdapterRequestDevice pfn_doeNativeAdapterRequestDevice = NULL;
 PFN_doeNativeInstanceCreateAdapter pfn_doeNativeInstanceCreateAdapter = NULL;
 PFN_doeRequestAdapterFlat pfn_doeRequestAdapterFlat = NULL;
@@ -380,6 +381,7 @@ napi_value doe_load_library(napi_env env, napi_callback_info info) {
     pfn_doeNativeGetLastErrorColumn = (PFN_doeNativeGetLastErrorColumn)LIB_SYM(g_lib, "doeNativeGetLastErrorColumn");
     pfn_doeNativeCheckShaderSource = (PFN_doeNativeCheckShaderSource)LIB_SYM(g_lib, "doeNativeCheckShaderSource");
     pfn_doeNativeShaderModuleGetBindings = (PFN_doeNativeShaderModuleGetBindings)LIB_SYM(g_lib, "doeNativeShaderModuleGetBindings");
+    pfn_doeNativeShaderModuleGetBindingsForEntryPoint = (PFN_doeNativeShaderModuleGetBindingsForEntryPoint)LIB_SYM(g_lib, "doeNativeShaderModuleGetBindingsForEntryPoint");
     pfn_doeNativeAdapterRequestDevice = (PFN_doeNativeAdapterRequestDevice)LIB_SYM(g_lib, "doeNativeAdapterRequestDevice");
     pfn_doeNativeInstanceCreateAdapter = (PFN_doeNativeInstanceCreateAdapter)LIB_SYM(g_lib, "doeNativeInstanceCreateAdapter");
     pfn_doeNativeBufferMapAsync = (PFN_doeNativeBufferMapAsync)LIB_SYM(g_lib, "doeNativeBufferMapAsync");

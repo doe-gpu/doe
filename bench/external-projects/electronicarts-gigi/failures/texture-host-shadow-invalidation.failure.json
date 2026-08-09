@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "texture-host-shadow-invalidation",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "upstreamCommit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "A newly allocated JavaScript texture shadow was treated as valid zero data and native texture writes did not invalidate it, allowing stale bytes to replace correct Vulkan readback; shadow validity now follows native writes and dispatches.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-ordered-readback2/raw-suite.json",
+      "sha256": "0d81ff22c4a6b1bbffeeea756d782e8be5829261e981ead5ee7fe769e93b00e5"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "implementationPaths": [
+    "packages/doe-gpu/src/vendor/webgpu/index.js"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "verifiedAt": "2026-08-08T22:02:53Z"
+}

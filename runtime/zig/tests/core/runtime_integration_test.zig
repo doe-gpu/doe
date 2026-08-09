@@ -11,7 +11,7 @@ const dispatch_preconditions = @import("../../src/core/compute/dispatch_precondi
 const compute_fast = @import("../../src/native/compute/doe_compute_fast.zig");
 
 // ============================================================
-// doe_buffer_native.zig — Buffer constants and map state
+// Native buffer constants and map state
 // ============================================================
 
 // 1. Buffer usage flag combinations — verify flag constants, composability.

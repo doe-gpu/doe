@@ -25,7 +25,7 @@
 
 const std = @import("std");
 const schema = @import("schema.zig");
-const body = @import("emit_kernel_body.zig");
+const body = @import("emit_kernel_context.zig");
 
 pub fn emitCslKvWriteSlotSharded(
     writer: anytype,
@@ -232,7 +232,7 @@ test "slot_sharded kv_write emits ownership guard + local_kv_len buffers" {
     };
     var buf = std.ArrayList(u8){};
     defer buf.deinit(allocator);
-    try body.emitWithConfig(buf.writer(allocator), semantic, .csl, &config);
+    try emitCslKvWriteSlotSharded(buf.writer(allocator), semantic, &config);
     const text = buf.items;
     try std.testing.expect(std.mem.indexOf(u8, text, "param pe_id: i16;") != null);
     try std.testing.expect(std.mem.indexOf(u8, text, "param num_pes: i16;") != null);

@@ -4,7 +4,6 @@ pub const queue = @import("queue/mod.zig");
 pub const replay = @import("replay/mod.zig");
 pub const resource = @import("resource/mod.zig");
 pub const trace = @import("trace/mod.zig");
-pub const command_partition = @import("command_partition.zig");
 pub const command_dispatch = @import("command_dispatch.zig");
 pub const surface = @import("surface.zig");
 pub const wgpu_handle_types = @import("abi/wgpu_handle_types.zig");

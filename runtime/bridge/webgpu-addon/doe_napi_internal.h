@@ -564,6 +564,7 @@ DECL_PFN(uint32_t, doeNativeGetLastErrorLine, (void));
 DECL_PFN(uint32_t, doeNativeGetLastErrorColumn, (void));
 DECL_PFN(uint32_t, doeNativeCheckShaderSource, (const char*, size_t));
 DECL_PFN(size_t, doeNativeShaderModuleGetBindings, (WGPUShaderModule, DoeShaderBindingInfo*, size_t));
+DECL_PFN(size_t, doeNativeShaderModuleGetBindingsForEntryPoint, (WGPUShaderModule, const char*, size_t, DoeShaderBindingInfo*, size_t));
 DECL_PFN(WGPUFuture, doeNativeAdapterRequestDevice, (WGPUAdapter, const void*, WGPURequestDeviceCallbackInfo));
 DECL_PFN(WGPUAdapter, doeNativeInstanceCreateAdapter, (WGPUInstance, const void*));
 DECL_PFN(WGPUFuture, doeRequestAdapterFlat, (WGPUInstance, const void*, uint32_t, WGPURequestAdapterCallback, void*, void*));
@@ -633,7 +634,7 @@ typedef void (*FnDeviceSetUncapturedErrorCallback)(void* device, void (*callback
 typedef void (*FnDeviceRegisterLostCallback)(void* device, void (*callback)(uint32_t, const char*, size_t, void*), void* userdata);
 typedef void* (*FnRenderPipelineGetBindGroupLayout)(void* pipeline, uint32_t group_index);
 typedef void (*FnCommandEncoderClearBuffer)(void* encoder, void* buffer, uint64_t offset, uint64_t size);
-typedef void (*FnCommandEncoderCopyTextureToTexture)(void* encoder, void* src_texture, uint32_t src_mip, uint32_t src_slice, uint32_t src_x, uint32_t src_y, uint32_t src_z, uint32_t src_aspect, void* dst_texture, uint32_t dst_mip, uint32_t dst_slice, uint32_t dst_x, uint32_t dst_y, uint32_t dst_z, uint32_t dst_aspect, uint32_t width, uint32_t height, uint32_t depth_or_layers);
+typedef void (*FnCommandEncoderCopyTextureToTexture)(void* encoder, void* src_texture, uint32_t src_mip, uint32_t src_slice, uint32_t src_x, uint32_t src_y, uint32_t src_z, void* dst_texture, uint32_t dst_mip, uint32_t dst_slice, uint32_t dst_x, uint32_t dst_y, uint32_t dst_z, uint32_t width, uint32_t height, uint32_t depth_or_layers);
 typedef void (*FnWgpuCommandEncoderCopyTextureToTexture)(WGPUCommandEncoder encoder, const WGPUTexelCopyTextureInfo* source, const WGPUTexelCopyTextureInfo* destination, const WGPUExtent3D* copy_size);
 typedef void (*FnQueueWriteTexture)(void* queue, void* texture, const void* data, size_t data_len, uint32_t bytes_per_row, uint32_t rows_per_image, uint32_t dst_x, uint32_t dst_y, uint32_t dst_z, uint32_t dst_mip, uint32_t dst_slice, uint32_t width, uint32_t height, uint32_t depth_or_layers);
 typedef void* (*FnDeviceCreateRenderBundleEncoder)(void* device, const void* desc);

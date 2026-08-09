@@ -98,7 +98,7 @@ pub export fn wgpuComputePassEncoderSetLabel(a0: abi_core.WGPUComputePassEncoder
 }
 
 pub export fn wgpuComputePipelineGetBindGroupLayout(a0: abi_core.WGPUComputePipeline, a1: u32) callconv(.c) abi_core.WGPUBindGroupLayout {
-    return native.doeNativeComputePipelineGetBindGroupLayout(a0, a1);
+    return @ptrCast(native.doeNativeComputePipelineGetBindGroupLayout(a0, a1));
 }
 
 pub export fn wgpuComputePipelineSetLabel(a0: abi_core.WGPUComputePipeline, a1: abi_core.WGPUStringView) callconv(.c) void {

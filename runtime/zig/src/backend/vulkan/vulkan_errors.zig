@@ -5,7 +5,7 @@
 // from here (or via vk_constants re-exports) instead of defining their own.
 
 const std = @import("std");
-const common_errors = @import("../common/errors.zig");
+const common_errors = @import("../../contracts/execution.zig");
 const vk = @import("vulkan_types.zig");
 
 pub const VkResult = vk.VkResult;

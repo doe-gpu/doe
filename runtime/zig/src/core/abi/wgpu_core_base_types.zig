@@ -1,4 +1,5 @@
 const handles = @import("wgpu_handle_types.zig");
+const upstream = @import("generated/webgpu_upstream.zig");
 const layout = @import("../../contracts/model/model_texture_layout_value_types.zig");
 const execution_types = @import("wgpu_execution_types.zig");
 
@@ -29,16 +30,18 @@ pub const WGPUFuture = handles.WGPUFuture;
 pub const WGPUStringView = handles.WGPUStringView;
 
 pub const WGPUBool = handles.WGPUBool;
-pub const WGPUFlags = u64;
+pub const WGPUFlags = layout.WGPUFlags;
 pub const WGPUBufferUsage = WGPUFlags;
 pub const WGPUMapMode = WGPUFlags;
 pub const WGPUAlphaMode = u32;
-pub const WGPUSType = u32;
+pub const WGPUSType = layout.WGPUSType;
 
 pub const WGPUSType_ShaderSourceWGSL: WGPUSType = 0x00000002;
 pub const WGPUSType_ShaderSourceMSL: WGPUSType = 0x00000003;
 pub const WGPUSType_ShaderSourceSPIRV: WGPUSType = 0x00000004;
 pub const WGPUSType_ShaderSourceHLSL: WGPUSType = 0x00000005;
+pub const WGPUSType_RenderPassMaxDrawCount: WGPUSType = 0x00000003;
+pub const WGPUSType_TextureComponentSwizzleDescriptor: WGPUSType = 0x0000000C;
 pub const WGPUSType_ExternalTextureBindingEntry: WGPUSType = 0x00050001;
 pub const WGPUSType_ExternalTextureBindingLayout: WGPUSType = 0x00050002;
 
@@ -61,13 +64,13 @@ pub const WGPUBufferUsage_Uniform: WGPUBufferUsage = 0x0000000000000040;
 pub const WGPUBufferUsage_Storage: WGPUBufferUsage = 0x0000000000000080;
 pub const WGPUBufferUsage_QueryResolve: WGPUBufferUsage = 0x0000000000000200;
 
-pub const WGPUQueryType = u32;
+pub const WGPUQueryType = upstream.WGPUQueryType;
 pub const WGPUQueryType_Timestamp: WGPUQueryType = 0x00000002;
 
 pub const WGPUMapMode_Read: WGPUMapMode = 0x0000000000000001;
 pub const WGPUMapMode_Write: WGPUMapMode = 0x0000000000000002;
 
-pub const WGPUMapAsyncStatus = u32;
+pub const WGPUMapAsyncStatus = upstream.WGPUMapAsyncStatus;
 pub const WGPUMapAsyncStatus_Success: WGPUMapAsyncStatus = 1;
 pub const WGPUBufferMapAsyncStatus = WGPUMapAsyncStatus;
 pub const WGPUBufferMapAsyncStatus_Success = WGPUMapAsyncStatus_Success;

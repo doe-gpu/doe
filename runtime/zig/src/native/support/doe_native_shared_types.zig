@@ -5,12 +5,7 @@ const backend_lifecycle = @import("../../backend/dropin_lifecycle.zig");
 const abi_binding = @import("../../core/abi/wgpu_binding_base_types.zig");
 const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
 const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
-
-pub const BackendKind = enum(u8) {
-    metal = 0,
-    vulkan = 1,
-    d3d12 = 2,
-};
+const binding_contract = @import("../../contracts/binding.zig");
 
 pub const NativeVulkanRuntime = if (has_vulkan) backend_lifecycle.NativeVulkanRuntime else void;
 pub const NativeD3D12Runtime = backend_lifecycle.NativeD3D12Runtime;
@@ -30,12 +25,12 @@ pub const extractWorkgroupSize = @import("../../compiler/wgsl/runtime/shader_inf
 pub const BindingInfo = struct {
     group: u32,
     binding: u32,
-    kind: u32 = @intFromEnum(wgsl_compiler.BindingKind.buffer),
+    kind: u32 = @intFromEnum(binding_contract.ShaderKind.buffer),
     addr_space: u32 = 0,
     access: u32 = 0,
 };
 
-pub const MAX_SHADER_BINDINGS: usize = wgsl_compiler.MAX_BINDINGS;
+pub const MAX_SHADER_BINDINGS: usize = binding_contract.MAX_SHADER_BINDINGS;
 
 pub const CompilationMessageKind = enum(u8) {
     none,

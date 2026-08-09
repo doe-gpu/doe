@@ -1,0 +1,4387 @@
+{
+  "manifestSha256": "71c43cb728fbe60f2ca19c3c523a3d5f0f1d9777405e6b36faee7141fd425fc9",
+  "modules": [
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "02effdd872df4fe27781bf1de2667dc48a0e4c73e4d61dc1ab0d009eeab8cd34",
+          "kind": "struct",
+          "name": "BackendRuntime"
+        }
+      ],
+      "path": "src/backend/backend_runtime.zig",
+      "sha256": "5e009f85a08144672435e9599ba098960a972e8799efcfa5a565e5f2f7c3622a"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "25fda5d1f813ca7fb3a0b56b68173f29fe56b189f6644da90de314dcb7c58106",
+          "kind": "constant",
+          "name": "NativeExecutionStatus"
+        },
+        {
+          "contractTokenSha256": "880f578d0bae5d73bd056e2035eb56ec91f1698cf02830dc7dbd7f28064e0311",
+          "kind": "constant",
+          "name": "NativeExecutionResult"
+        },
+        {
+          "contractTokenSha256": "97b7b1b629d68d780c8d1240edc98415f909347c1df613bcc194c5cca4ecc70b",
+          "kind": "enum",
+          "name": "UploadBufferUsageMode"
+        },
+        {
+          "contractTokenSha256": "c91b5e25da823f0f2f15ac3bc1066bf72577dc41cc254123ec1c2300bd56242f",
+          "kind": "enum",
+          "name": "QueueWaitMode"
+        },
+        {
+          "contractTokenSha256": "f070c8c77dc5a164813dfb0f2c032defcdd84388bfc71bf8f5296e7cb95c5e91",
+          "kind": "enum",
+          "name": "QueueSyncMode"
+        },
+        {
+          "contractTokenSha256": "0f41c082f03207352455d43ab41efff16263db9dfb7c6ccb1005b5087804960f",
+          "kind": "enum",
+          "name": "QueueFamilyPolicy"
+        },
+        {
+          "contractTokenSha256": "3e66b0bbff301bce2f0ed088624bdbe264f8ca388216d1cec98acee90a2f8a57",
+          "kind": "enum",
+          "name": "QueueFamilyKind"
+        },
+        {
+          "contractTokenSha256": "760f75304472bcfdf776860bef56d5a152a5735f617df2bbdc8d6548a620bf1b",
+          "kind": "enum",
+          "name": "DeferredSubmissionSyncPolicy"
+        },
+        {
+          "contractTokenSha256": "3a641035d6543ec23db2ce70f67079b6e8656da3fa57038f45db29ba9801d07e",
+          "kind": "enum",
+          "name": "GpuTimestampMode"
+        }
+      ],
+      "path": "src/backend/runtime_types.zig",
+      "sha256": "9d5c6c53808708da737bf643d76cafdd7ccb938fda74b7bb5b7e2a29f0440ed0"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c658a2850813cb178f20967e93eca748d343dde6b28a61be1c0e32807fcac679",
+          "kind": "constant",
+          "name": "RunOptions"
+        },
+        {
+          "contractTokenSha256": "07a4d12d8b20be6d6c95b06870c4ab6cc6f7f14913723066d10bff949f986cb5",
+          "kind": "constant",
+          "name": "CliRunFn"
+        },
+        {
+          "contractTokenSha256": "12afee56d31bd66349c08887dcdd8a6292c5952508e346e25d195986c7868661",
+          "kind": "function",
+          "name": "runCli"
+        }
+      ],
+      "path": "src/cli/doe_plan_executor_cli.zig",
+      "sha256": "5a9161ac0e31e6a4ae656116c44f2e7e2ec43ecacb9e3ab780b69ee8acec6724"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "f5869879a4cd0a927f056621637cceb51856e2ea1d31b03ab0a7ac4227176903",
+          "kind": "constant",
+          "name": "RunnerError"
+        },
+        {
+          "contractTokenSha256": "2a62a938b1bd99014799333bb449a72e96b6cdee3717aae91637daf8d93da52f",
+          "kind": "function",
+          "name": "runCli"
+        }
+      ],
+      "path": "src/cli/module_runner_cli.zig",
+      "sha256": "382e55f4c7a448038df33efe947c23f7e2432e1dc3f632d3e99f58708d2212e9"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "2a62a938b1bd99014799333bb449a72e96b6cdee3717aae91637daf8d93da52f",
+          "kind": "function",
+          "name": "runCli"
+        }
+      ],
+      "path": "src/cli/runtime_cli.zig",
+      "sha256": "4f376b3c0a1d0aae60f69b25c1f2a39eb7250a0bfbddae1c1860fc8aaaca3338"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "2598726b9e8326e716cb49eccdf968ef9e52d39ea9c09228c3d7ea89f3df2fe9",
+          "kind": "constant",
+          "name": "wse3"
+        },
+        {
+          "contractTokenSha256": "f428a3268c5eefa7d79b4cb51721736e0b5b10d918aa03486161f4aae190463b",
+          "kind": "constant",
+          "name": "webgpu_generic"
+        },
+        {
+          "contractTokenSha256": "84be5aa0c2cfcaab0df8649c2e4e4f49e6a73dbd410fe8c0e2f08aedfd9bf00f",
+          "kind": "constant",
+          "name": "msl"
+        },
+        {
+          "contractTokenSha256": "aafe54ce7d79f8847f57354f409782830c71af1b8a175df6d6a69b86a74548e5",
+          "kind": "constant",
+          "name": "spir_v"
+        },
+        {
+          "contractTokenSha256": "8369de960c095f05d0316a05bb3c2fa60ff07f6e92d0d042c1c1429b262acf1a",
+          "kind": "enum",
+          "name": "NumericalMode"
+        },
+        {
+          "contractTokenSha256": "a36a00604beea95e7210a59b60574a88a3194be8f3cfce029e58e940f81810e3",
+          "kind": "struct",
+          "name": "CollectiveCapability"
+        },
+        {
+          "contractTokenSha256": "9d12e003285d06b010efb8099c97cbde87b27da94b8860ba146847dc44b77cea",
+          "kind": "enum",
+          "name": "FusedIntrinsic"
+        },
+        {
+          "contractTokenSha256": "532482e6e73a935180ba84d12e25fffc3269f3be11fbf9946f7dbd19d9c948d6",
+          "kind": "enum",
+          "name": "StreamingGemmPrimitive"
+        },
+        {
+          "contractTokenSha256": "4cbc1ecd2a241d7a2166a6100e0c21a88988ba16ff90a1c02d00217fb06b9a0b",
+          "kind": "enum",
+          "name": "RuntimeSizedBindingPolicy"
+        },
+        {
+          "contractTokenSha256": "c9980b1c4d32aecd259f6e087a94d2297c25ddddcd63c04a37eb8b6475045c7b",
+          "kind": "struct",
+          "name": "CorrectnessFields"
+        },
+        {
+          "contractTokenSha256": "d3c4575faf7e4db7a501c9c0947464717906da26f1067a43a8cd2887ef395479",
+          "kind": "struct",
+          "name": "PlannerFields"
+        },
+        {
+          "contractTokenSha256": "167468977288088561e7394b5c32de3edc3cdc9be1ad828fad59ac85a93cfea5",
+          "kind": "struct",
+          "name": "TargetDescriptor"
+        },
+        {
+          "contractTokenSha256": "c9a2b0b7542b19424dc1077dc2add596115f24241806b041205e841d07bfac9d",
+          "kind": "function",
+          "name": "descriptorHash"
+        }
+      ],
+      "path": "src/compiler/targets/mod.zig",
+      "sha256": "81ab22d333d99261718b3483762096237281726f43e827bf22f32178efb3b724"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "2983b7ed4d5957921874ec5826eb2454a825eec00e2e810b1dba7724fd09257a",
+          "kind": "constant",
+          "name": "descriptor"
+        }
+      ],
+      "path": "src/compiler/targets/msl.zig",
+      "sha256": "d6077d5c4f69907d0869c29c53f318c035fdf28c0423b20332a295e5ebe3c34c"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "3bf5c64f24984e4c25baee719fa206353e444f4b89feaf5e82f4baef48bbd709",
+          "kind": "constant",
+          "name": "descriptor"
+        }
+      ],
+      "path": "src/compiler/targets/spir_v.zig",
+      "sha256": "08510d951e93b941a5bd2e0c1bd9b9acce9f45b7499caa1f4d116f39d9172472"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "1059b1c71cf47558cfbe8def818cd592f676d1c2c2183f142196805f45cb7515",
+          "kind": "constant",
+          "name": "descriptor"
+        }
+      ],
+      "path": "src/compiler/targets/webgpu_generic.zig",
+      "sha256": "5675abfe57b1333b226f0423ebea911d872ae24903b8d394bb5e9f2df55c43e7"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "a131bd59d569fb0937f7b50904bcab30b8abaec0f4ded9cb33109a9584dfa1d2",
+          "kind": "constant",
+          "name": "descriptor"
+        }
+      ],
+      "path": "src/compiler/targets/wse3.zig",
+      "sha256": "a3f76a4c55c2d7511b0cf24b780330291eb176ae92a9152291ce5feb1ebf5699"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "f04c6206a5440c89e7cc7691b947e72b7a2040b2c77e9c28918b9e4f4a71b4b5",
+          "kind": "constant",
+          "name": "DigestError"
+        },
+        {
+          "contractTokenSha256": "e754fe19e010daa2d5ac748467ed5994066d51484f438abf359059a831bed7e7",
+          "kind": "function",
+          "name": "compute"
+        },
+        {
+          "contractTokenSha256": "85aa694c43c81aa3a569b35ac68f9e6fcca703ddb36c5f6b77164dd9524f56b2",
+          "kind": "function",
+          "name": "computeWithEmitterDigest"
+        },
+        {
+          "contractTokenSha256": "5fc301fac9ad1efa9726a1496d5801aece31eed4ca7d6387dfc19c10ef813916",
+          "kind": "function",
+          "name": "canonicalizeManifestLoweringEntry"
+        },
+        {
+          "contractTokenSha256": "1175496b8f5fe9983db50b6ded016e78c98a977fb0ced64ef43cce4d6de1f053",
+          "kind": "function",
+          "name": "manifestLoweringEntryDigest"
+        }
+      ],
+      "path": "src/compiler/tsir/digest.zig",
+      "sha256": "d727f3c49628f4621048fa06ec8a9f5abc6c40f038f3d7f6653515cde0e2adc8"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "3e5c918fc6943a3d7b92ef84e3a3c614fb285bca23f8a6fcab63196404873a2a",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "5526a2f27ae8cfc340a4a3f871d79a7c98532d704c36062f384477d93b8ebd65",
+          "kind": "function",
+          "name": "emitterCodeDigest"
+        },
+        {
+          "contractTokenSha256": "c1a3fd60328af0e1116206fb7793f1d0354130d2f108fa15506056ab2ebd08b6",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "b1c07a280063132c3567fbf9c28f17d2f67769ddf0f0e63c1b40144e68854c4a",
+          "kind": "function",
+          "name": "emitSemantic"
+        },
+        {
+          "contractTokenSha256": "d8d8937371ab60a3246fbdcd87539c4f9c68d363fa726cc8b3cb716636481a89",
+          "kind": "function",
+          "name": "emitSemanticFunction"
+        },
+        {
+          "contractTokenSha256": "7d2cc4fb8a818482b28d8313f297403ea4e855fd2553aaba04ab8db836b52eea",
+          "kind": "function",
+          "name": "emitSemanticFunctionWithConfig"
+        },
+        {
+          "contractTokenSha256": "e9873c386e981f3958ecea73beb38cb7716acc756c333eeadf658a9b716cc72f",
+          "kind": "function",
+          "name": "emitFunction"
+        }
+      ],
+      "path": "src/compiler/tsir/emit_csl.zig",
+      "sha256": "0af9b423ba02f62b4085b0b7413b604f35225cbd497e0f43fc366dcb8a9ac05c"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "56ca6301668a2eff72ab3daadb55e8a972b1a798cbb8093ecb44c78e88a8213a",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "5526a2f27ae8cfc340a4a3f871d79a7c98532d704c36062f384477d93b8ebd65",
+          "kind": "function",
+          "name": "emitterCodeDigest"
+        },
+        {
+          "contractTokenSha256": "c1a3fd60328af0e1116206fb7793f1d0354130d2f108fa15506056ab2ebd08b6",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "e9873c386e981f3958ecea73beb38cb7716acc756c333eeadf658a9b716cc72f",
+          "kind": "function",
+          "name": "emitFunction"
+        },
+        {
+          "contractTokenSha256": "b1c07a280063132c3567fbf9c28f17d2f67769ddf0f0e63c1b40144e68854c4a",
+          "kind": "function",
+          "name": "emitSemantic"
+        },
+        {
+          "contractTokenSha256": "d8d8937371ab60a3246fbdcd87539c4f9c68d363fa726cc8b3cb716636481a89",
+          "kind": "function",
+          "name": "emitSemanticFunction"
+        }
+      ],
+      "path": "src/compiler/tsir/emit_dxil.zig",
+      "sha256": "5971c0b1acb152c43e712aea77369346548c144a70f1c6a3126f43d39df41f32"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "e54bcad59dab0a1fb725b9d265eb0190d7f00b9c2306b04877b985e57209b607",
+          "kind": "enum",
+          "name": "Backend"
+        },
+        {
+          "contractTokenSha256": "7417984aaf7390836b846fd1effc8544ff05e1d81ec905c79270402492d5112d",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "bd7a773fb05d23489d9d69d18dd9c23a1d5523372807d8ada94951857a734172",
+          "kind": "enum",
+          "name": "KvCachePeStrategy"
+        },
+        {
+          "contractTokenSha256": "fcb50aef3824d1d7090b5d72ccb82221a9e34922ff27b056bd3a0eef8f843b3d",
+          "kind": "enum",
+          "name": "AttentionPeStrategy"
+        },
+        {
+          "contractTokenSha256": "62d6aa6552185524c9215fd772e81be903d1d78813a9ba2353d225a8b5816e21",
+          "kind": "enum",
+          "name": "AttentionPeIdSource"
+        },
+        {
+          "contractTokenSha256": "44be9d1d65ec67cb3169a642aa8b97864b635b0a551b7098c6f6d082d849c1d9",
+          "kind": "struct",
+          "name": "Config"
+        },
+        {
+          "contractTokenSha256": "880f8cc3a07ae09514bb3b516276e711e9a6a6713055205e553b86c93e4be897",
+          "kind": "constant",
+          "name": "default_config"
+        },
+        {
+          "contractTokenSha256": "23a57fcc79998a8258c4d41680c9143d81a461e5a6e1d5f267c65fd3c1da7ef3",
+          "kind": "constant",
+          "name": "cslElemName"
+        },
+        {
+          "contractTokenSha256": "b3cf8cc6da13e945967cd809800d5499f86d6bd0910396393fdb5d7024dc8542",
+          "kind": "constant",
+          "name": "wgslElemName"
+        },
+        {
+          "contractTokenSha256": "78eed39158bf79724672af849c5e0375d4657aec3fbf75a67e46d98bf2e0351d",
+          "kind": "constant",
+          "name": "isSupportedComputeElem"
+        },
+        {
+          "contractTokenSha256": "0422dbc55c60d7c74a8cc2f54b7f5cf30cb5e19cc734fd0c0425c01a733fe167",
+          "kind": "constant",
+          "name": "writeWgslF16Enable"
+        },
+        {
+          "contractTokenSha256": "55e8094719c527ea395dd50668a866f49183852c59085b7d13e501ccd52a211c",
+          "kind": "function",
+          "name": "requireSupportedComputeElem"
+        },
+        {
+          "contractTokenSha256": "fe682590809b00063c40205cbf66914dc9ad6a604b1670b7c7b7b642852d9608",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "c0436a294e940c81a31a4da0df0af0db88f3e429d50e9e79dda1e0ffff80b9f5",
+          "kind": "function",
+          "name": "emitWithConfig"
+        },
+        {
+          "contractTokenSha256": "1c546228af730f5c21b9bb1cfce4833dd3c029c33490c8f8a457b358232c6c91",
+          "kind": "function",
+          "name": "writeCslSqrtNr"
+        },
+        {
+          "contractTokenSha256": "f33dce44006695a877227300916ae35d6cae665d680df32e99e8c32f5a09126e",
+          "kind": "function",
+          "name": "writeCslBufferArray"
+        },
+        {
+          "contractTokenSha256": "29f18e5bb15e8142055dba409c31106b14ccbcb4b7009c289dcdcf795c800b5c",
+          "kind": "function",
+          "name": "writeCslBufferPointer"
+        },
+        {
+          "contractTokenSha256": "c5b845fc3e42c2e429326cbef7b4a1a07603182f9395b84c41a394d901fbe385",
+          "kind": "function",
+          "name": "writeCslExportSymbol"
+        },
+        {
+          "contractTokenSha256": "2f44b4a0f3f00a0977965a63b126ffba00e3aef1be33b1e70f77a021dabfb9d6",
+          "kind": "function",
+          "name": "bindingForRole"
+        },
+        {
+          "contractTokenSha256": "a1755d4707fe833dbe10790c5ec211c6d56b3143b665eef02e208bb7761c2edd",
+          "kind": "function",
+          "name": "requireElem"
+        }
+      ],
+      "path": "src/compiler/tsir/emit_kernel_body.zig",
+      "sha256": "358ce5f1ca7498a12975467e3da46b779164cb09f6ddc6ee9d85425f79a2a12a"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "56ca6301668a2eff72ab3daadb55e8a972b1a798cbb8093ecb44c78e88a8213a",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "5526a2f27ae8cfc340a4a3f871d79a7c98532d704c36062f384477d93b8ebd65",
+          "kind": "function",
+          "name": "emitterCodeDigest"
+        },
+        {
+          "contractTokenSha256": "c1a3fd60328af0e1116206fb7793f1d0354130d2f108fa15506056ab2ebd08b6",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "e9873c386e981f3958ecea73beb38cb7716acc756c333eeadf658a9b716cc72f",
+          "kind": "function",
+          "name": "emitFunction"
+        },
+        {
+          "contractTokenSha256": "b1c07a280063132c3567fbf9c28f17d2f67769ddf0f0e63c1b40144e68854c4a",
+          "kind": "function",
+          "name": "emitSemantic"
+        },
+        {
+          "contractTokenSha256": "d8d8937371ab60a3246fbdcd87539c4f9c68d363fa726cc8b3cb716636481a89",
+          "kind": "function",
+          "name": "emitSemanticFunction"
+        }
+      ],
+      "path": "src/compiler/tsir/emit_msl.zig",
+      "sha256": "6f280cbc5a341261587c97bff26ea8f4e71a1120c5fe8a76f3a85067765f4534"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "56ca6301668a2eff72ab3daadb55e8a972b1a798cbb8093ecb44c78e88a8213a",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "5526a2f27ae8cfc340a4a3f871d79a7c98532d704c36062f384477d93b8ebd65",
+          "kind": "function",
+          "name": "emitterCodeDigest"
+        },
+        {
+          "contractTokenSha256": "c1a3fd60328af0e1116206fb7793f1d0354130d2f108fa15506056ab2ebd08b6",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "e9873c386e981f3958ecea73beb38cb7716acc756c333eeadf658a9b716cc72f",
+          "kind": "function",
+          "name": "emitFunction"
+        },
+        {
+          "contractTokenSha256": "b1c07a280063132c3567fbf9c28f17d2f67769ddf0f0e63c1b40144e68854c4a",
+          "kind": "function",
+          "name": "emitSemantic"
+        },
+        {
+          "contractTokenSha256": "d8d8937371ab60a3246fbdcd87539c4f9c68d363fa726cc8b3cb716636481a89",
+          "kind": "function",
+          "name": "emitSemanticFunction"
+        }
+      ],
+      "path": "src/compiler/tsir/emit_spir_v.zig",
+      "sha256": "61712466e41a23adeb183368e498b4811defabf97c3a711ae82f7d63e6aa841d"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "3e5c918fc6943a3d7b92ef84e3a3c614fb285bca23f8a6fcab63196404873a2a",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "5526a2f27ae8cfc340a4a3f871d79a7c98532d704c36062f384477d93b8ebd65",
+          "kind": "function",
+          "name": "emitterCodeDigest"
+        },
+        {
+          "contractTokenSha256": "c1a3fd60328af0e1116206fb7793f1d0354130d2f108fa15506056ab2ebd08b6",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "b1c07a280063132c3567fbf9c28f17d2f67769ddf0f0e63c1b40144e68854c4a",
+          "kind": "function",
+          "name": "emitSemantic"
+        },
+        {
+          "contractTokenSha256": "d8d8937371ab60a3246fbdcd87539c4f9c68d363fa726cc8b3cb716636481a89",
+          "kind": "function",
+          "name": "emitSemanticFunction"
+        },
+        {
+          "contractTokenSha256": "e9873c386e981f3958ecea73beb38cb7716acc756c333eeadf658a9b716cc72f",
+          "kind": "function",
+          "name": "emitFunction"
+        }
+      ],
+      "path": "src/compiler/tsir/emit_webgpu.zig",
+      "sha256": "42db7e80406c92397edf5ed39f13edccf6043122690058f1c01840bb249cc8af"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "68b4f9109db924c53bff9b85f0d5eb3bf4da63e823e7b8ead238d87ff69e0792",
+          "kind": "constant",
+          "name": "FrontendError"
+        },
+        {
+          "contractTokenSha256": "e70e692a07b7923cecfad418107dd24b23fbbfe4d36e76768d110ec0f2699911",
+          "kind": "function",
+          "name": "lowerIrToTsir"
+        }
+      ],
+      "path": "src/compiler/tsir/frontend.zig",
+      "sha256": "c5f0cc5614f1923592977ecd335110275a393c85660340bc78304e9ea5d48e1c"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "981cc0bd75555c98fd35ceb5d6aefcdd5bf3b7c2fe6e3b8f945ff5b612e17ca5",
+          "kind": "constant",
+          "name": "schema"
+        },
+        {
+          "contractTokenSha256": "720580f870598c7d6d34da2ad7284aa2f770fb5ed4dcaa515c21fd53268abf8a",
+          "kind": "constant",
+          "name": "digest"
+        },
+        {
+          "contractTokenSha256": "fd169bcf183b836a3d8e3fad82616236867298da2f5bf20b5b874cdc7cf7d99e",
+          "kind": "constant",
+          "name": "reference"
+        },
+        {
+          "contractTokenSha256": "822862134cc3747f92614c03a63eaaf95a0c87f9c679d9ebd74bb835bb92e23d",
+          "kind": "constant",
+          "name": "frontend"
+        },
+        {
+          "contractTokenSha256": "590704bbb72a2fbfb857232790b279e8a3e8c6af16377ce2e9492739f8881584",
+          "kind": "constant",
+          "name": "planner"
+        },
+        {
+          "contractTokenSha256": "f0a2f44bdbdf600e3549c65574e87af88279a9cca48551c04482c25b4cc912f9",
+          "kind": "constant",
+          "name": "emit_kernel_body"
+        },
+        {
+          "contractTokenSha256": "a6dfd64c32e426fa7b4c9b805ef42aa87f28cba91d16369f726018f9ab5d6ee4",
+          "kind": "constant",
+          "name": "emit_csl"
+        },
+        {
+          "contractTokenSha256": "ded36587412005be702cb363b9f6b30f4e0258da35f25f4b14387a8e97209ef0",
+          "kind": "constant",
+          "name": "emit_dxil"
+        },
+        {
+          "contractTokenSha256": "50f12e1a9a14a72df8ff06052701efe93e6556b5cb72f9aeda1f32d72255a723",
+          "kind": "constant",
+          "name": "emit_msl"
+        },
+        {
+          "contractTokenSha256": "5cba1d305a400f75cf3f264d185d09e789a2931044fdc833897a3f43850a43a6",
+          "kind": "constant",
+          "name": "emit_spir_v"
+        },
+        {
+          "contractTokenSha256": "c735226ca0cab89fab3b7a8dd449da6e9505945c33ad6b7cdcb15384a2a068cf",
+          "kind": "constant",
+          "name": "emit_webgpu"
+        },
+        {
+          "contractTokenSha256": "8a9a9edc529ead721664c687f758a1cfe3aa73cdd9751cd1692078fb9843a3a2",
+          "kind": "constant",
+          "name": "CONTRACT_VERSION"
+        },
+        {
+          "contractTokenSha256": "fc13586324f731180ec1bcb4fdb19b0a55d1f6ffe98db911e7095e421a33999a",
+          "kind": "constant",
+          "name": "ExactnessClass"
+        },
+        {
+          "contractTokenSha256": "ab4e8fc84066ea0a8140258ee56aa965f474d23e83b537eaf1e88d81a3e9ead7",
+          "kind": "constant",
+          "name": "AlgorithmExactInvariant"
+        },
+        {
+          "contractTokenSha256": "3e223e0fff33cf456eb387f55f70fb973d63a085f4eeceb5844255f9f556b952",
+          "kind": "constant",
+          "name": "Exactness"
+        },
+        {
+          "contractTokenSha256": "2671ac0b6a6856e71985143750739f2208f6827512632e5f805b3b4487a2dd92",
+          "kind": "constant",
+          "name": "RejectionReason"
+        },
+        {
+          "contractTokenSha256": "c303f017a32479c7c91ee703e72ba3d327fd172a6fe4002ccf2d964b46c10df0",
+          "kind": "constant",
+          "name": "RejectionEntry"
+        },
+        {
+          "contractTokenSha256": "4a0d9033ea253fa90c667042cc8f0f2e24b0cad2899cd86110760bb29c287cc2",
+          "kind": "constant",
+          "name": "KernelFamilyHint"
+        },
+        {
+          "contractTokenSha256": "34990d9f00b3c7cd742c3553cf69c5a1591c253b58be566fb1dbac20dd359c0b",
+          "kind": "constant",
+          "name": "ScalarKind"
+        },
+        {
+          "contractTokenSha256": "7b3d2b5ee6a0443f3266ce8d347e3f7c9d2809294cce8c204f82ecf02673e902",
+          "kind": "constant",
+          "name": "ReductionAssociativity"
+        },
+        {
+          "contractTokenSha256": "3d3417fcc1747eedeb3511d71047ed7f2ad7d86d8b3c1a2b3d1bfb87ceac1faa",
+          "kind": "constant",
+          "name": "NanInfPolicy"
+        },
+        {
+          "contractTokenSha256": "0142e9742b2d3ae6a66a9a2f28a76d73a2b46301462a8d10424f25e0e648296c",
+          "kind": "constant",
+          "name": "NumericalContract"
+        },
+        {
+          "contractTokenSha256": "e304dce2e5cd306c7da20c20edb55cec52981dce4cce5daa14de39ec974d7679",
+          "kind": "constant",
+          "name": "ReductionOp"
+        },
+        {
+          "contractTokenSha256": "702a632bda29abc0b8e06c1df92d19cef1a30b98b6efd1447ee257debb1bcbfe",
+          "kind": "constant",
+          "name": "ReductionRealizationNode"
+        },
+        {
+          "contractTokenSha256": "8fda8350dcb64452fabb5890f175b3f09d65c0e5c240818ace96c22f252dd402",
+          "kind": "constant",
+          "name": "SemanticBodyOp"
+        },
+        {
+          "contractTokenSha256": "bafcf8151b455ad8548aa175dca314e913c2a860a7d23d7b195f9688cc5a8cfc",
+          "kind": "constant",
+          "name": "SemanticBindingRole"
+        },
+        {
+          "contractTokenSha256": "2166887054c61ae73ece00a038df2bd7c5309e11abbd6b86d2e01d559447e113",
+          "kind": "constant",
+          "name": "SemanticAxisRole"
+        },
+        {
+          "contractTokenSha256": "149409630e1e4e5be9e05f66919eb4d42b2c1b32a2ca2d97385f3e9e962968ad",
+          "kind": "constant",
+          "name": "SemanticBodyBinding"
+        },
+        {
+          "contractTokenSha256": "f1b9058bc9ce2ad84efbd96ad727930a7649b9d6e9347136ed8db7bdecaa3c75",
+          "kind": "constant",
+          "name": "SemanticBodyAxis"
+        },
+        {
+          "contractTokenSha256": "6e52bc999a7e59263d898021f8d61b912002dabc8ef0e21d06fe557d7e1b8ad5",
+          "kind": "constant",
+          "name": "IterationAxis"
+        },
+        {
+          "contractTokenSha256": "6747ee1d8bf2d87a1fed17a9622e235f3487447797ba25b360e7b0b7bf43fef1",
+          "kind": "constant",
+          "name": "BufferBinding"
+        },
+        {
+          "contractTokenSha256": "16d6e3d0c51b12eda2cbba7ba7e33afb4c203833465db889164cccedc1edbe53",
+          "kind": "constant",
+          "name": "SemanticFunction"
+        },
+        {
+          "contractTokenSha256": "00ad7640334d9014c80d681b1f0065c058748a127b141e5c5d068fd9f776bb15",
+          "kind": "constant",
+          "name": "RmsNormFormula"
+        },
+        {
+          "contractTokenSha256": "ef99391134cc0f528939197bac9f35b52d89419fe46320decc4e58df32f46c3a",
+          "kind": "constant",
+          "name": "RmsNormReductionTarget"
+        },
+        {
+          "contractTokenSha256": "bf3a80561b94346bbcefe0982552b826b31104bb10be8a963226d662d9222091",
+          "kind": "constant",
+          "name": "RmsNormEpsilonSource"
+        },
+        {
+          "contractTokenSha256": "27a02230150da52d23ae626f9c7e82bd635c147468b57e1464407e1d7b402497",
+          "kind": "constant",
+          "name": "RmsNormEpsilon"
+        },
+        {
+          "contractTokenSha256": "e6da5d5ee0e65798f6cc919f7ee12e8c27ee1dfbe1495c538ce4ac8b690246b8",
+          "kind": "constant",
+          "name": "RmsNormBody"
+        },
+        {
+          "contractTokenSha256": "8ed85409a359590f3ede4b3386f7f30a033d950ec01f3a2a48edfe13300df7f7",
+          "kind": "constant",
+          "name": "SemanticBody"
+        },
+        {
+          "contractTokenSha256": "ff7f90921992b89c04dc5628c69274fe1aaca4fa01b4a60bea181bf7d504e38b",
+          "kind": "constant",
+          "name": "CollectiveKind"
+        },
+        {
+          "contractTokenSha256": "fae103f1a82b27d31c696a5101b2965d1687b60d0e2528210d15888e7485e59b",
+          "kind": "constant",
+          "name": "ReductionTreeShape"
+        },
+        {
+          "contractTokenSha256": "5ec832ff4e07c46d34f283673f0091126765a294925937c5a940b23f73e3dc71",
+          "kind": "constant",
+          "name": "ResidencyClass"
+        },
+        {
+          "contractTokenSha256": "8772b8715d88e60798fb5be3b0617f0fa1bff6914ce2fe1fbcba60e93f412436",
+          "kind": "constant",
+          "name": "Semantic"
+        },
+        {
+          "contractTokenSha256": "ffbb98d43b17d9543cd3018eaeb6209fc9a338b1a8bd210ceed698904a4cb4c4",
+          "kind": "constant",
+          "name": "Realization"
+        },
+        {
+          "contractTokenSha256": "8fbb86576864e863eacd6221f1b9c6d0439b842a860d55af46b011df3cbf7940",
+          "kind": "constant",
+          "name": "Digests"
+        },
+        {
+          "contractTokenSha256": "0124c0191aeb64e2e95c12f98b2b8e8e68e1ef3e9e3cc5215a97dd340405338c",
+          "kind": "constant",
+          "name": "ManifestLoweringEntry"
+        }
+      ],
+      "path": "src/compiler/tsir/mod.zig",
+      "sha256": "f9a24b1f15c72a9a740cc4df330d29a50c261f4b29d63f3c69cbfce1765fd56d"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "004968b9306c8fad762cdea3aae589cdca2233860929b6706b583a3d4272bebe",
+          "kind": "constant",
+          "name": "PlannerError"
+        },
+        {
+          "contractTokenSha256": "3853e47642128ce7bd602a38fdfb832bf4e28661ac3a1f7e4b66b2eac7232765",
+          "kind": "struct",
+          "name": "LoaderCapabilities"
+        },
+        {
+          "contractTokenSha256": "590db17b7b3f5fab8954047a004e2f446524d427c209f7d0699ad467568e1828",
+          "kind": "struct",
+          "name": "Options"
+        },
+        {
+          "contractTokenSha256": "d635cfb455b1057ff515afeb86f3fa8e0f4a528d047b9ef1b84bb708fecca2b1",
+          "kind": "function",
+          "name": "planRealization"
+        },
+        {
+          "contractTokenSha256": "a92ccdaa261d91e291db5bbcf4bd993001f5599579f5e2e0cc668d1108a389dc",
+          "kind": "function",
+          "name": "supportsNumericalMode"
+        },
+        {
+          "contractTokenSha256": "54b334b06d86bf2e161dfa091f08c0fac82c2f6a9d599afa94ad6026684e09e9",
+          "kind": "function",
+          "name": "appendRejection"
+        }
+      ],
+      "path": "src/compiler/tsir/planner.zig",
+      "sha256": "3c25869d3ae3eb35a5e372884a9efc62a9199698c2ba1f94d9a2621d790cef50"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "35449f6542fa4fe45c28f95356aa981f1618894d00d530704df189fa387ff3f6",
+          "kind": "constant",
+          "name": "InterpretError"
+        },
+        {
+          "contractTokenSha256": "3d742fee14bc895bb35e416db098feeb8192e25a46d38aa031655149c5548a67",
+          "kind": "constant",
+          "name": "Result"
+        },
+        {
+          "contractTokenSha256": "981fb0226f458108144dab7a12bb9abc3c35acab30ccd304b42cc482646c58a0",
+          "kind": "function",
+          "name": "run"
+        },
+        {
+          "contractTokenSha256": "7071a68a4d67d12c250e95e672e6b0b4e21f83ac96657bee000afc1c0b6b3fcb",
+          "kind": "function",
+          "name": "freeResult"
+        },
+        {
+          "contractTokenSha256": "4a4374d6c3f8a27b37f7059629bfee2a669ce0abeb934358964605c07ed53312",
+          "kind": "struct",
+          "name": "TranscendentalTable"
+        },
+        {
+          "contractTokenSha256": "342bfe5e80d4e91df052d0bb5fb06a24b5043697433b14991bfc59508e799cdb",
+          "kind": "function",
+          "name": "transcendentals"
+        }
+      ],
+      "path": "src/compiler/tsir/reference_interpreter.zig",
+      "sha256": "279035099d4f6c95c0f8e51dfeb3a47c72643e84a81bbaa4cd02650cccb872a0"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "ffb11d6bdc2ef951634158a3ad967f0e681faca1a53227a4e9afd519ce63d836",
+          "kind": "constant",
+          "name": "CONTRACT_VERSION"
+        },
+        {
+          "contractTokenSha256": "57c9122f0f5f9eca57961c120279e88a29c11df499d7d1bef9d8bb29b2c90f51",
+          "kind": "enum",
+          "name": "ExactnessClass"
+        },
+        {
+          "contractTokenSha256": "f55694255662ed1b6799fce524f9d7293a7c2d224d4f6cb6458d02f92ee08d1d",
+          "kind": "enum",
+          "name": "AlgorithmExactInvariant"
+        },
+        {
+          "contractTokenSha256": "d1c33a47f8c5489e23a247b3847ded1bc28175b4d2519e7b1ba8c50669d18135",
+          "kind": "struct",
+          "name": "Exactness"
+        },
+        {
+          "contractTokenSha256": "e320c750c851e20e30656e0f3c8950af8eb09fc6a6312a6b68780a1aadadb900",
+          "kind": "enum",
+          "name": "RejectionReason"
+        },
+        {
+          "contractTokenSha256": "2303cdde93188a8957ca1210e55729194353e4d0bab15530f166ce0d120617e5",
+          "kind": "struct",
+          "name": "RejectionEntry"
+        },
+        {
+          "contractTokenSha256": "70e7e4493a599a3a26bbecc41c853edc5db39f35dbbbbfeebf34ca907e2aa208",
+          "kind": "enum",
+          "name": "KernelFamilyHint"
+        },
+        {
+          "contractTokenSha256": "88dcaa642fc6378e299c5e0c8033d17ecf875915fc2c168ecd71c987f4bea05b",
+          "kind": "enum",
+          "name": "ScalarKind"
+        },
+        {
+          "contractTokenSha256": "2afec017759329746f1af50e05fb77f874298473635b8e1773bf9d733f37da3e",
+          "kind": "enum",
+          "name": "ReductionAssociativity"
+        },
+        {
+          "contractTokenSha256": "5820e8131a7a0cdceb73c451b573aacfd462533a01e616eadde1543ee1b50f47",
+          "kind": "enum",
+          "name": "NanInfPolicy"
+        },
+        {
+          "contractTokenSha256": "d3ce744c8a449e7440ab1cc285f6affcf6b63a6f47160f9e601f8b8236822dba",
+          "kind": "enum",
+          "name": "ReductionOp"
+        },
+        {
+          "contractTokenSha256": "7f2e3f65b3fbe66697c776ac97bfdc3267e56d2816acd8856aa47f8be53c4552",
+          "kind": "struct",
+          "name": "NumericalContract"
+        },
+        {
+          "contractTokenSha256": "2c6192e23c284deb2e907a75f64655933c76e623cd4033b134f4d330b3275f8a",
+          "kind": "enum",
+          "name": "CollectiveKind"
+        },
+        {
+          "contractTokenSha256": "5be79f79b2e139fb3c0b2090795b078e921eb862f6144b4edeed2d6d1b02e8b3",
+          "kind": "enum",
+          "name": "ReductionTreeShape"
+        },
+        {
+          "contractTokenSha256": "28ec06cf80b7b3c06046069739b445570e316cf56c32229053812ed41db0e570",
+          "kind": "struct",
+          "name": "CollectiveSemanticNode"
+        },
+        {
+          "contractTokenSha256": "53ef47b1521fa36ff33fecab81e8f8876cec6d96f571500f491ff117abfb774f",
+          "kind": "struct",
+          "name": "CollectiveRealizationNode"
+        },
+        {
+          "contractTokenSha256": "d95a6d97c4bf2e5162600018a56588e07f7e6b552f0a791856b4789665449563",
+          "kind": "struct",
+          "name": "ReductionRealizationNode"
+        },
+        {
+          "contractTokenSha256": "54c9084010346ffe8a6ec3cdc82a9056545c2c86945ecb9d8e7d65ab157a419a",
+          "kind": "struct",
+          "name": "BufferBinding"
+        },
+        {
+          "contractTokenSha256": "a62ec0933b81742d703e5deeb206b858652c0e0117c6e97c8e0d617b934a8842",
+          "kind": "struct",
+          "name": "IterationAxis"
+        },
+        {
+          "contractTokenSha256": "dbec4d0485c52edadab3a9a2975815f9e69d16332004cf670e13e3b9a409b035",
+          "kind": "struct",
+          "name": "ReductionRegion"
+        },
+        {
+          "contractTokenSha256": "9c94d297cbbe4c1c2377dc6ffecaed0306069dce7992c74e4f5cd0ba5e4007ea",
+          "kind": "enum",
+          "name": "SemanticBodyOp"
+        },
+        {
+          "contractTokenSha256": "f3983b3020e110ff457013dbea8d5b875f1076293df78684c03ea4e33cd804dd",
+          "kind": "enum",
+          "name": "SemanticBindingRole"
+        },
+        {
+          "contractTokenSha256": "92c966974b2f8ee2f8030e9ed2b424822620273eb5ae31ea24a158564c1c3366",
+          "kind": "enum",
+          "name": "SemanticAxisRole"
+        },
+        {
+          "contractTokenSha256": "e896a3b9b511d21479554d347d535d481f807ab466176423f13239037f8d3d43",
+          "kind": "struct",
+          "name": "SemanticBodyBinding"
+        },
+        {
+          "contractTokenSha256": "d7b2812f1a59df21aaa3b9d609afc2c1c0aaaf0e782539faec0f58bbf5b6d1c9",
+          "kind": "struct",
+          "name": "SemanticBodyAxis"
+        },
+        {
+          "contractTokenSha256": "3198cc4dcf2e5dc0a7aa66a3bde795a767ec9f8c3142bce201337d79f396d673",
+          "kind": "enum",
+          "name": "RmsNormFormula"
+        },
+        {
+          "contractTokenSha256": "f87f211ba72de2d483b1b8347176cea185ae48f14d60798017f7e3019769c731",
+          "kind": "enum",
+          "name": "RmsNormReductionTarget"
+        },
+        {
+          "contractTokenSha256": "1bcc7a4abbbd75a90aa26d5955807afb3c2f9027caedafc222f11305364c173d",
+          "kind": "enum",
+          "name": "RmsNormEpsilonSource"
+        },
+        {
+          "contractTokenSha256": "e1a65aede884b56ea341323f2d5111af0d4933fc5951317df224a59cafe69e9f",
+          "kind": "struct",
+          "name": "RmsNormEpsilon"
+        },
+        {
+          "contractTokenSha256": "c9cad3b108417554735f0365c8008323b44696f2c1e53155b026f8a07b65e2d4",
+          "kind": "struct",
+          "name": "RmsNormBody"
+        },
+        {
+          "contractTokenSha256": "10e389feb4afe0de4e9a97a33492e937c7985aa2eb536f6d2841577fe9d9f814",
+          "kind": "enum",
+          "name": "SoftmaxMode"
+        },
+        {
+          "contractTokenSha256": "d9258c7cf9d25b99c74928800c383ea050e9a5f52d94f06f49431fb561b7f845",
+          "kind": "enum",
+          "name": "CausalMode"
+        },
+        {
+          "contractTokenSha256": "d506a982dc9c58ff2c71cc1757d25c462b482944c68011d34571c7a31a7937d3",
+          "kind": "struct",
+          "name": "AttentionScoresBody"
+        },
+        {
+          "contractTokenSha256": "ad7537b9efd1d2a4d627fe48ed58d5489d777814e3d042992fbbbcd2345eeefe",
+          "kind": "enum",
+          "name": "AttentionScaleSource"
+        },
+        {
+          "contractTokenSha256": "6ad2eff5a8a573439a238389c0055dc2a9be44d4c3dc9d9f11b5d0fc83cacc8c",
+          "kind": "struct",
+          "name": "Conv1DDepthwiseBody"
+        },
+        {
+          "contractTokenSha256": "06308ccec0cdb665f35ca96f7fa07f1d40c9bf1cc27f08f266b16f0f8711674c",
+          "kind": "struct",
+          "name": "L2NormalizeBody"
+        },
+        {
+          "contractTokenSha256": "8a7ba7e93e0bbc34fcc47f3620a9adaf74b0953afd2f9ae272b0b4a8bcd04bc2",
+          "kind": "struct",
+          "name": "LinearAttentionBody"
+        },
+        {
+          "contractTokenSha256": "2874a23bf9417ae685095fd739aad1f77be3069688d81443cad8c02e34252951",
+          "kind": "enum",
+          "name": "LinearAttentionNormMode"
+        },
+        {
+          "contractTokenSha256": "15fe9abac073bfb131a58f429267478e2ebde8ac960bce0146f8553a6cf0e5e6",
+          "kind": "struct",
+          "name": "SemanticBody"
+        },
+        {
+          "contractTokenSha256": "23274dd79ddc706304cfd9520e7ceabdfb76d5edbfedf8d8dec5fee3a309ff51",
+          "kind": "struct",
+          "name": "SemanticFunction"
+        },
+        {
+          "contractTokenSha256": "40a431d7fc341bfcb96b3a1cbda1d9ca351e8e4efb45efb8382d6525e8582a32",
+          "kind": "struct",
+          "name": "Semantic"
+        },
+        {
+          "contractTokenSha256": "d49566947e4a0bf40bab5b306061c891d8dbaee891fecb92a3c6e0fc2ae31758",
+          "kind": "enum",
+          "name": "ResidencyClass"
+        },
+        {
+          "contractTokenSha256": "97194f98c7a86367a143cce70ffec8180fa3daaed93309d4c2f34e6c1aa3f4b3",
+          "kind": "struct",
+          "name": "ResidencyDecision"
+        },
+        {
+          "contractTokenSha256": "6432f6f42b87750a5c8f643722f692125662dbed706a408730f1a53418b8c19c",
+          "kind": "struct",
+          "name": "TileFactors"
+        },
+        {
+          "contractTokenSha256": "74737afb2468903494cbbcdb028fb2b036f589760af336451549940019cbc729",
+          "kind": "struct",
+          "name": "PEGridShape"
+        },
+        {
+          "contractTokenSha256": "e315033ca05910332bf35398f5d54cb4883792d1c505ed51da918e800a07d134",
+          "kind": "struct",
+          "name": "RealizationFunction"
+        },
+        {
+          "contractTokenSha256": "7d04b1a754a83c899b50f58e5d47fe5be1e770f5530aed547b77613ef518ff2a",
+          "kind": "struct",
+          "name": "Realization"
+        },
+        {
+          "contractTokenSha256": "9fc440636500bcc473ba48f156e2bb629e6040a82a6ce4287fe64b9e3510ba83",
+          "kind": "struct",
+          "name": "Digests"
+        },
+        {
+          "contractTokenSha256": "5113a2b5ab81bf3fee2ae4d4943eb7ccfc9764ba71e0c4eadc1b35a81b11891c",
+          "kind": "struct",
+          "name": "ManifestLoweringEntry"
+        }
+      ],
+      "path": "src/compiler/tsir/schema.zig",
+      "sha256": "6906ae57e3e799e37a771416c11533b1b478428220af785d1a6f92d3bea9e9d5"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "d986c730621cf63303f2fd939e6a3c8e01e01aec582fac599f1aa68ec6d6d3d0",
+          "kind": "enum",
+          "name": "Direction"
+        },
+        {
+          "contractTokenSha256": "424c380418e4e9c582cfe1214d8a976303995b9a660b5c51062492fad05a5594",
+          "kind": "enum",
+          "name": "Arch"
+        },
+        {
+          "contractTokenSha256": "3bcc239e775576877f738c5b9e58c275e05941ea3a6f8ddc63e209f110a9e6e8",
+          "kind": "constant",
+          "name": "MAX_COLORS"
+        },
+        {
+          "contractTokenSha256": "f965d47c69d26862b4ac3520c883770ed3b15080716622d12055b3623e6073c2",
+          "kind": "constant",
+          "name": "MEMCPY_RESERVED_COLORS"
+        },
+        {
+          "contractTokenSha256": "ff390c159d36eb540cfaaebfafbf7a1e6e3882706f0d8b662979f90e62771eb8",
+          "kind": "constant",
+          "name": "APP_COLORS"
+        },
+        {
+          "contractTokenSha256": "9855c9aa919b04fb58a80b2efc9f01fba51d0f7947a0d869081856437cb8c9ba",
+          "kind": "constant",
+          "name": "PE_SRAM_BYTES"
+        },
+        {
+          "contractTokenSha256": "0376d9ca19702eb887be63cfdc8b9e395501236d0849fad75804856bf505c9b2",
+          "kind": "constant",
+          "name": "MAX_RECT_DIM"
+        },
+        {
+          "contractTokenSha256": "062dab6c5ac171b8effed871229c1904bc5bdaf63cd3e1c4b5d1eb8ccfa4c1b5",
+          "kind": "constant",
+          "name": "SECTION_SEPARATOR"
+        },
+        {
+          "contractTokenSha256": "c2e936e409e4eb19e2aea79b0d0e94780662507ca2d21eada2337f75df217c62",
+          "kind": "constant",
+          "name": "SECTION_SEPARATOR_END"
+        },
+        {
+          "contractTokenSha256": "9dcd13366901b298ea94c9b4ab11bfa5635cb1a09613f340d55957816a8bc7f5",
+          "kind": "constant",
+          "name": "LAYOUT_FILENAME"
+        },
+        {
+          "contractTokenSha256": "bed83bcefef225f6c678e40333a4c3ffd0ab66d07fc7beae84e590efc5d4775a",
+          "kind": "constant",
+          "name": "PE_PROGRAM_FILENAME"
+        },
+        {
+          "contractTokenSha256": "0b22151aa9281a7c5811b4eda660ab3756a21ba425c4eb93f2f460e1ed3f52bc",
+          "kind": "constant",
+          "name": "HOST_PLAN_SCHEMA_VERSION"
+        },
+        {
+          "contractTokenSha256": "47076ec091188c0826212c80d5b464a8e8af93a68c5880f561fa9b0c05d1295e",
+          "kind": "constant",
+          "name": "HOST_PLAN_ARTIFACT_KIND"
+        },
+        {
+          "contractTokenSha256": "c4f08a7b034af43d8611784c1db188a237f4149adb389202ad1123ce0ff1f60c",
+          "kind": "constant",
+          "name": "HOST_PLAN_TARGET"
+        },
+        {
+          "contractTokenSha256": "29cba14b7417217f144de0bfc7cadfdc613dbaaf1e9e79ce1f831055e344a45e",
+          "kind": "constant",
+          "name": "HOST_PLAN_CONTRACT"
+        },
+        {
+          "contractTokenSha256": "0d17ff9ac75456bb0d7210079b8fd494bae0cd6bfa01b578dfa32015ac6c88ce",
+          "kind": "constant",
+          "name": "HOST_PLAN_DISCOVERY_EXPLICIT_CONFIG"
+        },
+        {
+          "contractTokenSha256": "7772ee1958330e92c486d1223306cb167c3e1a60d73441dd60d2acf7bbfac9a1",
+          "kind": "constant",
+          "name": "HOST_PLAN_DISCOVERY_IMPLICIT_PATH_LOOKUP"
+        },
+        {
+          "contractTokenSha256": "62e3c8f313d44ab3b39d3b3a12d6e1e7b0816b0a30bb3c85489eefe46f101be5",
+          "kind": "constant",
+          "name": "CSLC_SDK_MIN_VERSION"
+        },
+        {
+          "contractTokenSha256": "d58a294c57ac18e66f2a7fec556030f79e7254a310a15749437a060c18233fff",
+          "kind": "constant",
+          "name": "CSLC_VERSION_ARG"
+        },
+        {
+          "contractTokenSha256": "c071c0344600a203241ee79ad42c0e6fe25557c89ecba0e8dc7fc94542a52c69",
+          "kind": "constant",
+          "name": "SIMULATOR_PLAN_SCHEMA_VERSION"
+        },
+        {
+          "contractTokenSha256": "1fd023866d4e7c7ba1bc56b54a2ce7343d4201f2d70db15f353f0d49f5002930",
+          "kind": "constant",
+          "name": "SIMULATOR_PLAN_ARTIFACT_KIND"
+        },
+        {
+          "contractTokenSha256": "0eab6c5667577fa4762236498f33b61ae737894b6584cac48633541b512ef7b8",
+          "kind": "constant",
+          "name": "SIMULATOR_PLAN_TARGET"
+        },
+        {
+          "contractTokenSha256": "e42e81647afa92a852c6e41ae4f9e126f17049dfb90517309e7d22f1a686193d",
+          "kind": "constant",
+          "name": "SIMULATOR_PLAN_CONTRACT"
+        },
+        {
+          "contractTokenSha256": "28d5ac3d6be1798d60d2b9a016e09750507ab17407612422f198bde7752001c8",
+          "kind": "constant",
+          "name": "SIMULATOR_DRIVER_PROTOCOL"
+        },
+        {
+          "contractTokenSha256": "74ed01cb37796fd47513e5a335187daf9d0c2ff61fc06b185e65c4b37f702fef",
+          "kind": "constant",
+          "name": "SIMULATOR_DRIVER_ENV_VAR"
+        },
+        {
+          "contractTokenSha256": "80897209b5c9ae6f95a2af076ff04c243391776bf378865a4399b85647764526",
+          "kind": "constant",
+          "name": "SIMULATOR_RESULT_SCHEMA_VERSION"
+        },
+        {
+          "contractTokenSha256": "9ab9eebfd660fbeb418e61285bf369c452d5cb7c3a3cc753f8a02bdb4d26f08e",
+          "kind": "constant",
+          "name": "SIMULATOR_RESULT_ARTIFACT_KIND"
+        },
+        {
+          "contractTokenSha256": "ca19b7fd98c4b70ec6114ad684ad23e83c2a8782ed54e97a000cf34b12fd9ca6",
+          "kind": "constant",
+          "name": "SIMULATOR_RESULT_TARGET"
+        },
+        {
+          "contractTokenSha256": "ec6ca64b31fe6b8fce3490ca8a5db259c1a49aa0970b0afdc5a80c1c5098942b",
+          "kind": "constant",
+          "name": "SIMULATOR_RESULT_CONTRACT"
+        },
+        {
+          "contractTokenSha256": "17aab073e27e339e2059788f402167f5d6d7cf706174747780fa3a8fe0c4d33d",
+          "kind": "constant",
+          "name": "MEMORY_PLAN_SCHEMA_VERSION"
+        },
+        {
+          "contractTokenSha256": "dd80408e1e1ce900d0b402d3eea03698aa51f13fac78ff957351dd13a418a1de",
+          "kind": "constant",
+          "name": "MEMORY_PLAN_ARTIFACT_KIND"
+        },
+        {
+          "contractTokenSha256": "5f43f89bfdd3e5c4a5b5bd42a1addc330c4d74e38931fc9a93b1d1681ec8de23",
+          "kind": "constant",
+          "name": "MEMORY_PLAN_TARGET"
+        },
+        {
+          "contractTokenSha256": "4bdd573514e386636260cac27ba7f12e7a308e8117eed54fe3d1748c3dc8cb60",
+          "kind": "constant",
+          "name": "MEMORY_PLAN_CONTRACT"
+        },
+        {
+          "contractTokenSha256": "bfdec8950b230ebcc8376e626c99d08a2119b113874ae6cb74f1def02c230ec1",
+          "kind": "constant",
+          "name": "RUNTIME_CONFIG_SCHEMA_VERSION"
+        },
+        {
+          "contractTokenSha256": "4cdebf019e8ba904ba4faf39bef0da7b07b93b310f3884f1bdd71d3a4672602a",
+          "kind": "constant",
+          "name": "RUNTIME_CONFIG_ARTIFACT_KIND"
+        },
+        {
+          "contractTokenSha256": "e7ac8077a3637f2232ed42c19b3e4312257256ee15dce49849741ef7a14f65c7",
+          "kind": "constant",
+          "name": "RUNTIME_CONFIG_TARGET"
+        },
+        {
+          "contractTokenSha256": "9e2d3f8b36fb92acd984fede8eff1fcab000c7c1fa026e3c7c4a3db72378a89f",
+          "kind": "constant",
+          "name": "RUNTIME_CONFIG_CONTRACT"
+        },
+        {
+          "contractTokenSha256": "3e3fd479642a8c5d8692da6d8466829258b27bb55722cc779442a153d48d42cc",
+          "kind": "function",
+          "name": "scalarTypeName"
+        },
+        {
+          "contractTokenSha256": "556a7e5d870dac5758070cc00f3551040069d3ff98f076741ccf3e2ae2119dbf",
+          "kind": "constant",
+          "name": "Q4K_BLOCK_SIZE"
+        },
+        {
+          "contractTokenSha256": "85de9d456dd6a7ac64a29f9b627c75338d080b5ca898c75f0d67d7b10fea519b",
+          "kind": "constant",
+          "name": "Q4K_BLOCK_BYTES"
+        },
+        {
+          "contractTokenSha256": "8c4002ac138fb4f9690264f078c8c9837a1877c26dd7ccbf448d4215bec7edb8",
+          "kind": "constant",
+          "name": "Q4K_SUB_BLOCKS"
+        },
+        {
+          "contractTokenSha256": "f8910908f6b71cd5d32bf9f4c36d2c0fbe7c8f29be4e8da0e828c4ae7e779b0c",
+          "kind": "constant",
+          "name": "Q4K_SUB_BLOCK_SIZE"
+        },
+        {
+          "contractTokenSha256": "f5181963c69f272cbf3811864254b00269eb3b439081408d923aabde38368a3b",
+          "kind": "constant",
+          "name": "Q8_0_BLOCK_SIZE"
+        },
+        {
+          "contractTokenSha256": "e3c451e11274fc9bb7d7d3bbc027e932ebb5aec16ffcafaea565e4df9a908691",
+          "kind": "constant",
+          "name": "Q8_0_BLOCK_BYTES"
+        },
+        {
+          "contractTokenSha256": "95f252391dc9d0b85c3387f47a020d7bfc002b94e89d07b2ed9ddf8579c982bc",
+          "kind": "function",
+          "name": "validateQ4kBufferSize"
+        },
+        {
+          "contractTokenSha256": "a48fb97c1b650f1c14f6b055ae9aaede3430cfdc36262e5e15d2549fbaaa63e9",
+          "kind": "function",
+          "name": "validateQ8_0BufferSize"
+        },
+        {
+          "contractTokenSha256": "73f3d9055e63a667e88d760b681778bc135b5f0e7d6162ace9af4626f7c274a6",
+          "kind": "function",
+          "name": "q4kElementCount"
+        },
+        {
+          "contractTokenSha256": "544db0796710bb2b7663d9f9a3030ccb42eaba527ff6361cab7d38775829304b",
+          "kind": "function",
+          "name": "q8_0ElementCount"
+        },
+        {
+          "contractTokenSha256": "b581cdc57b3ed8f90115cf58f1f919346280d24bb744be9d2e7c3291e16b8f37",
+          "kind": "constant",
+          "name": "FABIN_DSD"
+        },
+        {
+          "contractTokenSha256": "660f6c427c580c4f30d3d39d8de35a9b41ea0d756e7f984dfcd730ddabdfc42b",
+          "kind": "constant",
+          "name": "FABOUT_DSD"
+        },
+        {
+          "contractTokenSha256": "36dc494a073fa80409ec41ab978aa8822384329333858c91b017c1c891e35adc",
+          "kind": "constant",
+          "name": "MEM1D_DSD"
+        },
+        {
+          "contractTokenSha256": "e6634893e5a7331e29f9117acda418b6f8899a433c30135314d62a968d209fbd",
+          "kind": "constant",
+          "name": "MEM4D_DSD"
+        },
+        {
+          "contractTokenSha256": "5fc25f1cf46fda92fc24dd5fb567eceec9285e804a72180aaa9b590d05b08c97",
+          "kind": "struct",
+          "name": "ValidationError"
+        },
+        {
+          "contractTokenSha256": "0a0466ca54d69ed6b1d093130716c88d126bc0508437fdafb95e2ed56cec82f4",
+          "kind": "function",
+          "name": "validateOutput"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/csl_spec.zig",
+      "sha256": "aa2f6cab7f0b379ce371e2e4ba121ec7cc071f9ec415883122d4140576308d18"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "07407bbfc9d4e0e8611663825aa5c1d12f9299b00cb766dc1f0ab94a7f588b33",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "1b26368e8f350424a49ba73e71e1ae4dce83f2c0a6550a7eaf7bf7da199cff8d",
+          "kind": "constant",
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "5d528fc1f892ad0f4a1097467e76615319345026ff63256e79f8e1e6f9e2409f",
+          "kind": "function",
+          "name": "emit"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl.zig",
+      "sha256": "a06a490f444ee267e1cde9b1b145cdd7424be05d040178548ccaed1aa743e20d"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "907b473390b70652662e8675ed91bc602edcfc4df8182f2cdb1dcee10adfc4ee",
+          "kind": "function",
+          "name": "emitStreaming"
+        },
+        {
+          "contractTokenSha256": "267519f8a3c0e13f601c8573f73194aef15546f92e3e5a3e7de4c97b747fed17",
+          "kind": "function",
+          "name": "emitDecode"
+        },
+        {
+          "contractTokenSha256": "5691b2fd8760664024221f5b4a272050826faa20b8b6d5c1d87662e185f53a44",
+          "kind": "function",
+          "name": "emitTiled"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
+      "sha256": "1fb26ca446501326da874c8e67bbf457ec530dbc6459e900eb1f198977e5e758"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "5cee16d903e4f43c759e6480cc2c183d1b5ff82fbcd0f3b1d88f41fb0af28490",
+          "kind": "function",
+          "name": "emitLayout"
+        },
+        {
+          "contractTokenSha256": "e858e7a8bb929eb06f965fc85ba4db1619e8fedb1cddc5d701ba90cdd35fc7f6",
+          "kind": "function",
+          "name": "emitPeProgram"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_dense_gemv.zig",
+      "sha256": "87d7482576563603bb6199ec3ebd59daeb40d2b399085bc1e22a08e39fd20aed"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "59d7ef5429d7ce6a9b6c7221cadc358d56f644a758af9f8c61d902042664c50c",
+          "kind": "function",
+          "name": "emit"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
+      "sha256": "b70282522629c0cda557ada173b2bc97651634d89e4da17579176de55c17387c"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "b04da592161bc591477ba3e79cf13be6366263d3883cd61569429e2af8af6c67",
+          "kind": "constant",
+          "name": "LowerError"
+        },
+        {
+          "contractTokenSha256": "5117f9e58f4951e4b57ce624e8933deef76d51ab60dbc654dcc9b656d045918c",
+          "kind": "constant",
+          "name": "PREFILL_Q4K_GEMV_PATTERN"
+        },
+        {
+          "contractTokenSha256": "8936807bc9753f32eff821e0f0c8f096c5a601d91716fb0843a2caf9780817cc",
+          "kind": "struct",
+          "name": "GridDims"
+        },
+        {
+          "contractTokenSha256": "3dacb544e7b45a63b5d67cdbb1f21cf7a7a134c525c89c4bdbd53caa4a50c681",
+          "kind": "enum",
+          "name": "ExecPhase"
+        },
+        {
+          "contractTokenSha256": "ad436b2b97888b3c731457ebbdcf447bf798bd78c29f6b8a9100bb573addb125",
+          "kind": "enum",
+          "name": "ExecStepKind"
+        },
+        {
+          "contractTokenSha256": "03428041e936c9fb8b85c40e815a7c2274c748adfe409dc1b9de7f332599e319",
+          "kind": "enum",
+          "name": "AttentionType"
+        },
+        {
+          "contractTokenSha256": "2c23ea3cdff436011e1a0907ff1c706a56efdf910e8bfb3a20471451728f0d6d",
+          "kind": "struct",
+          "name": "ExecStep"
+        },
+        {
+          "contractTokenSha256": "0da1feb096b7d1b6d318c54ed9bb6088a6071adb0f9dd4ca26c8ddfc4fdeb0bb",
+          "kind": "function",
+          "name": "isPairedGateOp"
+        },
+        {
+          "contractTokenSha256": "bd98d905014d308d853be79f382d1c5982d55db7e43e29facd26c294cf67741e",
+          "kind": "function",
+          "name": "opToSpec"
+        },
+        {
+          "contractTokenSha256": "4aff828765c4fa0a68961967b1074dca7ecdce91cb9a53bed8dc96ad401da98e",
+          "kind": "function",
+          "name": "opToPattern"
+        },
+        {
+          "contractTokenSha256": "0365841936c9f97b37c15d8b1e3100eb2bd6d8de4152e49c78d465e3194a7d4b",
+          "kind": "function",
+          "name": "lowerToHostPlan"
+        },
+        {
+          "contractTokenSha256": "1195efbedd1cda8173a9b3788c737669c7a21fdfe4584cd322bf3946b9708f02",
+          "kind": "function",
+          "name": "lowerJsonToHostPlan"
+        },
+        {
+          "contractTokenSha256": "4c270c517d2cd9d70b436199c40039a8d489c60422295e055e2739f7c90d5d42",
+          "kind": "function",
+          "name": "lowerManifestExecutionToHostPlan"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig",
+      "sha256": "fb97ba9ea569d73471f21f25e004992577cf420fc0ba3cc0bc7bb38f98a3c2c4"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "ede160a0a37909d1c252bdd4102895b048fa9cd534dd6f1369a3b18b80c27bbf",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "5741a9c95607dc772cb914045bdb9d3386dd58e41a92d8d31e727db538ab7ffd",
+          "kind": "function",
+          "name": "emitForElem"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+      "sha256": "e1aa76368fe49eaea3f3fc65dc8d1e00b7a6daeeaade93fca4a85131e07b2f2e"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "0f10f98da27c4b95e64f0f81154b80365bd836fa8750920a04cd03dcf6685493",
+          "kind": "function",
+          "name": "emit"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_fused_ffn.zig",
+      "sha256": "05cba69ef4bd65642cb036a9f07e2f1b08b84f220945d3e23641a6a1c910096a"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "3f564eae21423ae81484ba415206250dced6ed1ff093bf550204442d08698b7d",
+          "kind": "function",
+          "name": "emit"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+      "sha256": "54fa407da4168d962c032851d32b10add36d8ee09c1438d59f817afe41506120"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "db54c528895c45b1fa822d57274286a08443a60de430c97bf36dcc0eb3db0d72",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "bda8ce510cd4c77ce06f6779357d773cea2f763b34d7a6c02e659f943e5043fa",
+          "kind": "struct",
+          "name": "WSE3"
+        },
+        {
+          "contractTokenSha256": "868702398d7247ecb17f439ebbea06f5276b9c025c5424556741a7ee6a62b7e3",
+          "kind": "struct",
+          "name": "ModelConfig"
+        },
+        {
+          "contractTokenSha256": "eb1a2efd66e838b376d86ad68535b47fd6753261d029c2dd5ac2fdff7bacbad4",
+          "kind": "struct",
+          "name": "KernelSpec"
+        },
+        {
+          "contractTokenSha256": "c927f3bca3d8e05549113766f7dbb05136c2da11838769b4acb2d163897c3d70",
+          "kind": "enum",
+          "name": "LaunchAttentionType"
+        },
+        {
+          "contractTokenSha256": "9e136e91622e1b1c8c54c7f8c6939e1925e5e2ba85e89e4ab1ac217eda69aa60",
+          "kind": "enum",
+          "name": "CurrentPosSource"
+        },
+        {
+          "contractTokenSha256": "f228976f2daa1d82d2dbf0a4a2d5404d25f514751739a6bc4662d1ad61b2bc8e",
+          "kind": "struct",
+          "name": "LaunchSpec"
+        },
+        {
+          "contractTokenSha256": "ead0f6d5c901c248b94d3a31c22f8a9f17d293e85add3986e2ebaf4a831d5362",
+          "kind": "struct",
+          "name": "HostPlan"
+        },
+        {
+          "contractTokenSha256": "f128087ca5b11d87494c4df2cd4a632ffbbb53a9ff87d9291c66b33408c832bc",
+          "kind": "struct",
+          "name": "SramEstimate"
+        },
+        {
+          "contractTokenSha256": "a5ca880f53e151a2476c7b5a72e3479ef85db29c3c91d5dc61392cc4ba1b9eb7",
+          "kind": "function",
+          "name": "estimateLayerSramBytes"
+        },
+        {
+          "contractTokenSha256": "0e8808d46398bc6bf0bde09dfcb412f031d46b4f1561e59238e469c8638685b4",
+          "kind": "function",
+          "name": "estimateModelSram"
+        },
+        {
+          "contractTokenSha256": "a82ead29133d5cea753e2ebb0721716038c03cddbed4a0d67ea261fb54e4aeb2",
+          "kind": "function",
+          "name": "estimateModelSramForPlan"
+        },
+        {
+          "contractTokenSha256": "dbc1294888dda44151ef0e8c875c6f81b1972b303e520e7d91c33cf7f24b008f",
+          "kind": "function",
+          "name": "effectiveKvCacheLayerCount"
+        },
+        {
+          "contractTokenSha256": "2ca284fc83572f352362bfa316d0720ef8a08d8e0e5e9fdeb8c905ef8c1de76e",
+          "kind": "function",
+          "name": "emitCompilationManifest"
+        },
+        {
+          "contractTokenSha256": "c74f411fa98c4d2ef2fbf7ebc0fd4923202409340e109f0d55fa1a006ca985f8",
+          "kind": "function",
+          "name": "emitPythonRunner"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
+      "sha256": "8caefa38a73f453fd41311ab27a4aff9ecf38c91848b02132361c607c36f6fcc"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "987669bfbd60f89a35da3fc1a62fb5023e4b74566817a279b86f812998c60a44",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "6d0658e5bca42639d22a2788a35eb02c2b857e6dbe4fa8edda01dd4dd6f9f468",
+          "kind": "struct",
+          "name": "CompileSourceSections"
+        },
+        {
+          "contractTokenSha256": "dd174dccddf21940fca08e0fef6c471f8050225b900712b575ec671993cc0088",
+          "kind": "function",
+          "name": "emitPatternSections"
+        },
+        {
+          "contractTokenSha256": "25058d995783010bfe1fe16849f693f7d8574b0a1d0eedb5851f776ff467a350",
+          "kind": "function",
+          "name": "emitPatternSectionsForElem"
+        },
+        {
+          "contractTokenSha256": "d53f12a741f2bf134332ed03ccbf742bec3df39c47850c20b4f3c57abc950b1a",
+          "kind": "function",
+          "name": "patternSource"
+        },
+        {
+          "contractTokenSha256": "98bedae6bd8d003f2bd66f1e7a188139e5ff317ad56f6f95e65c638e17060843",
+          "kind": "function",
+          "name": "sectionBody"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
+      "sha256": "ca845d7ee174eb05e6188b379fea407f11d5df035f03f8d11e29234e228fbe79"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "f08e61102cb4a689dbfd8817940fe151af1bce091b309287e002d06f1d1681b1",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "6c42e0b6650f5319bb00732d1c3299677d15c232f7a55adefb921ee9cfdfec05",
+          "kind": "struct",
+          "name": "CompileTarget"
+        },
+        {
+          "contractTokenSha256": "908d897f9fa0101a822a6e43e1e1397b252030042b2832ce9f4a4872bff2b13a",
+          "kind": "struct",
+          "name": "CompileParam"
+        },
+        {
+          "contractTokenSha256": "f10f3e9998d2479beeb05bcf027f891c83b4b5a3c553fbb11e0dede5544857b6",
+          "kind": "struct",
+          "name": "CompileTargetMetadata"
+        },
+        {
+          "contractTokenSha256": "be47739c0c06157929df23bea65915b2bcfb96e1c474901dde46600b0ef1e354",
+          "kind": "struct",
+          "name": "BindingMetadata"
+        },
+        {
+          "contractTokenSha256": "c03ebd40be2c8857b996f73aeb8b531b08f3ad71cf12409ebd10d43909262ffd",
+          "kind": "struct",
+          "name": "BindingShape"
+        },
+        {
+          "contractTokenSha256": "1c21670bba7170fc45b7681d8ccaf53a852ba26870d2a54271f5b893409501f0",
+          "kind": "struct",
+          "name": "BindingTransform"
+        },
+        {
+          "contractTokenSha256": "98e358d04befd93b6d9e71c511917a3371e149c9d896019fb1c67edac9e08baf",
+          "kind": "enum",
+          "name": "DiscoveryMode"
+        },
+        {
+          "contractTokenSha256": "f7526522fdc07b91dd1aed06c79d1cda8c7922883dbd7477300926ce484e0898",
+          "kind": "struct",
+          "name": "CslcPlan"
+        },
+        {
+          "contractTokenSha256": "8bb586d8c6f213864b9eb9a033db6b3e84dbc117830a4df9de1e446e9936ba5f",
+          "kind": "function",
+          "name": "makeCslcPlan"
+        },
+        {
+          "contractTokenSha256": "5368635a1521f21829bdb2e05ee1f8586f7b2ec11adfd3e6a20502053fa92ae8",
+          "kind": "function",
+          "name": "discoveryLabel"
+        },
+        {
+          "contractTokenSha256": "a54ab7e83cc0becd1391e3139b2ecb1d2eacb22896134ce8c593499f63c55699",
+          "kind": "function",
+          "name": "emitCompileTargetMetadataJson"
+        },
+        {
+          "contractTokenSha256": "c81277bf12181a058f2f7225d56d24e26fedc262603fa5936c4b5912ca9b611b",
+          "kind": "function",
+          "name": "emitCompileParamsFieldJson"
+        },
+        {
+          "contractTokenSha256": "3c81299f472ef8352f198a4d6b620d10f43700dc6688141c328fb108b26e81b8",
+          "kind": "function",
+          "name": "emitHostPlanArtifactJson"
+        },
+        {
+          "contractTokenSha256": "c76f2b5d36ba3fb0e97cef14f03f3fb03b3f8b73e1f3ee72117b78942306cc3d",
+          "kind": "function",
+          "name": "validateHostPlanArtifactJson"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+      "sha256": "72e52f69872bbc1404b1ac96a4812b1a09eeaeccb63ab871ae98304567e3b512"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "db54c528895c45b1fa822d57274286a08443a60de430c97bf36dcc0eb3db0d72",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "6c4bee9cb9aca561763dfd3746bbd3748fd89cb650323463244f85f71f6b8165",
+          "kind": "struct",
+          "name": "WeightMapping"
+        },
+        {
+          "contractTokenSha256": "b2d6e8e5c327d45a3f80fb2135afaf60f092a9c32a0399531ed7360455176d72",
+          "kind": "struct",
+          "name": "WeightMappingStatus"
+        },
+        {
+          "contractTokenSha256": "75bdefe04f0f03a803dcabbf38b1f0dd34c4ce2ce602fc962878026f44eda021",
+          "kind": "struct",
+          "name": "StateBuffer"
+        },
+        {
+          "contractTokenSha256": "d63cbb1252583cc9c15e9204f8b5ac4abd7ab435b5ed3860eb964a1196938dc9",
+          "kind": "struct",
+          "name": "RuntimeConfig"
+        },
+        {
+          "contractTokenSha256": "06260c25039865233ab40e5ae4ff2a25a12779339a2eb8815d2a86bd9a61c0c0",
+          "kind": "function",
+          "name": "emitRuntimeConfigJson"
+        },
+        {
+          "contractTokenSha256": "624dfd610084812060e601e4a6c1e148f13b81b51dd602e9a8b393f8c205e4cc",
+          "kind": "function",
+          "name": "emitFullPythonRunner"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
+      "sha256": "44bdc474f335883ebcf0741772dae15a555345da3ee9c313ea76bdc93e55c80b"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "17bc68fcc36fbc4becdcb5b0ace7e23b6be21b8e3ec6b0c188877b8aaacc3e7b",
+          "kind": "function",
+          "name": "emitWrite"
+        },
+        {
+          "contractTokenSha256": "28d683ec97adf56fe341e05d388a5a9870a5fabd8d79604bd0224dc41d0eb710",
+          "kind": "function",
+          "name": "emitRead"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_kv_cache.zig",
+      "sha256": "fd7e5c7ea648af5fe4b1d9c60f06c7c34ac30ed70416196a5e9e1664297435ac"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "b35f354ba0e4f12d167f164d5d770ec1504d3ca7e890da4fff837bbc425ae839",
+          "kind": "function",
+          "name": "emit"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_linear_attn.zig",
+      "sha256": "38e697495289382bdd5809fec08f98c7a4dbcf48b5eb173c70fe3b2df652855d"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "9b8b74eb09edc3d79d4bcc03147b582549a88bbea2ab874b52a540de5a1e83a5",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "6906a1ab59f52ea21160b66ecc21a1dfc57aa4390e8c87f20561070aa50831f6",
+          "kind": "enum",
+          "name": "ResidencyMode"
+        },
+        {
+          "contractTokenSha256": "e3e86cea012026d9ba8e850145a371a10b5760e8bf15eea1e6afda2748a4135d",
+          "kind": "enum",
+          "name": "BufferPlacement"
+        },
+        {
+          "contractTokenSha256": "51e31f244cc62b7bf1f9e4f91a7aba3555415b56b7615eb5cc9414b816ab6893",
+          "kind": "enum",
+          "name": "BufferKind"
+        },
+        {
+          "contractTokenSha256": "4a855da0dd33093d740db76810060646097608af00e6220a2812c3e8ff92e50a",
+          "kind": "struct",
+          "name": "BufferPlan"
+        },
+        {
+          "contractTokenSha256": "8ff022d573a220e9cddc2a9dea895d504ce19705d26ce5c0cbe22e9aac49f624",
+          "kind": "enum",
+          "name": "StreamStageKind"
+        },
+        {
+          "contractTokenSha256": "40fb625a309d001bf991d8c82236ca5f9ee81b13d41fc64c3074a63f765c589e",
+          "kind": "struct",
+          "name": "StreamStage"
+        },
+        {
+          "contractTokenSha256": "73884cc9da985f584f9afb76b00e20ef7b123b0fed5df8de620be04c39e591ce",
+          "kind": "struct",
+          "name": "PlacementPolicy"
+        },
+        {
+          "contractTokenSha256": "e218dda715960139de1c752326b1d3799751cb3fc3d9c5bd61c7d1dd6d17719f",
+          "kind": "struct",
+          "name": "DerivedGrid"
+        },
+        {
+          "contractTokenSha256": "f82c9bbf2fefbd31fa2d3500269d8dff4213d478df2b904a8fd10f3e5953aef9",
+          "kind": "struct",
+          "name": "MemoryPlan"
+        },
+        {
+          "contractTokenSha256": "6c78052b1fbaee0bf020034cf3fde85c806bff49c9f79b7b1c6ee142def7bea5",
+          "kind": "function",
+          "name": "deriveGrid"
+        },
+        {
+          "contractTokenSha256": "e995928013af888e34fb88b437e5484e9e1eb65807926f412dcc719ed6349eda",
+          "kind": "function",
+          "name": "planMemory"
+        },
+        {
+          "contractTokenSha256": "4dd47181cf1ee48f5601b2997d77d37af48019435205b2f2277fb054526d6b77",
+          "kind": "function",
+          "name": "emitPlanJson"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
+      "sha256": "65bd1c052b780dc01382e0e3e190621f8dabe61111d810918e5f2eb335cb722f"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "1ae07a602608e4634414c48941d100d286702b39a8c21e438e598caaa65255b8",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "7e60f1394b174cbe964dd716c7cc68b26d9450fd625ce9536c0bae9d75f77bc4",
+          "kind": "function",
+          "name": "emitDistributedLayout"
+        },
+        {
+          "contractTokenSha256": "0f4fe25e262659d14bb93b7573e7915ee045266ff62ca2c662ad1aa93d4baf3e",
+          "kind": "function",
+          "name": "emitDistributed"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
+      "sha256": "64d83aaf280bb0741b24d3dbf74c7895b22aa9dd4fc789858bb567b3c9cd63cd"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "0afdb75c54005234ab8c61bb10fa444aa5ff643d752d410a90116fb5fed62bd8",
+          "kind": "function",
+          "name": "emit"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+      "sha256": "0d27b4fc34d33145b5b8176130460e82f753da3cefee6effbd6658308709cc5c"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "45944047e44788729a67099d9ce98621c5cb4dd539a2c347c4da083c4b763766",
+          "kind": "function",
+          "name": "emit"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
+      "sha256": "2130a64ea8b7f40839d23b426a06ad4312498bf162895115762260dfa79d08ff"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "94c5c593b03997304b0da663d741e981dda55026d6b29b67424fc3126e58bcce",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "bb0047e92b1476e8d549492b1ef91cf8283305da6b5d00059eea4448711541a7",
+          "kind": "struct",
+          "name": "ArtifactPaths"
+        },
+        {
+          "contractTokenSha256": "06b55baff990998aaf6af270cb24091b580cd8a202a1ae8610155e782db4ad42",
+          "kind": "struct",
+          "name": "DriverConfig"
+        },
+        {
+          "contractTokenSha256": "09f28f921300ec38628de360a85cb4ebbc0ba0b54db354f99191d18044696800",
+          "kind": "struct",
+          "name": "SimulatorPlan"
+        },
+        {
+          "contractTokenSha256": "cd5dffcbf7ea44d02cf50d113c3fafa7de01c3ef8b68f05bbbd66892d948640e",
+          "kind": "enum",
+          "name": "SimulatorResultStatus"
+        },
+        {
+          "contractTokenSha256": "339ab464ab056f95628c11242f03ab6e8bd72ea031336d95dbd3f48ecd47fab0",
+          "kind": "enum",
+          "name": "SimulatorTermination"
+        },
+        {
+          "contractTokenSha256": "88d6cdb51ac3292140e9960f23b0af627b5579c190f436699fc521ef2330a16c",
+          "kind": "struct",
+          "name": "SimulatorResult"
+        },
+        {
+          "contractTokenSha256": "e1dfc9960bf73fff1938556fe5bdb0a910fba0dd0bb64c02b2e8a1cbde93dbe8",
+          "kind": "function",
+          "name": "emitSimulatorPlanArtifactJson"
+        },
+        {
+          "contractTokenSha256": "cae9d4d4601ea5cd9824cf274c4102ad3e43cb526af3b5897e93c076399c4bae",
+          "kind": "function",
+          "name": "emitLauncherScript"
+        },
+        {
+          "contractTokenSha256": "f2a0402f5f3e5218da955ac049399a32048b44a936d8cbf494d019b190719d42",
+          "kind": "function",
+          "name": "validateSimulatorPlanArtifactJson"
+        },
+        {
+          "contractTokenSha256": "a654a75c38c1b6f818d72d3c02d5eaf033abbf7422233d36d86d989b0bdc39e0",
+          "kind": "function",
+          "name": "parseSimulatorPlanArtifact"
+        },
+        {
+          "contractTokenSha256": "779637dd8157fd9991d25962aa54efe99c28acaa8771ebf172d14d0f40d24c1c",
+          "kind": "function",
+          "name": "emitSimulatorResultArtifactJson"
+        },
+        {
+          "contractTokenSha256": "25949956f441a6085c912fb82624f03b1b9d240713d786f9a4efd6a6fa52ba2c",
+          "kind": "function",
+          "name": "validateSimulatorResultArtifactJson"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
+      "sha256": "7904d047e2f9874df557da951762e6ce9ab13e4bfb94dd10b7dd12313bc4f040"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "94c5c593b03997304b0da663d741e981dda55026d6b29b67424fc3126e58bcce",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "949dc3505ac0aa110f42820b8f54581da2efd6b8e0e48577682fd725056e8d70",
+          "kind": "constant",
+          "name": "CompileTarget"
+        },
+        {
+          "contractTokenSha256": "9aa57c7415df21acd0445f4b32c55ced7d00f64ad6014bc95bbe458c4b918622",
+          "kind": "constant",
+          "name": "CslcPlan"
+        },
+        {
+          "contractTokenSha256": "eef2d895245a99f4e2679ce08c354a942deda0f040bdb80cfe48922b6dbc11b7",
+          "kind": "constant",
+          "name": "SimulatorArtifactPaths"
+        },
+        {
+          "contractTokenSha256": "a8279924fd94d90e0116ee513a84648f1ceec500b76fe39a28fa00bcb9013e81",
+          "kind": "function",
+          "name": "emitMakefile"
+        },
+        {
+          "contractTokenSha256": "d31803c2e760c624f9811dd23fddd65161ce619f371b1695b6dcf9387858316d",
+          "kind": "function",
+          "name": "emitCompilePlanJson"
+        },
+        {
+          "contractTokenSha256": "e114ea82f29491a06a8a31552d612651e898f4ae4094b7f1301978836dd3dde9",
+          "kind": "function",
+          "name": "emitSimulatorPlanJson"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
+      "sha256": "fe5c127a2990b5d1f1cd3633c34470cae5db8db5b4d50b5e0bbd5cbf575d10f6"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "b7e772a4c36cf604624a4c10b0bfeb1f88b4b7ed5847f0f10ca4a5fe1409ff6b",
+          "kind": "constant",
+          "name": "Error"
+        },
+        {
+          "contractTokenSha256": "ee7f0135cde11a340b30c9939cc9a4eb9a92841b8ff764030e72d5d1f5993aaa",
+          "kind": "constant",
+          "name": "CSLC_ENV_VAR"
+        },
+        {
+          "contractTokenSha256": "732a68a6a3d3247010c64c5a6d1ba64126d87077a55a086764f018c51ce034c6",
+          "kind": "constant",
+          "name": "CSLC_PATH_SENTINEL"
+        },
+        {
+          "contractTokenSha256": "538636f5a441848f7828a101e81e4a75aa525979bb4ff58eeb794d6bd61c1341",
+          "kind": "enum",
+          "name": "ToolchainDiscovery"
+        },
+        {
+          "contractTokenSha256": "2f9345696dcbf4d7d96ba6bb78c01c224c6dae73bb42aab6269b1b024e03d1ee",
+          "kind": "struct",
+          "name": "ToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "320e79673f736f418b158cdc6664455c2b7407975960236ae4a7f949be7d1145",
+          "kind": "struct",
+          "name": "ValidationResult"
+        },
+        {
+          "contractTokenSha256": "9b514bef4522fb39c06f18874ba44011bd60246c6512026033bf283ba06fa38c",
+          "kind": "function",
+          "name": "lastErrorMessage"
+        },
+        {
+          "contractTokenSha256": "10887b3688a01756100ddd2dc9a27ed3c3e8ff10822b323e7d311b2ec1f85582",
+          "kind": "function",
+          "name": "loadToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "9af911492c3702d9b6bd6fed4bece8b9e499f39c469bda92c7858d9a794c1793",
+          "kind": "function",
+          "name": "toolchainConfigFromEnvValue"
+        },
+        {
+          "contractTokenSha256": "7dc2c99f6c8ee7ff5a1e17866e52d372abb17f10a3c671683ff331e24fb7c17c",
+          "kind": "function",
+          "name": "validatePattern"
+        },
+        {
+          "contractTokenSha256": "d456161e9e954641218d21358668ced40eaea1a634a70c4a8796ba3d8c07773d",
+          "kind": "function",
+          "name": "validatePatternWithToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "7a8039244a3fcb0b91342b1339b0d555a99effda8a09003a716d58f4dcc29a10",
+          "kind": "function",
+          "name": "validateToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "9b598883a7d436535db03e6a55c1137d31b80f0180078ce9a35e00ad4b979013",
+          "kind": "enum",
+          "name": "PatternKind"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_validate.zig",
+      "sha256": "a0efb91a9877373b3dc47643d552eed1b9e59f2646f9f491e7dff26bacd29bb0"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "5235d658aaf216f16729f003f34582829d633ba31a346857200d10ca698ed7f2",
+          "kind": "constant",
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "fa49c2a3f38ecef6f00372113747d36d43105842a6502bcc172f01496cbf4418",
+          "kind": "constant",
+          "name": "DXC_ENV_VAR"
+        },
+        {
+          "contractTokenSha256": "2e3e0aaee5645686916e0076dcd750fb4cf0d35e87c653713c7840c129ecb13c",
+          "kind": "constant",
+          "name": "DXC_PATH_SENTINEL"
+        },
+        {
+          "contractTokenSha256": "f5adb16b7f19181727a0de4d98ff98b8fc32e343fe55c34c121709758660db40",
+          "kind": "constant",
+          "name": "Error"
+        },
+        {
+          "contractTokenSha256": "cd10536e0a6583959fc8f670ea67a3dc88f757b69fc0f9db3c3ead827af9e148",
+          "kind": "struct",
+          "name": "ShaderModel"
+        },
+        {
+          "contractTokenSha256": "a9c86810f9bee71d6b6d08a6fed6b30a6367120efa837c78a1b3d4a067087064",
+          "kind": "enum",
+          "name": "Stage"
+        },
+        {
+          "contractTokenSha256": "2c8323f43541963d294f7c240aa62dc65818a767e1e2bb8603588b4fc1c64a0c",
+          "kind": "struct",
+          "name": "EntryPoint"
+        },
+        {
+          "contractTokenSha256": "755b23b7e3251648942fadb37f2b88c2c3466d9025089e2cd8e9ed9b135827af",
+          "kind": "struct",
+          "name": "Module"
+        },
+        {
+          "contractTokenSha256": "538636f5a441848f7828a101e81e4a75aa525979bb4ff58eeb794d6bd61c1341",
+          "kind": "enum",
+          "name": "ToolchainDiscovery"
+        },
+        {
+          "contractTokenSha256": "2f9345696dcbf4d7d96ba6bb78c01c224c6dae73bb42aab6269b1b024e03d1ee",
+          "kind": "struct",
+          "name": "ToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "9b514bef4522fb39c06f18874ba44011bd60246c6512026033bf283ba06fa38c",
+          "kind": "function",
+          "name": "lastErrorMessage"
+        },
+        {
+          "contractTokenSha256": "21e643a52fa3ce636d83e96acd88fef28b69b9e0a7fc7927d430496c1986237f",
+          "kind": "function",
+          "name": "lower"
+        },
+        {
+          "contractTokenSha256": "86325f1399b7879c0e367030556dfdb43fff93bb6606cc5264ba44e3a0b0dc1e",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "12fb4f6ca8298390bf13c566da07b368737ae21213a12da82f5fffaa83a81abb",
+          "kind": "function",
+          "name": "emitWithToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "10887b3688a01756100ddd2dc9a27ed3c3e8ff10822b323e7d311b2ec1f85582",
+          "kind": "function",
+          "name": "loadToolchainConfig"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/dxil/emit_dxil.zig",
+      "sha256": "1aec951a28d46f7cc5481d09f5daafe42ef8d71698a409038f97634020b949e3"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "f3c8c19076ca2706b42a8c82d7e195618e8069622963397c9de83f36d4279ae5",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "5235d658aaf216f16729f003f34582829d633ba31a346857200d10ca698ed7f2",
+          "kind": "constant",
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "5d528fc1f892ad0f4a1097467e76615319345026ff63256e79f8e1e6f9e2409f",
+          "kind": "function",
+          "name": "emit"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
+      "sha256": "b6ff219dd129c8c5e84ffd1d5d5e097d0d9c84236bfbc9bbc7d68c476954f940"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "db54c528895c45b1fa822d57274286a08443a60de430c97bf36dcc0eb3db0d72",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "ece98dfe4ed7c406c4d177bcfad1dfebe58dc3a906241612c8d888f8a5575a4a",
+          "kind": "function",
+          "name": "emit_texture_builtin"
+        },
+        {
+          "contractTokenSha256": "9c4cff2e13ca18c43ecdb09e2a6d1a4a623dd1d22554e66e6dd1c0320f340fea",
+          "kind": "function",
+          "name": "emit_texture_global_helpers"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_texture.zig",
+      "sha256": "f398bde27b198e112e7b016d53b5fc4de34c096f3c165fd63196db93fb7f39bb"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "178df2fca1e7fcd99e7788f0460199504c82440471dd88a99d158c17fa76aabc",
+          "kind": "constant",
+          "name": "DISPATCH_INFO_REGISTER_SLOT"
+        },
+        {
+          "contractTokenSha256": "e10af19375d30dabf46786f583942029a930db96a6b3a45746031ee45518d2f8",
+          "kind": "constant",
+          "name": "DISPATCH_INFO_REGISTER_SPACE"
+        },
+        {
+          "contractTokenSha256": "0a4607d35e337b1681da38503212819dbbbcfc58f85218e7a70fa9e8d632ced3",
+          "kind": "constant",
+          "name": "DISPATCH_INFO_ROOT_PARAMETER_INDEX"
+        },
+        {
+          "contractTokenSha256": "9c513d7bcafe8670fcd8e7e3bcc7932286c6ef765172bf4a562137cd56cadfa9",
+          "kind": "constant",
+          "name": "DISPATCH_INFO_BUFFER_BYTES"
+        },
+        {
+          "contractTokenSha256": "0be2fbfed253b05ec93bdeef9c3429dde36b25255ee059826bdc94e39eb75419",
+          "kind": "constant",
+          "name": "DISPATCH_INFO_CBUFFER_NAME"
+        },
+        {
+          "contractTokenSha256": "b231ce5eb6ce42a0b43a76577a6f7677964cfb3ea7f2c36d370a909495a13a48",
+          "kind": "constant",
+          "name": "DISPATCH_INFO_FIELD_NAME"
+        },
+        {
+          "contractTokenSha256": "6d07dae9bdb9c63f35434279a69ff14b84b97bd0f3093ad53c85f1d67ae4794d",
+          "kind": "constant",
+          "name": "DISPATCH_INFO_PAD_FIELD_NAME"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/hlsl/hlsl_dispatch_contract.zig",
+      "sha256": "c8bda6e5d842435bd32aafe11ff509a65bf8a45d5c8e2deb41fca6a912feac65"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "db54c528895c45b1fa822d57274286a08443a60de430c97bf36dcc0eb3db0d72",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "220903e6981443d034fd4f49a076856ff7a6e41e1692e569d63d0e97cafea87c",
+          "kind": "constant",
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "5d528fc1f892ad0f4a1097467e76615319345026ff63256e79f8e1e6f9e2409f",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "7299b4db3a41f47b9621ce89c80770c69762b15506368f42842750b84fa84dd4",
+          "kind": "function",
+          "name": "moduleNeedsSizesParam"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/msl/emit_msl.zig",
+      "sha256": "d0aba6e2597a4041019ad25f46ca2fe878cd48564715a7c3f56a24875924394b"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "f3c8c19076ca2706b42a8c82d7e195618e8069622963397c9de83f36d4279ae5",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "cba61b2794b3b860e7ac09256809b3030eb9e643984f288060aafd6f8450def1",
+          "kind": "function",
+          "name": "emit_fragment_function"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/msl/emit_msl_fragment.zig",
+      "sha256": "0508b1bc6c43ba1b106b26f15e6dc83e290258c709456c86960083773734139b"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "db54c528895c45b1fa822d57274286a08443a60de430c97bf36dcc0eb3db0d72",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "85d4cca5cc192a74d3dce406a60888ce4206e59290956badd78601fb2f57e7d3",
+          "kind": "function",
+          "name": "vertex_function_name"
+        },
+        {
+          "contractTokenSha256": "760224685de8e3a374b750550fc51de057591d5dc7b51ec83e78f17278dc5e92",
+          "kind": "function",
+          "name": "fragment_function_name"
+        },
+        {
+          "contractTokenSha256": "121ec799fe4c1c6c298833f1038fec62f8ed01368a122dcbdcd8ac767cf175ab",
+          "kind": "function",
+          "name": "write_type"
+        },
+        {
+          "contractTokenSha256": "744854958e8b487c641cb97dc85b6363c44803d8839670b981b526285b9c94ea",
+          "kind": "function",
+          "name": "write_bound_global_param"
+        },
+        {
+          "contractTokenSha256": "f8ab20b78b13b0ee54f45f74816ffc37086014952d5d909bd1b6f107f40ba92d",
+          "kind": "function",
+          "name": "write_stmt"
+        },
+        {
+          "contractTokenSha256": "8f4605913d7e22be5520c38713f6d22118c9c67cad6891c86447eb4bc603c3cf",
+          "kind": "function",
+          "name": "write_expr"
+        },
+        {
+          "contractTokenSha256": "90eb899b8ab565df225a3177207d1a3bffc0e203c745182295e0ea4a73aee759",
+          "kind": "function",
+          "name": "write_str"
+        },
+        {
+          "contractTokenSha256": "b98b4a1c004e076fa91d3ae6e1520230df178bac9a57a8405b6b595f5b821721",
+          "kind": "function",
+          "name": "write_indent"
+        },
+        {
+          "contractTokenSha256": "288cf92f16527c4156474ded7748d2a534be510381fbe5a9221cb908ceb44058",
+          "kind": "function",
+          "name": "write_u32"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
+      "sha256": "4e5c2c06142324d80faca95cdfabd6b01573483efd9b756163b06f4078a60187"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "171866cb4ffc839481f98bf2bf4a20284154c579911ecc8baace955cfdf52359",
+          "kind": "function",
+          "name": "msl_name_for"
+        },
+        {
+          "contractTokenSha256": "9535f5bc746663eef68499178a7cf414202509cb5aa4615578446fee6974efc8",
+          "kind": "function",
+          "name": "module_uses_subgroups"
+        },
+        {
+          "contractTokenSha256": "25e1b3cfb907324ac8cb042e5a4d914f8a9082aa5ed5afa177c1d686c353a026",
+          "kind": "function",
+          "name": "msl_subgroup_attribute"
+        },
+        {
+          "contractTokenSha256": "ea54944747ba477480af9d0678cf49755bf0e3ae001805912b9c3ea930394f29",
+          "kind": "constant",
+          "name": "SIMDGROUP_INCLUDE"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/msl/emit_msl_subgroups.zig",
+      "sha256": "48cd0eba7913c5d62b5ec4354fe62345dd8fc55b3ad4cfc3d51ec450da295d5d"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "f3c8c19076ca2706b42a8c82d7e195618e8069622963397c9de83f36d4279ae5",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "1a74ae5be0e7017cdbc4bae7ee823b029a386b870461e49687668f8ea479161d",
+          "kind": "function",
+          "name": "emit_vertex_function"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/msl/emit_msl_vertex.zig",
+      "sha256": "9365528ed775a59b42701c384cff168cb4b39941a6e32ed66531a0910e12c30f"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "e1b7c078aad22c7b42e3c393b0d3951ec6431bd9957988161f19d2a9f19e3ef6",
+          "kind": "constant",
+          "name": "EmitError"
+        },
+        {
+          "contractTokenSha256": "5235d658aaf216f16729f003f34582829d633ba31a346857200d10ca698ed7f2",
+          "kind": "constant",
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "5d528fc1f892ad0f4a1097467e76615319345026ff63256e79f8e1e6f9e2409f",
+          "kind": "function",
+          "name": "emit"
+        },
+        {
+          "contractTokenSha256": "389a7f38e01528434b28bccbbd0a2cbb098729fe8fef0045fb2555c6bd04d65f",
+          "kind": "function",
+          "name": "emitForStage"
+        },
+        {
+          "contractTokenSha256": "f172de3ed96fd9b5fc792f1c967358b18fe4d5c1c39455b9246630c9b4a8d389",
+          "kind": "struct",
+          "name": "Emitter"
+        },
+        {
+          "contractTokenSha256": "88817ded2914a6e58597eef4758b3b164f27f888fb0c2ff404e092596f32fa36",
+          "kind": "constant",
+          "name": "addr_space_to_storage_class"
+        },
+        {
+          "contractTokenSha256": "a2db4b933f1bb1c135067a1bbaa7fc77c000b99b5f1d250b774fdd9f27ec0bb8",
+          "kind": "constant",
+          "name": "builtin_to_spirv"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/spirv/emit_spirv.zig",
+      "sha256": "6ee3dc4d9b0506e84fe9da0f5672e6cc4819ee3ff28978b23e774611a1c2ccc5"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "a2653937d59e98857d0e6c3386d04859f78d76bb06095971764f80e9bd7720b3",
+          "kind": "function",
+          "name": "FunctionState"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
+      "sha256": "b48aca414d84f10f9a82cf5789f8def5359292f0b3f1d1152d5bf2edc047439d"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "bde9bd0c4c8a12e5235e8743d47fbbedb6616e9faff79f90943d0dfebab19a93",
+          "kind": "function",
+          "name": "emit_io_global"
+        },
+        {
+          "contractTokenSha256": "d634c88a9071460bc91719aaf7104630139101118770ccebaa63f8f5ed38f2cc",
+          "kind": "function",
+          "name": "emit_stage_entry_wrapper"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/spirv/emit_spirv_stages.zig",
+      "sha256": "a82cdc138003c5b3fc1f195cd369536dfe6f43af80120425a69d4887114435e4"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "a4f542350e9554936880704860003a7e32d5fd74f28d60ffea6c0bf98852542b",
+          "kind": "function",
+          "name": "emit_texture_sample"
+        },
+        {
+          "contractTokenSha256": "f39bc9ce82fc61dd39464f152c7b4bcd8fe0f1455c4fa883ba2961cf47263424",
+          "kind": "function",
+          "name": "emit_texture_sample_bias"
+        },
+        {
+          "contractTokenSha256": "a14adf1282a542fee2a85dc6e5944774919e210a6bf7ac17b3252107c6fa3bdf",
+          "kind": "function",
+          "name": "emit_texture_sample_compare"
+        },
+        {
+          "contractTokenSha256": "77e459c3d0e0c53d0a78f0c84a323728937c255929ea4378e0bebb5039a864b2",
+          "kind": "function",
+          "name": "emit_texture_gather"
+        },
+        {
+          "contractTokenSha256": "7b84c4f2b656a0924584f321801040ca20d0a8554163b4c7b29f192362ca3087",
+          "kind": "function",
+          "name": "emit_texture_gather_compare"
+        },
+        {
+          "contractTokenSha256": "2727d1aba404a48cd0369106fb7e629becf43e99e26f94cc39268aef0031827b",
+          "kind": "function",
+          "name": "emit_texture_sample_grad"
+        },
+        {
+          "contractTokenSha256": "fa5e0d93dad1516e9d52321fc32387494357ccc1a708b20982ed68e1d3eecf3b",
+          "kind": "function",
+          "name": "emit_texture_sample_offset"
+        },
+        {
+          "contractTokenSha256": "e17069fc2dc32628cac9cd1fc9fdceafde3711ba4869db789e9de0d7b4449465",
+          "kind": "function",
+          "name": "emit_texture_sample_level_offset"
+        },
+        {
+          "contractTokenSha256": "8e03d340b0586e1908f89e6c31b27f99754dffe48e8b2935e2f0a14f6e129b33",
+          "kind": "function",
+          "name": "emit_texture_dimensions"
+        },
+        {
+          "contractTokenSha256": "4c06dbb8f9745040b9f2f7b82d8b8e02156e1237d6c1204c3411b0520fa05ee8",
+          "kind": "function",
+          "name": "emit_texture_load"
+        },
+        {
+          "contractTokenSha256": "0ca856b2be66f8f71832b805d14958c6c4ce42032f1f917468fd7460e69957bc",
+          "kind": "function",
+          "name": "emit_texture_num_levels"
+        },
+        {
+          "contractTokenSha256": "e735e0e3b9aaa9250fcff77bd394fc3cc6c416a246b0650b60ab2a1d3d6dea4c",
+          "kind": "function",
+          "name": "emit_texture_num_layers"
+        },
+        {
+          "contractTokenSha256": "87c221a0cc9d9bd4e09fc076d9842c9b74800741d0348f9417826f5c8112e6bc",
+          "kind": "function",
+          "name": "emit_texture_store"
+        }
+      ],
+      "path": "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig",
+      "sha256": "242005690130e4f3371e027a18404a57e15823d3601a91186c4b6bd632bbe9d9"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "7ab57d2846392f627187ebe6405ceef5032af3e4ffdd234b2bae4cd4f6e1eb5e",
+          "kind": "constant",
+          "name": "NULL_NODE"
+        },
+        {
+          "contractTokenSha256": "1dc6ca89c2e9590c70b7e8b02dfe648eadbbbd2653a6bff1f02648a36ce1a1aa",
+          "kind": "struct",
+          "name": "Node"
+        },
+        {
+          "contractTokenSha256": "29331b0c2cefcfee80fd845cc6b2fe91c8b0065d1a44c203f99e09e7dfcb8b1b",
+          "kind": "enum",
+          "name": "NodeTag"
+        },
+        {
+          "contractTokenSha256": "fe0a564ee58ba9f8d12fdada143d59f6d2d40b8d2ca2f821c105f0327de3053e",
+          "kind": "struct",
+          "name": "Span"
+        },
+        {
+          "contractTokenSha256": "b5416c3de3c16912bb81d309bc0fcc1e058734f62de90a0abb4b0214832d705c",
+          "kind": "struct",
+          "name": "FnExtra"
+        },
+        {
+          "contractTokenSha256": "3790c53b28fb951b7e62ebbc9da36bdd7635f3bbe04b703dfe16f2746fc35bcc",
+          "kind": "struct",
+          "name": "GlobalVarExtra"
+        },
+        {
+          "contractTokenSha256": "6b588003c2b673fd5277ab6e57d880213b5a9624df3836d59d1e2aef9cf134ff",
+          "kind": "struct",
+          "name": "OverrideExtra"
+        },
+        {
+          "contractTokenSha256": "51df9f91b8cafc0f26de94a18e57f50101c368cf7996562db4db5d0be790f8ce",
+          "kind": "struct",
+          "name": "ParamExtra"
+        },
+        {
+          "contractTokenSha256": "d4d1a03dff5d6080f737509a7161b04f416d60b6114f08b38f1e9474b9cade83",
+          "kind": "struct",
+          "name": "Ast"
+        }
+      ],
+      "path": "src/compiler/wgsl/frontend/ast.zig",
+      "sha256": "7310628172880b75e7c84ccfaaccf52b9f0e10919badd646da72c0d33c98efd6"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "1b610c6c9f98eda732d616d355e0d19787cd18853821cb50d2aaf20097748780",
+          "kind": "struct",
+          "name": "Lexer"
+        }
+      ],
+      "path": "src/compiler/wgsl/frontend/lexer.zig",
+      "sha256": "6fb908d3c5e5b20b8b1020b2e3f0f00ab205c7c07da3d632b53206c81cbda6aa"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "93a8120971478555d9407973db045dbfc5420d3d95c00b315f30fa07f5479c34",
+          "kind": "struct",
+          "name": "FailureContext"
+        },
+        {
+          "contractTokenSha256": "14a281bb1e571c50c12269e39235cf18079f042c54907fa90c093671bc5d7651",
+          "kind": "function",
+          "name": "resetLastFailureContext"
+        },
+        {
+          "contractTokenSha256": "1dda7babf51a3f8f96c8ebc93e6533409b7794442aad1d29a40add64db4b8f67",
+          "kind": "function",
+          "name": "lastFailureContext"
+        },
+        {
+          "contractTokenSha256": "2951d4e718d3776b6f237e46319e8cb5a2733294396b9758ab5ec4e771c84adc",
+          "kind": "constant",
+          "name": "ParseError"
+        },
+        {
+          "contractTokenSha256": "0d4dd057fa4ce54ce50224d31947da1c33a844ca41650e5b5126da2e88e31c31",
+          "kind": "constant",
+          "name": "AttrSpan"
+        },
+        {
+          "contractTokenSha256": "95b42e19e1e3d4a9a90dd4a1909bda7fbd98565cbe0ccffe8072d2a1195b0bba",
+          "kind": "struct",
+          "name": "Parser"
+        },
+        {
+          "contractTokenSha256": "1875c62e7ee61db8cf4f9ace9e978b72d7964f72413b2b1e29d28f7b20b717e1",
+          "kind": "function",
+          "name": "parseSource"
+        }
+      ],
+      "path": "src/compiler/wgsl/frontend/parser.zig",
+      "sha256": "ff8bdae50dc0e0b5f5584027bddd26607b959a0b9f61dc423d4c09fb36962428"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "1ca9d76040ed08c5f96fe078a26892979060bb31be64c7ec25e73ab45296ee7c",
+          "kind": "constant",
+          "name": "AnalyzeError"
+        },
+        {
+          "contractTokenSha256": "fbe19ce765c3577a0a518c60d44138d8a509d6c475a22b4b07d571025bd1bc7c",
+          "kind": "constant",
+          "name": "SymbolRef"
+        },
+        {
+          "contractTokenSha256": "0d4f3747b8192d10c66792cd94bfd3f9d4c98d9fd65c0b2aa6bbdc08a5a408c8",
+          "kind": "constant",
+          "name": "NodeInfo"
+        },
+        {
+          "contractTokenSha256": "3f90e7e7f887241bc19788c9fee380f05c79f4d9b6f570b4ddc5e6383993e9d4",
+          "kind": "constant",
+          "name": "AliasInfo"
+        },
+        {
+          "contractTokenSha256": "ed26aa90f47f0fee2adee6752a233212faf981f89292dfac45b7665f774d541c",
+          "kind": "constant",
+          "name": "StructFieldInfo"
+        },
+        {
+          "contractTokenSha256": "536a72f0d56ac086709953a5c11857adee493c1b1de99e4b3a66a5820075e163",
+          "kind": "constant",
+          "name": "StructInfo"
+        },
+        {
+          "contractTokenSha256": "bb4ce590dd1ce9d41bc8dea4ed865296b6920875023324583eab9a9ebe329faf",
+          "kind": "constant",
+          "name": "GlobalInfo"
+        },
+        {
+          "contractTokenSha256": "8e1f5a446d489299b7a7f01fc76a690d6d5f0b0f13515fd2fb656613c1784ccd",
+          "kind": "constant",
+          "name": "ParamInfo"
+        },
+        {
+          "contractTokenSha256": "79e9d24546717d1850993fdc848e6fe8f786713620839c2cc762b182e9d527ce",
+          "kind": "constant",
+          "name": "LocalInfo"
+        },
+        {
+          "contractTokenSha256": "e23072e99c9e3a69695c92c281b51aa83a7c454200b716db01bba4252e9ef840",
+          "kind": "constant",
+          "name": "FunctionInfo"
+        },
+        {
+          "contractTokenSha256": "7e6583fac2dca081163d0c772614c6e73ef6645d08612bb6711f2f677841c416",
+          "kind": "constant",
+          "name": "SemanticModule"
+        },
+        {
+          "contractTokenSha256": "693e09534fe5899e6f78b37a390e76fe7ea45a13988166603feae9da326f198c",
+          "kind": "struct",
+          "name": "FailureContext"
+        },
+        {
+          "contractTokenSha256": "14a281bb1e571c50c12269e39235cf18079f042c54907fa90c093671bc5d7651",
+          "kind": "function",
+          "name": "resetLastFailureContext"
+        },
+        {
+          "contractTokenSha256": "1dda7babf51a3f8f96c8ebc93e6533409b7794442aad1d29a40add64db4b8f67",
+          "kind": "function",
+          "name": "lastFailureContext"
+        },
+        {
+          "contractTokenSha256": "ddb2233ceb19ea3a0544af180acd31d72a9c9eacc1b17ce4367091b92bbdc3de",
+          "kind": "function",
+          "name": "analyze"
+        }
+      ],
+      "path": "src/compiler/wgsl/frontend/sema.zig",
+      "sha256": "7915fb266c7540c1e58bb0d18f61b1d66ee1616602c623e00de8d2b9f79f5946"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "00567e5a9dbb58be6de453e71593e3781182c546e11fac240a13a26ee7aff884",
+          "kind": "struct",
+          "name": "Token"
+        },
+        {
+          "contractTokenSha256": "443df633b7fc573e9c57b433537bb6e7d6a74023f7492cf80ae71a20dd7e3402",
+          "kind": "enum",
+          "name": "Tag"
+        },
+        {
+          "contractTokenSha256": "2feeb35c173330145212b08719b1eaeb86d76cd0672b2cd8a8e027d1e3161a78",
+          "kind": "function",
+          "name": "lookupIdent"
+        }
+      ],
+      "path": "src/compiler/wgsl/frontend/token.zig",
+      "sha256": "8f5b47431dd37246ce29e32093292b76d71691ccdd4fc364acde9799ce283329"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "ddc21875d1b99441911b3ae9b25e93b1a871f437765c1ce04c175793f7889ccf",
+          "kind": "constant",
+          "name": "TypeId"
+        },
+        {
+          "contractTokenSha256": "c85225766c9d7e1920d8d48a6ed8ffc5aaa4b94fb614ff49276a1678a0c4ed11",
+          "kind": "constant",
+          "name": "ExprId"
+        },
+        {
+          "contractTokenSha256": "c180ddc169b3cab631845279ddd2343e717bfd49fa033b8e8871fd12ef20fe25",
+          "kind": "constant",
+          "name": "StmtId"
+        },
+        {
+          "contractTokenSha256": "9c41becb2137baa33c38c45332a2228ab3035b4b6c47d22ba13dd60f9c8866c9",
+          "kind": "constant",
+          "name": "StructId"
+        },
+        {
+          "contractTokenSha256": "e161ddd38d62e8d399a8373853e3e790ab4d39a2f8a395d2d3013db9724cb160",
+          "kind": "constant",
+          "name": "FunctionId"
+        },
+        {
+          "contractTokenSha256": "702aaf1c273282df1a16204d33695e1e71d2dcd1a0739880ae1f790feffe9e05",
+          "kind": "constant",
+          "name": "GlobalId"
+        },
+        {
+          "contractTokenSha256": "2bff25e5f241f6d312cd17cfc180b343f248d2af5bd933bc971f516641a81bdd",
+          "kind": "constant",
+          "name": "INVALID_TYPE"
+        },
+        {
+          "contractTokenSha256": "bff60a3f34dfba78230566d21b2bc2c0747d1ad64a1fea2a03b4e155d9a9c2d5",
+          "kind": "struct",
+          "name": "Range"
+        },
+        {
+          "contractTokenSha256": "fb363746c950f6557bbeb0ca326eade00e8a73596c7606c119e08016abbe2452",
+          "kind": "enum",
+          "name": "AddressSpace"
+        },
+        {
+          "contractTokenSha256": "638be06e92200caf5b50e79b954f8efc9f965b32c89c3bea902a5a9d02719199",
+          "kind": "enum",
+          "name": "AccessMode"
+        },
+        {
+          "contractTokenSha256": "201ba03f0423c101248856be7222affed9d54c7d1d2ec28a20908d26f6ad9b56",
+          "kind": "enum",
+          "name": "ShaderStage"
+        },
+        {
+          "contractTokenSha256": "0a77ffcb813092848907a784bb56530d4706ca13fdd898398c5c37ec1655f4c8",
+          "kind": "enum",
+          "name": "Builtin"
+        },
+        {
+          "contractTokenSha256": "0b1d45bd5d39c29db1dadcb9826b7898a8206388d6f9fd36f531ec89119e4ace",
+          "kind": "enum",
+          "name": "Interpolation"
+        },
+        {
+          "contractTokenSha256": "3746aaf45857f7fc5434b12386012cfe79123ea22d9ad4c79b1f2bd02c326eae",
+          "kind": "enum",
+          "name": "InterpolationSampling"
+        },
+        {
+          "contractTokenSha256": "b76d44e9ec9ecdffc913b05f59153bd09dc46e6b5622ee85cd99ca8ab62bb852",
+          "kind": "struct",
+          "name": "IoAttr"
+        },
+        {
+          "contractTokenSha256": "591a9a3422cba59691238111dcb3e732912d1ec75e12cec2521f3fe8f81a6984",
+          "kind": "struct",
+          "name": "BindingPoint"
+        },
+        {
+          "contractTokenSha256": "bc1904664e2c5b9f248b20989971d8a46a7969bc72033401f4b622abb110edf1",
+          "kind": "enum",
+          "name": "GlobalClass"
+        },
+        {
+          "contractTokenSha256": "0adaef7fbc734f77dceb93d60beea232d7b696cee44a96e5e59025b6be0d554a",
+          "kind": "enum",
+          "name": "ScalarType"
+        },
+        {
+          "contractTokenSha256": "c635217eacc4542e032b89eca28dd59b6a0ee65b1d14e4d93cc50aadbe87dc37",
+          "kind": "enum",
+          "name": "TextureFormat"
+        },
+        {
+          "contractTokenSha256": "c7cd659ec763ba28218e6f628e6da93c6e4eb07781bf931cd64c2e6bd7c3d907",
+          "kind": "union",
+          "name": "Type"
+        },
+        {
+          "contractTokenSha256": "ec519ff6d5ac506d4f8876586c0d09df4ee56ef9ef180a2974d1074bd29deedb",
+          "kind": "struct",
+          "name": "TypeStore"
+        },
+        {
+          "contractTokenSha256": "093a0d4fd0ca94557ce5f120456ebe7e6bc3869030324410f5cf52ad5e7a65f9",
+          "kind": "struct",
+          "name": "StructField"
+        },
+        {
+          "contractTokenSha256": "ba6d424175295d3e221bbba7dcddbacd5c3386ed72ca2ac4b5bf1fc381d02da8",
+          "kind": "struct",
+          "name": "StructDef"
+        },
+        {
+          "contractTokenSha256": "a17326312ee49c47621453d8aa6976e3ae8ae1771a8b99ae6129d510c3e00efc",
+          "kind": "union",
+          "name": "ConstantValue"
+        },
+        {
+          "contractTokenSha256": "c6fbcd48e57b12b572256038f245476d56951042ea406136833f98022880f78c",
+          "kind": "struct",
+          "name": "Global"
+        },
+        {
+          "contractTokenSha256": "d433d969dbbaad89d064e84584120ff2a9f38d586b0eced1d9fc0207d4c752e7",
+          "kind": "struct",
+          "name": "Param"
+        },
+        {
+          "contractTokenSha256": "ab7c7d09de4b95f8a68f9de36e72780b7c2b5fa5ca006b9ed97f1b39bdede8fe",
+          "kind": "struct",
+          "name": "Local"
+        },
+        {
+          "contractTokenSha256": "7dbe71d0f748e0a5f1f6b040b7f98c37678c70384e00cdfeda0fd30581a9a8ea",
+          "kind": "enum",
+          "name": "ExprCategory"
+        },
+        {
+          "contractTokenSha256": "729ce52b42d401a1f1f47df0ad2d5eda9f6008b28de60761a4ef2e4f86cd882e",
+          "kind": "enum",
+          "name": "UnaryOp"
+        },
+        {
+          "contractTokenSha256": "5ea4db04d6fe0514a919dbe09a60520489d0b1d40b0cb7e867c18b89b64e7f76",
+          "kind": "enum",
+          "name": "BinaryOp"
+        },
+        {
+          "contractTokenSha256": "0e56c22d4260f55dfb9af751912a1c5276b84fb362bdf6dd3a4333c6e094ce11",
+          "kind": "enum",
+          "name": "AssignOp"
+        },
+        {
+          "contractTokenSha256": "daa05dac152440770d673c08edfb8d310de402dfac14e9b744de3ec78aca2eb8",
+          "kind": "enum",
+          "name": "CallKind"
+        },
+        {
+          "contractTokenSha256": "61f19bf52852d6dccbd0202181efa44f9f2c27d8bed7f32e4134fc9686557297",
+          "kind": "union",
+          "name": "Expr"
+        },
+        {
+          "contractTokenSha256": "c26bb20f395c6d5e9c98c37103778b02742e1511a572a11e9254bf0070f37cb2",
+          "kind": "struct",
+          "name": "ExprNode"
+        },
+        {
+          "contractTokenSha256": "dc7b874a03ce944454bc6eeca058a6d969b888559971f22db76803990ff2d7e5",
+          "kind": "enum",
+          "name": "LoopKind"
+        },
+        {
+          "contractTokenSha256": "52aee79a99928fbce7432a3439ef563a406669eff6faf6341ea2482ca1f277b3",
+          "kind": "struct",
+          "name": "SwitchCase"
+        },
+        {
+          "contractTokenSha256": "c23f07f80adc966ca7eff1757c8a79cfd97b93fdab7c615ab11a91fd02be1cdb",
+          "kind": "union",
+          "name": "Stmt"
+        },
+        {
+          "contractTokenSha256": "f8e99892b016fb5e1b411c914b45e7986b52cb0be8a8f3e575b73b9e5c1b27a1",
+          "kind": "struct",
+          "name": "Function"
+        },
+        {
+          "contractTokenSha256": "c0d69adc07fa53c63f4b756ca061cb4191e9243b9660a031c75790862c63575a",
+          "kind": "struct",
+          "name": "EntryPoint"
+        },
+        {
+          "contractTokenSha256": "9add838d5945adefc480bda170747a2ccfc720368e3a2395fc4588243dba3a46",
+          "kind": "struct",
+          "name": "OverrideEntry"
+        },
+        {
+          "contractTokenSha256": "5f6dd4b52c3749db73fd9c26f90f52f470bccabb80409a118d2ee38ef39b0d39",
+          "kind": "enum",
+          "name": "DispatchPreconditionKind"
+        },
+        {
+          "contractTokenSha256": "b589d67ac353709d745c2f36429ae8b6fc89161779978b596676dc1e539b29ed",
+          "kind": "struct",
+          "name": "DispatchPrecondition"
+        },
+        {
+          "contractTokenSha256": "aaeadf7543d9e7687ce600470b120fb33b5589cb243deed3bfac2dc9d81d9622",
+          "kind": "enum",
+          "name": "TextureDispatchPreconditionKind"
+        },
+        {
+          "contractTokenSha256": "9147ca5576f7ea619e9b1969786298de4e89852f6759176a12f6dbcba50e4768",
+          "kind": "enum",
+          "name": "TextureDispatchCoordMode"
+        },
+        {
+          "contractTokenSha256": "0d9a18fa0b1bd1f09e133b0b2553d595e7acb20571843b17a7c3bc4af5f46f2f",
+          "kind": "struct",
+          "name": "TextureDispatchPrecondition"
+        },
+        {
+          "contractTokenSha256": "4bff507b5a6f4f79e69b284bd82910b9f85c31769829f9180c49e40d6b7033f1",
+          "kind": "struct",
+          "name": "Module"
+        },
+        {
+          "contractTokenSha256": "6b8300f0d62c3a997a72563f411c9e43973c8974e9016536e9e9e1c07387d817",
+          "kind": "function",
+          "name": "dup_string"
+        },
+        {
+          "contractTokenSha256": "b118d6152e0f4a7e3b778fff6c1661175b52b0f90eaba6648df823f4ddc2681a",
+          "kind": "function",
+          "name": "is_scalar"
+        }
+      ],
+      "path": "src/compiler/wgsl/ir/ir.zig",
+      "sha256": "7cc074d7b1bd1919c0cdf0d6f92bd4d08daca3d769cc6385a23ff36aec473e75"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "5f8c55b5593d1d225d902176fe0281d18a66aa0f4081733b422879cb7c93b89e",
+          "kind": "constant",
+          "name": "BuildError"
+        },
+        {
+          "contractTokenSha256": "693e09534fe5899e6f78b37a390e76fe7ea45a13988166603feae9da326f198c",
+          "kind": "struct",
+          "name": "FailureContext"
+        },
+        {
+          "contractTokenSha256": "14a281bb1e571c50c12269e39235cf18079f042c54907fa90c093671bc5d7651",
+          "kind": "function",
+          "name": "resetLastFailureContext"
+        },
+        {
+          "contractTokenSha256": "1dda7babf51a3f8f96c8ebc93e6533409b7794442aad1d29a40add64db4b8f67",
+          "kind": "function",
+          "name": "lastFailureContext"
+        },
+        {
+          "contractTokenSha256": "e176ef3df01f359a5ff40589f428cb45ea87d396bfcefcb1d198b8c4b2b39bd0",
+          "kind": "function",
+          "name": "build"
+        }
+      ],
+      "path": "src/compiler/wgsl/ir/ir_builder.zig",
+      "sha256": "26901c59b943a51f71a4d3fb56e76e94ac4013724f90d25822c1c3cbfc80832f"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "12089ed3afb914a482528fb15da502443e958ca01ff6699a7a7ed222fd1608b7",
+          "kind": "constant",
+          "name": "RewriteError"
+        },
+        {
+          "contractTokenSha256": "944bdc861088bd103790807aff5412c786547d9134a447b6679cd0d9f4988178",
+          "kind": "struct",
+          "name": "Config"
+        },
+        {
+          "contractTokenSha256": "f8d7b46945e7e6db532219baa376cf3344639e58ace88000de62095fd410d01d",
+          "kind": "struct",
+          "name": "Stats"
+        },
+        {
+          "contractTokenSha256": "e3783fc38793707bee8cd4b48a3be98d60a02d5e1956aae6d6e978a6ffd052b1",
+          "kind": "function",
+          "name": "apply"
+        },
+        {
+          "contractTokenSha256": "d9f6585f5c9c48fbf7e4130af0de8da7734d2dff8704082db046c230c6867754",
+          "kind": "function",
+          "name": "applyWithConfig"
+        }
+      ],
+      "path": "src/compiler/wgsl/ir/ir_opt_rewrite.zig",
+      "sha256": "1db1561f05ece98080d3ac8bfe0cac1e05b881d8d05c38e226808e6a00730d13"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "ce77149778c6e81bfc937fbd7563ef51380b713215058bca6dbcc44a0e585829",
+          "kind": "constant",
+          "name": "TransformError"
+        },
+        {
+          "contractTokenSha256": "82577c726a5b5e68b56116652be12b71dfed90e24ca7f8891d6cb07ca4b09d91",
+          "kind": "struct",
+          "name": "Config"
+        },
+        {
+          "contractTokenSha256": "f819816b3c5d5888cc5da055a2c8e3f7a704edfb0e75b61078e4890dcccc74b5",
+          "kind": "function",
+          "name": "apply"
+        }
+      ],
+      "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+      "sha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "eb12c3d1232ea15ace8cc2580088644c11d789af3504f164d2bb0e7792730782",
+          "kind": "constant",
+          "name": "ValidateError"
+        },
+        {
+          "contractTokenSha256": "81978cb7aae5b8cbcf90bc54d5af450539b71d4d5cf3a30c117fe58cb2868004",
+          "kind": "function",
+          "name": "validate"
+        }
+      ],
+      "path": "src/compiler/wgsl/ir/ir_validate.zig",
+      "sha256": "c81a82f65a37658f0b19ab104b5bf0b03b8747eacf5fc5ed767eb9174f019771"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "e6658f397329f9c07ddca83027766e62df02c8e2c8ceac5ce8ec5943fff3bbb5",
+          "kind": "function",
+          "name": "resolve_member_global"
+        },
+        {
+          "contractTokenSha256": "8cec5613a0ab324e6a493845f7fe4177c32d1fe16101bfc6b08a68ae435dc1d2",
+          "kind": "function",
+          "name": "struct_field_offset"
+        },
+        {
+          "contractTokenSha256": "af69dfede75823b25f7913b19aa0b3e68f2d74431d3daea3800516c5c9bd6236",
+          "kind": "function",
+          "name": "round_up"
+        },
+        {
+          "contractTokenSha256": "54813387d695d7bf6c71e8ea0483e51d40b25741b70afde13834c6d56b850878",
+          "kind": "function",
+          "name": "type_alignment"
+        },
+        {
+          "contractTokenSha256": "6f5686757f9038e63021331505498e73ba28343030b923ec89900f75e329e337",
+          "kind": "function",
+          "name": "type_size"
+        }
+      ],
+      "path": "src/compiler/wgsl/ir/layout_utils.zig",
+      "sha256": "5d40810293b87d015f50ac9dee31d705d803c67120a38db6b4be315c6880b4cb"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "4b638e9dc19725ba77107524cf7d04779e0a614e6fc19719e1dc8cb3ebd7662f",
+          "kind": "constant",
+          "name": "token"
+        },
+        {
+          "contractTokenSha256": "8e860c2ef5886880195a035d22c62b64f67561802ea458e0419f6a9620fdc722",
+          "kind": "constant",
+          "name": "lexer"
+        },
+        {
+          "contractTokenSha256": "4ff586dc1475c27241a25d97c2d8718988d62577c2df2a7f2cfdaaec8fbd41a0",
+          "kind": "constant",
+          "name": "ast"
+        },
+        {
+          "contractTokenSha256": "85625089f398027f487b8b6d295c3297c500647f00bf03d9374c149878ce598f",
+          "kind": "constant",
+          "name": "parser"
+        },
+        {
+          "contractTokenSha256": "b8d231efb3c4f6a63a9c82f16b64089fc0ca7d6c62cc59b42e7ac6787899ff99",
+          "kind": "constant",
+          "name": "sema"
+        },
+        {
+          "contractTokenSha256": "8289ea05caf40c4132b80af04da6a40cee181794d8cce161f52e7e722bcbc548",
+          "kind": "constant",
+          "name": "ir"
+        },
+        {
+          "contractTokenSha256": "87f46dfa98edbee11120b718bc4e530eceab13699c9880059b92d43b5670b8c2",
+          "kind": "constant",
+          "name": "ir_builder"
+        },
+        {
+          "contractTokenSha256": "1b8801ecb4369649534e6a0f5628c5ac363f51ddc926c3dc910f626871fca4f3",
+          "kind": "constant",
+          "name": "ir_validate"
+        },
+        {
+          "contractTokenSha256": "444329391997548c0cad35cf36dc764759ab295d8d267a03dc1b6ef1c1242092",
+          "kind": "constant",
+          "name": "ir_opt_rewrite"
+        },
+        {
+          "contractTokenSha256": "4e603df179e406297d59b748887468f4ccb00570d5f487b9ec4ab70976a82318",
+          "kind": "constant",
+          "name": "ir_transform_robustness"
+        },
+        {
+          "contractTokenSha256": "5f2918c0af697b6605979e7b8de4accbc081855831549e1bcc21f3b0d3a79e69",
+          "kind": "constant",
+          "name": "emit_msl"
+        },
+        {
+          "contractTokenSha256": "743aa72286e128ca9e3002b3f038bd1fc7c8276b6f0de95987b864cfffe4adcd",
+          "kind": "constant",
+          "name": "emit_msl_subgroups"
+        },
+        {
+          "contractTokenSha256": "14aea7cb15b80c86180d18038cc0d0ef86702cb78b662e84d83460700135b544",
+          "kind": "constant",
+          "name": "emit_msl_shared"
+        },
+        {
+          "contractTokenSha256": "2238df43204f0b8a0940871bdbb63a10329b5db504707eb2bcb6ffa536ecd078",
+          "kind": "constant",
+          "name": "emit_msl_vertex"
+        },
+        {
+          "contractTokenSha256": "e47b152b2c8c7c98c697b39a6fa5f7f874d607dba133babfc93f2b1a03347cbb",
+          "kind": "constant",
+          "name": "emit_msl_fragment"
+        },
+        {
+          "contractTokenSha256": "2ec3f36339f75158a28630332a6ad3ae905b4f37fc38a6a12e08c65594966fd5",
+          "kind": "constant",
+          "name": "emit_hlsl"
+        },
+        {
+          "contractTokenSha256": "a36da94486293ae6c79fb194c0a402bac953462a92b29ac3d24cd27d8103e9e2",
+          "kind": "constant",
+          "name": "hlsl_dispatch_contract"
+        },
+        {
+          "contractTokenSha256": "fa99435ed4f540d417eae42f21a7c74045835d5063a6637ce168b9a714e16457",
+          "kind": "constant",
+          "name": "emit_hlsl_texture"
+        },
+        {
+          "contractTokenSha256": "be60d21b0d196945727ccd9b0a0a54f97aa1ea7c80e6cd60342ab35d0e1306a9",
+          "kind": "constant",
+          "name": "emit_spirv"
+        },
+        {
+          "contractTokenSha256": "c125826cb96f500edacc815588ecb3adb80e91e264acd85062b8e58f882a3f61",
+          "kind": "constant",
+          "name": "emit_spirv_fn"
+        },
+        {
+          "contractTokenSha256": "6901b777eddd2cedc25cd88b0ee4fedc3f8bb729153c3d3fae25e7696e6b2f32",
+          "kind": "constant",
+          "name": "emit_spirv_stages"
+        },
+        {
+          "contractTokenSha256": "b3c88e72dc60968f55e16d400f2947bd6c23527b4afd80cda2c040e640faca04",
+          "kind": "constant",
+          "name": "emit_spirv_texture"
+        },
+        {
+          "contractTokenSha256": "c35cdd5b091bacc662026ca90b5b64cd039dbdf82d3430965acb0e3fb5e9e51e",
+          "kind": "constant",
+          "name": "emit_dxil"
+        },
+        {
+          "contractTokenSha256": "ab0b81c1215c791e9554173e5bdb5c599028f1aee43dd6690c402a55f9682bf2",
+          "kind": "constant",
+          "name": "emit_csl"
+        },
+        {
+          "contractTokenSha256": "6dba29e96aac472815c4a18bd7ee2e1a928574343775c4e6aea06017420ad185",
+          "kind": "constant",
+          "name": "emit_csl_reduce_dist"
+        },
+        {
+          "contractTokenSha256": "22b52faa4e970b77f6d354ace789accb84a6aa5492d6d159c1cd4cb1ac65552a",
+          "kind": "constant",
+          "name": "emit_csl_attention"
+        },
+        {
+          "contractTokenSha256": "23a7759d3edf0dcb3b7f51e65bfe93419391144695f6790f793f8e6d124f8d08",
+          "kind": "constant",
+          "name": "emit_csl_gather"
+        },
+        {
+          "contractTokenSha256": "28bb5e3f7f3c13f05eab04395941c75471cfc6f60c39d5c3ee28bd5831110ba5",
+          "kind": "constant",
+          "name": "emit_csl_rope"
+        },
+        {
+          "contractTokenSha256": "e36f1935540c0f6aa08f71b716f8ba7eebbef5832889df7f42badb75172ef2fa",
+          "kind": "constant",
+          "name": "emit_csl_dequant"
+        },
+        {
+          "contractTokenSha256": "f9c7d6322656846cea6fe1d4627837645fcc784048f9f2a48d070abf3a3e35b8",
+          "kind": "constant",
+          "name": "emit_csl_sample"
+        },
+        {
+          "contractTokenSha256": "bd1b8ceff0be7e4e48287541bffbf95d25d63263423253a84b5bca04585e7e31",
+          "kind": "constant",
+          "name": "emit_csl_fused"
+        },
+        {
+          "contractTokenSha256": "0b0fd00700c103eb67158db8e64f42cab33edcb182b1b18d6d1e88b93441829c",
+          "kind": "constant",
+          "name": "emit_csl_dense_gemv"
+        },
+        {
+          "contractTokenSha256": "d2d697d56ffef7d20b984e54525613978faccfd7982d15f1caa9cbaccdae744a",
+          "kind": "constant",
+          "name": "emit_csl_linear_attn"
+        },
+        {
+          "contractTokenSha256": "29fa66467dcd48473456459df7da6cc191143c991699c1db389529dd5d6e0b11",
+          "kind": "constant",
+          "name": "emit_csl_kv_cache"
+        },
+        {
+          "contractTokenSha256": "2fc9bad04843ed6584587ab67f04e0e3045f2831586d6a3e7121a30a67a1b5f5",
+          "kind": "constant",
+          "name": "emit_csl_fused_ffn"
+        },
+        {
+          "contractTokenSha256": "b61e2efff648c5bd6f98af6594db227a289c433676f0fd18ec271bc12e2565a4",
+          "kind": "constant",
+          "name": "emit_csl_host"
+        },
+        {
+          "contractTokenSha256": "63c7c70313a895b75cbb37c9835210a055b7f463f268de68f4f25f86e42d8940",
+          "kind": "constant",
+          "name": "emit_csl_host_plan"
+        },
+        {
+          "contractTokenSha256": "8e343136c02d3ff4e7495c177d68ded9923addd295995f857dadf3970795ca03",
+          "kind": "constant",
+          "name": "emit_csl_toolchain"
+        },
+        {
+          "contractTokenSha256": "1d67f6b3d2d9c2feccb82b76432f70c99cacdc0365729bee5b3c17dd377442b7",
+          "kind": "constant",
+          "name": "emit_csl_simulator"
+        },
+        {
+          "contractTokenSha256": "fcfbcc505501454dd9f8987667486155b349d10722cbd3c8e3d515d589935aa5",
+          "kind": "constant",
+          "name": "emit_csl_mem_plan"
+        },
+        {
+          "contractTokenSha256": "f5d6f854015afa0fbd4dbfe0b5ad48995c2adb4e89a50c948383e0b4a3ae7561",
+          "kind": "constant",
+          "name": "emit_csl_exec_v1"
+        },
+        {
+          "contractTokenSha256": "09fe7c472ace98ae6d959e382d3ddc2fe77cecb955abdf797cdc910f6ee0ef50",
+          "kind": "constant",
+          "name": "emit_csl_host_runtime"
+        },
+        {
+          "contractTokenSha256": "a0fba5e756b01446141eab430cc42378c016259831f3f01e0529850e6666c1ab",
+          "kind": "constant",
+          "name": "emit_csl_validate"
+        },
+        {
+          "contractTokenSha256": "4085947cdb6166840276e76aff4b3a476bc8a0ebe90f4fa0711ad26fedd03dfa",
+          "kind": "constant",
+          "name": "layout_utils"
+        },
+        {
+          "contractTokenSha256": "5014d0cfb13d5904d141d2ed2edce4295c41550902247a111770756836635c32",
+          "kind": "constant",
+          "name": "TranslateError"
+        },
+        {
+          "contractTokenSha256": "69697af57763fb2746f398a794c900c1c91181b5090654f0a0f7624488b0fc4d",
+          "kind": "constant",
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "3561d60c46297831977122279bae5713f20e7a8c0e91546c89ae11b9c95620ea",
+          "kind": "constant",
+          "name": "MAX_HLSL_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "3c9a0298b57af067fde471c703e1e62e7f9ed68e76d6c20f2bb92165f7cdffd5",
+          "kind": "constant",
+          "name": "MAX_SPIRV_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "a47a23317fb233ecafac68e72048fe847bd825825bf276cea61471c008169841",
+          "kind": "constant",
+          "name": "MAX_DXIL_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "a993ea0cb7a48a07843cc7d9c8a30f5083e0acb46149cdf238b930e614994ba3",
+          "kind": "constant",
+          "name": "MAX_CSL_OUTPUT"
+        },
+        {
+          "contractTokenSha256": "230e8f891ca99021b9d424f9452764426fcbd966233cb67660fb454e5c9b562c",
+          "kind": "constant",
+          "name": "DXIL_DXC_ENV_VAR"
+        },
+        {
+          "contractTokenSha256": "6c9da841a4ac4ec6e8221710633f50af91b7a75b91c6c976725dad1bfebd9659",
+          "kind": "constant",
+          "name": "DXIL_DXC_PATH_SENTINEL"
+        },
+        {
+          "contractTokenSha256": "3c5abcb77463388282f034c531383e289250eb4c6807286b0acc6f0e0d3ad2f6",
+          "kind": "constant",
+          "name": "DxilToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "5034d916a54da966a56ad5e7fe39b86ec2c32770ac20ba7ff72758886756efb9",
+          "kind": "constant",
+          "name": "DxilToolchainDiscovery"
+        },
+        {
+          "contractTokenSha256": "051b218e75eaeb1964c4cf47a100dab34fad27fcef626892e1f5e889e8f45ed3",
+          "kind": "constant",
+          "name": "CslValidationError"
+        },
+        {
+          "contractTokenSha256": "94cb882f9244a0b7f195756fcf0805ecb456199bcc5ff7f1f9f29f5f2ffdb84d",
+          "kind": "constant",
+          "name": "CslPatternKind"
+        },
+        {
+          "contractTokenSha256": "49fec9bbeae1fead9c492805cd252f14ae0397d751da583fad288a2da5b73510",
+          "kind": "constant",
+          "name": "CslValidationResult"
+        },
+        {
+          "contractTokenSha256": "b8edcaf63f83b836695b01cdcf9e7d8fcb4f010e5d6c3bf835f6a3b7b0468832",
+          "kind": "constant",
+          "name": "CslToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "732f921abbefda13752bfba70bc89c59169cbed236b68b54d466cd09d3b4ca1c",
+          "kind": "constant",
+          "name": "CslToolchainDiscovery"
+        },
+        {
+          "contractTokenSha256": "60d76477ee46af7a612a52a3d6e75719f63804c3ca709f133f41b854d1cd1d43",
+          "kind": "constant",
+          "name": "CSLC_ENV_VAR"
+        },
+        {
+          "contractTokenSha256": "2845c40357a402d6c0c1c387361072ceb1e9b3e66cd979259888a31dd9766caf",
+          "kind": "constant",
+          "name": "CSLC_PATH_SENTINEL"
+        },
+        {
+          "contractTokenSha256": "848082b1e8823b2986c2eaf880dcf600d3f1622512bdb6a1415d8cf9a7f69447",
+          "kind": "constant",
+          "name": "MAX_BINDINGS"
+        },
+        {
+          "contractTokenSha256": "52fd493a519ff2741a04bf55f6bc627c5e83b04c989bb66b9452853147cfe340",
+          "kind": "enum",
+          "name": "BindingKind"
+        },
+        {
+          "contractTokenSha256": "282b4683e7581c682bbdc054c459d616e86bbd7a72983485c0a92f54ebc874e3",
+          "kind": "struct",
+          "name": "BindingMeta"
+        },
+        {
+          "contractTokenSha256": "d912e90d74ff8ebcae0c15dceb19458790fe600a9fc06704804cd48e3b08179e",
+          "kind": "enum",
+          "name": "CompilationStage"
+        },
+        {
+          "contractTokenSha256": "791508dd68c0af75dcd04632822632bb864085c2be6ba4cdd585460f539a6281",
+          "kind": "struct",
+          "name": "CompilePhaseTimingsNs"
+        },
+        {
+          "contractTokenSha256": "bd07b92792ceac148507f511171f9619c1c60ec4ffd4317966ed98263f50c1cd",
+          "kind": "struct",
+          "name": "TimedAnalyzeResult"
+        },
+        {
+          "contractTokenSha256": "5ab16e646419412153b4841e646c5b234260d11948ade70d069b748600607b4c",
+          "kind": "struct",
+          "name": "SourceLocation"
+        },
+        {
+          "contractTokenSha256": "3c8e54252c32830b469ace2e9bfe2aa33392fad13de3b11d296510668be45ecc",
+          "kind": "struct",
+          "name": "LastErrorInfo"
+        },
+        {
+          "contractTokenSha256": "df0b7007da63134c1a3af7d805f32157cd620a7eca71682e3a70a07854b51473",
+          "kind": "function",
+          "name": "setLastErrorDetailPublic"
+        },
+        {
+          "contractTokenSha256": "05abb684b6980b16a370855d273a248dd9d6177957fbfb4a4c85e4561ea71c21",
+          "kind": "function",
+          "name": "lastErrorKind"
+        },
+        {
+          "contractTokenSha256": "f9fe66955c153268c508b890ded22791ed3f9414a89d2892cdb64edd08087c8f",
+          "kind": "function",
+          "name": "lastErrorContext"
+        },
+        {
+          "contractTokenSha256": "63a8a0e1f6bd2b9d00abdc63111c92c1f409c0e64019e41e6a7724a5ef116cac",
+          "kind": "function",
+          "name": "lastErrorInfo"
+        },
+        {
+          "contractTokenSha256": "da98fdf01f726c6a6234b5dc6a267c2b357eb0f4658a6967949932d8b4c1c595",
+          "kind": "function",
+          "name": "lastErrorStage"
+        },
+        {
+          "contractTokenSha256": "9b514bef4522fb39c06f18874ba44011bd60246c6512026033bf283ba06fa38c",
+          "kind": "function",
+          "name": "lastErrorMessage"
+        },
+        {
+          "contractTokenSha256": "84a903225206ca3c1c8673d92c6cd7357ae642d9b4fa4b9c45dfb553fd7fe1b5",
+          "kind": "function",
+          "name": "lastErrorLine"
+        },
+        {
+          "contractTokenSha256": "59919eba542dd798736edac4fd99e4de738e1539f8933541345d9d4d5393d0f3",
+          "kind": "function",
+          "name": "lastErrorColumn"
+        },
+        {
+          "contractTokenSha256": "6213d5b73ba965fe004f1494c0cf7735b0eb7d834da98b65fe6d189ed6e9d242",
+          "kind": "function",
+          "name": "analyzeToIr"
+        },
+        {
+          "contractTokenSha256": "d0c9e6ca414c78c5b4fc4440ea069b6e629d329c8ed2c69f97a398578680c38b",
+          "kind": "function",
+          "name": "analyzeToIrTimed"
+        },
+        {
+          "contractTokenSha256": "f0eccd0e198da959e352e54d2c93a98b8ed5724583849a8a0d8609a91effbf39",
+          "kind": "function",
+          "name": "analyzeToIrWithConfig"
+        },
+        {
+          "contractTokenSha256": "61cba4fa9365d735829e51907ac6b544e80b67a355b94d1e6375cb6862205a4e",
+          "kind": "function",
+          "name": "analyzeToIrWithConfigTimed"
+        },
+        {
+          "contractTokenSha256": "63e89692058d17cd4a9e53e8ee3806a56552aff71683797086fa478d62a69e7e",
+          "kind": "function",
+          "name": "extractBindings"
+        },
+        {
+          "contractTokenSha256": "41447b9f217e0e9107d4026335576245677ae95764a1c38888d298eaa8520e6a",
+          "kind": "function",
+          "name": "translateToMsl"
+        },
+        {
+          "contractTokenSha256": "3a69019418fc691df3c8f4cabd7bd3e1f30838c05b5cc97c6c8fa33556684c05",
+          "kind": "function",
+          "name": "translateToMslWithOverrides"
+        },
+        {
+          "contractTokenSha256": "8c3cbc328c6d7f1a9117b6678ee8bc30dc41e7c378fb22f0603e04683fa7c024",
+          "kind": "function",
+          "name": "applyOverrides"
+        },
+        {
+          "contractTokenSha256": "52fa2d471a25e1a33c3aaf5bb707ccf68f8d940fbe9d7e6f854af72ae30624e4",
+          "kind": "function",
+          "name": "translateToHlsl"
+        },
+        {
+          "contractTokenSha256": "9b0dd860019525edae29bbb6d5367483626d8e8301a3376414190150cb36607e",
+          "kind": "function",
+          "name": "translateToHlslWithOverrides"
+        },
+        {
+          "contractTokenSha256": "6602bff0083237406377b07a1942fe314605e50fad879c59ed1768bf95fde6dd",
+          "kind": "function",
+          "name": "translateToSpirv"
+        },
+        {
+          "contractTokenSha256": "6ea9740729660f140c54e02ccd964f33f9f2212a0963f4b53520d62d049eedf3",
+          "kind": "function",
+          "name": "translateToDxil"
+        },
+        {
+          "contractTokenSha256": "7f1ea112e3517731e020d2ea6fd72da6faea35739f2f990f572631d47cba2099",
+          "kind": "function",
+          "name": "translateToDxilWithToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "a3935803534e2de35949c0bcdb58fbfab09e9f3b0c42c92014a653312313a896",
+          "kind": "function",
+          "name": "translateToCsl"
+        },
+        {
+          "contractTokenSha256": "eac19a41e592d012b9ae85d963c86dc7a247aeab703721a8695a0ff30d1fcda5",
+          "kind": "function",
+          "name": "loadCslToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "23c2731454ceacd1da41c62b532947964fb873bc2ae317677d837c81505f2f9e",
+          "kind": "function",
+          "name": "validateCslPattern"
+        },
+        {
+          "contractTokenSha256": "61c211c4f61f8e6b003d64ad4d9614718268b96a7727c8d30e1bace9e7e21346",
+          "kind": "function",
+          "name": "validateCslPatternWithToolchainConfig"
+        },
+        {
+          "contractTokenSha256": "cd4f91266c88f6ca20d6d7336daa0034b62d5ddbb36e8b91a330c64ff7118ee6",
+          "kind": "function",
+          "name": "validateCslToolchainConfig"
+        }
+      ],
+      "path": "src/compiler/wgsl/mod.zig",
+      "sha256": "d23459d696de21602bae3ad801f180c07991c02b6c0b7f1e389967fcdd5734af"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "b461bf0ab956537d9ae2e89bc4285657a12b656921782b7e4e8aab3005581d91",
+          "kind": "struct",
+          "name": "TranslationInfo"
+        },
+        {
+          "contractTokenSha256": "c2412e219358d9353eac3be0e116760f6afd25ab4a101a690a8b8b5224324a02",
+          "kind": "struct",
+          "name": "TranslationResult"
+        },
+        {
+          "contractTokenSha256": "e5b0f10f718042d19f2f67b5b13a55626dc8d1032172436c08cce469269c6ace",
+          "kind": "struct",
+          "name": "TimedTranslationResult"
+        },
+        {
+          "contractTokenSha256": "bff745219a8b3abfe564d66a9608611c2a3274316e08d87c1c3c9fbaf343c1b8",
+          "kind": "function",
+          "name": "compute_runtime_robustness_config"
+        },
+        {
+          "contractTokenSha256": "f916565095c6977250478934b466cd2600c4eb8f39252ce4cefc40767bbd4a1b",
+          "kind": "function",
+          "name": "vulkan_compute_runtime_robustness_config"
+        },
+        {
+          "contractTokenSha256": "159ce395602613461688dd794ee39d3250ef8cd5e3780959d3d697589f1d9c80",
+          "kind": "function",
+          "name": "translateToMslForComputeRuntime"
+        },
+        {
+          "contractTokenSha256": "73ef46e6016cebc8edbd3dcc337a9c867caeec108fe35708b4adea8b076df04e",
+          "kind": "function",
+          "name": "translateToMslForComputeRuntimeTimed"
+        },
+        {
+          "contractTokenSha256": "2e1ab05a24a0450dc54f29febb82d41ffe7898d734981fcf4ca5106d54b66e36",
+          "kind": "function",
+          "name": "translateToSpirvForComputeRuntime"
+        },
+        {
+          "contractTokenSha256": "f293fe70cc5e55de8b2d5b0dc578ca843180f5aca9cb63709cfc575a93be3009",
+          "kind": "function",
+          "name": "translateToSpirvTimed"
+        },
+        {
+          "contractTokenSha256": "19474ba068433c33cbd75f40742e31bc54a509d1d7439bc63b20bf3d159284df",
+          "kind": "function",
+          "name": "translateToSpirvForVulkanComputeRuntime"
+        },
+        {
+          "contractTokenSha256": "a92c4e1c176b9383dd482ea84e348d4ef9e0f2c507b44ed91e832bf4c0f39790",
+          "kind": "struct",
+          "name": "VertexInputAttr"
+        },
+        {
+          "contractTokenSha256": "a86406013677606d2c969ec74a76d8d36d90db34acb55556443da8b0d3f31a5e",
+          "kind": "struct",
+          "name": "InterStageVar"
+        },
+        {
+          "contractTokenSha256": "80fcdd95f3d4037a01d2b36e349d331d8c275da2bf3bce7dd8c6fdc4437d0adf",
+          "kind": "struct",
+          "name": "GraphicsTranslationResult"
+        },
+        {
+          "contractTokenSha256": "401938f6254b07b58f633300d245742a6843aeedda2a810bf92718ebedefa3cc",
+          "kind": "function",
+          "name": "translateToSpirvForGraphicsRuntime"
+        }
+      ],
+      "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+      "sha256": "16744af5c36984acc70315fcc30a4d7c6d2ff843455febbb6346af9a19411643"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "8c9f5156271e15d154aed23ee1a5cf4f7f2f0b8e042deda37ea0dabaf6452b1a",
+          "kind": "function",
+          "name": "main"
+        }
+      ],
+      "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+      "sha256": "53dae67f995f4fe72dc960580617a0ac7c55bf603300a3b5defe584edae487f5"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "ad9a59a4c0f21627ac7c2eb0cdd09c8ed1d3dba26c89cc45b592a17ebfd6ba83",
+          "kind": "constant",
+          "name": "CoreCommandKind"
+        },
+        {
+          "contractTokenSha256": "e99727eb6ef6289107103b549a3a63e3e65d4fed0c972189a8475906112819fe",
+          "kind": "constant",
+          "name": "FullCommandKind"
+        },
+        {
+          "contractTokenSha256": "650e308b0dc29fa284088006cfbdd63725f22f4bf3a4cfe519f51650eca2ca3e",
+          "kind": "constant",
+          "name": "CoreCommand"
+        },
+        {
+          "contractTokenSha256": "e967b6803c264c12ff08cd3a6359a55bbbf0d8d93e925a976466048228f755db",
+          "kind": "constant",
+          "name": "FullCommand"
+        },
+        {
+          "contractTokenSha256": "6cea9a95332905bbac78fc8ae2edc7c916704566a59f28e85271bd7159a78f5e",
+          "kind": "enum",
+          "name": "CommandKind"
+        },
+        {
+          "contractTokenSha256": "fa9a1f5fd93b8103c8190b97d9eb259f6ac9763dffa1e5d24bdd0a31710612f6",
+          "kind": "union",
+          "name": "Command"
+        },
+        {
+          "contractTokenSha256": "8061b5afee3e7d36ee6b4ad799e03ef93710b3be2d9d45bc3860595e4c2738b2",
+          "kind": "function",
+          "name": "core_command_kind"
+        },
+        {
+          "contractTokenSha256": "6c82b748e6ee9deebe3110d76ea0037eb51e425f7f8de87c3e686d54b82baea2",
+          "kind": "function",
+          "name": "full_command_kind"
+        },
+        {
+          "contractTokenSha256": "632a671530c0adfa883e593ec484ae2a51576c3504e2c045b16117efc14292eb",
+          "kind": "function",
+          "name": "is_core_command_kind"
+        },
+        {
+          "contractTokenSha256": "5411a3cb4913322976d98f7be975cde672eb5daf670087b2bfc2bdc3180fdf74",
+          "kind": "function",
+          "name": "is_full_command_kind"
+        },
+        {
+          "contractTokenSha256": "aa56bc778e80c1c6e92bfaecf11f2c3b7cbcb93fb4f381c242ffce3950bc5ff1",
+          "kind": "function",
+          "name": "as_core_command"
+        },
+        {
+          "contractTokenSha256": "1cc70c95b48de63fb0ca6baf63dc4646c4f02cb71c5fc6adaf7f28f72b0c0ef3",
+          "kind": "function",
+          "name": "as_full_command"
+        },
+        {
+          "contractTokenSha256": "b738d10adc78ba7e0380d335f5783140db09c00188f9d633f7dc276cb6fa0171",
+          "kind": "function",
+          "name": "command_kind"
+        },
+        {
+          "contractTokenSha256": "8c805af226964bd30579628433445796c9e7a8293d4ce752513b16bdd871de46",
+          "kind": "function",
+          "name": "command_kind_name"
+        }
+      ],
+      "path": "src/contracts/model/model_commands.zig",
+      "sha256": "3fdaaa2c09f4daccd643287d6e848d0e4d46e6fa165741d781b6e591e5c521b5"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "032e079c9e3f298e65ff061d93e9dc13a6903bdf6a1a8e89692bd0a3e3d4e11d",
+          "kind": "struct",
+          "name": "DispatchCommand"
+        },
+        {
+          "contractTokenSha256": "c61e6f34f2a9afb3e74f3e64c5185ccd211bd70cc4120aadcba1234fcf0f7464",
+          "kind": "constant",
+          "name": "DispatchIndirectCommand"
+        },
+        {
+          "contractTokenSha256": "dab34e62424585d7782e684b26a6b8518f91628ed0ec3337e87bb33342b1b31b",
+          "kind": "enum",
+          "name": "KernelBindingResourceKind"
+        },
+        {
+          "contractTokenSha256": "34093d2e3095eb72cf66846457344ce8365a2e9b3062c8a9ff3e82a4cc242abb",
+          "kind": "struct",
+          "name": "KernelBinding"
+        },
+        {
+          "contractTokenSha256": "bba07d54e9da0aba0e0249a12af7764d10debe25f38834b90e3ee6404ee4aab8",
+          "kind": "enum",
+          "name": "KernelDispatchRepeatSynchronization"
+        },
+        {
+          "contractTokenSha256": "c0c704a4762ea4a8e0f5752fb9028b50074c2cf706353c3f3f3f3dfed3ab0aac",
+          "kind": "struct",
+          "name": "KernelDispatchOutputOracle"
+        },
+        {
+          "contractTokenSha256": "c0932e8feb88566aa9216fb45822b1cb4511a32c80424beab6ebcb83ef5d1cd1",
+          "kind": "struct",
+          "name": "KernelDispatchCommand"
+        }
+      ],
+      "path": "src/contracts/model/model_compute_types.zig",
+      "sha256": "06651f3e56cb1c798e923c929d16e9cdcc0109b04f1e54464825a1ede525e2f9"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "9946030d9a8124408d8fc0254b857cef2896bd6d2d47aeadc9125ad9f999e01e",
+          "kind": "struct",
+          "name": "DeviceProfile"
+        },
+        {
+          "contractTokenSha256": "9d39c3e24e9939f256cbd3379f8b475872ad59768c3a2424a19147b37f7899db",
+          "kind": "struct",
+          "name": "SemVer"
+        }
+      ],
+      "path": "src/contracts/model/model_profile.zig",
+      "sha256": "71f7892a7cc1249b436850a000a4b99753b6f3c29b9bf56aebd994a8f1c8c26f"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "51a958de12a32da53e3420f7ab33f85733b8f9e34cb59ea66a25a87f2ee5ce79",
+          "kind": "constant",
+          "name": "BuildTier"
+        },
+        {
+          "contractTokenSha256": "c7e853447b2a5c9db4923c31973a787174b97db1f7f37dc77f90c6d68c3d2311",
+          "kind": "constant",
+          "name": "TIER"
+        },
+        {
+          "contractTokenSha256": "91eda6e4b6e711b390fb4d7e1c79a3e42107700074fcee918e4443cc0ede93af",
+          "kind": "enum",
+          "name": "DropinErrorCode"
+        },
+        {
+          "contractTokenSha256": "3c06191376e30df7e2cda347375ec6aefe9b8338999f84eb9d76312f2150a351",
+          "kind": "function",
+          "name": "doeWgpuDropinLastErrorCode"
+        },
+        {
+          "contractTokenSha256": "0ca09ce67798b7e9ffbb0b8f6ecb56c85870c6cd8d359173ef377b0aad75ef8e",
+          "kind": "function",
+          "name": "doeWgpuDropinClearLastError"
+        },
+        {
+          "contractTokenSha256": "04ba78a89cef6b2ca5fcfc0fb5e73f324e89560fc46f15493bd60048f3c83302",
+          "kind": "function",
+          "name": "doeNativeComputePrewarmDispatchBindings"
+        },
+        {
+          "contractTokenSha256": "d62ba91e352a7aeda81b76bbd77b5d5b33e362247a50e1a3faec6908e543284e",
+          "kind": "function",
+          "name": "doeNativeComputeDispatchFlushOneBindGroup"
+        },
+        {
+          "contractTokenSha256": "c82834d1e066a3a94dd6fbc7b82edde19ad5cc7c077a129758171c84ad7b9e47",
+          "kind": "function",
+          "name": "doeWgpuDropinAbortMissingRequiredSymbol"
+        },
+        {
+          "contractTokenSha256": "3aff5385a9ba213e849abda8e311adabb2c48c20c819e6e1ada4f93408ae5d76",
+          "kind": "function",
+          "name": "loadRequiredProc"
+        },
+        {
+          "contractTokenSha256": "d05167fbb0d812a1a46ded255499cc273cc420bc3bf3e80a811a72e6b989d9d8",
+          "kind": "function",
+          "name": "wgpuGetProcAddress"
+        }
+      ],
+      "path": "src/dropin/wgpu_dropin_lib.zig",
+      "sha256": "b286a87a7aa864e236f84efa342fd1b577d927dac385de18c15c0b45c2b27644"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "6b1778505fd0ebffbe8c7cd81a53768a2c479aca486ec05f44052a464d21d399",
+          "kind": "struct",
+          "name": "backend"
+        },
+        {
+          "contractTokenSha256": "3ce7e21a88c5a59f61227a2b934ba2c704ff441e5d3fa6b6f75d0568172e65e3",
+          "kind": "struct",
+          "name": "cli"
+        },
+        {
+          "contractTokenSha256": "4e3b4cd728450e5748ffc61562c77bf9c2d71ca4b966335f8c0c81faaa35f4d7",
+          "kind": "struct",
+          "name": "compiler"
+        },
+        {
+          "contractTokenSha256": "7d45b3e577163a9e289987719b3bf119795a5cb4925a1940212c4f91b4593e40",
+          "kind": "struct",
+          "name": "contracts"
+        },
+        {
+          "contractTokenSha256": "4ca53780037703652e7f4edccee7ff3dd8be01ab81a34c81444ff14f9868a171",
+          "kind": "function",
+          "name": "dropin"
+        },
+        {
+          "contractTokenSha256": "2175d115e82a4f84cd911b1c75181fbfc7a267c126b654735bc1371fc7c685ce",
+          "kind": "struct",
+          "name": "plan"
+        },
+        {
+          "contractTokenSha256": "f957975fcdc307b1790599451eb74d7134576d947ca646e9e2b0edba528ce827",
+          "kind": "struct",
+          "name": "runtime"
+        },
+        {
+          "contractTokenSha256": "3bcbc48956025501e4aed545859be644d64354a4b8c61310aef60014b2cb283d",
+          "kind": "struct",
+          "name": "verification"
+        }
+      ],
+      "path": "src/mod.zig",
+      "sha256": "57c6de16908585bd2c8d8fa16f6670a74a14eb30ed46d0ea0af9c050cdd148b5"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "664b6b2fa333309b154dd2fdf925e17410942accffa8361da0aa3f5f64991f28",
+          "kind": "struct",
+          "name": "RunOptions"
+        },
+        {
+          "contractTokenSha256": "678171c802b3b0b44746705563e4514d5d81fb3c6449158c89d32e42e4ecd3eb",
+          "kind": "function",
+          "name": "runPlan"
+        }
+      ],
+      "path": "src/plan/doe_plan_executor.zig",
+      "sha256": "54cd8430ff066e88858c8ae5cbcb05182e537ceaca56fd43c040cc2bd6b06c25"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "993ae6f7747a12f59e9014d8c0f05c546d4bde261790a8d60d8accd8d33dadf6",
+          "kind": "constant",
+          "name": "Config"
+        },
+        {
+          "contractTokenSha256": "2cd0b0f30c22d98489c42400fb3c6e0d43b2865a42feab66bd0ef6831f2f7db1",
+          "kind": "constant",
+          "name": "executePlan"
+        },
+        {
+          "contractTokenSha256": "e11192d4b9d8aeb150387d3a3fff3dcbd1a121f3759b7f7d40930e4f44f176fc",
+          "kind": "function",
+          "name": "runPlan"
+        }
+      ],
+      "path": "src/plan/webgpu_plan_executor.zig",
+      "sha256": "abfca0e7c0e9398a838866ec9ca3244a6b488c599c42d8adc44627e5fa383a33"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "1eee9104b2ec31aa0e8e30440c76098d924841aa935d89eb1a636bf49768c466",
+          "kind": "constant",
+          "name": "RunOptions"
+        },
+        {
+          "contractTokenSha256": "07a4d12d8b20be6d6c95b06870c4ab6cc6f7f14913723066d10bff949f986cb5",
+          "kind": "constant",
+          "name": "CliRunFn"
+        },
+        {
+          "contractTokenSha256": "12afee56d31bd66349c08887dcdd8a6292c5952508e346e25d195986c7868661",
+          "kind": "function",
+          "name": "runCli"
+        }
+      ],
+      "path": "src/plan/webgpu_plan_executor_cli.zig",
+      "sha256": "a748be819675584d5f064330d59b1c6e9b495de1fd34770779a4b50e402ec8dc"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "4bab8df749aef6771fcc0185b1032d99359551111aca881e369a79d9286b4b93",
+          "kind": "enum",
+          "name": "BackendMode"
+        },
+        {
+          "contractTokenSha256": "60f59c9935db7384e8afec789f7e6d3002e15220ac0e940f9b3e5c373aede93a",
+          "kind": "constant",
+          "name": "DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS"
+        },
+        {
+          "contractTokenSha256": "071cbbd37b0d64fd9a6c2c114c130238d7ab6d1a7ed2d65c7f7ce632cb4160f1",
+          "kind": "enum",
+          "name": "ExecutionStatus"
+        },
+        {
+          "contractTokenSha256": "19a9a0e0844f2bc0392646538f190e92973eff2cffeed35a35add0f52c94e1f2",
+          "kind": "struct",
+          "name": "ExecutionResult"
+        },
+        {
+          "contractTokenSha256": "8c84c771d71298267579070d212ae3b2bb1ed46b93a733b96888358a8ab2e596",
+          "kind": "struct",
+          "name": "ExecutionContext"
+        },
+        {
+          "contractTokenSha256": "0623855998ac568253bb53aedbb41b8f86c23afa69484498f5e6437db146058c",
+          "kind": "constant",
+          "name": "UploadBufferUsageMode"
+        },
+        {
+          "contractTokenSha256": "e1bbb7c0b9a381ba480a0d5aeb22c90f55b2dc56440c4688ddb6571c10ba9835",
+          "kind": "constant",
+          "name": "QueueWaitMode"
+        },
+        {
+          "contractTokenSha256": "d7e4ea2cd8109d4631879c3b65a8f1a285abceb64cb20314c4256352dd08997b",
+          "kind": "constant",
+          "name": "QueueSyncMode"
+        },
+        {
+          "contractTokenSha256": "669c41115e60ecba6b27f8308baefb2e0b723ee6cad0bef71934c92beba410b0",
+          "kind": "constant",
+          "name": "GpuTimestampMode"
+        },
+        {
+          "contractTokenSha256": "093bf40ba3e1d2b1cd6b47824edd1766f459f475084b3551f96e5285f526e917",
+          "kind": "function",
+          "name": "parseUploadBufferUsage"
+        },
+        {
+          "contractTokenSha256": "993077474ba9ff7e882bc9ad1030f07e8042b3c5487b64e087acf2d57e13b4cc",
+          "kind": "function",
+          "name": "parseQueueWaitMode"
+        },
+        {
+          "contractTokenSha256": "e35a2b71541f427ee5eedcbad22cab57ab0e97c535e4ea57f986ad914c61bc54",
+          "kind": "function",
+          "name": "queueWaitModeName"
+        },
+        {
+          "contractTokenSha256": "b34b38afd08ccccfb17beff644f7de1eef77ad6a07ebda98b490b7cab167f49a",
+          "kind": "function",
+          "name": "parseQueueSyncMode"
+        },
+        {
+          "contractTokenSha256": "5919b6e546c7d2756982af71688ff859044868abf74602159f0d67e858fb0ebe",
+          "kind": "function",
+          "name": "queueSyncModeName"
+        },
+        {
+          "contractTokenSha256": "6bdaed26f2ed261c87a6df74c74f2249566329e542b2335e1cd71b9131e2ddec",
+          "kind": "function",
+          "name": "parseGpuTimestampMode"
+        },
+        {
+          "contractTokenSha256": "7dee2b59025e544d406e19c8bae45026c621df56da3446e1782eea27a25d7204",
+          "kind": "function",
+          "name": "parseBackend"
+        },
+        {
+          "contractTokenSha256": "dd0bbb788ed98c4d3c127dd1660dfb14e8c7fc5e6324209213a15652e9451db6",
+          "kind": "function",
+          "name": "parseBackendLane"
+        },
+        {
+          "contractTokenSha256": "ee043335060970c13e8271bf13995c589331f345fd4fd79fb4967012f397884c",
+          "kind": "function",
+          "name": "defaultBackendLane"
+        },
+        {
+          "contractTokenSha256": "0e96d6e19ed2bc5786e0debacfd3b3140aca0db27f24a4faf18d4db59b22cddd",
+          "kind": "function",
+          "name": "backendLaneName"
+        },
+        {
+          "contractTokenSha256": "0186e307ca7c28661a2b03c1db57f7d9e245e6f4c1b562a748faf71d534910d5",
+          "kind": "function",
+          "name": "backend_id_name"
+        },
+        {
+          "contractTokenSha256": "fc506daf9311e78ecc794231f33f2baa811af90b1604f847bb9be7bc0140f384",
+          "kind": "function",
+          "name": "executionModeName"
+        },
+        {
+          "contractTokenSha256": "1ba2f19cd4e18e3582fa7697494581ad1275d1f2db432e03d7c8d96608de76d3",
+          "kind": "function",
+          "name": "executionStatusName"
+        }
+      ],
+      "path": "src/runtime/execution.zig",
+      "sha256": "65e07c7d53af22678d3f98088c96d6fe1f9530f2e2b2f0eae70da89526d82df7"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "097afad4c47895583c6c670a3377d07689509bf40016ffd6f668ffc2cad6cfad",
+          "kind": "constant",
+          "name": "BYTE_LANES"
+        },
+        {
+          "contractTokenSha256": "14cded52931eb4c778fa0dc764a1a9a73d80a7ecc6fc9c0d656b2a2d945382f6",
+          "kind": "function",
+          "name": "countLeadingWhitespaceScalar"
+        },
+        {
+          "contractTokenSha256": "5231f4b2dbc4e3057942646fb9827458ea9be48f85a2ffcec0c9246d8ac9462a",
+          "kind": "function",
+          "name": "countLeadingWhitespace"
+        },
+        {
+          "contractTokenSha256": "f3e5503df2fc7ce487cb6bf64d103a682b98bd17bec836734eecbf69dccfe6fb",
+          "kind": "function",
+          "name": "countLeadingDigitsScalar"
+        },
+        {
+          "contractTokenSha256": "1ffd573086e91edc57bda3b766202001d58c91ee25176e3aee6634f8538270a3",
+          "kind": "function",
+          "name": "countLeadingDigits"
+        },
+        {
+          "contractTokenSha256": "d91feccb5ce28bea848578a9504bca0775fad98f42fe74bfd08d76f00d941604",
+          "kind": "function",
+          "name": "countLeadingHexDigitsScalar"
+        },
+        {
+          "contractTokenSha256": "2e312f162250b2335623eb0370f79204a0b941f8121ea53ed2db9f9471961592",
+          "kind": "function",
+          "name": "countLeadingHexDigits"
+        },
+        {
+          "contractTokenSha256": "f9b087319408e185ceddd0005eb857bd17748425207fd364880c16e4a38ea1e6",
+          "kind": "function",
+          "name": "countLeadingIdentContinueScalar"
+        },
+        {
+          "contractTokenSha256": "515348e62bcf89a17079df6cc03fca01467705876719f1c8365d6e89271a6683",
+          "kind": "function",
+          "name": "countLeadingIdentContinue"
+        },
+        {
+          "contractTokenSha256": "88333778e52ddddc317882d15b1df1e537447ad534d7e746a190f42155f7c0dd",
+          "kind": "function",
+          "name": "countLeadingAlnumScalar"
+        },
+        {
+          "contractTokenSha256": "47418229c6b4ab325625e0ff094d5664c9273ec5026c8f949358ee62dba741ee",
+          "kind": "function",
+          "name": "countLeadingAlnum"
+        },
+        {
+          "contractTokenSha256": "2d3ab05762b2b35ccfd799d5b14ffc213b6f6043c2ae1c152d77eb49d732f23c",
+          "kind": "function",
+          "name": "findFirstByteScalar"
+        },
+        {
+          "contractTokenSha256": "7310a8a2ec2e52319484020e9e882e2e05e2b0d4d3b9c7f5a1bc283efeaaa8b8",
+          "kind": "function",
+          "name": "findFirstByte"
+        },
+        {
+          "contractTokenSha256": "578a4bdb8efeeaf7c212538c463aefae3d33528d99b5d18dc636a5433ede9b8b",
+          "kind": "function",
+          "name": "findFirstJsonEscapeOrControlScalar"
+        },
+        {
+          "contractTokenSha256": "d4f4120bf0fbfe8bae6036fd5c845038cccf3fddbb9f6941b63b6d72534329ab",
+          "kind": "function",
+          "name": "findFirstJsonEscapeOrControl"
+        }
+      ],
+      "path": "src/runtime/simd/byte_scan.zig",
+      "sha256": "bbd7f527595de402d9609da8d332863da51c9e1810df4edc3fd0ef7a58e95dab"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "06913fae06d5f334eb867ec1e125d5a9bad70d1b39a05794b97ba6ce4a0c779e",
+          "kind": "constant",
+          "name": "F32_LANES"
+        },
+        {
+          "contractTokenSha256": "324ddc6cd993ad2581f0dd4800c28d90022992121db266c5f74b5db265bcf4e7",
+          "kind": "function",
+          "name": "dotF64Scalar"
+        },
+        {
+          "contractTokenSha256": "6fb0eebc0f0c9036cd5e4b1b9929bbde4fc3236fd3e4a1fb76f55b6b5832e42b",
+          "kind": "function",
+          "name": "dotF64"
+        },
+        {
+          "contractTokenSha256": "e1588bb915d9bfcd7319ef275f54c901f0ceb4df4b429ac24c98d72c73ad5ece",
+          "kind": "function",
+          "name": "sumF64Scalar"
+        },
+        {
+          "contractTokenSha256": "9ba637f95f380d9225720e825e52f8476bb8a361ca7ed9e57bbde77ea7864757",
+          "kind": "function",
+          "name": "sumF64"
+        }
+      ],
+      "path": "src/runtime/simd/f32_ops.zig",
+      "sha256": "7b82408343bdb44c63b1bd3991f1fc63cda7425351339c25d47d49d04dd2da7c"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "495be8d3bf31dbbc2b8ba233f2b35f94f0579e2a3a46099935a505f65c453da4",
+          "kind": "function",
+          "name": "writef"
+        },
+        {
+          "contractTokenSha256": "0361355a6096e5a29fdec78b3d22551661861202342c07da5fbfa04351447e45",
+          "kind": "function",
+          "name": "writeJsonString"
+        },
+        {
+          "contractTokenSha256": "2b335907975551d8fe8fff8d2119db62c85a8af4ec1fe8805a0f6ea85f394272",
+          "kind": "function",
+          "name": "normalizeExecutionStatusCode"
+        }
+      ],
+      "path": "src/runtime/trace/trace_text.zig",
+      "sha256": "655c6edc7dde45f2102d0e9be47b81fbcd649f7966867f61aad4fa491b931549"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "207720623b3b37e695477b4df83ac7706ba950cb286007e0de03441b14ef21f7",
+          "kind": "constant",
+          "name": "lean_verified"
+        },
+        {
+          "contractTokenSha256": "4829b46b061f5ba421a9abad2aabbab69626d1eb199201e4929dbd9ddc7a247d",
+          "kind": "constant",
+          "name": "comparability_obligations_sha256"
+        },
+        {
+          "contractTokenSha256": "e9b3a4e8e9dfb4d17a9809dc567b4451d3a3ae9004e6705cd22663c331c98a86",
+          "kind": "constant",
+          "name": "lean_toolchain_ref"
+        },
+        {
+          "contractTokenSha256": "00b1982349af80a5322b466dfd9387a4411caeb2494a608c8ffd9309adc8bbcf",
+          "kind": "constant",
+          "name": "lean_extract_program_sha256"
+        },
+        {
+          "contractTokenSha256": "ca7911013be530950686b7cd968843a98f82c0adb71044093d36084d5496c401",
+          "kind": "constant",
+          "name": "lean_source_tree_sha256"
+        },
+        {
+          "contractTokenSha256": "01e8c1b93778b460a8c1a60f1ccf2a006fff368c1aee9f89111246c2b6bf6192",
+          "kind": "constant",
+          "name": "generated_comparability_contract_sha256"
+        },
+        {
+          "contractTokenSha256": "8d02c3d74f7ffe8d95284b5f831c6bffd3ab47b2509cd181004080c4afdd7f7d",
+          "kind": "constant",
+          "name": "proof_pattern_spec_sha256"
+        },
+        {
+          "contractTokenSha256": "5e1dad6fb565e992acefff308d7cd157e356f48acbb5342792da0d2efdff4824",
+          "kind": "constant",
+          "name": "validator_elimination_available"
+        },
+        {
+          "contractTokenSha256": "76f576c9e1f192565d3e129607b16219336bb25de96188b31e654d5308e6f312",
+          "kind": "constant",
+          "name": "bounds_elimination_available"
+        },
+        {
+          "contractTokenSha256": "d063d3ae3acacf631914dea2f939c616319b21d10f35c9108930f163569cbd8d",
+          "kind": "enum",
+          "name": "BoundsPattern"
+        },
+        {
+          "contractTokenSha256": "5066c83b31b4f5a0af40ff7dd5f0a07647753fa9b7b8f63fd46d54e2b520a314",
+          "kind": "function",
+          "name": "boundsProven"
+        }
+      ],
+      "path": "src/verification/lean_proof.zig",
+      "sha256": "85953f9caefc24562aad0ad2b3b2ab3bdd6f27b1ffc8dbc11aa49b56b28a5597"
+    }
+  ],
+  "rootModule": "src/mod.zig",
+  "schemaVersion": 1,
+  "sourceTreeSha256": "7d4857fdf9d8c0107426915fef3f283107f335cea713d37ad8b5cff8813d671d"
+}

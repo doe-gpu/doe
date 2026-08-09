@@ -16,6 +16,7 @@ const std = @import("std");
 const ir = @import("../../ir/ir.zig");
 const emit_hlsl = @import("../hlsl/emit_hlsl.zig");
 const emit_dxil_native = @import("emit_dxil_native.zig");
+const dxil_validate = @import("dxil_validate.zig");
 
 pub const MAX_OUTPUT: usize = 256 * 1024;
 pub const DXC_ENV_VAR: []const u8 = "DOE_WGSL_DXC";
@@ -103,7 +104,9 @@ pub fn lower(module: *const ir.Module) Error!Module {
 /// Primary DXIL emission path: generates DXIL natively from the Doe IR.
 pub fn emit(module: *const ir.Module, out: []u8) Error!usize {
     clearLastError();
-    return emit_dxil_native.emit(module, out);
+    const len = try emit_dxil_native.emit(module, out);
+    try validateOutput(out[0..len], "native emitter");
+    return len;
 }
 
 /// DXC fallback path: generates HLSL, then invokes DXC to compile to DXIL.
@@ -160,8 +163,19 @@ pub fn emitWithToolchainConfig(module: *const ir.Module, out: []u8, config: Tool
     };
     defer alloc.free(bytes);
     if (bytes.len > out.len) return error.OutputTooLarge;
+    try validateOutput(bytes, "DXC");
     @memcpy(out[0..bytes.len], bytes);
     return bytes.len;
+}
+
+fn validateOutput(bytes: []const u8, producer: []const u8) Error!void {
+    const result = dxil_validate.validate(bytes);
+    if (result.valid) return;
+    setLastErrorFmt(
+        "{s} produced a structurally invalid DXIL container: {s}",
+        .{ producer, result.error_message orelse "unknown validation failure" },
+    );
+    return error.InvalidIr;
 }
 
 pub fn loadToolchainConfig(alloc: std.mem.Allocator) Error!ToolchainConfig {

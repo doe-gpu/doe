@@ -308,7 +308,7 @@ pub fn wgpuDeviceCreateErrorBuffer(
     };
     const raw = native.toOpaque(buffer);
     labelOwnedObject(raw, d.label);
-    return raw;
+    return @ptrCast(raw);
 }
 
 pub fn wgpuDeviceCreateErrorTexture(
@@ -344,7 +344,7 @@ pub fn wgpuDeviceCreateErrorTexture(
     };
     const raw = native.toOpaque(texture);
     labelOwnedObject(raw, d.label);
-    return raw;
+    return @ptrCast(raw);
 }
 
 pub fn wgpuDeviceImportSharedBufferMemory(
@@ -377,7 +377,7 @@ pub fn wgpuDeviceImportSharedFence(
     fence.* = .{ .shared_event = shared_event };
     const raw = native.toOpaque(fence);
     labelOwnedObject(raw, desc.label);
-    return raw;
+    return @ptrCast(raw);
 }
 
 pub fn wgpuDeviceImportSharedTextureMemory(
@@ -643,7 +643,7 @@ pub fn wgpuSharedTextureMemoryCreateTexture(
         return null;
     }
     labelOwnedObject(raw, desc.label);
-    return raw;
+    return @ptrCast(raw);
 }
 
 test "shared IOSurface formats map to the matching Metal channel order" {

@@ -1,5 +1,5 @@
 const std = @import("std");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/command.zig");
 const core_surface = @import("../../src/core/surface.zig");
 
 test "core surface ID and version" {
@@ -10,7 +10,7 @@ test "core surface ID and version" {
 test "core surface validate accepts core commands" {
     const upload = model.Command{ .upload = .{ .bytes = 64, .align_bytes = 4 } };
     const result = try core_surface.validate(upload);
-    try std.testing.expectEqual(core_surface.CoreCommandKind.upload, std.meta.activeTag(result));
+    try std.testing.expectEqual(model.CommandKind.upload, std.meta.activeTag(result));
 }
 
 test "core surface validate rejects full commands" {

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-project-harness",
+  "actorId": "vercel-labs-vgpu",
+  "harnessId": "node-ort-snapshot",
+  "upstream": {
+    "repositoryUrl": "https://github.com/vercel-labs/vgpu",
+    "commit": "86f2cadbd7a087f1695d736a12e218ab1ea2fc63",
+    "license": {
+      "identifier": "MIT",
+      "evidenceUrl": "https://github.com/vercel-labs/vgpu/blob/86f2cadbd7a087f1695d736a12e218ab1ea2fc63/LICENSE"
+    }
+  },
+  "providerSubstitution": {
+    "baselineProvider": "dawn-node-webgpu",
+    "comparisonProvider": "doe-gpu",
+    "seam": "A Node ESM loader resolves only the pinned workload's import of webgpu to the selected provider module; upstream application, WGSL, model, expected values, and lifecycle checks remain unchanged.",
+    "patchPaths": []
+  },
+  "fallbackPolicy": {
+    "requireHardware": true,
+    "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],
+    "providerIdentityAssertion": "The provider wrapper ID must equal the requested provider, ORT must produce a gpuBuffer, the adapter identity must be known and non-software, and a physical render node must be accessible before evidence is comparable."
+  },
+  "workload": {
+    "command": ["node", "bench/external-projects/vercel-labs-vgpu/run-matrix.mjs", "--require-all-pass"],
+    "immutableInputRefs": [
+      "bench/external-projects/vercel-labs-vgpu/oracle.md",
+      "bench/external-projects/vercel-labs-vgpu/repro-onuncapturederror.mjs"
+    ],
+    "oracle": {
+      "kind": "upstream",
+      "path": "bench/external-projects/vercel-labs-vgpu/oracle.md",
+      "reviewStatus": "reviewed"
+    },
+    "sameWorkPolicy": "Both providers execute the unchanged pinned Node 22 ORT workload, ONNX model, snapshot and reference paths, vgpu WGSL consumer, numeric expected values, lifecycle assertions, and provider-specific clean-process count.",
+    "completionBoundary": "Each successful mode includes ORT WebGPU inference, GPU-resident output validation, optional snapshot copy, vgpu consumer dispatch, queue flush, destination readback, numeric comparison, wrapper disposal, GPU disposal, and ORT session release."
+  },
+  "requiredMeasurements": [
+    "clean-process-success",
+    "crashes",
+    "hangs",
+    "timeouts",
+    "peak-memory-bytes",
+    "cold-p50",
+    "cold-p95",
+    "cold-p99",
+    "warm-p50",
+    "warm-p95",
+    "warm-p99",
+    "receipt-overhead"
+  ],
+  "requiredReceiptFields": [
+    "provider-identity",
+    "adapter-identity",
+    "driver-identity",
+    "shader-hashes",
+    "dispatch-shape",
+    "synchronization",
+    "readback",
+    "output-identity"
+  ],
+  "installation": {
+    "substitutionMode": "esm-loader",
+    "productionStatus": "harness-only",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "installCommand": ["npm", "ci"],
+    "validationCommand": ["node", "bench/external-projects/vercel-labs-vgpu/run-matrix.mjs", "--require-all-pass"]
+  },
+  "supportTargets": [],
+  "reliabilityPolicy": {
+    "cleanProcessRunsPerProvider": 3,
+    "concurrencyLevel": 1,
+    "concurrencyRunsPerProvider": 0,
+    "teardownCyclesPerProvider": 0,
+    "stressIterationsPerProvider": 0,
+    "processTimeoutSeconds": 120,
+    "memoryGrowthBoundaryBytes": 0,
+    "requireZeroCrashes": true,
+    "requireZeroHangs": true,
+    "requireZeroTimeouts": true
+  },
+  "performancePolicy": {
+    "timingScope": "complete clean-process ORT initialization, inference, both vgpu consumer paths, readback, oracle validation, and teardown",
+    "coldSamplesPerProvider": 3,
+    "warmupSamplesPerProvider": 0,
+    "warmSamplesPerProvider": 1,
+    "requiredPercentiles": ["p50", "p95", "p99"],
+    "throughputMetric": "oracle-passing snapshot-plus-reference workload processes per second",
+    "minimumMaterialSpeedupRatio": 1.1,
+    "maximumRegressionRatio": 1.05
+  },
+  "receiptPolicy": {
+    "captureRequired": true,
+    "replayRequired": false,
+    "runtimeBuildIdentityRequired": true
+  },
+  "releasePolicy": {
+    "promotionState": "not-promoted",
+    "blocking": false,
+    "command": ["node", "bench/external-projects/vercel-labs-vgpu/run-matrix.mjs", "--require-all-pass"],
+    "promotionReportIds": []
+  }
+}

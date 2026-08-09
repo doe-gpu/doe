@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe external project promotion policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "policyVersion",
+    "adoptionStages",
+    "promotionStates",
+    "promotionFloor"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "external-project-promotion-policy" },
+    "policyVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "adoptionStages": {
+      "type": "array",
+      "const": ["none", "validation-workload", "adopter", "design-partner", "supported-integration"]
+    },
+    "promotionStates": {
+      "type": "array",
+      "const": ["not-promoted", "candidate", "promoted", "suspended", "retired"]
+    },
+    "promotionFloor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimumEvidenceMaturity",
+        "minimumCleanProcessRunsPerProvider",
+        "minimumColdSamplesPerProvider",
+        "minimumWarmSamplesPerProvider",
+        "minimumConcurrencyLevel",
+        "minimumConcurrencyRunsPerProvider",
+        "minimumTeardownCyclesPerProvider",
+        "minimumStressIterationsPerProvider",
+        "maximumCrashesPerProvider",
+        "maximumHangsPerProvider",
+        "maximumTimeoutsPerProvider",
+        "maximumUnboundedMemoryGrowthBytes",
+        "requiredPercentiles",
+        "requiredReceiptFields",
+        "requirePhysicalGpu",
+        "requireProductionProviderSubstitution",
+        "requireUnchangedApplicationSource",
+        "requireUnchangedShaderSource",
+        "requireReplay",
+        "requireBlockingReleaseCommand",
+        "requireMaterialPerformanceWin",
+        "requireNoPerformanceRegression"
+      ],
+      "properties": {
+        "minimumEvidenceMaturity": { "type": "string", "const": "claimable" },
+        "minimumCleanProcessRunsPerProvider": { "type": "integer", "minimum": 1 },
+        "minimumColdSamplesPerProvider": { "type": "integer", "minimum": 1 },
+        "minimumWarmSamplesPerProvider": { "type": "integer", "minimum": 1 },
+        "minimumConcurrencyLevel": { "type": "integer", "minimum": 2 },
+        "minimumConcurrencyRunsPerProvider": { "type": "integer", "minimum": 1 },
+        "minimumTeardownCyclesPerProvider": { "type": "integer", "minimum": 1 },
+        "minimumStressIterationsPerProvider": { "type": "integer", "minimum": 1 },
+        "maximumCrashesPerProvider": { "type": "integer", "const": 0 },
+        "maximumHangsPerProvider": { "type": "integer", "const": 0 },
+        "maximumTimeoutsPerProvider": { "type": "integer", "const": 0 },
+        "maximumUnboundedMemoryGrowthBytes": { "type": "integer", "const": 0 },
+        "requiredPercentiles": {
+          "type": "array",
+          "const": ["p50", "p95", "p99"]
+        },
+        "requiredReceiptFields": {
+          "type": "array",
+          "minItems": 9,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "requirePhysicalGpu": { "type": "boolean", "const": true },
+        "requireProductionProviderSubstitution": { "type": "boolean", "const": true },
+        "requireUnchangedApplicationSource": { "type": "boolean", "const": true },
+        "requireUnchangedShaderSource": { "type": "boolean", "const": true },
+        "requireReplay": { "type": "boolean", "const": true },
+        "requireBlockingReleaseCommand": { "type": "boolean", "const": true },
+        "requireMaterialPerformanceWin": { "type": "boolean", "const": true },
+        "requireNoPerformanceRegression": { "type": "boolean", "const": true }
+      }
+    }
+  }
+}

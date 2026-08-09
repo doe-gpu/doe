@@ -272,8 +272,8 @@ napi_value doe_command_encoder_copy_texture_to_texture(napi_env env, napi_callba
     napi_get_value_uint32(env, argv[15], &depth_or_layers);
     if (pfn_doeNativeCommandEncoderCopyTextureToTexture) {
         pfn_doeNativeCommandEncoderCopyTextureToTexture(enc,
-            src_texture, src_mip, 0, src_x, src_y, src_z, src_aspect,
-            dst_texture, dst_mip, 0, dst_x, dst_y, dst_z, dst_aspect,
+            src_texture, src_mip, 0, src_x, src_y, src_z,
+            dst_texture, dst_mip, 0, dst_x, dst_y, dst_z,
             width, height, depth_or_layers);
     } else if (pfn_wgpuCommandEncoderCopyTextureToTexture) {
         WGPUTexelCopyTextureInfo s, d; WGPUExtent3D sz;

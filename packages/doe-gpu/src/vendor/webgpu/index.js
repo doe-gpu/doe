@@ -501,14 +501,20 @@ function preflightShaderSource(code) {
   return { ok: true, stage: '', kind: '', message: '', reasons: [] };
 }
 
-function requireAutoLayoutEntriesFromNative(shaderNative, visibility, path) {
-  if (typeof addon?.shaderModuleGetBindings !== 'function') {
+function requireAutoLayoutEntriesFromNative(shaderNative, visibility, path, entryPoint) {
+  const entryPointSpecific = typeof entryPoint === 'string' && entryPoint.length > 0;
+  const reflectionMethod = entryPointSpecific
+    ? addon?.shaderModuleGetBindingsForEntryPoint
+    : addon?.shaderModuleGetBindings;
+  if (typeof reflectionMethod !== 'function') {
     failValidation(
       path,
-      'layout: "auto" requires native shader binding metadata on this package surface'
+      `layout: "auto" requires ${entryPointSpecific ? 'entry-point-specific ' : ''}native shader binding metadata on this package surface`
     );
   }
-  const bindings = addon.shaderModuleGetBindings(shaderNative);
+  const bindings = entryPointSpecific
+    ? reflectionMethod(shaderNative, entryPoint)
+    : reflectionMethod(shaderNative);
   if (!Array.isArray(bindings)) {
     failValidation(
       path,
@@ -757,6 +763,7 @@ function materializeNodeCommandEncoderCommands(encoder) {
   if (!Array.isArray(encoder._commands) || encoder._commands.length === 0) {
     return;
   }
+  invalidateLazyDispatchCommandBufferShadows(encoder._commands);
   for (const cmd of encoder._commands) {
     if (cmd.t === 0) {
       const pass = addon.beginComputePass(encoder._native, cmd.d ?? undefined);
@@ -1138,6 +1145,12 @@ function invalidateLazyDispatchCommandBufferShadows(commands) {
       if (entry?.buffer != null) {
         invalidateBufferHostShadowByNative(entry.buffer);
       }
+      if (entry?.textureView != null) {
+        const viewInfo = nodeTextureViewDescriptors.get(entry.textureView);
+        if (viewInfo?.texture) {
+          viewInfo.texture._hostShadowValid = false;
+        }
+      }
     }
   }
 }
@@ -1198,8 +1211,8 @@ function ensureTextureHostShadow(texture) {
   const byteLength = texture.width * texture.height * texture.depthOrArrayLayers * bytesPerTexel;
   if (!(texture._hostShadow instanceof Uint8Array) || texture._hostShadow.byteLength !== byteLength) {
     texture._hostShadow = new Uint8Array(byteLength);
+    texture._hostShadowValid = false;
   }
-  texture._hostShadowValid = texture._hostShadowValid !== false;
   return texture._hostShadow;
 }
 
@@ -2268,11 +2281,12 @@ const nodeEncoderBackend = {
   },
   commandEncoderBeginComputePass(encoder, _descriptor, classes) {
     let passDescriptor = undefined;
+    let passLabel = '';
     if (_descriptor !== undefined && _descriptor !== null) {
       const descriptor = assertObject(_descriptor, 'GPUCommandEncoder.beginComputePass', 'descriptor');
       passDescriptor = {};
       if (descriptor.label !== undefined) {
-        passDescriptor.label = descriptor.label;
+        passLabel = String(descriptor.label);
       }
       if (descriptor.timestampWrites !== undefined && descriptor.timestampWrites !== null) {
         const writes = assertObject(descriptor.timestampWrites, 'GPUCommandEncoder.beginComputePass', 'descriptor.timestampWrites');
@@ -2289,6 +2303,7 @@ const nodeEncoderBackend = {
     if (passDescriptor === undefined && encoder._native == null) {
       const pass = new classes.DoeGPUComputePassEncoder(null, encoder);
       pass._descriptor = undefined;
+      pass.label = passLabel;
       encoder._activePass = pass;
       return pass;
     }
@@ -2298,6 +2313,7 @@ const nodeEncoderBackend = {
       encoder,
     );
     pass._descriptor = passDescriptor;
+    pass.label = passLabel;
     encoder._activePass = pass;
     return pass;
   },
@@ -2393,9 +2409,7 @@ const nodeEncoderBackend = {
     addon.commandEncoderResolveQuerySet(encoder._native, querySetNative, firstQuery, queryCount, destinationNative, destinationOffset);
   },
   commandEncoderCopyBufferToTexture(encoder, source, destination, copySize) {
-    if (copyBufferToTextureHostShadow(source, destination, copySize)) {
-      return;
-    }
+    copyBufferToTextureHostShadow(source, destination, copySize);
     ensureNodeCommandEncoderNative(encoder);
     addon.commandEncoderCopyBufferToTexture(
       encoder._native,
@@ -2415,9 +2429,7 @@ const nodeEncoderBackend = {
     );
   },
   commandEncoderCopyTextureToBuffer(encoder, source, destination, copySize) {
-    if (copyTextureToBufferHostShadow(source, destination, copySize)) {
-      return;
-    }
+    copyTextureToBufferHostShadow(source, destination, copySize);
     ensureNodeCommandEncoderNative(encoder);
     addon.commandEncoderCopyTextureToBuffer(
       encoder._native,
@@ -2464,9 +2476,7 @@ const nodeEncoderBackend = {
     }
   },
   commandEncoderCopyTextureToTexture(encoder, source, destination, copySize) {
-    if (copyTextureToTextureHostShadow(source, destination, copySize)) {
-      return;
-    }
+    copyTextureToTextureHostShadow(source, destination, copySize);
     ensureNodeCommandEncoderNative(encoder);
     addon.commandEncoderCopyTextureToTexture(
       encoder._native,
@@ -3037,6 +3047,10 @@ const fullSurfaceBackend = {
       size.height,
       size.depthOrArrayLayers ?? 1,
     );
+    const texture = textureWrapperForNative(destination.texture);
+    if (texture != null) {
+      texture._hostShadowValid = false;
+    }
   },
   async queueOnSubmittedWorkDone(queue, queueNative) {
     if (!queue.hasPendingSubmissions()) {
@@ -3162,11 +3176,12 @@ const fullSurfaceBackend = {
   adapterFeatures,
   preflightShaderSource,
   preflightShaderSourceOnCreate: false,
-  requireAutoLayoutEntriesFromNative(shader, visibility, path) {
+  requireAutoLayoutEntriesFromNative(shader, visibility, path, entryPoint) {
     return requireAutoLayoutEntriesFromNative(
       assertLiveResource(shader, path, 'GPUShaderModule'),
       visibility,
       path,
+      entryPoint,
     );
   },
   deviceGetQueue(native) {

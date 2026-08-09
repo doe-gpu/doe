@@ -42,6 +42,18 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
         self.assertTrue(args.with_native_backend_coverage_matrix_gate)
         self.assertTrue(args.with_tool_surface_gate)
 
+    def test_ecosystem_registry_gate_is_unconditionally_wired(self) -> None:
+        source = MODULE_PATH.read_text(encoding="utf-8")
+
+        self.assertIn('ecosystem_registry_gate.py"', source)
+        self.assertIn('"ecosystem-registry",', source)
+
+    def test_external_project_release_gate_is_unconditionally_wired(self) -> None:
+        source = MODULE_PATH.read_text(encoding="utf-8")
+
+        self.assertIn('external_project_release_gate.py"', source)
+        self.assertIn('"external-project-release-surface",', source)
+
     def test_compare_output_partition_gate_can_be_disabled_for_diagnostics(self) -> None:
         old_argv = sys.argv
         try:

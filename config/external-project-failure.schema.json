@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe external project failure regression record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "failureId",
+    "actorId",
+    "harnessId",
+    "upstreamCommit",
+    "category",
+    "status",
+    "summary",
+    "failureEvidence",
+    "minimizedReproPaths",
+    "implementationPaths",
+    "regressionTestPaths",
+    "verifiedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "external-project-failure" },
+    "failureId": { "$ref": "#/$defs/id" },
+    "actorId": { "$ref": "#/$defs/id" },
+    "harnessId": { "$ref": "#/$defs/id" },
+    "upstreamCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "category": {
+      "type": "string",
+      "enum": ["correctness", "compatibility", "crash", "hang", "timeout", "memory", "installation", "performance"]
+    },
+    "status": { "type": "string", "const": "fixed-regression-protected" },
+    "summary": { "type": "string", "minLength": 1 },
+    "failureEvidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidenceRef" }
+    },
+    "minimizedReproPaths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/repoPath" }
+    },
+    "implementationPaths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/repoPath" }
+    },
+    "regressionTestPaths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/repoPath" }
+    },
+    "verifiedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "repoPath": { "type": "string", "pattern": "^[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)+$" },
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^bench/out/external-projects/[a-z0-9][a-z0-9-]*/[^/]+/[^/].*$" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

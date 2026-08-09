@@ -1,0 +1,235 @@
+{
+  "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
+  "candidates": [
+    {
+      "fanIn": 5,
+      "fanOut": 23,
+      "lineCount": 986,
+      "path": "src/backend/vulkan/native_runtime.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 6,
+      "fanOut": 16,
+      "lineCount": 987,
+      "path": "src/backend/vulkan/vk_pipeline.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 13,
+      "lineCount": 982,
+      "path": "src/backend/vulkan/vk_render.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 10,
+      "fanOut": 13,
+      "lineCount": 980,
+      "path": "src/backend/vulkan/vk_resources.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 8,
+      "fanOut": 8,
+      "lineCount": 819,
+      "path": "src/backend/vulkan/vk_upload.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 3,
+      "fanOut": 5,
+      "lineCount": 808,
+      "path": "src/backend/vulkan/vulkan_surface.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 1,
+      "lineCount": 999,
+      "path": "src/compiler/tsir/digest.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 6,
+      "fanOut": 10,
+      "lineCount": 895,
+      "path": "src/compiler/tsir/emit_kernel_body.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 9,
+      "lineCount": 914,
+      "path": "src/compiler/tsir/frontend.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 4,
+      "lineCount": 841,
+      "path": "src/compiler/tsir/reference_extended_ops.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 2,
+      "fanOut": 3,
+      "lineCount": 989,
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 23,
+      "lineCount": 918,
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 3,
+      "fanOut": 3,
+      "lineCount": 845,
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 12,
+      "fanOut": 3,
+      "lineCount": 891,
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 2,
+      "fanOut": 3,
+      "lineCount": 919,
+      "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 3,
+      "fanOut": 7,
+      "lineCount": 945,
+      "path": "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 3,
+      "lineCount": 804,
+      "path": "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 2,
+      "fanOut": 7,
+      "lineCount": 999,
+      "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 4,
+      "fanOut": 2,
+      "lineCount": 833,
+      "path": "src/compiler/wgsl/frontend/parser_expr.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 5,
+      "lineCount": 995,
+      "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 18,
+      "fanOut": 48,
+      "lineCount": 912,
+      "path": "src/compiler/wgsl/mod.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 5,
+      "lineCount": 980,
+      "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 3,
+      "lineCount": 994,
+      "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 7,
+      "fanOut": 3,
+      "lineCount": 916,
+      "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 1,
+      "fanOut": 8,
+      "lineCount": 806,
+      "path": "src/dropin/dropin_browser_shared_memory.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 2,
+      "fanOut": 9,
+      "lineCount": 999,
+      "path": "src/native/compute/doe_compute_fast.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 5,
+      "fanOut": 12,
+      "lineCount": 809,
+      "path": "src/native/resource/doe_texture_sampler_native.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 2,
+      "fanOut": 16,
+      "lineCount": 964,
+      "path": "src/native/shader/doe_shader_native.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 4,
+      "fanOut": 15,
+      "lineCount": 993,
+      "path": "src/native/vulkan/vulkan_compute_native.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 14,
+      "fanOut": 12,
+      "lineCount": 811,
+      "path": "src/runtime/execution.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 7,
+      "fanOut": 8,
+      "lineCount": 840,
+      "path": "src/runtime/trace/trace.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    },
+    {
+      "fanIn": 0,
+      "fanOut": 4,
+      "lineCount": 828,
+      "path": "src/spatial/csl/csl_host_plan_tool.zig",
+      "reason": "handwritten module exceeds the 800-line architecture review signal"
+    }
+  ],
+  "manifestPath": "runtime/zig/source-layout.json",
+  "manifestSha256": "4fdc9c9135cca2d61214c511611b8b9b565010bba72ec41bcd9124f3434febc4",
+  "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
+  "schemaVersion": 1,
+  "sourceLayoutVersion": 2,
+  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e"
+}

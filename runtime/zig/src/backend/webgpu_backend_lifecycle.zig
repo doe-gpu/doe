@@ -207,10 +207,10 @@ pub fn requestAdapter(self: anytype) !abi_core.WGPUAdapter {
     };
     const options = abi_callback.WGPURequestAdapterOptions{
         .nextInChain = null,
-        .featureLevel = .undefined,
-        .powerPreference = .highPerformance,
+        .featureLevel = @intFromEnum(abi_callback.WGPUFeatureLevel.undefined),
+        .powerPreference = @intFromEnum(abi_callback.WGPUPowerPreference.highPerformance),
         .forceFallbackAdapter = abi_core.WGPU_FALSE,
-        .backendType = self.core.requested_backend_type,
+        .backendType = @intFromEnum(self.core.requested_backend_type),
         .compatibleSurface = null,
     };
     timestampLog(

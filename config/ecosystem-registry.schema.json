@@ -7,6 +7,8 @@
     "schemaVersion",
     "registryRevision",
     "scoringPolicyVersion",
+    "promotionPolicyVersion",
+    "evaluationQueue",
     "actors"
   ],
   "properties": {
@@ -19,15 +21,47 @@
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
+    "promotionPolicyVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "evaluationQueue": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["position", "actorId", "plannedHarnessIds"],
+        "properties": {
+          "position": { "type": "integer", "minimum": 1 },
+          "actorId": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "plannedHarnessIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*$"
+            }
+          }
+        }
+      }
+    },
     "actors": {
       "type": "array",
       "items": { "$ref": "#/$defs/actor" }
     }
   },
   "$defs": {
-    "repoPath": {
+    "externalHarnessPath": {
       "type": "string",
-      "pattern": "^(bench/external-projects|reports/ecosystem)/[a-z0-9][a-z0-9-]*/[^/].*$"
+      "pattern": "^bench/external-projects/[a-z0-9][a-z0-9-]*/[^/].*$"
+    },
+    "ecosystemReportPath": {
+      "type": "string",
+      "pattern": "^reports/ecosystem/[a-z0-9][a-z0-9-]*/[^/].*$"
     },
     "observationReference": {
       "type": "string",
@@ -43,6 +77,8 @@
         "source",
         "engagementStatus",
         "evidenceMaturity",
+        "adoptionStage",
+        "promotionStatus",
         "observations",
         "scoreHistory",
         "harnesses",
@@ -78,6 +114,20 @@
           "type": "string",
           "enum": ["source-only", "diagnostic", "comparable", "claimable"]
         },
+        "adoptionStage": {
+          "type": "string",
+          "enum": [
+            "none",
+            "validation-workload",
+            "adopter",
+            "design-partner",
+            "supported-integration"
+          ]
+        },
+        "promotionStatus": {
+          "type": "string",
+          "enum": ["not-promoted", "candidate", "promoted", "suspended", "retired"]
+        },
         "observations": {
           "type": "array",
           "minItems": 1,
@@ -95,6 +145,14 @@
         "reviewedReports": {
           "type": "array",
           "items": { "$ref": "#/$defs/reviewedReport" }
+        },
+        "failureRecords": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^bench/external-projects/[a-z0-9][a-z0-9-]*/failures/[a-z0-9][a-z0-9-]*\\.failure\\.json$"
+          }
         },
         "claimIndexRefs": {
           "type": "array",
@@ -233,7 +291,7 @@
           "type": "string",
           "enum": ["proposed", "ready", "measured", "retired"]
         },
-        "manifestPath": { "$ref": "#/$defs/repoPath" },
+        "manifestPath": { "$ref": "#/$defs/externalHarnessPath" },
         "proofTargets": {
           "type": "array",
           "minItems": 1,
@@ -278,7 +336,7 @@
           "type": "string",
           "pattern": "^[a-z0-9][a-z0-9-]*$"
         },
-        "path": { "$ref": "#/$defs/repoPath" },
+        "path": { "$ref": "#/$defs/ecosystemReportPath" },
         "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
         "reviewedAt": { "type": "string", "format": "date-time" },
         "reviewer": { "type": "string", "minLength": 1 }

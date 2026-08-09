@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-promotion-policy",
+  "policyVersion": "1.0.0",
+  "adoptionStages": [
+    "none",
+    "validation-workload",
+    "adopter",
+    "design-partner",
+    "supported-integration"
+  ],
+  "promotionStates": [
+    "not-promoted",
+    "candidate",
+    "promoted",
+    "suspended",
+    "retired"
+  ],
+  "promotionFloor": {
+    "minimumEvidenceMaturity": "claimable",
+    "minimumCleanProcessRunsPerProvider": 30,
+    "minimumColdSamplesPerProvider": 30,
+    "minimumWarmSamplesPerProvider": 100,
+    "minimumConcurrencyLevel": 4,
+    "minimumConcurrencyRunsPerProvider": 30,
+    "minimumTeardownCyclesPerProvider": 100,
+    "minimumStressIterationsPerProvider": 1000,
+    "maximumCrashesPerProvider": 0,
+    "maximumHangsPerProvider": 0,
+    "maximumTimeoutsPerProvider": 0,
+    "maximumUnboundedMemoryGrowthBytes": 0,
+    "requiredPercentiles": ["p50", "p95", "p99"],
+    "requiredReceiptFields": [
+      "provider-identity",
+      "adapter-identity",
+      "driver-identity",
+      "shader-hashes",
+      "dispatch-shape",
+      "synchronization",
+      "readback",
+      "output-identity",
+      "runtime-build-identity"
+    ],
+    "requirePhysicalGpu": true,
+    "requireProductionProviderSubstitution": true,
+    "requireUnchangedApplicationSource": true,
+    "requireUnchangedShaderSource": true,
+    "requireReplay": true,
+    "requireBlockingReleaseCommand": true,
+    "requireMaterialPerformanceWin": true,
+    "requireNoPerformanceRegression": true
+  }
+}

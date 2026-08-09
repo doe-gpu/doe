@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "holoscript-tropical-spmv-2026-08-08-diagnostic",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "tropical-spmv",
+  "generatedAt": "2026-08-08T19:35:13.970Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-08T19:35:30Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "2",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "entry-point-scoped-auto-layout",
+      "category": "compatibility",
+      "status": "fixed",
+      "summary": "HoloScript's multi-entry-point shader exposed whole-module auto-layout reflection in Doe. The runtime now reflects only resources reachable from the selected compute entry point.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run1/raw-matrix.json",
+          "sha256": "5a6b5ed3c73074579aa730b42c402c1b0c5c0257ae59cb9fa6275742a53e58d9"
+        },
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run5/raw-matrix.json",
+          "sha256": "733128df1d26cd08e27c1dd393c656c09e8a10061bcc2309d4ae0760393e672e"
+        }
+      ]
+    },
+    {
+      "id": "labeled-compute-pass-semantics",
+      "category": "correctness",
+      "status": "fixed",
+      "summary": "A compute-pass label incorrectly selected a different Doe execution route and produced a zero dispatch. Labels now remain observable metadata without changing dispatch semantics.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run1/raw-matrix.json",
+          "sha256": "5a6b5ed3c73074579aa730b42c402c1b0c5c0257ae59cb9fa6275742a53e58d9"
+        },
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run5/raw-matrix.json",
+          "sha256": "733128df1d26cd08e27c1dd393c656c09e8a10061bcc2309d4ae0760393e672e"
+        }
+      ]
+    },
+    {
+      "id": "oracle-backed-external-reliability",
+      "category": "reliability",
+      "status": "verified",
+      "summary": "After both fixes, Doe completed all three clean processes and produced exact CPU-oracle hashes for four seeded graph topologies across 192 measured dispatches per provider.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run5/receipt-summary.json",
+          "sha256": "b5f4986ef0cfa148a1ede07361816583e8cfeecb664562424fa60135de45dc7f"
+        }
+      ]
+    },
+    {
+      "id": "hardware-performance-claim",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "The host exposed llvmpipe and denied read/write access to /dev/dri/renderD128, so all recorded latency and receipt-overhead values remain diagnostic.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run5/receipt-summary.json",
+          "sha256": "b5f4986ef0cfa148a1ede07361816583e8cfeecb664562424fa60135de45dc7f"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "No hardware-eligible speed comparison was possible on this host.",
+    "The receipt-overhead samples measure the external evidence capture boundary and are diagnostic under the software renderer.",
+    "The result covers HoloScript tropical SpMV at the pinned upstream commit, not the package's complete WebGPU surface."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": [
+      "software-renderer-detected",
+      "render-node-inaccessible",
+      "hardware-performance-ineligible"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 171020288
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 185880576
+    }
+  },
+  "performance": {
+    "unit": "ms",
+    "baseline": {
+      "cold": {
+        "p50": 0.9011820000000057,
+        "p95": 4.268346000000008,
+        "p99": 4.268346000000008
+      },
+      "warm": {
+        "p50": 0.3305639999999812,
+        "p95": 0.570588999999984,
+        "p99": 0.9189890000000105
+      }
+    },
+    "comparison": {
+      "cold": {
+        "p50": 0.9261740000000032,
+        "p95": 6.62369099999998,
+        "p99": 6.62369099999998
+      },
+      "warm": {
+        "p50": 0.49765400000001137,
+        "p95": 0.8848219999999856,
+        "p99": 1.045962000000003
+      }
+    }
+  },
+  "receiptOverhead": {
+    "unit": "ms",
+    "untracedP50": 73.40510999999998,
+    "receiptEnabledP50": 74.703475
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The ESM provider loader is a controlled harness substitution, not a validated production installation path."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "The run used llvmpipe and the physical render node was inaccessible."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic matrix did not exercise concurrent clean processes."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "The diagnostic matrix did not run a dedicated repeated device and process teardown lane."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The 192 measured dispatches per provider are compatibility coverage, not the promotion stress floor."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS was captured, but no bounded-growth leak test was run."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "Reviewed receipt evidence captured provider, adapter, dispatch, synchronization, readback, shader, and output identity for the diagnostic run."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "Software rendering and inaccessible physical hardware make all latency results diagnostic."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is not promoted and is not a blocking release dependency."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run5/receipt-summary.json",
+      "sha256": "b5f4986ef0cfa148a1ede07361816583e8cfeecb664562424fa60135de45dc7f"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run1/raw-matrix.json",
+      "sha256": "5a6b5ed3c73074579aa730b42c402c1b0c5c0257ae59cb9fa6275742a53e58d9"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run5/raw-matrix.json",
+      "sha256": "733128df1d26cd08e27c1dd393c656c09e8a10061bcc2309d4ae0760393e672e"
+    }
+  ]
+}

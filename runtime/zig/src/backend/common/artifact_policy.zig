@@ -1,4 +1,4 @@
-const model = @import("../../contracts/model/model_commands.zig");
+const model = @import("../../contracts/command.zig");
 const runtime_types = @import("../runtime_types.zig");
 
 pub fn should_emit_shader_artifact(command: model.Command) bool {

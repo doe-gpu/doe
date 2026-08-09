@@ -1,13 +1,13 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model_commands = @import("../../contracts/model/model_commands.zig");
+const model_commands = @import("../../contracts/command.zig");
 const model_policy = @import("../../contracts/model/model_policy.zig");
 const model_quirks = @import("../../contracts/model/model_quirks.zig");
 const execution = @import("../execution.zig");
-const semantic_trace = @import("semantic_trace.zig");
+const semantic_trace = @import("../../contracts/semantic.zig");
 const trace_text = @import("trace_text.zig");
 const trace_determinism = @import("trace_determinism.zig");
-const numeric_stability = @import("../../experimental/numeric_stability/mod.zig");
+const numeric_stability = @import("../numeric_stability/mod.zig");
 
 const model = struct {
     pub const Api = model_policy.Api;

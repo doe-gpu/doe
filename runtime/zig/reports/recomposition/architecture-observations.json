@@ -1,0 +1,76 @@
+{
+  "captureStatus": "captured",
+  "observations": {
+    "baselineComparison": {
+      "status": "not-captured"
+    },
+    "buildMeasurements": {
+      "cleanCompile": "not-captured",
+      "incrementalCompile": "not-captured",
+      "status": "not-captured"
+    },
+    "coChange": {
+      "commitsConsidered": 0,
+      "reportedPairCount": 0,
+      "status": "not-captured-at-frozen-source"
+    },
+    "fanInDistribution": {
+      "maximum": 79,
+      "mean": 4.071,
+      "median": 2,
+      "minimum": 0,
+      "p25": 1.0,
+      "p75": 3.0,
+      "populationStdDev": 7.244
+    },
+    "fanOutDistribution": {
+      "maximum": 46,
+      "mean": 4.071,
+      "median": 3,
+      "minimum": 0,
+      "p25": 1.0,
+      "p75": 5.0,
+      "populationStdDev": 4.89
+    },
+    "fileSizeDistribution": {
+      "maximum": 999,
+      "mean": 262.532,
+      "median": 170,
+      "minimum": 1,
+      "p25": 69.0,
+      "p75": 384.0,
+      "populationStdDev": 255.189
+    },
+    "moduleCount": 547,
+    "oneConsumerModuleCount": 207,
+    "publicDeclarationsByLayer": {
+      "backend-common": 41,
+      "backend-d3d12": 274,
+      "backend-interface": 162,
+      "backend-metal": 214,
+      "backend-vulkan": 1043,
+      "cli": 37,
+      "command": 60,
+      "compatibility": 12,
+      "compiler": 1056,
+      "contracts": 770,
+      "core": 1670,
+      "dropin": 158,
+      "experimental": 175,
+      "full": 314,
+      "integrations": 4,
+      "native": 824,
+      "package-root": 8,
+      "plan": 115,
+      "quirk": 28,
+      "runtime": 179,
+      "spatial": 27,
+      "tooling": 2,
+      "verification": 11
+    },
+    "reexportOnlyModuleCount": 49,
+    "status": "diagnostic-only"
+  },
+  "schemaVersion": 1,
+  "sourceTreeSha256": "7d4857fdf9d8c0107426915fef3f283107f335cea713d37ad8b5cff8813d671d"
+}

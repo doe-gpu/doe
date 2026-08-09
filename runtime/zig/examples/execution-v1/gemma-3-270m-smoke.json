@@ -38,6 +38,7 @@
     { "name": "activation", "phase": "decode", "op": "gelu", "kernelKey": "gelu" },
     { "name": "down_proj", "phase": "decode", "op": "matmul_q4k", "kernelKey": "gemv", "weightsKey": "layer.0.mlp.down_proj" },
     { "name": "ffn_residual", "phase": "decode", "op": "residual", "kernelKey": "residual" },
+    { "name": "lm_head", "phase": "decode", "op": "matmul_q4k", "kernelKey": "gemv", "weightsKey": "lm_head" },
     { "name": "sample", "phase": "decode", "op": "sample", "kernelKey": "sample" }
   ]
 }

@@ -1,17 +1,26 @@
 const std = @import("std");
-const model = @import("../../src/contracts/model/model.zig");
+const command = @import("../../src/contracts/command.zig");
+const policy = @import("../../src/contracts/model/model_policy.zig");
+const profile = @import("../../src/contracts/model/model_profile.zig");
+const quirks = @import("../../src/contracts/model/model_quirks.zig");
+const gpu = @import("../../src/contracts/model/model_gpu_types.zig");
+const resource = @import("../../src/contracts/model/model_resource_types.zig");
+const compute = @import("../../src/contracts/model/model_compute_types.zig");
+const render_types = @import("../../src/contracts/model/model_render_types.zig");
+const surface = @import("../../src/contracts/model/model_surface_control_types.zig");
+const async_types = @import("../../src/contracts/model/model_async_types.zig");
 
 // ============================================================
 // Schema version stability
 // ============================================================
 
 test "CURRENT_SCHEMA_VERSION is 2" {
-    try std.testing.expectEqual(@as(model.SchemaVersion, 2), model.CURRENT_SCHEMA_VERSION);
+    try std.testing.expectEqual(@as(policy.SchemaVersion, 2), policy.CURRENT_SCHEMA_VERSION);
 }
 
 test "SchemaVersion is u8" {
-    try std.testing.expect(@TypeOf(model.CURRENT_SCHEMA_VERSION) == model.SchemaVersion);
-    try std.testing.expect(model.SchemaVersion == u8);
+    try std.testing.expect(@TypeOf(policy.CURRENT_SCHEMA_VERSION) == policy.SchemaVersion);
+    try std.testing.expect(policy.SchemaVersion == u8);
 }
 
 // ============================================================
@@ -19,22 +28,22 @@ test "SchemaVersion is u8" {
 // ============================================================
 
 test "Api enum has exactly 4 variants" {
-    const fields = @typeInfo(model.Api).@"enum".fields;
+    const fields = @typeInfo(policy.Api).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 4), fields.len);
 }
 
 test "Api enum ordinals are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.Api.vulkan));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.Api.metal));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.Api.d3d12));
-    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(model.Api.webgpu));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(policy.Api.vulkan));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(policy.Api.metal));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(policy.Api.d3d12));
+    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(policy.Api.webgpu));
 }
 
 test "Api enum tag names match expected strings" {
-    try std.testing.expectEqualStrings("vulkan", @tagName(model.Api.vulkan));
-    try std.testing.expectEqualStrings("metal", @tagName(model.Api.metal));
-    try std.testing.expectEqualStrings("d3d12", @tagName(model.Api.d3d12));
-    try std.testing.expectEqualStrings("webgpu", @tagName(model.Api.webgpu));
+    try std.testing.expectEqualStrings("vulkan", @tagName(policy.Api.vulkan));
+    try std.testing.expectEqualStrings("metal", @tagName(policy.Api.metal));
+    try std.testing.expectEqualStrings("d3d12", @tagName(policy.Api.d3d12));
+    try std.testing.expectEqualStrings("webgpu", @tagName(policy.Api.webgpu));
 }
 
 // ============================================================
@@ -42,16 +51,16 @@ test "Api enum tag names match expected strings" {
 // ============================================================
 
 test "Scope enum has exactly 5 variants" {
-    const fields = @typeInfo(model.Scope).@"enum".fields;
+    const fields = @typeInfo(policy.Scope).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 5), fields.len);
 }
 
 test "Scope enum ordinals are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.Scope.alignment));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.Scope.barrier));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.Scope.layout));
-    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(model.Scope.driver_toggle));
-    try std.testing.expectEqual(@as(u8, 4), @intFromEnum(model.Scope.memory));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(policy.Scope.alignment));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(policy.Scope.barrier));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(policy.Scope.layout));
+    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(policy.Scope.driver_toggle));
+    try std.testing.expectEqual(@as(u8, 4), @intFromEnum(policy.Scope.memory));
 }
 
 // ============================================================
@@ -59,15 +68,15 @@ test "Scope enum ordinals are stable" {
 // ============================================================
 
 test "SafetyClass enum has exactly 4 variants" {
-    const fields = @typeInfo(model.SafetyClass).@"enum".fields;
+    const fields = @typeInfo(policy.SafetyClass).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 4), fields.len);
 }
 
 test "SafetyClass enum ordinals are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.SafetyClass.low));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.SafetyClass.moderate));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.SafetyClass.high));
-    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(model.SafetyClass.critical));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(policy.SafetyClass.low));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(policy.SafetyClass.moderate));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(policy.SafetyClass.high));
+    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(policy.SafetyClass.critical));
 }
 
 // ============================================================
@@ -75,14 +84,14 @@ test "SafetyClass enum ordinals are stable" {
 // ============================================================
 
 test "VerificationMode enum has exactly 3 variants" {
-    const fields = @typeInfo(model.VerificationMode).@"enum".fields;
+    const fields = @typeInfo(policy.VerificationMode).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 3), fields.len);
 }
 
 test "VerificationMode enum ordinals are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.VerificationMode.guard_only));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.VerificationMode.lean_preferred));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.VerificationMode.lean_required));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(policy.VerificationMode.guard_only));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(policy.VerificationMode.lean_preferred));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(policy.VerificationMode.lean_required));
 }
 
 // ============================================================
@@ -90,14 +99,14 @@ test "VerificationMode enum ordinals are stable" {
 // ============================================================
 
 test "ProofLevel enum has exactly 3 variants" {
-    const fields = @typeInfo(model.ProofLevel).@"enum".fields;
+    const fields = @typeInfo(policy.ProofLevel).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 3), fields.len);
 }
 
 test "ProofLevel enum ordinals are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.ProofLevel.proven));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.ProofLevel.guarded));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.ProofLevel.rejected));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(policy.ProofLevel.proven));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(policy.ProofLevel.guarded));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(policy.ProofLevel.rejected));
 }
 
 // ============================================================
@@ -105,39 +114,39 @@ test "ProofLevel enum ordinals are stable" {
 // ============================================================
 
 test "CommandKind enum has exactly 25 variants" {
-    const fields = @typeInfo(model.CommandKind).@"enum".fields;
+    const fields = @typeInfo(command.CommandKind).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 25), fields.len);
 }
 
 test "CommandKind ordinals for core commands are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.CommandKind.upload));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.CommandKind.buffer_write));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.CommandKind.copy_buffer_to_texture));
-    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(model.CommandKind.barrier));
-    try std.testing.expectEqual(@as(u8, 4), @intFromEnum(model.CommandKind.dispatch));
-    try std.testing.expectEqual(@as(u8, 5), @intFromEnum(model.CommandKind.dispatch_indirect));
-    try std.testing.expectEqual(@as(u8, 6), @intFromEnum(model.CommandKind.kernel_dispatch));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(command.CommandKind.upload));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(command.CommandKind.buffer_write));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(command.CommandKind.copy_buffer_to_texture));
+    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(command.CommandKind.barrier));
+    try std.testing.expectEqual(@as(u8, 4), @intFromEnum(command.CommandKind.dispatch));
+    try std.testing.expectEqual(@as(u8, 5), @intFromEnum(command.CommandKind.dispatch_indirect));
+    try std.testing.expectEqual(@as(u8, 6), @intFromEnum(command.CommandKind.kernel_dispatch));
 }
 
 test "CommandKind ordinals for full commands are stable" {
-    try std.testing.expectEqual(@as(u8, 7), @intFromEnum(model.CommandKind.render_draw));
-    try std.testing.expectEqual(@as(u8, 8), @intFromEnum(model.CommandKind.draw_indirect));
-    try std.testing.expectEqual(@as(u8, 9), @intFromEnum(model.CommandKind.draw_indexed_indirect));
-    try std.testing.expectEqual(@as(u8, 10), @intFromEnum(model.CommandKind.render_pass));
-    try std.testing.expectEqual(@as(u8, 11), @intFromEnum(model.CommandKind.sampler_create));
-    try std.testing.expectEqual(@as(u8, 12), @intFromEnum(model.CommandKind.sampler_destroy));
-    try std.testing.expectEqual(@as(u8, 13), @intFromEnum(model.CommandKind.texture_write));
-    try std.testing.expectEqual(@as(u8, 14), @intFromEnum(model.CommandKind.texture_query));
-    try std.testing.expectEqual(@as(u8, 15), @intFromEnum(model.CommandKind.texture_destroy));
-    try std.testing.expectEqual(@as(u8, 16), @intFromEnum(model.CommandKind.surface_create));
-    try std.testing.expectEqual(@as(u8, 17), @intFromEnum(model.CommandKind.surface_capabilities));
-    try std.testing.expectEqual(@as(u8, 18), @intFromEnum(model.CommandKind.surface_configure));
-    try std.testing.expectEqual(@as(u8, 19), @intFromEnum(model.CommandKind.surface_acquire));
-    try std.testing.expectEqual(@as(u8, 20), @intFromEnum(model.CommandKind.surface_present));
-    try std.testing.expectEqual(@as(u8, 21), @intFromEnum(model.CommandKind.surface_unconfigure));
-    try std.testing.expectEqual(@as(u8, 22), @intFromEnum(model.CommandKind.surface_release));
-    try std.testing.expectEqual(@as(u8, 23), @intFromEnum(model.CommandKind.async_diagnostics));
-    try std.testing.expectEqual(@as(u8, 24), @intFromEnum(model.CommandKind.map_async));
+    try std.testing.expectEqual(@as(u8, 7), @intFromEnum(command.CommandKind.render_draw));
+    try std.testing.expectEqual(@as(u8, 8), @intFromEnum(command.CommandKind.draw_indirect));
+    try std.testing.expectEqual(@as(u8, 9), @intFromEnum(command.CommandKind.draw_indexed_indirect));
+    try std.testing.expectEqual(@as(u8, 10), @intFromEnum(command.CommandKind.render_pass));
+    try std.testing.expectEqual(@as(u8, 11), @intFromEnum(command.CommandKind.sampler_create));
+    try std.testing.expectEqual(@as(u8, 12), @intFromEnum(command.CommandKind.sampler_destroy));
+    try std.testing.expectEqual(@as(u8, 13), @intFromEnum(command.CommandKind.texture_write));
+    try std.testing.expectEqual(@as(u8, 14), @intFromEnum(command.CommandKind.texture_query));
+    try std.testing.expectEqual(@as(u8, 15), @intFromEnum(command.CommandKind.texture_destroy));
+    try std.testing.expectEqual(@as(u8, 16), @intFromEnum(command.CommandKind.surface_create));
+    try std.testing.expectEqual(@as(u8, 17), @intFromEnum(command.CommandKind.surface_capabilities));
+    try std.testing.expectEqual(@as(u8, 18), @intFromEnum(command.CommandKind.surface_configure));
+    try std.testing.expectEqual(@as(u8, 19), @intFromEnum(command.CommandKind.surface_acquire));
+    try std.testing.expectEqual(@as(u8, 20), @intFromEnum(command.CommandKind.surface_present));
+    try std.testing.expectEqual(@as(u8, 21), @intFromEnum(command.CommandKind.surface_unconfigure));
+    try std.testing.expectEqual(@as(u8, 22), @intFromEnum(command.CommandKind.surface_release));
+    try std.testing.expectEqual(@as(u8, 23), @intFromEnum(command.CommandKind.async_diagnostics));
+    try std.testing.expectEqual(@as(u8, 24), @intFromEnum(command.CommandKind.map_async));
 }
 
 // ============================================================
@@ -145,26 +154,21 @@ test "CommandKind ordinals for full commands are stable" {
 // ============================================================
 
 test "Command union variant count matches CommandKind field count" {
-    const cmd_fields = @typeInfo(model.Command).@"union".fields;
-    const kind_fields = @typeInfo(model.CommandKind).@"enum".fields;
+    const cmd_fields = @typeInfo(command.Command).@"union".fields;
+    const kind_fields = @typeInfo(command.CommandKind).@"enum".fields;
     try std.testing.expectEqual(kind_fields.len, cmd_fields.len);
 }
 
-test "Command union equals CoreCommand + FullCommand count" {
-    const core_count = @typeInfo(model.CoreCommand).@"union".fields.len;
-    const full_count = @typeInfo(model.FullCommand).@"union".fields.len;
-    const combined_count = @typeInfo(model.Command).@"union".fields.len;
-    try std.testing.expectEqual(core_count + full_count, combined_count);
-}
-
-test "CoreCommandKind has exactly 11 variants" {
-    const fields = @typeInfo(model.CoreCommandKind).@"enum".fields;
-    try std.testing.expectEqual(@as(usize, 11), fields.len);
-}
-
-test "FullCommandKind has exactly 14 variants" {
-    const fields = @typeInfo(model.FullCommandKind).@"enum".fields;
-    try std.testing.expectEqual(@as(usize, 14), fields.len);
+test "Command registry assigns every kind to one scope" {
+    try std.testing.expectEqual(@as(usize, 25), command.metadata.len);
+    var core_count: usize = 0;
+    var full_count: usize = 0;
+    for (command.metadata) |metadata| switch (metadata.scope) {
+        .core => core_count += 1,
+        .full => full_count += 1,
+    };
+    try std.testing.expectEqual(@as(usize, 11), core_count);
+    try std.testing.expectEqual(@as(usize, 14), full_count);
 }
 
 // ============================================================
@@ -172,29 +176,29 @@ test "FullCommandKind has exactly 14 variants" {
 // ============================================================
 
 test "parse_api accepts lowercase variants" {
-    try std.testing.expectEqual(model.Api.vulkan, try model.parse_api("vulkan"));
-    try std.testing.expectEqual(model.Api.metal, try model.parse_api("metal"));
-    try std.testing.expectEqual(model.Api.d3d12, try model.parse_api("d3d12"));
-    try std.testing.expectEqual(model.Api.webgpu, try model.parse_api("webgpu"));
+    try std.testing.expectEqual(policy.Api.vulkan, try policy.parse_api("vulkan"));
+    try std.testing.expectEqual(policy.Api.metal, try policy.parse_api("metal"));
+    try std.testing.expectEqual(policy.Api.d3d12, try policy.parse_api("d3d12"));
+    try std.testing.expectEqual(policy.Api.webgpu, try policy.parse_api("webgpu"));
 }
 
 test "parse_api accepts uppercase variants" {
-    try std.testing.expectEqual(model.Api.vulkan, try model.parse_api("VULKAN"));
-    try std.testing.expectEqual(model.Api.metal, try model.parse_api("METAL"));
-    try std.testing.expectEqual(model.Api.d3d12, try model.parse_api("D3D12"));
-    try std.testing.expectEqual(model.Api.webgpu, try model.parse_api("WEBGPU"));
+    try std.testing.expectEqual(policy.Api.vulkan, try policy.parse_api("VULKAN"));
+    try std.testing.expectEqual(policy.Api.metal, try policy.parse_api("METAL"));
+    try std.testing.expectEqual(policy.Api.d3d12, try policy.parse_api("D3D12"));
+    try std.testing.expectEqual(policy.Api.webgpu, try policy.parse_api("WEBGPU"));
 }
 
 test "parse_api accepts mixed-case variants" {
-    try std.testing.expectEqual(model.Api.vulkan, try model.parse_api("Vulkan"));
-    try std.testing.expectEqual(model.Api.metal, try model.parse_api("Metal"));
+    try std.testing.expectEqual(policy.Api.vulkan, try policy.parse_api("Vulkan"));
+    try std.testing.expectEqual(policy.Api.metal, try policy.parse_api("Metal"));
 }
 
 test "parse_api rejects unknown strings" {
-    try std.testing.expectError(error.InvalidApi, model.parse_api("opengl"));
-    try std.testing.expectError(error.InvalidApi, model.parse_api(""));
-    try std.testing.expectError(error.InvalidApi, model.parse_api("dx12"));
-    try std.testing.expectError(error.InvalidApi, model.parse_api("vulkan "));
+    try std.testing.expectError(error.InvalidApi, policy.parse_api("opengl"));
+    try std.testing.expectError(error.InvalidApi, policy.parse_api(""));
+    try std.testing.expectError(error.InvalidApi, policy.parse_api("dx12"));
+    try std.testing.expectError(error.InvalidApi, policy.parse_api("vulkan "));
 }
 
 // ============================================================
@@ -202,23 +206,23 @@ test "parse_api rejects unknown strings" {
 // ============================================================
 
 test "parse_scope accepts all valid scopes" {
-    try std.testing.expectEqual(model.Scope.alignment, try model.parse_scope("alignment"));
-    try std.testing.expectEqual(model.Scope.barrier, try model.parse_scope("barrier"));
-    try std.testing.expectEqual(model.Scope.layout, try model.parse_scope("layout"));
-    try std.testing.expectEqual(model.Scope.driver_toggle, try model.parse_scope("driver_toggle"));
-    try std.testing.expectEqual(model.Scope.memory, try model.parse_scope("memory"));
+    try std.testing.expectEqual(policy.Scope.alignment, try policy.parse_scope("alignment"));
+    try std.testing.expectEqual(policy.Scope.barrier, try policy.parse_scope("barrier"));
+    try std.testing.expectEqual(policy.Scope.layout, try policy.parse_scope("layout"));
+    try std.testing.expectEqual(policy.Scope.driver_toggle, try policy.parse_scope("driver_toggle"));
+    try std.testing.expectEqual(policy.Scope.memory, try policy.parse_scope("memory"));
 }
 
 test "parse_scope is case-insensitive" {
-    try std.testing.expectEqual(model.Scope.alignment, try model.parse_scope("ALIGNMENT"));
-    try std.testing.expectEqual(model.Scope.barrier, try model.parse_scope("Barrier"));
-    try std.testing.expectEqual(model.Scope.memory, try model.parse_scope("MEMORY"));
+    try std.testing.expectEqual(policy.Scope.alignment, try policy.parse_scope("ALIGNMENT"));
+    try std.testing.expectEqual(policy.Scope.barrier, try policy.parse_scope("Barrier"));
+    try std.testing.expectEqual(policy.Scope.memory, try policy.parse_scope("MEMORY"));
 }
 
 test "parse_scope rejects unknown strings" {
-    try std.testing.expectError(error.InvalidScope, model.parse_scope("unknown"));
-    try std.testing.expectError(error.InvalidScope, model.parse_scope(""));
-    try std.testing.expectError(error.InvalidScope, model.parse_scope("compute"));
+    try std.testing.expectError(error.InvalidScope, policy.parse_scope("unknown"));
+    try std.testing.expectError(error.InvalidScope, policy.parse_scope(""));
+    try std.testing.expectError(error.InvalidScope, policy.parse_scope("compute"));
 }
 
 // ============================================================
@@ -226,21 +230,21 @@ test "parse_scope rejects unknown strings" {
 // ============================================================
 
 test "parse_safety accepts all valid classes" {
-    try std.testing.expectEqual(model.SafetyClass.low, try model.parse_safety("low"));
-    try std.testing.expectEqual(model.SafetyClass.moderate, try model.parse_safety("moderate"));
-    try std.testing.expectEqual(model.SafetyClass.high, try model.parse_safety("high"));
-    try std.testing.expectEqual(model.SafetyClass.critical, try model.parse_safety("critical"));
+    try std.testing.expectEqual(policy.SafetyClass.low, try policy.parse_safety("low"));
+    try std.testing.expectEqual(policy.SafetyClass.moderate, try policy.parse_safety("moderate"));
+    try std.testing.expectEqual(policy.SafetyClass.high, try policy.parse_safety("high"));
+    try std.testing.expectEqual(policy.SafetyClass.critical, try policy.parse_safety("critical"));
 }
 
 test "parse_safety is case-insensitive" {
-    try std.testing.expectEqual(model.SafetyClass.low, try model.parse_safety("LOW"));
-    try std.testing.expectEqual(model.SafetyClass.critical, try model.parse_safety("CRITICAL"));
+    try std.testing.expectEqual(policy.SafetyClass.low, try policy.parse_safety("LOW"));
+    try std.testing.expectEqual(policy.SafetyClass.critical, try policy.parse_safety("CRITICAL"));
 }
 
 test "parse_safety rejects unknown strings" {
-    try std.testing.expectError(error.InvalidSafetyClass, model.parse_safety("extreme"));
-    try std.testing.expectError(error.InvalidSafetyClass, model.parse_safety(""));
-    try std.testing.expectError(error.InvalidSafetyClass, model.parse_safety("medium"));
+    try std.testing.expectError(error.InvalidSafetyClass, policy.parse_safety("extreme"));
+    try std.testing.expectError(error.InvalidSafetyClass, policy.parse_safety(""));
+    try std.testing.expectError(error.InvalidSafetyClass, policy.parse_safety("medium"));
 }
 
 // ============================================================
@@ -248,20 +252,20 @@ test "parse_safety rejects unknown strings" {
 // ============================================================
 
 test "parse_verification_mode accepts all valid modes" {
-    try std.testing.expectEqual(model.VerificationMode.guard_only, try model.parse_verification_mode("guard_only"));
-    try std.testing.expectEqual(model.VerificationMode.lean_preferred, try model.parse_verification_mode("lean_preferred"));
-    try std.testing.expectEqual(model.VerificationMode.lean_required, try model.parse_verification_mode("lean_required"));
+    try std.testing.expectEqual(policy.VerificationMode.guard_only, try policy.parse_verification_mode("guard_only"));
+    try std.testing.expectEqual(policy.VerificationMode.lean_preferred, try policy.parse_verification_mode("lean_preferred"));
+    try std.testing.expectEqual(policy.VerificationMode.lean_required, try policy.parse_verification_mode("lean_required"));
 }
 
 test "parse_verification_mode is case-insensitive" {
-    try std.testing.expectEqual(model.VerificationMode.lean_required, try model.parse_verification_mode("LEAN_REQUIRED"));
-    try std.testing.expectEqual(model.VerificationMode.guard_only, try model.parse_verification_mode("Guard_Only"));
+    try std.testing.expectEqual(policy.VerificationMode.lean_required, try policy.parse_verification_mode("LEAN_REQUIRED"));
+    try std.testing.expectEqual(policy.VerificationMode.guard_only, try policy.parse_verification_mode("Guard_Only"));
 }
 
 test "parse_verification_mode rejects unknown strings" {
-    try std.testing.expectError(error.InvalidVerificationMode, model.parse_verification_mode("auto"));
-    try std.testing.expectError(error.InvalidVerificationMode, model.parse_verification_mode(""));
-    try std.testing.expectError(error.InvalidVerificationMode, model.parse_verification_mode("lean"));
+    try std.testing.expectError(error.InvalidVerificationMode, policy.parse_verification_mode("auto"));
+    try std.testing.expectError(error.InvalidVerificationMode, policy.parse_verification_mode(""));
+    try std.testing.expectError(error.InvalidVerificationMode, policy.parse_verification_mode("lean"));
 }
 
 // ============================================================
@@ -269,20 +273,20 @@ test "parse_verification_mode rejects unknown strings" {
 // ============================================================
 
 test "parse_proof_level accepts all valid levels" {
-    try std.testing.expectEqual(model.ProofLevel.proven, try model.parse_proof_level("proven"));
-    try std.testing.expectEqual(model.ProofLevel.guarded, try model.parse_proof_level("guarded"));
-    try std.testing.expectEqual(model.ProofLevel.rejected, try model.parse_proof_level("rejected"));
+    try std.testing.expectEqual(policy.ProofLevel.proven, try policy.parse_proof_level("proven"));
+    try std.testing.expectEqual(policy.ProofLevel.guarded, try policy.parse_proof_level("guarded"));
+    try std.testing.expectEqual(policy.ProofLevel.rejected, try policy.parse_proof_level("rejected"));
 }
 
 test "parse_proof_level is case-insensitive" {
-    try std.testing.expectEqual(model.ProofLevel.rejected, try model.parse_proof_level("REJECTED"));
-    try std.testing.expectEqual(model.ProofLevel.proven, try model.parse_proof_level("Proven"));
+    try std.testing.expectEqual(policy.ProofLevel.rejected, try policy.parse_proof_level("REJECTED"));
+    try std.testing.expectEqual(policy.ProofLevel.proven, try policy.parse_proof_level("Proven"));
 }
 
 test "parse_proof_level rejects unknown strings" {
-    try std.testing.expectError(error.InvalidProofLevel, model.parse_proof_level("pending"));
-    try std.testing.expectError(error.InvalidProofLevel, model.parse_proof_level(""));
-    try std.testing.expectError(error.InvalidProofLevel, model.parse_proof_level("verified"));
+    try std.testing.expectError(error.InvalidProofLevel, policy.parse_proof_level("pending"));
+    try std.testing.expectError(error.InvalidProofLevel, policy.parse_proof_level(""));
+    try std.testing.expectError(error.InvalidProofLevel, policy.parse_proof_level("verified"));
 }
 
 // ============================================================
@@ -290,48 +294,48 @@ test "parse_proof_level rejects unknown strings" {
 // ============================================================
 
 test "verification_mode_name round-trips for all variants" {
-    const modes = [_]model.VerificationMode{ .guard_only, .lean_preferred, .lean_required };
+    const modes = [_]policy.VerificationMode{ .guard_only, .lean_preferred, .lean_required };
     for (modes) |mode| {
-        const name = model.verification_mode_name(mode);
-        const parsed = try model.parse_verification_mode(name);
+        const name = policy.verification_mode_name(mode);
+        const parsed = try policy.parse_verification_mode(name);
         try std.testing.expectEqual(mode, parsed);
     }
 }
 
 test "proof_level_name round-trips for all variants" {
-    const levels = [_]model.ProofLevel{ .proven, .guarded, .rejected };
+    const levels = [_]policy.ProofLevel{ .proven, .guarded, .rejected };
     for (levels) |level| {
-        const name = model.proof_level_name(level);
-        const parsed = try model.parse_proof_level(name);
+        const name = policy.proof_level_name(level);
+        const parsed = try policy.parse_proof_level(name);
         try std.testing.expectEqual(level, parsed);
     }
 }
 
 test "scope_name returns correct strings for all variants" {
-    try std.testing.expectEqualStrings("alignment", model.scope_name(.alignment));
-    try std.testing.expectEqualStrings("barrier", model.scope_name(.barrier));
-    try std.testing.expectEqualStrings("layout", model.scope_name(.layout));
-    try std.testing.expectEqualStrings("driver_toggle", model.scope_name(.driver_toggle));
-    try std.testing.expectEqualStrings("memory", model.scope_name(.memory));
+    try std.testing.expectEqualStrings("alignment", policy.scope_name(.alignment));
+    try std.testing.expectEqualStrings("barrier", policy.scope_name(.barrier));
+    try std.testing.expectEqualStrings("layout", policy.scope_name(.layout));
+    try std.testing.expectEqualStrings("driver_toggle", policy.scope_name(.driver_toggle));
+    try std.testing.expectEqualStrings("memory", policy.scope_name(.memory));
 }
 
 test "safety_class_name returns correct strings for all variants" {
-    try std.testing.expectEqualStrings("low", model.safety_class_name(.low));
-    try std.testing.expectEqualStrings("moderate", model.safety_class_name(.moderate));
-    try std.testing.expectEqualStrings("high", model.safety_class_name(.high));
-    try std.testing.expectEqualStrings("critical", model.safety_class_name(.critical));
+    try std.testing.expectEqualStrings("low", policy.safety_class_name(.low));
+    try std.testing.expectEqualStrings("moderate", policy.safety_class_name(.moderate));
+    try std.testing.expectEqualStrings("high", policy.safety_class_name(.high));
+    try std.testing.expectEqualStrings("critical", policy.safety_class_name(.critical));
 }
 
 test "verification_mode_name returns correct strings for all variants" {
-    try std.testing.expectEqualStrings("guard_only", model.verification_mode_name(.guard_only));
-    try std.testing.expectEqualStrings("lean_preferred", model.verification_mode_name(.lean_preferred));
-    try std.testing.expectEqualStrings("lean_required", model.verification_mode_name(.lean_required));
+    try std.testing.expectEqualStrings("guard_only", policy.verification_mode_name(.guard_only));
+    try std.testing.expectEqualStrings("lean_preferred", policy.verification_mode_name(.lean_preferred));
+    try std.testing.expectEqualStrings("lean_required", policy.verification_mode_name(.lean_required));
 }
 
 test "proof_level_name returns correct strings for all variants" {
-    try std.testing.expectEqualStrings("proven", model.proof_level_name(.proven));
-    try std.testing.expectEqualStrings("guarded", model.proof_level_name(.guarded));
-    try std.testing.expectEqualStrings("rejected", model.proof_level_name(.rejected));
+    try std.testing.expectEqualStrings("proven", policy.proof_level_name(.proven));
+    try std.testing.expectEqualStrings("guarded", policy.proof_level_name(.guarded));
+    try std.testing.expectEqualStrings("rejected", policy.proof_level_name(.rejected));
 }
 
 // ============================================================
@@ -339,15 +343,15 @@ test "proof_level_name returns correct strings for all variants" {
 // ============================================================
 
 test "requiresProof is true only for lean_required" {
-    try std.testing.expect(model.requiresProof(.lean_required));
-    try std.testing.expect(!model.requiresProof(.lean_preferred));
-    try std.testing.expect(!model.requiresProof(.guard_only));
+    try std.testing.expect(policy.requiresProof(.lean_required));
+    try std.testing.expect(!policy.requiresProof(.lean_preferred));
+    try std.testing.expect(!policy.requiresProof(.guard_only));
 }
 
 test "needsStrongestProof is true only for proven" {
-    try std.testing.expect(model.needsStrongestProof(.proven));
-    try std.testing.expect(!model.needsStrongestProof(.guarded));
-    try std.testing.expect(!model.needsStrongestProof(.rejected));
+    try std.testing.expect(policy.needsStrongestProof(.proven));
+    try std.testing.expect(!policy.needsStrongestProof(.guarded));
+    try std.testing.expect(!policy.needsStrongestProof(.rejected));
 }
 
 // ============================================================
@@ -355,35 +359,35 @@ test "needsStrongestProof is true only for proven" {
 // ============================================================
 
 test "SemVer.parse three-part version" {
-    const v = try model.SemVer.parse("1.2.3");
+    const v = try profile.SemVer.parse("1.2.3");
     try std.testing.expectEqual(@as(u32, 1), v.major);
     try std.testing.expectEqual(@as(u32, 2), v.minor);
     try std.testing.expectEqual(@as(u32, 3), v.patch);
 }
 
 test "SemVer.parse two-part version defaults patch to 0" {
-    const v = try model.SemVer.parse("10.20");
+    const v = try profile.SemVer.parse("10.20");
     try std.testing.expectEqual(@as(u32, 10), v.major);
     try std.testing.expectEqual(@as(u32, 20), v.minor);
     try std.testing.expectEqual(@as(u32, 0), v.patch);
 }
 
 test "SemVer.parse single number defaults minor and patch to 0" {
-    const v = try model.SemVer.parse("5");
+    const v = try profile.SemVer.parse("5");
     try std.testing.expectEqual(@as(u32, 5), v.major);
     try std.testing.expectEqual(@as(u32, 0), v.minor);
     try std.testing.expectEqual(@as(u32, 0), v.patch);
 }
 
 test "SemVer.parse zero version" {
-    const v = try model.SemVer.parse("0.0.0");
+    const v = try profile.SemVer.parse("0.0.0");
     try std.testing.expectEqual(@as(u32, 0), v.major);
     try std.testing.expectEqual(@as(u32, 0), v.minor);
     try std.testing.expectEqual(@as(u32, 0), v.patch);
 }
 
 test "SemVer.parse large numbers" {
-    const v = try model.SemVer.parse("999.888.777");
+    const v = try profile.SemVer.parse("999.888.777");
     try std.testing.expectEqual(@as(u32, 999), v.major);
     try std.testing.expectEqual(@as(u32, 888), v.minor);
     try std.testing.expectEqual(@as(u32, 777), v.patch);
@@ -394,27 +398,27 @@ test "SemVer.parse large numbers" {
 // ============================================================
 
 test "SemVer.parse rejects empty part between dots" {
-    try std.testing.expectError(error.InvalidVersion, model.SemVer.parse("1..3"));
+    try std.testing.expectError(error.InvalidVersion, profile.SemVer.parse("1..3"));
 }
 
 test "SemVer.parse rejects four-part version" {
-    try std.testing.expectError(error.InvalidVersion, model.SemVer.parse("1.2.3.4"));
+    try std.testing.expectError(error.InvalidVersion, profile.SemVer.parse("1.2.3.4"));
 }
 
 test "SemVer.parse rejects non-numeric part" {
-    try std.testing.expectError(error.InvalidVersion, model.SemVer.parse("1.abc.3"));
+    try std.testing.expectError(error.InvalidVersion, profile.SemVer.parse("1.abc.3"));
 }
 
 test "SemVer.parse rejects trailing dot" {
-    try std.testing.expectError(error.InvalidVersion, model.SemVer.parse("1.2."));
+    try std.testing.expectError(error.InvalidVersion, profile.SemVer.parse("1.2."));
 }
 
 test "SemVer.parse rejects leading dot" {
-    try std.testing.expectError(error.InvalidVersion, model.SemVer.parse(".1.2"));
+    try std.testing.expectError(error.InvalidVersion, profile.SemVer.parse(".1.2"));
 }
 
 test "SemVer.parse rejects negative numbers" {
-    try std.testing.expectError(error.InvalidVersion, model.SemVer.parse("-1.0.0"));
+    try std.testing.expectError(error.InvalidVersion, profile.SemVer.parse("-1.0.0"));
 }
 
 // ============================================================
@@ -422,64 +426,64 @@ test "SemVer.parse rejects negative numbers" {
 // ============================================================
 
 test "SemVer.cmp returns eq for identical versions" {
-    const v = model.SemVer{ .major = 1, .minor = 2, .patch = 3 };
+    const v = profile.SemVer{ .major = 1, .minor = 2, .patch = 3 };
     try std.testing.expectEqual(std.math.Order.eq, v.cmp(v));
 }
 
 test "SemVer.cmp major dominates" {
-    const a = model.SemVer{ .major = 1, .minor = 99, .patch = 99 };
-    const b = model.SemVer{ .major = 2, .minor = 0, .patch = 0 };
+    const a = profile.SemVer{ .major = 1, .minor = 99, .patch = 99 };
+    const b = profile.SemVer{ .major = 2, .minor = 0, .patch = 0 };
     try std.testing.expectEqual(std.math.Order.lt, a.cmp(b));
     try std.testing.expectEqual(std.math.Order.gt, b.cmp(a));
 }
 
 test "SemVer.cmp minor breaks tie on major" {
-    const a = model.SemVer{ .major = 1, .minor = 0, .patch = 99 };
-    const b = model.SemVer{ .major = 1, .minor = 1, .patch = 0 };
+    const a = profile.SemVer{ .major = 1, .minor = 0, .patch = 99 };
+    const b = profile.SemVer{ .major = 1, .minor = 1, .patch = 0 };
     try std.testing.expectEqual(std.math.Order.lt, a.cmp(b));
 }
 
 test "SemVer.cmp patch breaks tie on major and minor" {
-    const a = model.SemVer{ .major = 1, .minor = 2, .patch = 3 };
-    const b = model.SemVer{ .major = 1, .minor = 2, .patch = 4 };
+    const a = profile.SemVer{ .major = 1, .minor = 2, .patch = 3 };
+    const b = profile.SemVer{ .major = 1, .minor = 2, .patch = 4 };
     try std.testing.expectEqual(std.math.Order.lt, a.cmp(b));
 }
 
 test "SemVer.equals returns true for identical versions" {
-    const v = model.SemVer{ .major = 3, .minor = 5, .patch = 7 };
+    const v = profile.SemVer{ .major = 3, .minor = 5, .patch = 7 };
     try std.testing.expect(v.equals(v));
 }
 
 test "SemVer.equals returns false for different versions" {
-    const a = model.SemVer{ .major = 1, .minor = 0, .patch = 0 };
-    const b = model.SemVer{ .major = 1, .minor = 0, .patch = 1 };
+    const a = profile.SemVer{ .major = 1, .minor = 0, .patch = 0 };
+    const b = profile.SemVer{ .major = 1, .minor = 0, .patch = 1 };
     try std.testing.expect(!a.equals(b));
 }
 
 test "SemVer.ge includes equal" {
-    const v = model.SemVer{ .major = 2, .minor = 0, .patch = 0 };
+    const v = profile.SemVer{ .major = 2, .minor = 0, .patch = 0 };
     try std.testing.expect(v.ge(v));
 }
 
 test "SemVer.ge includes greater" {
-    const a = model.SemVer{ .major = 2, .minor = 0, .patch = 0 };
-    const b = model.SemVer{ .major = 1, .minor = 0, .patch = 0 };
+    const a = profile.SemVer{ .major = 2, .minor = 0, .patch = 0 };
+    const b = profile.SemVer{ .major = 1, .minor = 0, .patch = 0 };
     try std.testing.expect(a.ge(b));
 }
 
 test "SemVer.ge returns false when less" {
-    const a = model.SemVer{ .major = 1, .minor = 0, .patch = 0 };
-    const b = model.SemVer{ .major = 2, .minor = 0, .patch = 0 };
+    const a = profile.SemVer{ .major = 1, .minor = 0, .patch = 0 };
+    const b = profile.SemVer{ .major = 2, .minor = 0, .patch = 0 };
     try std.testing.expect(!a.ge(b));
 }
 
 test "SemVer.gt excludes equal" {
-    const v = model.SemVer{ .major = 1, .minor = 1, .patch = 1 };
+    const v = profile.SemVer{ .major = 1, .minor = 1, .patch = 1 };
     try std.testing.expect(!v.gt(v));
 }
 
 test "SemVer.lt excludes equal" {
-    const v = model.SemVer{ .major = 1, .minor = 1, .patch = 1 };
+    const v = profile.SemVer{ .major = 1, .minor = 1, .patch = 1 };
     try std.testing.expect(!v.lt(v));
 }
 
@@ -488,28 +492,28 @@ test "SemVer.lt excludes equal" {
 // ============================================================
 
 test "command_kind extracts upload tag" {
-    const cmd = model.Command{ .upload = .{ .bytes = 64, .align_bytes = 4 } };
-    try std.testing.expectEqual(model.CommandKind.upload, model.command_kind(cmd));
+    const cmd = command.Command{ .upload = .{ .bytes = 64, .align_bytes = 4 } };
+    try std.testing.expectEqual(command.CommandKind.upload, command.command_kind(cmd));
 }
 
 test "command_kind extracts dispatch tag" {
-    const cmd = model.Command{ .dispatch = .{ .x = 1, .y = 2, .z = 3 } };
-    try std.testing.expectEqual(model.CommandKind.dispatch, model.command_kind(cmd));
+    const cmd = command.Command{ .dispatch = .{ .x = 1, .y = 2, .z = 3 } };
+    try std.testing.expectEqual(command.CommandKind.dispatch, command.command_kind(cmd));
 }
 
 test "command_kind extracts render_draw tag" {
-    const cmd = model.Command{ .render_draw = .{ .draw_count = 1 } };
-    try std.testing.expectEqual(model.CommandKind.render_draw, model.command_kind(cmd));
+    const cmd = command.Command{ .render_draw = .{ .draw_count = 1 } };
+    try std.testing.expectEqual(command.CommandKind.render_draw, command.command_kind(cmd));
 }
 
 test "command_kind extracts sampler_create tag" {
-    const cmd = model.Command{ .sampler_create = .{ .handle = 42 } };
-    try std.testing.expectEqual(model.CommandKind.sampler_create, model.command_kind(cmd));
+    const cmd = command.Command{ .sampler_create = .{ .handle = 42 } };
+    try std.testing.expectEqual(command.CommandKind.sampler_create, command.command_kind(cmd));
 }
 
 test "command_kind extracts map_async tag" {
-    const cmd = model.Command{ .map_async = .{ .bytes = 256 } };
-    try std.testing.expectEqual(model.CommandKind.map_async, model.command_kind(cmd));
+    const cmd = command.Command{ .map_async = .{ .bytes = 256 } };
+    try std.testing.expectEqual(command.CommandKind.map_async, command.command_kind(cmd));
 }
 
 // ============================================================
@@ -517,7 +521,7 @@ test "command_kind extracts map_async tag" {
 // ============================================================
 
 test "command_kind_name returns correct strings for all variants" {
-    const expected = [_]struct { kind: model.CommandKind, name: []const u8 }{
+    const expected = [_]struct { kind: command.CommandKind, name: []const u8 }{
         .{ .kind = .upload, .name = "upload" },
         .{ .kind = .copy_buffer_to_texture, .name = "copy_buffer_to_texture" },
         .{ .kind = .barrier, .name = "barrier" },
@@ -544,16 +548,16 @@ test "command_kind_name returns correct strings for all variants" {
         .{ .kind = .map_async, .name = "map_async" },
     };
     for (expected) |entry| {
-        try std.testing.expectEqualStrings(entry.name, model.command_kind_name(entry.kind));
+        try std.testing.expectEqualStrings(entry.name, command.command_kind_name(entry.kind));
     }
 }
 
 // ============================================================
-// is_core_command_kind / is_full_command_kind — partition correctness
+// is_core_command_kind / is_full_command_kind — scope correctness
 // ============================================================
 
 test "core commands are classified as core and not full" {
-    const core_kinds = [_]model.CommandKind{
+    const core_kinds = [_]command.CommandKind{
         .upload,
         .copy_buffer_to_texture,
         .barrier,
@@ -566,13 +570,13 @@ test "core commands are classified as core and not full" {
         .map_async,
     };
     for (core_kinds) |kind| {
-        try std.testing.expect(model.is_core_command_kind(kind));
-        try std.testing.expect(!model.is_full_command_kind(kind));
+        try std.testing.expect(command.is_core_command_kind(kind));
+        try std.testing.expect(!command.is_full_command_kind(kind));
     }
 }
 
 test "full commands are classified as full and not core" {
-    const full_kinds = [_]model.CommandKind{
+    const full_kinds = [_]command.CommandKind{
         .render_draw,
         .draw_indirect,
         .draw_indexed_indirect,
@@ -589,120 +593,35 @@ test "full commands are classified as full and not core" {
         .async_diagnostics,
     };
     for (full_kinds) |kind| {
-        try std.testing.expect(model.is_full_command_kind(kind));
-        try std.testing.expect(!model.is_core_command_kind(kind));
+        try std.testing.expect(command.is_full_command_kind(kind));
+        try std.testing.expect(!command.is_core_command_kind(kind));
     }
 }
 
 test "every CommandKind is either core or full" {
-    const all_fields = @typeInfo(model.CommandKind).@"enum".fields;
+    const all_fields = @typeInfo(command.CommandKind).@"enum".fields;
     inline for (all_fields) |field| {
-        const kind: model.CommandKind = @enumFromInt(field.value);
-        const is_core = model.is_core_command_kind(kind);
-        const is_full = model.is_full_command_kind(kind);
+        const kind: command.CommandKind = @enumFromInt(field.value);
+        const is_core = command.is_core_command_kind(kind);
+        const is_full = command.is_full_command_kind(kind);
         // Exactly one must be true
         try std.testing.expect(is_core != is_full);
     }
 }
 
 // ============================================================
-// as_core_command / as_full_command — projection
+// Command scope — no duplicate projected unions
 // ============================================================
 
-test "as_core_command converts upload and preserves payload" {
-    const cmd = model.Command{ .upload = .{ .bytes = 512, .align_bytes = 16 } };
-    const core = model.as_core_command(cmd);
-    try std.testing.expect(core != null);
-    try std.testing.expectEqual(@as(usize, 512), core.?.upload.bytes);
-    try std.testing.expectEqual(@as(u32, 16), core.?.upload.align_bytes);
-}
+test "command scope preserves the canonical payload" {
+    const upload = command.Command{ .upload = .{ .bytes = 512, .align_bytes = 16 } };
+    try std.testing.expect(command.is_core_command_kind(command.command_kind(upload)));
+    try std.testing.expectEqual(@as(usize, 512), upload.upload.bytes);
+    try std.testing.expectEqual(@as(u32, 16), upload.upload.align_bytes);
 
-test "as_core_command converts dispatch and preserves payload" {
-    const cmd = model.Command{ .dispatch = .{ .x = 4, .y = 5, .z = 6 } };
-    const core = model.as_core_command(cmd);
-    try std.testing.expect(core != null);
-    try std.testing.expectEqual(@as(u32, 4), core.?.dispatch.x);
-    try std.testing.expectEqual(@as(u32, 5), core.?.dispatch.y);
-    try std.testing.expectEqual(@as(u32, 6), core.?.dispatch.z);
-}
-
-test "as_core_command converts barrier and preserves payload" {
-    const cmd = model.Command{ .barrier = .{ .dependency_count = 7 } };
-    const core = model.as_core_command(cmd);
-    try std.testing.expect(core != null);
-    try std.testing.expectEqual(@as(u32, 7), core.?.barrier.dependency_count);
-}
-
-test "as_core_command converts map_async and preserves payload" {
-    const cmd = model.Command{ .map_async = .{ .bytes = 1024 } };
-    const core = model.as_core_command(cmd);
-    try std.testing.expect(core != null);
-    try std.testing.expectEqual(@as(usize, 1024), core.?.map_async.bytes);
-}
-
-test "as_core_command returns null for render_draw" {
-    const cmd = model.Command{ .render_draw = .{ .draw_count = 1 } };
-    try std.testing.expect(model.as_core_command(cmd) == null);
-}
-
-test "as_core_command returns null for sampler_create" {
-    const cmd = model.Command{ .sampler_create = .{ .handle = 99 } };
-    try std.testing.expect(model.as_core_command(cmd) == null);
-}
-
-test "as_core_command returns null for surface_present" {
-    const cmd = model.Command{ .surface_present = .{ .handle = 1 } };
-    try std.testing.expect(model.as_core_command(cmd) == null);
-}
-
-test "as_core_command returns null for async_diagnostics" {
-    const cmd = model.Command{ .async_diagnostics = .{} };
-    try std.testing.expect(model.as_core_command(cmd) == null);
-}
-
-test "as_full_command converts render_draw and preserves payload" {
-    const cmd = model.Command{ .render_draw = .{ .draw_count = 10 } };
-    const full = model.as_full_command(cmd);
-    try std.testing.expect(full != null);
-    try std.testing.expectEqual(@as(u32, 10), full.?.render_draw.draw_count);
-}
-
-test "as_full_command converts sampler_create and preserves payload" {
-    const cmd = model.Command{ .sampler_create = .{ .handle = 77 } };
-    const full = model.as_full_command(cmd);
-    try std.testing.expect(full != null);
-    try std.testing.expectEqual(@as(u64, 77), full.?.sampler_create.handle);
-}
-
-test "as_full_command converts surface_configure and preserves payload" {
-    const cmd = model.Command{ .surface_configure = .{ .handle = 1, .width = 800, .height = 600 } };
-    const full = model.as_full_command(cmd);
-    try std.testing.expect(full != null);
-    try std.testing.expectEqual(@as(u64, 1), full.?.surface_configure.handle);
-    try std.testing.expectEqual(@as(u32, 800), full.?.surface_configure.width);
-    try std.testing.expectEqual(@as(u32, 600), full.?.surface_configure.height);
-}
-
-test "as_full_command converts async_diagnostics and preserves payload" {
-    const cmd = model.Command{ .async_diagnostics = .{ .iterations = 5 } };
-    const full = model.as_full_command(cmd);
-    try std.testing.expect(full != null);
-    try std.testing.expectEqual(@as(u32, 5), full.?.async_diagnostics.iterations);
-}
-
-test "as_full_command returns null for upload" {
-    const cmd = model.Command{ .upload = .{ .bytes = 64, .align_bytes = 4 } };
-    try std.testing.expect(model.as_full_command(cmd) == null);
-}
-
-test "as_full_command returns null for dispatch" {
-    const cmd = model.Command{ .dispatch = .{ .x = 1, .y = 1, .z = 1 } };
-    try std.testing.expect(model.as_full_command(cmd) == null);
-}
-
-test "as_full_command returns null for barrier" {
-    const cmd = model.Command{ .barrier = .{ .dependency_count = 3 } };
-    try std.testing.expect(model.as_full_command(cmd) == null);
+    const render = command.Command{ .render_draw = .{ .draw_count = 10 } };
+    try std.testing.expect(command.is_full_command_kind(command.command_kind(render)));
+    try std.testing.expectEqual(@as(u32, 10), render.render_draw.draw_count);
 }
 
 // ============================================================
@@ -710,7 +629,7 @@ test "as_full_command returns null for barrier" {
 // ============================================================
 
 test "UploadCommand has no defaults — both fields required" {
-    const fields = @typeInfo(model.UploadCommand).@"struct".fields;
+    const fields = @typeInfo(resource.UploadCommand).@"struct".fields;
     try std.testing.expectEqual(@as(usize, 2), fields.len);
     // Verify field names
     try std.testing.expectEqualStrings("bytes", fields[0].name);
@@ -722,7 +641,7 @@ test "UploadCommand has no defaults — both fields required" {
 // ============================================================
 
 test "DispatchCommand has 3 required fields" {
-    const fields = @typeInfo(model.DispatchCommand).@"struct".fields;
+    const fields = @typeInfo(compute.DispatchCommand).@"struct".fields;
     try std.testing.expectEqual(@as(usize, 3), fields.len);
     try std.testing.expectEqualStrings("x", fields[0].name);
     try std.testing.expectEqualStrings("y", fields[1].name);
@@ -734,7 +653,7 @@ test "DispatchCommand has 3 required fields" {
 // ============================================================
 
 test "RenderDrawCommand default draw_count is required, vertex_count defaults to 3" {
-    const cmd = model.RenderDrawCommand{ .draw_count = 1 };
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
     try std.testing.expectEqual(@as(u32, 1), cmd.draw_count);
     try std.testing.expectEqual(@as(u32, 3), cmd.vertex_count);
     try std.testing.expectEqual(@as(u32, 1), cmd.instance_count);
@@ -743,28 +662,28 @@ test "RenderDrawCommand default draw_count is required, vertex_count defaults to
 }
 
 test "RenderDrawCommand default target matches render target constants" {
-    const cmd = model.RenderDrawCommand{ .draw_count = 1 };
-    try std.testing.expectEqual(model.DEFAULT_RENDER_TARGET_HANDLE, cmd.target_handle);
-    try std.testing.expectEqual(model.DEFAULT_RENDER_TARGET_WIDTH, cmd.target_width);
-    try std.testing.expectEqual(model.DEFAULT_RENDER_TARGET_HEIGHT, cmd.target_height);
-    try std.testing.expectEqual(model.DEFAULT_RENDER_TARGET_FORMAT, cmd.target_format);
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
+    try std.testing.expectEqual(render_types.DEFAULT_RENDER_TARGET_HANDLE, cmd.target_handle);
+    try std.testing.expectEqual(render_types.DEFAULT_RENDER_TARGET_WIDTH, cmd.target_width);
+    try std.testing.expectEqual(render_types.DEFAULT_RENDER_TARGET_HEIGHT, cmd.target_height);
+    try std.testing.expectEqual(render_types.DEFAULT_RENDER_TARGET_FORMAT, cmd.target_format);
 }
 
 test "RenderDrawCommand default pipeline/bind/encode modes" {
-    const cmd = model.RenderDrawCommand{ .draw_count = 1 };
-    try std.testing.expectEqual(model.RenderDrawPipelineMode.static, cmd.pipeline_mode);
-    try std.testing.expectEqual(model.RenderDrawBindGroupMode.no_change, cmd.bind_group_mode);
-    try std.testing.expectEqual(model.RenderDrawEncodeMode.render_bundle, cmd.encode_mode);
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
+    try std.testing.expectEqual(render_types.RenderDrawPipelineMode.static, cmd.pipeline_mode);
+    try std.testing.expectEqual(render_types.RenderDrawBindGroupMode.no_change, cmd.bind_group_mode);
+    try std.testing.expectEqual(render_types.RenderDrawEncodeMode.render_bundle, cmd.encode_mode);
 }
 
 test "RenderDrawCommand default viewport depth range is 0 to 1" {
-    const cmd = model.RenderDrawCommand{ .draw_count = 1 };
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
     try std.testing.expectEqual(@as(f32, 0), cmd.viewport_min_depth);
     try std.testing.expectEqual(@as(f32, 1), cmd.viewport_max_depth);
 }
 
 test "RenderDrawCommand default optional fields are null" {
-    const cmd = model.RenderDrawCommand{ .draw_count = 1 };
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
     try std.testing.expect(cmd.index_count == null);
     try std.testing.expect(cmd.index_data == null);
     try std.testing.expect(cmd.viewport_width == null);
@@ -783,14 +702,14 @@ test "RenderDrawCommand default optional fields are null" {
 }
 
 test "RenderDrawCommand default blend is disabled" {
-    const cmd = model.RenderDrawCommand{ .draw_count = 1 };
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
     try std.testing.expect(!cmd.blend_enabled);
     try std.testing.expectEqual(@as(u32, 0xF), cmd.color_write_mask);
     try std.testing.expectEqual(@as(u32, 1), cmd.sample_count);
 }
 
 test "RenderDrawCommand default clear_color alpha is 1" {
-    const cmd = model.RenderDrawCommand{ .draw_count = 1 };
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
     try std.testing.expectEqual(@as(f32, 0), cmd.clear_color[0]);
     try std.testing.expectEqual(@as(f32, 0), cmd.clear_color[1]);
     try std.testing.expectEqual(@as(f32, 0), cmd.clear_color[2]);
@@ -798,8 +717,8 @@ test "RenderDrawCommand default clear_color alpha is 1" {
 }
 
 test "RenderDrawCommand default depth-stencil state" {
-    const cmd = model.RenderDrawCommand{ .draw_count = 1 };
-    try std.testing.expectEqual(model.WGPUTextureFormat_Undefined, cmd.depth_stencil_format);
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
+    try std.testing.expectEqual(gpu.WGPUTextureFormat_Undefined, cmd.depth_stencil_format);
     try std.testing.expect(!cmd.depth_write_enabled);
     try std.testing.expect(!cmd.unclipped_depth);
     try std.testing.expectEqual(@as(u32, 0xFFFF_FFFF), cmd.stencil_read_mask);
@@ -811,7 +730,7 @@ test "RenderDrawCommand default depth-stencil state" {
 // ============================================================
 
 test "SamplerCreateCommand defaults" {
-    const cmd = model.SamplerCreateCommand{ .handle = 1 };
+    const cmd = render_types.SamplerCreateCommand{ .handle = 1 };
     try std.testing.expectEqual(@as(u64, 1), cmd.handle);
     try std.testing.expectEqual(@as(u32, 2), cmd.address_mode_u);
     try std.testing.expectEqual(@as(u32, 2), cmd.address_mode_v);
@@ -830,12 +749,12 @@ test "SamplerCreateCommand defaults" {
 // ============================================================
 
 test "SurfaceConfigureCommand defaults" {
-    const cmd = model.SurfaceConfigureCommand{ .handle = 1, .width = 640, .height = 480 };
-    try std.testing.expectEqual(model.WGPUTextureFormat_RGBA8Unorm, cmd.format);
-    try std.testing.expectEqual(model.WGPUTextureUsage_RenderAttachment, cmd.usage);
+    const cmd = surface.SurfaceConfigureCommand{ .handle = 1, .width = 640, .height = 480 };
+    try std.testing.expectEqual(gpu.WGPUTextureFormat_RGBA8Unorm, cmd.format);
+    try std.testing.expectEqual(gpu.WGPUTextureUsage_RenderAttachment, cmd.usage);
     try std.testing.expectEqual(@as(u32, 0x00000001), cmd.alpha_mode);
     try std.testing.expectEqual(@as(u32, 0x00000002), cmd.present_mode);
-    try std.testing.expectEqual(model.WGPUCanvasToneMappingMode_Standard, cmd.tone_mapping_mode);
+    try std.testing.expectEqual(surface.WGPUCanvasToneMappingMode_Standard, cmd.tone_mapping_mode);
     try std.testing.expectEqual(@as(u32, 2), cmd.desired_maximum_frame_latency);
 }
 
@@ -844,11 +763,11 @@ test "SurfaceConfigureCommand defaults" {
 // ============================================================
 
 test "AsyncDiagnosticsCommand defaults" {
-    const cmd = model.AsyncDiagnosticsCommand{};
-    try std.testing.expectEqual(model.WGPUTextureFormat_RGBA8Unorm, cmd.target_format);
-    try std.testing.expectEqual(model.AsyncDiagnosticsMode.pipeline_async, cmd.mode);
+    const cmd = async_types.AsyncDiagnosticsCommand{};
+    try std.testing.expectEqual(gpu.WGPUTextureFormat_RGBA8Unorm, cmd.target_format);
+    try std.testing.expectEqual(async_types.AsyncDiagnosticsMode.pipeline_async, cmd.mode);
     try std.testing.expectEqual(@as(u32, 1), cmd.iterations);
-    try std.testing.expectEqual(model.AsyncDiagnosticsFeaturePolicy.strict, cmd.feature_policy);
+    try std.testing.expectEqual(async_types.AsyncDiagnosticsFeaturePolicy.strict, cmd.feature_policy);
 }
 
 // ============================================================
@@ -856,8 +775,8 @@ test "AsyncDiagnosticsCommand defaults" {
 // ============================================================
 
 test "MapAsyncCommand default mode is write" {
-    const cmd = model.MapAsyncCommand{ .bytes = 64 };
-    try std.testing.expectEqual(model.MapAsyncMode.write, cmd.mode);
+    const cmd = async_types.MapAsyncCommand{ .bytes = 64 };
+    try std.testing.expectEqual(async_types.MapAsyncMode.write, cmd.mode);
 }
 
 // ============================================================
@@ -865,10 +784,10 @@ test "MapAsyncCommand default mode is write" {
 // ============================================================
 
 test "KernelDispatchCommand defaults" {
-    const cmd = model.KernelDispatchCommand{ .kernel = "test.wgsl", .x = 1, .y = 1, .z = 1 };
+    const cmd = compute.KernelDispatchCommand{ .kernel = "test.wgsl", .x = 1, .y = 1, .z = 1 };
     try std.testing.expect(cmd.entry_point == null);
     try std.testing.expectEqual(@as(u32, 1), cmd.repeat);
-    try std.testing.expectEqual(model.KernelDispatchRepeatSynchronization.dependent, cmd.repeat_synchronization);
+    try std.testing.expectEqual(compute.KernelDispatchRepeatSynchronization.dependent, cmd.repeat_synchronization);
     try std.testing.expectEqual(@as(u32, 0), cmd.warmup_dispatch_count);
     try std.testing.expect(!cmd.initialize_buffers_on_create);
     try std.testing.expect(cmd.bindings == null);
@@ -879,17 +798,17 @@ test "KernelDispatchCommand defaults" {
 // ============================================================
 
 test "KernelBinding defaults" {
-    const kb = model.KernelBinding{ .binding = 0, .resource_kind = .buffer, .resource_handle = 1 };
+    const kb = compute.KernelBinding{ .binding = 0, .resource_kind = .buffer, .resource_handle = 1 };
     try std.testing.expectEqual(@as(u32, 0), kb.group);
-    try std.testing.expectEqual(model.WGPUShaderStage_Compute, kb.visibility);
+    try std.testing.expectEqual(gpu.WGPUShaderStage_Compute, kb.visibility);
     try std.testing.expectEqual(@as(u64, 0), kb.buffer_offset);
-    try std.testing.expectEqual(model.WGPUWholeSize, kb.buffer_size);
-    try std.testing.expectEqual(model.WGPUBufferBindingType_Undefined, kb.buffer_type);
-    try std.testing.expectEqual(model.WGPUTextureSampleType_Undefined, kb.texture_sample_type);
-    try std.testing.expectEqual(model.WGPUTextureViewDimension_Undefined, kb.texture_view_dimension);
-    try std.testing.expectEqual(model.WGPUStorageTextureAccess_Undefined, kb.storage_texture_access);
-    try std.testing.expectEqual(model.WGPUTextureAspect_Undefined, kb.texture_aspect);
-    try std.testing.expectEqual(model.WGPUTextureFormat_Undefined, kb.texture_format);
+    try std.testing.expectEqual(gpu.WGPUWholeSize, kb.buffer_size);
+    try std.testing.expectEqual(gpu.WGPUBufferBindingType_Undefined, kb.buffer_type);
+    try std.testing.expectEqual(gpu.WGPUTextureSampleType_Undefined, kb.texture_sample_type);
+    try std.testing.expectEqual(gpu.WGPUTextureViewDimension_Undefined, kb.texture_view_dimension);
+    try std.testing.expectEqual(gpu.WGPUStorageTextureAccess_Undefined, kb.storage_texture_access);
+    try std.testing.expectEqual(gpu.WGPUTextureAspect_Undefined, kb.texture_aspect);
+    try std.testing.expectEqual(gpu.WGPUTextureFormat_Undefined, kb.texture_format);
     try std.testing.expect(!kb.texture_multisampled);
 }
 
@@ -898,18 +817,18 @@ test "KernelBinding defaults" {
 // ============================================================
 
 test "CopyTextureResource defaults" {
-    const r = model.CopyTextureResource{ .handle = 1 };
-    try std.testing.expectEqual(model.CopyResourceKind.buffer, r.kind);
+    const r = resource.CopyTextureResource{ .handle = 1 };
+    try std.testing.expectEqual(resource.CopyResourceKind.buffer, r.kind);
     try std.testing.expectEqual(@as(u32, 1), r.width);
     try std.testing.expectEqual(@as(u32, 1), r.height);
     try std.testing.expectEqual(@as(u32, 1), r.depth_or_array_layers);
-    try std.testing.expectEqual(model.WGPUTextureFormat_Undefined, r.format);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0), r.usage);
-    try std.testing.expectEqual(model.WGPUTextureDimension_Undefined, r.dimension);
-    try std.testing.expectEqual(model.WGPUTextureViewDimension_Undefined, r.view_dimension);
+    try std.testing.expectEqual(gpu.WGPUTextureFormat_Undefined, r.format);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0), r.usage);
+    try std.testing.expectEqual(gpu.WGPUTextureDimension_Undefined, r.dimension);
+    try std.testing.expectEqual(gpu.WGPUTextureViewDimension_Undefined, r.view_dimension);
     try std.testing.expectEqual(@as(u32, 0), r.mip_level);
     try std.testing.expectEqual(@as(u32, 1), r.sample_count);
-    try std.testing.expectEqual(model.WGPUTextureAspect_Undefined, r.aspect);
+    try std.testing.expectEqual(gpu.WGPUTextureAspect_Undefined, r.aspect);
     try std.testing.expectEqual(@as(u32, 0), r.bytes_per_row);
     try std.testing.expectEqual(@as(u32, 0), r.rows_per_image);
     try std.testing.expectEqual(@as(u64, 0), r.offset);
@@ -920,9 +839,9 @@ test "CopyTextureResource defaults" {
 // ============================================================
 
 test "CopyCommand defaults for temporary buffer" {
-    const src = model.CopyTextureResource{ .handle = 1 };
-    const dst = model.CopyTextureResource{ .handle = 2 };
-    const cmd = model.CopyCommand{ .direction = .buffer_to_texture, .src = src, .dst = dst, .bytes = 256 };
+    const src = resource.CopyTextureResource{ .handle = 1 };
+    const dst = resource.CopyTextureResource{ .handle = 2 };
+    const cmd = resource.CopyCommand{ .direction = .buffer_to_texture, .src = src, .dst = dst, .bytes = 256 };
     try std.testing.expect(!cmd.uses_temporary_buffer);
     try std.testing.expectEqual(@as(u32, 0), cmd.temporary_buffer_alignment);
 }
@@ -932,7 +851,7 @@ test "CopyCommand defaults for temporary buffer" {
 // ============================================================
 
 test "Quirk default priority is 0" {
-    const q = model.Quirk{
+    const q = quirks.Quirk{
         .schema_version = 2,
         .quirk_id = "test-quirk",
         .scope = .alignment,
@@ -951,7 +870,7 @@ test "Quirk default priority is 0" {
 // ============================================================
 
 test "MatchSpec optional fields default to null" {
-    const ms = model.MatchSpec{ .vendor = "nvidia", .api = .vulkan };
+    const ms = quirks.MatchSpec{ .vendor = "nvidia", .api = .vulkan };
     try std.testing.expect(ms.device_family == null);
     try std.testing.expect(ms.driver_range == null);
 }
@@ -961,7 +880,7 @@ test "MatchSpec optional fields default to null" {
 // ============================================================
 
 test "DeviceProfile optional device_family defaults to null" {
-    const dp = model.DeviceProfile{
+    const dp = profile.DeviceProfile{
         .vendor = "intel",
         .api = .d3d12,
         .driver_version = .{ .major = 1, .minor = 0, .patch = 0 },
@@ -974,21 +893,21 @@ test "DeviceProfile optional device_family defaults to null" {
 // ============================================================
 
 test "WGPUTextureUsage flag values are ABI-stable" {
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0), model.WGPUTextureUsage_None);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x01), model.WGPUTextureUsage_CopySrc);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x02), model.WGPUTextureUsage_CopyDst);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x04), model.WGPUTextureUsage_TextureBinding);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x08), model.WGPUTextureUsage_StorageBinding);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x10), model.WGPUTextureUsage_RenderAttachment);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0), gpu.WGPUTextureUsage_None);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x01), gpu.WGPUTextureUsage_CopySrc);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x02), gpu.WGPUTextureUsage_CopyDst);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x04), gpu.WGPUTextureUsage_TextureBinding);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x08), gpu.WGPUTextureUsage_StorageBinding);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x10), gpu.WGPUTextureUsage_RenderAttachment);
 }
 
 test "texture usage flags are distinct powers of two" {
-    const flags = [_]model.WGPUFlags{
-        model.WGPUTextureUsage_CopySrc,
-        model.WGPUTextureUsage_CopyDst,
-        model.WGPUTextureUsage_TextureBinding,
-        model.WGPUTextureUsage_StorageBinding,
-        model.WGPUTextureUsage_RenderAttachment,
+    const flags = [_]gpu.WGPUFlags{
+        gpu.WGPUTextureUsage_CopySrc,
+        gpu.WGPUTextureUsage_CopyDst,
+        gpu.WGPUTextureUsage_TextureBinding,
+        gpu.WGPUTextureUsage_StorageBinding,
+        gpu.WGPUTextureUsage_RenderAttachment,
     };
     for (flags, 0..) |a, i| {
         try std.testing.expect(a != 0);
@@ -1005,10 +924,10 @@ test "texture usage flags are distinct powers of two" {
 // ============================================================
 
 test "WGPUShaderStage flag values are ABI-stable" {
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x00), model.WGPUShaderStage_None);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x01), model.WGPUShaderStage_Vertex);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x02), model.WGPUShaderStage_Fragment);
-    try std.testing.expectEqual(@as(model.WGPUFlags, 0x04), model.WGPUShaderStage_Compute);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x00), gpu.WGPUShaderStage_None);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x01), gpu.WGPUShaderStage_Vertex);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x02), gpu.WGPUShaderStage_Fragment);
+    try std.testing.expectEqual(@as(gpu.WGPUFlags, 0x04), gpu.WGPUShaderStage_Compute);
 }
 
 // ============================================================
@@ -1016,11 +935,11 @@ test "WGPUShaderStage flag values are ABI-stable" {
 // ============================================================
 
 test "WGPUCopyStrideUndefined is 0xFFFFFFFF" {
-    try std.testing.expectEqual(@as(u32, 0xFFFFFFFF), model.WGPUCopyStrideUndefined);
+    try std.testing.expectEqual(@as(u32, 0xFFFFFFFF), gpu.WGPUCopyStrideUndefined);
 }
 
 test "WGPUWholeSize is 0xFFFFFFFFFFFFFFFF" {
-    try std.testing.expectEqual(@as(u64, 0xFFFFFFFFFFFFFFFF), model.WGPUWholeSize);
+    try std.testing.expectEqual(@as(u64, 0xFFFFFFFFFFFFFFFF), gpu.WGPUWholeSize);
 }
 
 // ============================================================
@@ -1028,19 +947,19 @@ test "WGPUWholeSize is 0xFFFFFFFFFFFFFFFF" {
 // ============================================================
 
 test "DEFAULT_RENDER_TARGET_HANDLE is 0xFFFFFFFFFFFFFFFE" {
-    try std.testing.expectEqual(@as(u64, 0xFFFF_FFFF_FFFF_FFFE), model.DEFAULT_RENDER_TARGET_HANDLE);
+    try std.testing.expectEqual(@as(u64, 0xFFFF_FFFF_FFFF_FFFE), render_types.DEFAULT_RENDER_TARGET_HANDLE);
 }
 
 test "DEFAULT_RENDER_TARGET_WIDTH is 64" {
-    try std.testing.expectEqual(@as(u32, 64), model.DEFAULT_RENDER_TARGET_WIDTH);
+    try std.testing.expectEqual(@as(u32, 64), render_types.DEFAULT_RENDER_TARGET_WIDTH);
 }
 
 test "DEFAULT_RENDER_TARGET_HEIGHT is 64" {
-    try std.testing.expectEqual(@as(u32, 64), model.DEFAULT_RENDER_TARGET_HEIGHT);
+    try std.testing.expectEqual(@as(u32, 64), render_types.DEFAULT_RENDER_TARGET_HEIGHT);
 }
 
 test "DEFAULT_RENDER_TARGET_FORMAT is RGBA8Unorm" {
-    try std.testing.expectEqual(model.WGPUTextureFormat_RGBA8Unorm, model.DEFAULT_RENDER_TARGET_FORMAT);
+    try std.testing.expectEqual(gpu.WGPUTextureFormat_RGBA8Unorm, render_types.DEFAULT_RENDER_TARGET_FORMAT);
 }
 
 // ============================================================
@@ -1048,15 +967,15 @@ test "DEFAULT_RENDER_TARGET_FORMAT is RGBA8Unorm" {
 // ============================================================
 
 test "MAX_VERTEX_BUFFERS is 8" {
-    try std.testing.expectEqual(@as(usize, 8), model.MAX_VERTEX_BUFFERS);
+    try std.testing.expectEqual(@as(usize, 8), render_types.MAX_VERTEX_BUFFERS);
 }
 
 test "MAX_VERTEX_ATTRIBUTES is 16" {
-    try std.testing.expectEqual(@as(usize, 16), model.MAX_VERTEX_ATTRIBUTES);
+    try std.testing.expectEqual(@as(usize, 16), render_types.MAX_VERTEX_ATTRIBUTES);
 }
 
 test "MAX_RENDER_BIND_ENTRIES is 16" {
-    try std.testing.expectEqual(@as(usize, 16), model.MAX_RENDER_BIND_ENTRIES);
+    try std.testing.expectEqual(@as(usize, 16), render_types.MAX_RENDER_BIND_ENTRIES);
 }
 
 // ============================================================
@@ -1064,8 +983,8 @@ test "MAX_RENDER_BIND_ENTRIES is 16" {
 // ============================================================
 
 test "WGPUVertexStepMode constants are ABI-stable" {
-    try std.testing.expectEqual(@as(u32, 0x00000001), model.WGPUVertexStepMode_Vertex);
-    try std.testing.expectEqual(@as(u32, 0x00000002), model.WGPUVertexStepMode_Instance);
+    try std.testing.expectEqual(@as(u32, 0x00000001), render_types.WGPUVertexStepMode_Vertex);
+    try std.testing.expectEqual(@as(u32, 0x00000002), render_types.WGPUVertexStepMode_Instance);
 }
 
 // ============================================================
@@ -1073,10 +992,10 @@ test "WGPUVertexStepMode constants are ABI-stable" {
 // ============================================================
 
 test "WGPUTextureDimension constants are sequential from 0" {
-    try std.testing.expectEqual(@as(u32, 0), model.WGPUTextureDimension_Undefined);
-    try std.testing.expectEqual(@as(u32, 1), model.WGPUTextureDimension_1D);
-    try std.testing.expectEqual(@as(u32, 2), model.WGPUTextureDimension_2D);
-    try std.testing.expectEqual(@as(u32, 3), model.WGPUTextureDimension_3D);
+    try std.testing.expectEqual(@as(u32, 0), gpu.WGPUTextureDimension_Undefined);
+    try std.testing.expectEqual(@as(u32, 1), gpu.WGPUTextureDimension_1D);
+    try std.testing.expectEqual(@as(u32, 2), gpu.WGPUTextureDimension_2D);
+    try std.testing.expectEqual(@as(u32, 3), gpu.WGPUTextureDimension_3D);
 }
 
 // ============================================================
@@ -1084,13 +1003,13 @@ test "WGPUTextureDimension constants are sequential from 0" {
 // ============================================================
 
 test "WGPUTextureViewDimension constants are sequential from 0" {
-    try std.testing.expectEqual(@as(u32, 0), model.WGPUTextureViewDimension_Undefined);
-    try std.testing.expectEqual(@as(u32, 1), model.WGPUTextureViewDimension_1D);
-    try std.testing.expectEqual(@as(u32, 2), model.WGPUTextureViewDimension_2D);
-    try std.testing.expectEqual(@as(u32, 3), model.WGPUTextureViewDimension_2DArray);
-    try std.testing.expectEqual(@as(u32, 4), model.WGPUTextureViewDimension_Cube);
-    try std.testing.expectEqual(@as(u32, 5), model.WGPUTextureViewDimension_CubeArray);
-    try std.testing.expectEqual(@as(u32, 6), model.WGPUTextureViewDimension_3D);
+    try std.testing.expectEqual(@as(u32, 0), gpu.WGPUTextureViewDimension_Undefined);
+    try std.testing.expectEqual(@as(u32, 1), gpu.WGPUTextureViewDimension_1D);
+    try std.testing.expectEqual(@as(u32, 2), gpu.WGPUTextureViewDimension_2D);
+    try std.testing.expectEqual(@as(u32, 3), gpu.WGPUTextureViewDimension_2DArray);
+    try std.testing.expectEqual(@as(u32, 4), gpu.WGPUTextureViewDimension_Cube);
+    try std.testing.expectEqual(@as(u32, 5), gpu.WGPUTextureViewDimension_CubeArray);
+    try std.testing.expectEqual(@as(u32, 6), gpu.WGPUTextureViewDimension_3D);
 }
 
 // ============================================================
@@ -1098,10 +1017,10 @@ test "WGPUTextureViewDimension constants are sequential from 0" {
 // ============================================================
 
 test "WGPUTextureAspect constants are sequential from 0" {
-    try std.testing.expectEqual(@as(u32, 0), model.WGPUTextureAspect_Undefined);
-    try std.testing.expectEqual(@as(u32, 1), model.WGPUTextureAspect_All);
-    try std.testing.expectEqual(@as(u32, 2), model.WGPUTextureAspect_StencilOnly);
-    try std.testing.expectEqual(@as(u32, 3), model.WGPUTextureAspect_DepthOnly);
+    try std.testing.expectEqual(@as(u32, 0), gpu.WGPUTextureAspect_Undefined);
+    try std.testing.expectEqual(@as(u32, 1), gpu.WGPUTextureAspect_All);
+    try std.testing.expectEqual(@as(u32, 2), gpu.WGPUTextureAspect_StencilOnly);
+    try std.testing.expectEqual(@as(u32, 3), gpu.WGPUTextureAspect_DepthOnly);
 }
 
 // ============================================================
@@ -1109,10 +1028,10 @@ test "WGPUTextureAspect constants are sequential from 0" {
 // ============================================================
 
 test "WGPUBufferBindingType constants are sequential from 1" {
-    try std.testing.expectEqual(@as(u32, 1), model.WGPUBufferBindingType_Undefined);
-    try std.testing.expectEqual(@as(u32, 2), model.WGPUBufferBindingType_Uniform);
-    try std.testing.expectEqual(@as(u32, 3), model.WGPUBufferBindingType_Storage);
-    try std.testing.expectEqual(@as(u32, 4), model.WGPUBufferBindingType_ReadOnlyStorage);
+    try std.testing.expectEqual(@as(u32, 1), gpu.WGPUBufferBindingType_Undefined);
+    try std.testing.expectEqual(@as(u32, 2), gpu.WGPUBufferBindingType_Uniform);
+    try std.testing.expectEqual(@as(u32, 3), gpu.WGPUBufferBindingType_Storage);
+    try std.testing.expectEqual(@as(u32, 4), gpu.WGPUBufferBindingType_ReadOnlyStorage);
 }
 
 // ============================================================
@@ -1120,12 +1039,12 @@ test "WGPUBufferBindingType constants are sequential from 1" {
 // ============================================================
 
 test "WGPUTextureSampleType constants are sequential from 1" {
-    try std.testing.expectEqual(@as(u32, 1), model.WGPUTextureSampleType_Undefined);
-    try std.testing.expectEqual(@as(u32, 2), model.WGPUTextureSampleType_Float);
-    try std.testing.expectEqual(@as(u32, 3), model.WGPUTextureSampleType_UnfilterableFloat);
-    try std.testing.expectEqual(@as(u32, 4), model.WGPUTextureSampleType_Depth);
-    try std.testing.expectEqual(@as(u32, 5), model.WGPUTextureSampleType_Sint);
-    try std.testing.expectEqual(@as(u32, 6), model.WGPUTextureSampleType_Uint);
+    try std.testing.expectEqual(@as(u32, 1), gpu.WGPUTextureSampleType_Undefined);
+    try std.testing.expectEqual(@as(u32, 2), gpu.WGPUTextureSampleType_Float);
+    try std.testing.expectEqual(@as(u32, 3), gpu.WGPUTextureSampleType_UnfilterableFloat);
+    try std.testing.expectEqual(@as(u32, 4), gpu.WGPUTextureSampleType_Depth);
+    try std.testing.expectEqual(@as(u32, 5), gpu.WGPUTextureSampleType_Sint);
+    try std.testing.expectEqual(@as(u32, 6), gpu.WGPUTextureSampleType_Uint);
 }
 
 // ============================================================
@@ -1133,10 +1052,10 @@ test "WGPUTextureSampleType constants are sequential from 1" {
 // ============================================================
 
 test "WGPUStorageTextureAccess constants are sequential from 1" {
-    try std.testing.expectEqual(@as(u32, 1), model.WGPUStorageTextureAccess_Undefined);
-    try std.testing.expectEqual(@as(u32, 2), model.WGPUStorageTextureAccess_WriteOnly);
-    try std.testing.expectEqual(@as(u32, 3), model.WGPUStorageTextureAccess_ReadOnly);
-    try std.testing.expectEqual(@as(u32, 4), model.WGPUStorageTextureAccess_ReadWrite);
+    try std.testing.expectEqual(@as(u32, 1), gpu.WGPUStorageTextureAccess_Undefined);
+    try std.testing.expectEqual(@as(u32, 2), gpu.WGPUStorageTextureAccess_WriteOnly);
+    try std.testing.expectEqual(@as(u32, 3), gpu.WGPUStorageTextureAccess_ReadOnly);
+    try std.testing.expectEqual(@as(u32, 4), gpu.WGPUStorageTextureAccess_ReadWrite);
 }
 
 // ============================================================
@@ -1144,8 +1063,8 @@ test "WGPUStorageTextureAccess constants are sequential from 1" {
 // ============================================================
 
 test "WGPUCanvasToneMappingMode constants are ABI-stable" {
-    try std.testing.expectEqual(@as(u32, 0x00000001), model.WGPUCanvasToneMappingMode_Standard);
-    try std.testing.expectEqual(@as(u32, 0x00000002), model.WGPUCanvasToneMappingMode_Extended);
+    try std.testing.expectEqual(@as(u32, 0x00000001), surface.WGPUCanvasToneMappingMode_Standard);
+    try std.testing.expectEqual(@as(u32, 0x00000002), surface.WGPUCanvasToneMappingMode_Extended);
 }
 
 // ============================================================
@@ -1153,35 +1072,35 @@ test "WGPUCanvasToneMappingMode constants are ABI-stable" {
 // ============================================================
 
 test "WGPUTextureFormat_Undefined is 0" {
-    try std.testing.expectEqual(@as(model.WGPUTextureFormat, 0), model.WGPUTextureFormat_Undefined);
+    try std.testing.expectEqual(@as(gpu.WGPUTextureFormat, 0), gpu.WGPUTextureFormat_Undefined);
 }
 
 test "WGPUTextureFormat_R8Unorm is 1" {
-    try std.testing.expectEqual(@as(model.WGPUTextureFormat, 1), model.WGPUTextureFormat_R8Unorm);
+    try std.testing.expectEqual(@as(gpu.WGPUTextureFormat, 1), gpu.WGPUTextureFormat_R8Unorm);
 }
 
 test "WGPUTextureFormat_RGBA8Unorm is 0x16" {
-    try std.testing.expectEqual(@as(model.WGPUTextureFormat, 0x16), model.WGPUTextureFormat_RGBA8Unorm);
+    try std.testing.expectEqual(@as(gpu.WGPUTextureFormat, 0x16), gpu.WGPUTextureFormat_RGBA8Unorm);
 }
 
 test "WGPUTextureFormat_BGRA8Unorm is 0x1B" {
-    try std.testing.expectEqual(@as(model.WGPUTextureFormat, 0x1B), model.WGPUTextureFormat_BGRA8Unorm);
+    try std.testing.expectEqual(@as(gpu.WGPUTextureFormat, 0x1B), gpu.WGPUTextureFormat_BGRA8Unorm);
 }
 
 test "WGPUTextureFormat_Depth32Float is 0x30" {
-    try std.testing.expectEqual(@as(model.WGPUTextureFormat, 0x30), model.WGPUTextureFormat_Depth32Float);
+    try std.testing.expectEqual(@as(gpu.WGPUTextureFormat, 0x30), gpu.WGPUTextureFormat_Depth32Float);
 }
 
 test "WGPUTextureFormat_Depth32FloatStencil8 is 0x31" {
-    try std.testing.expectEqual(@as(model.WGPUTextureFormat, 0x31), model.WGPUTextureFormat_Depth32FloatStencil8);
+    try std.testing.expectEqual(@as(gpu.WGPUTextureFormat, 0x31), gpu.WGPUTextureFormat_Depth32FloatStencil8);
 }
 
 test "WGPUTextureFormat_BC1RGBAUnorm starts compressed block at 0x32" {
-    try std.testing.expectEqual(@as(model.WGPUTextureFormat, 0x32), model.WGPUTextureFormat_BC1RGBAUnorm);
+    try std.testing.expectEqual(@as(gpu.WGPUTextureFormat, 0x32), gpu.WGPUTextureFormat_BC1RGBAUnorm);
 }
 
 test "WGPUTextureFormat_ASTC12x12UnormSrgb is 0x65" {
-    try std.testing.expectEqual(@as(model.WGPUTextureFormat, 0x65), model.WGPUTextureFormat_ASTC12x12UnormSrgb);
+    try std.testing.expectEqual(@as(gpu.WGPUTextureFormat, 0x65), gpu.WGPUTextureFormat_ASTC12x12UnormSrgb);
 }
 
 // ============================================================
@@ -1189,30 +1108,30 @@ test "WGPUTextureFormat_ASTC12x12UnormSrgb is 0x65" {
 // ============================================================
 
 test "QuirkAction has exactly 4 variants" {
-    const fields = @typeInfo(model.QuirkAction).@"union".fields;
+    const fields = @typeInfo(quirks.QuirkAction).@"union".fields;
     try std.testing.expectEqual(@as(usize, 4), fields.len);
 }
 
 test "QuirkAction no_op can be constructed" {
-    const action: model.QuirkAction = .no_op;
+    const action: quirks.QuirkAction = .no_op;
     try std.testing.expectEqual(
         @as(usize, @intFromEnum(std.meta.activeTag(action))),
-        @as(usize, @intFromEnum(@as(std.meta.Tag(model.QuirkAction), .no_op))),
+        @as(usize, @intFromEnum(@as(std.meta.Tag(quirks.QuirkAction), .no_op))),
     );
 }
 
 test "QuirkAction use_temporary_buffer carries alignment_bytes" {
-    const action = model.QuirkAction{ .use_temporary_buffer = .{ .alignment_bytes = 256 } };
+    const action = quirks.QuirkAction{ .use_temporary_buffer = .{ .alignment_bytes = 256 } };
     try std.testing.expectEqual(@as(u32, 256), action.use_temporary_buffer.alignment_bytes);
 }
 
 test "QuirkAction use_temporary_render_texture carries min_mip_level" {
-    const action = model.QuirkAction{ .use_temporary_render_texture = .{ .min_mip_level = 3 } };
+    const action = quirks.QuirkAction{ .use_temporary_render_texture = .{ .min_mip_level = 3 } };
     try std.testing.expectEqual(@as(u32, 3), action.use_temporary_render_texture.min_mip_level);
 }
 
 test "QuirkAction toggle carries toggle_name" {
-    const action = model.QuirkAction{ .toggle = .{ .toggle_name = "some_toggle" } };
+    const action = quirks.QuirkAction{ .toggle = .{ .toggle_name = "some_toggle" } };
     try std.testing.expectEqualStrings("some_toggle", action.toggle.toggle_name);
 }
 
@@ -1221,13 +1140,13 @@ test "QuirkAction toggle carries toggle_name" {
 // ============================================================
 
 test "CopyResourceKind has exactly 2 variants" {
-    const fields = @typeInfo(model.CopyResourceKind).@"enum".fields;
+    const fields = @typeInfo(resource.CopyResourceKind).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 2), fields.len);
 }
 
 test "CopyResourceKind ordinals are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.CopyResourceKind.buffer));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.CopyResourceKind.texture));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(resource.CopyResourceKind.buffer));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(resource.CopyResourceKind.texture));
 }
 
 // ============================================================
@@ -1235,15 +1154,15 @@ test "CopyResourceKind ordinals are stable" {
 // ============================================================
 
 test "CopyDirection has exactly 4 variants" {
-    const fields = @typeInfo(model.CopyDirection).@"enum".fields;
+    const fields = @typeInfo(resource.CopyDirection).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 4), fields.len);
 }
 
 test "CopyDirection ordinals are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.CopyDirection.buffer_to_buffer));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.CopyDirection.buffer_to_texture));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.CopyDirection.texture_to_buffer));
-    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(model.CopyDirection.texture_to_texture));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(resource.CopyDirection.buffer_to_buffer));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(resource.CopyDirection.buffer_to_texture));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(resource.CopyDirection.texture_to_buffer));
+    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(resource.CopyDirection.texture_to_texture));
 }
 
 // ============================================================
@@ -1251,15 +1170,15 @@ test "CopyDirection ordinals are stable" {
 // ============================================================
 
 test "KernelBindingResourceKind has exactly 4 variants" {
-    const fields = @typeInfo(model.KernelBindingResourceKind).@"enum".fields;
+    const fields = @typeInfo(compute.KernelBindingResourceKind).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 4), fields.len);
 }
 
 test "KernelBindingResourceKind ordinals are stable" {
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.KernelBindingResourceKind.buffer));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.KernelBindingResourceKind.texture));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.KernelBindingResourceKind.storage_texture));
-    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(model.KernelBindingResourceKind.sampler));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(compute.KernelBindingResourceKind.buffer));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(compute.KernelBindingResourceKind.texture));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(compute.KernelBindingResourceKind.storage_texture));
+    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(compute.KernelBindingResourceKind.sampler));
 }
 
 // ============================================================
@@ -1267,7 +1186,7 @@ test "KernelBindingResourceKind ordinals are stable" {
 // ============================================================
 
 test "RenderDrawPipelineMode has exactly 2 variants" {
-    const fields = @typeInfo(model.RenderDrawPipelineMode).@"enum".fields;
+    const fields = @typeInfo(render_types.RenderDrawPipelineMode).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 2), fields.len);
 }
 
@@ -1276,7 +1195,7 @@ test "RenderDrawPipelineMode has exactly 2 variants" {
 // ============================================================
 
 test "RenderDrawBindGroupMode has exactly 2 variants" {
-    const fields = @typeInfo(model.RenderDrawBindGroupMode).@"enum".fields;
+    const fields = @typeInfo(render_types.RenderDrawBindGroupMode).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 2), fields.len);
 }
 
@@ -1285,7 +1204,7 @@ test "RenderDrawBindGroupMode has exactly 2 variants" {
 // ============================================================
 
 test "RenderDrawEncodeMode has exactly 2 variants" {
-    const fields = @typeInfo(model.RenderDrawEncodeMode).@"enum".fields;
+    const fields = @typeInfo(render_types.RenderDrawEncodeMode).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 2), fields.len);
 }
 
@@ -1294,7 +1213,7 @@ test "RenderDrawEncodeMode has exactly 2 variants" {
 // ============================================================
 
 test "RenderIndexFormat has exactly 2 variants" {
-    const fields = @typeInfo(model.RenderIndexFormat).@"enum".fields;
+    const fields = @typeInfo(render_types.RenderIndexFormat).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 2), fields.len);
 }
 
@@ -1303,7 +1222,7 @@ test "RenderIndexFormat has exactly 2 variants" {
 // ============================================================
 
 test "AsyncDiagnosticsMode has exactly 6 variants" {
-    const fields = @typeInfo(model.AsyncDiagnosticsMode).@"enum".fields;
+    const fields = @typeInfo(async_types.AsyncDiagnosticsMode).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 6), fields.len);
 }
 
@@ -1312,7 +1231,7 @@ test "AsyncDiagnosticsMode has exactly 6 variants" {
 // ============================================================
 
 test "AsyncDiagnosticsFeaturePolicy has exactly 2 variants" {
-    const fields = @typeInfo(model.AsyncDiagnosticsFeaturePolicy).@"enum".fields;
+    const fields = @typeInfo(async_types.AsyncDiagnosticsFeaturePolicy).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 2), fields.len);
 }
 
@@ -1321,7 +1240,7 @@ test "AsyncDiagnosticsFeaturePolicy has exactly 2 variants" {
 // ============================================================
 
 test "MapAsyncMode has exactly 2 variants" {
-    const fields = @typeInfo(model.MapAsyncMode).@"enum".fields;
+    const fields = @typeInfo(async_types.MapAsyncMode).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 2), fields.len);
 }
 
@@ -1330,15 +1249,15 @@ test "MapAsyncMode has exactly 2 variants" {
 // ============================================================
 
 test "WGPUFlags is u64" {
-    try std.testing.expect(model.WGPUFlags == u64);
+    try std.testing.expect(gpu.WGPUFlags == u64);
 }
 
 test "WGPUSType is u32" {
-    try std.testing.expect(model.WGPUSType == u32);
+    try std.testing.expect(gpu.WGPUSType == u32);
 }
 
 test "WGPUTextureFormat is u32" {
-    try std.testing.expect(model.WGPUTextureFormat == u32);
+    try std.testing.expect(gpu.WGPUTextureFormat == u32);
 }
 
 // ============================================================
@@ -1347,48 +1266,33 @@ test "WGPUTextureFormat is u32" {
 // ============================================================
 
 test "DrawIndirectCommand is same type as RenderDrawCommand" {
-    try std.testing.expect(model.DrawIndirectCommand == model.RenderDrawCommand);
+    try std.testing.expect(render_types.DrawIndirectCommand == render_types.RenderDrawCommand);
 }
 
 test "DrawIndexedIndirectCommand is same type as RenderDrawCommand" {
-    try std.testing.expect(model.DrawIndexedIndirectCommand == model.RenderDrawCommand);
+    try std.testing.expect(render_types.DrawIndexedIndirectCommand == render_types.RenderDrawCommand);
 }
 
 test "RenderPassCommand is same type as RenderDrawCommand" {
-    try std.testing.expect(model.RenderPassCommand == model.RenderDrawCommand);
+    try std.testing.expect(render_types.RenderPassCommand == render_types.RenderDrawCommand);
 }
 
 test "DispatchIndirectCommand is same type as DispatchCommand" {
-    try std.testing.expect(model.DispatchIndirectCommand == model.DispatchCommand);
+    try std.testing.expect(compute.DispatchIndirectCommand == compute.DispatchCommand);
 }
 
 // ============================================================
-// core_command_kind / full_command_kind projections
+// Canonical command scope metadata
 // ============================================================
 
-test "core_command_kind returns correct CoreCommandKind for core variants" {
-    try std.testing.expectEqual(model.CoreCommandKind.upload, model.core_command_kind(.upload).?);
-    try std.testing.expectEqual(model.CoreCommandKind.dispatch, model.core_command_kind(.dispatch).?);
-    try std.testing.expectEqual(model.CoreCommandKind.barrier, model.core_command_kind(.barrier).?);
-    try std.testing.expectEqual(model.CoreCommandKind.map_async, model.core_command_kind(.map_async).?);
-    try std.testing.expectEqual(model.CoreCommandKind.texture_write, model.core_command_kind(.texture_write).?);
-}
+test "command scope metadata partitions representative kinds" {
+    try std.testing.expect(command.is_core_command_kind(.upload));
+    try std.testing.expect(command.is_core_command_kind(.dispatch));
+    try std.testing.expect(command.is_core_command_kind(.map_async));
+    try std.testing.expect(!command.is_full_command_kind(.upload));
 
-test "core_command_kind returns null for full variants" {
-    try std.testing.expect(model.core_command_kind(.render_draw) == null);
-    try std.testing.expect(model.core_command_kind(.surface_present) == null);
-    try std.testing.expect(model.core_command_kind(.async_diagnostics) == null);
-}
-
-test "full_command_kind returns correct FullCommandKind for full variants" {
-    try std.testing.expectEqual(model.FullCommandKind.render_draw, model.full_command_kind(.render_draw).?);
-    try std.testing.expectEqual(model.FullCommandKind.sampler_create, model.full_command_kind(.sampler_create).?);
-    try std.testing.expectEqual(model.FullCommandKind.surface_present, model.full_command_kind(.surface_present).?);
-    try std.testing.expectEqual(model.FullCommandKind.async_diagnostics, model.full_command_kind(.async_diagnostics).?);
-}
-
-test "full_command_kind returns null for core variants" {
-    try std.testing.expect(model.full_command_kind(.upload) == null);
-    try std.testing.expect(model.full_command_kind(.dispatch) == null);
-    try std.testing.expect(model.full_command_kind(.map_async) == null);
+    try std.testing.expect(command.is_full_command_kind(.render_draw));
+    try std.testing.expect(command.is_full_command_kind(.surface_present));
+    try std.testing.expect(command.is_full_command_kind(.async_diagnostics));
+    try std.testing.expect(!command.is_core_command_kind(.render_draw));
 }

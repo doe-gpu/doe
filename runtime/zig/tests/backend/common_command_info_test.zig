@@ -1,6 +1,6 @@
 const std = @import("std");
-const model = @import("../../src/contracts/model/model.zig");
-const command_info = @import("../../src/backend/common/command_info.zig");
+const model = @import("../../src/contracts/command.zig");
+const command_info = @import("../../src/contracts/command.zig");
 
 test "manifest_module returns correct names for all commands" {
     const upload_cmd = model.Command{ .upload = .{ .bytes = 1024, .align_bytes = 256 } };

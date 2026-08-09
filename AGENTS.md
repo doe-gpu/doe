@@ -244,8 +244,12 @@ Do not bypass earlier stages to satisfy later-stage outcomes.
 
 ## File size
 
-- 999 lines max for Zig runtime source files in `runtime/zig/src`; shard before exceeding this
-- split by cohesive functionality, not by arbitrary line count
+- `runtime/zig/source-layout.json` is the source of truth for Zig source size policy
+- 800 lines is an advisory architecture review signal
+- handwritten production files above 1,200 lines require a cohesive-module justification in the architecture manifest
+- handwritten production files above 1,500 lines fail the gate
+- generated files use separately declared reproducible generation contracts
+- split by named semantic responsibility, not by arbitrary line count
 - group by feature (e.g. `pipeline_cache.zig`) not by type (e.g. `helpers.zig`)
 - keep related code together; splitting a file must not scatter a single concern
 - Python benchmark and tooling files must stay modular; when a file exceeds 1200 lines, add a tracked sharding follow-up in the relevant live topical shard with owner and next split target.

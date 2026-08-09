@@ -344,7 +344,7 @@ fn copy_external_texture_to_dst(
 ) void {
     if (ext_texture_mod.resolvePlane0DoeTexture(ext)) |src_tex| {
         const source_copy = abi_copy.WGPUTexelCopyTextureInfo{
-            .texture = native_helpers.toOpaque(src_tex),
+            .texture = @ptrCast(native_helpers.toOpaque(src_tex)),
             .mipLevel = 0,
             .origin = origin,
             .aspect = abi_texture.WGPUTextureAspect_All,

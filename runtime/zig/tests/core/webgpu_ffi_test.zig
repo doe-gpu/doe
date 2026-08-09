@@ -16,7 +16,7 @@
 const std = @import("std");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
 const ffi = @import("../../src/compat/webgpu_ffi.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const command = @import("../../src/contracts/command.zig");
 
 // ============================================================
 // 1. Type size assertions — ABI break if sizes change
@@ -269,35 +269,35 @@ test "enum values: WGPUCallbackMode constants" {
 
 test "enum values: CommandKind tag order is stable" {
     // CommandKind is enum(u8) — tag order is ABI for the JS-to-Zig command dispatch.
-    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(model.CommandKind.upload));
-    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(model.CommandKind.buffer_write));
-    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(model.CommandKind.copy_buffer_to_texture));
-    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(model.CommandKind.barrier));
-    try std.testing.expectEqual(@as(u8, 4), @intFromEnum(model.CommandKind.dispatch));
-    try std.testing.expectEqual(@as(u8, 5), @intFromEnum(model.CommandKind.dispatch_indirect));
-    try std.testing.expectEqual(@as(u8, 6), @intFromEnum(model.CommandKind.kernel_dispatch));
-    try std.testing.expectEqual(@as(u8, 7), @intFromEnum(model.CommandKind.render_draw));
-    try std.testing.expectEqual(@as(u8, 8), @intFromEnum(model.CommandKind.draw_indirect));
-    try std.testing.expectEqual(@as(u8, 9), @intFromEnum(model.CommandKind.draw_indexed_indirect));
-    try std.testing.expectEqual(@as(u8, 10), @intFromEnum(model.CommandKind.render_pass));
-    try std.testing.expectEqual(@as(u8, 11), @intFromEnum(model.CommandKind.sampler_create));
-    try std.testing.expectEqual(@as(u8, 12), @intFromEnum(model.CommandKind.sampler_destroy));
-    try std.testing.expectEqual(@as(u8, 13), @intFromEnum(model.CommandKind.texture_write));
-    try std.testing.expectEqual(@as(u8, 14), @intFromEnum(model.CommandKind.texture_query));
-    try std.testing.expectEqual(@as(u8, 15), @intFromEnum(model.CommandKind.texture_destroy));
-    try std.testing.expectEqual(@as(u8, 16), @intFromEnum(model.CommandKind.surface_create));
-    try std.testing.expectEqual(@as(u8, 17), @intFromEnum(model.CommandKind.surface_capabilities));
-    try std.testing.expectEqual(@as(u8, 18), @intFromEnum(model.CommandKind.surface_configure));
-    try std.testing.expectEqual(@as(u8, 19), @intFromEnum(model.CommandKind.surface_acquire));
-    try std.testing.expectEqual(@as(u8, 20), @intFromEnum(model.CommandKind.surface_present));
-    try std.testing.expectEqual(@as(u8, 21), @intFromEnum(model.CommandKind.surface_unconfigure));
-    try std.testing.expectEqual(@as(u8, 22), @intFromEnum(model.CommandKind.surface_release));
-    try std.testing.expectEqual(@as(u8, 23), @intFromEnum(model.CommandKind.async_diagnostics));
-    try std.testing.expectEqual(@as(u8, 24), @intFromEnum(model.CommandKind.map_async));
+    try std.testing.expectEqual(@as(u8, 0), @intFromEnum(command.CommandKind.upload));
+    try std.testing.expectEqual(@as(u8, 1), @intFromEnum(command.CommandKind.buffer_write));
+    try std.testing.expectEqual(@as(u8, 2), @intFromEnum(command.CommandKind.copy_buffer_to_texture));
+    try std.testing.expectEqual(@as(u8, 3), @intFromEnum(command.CommandKind.barrier));
+    try std.testing.expectEqual(@as(u8, 4), @intFromEnum(command.CommandKind.dispatch));
+    try std.testing.expectEqual(@as(u8, 5), @intFromEnum(command.CommandKind.dispatch_indirect));
+    try std.testing.expectEqual(@as(u8, 6), @intFromEnum(command.CommandKind.kernel_dispatch));
+    try std.testing.expectEqual(@as(u8, 7), @intFromEnum(command.CommandKind.render_draw));
+    try std.testing.expectEqual(@as(u8, 8), @intFromEnum(command.CommandKind.draw_indirect));
+    try std.testing.expectEqual(@as(u8, 9), @intFromEnum(command.CommandKind.draw_indexed_indirect));
+    try std.testing.expectEqual(@as(u8, 10), @intFromEnum(command.CommandKind.render_pass));
+    try std.testing.expectEqual(@as(u8, 11), @intFromEnum(command.CommandKind.sampler_create));
+    try std.testing.expectEqual(@as(u8, 12), @intFromEnum(command.CommandKind.sampler_destroy));
+    try std.testing.expectEqual(@as(u8, 13), @intFromEnum(command.CommandKind.texture_write));
+    try std.testing.expectEqual(@as(u8, 14), @intFromEnum(command.CommandKind.texture_query));
+    try std.testing.expectEqual(@as(u8, 15), @intFromEnum(command.CommandKind.texture_destroy));
+    try std.testing.expectEqual(@as(u8, 16), @intFromEnum(command.CommandKind.surface_create));
+    try std.testing.expectEqual(@as(u8, 17), @intFromEnum(command.CommandKind.surface_capabilities));
+    try std.testing.expectEqual(@as(u8, 18), @intFromEnum(command.CommandKind.surface_configure));
+    try std.testing.expectEqual(@as(u8, 19), @intFromEnum(command.CommandKind.surface_acquire));
+    try std.testing.expectEqual(@as(u8, 20), @intFromEnum(command.CommandKind.surface_present));
+    try std.testing.expectEqual(@as(u8, 21), @intFromEnum(command.CommandKind.surface_unconfigure));
+    try std.testing.expectEqual(@as(u8, 22), @intFromEnum(command.CommandKind.surface_release));
+    try std.testing.expectEqual(@as(u8, 23), @intFromEnum(command.CommandKind.async_diagnostics));
+    try std.testing.expectEqual(@as(u8, 24), @intFromEnum(command.CommandKind.map_async));
 }
 
 test "enum values: CommandKind variant count is stable" {
-    const fields = @typeInfo(model.CommandKind).@"enum".fields;
+    const fields = @typeInfo(command.CommandKind).@"enum".fields;
     try std.testing.expectEqual(@as(usize, 25), fields.len);
 }
 

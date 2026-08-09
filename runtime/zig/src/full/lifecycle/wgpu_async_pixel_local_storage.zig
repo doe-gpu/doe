@@ -447,10 +447,6 @@ fn createRenderAttachmentTextureView(
         .arrayLayerCount = 1,
         .aspect = abi_texture.WGPUTextureAspect_All,
         .usage = abi_texture.WGPUTextureUsage_RenderAttachment,
-        .swizzleR = abi_texture.WGPUTextureComponentSwizzle_Red,
-        .swizzleG = abi_texture.WGPUTextureComponentSwizzle_Green,
-        .swizzleB = abi_texture.WGPUTextureComponentSwizzle_Blue,
-        .swizzleA = abi_texture.WGPUTextureComponentSwizzle_Alpha,
     });
     if (view == null) return error.TextureViewCreationFailed;
     return view;
@@ -472,10 +468,6 @@ fn createStorageAttachmentTextureView(
         .arrayLayerCount = 1,
         .aspect = abi_texture.WGPUTextureAspect_All,
         .usage = abi_texture.WGPUTextureUsage_RenderAttachment | abi_texture.WGPUTextureUsage_StorageAttachment,
-        .swizzleR = abi_texture.WGPUTextureComponentSwizzle_Red,
-        .swizzleG = abi_texture.WGPUTextureComponentSwizzle_Green,
-        .swizzleB = abi_texture.WGPUTextureComponentSwizzle_Blue,
-        .swizzleA = abi_texture.WGPUTextureComponentSwizzle_Alpha,
     });
     if (view == null) return error.TextureViewCreationFailed;
     return view;

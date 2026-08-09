@@ -2,9 +2,13 @@ const std = @import("std");
 const testing = std.testing;
 
 const execution = @import("../../src/runtime/execution.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const command = @import("../../src/contracts/command.zig");
+const profile_contract = @import("../../src/contracts/model/model_profile.zig");
+const resource_types = @import("../../src/contracts/model/model_resource_types.zig");
+const compute = @import("../../src/contracts/model/model_compute_types.zig");
+const gpu = @import("../../src/contracts/model/model_gpu_types.zig");
 const backend_policy = @import("../../src/backend/backend_policy.zig");
-const backend_ids = @import("../../src/backend/backend_ids.zig");
+const backend_ids = @import("../../src/contracts/backend.zig");
 const compute_commands = @import("../../src/core/compute/wgpu_commands_compute.zig");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
 
@@ -232,7 +236,7 @@ test "backendLaneName round-trips through parseBackendLane for every lane" {
 // Default backend lane — per API selection
 
 test "defaultBackendLane selects metal_doe_app for metal API" {
-    const profile = model.DeviceProfile{
+    const profile = profile_contract.DeviceProfile{
         .vendor = "apple",
         .api = .metal,
         .driver_version = .{ .major = 1, .minor = 0, .patch = 0 },
@@ -241,7 +245,7 @@ test "defaultBackendLane selects metal_doe_app for metal API" {
 }
 
 test "defaultBackendLane selects d3d12_doe_app for d3d12 API" {
-    const profile = model.DeviceProfile{
+    const profile = profile_contract.DeviceProfile{
         .vendor = "amd",
         .api = .d3d12,
         .driver_version = .{ .major = 23, .minor = 1, .patch = 0 },
@@ -250,7 +254,7 @@ test "defaultBackendLane selects d3d12_doe_app for d3d12 API" {
 }
 
 test "defaultBackendLane selects vulkan_doe_app for vulkan API" {
-    const profile = model.DeviceProfile{
+    const profile = profile_contract.DeviceProfile{
         .vendor = "nvidia",
         .api = .vulkan,
         .driver_version = .{ .major = 535, .minor = 0, .patch = 0 },
@@ -259,7 +263,7 @@ test "defaultBackendLane selects vulkan_doe_app for vulkan API" {
 }
 
 test "defaultBackendLane falls back to vulkan_doe_app for webgpu API" {
-    const profile = model.DeviceProfile{
+    const profile = profile_contract.DeviceProfile{
         .vendor = "generic",
         .api = .webgpu,
         .driver_version = .{ .major = 1, .minor = 0, .patch = 0 },
@@ -413,7 +417,7 @@ test "sourceContainsComputeStage detects @compute anywhere in source" {
 // hasValidTextureExtent — texture dimension validation
 
 test "hasValidTextureExtent accepts valid 1x1x1 texture" {
-    const resource = model.CopyTextureResource{
+    const resource = resource_types.CopyTextureResource{
         .handle = 1,
         .width = 1,
         .height = 1,
@@ -423,7 +427,7 @@ test "hasValidTextureExtent accepts valid 1x1x1 texture" {
 }
 
 test "hasValidTextureExtent accepts large texture" {
-    const resource = model.CopyTextureResource{
+    const resource = resource_types.CopyTextureResource{
         .handle = 1,
         .width = 4096,
         .height = 2048,
@@ -433,7 +437,7 @@ test "hasValidTextureExtent accepts large texture" {
 }
 
 test "hasValidTextureExtent rejects zero width" {
-    const resource = model.CopyTextureResource{
+    const resource = resource_types.CopyTextureResource{
         .handle = 1,
         .width = 0,
         .height = 1,
@@ -443,7 +447,7 @@ test "hasValidTextureExtent rejects zero width" {
 }
 
 test "hasValidTextureExtent rejects zero height" {
-    const resource = model.CopyTextureResource{
+    const resource = resource_types.CopyTextureResource{
         .handle = 1,
         .width = 1,
         .height = 0,
@@ -453,7 +457,7 @@ test "hasValidTextureExtent rejects zero height" {
 }
 
 test "hasValidTextureExtent rejects zero depth" {
-    const resource = model.CopyTextureResource{
+    const resource = resource_types.CopyTextureResource{
         .handle = 1,
         .width = 1,
         .height = 1,
@@ -463,7 +467,7 @@ test "hasValidTextureExtent rejects zero depth" {
 }
 
 test "hasValidTextureExtent rejects all-zero dimensions" {
-    const resource = model.CopyTextureResource{
+    const resource = resource_types.CopyTextureResource{
         .handle = 1,
         .width = 0,
         .height = 0,
@@ -476,13 +480,13 @@ test "hasValidTextureExtent rejects all-zero dimensions" {
 // hasMatchingTextureExtent — texture extent comparison
 
 test "hasMatchingTextureExtent matches identical extents" {
-    const a = model.CopyTextureResource{
+    const a = resource_types.CopyTextureResource{
         .handle = 1,
         .width = 256,
         .height = 256,
         .depth_or_array_layers = 1,
     };
-    const b = model.CopyTextureResource{
+    const b = resource_types.CopyTextureResource{
         .handle = 2,
         .width = 256,
         .height = 256,
@@ -492,38 +496,38 @@ test "hasMatchingTextureExtent matches identical extents" {
 }
 
 test "hasMatchingTextureExtent rejects different width" {
-    const a = model.CopyTextureResource{ .handle = 1, .width = 256, .height = 256, .depth_or_array_layers = 1 };
-    const b = model.CopyTextureResource{ .handle = 2, .width = 512, .height = 256, .depth_or_array_layers = 1 };
+    const a = resource_types.CopyTextureResource{ .handle = 1, .width = 256, .height = 256, .depth_or_array_layers = 1 };
+    const b = resource_types.CopyTextureResource{ .handle = 2, .width = 512, .height = 256, .depth_or_array_layers = 1 };
     try testing.expect(!compute_commands.hasMatchingTextureExtent(a, b));
 }
 
 test "hasMatchingTextureExtent rejects different height" {
-    const a = model.CopyTextureResource{ .handle = 1, .width = 256, .height = 256, .depth_or_array_layers = 1 };
-    const b = model.CopyTextureResource{ .handle = 2, .width = 256, .height = 128, .depth_or_array_layers = 1 };
+    const a = resource_types.CopyTextureResource{ .handle = 1, .width = 256, .height = 256, .depth_or_array_layers = 1 };
+    const b = resource_types.CopyTextureResource{ .handle = 2, .width = 256, .height = 128, .depth_or_array_layers = 1 };
     try testing.expect(!compute_commands.hasMatchingTextureExtent(a, b));
 }
 
 test "hasMatchingTextureExtent rejects different depth" {
-    const a = model.CopyTextureResource{ .handle = 1, .width = 256, .height = 256, .depth_or_array_layers = 1 };
-    const b = model.CopyTextureResource{ .handle = 2, .width = 256, .height = 256, .depth_or_array_layers = 6 };
+    const a = resource_types.CopyTextureResource{ .handle = 1, .width = 256, .height = 256, .depth_or_array_layers = 1 };
+    const b = resource_types.CopyTextureResource{ .handle = 2, .width = 256, .height = 256, .depth_or_array_layers = 6 };
     try testing.expect(!compute_commands.hasMatchingTextureExtent(a, b));
 }
 
 test "hasMatchingTextureExtent ignores non-extent fields" {
-    const a = model.CopyTextureResource{
+    const a = resource_types.CopyTextureResource{
         .handle = 100,
         .width = 64,
         .height = 64,
         .depth_or_array_layers = 2,
-        .format = model.WGPUTextureFormat_RGBA8Unorm,
+        .format = gpu.WGPUTextureFormat_RGBA8Unorm,
         .mip_level = 0,
     };
-    const b = model.CopyTextureResource{
+    const b = resource_types.CopyTextureResource{
         .handle = 200,
         .width = 64,
         .height = 64,
         .depth_or_array_layers = 2,
-        .format = model.WGPUTextureFormat_BGRA8Unorm,
+        .format = gpu.WGPUTextureFormat_BGRA8Unorm,
         .mip_level = 3,
     };
     try testing.expect(compute_commands.hasMatchingTextureExtent(a, b));
@@ -564,11 +568,11 @@ test "bindingBufferLimit returns maxUniformBufferBindingSize for uniform binding
     limits.maxUniformBufferBindingSize = 65536;
     limits.maxStorageBufferBindingSize = 128_000_000;
 
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_Uniform,
+        .buffer_type = gpu.WGPUBufferBindingType_Uniform,
     };
     try testing.expectEqual(@as(u64, 65536), compute_commands.bindingBufferLimit(binding, limits));
 }
@@ -578,11 +582,11 @@ test "bindingBufferLimit returns maxStorageBufferBindingSize for storage binding
     limits.maxUniformBufferBindingSize = 65536;
     limits.maxStorageBufferBindingSize = 128_000_000;
 
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_Storage,
+        .buffer_type = gpu.WGPUBufferBindingType_Storage,
     };
     try testing.expectEqual(@as(u64, 128_000_000), compute_commands.bindingBufferLimit(binding, limits));
 }
@@ -592,11 +596,11 @@ test "bindingBufferLimit returns maxStorageBufferBindingSize for read-only stora
     limits.maxUniformBufferBindingSize = 65536;
     limits.maxStorageBufferBindingSize = 128_000_000;
 
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_ReadOnlyStorage,
+        .buffer_type = gpu.WGPUBufferBindingType_ReadOnlyStorage,
     };
     try testing.expectEqual(@as(u64, 128_000_000), compute_commands.bindingBufferLimit(binding, limits));
 }
@@ -606,11 +610,11 @@ test "bindingBufferLimit returns min positive limit for undefined binding type" 
     limits.maxUniformBufferBindingSize = 65536;
     limits.maxStorageBufferBindingSize = 128_000_000;
 
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_Undefined,
+        .buffer_type = gpu.WGPUBufferBindingType_Undefined,
     };
     try testing.expectEqual(@as(u64, 65536), compute_commands.bindingBufferLimit(binding, limits));
 }
@@ -620,11 +624,11 @@ test "bindingBufferLimit with zero uniform limit falls back to storage limit for
     limits.maxUniformBufferBindingSize = 0;
     limits.maxStorageBufferBindingSize = 256_000_000;
 
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_Undefined,
+        .buffer_type = gpu.WGPUBufferBindingType_Undefined,
     };
     try testing.expectEqual(@as(u64, 256_000_000), compute_commands.bindingBufferLimit(binding, limits));
 }
@@ -706,59 +710,59 @@ test "KernelSource modes cover all lookup results" {
 // Command — union tag verification
 
 test "Command union tag matches expected kind for upload" {
-    const cmd = model.Command{ .upload = .{ .bytes = 1024, .align_bytes = 256 } };
-    try testing.expectEqual(model.CommandKind.upload, std.meta.activeTag(cmd));
+    const cmd = command.Command{ .upload = .{ .bytes = 1024, .align_bytes = 256 } };
+    try testing.expectEqual(command.CommandKind.upload, std.meta.activeTag(cmd));
 }
 
 test "Command union tag matches expected kind for dispatch" {
-    const cmd = model.Command{ .dispatch = .{ .x = 4, .y = 4, .z = 1 } };
-    try testing.expectEqual(model.CommandKind.dispatch, std.meta.activeTag(cmd));
+    const cmd = command.Command{ .dispatch = .{ .x = 4, .y = 4, .z = 1 } };
+    try testing.expectEqual(command.CommandKind.dispatch, std.meta.activeTag(cmd));
 }
 
 test "Command union tag matches expected kind for barrier" {
-    const cmd = model.Command{ .barrier = .{ .dependency_count = 3 } };
-    try testing.expectEqual(model.CommandKind.barrier, std.meta.activeTag(cmd));
+    const cmd = command.Command{ .barrier = .{ .dependency_count = 3 } };
+    try testing.expectEqual(command.CommandKind.barrier, std.meta.activeTag(cmd));
 }
 
 test "Command union tag matches expected kind for kernel_dispatch" {
-    const cmd = model.Command{ .kernel_dispatch = .{
+    const cmd = command.Command{ .kernel_dispatch = .{
         .kernel = "test.wgsl",
         .x = 16,
         .y = 1,
         .z = 1,
     } };
-    try testing.expectEqual(model.CommandKind.kernel_dispatch, std.meta.activeTag(cmd));
+    try testing.expectEqual(command.CommandKind.kernel_dispatch, std.meta.activeTag(cmd));
 }
 
 test "Command union tag matches expected kind for copy_buffer_to_texture" {
-    const cmd = model.Command{ .copy_buffer_to_texture = .{
+    const cmd = command.Command{ .copy_buffer_to_texture = .{
         .direction = .buffer_to_buffer,
         .src = .{ .handle = 1 },
         .dst = .{ .handle = 2 },
         .bytes = 256,
     } };
-    try testing.expectEqual(model.CommandKind.copy_buffer_to_texture, std.meta.activeTag(cmd));
+    try testing.expectEqual(command.CommandKind.copy_buffer_to_texture, std.meta.activeTag(cmd));
 }
 
 test "Command union tag matches expected kind for map_async" {
-    const cmd = model.Command{ .map_async = .{ .bytes = 4096 } };
-    try testing.expectEqual(model.CommandKind.map_async, std.meta.activeTag(cmd));
+    const cmd = command.Command{ .map_async = .{ .bytes = 4096 } };
+    try testing.expectEqual(command.CommandKind.map_async, std.meta.activeTag(cmd));
 }
 
 // ============================================================
 // CopyDirection — all directions are distinct
 
 test "CopyDirection enum variants are distinct" {
-    try testing.expect(model.CopyDirection.buffer_to_buffer != model.CopyDirection.buffer_to_texture);
-    try testing.expect(model.CopyDirection.buffer_to_texture != model.CopyDirection.texture_to_buffer);
-    try testing.expect(model.CopyDirection.texture_to_buffer != model.CopyDirection.texture_to_texture);
+    try testing.expect(resource_types.CopyDirection.buffer_to_buffer != resource_types.CopyDirection.buffer_to_texture);
+    try testing.expect(resource_types.CopyDirection.buffer_to_texture != resource_types.CopyDirection.texture_to_buffer);
+    try testing.expect(resource_types.CopyDirection.texture_to_buffer != resource_types.CopyDirection.texture_to_texture);
 }
 
 // ============================================================
 // CopyCommand — default field values
 
 test "CopyCommand defaults uses_temporary_buffer to false" {
-    const cmd = model.CopyCommand{
+    const cmd = resource_types.CopyCommand{
         .direction = .buffer_to_buffer,
         .src = .{ .handle = 1 },
         .dst = .{ .handle = 2 },
@@ -769,7 +773,7 @@ test "CopyCommand defaults uses_temporary_buffer to false" {
 }
 
 test "CopyCommand explicit temporary buffer fields" {
-    const cmd = model.CopyCommand{
+    const cmd = resource_types.CopyCommand{
         .direction = .buffer_to_texture,
         .src = .{ .handle = 1 },
         .dst = .{ .handle = 2, .width = 64, .height = 64, .depth_or_array_layers = 1 },
@@ -785,14 +789,14 @@ test "CopyCommand explicit temporary buffer fields" {
 // KernelDispatchCommand — default values
 
 test "KernelDispatchCommand defaults repeat to 1 and warmup to 0" {
-    const cmd = model.KernelDispatchCommand{
+    const cmd = compute.KernelDispatchCommand{
         .kernel = "test.wgsl",
         .x = 1,
         .y = 1,
         .z = 1,
     };
     try testing.expectEqual(@as(u32, 1), cmd.repeat);
-    try testing.expectEqual(model.KernelDispatchRepeatSynchronization.dependent, cmd.repeat_synchronization);
+    try testing.expectEqual(compute.KernelDispatchRepeatSynchronization.dependent, cmd.repeat_synchronization);
     try testing.expectEqual(@as(u32, 0), cmd.warmup_dispatch_count);
     try testing.expect(!cmd.initialize_buffers_on_create);
     try testing.expect(cmd.bindings == null);
@@ -803,28 +807,28 @@ test "KernelDispatchCommand defaults repeat to 1 and warmup to 0" {
 // KernelBinding — default values
 
 test "KernelBinding defaults to compute visibility and whole-size" {
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 42,
     };
     try testing.expectEqual(@as(u32, 0), binding.group);
-    try testing.expectEqual(model.WGPUShaderStage_Compute, binding.visibility);
+    try testing.expectEqual(gpu.WGPUShaderStage_Compute, binding.visibility);
     try testing.expectEqual(@as(u64, 0), binding.buffer_offset);
-    try testing.expectEqual(model.WGPUWholeSize, binding.buffer_size);
-    try testing.expectEqual(model.WGPUBufferBindingType_Undefined, binding.buffer_type);
+    try testing.expectEqual(gpu.WGPUWholeSize, binding.buffer_size);
+    try testing.expectEqual(gpu.WGPUBufferBindingType_Undefined, binding.buffer_type);
 }
 
 // ============================================================
 // CopyTextureResource — default values
 
 test "CopyTextureResource defaults to 1x1x1 buffer resource" {
-    const resource = model.CopyTextureResource{ .handle = 1 };
-    try testing.expectEqual(model.CopyResourceKind.buffer, resource.kind);
+    const resource = resource_types.CopyTextureResource{ .handle = 1 };
+    try testing.expectEqual(resource_types.CopyResourceKind.buffer, resource.kind);
     try testing.expectEqual(@as(u32, 1), resource.width);
     try testing.expectEqual(@as(u32, 1), resource.height);
     try testing.expectEqual(@as(u32, 1), resource.depth_or_array_layers);
-    try testing.expectEqual(model.WGPUTextureFormat_Undefined, resource.format);
+    try testing.expectEqual(gpu.WGPUTextureFormat_Undefined, resource.format);
     try testing.expectEqual(@as(u64, 0), resource.offset);
     try testing.expectEqual(@as(u32, 0), resource.mip_level);
     try testing.expectEqual(@as(u32, 1), resource.sample_count);

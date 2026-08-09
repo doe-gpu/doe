@@ -1,7 +1,7 @@
 const std = @import("std");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/model/model_profile.zig");
 const execution = @import("../../src/runtime/execution.zig");
-const backend_ids = @import("../../src/backend/backend_ids.zig");
+const backend_ids = @import("../../src/contracts/backend.zig");
 const backend_policy = @import("../../src/backend/backend_policy.zig");
 
 test "execution backend lane parser accepts vulkan_doe_app" {

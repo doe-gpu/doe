@@ -8,7 +8,7 @@ const vk_constants = @import("../../src/backend/vulkan/vk_constants.zig");
 const vk_formats = @import("../../src/backend/vulkan/vk_formats.zig");
 const vulkan_errors = @import("../../src/backend/vulkan/vulkan_errors.zig");
 const backend_policy = @import("../../src/backend/backend_policy.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/model/model_gpu_types.zig");
 
 // ============================================================
 // Upload constant stability

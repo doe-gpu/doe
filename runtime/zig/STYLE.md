@@ -8,6 +8,30 @@ This guide is the Zig style contract for `zig`.
 - Keep runtime decisions deterministic and traceable.
 - Fail fast on invalid/unsupported inputs with actionable errors.
 - Keep hot-path execution allocation-light after initialization.
+- Give every semantic fact one authoritative owner and every subsystem one
+  narrow public surface.
+- Eliminate duplicate registries, policy maps, profile unions, errors, artifact
+  fields, and conversion taxonomies before optimizing file count.
+
+## Invariant registry
+
+These identifiers are normative and should be named by reviews, regression
+tests, and receipts when a change touches the corresponding boundary.
+
+| ID | Invariant | Enforcement surface |
+| --- | --- | --- |
+| `INV-OWNER-001` | Shared behavior lives with the narrowest subsystem that owns its semantics; dependency direction remains one-way. | `tools/check_source_layout.py`, `tools/check_core_import_fence.py`, import tests |
+| `INV-PLAN-002` | Immediate, recorded, replayed, direct, and indirect execution derive from one prepared-operation contract. | affected executor parity tests, trace/replay gates |
+| `INV-RESOURCE-003` | Every resource has one explicit owner and every ownership transition has one cleanup path. | allocator-backed tests, lifecycle and failure-path tests |
+| `INV-RECEIPT-004` | Structural refactors preserve the canonical behavior receipt and first failure boundary. | trace determinism, replay, semantic digest, and workload-oracle tests |
+| `INV-FACADE-005` | Module roots and compatibility facades aggregate, normalize, delegate, or translate errors; they do not own independent domain behavior. | `source-layout.json`, `tools/check_source_layout.py`, exercised facade tests |
+| `INV-REGISTRY-006` | Each command, capability, error class, artifact identity, and timing field has one authoritative registry or contract. | compile-time coverage, schema gates, duplicate-declaration inventory |
+| `INV-CONTEXT-007` | Promoted execution boundaries use explicit context, request, and report types rather than `anytype` dependency hiding. | affected-path compile and parity tests |
+| `INV-ARCH-008` | Every production module has one declared owner, layer, and special role, with zero forbidden dependency edges or cycles. | versioned `source-layout.json`, architecture graph gate |
+
+No prose-only waiver satisfies an invariant. If the named global gate cannot
+observe a changed behavior, the affected subsystem must add a focused
+characterization or parity test in the same change.
 
 ## Repository conventions
 
@@ -18,6 +42,12 @@ This guide is the Zig style contract for `zig`.
 - The current ownership directories and compatibility facades are generated in
   `src/README.md` from `source-layout.json`. Do not duplicate that changing
   module inventory in this guide.
+
+`source-layout.json` is the architecture manifest, not merely a directory
+inventory. Its architecture-aware version must own layers, import permissions,
+special roles, compatibility-facade lifecycle, generated sources, and any
+cohesive-module size justification. Do not create a second policy file for
+those facts.
 
 ## Architectural decoupling
 
@@ -59,16 +89,77 @@ This guide is the Zig style contract for `zig`.
   modules are compatibility/facade surfaces, not default implementation
   dependencies.
 
+## Module roots and facades
+
+- Module roots may re-export contracts, normalize public inputs, delegate to
+  feature owners, and translate errors at the public boundary.
+- Module roots must not own mutable diagnostic state, semantic transforms,
+  backend realization, resource state machines, or substantive feature tests.
+- Compatibility facades may contain aliases and delegation required by a
+  declared consumer. They must not introduce independent policy or execution
+  semantics.
+- Every compatibility facade must be declared in `source-layout.json` and
+  name its external consumer, reason, owner, consumer-facing test, and removal
+  condition.
+- When moving implementation out of a root or facade, definitions move first;
+  the facade remains only until its declared consumers migrate.
+
 ## File size
 
-- 999 lines max per source file in `runtime/zig/src/`.
-- Shard before exceeding this limit, not after.
-- Exceptions, when unavoidable, are tracked in the `ALLOWLIST` in
-  `runtime/zig/tools/check_line_limits.py` and each entry must name a
-  specific sharding follow-up in the relevant live status shard. Treat
-  allowlist entries as tracked debt, not precedent for new files.
-- Split by cohesive functionality (e.g. `pipeline_cache.zig`), not by type (e.g. `helpers.zig`).
-- Keep related code together; splitting must not scatter a single concern.
+The architecture-aware policy in `source-layout.json` is active:
+
+- 800 lines is an advisory review signal;
+- more than 1,200 lines requires an explicit cohesive-module justification in
+  the architecture manifest;
+- 1,500 lines is the hard maximum for handwritten production source;
+- generated specification or table files use a separately declared,
+  reproducible generation contract;
+- no size-driven split is accepted unless every resulting module has a named
+  semantic responsibility.
+
+The thresholds are not targets. A file that owns multiple state machines,
+artifact kinds, input languages, or execution phases must split even below the
+advisory signal. Split by cohesive functionality, keep related code together,
+and do not create a module whose only identity is satisfying a line limit.
+
+File-count reduction and size distribution are campaign observations, not
+architectural correctness gates.
+
+## Semantic inventory decisions
+
+Architecture analysis assigns every production file one decision:
+
+- **Keep**: executable or package root, ABI/FFI boundary, generated
+  specification, stable shared contract, or independently meaningful
+  algorithm.
+- **Merge**: one production importer, no independent contract or test identity,
+  same owner as its consumer, and only forwarding declarations, private
+  constants, or a tiny private record.
+- **Elevate**: a semantic fact used across layers currently lives inside one
+  implementation; move it to the neutral owner.
+- **Recompose**: one file owns multiple state machines, policies, contexts,
+  artifact kinds, or pipeline phases; reorganize by those responsibilities.
+- **Delete**: unreachable, superseded, duplicated, or an unconsumed
+  compatibility facade.
+
+Physical size, fan-in, fan-out, and co-change frequency are diagnostic evidence
+for these decisions. None decides the outcome alone.
+
+## Canonical contract families
+
+Resolve duplicate sources of truth in this order:
+
+1. command kinds, payloads, scope, parser names, and trace names;
+2. capabilities and feature identities;
+3. error and unsupported classifications;
+4. artifact identity and hash fields;
+5. timing and dispatch-result semantics;
+6. texture-format and binding mappings;
+7. backend selection and fallback policy.
+
+Each family has one neutral typed owner. Backend-specific conversion and native
+control flow remain local to the backend. Prefer an explicit tagged union plus
+complete metadata table before considering type generation.
 
 ## Formatting
 
@@ -111,6 +202,16 @@ This guide is the Zig style contract for `zig`.
 - Module-specific constants stay in the module that uses them.
 - If a value appears in more than one file, it must have a single source of truth.
 
+## Canonical serialization
+
+- Each schema-owned artifact kind owns its canonical field walk and validation.
+- Shared byte, number, string, and key emission belongs in one narrow canonical
+  writer module.
+- Do not combine unrelated artifact walkers in a catch-all digest module only
+  because they share SHA-256 or JSON emission.
+- Canonicalization refactors must preserve exact bytes, semantic digests, error
+  classification, and allocation cleanup through characterization tests.
+
 ```zig
 const QUEUE_SYNC_RETRY_LIMIT: u32 = 3;
 const QUEUE_SYNC_RETRY_BACKOFF_NS: u64 = 1_000_000;
@@ -123,6 +224,24 @@ pub const TIMESTAMP_BUFFER_SIZE: u64 = 16;
 - Use early returns for invalid states.
 - Keep fallback behavior explicit and auditable.
 - Do not introduce silent capability switching.
+
+## Prepared operation parity
+
+- Resolve policy, bindings, work shape, entry point, specialization, and
+  fallback eligibility before selecting an executor.
+- Immediate, recorded, replayed, direct, indirect, and backend-specific paths
+  consume the same immutable prepared-operation contract.
+- Executor adapters may differ only in submission, resource retention,
+  completion, readback scheduling, and evidence capture.
+- An executor must not reinterpret bindings, invent defaults, change dispatch
+  shape, or select a different shader or pipeline.
+- Every executor split or merge requires a parity test that changes one plan
+  field and proves all applicable adapters observe the same change.
+
+Promoted execution interfaces use named types such as `ComputeContext`,
+`DispatchRequest`, and `DispatchReport`. `anytype` remains acceptable for
+private, local, compile-time-generic helpers; it is forbidden where it hides
+the dependencies or output contract of a subsystem or promoted execution path.
 
 ## Errors and diagnostics
 
@@ -165,6 +284,12 @@ pub const TIMESTAMP_BUFFER_SIZE: u64 = 16;
 - Prefer arena allocators only for clearly bounded lifetimes such as one parse,
   one request, or one artifact build; do not use arenas to hide long-lived
   ownership.
+- Resource contracts should make ownership state explicit where a value crosses
+  a subsystem boundary: `borrowed`, `scope_owned`, `submit_owned`,
+  `transferred`, or `retained`.
+- Ownership transitions belong to the resource owner, not to convenience
+  callers. Each transition must have one success cleanup path and one tested
+  failure cleanup path.
 
 ## FFI and C interop
 
@@ -203,9 +328,50 @@ fn onQueueWorkDone(status: types.WGPUQueueWorkDoneStatus, userdata1: ?*anyopaque
 - Preserve hash-chain invariants in trace rows/meta.
 - Include enough metadata to reproduce selection and execution outcomes.
 
+## Structural refactor receipts
+
+Before moving runtime or compiler behavior, capture the observable contract for
+the affected path. The retained evidence must cover every applicable field:
+
+- resolved policy and runtime identity;
+- semantic or prepared-operation plan;
+- operation and submission order;
+- shader, pipeline, and specialization identity;
+- resource acquisition, transfer, retention, and release events;
+- output identity or oracle verdict;
+- diagnostic classification and first failure boundary.
+
+After the move, compare the receipt, semantic digest, trace chain, output
+oracle, and performance class. Remove a compatibility facade only after its
+declared consumers use the new owner and the parity evidence remains green.
+
+Before a recomposition campaign begins, bind the baseline to one commit and
+retain:
+
+- public Zig modules and declarations reachable through `@import("doe")`;
+- exported C ABI symbols;
+- command parsing and normalized command representations;
+- compiler semantic and target-output digests;
+- traces, terminal hashes, replay results, and receipt identities;
+- backend capabilities and unsupported classifications;
+- representative backend outputs;
+- clean and incremental compilation measurements, promoted hot-path medians,
+  and binary sizes.
+
+Every structural change is classified as exact equivalence, an explicitly
+approved contract change, or failure. Public API changes require a manifest
+diff; no rename, move, or split may silently change an error name, import path,
+shader output, fallback decision, synchronization behavior, or receipt field.
+
 ## Testing
 
-- Tests are inline `test` blocks in the source file they cover.
+- Use inline `test` blocks for private, pure, module-local behavior.
+- Use dedicated external tests for integration, ABI, backend execution, golden
+  artifacts, cross-module characterization, and cross-backend parity.
+- Shared fixtures belong in one domain-local fixture module when multiple tests
+  genuinely share setup.
+- Generate suite imports from the owned test inventory instead of maintaining
+  parallel manual aggregator lists.
 - Test names are descriptive behavior strings: `test "vendor comparison ignores case"`.
 - Use `std.testing.expect` and `std.testing.expectEqual` for assertions.
 - Prefer `std.testing.allocator` for tests that exercise allocation-owning code

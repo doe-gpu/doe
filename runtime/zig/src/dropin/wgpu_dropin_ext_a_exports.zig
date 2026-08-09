@@ -57,7 +57,7 @@ pub export fn wgpuAdapterGetInfo(a0: types.WGPUAdapter, a1: *p1cap.AdapterInfo) 
 }
 
 pub export fn wgpuAdapterGetInstance(a0: types.WGPUAdapter) callconv(.c) types.WGPUInstance {
-    return native.doeNativeAdapterGetInstance(a0);
+    return @ptrCast(native.doeNativeAdapterGetInstance(a0));
 }
 
 pub export fn wgpuAdapterGetLimits(a0: types.WGPUAdapter, a1: *p1cap.Limits) callconv(.c) types.WGPUStatus {
@@ -225,7 +225,7 @@ pub export fn wgpuDeviceCreateRenderPipelineAsync(a0: types.WGPUDevice, a1: *con
 }
 
 pub export fn wgpuDeviceCreateExternalTexture(a0: types.WGPUDevice, a1: ?*const anyopaque) callconv(.c) p2life.WGPUExternalTexture {
-    return native.doeNativeDeviceCreateExternalTexture(a0, a1);
+    return @ptrCast(native.doeNativeDeviceCreateExternalTexture(a0, a1));
 }
 
 pub export fn wgpuDeviceCreateResourceTable(a0: types.WGPUDevice, a1: *const p1res.ResourceTableDescriptor) callconv(.c) p1res.WGPUResourceTable {
@@ -238,13 +238,13 @@ pub export fn wgpuDeviceDestroy(a0: types.WGPUDevice) callconv(.c) void {
 }
 
 pub export fn wgpuDeviceGetAdapter(a0: types.WGPUDevice) callconv(.c) types.WGPUAdapter {
-    return native.doeNativeDeviceGetAdapter(a0);
+    return @ptrCast(native.doeNativeDeviceGetAdapter(a0));
 }
 
 pub export fn wgpuDeviceGetAdapterInfo(a0: types.WGPUDevice, a1: *p1cap.AdapterInfo) callconv(.c) types.WGPUStatus {
     const adapter = native.doeNativeDeviceGetAdapter(a0) orelse return 0;
     defer native.doeNativeAdapterRelease(adapter);
-    return fill_adapter_info_struct(adapter, a1);
+    return fill_adapter_info_struct(@ptrCast(adapter), a1);
 }
 
 pub export fn wgpuDeviceGetFeatures(a0: types.WGPUDevice, a1: *p1cap.SupportedFeatures) callconv(.c) void {

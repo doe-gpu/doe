@@ -1,18 +1,19 @@
 const std = @import("std");
-const model_commands = @import("../../contracts/model/model_commands.zig");
+const model_commands = @import("../../contracts/command.zig");
 const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
+const compute_contract = @import("../../contracts/compute.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
 const model_surface_control_types = @import("../../contracts/model/model_surface_control_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
 const webgpu = @import("../runtime_types.zig");
-const common_errors = @import("../common/errors.zig");
+const common_errors = @import("../../contracts/execution.zig");
 const common_timing = @import("../common/timing.zig");
-const command_info = @import("../common/command_info.zig");
-const command_requirements = @import("../common/command_requirements.zig");
-const capabilities = @import("../common/capabilities.zig");
-const artifact_meta = @import("../common/artifact_meta.zig");
+const command_info = @import("../../contracts/command.zig");
+const command_requirements = @import("../../contracts/command.zig");
+const capabilities = @import("../../contracts/capability.zig");
+const artifact_meta = @import("../../contracts/artifact.zig");
 const artifact_policy = @import("../common/artifact_policy.zig");
 const submit_count_policy = @import("../common/submit_count_policy.zig");
 const bridge = @import("metal_bridge_decls.zig");
@@ -157,19 +158,19 @@ fn execute_dispatch_indirect(self: anytype, dispatch: model.DispatchIndirectComm
     return self.ok_result(0, metrics.encode_ns, metrics.submit_wait_ns, metrics.dispatch_count);
 }
 
-fn execute_kernel_dispatch(self: anytype, kd: model.KernelDispatchCommand) !webgpu.NativeExecutionResult {
+fn execute_kernel_dispatch(comptime Backend: type, self: *Backend, request: compute_contract.DispatchRequest) !webgpu.NativeExecutionResult {
     const rt = self.get_runtime();
     const want_ts = self.gpu_timestamps_wanted();
     const result = try rt.run_kernel_dispatch_timed(
-        kd.kernel,
-        kd.entry_point,
-        kd.x,
-        kd.y,
-        kd.z,
-        kd.repeat,
-        kd.warmup_dispatch_count,
-        kd.initialize_buffers_on_create,
-        kd.bindings,
+        request.kernel,
+        request.entry_point,
+        request.workgroups.x,
+        request.workgroups.y,
+        request.workgroups.z,
+        request.repeat,
+        request.warmup_dispatch_count,
+        request.initialize_buffers_on_create,
+        request.bindings,
         self.queue_sync_mode,
         want_ts,
     );
@@ -177,7 +178,7 @@ fn execute_kernel_dispatch(self: anytype, kd: model.KernelDispatchCommand) !webg
     r.gpu_timestamp_ns = result.gpu_elapsed_ns;
     r.gpu_timestamp_attempted = result.gpu_timestamps_attempted;
     r.gpu_timestamp_valid = result.gpu_timestamps_valid;
-    host_plan_artifact.emitForKernelDispatch(self, kd) catch {};
+    host_plan_artifact.emitForKernelDispatch(self, request.toCommand()) catch {};
     return r;
 }
 
@@ -309,7 +310,7 @@ fn execute_map_async(self: anytype, cmd: model.MapAsyncCommand) !webgpu.NativeEx
     return self.ok_result(0, encode_ns, 0, 0);
 }
 
-fn flush_pending_uploads_if_required(self: anytype, command: model.Command) !u64 {
+fn flush_pending_uploads_if_required(comptime Backend: type, self: *Backend, command: model.Command) !u64 {
     const rt = self.get_runtime();
     var submit_wait_ns: u64 = 0;
     const requires_compute_boundary = switch (command) {
@@ -330,7 +331,12 @@ fn flush_pending_uploads_if_required(self: anytype, command: model.Command) !u64
     return submit_wait_ns;
 }
 
-fn execute_native_command(self: anytype, command: model.Command) !webgpu.NativeExecutionResult {
+fn execute_native_command(
+    comptime Backend: type,
+    self: *Backend,
+    command: model.Command,
+    promoted_dispatch: ?compute_contract.DispatchRequest,
+) !webgpu.NativeExecutionResult {
     host_plan_artifact.clearHostPlanArtifact(self);
     try self.check_timestamp_requirement();
 
@@ -346,7 +352,7 @@ fn execute_native_command(self: anytype, command: model.Command) !webgpu.NativeE
     }
 
     const flush_start = common_timing.now_ns();
-    const pending_submit_wait_ns = try flush_pending_uploads_if_required(self, command);
+    const pending_submit_wait_ns = try flush_pending_uploads_if_required(Backend, self, command);
     const flush_setup_ns = common_timing.ns_delta(common_timing.now_ns(), flush_start) -| pending_submit_wait_ns;
 
     var result = switch (command) {
@@ -356,7 +362,11 @@ fn execute_native_command(self: anytype, command: model.Command) !webgpu.NativeE
         .barrier => try execute_barrier(self),
         .dispatch => |dispatch| try execute_dispatch(self, dispatch),
         .dispatch_indirect => |dispatch| try execute_dispatch_indirect(self, dispatch),
-        .kernel_dispatch => |kd| try execute_kernel_dispatch(self, kd),
+        .kernel_dispatch => try execute_kernel_dispatch(
+            @TypeOf(self.*),
+            self,
+            promoted_dispatch orelse return error.InvalidArgument,
+        ),
         .sampler_create => |cmd| try execute_sampler_create(self, cmd),
         .sampler_destroy => |cmd| try execute_sampler_destroy(self, cmd),
         .texture_write => |cmd| try execute_texture_write(self, cmd),
@@ -399,7 +409,24 @@ fn execute_native_command(self: anytype, command: model.Command) !webgpu.NativeE
 
 pub fn execute_command(self: anytype, command: model.Command) anyerror!webgpu.NativeExecutionResult {
     self.last_submit_count = null;
-    const result = execute_native_command(self, command) catch |err| {
+    const result = execute_native_command(@TypeOf(self.*), self, command, null) catch |err| {
+        const requirements = command_requirements.requirements(command);
+        return .{
+            .status = common_errors.map_error_status(err),
+            .status_message = self.write_status("{s}", .{common_errors.error_code(err)}),
+            .dispatch_count = if (requirements.is_dispatch) requirements.operation_count else 0,
+            .gpu_timestamp_attempted = false,
+            .gpu_timestamp_valid = false,
+        };
+    };
+    self.last_submit_count = submit_count_policy.selectedCommandSubmitCount(command, result);
+    return result;
+}
+
+pub fn execute_dispatch_request(comptime Backend: type, self: *Backend, request: compute_contract.DispatchRequest) anyerror!webgpu.NativeExecutionResult {
+    self.last_submit_count = null;
+    const command = model.Command{ .kernel_dispatch = request.toCommand() };
+    const result = execute_native_command(Backend, self, command, request) catch |err| {
         const requirements = command_requirements.requirements(command);
         return .{
             .status = common_errors.map_error_status(err),

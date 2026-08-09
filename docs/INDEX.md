@@ -3,9 +3,14 @@
 Use this page to find the owner of a subject. Live measurements and mutable
 state belong in artifacts, schemas, and status front doors—not copied prose.
 
-## Product and project
+## Canonical strategy
 
-- [`thesis.md`](thesis.md): product objective and expansion boundaries
+- [`thesis.md`](thesis.md): the single product strategy; objective, priorities,
+  Node/Bun wedge, downstream portfolio and flywheel, commercial journey, and
+  expansion boundaries
+
+## Product and project contracts
+
 - [`problems-addressed.md`](problems-addressed.md): user problems and proof required
 - [`architecture.md`](architecture.md): system surfaces and execution model
 - [`process.md`](process.md): stage, gate, and release law
@@ -17,7 +22,8 @@ state belong in artifacts, schemas, and status front doors—not copied prose.
 
 ## Package, support, and claims
 
-- [`node-bun-developer-wedge.md`](node-bun-developer-wedge.md)
+- [`node-bun-developer-wedge.md`](node-bun-developer-wedge.md): package and
+  downstream promotion contract; not a separate strategy
 - [`doe-support-matrix.md`](doe-support-matrix.md)
 - [`package-model.md`](package-model.md)
 - [`doe-gpu-node-runtime-scope.md`](doe-gpu-node-runtime-scope.md)
@@ -26,12 +32,15 @@ state belong in artifacts, schemas, and status front doors—not copied prose.
 - [`public-claim-boundary.md`](public-claim-boundary.md)
 - [`backend-evidence-matrix.md`](backend-evidence-matrix.md)
 - [`config-schema-enforcement.md`](config-schema-enforcement.md)
+- [`ecosystem.md`](ecosystem.md): actor research, scoring, adoption evidence,
+  downstream release promotion, and evidence routing
 
 ## Workloads, performance, and operations
 
 - [`workload-system.md`](workload-system.md)
 - [`benchmark-taxonomy.md`](benchmark-taxonomy.md)
-- [`performance-strategy.md`](performance-strategy.md)
+- [`performance-strategy.md`](performance-strategy.md): measurement and
+  comparison contract; not a separate strategy
 - [`operator-runbook.md`](operator-runbook.md)
 - [`concurrency-strategy.md`](concurrency-strategy.md)
 - [`numeric-stability.md`](numeric-stability.md)

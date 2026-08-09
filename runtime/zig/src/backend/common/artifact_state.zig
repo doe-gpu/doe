@@ -1,5 +1,5 @@
 const std = @import("std");
-const artifact_meta = @import("artifact_meta.zig");
+const artifact_meta = @import("../../contracts/artifact.zig");
 
 pub fn persist_value(storage: []u8, len: *usize, value: []const u8) void {
     if (value.len > storage.len) {

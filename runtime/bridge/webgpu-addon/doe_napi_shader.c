@@ -382,3 +382,41 @@ napi_value doe_shader_module_get_bindings(napi_env env, napi_callback_info info)
 
     return array;
 }
+
+napi_value doe_shader_module_get_bindings_for_entry_point(napi_env env, napi_callback_info info) {
+    NAPI_ASSERT_ARGC(env, info, 2);
+    WGPUShaderModule shader_module = unwrap_ptr(env, _args[0]);
+    if (!shader_module) NAPI_THROW(env, "shaderModuleGetBindingsForEntryPoint: null shader module");
+    if (!pfn_doeNativeShaderModuleGetBindingsForEntryPoint) {
+        NAPI_THROW(env, "shaderModuleGetBindingsForEntryPoint: native entry-point binding metadata not available");
+    }
+    size_t entry_len = 0;
+    napi_get_value_string_utf8(env, _args[1], NULL, 0, &entry_len);
+    char* entry_point = (char*)malloc(entry_len + 1);
+    if (!entry_point) NAPI_THROW(env, "shaderModuleGetBindingsForEntryPoint: out of memory");
+    napi_get_value_string_utf8(env, _args[1], entry_point, entry_len + 1, &entry_len);
+
+    DoeShaderBindingInfo bindings[16];
+    size_t count = pfn_doeNativeShaderModuleGetBindingsForEntryPoint(
+        shader_module, entry_point, entry_len, bindings, 16);
+    free(entry_point);
+    napi_value array;
+    napi_create_array_with_length(env, count, &array);
+    for (size_t i = 0; i < count; i++) {
+        napi_value entry;
+        napi_create_object(env, &entry);
+        napi_value group, binding, kind, space, access;
+        napi_create_uint32(env, bindings[i].group, &group);
+        napi_create_uint32(env, bindings[i].binding, &binding);
+        napi_create_string_utf8(env, doe_binding_kind_name(bindings[i].kind), NAPI_AUTO_LENGTH, &kind);
+        napi_create_string_utf8(env, doe_binding_space_name(bindings[i].addr_space), NAPI_AUTO_LENGTH, &space);
+        napi_create_string_utf8(env, doe_binding_access_name(bindings[i].access), NAPI_AUTO_LENGTH, &access);
+        napi_set_named_property(env, entry, "group", group);
+        napi_set_named_property(env, entry, "binding", binding);
+        napi_set_named_property(env, entry, "type", kind);
+        napi_set_named_property(env, entry, "space", space);
+        napi_set_named_property(env, entry, "access", access);
+        napi_set_element(env, array, i, entry);
+    }
+    return array;
+}

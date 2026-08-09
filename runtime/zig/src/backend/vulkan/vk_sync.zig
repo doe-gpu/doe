@@ -9,7 +9,7 @@
 
 const std = @import("std");
 const c = @import("vk_constants.zig");
-const common_errors = @import("../common/errors.zig");
+const common_errors = @import("../../contracts/execution.zig");
 
 const VK_NULL_U64 = c.VK_NULL_U64;
 

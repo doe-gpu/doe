@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "entry-point-scoped-auto-layout",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "tropical-spmv",
+  "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+  "category": "compatibility",
+  "status": "fixed-regression-protected",
+  "summary": "A multi-entry-point upstream WGSL module exposed whole-module auto-layout reflection; Doe now reflects only resources reachable from the selected compute entry point.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run1/raw-matrix.json",
+      "sha256": "5a6b5ed3c73074579aa730b42c402c1b0c5c0257ae59cb9fa6275742a53e58d9"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/tests/core/wgsl_cross_backend_test.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/compiler/wgsl/mod.zig",
+    "runtime/zig/src/native/shader/doe_shader_native.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/tests/core/wgsl_cross_backend_test.zig"
+  ],
+  "verifiedAt": "2026-08-08T19:35:30Z"
+}

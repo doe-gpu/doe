@@ -53,7 +53,8 @@ pub export fn doeNativeCommandEncoderBeginComputePass(enc_raw: ?*anyopaque, desc
     var timestamp_end_query_set: ?*anyopaque = null;
     var timestamp_end_write_index = native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX;
     if (desc) |d| {
-        if (d.timestampWrites) |timestamp_writes| {
+        if (d.timestampWrites != null) {
+            const timestamp_writes: *const abi_pipeline.WGPUPassTimestampWrites = @ptrCast(d.timestampWrites);
             if (cast(query_native.DoeQuerySet, timestamp_writes.querySet)) |query_set| {
                 const query_set_raw = toOpaque(query_set);
                 if (timestamp_writes.beginningOfPassWriteIndex != native_types.UNUSED_PASS_TIMESTAMP_WRITE_INDEX) {
@@ -153,24 +154,11 @@ pub export fn doeNativeCommandEncoderCopyTextureToBuffer(
     const src_texture = cast(DoeTexture, src_texture_raw) orelse return;
     const dst_buffer = cast(DoeBuffer, dst_buffer_raw) orelse return;
     if (src_texture.error_object or dst_buffer.error_object) return;
-    if (resource_ops.handleVulkanCopyTextureToBuffer(
-        enc,
-        src_texture,
-        src_mip_level,
-        dst_buffer,
-        dst_offset,
-        dst_bytes_per_row,
-        dst_rows_per_image,
-        width,
-        height,
-        depth_or_array_layers,
-    )) {
-        return;
-    }
+    const vulkan = enc.dev.backend == .vulkan;
     enc.cmds.append(alloc, .{ .copy_texture_to_buffer = .{
-        .src_texture = src_texture.mtl,
+        .src_texture = if (vulkan) @ptrCast(src_texture) else src_texture.mtl,
         .src_mip_level = src_mip_level,
-        .dst_buffer = dst_buffer.mtl,
+        .dst_buffer = if (vulkan) @ptrCast(dst_buffer) else dst_buffer.mtl,
         .dst_offset = dst_offset,
         .dst_bytes_per_row = dst_bytes_per_row,
         .dst_rows_per_image = dst_rows_per_image,

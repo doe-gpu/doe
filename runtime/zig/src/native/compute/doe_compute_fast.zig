@@ -341,7 +341,7 @@ fn appendRecordedDispatch(
         &cmd.dispatch.buf_offsets,
         &cmd.dispatch.buf_sizes,
     );
-    vulkan_fast.populateRecordedDispatchBindingState(pipe, &cmd.dispatch);
+    vulkan_fast.populateRecordedDispatchBindingState(pipe, bind_groups[0..], &cmd.dispatch);
     if (native_cmds.tryMergeDispatchIntoLast(cmds, &cmd)) return true;
     cmds.append(alloc, cmd) catch std.debug.panic("doe_compute_fast: OOM recording dispatch command", .{});
     return true;

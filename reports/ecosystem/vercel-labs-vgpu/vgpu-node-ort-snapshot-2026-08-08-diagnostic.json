@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "vgpu-node-ort-snapshot-2026-08-08-diagnostic",
+  "actorId": "vercel-labs-vgpu",
+  "harnessId": "node-ort-snapshot",
+  "generatedAt": "2026-08-09T01:10:07.926Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-09T01:11:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "5",
+  "upstream": {
+    "repositoryUrl": "https://github.com/vercel-labs/vgpu",
+    "commit": "86f2cadbd7a087f1695d736a12e218ab1ea2fc63",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "receipt-explained-failure",
+  "findings": [
+    {
+      "id": "unchanged-upstream-dawn-baseline",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "The pinned, unchanged vgpu Node 22 workload passed all three clean Dawn processes, including its ONNX model hash, GPU-resident output gate, numeric oracle, zero-copy identity, copy counts, and lifecycle assertions.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/2026-08-08T-run3/raw-matrix.json",
+          "sha256": "b5228908f97b0b5514eb8220bded6296f8a2e25f3045180ce9d701ebe7ed7655"
+        }
+      ]
+    },
+    {
+      "id": "doe-device-error-handler-compatibility",
+      "category": "compatibility",
+      "status": "discovered",
+      "summary": "A minimized provider probe and all three unchanged application processes show that ONNX Runtime Web assigns GPUDevice.onuncapturederror while Doe's Node provider setter rejects that standard device capability before inference begins; Dawn accepts the same setter.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/2026-08-08T-run3/raw-matrix.json",
+          "sha256": "b5228908f97b0b5514eb8220bded6296f8a2e25f3045180ce9d701ebe7ed7655"
+        },
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/2026-08-08T-run3/receipt-summary.json",
+          "sha256": "31975892190ec55ff334d3333a30eff086296bee97dfe8efbf4b0c3586babee2"
+        }
+      ]
+    },
+    {
+      "id": "hardware-performance-ineligible",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "Dawn selected llvmpipe after the physical render node denied access, and Doe did not complete the workload, so the observed process durations cannot support a speed comparison.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/2026-08-08T-run3/receipt-summary.json",
+          "sha256": "31975892190ec55ff334d3333a30eff086296bee97dfe8efbf4b0c3586babee2"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Doe failed before ORT inference, vgpu dispatch, synchronization, readback, numeric comparison, and lifecycle teardown could execute.",
+    "The host denied access to /dev/dri/renderD128 and Dawn selected llvmpipe, so the run is not hardware-comparable.",
+    "Doe's adapter description identifies its runtime route but does not expose the underlying physical adapter and driver identity on this host.",
+    "The result covers the pinned Node ORT integration workload, not vgpu's browser renderer or complete API surface."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "doe-onuncapturederror-unsupported",
+      "comparison-workload-incomplete",
+      "software-renderer-detected",
+      "render-node-inaccessible",
+      "driver-identity-incomplete"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 386924544
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 3,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 303607808
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The comparison provider did not complete the workload and the baseline used a software renderer."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "Doe failed before a matched traced and untraced workload pair could complete."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The ESM provider loader is a controlled harness substitution, not a validated production installation path."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "The physical render node was inaccessible and Dawn selected llvmpipe."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic matrix did not execute concurrent processes."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "The baseline exercised upstream lifecycle assertions, but no promotion-scale teardown lane ran and Doe never reached teardown."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Three clean processes per provider diagnose repeatability but do not satisfy the promotion stress policy."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS was captured, but no bounded-growth leak test ran."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "The harness captured provider and adapter identities plus the deterministic failure boundary, but Doe produced no dispatch, synchronization, readback, or output receipt."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "The comparison did not complete and the incumbent used software rendering."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is not promoted and Doe does not yet pass its correctness boundary."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/2026-08-08T-run3/receipt-summary.json",
+      "sha256": "31975892190ec55ff334d3333a30eff086296bee97dfe8efbf4b0c3586babee2"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/2026-08-08T-run3/raw-matrix.json",
+      "sha256": "b5228908f97b0b5514eb8220bded6296f8a2e25f3045180ce9d701ebe7ed7655"
+    }
+  ]
+}

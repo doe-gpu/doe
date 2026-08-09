@@ -1,7 +1,7 @@
 const std = @import("std");
 const execution = @import("../execution.zig");
 const quirk = @import("../../quirk/mod.zig");
-const semantic_trace = @import("semantic_trace.zig");
+const semantic_trace = @import("../../contracts/semantic.zig");
 const trace = @import("trace.zig");
 
 const ESTIMATED_TRACE_ROW_BYTES: usize = 768;

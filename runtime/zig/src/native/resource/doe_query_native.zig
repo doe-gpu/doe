@@ -10,6 +10,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 const has_vulkan = (builtin.os.tag == .linux);
 const resource_ops = @import("../../backend/dropin_resource_ops.zig");
+const backend_contract = @import("../../contracts/backend.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const native_cmds = @import("../support/doe_native_command_types.zig");
@@ -37,7 +38,7 @@ pub const DoeQuerySet = struct {
     destroyed: bool = false,
     count: u32 = 0,
     query_type: u32 = WGPU_QUERY_TYPE_TIMESTAMP,
-    backend: native_shared.BackendKind = .metal,
+    backend: backend_contract.NativeBackendKind = .metal,
     /// Metal: opaque handle to MTLCounterSampleBuffer for GPU timestamp sampling.
     counter_sample_buffer: ?*anyopaque = null,
     /// Vulkan: VkQueryPool handle for timestamp queries.

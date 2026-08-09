@@ -1,6 +1,6 @@
 const std = @import("std");
 const command_stream = @import("../command/command_stream.zig");
-const model_commands = @import("../contracts/model/model_commands.zig");
+const model_commands = @import("../contracts/command.zig");
 const model_quirks = @import("../contracts/model/model_quirks.zig");
 const quirk = @import("../quirk/mod.zig");
 const replay = @import("../runtime/trace/replay.zig");

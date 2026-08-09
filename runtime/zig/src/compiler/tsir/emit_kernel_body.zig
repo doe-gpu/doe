@@ -7,6 +7,7 @@
 
 const std = @import("std");
 const schema = @import("schema.zig");
+const emit_context = @import("emit_kernel_context.zig");
 
 pub const Backend = enum {
     webgpu,
@@ -16,12 +17,7 @@ pub const Backend = enum {
     spir_v,
 };
 
-pub const EmitError = std.mem.Allocator.Error || error{
-    InvalidBodyContract,
-    MissingBindingRole,
-    UnsupportedKernelBody,
-    UnsupportedScalarKind,
-};
+pub const EmitError = emit_context.EmitError;
 
 /// Emitter configuration knobs the live HostPlan path needs to control
 /// when delegating through TSIR. The defaults preserve the prior behavior
@@ -76,7 +72,7 @@ pub const EmitError = std.mem.Allocator.Error || error{
 /// strategy via `@set_tile_code` without forwarding `slots_per_pe`,
 /// the emitted body needs a source-level default to satisfy cslc's
 /// uninitialized-param check.
-pub const KvCachePeStrategy = enum { full_per_pe, slot_sharded };
+pub const KvCachePeStrategy = emit_context.KvCachePeStrategy;
 
 /// Per-PE residency layout for `attention_scores`:
 ///
@@ -98,40 +94,18 @@ pub const KvCachePeStrategy = enum { full_per_pe, slot_sharded };
 ///     reduce). This unblocks `head_dim=512` at `kv_len ≥ 15`, which
 ///     the single-PE path cannot fit (see
 ///     `docs/cerebras-model-ledgers.md` attention-canary follow-up).
-pub const AttentionPeStrategy = enum { full_per_pe, kv_axis_sharded };
-pub const AttentionPeIdSource = enum { tile_param, layout_coordinates };
+pub const AttentionPeStrategy = emit_context.AttentionPeStrategy;
+pub const AttentionPeIdSource = emit_context.AttentionPeIdSource;
 
-pub const Config = struct {
-    var_prefix: []const u8 = "tsir_",
-    chunk_size_default: ?u32 = null,
-    hidden_size_default: ?u32 = null,
-    gemma_one_plus_weight_offset: bool = false,
-    head_dim_default: ?u32 = null,
-    max_seq_len_default: ?u32 = null,
-    read_len_default: ?u32 = null,
-    kv_cache_pe_strategy: KvCachePeStrategy = .full_per_pe,
-    kv_slots_per_pe_default: ?u32 = null,
-    attention_pe_strategy: AttentionPeStrategy = .full_per_pe,
-    /// `.tile_param` expects the wrapper layout to provide `pe_id`.
-    /// `.layout_coordinates` derives it from CSL `<layout>` coordinates,
-    /// which avoids per-tile code specialization for large 2-D grids.
-    attention_pe_id_source: AttentionPeIdSource = .tile_param,
-    /// Compile-time default for `slots_per_pe` in the kv-axis-sharded
-    /// attention path. `slots_per_pe = ceil(kv_len_max / num_pes)`.
-    /// The live wrapper computes this from the manifest-shape kv_len
-    /// budget; TSIR-only callers leave it null and accept the
-    /// `csl_compile_uninitialized_param` failure.
-    attention_slots_per_pe_default: ?u32 = null,
-};
-
-pub const default_config: Config = .{};
+pub const Config = emit_context.Config;
+pub const default_config = emit_context.default_config;
 
 // Track 2 dtype-routing helpers live in `emit_dtype_routing.zig` so
 // emit_kernel_body.zig stays under the 999-line cap. Re-exported here
 // for backward-compat callers that referenced them via this module.
 const dtype_routing = @import("emit_dtype_routing.zig");
 const csl_f16_pack = @import("emit_csl_f16_pack.zig");
-pub const cslElemName = dtype_routing.cslElemName;
+pub const cslElemName = emit_context.cslElemName;
 pub const wgslElemName = dtype_routing.wgslElemName;
 pub const isSupportedComputeElem = dtype_routing.isSupportedComputeElem;
 pub const writeWgslF16Enable = dtype_routing.writeWgslF16Enable;
@@ -141,9 +115,7 @@ pub const writeWgslF16Enable = dtype_routing.writeWgslF16Enable;
 /// canonical binding) before producing any source bytes. Returns
 /// `EmitError.UnsupportedScalarKind` so emit-body callers don't have
 /// to widen their error sets.
-pub fn requireSupportedComputeElem(elem: schema.ScalarKind) EmitError!void {
-    if (!dtype_routing.isSupportedComputeElem(elem)) return error.UnsupportedScalarKind;
-}
+pub const requireSupportedComputeElem = emit_context.requireSupportedComputeElem;
 
 pub fn emit(writer: anytype, func: schema.SemanticFunction, backend: Backend) EmitError!void {
     return emitWithConfig(writer, func, backend, &default_config);
@@ -466,29 +438,7 @@ fn writeCslHiddenSizeParam(writer: anytype, config: *const Config) !void {
     }
 }
 
-pub fn writeCslSqrtNr(writer: anytype, elem: schema.ScalarKind) !void {
-    const ty = cslElemName(elem);
-    if (elem == .f32) {
-        // Preserve byte-identical f32 output: same line shape as before
-        // the dtype widening so the f32 lane keeps its byte-identity
-        // canary green.
-        try writer.writeAll("fn sqrt_nr(x: f32) f32 {\n");
-        try writer.writeAll("    const y0: f32 = math.sqrt(x);\n");
-        try writer.writeAll("    return 0.5 * (y0 + x / y0);\n");
-        try writer.writeAll("}\n\n");
-        return;
-    }
-    // For non-f32 lanes (f16 today) up-cast to f32 for the math.sqrt
-    // libm call and the Newton-Raphson refinement, then narrow back.
-    // Tensors stay in `elem`; this carve-out is the libm coverage
-    // detail flagged in the Track-2 design notes.
-    try writer.print("fn sqrt_nr(x: {s}) {s} {{\n", .{ ty, ty });
-    try writer.writeAll("    const x32: f32 = @as(f32, x);\n");
-    try writer.writeAll("    const y0: f32 = math.sqrt(x32);\n");
-    try writer.writeAll("    const refined: f32 = 0.5 * (y0 + x32 / y0);\n");
-    try writer.print("    return @as({s}, refined);\n", .{ty});
-    try writer.writeAll("}\n\n");
-}
+pub const writeCslSqrtNr = emit_context.writeCslSqrtNr;
 
 fn emitCslGather(writer: anytype, func: schema.SemanticFunction) EmitError!void {
     const indices = try bindingForRole(func, .indices);
@@ -573,37 +523,9 @@ fn emitCslResidualAdd(
     try writer.writeAll("}\n");
 }
 
-pub fn writeCslBufferArray(
-    writer: anytype,
-    prefix: []const u8,
-    name: []const u8,
-    extent: []const u8,
-    elem_type: []const u8,
-) !void {
-    try writer.print(
-        "var {s}{s}: [{s}]{s} = @zeros([{s}]{s});\n",
-        .{ prefix, name, extent, elem_type, extent, elem_type },
-    );
-}
-
-pub fn writeCslBufferPointer(
-    writer: anytype,
-    prefix: []const u8,
-    name: []const u8,
-    elem_type: []const u8,
-) !void {
-    try writer.print(
-        "var {s}{s}_ptr: [*]{s} = &{s}{s};\n",
-        .{ prefix, name, elem_type, prefix, name },
-    );
-}
-
-pub fn writeCslExportSymbol(writer: anytype, prefix: []const u8, name: []const u8) !void {
-    try writer.print(
-        "    @export_symbol({s}{s}_ptr, \"{s}\");\n",
-        .{ prefix, name, name },
-    );
-}
+pub const writeCslBufferArray = emit_context.writeCslBufferArray;
+pub const writeCslBufferPointer = emit_context.writeCslBufferPointer;
+pub const writeCslExportSymbol = emit_context.writeCslExportSymbol;
 
 fn writeCslChunkSizeParam(writer: anytype, config: *const Config) !void {
     if (config.chunk_size_default) |value| {
@@ -884,17 +806,8 @@ fn emitSpirVGather(writer: anytype, func: schema.SemanticFunction) EmitError!voi
     try writer.writeAll("void main() { uint h = gl_GlobalInvocationID.x; uint token = gl_GlobalInvocationID.y; if (token >= tsir_num_tokens || h >= tsir_hidden) return; uint row = tsir_indices[token]; uint dst = token * tsir_hidden + h; tsir_output[dst] = (row >= tsir_vocab) ? 0.0 : tsir_table[row * tsir_hidden + h]; }\n");
 }
 
-pub fn bindingForRole(func: schema.SemanticFunction, role: schema.SemanticBindingRole) EmitError!schema.BufferBinding {
-    for (func.body.binding_roles) |binding_role| {
-        if (binding_role.role == role) return bindingForIndex(func, binding_role.binding_index);
-    }
-    return error.MissingBindingRole;
-}
-
-fn bindingForIndex(func: schema.SemanticFunction, binding_index: u32) EmitError!schema.BufferBinding {
-    if (binding_index >= func.bindings.len) return error.InvalidBodyContract;
-    return func.bindings[@intCast(binding_index)];
-}
+pub const bindingForRole = emit_context.bindingForRole;
+const bindingForIndex = emit_context.bindingForIndex;
 
 fn rmsNormBody(func: schema.SemanticFunction) EmitError!schema.RmsNormBody {
     const rms = func.body.rms_norm orelse return error.InvalidBodyContract;
@@ -903,9 +816,7 @@ fn rmsNormBody(func: schema.SemanticFunction) EmitError!schema.RmsNormBody {
     return rms;
 }
 
-pub fn requireElem(binding: schema.BufferBinding, elem: schema.ScalarKind) EmitError!void {
-    if (binding.elem != elem) return error.UnsupportedScalarKind;
-}
+pub const requireElem = emit_context.requireElem;
 
 fn requireFusedGemvF32(func: schema.SemanticFunction) EmitError!void {
     try requireElem(try bindingForRole(func, .matrix), .f32);

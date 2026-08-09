@@ -3,7 +3,7 @@
 // Validates the public API of lean_proof.zig: BoundsPattern enum
 // exhaustiveness, proof availability constants under default build
 // (lean_verified=false), and the relationship between proof levels,
-// safety classes, and verification modes defined in model.zig.
+// safety classes, and verification modes defined in model_policy.zig.
 //
 // The comptime validation block in lean_proof.zig only fires when
 // -Dlean-verified=true; these tests cover the default (unverified)
@@ -14,7 +14,7 @@ const std = @import("std");
 const testing = std.testing;
 
 const lean_proof = @import("../../src/verification/lean_proof.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/model/model_policy.zig");
 
 const ExpectedBoundsPattern = struct {
     pattern: lean_proof.BoundsPattern,
@@ -105,7 +105,7 @@ test "boundsProven exhaustively covers every BoundsPattern variant" {
 }
 
 // ============================================================
-// Proof level classification — model.zig contracts
+// Proof level classification — policy contracts
 // ============================================================
 
 test "ProofLevel enum has exactly 3 variants" {
@@ -126,7 +126,7 @@ test "needsStrongestProof is true only for proven level" {
 }
 
 // ============================================================
-// Safety class to proof requirement — model.zig contracts
+// Safety class to proof requirement — policy contracts
 // ============================================================
 
 test "SafetyClass enum has exactly 4 variants" {
@@ -149,7 +149,7 @@ test "critical safety class is the highest rank" {
 }
 
 // ============================================================
-// Verification mode to proof requirement — model.zig contracts
+// Verification mode to proof requirement — policy contracts
 // ============================================================
 
 test "VerificationMode enum has exactly 3 variants" {

@@ -269,8 +269,8 @@ fn runResourceTableImmediatesDiagnostics(self: anytype, target_format: abi_base.
     );
     if (render_bundle_encoder == null) return error.RenderBundleEncoderCreationFailed;
     defer render_api.render_bundle_encoder_release(render_bundle_encoder);
-    p1_resource_table_procs_mod.setRenderBundleResourceTable(resource_table_procs, render_bundle_encoder, table);
-    p1_resource_table_procs_mod.setRenderBundleImmediates(resource_table_procs, render_bundle_encoder, 0, immediate_data[0..].ptr, 0);
+    p1_resource_table_procs_mod.setRenderBundleResourceTable(resource_table_procs, @ptrCast(render_bundle_encoder), table);
+    p1_resource_table_procs_mod.setRenderBundleImmediates(resource_table_procs, @ptrCast(render_bundle_encoder), 0, immediate_data[0..].ptr, 0);
     const render_bundle = render_api.render_bundle_encoder_finish(
         render_bundle_encoder,
         &render_types_mod.RenderBundleDescriptor{
@@ -534,12 +534,13 @@ fn runLifecycleRefcountDiagnostics(self: anytype, target_format: abi_base.WGPUTe
     if (surface_procs_mod.loadSurfaceProcs(self.core.dyn_lib)) |surface_procs| {
         var surface_it = self.full.surfaces.valueIterator();
         if (surface_it.next()) |managed_surface| {
-            touchAddRefAndRelease(
-                p2_lifecycle_procs_mod.WGPUSurface,
-                lifecycle.surface_add_ref,
-                surface_procs.surface_release,
-                managed_surface.*.surface,
-            );
+            const surface = managed_surface.*.surface;
+            if (surface != null) {
+                if (lifecycle.surface_add_ref) |add_ref| {
+                    add_ref(@ptrCast(surface));
+                    surface_procs.surface_release(surface);
+                }
+            }
         }
     }
 }
@@ -696,10 +697,6 @@ fn createDiagnosticTextureView(
         .arrayLayerCount = 1,
         .aspect = abi_base.WGPUTextureAspect_All,
         .usage = abi_base.WGPUTextureUsage_RenderAttachment,
-        .swizzleR = abi_base.WGPUTextureComponentSwizzle_Red,
-        .swizzleG = abi_base.WGPUTextureComponentSwizzle_Green,
-        .swizzleB = abi_base.WGPUTextureComponentSwizzle_Blue,
-        .swizzleA = abi_base.WGPUTextureComponentSwizzle_Alpha,
     });
     if (view == null) return error.TextureViewCreationFailed;
     return view;

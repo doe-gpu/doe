@@ -239,8 +239,8 @@ napi_value native_direct_command_encoder_copy_texture_to_texture(napi_env env, n
     } else if (pfn_doeNativeCommandEncoderCopyTextureToTexture) {
         pfn_doeNativeCommandEncoderCopyTextureToTexture(
             encoder,
-            src_texture, src_mip, 0, src_x, src_y, src_z, src_aspect,
-            dst_texture, dst_mip, 0, dst_x, dst_y, dst_z, dst_aspect,
+            src_texture, src_mip, 0, src_x, src_y, src_z,
+            dst_texture, dst_mip, 0, dst_x, dst_y, dst_z,
             width, height, depth_or_layers);
     }
     napi_value undefined_value;

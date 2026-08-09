@@ -91,6 +91,10 @@ def main() -> int:
     tools_dir = BENCH_ROOT / "tools"
     dropin_dir = BENCH_ROOT / "drop-in"
     schema_gate = gates_dir / "schema_gate.py"
+    ecosystem_registry_gate = gates_dir / "ecosystem_registry_gate.py"
+    external_project_release_gate = (
+        gates_dir / "external_project_release_gate.py"
+    )
     claim_index_gate = gates_dir / "claim_index_gate.py"
     dawn_replacement_frontier_gate = gates_dir / "dawn_replacement_frontier_gate.py"
     tool_surface_gate = gates_dir / "tool_surface_gate.py"
@@ -202,6 +206,14 @@ def main() -> int:
                 [sys.executable, str(tracked_ignore_gate)],
             )
         run_gate("schema", [sys.executable, str(schema_gate)])
+        run_gate(
+            "ecosystem-registry",
+            [sys.executable, str(ecosystem_registry_gate)],
+        )
+        run_gate(
+            "external-project-release-surface",
+            [sys.executable, str(external_project_release_gate)],
+        )
         if args.with_claim_index_gate:
             run_gate("claim-index", [sys.executable, str(claim_index_gate)])
         if args.with_dawn_replacement_frontier_gate:

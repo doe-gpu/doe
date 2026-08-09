@@ -1,4 +1,5 @@
 const std = @import("std");
+const build_options = @import("build_options");
 const ownership = @import("../../src/dropin/dropin_symbol_ownership.zig");
 
 test "symbol ownership parser accepts doe_metal" {
@@ -8,7 +9,7 @@ test "symbol ownership parser accepts doe_metal" {
 }
 
 test "symbol ownership config parser owns symbol names" {
-    const owned = try ownership.parse_symbol_ownership_config(std.testing.allocator, @embedFile("../../../config/dropin-symbol-ownership.json"));
+    const owned = try ownership.parse_symbol_ownership_config(std.testing.allocator, build_options.dropin_symbol_ownership_config_json);
     defer {
         for (owned) |entry| {
             std.testing.allocator.free(entry.symbol);

@@ -135,7 +135,7 @@ pub export fn wgpuRenderPipelineAddRef(a0: abi_core.WGPURenderPipeline) callconv
 }
 
 pub export fn wgpuRenderPipelineGetBindGroupLayout(a0: abi_core.WGPURenderPipeline, a1: u32) callconv(.c) abi_core.WGPUBindGroupLayout {
-    return native.doeNativeRenderPipelineGetBindGroupLayout(a0, a1);
+    return @ptrCast(native.doeNativeRenderPipelineGetBindGroupLayout(a0, a1));
 }
 
 pub export fn wgpuResourceTableAddRef(a0: p1res.WGPUResourceTable) callconv(.c) void {
@@ -271,7 +271,7 @@ test "shader compilation info surfaces Doe module diagnostics" {
         .compilation_message_column = 7,
     };
     var capture = CompilationInfoCapture{};
-    const future = wgpuShaderModuleGetCompilationInfo(native.toOpaque(&module), .{
+    const future = wgpuShaderModuleGetCompilationInfo(@ptrCast(native.toOpaque(&module)), .{
         .nextInChain = null,
         .mode = 3,
         .callback = captureCompilationInfo,

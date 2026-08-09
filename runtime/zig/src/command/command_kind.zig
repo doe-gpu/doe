@@ -1,36 +1,11 @@
 const std = @import("std");
+const command = @import("../contracts/command.zig");
 const command_json_raw = @import("command_json_raw.zig");
 
 pub const ParseError = command_json_raw.ParseError;
 pub const RawCommand = command_json_raw.RawCommand;
 
-pub const NormalizedKind = enum {
-    upload,
-    buffer_write,
-    copy,
-    barrier,
-    dispatch,
-    dispatch_indirect,
-    kernel_dispatch,
-    render_draw,
-    draw_indirect,
-    draw_indexed_indirect,
-    render_pass,
-    sampler_create,
-    sampler_destroy,
-    texture_write,
-    texture_query,
-    texture_destroy,
-    surface_create,
-    surface_capabilities,
-    surface_configure,
-    surface_acquire,
-    surface_present,
-    surface_unconfigure,
-    surface_release,
-    async_diagnostics,
-    map_async,
-};
+pub const NormalizedKind = command.Kind;
 
 pub fn commandKindEquals(raw_kind: []const u8, kind: []const u8) bool {
     return std.ascii.eqlIgnoreCase(raw_kind, kind);
@@ -58,7 +33,7 @@ const KindAliases = struct {
 const KIND_ALIASES = [_]KindAliases{
     .{ .kind = .upload, .aliases = &.{ "upload", "buffer_upload" } },
     .{ .kind = .buffer_write, .aliases = &.{ "buffer_write", "write_buffer", "queue_write_buffer" } },
-    .{ .kind = .copy, .aliases = &.{
+    .{ .kind = .copy_buffer_to_texture, .aliases = &.{
         "copy_buffer_to_texture",
         "copy_texture",
         "texture_copy",

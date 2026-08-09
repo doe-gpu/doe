@@ -47,7 +47,7 @@ fn buffer_map_sync_callback(
 }
 
 pub export fn wgpuCreateInstance(a0: ?*anyopaque) callconv(.c) abi_base.WGPUInstance {
-    return native.doeNativeCreateInstance(a0);
+    return @ptrCast(native.doeNativeCreateInstance(a0));
 }
 
 pub export fn wgpuInstanceRequestAdapter(a0: abi_base.WGPUInstance, a1: ?*const abi_descriptor.WGPURequestAdapterOptions, a2: abi_descriptor.WGPURequestAdapterCallbackInfo) callconv(.c) abi_base.WGPUFuture {
@@ -67,7 +67,7 @@ pub export fn wgpuAdapterRequestDevice(a0: abi_base.WGPUAdapter, a1: ?*const abi
 }
 
 pub export fn wgpuAdapterCreateDevice(a0: abi_base.WGPUAdapter, a1: ?*const abi_descriptor.WGPUDeviceDescriptor) callconv(.c) abi_base.WGPUDevice {
-    return native.doeNativeAdapterCreateDevice(a0, a1);
+    return @ptrCast(native.doeNativeAdapterCreateDevice(a0, a1));
 }
 
 pub export fn doeNativeQueueFamilyPolicyCode(q_raw: ?*anyopaque) callconv(.c) u32 {
@@ -303,18 +303,20 @@ pub export fn wgpuCommandEncoderFinish(a0: abi_base.WGPUCommandEncoder, a1: ?*co
 }
 
 pub export fn wgpuDeviceGetQueue(a0: abi_base.WGPUDevice) callconv(.c) abi_base.WGPUQueue {
-    return native.doeNativeDeviceGetQueue(a0);
+    return @ptrCast(native.doeNativeDeviceGetQueue(a0));
 }
 
 pub export fn wgpuQueueSubmit(a0: abi_base.WGPUQueue, a1: usize, a2: [*c]abi_base.WGPUCommandBuffer) callconv(.c) void {
-    native.doeNativeQueueSubmit(a0, a1, a2);
+    if (a1 > 0 and a2 == null) return;
+    const command_buffers: [*]const ?*anyopaque = @ptrCast(a2);
+    native.doeNativeQueueSubmit(a0, a1, command_buffers);
 }
 
 pub export fn doeQueueSubmitOneAndRelease(
     queue: abi_base.WGPUQueue,
     command_buffer: abi_base.WGPUCommandBuffer,
 ) callconv(.c) void {
-    var command_buffers = [_]abi_base.WGPUCommandBuffer{command_buffer};
+    var command_buffers = [_]?*anyopaque{@ptrCast(command_buffer)};
     native.doeNativeQueueSubmit(queue, command_buffers.len, &command_buffers);
     native.doeNativeCommandBufferRelease(command_buffer);
 }
@@ -416,7 +418,7 @@ pub export fn wgpuDeviceHasFeature(a0: abi_base.WGPUDevice, a1: abi_base.WGPUFea
 }
 
 pub export fn wgpuDeviceCreateQuerySet(a0: abi_base.WGPUDevice, a1: *const abi_descriptor.WGPUQuerySetDescriptor) callconv(.c) abi_base.WGPUQuerySet {
-    return native.doeNativeDeviceCreateQuerySet(a0, a1.type, a1.count);
+    return @ptrCast(native.doeNativeDeviceCreateQuerySet(a0, a1.type, a1.count));
 }
 
 pub export fn wgpuCommandEncoderResolveQuerySet(a0: abi_base.WGPUCommandEncoder, a1: abi_base.WGPUQuerySet, a2: u32, a3: u32, a4: abi_base.WGPUBuffer, a5: u64) callconv(.c) void {

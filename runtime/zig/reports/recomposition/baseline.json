@@ -1,0 +1,110 @@
+{
+  "architectureObservationCapture": "captured",
+  "artifactCapture": {
+    "artifacts": [
+      {
+        "path": "libonnxruntime_doe_ep.so",
+        "sha256": "e7be513c0834198cb33013672b1da8ae53305bef2dc130fd28e2b9ba28d2777c",
+        "sizeBytes": 6055192,
+        "symbolCount": 100
+      },
+      {
+        "path": "libwebgpu_doe.so",
+        "sha256": "e6148f2ed8e1682ff0c41235b197ff2bc058c29b7c20428a9541e2e4e198523c",
+        "sizeBytes": 9474800,
+        "symbolCount": 730
+      }
+    ],
+    "sourceBinding": "verified-git-snapshot",
+    "status": "captured"
+  },
+  "baselineId": "120cf1eb772141464de0eea2fd269305ddc0a042eeca63513e5444d4f2687af1",
+  "baselineKind": "structural-recomposition",
+  "behaviorCapture": {
+    "backendCapabilities": "not-captured",
+    "commandNormalization": "captured",
+    "errorClassifications": "captured",
+    "performance": "not-captured",
+    "semanticFixtures": "captured",
+    "traceAndReceiptIdentity": "captured",
+    "wgslLoweringDigests": "ir-and-target-outputs-captured"
+  },
+  "frozen": true,
+  "git": {
+    "baseCommit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
+    "dirtyPaths": [],
+    "isClean": true,
+    "requestedRef": "HEAD",
+    "snapshotKind": "git-archive"
+  },
+  "host": {
+    "machine": "x86_64",
+    "operatingSystem": "Linux",
+    "release": "6.8.0-90-generic"
+  },
+  "manifestSha256": "71c43cb728fbe60f2ca19c3c523a3d5f0f1d9777405e6b36faee7141fd425fc9",
+  "moduleCount": 547,
+  "policyHashes": {
+    "architectureAnalyzer": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
+    "architectureChecker": "ecc72fd92fbecb9afbdcc12d429d4e53e07e7c30530daff9559fa27d1b32d9c8",
+    "architectureReportGenerator": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
+    "architectureReportIntegrity": "b184f66919c9fa3f5d4f7ed9373d2cc20212c6ce9eb79f243edaab095a7c86ac",
+    "astInventory": "df0a1d5a086cf2191cdda3f252de5109fcdac9075c8fe0e9487e690787ab8a7c",
+    "astInventoryRunner": "6b74e04fa9279bd62dfc1bd2828510901bd281b1c13385cbf0eb47ec07d3c15f",
+    "baselineVerifier": "03fbea54888759cd168d65bab80a478fdf91159e6f523ccbf8c805bb10234cf1",
+    "buildMeasurementCapture": "37b48bc73a3c3402051a2c7985214f794b4d2e1c41cc0d07d375953020c91cc8",
+    "semanticFixtureCapture": "70573f602f7432f75c9aebff0d20c571c27fc53992f4cfc9d40d3b23176afc7d",
+    "semanticFixtureVerifier": "8773dde03b7423e586dc7d8485b5c1cafeb1c35495967030fb196984f6b2b396",
+    "sourceLayout": "e508c21f2f149ca5573034245b9d324205c94db23c6ce04dfb988c1bbaf49acd",
+    "styleGuide": "bde7d2deafe87af757db1e1e8dde22ade332b7d691ea6ab6173e8ee1c7375f56"
+  },
+  "publicApiCapture": "captured",
+  "schemaVersion": 1,
+  "semanticFixtureCapture": {
+    "captureToolSha256": "70573f602f7432f75c9aebff0d20c571c27fc53992f4cfc9d40d3b23176afc7d",
+    "fileCount": 13,
+    "irDigestInstrumentation": {
+      "kind": "post-hoc-pure-observer",
+      "observers": [
+        {
+          "path": "src/cli/entrypoints/main_emit_ir_digest.zig",
+          "sha256": "e176fc51781e5f55ae76015a0669cefcb1f42c85b07750a17a6a61cf015ac4b1"
+        },
+        {
+          "path": "src/compiler/wgsl/ir/ir_digest.zig",
+          "sha256": "6470ebe184a20539a299a673b58f8ae2c7e8151bf9d42d93504b9d530a46f86c"
+        }
+      ],
+      "status": "installed"
+    },
+    "manifestSha256": "558e7924388f6accdebf847e11527358f2dbdd2368fa84d9651507d9aa2e9b2a",
+    "replayStatus": "passed",
+    "sharedLibraries": [
+      {
+        "path": "libonnxruntime_doe_ep.so",
+        "sha256": "e7be513c0834198cb33013672b1da8ae53305bef2dc130fd28e2b9ba28d2777c",
+        "sizeBytes": 6055192,
+        "symbolCount": 100,
+        "symbols": "abi/libonnxruntime_doe_ep.so.symbols.txt"
+      },
+      {
+        "path": "libwebgpu_doe.so",
+        "sha256": "e6148f2ed8e1682ff0c41235b197ff2bc058c29b7c20428a9541e2e4e198523c",
+        "sizeBytes": 9474800,
+        "symbolCount": 730,
+        "symbols": "abi/libwebgpu_doe.so.symbols.txt"
+      }
+    ],
+    "status": "captured",
+    "wgslIrDigest": "6285d665501c6e717ed3b9dbb28886ac027b21b17e2411a835ba52956b04f47f"
+  },
+  "sourceTreeSha256": "7d4857fdf9d8c0107426915fef3f283107f335cea713d37ad8b5cff8813d671d",
+  "toolchain": {
+    "python": "3.12.3",
+    "zig": {
+      "path": "doe/.tooling/zig-0.15.2/zig",
+      "status": "captured",
+      "version": "0.15.2"
+    }
+  }
+}

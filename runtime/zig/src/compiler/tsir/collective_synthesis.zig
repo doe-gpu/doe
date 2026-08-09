@@ -19,8 +19,8 @@
 
 const std = @import("std");
 const targets = @import("../targets/mod.zig");
-const tsir = @import("mod.zig");
-const planner = @import("planner.zig");
+const tsir = @import("schema.zig");
+const planner_support = @import("planner_support.zig");
 
 pub const SynthesisError = error{
     OutOfMemory,
@@ -39,8 +39,8 @@ pub fn synthesize(
 
     var next_color: u32 = 0;
     for (func.collectives, 0..) |node, collective_index| {
-        if (node.kind != .workgroup_barrier and !planner.supportsNumericalMode(descriptor, node.dtype)) {
-            try planner.appendRejection(
+        if (node.kind != .workgroup_barrier and !planner_support.supportsNumericalMode(descriptor, node.dtype)) {
+            try planner_support.appendRejection(
                 allocator,
                 rejections,
                 .tsir_target_unfit,
@@ -52,7 +52,7 @@ pub fn synthesize(
             continue;
         }
         if (!supportsCollective(descriptor, node.kind, node.exactness.class)) {
-            try planner.appendRejection(
+            try planner_support.appendRejection(
                 allocator,
                 rejections,
                 .tsir_collective_not_representable,
@@ -66,7 +66,7 @@ pub fn synthesize(
 
         const color = if (needsFabricColor(node.kind)) blk: {
             if (next_color >= descriptor.correctness.fabric_color_count) {
-                try planner.appendRejection(
+                try planner_support.appendRejection(
                     allocator,
                     rejections,
                     .tsir_collective_not_representable,

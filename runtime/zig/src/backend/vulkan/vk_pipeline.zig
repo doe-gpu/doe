@@ -18,7 +18,7 @@ const model_texture_types = @import("../../contracts/model/model_texture_value_t
 const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
 const hash_contract = @import("../../native/vulkan/vulkan_pipeline_hash.zig");
 const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
-const common_errors = @import("../common/errors.zig");
+const common_errors = @import("../../contracts/execution.zig");
 const path_utils = @import("../common/path_utils.zig");
 
 const VkBuffer = c.VkBuffer;

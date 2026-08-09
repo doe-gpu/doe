@@ -1,0 +1,78 @@
+{
+  "artifacts": [
+    {
+      "path": "$MEASUREMENT_ROOT/prefix/bin/doe-dispatch-seam-bench",
+      "sha256": "8f9bc2a06166b8c769cc9d7f381139ee3d81a937510c293c8be2071c9cc6d53c",
+      "sizeBytes": 2270184
+    },
+    {
+      "path": "$MEASUREMENT_ROOT/prefix/bin/doe-zig-runtime",
+      "sha256": "4474c32dc719a61958e5e4c3e2408f05bff39c222f097a73f71083ab67a58131",
+      "sizeBytes": 11105312
+    }
+  ],
+  "buildStep": "doe-runtime",
+  "captureToolChangedDuringCapture": false,
+  "captureToolSha256": "37b48bc73a3c3402051a2c7985214f794b4d2e1c41cc0d07d375953020c91cc8",
+  "cleanCompile": {
+    "elapsedNs": 68406532604,
+    "exitCode": 0,
+    "stderr": "",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "",
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "command": [
+    "/home/clocksmith/deco/doe/.tooling/zig-0.15.2/zig",
+    "build",
+    "doe-runtime",
+    "dispatch-seam-bench",
+    "-Doptimize=ReleaseSafe",
+    "-j1",
+    "--seed",
+    "0",
+    "--summary",
+    "none",
+    "--cache-dir",
+    "$MEASUREMENT_ROOT/cache",
+    "--global-cache-dir",
+    "$MEASUREMENT_ROOT/global-cache",
+    "--prefix",
+    "$MEASUREMENT_ROOT/prefix"
+  ],
+  "dispatchSeamBenchmark": {
+    "callsPerSample": 200000,
+    "characterizedLegacyMedianNs": 391172,
+    "measurementClass": "diagnostic-only",
+    "promotedMedianNs": 391151,
+    "sampleCount": 21,
+    "schemaVersion": 1,
+    "stateCalls": 8400002,
+    "status": "captured"
+  },
+  "host": {
+    "machine": "x86_64",
+    "operatingSystem": "Linux",
+    "release": "6.8.0-90-generic"
+  },
+  "incrementalCompile": {
+    "elapsedNs": 66960325,
+    "exitCode": 0,
+    "stderr": "",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "",
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "measurementClass": "diagnostic-only",
+  "optimize": "ReleaseSafe",
+  "schemaVersion": 1,
+  "sourceChangedBeforeIncremental": false,
+  "sourceChangedDuringCapture": false,
+  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e",
+  "status": "captured",
+  "toolchain": {
+    "path": "/home/clocksmith/deco/doe/.tooling/zig-0.15.2/zig",
+    "sha256": "2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51",
+    "version": "0.15.2"
+  }
+}

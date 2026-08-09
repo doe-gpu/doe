@@ -13,7 +13,7 @@ const model_compute_types = @import("../../contracts/model/model_compute_types.z
 const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const backend_policy = @import("../backend_policy.zig");
-const common_errors = @import("../common/errors.zig");
+const common_errors = @import("../../contracts/execution.zig");
 const common_timing = @import("../common/timing.zig");
 
 const VkBuffer = c.VkBuffer;

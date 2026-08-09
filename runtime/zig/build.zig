@@ -824,6 +824,39 @@ pub fn build(b: *std.Build) void {
     emit_msl_step.dependOn(&install_emit_msl.step);
     b.getInstallStep().dependOn(emit_msl_step);
 
+    const emit_ir_digest_exe = b.addExecutable(.{
+        .name = "doe-emit-ir-digest",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/cli/entrypoints/main_emit_ir_digest.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
+            },
+        }),
+    });
+    const install_emit_ir_digest = b.addInstallArtifact(emit_ir_digest_exe, .{});
+    const emit_ir_digest_step = b.step("emit-ir-digest", "Build the canonical WGSL IR digest tool");
+    emit_ir_digest_step.dependOn(&install_emit_ir_digest.step);
+    b.getInstallStep().dependOn(emit_ir_digest_step);
+
+    const dispatch_seam_bench_exe = b.addExecutable(.{
+        .name = "doe-dispatch-seam-bench",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/cli/entrypoints/main_dispatch_seam_bench.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "build_options", .module = build_options_module },
+                .{ .name = "doe", .module = doe_module },
+            },
+        }),
+    });
+    const install_dispatch_seam_bench = b.addInstallArtifact(dispatch_seam_bench_exe, .{});
+    const dispatch_seam_bench_step = b.step("dispatch-seam-bench", "Build the promoted dispatch seam diagnostic benchmark");
+    dispatch_seam_bench_step.dependOn(&install_dispatch_seam_bench.step);
+
     const emit_csl_exe = b.addExecutable(.{
         .name = "doe-emit-csl",
         .root_module = b.createModule(.{
@@ -1080,10 +1113,20 @@ pub fn build(b: *std.Build) void {
     source_layout_step.dependOn(&source_layout_check.step);
     b.getInstallStep().dependOn(&source_layout_check.step);
 
+    const webgpu_abi_check = b.addSystemCommand(&.{ "python3", "tools/generate_webgpu_abi.py", "--check" });
+    const webgpu_abi_step = b.step("webgpu-abi", "Validate generated WebGPU ABI against the pinned upstream header");
+    webgpu_abi_step.dependOn(&webgpu_abi_check.step);
+    b.getInstallStep().dependOn(&webgpu_abi_check.step);
+
     const line_limit_check = b.addSystemCommand(&.{ "python3", "tools/check_line_limits.py" });
     const line_limit_step = b.step("line-limits", "Validate Zig source line-count policy");
     line_limit_step.dependOn(&line_limit_check.step);
     b.getInstallStep().dependOn(&line_limit_check.step);
+
+    const test_inventory_check = b.addSystemCommand(&.{ "python3", "tools/generate_test_suites.py", "--check" });
+    const test_inventory_step = b.step("test-inventory", "Validate generated Zig test-suite roots");
+    test_inventory_step.dependOn(&test_inventory_check.step);
+    b.getInstallStep().dependOn(&test_inventory_check.step);
 
     const bridge_manifest_check = b.addSystemCommand(&.{ "python3", "tools/check_metal_bridge_manifest.py" });
     const bridge_manifest_step = b.step("bridge-manifest", "Validate the Metal bridge manifest against Zig declarations and bridge sources");
@@ -1244,15 +1287,17 @@ pub fn build(b: *std.Build) void {
     full_dropin_step.dependOn(&install_full_dropin.step);
 
     const test_step = b.step("test", "Run Zig unit tests");
+    const test_root_module = b.createModule(.{
+        .root_source_file = b.path("test_suite.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "build_options", .module = build_options_module },
+        },
+    });
+    addSourceModuleIncludePaths(test_root_module, b);
     const test_exec = b.addTest(.{
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("test_suite.zig"),
-            .target = target,
-            .optimize = optimize,
-            .imports = &.{
-                .{ .name = "build_options", .module = build_options_module },
-            },
-        }),
+        .root_module = test_root_module,
         .filters = test_filters,
     });
     test_exec.linkLibC();
@@ -1270,20 +1315,24 @@ pub fn build(b: *std.Build) void {
     const run_tests = b.addRunArtifact(test_exec);
     test_step.dependOn(&import_fence_check.step);
     test_step.dependOn(&source_layout_check.step);
+    test_step.dependOn(&webgpu_abi_check.step);
     test_step.dependOn(&line_limit_check.step);
+    test_step.dependOn(&test_inventory_check.step);
     test_step.dependOn(&bridge_manifest_check.step);
     test_step.dependOn(&run_tests.step);
 
     const core_test_step = b.step("test-core", "Run core-lane Zig unit tests");
+    const core_test_root_module = b.createModule(.{
+        .root_source_file = b.path("test_suite_core.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "build_options", .module = build_options_module },
+        },
+    });
+    addSourceModuleIncludePaths(core_test_root_module, b);
     const core_test_exec = b.addTest(.{
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("test_suite_core.zig"),
-            .target = target,
-            .optimize = optimize,
-            .imports = &.{
-                .{ .name = "build_options", .module = build_options_module },
-            },
-        }),
+        .root_module = core_test_root_module,
     });
     core_test_exec.linkLibC();
     if (target.result.os.tag == .windows) {
@@ -1300,20 +1349,24 @@ pub fn build(b: *std.Build) void {
     const run_core_tests = b.addRunArtifact(core_test_exec);
     core_test_step.dependOn(&import_fence_check.step);
     core_test_step.dependOn(&source_layout_check.step);
+    core_test_step.dependOn(&webgpu_abi_check.step);
     core_test_step.dependOn(&line_limit_check.step);
+    core_test_step.dependOn(&test_inventory_check.step);
     core_test_step.dependOn(&bridge_manifest_check.step);
     core_test_step.dependOn(&run_core_tests.step);
 
     const full_test_step = b.step("test-full", "Run full-lane Zig unit tests");
+    const full_test_root_module = b.createModule(.{
+        .root_source_file = b.path("test_suite_full.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "build_options", .module = build_options_module },
+        },
+    });
+    addSourceModuleIncludePaths(full_test_root_module, b);
     const full_test_exec = b.addTest(.{
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("test_suite_full.zig"),
-            .target = target,
-            .optimize = optimize,
-            .imports = &.{
-                .{ .name = "build_options", .module = build_options_module },
-            },
-        }),
+        .root_module = full_test_root_module,
     });
     full_test_exec.linkLibC();
     if (target.result.os.tag == .windows) {
@@ -1330,20 +1383,24 @@ pub fn build(b: *std.Build) void {
     const run_full_tests = b.addRunArtifact(full_test_exec);
     full_test_step.dependOn(&import_fence_check.step);
     full_test_step.dependOn(&source_layout_check.step);
+    full_test_step.dependOn(&webgpu_abi_check.step);
     full_test_step.dependOn(&line_limit_check.step);
+    full_test_step.dependOn(&test_inventory_check.step);
     full_test_step.dependOn(&bridge_manifest_check.step);
     full_test_step.dependOn(&run_full_tests.step);
 
     const d3d12_test_step = b.step("test-d3d12", "Run D3D12-focused Zig tests (no Metal test suite)");
+    const d3d12_test_root_module = b.createModule(.{
+        .root_source_file = b.path("test_suite_d3d12.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "build_options", .module = build_options_module },
+        },
+    });
+    addSourceModuleIncludePaths(d3d12_test_root_module, b);
     const d3d12_test_exec = b.addTest(.{
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("test_suite_d3d12.zig"),
-            .target = target,
-            .optimize = optimize,
-            .imports = &.{
-                .{ .name = "build_options", .module = build_options_module },
-            },
-        }),
+        .root_module = d3d12_test_root_module,
     });
     d3d12_test_exec.linkLibC();
     if (target.result.os.tag == .windows) {
@@ -1360,24 +1417,30 @@ pub fn build(b: *std.Build) void {
     const run_d3d12_tests = b.addRunArtifact(d3d12_test_exec);
     d3d12_test_step.dependOn(&import_fence_check.step);
     d3d12_test_step.dependOn(&source_layout_check.step);
+    d3d12_test_step.dependOn(&webgpu_abi_check.step);
     d3d12_test_step.dependOn(&line_limit_check.step);
+    d3d12_test_step.dependOn(&test_inventory_check.step);
     d3d12_test_step.dependOn(&run_d3d12_tests.step);
 
     const wgsl_test_step = b.step("test-wgsl", "Run WGSL shader compiler tests");
+    const wgsl_test_root_module = b.createModule(.{
+        .root_source_file = b.path("test_suite_wgsl.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "build_options", .module = build_options_module },
+        },
+    });
+    addSourceModuleIncludePaths(wgsl_test_root_module, b);
     const wgsl_test_exec = b.addTest(.{
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("test_suite_wgsl.zig"),
-            .target = target,
-            .optimize = optimize,
-            .imports = &.{
-                .{ .name = "build_options", .module = build_options_module },
-            },
-        }),
+        .root_module = wgsl_test_root_module,
     });
     wgsl_test_exec.linkLibC();
     const run_wgsl_tests = b.addRunArtifact(wgsl_test_exec);
     wgsl_test_step.dependOn(&source_layout_check.step);
+    wgsl_test_step.dependOn(&webgpu_abi_check.step);
     wgsl_test_step.dependOn(&line_limit_check.step);
+    wgsl_test_step.dependOn(&test_inventory_check.step);
     wgsl_test_step.dependOn(&run_wgsl_tests.step);
 
     const shader_bench_exe = b.addExecutable(.{

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "texture-copy-bridge-abi",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "upstreamCommit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+  "category": "crash",
+  "status": "fixed-regression-protected",
+  "summary": "The Node bridge declared two aspect parameters that the Doe native texture-copy export does not accept, shifting the destination pointer to 0x1 and crashing; the bridge typedef and both call sites now match the native ABI.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-texture-fixed/raw-suite.json",
+      "sha256": "a92c063709bdf1c038a4f832709a1276bbf233acf0c4bcecec56f5abb86bd503"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "implementationPaths": [
+    "runtime/bridge/webgpu-addon/doe_napi_internal.h",
+    "runtime/bridge/webgpu-addon/doe_napi_queue.c",
+    "runtime/bridge/webgpu-addon/doe_napi_nd_encoder.c"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "verifiedAt": "2026-08-08T22:02:53Z"
+}

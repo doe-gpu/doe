@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schema/zig-test-inventory.schema.json",
+  "title": "Doe Zig test inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "suites", "supportFiles"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "suites": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["output", "entries"],
+        "properties": {
+          "output": { "type": "string", "pattern": "^test_suite(?:_[a-z0-9_]+)?\\.zig$" },
+          "includes": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "kind"],
+              "properties": {
+                "path": { "type": "string", "pattern": "^(tests|src)/.+\\.zig$" },
+                "kind": {
+                  "enum": ["abi", "backend", "characterization", "cross-backend", "golden", "inline", "integration"]
+                },
+                "platforms": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": { "enum": ["linux", "macos", "windows"] }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "supportFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "kind", "consumers"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^tests/.+\\.zig$" },
+          "kind": { "enum": ["domain-fixture", "test-shard"] },
+          "consumers": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^tests/.+\\.zig$" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -10,13 +10,6 @@ pub const HostRuntimeError = error{
     UnsupportedHost,
 };
 
-pub const TraceLink = struct {
-    moduleIdentity: []const u8,
-    requestHash: []const u8,
-    policyHash: []const u8,
-    resultHash: []const u8,
-};
-
 pub fn hostProfile() HostRuntimeError!model_profile.DeviceProfile {
     return switch (builtin.os.tag) {
         .macos => .{
@@ -39,31 +32,6 @@ pub fn hostProfile() HostRuntimeError!model_profile.DeviceProfile {
         },
         else => HostRuntimeError.UnsupportedHost,
     };
-}
-
-pub fn jsonStringifyAlloc(allocator: std.mem.Allocator, value: anytype) ![]u8 {
-    var out: std.io.Writer.Allocating = .init(allocator);
-    errdefer out.deinit();
-    try std.json.Stringify.value(value, .{}, &out.writer);
-    return try out.toOwnedSlice();
-}
-
-pub fn sha256HexAlloc(allocator: std.mem.Allocator, bytes: []const u8) ![]u8 {
-    var digest: [32]u8 = undefined;
-    std.crypto.hash.sha2.Sha256.hash(bytes, &digest, .{});
-    const alphabet = "0123456789abcdef";
-    var out = try allocator.alloc(u8, digest.len * 2);
-    for (digest, 0..) |byte, idx| {
-        out[idx * 2] = alphabet[byte >> 4];
-        out[idx * 2 + 1] = alphabet[byte & 0x0F];
-    }
-    return out;
-}
-
-pub fn stableHashJsonAlloc(allocator: std.mem.Allocator, value: anytype) ![]u8 {
-    const encoded = try jsonStringifyAlloc(allocator, value);
-    defer allocator.free(encoded);
-    return try sha256HexAlloc(allocator, encoded);
 }
 
 pub fn duplicateString(allocator: std.mem.Allocator, value: []const u8) ![]u8 {

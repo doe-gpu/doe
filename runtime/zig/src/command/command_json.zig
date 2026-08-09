@@ -1,5 +1,5 @@
 const std = @import("std");
-const model_commands = @import("../contracts/model/model_commands.zig");
+const model_commands = @import("../contracts/command.zig");
 const model_async_types = @import("../contracts/model/model_async_types.zig");
 const command_kind = @import("command_kind.zig");
 const command_parse_copy = @import("command_parse_copy.zig");
@@ -107,7 +107,7 @@ fn parseOne(allocator: Allocator, raw: RawCommand) !model.Command {
         } };
     }
 
-    if (kind == .copy) {
+    if (kind == .copy_buffer_to_texture) {
         return command_parse_copy.parseCopyCommand(raw);
     }
 

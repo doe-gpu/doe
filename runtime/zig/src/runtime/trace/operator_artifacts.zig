@@ -1,11 +1,11 @@
 const std = @import("std");
-const model_commands = @import("../../contracts/model/model_commands.zig");
+const model_commands = @import("../../contracts/command.zig");
 const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
 const execution = @import("../execution.zig");
-const main_print = @import("../../cli/entrypoints/main_print.zig");
-const semantic_trace = @import("semantic_trace.zig");
+const main_print = @import("command_output.zig");
+const semantic_trace = @import("../../contracts/semantic.zig");
 const trace = @import("trace.zig");
-const hash_utils = @import("../../backend/common/hash_utils.zig");
+const hash_utils = @import("../../contracts/artifact.zig");
 
 const model = struct {
     pub const Command = model_commands.Command;

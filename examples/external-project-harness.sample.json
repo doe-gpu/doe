@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-project-harness",
+  "actorId": "sample-actor",
+  "harnessId": "sample-workload",
+  "upstream": {
+    "repositoryUrl": "https://github.com/example/sample-actor",
+    "commit": "1111111111111111111111111111111111111111",
+    "license": {
+      "identifier": "MIT",
+      "evidenceUrl": "https://github.com/example/sample-actor/blob/1111111111111111111111111111111111111111/LICENSE"
+    }
+  },
+  "providerSubstitution": {
+    "baselineProvider": "dawn-node-webgpu",
+    "comparisonProvider": "doe-gpu",
+    "seam": "Replace only the Node WebGPU provider factory.",
+    "patchPaths": [
+      "bench/external-projects/sample-actor/provider.patch"
+    ]
+  },
+  "fallbackPolicy": {
+    "requireHardware": true,
+    "prohibitedFallbacks": [
+      "cpu",
+      "mock",
+      "software-renderer",
+      "unknown-provider"
+    ],
+    "providerIdentityAssertion": "Require the selected provider and hardware adapter identity before dispatch."
+  },
+  "workload": {
+    "command": ["npm", "test", "--", "sample-workload"],
+    "immutableInputRefs": [
+      "bench/external-projects/sample-actor/inputs.json"
+    ],
+    "oracle": {
+      "kind": "upstream",
+      "path": "bench/external-projects/sample-actor/oracle.json",
+      "reviewStatus": "reviewed"
+    },
+    "sameWorkPolicy": "Both providers execute the same command and dispatch shape over identical inputs.",
+    "completionBoundary": "Wait for GPU completion and perform the same readback before stopping timing."
+  },
+  "requiredMeasurements": [
+    "clean-process-success",
+    "crashes",
+    "hangs",
+    "timeouts",
+    "peak-memory-bytes",
+    "cold-p50",
+    "cold-p95",
+    "cold-p99",
+    "warm-p50",
+    "warm-p95",
+    "warm-p99",
+    "receipt-overhead"
+  ],
+  "requiredReceiptFields": [
+    "provider-identity",
+    "adapter-identity",
+    "driver-identity",
+    "shader-hashes",
+    "dispatch-shape",
+    "synchronization",
+    "readback",
+    "output-identity"
+  ],
+  "installation": {
+    "substitutionMode": "provider-factory",
+    "productionStatus": "validated",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "installCommand": ["npm", "install", "doe-gpu"],
+    "validationCommand": ["npm", "test", "--", "sample-workload"]
+  },
+  "supportTargets": [
+    {
+      "id": "linux-x64-example-gpu",
+      "os": "linux",
+      "arch": "x86_64",
+      "runtime": "node-24",
+      "adapter": "Example GPU",
+      "driver": "example-driver-1",
+      "status": "validated"
+    }
+  ],
+  "reliabilityPolicy": {
+    "cleanProcessRunsPerProvider": 30,
+    "concurrencyLevel": 4,
+    "concurrencyRunsPerProvider": 30,
+    "teardownCyclesPerProvider": 100,
+    "stressIterationsPerProvider": 1000,
+    "processTimeoutSeconds": 120,
+    "memoryGrowthBoundaryBytes": 0,
+    "requireZeroCrashes": true,
+    "requireZeroHangs": true,
+    "requireZeroTimeouts": true
+  },
+  "performancePolicy": {
+    "timingScope": "provider initialization through completed output readback",
+    "coldSamplesPerProvider": 30,
+    "warmupSamplesPerProvider": 30,
+    "warmSamplesPerProvider": 100,
+    "requiredPercentiles": ["p50", "p95", "p99"],
+    "throughputMetric": "completed workloads per second",
+    "minimumMaterialSpeedupRatio": 1.1,
+    "maximumRegressionRatio": 1.05
+  },
+  "receiptPolicy": {
+    "captureRequired": true,
+    "replayRequired": true,
+    "runtimeBuildIdentityRequired": true
+  },
+  "releasePolicy": {
+    "promotionState": "candidate",
+    "blocking": false,
+    "command": ["npm", "test", "--", "sample-workload"],
+    "promotionReportIds": []
+  }
+}

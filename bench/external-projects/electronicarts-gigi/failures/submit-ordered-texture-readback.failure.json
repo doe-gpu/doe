@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "submit-ordered-texture-readback",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "upstreamCommit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Vulkan texture-to-buffer readback executed while commands were encoded, before the preceding recorded dispatch was submitted; the copy now remains ordered in the command stream and flushes compute replay before reading the texture.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-ordered-readback/raw-suite.json",
+      "sha256": "fb7723940ac81165354e394eb53337c69c7a68385815c421a2433919e64e73a6"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/native/command/doe_encoder_native.zig",
+    "runtime/zig/src/native/queue/doe_queue_submit_vulkan.zig"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "verifiedAt": "2026-08-08T22:02:53Z"
+}

@@ -13,8 +13,8 @@
 // Expected when the bug is fixed:
 //     dispatched u32: 42 (expect 42)
 //
-// Current behavior:
-//     dispatched u32: 0 (expect 42)
+// Add --label to cover a labeled compute pass and --native to force a native
+// command encoder before the pass begins.
 
 import { setupGlobals } from '../../../packages/doe-gpu/src/compute.js';
 
@@ -53,7 +53,14 @@ const bindGroup = device.createBindGroup({
 });
 
 const encoder = device.createCommandEncoder();
-const pass = encoder.beginComputePass();
+if (process.argv.includes('--native')) {
+  const nativeRouteSource = device.createBuffer({ size: 4, usage: 0x04 });
+  const nativeRouteDestination = device.createBuffer({ size: 4, usage: 0x08 });
+  encoder.copyBufferToBuffer(nativeRouteSource, 0, nativeRouteDestination, 0, 4);
+}
+const pass = encoder.beginComputePass(
+  process.argv.includes('--label') ? { label: 'zero-dispatch-repro' } : undefined,
+);
 pass.setPipeline(pipeline);
 pass.setBindGroup(0, bindGroup);
 pass.dispatchWorkgroups(1);

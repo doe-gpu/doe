@@ -1,4 +1,4 @@
-const compressed_formats = @import("../../core/abi/wgpu_type_texture_formats.zig");
+const compressed_formats = @import("../texture_format.zig");
 const layout = @import("model_texture_layout_value_types.zig");
 
 pub const WGPUTextureFormat_Undefined: layout.WGPUTextureFormat = 0;

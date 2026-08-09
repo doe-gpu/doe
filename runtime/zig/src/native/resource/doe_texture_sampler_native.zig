@@ -238,6 +238,30 @@ fn identity_swizzle(swizzle_r: u32, swizzle_g: u32, swizzle_b: u32, swizzle_a: u
         swizzle_a == abi_texture.WGPUTextureComponentSwizzle_Alpha;
 }
 
+const TextureViewSwizzle = struct { r: u32, g: u32, b: u32, a: u32 };
+
+pub fn resolveTextureViewSwizzle(desc: *const abi_pipeline.WGPUTextureViewDescriptor) TextureViewSwizzle {
+    var result = TextureViewSwizzle{
+        .r = abi_texture.WGPUTextureComponentSwizzle_Red,
+        .g = abi_texture.WGPUTextureComponentSwizzle_Green,
+        .b = abi_texture.WGPUTextureComponentSwizzle_Blue,
+        .a = abi_texture.WGPUTextureComponentSwizzle_Alpha,
+    };
+    var chain = desc.nextInChain;
+    while (chain != null) {
+        const item: *const abi_pipeline.WGPUChainedStruct = @ptrCast(chain);
+        if (item.sType == abi_core.WGPUSType_TextureComponentSwizzleDescriptor) {
+            const extension: *const abi_pipeline.WGPUTextureComponentSwizzleDescriptor = @ptrCast(item);
+            if (extension.swizzle.r != 0) result.r = extension.swizzle.r;
+            if (extension.swizzle.g != 0) result.g = extension.swizzle.g;
+            if (extension.swizzle.b != 0) result.b = extension.swizzle.b;
+            if (extension.swizzle.a != 0) result.a = extension.swizzle.a;
+        }
+        chain = item.next;
+    }
+    return result;
+}
+
 pub fn canBorrowMetalTextureForFullView(
     tex: *const DoeTexture,
     resolved_format: u32,
@@ -479,10 +503,6 @@ pub export fn doeNativeTextureCreateView(tex_raw: ?*anyopaque, desc: ?*const abi
         .arrayLayerCount = if (tex.dimension == abi_texture.WGPUTextureDimension_3D) 1 else tex.depth_or_array_layers,
         .aspect = abi_texture.WGPUTextureAspect_All,
         .usage = tex.usage,
-        .swizzleR = abi_texture.WGPUTextureComponentSwizzle_Red,
-        .swizzleG = abi_texture.WGPUTextureComponentSwizzle_Green,
-        .swizzleB = abi_texture.WGPUTextureComponentSwizzle_Blue,
-        .swizzleA = abi_texture.WGPUTextureComponentSwizzle_Alpha,
     };
     const requested = desc orelse &default_desc;
     const resolved_mip_level_count = resolveTextureViewMipLevelCount(tex, requested.baseMipLevel, requested.mipLevelCount) orelse return null;
@@ -494,15 +514,16 @@ pub export fn doeNativeTextureCreateView(tex_raw: ?*anyopaque, desc: ?*const abi
     const resolved_format = if (d.format != 0) d.format else tex.format;
     const resolved_dimension = if (d.dimension != 0) d.dimension else default_texture_view_dimension(tex);
     const resolved_usage = if (d.usage != 0) d.usage else tex.usage;
-    const resolved_swizzle_r = if (d.swizzleR != 0) d.swizzleR else abi_texture.WGPUTextureComponentSwizzle_Red;
-    const resolved_swizzle_g = if (d.swizzleG != 0) d.swizzleG else abi_texture.WGPUTextureComponentSwizzle_Green;
-    const resolved_swizzle_b = if (d.swizzleB != 0) d.swizzleB else abi_texture.WGPUTextureComponentSwizzle_Blue;
-    const resolved_swizzle_a = if (d.swizzleA != 0) d.swizzleA else abi_texture.WGPUTextureComponentSwizzle_Alpha;
+    const resolved_swizzle = resolveTextureViewSwizzle(d);
+    const resolved_swizzle_r = resolved_swizzle.r;
+    const resolved_swizzle_g = resolved_swizzle.g;
+    const resolved_swizzle_b = resolved_swizzle.b;
+    const resolved_swizzle_a = resolved_swizzle.a;
     const tv = make(DoeTextureView) orelse return null;
     native_helpers.object_add_ref(DoeTexture, tex_raw);
     if (tex.mtl == null and tex.vk_id != 0) {
         const vk_render = @import("../vulkan/vulkan_render_native.zig");
-        if (!vk_render.vulkan_create_texture_view(tex, tv, d)) {
+        if (!vk_render.vulkan_create_texture_view(tex, tv, d, resolved_swizzle_r, resolved_swizzle_g, resolved_swizzle_b, resolved_swizzle_a)) {
             native_exports.doeNativeTextureRelease(tex_raw);
             alloc.destroy(tv);
             return null;

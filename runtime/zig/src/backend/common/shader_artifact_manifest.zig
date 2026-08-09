@@ -1,8 +1,8 @@
 const std = @import("std");
-const artifact_meta = @import("artifact_meta.zig");
+const artifact_meta = @import("../../contracts/artifact.zig");
 const artifact_state = @import("artifact_state.zig");
-const common_errors = @import("errors.zig");
-const hash_utils = @import("hash_utils.zig");
+const common_errors = @import("../../contracts/execution.zig");
+const hash_utils = @import("../../contracts/artifact.zig");
 
 const SHADER_ARTIFACT_DIR = "bench/out/shader-artifacts";
 const SHADER_TOOLCHAIN_PATH = "config/shader-toolchain.json";

@@ -1,7 +1,7 @@
 const std = @import("std");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/model/model_profile.zig");
 const backend_policy = @import("../../src/backend/backend_policy.zig");
-const backend_selection = @import("../../src/backend/backend_selection.zig");
+const backend_selection = @import("../../src/contracts/backend.zig");
 
 test "metal lane selects doe_metal" {
     const profile = model.DeviceProfile{

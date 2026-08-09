@@ -1,0 +1,81 @@
+{
+  "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
+  "candidates": [
+    {
+      "consumer": "src/dropin/wgpu_dropin_lib.zig",
+      "lineCount": 621,
+      "owner": "dropin",
+      "path": "src/dropin/dropin_abi_procs.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/dropin/wgpu_dropin_ext_a.zig",
+      "lineCount": 434,
+      "owner": "dropin",
+      "path": "src/dropin/wgpu_dropin_ext_a_exports.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/native/api/doe_native_api_misc_exports.zig",
+      "lineCount": 113,
+      "owner": "native",
+      "path": "src/native/command/doe_immediates_external_native.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/native/api/doe_native_api_core_exports.zig",
+      "lineCount": 382,
+      "owner": "native",
+      "path": "src/native/compute/doe_compute_ext_native.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/native/api/doe_native_api_core_exports.zig",
+      "lineCount": 88,
+      "owner": "native",
+      "path": "src/native/lifecycle/doe_canvas_event_native.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/native/api/doe_native_api_render_exports.zig",
+      "lineCount": 606,
+      "owner": "native",
+      "path": "src/native/render/doe_bundle_native.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/native/api/doe_native_api_render_exports.zig",
+      "lineCount": 137,
+      "owner": "native",
+      "path": "src/native/render/doe_render_pass_controls_native.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/native/render/doe_render_native.zig",
+      "lineCount": 574,
+      "owner": "native",
+      "path": "src/native/render/doe_render_pipeline_native.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/native/api/doe_native_api_misc_exports.zig",
+      "lineCount": 229,
+      "owner": "native",
+      "path": "src/native/shader/doe_shader_compilation_info_native.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    },
+    {
+      "consumer": "src/native/api/doe_native_api_misc_exports.zig",
+      "lineCount": 79,
+      "owner": "native",
+      "path": "src/native/support/doe_adapter_info_native.zig",
+      "reason": "one production consumer, no public declaration, no local test, and no special role"
+    }
+  ],
+  "manifestPath": "runtime/zig/source-layout.json",
+  "manifestSha256": "4fdc9c9135cca2d61214c511611b8b9b565010bba72ec41bcd9124f3434febc4",
+  "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
+  "schemaVersion": 1,
+  "sourceLayoutVersion": 2,
+  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e"
+}

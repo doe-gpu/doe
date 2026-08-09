@@ -383,6 +383,25 @@ test "cross-backend: texture load compiles across all backends" {
     try std.testing.expect(contains(out.hlsl, ".Load("));
 }
 
+test "entry-point binding reflection excludes resources used by sibling entry points" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read> first_input: array<f32>;
+        \\@group(0) @binding(1) var<uniform> first_dims: vec4u;
+        \\@group(0) @binding(0) var<storage, read> second_input: array<u32>;
+        \\@group(0) @binding(1) var<storage, read_write> second_output: array<u32>;
+        \\@compute @workgroup_size(1) fn first() { _ = first_input[first_dims.x]; }
+        \\@compute @workgroup_size(1) fn second() { second_output[0] = second_input[0]; }
+    ;
+    var bindings: [mod.MAX_BINDINGS]mod.BindingMeta = undefined;
+    const count = try mod.extractBindingsForEntryPoint(alloc, source, "second", &bindings);
+    try std.testing.expectEqual(@as(usize, 2), count);
+    try std.testing.expectEqual(@as(u32, 0), bindings[0].binding);
+    try std.testing.expectEqual(mod.ir.AddressSpace.storage, bindings[0].addr_space);
+    try std.testing.expectEqual(mod.ir.AccessMode.read, bindings[0].access);
+    try std.testing.expectEqual(@as(u32, 1), bindings[1].binding);
+    try std.testing.expectEqual(mod.ir.AccessMode.read_write, bindings[1].access);
+}
+
 test "cross-backend: texture sample compiles across all backends" {
     const source =
         \\@group(0) @binding(0) var tex: texture_2d<f32>;

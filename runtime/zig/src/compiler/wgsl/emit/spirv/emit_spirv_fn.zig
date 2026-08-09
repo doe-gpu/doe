@@ -845,8 +845,9 @@ pub fn FunctionState(comptime EmitterT: type) type {
                 else => return error.UnsupportedConstruct,
             };
 
+            if (try emit_spirv_fn_helpers.emitBoolScalarConstruct(self, target_ty, source_ty, target_scalar, source_scalar, source_id)) |result| return result;
             const opcode: u16 = switch (scalar_construct_kind(target_scalar)) {
-                .bool => return error.UnsupportedConstruct,
+                .bool => unreachable,
                 .signed => switch (scalar_construct_kind(source_scalar)) {
                     .signed => return source_id,
                     .unsigned => spirv.Opcode.Bitcast,

@@ -15,7 +15,7 @@
 //   .sigmoid -> `1 / (1 + exp(-x))` (Qwen `attentionOutputGate`)
 
 const schema = @import("schema.zig");
-const body_emit = @import("emit_kernel_body.zig");
+const body_emit = @import("emit_kernel_context.zig");
 
 pub const Kind = enum { gelu, silu, sigmoid };
 

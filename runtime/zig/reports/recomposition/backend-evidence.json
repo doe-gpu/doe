@@ -1,0 +1,47 @@
+{
+  "backends": {
+    "d3d12": {
+      "availability": "not-available-host-os",
+      "representativeOutput": "not-captured",
+      "requiredHostOs": "Windows"
+    },
+    "metal": {
+      "availability": "not-available-host-os",
+      "representativeOutput": "not-captured",
+      "requiredHostOs": "Darwin"
+    },
+    "vulkan": {
+      "availability": "diagnostic-only",
+      "device": {
+        "deviceName": "llvmpipe (LLVM 19.1.1, 256 bits)",
+        "deviceType": "PHYSICAL_DEVICE_TYPE_CPU",
+        "driverInfo": "Mesa 24.2.8-1ubuntu1~24.04.1 (LLVM 19.1.1)",
+        "driverName": "llvmpipe"
+      },
+      "physicalGpuEligible": false,
+      "renderNodes": [
+        {
+          "path": "/dev/dri/renderD128",
+          "readable": false,
+          "writable": false
+        }
+      ],
+      "representativeOutput": "not-captured-physical-run-required",
+      "softwareFallbackDetected": true,
+      "summaryExitCode": 0
+    }
+  },
+  "claimable": false,
+  "evidenceMaturity": "diagnostic",
+  "host": {
+    "machine": "x86_64",
+    "operatingSystem": "Linux",
+    "release": "6.8.0-90-generic"
+  },
+  "policy": {
+    "physicalHardwareRequired": true,
+    "softwareFallbackProhibited": true
+  },
+  "schemaVersion": 1,
+  "status": "hardware-evidence-incomplete"
+}

@@ -2,7 +2,12 @@ const std = @import("std");
 const testing = std.testing;
 
 const trace = @import("../../src/runtime/trace/trace.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const command = @import("../../src/contracts/command.zig");
+const policy = @import("../../src/contracts/model/model_policy.zig");
+const quirks = @import("../../src/contracts/model/model_quirks.zig");
+const resource = @import("../../src/contracts/model/model_resource_types.zig");
+const render = @import("../../src/contracts/model/model_render_types.zig");
+const texture = @import("../../src/contracts/model/model_texture_types.zig");
 const execution = @import("../../src/runtime/execution.zig");
 
 // ============================================================
@@ -12,20 +17,20 @@ const execution = @import("../../src/runtime/execution.zig");
 
 const MockDecision = struct {
     matched_quirk_id: ?[]const u8 = null,
-    action: ?model.QuirkAction = null,
+    action: ?quirks.QuirkAction = null,
     score: u32 = 0,
     matched_count: u32 = 0,
     requires_lean: bool = false,
     is_blocking: bool = false,
-    proof_level: ?model.ProofLevel = null,
-    verification_mode: ?model.VerificationMode = null,
+    proof_level: ?policy.ProofLevel = null,
+    verification_mode: ?policy.VerificationMode = null,
     applied_toggle: ?[]const u8 = null,
-    matched_scope: ?model.Scope = null,
-    matched_safety_class: ?model.SafetyClass = null,
+    matched_scope: ?policy.Scope = null,
+    matched_safety_class: ?policy.SafetyClass = null,
 };
 
 const MockResult = struct {
-    command: model.Command,
+    command: command.Command,
     decision: MockDecision,
 };
 
@@ -220,17 +225,17 @@ test "actionName: no_op returns no_op" {
 }
 
 test "actionName: use_temporary_buffer returns correct string" {
-    const action = model.QuirkAction{ .use_temporary_buffer = .{ .alignment_bytes = 16 } };
+    const action = quirks.QuirkAction{ .use_temporary_buffer = .{ .alignment_bytes = 16 } };
     try testing.expectEqualStrings("use_temporary_buffer", trace.actionName(action));
 }
 
 test "actionName: use_temporary_render_texture returns correct string" {
-    const action = model.QuirkAction{ .use_temporary_render_texture = .{ .min_mip_level = 0 } };
+    const action = quirks.QuirkAction{ .use_temporary_render_texture = .{ .min_mip_level = 0 } };
     try testing.expectEqualStrings("use_temporary_render_texture", trace.actionName(action));
 }
 
 test "actionName: toggle returns toggle" {
-    const action = model.QuirkAction{ .toggle = .{ .toggle_name = "some_toggle" } };
+    const action = quirks.QuirkAction{ .toggle = .{ .toggle_name = "some_toggle" } };
     try testing.expectEqualStrings("toggle", trace.actionName(action));
 }
 
@@ -250,7 +255,7 @@ test "scopeName: all variants produce correct strings" {
 }
 
 test "scopeName: variant count matches expected" {
-    const fields = @typeInfo(model.Scope).@"enum".fields;
+    const fields = @typeInfo(policy.Scope).@"enum".fields;
     try testing.expectEqual(@as(usize, 5), fields.len);
 }
 
@@ -269,7 +274,7 @@ test "safetyClassName: all variants produce correct strings" {
 }
 
 test "safetyClassName: variant count matches expected" {
-    const fields = @typeInfo(model.SafetyClass).@"enum".fields;
+    const fields = @typeInfo(policy.SafetyClass).@"enum".fields;
     try testing.expectEqual(@as(usize, 4), fields.len);
 }
 
@@ -287,7 +292,7 @@ test "verificationModeName: all variants produce correct strings" {
 }
 
 test "verificationModeName: variant count matches expected" {
-    const fields = @typeInfo(model.VerificationMode).@"enum".fields;
+    const fields = @typeInfo(policy.VerificationMode).@"enum".fields;
     try testing.expectEqual(@as(usize, 3), fields.len);
 }
 
@@ -305,7 +310,7 @@ test "proofLevelName: all variants produce correct strings" {
 }
 
 test "proofLevelName: variant count matches expected" {
-    const fields = @typeInfo(model.ProofLevel).@"enum".fields;
+    const fields = @typeInfo(policy.ProofLevel).@"enum".fields;
     try testing.expectEqual(@as(usize, 3), fields.len);
 }
 
@@ -320,7 +325,7 @@ test "apiName: all variants produce correct strings" {
 }
 
 test "apiName: variant count matches expected" {
-    const fields = @typeInfo(model.Api).@"enum".fields;
+    const fields = @typeInfo(policy.Api).@"enum".fields;
     try testing.expectEqual(@as(usize, 4), fields.len);
 }
 
@@ -328,97 +333,97 @@ test "apiName: variant count matches expected" {
 // commandToTag — command-to-tag mapping
 
 test "commandToTag: upload maps to upload" {
-    const cmd = model.Command{ .upload = .{ .bytes = 1024, .align_bytes = 4 } };
+    const cmd = command.Command{ .upload = .{ .bytes = 1024, .align_bytes = 4 } };
     try testing.expectEqualStrings("upload", trace.commandToTag(cmd));
 }
 
 test "commandToTag: barrier maps to barrier" {
-    const cmd = model.Command{ .barrier = .{ .dependency_count = 2 } };
+    const cmd = command.Command{ .barrier = .{ .dependency_count = 2 } };
     try testing.expectEqualStrings("barrier", trace.commandToTag(cmd));
 }
 
 test "commandToTag: dispatch maps to dispatch" {
-    const cmd = model.Command{ .dispatch = .{ .x = 1, .y = 1, .z = 1 } };
+    const cmd = command.Command{ .dispatch = .{ .x = 1, .y = 1, .z = 1 } };
     try testing.expectEqualStrings("dispatch", trace.commandToTag(cmd));
 }
 
 test "commandToTag: async_diagnostics maps to diagnostics" {
-    const cmd = model.Command{ .async_diagnostics = .{} };
+    const cmd = command.Command{ .async_diagnostics = .{} };
     try testing.expectEqualStrings("diagnostics", trace.commandToTag(cmd));
 }
 
 test "commandToTag: map_async maps to sync" {
-    const cmd = model.Command{ .map_async = .{ .bytes = 64 } };
+    const cmd = command.Command{ .map_async = .{ .bytes = 64 } };
     try testing.expectEqualStrings("sync", trace.commandToTag(cmd));
 }
 
 test "commandToTag: surface_configure maps to frame" {
-    const cmd = model.Command{ .surface_configure = .{ .handle = 1, .width = 800, .height = 600 } };
+    const cmd = command.Command{ .surface_configure = .{ .handle = 1, .width = 800, .height = 600 } };
     try testing.expectEqualStrings("frame", trace.commandToTag(cmd));
 }
 
 test "commandToTag: surface_acquire maps to frame" {
-    const cmd = model.Command{ .surface_acquire = .{ .handle = 1 } };
+    const cmd = command.Command{ .surface_acquire = .{ .handle = 1 } };
     try testing.expectEqualStrings("frame", trace.commandToTag(cmd));
 }
 
 test "commandToTag: surface_present maps to frame" {
-    const cmd = model.Command{ .surface_present = .{ .handle = 1 } };
+    const cmd = command.Command{ .surface_present = .{ .handle = 1 } };
     try testing.expectEqualStrings("frame", trace.commandToTag(cmd));
 }
 
 test "commandToTag: surface_unconfigure maps to frame" {
-    const cmd = model.Command{ .surface_unconfigure = .{ .handle = 1 } };
+    const cmd = command.Command{ .surface_unconfigure = .{ .handle = 1 } };
     try testing.expectEqualStrings("frame", trace.commandToTag(cmd));
 }
 
 test "commandToTag: surface_release maps to frame" {
-    const cmd = model.Command{ .surface_release = .{ .handle = 1 } };
+    const cmd = command.Command{ .surface_release = .{ .handle = 1 } };
     try testing.expectEqualStrings("frame", trace.commandToTag(cmd));
 }
 
 test "commandToTag: render_draw maps to render_draw" {
-    const cmd = model.Command{ .render_draw = std.mem.zeroes(model.RenderDrawCommand) };
+    const cmd = command.Command{ .render_draw = std.mem.zeroes(render.RenderDrawCommand) };
     try testing.expectEqualStrings("render_draw", trace.commandToTag(cmd));
 }
 
 test "commandToTag: copy_buffer_to_texture maps correctly" {
-    const cmd = model.Command{ .copy_buffer_to_texture = std.mem.zeroes(model.CopyCommand) };
+    const cmd = command.Command{ .copy_buffer_to_texture = std.mem.zeroes(resource.CopyCommand) };
     try testing.expectEqualStrings("copy_buffer_to_texture", trace.commandToTag(cmd));
 }
 
 test "commandToTag: sampler_create maps to sampler_create" {
-    const cmd = model.Command{ .sampler_create = .{ .handle = 1 } };
+    const cmd = command.Command{ .sampler_create = .{ .handle = 1 } };
     try testing.expectEqualStrings("sampler_create", trace.commandToTag(cmd));
 }
 
 test "commandToTag: sampler_destroy maps to sampler_destroy" {
-    const cmd = model.Command{ .sampler_destroy = .{ .handle = 1 } };
+    const cmd = command.Command{ .sampler_destroy = .{ .handle = 1 } };
     try testing.expectEqualStrings("sampler_destroy", trace.commandToTag(cmd));
 }
 
 test "commandToTag: texture_write maps to texture_write" {
-    const cmd = model.Command{ .texture_write = std.mem.zeroes(model.TextureWriteCommand) };
+    const cmd = command.Command{ .texture_write = std.mem.zeroes(texture.TextureWriteCommand) };
     try testing.expectEqualStrings("texture_write", trace.commandToTag(cmd));
 }
 
 test "commandToTag: texture_query maps to texture_query" {
-    const cmd = model.Command{ .texture_query = std.mem.zeroes(model.TextureQueryCommand) };
+    const cmd = command.Command{ .texture_query = std.mem.zeroes(texture.TextureQueryCommand) };
     try testing.expectEqualStrings("texture_query", trace.commandToTag(cmd));
 }
 
 test "commandToTag: texture_destroy maps to texture_destroy" {
-    const cmd = model.Command{ .texture_destroy = .{ .handle = 1 } };
+    const cmd = command.Command{ .texture_destroy = .{ .handle = 1 } };
     try testing.expectEqualStrings("texture_destroy", trace.commandToTag(cmd));
 }
 
 test "commandToTag: surface_create maps to surface_create" {
-    const cmd = model.Command{ .surface_create = .{ .handle = 1 } };
+    const cmd = command.Command{ .surface_create = .{ .handle = 1 } };
     try testing.expectEqualStrings("surface_create", trace.commandToTag(cmd));
 }
 
 test "commandToTag: surface_capabilities maps to surface_capabilities" {
-    const cmd = model.Command{ .surface_capabilities = .{ .handle = 1 } };
+    const cmd = command.Command{ .surface_capabilities = .{ .handle = 1 } };
     try testing.expectEqualStrings("surface_capabilities", trace.commandToTag(cmd));
 }
 

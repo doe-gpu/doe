@@ -376,8 +376,8 @@ pub fn bufferMapCallback(
 }
 
 pub fn uncapturedErrorCallback(
-    _: ?*const anyopaque,
-    error_type: abi_descriptor.WGPUErrorType,
+    _: [*c]const abi_base.WGPUDevice,
+    error_type: c_uint,
     message: abi_base.WGPUStringView,
     userdata1: ?*anyopaque,
     _: ?*anyopaque,
@@ -385,7 +385,7 @@ pub fn uncapturedErrorCallback(
     _ = message;
     const state_ptr = userdata1 orelse return;
     const state = @as(*runtime_state.UncapturedErrorState, @ptrCast(@alignCast(state_ptr)));
-    state.error_type.store(@intFromEnum(error_type), .release);
+    state.error_type.store(error_type, .release);
     state.pending.store(1, .release);
 }
 

@@ -7,7 +7,9 @@ const std = @import("std");
 const testing = std.testing;
 
 const resources = @import("../../src/core/resource/wgpu_resources.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const resource = @import("../../src/contracts/model/model_resource_types.zig");
+const compute = @import("../../src/contracts/model/model_compute_types.zig");
+const gpu = @import("../../src/contracts/model/model_gpu_types.zig");
 const types = @import("../../src/core/abi/wgpu_runtime_abi.zig");
 const normalizers = @import("../../src/core/resource/wgpu_resource_normalizers.zig");
 const loader = @import("../../src/core/abi/wgpu_loader.zig");
@@ -79,11 +81,11 @@ test "requiredBytes: power of two sizes stay aligned" {
 // ============================================================
 
 test "binding usage: uniform buffer includes Uniform+CopySrc+CopyDst" {
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_Uniform,
+        .buffer_type = gpu.WGPUBufferBindingType_Uniform,
     };
     const usage = resources.bindingUsageForBufferKind(binding);
     try testing.expect((usage & types.WGPUBufferUsage_Uniform) != 0);
@@ -94,11 +96,11 @@ test "binding usage: uniform buffer includes Uniform+CopySrc+CopyDst" {
 }
 
 test "binding usage: storage buffer includes Storage+CopySrc+CopyDst" {
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_Storage,
+        .buffer_type = gpu.WGPUBufferBindingType_Storage,
     };
     const usage = resources.bindingUsageForBufferKind(binding);
     try testing.expect((usage & types.WGPUBufferUsage_Storage) != 0);
@@ -107,11 +109,11 @@ test "binding usage: storage buffer includes Storage+CopySrc+CopyDst" {
 }
 
 test "binding usage: read-only storage buffer includes Storage+CopySrc+CopyDst" {
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_ReadOnlyStorage,
+        .buffer_type = gpu.WGPUBufferBindingType_ReadOnlyStorage,
     };
     const usage = resources.bindingUsageForBufferKind(binding);
     try testing.expect((usage & types.WGPUBufferUsage_Storage) != 0);
@@ -120,11 +122,11 @@ test "binding usage: read-only storage buffer includes Storage+CopySrc+CopyDst" 
 }
 
 test "binding usage: undefined type includes both Uniform and Storage" {
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_Undefined,
+        .buffer_type = gpu.WGPUBufferBindingType_Undefined,
     };
     const usage = resources.bindingUsageForBufferKind(binding);
     try testing.expect((usage & types.WGPUBufferUsage_Storage) != 0);
@@ -134,7 +136,7 @@ test "binding usage: undefined type includes both Uniform and Storage" {
 }
 
 test "binding usage: unrecognized type falls to default with both Uniform and Storage" {
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
@@ -148,17 +150,17 @@ test "binding usage: unrecognized type falls to default with both Uniform and St
 }
 
 test "binding usage: storage and read-only storage produce same flags" {
-    const storage = model.KernelBinding{
+    const storage = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_Storage,
+        .buffer_type = gpu.WGPUBufferBindingType_Storage,
     };
-    const ro_storage = model.KernelBinding{
+    const ro_storage = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 1,
-        .buffer_type = model.WGPUBufferBindingType_ReadOnlyStorage,
+        .buffer_type = gpu.WGPUBufferBindingType_ReadOnlyStorage,
     };
     try testing.expectEqual(
         resources.bindingUsageForBufferKind(storage),
@@ -171,12 +173,12 @@ test "binding usage: storage and read-only storage produce same flags" {
 // ============================================================
 
 test "normalizeTextureFormat: R8Unorm passes through" {
-    const result = resources.normalizeTextureFormat(model.WGPUTextureFormat_R8Unorm);
+    const result = resources.normalizeTextureFormat(gpu.WGPUTextureFormat_R8Unorm);
     try testing.expectEqual(types.WGPUTextureFormat_R8Unorm, result);
 }
 
 test "normalizeTextureFormat: Undefined passes through as Undefined" {
-    const result = resources.normalizeTextureFormat(model.WGPUTextureFormat_Undefined);
+    const result = resources.normalizeTextureFormat(gpu.WGPUTextureFormat_Undefined);
     try testing.expectEqual(types.WGPUTextureFormat_Undefined, result);
 }
 
@@ -185,24 +187,24 @@ test "normalizeTextureFormat: Undefined passes through as Undefined" {
 // ============================================================
 
 test "KernelBinding: defaults for optional fields" {
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 0,
         .resource_kind = .buffer,
         .resource_handle = 42,
     };
     try testing.expectEqual(@as(u32, 0), binding.group);
     try testing.expectEqual(@as(u64, 0), binding.buffer_offset);
-    try testing.expectEqual(model.WGPUWholeSize, binding.buffer_size);
-    try testing.expectEqual(model.WGPUBufferBindingType_Undefined, binding.buffer_type);
-    try testing.expectEqual(model.WGPUTextureFormat_Undefined, binding.texture_format);
+    try testing.expectEqual(gpu.WGPUWholeSize, binding.buffer_size);
+    try testing.expectEqual(gpu.WGPUBufferBindingType_Undefined, binding.buffer_type);
+    try testing.expectEqual(gpu.WGPUTextureFormat_Undefined, binding.texture_format);
     try testing.expect(!binding.texture_multisampled);
 }
 
 test "KernelBinding: resource_kind enum covers all types" {
-    const buffer_kind = model.KernelBindingResourceKind.buffer;
-    const texture_kind = model.KernelBindingResourceKind.texture;
-    const storage_texture_kind = model.KernelBindingResourceKind.storage_texture;
-    const sampler_kind = model.KernelBindingResourceKind.sampler;
+    const buffer_kind = compute.KernelBindingResourceKind.buffer;
+    const texture_kind = compute.KernelBindingResourceKind.texture;
+    const storage_texture_kind = compute.KernelBindingResourceKind.storage_texture;
+    const sampler_kind = compute.KernelBindingResourceKind.sampler;
 
     try testing.expect(@intFromEnum(buffer_kind) != @intFromEnum(texture_kind));
     try testing.expect(@intFromEnum(texture_kind) != @intFromEnum(storage_texture_kind));
@@ -210,7 +212,7 @@ test "KernelBinding: resource_kind enum covers all types" {
 }
 
 test "KernelBinding: custom group assignment" {
-    const binding = model.KernelBinding{
+    const binding = compute.KernelBinding{
         .binding = 3,
         .group = 2,
         .resource_kind = .texture,
@@ -225,22 +227,22 @@ test "KernelBinding: custom group assignment" {
 // ============================================================
 
 test "CopyTextureResource: kind enum distinguishes buffer and texture" {
-    const buf = model.CopyResourceKind.buffer;
-    const tex = model.CopyResourceKind.texture;
+    const buf = resource.CopyResourceKind.buffer;
+    const tex = resource.CopyResourceKind.texture;
     try testing.expect(@intFromEnum(buf) != @intFromEnum(tex));
 }
 
 test "CopyTextureResource: dimension constants are distinct" {
-    try testing.expect(model.WGPUTextureDimension_1D != model.WGPUTextureDimension_2D);
-    try testing.expect(model.WGPUTextureDimension_2D != model.WGPUTextureDimension_3D);
-    try testing.expect(model.WGPUTextureDimension_Undefined != model.WGPUTextureDimension_1D);
+    try testing.expect(gpu.WGPUTextureDimension_1D != gpu.WGPUTextureDimension_2D);
+    try testing.expect(gpu.WGPUTextureDimension_2D != gpu.WGPUTextureDimension_3D);
+    try testing.expect(gpu.WGPUTextureDimension_Undefined != gpu.WGPUTextureDimension_1D);
 }
 
 test "CopyTextureResource: view dimension constants are distinct" {
-    try testing.expect(model.WGPUTextureViewDimension_1D != model.WGPUTextureViewDimension_2D);
-    try testing.expect(model.WGPUTextureViewDimension_2D != model.WGPUTextureViewDimension_3D);
-    try testing.expect(model.WGPUTextureViewDimension_2DArray != model.WGPUTextureViewDimension_Cube);
-    try testing.expect(model.WGPUTextureViewDimension_Cube != model.WGPUTextureViewDimension_CubeArray);
+    try testing.expect(gpu.WGPUTextureViewDimension_1D != gpu.WGPUTextureViewDimension_2D);
+    try testing.expect(gpu.WGPUTextureViewDimension_2D != gpu.WGPUTextureViewDimension_3D);
+    try testing.expect(gpu.WGPUTextureViewDimension_2DArray != gpu.WGPUTextureViewDimension_Cube);
+    try testing.expect(gpu.WGPUTextureViewDimension_Cube != gpu.WGPUTextureViewDimension_CubeArray);
 }
 
 // ============================================================
@@ -248,18 +250,18 @@ test "CopyTextureResource: view dimension constants are distinct" {
 // ============================================================
 
 test "texture format: Undefined is 0" {
-    try testing.expectEqual(@as(u32, 0), model.WGPUTextureFormat_Undefined);
+    try testing.expectEqual(@as(u32, 0), gpu.WGPUTextureFormat_Undefined);
 }
 
 test "texture format: R8Unorm is 1" {
-    try testing.expectEqual(@as(u32, 1), model.WGPUTextureFormat_R8Unorm);
+    try testing.expectEqual(@as(u32, 1), gpu.WGPUTextureFormat_R8Unorm);
 }
 
 test "texture format: common formats have expected ordinal values" {
     // Validate a selection of format constants match webgpu.h values.
-    try testing.expect(model.WGPUTextureFormat_R8Unorm < model.WGPUTextureFormat_RGBA8Unorm);
-    try testing.expect(model.WGPUTextureFormat_RGBA8Unorm < model.WGPUTextureFormat_RGBA32Float);
-    try testing.expect(model.WGPUTextureFormat_Depth16Unorm < model.WGPUTextureFormat_Depth32Float);
+    try testing.expect(gpu.WGPUTextureFormat_R8Unorm < gpu.WGPUTextureFormat_RGBA8Unorm);
+    try testing.expect(gpu.WGPUTextureFormat_RGBA8Unorm < gpu.WGPUTextureFormat_RGBA32Float);
+    try testing.expect(gpu.WGPUTextureFormat_Depth16Unorm < gpu.WGPUTextureFormat_Depth32Float);
 }
 
 // ============================================================
@@ -267,11 +269,11 @@ test "texture format: common formats have expected ordinal values" {
 // ============================================================
 
 test "texture usage: flags are powers of two (non-overlapping bits)" {
-    const copy_src = model.WGPUTextureUsage_CopySrc;
-    const copy_dst = model.WGPUTextureUsage_CopyDst;
-    const tex_bind = model.WGPUTextureUsage_TextureBinding;
-    const store_bind = model.WGPUTextureUsage_StorageBinding;
-    const render = model.WGPUTextureUsage_RenderAttachment;
+    const copy_src = gpu.WGPUTextureUsage_CopySrc;
+    const copy_dst = gpu.WGPUTextureUsage_CopyDst;
+    const tex_bind = gpu.WGPUTextureUsage_TextureBinding;
+    const store_bind = gpu.WGPUTextureUsage_StorageBinding;
+    const render = gpu.WGPUTextureUsage_RenderAttachment;
 
     // Each flag should have no bits in common with any other.
     try testing.expectEqual(@as(u64, 0), copy_src & copy_dst);
@@ -287,15 +289,15 @@ test "texture usage: flags are powers of two (non-overlapping bits)" {
 }
 
 test "texture usage: flags can be combined with OR" {
-    const combined = model.WGPUTextureUsage_CopySrc | model.WGPUTextureUsage_CopyDst | model.WGPUTextureUsage_TextureBinding;
-    try testing.expect((combined & model.WGPUTextureUsage_CopySrc) != 0);
-    try testing.expect((combined & model.WGPUTextureUsage_CopyDst) != 0);
-    try testing.expect((combined & model.WGPUTextureUsage_TextureBinding) != 0);
-    try testing.expect((combined & model.WGPUTextureUsage_StorageBinding) == 0);
+    const combined = gpu.WGPUTextureUsage_CopySrc | gpu.WGPUTextureUsage_CopyDst | gpu.WGPUTextureUsage_TextureBinding;
+    try testing.expect((combined & gpu.WGPUTextureUsage_CopySrc) != 0);
+    try testing.expect((combined & gpu.WGPUTextureUsage_CopyDst) != 0);
+    try testing.expect((combined & gpu.WGPUTextureUsage_TextureBinding) != 0);
+    try testing.expect((combined & gpu.WGPUTextureUsage_StorageBinding) == 0);
 }
 
 test "texture usage: None is 0" {
-    try testing.expectEqual(@as(u64, 0), model.WGPUTextureUsage_None);
+    try testing.expectEqual(@as(u64, 0), gpu.WGPUTextureUsage_None);
 }
 
 // ============================================================
@@ -303,15 +305,15 @@ test "texture usage: None is 0" {
 // ============================================================
 
 test "buffer binding type: Undefined differs from Uniform" {
-    try testing.expect(model.WGPUBufferBindingType_Undefined != model.WGPUBufferBindingType_Uniform);
+    try testing.expect(gpu.WGPUBufferBindingType_Undefined != gpu.WGPUBufferBindingType_Uniform);
 }
 
 test "buffer binding type: all values are distinct" {
     const vals = [_]u32{
-        model.WGPUBufferBindingType_Undefined,
-        model.WGPUBufferBindingType_Uniform,
-        model.WGPUBufferBindingType_Storage,
-        model.WGPUBufferBindingType_ReadOnlyStorage,
+        gpu.WGPUBufferBindingType_Undefined,
+        gpu.WGPUBufferBindingType_Uniform,
+        gpu.WGPUBufferBindingType_Storage,
+        gpu.WGPUBufferBindingType_ReadOnlyStorage,
     };
     for (vals, 0..) |a, i| {
         for (vals[i + 1 ..]) |b| {
@@ -352,17 +354,17 @@ test "alignTo: unaligned value rounds up" {
 // ============================================================
 
 test "normalizeBufferBindingType: Uniform normalizes" {
-    const result = normalizers.normalizeBufferBindingType(model.WGPUBufferBindingType_Uniform);
+    const result = normalizers.normalizeBufferBindingType(gpu.WGPUBufferBindingType_Uniform);
     try testing.expectEqual(types.WGPUBufferBindingType_Uniform, result);
 }
 
 test "normalizeBufferBindingType: Storage normalizes" {
-    const result = normalizers.normalizeBufferBindingType(model.WGPUBufferBindingType_Storage);
+    const result = normalizers.normalizeBufferBindingType(gpu.WGPUBufferBindingType_Storage);
     try testing.expectEqual(types.WGPUBufferBindingType_Storage, result);
 }
 
 test "normalizeBufferBindingType: ReadOnlyStorage normalizes" {
-    const result = normalizers.normalizeBufferBindingType(model.WGPUBufferBindingType_ReadOnlyStorage);
+    const result = normalizers.normalizeBufferBindingType(gpu.WGPUBufferBindingType_ReadOnlyStorage);
     try testing.expectEqual(types.WGPUBufferBindingType_ReadOnlyStorage, result);
 }
 
@@ -376,17 +378,17 @@ test "normalizeBufferBindingType: unknown falls to Undefined" {
 // ============================================================
 
 test "normalizeTextureViewDimension: 2D normalizes" {
-    const result = normalizers.normalizeTextureViewDimension(model.WGPUTextureViewDimension_2D);
+    const result = normalizers.normalizeTextureViewDimension(gpu.WGPUTextureViewDimension_2D);
     try testing.expectEqual(types.WGPUTextureViewDimension_2D, result);
 }
 
 test "normalizeTextureViewDimension: 3D normalizes" {
-    const result = normalizers.normalizeTextureViewDimension(model.WGPUTextureViewDimension_3D);
+    const result = normalizers.normalizeTextureViewDimension(gpu.WGPUTextureViewDimension_3D);
     try testing.expectEqual(types.WGPUTextureViewDimension_3D, result);
 }
 
 test "normalizeTextureViewDimension: Cube normalizes" {
-    const result = normalizers.normalizeTextureViewDimension(model.WGPUTextureViewDimension_Cube);
+    const result = normalizers.normalizeTextureViewDimension(gpu.WGPUTextureViewDimension_Cube);
     try testing.expectEqual(types.WGPUTextureViewDimension_Cube, result);
 }
 
@@ -400,14 +402,14 @@ test "normalizeTextureViewDimension: unknown falls to 2D" {
 // ============================================================
 
 test "KernelDispatchCommand: defaults for optional fields" {
-    const cmd = model.KernelDispatchCommand{
+    const cmd = compute.KernelDispatchCommand{
         .kernel = "test_kernel",
         .x = 1,
         .y = 1,
         .z = 1,
     };
     try testing.expectEqual(@as(u32, 1), cmd.repeat);
-    try testing.expectEqual(model.KernelDispatchRepeatSynchronization.dependent, cmd.repeat_synchronization);
+    try testing.expectEqual(compute.KernelDispatchRepeatSynchronization.dependent, cmd.repeat_synchronization);
     try testing.expectEqual(@as(u32, 0), cmd.warmup_dispatch_count);
     try testing.expect(!cmd.initialize_buffers_on_create);
     try testing.expect(cmd.bindings == null);
@@ -415,7 +417,7 @@ test "KernelDispatchCommand: defaults for optional fields" {
 }
 
 test "KernelDispatchCommand: custom repeat and warmup" {
-    const cmd = model.KernelDispatchCommand{
+    const cmd = compute.KernelDispatchCommand{
         .kernel = "matmul",
         .x = 64,
         .y = 64,
@@ -434,8 +436,8 @@ test "KernelDispatchCommand: custom repeat and warmup" {
 // ============================================================
 
 test "WGPUWholeSize: is max u64" {
-    try testing.expectEqual(@as(u64, 0xFFFFFFFFFFFFFFFF), model.WGPUWholeSize);
-    try testing.expectEqual(std.math.maxInt(u64), model.WGPUWholeSize);
+    try testing.expectEqual(@as(u64, 0xFFFFFFFFFFFFFFFF), gpu.WGPUWholeSize);
+    try testing.expectEqual(std.math.maxInt(u64), gpu.WGPUWholeSize);
 }
 
 // ============================================================
@@ -443,8 +445,8 @@ test "WGPUWholeSize: is max u64" {
 // ============================================================
 
 test "texture aspect: All, StencilOnly, DepthOnly are distinct" {
-    try testing.expect(model.WGPUTextureAspect_All != model.WGPUTextureAspect_StencilOnly);
-    try testing.expect(model.WGPUTextureAspect_All != model.WGPUTextureAspect_DepthOnly);
-    try testing.expect(model.WGPUTextureAspect_StencilOnly != model.WGPUTextureAspect_DepthOnly);
-    try testing.expect(model.WGPUTextureAspect_Undefined != model.WGPUTextureAspect_All);
+    try testing.expect(gpu.WGPUTextureAspect_All != gpu.WGPUTextureAspect_StencilOnly);
+    try testing.expect(gpu.WGPUTextureAspect_All != gpu.WGPUTextureAspect_DepthOnly);
+    try testing.expect(gpu.WGPUTextureAspect_StencilOnly != gpu.WGPUTextureAspect_DepthOnly);
+    try testing.expect(gpu.WGPUTextureAspect_Undefined != gpu.WGPUTextureAspect_All);
 }

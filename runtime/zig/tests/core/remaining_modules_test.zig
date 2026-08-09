@@ -8,7 +8,10 @@ const testing = std.testing;
 const token = @import("../../src/compiler/wgsl/frontend/token.zig");
 const replay = @import("../../src/runtime/trace/replay.zig");
 const command_parse_helpers = @import("../../src/command/command_parse_helpers.zig");
-const model = @import("../../src/contracts/model/model.zig");
+const resource = @import("../../src/contracts/model/model_resource_types.zig");
+const compute = @import("../../src/contracts/model/model_compute_types.zig");
+const render = @import("../../src/contracts/model/model_render_types.zig");
+const gpu = @import("../../src/contracts/model/model_gpu_types.zig");
 
 // ============================================================
 // Token — Tag enum structure
@@ -173,19 +176,19 @@ test "Token.slice extracts identifier" {
 // ============================================================
 
 test "parseCopyResourceKind recognizes buffer" {
-    try testing.expectEqual(model.CopyResourceKind.buffer, command_parse_helpers.parseCopyResourceKind("buffer").?);
+    try testing.expectEqual(resource.CopyResourceKind.buffer, command_parse_helpers.parseCopyResourceKind("buffer").?);
 }
 
 test "parseCopyResourceKind recognizes texture" {
-    try testing.expectEqual(model.CopyResourceKind.texture, command_parse_helpers.parseCopyResourceKind("texture").?);
+    try testing.expectEqual(resource.CopyResourceKind.texture, command_parse_helpers.parseCopyResourceKind("texture").?);
 }
 
 test "parseCopyResourceKind returns null for unknown" {
-    try testing.expectEqual(@as(?model.CopyResourceKind, null), command_parse_helpers.parseCopyResourceKind("unknown"));
+    try testing.expectEqual(@as(?resource.CopyResourceKind, null), command_parse_helpers.parseCopyResourceKind("unknown"));
 }
 
 test "parseCopyResourceKind returns null for null input" {
-    try testing.expectEqual(@as(?model.CopyResourceKind, null), command_parse_helpers.parseCopyResourceKind(null));
+    try testing.expectEqual(@as(?resource.CopyResourceKind, null), command_parse_helpers.parseCopyResourceKind(null));
 }
 
 // ============================================================
@@ -193,20 +196,20 @@ test "parseCopyResourceKind returns null for null input" {
 // ============================================================
 
 test "parseCopyDirection recognizes explicit directions" {
-    try testing.expectEqual(model.CopyDirection.buffer_to_buffer, try command_parse_helpers.parseCopyDirection("buffer_to_buffer", null));
-    try testing.expectEqual(model.CopyDirection.buffer_to_texture, try command_parse_helpers.parseCopyDirection("buffer_to_texture", null));
-    try testing.expectEqual(model.CopyDirection.texture_to_buffer, try command_parse_helpers.parseCopyDirection("texture_to_buffer", null));
-    try testing.expectEqual(model.CopyDirection.texture_to_texture, try command_parse_helpers.parseCopyDirection("texture_to_texture", null));
+    try testing.expectEqual(resource.CopyDirection.buffer_to_buffer, try command_parse_helpers.parseCopyDirection("buffer_to_buffer", null));
+    try testing.expectEqual(resource.CopyDirection.buffer_to_texture, try command_parse_helpers.parseCopyDirection("buffer_to_texture", null));
+    try testing.expectEqual(resource.CopyDirection.texture_to_buffer, try command_parse_helpers.parseCopyDirection("texture_to_buffer", null));
+    try testing.expectEqual(resource.CopyDirection.texture_to_texture, try command_parse_helpers.parseCopyDirection("texture_to_texture", null));
 }
 
 test "parseCopyDirection infers from command name" {
-    try testing.expectEqual(model.CopyDirection.buffer_to_texture, try command_parse_helpers.parseCopyDirection(null, "copy_buffer_to_texture"));
-    try testing.expectEqual(model.CopyDirection.texture_to_buffer, try command_parse_helpers.parseCopyDirection(null, "copy_texture_to_buffer"));
-    try testing.expectEqual(model.CopyDirection.texture_to_texture, try command_parse_helpers.parseCopyDirection(null, "copy_texture_to_texture"));
+    try testing.expectEqual(resource.CopyDirection.buffer_to_texture, try command_parse_helpers.parseCopyDirection(null, "copy_buffer_to_texture"));
+    try testing.expectEqual(resource.CopyDirection.texture_to_buffer, try command_parse_helpers.parseCopyDirection(null, "copy_texture_to_buffer"));
+    try testing.expectEqual(resource.CopyDirection.texture_to_texture, try command_parse_helpers.parseCopyDirection(null, "copy_texture_to_texture"));
 }
 
 test "parseCopyDirection defaults to buffer_to_buffer" {
-    try testing.expectEqual(model.CopyDirection.buffer_to_buffer, try command_parse_helpers.parseCopyDirection(null, null));
+    try testing.expectEqual(resource.CopyDirection.buffer_to_buffer, try command_parse_helpers.parseCopyDirection(null, null));
 }
 
 test "parseCopyDirection rejects invalid direction string" {
@@ -218,32 +221,32 @@ test "parseCopyDirection rejects invalid direction string" {
 // ============================================================
 
 test "parseKernelBindingKind defaults to buffer for null" {
-    try testing.expectEqual(model.KernelBindingResourceKind.buffer, command_parse_helpers.parseKernelBindingKind(null).?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.buffer, command_parse_helpers.parseKernelBindingKind(null).?);
 }
 
 test "parseKernelBindingKind recognizes buffer variants" {
-    try testing.expectEqual(model.KernelBindingResourceKind.buffer, command_parse_helpers.parseKernelBindingKind("buffer").?);
-    try testing.expectEqual(model.KernelBindingResourceKind.buffer, command_parse_helpers.parseKernelBindingKind("uniform").?);
-    try testing.expectEqual(model.KernelBindingResourceKind.buffer, command_parse_helpers.parseKernelBindingKind("storage_buffer").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.buffer, command_parse_helpers.parseKernelBindingKind("buffer").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.buffer, command_parse_helpers.parseKernelBindingKind("uniform").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.buffer, command_parse_helpers.parseKernelBindingKind("storage_buffer").?);
 }
 
 test "parseKernelBindingKind recognizes texture" {
-    try testing.expectEqual(model.KernelBindingResourceKind.texture, command_parse_helpers.parseKernelBindingKind("texture").?);
-    try testing.expectEqual(model.KernelBindingResourceKind.texture, command_parse_helpers.parseKernelBindingKind("sampled_texture").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.texture, command_parse_helpers.parseKernelBindingKind("texture").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.texture, command_parse_helpers.parseKernelBindingKind("sampled_texture").?);
 }
 
 test "parseKernelBindingKind recognizes storage texture" {
-    try testing.expectEqual(model.KernelBindingResourceKind.storage_texture, command_parse_helpers.parseKernelBindingKind("storage_texture").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.storage_texture, command_parse_helpers.parseKernelBindingKind("storage_texture").?);
 }
 
 test "parseKernelBindingKind recognizes sampler" {
-    try testing.expectEqual(model.KernelBindingResourceKind.sampler, command_parse_helpers.parseKernelBindingKind("sampler").?);
-    try testing.expectEqual(model.KernelBindingResourceKind.sampler, command_parse_helpers.parseKernelBindingKind("filtering_sampler").?);
-    try testing.expectEqual(model.KernelBindingResourceKind.sampler, command_parse_helpers.parseKernelBindingKind("comparison_sampler").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.sampler, command_parse_helpers.parseKernelBindingKind("sampler").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.sampler, command_parse_helpers.parseKernelBindingKind("filtering_sampler").?);
+    try testing.expectEqual(compute.KernelBindingResourceKind.sampler, command_parse_helpers.parseKernelBindingKind("comparison_sampler").?);
 }
 
 test "parseKernelBindingKind returns null for unknown" {
-    try testing.expectEqual(@as(?model.KernelBindingResourceKind, null), command_parse_helpers.parseKernelBindingKind("invalid"));
+    try testing.expectEqual(@as(?compute.KernelBindingResourceKind, null), command_parse_helpers.parseKernelBindingKind("invalid"));
 }
 
 // ============================================================
@@ -251,30 +254,30 @@ test "parseKernelBindingKind returns null for unknown" {
 // ============================================================
 
 test "parseShaderStage recognizes compute" {
-    try testing.expectEqual(model.WGPUShaderStage_Compute, command_parse_helpers.parseShaderStage("compute").?);
+    try testing.expectEqual(gpu.WGPUShaderStage_Compute, command_parse_helpers.parseShaderStage("compute").?);
 }
 
 test "parseShaderStage recognizes vertex" {
-    try testing.expectEqual(model.WGPUShaderStage_Vertex, command_parse_helpers.parseShaderStage("vertex").?);
+    try testing.expectEqual(gpu.WGPUShaderStage_Vertex, command_parse_helpers.parseShaderStage("vertex").?);
 }
 
 test "parseShaderStage recognizes fragment" {
-    try testing.expectEqual(model.WGPUShaderStage_Fragment, command_parse_helpers.parseShaderStage("fragment").?);
+    try testing.expectEqual(gpu.WGPUShaderStage_Fragment, command_parse_helpers.parseShaderStage("fragment").?);
 }
 
 test "parseShaderStage recognizes all" {
     const all = command_parse_helpers.parseShaderStage("all").?;
-    try testing.expect(all & model.WGPUShaderStage_Vertex != 0);
-    try testing.expect(all & model.WGPUShaderStage_Fragment != 0);
-    try testing.expect(all & model.WGPUShaderStage_Compute != 0);
+    try testing.expect(all & gpu.WGPUShaderStage_Vertex != 0);
+    try testing.expect(all & gpu.WGPUShaderStage_Fragment != 0);
+    try testing.expect(all & gpu.WGPUShaderStage_Compute != 0);
 }
 
 test "parseShaderStage returns null for unknown" {
-    try testing.expectEqual(@as(?model.WGPUFlags, null), command_parse_helpers.parseShaderStage("pixel"));
+    try testing.expectEqual(@as(?gpu.WGPUFlags, null), command_parse_helpers.parseShaderStage("pixel"));
 }
 
 test "parseShaderStage returns null for null" {
-    try testing.expectEqual(@as(?model.WGPUFlags, null), command_parse_helpers.parseShaderStage(null));
+    try testing.expectEqual(@as(?gpu.WGPUFlags, null), command_parse_helpers.parseShaderStage(null));
 }
 
 // ============================================================
@@ -282,15 +285,15 @@ test "parseShaderStage returns null for null" {
 // ============================================================
 
 test "parseBufferBindingType recognizes types" {
-    try testing.expectEqual(model.WGPUBufferBindingType_Uniform, command_parse_helpers.parseBufferBindingType("uniform"));
-    try testing.expectEqual(model.WGPUBufferBindingType_Storage, command_parse_helpers.parseBufferBindingType("storage"));
-    try testing.expectEqual(model.WGPUBufferBindingType_ReadOnlyStorage, command_parse_helpers.parseBufferBindingType("readonly"));
-    try testing.expectEqual(model.WGPUBufferBindingType_ReadOnlyStorage, command_parse_helpers.parseBufferBindingType("read_only_storage"));
+    try testing.expectEqual(gpu.WGPUBufferBindingType_Uniform, command_parse_helpers.parseBufferBindingType("uniform"));
+    try testing.expectEqual(gpu.WGPUBufferBindingType_Storage, command_parse_helpers.parseBufferBindingType("storage"));
+    try testing.expectEqual(gpu.WGPUBufferBindingType_ReadOnlyStorage, command_parse_helpers.parseBufferBindingType("readonly"));
+    try testing.expectEqual(gpu.WGPUBufferBindingType_ReadOnlyStorage, command_parse_helpers.parseBufferBindingType("read_only_storage"));
 }
 
 test "parseBufferBindingType defaults to undefined" {
-    try testing.expectEqual(model.WGPUBufferBindingType_Undefined, command_parse_helpers.parseBufferBindingType(null));
-    try testing.expectEqual(model.WGPUBufferBindingType_Undefined, command_parse_helpers.parseBufferBindingType("unknown"));
+    try testing.expectEqual(gpu.WGPUBufferBindingType_Undefined, command_parse_helpers.parseBufferBindingType(null));
+    try testing.expectEqual(gpu.WGPUBufferBindingType_Undefined, command_parse_helpers.parseBufferBindingType("unknown"));
 }
 
 // ============================================================
@@ -298,16 +301,16 @@ test "parseBufferBindingType defaults to undefined" {
 // ============================================================
 
 test "parseTextureSampleType recognizes types" {
-    try testing.expectEqual(model.WGPUTextureSampleType_Float, command_parse_helpers.parseTextureSampleType("float"));
-    try testing.expectEqual(model.WGPUTextureSampleType_UnfilterableFloat, command_parse_helpers.parseTextureSampleType("unfilterable-float"));
-    try testing.expectEqual(model.WGPUTextureSampleType_UnfilterableFloat, command_parse_helpers.parseTextureSampleType("unfilterable_float"));
-    try testing.expectEqual(model.WGPUTextureSampleType_Depth, command_parse_helpers.parseTextureSampleType("depth"));
-    try testing.expectEqual(model.WGPUTextureSampleType_Sint, command_parse_helpers.parseTextureSampleType("sint"));
-    try testing.expectEqual(model.WGPUTextureSampleType_Uint, command_parse_helpers.parseTextureSampleType("uint"));
+    try testing.expectEqual(gpu.WGPUTextureSampleType_Float, command_parse_helpers.parseTextureSampleType("float"));
+    try testing.expectEqual(gpu.WGPUTextureSampleType_UnfilterableFloat, command_parse_helpers.parseTextureSampleType("unfilterable-float"));
+    try testing.expectEqual(gpu.WGPUTextureSampleType_UnfilterableFloat, command_parse_helpers.parseTextureSampleType("unfilterable_float"));
+    try testing.expectEqual(gpu.WGPUTextureSampleType_Depth, command_parse_helpers.parseTextureSampleType("depth"));
+    try testing.expectEqual(gpu.WGPUTextureSampleType_Sint, command_parse_helpers.parseTextureSampleType("sint"));
+    try testing.expectEqual(gpu.WGPUTextureSampleType_Uint, command_parse_helpers.parseTextureSampleType("uint"));
 }
 
 test "parseTextureSampleType defaults to undefined" {
-    try testing.expectEqual(model.WGPUTextureSampleType_Undefined, command_parse_helpers.parseTextureSampleType(null));
+    try testing.expectEqual(gpu.WGPUTextureSampleType_Undefined, command_parse_helpers.parseTextureSampleType(null));
 }
 
 // ============================================================
@@ -315,16 +318,16 @@ test "parseTextureSampleType defaults to undefined" {
 // ============================================================
 
 test "parseTextureViewDimension recognizes dimensions" {
-    try testing.expectEqual(model.WGPUTextureViewDimension_1D, command_parse_helpers.parseTextureViewDimension("1d"));
-    try testing.expectEqual(model.WGPUTextureViewDimension_2D, command_parse_helpers.parseTextureViewDimension("2d"));
-    try testing.expectEqual(model.WGPUTextureViewDimension_2DArray, command_parse_helpers.parseTextureViewDimension("2d-array"));
-    try testing.expectEqual(model.WGPUTextureViewDimension_Cube, command_parse_helpers.parseTextureViewDimension("cube"));
-    try testing.expectEqual(model.WGPUTextureViewDimension_CubeArray, command_parse_helpers.parseTextureViewDimension("cube-array"));
-    try testing.expectEqual(model.WGPUTextureViewDimension_3D, command_parse_helpers.parseTextureViewDimension("3d"));
+    try testing.expectEqual(gpu.WGPUTextureViewDimension_1D, command_parse_helpers.parseTextureViewDimension("1d"));
+    try testing.expectEqual(gpu.WGPUTextureViewDimension_2D, command_parse_helpers.parseTextureViewDimension("2d"));
+    try testing.expectEqual(gpu.WGPUTextureViewDimension_2DArray, command_parse_helpers.parseTextureViewDimension("2d-array"));
+    try testing.expectEqual(gpu.WGPUTextureViewDimension_Cube, command_parse_helpers.parseTextureViewDimension("cube"));
+    try testing.expectEqual(gpu.WGPUTextureViewDimension_CubeArray, command_parse_helpers.parseTextureViewDimension("cube-array"));
+    try testing.expectEqual(gpu.WGPUTextureViewDimension_3D, command_parse_helpers.parseTextureViewDimension("3d"));
 }
 
 test "parseTextureViewDimension defaults to undefined" {
-    try testing.expectEqual(model.WGPUTextureViewDimension_Undefined, command_parse_helpers.parseTextureViewDimension(null));
+    try testing.expectEqual(gpu.WGPUTextureViewDimension_Undefined, command_parse_helpers.parseTextureViewDimension(null));
 }
 
 // ============================================================
@@ -332,13 +335,13 @@ test "parseTextureViewDimension defaults to undefined" {
 // ============================================================
 
 test "parseTextureDimension recognizes dimensions" {
-    try testing.expectEqual(model.WGPUTextureDimension_1D, command_parse_helpers.parseTextureDimension("1d"));
-    try testing.expectEqual(model.WGPUTextureDimension_2D, command_parse_helpers.parseTextureDimension("2d"));
-    try testing.expectEqual(model.WGPUTextureDimension_3D, command_parse_helpers.parseTextureDimension("3d"));
+    try testing.expectEqual(gpu.WGPUTextureDimension_1D, command_parse_helpers.parseTextureDimension("1d"));
+    try testing.expectEqual(gpu.WGPUTextureDimension_2D, command_parse_helpers.parseTextureDimension("2d"));
+    try testing.expectEqual(gpu.WGPUTextureDimension_3D, command_parse_helpers.parseTextureDimension("3d"));
 }
 
 test "parseTextureDimension defaults to undefined" {
-    try testing.expectEqual(model.WGPUTextureDimension_Undefined, command_parse_helpers.parseTextureDimension(null));
+    try testing.expectEqual(gpu.WGPUTextureDimension_Undefined, command_parse_helpers.parseTextureDimension(null));
 }
 
 // ============================================================
@@ -346,16 +349,16 @@ test "parseTextureDimension defaults to undefined" {
 // ============================================================
 
 test "parseStorageTextureAccess recognizes modes" {
-    try testing.expectEqual(model.WGPUStorageTextureAccess_WriteOnly, command_parse_helpers.parseStorageTextureAccess("write_only"));
-    try testing.expectEqual(model.WGPUStorageTextureAccess_WriteOnly, command_parse_helpers.parseStorageTextureAccess("write-only"));
-    try testing.expectEqual(model.WGPUStorageTextureAccess_ReadOnly, command_parse_helpers.parseStorageTextureAccess("read_only"));
-    try testing.expectEqual(model.WGPUStorageTextureAccess_ReadOnly, command_parse_helpers.parseStorageTextureAccess("read-only"));
-    try testing.expectEqual(model.WGPUStorageTextureAccess_ReadWrite, command_parse_helpers.parseStorageTextureAccess("read_write"));
-    try testing.expectEqual(model.WGPUStorageTextureAccess_ReadWrite, command_parse_helpers.parseStorageTextureAccess("read-write"));
+    try testing.expectEqual(gpu.WGPUStorageTextureAccess_WriteOnly, command_parse_helpers.parseStorageTextureAccess("write_only"));
+    try testing.expectEqual(gpu.WGPUStorageTextureAccess_WriteOnly, command_parse_helpers.parseStorageTextureAccess("write-only"));
+    try testing.expectEqual(gpu.WGPUStorageTextureAccess_ReadOnly, command_parse_helpers.parseStorageTextureAccess("read_only"));
+    try testing.expectEqual(gpu.WGPUStorageTextureAccess_ReadOnly, command_parse_helpers.parseStorageTextureAccess("read-only"));
+    try testing.expectEqual(gpu.WGPUStorageTextureAccess_ReadWrite, command_parse_helpers.parseStorageTextureAccess("read_write"));
+    try testing.expectEqual(gpu.WGPUStorageTextureAccess_ReadWrite, command_parse_helpers.parseStorageTextureAccess("read-write"));
 }
 
 test "parseStorageTextureAccess defaults to undefined" {
-    try testing.expectEqual(model.WGPUStorageTextureAccess_Undefined, command_parse_helpers.parseStorageTextureAccess(null));
+    try testing.expectEqual(gpu.WGPUStorageTextureAccess_Undefined, command_parse_helpers.parseStorageTextureAccess(null));
 }
 
 // ============================================================
@@ -363,17 +366,17 @@ test "parseStorageTextureAccess defaults to undefined" {
 // ============================================================
 
 test "parseTextureAspect recognizes aspects" {
-    try testing.expectEqual(model.WGPUTextureAspect_All, command_parse_helpers.parseTextureAspect("all"));
-    try testing.expectEqual(model.WGPUTextureAspect_DepthOnly, command_parse_helpers.parseTextureAspect("depth-only"));
-    try testing.expectEqual(model.WGPUTextureAspect_DepthOnly, command_parse_helpers.parseTextureAspect("depth_only"));
-    try testing.expectEqual(model.WGPUTextureAspect_DepthOnly, command_parse_helpers.parseTextureAspect("depth"));
-    try testing.expectEqual(model.WGPUTextureAspect_StencilOnly, command_parse_helpers.parseTextureAspect("stencil-only"));
-    try testing.expectEqual(model.WGPUTextureAspect_StencilOnly, command_parse_helpers.parseTextureAspect("stencil_only"));
-    try testing.expectEqual(model.WGPUTextureAspect_StencilOnly, command_parse_helpers.parseTextureAspect("stencil"));
+    try testing.expectEqual(gpu.WGPUTextureAspect_All, command_parse_helpers.parseTextureAspect("all"));
+    try testing.expectEqual(gpu.WGPUTextureAspect_DepthOnly, command_parse_helpers.parseTextureAspect("depth-only"));
+    try testing.expectEqual(gpu.WGPUTextureAspect_DepthOnly, command_parse_helpers.parseTextureAspect("depth_only"));
+    try testing.expectEqual(gpu.WGPUTextureAspect_DepthOnly, command_parse_helpers.parseTextureAspect("depth"));
+    try testing.expectEqual(gpu.WGPUTextureAspect_StencilOnly, command_parse_helpers.parseTextureAspect("stencil-only"));
+    try testing.expectEqual(gpu.WGPUTextureAspect_StencilOnly, command_parse_helpers.parseTextureAspect("stencil_only"));
+    try testing.expectEqual(gpu.WGPUTextureAspect_StencilOnly, command_parse_helpers.parseTextureAspect("stencil"));
 }
 
 test "parseTextureAspect defaults to undefined" {
-    try testing.expectEqual(model.WGPUTextureAspect_Undefined, command_parse_helpers.parseTextureAspect(null));
+    try testing.expectEqual(gpu.WGPUTextureAspect_Undefined, command_parse_helpers.parseTextureAspect(null));
 }
 
 // ============================================================
@@ -381,15 +384,15 @@ test "parseTextureAspect defaults to undefined" {
 // ============================================================
 
 test "parseTextureFormat recognizes common formats" {
-    try testing.expectEqual(model.WGPUTextureFormat_RGBA8Unorm, try command_parse_helpers.parseTextureFormat("rgba8unorm"));
-    try testing.expectEqual(model.WGPUTextureFormat_BGRA8Unorm, try command_parse_helpers.parseTextureFormat("bgra8unorm"));
-    try testing.expectEqual(model.WGPUTextureFormat_R32Float, try command_parse_helpers.parseTextureFormat("r32float"));
-    try testing.expectEqual(model.WGPUTextureFormat_Depth32Float, try command_parse_helpers.parseTextureFormat("depth32float"));
-    try testing.expectEqual(model.WGPUTextureFormat_Depth24PlusStencil8, try command_parse_helpers.parseTextureFormat("depth24plus-stencil8"));
+    try testing.expectEqual(gpu.WGPUTextureFormat_RGBA8Unorm, try command_parse_helpers.parseTextureFormat("rgba8unorm"));
+    try testing.expectEqual(gpu.WGPUTextureFormat_BGRA8Unorm, try command_parse_helpers.parseTextureFormat("bgra8unorm"));
+    try testing.expectEqual(gpu.WGPUTextureFormat_R32Float, try command_parse_helpers.parseTextureFormat("r32float"));
+    try testing.expectEqual(gpu.WGPUTextureFormat_Depth32Float, try command_parse_helpers.parseTextureFormat("depth32float"));
+    try testing.expectEqual(gpu.WGPUTextureFormat_Depth24PlusStencil8, try command_parse_helpers.parseTextureFormat("depth24plus-stencil8"));
 }
 
 test "parseTextureFormat returns undefined for empty string" {
-    try testing.expectEqual(model.WGPUTextureFormat_Undefined, try command_parse_helpers.parseTextureFormat(""));
+    try testing.expectEqual(gpu.WGPUTextureFormat_Undefined, try command_parse_helpers.parseTextureFormat(""));
 }
 
 test "parseTextureFormat rejects invalid format name" {
@@ -397,8 +400,8 @@ test "parseTextureFormat rejects invalid format name" {
 }
 
 test "parseTextureFormat is case insensitive" {
-    try testing.expectEqual(model.WGPUTextureFormat_RGBA8Unorm, try command_parse_helpers.parseTextureFormat("RGBA8Unorm"));
-    try testing.expectEqual(model.WGPUTextureFormat_RGBA8Unorm, try command_parse_helpers.parseTextureFormat("RGBA8UNORM"));
+    try testing.expectEqual(gpu.WGPUTextureFormat_RGBA8Unorm, try command_parse_helpers.parseTextureFormat("RGBA8Unorm"));
+    try testing.expectEqual(gpu.WGPUTextureFormat_RGBA8Unorm, try command_parse_helpers.parseTextureFormat("RGBA8UNORM"));
 }
 
 // ============================================================
@@ -406,9 +409,9 @@ test "parseTextureFormat is case insensitive" {
 // ============================================================
 
 test "parseRenderDrawPipelineMode recognizes modes" {
-    try testing.expectEqual(model.RenderDrawPipelineMode.static, try command_parse_helpers.parseRenderDrawPipelineMode(null));
-    try testing.expectEqual(model.RenderDrawPipelineMode.static, try command_parse_helpers.parseRenderDrawPipelineMode("static"));
-    try testing.expectEqual(model.RenderDrawPipelineMode.redundant, try command_parse_helpers.parseRenderDrawPipelineMode("redundant"));
+    try testing.expectEqual(render.RenderDrawPipelineMode.static, try command_parse_helpers.parseRenderDrawPipelineMode(null));
+    try testing.expectEqual(render.RenderDrawPipelineMode.static, try command_parse_helpers.parseRenderDrawPipelineMode("static"));
+    try testing.expectEqual(render.RenderDrawPipelineMode.redundant, try command_parse_helpers.parseRenderDrawPipelineMode("redundant"));
 }
 
 test "parseRenderDrawPipelineMode rejects unknown mode" {
@@ -420,10 +423,10 @@ test "parseRenderDrawPipelineMode rejects unknown mode" {
 // ============================================================
 
 test "parseRenderDrawBindGroupMode recognizes modes" {
-    try testing.expectEqual(model.RenderDrawBindGroupMode.no_change, try command_parse_helpers.parseRenderDrawBindGroupMode(null));
-    try testing.expectEqual(model.RenderDrawBindGroupMode.no_change, try command_parse_helpers.parseRenderDrawBindGroupMode("no-change"));
-    try testing.expectEqual(model.RenderDrawBindGroupMode.no_change, try command_parse_helpers.parseRenderDrawBindGroupMode("no_change"));
-    try testing.expectEqual(model.RenderDrawBindGroupMode.redundant, try command_parse_helpers.parseRenderDrawBindGroupMode("redundant"));
+    try testing.expectEqual(render.RenderDrawBindGroupMode.no_change, try command_parse_helpers.parseRenderDrawBindGroupMode(null));
+    try testing.expectEqual(render.RenderDrawBindGroupMode.no_change, try command_parse_helpers.parseRenderDrawBindGroupMode("no-change"));
+    try testing.expectEqual(render.RenderDrawBindGroupMode.no_change, try command_parse_helpers.parseRenderDrawBindGroupMode("no_change"));
+    try testing.expectEqual(render.RenderDrawBindGroupMode.redundant, try command_parse_helpers.parseRenderDrawBindGroupMode("redundant"));
 }
 
 test "parseRenderDrawBindGroupMode rejects unknown mode" {
@@ -436,17 +439,17 @@ test "parseRenderDrawBindGroupMode rejects unknown mode" {
 
 test "parseRenderIndexFormat recognizes formats" {
     const uint16 = try command_parse_helpers.parseRenderIndexFormat("uint16");
-    try testing.expectEqual(model.RenderIndexFormat.uint16, uint16.?);
+    try testing.expectEqual(render.RenderIndexFormat.uint16, uint16.?);
     const uint32 = try command_parse_helpers.parseRenderIndexFormat("uint32");
-    try testing.expectEqual(model.RenderIndexFormat.uint32, uint32.?);
+    try testing.expectEqual(render.RenderIndexFormat.uint32, uint32.?);
     const u16_alias = try command_parse_helpers.parseRenderIndexFormat("u16");
-    try testing.expectEqual(model.RenderIndexFormat.uint16, u16_alias.?);
+    try testing.expectEqual(render.RenderIndexFormat.uint16, u16_alias.?);
     const u32_alias = try command_parse_helpers.parseRenderIndexFormat("u32");
-    try testing.expectEqual(model.RenderIndexFormat.uint32, u32_alias.?);
+    try testing.expectEqual(render.RenderIndexFormat.uint32, u32_alias.?);
 }
 
 test "parseRenderIndexFormat returns null for null input" {
-    try testing.expectEqual(@as(?model.RenderIndexFormat, null), try command_parse_helpers.parseRenderIndexFormat(null));
+    try testing.expectEqual(@as(?render.RenderIndexFormat, null), try command_parse_helpers.parseRenderIndexFormat(null));
 }
 
 test "parseRenderIndexFormat rejects unknown format" {

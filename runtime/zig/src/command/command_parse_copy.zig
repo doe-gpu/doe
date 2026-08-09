@@ -1,5 +1,5 @@
 const std = @import("std");
-const model_commands = @import("../contracts/model/model_commands.zig");
+const model_commands = @import("../contracts/command.zig");
 const model_resource_types = @import("../contracts/model/model_resource_types.zig");
 const model_texture_types = @import("../contracts/model/model_texture_value_types.zig");
 const parse_helpers = @import("command_parse_helpers.zig");

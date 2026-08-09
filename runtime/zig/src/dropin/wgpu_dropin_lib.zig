@@ -12,12 +12,19 @@ const dropin_router = @import("dropin_router.zig");
 const dropin_diagnostics = @import("dropin_diagnostics.zig");
 const dropin_abi_procs = @import("dropin_abi_procs.zig");
 const dropin_browser_shared_memory = @import("dropin_browser_shared_memory.zig");
-const dropin_build_info = @import("dropin_build_info.zig");
 const compute_fast = @import("../native/compute/doe_compute_fast.zig");
 
 const build_options = @import("build_options");
 pub const BuildTier = @TypeOf(build_options.build_tier);
 pub const TIER = build_options.build_tier;
+
+pub export fn doeWgpuDropinBuildInfoSchemaVersion() callconv(.c) u32 {
+    return 1;
+}
+
+pub export fn doeWgpuDropinLeanVerifiedBuild() callconv(.c) u32 {
+    return if (build_options.lean_verified) 1 else 0;
+}
 
 comptime {
     _ = dropin_ext_a;
@@ -27,7 +34,6 @@ comptime {
     _ = dropin_router;
     _ = dropin_diagnostics;
     _ = dropin_browser_shared_memory;
-    _ = dropin_build_info;
     _ = @import("../native/mod.zig");
     if (@import("builtin").os.tag == .macos) {
         // Multi-queue management: doeNativeMultiQueueDevice*, doeNativeQueueSubmit, etc.

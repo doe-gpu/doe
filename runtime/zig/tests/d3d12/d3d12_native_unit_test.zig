@@ -1,89 +1,21 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const d3d12_runtime = @import("../../src/backend/d3d12/d3d12_native_runtime.zig");
+const d3d12_upload = @import("../../src/backend/d3d12/d3d12_runtime_upload.zig");
+const path_utils = @import("../../src/backend/common/path_utils.zig");
 const dc = @import("../../src/backend/d3d12/d3d12_constants.zig");
-
-// ============================================================
-// strip_extension — pure string helper
-// ============================================================
-
-test "d3d12: strip_extension removes .wgsl suffix" {
-    const result = d3d12_runtime.strip_extension("matmul.wgsl");
-    try std.testing.expectEqualStrings("matmul", result);
-}
-
-test "d3d12: strip_extension removes .hlsl suffix" {
-    const result = d3d12_runtime.strip_extension("compute.hlsl");
-    try std.testing.expectEqualStrings("compute", result);
-}
-
-test "d3d12: strip_extension removes .dxil suffix" {
-    const result = d3d12_runtime.strip_extension("shader.dxil");
-    try std.testing.expectEqualStrings("shader", result);
-}
-
-test "d3d12: strip_extension removes .cso suffix" {
-    const result = d3d12_runtime.strip_extension("pass.cso");
-    try std.testing.expectEqualStrings("pass", result);
-}
-
-test "d3d12: strip_extension removes .dxbc suffix" {
-    const result = d3d12_runtime.strip_extension("legacy.dxbc");
-    try std.testing.expectEqualStrings("legacy", result);
-}
-
-test "d3d12: strip_extension returns input unchanged for no extension" {
-    const result = d3d12_runtime.strip_extension("bare_name");
-    try std.testing.expectEqualStrings("bare_name", result);
-}
-
-test "d3d12: strip_extension returns input unchanged for unknown extension" {
-    const result = d3d12_runtime.strip_extension("shader.spv");
-    try std.testing.expectEqualStrings("shader.spv", result);
-}
-
-test "d3d12: strip_extension returns input unchanged for .metal extension" {
-    const result = d3d12_runtime.strip_extension("vertex.metal");
-    try std.testing.expectEqualStrings("vertex.metal", result);
-}
-
-test "d3d12: strip_extension handles multiple dots with recognized suffix" {
-    const result = d3d12_runtime.strip_extension("path.to.kernel.wgsl");
-    try std.testing.expectEqualStrings("path.to.kernel", result);
-}
-
-test "d3d12: strip_extension handles multiple dots with .hlsl" {
-    const result = d3d12_runtime.strip_extension("my.compute.shader.hlsl");
-    try std.testing.expectEqualStrings("my.compute.shader", result);
-}
-
-test "d3d12: strip_extension handles empty string" {
-    const result = d3d12_runtime.strip_extension("");
-    try std.testing.expectEqualStrings("", result);
-}
-
-test "d3d12: strip_extension handles suffix-only input" {
-    const result = d3d12_runtime.strip_extension(".wgsl");
-    try std.testing.expectEqualStrings("", result);
-}
-
-test "d3d12: strip_extension is case-sensitive" {
-    // Only lowercase suffixes should be stripped.
-    const result = d3d12_runtime.strip_extension("shader.WGSL");
-    try std.testing.expectEqualStrings("shader.WGSL", result);
-}
 
 // ============================================================
 // file_exists — pure filesystem check
 // ============================================================
 
 test "d3d12: file_exists returns false for nonexistent path" {
-    const exists = d3d12_runtime.file_exists("/tmp/definitely_nonexistent_doe_test_file_12345.xyz");
+    const exists = path_utils.file_exists("/tmp/definitely_nonexistent_doe_test_file_12345.xyz");
     try std.testing.expect(!exists);
 }
 
 test "d3d12: file_exists returns false for empty path" {
-    const exists = d3d12_runtime.file_exists("");
+    const exists = path_utils.file_exists("");
     try std.testing.expect(!exists);
 }
 
@@ -103,12 +35,12 @@ test "d3d12: RESOURCE_STATE_RENDER_TARGET is 0x4" {
     try std.testing.expectEqual(@as(c_int, 0x00000004), dc.RESOURCE_STATE_RENDER_TARGET);
 }
 
-test "d3d12: RESOURCE_STATE_COPY_SOURCE is 0x400" {
-    try std.testing.expectEqual(@as(c_int, 0x00000400), dc.RESOURCE_STATE_COPY_SOURCE);
+test "d3d12: RESOURCE_STATE_COPY_SOURCE is 0x800" {
+    try std.testing.expectEqual(@as(c_int, 0x00000800), dc.RESOURCE_STATE_COPY_SOURCE);
 }
 
-test "d3d12: RESOURCE_STATE_COPY_DEST is 0x800" {
-    try std.testing.expectEqual(@as(c_int, 0x00000800), dc.RESOURCE_STATE_COPY_DEST);
+test "d3d12: RESOURCE_STATE_COPY_DEST is 0x400" {
+    try std.testing.expectEqual(@as(c_int, 0x00000400), dc.RESOURCE_STATE_COPY_DEST);
 }
 
 test "d3d12: RESOURCE_STATE_PIXEL_SHADER_RESOURCE is 0x80" {
@@ -263,23 +195,23 @@ test "d3d12: NativeD3D12Runtime default pending_uploads is empty" {
 // ============================================================
 
 test "d3d12: d3d12_pool_pop returns null from empty pool" {
-    var pool = d3d12_runtime.D3D12Pool{};
+    var pool = d3d12_upload.D3D12Pool{};
     defer pool.deinit(std.testing.allocator);
-    const result = d3d12_runtime.d3d12_pool_pop(&pool, 1024);
+    const result = d3d12_upload.d3d12PoolPop(&pool, 1024);
     try std.testing.expectEqual(@as(?*anyopaque, null), result);
 }
 
 test "d3d12: d3d12_pool_pop returns null for missing size key" {
-    var pool = d3d12_runtime.D3D12Pool{};
+    var pool = d3d12_upload.D3D12Pool{};
     defer pool.deinit(std.testing.allocator);
 
     // Insert an entry for size 2048 but look up size 1024.
-    var list = std.ArrayListUnmanaged(d3d12_runtime.PoolEntry){};
+    var list = std.ArrayListUnmanaged(d3d12_upload.PoolEntry){};
     const sentinel: usize = 0xDEAD;
     try list.append(std.testing.allocator, .{ .buffer = @ptrFromInt(sentinel) });
     try pool.put(std.testing.allocator, 2048, list);
 
-    const result = d3d12_runtime.d3d12_pool_pop(&pool, 1024);
+    const result = d3d12_upload.d3d12PoolPop(&pool, 1024);
     try std.testing.expectEqual(@as(?*anyopaque, null), result);
 
     // Cleanup: pop the inserted entry.
@@ -290,20 +222,20 @@ test "d3d12: d3d12_pool_pop returns null for missing size key" {
 }
 
 test "d3d12: d3d12_pool_pop returns entry for matching size and removes it" {
-    var pool = d3d12_runtime.D3D12Pool{};
+    var pool = d3d12_upload.D3D12Pool{};
     defer pool.deinit(std.testing.allocator);
 
     const sentinel: usize = 0xBEEF;
-    var list = std.ArrayListUnmanaged(d3d12_runtime.PoolEntry){};
+    var list = std.ArrayListUnmanaged(d3d12_upload.PoolEntry){};
     try list.append(std.testing.allocator, .{ .buffer = @ptrFromInt(sentinel) });
     try pool.put(std.testing.allocator, 4096, list);
 
-    const result = d3d12_runtime.d3d12_pool_pop(&pool, 4096);
+    const result = d3d12_upload.d3d12PoolPop(&pool, 4096);
     try std.testing.expect(result != null);
     try std.testing.expectEqual(@as(usize, sentinel), @intFromPtr(result.?));
 
     // Pool should now be empty for that size.
-    const second = d3d12_runtime.d3d12_pool_pop(&pool, 4096);
+    const second = d3d12_upload.d3d12PoolPop(&pool, 4096);
     try std.testing.expectEqual(@as(?*anyopaque, null), second);
 
     // Cleanup.

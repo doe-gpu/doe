@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "world-lab-consumer-execution-oracles-2026-08-08-diagnostic",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "generatedAt": "2026-08-09T01:26:55.243Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-09T01:27:26Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "7",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "receipt-explained-failure",
+  "findings": [
+    {
+      "id": "unchanged-upstream-dawn-baseline",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "The pinned, unchanged world-lab runtime-webgpu tests passed all 16 assertions in all three clean Dawn processes, including compute CPU/GPU parity, overflow behavior, generated fragment output readback, and shader validation.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/raw-suite.json",
+          "sha256": "652470d398177d0b7a49722046d9903a007c967bc28ac04167d808e968afd139"
+        }
+      ]
+    },
+    {
+      "id": "doe-generated-vegetation-wgsl-compiler-gaps",
+      "category": "compatibility",
+      "status": "discovered",
+      "summary": "All three Doe processes rejected unchanged generated vegetation WGSL at the large const-array declaration and exchanged.exchanged conditional, then produced zero candidates and a false overflow result where the upstream oracle expected two candidates and true overflow.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/raw-suite.json",
+          "sha256": "652470d398177d0b7a49722046d9903a007c967bc28ac04167d808e968afd139"
+        },
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/receipt-summary.json",
+          "sha256": "02dfabc3e89e5f77867f33170b664170339634f25953711b67def15bc41c267b"
+        }
+      ]
+    },
+    {
+      "id": "doe-invalid-shader-validation-gap",
+      "category": "correctness",
+      "status": "discovered",
+      "summary": "In all three Doe processes, the upstream deliberately invalid generated fragment shader produced zero compilation-info errors even though Doe's native diagnostics reported the missing params.p_n_const_value identifier; the same upstream assertion passed on Dawn.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/raw-suite.json",
+          "sha256": "652470d398177d0b7a49722046d9903a007c967bc28ac04167d808e968afd139"
+        },
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/receipt-summary.json",
+          "sha256": "02dfabc3e89e5f77867f33170b664170339634f25953711b67def15bc41c267b"
+        }
+      ]
+    },
+    {
+      "id": "doe-fullscreen-test-worker-exit",
+      "category": "reliability",
+      "status": "discovered",
+      "summary": "The Doe Vitest worker exited before completing five fullscreen-fragment assertions in each clean process. The harness parent exited normally with a test failure rather than an operating-system signal, so this report does not classify the event as a process crash.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/raw-suite.json",
+          "sha256": "652470d398177d0b7a49722046d9903a007c967bc28ac04167d808e968afd139"
+        }
+      ]
+    },
+    {
+      "id": "hardware-performance-ineligible",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "The physical render node was inaccessible, Dawn selected llvmpipe, and Doe did not complete the workload, so the observed process durations cannot support a speed comparison.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/receipt-summary.json",
+          "sha256": "02dfabc3e89e5f77867f33170b664170339634f25953711b67def15bc41c267b"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Doe did not complete the generated vegetation and fullscreen workloads, so provider output equivalence is not established.",
+    "The host denied access to /dev/dri/renderD128 and Dawn selected llvmpipe, so the run is not hardware-comparable.",
+    "The upstream test report does not emit dynamically assembled shader hashes, exact output bytes, or concrete vegetation workgroup counts.",
+    "The result covers three pinned runtime-webgpu consumer test files, not world-lab's complete WebGPU surface."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "doe-generated-wgsl-compile-failure",
+      "doe-compilation-info-validation-gap",
+      "doe-fullscreen-worker-exit",
+      "comparison-workload-incomplete",
+      "software-renderer-detected",
+      "render-node-inaccessible",
+      "dynamic-shader-identity-incomplete"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 235864064
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 3,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 283684864
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The comparison provider did not complete the workload and the baseline used a software renderer."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The harness did not run matched traced and untraced workload pairs, and Doe did not complete the comparison workload."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The Vite provider alias is a controlled harness substitution, not a validated production installation path."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "The physical render node was inaccessible and Dawn selected llvmpipe."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic matrix used sequential clean processes rather than concurrent workload execution."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "No promotion-scale teardown lane ran, and the Doe fullscreen worker exited before completing its assertions."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Three clean processes per provider establish diagnostic repeatability but do not satisfy the promotion stress policy."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS was captured, but no bounded-growth leak test ran."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "The harness captured provider and adapter identities plus repeated assertion failures, but dynamic shader hashes, exact output bytes, concrete vegetation dispatch counts, and completed Doe outputs are absent."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "The comparison did not complete and the incumbent used software rendering."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is not promoted and Doe does not yet pass its correctness boundary."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/receipt-summary.json",
+      "sha256": "02dfabc3e89e5f77867f33170b664170339634f25953711b67def15bc41c267b"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/raw-suite.json",
+      "sha256": "652470d398177d0b7a49722046d9903a007c967bc28ac04167d808e968afd139"
+    }
+  ]
+}

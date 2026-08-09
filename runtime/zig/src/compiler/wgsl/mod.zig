@@ -9,6 +9,7 @@ pub const ast = @import("frontend/ast.zig");
 pub const parser = @import("frontend/parser.zig");
 pub const sema = @import("frontend/sema.zig");
 pub const ir = @import("ir/ir.zig");
+pub const ir_digest = @import("ir/ir_digest.zig");
 pub const ir_builder = @import("ir/ir_builder.zig");
 pub const ir_validate = @import("ir/ir_validate.zig");
 pub const ir_opt_rewrite = @import("ir/ir_opt_rewrite.zig");
@@ -19,7 +20,7 @@ pub const emit_msl_shared = @import("emit/msl/emit_msl_shared.zig");
 pub const emit_msl_vertex = @import("emit/msl/emit_msl_vertex.zig");
 pub const emit_msl_fragment = @import("emit/msl/emit_msl_fragment.zig");
 pub const emit_hlsl = @import("emit/hlsl/emit_hlsl.zig");
-pub const hlsl_dispatch_contract = @import("emit/hlsl/hlsl_dispatch_contract.zig");
+pub const hlsl_dispatch_contract = @import("../../contracts/shader_abi/dispatch_info.zig");
 pub const emit_hlsl_texture = @import("emit/hlsl/emit_hlsl_texture.zig");
 pub const emit_spirv = @import("emit/spirv/emit_spirv.zig");
 pub const emit_spirv_fn = @import("emit/spirv/emit_spirv_fn.zig");
@@ -49,6 +50,7 @@ pub const emit_csl_validate = @import("emit/csl/emit_csl_validate.zig");
 const csl_tests = @import("emit/csl/doe_wgsl_csl_tests.zig");
 pub const layout_utils = @import("ir/layout_utils.zig");
 const lean_proof = @import("../../verification/lean_proof.zig");
+const binding_contract = @import("../../contracts/binding.zig");
 const std = @import("std");
 
 pub const TranslateError = error{
@@ -86,14 +88,9 @@ pub const CslToolchainConfig = emit_csl_validate.ToolchainConfig;
 pub const CslToolchainDiscovery = emit_csl_validate.ToolchainDiscovery;
 pub const CSLC_ENV_VAR = emit_csl_validate.CSLC_ENV_VAR;
 pub const CSLC_PATH_SENTINEL = emit_csl_validate.CSLC_PATH_SENTINEL;
-pub const MAX_BINDINGS: usize = 16;
+pub const MAX_BINDINGS: usize = binding_contract.MAX_SHADER_BINDINGS;
 
-pub const BindingKind = enum(u32) {
-    buffer,
-    sampler,
-    texture,
-    storage_texture,
-};
+pub const BindingKind = binding_contract.ShaderKind;
 
 pub const BindingMeta = struct {
     group: u32,
@@ -388,31 +385,82 @@ pub fn analyzeToIrWithConfigTimed(
     };
 }
 
+fn bindingMeta(module_ir: *const ir.Module, global: ir.Global) BindingMeta {
+    const binding_type, const binding_access = switch (module_ir.types.get(global.ty)) {
+        .sampler, .sampler_comparison => .{ BindingKind.sampler, ir.AccessMode.read },
+        .texture_2d, .texture_2d_array, .texture_cube, .texture_multisampled_2d, .texture_depth_2d, .texture_depth_cube, .texture_3d => .{ BindingKind.texture, ir.AccessMode.read },
+        .storage_texture_2d => |storage_tex| .{ BindingKind.storage_texture, storage_tex.access },
+        else => .{ BindingKind.buffer, global.access orelse switch (global.addr_space orelse .private) {
+            .uniform => ir.AccessMode.read,
+            .storage => ir.AccessMode.read_write,
+            else => ir.AccessMode.read,
+        } },
+    };
+    return .{
+        .group = global.binding.?.group,
+        .binding = global.binding.?.binding,
+        .kind = binding_type,
+        .addr_space = global.addr_space orelse .handle,
+        .access = binding_access,
+    };
+}
+
+fn markFunctionResources(module_ir: *const ir.Module, function_id: usize, visited: []bool, globals: []bool) void {
+    if (visited[function_id]) return;
+    visited[function_id] = true;
+    const function = module_ir.functions.items[function_id];
+    for (function.exprs.items) |expr| switch (expr.data) {
+        .global_ref => |global_id| globals[global_id] = true,
+        .call => |call| if (call.kind == .user) {
+            for (module_ir.functions.items, 0..) |candidate, candidate_id| {
+                if (std.mem.eql(u8, candidate.name, call.name)) {
+                    markFunctionResources(module_ir, candidate_id, visited, globals);
+                    break;
+                }
+            }
+        },
+        else => {},
+    };
+}
+
+pub fn extractBindingsForEntryPoint(allocator: std.mem.Allocator, wgsl: []const u8, entry_point: []const u8, out: []BindingMeta) TranslateError!usize {
+    var module_ir = try analyzeToIr(allocator, wgsl);
+    defer module_ir.deinit();
+    const visited = try allocator.alloc(bool, module_ir.functions.items.len);
+    defer allocator.free(visited);
+    @memset(visited, false);
+    const globals = try allocator.alloc(bool, module_ir.globals.items.len);
+    defer allocator.free(globals);
+    @memset(globals, false);
+
+    var found_entry_point = false;
+    for (module_ir.functions.items, 0..) |function, function_id| {
+        if (std.mem.eql(u8, function.name, entry_point)) {
+            found_entry_point = true;
+            markFunctionResources(&module_ir, function_id, visited, globals);
+            break;
+        }
+    }
+    if (!found_entry_point) return TranslateError.UnknownIdentifier;
+
+    var count: usize = 0;
+    for (module_ir.globals.items, globals) |global, used| {
+        if (!used or global.binding == null) continue;
+        if (count >= out.len) break;
+        out[count] = bindingMeta(&module_ir, global);
+        count += 1;
+    }
+    return count;
+}
+
 pub fn extractBindings(allocator: std.mem.Allocator, wgsl: []const u8, out: []BindingMeta) TranslateError!usize {
     var module_ir = try analyzeToIr(allocator, wgsl);
     defer module_ir.deinit();
-
     var count: usize = 0;
     for (module_ir.globals.items) |global| {
         if (global.binding == null) continue;
-        const binding_type, const binding_access = switch (module_ir.types.get(global.ty)) {
-            .sampler, .sampler_comparison => .{ BindingKind.sampler, ir.AccessMode.read },
-            .texture_2d, .texture_2d_array, .texture_cube, .texture_multisampled_2d, .texture_depth_2d, .texture_depth_cube, .texture_3d => .{ BindingKind.texture, ir.AccessMode.read },
-            .storage_texture_2d => |storage_tex| .{ BindingKind.storage_texture, storage_tex.access },
-            else => .{ BindingKind.buffer, global.access orelse switch (global.addr_space orelse .private) {
-                .uniform => ir.AccessMode.read,
-                .storage => ir.AccessMode.read_write,
-                else => ir.AccessMode.read,
-            } },
-        };
         if (count >= out.len) break;
-        out[count] = .{
-            .group = global.binding.?.group,
-            .binding = global.binding.?.binding,
-            .kind = binding_type,
-            .addr_space = global.addr_space orelse .handle,
-            .access = binding_access,
-        };
+        out[count] = bindingMeta(&module_ir, global);
         count += 1;
     }
     return count;

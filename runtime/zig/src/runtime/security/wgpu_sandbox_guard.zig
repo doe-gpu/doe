@@ -1,5 +1,5 @@
 const std = @import("std");
-const model = @import("../../contracts/model/model_commands.zig");
+const model = @import("../../contracts/command.zig");
 
 /// SandboxViolation is raised when a command attempts an operation that exceeds
 /// dynamic runtime bounds, potentially compromising memory or expected state.

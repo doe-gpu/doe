@@ -1,0 +1,466 @@
+{
+  "adjustments": [
+    {
+      "reason": "the named baseline predates promotion/removal of the experimental subsystem and the version-2 manifest was introduced after that commit",
+      "type": "restore-historical-experimental-layer"
+    },
+    {
+      "reason": "module decision reviews are SHA-bound to the live recomposition tree and cannot be projected backward onto the named baseline snapshot",
+      "removedReviewCount": 542,
+      "type": "remove-live-module-decision-reviews"
+    }
+  ],
+  "baseCommit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
+  "manifest": {
+    "allowedRootFiles": [
+      "README.md",
+      "mod.zig"
+    ],
+    "architecture": {
+      "canonicalContracts": {
+        "capability-registry": {
+          "forbiddenLegacyPaths": [
+            "src/backend/common/capabilities.zig"
+          ],
+          "path": "src/contracts/capability.zig",
+          "requiredPublicDeclarations": [
+            "Capability",
+            "CapabilitySet",
+            "name"
+          ]
+        },
+        "command-registry": {
+          "forbiddenLegacyPaths": [
+            "src/contracts/model/model_commands.zig",
+            "src/core/command_partition.zig",
+            "src/full/command_partition.zig"
+          ],
+          "path": "src/contracts/command.zig",
+          "requiredPublicDeclarations": [
+            "Command",
+            "Kind",
+            "Metadata",
+            "metadata",
+            "requirements"
+          ]
+        },
+        "compute-dispatch-contract": {
+          "forbiddenLegacyPaths": [],
+          "path": "src/contracts/compute.zig",
+          "requiredPublicDeclarations": [
+            "ComputeContext",
+            "DispatchReport",
+            "DispatchRequest",
+            "WorkgroupCount"
+          ]
+        },
+        "execution-error-registry": {
+          "forbiddenLegacyPaths": [
+            "src/backend/common/errors.zig"
+          ],
+          "path": "src/contracts/execution.zig",
+          "requiredPublicDeclarations": [
+            "BackendNativeError",
+            "ExecutionStatus",
+            "NativeExecutionStatus",
+            "classifyBackendError"
+          ]
+        }
+      },
+      "cohesiveModuleJustifications": [],
+      "compatibilityFacadeContracts": {
+        "src/compat/webgpu_ffi.zig": {
+          "consumer": "external Zig consumers and backend compatibility tests using the legacy flat WebGPU FFI namespace",
+          "owner": "core/abi",
+          "reason": "preserve the exercised flat import surface while internal code uses narrow ABI modules",
+          "removalCondition": "all declared external consumers migrate to namespaced ABI modules",
+          "test": "tests/core/webgpu_ffi_test.zig"
+        }
+      },
+      "cycleExceptions": [],
+      "dependencyExceptions": [],
+      "enforcement": {
+        "cycles": "error",
+        "unreachableModules": "error"
+      },
+      "generatedSourceContracts": {},
+      "layers": {
+        "backend-common": {
+          "globs": [
+            "src/backend/common/**"
+          ],
+          "mayImport": [
+            "backend-common",
+            "backend-interface",
+            "contracts"
+          ]
+        },
+        "backend-d3d12": {
+          "globs": [
+            "src/backend/d3d12/**"
+          ],
+          "mayImport": [
+            "backend-common",
+            "backend-d3d12",
+            "backend-interface",
+            "compiler",
+            "contracts",
+            "core",
+            "native",
+            "runtime"
+          ]
+        },
+        "backend-interface": {
+          "globs": [
+            "src/backend/*.zig"
+          ],
+          "mayImport": [
+            "backend-common",
+            "backend-d3d12",
+            "backend-interface",
+            "backend-metal",
+            "backend-vulkan",
+            "contracts",
+            "core",
+            "full",
+            "native",
+            "runtime"
+          ]
+        },
+        "backend-metal": {
+          "globs": [
+            "src/backend/metal/**"
+          ],
+          "mayImport": [
+            "backend-common",
+            "backend-interface",
+            "backend-metal",
+            "compiler",
+            "contracts",
+            "runtime"
+          ]
+        },
+        "backend-vulkan": {
+          "globs": [
+            "src/backend/vulkan/**"
+          ],
+          "mayImport": [
+            "backend-common",
+            "backend-interface",
+            "backend-vulkan",
+            "compiler",
+            "contracts",
+            "core",
+            "native",
+            "runtime"
+          ]
+        },
+        "cli": {
+          "globs": [
+            "src/cli/**"
+          ],
+          "mayImport": [
+            "backend-interface",
+            "cli",
+            "command",
+            "contracts",
+            "core",
+            "full",
+            "plan",
+            "quirk",
+            "runtime",
+            "tooling"
+          ]
+        },
+        "command": {
+          "globs": [
+            "src/command/**"
+          ],
+          "mayImport": [
+            "command",
+            "contracts",
+            "core",
+            "runtime"
+          ]
+        },
+        "compatibility": {
+          "globs": [
+            "src/compat/**"
+          ],
+          "mayImport": [
+            "backend-interface",
+            "compatibility"
+          ]
+        },
+        "compiler": {
+          "globs": [
+            "src/compiler/**"
+          ],
+          "mayImport": [
+            "contracts",
+            "compiler",
+            "verification"
+          ]
+        },
+        "contracts": {
+          "globs": [
+            "src/contracts/**"
+          ],
+          "mayImport": [
+            "contracts"
+          ]
+        },
+        "core": {
+          "globs": [
+            "src/core/**"
+          ],
+          "mayImport": [
+            "backend-interface",
+            "compiler",
+            "contracts",
+            "core",
+            "runtime"
+          ]
+        },
+        "dropin": {
+          "globs": [
+            "src/dropin/**"
+          ],
+          "mayImport": [
+            "backend-interface",
+            "compiler",
+            "core",
+            "dropin",
+            "full",
+            "native",
+            "runtime"
+          ]
+        },
+        "experimental": {
+          "globs": [
+            "src/experimental/**"
+          ],
+          "mayImport": [
+            "command",
+            "contracts",
+            "experimental",
+            "full",
+            "runtime"
+          ]
+        },
+        "full": {
+          "globs": [
+            "src/full/**"
+          ],
+          "mayImport": [
+            "backend-common",
+            "backend-interface",
+            "contracts",
+            "core",
+            "full",
+            "runtime"
+          ]
+        },
+        "integrations": {
+          "globs": [
+            "src/integrations/**"
+          ],
+          "mayImport": [
+            "integrations"
+          ]
+        },
+        "native": {
+          "globs": [
+            "src/native/**"
+          ],
+          "mayImport": [
+            "backend-interface",
+            "compiler",
+            "contracts",
+            "core",
+            "full",
+            "native",
+            "runtime"
+          ]
+        },
+        "package-root": {
+          "globs": [
+            "src/mod.zig"
+          ],
+          "mayImport": [
+            "backend-interface",
+            "cli",
+            "compiler",
+            "contracts",
+            "dropin",
+            "package-root",
+            "plan",
+            "runtime",
+            "verification"
+          ]
+        },
+        "plan": {
+          "globs": [
+            "src/plan/**"
+          ],
+          "mayImport": [
+            "backend-interface",
+            "cli",
+            "contracts",
+            "plan",
+            "quirk",
+            "runtime"
+          ]
+        },
+        "quirk": {
+          "globs": [
+            "src/quirk/**"
+          ],
+          "mayImport": [
+            "contracts",
+            "quirk",
+            "verification"
+          ]
+        },
+        "runtime": {
+          "globs": [
+            "src/runtime/**"
+          ],
+          "mayImport": [
+            "backend-common",
+            "backend-interface",
+            "contracts",
+            "core",
+            "quirk",
+            "runtime",
+            "tooling"
+          ]
+        },
+        "spatial": {
+          "globs": [
+            "src/spatial/**"
+          ],
+          "mayImport": [
+            "spatial"
+          ]
+        },
+        "tooling": {
+          "globs": [
+            "src/tooling/**"
+          ],
+          "mayImport": [
+            "tooling"
+          ]
+        },
+        "verification": {
+          "globs": [
+            "src/verification/**"
+          ],
+          "mayImport": [
+            "verification"
+          ]
+        }
+      },
+      "linePolicy": {
+        "advisoryReviewLines": 800,
+        "futureHardMaximumLines": 1500,
+        "futureJustificationAboveLines": 1200,
+        "mode": "future",
+        "transitionMaximumLines": 999
+      },
+      "moduleDecisionReviews": {},
+      "productionRoots": [
+        "src/mod.zig",
+        "src/**/mod.zig",
+        "src/compat/webgpu_ffi.zig",
+        "src/dropin/root.zig",
+        "src/cli/entrypoints/main*.zig",
+        "src/cli/entrypoints/module_runner.zig",
+        "src/compiler/tsir/tools/*.zig",
+        "src/integrations/onnxruntime/*_anchor.zig",
+        "src/spatial/csl/csl_bundle_emitter.zig",
+        "src/spatial/csl/csl_host_plan_tool.zig",
+        "src/spatial/csl/csl_sim_runner.zig",
+        "src/verification/lean_proof.zig"
+      ],
+      "reachabilityExceptions": [],
+      "specialRoles": {
+        "compatibility-facade": {
+          "globs": [
+            "src/compat/webgpu_ffi.zig"
+          ]
+        },
+        "entrypoint": {
+          "globs": [
+            "src/cli/entrypoints/*.zig",
+            "src/compiler/tsir/tools/*.zig",
+            "src/dropin/root.zig",
+            "src/integrations/onnxruntime/*_anchor.zig",
+            "src/spatial/csl/csl_bundle_emitter.zig",
+            "src/spatial/csl/csl_host_plan_tool.zig",
+            "src/spatial/csl/csl_sim_runner.zig"
+          ]
+        },
+        "ffi-boundary": {
+          "globs": [
+            "src/**/*bridge*.zig",
+            "src/**/*ffi*.zig"
+          ]
+        },
+        "generated": {
+          "globs": []
+        },
+        "package-root": {
+          "globs": [
+            "src/mod.zig",
+            "src/**/mod.zig"
+          ]
+        }
+      }
+    },
+    "compatibilityFacades": [
+      "src/compat/webgpu_ffi.zig"
+    ],
+    "moduleRoot": "src/mod.zig",
+    "nativeRootFiles": [
+      "mod.zig"
+    ],
+    "repositoryOnlyZigRoots": [
+      "bench"
+    ],
+    "sourceRoot": "src",
+    "topLevelOwners": {
+      "backend": "backend selection, shared backend seams, and Metal/Vulkan/D3D12 implementations",
+      "cli": "command-line orchestration and executable entrypoints",
+      "command": "command-stream parsing and normalization",
+      "compat": "explicit compatibility barrels that remain under test",
+      "compiler": "WGSL, TSIR, and compiler target descriptions",
+      "contracts": "neutral contracts shared by core and full runtime layers",
+      "core": "compute, resource, queue, replay, trace, and WebGPU ABI core",
+      "dropin": "WebGPU drop-in symbol routing and behavior policy",
+      "full": "render, surface, and full-runtime command behavior",
+      "integrations": "runtime integration anchors such as ONNX Runtime EP",
+      "native": "Doe-native WebGPU object and command implementation",
+      "plan": "direct execution-plan contracts and executors",
+      "quirk": "quirk parsing, selection, and application",
+      "runtime": "shared execution, cache, device, queue, diagnostics, and trace services",
+      "spatial": "HostPlan and CSL orchestration for spatial targets",
+      "tooling": "I/O contexts shared by command-line tools",
+      "verification": "runtime consumers of proof artifacts"
+    },
+    "version": 2,
+    "wgslRootFiles": [
+      "WGSL_SUPPORT.md",
+      "mod.zig"
+    ],
+    "wgslStageDirectories": [
+      "emit",
+      "frontend",
+      "ir",
+      "proof",
+      "runtime"
+    ]
+  },
+  "schemaVersion": 1,
+  "status": "frozen-baseline-architecture-manifest"
+}

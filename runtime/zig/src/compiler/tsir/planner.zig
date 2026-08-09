@@ -12,8 +12,9 @@
 
 const std = @import("std");
 const targets = @import("../targets/mod.zig");
-const tsir = @import("mod.zig");
+const tsir = @import("schema.zig");
 const collective_synthesis = @import("collective_synthesis.zig");
+const planner_support = @import("planner_support.zig");
 
 const FIRST_FIT_TILE_CAP: u32 = 64;
 const FIRST_FIT_PE_GRID_WIDTH_CAP: u32 = 8;
@@ -260,8 +261,8 @@ fn synthesizeReductions(
     defer out.deinit(allocator);
 
     for (func.reductions, 0..) |reduction, reduction_index| {
-        if (!supportsNumericalMode(descriptor, reduction.contract.accumulation)) {
-            try appendRejection(
+        if (!planner_support.supportsNumericalMode(descriptor, reduction.contract.accumulation)) {
+            try planner_support.appendRejection(
                 allocator,
                 rejections,
                 .tsir_target_unfit,
@@ -281,48 +282,6 @@ fn synthesizeReductions(
     }
 
     return out.toOwnedSlice(allocator) catch return error.OutOfMemory;
-}
-
-pub fn supportsNumericalMode(
-    descriptor: targets.TargetDescriptor,
-    kind: tsir.ScalarKind,
-) bool {
-    const mode = numericalModeForScalar(kind) orelse return false;
-    for (descriptor.correctness.native_numerical_modes) |native| {
-        if (native == mode) return true;
-    }
-    return false;
-}
-
-fn numericalModeForScalar(kind: tsir.ScalarKind) ?targets.NumericalMode {
-    return switch (kind) {
-        .f32 => .f32,
-        .f16 => .f16,
-        .bf16 => .bf16,
-        .i32, .u32 => null,
-    };
-}
-
-pub fn appendRejection(
-    allocator: std.mem.Allocator,
-    rejections: *std.ArrayList(tsir.RejectionEntry),
-    reason: tsir.RejectionReason,
-    function_index: u32,
-    field: []const u8,
-    node_index: u32,
-    detail_text: []const u8,
-) PlannerError!void {
-    const path = try std.fmt.allocPrint(
-        allocator,
-        "functions[{d}].{s}[{d}]",
-        .{ function_index, field, node_index },
-    );
-    const detail = try allocator.dupe(u8, detail_text);
-    try rejections.append(allocator, .{
-        .reason = reason,
-        .node_path = path,
-        .detail = detail,
-    });
 }
 
 fn floorPowerOfTwo(value: u32) u32 {

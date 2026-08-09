@@ -1,7 +1,7 @@
 const std = @import("std");
 const ir = @import("../wgsl/ir/ir.zig");
 const frontend_expr = @import("frontend_expr.zig");
-const tsir = @import("mod.zig");
+const tsir = @import("schema.zig");
 const types = @import("frontend_types.zig");
 
 const FrontendError = types.FrontendError;

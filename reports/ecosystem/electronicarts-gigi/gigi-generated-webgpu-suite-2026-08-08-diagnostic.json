@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "gigi-generated-webgpu-suite-2026-08-08-diagnostic",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "generatedAt": "2026-08-08T21:57:51.439Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-08T22:02:53Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "4",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/gigi",
+    "commit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "numeric-bool-scalar-conversions",
+      "category": "compatibility",
+      "status": "fixed",
+      "summary": "Gigi's generated buffer workload exposed unsupported explicit numeric-to-bool and bool-to-numeric WGSL conversions. Doe now validates and emits those conversions, and Buffers/buffertest_webgpu passes the unchanged upstream oracle.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run1/raw-suite.json",
+          "sha256": "02d5c8c0f61223630975966de83e7b3c27fac2fecfa4ea2edf6722cfb05ed46d"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run2/raw-suite.json",
+          "sha256": "9251b9aa206dea3969ac4214de307b0987e3087f659d70446c84bae844e8c60f"
+        }
+      ]
+    },
+    {
+      "id": "storage-texture-dispatch-readback",
+      "category": "correctness",
+      "status": "fixed",
+      "summary": "The unchanged ReadbackSequence case exposed lost recorded texture bindings, encode-time Vulkan readback, stale JavaScript texture shadows, and a texture-copy bridge ABI mismatch. The focused case now passes under both providers and each Doe defect has a checked-in regression record.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-bool-readback/raw-suite.json",
+          "sha256": "0c59d07826e5ab2a8ec36ebf847cc516769dc50683d09ade2698e603927712dc"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-texture-fixed/raw-suite.json",
+          "sha256": "a92c063709bdf1c038a4f832709a1276bbf233acf0c4bcecec56f5abb86bd503"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-texture-abi-fixed/raw-suite.json",
+          "sha256": "f7209f2440f664a27fea943f7c08872fc4696d30e0c704412de9cccbfba2107f"
+        }
+      ]
+    },
+    {
+      "id": "shared-compute-oracle-coverage",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "In the second 50-case matrix, Doe passes every buffer or compute case that Dawn passes: Buffers/StructuredBuffer, Buffers/buffertest_webgpu, Compute/BufferAtomics, and Compute/ReadbackSequence. Both also pass Textures/TextureFormats.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run2/raw-suite.json",
+          "sha256": "9251b9aa206dea3969ac4214de307b0987e3087f659d70446c84bae844e8c60f"
+        }
+      ]
+    },
+    {
+      "id": "remaining-suite-compatibility-gaps",
+      "category": "reliability",
+      "status": "discovered",
+      "summary": "The complete matrix is not reliable or equivalent: Dawn passes 9 of 50 cases without crashes, while Doe passes 5 of 50 and crashes in four cases. Four cases pass under Dawn but not Doe, including one crashing texture-mip case.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run2/raw-suite.json",
+          "sha256": "9251b9aa206dea3969ac4214de307b0987e3087f659d70446c84bae844e8c60f"
+        }
+      ]
+    },
+    {
+      "id": "hardware-performance-claim",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "The host lists /dev/dri/renderD128 but denies access, so neither provider is hardware-eligible and no speed or receipt-overhead comparison was measured.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run2/raw-suite.json",
+          "sha256": "9251b9aa206dea3969ac4214de307b0987e3087f659d70446c84bae844e8c60f"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The host denied access to its physical render node, so the run cannot support a hardware performance claim.",
+    "The 50 clean processes execute distinct generated cases once; they do not provide repeated cold and warm samples for any single workload.",
+    "The run captures provider and adapter identity but not the required driver identity, shader hashes, dispatch shape, synchronization identity, readback identity, or receipt overhead.",
+    "Many cases fail under both providers because of missing assets or exact gold-image differences; those shared failures are not classified as Doe defects without a minimized comparison.",
+    "The four remaining Doe crashes and four Dawn-only passing cases prevent a complete-suite reliability or compatibility claim."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "render-node-inaccessible",
+      "hardware-performance-ineligible",
+      "partial-receipt-fields",
+      "baseline-only-passing-cases",
+      "comparison-crashes",
+      "complete-suite-oracle-failure"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 50,
+      "successes": 9,
+      "failures": 41,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 2303553536
+    },
+    "comparison": {
+      "cleanProcessRuns": 50,
+      "successes": 5,
+      "failures": 41,
+      "crashes": 4,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 2208518144
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Each generated case ran once in a clean process on a hardware-ineligible host, so no per-workload cold/warm comparison is available."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The diagnostic matrix did not execute paired receipt-disabled and receipt-enabled samples."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The ESM provider loader is a controlled harness substitution, not a validated production installation path."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "The physical render node was inaccessible to both provider processes."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic matrix ran providers and cases serially."
+    },
+    "teardown": {
+      "status": "fail",
+      "summary": "Clean-process isolation was present, but four Doe cases terminated by SIGSEGV."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Distinct-case breadth is not repeated stress coverage for a stable workload."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS was captured, but no bounded-growth leak sequence was run."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "Provider and adapter identity are present, but the remaining required receipt fields and receipt overhead are absent."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "The host is hardware-ineligible and the suite has no repeated per-case cold/warm samples."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness has unresolved crashes and compatibility gaps and remains non-blocking."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run2/raw-suite.json",
+      "sha256": "9251b9aa206dea3969ac4214de307b0987e3087f659d70446c84bae844e8c60f"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run1/raw-suite.json",
+      "sha256": "02d5c8c0f61223630975966de83e7b3c27fac2fecfa4ea2edf6722cfb05ed46d"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-texture-abi-fixed/raw-suite.json",
+      "sha256": "f7209f2440f664a27fea943f7c08872fc4696d30e0c704412de9cccbfba2107f"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run2/raw-suite.json",
+      "sha256": "9251b9aa206dea3969ac4214de307b0987e3087f659d70446c84bae844e8c60f"
+    }
+  ]
+}

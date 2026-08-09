@@ -1,12 +1,13 @@
 const std = @import("std");
-const model_commands = @import("../contracts/model/model_commands.zig");
+const model_commands = @import("../contracts/command.zig");
 const model_profile = @import("../contracts/model/model_profile.zig");
 const model_transfer_types = @import("../contracts/model/model_compute_types.zig");
+const compute_contract = @import("../contracts/compute.zig");
 const backend_iface = @import("backend_iface.zig");
 const backend_policy = @import("backend_policy.zig");
 const backend_registry = @import("backend_registry.zig");
 const backend_runtime_telemetry = @import("backend_runtime_telemetry.zig");
-const backend_selection = @import("backend_selection.zig");
+const backend_selection = @import("../contracts/backend.zig");
 const backend_telemetry = @import("backend_telemetry.zig");
 const runtime_types = @import("runtime_types.zig");
 
@@ -77,6 +78,10 @@ pub const BackendRuntime = struct {
 
     pub fn execute_command(self: *BackendRuntime, command: model.Command) !runtime_types.NativeExecutionResult {
         return try self.backend.execute_command(command);
+    }
+
+    pub fn execute_dispatch(self: *BackendRuntime, request: compute_contract.DispatchRequest) !compute_contract.DispatchReport {
+        return try self.backend.execute_dispatch(request);
     }
 
     pub fn execute_buffer_write_bytes(self: *BackendRuntime, handle: u64, offset: u64, buffer_size: u64, data: []const u8) !runtime_types.NativeExecutionResult {

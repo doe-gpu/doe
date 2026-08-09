@@ -6,7 +6,7 @@
 
 const std = @import("std");
 const mod = @import("../../src/compiler/wgsl/mod.zig");
-const dispatch_contract = @import("../../src/compiler/wgsl/emit/hlsl/hlsl_dispatch_contract.zig");
+const dispatch_contract = @import("../../src/contracts/shader_abi/dispatch_info.zig");
 const maps = @import("../../src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig");
 const emit_dxil = @import("../../src/compiler/wgsl/emit/dxil/emit_dxil.zig");
 
@@ -446,6 +446,7 @@ test "hlsl dispatch contract: constants match expected values" {
     try testing.expectEqualStrings("DoeDispatchInfo", dispatch_contract.DISPATCH_INFO_CBUFFER_NAME);
     try testing.expectEqualStrings("doe_num_workgroups", dispatch_contract.DISPATCH_INFO_FIELD_NAME);
     try testing.expectEqualStrings("_doe_num_workgroups_pad", dispatch_contract.DISPATCH_INFO_PAD_FIELD_NAME);
+    try testing.expectEqual(@as(usize, 16), @sizeOf(dispatch_contract.Words));
 }
 
 // ============================================================

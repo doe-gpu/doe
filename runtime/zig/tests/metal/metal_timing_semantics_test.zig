@@ -1,6 +1,8 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const model = @import("../../src/contracts/model/model.zig");
+const model = @import("../../src/contracts/command.zig");
+const profile = @import("../../src/contracts/model/model_profile.zig");
+const gpu = @import("../../src/contracts/model/model_gpu_types.zig");
 const webgpu = @import("../../src/compat/webgpu_ffi.zig");
 const backend_iface = @import("../../src/backend/backend_iface.zig");
 const metal_mod = @import("../../src/backend/metal/mod.zig");
@@ -18,7 +20,7 @@ const FlushWorker = struct {
     }
 };
 
-fn test_profile() model.DeviceProfile {
+fn test_profile() profile.DeviceProfile {
     return .{
         .vendor = "apple",
         .api = .metal,
@@ -217,7 +219,7 @@ test "metal copy contract path executes native buffer-to-texture copy" {
     const result = try iface.execute_command(model.Command{ .copy_buffer_to_texture = .{
         .direction = .buffer_to_texture,
         .src = .{ .handle = 51, .offset = 0, .bytes_per_row = 8, .rows_per_image = 2 },
-        .dst = .{ .handle = 52, .kind = .texture, .width = 2, .height = 2, .depth_or_array_layers = 1, .format = model.WGPUTextureFormat_RGBA8Unorm, .usage = model.WGPUTextureUsage_CopyDst | model.WGPUTextureUsage_TextureBinding, .bytes_per_row = 8, .rows_per_image = 2 },
+        .dst = .{ .handle = 52, .kind = .texture, .width = 2, .height = 2, .depth_or_array_layers = 1, .format = gpu.WGPUTextureFormat_RGBA8Unorm, .usage = gpu.WGPUTextureUsage_CopyDst | gpu.WGPUTextureUsage_TextureBinding, .bytes_per_row = 8, .rows_per_image = 2 },
         .bytes = 16,
     } });
     try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, result.status);
@@ -236,7 +238,7 @@ test "metal surface lifecycle executes full presentation protocol" {
 
     try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, (try iface.execute_command(model.Command{ .surface_create = .{ .handle = 901 } })).status);
     try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, (try iface.execute_command(model.Command{ .surface_capabilities = .{ .handle = 901 } })).status);
-    try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, (try iface.execute_command(model.Command{ .surface_configure = .{ .handle = 901, .width = 64, .height = 64, .format = model.WGPUTextureFormat_RGBA8Unorm } })).status);
+    try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, (try iface.execute_command(model.Command{ .surface_configure = .{ .handle = 901, .width = 64, .height = 64, .format = gpu.WGPUTextureFormat_RGBA8Unorm } })).status);
     try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, (try iface.execute_command(model.Command{ .surface_acquire = .{ .handle = 901 } })).status);
     const present = try iface.execute_command(model.Command{ .surface_present = .{ .handle = 901 } });
     try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, present.status);
