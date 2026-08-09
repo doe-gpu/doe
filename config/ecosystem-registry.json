@@ -906,7 +906,7 @@
         },
         {
           "revisionId": "first-harness-review",
-          "recordedAt": "2026-08-09T02:03:32Z",
+          "recordedAt": "2026-08-09T02:11:19Z",
           "reviewer": "codex",
           "reviewStatus": "reviewed",
           "registryRevision": "9",
@@ -959,13 +959,13 @@
         {
           "reportId": "cpp-ml-mnist-webgpu-2026-08-09-diagnostic",
           "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-2026-08-09-diagnostic.json",
-          "sha256": "8493a8e1bc8caecaf7a79a2eb32c4174e84ed01cab5bd09acef789339567a93e",
-          "reviewedAt": "2026-08-09T02:03:32Z",
+          "sha256": "4050fced6b2a24353f31abc7b433bedd057fcbca25c6324ae70252d2a3367126",
+          "reviewedAt": "2026-08-09T02:11:19Z",
           "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-09T02:03:32Z"
+      "lastReviewedAt": "2026-08-09T02:11:19Z"
     },
     {
       "id": "dawn-node-webgpu",

@@ -14,7 +14,7 @@
   "providerSubstitution": {
     "baselineProvider": "dawn-node-webgpu",
     "comparisonProvider": "doe-gpu",
-    "seam": "A Node ESM loader redirects only the generated workload's exact webgpu package imports to the selected provider wrapper; the external driver supplies the generated entrypoint's documented TODO resources and adds readback usage before output allocation without changing upstream application or shader files.",
+    "seam": "A Node ESM loader redirects the generated workload's exact webgpu package imports to the selected provider wrapper and its exact pngjs imports to the pinned harness dependency; the external driver supplies the generated entrypoint's documented TODO resources and adds readback usage before output allocation without changing upstream application or shader files.",
     "patchPaths": []
   },
   "fallbackPolicy": {

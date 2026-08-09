@@ -4,10 +4,10 @@
   "reportId": "cpp-ml-mnist-webgpu-2026-08-09-diagnostic",
   "actorId": "electronicarts-cpp-ml-intro",
   "harnessId": "mnist-webgpu-demo",
-  "generatedAt": "2026-08-09T02:03:32Z",
+  "generatedAt": "2026-08-09T02:11:19Z",
   "review": {
     "status": "reviewed",
-    "reviewedAt": "2026-08-09T02:03:32Z",
+    "reviewedAt": "2026-08-09T02:11:19Z",
     "reviewer": "codex"
   },
   "registryRevision": "9",
@@ -27,7 +27,7 @@
       "evidence": [
         {
           "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
-          "sha256": "a3aadfe69d20da52c8169eca2df3ccf193114941ee4185d47ac47c44b9c7006b"
+          "sha256": "eec78b73babfed9170d2857edeef44c6f9c6ae67b267f63c1392241e35556541"
         }
       ]
     },
@@ -39,11 +39,11 @@
       "evidence": [
         {
           "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
-          "sha256": "a3aadfe69d20da52c8169eca2df3ccf193114941ee4185d47ac47c44b9c7006b"
+          "sha256": "eec78b73babfed9170d2857edeef44c6f9c6ae67b267f63c1392241e35556541"
         },
         {
           "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/receipt-summary.json",
-          "sha256": "97c0e9f63fdbcb181336b43d2ce7f06a0c3670ff59a9529681ff1ccc3956afc7"
+          "sha256": "81608bb6527e50db6c93893f845b733d58757965070c40bd35f417b905eca79e"
         }
       ]
     },
@@ -55,7 +55,7 @@
       "evidence": [
         {
           "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
-          "sha256": "a3aadfe69d20da52c8169eca2df3ccf193114941ee4185d47ac47c44b9c7006b"
+          "sha256": "eec78b73babfed9170d2857edeef44c6f9c6ae67b267f63c1392241e35556541"
         }
       ]
     },
@@ -67,7 +67,7 @@
       "evidence": [
         {
           "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/receipt-summary.json",
-          "sha256": "97c0e9f63fdbcb181336b43d2ce7f06a0c3670ff59a9529681ff1ccc3956afc7"
+          "sha256": "81608bb6527e50db6c93893f845b733d58757965070c40bd35f417b905eca79e"
         }
       ]
     }
@@ -76,7 +76,7 @@
     "Doe did not compile and complete the generated graph, so provider output equivalence is not established.",
     "The host denied read/write access to its render node and did not produce a complete physical adapter and driver identity, so this run is not hardware-comparable.",
     "The harness records the generated module hash but does not yet emit each dynamically extracted WGSL entry-point hash.",
-    "The diagnostic run records Doe commit d3460aee4 with a dirty worktree containing harness and report work; the AMD rerun must use a clean checkout and freshly built runtime.",
+    "The diagnostic run records Doe commit 8ac1ba895 with a dirty worktree containing harness and toolchain-bootstrap work; the AMD rerun must use a clean checkout and freshly built runtime.",
     "Three sequential clean processes establish diagnostic repeatability, not promotion-scale concurrency, teardown, stress, or memory-growth reliability.",
     "The harness-only ESM provider redirection is not a validated production installation path."
   ],
@@ -174,13 +174,13 @@
   "receipts": [
     {
       "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/receipt-summary.json",
-      "sha256": "97c0e9f63fdbcb181336b43d2ce7f06a0c3670ff59a9529681ff1ccc3956afc7"
+      "sha256": "81608bb6527e50db6c93893f845b733d58757965070c40bd35f417b905eca79e"
     }
   ],
   "rawEvidence": [
     {
       "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
-      "sha256": "a3aadfe69d20da52c8169eca2df3ccf193114941ee4185d47ac47c44b9c7006b"
+      "sha256": "eec78b73babfed9170d2857edeef44c6f9c6ae67b267f63c1392241e35556541"
     }
   ]
 }

@@ -159,6 +159,7 @@ function providerEnvironment(provider, modulePath, upstream, runtimeDir) {
   const env = {
     ...process.env,
     DOE_CPP_ML_UPSTREAM: upstream,
+    DOE_EXTERNAL_PNGJS_MODULE: resolve(repoRoot, 'bench/node_modules/pngjs/lib/png.js'),
     DOE_EXTERNAL_WEBGPU_PROVIDER: provider,
     XDG_RUNTIME_DIR: runtimeDir,
   };
@@ -329,6 +330,8 @@ async function main() {
     'doe-gpu': resolve(repoRoot, 'packages/doe-gpu/src/index.js'),
   };
   for (const modulePath of Object.values(modules)) await access(modulePath, fsConstants.R_OK);
+  const pngjsModule = resolve(repoRoot, 'bench/node_modules/pngjs/lib/png.js');
+  await access(pngjsModule, fsConstants.R_OK);
   const hostHardware = await inspectHostHardware();
   const providers = {};
   for (const [provider, modulePath] of Object.entries(modules)) {
@@ -399,6 +402,7 @@ async function main() {
       applicationSourceUnchanged: true,
       shaderSourceUnchanged: true,
       modules,
+      dependencyModules: { pngjs: pngjsModule },
     },
     oracle: {
       cases: 10,
