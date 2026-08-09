@@ -24,13 +24,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 bench/tools/bootstrap_zig.py
           zig_version="$(jq -r '.toolchains.zig.version' config/toolchains.json)"
-          zig_url="https://ziglang.org/download/${zig_version}/zig-x86_64-linux-${zig_version}.tar.xz"
-          curl -fL "$zig_url" -o /tmp/zig.tar.xz
-          rm -rf /tmp/zig-install
-          mkdir -p /tmp/zig-install
-          tar -xf /tmp/zig.tar.xz -C /tmp/zig-install --strip-components=1
-          echo "/tmp/zig-install" >> "$GITHUB_PATH"
+          echo "$GITHUB_WORKSPACE/.tooling/zig-${zig_version}" >> "$GITHUB_PATH"
       - name: Run WGSL compiler tests
         working-directory: runtime/zig
         run: |

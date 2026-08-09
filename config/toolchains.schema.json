@@ -20,7 +20,21 @@
             "enum": ["stable", "nightly", "beta"]
           },
           "lockfile": { "type": "string", "minLength": 1 },
-          "contract": { "type": "string", "minLength": 1 }
+          "contract": { "type": "string", "minLength": 1 },
+          "archives": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["url", "sha256", "sizeBytes"],
+              "properties": {
+                "url": { "type": "string", "format": "uri" },
+                "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                "sizeBytes": { "type": "integer", "minimum": 1 }
+              }
+            }
+          }
         }
       },
       "minProperties": 1

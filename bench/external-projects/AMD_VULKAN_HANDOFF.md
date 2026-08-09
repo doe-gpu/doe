@@ -25,7 +25,8 @@ Required software and access:
 - Python 3;
 - `git`, `npm`, `vulkaninfo`, and `sha256sum`;
 - read and write access to at least one `/dev/dri/renderD*` node; and
-- the checked-in Zig 0.15.2 toolchain at `.tooling/zig-0.15.2/zig`.
+- network access to the schema-pinned Zig archive declared in
+  `config/toolchains.json`.
 
 From the Doe checkout, set explicit paths and a stable run identifier:
 
@@ -41,6 +42,7 @@ sha256sum "$DOE_AMD_VULKAN_ICD"
 git status --short
 git rev-parse HEAD
 node --version
+python3 bench/tools/bootstrap_zig.py
 ./.tooling/zig-0.15.2/zig version
 vulkaninfo --summary
 ls -l /dev/dri/renderD*

@@ -10,6 +10,10 @@
       "data": "config/zig-test-inventory.json"
     },
     {
+      "schema": "config/toolchains.schema.json",
+      "data": "config/toolchains.json"
+    },
+    {
       "schema": "config/webgpu-abi-source.schema.json",
       "data": "config/webgpu-abi-source.json"
     },
