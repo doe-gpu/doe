@@ -1,6 +1,7 @@
 const std = @import("std");
 const ast_mod = @import("ast.zig");
 const ir = @import("../ir/ir.zig");
+const sema_type_syntax = @import("sema_type_syntax.zig");
 const sema_helpers = @import("sema_helpers.zig");
 const sema_types = @import("sema_types.zig");
 
@@ -9,6 +10,7 @@ const AnalyzeError = sema_types.AnalyzeError;
 
 const parse_access = sema_helpers.parse_access;
 const parse_address_space = sema_helpers.parse_address_space;
+const parse_matrix_shape = sema_type_syntax.parseMatrixShape;
 const parse_wgsl_int_literal = sema_helpers.parse_wgsl_int_literal;
 const parse_storage_texture_format = sema_helpers.parse_storage_texture_format;
 
@@ -90,23 +92,6 @@ pub fn resolve_type_parameterized(self: anytype, node: Node) !ir.TypeId {
         return try self.module.types.intern(.{ .ref = .{ .elem = elem, .addr_space = addr_space, .access = access } });
     }
     return error.UnknownType;
-}
-
-fn parse_matrix_shape(name: []const u8) ?struct { columns: u8, rows: u8 } {
-    if (!std.mem.startsWith(u8, name, "mat") or name.len != 6 or name[4] != 'x') return null;
-    const columns: u8 = switch (name[3]) {
-        '2' => 2,
-        '3' => 3,
-        '4' => 4,
-        else => return null,
-    };
-    const rows: u8 = switch (name[5]) {
-        '2' => 2,
-        '3' => 3,
-        '4' => 4,
-        else => return null,
-    };
-    return .{ .columns = columns, .rows = rows };
 }
 
 const MAX_ARRAY_LENGTH_CONST_DEPTH: u8 = 32;

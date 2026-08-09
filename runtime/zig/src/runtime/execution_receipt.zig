@@ -132,7 +132,7 @@ fn applyTelemetry(result: *ExecutionResult, telemetry: backend_telemetry.Backend
 test "failure preserves backend telemetry and first failure code" {
     const std = @import("std");
     const telemetry = backend_telemetry.BackendTelemetry{
-        .backend_id = .vulkan,
+        .backend_id = .doe_vulkan,
         .backend_selection_reason = "profile-api",
         .fallback_used = false,
         .selection_policy_hash = "policy-hash",

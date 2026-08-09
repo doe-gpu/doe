@@ -4,6 +4,7 @@ const plan_config = @import("webgpu_plan_executor_config.zig");
 const plan_core = @import("webgpu_plan_executor_core.zig");
 const plan_emit = @import("webgpu_plan_executor_emit.zig");
 const support = @import("webgpu_plan_executor_support.zig");
+const plan_validation = @import("plan_validation.zig");
 
 const Allocator = std.mem.Allocator;
 
@@ -39,7 +40,7 @@ pub fn runPlan(allocator: Allocator, options: plan_config.RunOptions) !void {
 
     if (!std.mem.eql(u8, loaded.plan.workload_id, options.workload_id)) return error.WorkloadMismatch;
     const workload_prepare_start_ns = support.nowNs();
-    try validatePlanCounts(loaded.plan);
+    try plan_validation.validateCounts(loaded.plan);
     var buffer_specs = try support.collectBufferSpecs(allocator, loaded.plan);
     defer buffer_specs.deinit();
     const kernel_root = try support.loadKernelRoot(allocator, loaded.plan.ir_path);
@@ -95,26 +96,6 @@ pub fn runPlan(allocator: Allocator, options: plan_config.RunOptions) !void {
         resolved_identity,
         TRACE_EMIT_DEFAULTS,
     );
-}
-
-fn validatePlanCounts(plan: dawn_plan_types.Plan) !void {
-    var buffer_write_count: u32 = 0;
-    var buffer_load_count: u32 = 0;
-    var dispatch_count: u32 = 0;
-    for (plan.commands) |command| {
-        switch (command) {
-            .buffer_write => buffer_write_count += 1,
-            .buffer_load => buffer_load_count += 1,
-            .kernel_dispatch => dispatch_count += 1,
-        }
-    }
-    if (buffer_write_count != plan.buffer_write_count or
-        buffer_load_count != plan.buffer_load_count or
-        dispatch_count != plan.dispatch_count or
-        plan.command_count != plan.commands.len)
-    {
-        return error.InvalidPlan;
-    }
 }
 
 fn makeDryRunResults(allocator: Allocator, plan: dawn_plan_types.Plan, identity: support.BackendIdentity) ![]support.StepResult {

@@ -40,6 +40,11 @@ fn executeBackendOperation(backend: *backend_runtime.BackendRuntime, operation: 
     };
 }
 
+fn elapsedSince(start: i128) u64 {
+    const end = std.time.nanoTimestamp();
+    return if (end > start) @intCast(end - start) else 0;
+}
+
 pub const BackendMode = enum {
     trace,
     native,
@@ -158,17 +163,21 @@ pub const ExecutionContext = struct {
         };
         const command_start = std.time.nanoTimestamp();
         const native = executeBackendOperation(backend, operation) catch |err| {
+            const duration_ns = elapsedSince(command_start);
+            const command_telemetry = backend.telemetry();
             return execution_receipt.failure(
                 identity,
-                backend.telemetry(),
-                elapsedSince(command_start),
+                command_telemetry,
+                duration_ns,
                 @errorName(err),
             );
         };
+        const duration_ns = elapsedSince(command_start);
+        const command_telemetry = backend.telemetry();
         return execution_receipt.success(
             identity,
-            backend.telemetry(),
-            elapsedSince(command_start),
+            command_telemetry,
+            duration_ns,
             native,
         );
     }

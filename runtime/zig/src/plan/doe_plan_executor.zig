@@ -13,6 +13,7 @@ const semantic_trace = @import("../contracts/semantic.zig");
 const trace = @import("../runtime/trace/trace.zig");
 const trace_jsonl_emit = @import("../runtime/trace/trace_jsonl_emit.zig");
 const dawn_plan_types = @import("dawn_plan_types.zig");
+const plan_validation = @import("plan_validation.zig");
 
 const model = struct {
     pub const Command = model_commands.Command;
@@ -170,26 +171,6 @@ fn lowerPlanCommands(allocator: Allocator, plan: dawn_plan_types.Plan) ![]Execut
     return commands;
 }
 
-fn validatePlanCounts(plan: dawn_plan_types.Plan) !void {
-    var buffer_write_count: u32 = 0;
-    var buffer_load_count: u32 = 0;
-    var dispatch_count: u32 = 0;
-    for (plan.commands) |command| {
-        switch (command) {
-            .buffer_write => buffer_write_count += 1,
-            .buffer_load => buffer_load_count += 1,
-            .kernel_dispatch => dispatch_count += 1,
-        }
-    }
-    if (buffer_write_count != plan.buffer_write_count or
-        buffer_load_count != plan.buffer_load_count or
-        dispatch_count != plan.dispatch_count or
-        plan.command_count != plan.commands.len)
-    {
-        return error.InvalidPlan;
-    }
-}
-
 fn loadKernelRoot(allocator: Allocator, ir_path: []const u8, override_root: ?[]const u8) ![]const u8 {
     if (override_root) |value| return allocator.dupe(u8, value);
     const ir_bytes = std.fs.cwd().readFileAlloc(allocator, ir_path, 8 * 1024 * 1024) catch {
@@ -293,7 +274,7 @@ pub fn runPlan(allocator: Allocator, options: RunOptions) !void {
     if (!std.mem.eql(u8, loaded.plan.workload_id, options.workload_id)) return error.WorkloadMismatch;
 
     const workload_prepare_start_ns = nowNs();
-    try validatePlanCounts(loaded.plan);
+    try plan_validation.validateCounts(loaded.plan);
     const kernel_root = try loadKernelRoot(allocator, loaded.plan.ir_path, options.kernel_root);
     defer allocator.free(kernel_root);
     const executable_commands = try lowerPlanCommands(allocator, loaded.plan);

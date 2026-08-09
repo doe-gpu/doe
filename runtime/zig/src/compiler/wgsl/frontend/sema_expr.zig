@@ -1,12 +1,14 @@
 const std = @import("std");
 const token_mod = @import("token.zig");
 const ir = @import("../ir/ir.zig");
+const sema_type_syntax = @import("sema_type_syntax.zig");
 const sema_helpers = @import("sema_helpers.zig");
 const sema_typeutils = @import("sema_typeutils.zig");
 
 const Tag = token_mod.Tag;
 const concrete_numeric_type = sema_helpers.concrete_numeric_type;
 const materialize_inferred_local_type = sema_typeutils.materialize_inferred_local_type;
+const parse_matrix_shape = sema_type_syntax.parseMatrixShape;
 
 pub fn analyze_binary_type(self: anytype, lhs_ty: ir.TypeId, rhs_ty: ir.TypeId, op: Tag) !ir.TypeId {
     return switch (op) {
@@ -398,23 +400,6 @@ fn parse_vector_len(name: []const u8) ?u8 {
         '4' => 4,
         else => null,
     };
-}
-
-fn parse_matrix_shape(name: []const u8) ?struct { columns: u8, rows: u8 } {
-    if (!std.mem.startsWith(u8, name, "mat") or name.len != 6 or name[4] != 'x') return null;
-    const columns: u8 = switch (name[3]) {
-        '2' => 2,
-        '3' => 3,
-        '4' => 4,
-        else => return null,
-    };
-    const rows: u8 = switch (name[5]) {
-        '2' => 2,
-        '3' => 3,
-        '4' => 4,
-        else => return null,
-    };
-    return .{ .columns = columns, .rows = rows };
 }
 
 fn construct_scalar_compatible(self: anytype, target_ty: ir.TypeId, actual_ty: ir.TypeId) bool {

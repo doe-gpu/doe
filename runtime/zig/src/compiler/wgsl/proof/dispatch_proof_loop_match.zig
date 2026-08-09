@@ -1,6 +1,14 @@
 const std = @import("std");
 const ir = @import("../ir/ir.zig");
 const ir_const_eval = @import("../ir/ir_const_eval.zig");
+const ir_query = @import("../ir/ir_query.zig");
+
+const expr_contains_expr = ir_query.exprContainsExpr;
+const is_local_ref = ir_query.isLocalRef;
+const resolve_const_local_initializer = ir_query.resolveConstLocalInitializer;
+const resolve_value_alias = ir_query.resolveValueAlias;
+const stmt_contains_expr = ir_query.stmtContainsExpr;
+const stmt_writes_local = ir_query.stmtWritesLocal;
 
 const MAX_U32_VALUE: u64 = std.math.maxInt(u32);
 
@@ -555,141 +563,6 @@ fn match_positive_u32_literal(module: *const ir.Module, function: *const ir.Func
 
 fn exclusive_limit_from_inclusive(value: u64) ?u64 {
     return std.math.add(u64, value, 1) catch null;
-}
-
-fn stmt_writes_local(function: *const ir.Function, stmt_id: ir.StmtId, local_idx: u32) bool {
-    if (stmt_id >= function.stmts.items.len) return false;
-    const stmt = function.stmts.items[stmt_id];
-    switch (stmt) {
-        .block => |range| {
-            for (function.stmt_children.items[range.start .. range.start + range.len]) |child_id| {
-                if (stmt_writes_local(function, child_id, local_idx)) return true;
-            }
-            return false;
-        },
-        .assign => |assign| return is_local_ref(function, assign.lhs, local_idx),
-        .if_ => |if_stmt| return stmt_writes_local(function, if_stmt.then_block, local_idx) or
-            (if_stmt.else_block != null and stmt_writes_local(function, if_stmt.else_block.?, local_idx)),
-        .loop_ => |loop_stmt| {
-            if (loop_stmt.init) |init_stmt| if (stmt_writes_local(function, init_stmt, local_idx)) return true;
-            if (loop_stmt.continuing) |continuing_stmt| if (stmt_writes_local(function, continuing_stmt, local_idx)) return true;
-            return stmt_writes_local(function, loop_stmt.body, local_idx);
-        },
-        .switch_ => |switch_stmt| {
-            for (function.switch_cases.items[switch_stmt.cases.start .. switch_stmt.cases.start + switch_stmt.cases.len]) |case_node| {
-                if (stmt_writes_local(function, case_node.body, local_idx)) return true;
-            }
-            return false;
-        },
-        else => return false,
-    }
-}
-
-fn is_local_ref(function: *const ir.Function, expr_id: ir.ExprId, local_idx: u32) bool {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    return switch (expr.data) {
-        .local_ref => |value| value == local_idx,
-        else => false,
-    };
-}
-
-fn stmt_contains_expr(function: *const ir.Function, stmt_id: ir.StmtId, target_expr_id: ir.ExprId) bool {
-    if (stmt_id >= function.stmts.items.len) return false;
-    const stmt = function.stmts.items[stmt_id];
-    switch (stmt) {
-        .block => |range| {
-            for (function.stmt_children.items[range.start .. range.start + range.len]) |child_id| {
-                if (stmt_contains_expr(function, child_id, target_expr_id)) return true;
-            }
-            return false;
-        },
-        .local_decl => |decl| {
-            if (decl.initializer) |init_expr| return expr_contains_expr(function, init_expr, target_expr_id);
-            return false;
-        },
-        .expr => |value| return expr_contains_expr(function, value, target_expr_id),
-        .assign => |assign| return expr_contains_expr(function, assign.lhs, target_expr_id) or
-            expr_contains_expr(function, assign.rhs, target_expr_id),
-        .return_ => |value| {
-            if (value) |expr_ref| return expr_contains_expr(function, expr_ref, target_expr_id);
-            return false;
-        },
-        .if_ => |if_stmt| return expr_contains_expr(function, if_stmt.cond, target_expr_id) or
-            stmt_contains_expr(function, if_stmt.then_block, target_expr_id) or
-            (if_stmt.else_block != null and stmt_contains_expr(function, if_stmt.else_block.?, target_expr_id)),
-        .loop_ => |loop_stmt| {
-            if (loop_stmt.init) |init_stmt| if (stmt_contains_expr(function, init_stmt, target_expr_id)) return true;
-            if (loop_stmt.cond) |cond_expr| if (expr_contains_expr(function, cond_expr, target_expr_id)) return true;
-            if (loop_stmt.continuing) |continuing_stmt| if (stmt_contains_expr(function, continuing_stmt, target_expr_id)) return true;
-            return stmt_contains_expr(function, loop_stmt.body, target_expr_id);
-        },
-        .switch_ => |switch_stmt| {
-            if (expr_contains_expr(function, switch_stmt.expr, target_expr_id)) return true;
-            for (function.switch_cases.items[switch_stmt.cases.start .. switch_stmt.cases.start + switch_stmt.cases.len]) |case_node| {
-                if (stmt_contains_expr(function, case_node.body, target_expr_id)) return true;
-            }
-            return false;
-        },
-        else => return false,
-    }
-}
-
-fn expr_contains_expr(function: *const ir.Function, expr_id: ir.ExprId, target_expr_id: ir.ExprId) bool {
-    if (expr_id == target_expr_id) return true;
-    if (expr_id >= function.exprs.items.len) return false;
-    const expr = function.exprs.items[expr_id];
-    switch (expr.data) {
-        .load => |inner| return expr_contains_expr(function, inner, target_expr_id),
-        .unary => |unary| return expr_contains_expr(function, unary.operand, target_expr_id),
-        .binary => |binary| return expr_contains_expr(function, binary.lhs, target_expr_id) or
-            expr_contains_expr(function, binary.rhs, target_expr_id),
-        .call => |call| {
-            for (function.expr_args.items[call.args.start .. call.args.start + call.args.len]) |arg_id| {
-                if (expr_contains_expr(function, arg_id, target_expr_id)) return true;
-            }
-            return false;
-        },
-        .construct => |construct| {
-            for (function.expr_args.items[construct.args.start .. construct.args.start + construct.args.len]) |arg_id| {
-                if (expr_contains_expr(function, arg_id, target_expr_id)) return true;
-            }
-            return false;
-        },
-        .member => |member| return expr_contains_expr(function, member.base, target_expr_id),
-        .index => |index| return expr_contains_expr(function, index.base, target_expr_id) or
-            expr_contains_expr(function, index.index, target_expr_id),
-        else => return false,
-    }
-}
-
-fn resolve_value_alias(function: *const ir.Function, expr_id: ir.ExprId) ir.ExprId {
-    var current = expr_id;
-    while (true) {
-        const expr = function.exprs.items[current];
-        switch (expr.data) {
-            .load => |inner| current = inner,
-            .construct => |construct| {
-                if (construct.args.len != 1) return current;
-                current = function.expr_args.items[construct.args.start];
-            },
-            .local_ref => |local_idx| {
-                current = resolve_const_local_initializer(function, local_idx) orelse return current;
-            },
-            else => return current,
-        }
-    }
-}
-
-fn resolve_const_local_initializer(function: *const ir.Function, local_idx: u32) ?ir.ExprId {
-    for (function.stmts.items) |stmt| {
-        switch (stmt) {
-            .local_decl => |decl| {
-                if (decl.local == local_idx and decl.is_const) return decl.initializer;
-            },
-            else => {},
-        }
-    }
-    return null;
 }
 
 fn match_u32_literal(module: *const ir.Module, function: *const ir.Function, expr_id: ir.ExprId, expected: u32) bool {

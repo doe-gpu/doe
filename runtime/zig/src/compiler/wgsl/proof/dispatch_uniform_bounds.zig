@@ -1,7 +1,14 @@
 const std = @import("std");
 const ir = @import("../ir/ir.zig");
 const ir_const_eval = @import("../ir/ir_const_eval.zig");
+const ir_query = @import("../ir/ir_query.zig");
 const layout_utils = @import("../ir/layout_utils.zig");
+
+const expr_contains_expr = ir_query.exprContainsExpr;
+const is_local_ref = ir_query.isLocalRef;
+const resolve_const_local_initializer = ir_query.resolveConstLocalInitializer;
+const resolve_indexable_type = ir_query.resolveIndexableType;
+const resolve_value_alias = ir_query.resolveValueAlias;
 
 const UniformField = struct {
     binding: ir.BindingPoint,
@@ -821,14 +828,6 @@ fn match_u32_literal_value(function: *const ir.Function, expr_id: ir.ExprId) ?u6
     };
 }
 
-fn is_local_ref(function: *const ir.Function, expr_id: ir.ExprId, local_idx: u32) bool {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    return switch (expr.data) {
-        .local_ref => |value| value == local_idx,
-        else => false,
-    };
-}
-
 fn is_single_break_block(function: *const ir.Function, stmt_id: ir.StmtId) bool {
     if (stmt_id >= function.stmts.items.len) return false;
     const range = switch (function.stmts.items[stmt_id]) {
@@ -890,44 +889,6 @@ fn stmt_contains_expr(function: *const ir.Function, stmt_id: ir.StmtId, target_e
     }
 }
 
-fn expr_contains_expr(function: *const ir.Function, expr_id: ir.ExprId, target_expr_id: ir.ExprId) bool {
-    if (expr_id == target_expr_id) return true;
-    if (expr_id >= function.exprs.items.len) return false;
-    const expr = function.exprs.items[expr_id];
-    switch (expr.data) {
-        .load => |inner| return expr_contains_expr(function, inner, target_expr_id),
-        .unary => |unary| return expr_contains_expr(function, unary.operand, target_expr_id),
-        .binary => |binary| return expr_contains_expr(function, binary.lhs, target_expr_id) or
-            expr_contains_expr(function, binary.rhs, target_expr_id),
-        .call => |call| {
-            for (function.expr_args.items[call.args.start .. call.args.start + call.args.len]) |arg_id| {
-                if (expr_contains_expr(function, arg_id, target_expr_id)) return true;
-            }
-            return false;
-        },
-        .construct => |construct| {
-            for (function.expr_args.items[construct.args.start .. construct.args.start + construct.args.len]) |arg_id| {
-                if (expr_contains_expr(function, arg_id, target_expr_id)) return true;
-            }
-            return false;
-        },
-        .member => |member| return expr_contains_expr(function, member.base, target_expr_id),
-        .index => |index| return expr_contains_expr(function, index.base, target_expr_id) or
-            expr_contains_expr(function, index.index, target_expr_id),
-        else => return false,
-    }
-}
-
-fn resolve_indexable_type(types: *const ir.TypeStore, ty: ir.TypeId) ir.TypeId {
-    var current = ty;
-    while (true) {
-        switch (types.get(current)) {
-            .ref => |ref_ty| current = ref_ty.elem,
-            else => return current,
-        }
-    }
-}
-
 fn resolve_runtime_array_element_stride(
     module: *const ir.Module,
     function: *const ir.Function,
@@ -961,34 +922,4 @@ fn resolve_storage_binding(
         .index => |index| return resolve_storage_binding(module, function, index.base),
         else => return null,
     }
-}
-
-fn resolve_value_alias(function: *const ir.Function, expr_id: ir.ExprId) ir.ExprId {
-    var current = expr_id;
-    while (true) {
-        const expr = function.exprs.items[current];
-        switch (expr.data) {
-            .load => |inner| current = inner,
-            .construct => |construct| {
-                if (construct.args.len != 1) return current;
-                current = function.expr_args.items[construct.args.start];
-            },
-            .local_ref => |local_idx| {
-                current = resolve_const_local_initializer(function, local_idx) orelse return current;
-            },
-            else => return current,
-        }
-    }
-}
-
-fn resolve_const_local_initializer(function: *const ir.Function, local_idx: u32) ?ir.ExprId {
-    for (function.stmts.items) |stmt| {
-        switch (stmt) {
-            .local_decl => |decl| {
-                if (decl.local == local_idx and decl.is_const) return decl.initializer;
-            },
-            else => {},
-        }
-    }
-    return null;
 }

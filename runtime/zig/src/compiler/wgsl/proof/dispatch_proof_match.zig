@@ -1,8 +1,13 @@
 const ir = @import("../ir/ir.zig");
 const ir_const_eval = @import("../ir/ir_const_eval.zig");
+const ir_query = @import("../ir/ir_query.zig");
 const loop_match = @import("dispatch_proof_loop_match.zig");
 const layout_utils = @import("../ir/layout_utils.zig");
 const lean_proof = @import("../../../verification/lean_proof.zig");
+
+const resolve_const_local_initializer = ir_query.resolveConstLocalInitializer;
+const resolve_indexable_type = ir_query.resolveIndexableType;
+const resolve_value_alias = ir_query.resolveValueAlias;
 
 pub fn try_elide_storage_index(
     module: *const ir.Module,
@@ -242,16 +247,6 @@ fn try_elide_dispatch_validated_builtin_index(
     }
 
     return null;
-}
-
-fn resolve_indexable_type(types: *const ir.TypeStore, ty: ir.TypeId) ir.TypeId {
-    var current = ty;
-    while (true) {
-        switch (types.get(current)) {
-            .ref => |ref_ty| current = ref_ty.elem,
-            else => return current,
-        }
-    }
 }
 
 fn resolve_runtime_array_element_stride(
@@ -944,36 +939,6 @@ fn classify_builtin_component(
     if (std.mem.eql(u8, member.field_name, "x")) return 0;
     if (std.mem.eql(u8, member.field_name, "y")) return 1;
     if (std.mem.eql(u8, member.field_name, "z")) return 2;
-    return null;
-}
-
-fn resolve_value_alias(function: *const ir.Function, expr_id: ir.ExprId) ir.ExprId {
-    var current = expr_id;
-    while (true) {
-        const expr = function.exprs.items[current];
-        switch (expr.data) {
-            .load => |inner| current = inner,
-            .construct => |construct| {
-                if (construct.args.len != 1) return current;
-                current = function.expr_args.items[construct.args.start];
-            },
-            .local_ref => |local_idx| {
-                current = resolve_const_local_initializer(function, local_idx) orelse return current;
-            },
-            else => return current,
-        }
-    }
-}
-
-fn resolve_const_local_initializer(function: *const ir.Function, local_idx: u32) ?ir.ExprId {
-    for (function.stmts.items) |stmt| {
-        switch (stmt) {
-            .local_decl => |decl| {
-                if (decl.local == local_idx and decl.is_const) return decl.initializer;
-            },
-            else => {},
-        }
-    }
     return null;
 }
 

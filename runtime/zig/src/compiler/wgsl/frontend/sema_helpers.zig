@@ -1,10 +1,14 @@
 const std = @import("std");
 const ast_mod = @import("ast.zig");
 const ir = @import("../ir/ir.zig");
+const sema_type_syntax = @import("sema_type_syntax.zig");
 const sema_types = @import("sema_types.zig");
 
 const Ast = ast_mod.Ast;
 const SemanticModule = sema_types.SemanticModule;
+
+pub const parse_access = sema_type_syntax.parseAccess;
+pub const parse_address_space = sema_type_syntax.parseAddressSpace;
 
 pub fn init_builtin_types(module: *SemanticModule) !void {
     module.void_type = try module.types.intern(.{ .scalar = .void });
@@ -67,22 +71,6 @@ pub fn parse_builtin_attr(tree: *const Ast, attr_idx: u32) !ir.Builtin {
     if (std.mem.eql(u8, name, "subgroup_invocation_id")) return .subgroup_invocation_id;
     if (std.mem.eql(u8, name, "clip_distances")) return .clip_distances;
     if (std.mem.eql(u8, name, "primitive_index")) return .primitive_index;
-    return error.InvalidAttribute;
-}
-
-pub fn parse_address_space(name: []const u8) !ir.AddressSpace {
-    if (std.mem.eql(u8, name, "function")) return .function;
-    if (std.mem.eql(u8, name, "private")) return .private;
-    if (std.mem.eql(u8, name, "workgroup")) return .workgroup;
-    if (std.mem.eql(u8, name, "uniform")) return .uniform;
-    if (std.mem.eql(u8, name, "storage")) return .storage;
-    return error.InvalidAttribute;
-}
-
-pub fn parse_access(name: []const u8) !ir.AccessMode {
-    if (std.mem.eql(u8, name, "read")) return .read;
-    if (std.mem.eql(u8, name, "write")) return .write;
-    if (std.mem.eql(u8, name, "read_write")) return .read_write;
     return error.InvalidAttribute;
 }
 

@@ -2,8 +2,13 @@ const std = @import("std");
 const dispatch_proof_match = @import("../proof/dispatch_proof_match.zig");
 const dispatch_uniform_bounds = @import("../proof/dispatch_uniform_bounds.zig");
 const ir = @import("ir.zig");
+const ir_query = @import("ir_query.zig");
 const lean_proof = @import("../../../verification/lean_proof.zig");
 const robustness_static_bounds = @import("../proof/robustness_static_bounds.zig");
+
+const resolve_const_local_initializer = ir_query.resolveConstLocalInitializer;
+const resolve_indexable_type = ir_query.resolveIndexableType;
+const resolve_value_alias = ir_query.resolveValueAlias;
 
 pub const TransformError = error{
     OutOfMemory,
@@ -115,17 +120,6 @@ fn transform_function(
 }
 
 /// Resolve through ref types to get the indexable element type.
-fn resolve_indexable_type(types: *const ir.TypeStore, ty: ir.TypeId) ir.TypeId {
-    var current = ty;
-    while (true) {
-        switch (types.get(current)) {
-            .ref => |ref_ty| current = ref_ty.elem,
-            else => return current,
-        }
-    }
-}
-
-/// Intern the u32 scalar type, creating it if it does not already exist.
 fn ensure_u32_type(module: *ir.Module) TransformError!ir.TypeId {
     return module.types.intern(.{ .scalar = .u32 }) catch return error.OutOfMemory;
 }
@@ -295,36 +289,6 @@ fn dispatch_fit_texture_coord_dim(tex_type: ir.Type) ?u8 {
         .texture_3d => 3,
         else => null,
     };
-}
-
-fn resolve_value_alias(function: *const ir.Function, expr_id: ir.ExprId) ir.ExprId {
-    var current = expr_id;
-    while (true) {
-        const expr = function.exprs.items[current];
-        switch (expr.data) {
-            .load => |inner| current = inner,
-            .construct => |construct| {
-                if (construct.args.len != 1) return current;
-                current = function.expr_args.items[construct.args.start];
-            },
-            .local_ref => |local_idx| {
-                current = resolve_const_local_initializer(function, local_idx) orelse return current;
-            },
-            else => return current,
-        }
-    }
-}
-
-fn resolve_const_local_initializer(function: *const ir.Function, local_idx: u32) ?ir.ExprId {
-    for (function.stmts.items) |stmt| {
-        switch (stmt) {
-            .local_decl => |decl| {
-                if (decl.local == local_idx and decl.is_const) return decl.initializer;
-            },
-            else => {},
-        }
-    }
-    return null;
 }
 
 fn classify_gid_scalar(function: *const ir.Function, expr_id: ir.ExprId) ?u8 {
