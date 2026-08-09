@@ -1,0 +1,104 @@
+# Runtime architecture audit
+
+This is the current classification of Doe's non-test Zig surfaces. It is an
+architecture review, not a claim that every line is promoted product code.
+The import fence and source-layout gates are the structural authority; this
+page records the lifecycle interpretation and follow-up decisions.
+
+## Verdict
+
+The runtime is layered and its declared import topology is currently green:
+
+- `zig build import-fence` passes.
+- `zig build source-layout` passes.
+- No dependency, cycle, reachability, or cohesive-module exceptions are
+  currently recorded in `runtime/zig/source-layout.json`.
+
+That proves the boundaries are enforceable. It does not prove that every
+boundary is the smallest or best reuse boundary. The main remaining risks are
+known legacy contract paths, broad layer permissions, platform-specific
+parallel implementations, and diagnostic/future modules living under
+production-shaped roots.
+
+## Classification
+
+| Surface | Classification | Boundary decision |
+| --- | --- | --- |
+| `src/contracts/` | Canonical | Shared semantic contracts. New consumers should import these rather than backend or model-specific copies. |
+| `src/compiler/wgsl/` | Canonical | WGSL parsing, IR, transforms, proofs, and target emission. Keep lowering separate from native execution. |
+| `src/compiler/tsir/` | Diagnostic/canonical research path | Doe-owned portability path with real contracts, but broad target execution is not yet promoted. |
+| `src/backend/common/` | Canonical shared implementation | The current six helpers import canonical contracts and are reused by backend paths; no merge is justified from this audit. |
+| `src/backend/metal/`, `vulkan/`, `d3d12/` | Canonical platform components | Keep separate because the native APIs, synchronization, memory, and failure models differ. Reuse policy, contracts, tracing, and common helpers. |
+| `src/native/` | Canonical runtime | Doe-native WebGPU objects, resource ownership, commands, and lifecycle. Backend mechanics should remain below shared runtime contracts. |
+| `src/runtime/` | Canonical shared services | Queues, cache, device, lifecycle, diagnostics, execution policy, and trace services shared by runtime paths. |
+| `src/core/` | Canonical compute core | Narrower WebGPU/compute ABI and shared core behavior. It must not become a second full-runtime implementation. |
+| `src/full/` | Mixed: canonical full surface plus module incubation | Full WebGPU behavior is a valid surface; `src/full/modules/rendering` and `services` are reachable through `module-core-runner`, package tooling, and module gates, but are not native GPU execution evidence. |
+| `src/dropin/` and `src/compat/` | Compatibility surfaces | Keep only for declared consumers and tests. Facades need removal conditions, not silent permanence. |
+| `src/spatial/` | Diagnostic target path | HostPlan/CSL tooling is Doe-owned, but simulator or bootstrap output is not general hardware evidence. |
+| `src/integrations/` | Repo-only integration seams | Keep external adapters isolated from the runtime product contract. |
+| `src/plan/`, `src/command/`, `src/quirk/`, `src/verification/` | Supporting runtime layers | Keep separate where they own distinct policy, normalization, or proof boundaries. |
+| `src/cli/`, `runtime/zig/tools/`, `runtime/zig/bench/` | Tooling | Not runtime product code; do not use their size as evidence of runtime capability. |
+| `src/core/abi/generated/` | Generated | Maintain through the generator contract; do not hand-refactor generated ABI. |
+
+## Reuse and deduplication findings
+
+### Reachability accounting caveat
+
+The current architecture report marks the whole `runtime/zig/src` tree
+reachable. This is expected from the current root policy: `productionRoots`
+includes `src/**/mod.zig`, the module runner, compiler tools, integration
+anchors, spatial tools, and proof consumers. Barrel modules intentionally
+re-export large surfaces, so “reachable” currently means “reachable from a
+declared source root,” not “required by the shipped native runtime.”
+
+The report therefore cannot yet answer the reduction question by itself. The
+next measurement must produce separate graphs for:
+
+- shipped native/package runtime;
+- drop-in and compatibility surfaces;
+- module-incubation and benchmark tools;
+- compiler/TSIR/spatial toolchains.
+
+Until those graphs exist, deleting an apparently reachable module would mix
+runtime, package, and evidence-tool contracts.
+
+The source-layout manifest records the important canonicalization decisions:
+
+- `src/contracts/capability.zig` supersedes
+  `src/backend/common/capabilities.zig`.
+- `src/contracts/command.zig` supersedes the model, core, and full command
+  registry paths listed as forbidden legacy paths.
+- `src/contracts/execution.zig` supersedes `src/backend/common/errors.zig`.
+- `src/compat/webgpu_ffi.zig` is an intentional external facade with a named
+  consumer, test, owner, and removal condition.
+
+The forbidden legacy files are absent from the current tree, and the current
+Zig sources do not import them. That is evidence that this particular contract
+deduplication has already landed. Keep the forbidden-path entries as guards;
+remove them only when the compatibility and migration history no longer needs
+the protection.
+
+Metal, Vulkan, and D3D12 should not be merged into one implementation. Their
+platform mechanics are correctly separate. The reuse target is the semantic
+layer above them: contracts, command meaning, capability policy, artifact
+identity, timing, trace, and error taxonomy.
+
+## Architecture follow-up
+
+1. Add separate runtime/tool reachability views without weakening the existing
+   import fence.
+2. Keep the forbidden legacy paths guarded and verify new code imports the
+   canonical contracts.
+3. Keep `src/full/modules/` classified as module incubation and ensure its
+   deterministic contract results are never promoted as physical GPU evidence.
+4. Consolidate high-confidence repeated helpers in backend artifact/timing,
+   TSIR/CSL emission, and module request parsing only when semantic tests cover
+   both consumers.
+5. Split only the files that exceed the advisory architecture signal when the
+   split follows a real responsibility boundary.
+6. Re-run import-fence, source-layout, core tests, WGSL tests, and package tests
+   after each migration.
+
+No implementation has been deleted in this audit. The evidence currently
+supports “layered with module-incubation separation and targeted file review,”
+not “rewrite the runtime” or “everything is already optimally abstracted.”
