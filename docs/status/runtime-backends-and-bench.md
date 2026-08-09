@@ -36,6 +36,10 @@ file only names the promoted boundary and open admission gates.
   and identities, successful dispatches, and output-oracle matches. Version 1
   evidence remains an unbound capability snapshot; Metal and D3D12 remain
   separate physical-host obligations.
+- The recomposition kernel-dispatch receipt rebuilds the frozen baseline and
+  current runtime, runs the same output-oracled kernel on the AMD-only Vulkan
+  ICD, and requires exact normalized command, output, error, trace, receipt,
+  and shader-artifact identities before classifying the dispatch seam equal.
 
 ## Admission blockers
 

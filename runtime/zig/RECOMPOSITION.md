@@ -690,7 +690,13 @@ universal ideals.
 - [x] Route command JSON through the canonical command, runtime router, `BackendIface`, concrete compute implementation, neutral result, trace, and receipt path.
 - [x] Share validation, command/capability contracts, workgroup normalization, artifact identity, timing semantics, error taxonomy, and pure layout calculations across backends.
 - [x] Keep resource transitions, encoder creation, descriptor allocation, fences/semaphores, native lifetimes, driver workarounds, and submission batching backend-local.
-- [ ] Prove exact normalized-output, error, trace-identity, receipt, and artifact-digest equality between the old and new kernel-dispatch paths.
+- [x] Prove exact normalized-output, error, trace-identity, receipt, and artifact-digest equality between the old and new kernel-dispatch paths in `runtime/zig/reports/recomposition/kernel-dispatch-equivalence.json`.
+  Reproduce on an admitted AMD Vulkan host with:
+
+  ```bash
+  python3 runtime/zig/tools/capture_kernel_dispatch_equivalence.py \
+    --vulkan-icd /path/to/physical-amd-icd.json
+  ```
 - [x] Benchmark old and new kernel-dispatch paths on identical fixed workloads before deleting the former path.
 - [ ] Delete temporary characterization adapters and the former kernel-dispatch path after equivalence and performance checks pass.
 - [x] Apply the proven execution-contract pattern to buffer upload and writes.
