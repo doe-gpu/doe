@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe recomposition backend evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "backends",
+    "claimable",
+    "evidenceMaturity",
+    "host",
+    "policy",
+    "schemaVersion",
+    "status"
+  ],
+  "properties": {
+    "backends": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["d3d12", "metal", "vulkan"],
+      "properties": {
+        "d3d12": { "$ref": "#/$defs/osBackend" },
+        "metal": { "$ref": "#/$defs/osBackend" },
+        "vulkan": { "$ref": "#/$defs/vulkanBackend" }
+      }
+    },
+    "claimable": { "type": "boolean" },
+    "evidenceMaturity": {
+      "type": "string",
+      "enum": ["diagnostic", "comparable"]
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["machine", "operatingSystem", "release"],
+      "properties": {
+        "machine": { "type": "string", "minLength": 1 },
+        "operatingSystem": { "type": "string", "minLength": 1 },
+        "release": { "type": "string", "minLength": 1 }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["physicalHardwareRequired", "softwareFallbackProhibited"],
+      "properties": {
+        "physicalHardwareRequired": { "type": "boolean", "const": true },
+        "softwareFallbackProhibited": { "type": "boolean", "const": true }
+      }
+    },
+    "schemaVersion": { "type": "integer", "const": 2 },
+    "status": {
+      "type": "string",
+      "enum": ["captured", "hardware-evidence-incomplete"]
+    }
+  },
+  "$defs": {
+    "osBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["availability", "representativeOutput", "requiredHostOs"],
+      "properties": {
+        "availability": {
+          "type": "string",
+          "enum": ["eligible-not-run", "not-available-host-os"]
+        },
+        "representativeOutput": {
+          "type": "string",
+          "enum": ["captured", "not-captured"]
+        },
+        "requiredHostOs": {
+          "type": "string",
+          "enum": ["Darwin", "Windows"]
+        }
+      }
+    },
+    "outputSide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dispatchCount",
+        "executionBackend",
+        "outputOracleCount",
+        "outputOracleMatchedCount",
+        "product",
+        "sampleCount"
+      ],
+      "properties": {
+        "dispatchCount": { "type": "integer", "minimum": 1 },
+        "executionBackend": { "type": "string", "minLength": 1 },
+        "outputOracleCount": { "type": "integer", "minimum": 1 },
+        "outputOracleMatchedCount": { "type": "integer", "minimum": 1 },
+        "product": { "type": "string", "minLength": 1 },
+        "sampleCount": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "renderNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "readable", "writable"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^/dev/dri/renderD[0-9]+$" },
+        "readable": { "type": "boolean" },
+        "writable": { "type": "boolean" }
+      }
+    },
+    "representativeOutputEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline",
+        "comparison",
+        "reportPath",
+        "reportSha256",
+        "workloadId"
+      ],
+      "properties": {
+        "baseline": { "$ref": "#/$defs/outputSide" },
+        "comparison": { "$ref": "#/$defs/outputSide" },
+        "reportPath": { "type": "string", "pattern": "^bench/out/[^/].*\\.json$" },
+        "reportSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "workloadId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "vulkanBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "availability",
+        "physicalGpuEligible",
+        "renderNodes",
+        "representativeOutput"
+      ],
+      "properties": {
+        "availability": {
+          "type": "string",
+          "enum": [
+            "diagnostic-only",
+            "not-captured-vulkaninfo-missing",
+            "physical-adapter-accessible"
+          ]
+        },
+        "device": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["deviceName", "deviceType", "driverInfo", "driverName"],
+          "properties": {
+            "deviceName": { "type": ["string", "null"] },
+            "deviceType": { "type": ["string", "null"] },
+            "driverInfo": { "type": ["string", "null"] },
+            "driverName": { "type": ["string", "null"] }
+          }
+        },
+        "physicalGpuEligible": { "type": "boolean" },
+        "renderNodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/renderNode" }
+        },
+        "representativeOutput": {
+          "type": "string",
+          "enum": [
+            "captured",
+            "eligible-not-run",
+            "not-captured",
+            "not-captured-physical-run-required",
+            "not-captured-render-node-access-required"
+          ]
+        },
+        "representativeOutputEvidence": {
+          "$ref": "#/$defs/representativeOutputEvidence"
+        },
+        "softwareFallbackDetected": { "type": "boolean" },
+        "summaryExitCode": { "type": "integer" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "representativeOutput": { "const": "captured" } },
+            "required": ["representativeOutput"]
+          },
+          "then": { "required": ["representativeOutputEvidence"] }
+        }
+      ]
+    }
+  }
+}

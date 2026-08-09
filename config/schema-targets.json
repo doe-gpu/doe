@@ -102,6 +102,10 @@
       "data": "config/vulkan-host-profiles.json"
     },
     {
+      "schema": "config/recomposition-backend-evidence.schema.json",
+      "data": "runtime/zig/reports/recomposition/backend-evidence.json"
+    },
+    {
       "schema": "config/governed-lanes.schema.json",
       "data": "config/governed-lanes.json"
     },

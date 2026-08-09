@@ -11,23 +11,44 @@
       "requiredHostOs": "Darwin"
     },
     "vulkan": {
-      "availability": "diagnostic-only",
+      "availability": "physical-adapter-accessible",
       "device": {
-        "deviceName": "llvmpipe (LLVM 19.1.1, 256 bits)",
-        "deviceType": "PHYSICAL_DEVICE_TYPE_CPU",
-        "driverInfo": "Mesa 24.2.8-1ubuntu1~24.04.1 (LLVM 19.1.1)",
-        "driverName": "llvmpipe"
+        "deviceName": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+        "deviceType": "PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU",
+        "driverInfo": "Mesa 26.0.3-1ubuntu1",
+        "driverName": "radv"
       },
-      "physicalGpuEligible": false,
+      "physicalGpuEligible": true,
       "renderNodes": [
         {
           "path": "/dev/dri/renderD128",
-          "readable": false,
-          "writable": false
+          "readable": true,
+          "writable": true
         }
       ],
-      "representativeOutput": "not-captured-physical-run-required",
-      "softwareFallbackDetected": true,
+      "representativeOutput": "captured",
+      "representativeOutputEvidence": {
+        "baseline": {
+          "dispatchCount": 100,
+          "executionBackend": "doe_vulkan",
+          "outputOracleCount": 1,
+          "outputOracleMatchedCount": 1,
+          "product": "doe",
+          "sampleCount": 7
+        },
+        "comparison": {
+          "dispatchCount": 100,
+          "executionBackend": "dawn_delegate",
+          "outputOracleCount": 1,
+          "outputOracleMatchedCount": 1,
+          "product": "dawn_delegate",
+          "sampleCount": 7
+        },
+        "reportPath": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/compute/report.json",
+        "reportSha256": "6752bcb89c786e1dd9f6dc040111593e074bcd35e56c74db1524a0c1cac691a5",
+        "workloadId": "compute_workgroup_atomic_1024"
+      },
+      "softwareFallbackDetected": false,
       "summaryExitCode": 0
     }
   },
@@ -36,12 +57,12 @@
   "host": {
     "machine": "x86_64",
     "operatingSystem": "Linux",
-    "release": "6.8.0-90-generic"
+    "release": "7.0.0-28-generic"
   },
   "policy": {
     "physicalHardwareRequired": true,
     "softwareFallbackProhibited": true
   },
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "status": "hardware-evidence-incomplete"
 }

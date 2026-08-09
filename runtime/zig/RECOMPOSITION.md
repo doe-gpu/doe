@@ -639,6 +639,7 @@ universal ideals.
 - [x] Capture WGSL-to-IR and WGSL-to-MSL/SPIR-V/HLSL/CSL semantic and output digests as immutable fixtures.
 - [x] Capture trace rows, terminal trace hashes, replay results, receipt identities, and first failure boundaries for the promoted paths.
 - [ ] Capture backend capability reports and representative Metal, Vulkan, and D3D12 compute outputs with explicit hardware/runtime identity.
+  - Vulkan is captured and receipt-bound in `runtime/zig/reports/recomposition/backend-evidence.json`; Metal and D3D12 remain separate host obligations.
 - [x] Capture clean and incremental compilation measurements, promoted hot-path benchmark medians, and binary sizes without turning them into universal claims.
 - [x] Add one baseline verifier that classifies a structural result as exact equivalence, approved contract change, or failure.
 - [x] Extend `runtime/zig/source-layout.json` to version 2 instead of creating another architecture policy file.
