@@ -108,6 +108,15 @@ class NativeCompareConfigSupportTests(unittest.TestCase):
                     selector=config.get("selector"),
                 )
                 self.assertTrue(workloads)
+                required_samples = (
+                    policy.comparability_min_timed_samples
+                    if any(workload.claim_eligible for workload in workloads)
+                    else policy.smoke_comparability_min_timed_samples
+                )
+                self.assertGreaterEqual(
+                    config["run"]["iterations"],
+                    required_samples,
+                )
                 for workload in workloads:
                     self.assertTrue(workload.comparable, msg=workload.id)
                     self.assertEqual(workload.benchmark_class, "comparable", msg=workload.id)

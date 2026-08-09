@@ -22,6 +22,9 @@ file only names the promoted boundary and open admission gates.
 - Strict Linux Vulkan profiles declare ordered distro-specific ICD path
   candidates. Preflight selects only the first installed declared candidate;
   it does not scan for or fall back to an undeclared software ICD.
+- GPU smoke configs that select claim-eligible catalog workloads use the full
+  comparability sample floor. The lower diagnostic smoke floor applies only to
+  workloads that are not claim-eligible.
 
 ## Admission blockers
 

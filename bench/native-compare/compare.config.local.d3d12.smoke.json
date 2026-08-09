@@ -9,7 +9,7 @@
     "commandTemplate": "runtime/zig/zig-out/bin/doe-zig-runtime.exe --commands {commands} --quirks {quirks} --vendor {vendor} --api {api} --family {family} --driver {driver} --backend native --backend-lane d3d12_dawn_release --execute --trace --queue-sync-mode {queue_sync_mode} --upload-buffer-usage {upload_buffer_usage} --upload-submit-every {upload_submit_every} --trace-jsonl {trace_jsonl} --trace-meta {trace_meta} {extra_args}"
   },
   "run": {
-    "iterations": 3,
+    "iterations": 7,
     "warmup": 0,
     "out": "bench/out/dawn-vs-doe.local.d3d12.smoke.json",
     "workspace": "bench/out/runtime-comparisons.local.d3d12.smoke",
