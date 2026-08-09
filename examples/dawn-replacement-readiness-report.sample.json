@@ -2,12 +2,133 @@
   "artifactKind": "dawn-replacement-readiness-report",
   "frontierId": "dawn-replacement-frontier-v0",
   "gate": {
-    "failures": [],
-    "ok": true,
+    "failures": [
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-node-amd-vulkan: claimState must be claim-indexed, got 'scaffolded'",
+        "path": "rows[3].claimIndexEntryIds[1]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-node-amd-vulkan: comparisonStatus must be comparable, got 'not-evaluated'",
+        "path": "rows[3].claimIndexEntryIds[1]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-node-amd-vulkan: claimStatus must be claimable, got 'not-evaluated'",
+        "path": "rows[3].claimIndexEntryIds[1]"
+      },
+      {
+        "code": "claim_index_entry_missing_claim_path",
+        "message": "package-node-amd-vulkan: claim-allowed frontier rows require claimPath",
+        "path": "rows[3].claimIndexEntryIds[1]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-node-amd-vulkan: claimState must be claim-indexed, got 'scaffolded'",
+        "path": "rows[3].evidenceSlices[1].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-node-amd-vulkan: comparisonStatus must be comparable, got 'not-evaluated'",
+        "path": "rows[3].evidenceSlices[1].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-node-amd-vulkan: claimStatus must be claimable, got 'not-evaluated'",
+        "path": "rows[3].evidenceSlices[1].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_missing_claim_path",
+        "message": "package-node-amd-vulkan: claim-allowed frontier rows require claimPath",
+        "path": "rows[3].evidenceSlices[1].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-bun-amd-vulkan: claimState must be claim-indexed, got 'scaffolded'",
+        "path": "rows[4].claimIndexEntryIds[1]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-bun-amd-vulkan: comparisonStatus must be comparable, got 'not-evaluated'",
+        "path": "rows[4].claimIndexEntryIds[1]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-bun-amd-vulkan: claimStatus must be claimable, got 'not-evaluated'",
+        "path": "rows[4].claimIndexEntryIds[1]"
+      },
+      {
+        "code": "claim_index_entry_missing_claim_path",
+        "message": "package-bun-amd-vulkan: claim-allowed frontier rows require claimPath",
+        "path": "rows[4].claimIndexEntryIds[1]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-bun-amd-vulkan: claimState must be claim-indexed, got 'scaffolded'",
+        "path": "rows[4].evidenceSlices[1].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-bun-amd-vulkan: comparisonStatus must be comparable, got 'not-evaluated'",
+        "path": "rows[4].evidenceSlices[1].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "package-bun-amd-vulkan: claimStatus must be claimable, got 'not-evaluated'",
+        "path": "rows[4].evidenceSlices[1].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_missing_claim_path",
+        "message": "package-bun-amd-vulkan: claim-allowed frontier rows require claimPath",
+        "path": "rows[4].evidenceSlices[1].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "dropin-cutover-linux-vulkan: claimState must be claim-indexed, got 'scaffolded'",
+        "path": "rows[9].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "dropin-cutover-linux-vulkan: comparisonStatus must be comparable, got 'not-evaluated'",
+        "path": "rows[9].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "dropin-cutover-linux-vulkan: claimStatus must be claimable, got 'not-evaluated'",
+        "path": "rows[9].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_missing_claim_path",
+        "message": "dropin-cutover-linux-vulkan: claim-allowed frontier rows require claimPath",
+        "path": "rows[9].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "dropin-cutover-linux-vulkan: claimState must be claim-indexed, got 'scaffolded'",
+        "path": "rows[9].evidenceSlices[0].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "dropin-cutover-linux-vulkan: comparisonStatus must be comparable, got 'not-evaluated'",
+        "path": "rows[9].evidenceSlices[0].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_not_claimable",
+        "message": "dropin-cutover-linux-vulkan: claimStatus must be claimable, got 'not-evaluated'",
+        "path": "rows[9].evidenceSlices[0].claimIndexEntryIds[0]"
+      },
+      {
+        "code": "claim_index_entry_missing_claim_path",
+        "message": "dropin-cutover-linux-vulkan: claim-allowed frontier rows require claimPath",
+        "path": "rows[9].evidenceSlices[0].claimIndexEntryIds[0]"
+      }
+    ],
+    "ok": false,
     "summary": {
-      "claimAllowedEvidenceSliceCount": 5,
+      "claimAllowedEvidenceSliceCount": 7,
       "claimAllowedRowCount": 5,
-      "evidenceSliceCount": 16,
+      "evidenceSliceCount": 18,
       "frontierRowCount": 11,
       "requiredRowCount": 11
     }
@@ -18,20 +139,20 @@
       "claimAllowed": true,
       "claimIndexEntries": [
         {
-          "claimPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json",
+          "claimPath": "bench/out/apple-metal/20260705T163736Z/runtime.apple-metal.claim.json",
           "claimState": "claim-indexed",
           "claimStatus": "claimable",
           "comparisonStatus": "comparable",
           "id": "native-strict-apple-metal",
-          "reportPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json"
+          "reportPath": "bench/out/apple-metal/20260705T163736Z/runtime.apple-metal.compare.json"
         },
         {
-          "claimPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json",
+          "claimPath": "bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.claim.json",
           "claimState": "claim-indexed",
           "claimStatus": "claimable",
           "comparisonStatus": "comparable",
           "id": "native-release-apple-metal",
-          "reportPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json"
+          "reportPath": "bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.json"
         }
       ],
       "currentState": "claimable",
@@ -49,20 +170,20 @@
           "claimAllowed": true,
           "claimIndexEntries": [
             {
-              "claimPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.claim.json",
+              "claimPath": "bench/out/apple-metal/20260705T163736Z/runtime.apple-metal.claim.json",
               "claimState": "claim-indexed",
               "claimStatus": "claimable",
               "comparisonStatus": "comparable",
               "id": "native-strict-apple-metal",
-              "reportPath": "bench/out/apple-metal/compare/20260626T183822Z/dawn-vs-doe.apple.metal.compare.json"
+              "reportPath": "bench/out/apple-metal/20260705T163736Z/runtime.apple-metal.compare.json"
             },
             {
-              "claimPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.claim.json",
+              "claimPath": "bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.claim.json",
               "claimState": "claim-indexed",
               "claimStatus": "claimable",
               "comparisonStatus": "comparable",
               "id": "native-release-apple-metal",
-              "reportPath": "bench/out/apple-metal/release/20260626T184854Z/dawn-vs-doe.apple.metal.release.json"
+              "reportPath": "bench/out/apple-metal/release/20260706T001555Z/runtime.apple-metal.release.json"
             }
           ],
           "currentState": "claimable",
@@ -242,12 +363,21 @@
       "claimAllowed": true,
       "claimIndexEntries": [
         {
-          "claimPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json",
+          "claimPath": "bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.claim.json",
           "claimState": "claim-indexed",
           "claimStatus": "claimable",
           "comparisonStatus": "comparable",
           "id": "package-node-apple-metal",
-          "reportPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json"
+          "reportPath": "bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.compare.json"
+        },
+        {
+          "blocker": "AMD Vulkan Node package evidence was removed from checkout; this lane is scaffolded until the new package compare artifacts are regenerated.",
+          "claimPath": "",
+          "claimState": "scaffolded",
+          "claimStatus": "not-evaluated",
+          "comparisonStatus": "not-evaluated",
+          "id": "package-node-amd-vulkan",
+          "reportPath": ""
         }
       ],
       "currentState": "claimable",
@@ -255,6 +385,9 @@
       "doeTarget": "doe-gpu-node",
       "evidencePaths": [
         "reports/claim-index.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.claim.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.claim-rehearsal.manifest.json",
         "packages/doe-gpu/README.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
@@ -265,12 +398,12 @@
           "claimAllowed": true,
           "claimIndexEntries": [
             {
-              "claimPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.claim.json",
+              "claimPath": "bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.claim.json",
               "claimState": "claim-indexed",
               "claimStatus": "claimable",
               "comparisonStatus": "comparable",
               "id": "package-node-apple-metal",
-              "reportPath": "bench/out/apple-metal/20260626T185557Z/gemma64.node-package.warm.ir.compare.json"
+              "reportPath": "bench/out/apple-metal/20260706T001434Z/gemma64.node-package.warm.ir.compare.json"
             }
           ],
           "currentState": "claimable",
@@ -287,6 +420,39 @@
           "os": "macos",
           "readinessStatus": "claimable",
           "runtimeHost": "node"
+        },
+        {
+          "arch": "x64",
+          "blockers": [],
+          "claimAllowed": true,
+          "claimIndexEntries": [
+            {
+              "blocker": "AMD Vulkan Node package evidence was removed from checkout; this lane is scaffolded until the new package compare artifacts are regenerated.",
+              "claimPath": "",
+              "claimState": "scaffolded",
+              "claimStatus": "not-evaluated",
+              "comparisonStatus": "not-evaluated",
+              "id": "package-node-amd-vulkan",
+              "reportPath": ""
+            }
+          ],
+          "currentState": "claimable",
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.claim.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.claim-rehearsal.manifest.json",
+            "packages/doe-gpu/README.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "id": "node-linux-x64-amd-vulkan",
+          "label": "Node Linux x64 AMD Vulkan",
+          "notes": "The Node package Linux AMD Vulkan slice is claimable through the indexed local Gemma 270M package comparison and claim rehearsal.",
+          "os": "linux",
+          "readinessStatus": "claimable",
+          "runtimeHost": "node"
         }
       ],
       "id": "package-node-runtime",
@@ -298,12 +464,21 @@
       "claimAllowed": true,
       "claimIndexEntries": [
         {
-          "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json",
+          "claimPath": "bench/out/apple-metal/20260705T163736Z/gemma64.bun-package.warm.ir.claim.json",
           "claimState": "claim-indexed",
           "claimStatus": "claimable",
           "comparisonStatus": "comparable",
           "id": "package-bun-apple-metal",
-          "reportPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json"
+          "reportPath": "bench/out/apple-metal/20260705T163736Z/gemma64.bun-package.warm.ir.compare.json"
+        },
+        {
+          "blocker": "AMD Vulkan Bun package evidence was removed from checkout; this lane is scaffolded until the new package compare artifacts are regenerated.",
+          "claimPath": "",
+          "claimState": "scaffolded",
+          "claimStatus": "not-evaluated",
+          "comparisonStatus": "not-evaluated",
+          "id": "package-bun-amd-vulkan",
+          "reportPath": ""
         }
       ],
       "currentState": "claimable",
@@ -311,6 +486,9 @@
       "doeTarget": "doe-gpu-bun",
       "evidencePaths": [
         "reports/claim-index.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.claim.json",
+        "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.claim-rehearsal.manifest.json",
         "packages/doe-gpu/README.md",
         "docs/status/runtime-backends-and-bench.md"
       ],
@@ -321,12 +499,12 @@
           "claimAllowed": true,
           "claimIndexEntries": [
             {
-              "claimPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.claim.json",
+              "claimPath": "bench/out/apple-metal/20260705T163736Z/gemma64.bun-package.warm.ir.claim.json",
               "claimState": "claim-indexed",
               "claimStatus": "claimable",
               "comparisonStatus": "comparable",
               "id": "package-bun-apple-metal",
-              "reportPath": "bench/out/apple-metal/20260626T185725Z/gemma64.bun-package.warm.ir.compare.json"
+              "reportPath": "bench/out/apple-metal/20260705T163736Z/gemma64.bun-package.warm.ir.compare.json"
             }
           ],
           "currentState": "claimable",
@@ -341,6 +519,39 @@
           "label": "Bun macOS arm64 Apple Metal",
           "notes": "The Bun package slice is claimable only for the indexed Apple Metal package receipt.",
           "os": "macos",
+          "readinessStatus": "claimable",
+          "runtimeHost": "bun"
+        },
+        {
+          "arch": "x64",
+          "blockers": [],
+          "claimAllowed": true,
+          "claimIndexEntries": [
+            {
+              "blocker": "AMD Vulkan Bun package evidence was removed from checkout; this lane is scaffolded until the new package compare artifacts are regenerated.",
+              "claimPath": "",
+              "claimState": "scaffolded",
+              "claimStatus": "not-evaluated",
+              "comparisonStatus": "not-evaluated",
+              "id": "package-bun-amd-vulkan",
+              "reportPath": ""
+            }
+          ],
+          "currentState": "claimable",
+          "evidencePaths": [
+            "reports/claim-index.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.claim.json",
+            "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.claim-rehearsal.manifest.json",
+            "packages/doe-gpu/README.md",
+            "docs/status/runtime-backends-and-bench.md"
+          ],
+          "gpuApi": "vulkan",
+          "gpuVendor": "amd",
+          "id": "bun-linux-x64-amd-vulkan",
+          "label": "Bun Linux x64 AMD Vulkan",
+          "notes": "The Bun package Linux AMD Vulkan slice is claimable through the indexed local Gemma 270M package comparison and claim rehearsal.",
+          "os": "linux",
           "readinessStatus": "claimable",
           "runtimeHost": "bun"
         }
@@ -479,12 +690,13 @@
       "claimAllowed": false,
       "claimIndexEntries": [
         {
+          "blocker": "Browser ORT comparison evidence was removed from checkout; this lane is scaffolded until a fresh browser comparison report is regenerated.",
           "claimPath": "",
-          "claimState": "diagnostic",
-          "claimStatus": "diagnostic",
-          "comparisonStatus": "comparable",
+          "claimState": "scaffolded",
+          "claimStatus": "not-evaluated",
+          "comparisonStatus": "not-evaluated",
           "id": "ort-browser-apple-metal",
-          "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
+          "reportPath": ""
         },
         {
           "blocker": "The checked-in Chromium browser release evidence is still diagnostic; claim indexing requires a published release-candidate browser archive with passing candidate consistency and a claimable browser frontier row.",
@@ -552,12 +764,13 @@
           "claimAllowed": false,
           "claimIndexEntries": [
             {
+              "blocker": "Browser ORT comparison evidence was removed from checkout; this lane is scaffolded until a fresh browser comparison report is regenerated.",
               "claimPath": "",
-              "claimState": "diagnostic",
-              "claimStatus": "diagnostic",
-              "comparisonStatus": "comparable",
+              "claimState": "scaffolded",
+              "claimStatus": "not-evaluated",
+              "comparisonStatus": "not-evaluated",
               "id": "ort-browser-apple-metal",
-              "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
+              "reportPath": ""
             },
             {
               "blocker": "The checked-in Chromium browser release evidence is still diagnostic; claim indexing requires a published release-candidate browser archive with passing candidate consistency and a claimable browser frontier row.",
@@ -781,8 +994,8 @@
             "artifactKind": "browser_release_artifact_bundle",
             "artifactVerification": {
               "requiredForClaimable": true,
-              "verified": true,
-              "verifyFilesRootProvided": true
+              "verified": false,
+              "verifyFilesRootProvided": false
             },
             "bundleId": "browser-release-diagnostic-sample-v1",
             "claimReports": [
@@ -907,14 +1120,20 @@
               "package_inputs_not_release_candidate",
               "package_inputs_not_release_candidate_eligible",
               "provenance_report_not_pass",
-              "release_artifact_bundle_not_release_candidate"
+              "release_artifact_bundle_not_release_candidate",
+              "release_support_artifact_hash_mismatch"
             ],
-            "failureCount": 7,
+            "failureCount": 8,
             "failures": [
               {
                 "code": "release_artifact_bundle_not_release_candidate",
                 "message": "browser release artifact bundle must be a release_candidate",
                 "path": "releaseCandidateEvidence.releaseArtifactBundle.releaseStatus"
+              },
+              {
+                "code": "release_support_artifact_hash_mismatch",
+                "message": "release support artifact sha256 must match referenced file bytes",
+                "path": "releaseCandidateEvidence.releaseSupportArtifacts.contracts[0].sha256"
               },
               {
                 "code": "provenance_report_not_pass",
@@ -2301,12 +2520,13 @@
       "claimAllowed": true,
       "claimIndexEntries": [
         {
-          "claimPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json",
-          "claimState": "claim-indexed",
-          "claimStatus": "claimable",
-          "comparisonStatus": "comparable",
+          "blocker": "Drop-in cutover rehearsal artifacts were not present in checkout; this lane is scaffolded until a fresh drop-in rehearsal receipt and claim sidecar are published.",
+          "claimPath": "",
+          "claimState": "scaffolded",
+          "claimStatus": "not-evaluated",
+          "comparisonStatus": "not-evaluated",
           "id": "dropin-cutover-linux-vulkan",
-          "reportPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json"
+          "reportPath": ""
         }
       ],
       "currentState": "claimable",
@@ -2333,12 +2553,13 @@
           "claimAllowed": true,
           "claimIndexEntries": [
             {
-              "claimPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal.claim.json",
-              "claimState": "claim-indexed",
-              "claimStatus": "claimable",
-              "comparisonStatus": "comparable",
+              "blocker": "Drop-in cutover rehearsal artifacts were not present in checkout; this lane is scaffolded until a fresh drop-in rehearsal receipt and claim sidecar are published.",
+              "claimPath": "",
+              "claimState": "scaffolded",
+              "claimStatus": "not-evaluated",
+              "comparisonStatus": "not-evaluated",
               "id": "dropin-cutover-linux-vulkan",
-              "reportPath": "bench/out/dropin/20260702T164301Z/dropin-cutover-rehearsal-receipt.json"
+              "reportPath": ""
             }
           ],
           "currentState": "claimable",
@@ -2431,10 +2652,10 @@
   "summary": {
     "blockedEvidenceSliceCount": 10,
     "blockedProductRowCount": 5,
-    "claimAllowedEvidenceSliceCount": 5,
+    "claimAllowedEvidenceSliceCount": 7,
     "claimAllowedProductRowCount": 5,
     "coveredEvidenceReleaseRowCount": 1,
-    "evidenceSliceCount": 16,
+    "evidenceSliceCount": 18,
     "frontierRowCount": 11,
     "productRowCount": 10,
     "uniqueBlockerCount": 8

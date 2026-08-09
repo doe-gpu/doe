@@ -903,9 +903,9 @@
       },
       "src/backend/vulkan/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "13625d6d5bec2ab0579424421cae25ebc1fdf3dbfc54fc2866bcfdebf9155ca9",
+        "moduleSha256": "3a9457f04eb277a48965e1dc2ae519c629e485d9aa31176f57cdf478255da33b",
         "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-recomposition-review/2026-08-09"
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",

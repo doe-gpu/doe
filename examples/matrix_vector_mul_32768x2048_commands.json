@@ -7,6 +7,17 @@
     "z": 1,
     "repeat": 100,
     "repeatSynchronization": "independent",
+    "initialize_buffers_on_create": true,
+    "output_oracle": {
+      "schema_version": 1,
+      "kind": "sha256_exact_v1",
+      "initialization": "zero_fill_v1",
+      "binding_group": 0,
+      "binding": 2,
+      "dispatch_count": 100,
+      "expected_sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+      "reference_id": "sha256_zero_bytes_131072_v1"
+    },
     "bindings": [
       {
         "binding": 0,

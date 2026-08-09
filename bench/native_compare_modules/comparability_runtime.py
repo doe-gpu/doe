@@ -253,6 +253,7 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
 
     kernels: list[str] = []
     seen: set[str] = set()
+    kernel_dispatch_command_count = 0
     output_oracle_count = 0
     output_oracle_dispatch_mismatches: list[dict[str, int]] = []
     for index, command in enumerate(payload):
@@ -260,6 +261,7 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
             continue
         if str(command.get("kind", "")).strip() != "kernel_dispatch":
             continue
+        kernel_dispatch_command_count += 1
         output_oracle = command.get("output_oracle") or command.get("outputOracle")
         if isinstance(output_oracle, dict):
             output_oracle_count += 1
@@ -281,6 +283,7 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
             seen.add(kernel)
             kernels.append(kernel)
     details["kernelDispatchCount"] = len(kernels)
+    details["kernelDispatchCommandCount"] = kernel_dispatch_command_count
     details["kernelDispatchOutputOracleCount"] = output_oracle_count
     details["kernelDispatchOutputOracleDispatchMismatches"] = output_oracle_dispatch_mismatches
     details["kernelDispatchKernels"] = kernels
@@ -294,6 +297,15 @@ def _expected_spirv_artifact_path(kernel: str) -> Path:
     if kernel_path.suffix == ".wgsl":
         return _DEFAULT_COMPARE_KERNEL_ROOT / kernel_path.with_suffix(".spv")
     return _DEFAULT_COMPARE_KERNEL_ROOT / f"{kernel}.spv"
+
+
+def _expected_wgsl_source_path(kernel: str) -> Path:
+    kernel_path = Path(kernel)
+    if kernel_path.suffix == ".spv":
+        return _DEFAULT_COMPARE_KERNEL_ROOT / kernel_path.with_suffix(".wgsl")
+    if kernel_path.suffix == ".wgsl":
+        return _DEFAULT_COMPARE_KERNEL_ROOT / kernel_path
+    return _DEFAULT_COMPARE_KERNEL_ROOT / f"{kernel}.wgsl"
 
 
 def assess_native_shader_artifact_equivalence(
@@ -368,12 +380,16 @@ def assess_native_shader_artifact_equivalence(
 
     declared_oracle_count = int(command_details.get("kernelDispatchOutputOracleCount", 0) or 0)
     oracle_failures: list[dict[str, str]] = []
-    if declared_oracle_count != len(kernels):
+    kernel_dispatch_command_count = int(
+        command_details.get("kernelDispatchCommandCount", 0) or 0
+    )
+    if declared_oracle_count != kernel_dispatch_command_count:
         oracle_failures.append({
             "kernel": "<commands>",
             "reason": (
                 "every strict native kernel_dispatch requires an output oracle: "
-                f"kernels={len(kernels)} oracles={declared_oracle_count}"
+                f"commands={kernel_dispatch_command_count} "
+                f"uniqueKernels={len(kernels)} oracles={declared_oracle_count}"
             ),
         })
     oracle_dispatch_mismatches = command_details.get(
@@ -410,7 +426,7 @@ def assess_native_shader_artifact_equivalence(
 
     for kernel in kernels:
         artifact_path = _expected_spirv_artifact_path(kernel)
-        source_path = _DEFAULT_COMPARE_KERNEL_ROOT / kernel
+        source_path = _expected_wgsl_source_path(kernel)
         artifact_entry = {
             "kernel": kernel,
             "expectedSpirvPath": str(artifact_path),

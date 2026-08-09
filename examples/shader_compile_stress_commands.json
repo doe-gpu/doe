@@ -8,6 +8,16 @@
     "repeat": 50,
     "warmup_dispatch_count": 1,
     "initialize_buffers_on_create": true,
+    "output_oracle": {
+      "schema_version": 1,
+      "kind": "sha256_exact_v1",
+      "initialization": "zero_fill_v1",
+      "binding_group": 0,
+      "binding": 2,
+      "dispatch_count": 50,
+      "expected_sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "reference_id": "sha256_zero_bytes_1048576_v1"
+    },
     "bindings": [
       {
         "binding": 0,

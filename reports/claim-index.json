@@ -109,11 +109,11 @@
       "runtimeHost": "browser",
       "backend": "apple-metal",
       "comparison": "doe-vs-dawn",
-      "metricDirection": "lower-is-better",
-      "claimState": "diagnostic",
-      "comparisonStatus": "comparable",
-      "claimStatus": "diagnostic",
-      "reportPath": "bench/out/browser-ort-webgpu-compare/20260626T193131Z/browser.compare.json"
+      "metricDirection": "status-only",
+      "claimState": "scaffolded",
+      "comparisonStatus": "not-evaluated",
+      "claimStatus": "not-evaluated",
+      "blocker": "Browser ORT comparison evidence was removed from checkout; this lane is scaffolded until a fresh browser comparison report is regenerated."
     },
     {
       "id": "browser-chromium-release",

@@ -29,6 +29,8 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         self,
         root: Path,
         *,
+        duplicate_dispatch: bool = False,
+        extensionless_kernel: bool = False,
         stale_source: bool = False,
         oracle_match: bool = True,
         oracle_dispatch_count: int = 3,
@@ -40,9 +42,9 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         (kernel_root / "test.wgsl").write_bytes(source)
         (kernel_root / "test.spv").write_bytes(spirv)
         commands = root / "commands.json"
-        commands.write_text(json.dumps([{
+        dispatch_command = {
             "kind": "kernel_dispatch",
-            "kernel": "test.wgsl",
+            "kernel": "test" if extensionless_kernel else "test.wgsl",
             "x": 1,
             "y": 1,
             "z": 1,
@@ -51,10 +53,18 @@ class NativeShaderComparabilityTests(unittest.TestCase):
                 "kind": "sha256_exact_v1",
                 "dispatch_count": oracle_dispatch_count,
             },
-        }]), encoding="utf-8")
+        }
+        commands.write_text(
+            json.dumps(
+                [dispatch_command, dispatch_command]
+                if duplicate_dispatch
+                else [dispatch_command]
+            ),
+            encoding="utf-8",
+        )
         manifest = root / "manifest.json"
         manifest.write_text(json.dumps({
-            "module": "test.wgsl",
+            "module": "test" if extensionless_kernel else "test.wgsl",
             "wgslSha256": _sha256(b"stale") if stale_source else _sha256(source),
             "spirvSha256": _sha256(spirv),
         }), encoding="utf-8")
@@ -62,16 +72,16 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         doe_sample = {"traceMeta": {
             "executionBackend": "doe_vulkan",
             "shaderArtifactManifestPath": str(manifest),
-            "outputOracleCount": 1,
-            "outputOracleMatchedCount": 1 if oracle_match else 0,
+            "outputOracleCount": 2 if duplicate_dispatch else 1,
+            "outputOracleMatchedCount": (2 if duplicate_dispatch else 1) if oracle_match else 0,
             "outputOracleFailedCount": 0 if oracle_match else 1,
             "outputOracleExpectedSha256": expected,
             "outputOracleActualSha256": expected if oracle_match else "b" * 64,
         }}
         dawn_sample = {"traceMeta": {
             "executionBackend": "dawn_delegate",
-            "outputOracleCount": 1,
-            "outputOracleMatchedCount": 1,
+            "outputOracleCount": 2 if duplicate_dispatch else 1,
+            "outputOracleMatchedCount": 2 if duplicate_dispatch else 1,
             "outputOracleFailedCount": 0,
             "outputOracleExpectedSha256": expected,
             "outputOracleActualSha256": expected,
@@ -99,6 +109,29 @@ class NativeShaderComparabilityTests(unittest.TestCase):
             applies, passes, _, reason = self._assess(Path(tmpdir))
         self.assertTrue(applies)
         self.assertTrue(passes, reason)
+
+    def test_extensionless_kernel_resolves_wgsl_source_and_spirv(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            applies, passes, details, reason = self._assess(
+                Path(tmpdir), extensionless_kernel=True
+            )
+        self.assertTrue(applies)
+        self.assertTrue(passes, reason)
+        self.assertTrue(
+            details["resolvedSpirvArtifacts"][0]["expectedWgslPath"].endswith(
+                "/test.wgsl"
+            )
+        )
+
+    def test_each_dispatch_command_requires_its_own_oracle(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            applies, passes, details, reason = self._assess(
+                Path(tmpdir), duplicate_dispatch=True
+            )
+        self.assertTrue(applies)
+        self.assertTrue(passes, reason)
+        self.assertEqual(details["kernelDispatchCommandCount"], 2)
+        self.assertEqual(details["kernelDispatchCount"], 1)
 
     def test_stale_wgsl_hash_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

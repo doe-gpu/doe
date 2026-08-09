@@ -26,6 +26,7 @@ const HASH_HEX_SIZE: usize = hash_utils.SHA256_HEX_SIZE;
 const MANIFEST_MODULE_CAPACITY: usize = 64;
 const MANIFEST_STATUS_CODE_CAPACITY: usize = 256;
 const STATUS_MESSAGE_BYTES: usize = 256;
+const MAX_SHADER_SOURCE_BYTES: usize = 16 * 1024 * 1024;
 const BOOTSTRAP_MANIFEST_MODULE = "bootstrap";
 const BOOTSTRAP_MANIFEST_STATUS_CODE = "backend_initialized";
 
@@ -266,15 +267,21 @@ pub const ZigVulkanBackend = struct {
     }
 
     pub fn shader_source_hash_for_module(self: *ZigVulkanBackend, module: []const u8) ?[HASH_HEX_SIZE]u8 {
-        const direct = std.fs.cwd().readFileAlloc(self.allocator, module, 16 * 1024 * 1024) catch null;
-        if (direct) |bytes| {
-            defer self.allocator.free(bytes);
-            return hash_utils.sha256_hex(bytes);
-        }
+        if (self.hash_shader_source_file(module)) |hash| return hash;
         const root = self.kernel_root_owned orelse "bench/kernels";
         const path = std.fs.path.join(self.allocator, &.{ root, module }) catch return null;
         defer self.allocator.free(path);
-        const bytes = std.fs.cwd().readFileAlloc(self.allocator, path, 16 * 1024 * 1024) catch return null;
+        if (self.hash_shader_source_file(path)) |hash| return hash;
+        if (std.mem.endsWith(u8, module, ".wgsl")) return null;
+        const wgsl_module = std.fmt.allocPrint(self.allocator, "{s}.wgsl", .{module}) catch return null;
+        defer self.allocator.free(wgsl_module);
+        const wgsl_path = std.fs.path.join(self.allocator, &.{ root, wgsl_module }) catch return null;
+        defer self.allocator.free(wgsl_path);
+        return self.hash_shader_source_file(wgsl_path);
+    }
+
+    fn hash_shader_source_file(self: *ZigVulkanBackend, path: []const u8) ?[HASH_HEX_SIZE]u8 {
+        const bytes = std.fs.cwd().readFileAlloc(self.allocator, path, MAX_SHADER_SOURCE_BYTES) catch return null;
         defer self.allocator.free(bytes);
         return hash_utils.sha256_hex(bytes);
     }
@@ -544,3 +551,15 @@ const VTABLE = backend_iface.BackendVTable{
     .prewarm_kernel_dispatch = prewarm_kernel_dispatch,
     .capture_buffer = capture_buffer,
 };
+
+test "extensionless artifact module resolves the executed WGSL source" {
+    var backend: ZigVulkanBackend = undefined;
+    backend.allocator = std.testing.allocator;
+    backend.kernel_root_owned = try std.testing.allocator.dupe(u8, "../../bench/kernels");
+    defer std.testing.allocator.free(backend.kernel_root_owned.?);
+
+    const extensionless_hash = backend.shader_source_hash_for_module("concurrent_execution_runsingle_u32");
+    const explicit_hash = backend.shader_source_hash_for_module("concurrent_execution_runsingle_u32.wgsl");
+    try std.testing.expect(extensionless_hash != null);
+    try std.testing.expectEqual(explicit_hash, extensionless_hash);
+}
