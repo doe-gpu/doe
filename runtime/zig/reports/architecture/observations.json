@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "ddcd15a86a77b56548b6638ed85dd34d0b70fa0b98cbab0fe57fd13d3b694cbf",
+  "manifestSha256": "9037b20ed39e1c9dd34a34ccec441e862108bf984dfab7057484b26f3f0b93ce",
   "observations": {
     "baselineComparison": {
       "moduleCountDelta": -5,
@@ -14,7 +14,7 @@
       "artifacts": [
         {
           "path": "$MEASUREMENT_ROOT/prefix/bin/doe-zig-runtime",
-          "sha256": "6052f1b2b6c35072b68cd1241ea298856ef6e3f1418f4766f1deac625811ee95",
+          "sha256": "b83f204816ab39ec6c0b85d91cbd464422bd72c5a75da841f9a81d0261fbfd70",
           "sizeBytes": 11194208
         }
       ],
@@ -22,7 +22,7 @@
       "captureToolChangedDuringCapture": false,
       "captureToolSha256": "897fe525b858db9269d5b8bc624d6a42b07e1283f7bfa26cf0d12ef9152a2c66",
       "cleanCompile": {
-        "elapsedNs": 63727835261,
+        "elapsedNs": 63492524420,
         "exitCode": 0,
         "stderr": "",
         "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -52,7 +52,7 @@
         "release": "7.0.0-28-generic"
       },
       "incrementalCompile": {
-        "elapsedNs": 50600914,
+        "elapsedNs": 43624530,
         "exitCode": 0,
         "stderr": "",
         "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

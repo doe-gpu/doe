@@ -12,7 +12,7 @@
       "ort-plugin-ep"
     ]
   },
-  "captureToolSha256": "3ef918e0b91eb89c2973191bcdbe0a268ad106fbb570f60a47b5b7b512b5fa56",
+  "captureToolSha256": "ea5f1aaaf30758a74244d08b7a3f26b358b17f49609eed5741d7e5e2d8c15287",
   "commandNormalization": {
     "input": "command-input.json",
     "output": "command-normalized.jsonl"
@@ -187,14 +187,14 @@
   "sharedLibraries": [
     {
       "path": "libonnxruntime_doe_ep.so",
-      "sha256": "22ba7109772ebe1aa40ca4183dadb3827968290fa8024f0b13d047e5698bd791",
+      "sha256": "ef91862b01fb9df3707c00ed4e20599a5c7e9880bf5fffe300df6d314030098b",
       "sizeBytes": 6077976,
       "symbolCount": 100,
       "symbols": "abi/libonnxruntime_doe_ep.so.symbols.txt"
     },
     {
       "path": "libwebgpu_doe.so",
-      "sha256": "bf010c002071e3e8aac0b835d952a0abe93319dbbc547891d0cc508d655e7582",
+      "sha256": "ab4b131eaf868b2e6946b2914596981ce352ae098c6fbfa13bb21908a7512153",
       "sizeBytes": 9721896,
       "symbolCount": 731,
       "symbols": "abi/libwebgpu_doe.so.symbols.txt"

@@ -34089,7 +34089,7 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "ddcd15a86a77b56548b6638ed85dd34d0b70fa0b98cbab0fe57fd13d3b694cbf",
+  "manifestSha256": "9037b20ed39e1c9dd34a34ccec441e862108bf984dfab7057484b26f3f0b93ce",
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
