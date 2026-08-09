@@ -7,6 +7,11 @@
 const std = @import("std");
 const host = @import("emit_csl_host.zig");
 const spec = @import("csl_spec.zig");
+const text_buffer = @import("csl_text_buffer.zig");
+
+const write = text_buffer.write;
+const writeInt = text_buffer.writeInt;
+const writeJsonString = text_buffer.writeJsonString;
 
 const PHASE_TARGET_SUFFIXES = [_][]const u8{ "_prefill", "_decode" };
 const PHASE_SPECIALIZED_KERNELS = [_][]const u8{ "rmsnorm", "residual", "gelu", "gelu_gated", "silu_gated", "sigmoid_gated" };
@@ -622,37 +627,6 @@ fn jsonToU32(raw: ?std.json.Value) ?u32 {
         },
         else => null,
     };
-}
-
-fn writeJsonString(buf: []u8, pos: *usize, value: []const u8) EmitError!void {
-    try write(buf, pos, "\"");
-    for (value) |ch| {
-        switch (ch) {
-            '"' => try write(buf, pos, "\\\""),
-            '\\' => try write(buf, pos, "\\\\"),
-            '\n' => try write(buf, pos, "\\n"),
-            '\r' => try write(buf, pos, "\\r"),
-            '\t' => try write(buf, pos, "\\t"),
-            else => {
-                if (pos.* + 1 > buf.len) return error.OutputTooLarge;
-                buf[pos.*] = ch;
-                pos.* += 1;
-            },
-        }
-    }
-    try write(buf, pos, "\"");
-}
-
-fn write(buf: []u8, pos: *usize, text: []const u8) EmitError!void {
-    if (pos.* + text.len > buf.len) return error.OutputTooLarge;
-    @memcpy(buf[pos.*..][0..text.len], text);
-    pos.* += text.len;
-}
-
-fn writeInt(buf: []u8, pos: *usize, value: anytype) EmitError!void {
-    var tmp: [20]u8 = undefined;
-    const slice = std.fmt.bufPrint(&tmp, "{d}", .{value}) catch return error.OutputTooLarge;
-    try write(buf, pos, slice);
 }
 
 test "host plan artifact emits schema and cslc plan" {

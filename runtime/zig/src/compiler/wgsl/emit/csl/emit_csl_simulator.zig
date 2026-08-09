@@ -2,6 +2,10 @@ const std = @import("std");
 const spec = @import("csl_spec.zig");
 const host_plan = @import("emit_csl_host_plan.zig");
 const host_runtime = @import("emit_csl_host_runtime.zig");
+const text_buffer = @import("csl_text_buffer.zig");
+
+const write = text_buffer.write;
+const writeInt = text_buffer.writeInt;
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -416,18 +420,6 @@ fn validateCompileTargets(raw: std.json.Value) EmitError!void {
         },
         else => return error.InvalidSchema,
     }
-}
-
-fn write(buf: []u8, pos: *usize, text: []const u8) EmitError!void {
-    if (pos.* + text.len > buf.len) return error.OutputTooLarge;
-    @memcpy(buf[pos.*..][0..text.len], text);
-    pos.* += text.len;
-}
-
-fn writeInt(buf: []u8, pos: *usize, value: anytype) EmitError!void {
-    var tmp: [32]u8 = undefined;
-    const slice = std.fmt.bufPrint(&tmp, "{d}", .{value}) catch return error.OutputTooLarge;
-    try write(buf, pos, slice);
 }
 
 fn writeJsonString(buf: []u8, pos: *usize, text: []const u8) EmitError!void {

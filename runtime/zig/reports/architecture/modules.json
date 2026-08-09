@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
+  "manifestSha256": "d9790e19d4b88d8f252353e4e7c6ed146ed6c8018e933e1db7ee810689e4a16e",
   "modules": [
     {
       "containsCImport": false,
@@ -307,7 +307,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 5,
+      "fanIn": 6,
       "fanOut": 1,
       "imports": [
         "src/contracts/backend.zig"
@@ -342,7 +342,8 @@
         "src/backend/backend_runtime.zig",
         "src/backend/dawn_delegate_backend.zig",
         "src/backend/mod.zig",
-        "src/runtime/execution.zig"
+        "src/runtime/execution.zig",
+        "src/runtime/execution_receipt.zig"
       ],
       "roles": [],
       "sha256": "9aa685520eab579d8d6215913e7fa2dbd436745b1e94eaf41a48daa7cd6e1a96",
@@ -14857,15 +14858,16 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/targets/mod.zig",
         "src/compiler/tsir/emit_kernel_body.zig",
+        "src/compiler/tsir/emit_semantic_metadata.zig",
         "src/compiler/tsir/schema.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 329,
+      "lineCount": 237,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/emit_csl.zig",
@@ -14873,37 +14875,37 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 19,
+          "line": 24,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 27,
+          "line": 32,
           "name": "emitterCodeDigest"
         },
         {
           "kind": "fn",
-          "line": 40,
+          "line": 46,
           "name": "emit"
         },
         {
           "kind": "fn",
-          "line": 51,
+          "line": 57,
           "name": "emitSemantic"
         },
         {
           "kind": "fn",
-          "line": 70,
+          "line": 76,
           "name": "emitSemanticFunction"
         },
         {
           "kind": "fn",
-          "line": 91,
+          "line": 97,
           "name": "emitSemanticFunctionWithConfig"
         },
         {
           "kind": "fn",
-          "line": 168,
+          "line": 174,
           "name": "emitFunction"
         }
       ],
@@ -14916,9 +14918,9 @@
         "src/compiler/tsir/mod.zig"
       ],
       "roles": [],
-      "sha256": "0af9b423ba02f62b4085b0b7413b604f35225cbd497e0f43fc366dcb8a9ac05c",
+      "sha256": "fed74fa13b7657ebf09fba6b20b0f8e5771181491056c59a0910acaf71e6a134",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 26
+      "topLevelDeclarationCount": 23
     },
     {
       "containsCImport": false,
@@ -15042,7 +15044,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 69,
+      "lineCount": 71,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/emit_dxil.zig",
@@ -15050,32 +15052,32 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 17,
+          "line": 18,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 19,
+          "line": 20,
           "name": "emitterCodeDigest"
         },
         {
           "kind": "fn",
-          "line": 29,
+          "line": 31,
           "name": "emit"
         },
         {
           "kind": "fn",
-          "line": 38,
+          "line": 40,
           "name": "emitFunction"
         },
         {
           "kind": "fn",
-          "line": 46,
+          "line": 48,
           "name": "emitSemantic"
         },
         {
           "kind": "fn",
-          "line": 56,
+          "line": 58,
           "name": "emitSemanticFunction"
         }
       ],
@@ -15088,9 +15090,9 @@
         "src/compiler/tsir/mod.zig"
       ],
       "roles": [],
-      "sha256": "5971c0b1acb152c43e712aea77369346548c144a70f1c6a3126f43d39df41f32",
+      "sha256": "1a2ffb1d78b47bb52a0e747b1ae00bf574339e466663784d4d3e93f0c4993ff7",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 14
+      "topLevelDeclarationCount": 15
     },
     {
       "containsCImport": false,
@@ -15610,7 +15612,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 69,
+      "lineCount": 71,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/emit_msl.zig",
@@ -15618,32 +15620,32 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 17,
+          "line": 18,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 19,
+          "line": 20,
           "name": "emitterCodeDigest"
         },
         {
           "kind": "fn",
-          "line": 29,
+          "line": 31,
           "name": "emit"
         },
         {
           "kind": "fn",
-          "line": 38,
+          "line": 40,
           "name": "emitFunction"
         },
         {
           "kind": "fn",
-          "line": 46,
+          "line": 48,
           "name": "emitSemantic"
         },
         {
           "kind": "fn",
-          "line": 56,
+          "line": 58,
           "name": "emitSemanticFunction"
         }
       ],
@@ -15656,9 +15658,81 @@
         "src/compiler/tsir/mod.zig"
       ],
       "roles": [],
-      "sha256": "6f280cbc5a341261587c97bff26ea8f4e71a1120c5fe8a76f3a85067765f4534",
+      "sha256": "76f8c08efe0ea69d015f89183cae9b4c68c57a3d6e99d14bee2b41732909e44a",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 14
+      "topLevelDeclarationCount": 15
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 1,
+      "imports": [
+        "src/compiler/tsir/schema.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 91,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/tsir/emit_semantic_metadata.zig",
+      "publicDeclarationCount": 8,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 7,
+          "name": "writeResidency"
+        },
+        {
+          "kind": "fn",
+          "line": 24,
+          "name": "writeTiles"
+        },
+        {
+          "kind": "fn",
+          "line": 32,
+          "name": "writeCollectives"
+        },
+        {
+          "kind": "fn",
+          "line": 44,
+          "name": "writeReductions"
+        },
+        {
+          "kind": "fn",
+          "line": 53,
+          "name": "writeOptionalU32"
+        },
+        {
+          "kind": "fn",
+          "line": 61,
+          "name": "writeOptionalU64"
+        },
+        {
+          "kind": "fn",
+          "line": 69,
+          "name": "writeHash"
+        },
+        {
+          "kind": "fn",
+          "line": 78,
+          "name": "writeQuoted"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/tsir/emit_csl.zig",
+        "src/compiler/tsir/emit_text_skeleton.zig",
+        "src/compiler/tsir/emit_webgpu.zig"
+      ],
+      "roles": [],
+      "sha256": "80b667edb4a0b6a9d8d3f9ddc8f5e20db2a31dc2f683d56678dfd14ff158c18c",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 12
     },
     {
       "containsCImport": false,
@@ -15672,7 +15746,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 69,
+      "lineCount": 71,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/emit_spir_v.zig",
@@ -15680,32 +15754,32 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 17,
+          "line": 18,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 19,
+          "line": 20,
           "name": "emitterCodeDigest"
         },
         {
           "kind": "fn",
-          "line": 29,
+          "line": 31,
           "name": "emit"
         },
         {
           "kind": "fn",
-          "line": 38,
+          "line": 40,
           "name": "emitFunction"
         },
         {
           "kind": "fn",
-          "line": 46,
+          "line": 48,
           "name": "emitSemantic"
         },
         {
           "kind": "fn",
-          "line": 56,
+          "line": 58,
           "name": "emitSemanticFunction"
         }
       ],
@@ -15718,23 +15792,24 @@
         "src/compiler/tsir/mod.zig"
       ],
       "roles": [],
-      "sha256": "61712466e41a23adeb183368e498b4811defabf97c3a711ae82f7d63e6aa841d",
+      "sha256": "bb1e1470c267c8e1b9f737a82499b7d0859d8e4ec3307390126079e871057105",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 14
+      "topLevelDeclarationCount": 15
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/targets/mod.zig",
         "src/compiler/tsir/emit_kernel_body.zig",
+        "src/compiler/tsir/emit_semantic_metadata.zig",
         "src/compiler/tsir/schema.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 226,
+      "lineCount": 132,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/emit_text_skeleton.zig",
@@ -15742,32 +15817,32 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 13,
+          "line": 17,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 19,
+          "line": 23,
           "name": "BackendTextSpec"
         },
         {
           "kind": "fn",
-          "line": 25,
+          "line": 29,
           "name": "emit"
         },
         {
           "kind": "fn",
-          "line": 37,
+          "line": 41,
           "name": "emitSemantic"
         },
         {
           "kind": "fn",
-          "line": 58,
+          "line": 62,
           "name": "emitSemanticFunction"
         },
         {
           "kind": "fn",
-          "line": 84,
+          "line": 88,
           "name": "emitFunction"
         }
       ],
@@ -15782,23 +15857,24 @@
         "src/compiler/tsir/emit_spir_v.zig"
       ],
       "roles": [],
-      "sha256": "d7ded5425b064b7077497f06c6d46690a417a02bc32a4293a2500e32cddad5bd",
+      "sha256": "564be3952949c04ac7693458c2364a0e81fd4b81aeb04a2c0719a794d3284a8a",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 23
+      "topLevelDeclarationCount": 19
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/targets/mod.zig",
         "src/compiler/tsir/emit_kernel_body.zig",
+        "src/compiler/tsir/emit_semantic_metadata.zig",
         "src/compiler/tsir/schema.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 233,
+      "lineCount": 141,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/emit_webgpu.zig",
@@ -15806,32 +15882,32 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 19,
+          "line": 24,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 26,
+          "line": 31,
           "name": "emitterCodeDigest"
         },
         {
           "kind": "fn",
-          "line": 35,
+          "line": 41,
           "name": "emit"
         },
         {
           "kind": "fn",
-          "line": 46,
+          "line": 52,
           "name": "emitSemantic"
         },
         {
           "kind": "fn",
-          "line": 65,
+          "line": 71,
           "name": "emitSemanticFunction"
         },
         {
           "kind": "fn",
-          "line": 90,
+          "line": 96,
           "name": "emitFunction"
         }
       ],
@@ -15844,9 +15920,9 @@
         "src/compiler/tsir/mod.zig"
       ],
       "roles": [],
-      "sha256": "42db7e80406c92397edf5ed39f13edccf6043122690058f1c01840bb249cc8af",
+      "sha256": "323c433cdad0ca89ff6a3bc374b3611e9c47a7c852fe01924d1880fab852de3d",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 25
+      "topLevelDeclarationCount": 22
     },
     {
       "containsCImport": false,
@@ -16841,7 +16917,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 33,
+      "fanIn": 34,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -17126,6 +17202,7 @@
         "src/compiler/tsir/emit_kernel_body_linear_attention.zig",
         "src/compiler/tsir/emit_kernel_context.zig",
         "src/compiler/tsir/emit_msl.zig",
+        "src/compiler/tsir/emit_semantic_metadata.zig",
         "src/compiler/tsir/emit_spir_v.zig",
         "src/compiler/tsir/emit_text_skeleton.zig",
         "src/compiler/tsir/emit_webgpu.zig",
@@ -17544,6 +17621,128 @@
     {
       "containsCImport": false,
       "definesMain": false,
+      "fanIn": 5,
+      "fanOut": 1,
+      "imports": [
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 31,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 3,
+          "name": "Error"
+        },
+        {
+          "kind": "fn",
+          "line": 5,
+          "name": "emitBuffer"
+        },
+        {
+          "kind": "fn",
+          "line": 15,
+          "name": "emitPointer"
+        },
+        {
+          "kind": "fn",
+          "line": 25,
+          "name": "emitExport"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_sample.zig"
+      ],
+      "roles": [],
+      "sha256": "c6fe1ed942c65cf9e5e3d21e314cf54ca6313f1151a2eae0fe363f7681523d2a",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 5
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 15,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 54,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "Error"
+        },
+        {
+          "kind": "fn",
+          "line": 9,
+          "name": "write"
+        },
+        {
+          "kind": "fn",
+          "line": 15,
+          "name": "writeInt"
+        },
+        {
+          "kind": "fn",
+          "line": 21,
+          "name": "writeJsonString"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig"
+      ],
+      "roles": [],
+      "sha256": "a09d131b3ef03377942d1b547da2ffc8c687cd92b11257c69af5ec6b508b7095",
+      "testBlockCount": 2,
+      "topLevelDeclarationCount": 8
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
       "fanIn": 1,
       "fanOut": 3,
       "imports": [
@@ -17866,9 +18065,10 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 19,
+      "fanOut": 20,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
@@ -17890,7 +18090,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 179,
+      "lineCount": 176,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
@@ -17898,17 +18098,17 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 32,
+          "line": 35,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 40,
+          "line": 43,
           "name": "MAX_OUTPUT"
         },
         {
           "kind": "fn",
-          "line": 42,
+          "line": 45,
           "name": "emit"
         }
       ],
@@ -17924,9 +18124,9 @@
         "src/compiler/wgsl/emit/csl/emit_csl.zig"
       ],
       "roles": [],
-      "sha256": "43f7391be58807600550a17d485b449b6ab73fcbb7eb9d7af7d5b698183d1f31",
+      "sha256": "b9d5b9ba8effe7ecc0204df0e2a7e6254fed79053db71811bc9cc92e3252396f",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 27
+      "topLevelDeclarationCount": 28
     },
     {
       "containsCImport": false,
@@ -17982,15 +18182,16 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 151,
+      "lineCount": 137,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
@@ -17998,12 +18199,12 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 15,
+          "line": 19,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 17,
+          "line": 21,
           "name": "emit"
         }
       ],
@@ -18021,9 +18222,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "b70282522629c0cda557ada173b2bc97651634d89e4da17579176de55c17387c",
+      "sha256": "f21640c968a2ec10d41d624283051139713bec8300dba673c1ba51e49257f26e",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 8
+      "topLevelDeclarationCount": 9
     },
     {
       "containsCImport": false,
@@ -18176,15 +18377,16 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 287,
+      "lineCount": 264,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
@@ -18192,17 +18394,17 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 44,
+          "line": 49,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 46,
+          "line": 51,
           "name": "emit"
         },
         {
           "kind": "fn",
-          "line": 55,
+          "line": 60,
           "name": "emitForElem"
         }
       ],
@@ -18220,9 +18422,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "e1aa76368fe49eaea3f3fc65dc8d1e00b7a6daeeaade93fca4a85131e07b2f2e",
+      "sha256": "cb9e220ff7a08e98768682ce8b59f8046c56ddb81f135797823516125c5d7710",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 12
+      "topLevelDeclarationCount": 13
     },
     {
       "containsCImport": false,
@@ -18275,15 +18477,16 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 148,
+      "lineCount": 125,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
@@ -18291,12 +18494,12 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 39,
+          "line": 44,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 41,
+          "line": 46,
           "name": "emit"
         }
       ],
@@ -18314,19 +18517,21 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "54fa407da4168d962c032851d32b10add36d8ee09c1438d59f817afe41506120",
+      "sha256": "1885208758129cb94d91a8c8b0acb817d4db62643ca3780171f5de353b9a06ac",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 8
+      "topLevelDeclarationCount": 9
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 9,
-      "fanOut": 0,
-      "imports": [],
+      "fanOut": 1,
+      "imports": [
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig"
+      ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 664,
+      "lineCount": 656,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
@@ -18334,77 +18539,77 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 14,
+          "line": 18,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 20,
+          "line": 24,
           "name": "WSE3"
         },
         {
           "kind": "const",
-          "line": 27,
+          "line": 31,
           "name": "ModelConfig"
         },
         {
           "kind": "const",
-          "line": 65,
+          "line": 69,
           "name": "KernelSpec"
         },
         {
           "kind": "const",
-          "line": 71,
+          "line": 75,
           "name": "LaunchAttentionType"
         },
         {
           "kind": "const",
-          "line": 76,
+          "line": 80,
           "name": "CurrentPosSource"
         },
         {
           "kind": "const",
-          "line": 80,
+          "line": 84,
           "name": "LaunchSpec"
         },
         {
           "kind": "const",
-          "line": 91,
+          "line": 95,
           "name": "HostPlan"
         },
         {
           "kind": "const",
-          "line": 100,
+          "line": 104,
           "name": "SramEstimate"
         },
         {
           "kind": "fn",
-          "line": 125,
+          "line": 129,
           "name": "estimateLayerSramBytes"
         },
         {
           "kind": "fn",
-          "line": 160,
+          "line": 164,
           "name": "estimateModelSram"
         },
         {
           "kind": "fn",
-          "line": 174,
+          "line": 178,
           "name": "estimateModelSramForPlan"
         },
         {
           "kind": "fn",
-          "line": 195,
+          "line": 199,
           "name": "effectiveKvCacheLayerCount"
         },
         {
           "kind": "fn",
-          "line": 230,
+          "line": 234,
           "name": "emitCompilationManifest"
         },
         {
           "kind": "fn",
-          "line": 290,
+          "line": 294,
           "name": "emitPythonRunner"
         }
       ],
@@ -18428,9 +18633,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "8caefa38a73f453fd41311ab27a4aff9ecf38c91848b02132361c607c36f6fcc",
+      "sha256": "0920066060e5a964e05a9174fda17427a68380ae75fad51008ebcf0ec8d9713f",
       "testBlockCount": 4,
-      "topLevelDeclarationCount": 37
+      "topLevelDeclarationCount": 38
     },
     {
       "containsCImport": false,
@@ -18479,9 +18684,10 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 23,
+      "fanOut": 24,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_dense_gemv.zig",
@@ -18507,7 +18713,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 918,
+      "lineCount": 915,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
@@ -18515,32 +18721,32 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 27,
+          "line": 30,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 46,
+          "line": 49,
           "name": "CompileSourceSections"
         },
         {
           "kind": "fn",
-          "line": 52,
+          "line": 55,
           "name": "emitPatternSections"
         },
         {
           "kind": "fn",
-          "line": 60,
+          "line": 63,
           "name": "emitPatternSectionsForElem"
         },
         {
           "kind": "fn",
-          "line": 290,
+          "line": 293,
           "name": "patternSource"
         },
         {
           "kind": "fn",
-          "line": 323,
+          "line": 326,
           "name": "sectionBody"
         }
       ],
@@ -18555,22 +18761,23 @@
         "src/compiler/mod.zig"
       ],
       "roles": [],
-      "sha256": "ca845d7ee174eb05e6188b379fea407f11d5df035f03f8d11e29234e228fbe79",
+      "sha256": "fb910780f481a29da808c948a6a4b3fa3bd574b1cfc920f454cb8952b8cf0dcd",
       "testBlockCount": 13,
-      "topLevelDeclarationCount": 72
+      "topLevelDeclarationCount": 73
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 4,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 783,
+      "lineCount": 757,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
@@ -18578,77 +18785,77 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 15,
+          "line": 20,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 22,
+          "line": 27,
           "name": "CompileTarget"
         },
         {
           "kind": "const",
-          "line": 38,
+          "line": 43,
           "name": "CompileParam"
         },
         {
           "kind": "const",
-          "line": 43,
+          "line": 48,
           "name": "CompileTargetMetadata"
         },
         {
           "kind": "const",
-          "line": 48,
+          "line": 53,
           "name": "BindingMetadata"
         },
         {
           "kind": "const",
-          "line": 59,
+          "line": 64,
           "name": "BindingShape"
         },
         {
           "kind": "const",
-          "line": 64,
+          "line": 69,
           "name": "BindingTransform"
         },
         {
           "kind": "const",
-          "line": 70,
+          "line": 75,
           "name": "DiscoveryMode"
         },
         {
           "kind": "const",
-          "line": 75,
+          "line": 80,
           "name": "CslcPlan"
         },
         {
           "kind": "fn",
-          "line": 81,
+          "line": 86,
           "name": "makeCslcPlan"
         },
         {
           "kind": "fn",
-          "line": 96,
+          "line": 101,
           "name": "discoveryLabel"
         },
         {
           "kind": "fn",
-          "line": 103,
+          "line": 108,
           "name": "emitCompileTargetMetadataJson"
         },
         {
           "kind": "fn",
-          "line": 140,
+          "line": 145,
           "name": "emitCompileParamsFieldJson"
         },
         {
           "kind": "fn",
-          "line": 188,
+          "line": 193,
           "name": "emitHostPlanArtifactJson"
         },
         {
           "kind": "fn",
-          "line": 282,
+          "line": 287,
           "name": "validateHostPlanArtifactJson"
         }
       ],
@@ -18667,23 +18874,24 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "88da90bfc12cff83f00079d119ffb0521c9624b991aa0fe6b547669e8f2c9bf8",
+      "sha256": "ef94c0890215fe3c3f7f654d1a881f774f891291c0b6f7d4f5c3c9c7503e188f",
       "testBlockCount": 5,
-      "topLevelDeclarationCount": 49
+      "topLevelDeclarationCount": 50
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 845,
+      "lineCount": 837,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
@@ -18691,37 +18899,37 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 17,
+          "line": 21,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 23,
+          "line": 27,
           "name": "WeightMapping"
         },
         {
           "kind": "const",
-          "line": 48,
+          "line": 52,
           "name": "WeightMappingStatus"
         },
         {
           "kind": "const",
-          "line": 59,
+          "line": 63,
           "name": "StateBuffer"
         },
         {
           "kind": "const",
-          "line": 68,
+          "line": 72,
           "name": "RuntimeConfig"
         },
         {
           "kind": "fn",
-          "line": 83,
+          "line": 87,
           "name": "emitRuntimeConfigJson"
         },
         {
           "kind": "fn",
-          "line": 250,
+          "line": 254,
           "name": "emitFullPythonRunner"
         }
       ],
@@ -18739,23 +18947,24 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "44bdc474f335883ebcf0741772dae15a555345da3ee9c313ea76bdc93e55c80b",
+      "sha256": "f0a13425e5b9a82c760d0107f7c4b7345eb736291bd4890473922722284457ae",
       "testBlockCount": 3,
-      "topLevelDeclarationCount": 29
+      "topLevelDeclarationCount": 30
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 12,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_maps.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 891,
+      "lineCount": 888,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
@@ -18763,62 +18972,62 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 14,
+          "line": 15,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 21,
+          "line": 22,
           "name": "WalkConfig"
         },
         {
           "kind": "fn",
-          "line": 45,
+          "line": 46,
           "name": "write"
         },
         {
           "kind": "fn",
-          "line": 51,
+          "line": 50,
           "name": "writeIndent"
         },
         {
           "kind": "fn",
-          "line": 56,
+          "line": 55,
           "name": "writeInt"
         },
         {
           "kind": "fn",
-          "line": 62,
+          "line": 59,
           "name": "isBarrierName"
         },
         {
           "kind": "fn",
-          "line": 68,
+          "line": 65,
           "name": "isBarrierExpr"
         },
         {
           "kind": "fn",
-          "line": 76,
+          "line": 73,
           "name": "isBarrierStmt"
         },
         {
           "kind": "fn",
-          "line": 84,
+          "line": 81,
           "name": "isUniformGlobalBase"
         },
         {
           "kind": "fn",
-          "line": 160,
+          "line": 157,
           "name": "arrayElemType"
         },
         {
           "kind": "fn",
-          "line": 198,
+          "line": 195,
           "name": "emitBuiltinMemberShim"
         },
         {
           "kind": "fn",
-          "line": 268,
+          "line": 265,
           "name": "Emit"
         }
       ],
@@ -18845,9 +19054,9 @@
         "src/compiler/wgsl/emit/csl/emit_csl_sample.zig"
       ],
       "roles": [],
-      "sha256": "130e0594c1550e86e819dfccb3dfb6acd64437a3e21b077df9f81c6785d0283f",
+      "sha256": "4baf4768ef3192118571d61201581d195d9e126df6afbb905fd1a14cb039cac8",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 19
+      "topLevelDeclarationCount": 20
     },
     {
       "containsCImport": false,
@@ -18907,15 +19116,16 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 919,
+      "lineCount": 911,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
@@ -18923,87 +19133,87 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 17,
+          "line": 21,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 27,
+          "line": 31,
           "name": "emitElementWiseLayout"
         },
         {
           "kind": "fn",
-          "line": 114,
+          "line": 118,
           "name": "emitReductionLayout"
         },
         {
           "kind": "fn",
-          "line": 182,
+          "line": 186,
           "name": "emitMatmulLayout"
         },
         {
           "kind": "fn",
-          "line": 263,
+          "line": 267,
           "name": "emitMatmulQ4kLayout"
         },
         {
           "kind": "fn",
-          "line": 337,
+          "line": 341,
           "name": "emitGatherLayout"
         },
         {
           "kind": "fn",
-          "line": 388,
+          "line": 392,
           "name": "emitRoPELayout"
         },
         {
           "kind": "fn",
-          "line": 412,
+          "line": 416,
           "name": "emitDequantLayout"
         },
         {
           "kind": "fn",
-          "line": 464,
+          "line": 468,
           "name": "emitStreamingAttentionLayout"
         },
         {
           "kind": "fn",
-          "line": 486,
+          "line": 490,
           "name": "emitDecodeAttentionLayout"
         },
         {
           "kind": "fn",
-          "line": 510,
+          "line": 514,
           "name": "emitTiledAttentionLayout"
         },
         {
           "kind": "fn",
-          "line": 543,
+          "line": 547,
           "name": "emitSampleLayout"
         },
         {
           "kind": "fn",
-          "line": 565,
+          "line": 569,
           "name": "emitFusedGemvLayout"
         },
         {
           "kind": "fn",
-          "line": 645,
+          "line": 649,
           "name": "emitLinearAttentionLayout"
         },
         {
           "kind": "fn",
-          "line": 668,
+          "line": 672,
           "name": "emitKvWriteLayout"
         },
         {
           "kind": "fn",
-          "line": 698,
+          "line": 702,
           "name": "emitKvReadLayout"
         },
         {
           "kind": "fn",
-          "line": 727,
+          "line": 731,
           "name": "emitFusedFfnLayout"
         }
       ],
@@ -19020,9 +19230,9 @@
         "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig"
       ],
       "roles": [],
-      "sha256": "cc0b80260a6642ce8b54dc95a9b21dfcee3131e9585f8eb33520c40767ca7aec",
+      "sha256": "3f3941ab50ca0e94913996daf065ff78522f870b48a203e04932afe258b6ef68",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 34
+      "topLevelDeclarationCount": 35
     },
     {
       "containsCImport": false,
@@ -19139,14 +19349,15 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 208,
+      "lineCount": 205,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
@@ -19154,12 +19365,12 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 20,
+          "line": 23,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 28,
+          "line": 31,
           "name": "emit"
         }
       ],
@@ -19176,22 +19387,23 @@
         "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig"
       ],
       "roles": [],
-      "sha256": "4090eb265d49db0ffc22494719fa52c0d011966a6ac9e51b3b0356bc88dff68a",
+      "sha256": "4927e1ca5ce57461a54b7a2666b14e6af35c21c1a25ceae93a48d4d7a056edd8",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 7
+      "topLevelDeclarationCount": 8
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 360,
+      "lineCount": 357,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
@@ -19199,32 +19411,32 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 45,
+          "line": 48,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 54,
+          "line": 57,
           "name": "Q4_K_M_BLOCK_BYTES"
         },
         {
           "kind": "const",
-          "line": 58,
+          "line": 61,
           "name": "Q4_K_M_SUBBLOCKS"
         },
         {
           "kind": "const",
-          "line": 59,
+          "line": 62,
           "name": "Q4_K_M_SUBBLOCK_ELEMENTS"
         },
         {
           "kind": "const",
-          "line": 60,
+          "line": 63,
           "name": "Q4_K_M_BLOCK_ELEMENTS"
         },
         {
           "kind": "fn",
-          "line": 66,
+          "line": 69,
           "name": "emit"
         }
       ],
@@ -19241,22 +19453,23 @@
         "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig"
       ],
       "roles": [],
-      "sha256": "1adc4c54dc673e88b1b965f2908d09584f2e36c23b2748ddd04dc627a7b5242c",
+      "sha256": "9324f407cd7ead480ba3465b5254033e12824bbf2564095ec049660f0d2b0663",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 11
+      "topLevelDeclarationCount": 12
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 638,
+      "lineCount": 612,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
@@ -19264,67 +19477,67 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 15,
+          "line": 20,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 20,
+          "line": 25,
           "name": "ResidencyMode"
         },
         {
           "kind": "const",
-          "line": 25,
+          "line": 30,
           "name": "BufferPlacement"
         },
         {
           "kind": "const",
-          "line": 31,
+          "line": 36,
           "name": "BufferKind"
         },
         {
           "kind": "const",
-          "line": 44,
+          "line": 49,
           "name": "BufferPlan"
         },
         {
           "kind": "const",
-          "line": 52,
+          "line": 57,
           "name": "StreamStageKind"
         },
         {
           "kind": "const",
-          "line": 59,
+          "line": 64,
           "name": "StreamStage"
         },
         {
           "kind": "const",
-          "line": 67,
+          "line": 72,
           "name": "PlacementPolicy"
         },
         {
           "kind": "const",
-          "line": 73,
+          "line": 78,
           "name": "DerivedGrid"
         },
         {
           "kind": "const",
-          "line": 78,
+          "line": 83,
           "name": "MemoryPlan"
         },
         {
           "kind": "fn",
-          "line": 106,
+          "line": 111,
           "name": "deriveGrid"
         },
         {
           "kind": "fn",
-          "line": 134,
+          "line": 139,
           "name": "planMemory"
         },
         {
           "kind": "fn",
-          "line": 143,
+          "line": 148,
           "name": "emitPlanJson"
         }
       ],
@@ -19342,22 +19555,23 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "65bd1c052b780dc01382e0e3e190621f8dabe61111d810918e5f2eb335cb722f",
+      "sha256": "4b368f3d5e423e65a678c2fea86eba92e211306f359284d458e6239287629d64",
       "testBlockCount": 3,
-      "topLevelDeclarationCount": 49
+      "topLevelDeclarationCount": 50
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 283,
+      "lineCount": 275,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
@@ -19365,17 +19579,17 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 23,
+          "line": 27,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 33,
+          "line": 37,
           "name": "emitDistributedLayout"
         },
         {
           "kind": "fn",
-          "line": 119,
+          "line": 123,
           "name": "emitDistributed"
         }
       ],
@@ -19392,9 +19606,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "64d83aaf280bb0741b24d3dbf74c7895b22aa9dd4fc789858bb567b3c9cd63cd",
+      "sha256": "d020083ad8da146812367f12336c7a43e3e94624113a44e9f2eace1df71ed180",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 8
+      "topLevelDeclarationCount": 9
     },
     {
       "containsCImport": false,
@@ -19489,15 +19703,16 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 149,
+      "lineCount": 126,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
@@ -19505,12 +19720,12 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 14,
+          "line": 19,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 16,
+          "line": 21,
           "name": "emit"
         }
       ],
@@ -19528,23 +19743,24 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "0d27b4fc34d33145b5b8176130460e82f753da3cefee6effbd6658308709cc5c",
+      "sha256": "01871cd09b2c1fec1be82d53679b7a67a8ebdc6b0985995bb70052dec8b0ec9d",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 9
+      "topLevelDeclarationCount": 10
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 107,
+      "lineCount": 84,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
@@ -19552,12 +19768,12 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 13,
+          "line": 18,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 15,
+          "line": 20,
           "name": "emit"
         }
       ],
@@ -19575,23 +19791,24 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "2130a64ea8b7f40839d23b426a06ad4312498bf162895115762260dfa79d08ff",
+      "sha256": "ba3de0c16fc62b3ad56e5d901ed1aaad4a798ff374a4608d235774b6b68dfa87",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 8
+      "topLevelDeclarationCount": 9
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/tsir/emit_kernel_body.zig",
         "src/compiler/tsir/schema.zig",
-        "src/compiler/wgsl/emit/csl/csl_spec.zig"
+        "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 718,
+      "lineCount": 715,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
@@ -19599,22 +19816,22 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 12,
+          "line": 15,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 19,
+          "line": 22,
           "name": "isSemanticPattern"
         },
         {
           "kind": "fn",
-          "line": 31,
+          "line": 34,
           "name": "emitLayout"
         },
         {
           "kind": "fn",
-          "line": 45,
+          "line": 48,
           "name": "emitPeProgram"
         }
       ],
@@ -19627,24 +19844,25 @@
         "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig"
       ],
       "roles": [],
-      "sha256": "1c61be4fa8616f758d68f715eebd3a79d44d6961d8040be353015f00c8e1cc99",
+      "sha256": "0199b90b2bd8502deb08ce1b2e7334347095e1c2764c2e32dd835763b2ad6ee5",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 29
+      "topLevelDeclarationCount": 30
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 4,
+      "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 657,
+      "lineCount": 649,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
@@ -19652,67 +19870,67 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 6,
+          "line": 10,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 14,
+          "line": 18,
           "name": "ArtifactPaths"
         },
         {
           "kind": "const",
-          "line": 23,
+          "line": 27,
           "name": "DriverConfig"
         },
         {
           "kind": "const",
-          "line": 27,
+          "line": 31,
           "name": "SimulatorPlan"
         },
         {
           "kind": "const",
-          "line": 83,
+          "line": 87,
           "name": "SimulatorResultStatus"
         },
         {
           "kind": "const",
-          "line": 89,
+          "line": 93,
           "name": "SimulatorTermination"
         },
         {
           "kind": "const",
-          "line": 96,
+          "line": 100,
           "name": "SimulatorResult"
         },
         {
           "kind": "fn",
-          "line": 108,
+          "line": 112,
           "name": "emitSimulatorPlanArtifactJson"
         },
         {
           "kind": "fn",
-          "line": 208,
+          "line": 212,
           "name": "emitLauncherScript"
         },
         {
           "kind": "fn",
-          "line": 240,
+          "line": 244,
           "name": "validateSimulatorPlanArtifactJson"
         },
         {
           "kind": "fn",
-          "line": 291,
+          "line": 295,
           "name": "parseSimulatorPlanArtifact"
         },
         {
           "kind": "fn",
-          "line": 312,
+          "line": 316,
           "name": "emitSimulatorResultArtifactJson"
         },
         {
           "kind": "fn",
-          "line": 357,
+          "line": 361,
           "name": "validateSimulatorResultArtifactJson"
         }
       ],
@@ -19730,17 +19948,18 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "7904d047e2f9874df557da951762e6ce9ab13e4bfb94dd10b7dd12313bc4f040",
+      "sha256": "59fbbb91dcfeda2106dd76132b807b159f2673487e8f59bc17caa41bd81012a8",
       "testBlockCount": 5,
-      "topLevelDeclarationCount": 35
+      "topLevelDeclarationCount": 36
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 5,
+      "fanOut": 6,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
@@ -19748,7 +19967,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 192,
+      "lineCount": 184,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
@@ -19756,37 +19975,37 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 8,
+          "line": 12,
           "name": "EmitError"
         },
         {
           "kind": "const",
-          "line": 16,
+          "line": 20,
           "name": "CompileTarget"
         },
         {
           "kind": "const",
-          "line": 17,
+          "line": 21,
           "name": "CslcPlan"
         },
         {
           "kind": "const",
-          "line": 18,
+          "line": 22,
           "name": "SimulatorArtifactPaths"
         },
         {
           "kind": "fn",
-          "line": 21,
+          "line": 25,
           "name": "emitMakefile"
         },
         {
           "kind": "fn",
-          "line": 100,
+          "line": 104,
           "name": "emitCompilePlanJson"
         },
         {
           "kind": "fn",
-          "line": 111,
+          "line": 115,
           "name": "emitSimulatorPlanJson"
         }
       ],
@@ -19802,9 +20021,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "fe5c127a2990b5d1f1cd3633c34470cae5db8db5b4d50b5e0bbd5cbf575d10f6",
+      "sha256": "1aa5215c3c3c70e6d92c55bd014f77cb0ff894e29dfbd4d21b12f74e97beddf2",
       "testBlockCount": 2,
-      "topLevelDeclarationCount": 17
+      "topLevelDeclarationCount": 18
     },
     {
       "containsCImport": false,
@@ -22833,60 +23052,61 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 4,
+      "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/frontend/ast.zig",
         "src/compiler/wgsl/frontend/sema_helpers.zig",
+        "src/compiler/wgsl/frontend/sema_type_syntax.zig",
         "src/compiler/wgsl/frontend/sema_types.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 482,
+      "lineCount": 470,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
       "publicDeclarationCount": 8,
       "publicDeclarations": [
         {
-          "kind": "fn",
-          "line": 10,
-          "name": "parse_stage"
+          "kind": "const",
+          "line": 11,
+          "name": "parse_access"
         },
         {
-          "kind": "fn",
-          "line": 22,
-          "name": "parse_workgroup_size"
-        },
-        {
-          "kind": "fn",
-          "line": 83,
-          "name": "parse_binding"
-        },
-        {
-          "kind": "fn",
-          "line": 97,
-          "name": "parse_io_attr"
-        },
-        {
-          "kind": "fn",
-          "line": 129,
-          "name": "infer_builtin_call"
-        },
-        {
-          "kind": "fn",
-          "line": 376,
-          "name": "parse_override_id"
-        },
-        {
-          "kind": "fn",
-          "line": 387,
+          "kind": "const",
+          "line": 12,
           "name": "parse_address_space"
         },
         {
           "kind": "fn",
-          "line": 396,
-          "name": "parse_access"
+          "line": 14,
+          "name": "parse_stage"
+        },
+        {
+          "kind": "fn",
+          "line": 26,
+          "name": "parse_workgroup_size"
+        },
+        {
+          "kind": "fn",
+          "line": 87,
+          "name": "parse_binding"
+        },
+        {
+          "kind": "fn",
+          "line": 101,
+          "name": "parse_io_attr"
+        },
+        {
+          "kind": "fn",
+          "line": 133,
+          "name": "infer_builtin_call"
+        },
+        {
+          "kind": "fn",
+          "line": 380,
+          "name": "parse_override_id"
         }
       ],
       "reachabilityViewRoots": [],
@@ -22901,24 +23121,25 @@
         "src/compiler/wgsl/frontend/sema.zig"
       ],
       "roles": [],
-      "sha256": "4b6ce8180a503c9db58405525662888cbf1792267758fc61e8f92271fdb06825",
+      "sha256": "f0d4feff6ced03cebf75852ccbde34551972bea149c5e8811bdc3db15740cd0d",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 31
+      "topLevelDeclarationCount": 32
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 4,
+      "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/frontend/sema_helpers.zig",
+        "src/compiler/wgsl/frontend/sema_type_syntax.zig",
         "src/compiler/wgsl/frontend/sema_typeutils.zig",
         "src/compiler/wgsl/frontend/token.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 441,
+      "lineCount": 426,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema_expr.zig",
@@ -22926,27 +23147,27 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 11,
+          "line": 13,
           "name": "analyze_binary_type"
         },
         {
           "kind": "fn",
-          "line": 21,
+          "line": 23,
           "name": "logical_not_result_type"
         },
         {
           "kind": "fn",
-          "line": 29,
+          "line": 31,
           "name": "analyze_unary_type"
         },
         {
           "kind": "fn",
-          "line": 42,
+          "line": 44,
           "name": "infer_constructor_call"
         },
         {
           "kind": "fn",
-          "line": 58,
+          "line": 60,
           "name": "validate_construct"
         }
       ],
@@ -22962,96 +23183,97 @@
         "src/compiler/wgsl/frontend/sema.zig"
       ],
       "roles": [],
-      "sha256": "12a83a6a2bd78416e518a3090bdc7227d93b498fd526238e461c48a5124669eb",
+      "sha256": "b4728de91ec11269fe8d641d540252447968dcd9608ec4993159dbab6bfb02fb",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 32
+      "topLevelDeclarationCount": 33
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 7,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/wgsl/frontend/ast.zig",
+        "src/compiler/wgsl/frontend/sema_type_syntax.zig",
         "src/compiler/wgsl/frontend/sema_types.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 222,
+      "lineCount": 210,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
       "publicDeclarationCount": 14,
       "publicDeclarations": [
         {
-          "kind": "fn",
-          "line": 9,
-          "name": "init_builtin_types"
+          "kind": "const",
+          "line": 10,
+          "name": "parse_access"
         },
         {
-          "kind": "fn",
-          "line": 22,
-          "name": "concrete_numeric_type"
-        },
-        {
-          "kind": "fn",
-          "line": 34,
-          "name": "decode_packed_span"
-        },
-        {
-          "kind": "fn",
-          "line": 38,
-          "name": "parse_single_int_attr"
-        },
-        {
-          "kind": "fn",
-          "line": 47,
-          "name": "parse_builtin_attr"
-        },
-        {
-          "kind": "fn",
-          "line": 73,
+          "kind": "const",
+          "line": 11,
           "name": "parse_address_space"
         },
         {
           "kind": "fn",
-          "line": 82,
-          "name": "parse_access"
+          "line": 13,
+          "name": "init_builtin_types"
         },
         {
           "kind": "fn",
-          "line": 89,
+          "line": 26,
+          "name": "concrete_numeric_type"
+        },
+        {
+          "kind": "fn",
+          "line": 38,
+          "name": "decode_packed_span"
+        },
+        {
+          "kind": "fn",
+          "line": 42,
+          "name": "parse_single_int_attr"
+        },
+        {
+          "kind": "fn",
+          "line": 51,
+          "name": "parse_builtin_attr"
+        },
+        {
+          "kind": "fn",
+          "line": 77,
           "name": "parse_storage_texture_format"
         },
         {
           "kind": "fn",
-          "line": 131,
+          "line": 119,
           "name": "int_literal_suffix"
         },
         {
           "kind": "fn",
-          "line": 140,
+          "line": 128,
           "name": "float_literal_suffix"
         },
         {
           "kind": "fn",
-          "line": 149,
+          "line": 137,
           "name": "parse_wgsl_int_literal"
         },
         {
           "kind": "fn",
-          "line": 156,
+          "line": 144,
           "name": "parse_wgsl_float_literal"
         },
         {
           "kind": "const",
-          "line": 160,
+          "line": 148,
           "name": "ParsedSwizzle"
         },
         {
           "kind": "fn",
-          "line": 165,
+          "line": 153,
           "name": "parse_vector_swizzle"
         }
       ],
@@ -23073,24 +23295,25 @@
         "src/compiler/wgsl/ir/ir_builder.zig"
       ],
       "roles": [],
-      "sha256": "2bcfde02869ad96e98a4b2e3868ce87e5a34158766b1f28593007fb8dbf9c14c",
+      "sha256": "960a3f7997336af76f9e9218d1deb67fb7ba373fda502beba05b12a6cf48b997",
       "testBlockCount": 2,
-      "topLevelDeclarationCount": 27
+      "topLevelDeclarationCount": 28
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 4,
+      "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/frontend/ast.zig",
         "src/compiler/wgsl/frontend/sema_helpers.zig",
+        "src/compiler/wgsl/frontend/sema_type_syntax.zig",
         "src/compiler/wgsl/frontend/sema_types.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 152,
+      "lineCount": 137,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
@@ -23098,7 +23321,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 15,
+          "line": 17,
           "name": "resolve_type_parameterized"
         }
       ],
@@ -23114,9 +23337,65 @@
         "src/compiler/wgsl/frontend/sema.zig"
       ],
       "roles": [],
-      "sha256": "e778963fae0673f37ab8314d32e32d79769dd084af8383292d203cd4b34dc59e",
+      "sha256": "0920877f81922e41430ed119ced1ab92123d3949791b1249b7c196dd75c2f832",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 17
+      "topLevelDeclarationCount": 18
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 4,
+      "fanOut": 1,
+      "imports": [
+        "src/compiler/wgsl/ir/ir.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 47,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/frontend/sema_type_syntax.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "MatrixShape"
+        },
+        {
+          "kind": "fn",
+          "line": 9,
+          "name": "parseAddressSpace"
+        },
+        {
+          "kind": "fn",
+          "line": 18,
+          "name": "parseAccess"
+        },
+        {
+          "kind": "fn",
+          "line": 25,
+          "name": "parseMatrixShape"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/frontend/sema_attrs.zig",
+        "src/compiler/wgsl/frontend/sema_expr.zig",
+        "src/compiler/wgsl/frontend/sema_helpers.zig",
+        "src/compiler/wgsl/frontend/sema_resolve.zig"
+      ],
+      "roles": [],
+      "sha256": "40c66602c346c2bee59df76cbd031730b4dd60e35fa63da4bd8edb56ebe027ed",
+      "testBlockCount": 1,
+      "topLevelDeclarationCount": 7
     },
     {
       "containsCImport": false,
@@ -23343,7 +23622,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 79,
+      "fanIn": 81,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -23664,12 +23943,14 @@
         "src/compiler/wgsl/frontend/sema_expr.zig",
         "src/compiler/wgsl/frontend/sema_helpers.zig",
         "src/compiler/wgsl/frontend/sema_resolve.zig",
+        "src/compiler/wgsl/frontend/sema_type_syntax.zig",
         "src/compiler/wgsl/frontend/sema_types.zig",
         "src/compiler/wgsl/frontend/sema_typeutils.zig",
         "src/compiler/wgsl/ir/ir_builder.zig",
         "src/compiler/wgsl/ir/ir_const_eval.zig",
         "src/compiler/wgsl/ir/ir_digest.zig",
         "src/compiler/wgsl/ir/ir_opt_rewrite.zig",
+        "src/compiler/wgsl/ir/ir_query.zig",
         "src/compiler/wgsl/ir/ir_transform_robustness.zig",
         "src/compiler/wgsl/ir/ir_validate.zig",
         "src/compiler/wgsl/ir/layout_utils.zig",
@@ -23921,10 +24202,83 @@
     {
       "containsCImport": false,
       "definesMain": false,
+      "fanIn": 5,
+      "fanOut": 1,
+      "imports": [
+        "src/compiler/wgsl/ir/ir.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 146,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/ir/ir_query.zig",
+      "publicDeclarationCount": 7,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 3,
+          "name": "resolveValueAlias"
+        },
+        {
+          "kind": "fn",
+          "line": 21,
+          "name": "resolveConstLocalInitializer"
+        },
+        {
+          "kind": "fn",
+          "line": 33,
+          "name": "resolveIndexableType"
+        },
+        {
+          "kind": "fn",
+          "line": 43,
+          "name": "isLocalRef"
+        },
+        {
+          "kind": "fn",
+          "line": 51,
+          "name": "stmtWritesLocal"
+        },
+        {
+          "kind": "fn",
+          "line": 79,
+          "name": "stmtContainsExpr"
+        },
+        {
+          "kind": "fn",
+          "line": 120,
+          "name": "exprContainsExpr"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+        "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+        "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+        "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+        "src/compiler/wgsl/proof/robustness_static_bounds.zig"
+      ],
+      "roles": [],
+      "sha256": "a944c59d5f57bcc43ebebae43d39980bb7731af8ae6fbd31903961f818cc4aee",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 8
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
       "fanIn": 1,
-      "fanOut": 5,
+      "fanOut": 6,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_query.zig",
         "src/compiler/wgsl/proof/dispatch_proof_match.zig",
         "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
         "src/compiler/wgsl/proof/robustness_static_bounds.zig",
@@ -23932,7 +24286,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 995,
+      "lineCount": 959,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
@@ -23940,17 +24294,17 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 8,
+          "line": 13,
           "name": "TransformError"
         },
         {
           "kind": "const",
-          "line": 12,
+          "line": 17,
           "name": "Config"
         },
         {
           "kind": "fn",
-          "line": 24,
+          "line": 29,
           "name": "apply"
         }
       ],
@@ -23966,9 +24320,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "1f6893af03fcb1a2810841647b805c9c28816a483a16bec132b01ee08b439a94",
+      "sha256": "8c58fef7eb80f473bd168fa81999a977201f20660671e9b606da9c4a96313af0",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 45
+      "topLevelDeclarationCount": 46
     },
     {
       "containsCImport": false,
@@ -24670,14 +25024,15 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
-        "src/compiler/wgsl/ir/ir_const_eval.zig"
+        "src/compiler/wgsl/ir/ir_const_eval.zig",
+        "src/compiler/wgsl/ir/ir_query.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 701,
+      "lineCount": 574,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
@@ -24685,7 +25040,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 24,
+          "line": 32,
           "name": "find_bounded_loop_limit"
         }
       ],
@@ -24702,25 +25057,26 @@
         "src/compiler/wgsl/proof/robustness_static_bounds.zig"
       ],
       "roles": [],
-      "sha256": "581f81021f55a63e312607c0d2924ad9fae987af37847d0b05cb9003564eb50a",
+      "sha256": "9ee668f2656a1619b046f21289d99d0e58f3a0a9e78ca8f595379bc1a6f5f18a",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 41
+      "topLevelDeclarationCount": 42
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 5,
+      "fanOut": 6,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
         "src/compiler/wgsl/ir/ir_const_eval.zig",
+        "src/compiler/wgsl/ir/ir_query.zig",
         "src/compiler/wgsl/ir/layout_utils.zig",
         "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
         "src/verification/lean_proof.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 980,
+      "lineCount": 945,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
@@ -24728,27 +25084,27 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 7,
+          "line": 12,
           "name": "try_elide_storage_index"
         },
         {
           "kind": "fn",
-          "line": 164,
+          "line": 169,
           "name": "try_elide_dispatch_validated_storage_index"
         },
         {
           "kind": "fn",
-          "line": 533,
+          "line": 528,
           "name": "match_gid_component_plus_offset"
         },
         {
           "kind": "fn",
-          "line": 581,
+          "line": 576,
           "name": "match_gid_component_times_stride_plus_offset"
         },
         {
           "kind": "fn",
-          "line": 608,
+          "line": 603,
           "name": "match_gid_component_tiled_plus_offset"
         }
       ],
@@ -24764,23 +25120,24 @@
         "src/compiler/wgsl/ir/ir_transform_robustness.zig"
       ],
       "roles": [],
-      "sha256": "00bdf308ece87a3705a9fd045f7a113db797fd719caffffcab85518b66d0e18b",
+      "sha256": "4e2a956bdda83367f2ed6d9a7696a9b65683a0c648b507ed92e858351c21dba0",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 43
+      "topLevelDeclarationCount": 44
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
         "src/compiler/wgsl/ir/ir_const_eval.zig",
+        "src/compiler/wgsl/ir/ir_query.zig",
         "src/compiler/wgsl/ir/layout_utils.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 994,
+      "lineCount": 925,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
@@ -24788,7 +25145,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 17,
+          "line": 24,
           "name": "try_elide_uniform_validated_storage_index"
         }
       ],
@@ -24804,22 +25161,23 @@
         "src/compiler/wgsl/ir/ir_transform_robustness.zig"
       ],
       "roles": [],
-      "sha256": "1283c69be9ddf0e487892598747461e2521b32ad8cef26d92b31f61e66c8f415",
+      "sha256": "bfb7b3c834baabc26c1db990e3b680539af1ac37bf6d71d8c907ce1c80fce78c",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 59
+      "topLevelDeclarationCount": 60
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_query.zig",
         "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 762,
+      "lineCount": 635,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
@@ -24827,7 +25185,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 7,
+          "line": 15,
           "name": "sizedArrayIndexProvablyInBounds"
         }
       ],
@@ -24843,9 +25201,9 @@
         "src/compiler/wgsl/ir/ir_transform_robustness.zig"
       ],
       "roles": [],
-      "sha256": "2e68ab7b7ccde81c21ef474559fc388d46bc17398d6f3ce7760217401f1d4844",
+      "sha256": "284820b196920c722e669b9bc06f66dcce7b7ab9668fddad30f4f403f53ad8aa",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 38
+      "topLevelDeclarationCount": 39
     },
     {
       "containsCImport": false,
@@ -25805,7 +26163,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 25,
+      "fanIn": 26,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -25905,7 +26263,8 @@
         "src/contracts/compute.zig",
         "src/contracts/mod.zig",
         "src/core/abi/wgpu_execution_types.zig",
-        "src/runtime/execution.zig"
+        "src/runtime/execution.zig",
+        "src/runtime/execution_receipt.zig"
       ],
       "roles": [],
       "sha256": "648dc2c443fd47ebf04c8e2111ea4f9dd0b32b48d247a21d845c2547e3cda6fd",
@@ -29467,7 +29826,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 10,
+      "fanIn": 11,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -29501,6 +29860,7 @@
         "src/contracts/mod.zig",
         "src/plan/doe_plan_executor.zig",
         "src/runtime/execution.zig",
+        "src/runtime/execution_receipt.zig",
         "src/runtime/numeric_stability/runtime.zig",
         "src/runtime/numeric_stability/runtime_plan.zig",
         "src/runtime/trace/operator_artifacts.zig",
@@ -49032,7 +49392,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 5,
+      "fanIn": 6,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -49111,6 +49471,7 @@
       "reachable": true,
       "reverseImports": [
         "src/plan/doe_plan_executor.zig",
+        "src/plan/plan_validation.zig",
         "src/plan/webgpu_plan_executor.zig",
         "src/plan/webgpu_plan_executor_core.zig",
         "src/plan/webgpu_plan_executor_emit.zig",
@@ -49125,7 +49486,7 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
-      "fanOut": 14,
+      "fanOut": 15,
       "imports": [
         "src/backend/backend_policy.zig",
         "src/contracts/command.zig",
@@ -49135,6 +49496,7 @@
         "src/contracts/model/model_profile.zig",
         "src/contracts/semantic.zig",
         "src/plan/dawn_plan_types.zig",
+        "src/plan/plan_validation.zig",
         "src/plan/synthetic_assets.zig",
         "src/quirk/mod.zig",
         "src/runtime/execution.zig",
@@ -49144,7 +49506,7 @@
       ],
       "isProductionRoot": false,
       "layer": "plan",
-      "lineCount": 554,
+      "lineCount": 535,
       "onlyReexports": false,
       "owner": "plan",
       "path": "src/plan/doe_plan_executor.zig",
@@ -49152,12 +49514,12 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 34,
+          "line": 35,
           "name": "RunOptions"
         },
         {
           "kind": "fn",
-          "line": 282,
+          "line": 263,
           "name": "runPlan"
         }
       ],
@@ -49171,7 +49533,7 @@
         "src/plan/mod.zig"
       ],
       "roles": [],
-      "sha256": "4c92de9a43a3968c8adbc881d4b1f90a354293ec827cab47dd59712185e8e6ef",
+      "sha256": "15ef382b452094004d0860b0dbdf45eb248ce68bf07e53b5f0d4f2238b7fc8bb",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 39
     },
@@ -49226,6 +49588,52 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
+      "fanOut": 1,
+      "imports": [
+        "src/plan/dawn_plan_types.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "plan",
+      "lineCount": 103,
+      "onlyReexports": false,
+      "owner": "plan",
+      "path": "src/plan/plan_validation.zig",
+      "publicDeclarationCount": 3,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "CommandCounts"
+        },
+        {
+          "kind": "fn",
+          "line": 11,
+          "name": "countCommands"
+        },
+        {
+          "kind": "fn",
+          "line": 28,
+          "name": "validateCounts"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/plan/doe_plan_executor.zig",
+        "src/plan/webgpu_plan_executor.zig"
+      ],
+      "roles": [],
+      "sha256": "f34e14127d0fd97bbe7852aeb234049f4cbbf5bb89b72bb781346eef5f201a62",
+      "testBlockCount": 2,
+      "topLevelDeclarationCount": 8
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 2,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -49275,9 +49683,10 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 5,
+      "fanOut": 6,
       "imports": [
         "src/plan/dawn_plan_types.zig",
+        "src/plan/plan_validation.zig",
         "src/plan/webgpu_plan_executor_config.zig",
         "src/plan/webgpu_plan_executor_core.zig",
         "src/plan/webgpu_plan_executor_emit.zig",
@@ -49285,7 +49694,7 @@
       ],
       "isProductionRoot": false,
       "layer": "plan",
-      "lineCount": 217,
+      "lineCount": 198,
       "onlyReexports": false,
       "owner": "plan",
       "path": "src/plan/webgpu_plan_executor.zig",
@@ -49293,17 +49702,17 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 25,
+          "line": 26,
           "name": "Config"
         },
         {
           "kind": "const",
-          "line": 26,
+          "line": 27,
           "name": "executePlan"
         },
         {
           "kind": "fn",
-          "line": 28,
+          "line": 29,
           "name": "runPlan"
         }
       ],
@@ -49318,7 +49727,7 @@
         "src/plan/mod.zig"
       ],
       "roles": [],
-      "sha256": "abfca0e7c0e9398a838866ec9ca3244a6b488c599c42d8adc44627e5fa383a33",
+      "sha256": "4f860cf974c3598830921ac6ba11ae001eac2623db0b2baea45a2de4a733b96e",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 20
     },
@@ -50597,7 +51006,7 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 14,
-      "fanOut": 12,
+      "fanOut": 13,
       "imports": [
         "src/backend/backend_policy.zig",
         "src/backend/backend_runtime.zig",
@@ -50610,11 +51019,12 @@
         "src/contracts/model/model_compute_types.zig",
         "src/contracts/model/model_profile.zig",
         "src/contracts/semantic.zig",
-        "src/core/abi/wgpu_loader.zig"
+        "src/core/abi/wgpu_loader.zig",
+        "src/runtime/execution_receipt.zig"
       ],
       "isProductionRoot": false,
       "layer": "runtime",
-      "lineCount": 811,
+      "lineCount": 522,
       "onlyReexports": false,
       "owner": "runtime",
       "path": "src/runtime/execution.zig",
@@ -50622,112 +51032,112 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 29,
+          "line": 48,
           "name": "BackendMode"
         },
         {
           "kind": "const",
-          "line": 34,
+          "line": 53,
           "name": "DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS"
         },
         {
           "kind": "const",
-          "line": 36,
+          "line": 55,
           "name": "ExecutionStatus"
         },
         {
           "kind": "const",
-          "line": 38,
+          "line": 56,
           "name": "ExecutionResult"
         },
         {
           "kind": "const",
-          "line": 70,
+          "line": 58,
           "name": "ExecutionContext"
         },
         {
           "kind": "const",
-          "line": 576,
+          "line": 287,
           "name": "UploadBufferUsageMode"
         },
         {
           "kind": "const",
-          "line": 577,
+          "line": 288,
           "name": "QueueWaitMode"
         },
         {
           "kind": "const",
-          "line": 578,
+          "line": 289,
           "name": "QueueSyncMode"
         },
         {
           "kind": "const",
-          "line": 579,
+          "line": 290,
           "name": "GpuTimestampMode"
         },
         {
           "kind": "fn",
-          "line": 581,
+          "line": 292,
           "name": "parseUploadBufferUsage"
         },
         {
           "kind": "fn",
-          "line": 587,
+          "line": 298,
           "name": "parseQueueWaitMode"
         },
         {
           "kind": "fn",
-          "line": 593,
+          "line": 304,
           "name": "queueWaitModeName"
         },
         {
           "kind": "fn",
-          "line": 600,
+          "line": 311,
           "name": "parseQueueSyncMode"
         },
         {
           "kind": "fn",
-          "line": 606,
+          "line": 317,
           "name": "queueSyncModeName"
         },
         {
           "kind": "fn",
-          "line": 613,
+          "line": 324,
           "name": "parseGpuTimestampMode"
         },
         {
           "kind": "fn",
-          "line": 620,
+          "line": 331,
           "name": "parseBackend"
         },
         {
           "kind": "fn",
-          "line": 627,
+          "line": 338,
           "name": "parseBackendLane"
         },
         {
           "kind": "fn",
-          "line": 631,
+          "line": 342,
           "name": "defaultBackendLane"
         },
         {
           "kind": "fn",
-          "line": 639,
+          "line": 350,
           "name": "backendLaneName"
         },
         {
           "kind": "fn",
-          "line": 643,
+          "line": 354,
           "name": "backend_id_name"
         },
         {
           "kind": "fn",
-          "line": 647,
+          "line": 358,
           "name": "executionModeName"
         },
         {
           "kind": "fn",
-          "line": 654,
+          "line": 365,
           "name": "executionStatusName"
         }
       ],
@@ -50754,9 +51164,77 @@
         "src/runtime/trace/trace_jsonl_emit.zig"
       ],
       "roles": [],
-      "sha256": "e730b53019f85a3486afb0b076cf1677b259ca45b81fa028d1ec0ec201ee2795",
+      "sha256": "0486c3e2dce261062d98548adfc2190f714b818b6414d9f0cb48142b052b317e",
       "testBlockCount": 12,
-      "topLevelDeclarationCount": 50
+      "topLevelDeclarationCount": 53
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 3,
+      "imports": [
+        "src/backend/backend_telemetry.zig",
+        "src/contracts/execution.zig",
+        "src/contracts/semantic.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "runtime",
+      "lineCount": 193,
+      "onlyReexports": false,
+      "owner": "runtime",
+      "path": "src/runtime/execution_receipt.zig",
+      "publicDeclarationCount": 7,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "ExecutionStatus"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "ExecutionResult"
+        },
+        {
+          "kind": "const",
+          "line": 39,
+          "name": "Identity"
+        },
+        {
+          "kind": "fn",
+          "line": 45,
+          "name": "skipped"
+        },
+        {
+          "kind": "fn",
+          "line": 49,
+          "name": "missingBackend"
+        },
+        {
+          "kind": "fn",
+          "line": 53,
+          "name": "failure"
+        },
+        {
+          "kind": "fn",
+          "line": 65,
+          "name": "success"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/runtime/execution.zig"
+      ],
+      "roles": [],
+      "sha256": "b27af78509c25e9664dd4906b2774ac3998a17265c2764c736b1c513c916d33c",
+      "testBlockCount": 2,
+      "topLevelDeclarationCount": 14
     },
     {
       "containsCImport": false,
@@ -53609,5 +54087,5 @@
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5"
+  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e"
 }

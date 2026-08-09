@@ -8,6 +8,9 @@ const std = @import("std");
 const spec = @import("csl_spec.zig");
 const tsir_kernel_body = @import("../../../tsir/emit_kernel_body.zig");
 const tsir_schema = @import("../../../tsir/schema.zig");
+const text_buffer = @import("csl_text_buffer.zig");
+
+const write = text_buffer.write;
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -709,10 +712,4 @@ fn emitComptime(buf: []u8, pos: *usize, names: []const []const u8) EmitError!voi
     }
     try write(buf, pos, "    @export_symbol(compute);\n");
     try write(buf, pos, "}\n");
-}
-
-fn write(buf: []u8, pos: *usize, text: []const u8) EmitError!void {
-    if (pos.* + text.len > buf.len) return error.OutputTooLarge;
-    @memcpy(buf[pos.*..][0..text.len], text);
-    pos.* += text.len;
 }

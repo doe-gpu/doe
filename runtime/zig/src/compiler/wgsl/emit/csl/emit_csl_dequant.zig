@@ -11,6 +11,10 @@
 const ir = @import("../../ir/ir.zig");
 const classify = @import("emit_csl_classify.zig");
 const W = @import("emit_csl_ir_walk.zig");
+const storage_emit = @import("csl_storage_emit.zig");
+
+const emitBuf = storage_emit.emitBuffer;
+const emitExport = storage_emit.emitExport;
 
 pub const EmitError = W.EmitError;
 
@@ -122,16 +126,6 @@ pub fn emit(
     try W.write(buf, pos, "}\n");
 }
 
-fn emitBuf(buf: []u8, pos: *usize, name: []const u8, ty: []const u8) EmitError!void {
-    try W.write(buf, pos, "var ");
-    try W.write(buf, pos, name);
-    try W.write(buf, pos, ": ");
-    try W.write(buf, pos, ty);
-    try W.write(buf, pos, " = @zeros(");
-    try W.write(buf, pos, ty);
-    try W.write(buf, pos, ");\n");
-}
-
 fn emitPtrTyped(buf: []u8, pos: *usize, name: []const u8, elem: []const u8) EmitError!void {
     try W.write(buf, pos, "var ");
     try W.write(buf, pos, name);
@@ -140,12 +134,4 @@ fn emitPtrTyped(buf: []u8, pos: *usize, name: []const u8, elem: []const u8) Emit
     try W.write(buf, pos, " = &");
     try W.write(buf, pos, name);
     try W.write(buf, pos, ";\n");
-}
-
-fn emitExport(buf: []u8, pos: *usize, name: []const u8) EmitError!void {
-    try W.write(buf, pos, "    @export_symbol(");
-    try W.write(buf, pos, name);
-    try W.write(buf, pos, "_ptr, \"");
-    try W.write(buf, pos, name);
-    try W.write(buf, pos, "\");\n");
 }

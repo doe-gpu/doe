@@ -10,6 +10,10 @@
 //   3. A conservative SRAM estimate for sizing discussion.
 
 const std = @import("std");
+const text_buffer = @import("csl_text_buffer.zig");
+
+const write = text_buffer.write;
+const writeInt = text_buffer.writeInt;
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -514,18 +518,6 @@ fn writeJsonString(buf: []u8, pos: *usize, value: []const u8) EmitError!void {
 
 fn writeBool(buf: []u8, pos: *usize, value: bool) EmitError!void {
     try write(buf, pos, if (value) "true" else "false");
-}
-
-fn write(buf: []u8, pos: *usize, text: []const u8) EmitError!void {
-    if (pos.* + text.len > buf.len) return error.OutputTooLarge;
-    @memcpy(buf[pos.*..][0..text.len], text);
-    pos.* += text.len;
-}
-
-fn writeInt(buf: []u8, pos: *usize, value: anytype) EmitError!void {
-    var tmp: [32]u8 = undefined;
-    const slice = std.fmt.bufPrint(&tmp, "{d}", .{value}) catch return error.OutputTooLarge;
-    try write(buf, pos, slice);
 }
 
 test "SRAM estimate is explicit and conservative" {

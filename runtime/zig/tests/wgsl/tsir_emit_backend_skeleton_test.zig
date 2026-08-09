@@ -10,18 +10,21 @@ test "tsir backend skeleton emitters expose source-backed code digests" {
         @embedFile("../../src/compiler/tsir/emit_spir_v.zig"),
         @embedFile("../../src/compiler/tsir/emit_text_skeleton.zig"),
         @embedFile("../../src/compiler/tsir/emit_kernel_body.zig"),
+        @embedFile("../../src/compiler/tsir/emit_semantic_metadata.zig"),
     );
     try expectDigest(
         tsir.emit_msl.emitterCodeDigest(),
         @embedFile("../../src/compiler/tsir/emit_msl.zig"),
         @embedFile("../../src/compiler/tsir/emit_text_skeleton.zig"),
         @embedFile("../../src/compiler/tsir/emit_kernel_body.zig"),
+        @embedFile("../../src/compiler/tsir/emit_semantic_metadata.zig"),
     );
     try expectDigest(
         tsir.emit_dxil.emitterCodeDigest(),
         @embedFile("../../src/compiler/tsir/emit_dxil.zig"),
         @embedFile("../../src/compiler/tsir/emit_text_skeleton.zig"),
         @embedFile("../../src/compiler/tsir/emit_kernel_body.zig"),
+        @embedFile("../../src/compiler/tsir/emit_semantic_metadata.zig"),
     );
 }
 
@@ -153,11 +156,13 @@ fn expectDigest(
     emitter_source: []const u8,
     common_source: []const u8,
     body_source: []const u8,
+    semantic_metadata_source: []const u8,
 ) !void {
     var h = std.crypto.hash.sha2.Sha256.init(.{});
     h.update(emitter_source);
     h.update(common_source);
     h.update(body_source);
+    h.update(semantic_metadata_source);
     var expected: [32]u8 = undefined;
     h.final(&expected);
     try std.testing.expectEqualSlices(u8, &expected, &actual);

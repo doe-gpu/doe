@@ -46,7 +46,6 @@ REVIEWED_SIGNALS: dict[str, str] = {
     "src/native/resource/doe_texture_sampler_native.zig": "Keep: cohesive native texture, texture-view, and sampler ABI ownership; the upstream chained swizzle descriptor belongs to texture-view normalization and does not justify a size-only split.",
     "src/native/shader/doe_shader_native.zig": "Keep: native shader-module creation, translation, cache, diagnostics, and object-lifetime boundary.",
     "src/native/vulkan/vulkan_compute_native.zig": "Keep: native WebGPU-to-Vulkan compute command orchestration and lifetime boundary.",
-    "src/runtime/execution.zig": "Keep: authoritative runtime execution/result normalization and backend routing policy; trace serialization and backend mechanics are separate.",
     "src/runtime/trace/trace.zig": "Keep: authoritative trace state, hash-chain, replay, and trace receipt model; format emitters are separate.",
     "src/spatial/csl/csl_host_plan_tool.zig": "Keep: cohesive CSL host-plan tool contract and process-facing validation behavior.",
     "src/dropin/dropin_abi_procs.zig": "Keep: WebGPU ABI proc-table population capsule with 108 declarations; merging would mix ABI table ownership with drop-in object behavior.",

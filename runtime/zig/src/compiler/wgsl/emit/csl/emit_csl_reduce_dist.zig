@@ -19,6 +19,10 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
 const spec = @import("csl_spec.zig");
+const text_buffer = @import("csl_text_buffer.zig");
+
+const write = text_buffer.write;
+const writeInt = text_buffer.writeInt;
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -269,15 +273,3 @@ pub fn emitDistributed(
 // ---------------------------------------------------------------------------
 // Write helpers
 // ---------------------------------------------------------------------------
-
-fn write(buf: []u8, pos: *usize, text: []const u8) EmitError!void {
-    if (pos.* + text.len > buf.len) return error.OutputTooLarge;
-    @memcpy(buf[pos.*..][0..text.len], text);
-    pos.* += text.len;
-}
-
-fn writeInt(buf: []u8, pos: *usize, value: anytype) EmitError!void {
-    var tmp: [20]u8 = undefined;
-    const slice = std.fmt.bufPrint(&tmp, "{d}", .{value}) catch return error.OutputTooLarge;
-    try write(buf, pos, slice);
-}

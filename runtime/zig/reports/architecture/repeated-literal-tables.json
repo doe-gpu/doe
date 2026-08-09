@@ -5,11 +5,11 @@
       "literalTokenSha256": "064774b851a99fd3cd766abb558e324be11f6de53c354107283942e805edf862",
       "locations": [
         {
-          "endLine": 63,
+          "endLine": 67,
           "literalCount": 4,
           "name": "ModelConfig",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 27
+          "startLine": 31
         },
         {
           "endLine": 45,
@@ -71,33 +71,13 @@
           "name": "doeNativeShaderModuleGetBindingsForEntryPoint",
           "path": "src/native/shader/doe_shader_native.zig",
           "startLine": 265
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
-      "literalTokenSha256": "1140449875975a0d6d349dfa9374918abdf95e57ed46436270da0f5f3df12ad2",
-      "locations": [
-        {
-          "endLine": 251,
-          "literalCount": 9,
-          "name": "writeResidency",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 233
         },
         {
-          "endLine": 148,
-          "literalCount": 9,
-          "name": "writeResidency",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 130
-        },
-        {
-          "endLine": 155,
-          "literalCount": 9,
-          "name": "writeResidency",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 137
+          "endLine": 111,
+          "literalCount": 7,
+          "name": "empty",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 84
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -153,26 +133,6 @@
           "name": "destroy_descriptor_state",
           "path": "src/backend/vulkan/vk_pipeline.zig",
           "startLine": 502
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
-      "literalTokenSha256": "1fc56c6bebe4944cd519565788dcdd9d437e535734bab91bd703bb22a85d7503",
-      "locations": [
-        {
-          "endLine": 394,
-          "literalCount": 5,
-          "name": "parse_address_space",
-          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 387
-        },
-        {
-          "endLine": 80,
-          "literalCount": 5,
-          "name": "parse_address_space",
-          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
-          "startLine": 73
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -284,11 +244,11 @@
           "startLine": 62
         },
         {
-          "endLine": 656,
+          "endLine": 663,
           "literalCount": 4,
           "name": "row_param_guarded_by_uniform_rows",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 627
+          "startLine": 634
         },
         {
           "endLine": 72,
@@ -409,11 +369,11 @@
           "startLine": 412
         },
         {
-          "endLine": 77,
+          "endLine": 80,
           "literalCount": 4,
           "name": "emit",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
-          "startLine": 42
+          "startLine": 45
         },
         {
           "endLine": 160,
@@ -599,26 +559,6 @@
       "reason": "identical ordered sequence of at least four literal tokens"
     },
     {
-      "literalTokenSha256": "4bc6f80182e4468af704a73b30c8907b9949aa974c32d7f0a218cf48deaa0047",
-      "locations": [
-        {
-          "endLine": 418,
-          "literalCount": 18,
-          "name": "parse_matrix_shape",
-          "path": "src/compiler/wgsl/frontend/sema_expr.zig",
-          "startLine": 403
-        },
-        {
-          "endLine": 110,
-          "literalCount": 18,
-          "name": "parse_matrix_shape",
-          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 95
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
       "literalTokenSha256": "4c18c5ffa17b33e897d2bb96824e3b2d837edee6cc2d8abd145b87a4e018bb17",
       "locations": [
         {
@@ -703,11 +643,11 @@
           "startLine": 103
         },
         {
-          "endLine": 507,
+          "endLine": 502,
           "literalCount": 4,
           "name": "workgroup_size_for_function",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 502
+          "startLine": 497
         },
         {
           "endLine": 426,
@@ -1088,33 +1028,6 @@
       "reason": "identical ordered sequence of at least four literal tokens"
     },
     {
-      "literalTokenSha256": "797e2247380c635aad488384dc287f217400a7e58d675953ef52f30a9f292e81",
-      "locations": [
-        {
-          "endLine": 329,
-          "literalCount": 12,
-          "name": "writeQuoted",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 316
-        },
-        {
-          "endLine": 226,
-          "literalCount": 12,
-          "name": "writeQuoted",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 213
-        },
-        {
-          "endLine": 233,
-          "literalCount": 12,
-          "name": "writeQuoted",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 220
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
       "literalTokenSha256": "7b874f3542e4955d362d33ce46cdd4e4341086917d1bb9925388924fd82b9e20",
       "locations": [
         {
@@ -1267,82 +1180,28 @@
       "reason": "identical ordered sequence of at least four literal tokens"
     },
     {
-      "literalTokenSha256": "802b3b1f10ef600f774e7258c9fb77d1d911f32882f21284b03e26ba39e75e99",
-      "locations": [
-        {
-          "endLine": 262,
-          "literalCount": 4,
-          "name": "writeTiles",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 253
-        },
-        {
-          "endLine": 159,
-          "literalCount": 4,
-          "name": "writeTiles",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 150
-        },
-        {
-          "endLine": 166,
-          "literalCount": 4,
-          "name": "writeTiles",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 157
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
       "literalTokenSha256": "8699851c442ea970321f9b5c69e92b131a62b8cde55642384a5d2c1abfeaf2af",
       "locations": [
         {
-          "endLine": 29,
+          "endLine": 32,
           "literalCount": 9,
           "name": "isSemanticPattern",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 19
+          "startLine": 22
         },
         {
-          "endLine": 43,
+          "endLine": 46,
           "literalCount": 9,
           "name": "emitLayout",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 31
+          "startLine": 34
         },
         {
-          "endLine": 57,
+          "endLine": 60,
           "literalCount": 9,
           "name": "emitPeProgram",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 45
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
-      "literalTokenSha256": "88d3c8fcc66b8b7fc91bcb35c5feb807bf0990c561937ad3f66b0d99381445b0",
-      "locations": [
-        {
-          "endLine": 277,
-          "literalCount": 7,
-          "name": "writeCollectives",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 264
-        },
-        {
-          "endLine": 174,
-          "literalCount": 7,
-          "name": "writeCollectives",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 161
-        },
-        {
-          "endLine": 181,
-          "literalCount": 7,
-          "name": "writeCollectives",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 168
+          "startLine": 48
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1555,11 +1414,11 @@
           "startLine": 197
         },
         {
-          "endLine": 243,
+          "endLine": 251,
           "literalCount": 4,
           "name": "match_simple_exclusive_limit",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 215
+          "startLine": 223
         },
         {
           "endLine": 703,
@@ -1603,18 +1462,11 @@
           "startLine": 230
         },
         {
-          "endLine": 191,
+          "endLine": 26,
           "literalCount": 6,
-          "name": "validatePlanCounts",
-          "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 173
-        },
-        {
-          "endLine": 118,
-          "literalCount": 6,
-          "name": "validatePlanCounts",
-          "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 100
+          "name": "countCommands",
+          "path": "src/plan/plan_validation.zig",
+          "startLine": 11
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1623,46 +1475,25 @@
       "literalTokenSha256": "a1a37be46194b8ce0c54108572d10ae05413fdce44b4a4e2d777f5ba688d8f8c",
       "locations": [
         {
-          "endLine": 143,
+          "endLine": 23,
+          "literalCount": 4,
+          "name": "emitPointer",
+          "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
+          "startLine": 15
+        },
+        {
+          "endLine": 137,
           "literalCount": 4,
           "name": "emitPtrTyped",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
-          "startLine": 135
+          "startLine": 129
         },
         {
-          "endLine": 271,
-          "literalCount": 4,
-          "name": "emitPtr",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
-          "startLine": 263
-        },
-        {
-          "endLine": 140,
-          "literalCount": 4,
-          "name": "emitPtr",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
-          "startLine": 132
-        },
-        {
-          "endLine": 141,
-          "literalCount": 4,
-          "name": "emitPtr",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
-          "startLine": 133
-        },
-        {
-          "endLine": 99,
-          "literalCount": 4,
-          "name": "emitPtr",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
-          "startLine": 91
-        },
-        {
-          "endLine": 699,
+          "endLine": 702,
           "literalCount": 4,
           "name": "emitPtr",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 691
+          "startLine": 694
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1758,11 +1589,11 @@
           "startLine": 116
         },
         {
-          "endLine": 712,
+          "endLine": 715,
           "literalCount": 6,
           "name": "emitComptime",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 701
+          "startLine": 704
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1839,11 +1670,11 @@
           "startLine": 215
         },
         {
-          "endLine": 434,
+          "endLine": 398,
           "literalCount": 4,
           "name": "texture_pattern_is_identity",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 426
+          "startLine": 390
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1992,18 +1823,18 @@
       "literalTokenSha256": "ba68babaa7ed3bd96693b3916cecb9599d89ecfb702f2ddfd286942917a7f472",
       "locations": [
         {
-          "endLine": 482,
+          "endLine": 470,
           "literalCount": 17,
           "name": "parse_builtin_attr",
           "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 458
+          "startLine": 446
         },
         {
-          "endLine": 71,
+          "endLine": 75,
           "literalCount": 17,
           "name": "parse_builtin_attr",
           "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
-          "startLine": 47
+          "startLine": 51
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2252,11 +2083,11 @@
       "literalTokenSha256": "d336bcbbe6bd4ef965654e68955fed76662f6728412cf4d05679ed3666b37366",
       "locations": [
         {
-          "endLine": 481,
+          "endLine": 476,
           "literalCount": 7,
           "name": "match_dispatch_height",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 460
+          "startLine": 455
         },
         {
           "endLine": 177,
@@ -2291,26 +2122,6 @@
           "name": "buildAutoRmsnormObservation",
           "path": "src/runtime/numeric_stability/runtime_plan.zig",
           "startLine": 242
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
-      "literalTokenSha256": "d5b433c332bc31a15b072ccbd714b47bb5025df6307cfbca5cd9f27fa295ed8c",
-      "locations": [
-        {
-          "endLine": 644,
-          "literalCount": 14,
-          "name": "writeJsonString",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 627
-        },
-        {
-          "endLine": 533,
-          "literalCount": 14,
-          "name": "writeJsonString",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
-          "startLine": 516
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2507,53 +2318,25 @@
       "literalTokenSha256": "e1f122d3817638fc03df5f67b384ebf3b331fb78fab06fe4c1a5f2beba6384ba",
       "locations": [
         {
-          "endLine": 133,
+          "endLine": 13,
           "literalCount": 4,
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
-          "startLine": 125
+          "name": "emitBuffer",
+          "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
+          "startLine": 5
         },
         {
-          "endLine": 249,
-          "literalCount": 4,
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
-          "startLine": 241
-        },
-        {
-          "endLine": 261,
+          "endLine": 256,
           "literalCount": 4,
           "name": "emitBufForElem",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
-          "startLine": 251
+          "startLine": 246
         },
         {
-          "endLine": 130,
-          "literalCount": 4,
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
-          "startLine": 122
-        },
-        {
-          "endLine": 131,
-          "literalCount": 4,
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
-          "startLine": 123
-        },
-        {
-          "endLine": 89,
-          "literalCount": 4,
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
-          "startLine": 81
-        },
-        {
-          "endLine": 689,
+          "endLine": 692,
           "literalCount": 4,
           "name": "emitBuf",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 681
+          "startLine": 684
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2582,11 +2365,11 @@
       "literalTokenSha256": "e463970d1a718f94689644b6489f93d3d905d26e129d3283415c222041f1e13b",
       "locations": [
         {
-          "endLine": 12,
+          "endLine": 17,
           "literalCount": 6,
           "name": "PHASE_SPECIALIZED_KERNELS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 12
+          "startLine": 17
         },
         {
           "endLine": 28,
@@ -2616,11 +2399,11 @@
           "startLine": 16
         },
         {
-          "endLine": 115,
+          "endLine": 120,
           "literalCount": 5,
           "name": "transform_function",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 30
+          "startLine": 35
         },
         {
           "endLine": 445,
@@ -2690,11 +2473,11 @@
           "startLine": 178
         },
         {
-          "endLine": 487,
+          "endLine": 492,
           "literalCount": 11,
           "name": "validateHostPlan",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 459
+          "startLine": 464
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2775,33 +2558,6 @@
       "reason": "identical ordered sequence of at least four literal tokens"
     },
     {
-      "literalTokenSha256": "f65d81869864adca2f2a227937eb5a90e1981cc07d2d4fbd01b77c1f4ff07737",
-      "locations": [
-        {
-          "endLine": 289,
-          "literalCount": 5,
-          "name": "writeReductions",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 279
-        },
-        {
-          "endLine": 186,
-          "literalCount": 5,
-          "name": "writeReductions",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 176
-        },
-        {
-          "endLine": 193,
-          "literalCount": 5,
-          "name": "writeReductions",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 183
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
       "literalTokenSha256": "fce4f3bdbf9d1f10ed04c692209b59d08e493bb053cab5ebd638f91ccf5921c0",
       "locations": [
         {
@@ -2825,25 +2581,25 @@
       "literalTokenSha256": "ffd5200cbdcf1cb48a357aa7b716b77f2d194b5041a746edd477959b14813111",
       "locations": [
         {
-          "endLine": 948,
+          "endLine": 943,
           "literalCount": 6,
           "name": "classify_builtin_component",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 926
+          "startLine": 921
         },
         {
-          "endLine": 788,
+          "endLine": 795,
           "literalCount": 6,
           "name": "classify_builtin_component",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 766
+          "startLine": 773
         },
         {
-          "endLine": 629,
+          "endLine": 532,
           "literalCount": 6,
           "name": "classify_local_invocation_axis",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 611
+          "startLine": 514
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2870,10 +2626,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
+  "manifestSha256": "d9790e19d4b88d8f252353e4e7c6ed146ed6c8018e933e1db7ee810689e4a16e",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5",
+  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
   "status": "captured"
 }

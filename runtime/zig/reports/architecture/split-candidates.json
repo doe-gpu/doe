@@ -80,29 +80,29 @@
     },
     {
       "fanIn": 1,
-      "fanOut": 23,
-      "lineCount": 918,
+      "fanOut": 24,
+      "lineCount": 915,
       "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
       "fanIn": 3,
-      "fanOut": 3,
-      "lineCount": 845,
+      "fanOut": 4,
+      "lineCount": 837,
       "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
       "fanIn": 12,
-      "fanOut": 3,
-      "lineCount": 891,
+      "fanOut": 4,
+      "lineCount": 888,
       "path": "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
       "fanIn": 2,
-      "fanOut": 3,
-      "lineCount": 919,
+      "fanOut": 4,
+      "lineCount": 911,
       "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -136,8 +136,8 @@
     },
     {
       "fanIn": 1,
-      "fanOut": 5,
-      "lineCount": 995,
+      "fanOut": 6,
+      "lineCount": 959,
       "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -150,15 +150,15 @@
     },
     {
       "fanIn": 1,
-      "fanOut": 5,
-      "lineCount": 980,
+      "fanOut": 6,
+      "lineCount": 945,
       "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
       "fanIn": 1,
-      "fanOut": 3,
-      "lineCount": 994,
+      "fanOut": 4,
+      "lineCount": 925,
       "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -205,13 +205,6 @@
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
-      "fanIn": 14,
-      "fanOut": 12,
-      "lineCount": 811,
-      "path": "src/runtime/execution.zig",
-      "reason": "handwritten module exceeds the 800-line architecture review signal"
-    },
-    {
       "fanIn": 6,
       "fanOut": 8,
       "lineCount": 840,
@@ -227,9 +220,9 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
+  "manifestSha256": "d9790e19d4b88d8f252353e4e7c6ed146ed6c8018e933e1db7ee810689e4a16e",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5"
+  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e"
 }

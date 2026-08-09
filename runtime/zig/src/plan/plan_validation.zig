@@ -37,12 +37,13 @@ pub fn validateCounts(plan: dawn_plan_types.Plan) !void {
 }
 
 test "plan count validation accepts matching structural work" {
-    const commands = [_]dawn_plan_types.Command{
+    var data = [_]u32{1};
+    var commands = [_]dawn_plan_types.Command{
         .{ .buffer_write = .{
             .handle = 1,
             .offset = 0,
             .buffer_size = 4,
-            .data = &.{1},
+            .data = &data,
         } },
         .{ .kernel_dispatch = .{
             .kernel = "kernel",
@@ -59,7 +60,7 @@ test "plan count validation accepts matching structural work" {
 }
 
 test "plan count validation rejects a mismatched dispatch count" {
-    const commands = [_]dawn_plan_types.Command{
+    var commands = [_]dawn_plan_types.Command{
         .{ .kernel_dispatch = .{
             .kernel = "kernel",
             .entry_point = "main",
@@ -75,7 +76,7 @@ test "plan count validation rejects a mismatched dispatch count" {
 }
 
 fn testPlan(
-    commands: []const dawn_plan_types.Command,
+    commands: []dawn_plan_types.Command,
     command_count: u32,
     buffer_write_count: u32,
     buffer_load_count: u32,

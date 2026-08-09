@@ -145,22 +145,22 @@
         {
           "name": "ATTENTION_LINEAR_WGSL",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 486
+          "startLine": 483
         },
         {
           "name": "ATTENTION_STREAMING_WGSL",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 497
+          "startLine": 494
         },
         {
           "name": "ATTENTION_DECODE_WGSL",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 509
+          "startLine": 506
         },
         {
           "name": "ATTENTION_TILED_WGSL",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 525
+          "startLine": 522
         },
         {
           "name": "ATTENTION_CAPTURE_PLAN_ID",
@@ -176,17 +176,17 @@
         {
           "name": "ATTN_PREFILL_HEAD_DIM",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 570
+          "startLine": 573
         },
         {
           "name": "ATTN_PREFILL_QUERY_SEQ_LEN",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 571
+          "startLine": 574
         },
         {
           "name": "ATTN_PREFILL_SCALE",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 573
+          "startLine": 576
         }
       ],
       "prefix": "ATTN",
@@ -396,7 +396,7 @@
         {
           "name": "BODY_SOURCE",
           "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 17
+          "startLine": 15
         },
         {
           "name": "BODY_SOURCE",
@@ -416,7 +416,7 @@
         {
           "name": "BODY_SOURCE",
           "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 17
+          "startLine": 15
         }
       ],
       "prefix": "BODY",
@@ -1183,17 +1183,17 @@
         {
           "name": "DEFAULT_MODULE_NAME",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 30
+          "startLine": 31
         },
         {
           "name": "DEFAULT_EXECUTION_BACKEND",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 31
+          "startLine": 32
         },
         {
           "name": "DEFAULT_SEMANTIC_STAGE",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 32
+          "startLine": 33
         },
         {
           "name": "DEFAULT_CACHE_DIR_SUFFIX",
@@ -1203,32 +1203,32 @@
         {
           "name": "DEFAULT_BACKEND_SELECTION_REASON",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 10
+          "startLine": 11
         },
         {
           "name": "DEFAULT_TIMING_SOURCE",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 11
+          "startLine": 12
         },
         {
           "name": "DEFAULT_TIMING_CLASS",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 12
+          "startLine": 13
         },
         {
           "name": "DEFAULT_SEMANTIC_STAGE",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 13
+          "startLine": 14
         },
         {
           "name": "DEFAULT_QUEUE_SYNC_MODE",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 14
+          "startLine": 15
         },
         {
           "name": "DEFAULT_SCHEMA",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 15
+          "startLine": 16
         },
         {
           "name": "DEFAULT_SEMANTIC_STAGE",
@@ -1273,7 +1273,7 @@
         {
           "name": "DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS",
           "path": "src/runtime/execution.zig",
-          "startLine": 34
+          "startLine": 53
         },
         {
           "name": "DEFAULT_POLICY_PATH",
@@ -1320,7 +1320,7 @@
         {
           "name": "DENSE_GEMV_COMPILE_TILE_MARKER",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 13
+          "startLine": 18
         },
         {
           "name": "DENSE_GEMV_COMPILE_HIDDEN_TILE_WIDTH",
@@ -2290,7 +2290,7 @@
         {
           "name": "EMITTER_SOURCE",
           "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 16
+          "startLine": 14
         },
         {
           "name": "EMITTER_SOURCE",
@@ -2310,7 +2310,7 @@
         {
           "name": "EMITTER_SOURCE",
           "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 16
+          "startLine": 14
         }
       ],
       "prefix": "EMITTER",
@@ -2481,12 +2481,12 @@
         {
           "name": "F16_BYTES_PER_WEIGHT",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 111
+          "startLine": 115
         },
         {
           "name": "F16_BYTES_PER_VALUE",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
-          "startLine": 103
+          "startLine": 108
         }
       ],
       "prefix": "F16",
@@ -3039,27 +3039,6 @@
     {
       "members": [
         {
-          "name": "HEX_DIGITS",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 13
-        },
-        {
-          "name": "HEX_DIGITS",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 9
-        },
-        {
-          "name": "HEX_DIGITS",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 13
-        }
-      ],
-      "prefix": "HEX",
-      "reason": "shared constant-name prefix; ownership and value similarity require review"
-    },
-    {
-      "members": [
-        {
           "name": "HOST_PLAN_ARTIFACT_DIR",
           "path": "src/backend/metal/metal_host_plan_artifact.zig",
           "startLine": 10
@@ -3139,17 +3118,17 @@
         {
           "name": "INITIAL_OUTPUT_CAPACITY",
           "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 12
+          "startLine": 13
         },
         {
           "name": "INITIAL_OUTPUT_CAPACITY",
           "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 8
+          "startLine": 9
         },
         {
           "name": "INITIAL_OUTPUT_CAPACITY",
           "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 12
+          "startLine": 13
         },
         {
           "name": "INITIAL_ABBREV_WIDTH",
@@ -3232,17 +3211,17 @@
         {
           "name": "KV_CACHE_F16_BYTES_PER_VALUE",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 112
+          "startLine": 116
         },
         {
           "name": "KV_WRITE_WGSL",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 583
+          "startLine": 580
         },
         {
           "name": "KV_READ_WGSL",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 595
+          "startLine": 592
         }
       ],
       "prefix": "KV",
@@ -3863,17 +3842,17 @@
         {
           "name": "MAX_OUTPUT",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
-          "startLine": 40
+          "startLine": 43
         },
         {
           "name": "MAX_BUFFERS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
-          "startLine": 97
+          "startLine": 102
         },
         {
           "name": "MAX_STREAM_STAGES",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
-          "startLine": 98
+          "startLine": 103
         },
         {
           "name": "MAX_ERRORS",
@@ -3983,12 +3962,12 @@
         {
           "name": "MAX_ATTR_CONST_DEPTH",
           "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 36
+          "startLine": 40
         },
         {
           "name": "MAX_ARRAY_LENGTH_CONST_DEPTH",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 112
+          "startLine": 97
         },
         {
           "name": "MAX_CONST_ALIAS_DEPTH",
@@ -4028,12 +4007,12 @@
         {
           "name": "MAX_U32_VALUE",
           "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
-          "startLine": 5
+          "startLine": 13
         },
         {
           "name": "MAX_RECURSION_DEPTH",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 5
+          "startLine": 13
         },
         {
           "name": "MAX_VERTEX_INPUT_ATTRS",
@@ -4820,33 +4799,13 @@
       "members": [
         {
           "name": "NIBBLE_SHIFT",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 14
+          "path": "src/compiler/tsir/emit_semantic_metadata.zig",
+          "startLine": 4
         },
         {
           "name": "NIBBLE_MASK",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 15
-        },
-        {
-          "name": "NIBBLE_SHIFT",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 10
-        },
-        {
-          "name": "NIBBLE_MASK",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 11
-        },
-        {
-          "name": "NIBBLE_SHIFT",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 14
-        },
-        {
-          "name": "NIBBLE_MASK",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 15
+          "path": "src/compiler/tsir/emit_semantic_metadata.zig",
+          "startLine": 5
         },
         {
           "name": "NIBBLE_BITS",
@@ -4939,12 +4898,12 @@
         {
           "name": "PHASE_TARGET_SUFFIXES",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 11
+          "startLine": 16
         },
         {
           "name": "PHASE_SPECIALIZED_KERNELS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 12
+          "startLine": 17
         },
         {
           "name": "PHASE_TARGET_SUFFIXES",
@@ -5063,22 +5022,22 @@
         {
           "name": "Q4_K_M_BLOCK_BYTES",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 54
+          "startLine": 57
         },
         {
           "name": "Q4_K_M_SUBBLOCKS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 58
+          "startLine": 61
         },
         {
           "name": "Q4_K_M_SUBBLOCK_ELEMENTS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 59
+          "startLine": 62
         },
         {
           "name": "Q4_K_M_BLOCK_ELEMENTS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 60
+          "startLine": 63
         }
       ],
       "prefix": "Q4",
@@ -5109,7 +5068,7 @@
         {
           "name": "Q4K_UPPER_BOUND_BYTES_PER_WEIGHT",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 109
+          "startLine": 113
         },
         {
           "name": "Q4K_BLOCK_BYTES_TEXT",
@@ -5140,7 +5099,7 @@
         {
           "name": "Q8_0_BYTES_PER_WEIGHT",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 110
+          "startLine": 114
         }
       ],
       "prefix": "Q8",
@@ -5804,7 +5763,7 @@
         {
           "name": "SAMPLE_WGSL",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 555
+          "startLine": 552
         },
         {
           "name": "SAMPLE_UNIFORM_EXTENDED_WORDS",
@@ -5844,6 +5803,37 @@
         }
       ],
       "prefix": "SELECTION",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 16
+        },
+        {
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_dxil.zig",
+          "startLine": 11
+        },
+        {
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_msl.zig",
+          "startLine": 11
+        },
+        {
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_spir_v.zig",
+          "startLine": 11
+        },
+        {
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 16
+        }
+      ],
+      "prefix": "SEMANTIC",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -6395,12 +6385,12 @@
         {
           "name": "TEXTURE_LOAD_NAME",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 239
+          "startLine": 233
         },
         {
           "name": "TEXTURE_STORE_NAME",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 240
+          "startLine": 234
         }
       ],
       "prefix": "TEXTURE",
@@ -6477,7 +6467,7 @@
         {
           "name": "TRACE_EMIT_DEFAULTS",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 17
+          "startLine": 18
         }
       ],
       "prefix": "TRACE",
@@ -16011,6 +16001,11 @@
           "startLine": 10
         },
         {
+          "name": "backend_telemetry",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 3
+        },
+        {
           "name": "backend_contract",
           "path": "src/runtime/render/render_bundle.zig",
           "startLine": 22
@@ -17137,6 +17132,11 @@
         },
         {
           "name": "dawn_plan_types",
+          "path": "src/plan/plan_validation.zig",
+          "startLine": 2
+        },
+        {
+          "name": "dawn_plan_types",
           "path": "src/plan/webgpu_plan_executor.zig",
           "startLine": 2
         },
@@ -17904,9 +17904,40 @@
           "name": "execution_contract",
           "path": "src/runtime/execution.zig",
           "startLine": 2
+        },
+        {
+          "name": "execution_receipt",
+          "path": "src/runtime/execution.zig",
+          "startLine": 14
+        },
+        {
+          "name": "execution_contract",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 1
         }
       ],
       "prefix": "execution",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "expr_contains_expr",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 6
+        },
+        {
+          "name": "expr_contains_expr",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 7
+        },
+        {
+          "name": "expr_contains_expr",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 6
+        }
+      ],
+      "prefix": "expr",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -18316,6 +18347,11 @@
           "startLine": 10
         },
         {
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 5
+        },
+        {
           "name": "ir_digest",
           "path": "src/compiler/wgsl/mod.zig",
           "startLine": 12
@@ -18346,13 +18382,33 @@
           "startLine": 3
         },
         {
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 4
+        },
+        {
           "name": "ir_const_eval",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
           "startLine": 2
         },
         {
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 3
+        },
+        {
           "name": "ir_const_eval",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 3
+        },
+        {
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 4
+        },
+        {
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
           "startLine": 3
         }
       ],
@@ -18370,6 +18426,21 @@
           "name": "is_handle_type",
           "path": "src/compiler/wgsl/frontend/sema.zig",
           "startLine": 771
+        },
+        {
+          "name": "is_local_ref",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 7
+        },
+        {
+          "name": "is_local_ref",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 8
+        },
+        {
+          "name": "is_local_ref",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 7
         },
         {
           "name": "is_core_command_kind",
@@ -18492,12 +18563,12 @@
         {
           "name": "layout_utils",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 4
+          "startLine": 5
         },
         {
           "name": "layout_utils",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 4
+          "startLine": 5
         }
       ],
       "prefix": "layout",
@@ -18508,7 +18579,7 @@
         {
           "name": "lean_proof",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 5
+          "startLine": 6
         },
         {
           "name": "lean_proof",
@@ -18518,7 +18589,7 @@
         {
           "name": "lean_proof",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 5
+          "startLine": 6
         },
         {
           "name": "lean_proof",
@@ -21549,23 +21620,53 @@
         },
         {
           "name": "parse_access",
-          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
+          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
+          "startLine": 11
+        },
+        {
+          "name": "parse_address_space",
+          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
+          "startLine": 12
+        },
+        {
+          "name": "parse_matrix_shape",
+          "path": "src/compiler/wgsl/frontend/sema_expr.zig",
+          "startLine": 11
+        },
+        {
+          "name": "parse_access",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
           "startLine": 10
         },
         {
           "name": "parse_address_space",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
+          "startLine": 11
+        },
+        {
+          "name": "parse_access",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
           "startLine": 11
         },
         {
-          "name": "parse_wgsl_int_literal",
+          "name": "parse_address_space",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
           "startLine": 12
         },
         {
-          "name": "parse_storage_texture_format",
+          "name": "parse_matrix_shape",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
           "startLine": 13
+        },
+        {
+          "name": "parse_wgsl_int_literal",
+          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
+          "startLine": 14
+        },
+        {
+          "name": "parse_storage_texture_format",
+          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
+          "startLine": 15
         },
         {
           "name": "parse_wgsl_int_literal",
@@ -21712,6 +21813,11 @@
     {
       "members": [
         {
+          "name": "plan_validation",
+          "path": "src/plan/doe_plan_executor.zig",
+          "startLine": 16
+        },
+        {
           "name": "plan_config",
           "path": "src/plan/webgpu_plan_executor.zig",
           "startLine": 3
@@ -21725,6 +21831,11 @@
           "name": "plan_emit",
           "path": "src/plan/webgpu_plan_executor.zig",
           "startLine": 5
+        },
+        {
+          "name": "plan_validation",
+          "path": "src/plan/webgpu_plan_executor.zig",
+          "startLine": 7
         }
       ],
       "prefix": "plan",
@@ -22313,6 +22424,71 @@
           "name": "resolve_index_format",
           "path": "src/backend/d3d12/commands/d3d12_render.zig",
           "startLine": 26
+        },
+        {
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 9
+        },
+        {
+          "name": "resolve_indexable_type",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 10
+        },
+        {
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 11
+        },
+        {
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 8
+        },
+        {
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 9
+        },
+        {
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 8
+        },
+        {
+          "name": "resolve_indexable_type",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 9
+        },
+        {
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 10
+        },
+        {
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 9
+        },
+        {
+          "name": "resolve_indexable_type",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 10
+        },
+        {
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 11
+        },
+        {
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 8
+        },
+        {
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 9
         }
       ],
       "prefix": "resolve",
@@ -22638,34 +22814,54 @@
           "startLine": 4
         },
         {
-          "name": "sema_types",
+          "name": "sema_type_syntax",
           "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
           "startLine": 5
         },
         {
-          "name": "sema_helpers",
+          "name": "sema_types",
+          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
+          "startLine": 6
+        },
+        {
+          "name": "sema_type_syntax",
           "path": "src/compiler/wgsl/frontend/sema_expr.zig",
           "startLine": 4
+        },
+        {
+          "name": "sema_helpers",
+          "path": "src/compiler/wgsl/frontend/sema_expr.zig",
+          "startLine": 5
         },
         {
           "name": "sema_typeutils",
           "path": "src/compiler/wgsl/frontend/sema_expr.zig",
-          "startLine": 5
+          "startLine": 6
+        },
+        {
+          "name": "sema_type_syntax",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
+          "startLine": 4
         },
         {
           "name": "sema_types",
           "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
+          "startLine": 5
+        },
+        {
+          "name": "sema_type_syntax",
+          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
           "startLine": 4
         },
         {
           "name": "sema_helpers",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 4
+          "startLine": 5
         },
         {
           "name": "sema_types",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 5
+          "startLine": 6
         },
         {
           "name": "sema_types",
@@ -22694,6 +22890,21 @@
           "startLine": 6
         },
         {
+          "name": "semantic_metadata",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 11
+        },
+        {
+          "name": "semantic_metadata",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 7
+        },
+        {
+          "name": "semantic_metadata",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 11
+        },
+        {
           "name": "semantic_ops",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
           "startLine": 20
@@ -22707,6 +22918,11 @@
           "name": "semantic_trace",
           "path": "src/runtime/execution.zig",
           "startLine": 13
+        },
+        {
+          "name": "semantic_trace",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 2
         },
         {
           "name": "semantic_trace",
@@ -22812,6 +23028,63 @@
     {
       "members": [
         {
+          "name": "stmt_contains_expr",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 10
+        },
+        {
+          "name": "stmt_writes_local",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 11
+        },
+        {
+          "name": "stmt_contains_expr",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 10
+        },
+        {
+          "name": "stmt_writes_local",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 11
+        }
+      ],
+      "prefix": "stmt",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
+          "startLine": 14
+        },
+        {
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+          "startLine": 43
+        },
+        {
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+          "startLine": 38
+        },
+        {
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+          "startLine": 13
+        },
+        {
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
+          "startLine": 12
+        }
+      ],
+      "prefix": "storage",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
           "name": "surface_runtime",
           "path": "src/backend/metal/metal_native_runtime.zig",
           "startLine": 25
@@ -22904,6 +23177,87 @@
         }
       ],
       "prefix": "task",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
+          "startLine": 1
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
+          "startLine": 31
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
+          "startLine": 13
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
+          "startLine": 26
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+          "startLine": 10
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
+          "startLine": 16
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
+          "startLine": 13
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
+          "startLine": 16
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
+          "startLine": 19
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
+          "startLine": 44
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
+          "startLine": 14
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
+          "startLine": 22
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 11
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
+          "startLine": 5
+        },
+        {
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
+          "startLine": 7
+        }
+      ],
+      "prefix": "text",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -23884,10 +24238,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
+  "manifestSha256": "d9790e19d4b88d8f252353e4e7c6ed146ed6c8018e933e1db7ee810689e4a16e",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5",
+  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
   "status": "captured"
 }

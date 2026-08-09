@@ -10,6 +10,7 @@ test "tsir webgpu emitter exposes source-backed code digest" {
     var h = std.crypto.hash.sha2.Sha256.init(.{});
     h.update(@embedFile("../../src/compiler/tsir/emit_webgpu.zig"));
     h.update(@embedFile("../../src/compiler/tsir/emit_kernel_body.zig"));
+    h.update(@embedFile("../../src/compiler/tsir/emit_semantic_metadata.zig"));
     h.final(&expected);
     try std.testing.expectEqualSlices(u8, &expected, &digest);
     try std.testing.expect(!allZero(&digest));

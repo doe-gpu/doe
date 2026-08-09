@@ -10,6 +10,7 @@ const std = @import("std");
 const ir = @import("../../ir/ir.zig");
 const spec = @import("csl_spec.zig");
 const maps = @import("emit_csl_maps.zig");
+const text_buffer = @import("csl_text_buffer.zig");
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -43,9 +44,7 @@ pub const WalkConfig = struct {
 // ---------------------------------------------------------------------------
 
 pub fn write(buf: []u8, pos: *usize, text: []const u8) EmitError!void {
-    if (pos.* + text.len > buf.len) return error.OutputTooLarge;
-    @memcpy(buf[pos.*..][0..text.len], text);
-    pos.* += text.len;
+    return text_buffer.write(buf, pos, text);
 }
 
 pub fn writeIndent(buf: []u8, pos: *usize, level: usize) EmitError!void {
@@ -54,9 +53,7 @@ pub fn writeIndent(buf: []u8, pos: *usize, level: usize) EmitError!void {
 }
 
 pub fn writeInt(buf: []u8, pos: *usize, value: anytype) EmitError!void {
-    var tmp: [20]u8 = undefined;
-    const slice = std.fmt.bufPrint(&tmp, "{d}", .{value}) catch return error.OutputTooLarge;
-    try write(buf, pos, slice);
+    return text_buffer.writeInt(buf, pos, value);
 }
 
 pub fn isBarrierName(name: []const u8) bool {

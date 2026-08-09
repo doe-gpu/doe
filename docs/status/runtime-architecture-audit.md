@@ -5,6 +5,29 @@ architecture review, not a claim that every line is promoted product code.
 The import fence and source-layout gates are the structural authority; this
 page records the lifecycle interpretation and follow-up decisions.
 
+## Current canonicalization pass
+
+The latest source-layout evidence incorporates a behavior-preserving
+consolidation of repeated Zig implementation details:
+
+- execution result construction and telemetry snapshots are owned by
+  `src/runtime/execution_receipt.zig`;
+- plan command counting and declared-count validation are owned by
+  `src/plan/plan_validation.zig`;
+- shared WGSL IR queries and semantic type-syntax parsing are owned by narrow
+  modules next to the IR and frontend consumers;
+- CSL bounded text writing and storage declaration emission are shared by the
+  target emitters instead of copied into each operation module;
+- TSIR semantic metadata serialization is shared across the CSL, WebGPU, and
+  text-skeleton emitters, and its source is included in the affected emitter
+  identity digests.
+
+The emitted contracts and runtime behavior are unchanged. Source-backed
+emitter identities change intentionally because the shared serializer is now
+part of their transitive implementation. Current module decisions,
+reachability, and duplicate-declaration evidence are in
+`runtime/zig/reports/architecture/`.
+
 ## Current reachability correction
 
 `runtime/zig/source-layout.json` now defines named reachability views for the
@@ -108,9 +131,9 @@ identity, timing, trace, and error taxonomy.
    deterministic contract results are never promoted as physical GPU evidence.
 3. Move test-only compatibility aggregators out of production source after
    their consumers import narrow canonical contracts.
-4. Consolidate high-confidence repeated helpers in backend artifact/timing,
-   TSIR/CSL emission, and module request parsing only when semantic tests cover
-   both consumers.
+4. Continue with high-confidence backend artifact/timing and module request
+   parsing helpers only when semantic tests cover every consumer; keep
+   platform API mechanics separate.
 5. Split only the files that exceed the advisory architecture signal when the
    split follows a real responsibility boundary.
 6. Re-run import-fence, source-layout, core tests, WGSL tests, and package tests

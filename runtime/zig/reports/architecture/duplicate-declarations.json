@@ -13,27 +13,27 @@
           "tokenCount": 7
         },
         {
-          "endLine": 5,
+          "endLine": 6,
           "kind": "constant",
           "name": "sema_types",
           "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 5,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "sema_types",
-          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
-          "startLine": 4,
+          "startLine": 6,
           "tokenCount": 7
         },
         {
           "endLine": 5,
           "kind": "constant",
           "name": "sema_types",
-          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
           "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "sema_types",
+          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
+          "startLine": 6,
           "tokenCount": 7
         },
         {
@@ -261,6 +261,52 @@
     {
       "locations": [
         {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 11,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 9,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 10,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 11,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 9,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 14,
           "kind": "constant",
           "name": "vk_sync",
@@ -324,44 +370,6 @@
         }
       ],
       "normalizedTokenSha256": "01fea1d8a8a2378088b33dbee97dae11254c7238e22b7cf8ff145a61eb90a4c0",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 656,
-          "kind": "function",
-          "name": "writeInt",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 652,
-          "tokenCount": 68
-        },
-        {
-          "endLine": 910,
-          "kind": "function",
-          "name": "writeInt",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
-          "startLine": 906,
-          "tokenCount": 68
-        },
-        {
-          "endLine": 283,
-          "kind": "function",
-          "name": "writeInt",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
-          "startLine": 279,
-          "tokenCount": 68
-        },
-        {
-          "endLine": 132,
-          "kind": "function",
-          "name": "writeInt",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
-          "startLine": 128,
-          "tokenCount": 68
-        }
-      ],
-      "normalizedTokenSha256": "026bc53a4cd90137756b851cc60f7b116dde899327f5ea164ec68def3d1c6884",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -833,11 +841,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 576,
+          "endLine": 287,
           "kind": "constant",
           "name": "UploadBufferUsageMode",
           "path": "src/runtime/execution.zig",
-          "startLine": 576,
+          "startLine": 287,
           "tokenCount": 7
         }
       ],
@@ -953,11 +961,11 @@
           "tokenCount": 17
         },
         {
-          "endLine": 38,
+          "endLine": 41,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
-          "startLine": 32,
+          "startLine": 35,
           "tokenCount": 17
         }
       ],
@@ -1493,6 +1501,116 @@
     {
       "locations": [
         {
+          "endLine": 33,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
+          "startLine": 33,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 15,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
+          "startLine": 15,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 28,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
+          "startLine": 28,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 12,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+          "startLine": 12,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 18,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
+          "startLine": 18,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 18,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
+          "startLine": 18,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 21,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
+          "startLine": 21,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 46,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
+          "startLine": 46,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
+          "startLine": 16,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 24,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
+          "startLine": 24,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 13,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 13,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
+          "startLine": 7,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "write",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
+          "startLine": 9,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "092d8af239a994b51302cc419667c1d048d33a1cffb2beb69f3291e6380d7f53",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 20,
           "kind": "constant",
           "name": "host_plan_artifact",
@@ -1701,28 +1819,6 @@
     {
       "locations": [
         {
-          "endLine": 401,
-          "kind": "function",
-          "name": "parse_access",
-          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 396,
-          "tokenCount": 79
-        },
-        {
-          "endLine": 87,
-          "kind": "function",
-          "name": "parse_access",
-          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
-          "startLine": 82,
-          "tokenCount": 79
-        }
-      ],
-      "normalizedTokenSha256": "0b8eb377b354762f6ee03fdce2e8915078b54cb5515a0c2ff87a2fec6693d918",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 37,
           "kind": "constant",
           "name": "WGPUTextureFormat_Undefined",
@@ -1848,116 +1944,6 @@
         }
       ],
       "normalizedTokenSha256": "0c6065e56b2b3869e81e5588a6c1f3cffadadc6e2979fbe2497d9451951e03ba",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 179,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
-          "startLine": 175,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 523,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 519,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 347,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 343,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 650,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 646,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 578,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
-          "startLine": 574,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 904,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
-          "startLine": 900,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 196,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
-          "startLine": 192,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 348,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 344,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 539,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
-          "startLine": 535,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 277,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
-          "startLine": 273,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 718,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
-          "startLine": 714,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 425,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
-          "startLine": 421,
-          "tokenCount": 70
-        },
-        {
-          "endLine": 126,
-          "kind": "function",
-          "name": "write",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
-          "startLine": 122,
-          "tokenCount": 70
-        }
-      ],
-      "normalizedTokenSha256": "0c6ff954fc01e88ad93adb635c955d590dc7b53169d552e0e60756127a010651",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -2283,57 +2269,11 @@
     {
       "locations": [
         {
-          "endLine": 151,
-          "kind": "function",
-          "name": "emitExport",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
-          "startLine": 145,
-          "tokenCount": 86
-        },
-        {
-          "endLine": 279,
-          "kind": "function",
-          "name": "emitExport",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
-          "startLine": 273,
-          "tokenCount": 86
-        },
-        {
-          "endLine": 148,
-          "kind": "function",
-          "name": "emitExport",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
-          "startLine": 142,
-          "tokenCount": 86
-        },
-        {
-          "endLine": 149,
-          "kind": "function",
-          "name": "emitExport",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
-          "startLine": 143,
-          "tokenCount": 86
-        },
-        {
-          "endLine": 107,
-          "kind": "function",
-          "name": "emitExport",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
-          "startLine": 101,
-          "tokenCount": 86
-        }
-      ],
-      "normalizedTokenSha256": "0ea9dd6ebc880749c660aeb7fb392869334f01fd31ab47428052c3919c792b89",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 12,
+          "endLine": 17,
           "kind": "constant",
           "name": "PHASE_SPECIALIZED_KERNELS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 12,
+          "startLine": 17,
           "tokenCount": 23
         },
         {
@@ -2400,36 +2340,6 @@
         }
       ],
       "normalizedTokenSha256": "0f04d178a098d2dbeb825432415c78acabac1915557f476519a8de5cf3b9087c",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 277,
-          "kind": "function",
-          "name": "writeCollectives",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 264,
-          "tokenCount": 135
-        },
-        {
-          "endLine": 174,
-          "kind": "function",
-          "name": "writeCollectives",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 161,
-          "tokenCount": 135
-        },
-        {
-          "endLine": 181,
-          "kind": "function",
-          "name": "writeCollectives",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 168,
-          "tokenCount": 135
-        }
-      ],
-      "normalizedTokenSha256": "0f2721b51f062c0f67bade76dd612a259ca5f0eca40f48231bcefba65308b505",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -2504,6 +2414,28 @@
         }
       ],
       "normalizedTokenSha256": "0f7752820bc864ffc6322f8d641a6c6ca81f69b188778ab072ffaca4fef3a771",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 55,
+          "kind": "constant",
+          "name": "ExecutionStatus",
+          "path": "src/runtime/execution.zig",
+          "startLine": 55,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "ExecutionStatus",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "0f7844ac8d85adca575ff08664a56d9b1ccf2871b0bba241277b37a1e5de428b",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -3517,11 +3449,11 @@
     {
       "locations": [
         {
-          "endLine": 13,
+          "endLine": 14,
           "kind": "constant",
           "name": "DEFAULT_SEMANTIC_STAGE",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 13,
+          "startLine": 14,
           "tokenCount": 4
         },
         {
@@ -3564,6 +3496,52 @@
         }
       ],
       "normalizedTokenSha256": "16fa2b5c491e4f6297e48b3ebce10483d2b3557a9954e36d081e9bc71ef78af2",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 16,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_dxil.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_msl.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_spir_v.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "SEMANTIC_METADATA_SOURCE",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 16,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "17219ce7ffd79d98d2db29865176303c58d695625904e3a541bf198632322136",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -3743,11 +3721,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 7,
+          "endLine": 8,
           "kind": "constant",
           "name": "Tag",
           "path": "src/compiler/wgsl/frontend/sema_expr.zig",
-          "startLine": 7,
+          "startLine": 8,
           "tokenCount": 6
         },
         {
@@ -3765,35 +3743,35 @@
     {
       "locations": [
         {
-          "endLine": 19,
+          "endLine": 20,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
-          "startLine": 14,
-          "tokenCount": 15
-        },
-        {
-          "endLine": 25,
-          "kind": "constant",
-          "name": "EmitError",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
-          "startLine": 20,
-          "tokenCount": 15
-        },
-        {
-          "endLine": 50,
-          "kind": "constant",
-          "name": "EmitError",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 45,
+          "startLine": 15,
           "tokenCount": 15
         },
         {
           "endLine": 28,
           "kind": "constant",
           "name": "EmitError",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
           "startLine": 23,
+          "tokenCount": 15
+        },
+        {
+          "endLine": 53,
+          "kind": "constant",
+          "name": "EmitError",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
+          "startLine": 48,
+          "tokenCount": 15
+        },
+        {
+          "endLine": 32,
+          "kind": "constant",
+          "name": "EmitError",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
+          "startLine": 27,
           "tokenCount": 15
         }
       ],
@@ -3828,6 +3806,36 @@
         }
       ],
       "normalizedTokenSha256": "1b75b8abb01d309d2b5dedf539e4dc77e393b81ee558bbe5aea87eb1ea195188",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "is_local_ref",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 7,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "is_local_ref",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 8,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "is_local_ref",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 7,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "1b81cef73472b168772a8ba5d5ccf71524a54a3a76361de233f7a34bf1fb7ba5",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -4097,6 +4105,28 @@
     {
       "locations": [
         {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "backend_telemetry",
+          "path": "src/runtime/execution.zig",
+          "startLine": 10,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "backend_telemetry",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "1e744214bc3e778f8451d074a81301e8f6dca00be1ade230542c98b608d4c272",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 5,
           "kind": "constant",
           "name": "runtime_types",
@@ -4181,6 +4211,36 @@
     {
       "locations": [
         {
+          "endLine": 18,
+          "kind": "constant",
+          "name": "writeHash",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 18,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "writeHash",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 11,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 18,
+          "kind": "constant",
+          "name": "writeHash",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 18,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "1f46f6772f32fa25bb3b7fedfecda84f41e17e5003d1f210cc269c202c64e7dc",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 15,
           "kind": "constant",
           "name": "async_procs_mod",
@@ -4206,6 +4266,52 @@
         }
       ],
       "normalizedTokenSha256": "1f4e54f6557993b8e9276a7096290e1d2809468500a5b29b7ba4910640d3db6d",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 9,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 8,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 8,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 9,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 8,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -4416,36 +4522,6 @@
         }
       ],
       "normalizedTokenSha256": "2166032350451e77eea6190313e1b47e4c92f1c49547f4a392654a2737cfa880",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 13,
-          "kind": "constant",
-          "name": "HEX_DIGITS",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 13,
-          "tokenCount": 4
-        },
-        {
-          "endLine": 9,
-          "kind": "constant",
-          "name": "HEX_DIGITS",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 9,
-          "tokenCount": 4
-        },
-        {
-          "endLine": 13,
-          "kind": "constant",
-          "name": "HEX_DIGITS",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 13,
-          "tokenCount": 4
-        }
-      ],
-      "normalizedTokenSha256": "2177a0575c691ba52afbf2a87156a86dafae6c42332e75e844219e341ce93b19",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -4937,6 +5013,14 @@
           "path": "src/runtime/execution.zig",
           "startLine": 13,
           "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "semantic_trace",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 2,
+          "tokenCount": 7
         }
       ],
       "normalizedTokenSha256": "2484d5066d46e113606d7d3173fccccec18791c829d10911dbced0a585b30165",
@@ -5261,11 +5345,11 @@
     {
       "locations": [
         {
-          "endLine": 17,
+          "endLine": 15,
           "kind": "constant",
           "name": "BODY_SOURCE",
           "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 17,
+          "startLine": 15,
           "tokenCount": 7
         },
         {
@@ -5293,11 +5377,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 17,
+          "endLine": 15,
           "kind": "constant",
           "name": "BODY_SOURCE",
           "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 17,
+          "startLine": 15,
           "tokenCount": 7
         }
       ],
@@ -5627,36 +5711,6 @@
     {
       "locations": [
         {
-          "endLine": 262,
-          "kind": "function",
-          "name": "writeTiles",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 253,
-          "tokenCount": 71
-        },
-        {
-          "endLine": 159,
-          "kind": "function",
-          "name": "writeTiles",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 150,
-          "tokenCount": 71
-        },
-        {
-          "endLine": 166,
-          "kind": "function",
-          "name": "writeTiles",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 157,
-          "tokenCount": 71
-        }
-      ],
-      "normalizedTokenSha256": "296a7ddd75631afcb4c4aa53ba308e91008d54a612fd1c3def14917cc10690be",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 14,
           "kind": "constant",
           "name": "WGPUAdapter",
@@ -5964,6 +6018,36 @@
         }
       ],
       "normalizedTokenSha256": "2d0333fb9d09e1ab417def9b63b7b9850f596ed5fafcc30c9f0e9818525641d1",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 19,
+          "kind": "constant",
+          "name": "writeQuoted",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 19,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 12,
+          "kind": "constant",
+          "name": "writeQuoted",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 12,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 19,
+          "kind": "constant",
+          "name": "writeQuoted",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 19,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "2d8257f5b99069bb2c08016bd0914e93caea8ce83e446552bedbdaac68d6b111",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -6489,11 +6573,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 5,
+          "endLine": 6,
           "kind": "constant",
           "name": "sema_typeutils",
           "path": "src/compiler/wgsl/frontend/sema_expr.zig",
-          "startLine": 5,
+          "startLine": 6,
           "tokenCount": 7
         }
       ],
@@ -6525,19 +6609,19 @@
     {
       "locations": [
         {
-          "endLine": 173,
+          "endLine": 176,
           "kind": "function",
           "name": "writeSection",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
-          "startLine": 169,
+          "startLine": 172,
           "tokenCount": 60
         },
         {
-          "endLine": 341,
+          "endLine": 344,
           "kind": "function",
           "name": "writeSection",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-          "startLine": 337,
+          "startLine": 340,
           "tokenCount": 60
         }
       ],
@@ -6765,44 +6849,6 @@
     {
       "locations": [
         {
-          "endLine": 529,
-          "kind": "function",
-          "name": "writeInt",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 525,
-          "tokenCount": 68
-        },
-        {
-          "endLine": 647,
-          "kind": "function",
-          "name": "writeInt",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
-          "startLine": 643,
-          "tokenCount": 68
-        },
-        {
-          "endLine": 545,
-          "kind": "function",
-          "name": "writeInt",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
-          "startLine": 541,
-          "tokenCount": 68
-        },
-        {
-          "endLine": 431,
-          "kind": "function",
-          "name": "writeInt",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
-          "startLine": 427,
-          "tokenCount": 68
-        }
-      ],
-      "normalizedTokenSha256": "35c5dc071d23898d638e7f8332386906b5e7fc11295ac4b04ed82343a5e5426b",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 7,
           "kind": "constant",
           "name": "model_policy",
@@ -6975,28 +7021,6 @@
     {
       "locations": [
         {
-          "endLine": 191,
-          "kind": "function",
-          "name": "validatePlanCounts",
-          "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 173,
-          "tokenCount": 109
-        },
-        {
-          "endLine": 118,
-          "kind": "function",
-          "name": "validatePlanCounts",
-          "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 100,
-          "tokenCount": 109
-        }
-      ],
-      "normalizedTokenSha256": "38f2d1a335393e70123fbc8aaf72d1a9f9d24cb11c732a066e3f05c8065ba6d2",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 9,
           "kind": "constant",
           "name": "capability_structs",
@@ -7082,36 +7106,6 @@
         }
       ],
       "normalizedTokenSha256": "39ca07aaba274d86de63755fd6cff490345d085922c538290061e86c0e3de0a8",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 15,
-          "kind": "constant",
-          "name": "NIBBLE_MASK",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 15,
-          "tokenCount": 6
-        },
-        {
-          "endLine": 11,
-          "kind": "constant",
-          "name": "NIBBLE_MASK",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 11,
-          "tokenCount": 6
-        },
-        {
-          "endLine": 15,
-          "kind": "constant",
-          "name": "NIBBLE_MASK",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 15,
-          "tokenCount": 6
-        }
-      ],
-      "normalizedTokenSha256": "39f13edb51b4c57ee5dddb310808c32793a3e4a45a2be95b932464622e8546f0",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -7397,19 +7391,19 @@
     {
       "locations": [
         {
-          "endLine": 271,
+          "endLine": 266,
           "kind": "function",
           "name": "resolve_runtime_array_element_stride",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 257,
+          "startLine": 252,
           "tokenCount": 131
         },
         {
-          "endLine": 945,
+          "endLine": 906,
           "kind": "function",
           "name": "resolve_runtime_array_element_stride",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 931,
+          "startLine": 892,
           "tokenCount": 131
         }
       ],
@@ -7841,27 +7835,27 @@
     {
       "locations": [
         {
-          "endLine": 23,
+          "endLine": 28,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 19,
+          "startLine": 24,
           "tokenCount": 25
         },
         {
-          "endLine": 17,
+          "endLine": 21,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 13,
+          "startLine": 17,
           "tokenCount": 25
         },
         {
-          "endLine": 23,
+          "endLine": 28,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 19,
+          "startLine": 24,
           "tokenCount": 25
         }
       ],
@@ -8451,11 +8445,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 15,
+          "endLine": 19,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
-          "startLine": 15,
+          "startLine": 19,
           "tokenCount": 7
         },
         {
@@ -8467,11 +8461,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 44,
+          "endLine": 49,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
-          "startLine": 44,
+          "startLine": 49,
           "tokenCount": 7
         },
         {
@@ -8483,11 +8477,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 39,
+          "endLine": 44,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
-          "startLine": 39,
+          "startLine": 44,
           "tokenCount": 7
         },
         {
@@ -8515,19 +8509,19 @@
           "tokenCount": 7
         },
         {
-          "endLine": 14,
+          "endLine": 19,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
-          "startLine": 14,
+          "startLine": 19,
           "tokenCount": 7
         },
         {
-          "endLine": 13,
+          "endLine": 18,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
-          "startLine": 13,
+          "startLine": 18,
           "tokenCount": 7
         }
       ],
@@ -8917,6 +8911,28 @@
     {
       "locations": [
         {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "stmt_writes_local",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 11,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "stmt_writes_local",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 11,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "4471274d05b172550f9dc5386205aa17e50e6ba2727b97ae0bd368dbddd2e8cd",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 135,
           "kind": "constant",
           "name": "WGPUTextureFormat_ASTC10x10UnormSrgb",
@@ -8986,28 +9002,6 @@
         }
       ],
       "normalizedTokenSha256": "458be8adf15c5896a151500d8bc25dbbd33d0d9700b53562c8c74978e30e15c4",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 394,
-          "kind": "function",
-          "name": "parse_address_space",
-          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 387,
-          "tokenCount": 117
-        },
-        {
-          "endLine": 80,
-          "kind": "function",
-          "name": "parse_address_space",
-          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
-          "startLine": 73,
-          "tokenCount": 117
-        }
-      ],
-      "normalizedTokenSha256": "458d4872bcbe40a6cb3afad543e7df0f72e597013753388d1f9150dc40c3c39e",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -9295,6 +9289,36 @@
     {
       "locations": [
         {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "expr_contains_expr",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 6,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "expr_contains_expr",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 7,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "expr_contains_expr",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 6,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "485eb0eac856ed67ec8586e9029d262c0f500b293d46baaa33daa4ecaad233d5",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 415,
           "kind": "function",
           "name": "capture_buffer",
@@ -9377,19 +9401,19 @@
     {
       "locations": [
         {
-          "endLine": 113,
+          "endLine": 117,
           "kind": "constant",
           "name": "PROJECTION_COUNT",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 113,
+          "startLine": 117,
           "tokenCount": 6
         },
         {
-          "endLine": 104,
+          "endLine": 109,
           "kind": "constant",
           "name": "PROJECTION_COUNT",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
-          "startLine": 104,
+          "startLine": 109,
           "tokenCount": 6
         }
       ],
@@ -10105,6 +10129,36 @@
     {
       "locations": [
         {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "resolve_indexable_type",
+          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+          "startLine": 10,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "resolve_indexable_type",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 9,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "resolve_indexable_type",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 10,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "4ea5729135546642897233895cd32ee72c7724e52006dfc8a4c760f159fd0b63",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 23,
           "kind": "constant",
           "name": "planner_support",
@@ -10272,6 +10326,132 @@
         }
       ],
       "normalizedTokenSha256": "4f7db3e3ba5002354cdb46d7f810d972b355ddc55201cea41292c929328a0a0b",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 31,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
+          "startLine": 31,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 13,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
+          "startLine": 13,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 26,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
+          "startLine": 26,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+          "startLine": 10,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
+          "startLine": 16,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 13,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
+          "startLine": 13,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
+          "startLine": 16,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 19,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
+          "startLine": 19,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 44,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
+          "startLine": 44,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 14,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
+          "startLine": 14,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 22,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
+          "startLine": 22,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_semantic_ops.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "text_buffer",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "4f8b2f45c98e2e65e1d5244fd6c7641d293c9dad4449f6be467e4d4e48361d6d",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -10663,6 +10843,76 @@
     {
       "locations": [
         {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "writeInt",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
+          "startLine": 16,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 13,
+          "kind": "constant",
+          "name": "writeInt",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+          "startLine": 13,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 19,
+          "kind": "constant",
+          "name": "writeInt",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
+          "startLine": 19,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 19,
+          "kind": "constant",
+          "name": "writeInt",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
+          "startLine": 19,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 17,
+          "kind": "constant",
+          "name": "writeInt",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
+          "startLine": 17,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 25,
+          "kind": "constant",
+          "name": "writeInt",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_reduce_dist.zig",
+          "startLine": 25,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "writeInt",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
+          "startLine": 8,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "writeInt",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
+          "startLine": 10,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "531a00fc908d6122a9892e1831557ed54695a47ef6da3962b551019acdb1d39f",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 11,
           "kind": "constant",
           "name": "process_roots",
@@ -10724,6 +10974,28 @@
         }
       ],
       "normalizedTokenSha256": "54158c578e6ea6847c2d95cd655fb69cc479777c628eab31c8cf79c96f375efb",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 14,
+          "kind": "constant",
+          "name": "writeJsonString",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
+          "startLine": 14,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 18,
+          "kind": "constant",
+          "name": "writeJsonString",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
+          "startLine": 18,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "5448a3bb506b7d35cfe1fecde76c0ca77997c8f586e482bad67ccd0e91dc6890",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -10915,27 +11187,27 @@
     {
       "locations": [
         {
-          "endLine": 17,
+          "endLine": 18,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/tsir/emit_dxil.zig",
-          "startLine": 17,
+          "startLine": 18,
           "tokenCount": 7
         },
         {
-          "endLine": 17,
+          "endLine": 18,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/tsir/emit_msl.zig",
-          "startLine": 17,
+          "startLine": 18,
           "tokenCount": 7
         },
         {
-          "endLine": 17,
+          "endLine": 18,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/tsir/emit_spir_v.zig",
-          "startLine": 17,
+          "startLine": 18,
           "tokenCount": 7
         }
       ],
@@ -11081,52 +11353,6 @@
     {
       "locations": [
         {
-          "endLine": 316,
-          "kind": "function",
-          "name": "resolve_value_alias",
-          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 300,
-          "tokenCount": 126
-        },
-        {
-          "endLine": 681,
-          "kind": "function",
-          "name": "resolve_value_alias",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
-          "startLine": 665,
-          "tokenCount": 126
-        },
-        {
-          "endLine": 966,
-          "kind": "function",
-          "name": "resolve_value_alias",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 950,
-          "tokenCount": 126
-        },
-        {
-          "endLine": 982,
-          "kind": "function",
-          "name": "resolve_value_alias",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 966,
-          "tokenCount": 126
-        },
-        {
-          "endLine": 741,
-          "kind": "function",
-          "name": "resolve_value_alias",
-          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 725,
-          "tokenCount": 126
-        }
-      ],
-      "normalizedTokenSha256": "589bc9a6b2c7025e96a535884062df478f568bd395f3b5e6a4f4a6bd5b906718",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 8,
           "kind": "constant",
           "name": "sema_helpers",
@@ -11143,19 +11369,19 @@
           "tokenCount": 7
         },
         {
-          "endLine": 4,
+          "endLine": 5,
           "kind": "constant",
           "name": "sema_helpers",
           "path": "src/compiler/wgsl/frontend/sema_expr.zig",
-          "startLine": 4,
+          "startLine": 5,
           "tokenCount": 7
         },
         {
-          "endLine": 4,
+          "endLine": 5,
           "kind": "constant",
           "name": "sema_helpers",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 4,
+          "startLine": 5,
           "tokenCount": 7
         },
         {
@@ -11613,36 +11839,6 @@
     {
       "locations": [
         {
-          "endLine": 126,
-          "kind": "function",
-          "name": "resolve_indexable_type",
-          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 118,
-          "tokenCount": 61
-        },
-        {
-          "endLine": 255,
-          "kind": "function",
-          "name": "resolve_indexable_type",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 247,
-          "tokenCount": 61
-        },
-        {
-          "endLine": 929,
-          "kind": "function",
-          "name": "resolve_indexable_type",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 921,
-          "tokenCount": 61
-        }
-      ],
-      "normalizedTokenSha256": "5b9b29be72ac4823ed8c9768ddc0a8d3bec43e4e7f018a3d82606418d4ac5196",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 109,
           "kind": "constant",
           "name": "isASTCFormat",
@@ -11937,11 +12133,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 7,
+          "endLine": 8,
           "kind": "constant",
           "name": "Node",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 7,
+          "startLine": 8,
           "tokenCount": 6
         },
         {
@@ -11962,28 +12158,6 @@
         }
       ],
       "normalizedTokenSha256": "5e7726d431ff7bfed34dd1c0b2582d47365abaad0c9c056c06cf248e5a492588",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 34,
-          "kind": "function",
-          "name": "emitterCodeDigest",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 27,
-          "tokenCount": 66
-        },
-        {
-          "endLine": 33,
-          "kind": "function",
-          "name": "emitterCodeDigest",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 26,
-          "tokenCount": 66
-        }
-      ],
-      "normalizedTokenSha256": "5eb7cb5aefd4da37e00e5c53703d94e498d1224b3fbd07cb615d3d543a1e7c3a",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -12465,28 +12639,6 @@
     {
       "locations": [
         {
-          "endLine": 635,
-          "kind": "function",
-          "name": "stmt_contains_expr",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
-          "startLine": 596,
-          "tokenCount": 437
-        },
-        {
-          "endLine": 320,
-          "kind": "function",
-          "name": "stmt_contains_expr",
-          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 281,
-          "tokenCount": 437
-        }
-      ],
-      "normalizedTokenSha256": "62ea9e119255a175eeb7343b2509944f48c95cbef1f3d72a49de426f1b42382c",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 14,
           "kind": "constant",
           "name": "metal_bridge_create_command_buffer",
@@ -12572,36 +12724,6 @@
         }
       ],
       "normalizedTokenSha256": "64ab28591de1b968cad3759662689eb36c118876154585b3a4a04d9429f5ebd0",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 297,
-          "kind": "function",
-          "name": "writeOptionalU32",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 291,
-          "tokenCount": 49
-        },
-        {
-          "endLine": 194,
-          "kind": "function",
-          "name": "writeOptionalU32",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 188,
-          "tokenCount": 49
-        },
-        {
-          "endLine": 201,
-          "kind": "function",
-          "name": "writeOptionalU32",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 195,
-          "tokenCount": 49
-        }
-      ],
-      "normalizedTokenSha256": "64e9aada03cceb5b8e4f06d742befe9c09173dd5c86f028dff2f91f97e19329e",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -13009,11 +13131,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 579,
+          "endLine": 290,
           "kind": "constant",
           "name": "GpuTimestampMode",
           "path": "src/runtime/execution.zig",
-          "startLine": 579,
+          "startLine": 290,
           "tokenCount": 7
         }
       ],
@@ -13165,6 +13287,36 @@
     {
       "locations": [
         {
+          "endLine": 21,
+          "kind": "constant",
+          "name": "writeResidency",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 21,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 14,
+          "kind": "constant",
+          "name": "writeResidency",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 14,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 21,
+          "kind": "constant",
+          "name": "writeResidency",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 21,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "68742ff3eb3a642abd2fb9c11b31c86bc432e4b457cb6083eab0ed80c5ce34c8",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 7,
           "kind": "constant",
           "name": "trace",
@@ -13209,27 +13361,27 @@
     {
       "locations": [
         {
-          "endLine": 36,
+          "endLine": 38,
           "kind": "function",
           "name": "emit",
           "path": "src/compiler/tsir/emit_dxil.zig",
-          "startLine": 29,
+          "startLine": 31,
           "tokenCount": 53
         },
         {
-          "endLine": 36,
+          "endLine": 38,
           "kind": "function",
           "name": "emit",
           "path": "src/compiler/tsir/emit_msl.zig",
-          "startLine": 29,
+          "startLine": 31,
           "tokenCount": 53
         },
         {
-          "endLine": 36,
+          "endLine": 38,
           "kind": "function",
           "name": "emit",
           "path": "src/compiler/tsir/emit_spir_v.zig",
-          "startLine": 29,
+          "startLine": 31,
           "tokenCount": 53
         }
       ],
@@ -14225,6 +14377,52 @@
     {
       "locations": [
         {
+          "endLine": 14,
+          "kind": "constant",
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
+          "startLine": 14,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 43,
+          "kind": "constant",
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+          "startLine": 43,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 38,
+          "kind": "constant",
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+          "startLine": 38,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 13,
+          "kind": "constant",
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+          "startLine": 13,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 12,
+          "kind": "constant",
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
+          "startLine": 12,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "6f31a137a3172c46a235f9e5636a6fa241dad2d55d056eda680024b563c667e6",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 4,
           "kind": "constant",
           "name": "model_profile",
@@ -14512,6 +14710,28 @@
         }
       ],
       "normalizedTokenSha256": "71153dcaac9b09106d6933eee58ac8d36919b7f42f0673be4210dae8bcf7bc44",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "stmt_contains_expr",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 10,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "stmt_contains_expr",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 10,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "712de724f72f77f5dd3497702f0459f59a42dacd55a4e69b6bc5311ea537816d",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -14989,11 +15209,11 @@
           "tokenCount": 24
         },
         {
-          "endLine": 85,
+          "endLine": 86,
           "kind": "function",
           "name": "nowNs",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 83,
+          "startLine": 84,
           "tokenCount": 24
         },
         {
@@ -15102,6 +15322,28 @@
         }
       ],
       "normalizedTokenSha256": "75c8e991fdb3e46da39f7c7d6b9a3efb8a0f637a4da25ca211ce8b957c009493",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 40,
+          "kind": "function",
+          "name": "emitterCodeDigest",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 32,
+          "tokenCount": 73
+        },
+        {
+          "endLine": 39,
+          "kind": "function",
+          "name": "emitterCodeDigest",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 31,
+          "tokenCount": 73
+        }
+      ],
+      "normalizedTokenSha256": "76027321d07c9e2a257c0c653b32677b7b97e5d1c37fd76a74d4d642091fa60b",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -15284,6 +15526,14 @@
           "name": "schema",
           "path": "src/compiler/tsir/emit_msl.zig",
           "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "schema",
+          "path": "src/compiler/tsir/emit_semantic_metadata.zig",
+          "startLine": 1,
           "tokenCount": 7
         },
         {
@@ -15647,11 +15897,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 9,
+          "endLine": 10,
           "kind": "constant",
           "name": "materialize_inferred_local_type",
           "path": "src/compiler/wgsl/frontend/sema_expr.zig",
-          "startLine": 9,
+          "startLine": 10,
           "tokenCount": 6
         }
       ],
@@ -16011,45 +16261,23 @@
     {
       "locations": [
         {
-          "endLine": 3,
+          "endLine": 4,
           "kind": "constant",
           "name": "loop_match",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 3,
+          "startLine": 4,
           "tokenCount": 7
         },
         {
-          "endLine": 3,
+          "endLine": 4,
           "kind": "constant",
           "name": "loop_match",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 3,
+          "startLine": 4,
           "tokenCount": 7
         }
       ],
       "normalizedTokenSha256": "7eeae39a9bcefac931f40400f6baea5f45c141be7aa5227f0aa282181904692c",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 418,
-          "kind": "function",
-          "name": "parse_matrix_shape",
-          "path": "src/compiler/wgsl/frontend/sema_expr.zig",
-          "startLine": 403,
-          "tokenCount": 133
-        },
-        {
-          "endLine": 110,
-          "kind": "function",
-          "name": "parse_matrix_shape",
-          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 95,
-          "tokenCount": 133
-        }
-      ],
-      "normalizedTokenSha256": "7fa91de810e0fbb47b719bf68c575d36a01be57ca51bf507969ed00e961b0ec1",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -16085,19 +16313,19 @@
     {
       "locations": [
         {
-          "endLine": 4,
+          "endLine": 5,
           "kind": "constant",
           "name": "layout_utils",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 4,
+          "startLine": 5,
           "tokenCount": 7
         },
         {
-          "endLine": 4,
+          "endLine": 5,
           "kind": "constant",
           "name": "layout_utils",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 4,
+          "startLine": 5,
           "tokenCount": 7
         }
       ],
@@ -16197,11 +16425,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 10,
+          "endLine": 11,
           "kind": "constant",
           "name": "parse_access",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 10,
+          "startLine": 11,
           "tokenCount": 6
         }
       ],
@@ -16755,36 +16983,6 @@
     {
       "locations": [
         {
-          "endLine": 663,
-          "kind": "function",
-          "name": "expr_contains_expr",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
-          "startLine": 637,
-          "tokenCount": 301
-        },
-        {
-          "endLine": 919,
-          "kind": "function",
-          "name": "expr_contains_expr",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 893,
-          "tokenCount": 301
-        },
-        {
-          "endLine": 348,
-          "kind": "function",
-          "name": "expr_contains_expr",
-          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 322,
-          "tokenCount": 301
-        }
-      ],
-      "normalizedTokenSha256": "8375498a38e32f41d05e42fddbd26b7b7d89caa669a6cdbc8d2d29506621c430",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 5,
           "kind": "constant",
           "name": "proc_types",
@@ -17065,6 +17263,36 @@
     {
       "locations": [
         {
+          "endLine": 22,
+          "kind": "constant",
+          "name": "writeTiles",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 22,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 15,
+          "kind": "constant",
+          "name": "writeTiles",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 15,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 22,
+          "kind": "constant",
+          "name": "writeTiles",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 22,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "8767a6e1e630523a9438459c4a54f2b8f376991ca1ebbc9a1710bf32ec4ebeeb",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 28,
           "kind": "constant",
           "name": "DoeInstance",
@@ -17092,6 +17320,14 @@
           "name": "dawn_plan_types",
           "path": "src/plan/doe_plan_executor.zig",
           "startLine": 15,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "dawn_plan_types",
+          "path": "src/plan/plan_validation.zig",
+          "startLine": 2,
           "tokenCount": 7
         },
         {
@@ -17291,11 +17527,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 660,
+          "endLine": 371,
           "kind": "constant",
           "name": "testing",
           "path": "src/runtime/execution.zig",
-          "startLine": 660,
+          "startLine": 371,
           "tokenCount": 6
         }
       ],
@@ -17466,36 +17702,6 @@
         }
       ],
       "normalizedTokenSha256": "8b72c04c853ee8a03e10d5e05473e22133a25a02cf21a74ebd5119292054794c",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 314,
-          "kind": "function",
-          "name": "writeHash",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 307,
-          "tokenCount": 79
-        },
-        {
-          "endLine": 211,
-          "kind": "function",
-          "name": "writeHash",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 204,
-          "tokenCount": 79
-        },
-        {
-          "endLine": 218,
-          "kind": "function",
-          "name": "writeHash",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 211,
-          "tokenCount": 79
-        }
-      ],
-      "normalizedTokenSha256": "8b9db1e34b72021ea3a668a453d51184bc7145ccaacd16879428689670dfcbe7",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -17888,52 +18094,6 @@
         }
       ],
       "normalizedTokenSha256": "8e997f1eb560a9d79ebaba2a81c77a0bfc477c2ae3f34174a8afc3f499e65e46",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 133,
-          "kind": "function",
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
-          "startLine": 125,
-          "tokenCount": 117
-        },
-        {
-          "endLine": 249,
-          "kind": "function",
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
-          "startLine": 241,
-          "tokenCount": 117
-        },
-        {
-          "endLine": 130,
-          "kind": "function",
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
-          "startLine": 122,
-          "tokenCount": 117
-        },
-        {
-          "endLine": 131,
-          "kind": "function",
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
-          "startLine": 123,
-          "tokenCount": 117
-        },
-        {
-          "endLine": 89,
-          "kind": "function",
-          "name": "emitBuf",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
-          "startLine": 81,
-          "tokenCount": 117
-        }
-      ],
-      "normalizedTokenSha256": "8ea8a87c09f70b6d598672a678ed912fe6cb74575367d9b9a685c4e04f3e6b3c",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -18399,19 +18559,19 @@
     {
       "locations": [
         {
-          "endLine": 12,
+          "endLine": 16,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
-          "startLine": 6,
+          "startLine": 10,
           "tokenCount": 17
         },
         {
-          "endLine": 14,
+          "endLine": 18,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
-          "startLine": 8,
+          "startLine": 12,
           "tokenCount": 17
         }
       ],
@@ -18460,28 +18620,6 @@
         }
       ],
       "normalizedTokenSha256": "952edede733901cdb3dac2630e984ce920d4eb5a58759e2d37bd60f43f0c96f9",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 644,
-          "kind": "function",
-          "name": "writeJsonString",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 627,
-          "tokenCount": 155
-        },
-        {
-          "endLine": 533,
-          "kind": "function",
-          "name": "writeJsonString",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_mem_plan.zig",
-          "startLine": 516,
-          "tokenCount": 155
-        }
-      ],
-      "normalizedTokenSha256": "956fb00b78493a5fafaae93555240e7908a2671c0e45ffbdc6b8d5c4bd2875cf",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -18555,19 +18693,19 @@
     {
       "locations": [
         {
-          "endLine": 49,
+          "endLine": 55,
           "kind": "function",
           "name": "emit",
           "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 40,
+          "startLine": 46,
           "tokenCount": 82
         },
         {
-          "endLine": 44,
+          "endLine": 50,
           "kind": "function",
           "name": "emit",
           "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 35,
+          "startLine": 41,
           "tokenCount": 82
         }
       ],
@@ -18594,6 +18732,28 @@
         }
       ],
       "normalizedTokenSha256": "963c1bebcb4ceccd761f817d5dfb60e32174715ec77864b3704a9403d5ffb86d",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "parse_access",
+          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "parse_access",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
+          "startLine": 10,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "965c5864a955c09e8ebd464f7e76bb4283f7a8ff570f7f4bc54e880398c9917e",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -18665,19 +18825,19 @@
     {
       "locations": [
         {
-          "endLine": 68,
+          "endLine": 74,
           "kind": "function",
           "name": "emitSemantic",
           "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 51,
+          "startLine": 57,
           "tokenCount": 123
         },
         {
-          "endLine": 63,
+          "endLine": 69,
           "kind": "function",
           "name": "emitSemantic",
           "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 46,
+          "startLine": 52,
           "tokenCount": 123
         }
       ],
@@ -18709,71 +18869,11 @@
     {
       "locations": [
         {
-          "endLine": 14,
-          "kind": "constant",
-          "name": "NIBBLE_SHIFT",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 14,
-          "tokenCount": 6
-        },
-        {
-          "endLine": 10,
-          "kind": "constant",
-          "name": "NIBBLE_SHIFT",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 10,
-          "tokenCount": 6
-        },
-        {
-          "endLine": 14,
-          "kind": "constant",
-          "name": "NIBBLE_SHIFT",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 14,
-          "tokenCount": 6
-        }
-      ],
-      "normalizedTokenSha256": "9820b43030e118eaf9ad9259c635c61ffaa466e68782f811101d025d64729036",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 594,
-          "kind": "function",
-          "name": "is_local_ref",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
-          "startLine": 588,
-          "tokenCount": 65
-        },
-        {
-          "endLine": 830,
-          "kind": "function",
-          "name": "is_local_ref",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 824,
-          "tokenCount": 65
-        },
-        {
-          "endLine": 251,
-          "kind": "function",
-          "name": "is_local_ref",
-          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 245,
-          "tokenCount": 65
-        }
-      ],
-      "normalizedTokenSha256": "989afc5d0d8480242533e84a5dfffb4813fe966c82c14ef20b9144b81a3f0779",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 13,
+          "endLine": 18,
           "kind": "constant",
           "name": "DENSE_GEMV_COMPILE_TILE_MARKER",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 13,
+          "startLine": 18,
           "tokenCount": 9
         },
         {
@@ -18955,27 +19055,27 @@
     {
       "locations": [
         {
-          "endLine": 44,
+          "endLine": 46,
           "kind": "function",
           "name": "emitFunction",
           "path": "src/compiler/tsir/emit_dxil.zig",
-          "startLine": 38,
+          "startLine": 40,
           "tokenCount": 47
         },
         {
-          "endLine": 44,
+          "endLine": 46,
           "kind": "function",
           "name": "emitFunction",
           "path": "src/compiler/tsir/emit_msl.zig",
-          "startLine": 38,
+          "startLine": 40,
           "tokenCount": 47
         },
         {
-          "endLine": 44,
+          "endLine": 46,
           "kind": "function",
           "name": "emitFunction",
           "path": "src/compiler/tsir/emit_spir_v.zig",
-          "startLine": 38,
+          "startLine": 40,
           "tokenCount": 47
         }
       ],
@@ -19318,36 +19418,6 @@
         }
       ],
       "normalizedTokenSha256": "9db4f67d152bd3257bd1d123f3fc02563683b266bfd16bb65b3139d2534e5c39",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 329,
-          "kind": "function",
-          "name": "writeQuoted",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 316,
-          "tokenCount": 109
-        },
-        {
-          "endLine": 226,
-          "kind": "function",
-          "name": "writeQuoted",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 213,
-          "tokenCount": 109
-        },
-        {
-          "endLine": 233,
-          "kind": "function",
-          "name": "writeQuoted",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 220,
-          "tokenCount": 109
-        }
-      ],
-      "normalizedTokenSha256": "9dc9260492b55a989aa99133c9b56110b67d75ac4f3a7d1ae0ba0e9a646215fd",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -19800,44 +19870,6 @@
         }
       ],
       "normalizedTokenSha256": "a247e68c83b1a87eddd16693121046c0b5239bf5e59eb460c0b0c9653b66ebaa",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 271,
-          "kind": "function",
-          "name": "emitPtr",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
-          "startLine": 263,
-          "tokenCount": 117
-        },
-        {
-          "endLine": 140,
-          "kind": "function",
-          "name": "emitPtr",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
-          "startLine": 132,
-          "tokenCount": 117
-        },
-        {
-          "endLine": 141,
-          "kind": "function",
-          "name": "emitPtr",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
-          "startLine": 133,
-          "tokenCount": 117
-        },
-        {
-          "endLine": 99,
-          "kind": "function",
-          "name": "emitPtr",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
-          "startLine": 91,
-          "tokenCount": 117
-        }
-      ],
-      "normalizedTokenSha256": "a249939b03c0936f63d9550f19573d18bfbe1b715f97c4eb8853ebf35b81e673",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -20407,19 +20439,19 @@
     {
       "locations": [
         {
-          "endLine": 8,
+          "endLine": 9,
           "kind": "constant",
           "name": "INITIAL_OUTPUT_CAPACITY",
           "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 8,
+          "startLine": 9,
           "tokenCount": 6
         },
         {
-          "endLine": 12,
+          "endLine": 13,
           "kind": "constant",
           "name": "INITIAL_OUTPUT_CAPACITY",
           "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 12,
+          "startLine": 13,
           "tokenCount": 6
         }
       ],
@@ -20733,6 +20765,28 @@
     {
       "locations": [
         {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "execution_contract",
+          "path": "src/runtime/execution.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "execution_contract",
+          "path": "src/runtime/execution_receipt.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "a9abe1455eb4afea529814d675518b4517b14d62525736271916b3f2de3397d2",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 5,
           "kind": "constant",
           "name": "WGPUFlags",
@@ -20843,19 +20897,19 @@
     {
       "locations": [
         {
-          "endLine": 208,
+          "endLine": 205,
           "kind": "function",
           "name": "storageExportName",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
-          "startLine": 198,
+          "startLine": 195,
           "tokenCount": 94
         },
         {
-          "endLine": 360,
+          "endLine": 357,
           "kind": "function",
           "name": "storageExportName",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 350,
+          "startLine": 347,
           "tokenCount": 94
         }
       ],
@@ -20882,6 +20936,36 @@
         }
       ],
       "normalizedTokenSha256": "aaed5717ff253e4d391758c638483fad24561b4230e1a85994f9c0615f6e3618",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "semantic_metadata",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "semantic_metadata",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "semantic_metadata",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "ab6c3dbb0e0023251ac32a56d054438bc7e24e3e3f5bab18e7846e5857673da1",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -21093,19 +21177,19 @@
     {
       "locations": [
         {
-          "endLine": 8,
+          "endLine": 9,
           "kind": "constant",
           "name": "AnalyzeError",
           "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 8,
+          "startLine": 9,
           "tokenCount": 6
         },
         {
-          "endLine": 8,
+          "endLine": 9,
           "kind": "constant",
           "name": "AnalyzeError",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 8,
+          "startLine": 9,
           "tokenCount": 6
         },
         {
@@ -21145,27 +21229,65 @@
     {
       "locations": [
         {
-          "endLine": 54,
+          "endLine": 46,
+          "kind": "constant",
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+          "startLine": 46,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 41,
+          "kind": "constant",
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+          "startLine": 41,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+          "startLine": 16,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 15,
+          "kind": "constant",
+          "name": "emitPtr",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
+          "startLine": 15,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "b0f1b13c7ba8a26b32b87f36010d67ddb029e22fb8f84d40e0c5ed49049d7674",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 56,
           "kind": "function",
           "name": "emitSemantic",
           "path": "src/compiler/tsir/emit_dxil.zig",
-          "startLine": 46,
+          "startLine": 48,
           "tokenCount": 61
         },
         {
-          "endLine": 54,
+          "endLine": 56,
           "kind": "function",
           "name": "emitSemantic",
           "path": "src/compiler/tsir/emit_msl.zig",
-          "startLine": 46,
+          "startLine": 48,
           "tokenCount": 61
         },
         {
-          "endLine": 54,
+          "endLine": 56,
           "kind": "function",
           "name": "emitSemantic",
           "path": "src/compiler/tsir/emit_spir_v.zig",
-          "startLine": 46,
+          "startLine": 48,
           "tokenCount": 61
         }
       ],
@@ -21501,6 +21623,28 @@
     {
       "locations": [
         {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "parse_matrix_shape",
+          "path": "src/compiler/wgsl/frontend/sema_expr.zig",
+          "startLine": 11,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 13,
+          "kind": "constant",
+          "name": "parse_matrix_shape",
+          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
+          "startLine": 13,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "b45a20b8dae601ce9482d362debd6d70dc5e5e70ef96074355692c21e4b8004e",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 5,
           "kind": "constant",
           "name": "shared",
@@ -21539,27 +21683,27 @@
     {
       "locations": [
         {
-          "endLine": 69,
+          "endLine": 71,
           "kind": "function",
           "name": "emitSemanticFunction",
           "path": "src/compiler/tsir/emit_dxil.zig",
-          "startLine": 56,
+          "startLine": 58,
           "tokenCount": 56
         },
         {
-          "endLine": 69,
+          "endLine": 71,
           "kind": "function",
           "name": "emitSemanticFunction",
           "path": "src/compiler/tsir/emit_msl.zig",
-          "startLine": 56,
+          "startLine": 58,
           "tokenCount": 56
         },
         {
-          "endLine": 69,
+          "endLine": 71,
           "kind": "function",
           "name": "emitSemanticFunction",
           "path": "src/compiler/tsir/emit_spir_v.zig",
-          "startLine": 56,
+          "startLine": 58,
           "tokenCount": 56
         }
       ],
@@ -22247,36 +22391,6 @@
     {
       "locations": [
         {
-          "endLine": 305,
-          "kind": "function",
-          "name": "writeOptionalU64",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 299,
-          "tokenCount": 49
-        },
-        {
-          "endLine": 202,
-          "kind": "function",
-          "name": "writeOptionalU64",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 196,
-          "tokenCount": 49
-        },
-        {
-          "endLine": 209,
-          "kind": "function",
-          "name": "writeOptionalU64",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 203,
-          "tokenCount": 49
-        }
-      ],
-      "normalizedTokenSha256": "ba4514da49105728b1abbb8c98084ddeaf75c4cc8193a8eb7c9c9580e002df77",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 21,
           "kind": "constant",
           "name": "common",
@@ -22458,6 +22572,28 @@
         }
       ],
       "normalizedTokenSha256": "bc9a1091d303fffa766763e970a87ba61fdc3f50e60fa78d82e9deb269ec19d9",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 12,
+          "kind": "constant",
+          "name": "parse_address_space",
+          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
+          "startLine": 12,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "parse_address_space",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "bca60812211c69884e8ee4cdd43cc4a5e31788e90bb311cf8cdc376782dcf752",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -22687,6 +22823,14 @@
           "tokenCount": 7
         },
         {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/frontend/sema_type_syntax.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
           "endLine": 3,
           "kind": "constant",
           "name": "ir",
@@ -22900,36 +23044,6 @@
         }
       ],
       "normalizedTokenSha256": "c1f54d92b467384489c71ec26d7f346d155bf7a24b5f3e103e56bc7c025bdf59",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 27,
-          "kind": "function",
-          "name": "emitterCodeDigest",
-          "path": "src/compiler/tsir/emit_dxil.zig",
-          "startLine": 19,
-          "tokenCount": 73
-        },
-        {
-          "endLine": 27,
-          "kind": "function",
-          "name": "emitterCodeDigest",
-          "path": "src/compiler/tsir/emit_msl.zig",
-          "startLine": 19,
-          "tokenCount": 73
-        },
-        {
-          "endLine": 27,
-          "kind": "function",
-          "name": "emitterCodeDigest",
-          "path": "src/compiler/tsir/emit_spir_v.zig",
-          "startLine": 19,
-          "tokenCount": 73
-        }
-      ],
-      "normalizedTokenSha256": "c21e76e12d59428e85a50ad8743f7ac43daed866f97dad472f4878e6cf0a9bcb",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -24094,6 +24208,14 @@
           "endLine": 1,
           "kind": "constant",
           "name": "std",
+          "path": "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
           "path": "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
           "startLine": 1,
           "tokenCount": 7
@@ -24590,6 +24712,14 @@
           "endLine": 1,
           "kind": "constant",
           "name": "std",
+          "path": "src/compiler/wgsl/frontend/sema_type_syntax.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
           "path": "src/compiler/wgsl/frontend/sema_types.zig",
           "startLine": 1,
           "tokenCount": 7
@@ -24675,11 +24805,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 980,
+          "endLine": 945,
           "kind": "constant",
           "name": "std",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 980,
+          "startLine": 945,
           "tokenCount": 7
         },
         {
@@ -25559,6 +25689,14 @@
           "kind": "constant",
           "name": "std",
           "path": "src/plan/doe_plan_executor.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/plan/plan_validation.zig",
           "startLine": 1,
           "tokenCount": 7
         },
@@ -26927,6 +27065,36 @@
     {
       "locations": [
         {
+          "endLine": 20,
+          "kind": "constant",
+          "name": "writeReductions",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 20,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 13,
+          "kind": "constant",
+          "name": "writeReductions",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 13,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 20,
+          "kind": "constant",
+          "name": "writeReductions",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 20,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "c9eab6f04ec8eeb62c6973ce2cd8a9dbd8c29a622cfb5efde85dc37e64c3b538",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 8,
           "kind": "constant",
           "name": "Result",
@@ -27815,19 +27983,19 @@
           "tokenCount": 6
         },
         {
-          "endLine": 7,
+          "endLine": 8,
           "kind": "constant",
           "name": "Ast",
           "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 7,
+          "startLine": 8,
           "tokenCount": 6
         },
         {
-          "endLine": 6,
+          "endLine": 7,
           "kind": "constant",
           "name": "Ast",
           "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
-          "startLine": 6,
+          "startLine": 7,
           "tokenCount": 6
         },
         {
@@ -28091,6 +28259,44 @@
     {
       "locations": [
         {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir_query",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "d50a9538f5838df18b5fb32f5e158d37d831df0ec5cac45ce16ec9e9a9a053a9",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 3,
           "kind": "constant",
           "name": "ir",
@@ -28120,6 +28326,14 @@
           "name": "ir",
           "path": "src/compiler/wgsl/ir/ir_opt_rewrite.zig",
           "startLine": 9,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/ir/ir_query.zig",
+          "startLine": 1,
           "tokenCount": 7
         },
         {
@@ -28377,11 +28591,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 578,
+          "endLine": 289,
           "kind": "constant",
           "name": "QueueSyncMode",
           "path": "src/runtime/execution.zig",
-          "startLine": 578,
+          "startLine": 289,
           "tokenCount": 7
         }
       ],
@@ -28533,11 +28747,11 @@
     {
       "locations": [
         {
-          "endLine": 514,
+          "endLine": 519,
           "kind": "function",
           "name": "isPhaseSpecializedKernel",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-          "startLine": 509,
+          "startLine": 514,
           "tokenCount": 43
         },
         {
@@ -28805,27 +29019,27 @@
     {
       "locations": [
         {
-          "endLine": 17,
+          "endLine": 21,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-          "startLine": 14,
+          "startLine": 18,
           "tokenCount": 11
         },
         {
-          "endLine": 20,
+          "endLine": 24,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
-          "startLine": 17,
+          "startLine": 21,
           "tokenCount": 11
         },
         {
-          "endLine": 20,
+          "endLine": 24,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_layout.zig",
-          "startLine": 17,
+          "startLine": 21,
           "tokenCount": 11
         },
         {
@@ -29225,11 +29439,11 @@
     {
       "locations": [
         {
-          "endLine": 12,
+          "endLine": 14,
           "kind": "constant",
           "name": "parse_wgsl_int_literal",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 12,
+          "startLine": 14,
           "tokenCount": 6
         },
         {
@@ -29332,6 +29546,44 @@
         }
       ],
       "normalizedTokenSha256": "dfb8bcfa024a2b620c987922ad10d14294a2be1de30a232caef6ef77a5966733",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "sema_type_syntax",
+          "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "sema_type_syntax",
+          "path": "src/compiler/wgsl/frontend/sema_expr.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "sema_type_syntax",
+          "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "sema_type_syntax",
+          "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "e02a0a89194ed33a0e66f525c5fd7289034a5c9af1f78f8ba50847433563b789",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -29445,11 +29697,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 11,
+          "endLine": 12,
           "kind": "constant",
           "name": "parse_address_space",
           "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
-          "startLine": 11,
+          "startLine": 12,
           "tokenCount": 6
         }
       ],
@@ -29527,11 +29779,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 577,
+          "endLine": 288,
           "kind": "constant",
           "name": "QueueWaitMode",
           "path": "src/runtime/execution.zig",
-          "startLine": 577,
+          "startLine": 288,
           "tokenCount": 7
         }
       ],
@@ -29565,11 +29817,11 @@
           "tokenCount": 17
         },
         {
-          "endLine": 89,
+          "endLine": 90,
           "kind": "function",
           "name": "elapsedSince",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 87,
+          "startLine": 88,
           "tokenCount": 17
         },
         {
@@ -29669,11 +29921,11 @@
     {
       "locations": [
         {
-          "endLine": 7,
+          "endLine": 8,
           "kind": "constant",
           "name": "SemanticModule",
           "path": "src/compiler/wgsl/frontend/sema_helpers.zig",
-          "startLine": 7,
+          "startLine": 8,
           "tokenCount": 6
         },
         {
@@ -30001,6 +30253,28 @@
     {
       "locations": [
         {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "plan_validation",
+          "path": "src/plan/doe_plan_executor.zig",
+          "startLine": 16,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "plan_validation",
+          "path": "src/plan/webgpu_plan_executor.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "e4d9388db6feb0d27799d7638f5d6f7f34186ddbb097b28b678aabefe3ab7573",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 9,
           "kind": "constant",
           "name": "queue_flush_breakdown",
@@ -30210,6 +30484,36 @@
         }
       ],
       "normalizedTokenSha256": "e7e3c1652c6e6731a9831e52a890e05bc5e882617b8e12f25e0d8c34197b5c5c",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 29,
+          "kind": "function",
+          "name": "emitterCodeDigest",
+          "path": "src/compiler/tsir/emit_dxil.zig",
+          "startLine": 20,
+          "tokenCount": 80
+        },
+        {
+          "endLine": 29,
+          "kind": "function",
+          "name": "emitterCodeDigest",
+          "path": "src/compiler/tsir/emit_msl.zig",
+          "startLine": 20,
+          "tokenCount": 80
+        },
+        {
+          "endLine": 29,
+          "kind": "function",
+          "name": "emitterCodeDigest",
+          "path": "src/compiler/tsir/emit_spir_v.zig",
+          "startLine": 20,
+          "tokenCount": 80
+        }
+      ],
+      "normalizedTokenSha256": "e7efdaf70fb3a1a1b0e1796cb367933b5a0235385273da6e7d17b7ef7f50d7e9",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -30535,52 +30839,6 @@
     {
       "locations": [
         {
-          "endLine": 328,
-          "kind": "function",
-          "name": "resolve_const_local_initializer",
-          "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 318,
-          "tokenCount": 74
-        },
-        {
-          "endLine": 693,
-          "kind": "function",
-          "name": "resolve_const_local_initializer",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
-          "startLine": 683,
-          "tokenCount": 74
-        },
-        {
-          "endLine": 978,
-          "kind": "function",
-          "name": "resolve_const_local_initializer",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 968,
-          "tokenCount": 74
-        },
-        {
-          "endLine": 994,
-          "kind": "function",
-          "name": "resolve_const_local_initializer",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 984,
-          "tokenCount": 74
-        },
-        {
-          "endLine": 753,
-          "kind": "function",
-          "name": "resolve_const_local_initializer",
-          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 743,
-          "tokenCount": 74
-        }
-      ],
-      "normalizedTokenSha256": "ea7340ae2f695e78bf6fa1fcc2c170b3c65e50e2b42539b1488bffcc959f89ef",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 2,
           "kind": "constant",
           "name": "model_commands",
@@ -30705,19 +30963,19 @@
     {
       "locations": [
         {
-          "endLine": 363,
+          "endLine": 327,
           "kind": "function",
           "name": "match_u32_literal",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 357,
+          "startLine": 321,
           "tokenCount": 65
         },
         {
-          "endLine": 515,
+          "endLine": 510,
           "kind": "function",
           "name": "match_u32_literal",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 509,
+          "startLine": 504,
           "tokenCount": 65
         }
       ],
@@ -30815,19 +31073,19 @@
     {
       "locations": [
         {
-          "endLine": 523,
+          "endLine": 518,
           "kind": "function",
           "name": "match_u32_literal_value",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 517,
+          "startLine": 512,
           "tokenCount": 60
         },
         {
-          "endLine": 822,
+          "endLine": 829,
           "kind": "function",
           "name": "match_u32_literal_value",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 816,
+          "startLine": 823,
           "tokenCount": 60
         }
       ],
@@ -31018,28 +31276,6 @@
         }
       ],
       "normalizedTokenSha256": "eb698aa3496c6160b015c48f3c45b489504193c89867e926d0f359a9c390cfe7",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 586,
-          "kind": "function",
-          "name": "stmt_writes_local",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
-          "startLine": 560,
-          "tokenCount": 298
-        },
-        {
-          "endLine": 279,
-          "kind": "function",
-          "name": "stmt_writes_local",
-          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 253,
-          "tokenCount": 298
-        }
-      ],
-      "normalizedTokenSha256": "ebaa3ed20aee179e90dfbdc140ff20863f7a1fb17e1973d25e075ef37394d1f7",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -31873,19 +32109,19 @@
     {
       "locations": [
         {
-          "endLine": 948,
+          "endLine": 943,
           "kind": "function",
           "name": "classify_builtin_component",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 926,
+          "startLine": 921,
           "tokenCount": 220
         },
         {
-          "endLine": 788,
+          "endLine": 795,
           "kind": "function",
           "name": "classify_builtin_component",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 766,
+          "startLine": 773,
           "tokenCount": 220
         }
       ],
@@ -32229,6 +32465,52 @@
     {
       "locations": [
         {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
+          "startLine": 16,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 45,
+          "kind": "constant",
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+          "startLine": 45,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 40,
+          "kind": "constant",
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+          "startLine": 40,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 15,
+          "kind": "constant",
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+          "startLine": 15,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 14,
+          "kind": "constant",
+          "name": "emitBuf",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
+          "startLine": 14,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "f3c4af42bf9efcae77f01955fd25cc1df0b819f099ff60415e0eb1409d3b470e",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 14,
           "kind": "constant",
           "name": "EmitError",
@@ -32376,36 +32658,6 @@
         }
       ],
       "normalizedTokenSha256": "f4389a27b5ec1394fedd7a07d4bc7ba4d43dd4c0f0ad3e0ac099f33eae283a24",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 289,
-          "kind": "function",
-          "name": "writeReductions",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 279,
-          "tokenCount": 95
-        },
-        {
-          "endLine": 186,
-          "kind": "function",
-          "name": "writeReductions",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 176,
-          "tokenCount": 95
-        },
-        {
-          "endLine": 193,
-          "kind": "function",
-          "name": "writeReductions",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 183,
-          "tokenCount": 95
-        }
-      ],
-      "normalizedTokenSha256": "f43ec25dce35272db7c616cbf2e6f69523fa46ecf88fe90f02809d0c7538ade7",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -32901,6 +33153,52 @@
     {
       "locations": [
         {
+          "endLine": 17,
+          "kind": "constant",
+          "name": "emitExport",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
+          "startLine": 17,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 47,
+          "kind": "constant",
+          "name": "emitExport",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+          "startLine": 47,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 42,
+          "kind": "constant",
+          "name": "emitExport",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
+          "startLine": 42,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 17,
+          "kind": "constant",
+          "name": "emitExport",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
+          "startLine": 17,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 16,
+          "kind": "constant",
+          "name": "emitExport",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_sample.zig",
+          "startLine": 16,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "f883808776114b07e227ece13d6de30038e83ff8ee31f65e567b5ce5df818aac",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 10,
           "kind": "constant",
           "name": "QueueWaitMode",
@@ -33195,19 +33493,19 @@
           "tokenCount": 8
         },
         {
-          "endLine": 28,
+          "endLine": 29,
           "kind": "constant",
           "name": "Allocator",
           "path": "src/plan/doe_plan_executor.zig",
-          "startLine": 28,
+          "startLine": 29,
           "tokenCount": 8
         },
         {
-          "endLine": 8,
+          "endLine": 9,
           "kind": "constant",
           "name": "Allocator",
           "path": "src/plan/webgpu_plan_executor.zig",
-          "startLine": 8,
+          "startLine": 9,
           "tokenCount": 8
         },
         {
@@ -33285,6 +33583,36 @@
     {
       "locations": [
         {
+          "endLine": 17,
+          "kind": "constant",
+          "name": "writeCollectives",
+          "path": "src/compiler/tsir/emit_csl.zig",
+          "startLine": 17,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "writeCollectives",
+          "path": "src/compiler/tsir/emit_text_skeleton.zig",
+          "startLine": 10,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 17,
+          "kind": "constant",
+          "name": "writeCollectives",
+          "path": "src/compiler/tsir/emit_webgpu.zig",
+          "startLine": 17,
+          "tokenCount": 6
+        }
+      ],
+      "normalizedTokenSha256": "fc263ae50bcb0f4ff19487db5d6973346868bb1a50f4128a4ce81a97f5cce149",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 6,
           "kind": "constant",
           "name": "native",
@@ -33340,36 +33668,6 @@
         }
       ],
       "normalizedTokenSha256": "fc70443a2961e4b940ea4cd9bf2336b4e3fac6779e88ab553ab8dd541c4b2e56",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 251,
-          "kind": "function",
-          "name": "writeResidency",
-          "path": "src/compiler/tsir/emit_csl.zig",
-          "startLine": 233,
-          "tokenCount": 187
-        },
-        {
-          "endLine": 148,
-          "kind": "function",
-          "name": "writeResidency",
-          "path": "src/compiler/tsir/emit_text_skeleton.zig",
-          "startLine": 130,
-          "tokenCount": 187
-        },
-        {
-          "endLine": 155,
-          "kind": "function",
-          "name": "writeResidency",
-          "path": "src/compiler/tsir/emit_webgpu.zig",
-          "startLine": 137,
-          "tokenCount": 187
-        }
-      ],
-      "normalizedTokenSha256": "fca700a301c8eb974b46bddf2d23ea1402989d031391da97e7222e5ab072852d",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -33915,19 +34213,19 @@
     {
       "locations": [
         {
-          "endLine": 5,
+          "endLine": 6,
           "kind": "constant",
           "name": "lean_proof",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 5,
+          "startLine": 6,
           "tokenCount": 7
         },
         {
-          "endLine": 5,
+          "endLine": 6,
           "kind": "constant",
           "name": "lean_proof",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 5,
+          "startLine": 6,
           "tokenCount": 7
         },
         {
@@ -33975,9 +34273,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "f48f81aa31a23968c32cfba626d345c96eda89a954902984c0cd56ce0e989f17",
+  "manifestSha256": "d9790e19d4b88d8f252353e4e7c6ed146ed6c8018e933e1db7ee810689e4a16e",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5"
+  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e"
 }

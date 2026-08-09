@@ -23,6 +23,9 @@ const rewrite = @import("emit_csl_host_compile_rewrite.zig");
 const validate = @import("emit_csl_validate.zig");
 const spec = @import("csl_spec.zig");
 const ir = @import("../../ir/ir.zig");
+const text_buffer = @import("csl_text_buffer.zig");
+
+const write = text_buffer.write;
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -338,12 +341,6 @@ fn writeSection(buf: []u8, pos: *usize, filename: []const u8) EmitError!void {
     try write(buf, pos, spec.SECTION_SEPARATOR);
     try write(buf, pos, filename);
     try write(buf, pos, spec.SECTION_SEPARATOR_END);
-}
-
-fn write(buf: []u8, pos: *usize, text: []const u8) EmitError!void {
-    if (pos.* + text.len > buf.len) return error.OutputTooLarge;
-    @memcpy(buf[pos.*..][0..text.len], text);
-    pos.* += text.len;
 }
 
 const ELEMENT_WISE_WGSL =

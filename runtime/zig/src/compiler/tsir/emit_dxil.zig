@@ -8,6 +8,7 @@ const common = @import("emit_text_skeleton.zig");
 const EMITTER_SOURCE = @embedFile("emit_dxil.zig");
 const COMMON_SOURCE = @embedFile("emit_text_skeleton.zig");
 const BODY_SOURCE = @embedFile("emit_kernel_body.zig");
+const SEMANTIC_METADATA_SOURCE = @embedFile("emit_semantic_metadata.zig");
 const SPEC = common.BackendTextSpec{
     .version_key = "doe.tsir.dxil_skeleton.version",
     .body_comment = "; tsir mechanical skeleton: DXIL module body is emitted by later lowering.",
@@ -21,6 +22,7 @@ pub fn emitterCodeDigest() [32]u8 {
     h.update(EMITTER_SOURCE);
     h.update(COMMON_SOURCE);
     h.update(BODY_SOURCE);
+    h.update(SEMANTIC_METADATA_SOURCE);
     var out: [32]u8 = undefined;
     h.final(&out);
     return out;
