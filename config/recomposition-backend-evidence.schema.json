@@ -47,7 +47,7 @@
         "softwareFallbackProhibited": { "type": "boolean", "const": true }
       }
     },
-    "schemaVersion": { "type": "integer", "const": 2 },
+    "schemaVersion": { "type": "integer", "const": 3 },
     "status": {
       "type": "string",
       "enum": ["captured", "hardware-evidence-incomplete"]
@@ -57,20 +57,72 @@
     "osBackend": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["availability", "representativeOutput", "requiredHostOs"],
+      "required": [
+        "availability",
+        "physicalGpuEligible",
+        "representativeOutput",
+        "requiredHostOs"
+      ],
       "properties": {
         "availability": {
           "type": "string",
-          "enum": ["eligible-not-run", "not-available-host-os"]
+          "enum": [
+            "diagnostic-only",
+            "eligible-not-run",
+            "not-available-host-os",
+            "physical-adapter-accessible"
+          ]
         },
+        "device": { "$ref": "#/$defs/device" },
+        "evidenceHost": { "$ref": "#/$defs/host" },
+        "physicalGpuEligible": { "type": "boolean" },
         "representativeOutput": {
           "type": "string",
-          "enum": ["captured", "not-captured"]
+          "enum": ["captured", "eligible-not-run", "not-captured"]
+        },
+        "representativeOutputEvidence": {
+          "$ref": "#/$defs/representativeOutputEvidence"
         },
         "requiredHostOs": {
           "type": "string",
           "enum": ["Darwin", "Windows"]
         }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "representativeOutput": { "const": "captured" } },
+            "required": ["representativeOutput"]
+          },
+          "then": {
+            "properties": { "physicalGpuEligible": { "const": true } },
+            "required": [
+              "device",
+              "evidenceHost",
+              "representativeOutputEvidence"
+            ]
+          }
+        }
+      ]
+    },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deviceName", "driverInfo", "driverName"],
+      "properties": {
+        "deviceName": { "type": ["string", "null"] },
+        "driverInfo": { "type": ["string", "null"] },
+        "driverName": { "type": ["string", "null"] }
+      }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["machine", "operatingSystem", "release"],
+      "properties": {
+        "machine": { "type": "string", "minLength": 1 },
+        "operatingSystem": { "type": "string", "minLength": 1 },
+        "release": { "type": "string", "minLength": 1 }
       }
     },
     "outputSide": {
@@ -150,6 +202,7 @@
             "driverName": { "type": ["string", "null"] }
           }
         },
+        "evidenceHost": { "$ref": "#/$defs/host" },
         "physicalGpuEligible": { "type": "boolean" },
         "renderNodes": {
           "type": "array",
@@ -177,7 +230,9 @@
             "properties": { "representativeOutput": { "const": "captured" } },
             "required": ["representativeOutput"]
           },
-          "then": { "required": ["representativeOutputEvidence"] }
+          "then": {
+            "required": ["evidenceHost", "representativeOutputEvidence"]
+          }
         }
       ]
     }
