@@ -50,6 +50,7 @@ WORKFLOW_ENTRYPOINTS = {
     "bench/runners/run_release_claim_windows.py",
     "bench/runners/run_release_pipeline.py",
     "bench/tools/bootstrap_dawn.py",
+    "bench/tools/bootstrap_zig.py",
     "bench/tools/build_test_inventory_dashboard.py",
     "bench/tools/cleanup_out.py",
     "browser/chromium/scripts/cleanup-browser-artifacts.py",

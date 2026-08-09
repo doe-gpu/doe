@@ -418,6 +418,9 @@ def reproduction_plan(selection: Selection, *, offline: bool = False) -> dict[st
         "upstreamRoot": _display_path(selection.root, selection.upstream_root),
         "runRoot": _display_path(selection.root, selection.run_root),
         "sourceCommands": source_commands,
+        "bootstrapCommands": [
+            item["command"] for item in selection.policy["bootstrapCommands"]
+        ],
         "versionCommands": [item["command"] for item in selection.policy["versionCommands"]],
         "hardwareProbe": selection.policy["hardwareProbes"][platform_id]["command"]["command"],
         "installCommand": install["installCommand"],
@@ -725,6 +728,11 @@ def prepare_external_project(
     payload = _preparation_base(selection)
     steps = payload["steps"]
     try:
+        for spec in selection.policy["bootstrapCommands"]:
+            result = recorder.run(spec)
+            steps.append(result.receipt)
+            _require_process(result, "bootstrap")
+
         for spec in selection.policy["versionCommands"]:
             result = recorder.run(spec)
             payload["toolVersions"].append(result.receipt)

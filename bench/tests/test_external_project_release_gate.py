@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import json
+import tempfile
 import unittest
 from pathlib import Path
 
 from bench.gates.external_project_release_gate import _floor_failures, evaluate
 from bench.lib.ecosystem_registry import load_json_object
+from bench.runners.run_external_project_release_suite import promoted_harnesses
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -49,6 +52,38 @@ class ExternalProjectReleaseGateTests(unittest.TestCase):
         self.assertIn("replay_not_required", codes)
         self.assertIn("release_command_not_blocking", codes)
         self.assertIn("missing_promotion_report", codes)
+
+    def test_release_runner_resolves_promoted_manifest_from_explicit_root(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest_path = root / "harness.json"
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "releasePolicy": {
+                            "promotionState": "promoted",
+                            "command": ["node", "run.mjs"],
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            registry = {
+                "actors": [
+                    {
+                        "id": "actor",
+                        "promotionStatus": "promoted",
+                        "harnesses": [
+                            {"id": "harness", "manifestPath": "harness.json"}
+                        ],
+                    }
+                ]
+            }
+
+            self.assertEqual(
+                promoted_harnesses(root, registry),
+                [("actor", "harness")],
+            )
 
 
 if __name__ == "__main__":

@@ -68,6 +68,22 @@ The generated `backend-evidence.json` must report
 `backends.vulkan.physicalGpuEligible=true`. That proves host eligibility, not a
 representative compute output.
 
+The canonical end-to-end command is:
+
+```bash
+python3 bench/cli.py external reproduce \
+  --actor electronicarts-cpp-ml-intro \
+  --harness mnist-webgpu-demo \
+  --run-id "$DOE_RUN_ID"
+```
+
+It executes the schema-backed bootstrap, tool-version capture, hardware probe,
+pinned checkout, dependency installation, Doe build, policy gates, workload,
+and evidence hashing. It writes `preparation.json`, `reproduction.json`, and
+complete process logs under the run directory. The manual commands below are
+the inspectable boundaries behind that orchestration and remain useful for
+isolating a failure.
+
 ## Build and pin the external workload
 
 Build the exact runtime consumed by `packages/doe-gpu`:

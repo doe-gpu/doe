@@ -5,6 +5,14 @@
   "runRootTemplate": "bench/out/external-projects/{actorId}/{runId}",
   "sourceCommandTimeoutSeconds": 600,
   "workloadCommandTimeoutSeconds": 7200,
+  "bootstrapCommands": [
+    {
+      "id": "bootstrap-zig",
+      "command": ["python3", "bench/tools/bootstrap_zig.py"],
+      "workingDirectory": ".",
+      "timeoutSeconds": 600
+    }
+  ],
   "versionCommands": [
     {
       "id": "git",
@@ -26,7 +34,7 @@
     },
     {
       "id": "zig",
-      "command": ["zig", "version"],
+      "command": [".tooling/zig-0.15.2/zig", "version"],
       "workingDirectory": ".",
       "timeoutSeconds": 30
     }
@@ -42,7 +50,11 @@
       "requiredPatterns": [
         "PHYSICAL_DEVICE_TYPE_(?:INTEGRATED|DISCRETE)_GPU"
       ],
-      "prohibitedPatterns": []
+      "prohibitedPatterns": [
+        "llvmpipe",
+        "SwiftShader",
+        "PHYSICAL_DEVICE_TYPE_CPU"
+      ]
     },
     "darwin": {
       "command": {
@@ -80,7 +92,7 @@
     "commonCommands": [
       {
         "id": "build-doe-dropin",
-        "command": ["zig", "build", "dropin", "-Doptimize=ReleaseFast"],
+        "command": ["../../.tooling/zig-0.15.2/zig", "build", "dropin", "-Doptimize=ReleaseFast"],
         "workingDirectory": "runtime/zig",
         "timeoutSeconds": 1800
       }

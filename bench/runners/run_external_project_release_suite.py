@@ -45,7 +45,9 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def promoted_harnesses(registry: dict[str, Any]) -> list[tuple[str, str]]:
+def promoted_harnesses(
+    root: Path, registry: dict[str, Any]
+) -> list[tuple[str, str]]:
     harnesses: list[tuple[str, str]] = []
     for actor in registry.get("actors", []):
         if not isinstance(actor, dict) or actor.get("promotionStatus") != "promoted":
@@ -72,7 +74,7 @@ def main() -> int:
         registry = load_json_object(root / args.registry)
         policy = load_json_object(root / args.policy)
         check = evaluate(root, registry, policy)
-        harnesses = promoted_harnesses(registry)
+        harnesses = promoted_harnesses(root, registry)
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         print(f"FAIL: external project release input error: {exc}")
         return 1
