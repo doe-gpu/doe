@@ -551,7 +551,7 @@ pub fn runCli() !void {
                     );
                 }
                 if (buffered_trace_rows) |*rows| {
-                    try rows.append(allocator, .{
+                    var buffered_row = BufferedTraceRow{
                         .seq = physical_command_index,
                         .command_label = command_label,
                         .kernel_name = kernel_name,
@@ -561,7 +561,9 @@ pub fn runCli() !void {
                         .hash = semantic_hash,
                         .previous_hash = trace_state.previous_hash,
                         .execution_result = execute_result,
-                    });
+                    };
+                    try buffered_row.snapshotExecutionTelemetry();
+                    try rows.append(allocator, buffered_row);
                 }
                 try artifact_recorder.record(
                     if (execution_context) |*ctx| ctx else null,

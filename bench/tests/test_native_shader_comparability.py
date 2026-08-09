@@ -133,6 +133,93 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         self.assertEqual(details["kernelDispatchCommandCount"], 2)
         self.assertEqual(details["kernelDispatchCount"], 1)
 
+    def test_multistage_manifests_are_collected_from_dispatch_trace_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            kernel_root = root / "bench" / "kernels"
+            kernel_root.mkdir(parents=True)
+            commands = []
+            trace_rows = []
+            manifests = []
+            for index, kernel in enumerate(("first.wgsl", "second.wgsl")):
+                source = f"@compute @workgroup_size(1) fn stage_{index}() {{}}\n".encode()
+                spirv = b"\x03\x02\x23\x07" + bytes([index])
+                (kernel_root / kernel).write_bytes(source)
+                (kernel_root / Path(kernel).with_suffix(".spv")).write_bytes(spirv)
+                manifest = root / f"manifest-{index}.json"
+                manifest.write_text(json.dumps({
+                    "module": kernel,
+                    "wgslSha256": _sha256(source),
+                    "spirvSha256": _sha256(spirv),
+                }), encoding="utf-8")
+                manifests.append(manifest)
+                commands.append({
+                    "kind": "kernel_dispatch",
+                    "kernel": kernel,
+                    "x": 1,
+                    "y": 1,
+                    "z": 1,
+                    "repeat": 1,
+                    "output_oracle": {
+                        "kind": "sha256_exact_v1",
+                        "dispatch_count": 1,
+                    },
+                })
+                trace_rows.append({
+                    "command": "kernel_dispatch",
+                    "kernel": kernel,
+                    "executionBackend": "doe_vulkan",
+                    "executionShaderArtifactManifestPath": str(manifest),
+                })
+            commands_path = root / "commands.json"
+            commands_path.write_text(json.dumps(commands), encoding="utf-8")
+            trace_path = root / "trace.ndjson"
+            trace_path.write_text(
+                "".join(json.dumps(row) + "\n" for row in trace_rows),
+                encoding="utf-8",
+            )
+            expected = "a" * 64
+            doe_sample = {
+                "traceArtifacts": {"jsonlPath": str(trace_path)},
+                "traceMeta": {
+                    "executionBackend": "doe_vulkan",
+                    "shaderArtifactManifestPath": str(manifests[-1]),
+                    "outputOracleCount": 2,
+                    "outputOracleMatchedCount": 2,
+                    "outputOracleFailedCount": 0,
+                    "outputOracleExpectedSha256": expected,
+                    "outputOracleActualSha256": expected,
+                },
+            }
+            dawn_sample = {"traceMeta": {
+                "executionBackend": "dawn_delegate",
+                "outputOracleCount": 2,
+                "outputOracleMatchedCount": 2,
+                "outputOracleFailedCount": 0,
+                "outputOracleExpectedSha256": expected,
+                "outputOracleActualSha256": expected,
+            }}
+            with mock.patch.object(
+                comparability_runtime, "REPO_ROOT", root
+            ), mock.patch.object(
+                comparability_runtime, "_DEFAULT_COMPARE_KERNEL_ROOT", kernel_root
+            ):
+                applies, passes, details, reason = (
+                    comparability_runtime.assess_native_shader_artifact_equivalence(
+                        workload_api="vulkan",
+                        workload_commands_path=str(commands_path),
+                        comparability_mode="strict",
+                        is_dawn_vs_doe=True,
+                        left_execution_backends={"doe_vulkan"},
+                        right_execution_backends={"dawn_delegate"},
+                        left_command_samples=[doe_sample],
+                        right_command_samples=[dawn_sample],
+                    )
+                )
+        self.assertTrue(applies)
+        self.assertTrue(passes, reason)
+        self.assertEqual(len(details["shaderManifestReceiptPaths"]), 2)
+
     def test_stale_wgsl_hash_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             _, passes, details, reason = self._assess(Path(tmpdir), stale_source=True)

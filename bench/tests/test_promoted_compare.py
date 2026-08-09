@@ -22,6 +22,7 @@ from bench.native_compare_modules.promoted_compare import (  # noqa: E402
     load_catalog,
     resolve_entry,
     build_run_config_argvs,
+    filter_selection_passthrough,
 )
 
 
@@ -202,6 +203,15 @@ class PromotedCompareTests(unittest.TestCase):
             )
         self.assertEqual(argvs[0][-2:], ["--side", "baseline"])
         self.assertEqual(argvs[1][-2:], ["--side", "comparison"])
+
+    def test_workload_id_passthrough_uses_run_config_option(self) -> None:
+        passthrough = filter_selection_passthrough(
+            ["--workload-id", "compute_kernel", "--iterations", "3"]
+        )
+        self.assertEqual(
+            passthrough,
+            ["--workload-filter", "compute_kernel", "--iterations", "3"],
+        )
 
     def test_build_run_config_argvs_resolve_config_relative_to_custom_catalog(self) -> None:
         with tempfile.TemporaryDirectory(prefix="doe-promoted-compare-") as tmpdir:

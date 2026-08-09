@@ -308,6 +308,68 @@ def _expected_wgsl_source_path(kernel: str) -> Path:
     return _DEFAULT_COMPARE_KERNEL_ROOT / f"{kernel}.wgsl"
 
 
+def _shader_manifest_receipts(
+    samples: list[dict[str, Any]],
+) -> tuple[set[str], list[dict[str, str]]]:
+    manifest_paths: set[str] = set()
+    trace_failures: list[dict[str, str]] = []
+    inspected_trace_paths: set[Path] = set()
+    for sample in samples:
+        if not isinstance(sample, dict):
+            continue
+        trace_meta = sample.get("traceMeta", {})
+        if not isinstance(trace_meta, dict):
+            trace_meta = {}
+        if str(trace_meta.get("executionBackend", "")) != "doe_vulkan":
+            continue
+        summary_path = str(trace_meta.get("shaderArtifactManifestPath", "")).strip()
+        if summary_path:
+            manifest_paths.add(summary_path)
+        trace_artifacts = sample.get("traceArtifacts", {})
+        if not isinstance(trace_artifacts, dict):
+            trace_artifacts = {}
+        raw_trace_path = str(
+            trace_artifacts.get("jsonlPath", sample.get("traceJsonlPath", ""))
+        ).strip()
+        if not raw_trace_path:
+            continue
+        trace_path = _resolve_repo_relative_path(raw_trace_path)
+        if trace_path in inspected_trace_paths:
+            continue
+        inspected_trace_paths.add(trace_path)
+        try:
+            trace_lines = trace_path.read_text(encoding="utf-8").splitlines()
+        except OSError as exc:
+            trace_failures.append({
+                "kernel": "<trace>",
+                "reason": f"failed to load shader receipt trace {trace_path}: {exc}",
+            })
+            continue
+        for line_number, line in enumerate(trace_lines, start=1):
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError as exc:
+                trace_failures.append({
+                    "kernel": "<trace>",
+                    "reason": (
+                        f"invalid shader receipt trace row {trace_path}:{line_number}: {exc}"
+                    ),
+                })
+                continue
+            if not isinstance(row, dict) or row.get("command") != "kernel_dispatch":
+                continue
+            if str(row.get("executionBackend", "")) != "doe_vulkan":
+                continue
+            manifest_path = str(
+                row.get("executionShaderArtifactManifestPath", "")
+            ).strip()
+            if manifest_path:
+                manifest_paths.add(manifest_path)
+    return manifest_paths, trace_failures
+
+
 def assess_native_shader_artifact_equivalence(
     *,
     workload_api: str,
@@ -353,12 +415,11 @@ def assess_native_shader_artifact_equivalence(
         if "doe_vulkan" in left_execution_backends
         else right_command_samples
     )
-    manifest_paths = sorted({
-        str(sample.get("traceMeta", {}).get("shaderArtifactManifestPath", "")).strip()
-        for sample in doe_samples
-        if isinstance(sample, dict) and isinstance(sample.get("traceMeta"), dict)
-        and str(sample.get("traceMeta", {}).get("executionBackend", "")) == "doe_vulkan"
-    } - {""})
+    manifest_path_set, trace_receipt_failures = _shader_manifest_receipts(doe_samples)
+    manifest_paths = sorted(manifest_path_set)
+    details["shaderManifestReceiptPaths"] = manifest_paths
+    details["shaderManifestTraceFailures"] = trace_receipt_failures
+    artifact_failures.extend(trace_receipt_failures)
     manifests: list[tuple[Path, dict[str, Any]]] = []
     for raw_path in manifest_paths:
         manifest_path = _resolve_repo_relative_path(raw_path)

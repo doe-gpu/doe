@@ -496,7 +496,7 @@ pub fn runPlan(allocator: Allocator, options: RunOptions) !void {
             semantic,
             TraceDecisionWrapper{ .decision = EMPTY_DECISION },
         );
-        try trace_rows.append(allocator, .{
+        var buffered_row = BufferedTraceRow{
             .seq = idx,
             .command_label = command_label,
             .kernel_name = kernel_name,
@@ -506,7 +506,9 @@ pub fn runPlan(allocator: Allocator, options: RunOptions) !void {
             .hash = row_hash,
             .previous_hash = previous_hash,
             .execution_result = execution_result,
-        });
+        };
+        try buffered_row.snapshotExecutionTelemetry();
+        try trace_rows.append(allocator, buffered_row);
         trace_summary.seq_max = @intCast(idx);
         trace_summary.row_count += 1;
         trace_summary.final_previous_hash = previous_hash;

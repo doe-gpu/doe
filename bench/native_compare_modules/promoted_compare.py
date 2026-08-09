@@ -301,6 +301,14 @@ def filter_selection_passthrough(argv: Sequence[str]) -> list[str]:
             if token not in {"--list-promoted", "--dry-run"}:
                 skip_value = True
             continue
+        if token == "--workload-id":
+            if index + 1 < len(argv):
+                passthrough.extend(("--workload-filter", argv[index + 1]))
+                skip_value = True
+            continue
+        if token.startswith("--workload-id="):
+            passthrough.extend(("--workload-filter", token.split("=", 1)[1]))
+            continue
         if token.startswith("--") and "=" in token:
             option_name = token.split("=", 1)[0]
             if option_name in _SELECTION_FLAGS:
