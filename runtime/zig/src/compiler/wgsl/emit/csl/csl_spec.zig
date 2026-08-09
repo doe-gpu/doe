@@ -61,7 +61,7 @@ pub const PE_PROGRAM_FILENAME: []const u8 = "pe_program.csl";
 // CSL host-plan and toolchain metadata
 // ---------------------------------------------------------------------------
 
-pub const HOST_PLAN_SCHEMA_VERSION: u32 = 2;
+pub const HOST_PLAN_SCHEMA_VERSION: u32 = 3;
 pub const HOST_PLAN_ARTIFACT_KIND: []const u8 = "csl_host_plan";
 pub const HOST_PLAN_TARGET: []const u8 = "wse3";
 pub const HOST_PLAN_CONTRACT: []const u8 = "explicit_host_plan";

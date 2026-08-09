@@ -14,7 +14,7 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 2
+      "const": 3
     },
     "artifactKind": {
       "type": "string",
@@ -91,7 +91,11 @@
           "name": { "type": "string", "minLength": 1 },
           "pattern": { "type": "string", "minLength": 1 },
           "layout": { "type": "string", "minLength": 1 },
-          "peProgram": { "type": "string", "minLength": 1 }
+          "peProgram": { "type": "string", "minLength": 1 },
+          "compileParams": {
+            "type": "object",
+            "additionalProperties": { "type": "integer", "minimum": 0 }
+          }
         }
       }
     },

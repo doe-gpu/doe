@@ -411,9 +411,21 @@ fn validateCompileTargetsValue(raw: std.json.Value) EmitError!void {
                 const layout = expectString(obj.get("layout"), "compileTarget.layout") orelse return error.InvalidSchema;
                 const pe_program = expectString(obj.get("peProgram"), "compileTarget.peProgram") orelse return error.InvalidSchema;
                 if (name.len == 0 or layout.len == 0 or pe_program.len == 0) return error.InvalidSchema;
+                if (obj.get("compileParams")) |raw_compile_params| {
+                    try validateCompileParamsValue(raw_compile_params);
+                }
             }
         },
         else => return error.InvalidSchema,
+    }
+}
+
+fn validateCompileParamsValue(raw: std.json.Value) EmitError!void {
+    const obj = expectObject(raw, "compileTarget.compileParams") orelse return error.InvalidSchema;
+    var iterator = obj.iterator();
+    while (iterator.next()) |entry| {
+        if (entry.key_ptr.len == 0) return error.InvalidSchema;
+        _ = jsonToU32(entry.value_ptr.*) orelse return error.InvalidSchema;
     }
 }
 
@@ -671,7 +683,7 @@ test "host plan artifact emits schema and cslc plan" {
     const cslc_plan = try makeCslcPlan(null);
     try emitHostPlanArtifactJson(&buf, &pos, plan, &targets, cslc_plan);
     const text = buf[0..pos];
-    try std.testing.expect(std.mem.indexOf(u8, text, "\"schemaVersion\": 2") != null);
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"schemaVersion\": 3") != null);
     try std.testing.expect(std.mem.indexOf(u8, text, "\"artifactKind\": \"csl_host_plan\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, text, "\"discovery\": \"implicit_path_lookup\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, text, "\"slidingWindowSize\": 512") != null);

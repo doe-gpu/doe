@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "artifactKind": "csl_host_plan",
   "target": "wse3",
   "contract": "explicit_host_plan",
@@ -7,13 +7,13 @@
     "peGrid": { "width": 32, "height": 4 },
     "kernels": [
       { "name": "embed", "pattern": "gather", "count": 1 },
-      { "name": "rmsnorm", "pattern": "reduction", "count": 4 },
+      { "name": "rmsnorm", "pattern": "rms_norm", "count": 4 },
       { "name": "tiled", "pattern": "tiled_matmul", "count": 7 },
       { "name": "rope", "pattern": "rope", "count": 4 },
       { "name": "attn_small", "pattern": "attention_tiled", "count": 1 },
       { "name": "residual", "pattern": "residual", "count": 4 },
       { "name": "gelu", "pattern": "gelu", "count": 2 },
-      { "name": "gemv", "pattern": "fused_gemv_dequant", "count": 7 },
+      { "name": "gemv", "pattern": "fused_gemv_dequant", "count": 8 },
       { "name": "attn_decode", "pattern": "attention_decode", "count": 1 },
       { "name": "sample", "pattern": "sample", "count": 1 }
     ],
@@ -52,22 +52,29 @@
         { "kernelName": "gelu", "repeat": 1 },
         { "kernelName": "gemv", "repeat": 1 },
         { "kernelName": "residual", "repeat": 1 },
+        { "kernelName": "gemv", "repeat": 1 },
         { "kernelName": "sample", "repeat": 1 }
       ]
     },
     "eosTokenId": 1
   },
   "compileTargets": [
-    { "name": "embed", "layout": "embed/layout.csl", "peProgram": "embed/pe_program.csl" },
-    { "name": "rmsnorm", "layout": "rmsnorm/layout.csl", "peProgram": "rmsnorm/pe_program.csl" },
-    { "name": "tiled", "layout": "tiled/layout.csl", "peProgram": "tiled/pe_program.csl" },
-    { "name": "rope", "layout": "rope/layout.csl", "peProgram": "rope/pe_program.csl" },
-    { "name": "attn_small", "layout": "attn_small/layout.csl", "peProgram": "attn_small/pe_program.csl" },
-    { "name": "residual", "layout": "residual/layout.csl", "peProgram": "residual/pe_program.csl" },
-    { "name": "gelu", "layout": "gelu/layout.csl", "peProgram": "gelu/pe_program.csl" },
-    { "name": "gemv", "layout": "gemv/layout.csl", "peProgram": "gemv/pe_program.csl" },
-    { "name": "attn_decode", "layout": "attn_decode/layout.csl", "peProgram": "attn_decode/pe_program.csl" },
-    { "name": "sample", "layout": "sample/layout.csl", "peProgram": "sample/pe_program.csl" }
+    { "name": "embed", "pattern": "gather", "layout": "embed/layout.csl", "peProgram": "embed/pe_program.csl" },
+    { "name": "rmsnorm", "pattern": "rms_norm", "layout": "rmsnorm/layout.csl", "peProgram": "rmsnorm/pe_program.csl" },
+    { "name": "rmsnorm_prefill", "pattern": "rms_norm", "layout": "rmsnorm/layout.csl", "peProgram": "rmsnorm/pe_program.csl" },
+    { "name": "rmsnorm_decode", "pattern": "rms_norm", "layout": "rmsnorm/layout.csl", "peProgram": "rmsnorm/pe_program.csl" },
+    { "name": "tiled", "pattern": "tiled_matmul", "layout": "tiled/layout.csl", "peProgram": "tiled/pe_program.csl" },
+    { "name": "rope", "pattern": "rope", "layout": "rope/layout.csl", "peProgram": "rope/pe_program.csl" },
+    { "name": "attn_small", "pattern": "attention_tiled", "layout": "attn_small/layout.csl", "peProgram": "attn_small/pe_program.csl" },
+    { "name": "residual", "pattern": "residual", "layout": "residual/layout.csl", "peProgram": "residual/pe_program.csl" },
+    { "name": "residual_prefill", "pattern": "residual", "layout": "residual/layout.csl", "peProgram": "residual/pe_program.csl" },
+    { "name": "residual_decode", "pattern": "residual", "layout": "residual/layout.csl", "peProgram": "residual/pe_program.csl" },
+    { "name": "gelu", "pattern": "gelu", "layout": "gelu/layout.csl", "peProgram": "gelu/pe_program.csl" },
+    { "name": "gelu_prefill", "pattern": "gelu", "layout": "gelu/layout.csl", "peProgram": "gelu/pe_program.csl" },
+    { "name": "gelu_decode", "pattern": "gelu", "layout": "gelu/layout.csl", "peProgram": "gelu/pe_program.csl" },
+    { "name": "gemv", "pattern": "fused_gemv_dequant", "layout": "gemv/layout.csl", "peProgram": "gemv/pe_program.csl" },
+    { "name": "attn_decode", "pattern": "attention_decode", "layout": "attn_decode/layout.csl", "peProgram": "attn_decode/pe_program.csl" },
+    { "name": "sample", "pattern": "sample", "layout": "sample/layout.csl", "peProgram": "sample/pe_program.csl" }
   ],
   "cslc": {
     "executable": "cslc",

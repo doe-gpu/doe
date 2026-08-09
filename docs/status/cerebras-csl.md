@@ -6,6 +6,11 @@ file.
 
 ## Current boundary
 
+HostPlan schema version 3 adds optional integer `compileParams` to each compile
+target. Version 2 fixtures migrate by changing only `schemaVersion` when they
+do not need per-target parameters; emitters and validators now reject
+non-integer parameter values.
+
 The generated snapshot is the current status surface:
 
 - `bench/out/r3-cerebras-status/snapshot.json`
