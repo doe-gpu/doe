@@ -41,6 +41,11 @@ file only names the promoted boundary and open admission gates.
 - `reports/claim-index.json` therefore scaffolds the AMD Vulkan native release,
   AMD package, browser ORT, and Linux Vulkan drop-in rows instead of borrowing
   older measured status after stricter evidence checks or artifact pruning.
+- The fresh Linux Vulkan drop-in gate passes symbol, behavior,
+  proc-resolution, and benchmark checks at
+  `bench/out/dropin/20260809T221600Z/dropin_report.json`. It remains diagnostic
+  until a cutover rehearsal receipt and rollback-side claim evidence are
+  retained and indexed.
 - `config/dawn-replacement-frontier.json` keeps claimable Apple slices visible
   but marks their mixed-platform product rows diagnostic while the AMD slices
   are unindexed; the generated readiness report now passes its coherence gate
