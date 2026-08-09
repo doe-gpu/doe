@@ -110,6 +110,10 @@
       "data": "runtime/zig/reports/recomposition/kernel-dispatch-equivalence.json"
     },
     {
+      "schema": "config/recomposition-dispatch-performance-approval.schema.json",
+      "data": "runtime/zig/reports/recomposition/kernel-dispatch-performance-approval.json"
+    },
+    {
       "schema": "config/governed-lanes.schema.json",
       "data": "config/governed-lanes.json"
     },

@@ -118,7 +118,6 @@ digraph doe_zig_architecture {
   "src/backend/webgpu_backend_types.zig" [label="src/backend/webgpu_backend_types.zig\nbackend-interface"];
   "src/cli/doe_plan_executor_cli.zig" [label="src/cli/doe_plan_executor_cli.zig\ncli"];
   "src/cli/entrypoints/main.zig" [label="src/cli/entrypoints/main.zig\ncli"];
-  "src/cli/entrypoints/main_dispatch_seam_bench.zig" [label="src/cli/entrypoints/main_dispatch_seam_bench.zig\ncli"];
   "src/cli/entrypoints/main_doe_plan_executor.zig" [label="src/cli/entrypoints/main_doe_plan_executor.zig\ncli"];
   "src/cli/entrypoints/main_emit_csl.zig" [label="src/cli/entrypoints/main_emit_csl.zig\ncli"];
   "src/cli/entrypoints/main_emit_dxil.zig" [label="src/cli/entrypoints/main_emit_dxil.zig\ncli"];

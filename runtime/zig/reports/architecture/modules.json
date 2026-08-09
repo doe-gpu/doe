@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "82b564df3db9c9a1bff2cdd3d4ab72f70e87fd879132db0ce3a284d9648fc93b",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4fdc9c9135cca2d61214c511611b8b9b565010bba72ec41bcd9124f3434febc4",
+  "manifestSha256": "ccdef4b5f309705f29bf987b85e4230ed63b54d5ebbf7244f02683119233e377",
   "modules": [
     {
       "containsCImport": false,
@@ -18,7 +18,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-interface",
-      "lineCount": 222,
+      "lineCount": 113,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/backend_iface.zig",
@@ -47,9 +47,9 @@
         "src/backend/vulkan/mod.zig"
       ],
       "roles": [],
-      "sha256": "5abbe0744e67f900d08940029b4fbdf8bf9811720bbd5e3624e8e7750322feef",
-      "testBlockCount": 1,
-      "topLevelDeclarationCount": 11
+      "sha256": "c91c64e4d88665ff668d74ca06de3cc745bfb2fc5345e22573f479cbf929a189",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 10
     },
     {
       "containsCImport": false,
@@ -12269,35 +12269,6 @@
       "sha256": "100b1b2b95364e4078d0746b05cd365e1f36333b024ac0eaa3e88566d3aa8c60",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 2
-    },
-    {
-      "containsCImport": false,
-      "definesMain": true,
-      "fanIn": 0,
-      "fanOut": 0,
-      "imports": [],
-      "isProductionRoot": true,
-      "layer": "cli",
-      "lineCount": 152,
-      "onlyReexports": false,
-      "owner": "cli",
-      "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-      "publicDeclarationCount": 1,
-      "publicDeclarations": [
-        {
-          "kind": "fn",
-          "line": 85,
-          "name": "main"
-        }
-      ],
-      "reachable": true,
-      "reverseImports": [],
-      "roles": [
-        "entrypoint"
-      ],
-      "sha256": "850efe036a8acea17933d1d3f10e6034fb98e823dff657ba5178a82de46f8a86",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 16
     },
     {
       "containsCImport": false,
@@ -51943,5 +51914,5 @@
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e"
+  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c"
 }

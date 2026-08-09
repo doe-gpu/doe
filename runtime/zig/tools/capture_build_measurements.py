@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import json
 import platform
 import shutil
 import subprocess
@@ -114,7 +113,6 @@ def capture(
             str(zig),
             "build",
             build_step,
-            "dispatch-seam-bench",
             f"-Doptimize={optimize}",
             "-j1",
             "--seed",
@@ -152,26 +150,6 @@ def capture(
         )
         builds_passed = clean["exitCode"] == 0 and incremental["exitCode"] == 0
         artifacts = _artifact_inventory(prefix, temporary_root)
-        benchmark_path = prefix / "bin" / "doe-dispatch-seam-bench"
-        benchmark = {
-            "status": "not-run-build-failed",
-        }
-        if builds_passed and benchmark_path.is_file():
-            benchmark_run = subprocess.run(
-                [str(benchmark_path)],
-                cwd=root,
-                check=False,
-                capture_output=True,
-                text=True,
-            )
-            if benchmark_run.returncode == 0:
-                benchmark = json.loads(benchmark_run.stdout)
-            else:
-                benchmark = {
-                    "exitCode": benchmark_run.returncode,
-                    "status": "failure",
-                    "stderr": benchmark_run.stderr[-4096:],
-                }
         normalized_command = [
             _sanitize(argument, temporary_root) for argument in command
         ]
@@ -186,7 +164,6 @@ def capture(
     payload = {
         "artifacts": artifacts,
         "buildStep": build_step,
-        "dispatchSeamBenchmark": benchmark,
         "cleanCompile": clean,
         "command": normalized_command,
         "captureToolChangedDuringCapture": capture_tool_changed,
@@ -199,7 +176,7 @@ def capture(
         "incrementalCompile": incremental,
         "measurementClass": "diagnostic-only",
         "optimize": optimize,
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "sourceChangedDuringCapture": source_changed,
         "sourceChangedBeforeIncremental": source_changed_before_incremental,
         "sourceTreeSha256": before.source_tree_sha256,

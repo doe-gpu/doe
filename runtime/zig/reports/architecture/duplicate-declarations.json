@@ -9149,14 +9149,6 @@
     {
       "locations": [
         {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "doe",
-          "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-          "startLine": 4,
-          "tokenCount": 7
-        },
-        {
           "endLine": 1,
           "kind": "constant",
           "name": "doe",
@@ -23741,14 +23733,6 @@
           "tokenCount": 7
         },
         {
-          "endLine": 3,
-          "kind": "constant",
-          "name": "std",
-          "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-          "startLine": 3,
-          "tokenCount": 7
-        },
-        {
           "endLine": 10,
           "kind": "constant",
           "name": "std",
@@ -34105,9 +34089,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4fdc9c9135cca2d61214c511611b8b9b565010bba72ec41bcd9124f3434febc4",
+  "manifestSha256": "ccdef4b5f309705f29bf987b85e4230ed63b54d5ebbf7244f02683119233e377",
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e"
+  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c"
 }

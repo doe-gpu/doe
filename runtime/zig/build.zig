@@ -841,22 +841,6 @@ pub fn build(b: *std.Build) void {
     emit_ir_digest_step.dependOn(&install_emit_ir_digest.step);
     b.getInstallStep().dependOn(emit_ir_digest_step);
 
-    const dispatch_seam_bench_exe = b.addExecutable(.{
-        .name = "doe-dispatch-seam-bench",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("src/cli/entrypoints/main_dispatch_seam_bench.zig"),
-            .target = target,
-            .optimize = optimize,
-            .imports = &.{
-                .{ .name = "build_options", .module = build_options_module },
-                .{ .name = "doe", .module = doe_module },
-            },
-        }),
-    });
-    const install_dispatch_seam_bench = b.addInstallArtifact(dispatch_seam_bench_exe, .{});
-    const dispatch_seam_bench_step = b.step("dispatch-seam-bench", "Build the promoted dispatch seam diagnostic benchmark");
-    dispatch_seam_bench_step.dependOn(&install_dispatch_seam_bench.step);
-
     const emit_csl_exe = b.addExecutable(.{
         .name = "doe-emit-csl",
         .root_module = b.createModule(.{

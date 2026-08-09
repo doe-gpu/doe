@@ -154,14 +154,14 @@
     }
   ],
   "git": {
-    "baseCommit": "WORKTREE:40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e",
+    "baseCommit": "WORKTREE:2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c",
     "requestedRef": "WORKTREE",
     "snapshotKind": "live-worktree"
   },
   "host": {
     "machine": "x86_64",
     "operatingSystem": "Linux",
-    "release": "6.8.0-90-generic"
+    "release": "7.0.0-28-generic"
   },
   "irDigestInstrumentation": {
     "kind": "native-worktree",
@@ -187,15 +187,15 @@
   "sharedLibraries": [
     {
       "path": "libonnxruntime_doe_ep.so",
-      "sha256": "32688537f582cad4138691cd6c0741a0febfcad178343c00fa686223cb39fc53",
-      "sizeBytes": 6059920,
+      "sha256": "be12d85a290487ad65521b75637cde251a7f5738bd2635054263084360d596f6",
+      "sizeBytes": 6077976,
       "symbolCount": 100,
       "symbols": "abi/libonnxruntime_doe_ep.so.symbols.txt"
     },
     {
       "path": "libwebgpu_doe.so",
-      "sha256": "41454c67cf38a26b6852eab4dce86de130ce43ef843223e40668169ed643ffb9",
-      "sizeBytes": 9502808,
+      "sha256": "24883920d7d5a2051fa4262173cd8e1f7dcd3576171f40d8c3f0afc1fbc74668",
+      "sizeBytes": 9721896,
       "symbolCount": 731,
       "symbols": "abi/libwebgpu_doe.so.symbols.txt"
     }
@@ -214,7 +214,7 @@
   },
   "wgsl": {
     "input": "wgsl-input.wgsl",
-    "irDigest": "6285d665501c6e717ed3b9dbb28886ac027b21b17e2411a835ba52956b04f47f",
+    "irDigest": "e15e361918e63aaaa841c022ebee2518a104d329b189a061604cce7a916a2ca3",
     "outputs": [
       "wgsl-output.csl",
       "wgsl-output.hlsl",

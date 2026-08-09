@@ -6,9 +6,9 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "5abbe0744e67f900d08940029b4fbdf8bf9811720bbd5e3624e8e7750322feef",
+      "moduleSha256": "c91c64e4d88665ff668d74ca06de3cc745bfb2fc5345e22573f479cbf929a189",
       "path": "src/backend/backend_iface.zig",
-      "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+      "reason": "Keep: neutral backend interface contract shared by eight production consumers.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-recomposition-review/2026-08-08",
       "suggestedDecision": "Keep"
@@ -1418,19 +1418,6 @@
       "moduleSha256": "100b1b2b95364e4078d0746b05cd365e1f36333b024ac0eaa3e88566d3aa8c60",
       "path": "src/cli/entrypoints/main.zig",
       "reason": "Keep: executable process root at src/cli/entrypoints/main.zig.",
-      "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
-      "suggestedDecision": "Keep"
-    },
-    {
-      "decision": "Keep",
-      "evidence": [
-        "declared production root",
-        "special roles: entrypoint"
-      ],
-      "moduleSha256": "850efe036a8acea17933d1d3f10e6034fb98e823dff657ba5178a82de46f8a86",
-      "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-      "reason": "Keep: executable process root at src/cli/entrypoints/main_dispatch_seam_bench.zig.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-recomposition-review/2026-08-08",
       "suggestedDecision": "Keep"
@@ -6568,13 +6555,13 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4fdc9c9135cca2d61214c511611b8b9b565010bba72ec41bcd9124f3434febc4",
+  "manifestSha256": "ccdef4b5f309705f29bf987b85e4230ed63b54d5ebbf7244f02683119233e377",
   "pendingCount": 0,
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
-  "reviewedCount": 543,
+  "reviewedCount": 542,
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e",
+  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c",
   "status": "complete",
-  "totalCount": 543
+  "totalCount": 542
 }

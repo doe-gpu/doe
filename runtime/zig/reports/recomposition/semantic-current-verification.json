@@ -6,15 +6,22 @@
     "reason": "Approve the additive doeNativeShaderModuleGetBindingsForEntryPoint export consumed by the Node auto-layout integration; all normalized commands, errors, WGSL outputs, traces, replay results, and other ABI symbols remain equivalent."
   },
   "baselineCommit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
-  "candidateCommit": "WORKTREE:40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e",
-  "classification": "approved-contract-change",
+  "candidateCommit": "WORKTREE:2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c",
+  "classification": "failure",
   "differences": [
     {
       "baselineSha256": "6397dec652765917af9a5fb11ec2002fb5bbb4915d85489ea74fc23076132565",
       "candidateSha256": "03af98295eb75e953d83e206623d521dfc7fbbda446a7aa14605e85fd0ce1414",
       "category": "abi-surface",
       "path": "abi/libwebgpu_doe.so.symbols.txt"
+    },
+    {
+      "baselineSha256": "d2fd4f17b8f81ae17c75bfa61ff6ba7f56252a2cea5ebb738ff9e3cfcf91953c",
+      "candidateSha256": "00a9efe2107e5d43edb827d9c3828e335c49d8757631b89ea56b275ae640cf33",
+      "category": "wgsl-lowering",
+      "path": "manifest:wgsl"
     }
   ],
+  "failureBoundary": "abi-surface+wgsl-lowering",
   "schemaVersion": 1
 }

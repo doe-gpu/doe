@@ -40,6 +40,10 @@ file only names the promoted boundary and open admission gates.
   current runtime, runs the same output-oracled kernel on the AMD-only Vulkan
   ICD, and requires exact normalized command, output, error, trace, receipt,
   and shader-artifact identities before classifying the dispatch seam equal.
+- After equivalence and no-regression approval, the temporary legacy-dispatch
+  mock and benchmark executable were removed. Build-measurement schema version
+  2 now captures only source-bound clean/incremental builds and artifacts; the
+  retired seam timing remains immutable in the recomposition approval receipt.
 
 ## Admission blockers
 

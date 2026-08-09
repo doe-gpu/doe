@@ -5776,11 +5776,6 @@
     {
       "members": [
         {
-          "name": "SAMPLE_COUNT",
-          "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-          "startLine": 12
-        },
-        {
           "name": "SAMPLE_WGSL",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
           "startLine": 555
@@ -15865,16 +15860,6 @@
           "startLine": 9
         },
         {
-          "name": "backend_iface",
-          "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-          "startLine": 5
-        },
-        {
-          "name": "backend_telemetry",
-          "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-          "startLine": 6
-        },
-        {
           "name": "backend_runtime_telemetry",
           "path": "src/cli/runtime_cli.zig",
           "startLine": 2
@@ -20010,11 +19995,6 @@
           "startLine": 2
         },
         {
-          "name": "model_compute",
-          "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-          "startLine": 9
-        },
-        {
           "name": "model_commands",
           "path": "src/cli/runtime_cli.zig",
           "startLine": 6
@@ -22661,11 +22641,6 @@
           "startLine": 1
         },
         {
-          "name": "runtime_types",
-          "path": "src/cli/entrypoints/main_dispatch_seam_bench.zig",
-          "startLine": 10
-        },
-        {
           "name": "runtime_compile",
           "path": "src/cli/entrypoints/main_emit_spirv.zig",
           "startLine": 4
@@ -24424,10 +24399,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4fdc9c9135cca2d61214c511611b8b9b565010bba72ec41bcd9124f3434febc4",
+  "manifestSha256": "ccdef4b5f309705f29bf987b85e4230ed63b54d5ebbf7244f02683119233e377",
   "reportGeneratorSha256": "2fd78c804f7f47d41089ecc80ae51c790cd4f95927173f924acb17c1b621beb9",
   "schemaVersion": 1,
   "sourceLayoutVersion": 2,
-  "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e",
+  "sourceTreeSha256": "2f4ab9f6b3e745acb01b40e4a4e4f4869b5dde5751e27f127793c57f193cd73c",
   "status": "captured"
 }

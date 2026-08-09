@@ -447,8 +447,8 @@
     "moduleDecisionReviews": {
       "src/backend/backend_iface.zig": {
         "decision": "Keep",
-        "moduleSha256": "5abbe0744e67f900d08940029b4fbdf8bf9811720bbd5e3624e8e7750322feef",
-        "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "moduleSha256": "c91c64e4d88665ff668d74ca06de3cc745bfb2fc5345e22573f479cbf929a189",
+        "reason": "Keep: neutral backend interface contract shared by eight production consumers.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/backend/backend_policy.zig": {
@@ -1151,12 +1151,6 @@
         "decision": "Keep",
         "moduleSha256": "100b1b2b95364e4078d0746b05cd365e1f36333b024ac0eaa3e88566d3aa8c60",
         "reason": "Keep: executable process root at src/cli/entrypoints/main.zig.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/cli/entrypoints/main_dispatch_seam_bench.zig": {
-        "decision": "Keep",
-        "moduleSha256": "850efe036a8acea17933d1d3f10e6034fb98e823dff657ba5178a82de46f8a86",
-        "reason": "Keep: executable process root at src/cli/entrypoints/main_dispatch_seam_bench.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/cli/entrypoints/main_doe_plan_executor.zig": {

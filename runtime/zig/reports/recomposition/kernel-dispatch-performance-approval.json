@@ -1,0 +1,24 @@
+{
+  "approval": {
+    "callsPerSample": 200000,
+    "characterizedLegacyMedianNs": 391172,
+    "promotedMedianNs": 391151,
+    "promotedNoSlower": true,
+    "sampleCount": 21
+  },
+  "artifactKind": "recomposition-dispatch-performance-approval",
+  "classification": "no-regression",
+  "generatedAt": "2026-08-09T03:17:00Z",
+  "schemaVersion": 1,
+  "sourceMeasurement": {
+    "commit": "81dda0ad226e60ad365d56e41f076de02510d0a0",
+    "path": "runtime/zig/reports/architecture/build-measurements.json",
+    "sha256": "4dc232a4a814f193d704c19fde56ea38eed8b8de75fd2d10a426429f695aa061",
+    "sourceTreeSha256": "40eb649d38e76d39586d26fbc41f62dec1acf7648bdc450a8bd39bea7448c45e"
+  },
+  "status": "approved",
+  "toolchain": {
+    "sha256": "2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51",
+    "version": "0.15.2"
+  }
+}

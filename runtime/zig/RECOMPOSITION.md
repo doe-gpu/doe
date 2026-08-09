@@ -698,7 +698,7 @@ universal ideals.
     --vulkan-icd /path/to/physical-amd-icd.json
   ```
 - [x] Benchmark old and new kernel-dispatch paths on identical fixed workloads before deleting the former path.
-- [ ] Delete temporary characterization adapters and the former kernel-dispatch path after equivalence and performance checks pass.
+- [x] Delete temporary characterization adapters and the former kernel-dispatch path after equivalence and performance checks pass; retain the immutable approvals in `runtime/zig/reports/recomposition/kernel-dispatch-equivalence.json` and `runtime/zig/reports/recomposition/kernel-dispatch-performance-approval.json`.
 - [x] Apply the proven execution-contract pattern to buffer upload and writes.
 - [x] Apply the proven execution-contract pattern to copy commands.
 - [x] Apply the proven execution-contract pattern to pipeline creation and caches.
