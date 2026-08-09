@@ -38,3 +38,8 @@ schema-backed summaries to `reports/ecosystem/<actor-id>/`.
 `bench/gates/external_project_release_gate.py` rejects incoherent promotion.
 `bench/runners/run_external_project_release_suite.py` executes every promoted
 harness as a blocking release dependency.
+
+Physical AMD Vulkan continuation is documented in
+[`AMD_VULKAN_HANDOFF.md`](AMD_VULKAN_HANDOFF.md). It keeps host admission,
+external-workload evidence, native smoke evidence, and promotion review as
+separate boundaries.

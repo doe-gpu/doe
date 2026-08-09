@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "registryRevision": "8",
+  "registryRevision": "9",
   "scoringPolicyVersion": "1.0.0",
   "promotionPolicyVersion": "1.0.0",
   "evaluationQueue": [
@@ -852,9 +852,9 @@
           "verifiedAt": "2026-08-08T18:35:06Z"
         }
       },
-      "engagementStatus": "researched",
-      "evidenceMaturity": "source-only",
-      "adoptionStage": "none",
+      "engagementStatus": "measured",
+      "evidenceMaturity": "diagnostic",
+      "adoptionStage": "validation-workload",
       "promotionStatus": "not-promoted",
       "observations": [
         {
@@ -862,6 +862,18 @@
           "summary": "The project contains a machine-learning introduction whose WebGPU code is generated through Gigi.",
           "evidenceUrl": "https://github.com/electronicarts/cpp-ml-intro/blob/c46a47b4fcee5ec48dbda7321210b1287b262b06/README.md",
           "observedAt": "2026-08-08T18:35:06Z"
+        },
+        {
+          "id": "generated-node-provider-seam",
+          "summary": "The checked-in generated MNIST Node entrypoint imports the exact webgpu package specifier, providing a narrow provider-substitution seam without editing application or shader source.",
+          "evidenceUrl": "https://github.com/electronicarts/cpp-ml-intro/blob/c46a47b4fcee5ec48dbda7321210b1287b262b06/Demo/mnist/Gigi/out/WebGPU/index.js",
+          "observedAt": "2026-08-09T02:03:32Z"
+        },
+        {
+          "id": "generated-mnist-model-assets",
+          "summary": "The pinned generated workload includes its neural-network weights, ten image inputs, and six-pass WebGPU module, enabling a deterministic external CPU output oracle.",
+          "evidenceUrl": "https://github.com/electronicarts/cpp-ml-intro/blob/c46a47b4fcee5ec48dbda7321210b1287b262b06/Demo/mnist/Gigi/out/WebGPU/mnist_Module.js",
+          "observedAt": "2026-08-09T02:03:32Z"
         }
       ],
       "scoreHistory": [
@@ -891,22 +903,69 @@
               }
             ]
           }
+        },
+        {
+          "revisionId": "first-harness-review",
+          "recordedAt": "2026-08-09T02:03:32Z",
+          "reviewer": "codex",
+          "reviewStatus": "reviewed",
+          "registryRevision": "9",
+          "scoringPolicyVersion": "1.0.0",
+          "changedByObservationRefs": [
+            "gigi-generated-webgpu-ml",
+            "generated-node-provider-seam",
+            "generated-mnist-model-assets"
+          ],
+          "doeLeverage": {
+            "score": 3,
+            "reasons": [
+              {
+                "summary": "The reviewed provider-swap workload exposes a reproducible Doe compiler and execution failure against an independent CPU oracle, while physical Vulkan correctness and performance remain unresolved leverage points.",
+                "observationRefs": [
+                  "generated-node-provider-seam",
+                  "generated-mnist-model-assets"
+                ]
+              }
+            ]
+          },
+          "existingCapabilityCoverage": {
+            "score": 1,
+            "reasons": [
+              {
+                "summary": "The project owns the generated application graph, model assets, dispatch orchestration, and package seam while delegating code generation and runtime implementation to external components.",
+                "observationRefs": [
+                  "gigi-generated-webgpu-ml",
+                  "generated-node-provider-seam",
+                  "generated-mnist-model-assets"
+                ]
+              }
+            ]
+          }
         }
       ],
       "harnesses": [
         {
           "id": "mnist-webgpu-demo",
-          "status": "proposed",
-          "proofTargets": ["correctness", "reliability", "performance", "compatibility"],
+          "status": "measured",
+          "manifestPath": "bench/external-projects/electronicarts-cpp-ml-intro/mnist-webgpu-demo.harness.json",
+          "proofTargets": ["correctness", "reliability", "performance", "compatibility", "diagnosis"],
           "oracle": {
-            "status": "replacement-required",
-            "observationRefs": ["gigi-generated-webgpu-ml"]
+            "status": "reviewed",
+            "observationRefs": ["generated-mnist-model-assets"]
           }
         }
       ],
-      "reviewedReports": [],
+      "reviewedReports": [
+        {
+          "reportId": "cpp-ml-mnist-webgpu-2026-08-09-diagnostic",
+          "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-2026-08-09-diagnostic.json",
+          "sha256": "8493a8e1bc8caecaf7a79a2eb32c4174e84ed01cab5bd09acef789339567a93e",
+          "reviewedAt": "2026-08-09T02:03:32Z",
+          "reviewer": "codex"
+        }
+      ],
       "claimIndexRefs": [],
-      "lastReviewedAt": null
+      "lastReviewedAt": "2026-08-09T02:03:32Z"
     },
     {
       "id": "dawn-node-webgpu",

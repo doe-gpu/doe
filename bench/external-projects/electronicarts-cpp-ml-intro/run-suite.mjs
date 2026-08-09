@@ -120,6 +120,16 @@ async function gitHead(upstream, timeoutMs) {
   return result.stdout.trim();
 }
 
+async function gitWorktreeDirty(repository, timeoutMs) {
+  const result = await runProcess('git', ['status', '--porcelain=v1'], {
+    cwd: repository,
+    env: process.env,
+    timeoutMs,
+  });
+  if (result.exitCode !== 0) throw new Error(`cannot read worktree status: ${result.stderr}`);
+  return result.stdout.trim().length > 0;
+}
+
 async function inspectHostHardware() {
   let renderNodes = [];
   try {
@@ -300,6 +310,10 @@ async function main() {
   if (actualCommit !== expectedCommit) {
     throw new Error(`upstream commit mismatch: expected ${expectedCommit}, received ${actualCommit}`);
   }
+  const doeSource = {
+    commit: await gitHead(repoRoot, options.timeoutMs),
+    worktreeDirty: await gitWorktreeDirty(repoRoot, options.timeoutMs),
+  };
   const outDir = resolve(
     repoRoot,
     'bench/out/external-projects/electronicarts-cpp-ml-intro',
@@ -333,6 +347,14 @@ async function main() {
       reliability: summarize(processes),
     };
   }
+  const doeProviderInfo = providers['doe-gpu'].probe.identity?.provider?.providerInfo ?? null;
+  let doeBuildMetadata = null;
+  let doeBuildMetadataSha256 = null;
+  if (doeProviderInfo?.buildMetadataPath) {
+    const metadataBytes = await readFile(doeProviderInfo.buildMetadataPath);
+    doeBuildMetadata = JSON.parse(metadataBytes.toString('utf8'));
+    doeBuildMetadataSha256 = createHash('sha256').update(metadataBytes).digest('hex');
+  }
 
   const immutableInputs = await Promise.all(generatedInputs.map(async (path) => ({
     path: `${generatedRoot}/${path}`,
@@ -364,6 +386,7 @@ async function main() {
       commit: actualCommit,
       licenseIdentifier: 'LicenseRef-EA-BSD-3-Clause-With-Marks',
     },
+    doeSource,
     host: {
       platform: process.platform,
       architecture: process.arch,
@@ -395,6 +418,7 @@ async function main() {
     artifactKind: 'cpp-ml-mnist-webgpu-receipt-summary',
     generatedAt,
     upstream: raw.upstream,
+    doeSource,
     host: raw.host,
     providers: Object.fromEntries(Object.entries(providers).map(([provider, item]) => [
       provider,
@@ -409,6 +433,11 @@ async function main() {
         reliability: item.reliability,
       },
     ])),
+    runtimeBuildIdentity: {
+      providerInfo: doeProviderInfo,
+      buildMetadata: doeBuildMetadata,
+      buildMetadataSha256: doeBuildMetadataSha256,
+    },
     shaderSourceOwner: immutableInputs.find((item) => item.path.endsWith('/mnist_Module.js')),
     modelWeights: immutableInputs.find((item) => item.path.endsWith('/Backprop_Weights.bin')),
     imageInputs: immutableInputs.filter((item) => /\/assets\/\d\.png$/.test(item.path)),
@@ -446,7 +475,7 @@ async function main() {
     },
     limitations: {
       dynamicallyGeneratedEntryPointShaderHashesRecorded: false,
-      driverIdentityRecorded: Object.values(providers).every((item) => item.probe.identity?.adapter !== null),
+      driverIdentityRecorded: false,
       receiptOverheadMeasured: false,
     },
   };

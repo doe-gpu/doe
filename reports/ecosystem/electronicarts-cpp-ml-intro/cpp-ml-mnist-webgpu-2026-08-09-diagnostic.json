@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "cpp-ml-mnist-webgpu-2026-08-09-diagnostic",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "generatedAt": "2026-08-09T02:03:32Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-09T02:03:32Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "9",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/cpp-ml-intro",
+    "commit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "receipt-explained-failure",
+  "findings": [
+    {
+      "id": "generated-graph-dawn-cpu-parity",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "The pinned generated six-pass WebGPU graph passed the independent 784-30-10 CPU oracle for all ten image inputs in all three clean Dawn processes; GPU and CPU argmax results matched and every output vector stayed within the reviewed absolute-error bound.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
+          "sha256": "a3aadfe69d20da52c8169eca2df3ccf193114941ee4185d47ac47c44b9c7006b"
+        }
+      ]
+    },
+    {
+      "id": "doe-presentation-wgsl-compiler-gap",
+      "category": "compatibility",
+      "status": "discovered",
+      "summary": "All three Doe processes rejected the unchanged generated Presentation shader at a comma-separated switch case, then reported failed shader-module creation, invalid texture copies, missing SPIR-V dispatch data, and zero output activations instead of the CPU oracle output.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
+          "sha256": "a3aadfe69d20da52c8169eca2df3ccf193114941ee4185d47ac47c44b9c7006b"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/receipt-summary.json",
+          "sha256": "97c0e9f63fdbcb181336b43d2ce7f06a0c3670ff59a9529681ff1ccc3956afc7"
+        }
+      ]
+    },
+    {
+      "id": "clean-process-failure-repeatability",
+      "category": "reliability",
+      "status": "verified",
+      "summary": "The baseline completed three of three clean processes without crashes, hangs, or timeouts, while Doe returned the same oracle failure and output identity in three of three clean processes without a process crash, hang, or timeout.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
+          "sha256": "a3aadfe69d20da52c8169eca2df3ccf193114941ee4185d47ac47c44b9c7006b"
+        }
+      ]
+    },
+    {
+      "id": "physical-vulkan-performance-ineligible",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "The host exposed a render node but denied read/write access, and the provider probe did not capture a complete physical adapter and driver identity, so the observed process durations cannot support a hardware performance comparison.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/receipt-summary.json",
+          "sha256": "97c0e9f63fdbcb181336b43d2ce7f06a0c3670ff59a9529681ff1ccc3956afc7"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Doe did not compile and complete the generated graph, so provider output equivalence is not established.",
+    "The host denied read/write access to its render node and did not produce a complete physical adapter and driver identity, so this run is not hardware-comparable.",
+    "The harness records the generated module hash but does not yet emit each dynamically extracted WGSL entry-point hash.",
+    "The diagnostic run records Doe commit d3460aee4 with a dirty worktree containing harness and report work; the AMD rerun must use a clean checkout and freshly built runtime.",
+    "Three sequential clean processes establish diagnostic repeatability, not promotion-scale concurrency, teardown, stress, or memory-growth reliability.",
+    "The harness-only ESM provider redirection is not a validated production installation path."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "doe-generated-wgsl-compile-failure",
+      "doe-shader-module-creation-failure",
+      "doe-dispatch-missing-spirv",
+      "comparison-output-zeroed",
+      "render-node-inaccessible",
+      "driver-identity-incomplete",
+      "dynamic-shader-identity-incomplete"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 193605632
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 3,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 169721856
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Doe did not complete the workload and the host was not eligible for physical-GPU evidence."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The diagnostic harness did not execute matched receipt-enabled and receipt-disabled workload pairs."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The ESM-loader provider redirection is a controlled harness seam rather than a validated package installation path."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "The render node was inaccessible and complete physical adapter and driver identity was absent."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic suite ran providers and clean processes sequentially."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "No promotion-scale repeated device teardown lane ran."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Three clean processes per provider do not satisfy the promotion stress policy."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS was captured, but no bounded-growth leak lane ran."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "Provider identity, generated-source identity, model/input hashes, dispatch intent, readback intent, repeated diagnostics, and output identities were captured, but dynamic shader hashes, driver identity, completed Doe dispatches, and matching Doe output are absent."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "Doe did not complete the workload and the host was not eligible for physical-GPU evidence."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is not promoted and Doe does not pass its correctness boundary."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/receipt-summary.json",
+      "sha256": "97c0e9f63fdbcb181336b43d2ce7f06a0c3670ff59a9529681ff1ccc3956afc7"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
+      "sha256": "a3aadfe69d20da52c8169eca2df3ccf193114941ee4185d47ac47c44b9c7006b"
+    }
+  ]
+}
