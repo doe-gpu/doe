@@ -207,11 +207,9 @@
       "surface": "native_runtime",
       "dawnComparator": "dawn_vulkan",
       "doeTarget": "doe_vulkan",
-      "currentState": "claimable",
-      "claimAllowed": true,
-      "claimIndexEntryIds": [
-        "native-release-amd-vulkan"
-      ],
+      "currentState": "diagnostic",
+      "claimAllowed": false,
+      "claimIndexEntryIds": [],
       "evidencePaths": [
         "reports/claim-index.json",
         "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
@@ -230,11 +228,9 @@
           "gpuApi": "vulkan",
           "gpuVendor": "amd",
           "runtimeHost": "native",
-          "currentState": "claimable",
-          "claimAllowed": true,
-          "claimIndexEntryIds": [
-            "native-release-amd-vulkan"
-          ],
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
           "evidencePaths": [
             "reports/claim-index.json",
             "bench/out/amd-vulkan/20260702T163200Z/dawn-vs-doe.amd.vulkan.release.json",
@@ -244,12 +240,16 @@
             "bench/docs/vulkan-pipeline-cache-integration.md",
             "docs/status/runtime-backends-and-bench.md"
           ],
-          "blockers": [],
-          "notes": "The native AMD Vulkan slice is claimable only through the indexed release claim and rehearsal manifest."
+          "blockers": [
+            "fresh_strict_source_and_output_oracle_evidence"
+          ],
+          "notes": "The native AMD Vulkan slice is diagnostic until a fresh strict run binds every executed shader source and validates every dispatch output oracle."
         }
       ],
-      "blockers": [],
-      "notes": "AMD Vulkan native Doe-vs-Dawn replacement claims are allowed only through the indexed release claim artifact and its rehearsal manifest."
+      "blockers": [
+        "fresh_strict_source_and_output_oracle_evidence"
+      ],
+      "notes": "Linux AMD Vulkan native runtime evidence is diagnostic while the current strict matrix closes source and output-oracle receipt gaps."
     },
     {
       "id": "native-d3d12-runtime",
@@ -304,8 +304,7 @@
       "currentState": "claimable",
       "claimAllowed": true,
       "claimIndexEntryIds": [
-        "package-node-apple-metal",
-        "package-node-amd-vulkan"
+        "package-node-apple-metal"
       ],
       "evidencePaths": [
         "reports/claim-index.json",
@@ -345,11 +344,9 @@
           "gpuApi": "vulkan",
           "gpuVendor": "amd",
           "runtimeHost": "node",
-          "currentState": "claimable",
-          "claimAllowed": true,
-          "claimIndexEntryIds": [
-            "package-node-amd-vulkan"
-          ],
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
           "evidencePaths": [
             "reports/claim-index.json",
             "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-node-package.compare.json",
@@ -358,12 +355,14 @@
             "packages/doe-gpu/README.md",
             "docs/status/runtime-backends-and-bench.md"
           ],
-          "blockers": [],
-          "notes": "The Node package Linux AMD Vulkan slice is claimable through the indexed local Gemma 270M package comparison and claim rehearsal."
+          "blockers": [
+            "amd_vulkan_package_evidence_regeneration"
+          ],
+          "notes": "The Node package Linux AMD Vulkan slice is diagnostic until fresh package evidence is retained and indexed."
         }
       ],
       "blockers": [],
-      "notes": "Node package claims are constrained to claim-indexed Apple Metal and Linux AMD Vulkan package receipts."
+      "notes": "Node package claims are currently constrained to the claim-indexed Apple Metal package receipt; Linux AMD Vulkan remains diagnostic."
     },
     {
       "id": "package-bun-runtime",
@@ -373,8 +372,7 @@
       "currentState": "claimable",
       "claimAllowed": true,
       "claimIndexEntryIds": [
-        "package-bun-apple-metal",
-        "package-bun-amd-vulkan"
+        "package-bun-apple-metal"
       ],
       "evidencePaths": [
         "reports/claim-index.json",
@@ -414,11 +412,9 @@
           "gpuApi": "vulkan",
           "gpuVendor": "amd",
           "runtimeHost": "bun",
-          "currentState": "claimable",
-          "claimAllowed": true,
-          "claimIndexEntryIds": [
-            "package-bun-amd-vulkan"
-          ],
+          "currentState": "diagnostic",
+          "claimAllowed": false,
+          "claimIndexEntryIds": [],
           "evidencePaths": [
             "reports/claim-index.json",
             "bench/out/local-evidence/20260703T175448Z/fixed-package/amd-vulkan-gemma270m-bun-package.compare.json",
@@ -427,12 +423,14 @@
             "packages/doe-gpu/README.md",
             "docs/status/runtime-backends-and-bench.md"
           ],
-          "blockers": [],
-          "notes": "The Bun package Linux AMD Vulkan slice is claimable through the indexed local Gemma 270M package comparison and claim rehearsal."
+          "blockers": [
+            "amd_vulkan_package_evidence_regeneration"
+          ],
+          "notes": "The Bun package Linux AMD Vulkan slice is diagnostic until fresh package evidence is retained and indexed."
         }
       ],
       "blockers": [],
-      "notes": "Bun package claims are constrained to claim-indexed Apple Metal and Linux AMD Vulkan package receipts."
+      "notes": "Bun package claims are currently constrained to the claim-indexed Apple Metal package receipt; Linux AMD Vulkan remains diagnostic."
     },
     {
       "id": "package-deno-runtime",
