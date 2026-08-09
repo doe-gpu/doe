@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "generatedAt": "2026-08-09T02:49:56Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-09T02:49:56Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "10",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/cpp-ml-intro",
+    "commit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "receipt-explained-failure",
+  "findings": [
+    {
+      "id": "physical-amd-vulkan-admission",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "The AMD-only Vulkan ICD exposed an accessible physical Radeon 8060S Graphics adapter through Mesa RADV, with no software fallback in the captured Vulkan and backend-capability evidence; both provider probes matched their requested provider and reported hardware eligibility.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/vulkaninfo-summary.txt",
+          "sha256": "9fafc3fca25a83e012172dec737983ce41b92374c9aaf93040b82d5f7bcb653e"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/backend-evidence.json",
+          "sha256": "de15d36db43ac565c37914dd48b12b7d6368b6b39898a74a6bf22f0de1b21f3f"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/receipt-summary.json",
+          "sha256": "94e7e3a84077eeadd196b158a3687f71efa53476373b581c7ba6b0ba9e10675a"
+        }
+      ]
+    },
+    {
+      "id": "native-vulkan-representative-output",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "The strict native compute smoke completed seven Doe and seven Dawn samples. Every sample executed one hundred dispatches, reported one successful output, and matched the workload's SHA-256 output oracle; the compare report passed structural comparability and coherence.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/compute/report.json",
+          "sha256": "6752bcb89c786e1dd9f6dc040111593e074bcd35e56c74db1524a0c1cac691a5"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/compute/run-artifacts/doe/doe-compute_workgroup_atomic_1024-20260809T024528Z.run.json",
+          "sha256": "864b120800bb5a1b7a5fd213308f509331f96354b859ded2322aac8995f16227"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/compute/run-artifacts/dawn_delegate/dawn_delegate-compute_workgroup_atomic_1024-20260809T024528Z.run.json",
+          "sha256": "a282a899861c2338509fcd7a65e493a382b526e14cf1d1e722d69b4b641c6284"
+        }
+      ]
+    },
+    {
+      "id": "native-vulkan-gpu-resource-smoke",
+      "category": "reliability",
+      "status": "verified",
+      "summary": "The canonical 16 MiB upload smoke completed seven samples per provider with matched execution shape and hash-bound per-sample GPU resource evidence. The report is comparable, but its unusually large operation-timing delta is retained only as diagnostic fairness-audit input.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/upload/report.json",
+          "sha256": "861582b23abd6db39a18374d7f723b639a46cabd940be4fbcc66701bcfaaac68"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/upload/run-artifacts/doe/doe-upload_write_buffer_16mb-20260809T023700Z.run.json",
+          "sha256": "e0a769a1f480b0133f52e9f73ab14103b84ecbd508717473a29163d07eb8e5f6"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/upload/run-artifacts/dawn_delegate/dawn_delegate-upload_write_buffer_16mb-20260809T023700Z.run.json",
+          "sha256": "859d9c804aca839b70909d46f4a89c08e582db8cd3b329e00c702d9eb13ac825"
+        }
+      ]
+    },
+    {
+      "id": "dawn-cpu-numeric-parity-with-label-oracle-failure",
+      "category": "correctness",
+      "status": "discovered",
+      "summary": "In all three Dawn processes, GPU and independent CPU argmax agreed for every input and outputs stayed finite and within the numeric error bound, but the strict suite correctly failed because both paths classified the input labeled five as digit six.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/raw-suite.json",
+          "sha256": "4c44f2ca47839a5287bebbd65ad55833c462d260a8ea2ae91bb9bbee4c1e2a32"
+        }
+      ]
+    },
+    {
+      "id": "doe-presentation-wgsl-compiler-gap",
+      "category": "compatibility",
+      "status": "discovered",
+      "summary": "All three Doe processes deterministically rejected the unchanged generated Presentation shader at the comma-separated switch case near case i32(0), then emitted dependent shader-module, texture-copy, SPIR-V binding, and dispatch failures and returned zeroed outputs.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/raw-suite.json",
+          "sha256": "4c44f2ca47839a5287bebbd65ad55833c462d260a8ea2ae91bb9bbee4c1e2a32"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/receipt-summary.json",
+          "sha256": "94e7e3a84077eeadd196b158a3687f71efa53476373b581c7ba6b0ba9e10675a"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Doe did not compile and complete the generated cpp-ml graph, so provider output equivalence is not established.",
+    "The strict expected-label oracle also rejects the Dawn and CPU result for the input labeled five; numeric GPU-to-CPU parity does not override that correctness failure.",
+    "The native smoke receipts prove representative physical Vulkan execution but are separate workloads and do not repair cpp-ml compatibility.",
+    "The native compare receipts do not embed the Git commit or native-library hash; the returned preparation receipt and cpp-ml receipt bind the clean external run, while the native reports remain a same-host reviewed companion bundle.",
+    "The native timing deltas are suspicious-speedup fairness-audit triggers and are not promoted as performance claims.",
+    "Three sequential clean processes establish diagnostic repeatability, not the promotion policy's clean-process, concurrency, teardown, stress, or memory-growth floors.",
+    "The harness records the generated module hash but does not emit each dynamically extracted WGSL entry-point hash.",
+    "The harness-only ESM provider redirection is not a validated production installation path."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "baseline-expected-label-oracle-failure",
+      "doe-generated-wgsl-compile-failure",
+      "doe-shader-module-creation-failure",
+      "doe-dispatch-missing-spirv",
+      "comparison-output-zeroed",
+      "dynamic-shader-identity-incomplete"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 3,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 168091648
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 3,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 153841664
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The cpp-ml workload did not pass correctness on either provider; native-smoke timings remain diagnostic and cannot substitute for matched application performance."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The diagnostic harness did not execute matched receipt-enabled and receipt-disabled workload pairs."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The ESM-loader provider redirection is a controlled harness seam rather than a validated package installation path."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "The AMD-only ICD, accessible render node, RADV identity, provider probes, native output oracle, and GPU-resource samples establish physical Vulkan support for this host.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/backend-evidence.json",
+          "sha256": "de15d36db43ac565c37914dd48b12b7d6368b6b39898a74a6bf22f0de1b21f3f"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/compute/report.json",
+          "sha256": "6752bcb89c786e1dd9f6dc040111593e074bcd35e56c74db1524a0c1cac691a5"
+        }
+      ]
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic suite ran providers and clean processes sequentially."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "No promotion-scale repeated device teardown lane ran."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Three clean processes per provider do not satisfy the promotion stress policy."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS and native GPU-resource samples were captured, but no bounded-growth leak lane ran."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "The run captures source, provider, hardware, model, input, native-smoke, and repeated-failure evidence, but dynamic shader hashes and successful Doe application outputs are absent."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "Application correctness failed, and the native-smoke timing deltas require fairness audit before any performance use."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is not promoted and Doe does not pass its application correctness boundary."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/preparation.json",
+      "sha256": "55ad50e63931cb7a89d7d5f036b88aef08029b859718d781a331298028f6f8da"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/reproduction.json",
+      "sha256": "f1178e0ec312ce8d6ee93c81794f271d55337503fb91d1baa46701ed209dd60f"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/receipt-summary.json",
+      "sha256": "94e7e3a84077eeadd196b158a3687f71efa53476373b581c7ba6b0ba9e10675a"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/raw-suite.json",
+      "sha256": "4c44f2ca47839a5287bebbd65ad55833c462d260a8ea2ae91bb9bbee4c1e2a32"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/vulkaninfo-summary.txt",
+      "sha256": "9fafc3fca25a83e012172dec737983ce41b92374c9aaf93040b82d5f7bcb653e"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/backend-evidence.json",
+      "sha256": "de15d36db43ac565c37914dd48b12b7d6368b6b39898a74a6bf22f0de1b21f3f"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/upload/report.json",
+      "sha256": "861582b23abd6db39a18374d7f723b639a46cabd940be4fbcc66701bcfaaac68"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-01/native-smoke/compute/report.json",
+      "sha256": "6752bcb89c786e1dd9f6dc040111593e074bcd35e56c74db1524a0c1cac691a5"
+    }
+  ]
+}

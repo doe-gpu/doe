@@ -28,6 +28,9 @@ file only names the promoted boundary and open admission gates.
 - GPU smoke verification resolves current compare-report receipt references,
   verifies their file hashes and identities, and checks every bound sample for
   successful GPU resource evidence. Legacy inline samples remain readable.
+- The AMD Vulkan external-project handoff has returned a reviewed diagnostic
+  report with physical-adapter, native-output, and GPU-resource evidence at
+  `reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic.json`.
 
 ## Admission blockers
 
@@ -39,8 +42,10 @@ file only names the promoted boundary and open admission gates.
 - Installation must pass from clean npm environments on every supported
   runtime, operating system, and architecture tuple.
 - Performance is still advisory in `config/gates.json`.
-- The AMD Vulkan application lane still needs returned physical-host artifacts;
-  the checked-in handoff is an execution contract, not hardware evidence.
+- The AMD Vulkan cpp-ml lane remains ineligible because the generated
+  Presentation WGSL does not compile in Doe and the strict application oracle
+  also rejects one baseline label. Physical-host admission is no longer the
+  blocker for that diagnostic lane.
 
 ## Ground truth
 

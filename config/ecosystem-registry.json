@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "registryRevision": "9",
+  "registryRevision": "10",
   "scoringPolicyVersion": "1.0.0",
   "promotionPolicyVersion": "1.0.0",
   "evaluationQueue": [
@@ -962,10 +962,17 @@
           "sha256": "4050fced6b2a24353f31abc7b433bedd057fcbca25c6324ae70252d2a3367126",
           "reviewedAt": "2026-08-09T02:11:19Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic",
+          "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic.json",
+          "sha256": "538cfb90bac5424ad6f8aaa314a0e7e002d24c6764eca0f2bbaccc5e05df265f",
+          "reviewedAt": "2026-08-09T02:49:56Z",
+          "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-09T02:11:19Z"
+      "lastReviewedAt": "2026-08-09T02:49:56Z"
     },
     {
       "id": "dawn-node-webgpu",
