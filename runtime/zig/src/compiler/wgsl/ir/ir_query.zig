@@ -1,4 +1,7 @@
+const std = @import("std");
+
 const ir = @import("ir.zig");
+const layout_utils = @import("layout_utils.zig");
 
 pub fn resolveValueAlias(function: *const ir.Function, expr_id: ir.ExprId) ir.ExprId {
     var current = expr_id;
@@ -36,6 +39,68 @@ pub fn resolveIndexableType(types: *const ir.TypeStore, ty: ir.TypeId) ir.TypeId
         switch (types.get(current)) {
             .ref => |ref_ty| current = ref_ty.elem,
             else => return current,
+        }
+    }
+}
+
+pub fn classifyBuiltinComponent(
+    function: *const ir.Function,
+    expr_id: ir.ExprId,
+    builtin: ir.Builtin,
+) ?u8 {
+    const expr = function.exprs.items[resolveValueAlias(function, expr_id)];
+    const member = switch (expr.data) {
+        .member => |value| value,
+        else => return null,
+    };
+    const base = function.exprs.items[resolveValueAlias(function, member.base)];
+    const param_idx = switch (base.data) {
+        .param_ref => |value| value,
+        else => return null,
+    };
+    if (param_idx >= function.params.items.len) return null;
+    const io = function.params.items[param_idx].io orelse return null;
+    if (io.builtin != builtin) return null;
+    if (std.mem.eql(u8, member.field_name, "x")) return 0;
+    if (std.mem.eql(u8, member.field_name, "y")) return 1;
+    if (std.mem.eql(u8, member.field_name, "z")) return 2;
+    return null;
+}
+
+pub fn matchIntLiteral(function: *const ir.Function, expr_id: ir.ExprId) ?u64 {
+    const expr = function.exprs.items[resolveValueAlias(function, expr_id)];
+    return switch (expr.data) {
+        .int_lit => |value| value,
+        else => null,
+    };
+}
+
+pub fn resolveRuntimeArrayElementStride(
+    module: *const ir.Module,
+    function: *const ir.Function,
+    base_id: ir.ExprId,
+) ?u64 {
+    const base_ty = resolveIndexableType(&module.types, function.exprs.items[base_id].ty);
+    const array = switch (module.types.get(base_ty)) {
+        .array => |value| value,
+        else => return null,
+    };
+    if (array.len != null) return null;
+    const elem_size = layout_utils.type_size(module, array.elem);
+    const elem_align = layout_utils.type_alignment(module, array.elem);
+    return layout_utils.round_up(elem_size, elem_align);
+}
+
+pub fn findGlobalBase(function: *const ir.Function, expr_id: ir.ExprId) ?u32 {
+    var cursor = expr_id;
+    while (true) {
+        const node = function.exprs.items[cursor];
+        switch (node.data) {
+            .global_ref => |index| return index,
+            .index => |index_expr| cursor = index_expr.base,
+            .member => |member| cursor = member.base,
+            .load => |inner| cursor = inner,
+            else => return null,
         }
     }
 }
@@ -143,4 +208,67 @@ pub fn exprContainsExpr(function: *const ir.Function, expr_id: ir.ExprId, target
             exprContainsExpr(function, index.index, target_expr_id),
         else => return false,
     }
+}
+
+test "canonical IR queries resolve builtin, literal, global base, and runtime stride" {
+    const allocator = std.testing.allocator;
+    var module = ir.Module.init(allocator);
+    defer module.deinit();
+
+    const scalar_type = try module.types.intern(.{ .scalar = .f32 });
+    const runtime_array_type = try module.types.intern(.{ .array = .{
+        .elem = scalar_type,
+        .len = null,
+    } });
+
+    var function = ir.Function{
+        .name = try ir.dup_string(allocator, "main"),
+        .return_type = ir.INVALID_TYPE,
+    };
+    defer function.deinit(allocator);
+    try function.params.append(allocator, .{
+        .name = try ir.dup_string(allocator, "gid"),
+        .ty = ir.INVALID_TYPE,
+        .io = .{ .builtin = .global_invocation_id },
+    });
+
+    const param_id = try function.append_expr(allocator, .{
+        .ty = ir.INVALID_TYPE,
+        .category = .value,
+        .data = .{ .param_ref = 0 },
+    });
+    const component_id = try function.append_expr(allocator, .{
+        .ty = ir.INVALID_TYPE,
+        .category = .value,
+        .data = .{ .member = .{
+            .base = param_id,
+            .field_name = try ir.dup_string(allocator, "y"),
+            .field_index = 1,
+        } },
+    });
+    const literal_id = try function.append_expr(allocator, .{
+        .ty = ir.INVALID_TYPE,
+        .category = .value,
+        .data = .{ .int_lit = 7 },
+    });
+    const global_id = try function.append_expr(allocator, .{
+        .ty = runtime_array_type,
+        .category = .ref,
+        .data = .{ .global_ref = 3 },
+    });
+    const index_id = try function.append_expr(allocator, .{
+        .ty = scalar_type,
+        .category = .ref,
+        .data = .{ .index = .{ .base = global_id, .index = literal_id } },
+    });
+    const load_id = try function.append_expr(allocator, .{
+        .ty = scalar_type,
+        .category = .value,
+        .data = .{ .load = index_id },
+    });
+
+    try std.testing.expectEqual(@as(?u8, 1), classifyBuiltinComponent(&function, component_id, .global_invocation_id));
+    try std.testing.expectEqual(@as(?u64, 7), matchIntLiteral(&function, literal_id));
+    try std.testing.expectEqual(@as(?u32, 3), findGlobalBase(&function, load_id));
+    try std.testing.expectEqual(@as(?u64, 4), resolveRuntimeArrayElementStride(&module, &function, global_id));
 }
