@@ -2,7 +2,7 @@ const std = @import("std");
 const abi_core = @import("../../core/abi/wgpu_core_base_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
-const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
+const wgsl_analysis = @import("../../compiler/wgsl/pipeline/analysis.zig");
 const runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compile.zig");
 const shared = @import("vulkan_render_shared.zig");
 
@@ -217,7 +217,7 @@ pub fn vulkan_create_graphics_shader_module(
 ) error{ OutOfMemory, ShaderCompileFailed }!void {
     const alloc = native_helpers.alloc;
     var result = runtime_compile.translateToSpirvForGraphicsRuntime(alloc, wgsl) catch {
-        std.log.err("doe_vulkan_render: WGSL→SPIR-V graphics translation failed: {s}", .{doe_wgsl.lastErrorMessage()});
+        std.log.err("doe_vulkan_render: WGSL→SPIR-V graphics translation failed: {s}", .{wgsl_analysis.lastErrorMessage()});
         return error.ShaderCompileFailed;
     };
     errdefer result.deinit(alloc);

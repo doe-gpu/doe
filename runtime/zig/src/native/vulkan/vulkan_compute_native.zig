@@ -6,7 +6,10 @@
 const builtin = @import("builtin");
 const has_vulkan = (builtin.os.tag == .linux);
 const std = @import("std");
-const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
+const wgsl_analysis = @import("../../compiler/wgsl/pipeline/analysis.zig");
+const wgsl_bindings = @import("../../compiler/wgsl/pipeline/binding_reflection.zig");
+const spirv_translation = @import("../../compiler/wgsl/pipeline/translate_spirv.zig");
+const wgsl_ir = @import("../../compiler/wgsl/ir/ir.zig");
 const runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compile.zig");
 const shader_translation_cache = @import("../shader/doe_shader_translation_cache.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
@@ -46,11 +49,11 @@ const DoeBindGroupLayoutEntry = native_shared.DoeBindGroupLayoutEntry;
 const MAX_KERNEL_BINDINGS: usize = MAX_COMPUTE_BIND_GROUPS * MAX_BIND;
 const MAX_FLAT_BIND: usize = native_shared.MAX_FLAT_BIND;
 
-const BINDING_KIND_BUFFER: u32 = @intFromEnum(doe_wgsl.BindingKind.buffer);
-const ADDRESS_SPACE_STORAGE: u32 = @intFromEnum(doe_wgsl.ir.AddressSpace.storage);
-const ADDRESS_SPACE_UNIFORM: u32 = @intFromEnum(doe_wgsl.ir.AddressSpace.uniform);
-const ACCESS_READ: u32 = @intFromEnum(doe_wgsl.ir.AccessMode.read);
-const ACCESS_READ_WRITE: u32 = @intFromEnum(doe_wgsl.ir.AccessMode.read_write);
+const BINDING_KIND_BUFFER: u32 = @intFromEnum(binding_contract.ShaderKind.buffer);
+const ADDRESS_SPACE_STORAGE: u32 = @intFromEnum(wgsl_ir.AddressSpace.storage);
+const ADDRESS_SPACE_UNIFORM: u32 = @intFromEnum(wgsl_ir.AddressSpace.uniform);
+const ACCESS_READ: u32 = @intFromEnum(wgsl_ir.AccessMode.read);
+const ACCESS_READ_WRITE: u32 = @intFromEnum(wgsl_ir.AccessMode.read_write);
 const BIND_GROUP_LAYOUT_RESOURCE_KIND_BUFFER = binding_contract.layoutResourceKindCode(.buffer);
 const BIND_GROUP_LAYOUT_RESOURCE_KIND_SAMPLER = binding_contract.layoutResourceKindCode(.sampler);
 const BIND_GROUP_LAYOUT_RESOURCE_KIND_TEXTURE = binding_contract.layoutResourceKindCode(.texture);
@@ -215,7 +218,7 @@ test "prepared binding cache retains identity and reloads state" {
     try std.testing.expectEqual(@as(u32, 1), bg.ref_count);
 }
 
-fn reflected_buffer_binding_type(meta: doe_wgsl.BindingMeta) u32 {
+fn reflected_buffer_binding_type(meta: wgsl_bindings.BindingMeta) u32 {
     if (meta.kind != .buffer) return model_binding_types.WGPUBufferBindingType_Storage;
     if (meta.addr_space == .uniform) return model_binding_types.WGPUBufferBindingType_Uniform;
     if (meta.addr_space == .storage and meta.access == .read) return model_binding_types.WGPUBufferBindingType_ReadOnlyStorage;
@@ -249,8 +252,8 @@ fn populate_pipeline_buffer_binding_types(pip: *DoeComputePipeline, shader_modul
         pip.vk_flat_buffer_binding_types_ready = true;
         return;
     };
-    var metadata: [native_shared.MAX_SHADER_BINDINGS]doe_wgsl.BindingMeta = undefined;
-    const count = doe_wgsl.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch 0;
+    var metadata: [native_shared.MAX_SHADER_BINDINGS]wgsl_bindings.BindingMeta = undefined;
+    const count = wgsl_bindings.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch 0;
     for (metadata[0..count]) |meta| {
         if (meta.group >= MAX_COMPUTE_BIND_GROUPS or meta.binding >= MAX_BIND) continue;
         const slot = (meta.group * MAX_BIND) + meta.binding;
@@ -345,14 +348,14 @@ pub fn vulkan_create_shader_module(
         return;
     }
 
-    var spirv_buf = alloc.alloc(u8, doe_wgsl.MAX_SPIRV_OUTPUT) catch return error.OutOfMemory;
+    var spirv_buf = alloc.alloc(u8, spirv_translation.MAX_OUTPUT) catch return error.OutOfMemory;
     defer alloc.free(spirv_buf);
 
     var translation = runtime_compile.translateToSpirvForVulkanComputeRuntime(alloc, wgsl, spirv_buf) catch {
         const head_len: usize = @min(wgsl.len, 120);
         std.log.err(
             "doe_vulkan_compute: WGSL→SPIR-V translation failed: {s} | wgsl[0..{d}]: {s}",
-            .{ doe_wgsl.lastErrorMessage(), head_len, wgsl[0..head_len] },
+            .{ wgsl_analysis.lastErrorMessage(), head_len, wgsl[0..head_len] },
         );
         return error.ShaderCompileFailed;
     };
