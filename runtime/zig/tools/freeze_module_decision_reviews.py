@@ -104,8 +104,17 @@ def freeze(manifest_path: Path, report_path: Path, reviewer: str) -> int:
         raise RuntimeError(
             f"reviewed signal map mismatch; missing={missing_reviews}, stale={stale_reviews}"
         )
+    existing_reviews = config["architecture"].get("moduleDecisionReviews", {})
     reviews = {}
     for path, module in sorted(modules.items()):
+        existing_review = existing_reviews.get(path)
+        if (
+            isinstance(existing_review, dict)
+            and existing_review.get("decision") == "Keep"
+            and existing_review.get("moduleSha256") == module["sha256"]
+        ):
+            reviews[path] = existing_review
+            continue
         reviews[path] = {
             "decision": "Keep",
             "moduleSha256": module["sha256"],

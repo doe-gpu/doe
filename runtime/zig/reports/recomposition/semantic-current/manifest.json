@@ -154,7 +154,7 @@
     }
   ],
   "git": {
-    "baseCommit": "WORKTREE:f90a9e71464707020dadf26ac88936560327842854db8558ede07d85f50cbbe5",
+    "baseCommit": "WORKTREE:3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
     "requestedRef": "WORKTREE",
     "snapshotKind": "live-worktree"
   },
@@ -187,15 +187,15 @@
   "sharedLibraries": [
     {
       "path": "libonnxruntime_doe_ep.so",
-      "sha256": "958c59bc0e23ea0bfe21377115769b03d9b63a1a8795d775cc6a7f3bbfeac558",
+      "sha256": "516a5a7be7ecde338cbf582a94aa1d3c43dd3e60ae5f2de4a700f977269b6347",
       "sizeBytes": 6077976,
       "symbolCount": 100,
       "symbols": "abi/libonnxruntime_doe_ep.so.symbols.txt"
     },
     {
       "path": "libwebgpu_doe.so",
-      "sha256": "1a81e2f05f60e36266d2e63e9c27bc3c773dc5baa72a0a8240c6101dd23edcbb",
-      "sizeBytes": 9723608,
+      "sha256": "a8911f4b0f2694064044f6260d00f1aeedd59a84542bacdc5201ced29eecab5d",
+      "sizeBytes": 9722984,
       "symbolCount": 731,
       "symbols": "abi/libwebgpu_doe.so.symbols.txt"
     }
