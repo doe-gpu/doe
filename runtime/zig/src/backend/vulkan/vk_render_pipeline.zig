@@ -6,6 +6,7 @@ const log = std.log.scoped(.vk_render_pipeline);
 const c = @import("vk_constants.zig");
 const vk_formats = @import("vk_formats.zig");
 const vk_pipeline = @import("vk_pipeline.zig");
+const vk_shader_source = @import("vk_shader_source.zig");
 const vk_pipeline_cache_persistent = @import("vk_pipeline_cache_persistent.zig");
 const vk_resources = @import("vk_resources.zig");
 
@@ -212,10 +213,10 @@ pub fn create_graphics_pipeline(
     // backend's kernel SPV cache so the first-use compile is shared across
     // subsequent draws in the same process.
     const vertex_spirv_words = cmd.vertex_spirv orelse
-        vk_pipeline.load_kernel_spirv_cached(self, DEFAULT_VERTEX_SHADER_NAME) catch
+        vk_shader_source.load_kernel_spirv_cached(self, DEFAULT_VERTEX_SHADER_NAME) catch
         return error.ShaderCompileFailed;
     const fragment_spirv_words = cmd.fragment_spirv orelse
-        vk_pipeline.load_kernel_spirv_cached(self, DEFAULT_FRAGMENT_SHADER_NAME) catch
+        vk_shader_source.load_kernel_spirv_cached(self, DEFAULT_FRAGMENT_SHADER_NAME) catch
         return error.ShaderCompileFailed;
     var vertex_entry_buf: [64]u8 = undefined;
     var fragment_entry_buf: [64]u8 = undefined;

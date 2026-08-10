@@ -787,7 +787,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "e2c4c21b579e9c4a0ea203d5a3880dc5846c0b9ad7eb21760360f3653c3c4048",
+      "moduleSha256": "c9e91c9f10b6872edbf39a6859cc13445e5545b03d4af2da0da13bebb4e6ba2a",
       "path": "src/backend/metal/metal_runtime_resources.zig",
       "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -922,7 +922,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "f224af10cd1727d0cf009ca278a98831ab4de126a83d756f2b2669b2b9274472",
+      "moduleSha256": "943122430ebb1de757bd3af89ea5fe6226efb05b0fe0af34140ecc5fd32531e5",
       "path": "src/backend/vulkan/native_runtime.zig",
       "reason": "Keep: owns Vulkan device/queue runtime lifetime and synchronization; adjacent resource, pipeline, upload, render, and surface capsules already own the separable domains.",
       "reviewStatus": "reviewed",
@@ -1114,9 +1114,9 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "a146c2c7bd238c7f4d3468a72ce94680107e72983b8a3ad71576446059440e6c",
+      "moduleSha256": "2c6a11297d81dafb17e463f6388cc7debe65dddf4475142d465edec1b54b5e83",
       "path": "src/backend/vulkan/vk_pipeline.zig",
-      "reason": "Keep: independently tested Vulkan compute-pipeline and descriptor-cache capsule shared by six production consumers.",
+      "reason": "Keep: Vulkan compute-pipeline and descriptor-state lifetime capsule; kernel source resolution and SPIR-V compilation now have a separate owner.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-recomposition-review/2026-08-09",
       "suggestedDecision": "Recompose"
@@ -1162,7 +1162,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "581feb52713ae73a782c525e55868cce2c804aa7cfbc5f084c17c3374ac86ee3",
+      "moduleSha256": "d1487804709470a104c639a8f6572b15a1f600b8caddd71b8e9a65c10b74e518",
       "path": "src/backend/vulkan/vk_render_pipeline.zig",
       "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -1215,6 +1215,18 @@
       "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-recomposition-review/2026-08-08",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "15248bca81ecd48517fdbf4e28f33a2572ff5fa1e05f95456118f0be72c798a7",
+      "path": "src/backend/vulkan/vk_shader_source.zig",
+      "reason": "Keep: Vulkan kernel source resolution, WGSL-to-SPIR-V fallback, and owned SPIR-V source cache boundary.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -3627,25 +3639,61 @@
     {
       "decision": "Keep",
       "evidence": [
-        "exceeds the 800-line architecture review signal"
+        "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "9a44a6954663f3543ff7926cbd562d37a60633d7bf8f99862c39a0b782508a7c",
+      "moduleSha256": "e708235962e90ee57a9b7055e966066863f68e091c32d497ed3990604f6d97a7",
       "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-      "reason": "Keep: cohesive runtime shader compilation and cache admission state machine.",
+      "reason": "Keep: exercised public runtime-translation facade delegating to compute, graphics, and shared metadata owners.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
-      "suggestedDecision": "Recompose"
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
     },
     {
       "decision": "Keep",
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "4093566fa2b23de6669f85333a3e915ad2201497723f7f0b209f294b2298c178",
+      "moduleSha256": "4465176049041f2556578838febe0c9454fc69e5de76cd1a7cb10830525d74de",
       "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
       "reason": "Keep: executable process root at src/compiler/wgsl/runtime/runtime_compile_report.zig.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-recomposition-review/2026-08-08",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "d81ce0feac4e6bcc13f26d7e3d073a24e9645f6f4ea4c803faadf794326e151a",
+      "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+      "reason": "Keep: runtime compute lowering policy and MSL/SPIR-V emission boundary shared by native backend consumers.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "2315cd8b8c8fef42902060ecabc8bb501181373387950181ae67a6d0cab7d642",
+      "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+      "reason": "Keep: graphics-stage SPIR-V emission and stage-interface reflection boundary.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "8d009694fbb8d1cb28588c6ff7e00e9b17afa3fb3afcd3051cc707e02134a7d2",
+      "path": "src/compiler/wgsl/runtime/runtime_translation_info.zig",
+      "reason": "Keep: shared ownership and construction contract for runtime compute translation metadata.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -5509,7 +5557,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "533654405024b618be5a385e03e293821f1e66ee11c6ef5d4de791dc00487889",
+      "moduleSha256": "0a34ef35839ef6f42dc1e11a1e057f0476e3f67e15c359e3ec5b665dcddfbfc6",
       "path": "src/native/shader/doe_shader_native.zig",
       "reason": "Keep: native shader-module creation, translation, cache, diagnostics, and object-lifetime boundary.",
       "reviewStatus": "reviewed",
@@ -5521,7 +5569,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "353c479f525527cc2deb6eff972808a115759de6277587155cd86d9baaea7622",
+      "moduleSha256": "31487ba7ae2ea83224fad2c9c9533256c14eaba66c81a8f40ffb7e69a8e2d877",
       "path": "src/native/shader/doe_shader_translation_cache.zig",
       "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -5689,7 +5737,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "89783231d899800b0f5b4c74ee2a8c9fd4ed3346ca977d40a3833462a20ab8e9",
+      "moduleSha256": "06e57dda7181c76eadc03d0d86437b03215f44d51cfb153c5cabeb00b33afd31",
       "path": "src/native/vulkan/vulkan_compute_native.zig",
       "reason": "Keep: native WebGPU-to-Vulkan compute command orchestration and lifetime boundary.",
       "reviewStatus": "reviewed",
@@ -5761,7 +5809,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "4bc2ec3ce2aea5cc7b670a705794ab790c70ca5c0707e3e000820e1f7b994b7b",
+      "moduleSha256": "18fb879cca750862c5ce64911eafb80b2c104dce73265367f16a0452639fefd0",
       "path": "src/native/vulkan/vulkan_render_pipeline_native.zig",
       "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -6544,13 +6592,13 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
+  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
   "pendingCount": 0,
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
-  "reviewedCount": 542,
+  "reviewedCount": 546,
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe",
+  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07",
   "status": "complete",
-  "totalCount": 542
+  "totalCount": 546
 }

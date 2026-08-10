@@ -14,6 +14,7 @@ const vk_device = @import("vk_device.zig");
 const vk_sync = @import("vk_sync.zig");
 const vk_upload = @import("vk_upload.zig");
 const vk_pipeline = @import("vk_pipeline.zig");
+const vk_shader_source = @import("vk_shader_source.zig");
 const vk_pipeline_cache_persistent = @import("vk_pipeline_cache_persistent.zig");
 const vk_resources = @import("vk_resources.zig");
 const vk_compute_sync = @import("vk_compute_sync.zig");
@@ -216,7 +217,7 @@ pub const NativeVulkanRuntime = struct {
         }
         vk_pipeline.release_cached_compute_states(self);
         vk_pipeline.release_descriptor_state_cache(self);
-        vk_pipeline.release_kernel_spirv_cache(self);
+        vk_shader_source.release_kernel_spirv_cache(self);
         vk_pipeline.destroy_pipeline_objects(self);
         vk_pipeline.destroy_descriptor_state(self);
         vk_resources.release_compute_buffers(self);
@@ -265,19 +266,19 @@ pub const NativeVulkanRuntime = struct {
     // --- Kernel/shader API ---
 
     pub fn load_kernel_source(self: *const NativeVulkanRuntime, allocator: std.mem.Allocator, kernel_name: []const u8) ![]u8 {
-        return vk_pipeline.load_kernel_source(self, allocator, kernel_name);
+        return vk_shader_source.load_kernel_source(self, allocator, kernel_name);
     }
 
     pub fn load_kernel_spirv(self: *const NativeVulkanRuntime, allocator: std.mem.Allocator, kernel_name: []const u8) ![]u32 {
-        return vk_pipeline.load_kernel_spirv(self, allocator, kernel_name);
+        return vk_shader_source.load_kernel_spirv(self, allocator, kernel_name);
     }
 
     pub fn load_kernel_spirv_cached(self: *NativeVulkanRuntime, kernel_name: []const u8) ![]const u32 {
-        return vk_pipeline.ensure_kernel_spirv_cached(self, kernel_name);
+        return vk_shader_source.ensure_kernel_spirv_cached(self, kernel_name);
     }
 
     pub fn ensure_kernel_spirv_cached(self: *NativeVulkanRuntime, kernel_name: []const u8) ![]const u32 {
-        return vk_pipeline.ensure_kernel_spirv_cached(self, kernel_name);
+        return vk_shader_source.ensure_kernel_spirv_cached(self, kernel_name);
     }
 
     pub fn set_compute_shader_spirv(

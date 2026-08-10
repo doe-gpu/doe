@@ -18,7 +18,7 @@ REPORT_PATH = ROOT / "reports" / "architecture" / "module-decisions.json"
 
 REVIEWED_SIGNALS: dict[str, str] = {
     "src/backend/vulkan/native_runtime.zig": "Keep: owns Vulkan device/queue runtime lifetime and synchronization; adjacent resource, pipeline, upload, render, and surface capsules already own the separable domains.",
-    "src/backend/vulkan/vk_pipeline.zig": "Keep: independently tested Vulkan compute-pipeline and descriptor-cache capsule shared by six production consumers.",
+    "src/backend/vulkan/vk_pipeline.zig": "Keep: Vulkan compute-pipeline and descriptor-state lifetime capsule; kernel source resolution and SPIR-V compilation now have a separate owner.",
     "src/backend/vulkan/vk_render.zig": "Keep: cohesive Vulkan render encoding state and commands; native render control remains backend-local by policy.",
     "src/backend/vulkan/vk_resources.zig": "Keep: cohesive Vulkan resource allocation, lookup, and lifetime capsule used across backend command domains.",
     "src/backend/vulkan/vk_upload.zig": "Keep: cohesive Vulkan upload staging and submission policy with backend-native synchronization semantics.",
@@ -39,7 +39,6 @@ REVIEWED_SIGNALS: dict[str, str] = {
     "src/compiler/wgsl/ir/ir_transform_robustness.zig": "Keep: one named WGSL IR robustness transform pass with proof-backed precondition emission.",
     "src/compiler/wgsl/proof/dispatch_proof_match.zig": "Keep: independently meaningful dispatch-proof matching algorithm.",
     "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig": "Keep: independently meaningful uniform-bounds proof algorithm.",
-    "src/compiler/wgsl/runtime/runtime_compile.zig": "Keep: cohesive runtime shader compilation and cache admission state machine.",
     "src/dropin/dropin_browser_shared_memory.zig": "Keep: browser shared-memory ABI and lifetime capsule; native ownership must remain isolated.",
     "src/native/compute/doe_compute_fast.zig": "Keep: promoted native fast-compute API and execution boundary; Vulkan bindings and backend implementation have separate owners.",
     "src/native/resource/doe_texture_sampler_native.zig": "Keep: cohesive native texture, texture-view, and sampler ABI ownership; the upstream chained swizzle descriptor belongs to texture-view normalization and does not justify a size-only split.",
@@ -59,9 +58,19 @@ REVIEWED_SIGNALS: dict[str, str] = {
     "src/native/support/doe_adapter_info_native.zig": "Keep: adapter-info native marshaling and ownership boundary.",
 }
 
+NAMED_BOUNDARY_REASONS: dict[str, str] = {
+    "src/backend/vulkan/vk_shader_source.zig": "Keep: Vulkan kernel source resolution, WGSL-to-SPIR-V fallback, and owned SPIR-V source cache boundary.",
+    "src/compiler/wgsl/runtime/runtime_compile.zig": "Keep: exercised public runtime-translation facade delegating to compute, graphics, and shared metadata owners.",
+    "src/compiler/wgsl/runtime/runtime_compute_translation.zig": "Keep: runtime compute lowering policy and MSL/SPIR-V emission boundary shared by native backend consumers.",
+    "src/compiler/wgsl/runtime/runtime_graphics_translation.zig": "Keep: graphics-stage SPIR-V emission and stage-interface reflection boundary.",
+    "src/compiler/wgsl/runtime/runtime_translation_info.zig": "Keep: shared ownership and construction contract for runtime compute translation metadata.",
+}
+
 
 def _default_reason(module: dict[str, Any]) -> str:
     path = module["path"]
+    if path in NAMED_BOUNDARY_REASONS:
+        return NAMED_BOUNDARY_REASONS[path]
     if module.get("specialRole"):
         return f"Keep: declared {module['specialRole']} boundary at {path}."
     if module.get("definesMain"):

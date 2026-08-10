@@ -25,11 +25,11 @@
       "literalTokenSha256": "0a41164fcad042b7b539901669ef3578f652ca5beea16b038342f14a736e7c63",
       "locations": [
         {
-          "endLine": 86,
+          "endLine": 87,
           "literalCount": 7,
           "name": "wgpu_compare_to_vk",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 75
+          "startLine": 76
         },
         {
           "endLine": 79,
@@ -128,11 +128,11 @@
           "startLine": 304
         },
         {
-          "endLine": 524,
+          "endLine": 460,
           "literalCount": 4,
           "name": "destroy_descriptor_state",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 502
+          "startLine": 438
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -334,11 +334,11 @@
           "startLine": 88
         },
         {
-          "endLine": 538,
+          "endLine": 474,
           "literalCount": 4,
           "name": "bind_descriptor_sets",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 526
+          "startLine": 462
         },
         {
           "endLine": 379,
@@ -623,11 +623,11 @@
           "startLine": 482
         },
         {
-          "endLine": 430,
+          "endLine": 53,
           "literalCount": 4,
           "name": "compute_workgroup_size",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 425
+          "path": "src/compiler/wgsl/runtime/runtime_translation_info.zig",
+          "startLine": 48
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -877,11 +877,11 @@
           "startLine": 84
         },
         {
-          "endLine": 117,
+          "endLine": 118,
           "literalCount": 7,
           "name": "resolve_entry_point_name",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 111
+          "startLine": 112
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1004,11 +1004,11 @@
           "startLine": 54
         },
         {
-          "endLine": 365,
+          "endLine": 301,
           "literalCount": 4,
           "name": "rebuild_compute_shader_spirv",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 361
+          "startLine": 297
         },
         {
           "endLine": 389,
@@ -1501,18 +1501,18 @@
       "literalTokenSha256": "a31b343180240fd82a90ccac28d3820c49470720d3541597c871a353eb8c6f0a",
       "locations": [
         {
-          "endLine": 357,
+          "endLine": 155,
           "literalCount": 7,
           "name": "extract_vertex_inputs",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 317
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 115
         },
         {
-          "endLine": 405,
+          "endLine": 203,
           "literalCount": 7,
           "name": "extract_inter_stage_vars",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 361
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 159
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2022,11 +2022,11 @@
       "literalTokenSha256": "cf02607498749410127fb5111ef8bab8f05cb0b6f4ad6f4c89566ea32aa7969e",
       "locations": [
         {
-          "endLine": 82,
+          "endLine": 78,
           "literalCount": 8,
           "name": "spirv_has_entry_point",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 66
+          "startLine": 62
         },
         {
           "endLine": 54,
@@ -2237,11 +2237,11 @@
       "literalTokenSha256": "dc543ae52bebb39fdb2a880239ee846c1bd3e56e5823ad04cc5213957b581afa",
       "locations": [
         {
-          "endLine": 310,
+          "endLine": 108,
           "literalCount": 8,
           "name": "emit_stage_spirv_words",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 285
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 83
         },
         {
           "endLine": 996,
@@ -2507,11 +2507,11 @@
           "startLine": 424
         },
         {
-          "endLine": 127,
+          "endLine": 128,
           "literalCount": 4,
           "name": "topology_to_vk",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 119
+          "startLine": 120
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2538,10 +2538,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
+  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe",
+  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07",
   "status": "captured"
 }

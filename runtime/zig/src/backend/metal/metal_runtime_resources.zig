@@ -5,7 +5,7 @@ const metal_buffer_pool = @import("metal_buffer_pool.zig");
 const metal_pipeline_cache = @import("metal_pipeline_cache.zig");
 const msl_translation = @import("../../compiler/wgsl/pipeline/translate_msl.zig");
 const emit_msl_maps = @import("../../compiler/wgsl/emit/msl/emit_msl_maps.zig");
-const wgsl_runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compile.zig");
+const wgsl_runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compute_translation.zig");
 const HAS_PIPELINE_CACHE = builtin.os.tag == .macos;
 
 const metal_bridge_cmd_buf_render_encoder = bridge.metal_bridge_cmd_buf_render_encoder;

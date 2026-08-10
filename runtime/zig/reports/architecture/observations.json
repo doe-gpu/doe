@@ -1,18 +1,18 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
+  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
   "observations": {
     "baselineComparison": {
-      "moduleCountDelta": -5,
-      "oneConsumerModuleCountDelta": 15,
-      "reexportOnlyModuleCountDelta": -14,
+      "moduleCountDelta": -1,
+      "oneConsumerModuleCountDelta": 16,
+      "reexportOnlyModuleCountDelta": -13,
       "sourceTreeSha256": "7d4857fdf9d8c0107426915fef3f283107f335cea713d37ad8b5cff8813d671d",
       "status": "diagnostic-only"
     },
     "buildMeasurements": {
       "capturedSourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6",
-      "currentSourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe",
+      "currentSourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07",
       "status": "stale-source-mismatch"
     },
     "coChange": {
@@ -21,34 +21,34 @@
       "status": "diagnostic-only"
     },
     "fanInDistribution": {
-      "maximum": 95,
-      "mean": 4.148,
+      "maximum": 97,
+      "mean": 4.143,
       "median": 2.0,
       "minimum": 0,
       "p25": 1.0,
       "p75": 4.0,
-      "populationStdDev": 7.431
+      "populationStdDev": 7.458
     },
     "fanOutDistribution": {
       "maximum": 53,
-      "mean": 4.148,
+      "mean": 4.143,
       "median": 3.0,
       "minimum": 0,
       "p25": 1.0,
       "p75": 5.0,
-      "populationStdDev": 4.834
+      "populationStdDev": 4.82
     },
     "fileSizeDistribution": {
       "maximum": 1055,
-      "mean": 260.164,
-      "median": 167.5,
+      "mean": 257.412,
+      "median": 166.0,
       "minimum": 1,
       "p25": 71.0,
-      "p75": 382.5,
-      "populationStdDev": 252.41
+      "p75": 379.0,
+      "populationStdDev": 249.771
     },
-    "moduleCount": 542,
-    "oneConsumerModuleCount": 222,
+    "moduleCount": 546,
+    "oneConsumerModuleCount": 223,
     "publicDeclarationsByLayer": {
       "backend-common": 20,
       "backend-d3d12": 253,
@@ -58,7 +58,7 @@
       "cli": 34,
       "command": 60,
       "compatibility": 12,
-      "compiler": 1184,
+      "compiler": 1205,
       "contracts": 730,
       "core": 1384,
       "dropin": 158,
@@ -73,11 +73,11 @@
       "tooling": 2,
       "verification": 11
     },
-    "reexportOnlyModuleCount": 35,
+    "reexportOnlyModuleCount": 36,
     "status": "diagnostic-only"
   },
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe"
+  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07"
 }

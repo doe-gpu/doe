@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
-  "classifiedLineCount": 140769,
-  "classifiedModuleCount": 536,
+  "classifiedLineCount": 140285,
+  "classifiedModuleCount": 539,
   "facadeOnlyFiles": [
     {
       "aggregateProductionRoot": true,
@@ -42,13 +42,20 @@
   ],
   "facadeOnlyLineCount": 240,
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
+  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe",
-  "unclassifiedFiles": [],
-  "unclassifiedLineCount": 0,
+  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07",
+  "unclassifiedFiles": [
+    {
+      "aggregateProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 22,
+      "path": "src/compiler/wgsl/runtime/runtime_compile.zig"
+    }
+  ],
+  "unclassifiedLineCount": 22,
   "views": [
     {
       "description": "WGSL compiler, TSIR, CSL, proof-consumer, and spatial toolchain roots selected by repository build targets",
@@ -88,8 +95,8 @@
     {
       "description": "Drop-in WebGPU ABI routing and the declared legacy flat compatibility facade",
       "name": "dropin-compatibility",
-      "reachableLineCount": 84350,
-      "reachableModuleCount": 312,
+      "reachableLineCount": 83866,
+      "reachableModuleCount": 315,
       "rootPatterns": [
         "src/dropin/root.zig",
         "src/dropin/wgpu_dropin_lib.zig",
@@ -104,8 +111,8 @@
     {
       "description": "Module incubation, plan comparison, and repo-only integration executables used for evidence rather than shipped runtime claims",
       "name": "module-incubation-evidence-tools",
-      "reachableLineCount": 76787,
-      "reachableModuleCount": 293,
+      "reachableLineCount": 76100,
+      "reachableModuleCount": 295,
       "rootPatterns": [
         "src/cli/entrypoints/module_runner.zig",
         "src/cli/module_runner_cli.zig",
@@ -135,8 +142,8 @@
     {
       "description": "Implementation roots selected by the shipped runtime CLI and libwebgpu_doe package artifact",
       "name": "shipped-native-package-runtime",
-      "reachableLineCount": 104136,
-      "reachableModuleCount": 395,
+      "reachableLineCount": 103652,
+      "reachableModuleCount": 398,
       "rootPatterns": [
         "src/cli/entrypoints/main.zig",
         "src/cli/runtime_cli.zig",

@@ -1030,24 +1030,24 @@
           "startLine": 403
         },
         {
-          "name": "DEFAULT_KERNEL_ROOT",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 30
-        },
-        {
           "name": "DEFAULT_VERTEX_SHADER_NAME",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 18
+          "startLine": 19
         },
         {
           "name": "DEFAULT_FRAGMENT_SHADER_NAME",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 19
+          "startLine": 20
         },
         {
           "name": "DEFAULT_RUNTIME_TEXTURE_USAGE",
           "path": "src/backend/vulkan/vk_resources.zig",
           "startLine": 26
+        },
+        {
+          "name": "DEFAULT_KERNEL_ROOT",
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 7
         },
         {
           "name": "DEFAULT_SURFACE_MAX_FRAME_LATENCY",
@@ -3076,12 +3076,12 @@
         {
           "name": "HOT_COMPUTE_STATE_CACHE_CAPACITY",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 133
+          "startLine": 129
         },
         {
           "name": "HOT_DESCRIPTOR_STATE_CACHE_CAPACITY",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 134
+          "startLine": 130
         },
         {
           "name": "HOT_COMPUTE_STATE_CACHE_CAPACITY",
@@ -3714,14 +3714,14 @@
           "startLine": 191
         },
         {
-          "name": "MAX_KERNEL_SOURCE_BYTES",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 28
-        },
-        {
           "name": "MAX_RENDER_DESCRIPTOR_BINDINGS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 490
+          "startLine": 491
+        },
+        {
+          "name": "MAX_KERNEL_SOURCE_BYTES",
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 5
         },
         {
           "name": "MAX_UPLOAD_BYTES",
@@ -4030,13 +4030,13 @@
         },
         {
           "name": "MAX_VERTEX_INPUT_ATTRS",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 312
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 110
         },
         {
           "name": "MAX_INTER_STAGE_VARS",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 313
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 111
         },
         {
           "name": "MAX_LANE_NAME_BYTES",
@@ -5942,22 +5942,27 @@
         {
           "name": "SPIRV_MAGIC",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 29
+          "startLine": 26
         },
         {
           "name": "SPIRV_OP_DECORATE",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 33
+          "startLine": 29
         },
         {
           "name": "SPIRV_DECORATION_BINDING",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 34
+          "startLine": 30
         },
         {
           "name": "SPIRV_OP_ENTRY_POINT",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 35
+          "startLine": 31
+        },
+        {
+          "name": "SPIRV_MAGIC",
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 6
         },
         {
           "name": "SPIRV_OP_EXECUTION_MODE",
@@ -6575,7 +6580,7 @@
         {
           "name": "VK_NULL_U64",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 28
+          "startLine": 29
         },
         {
           "name": "VK_NULL_U64",
@@ -8490,7 +8495,7 @@
         {
           "name": "VK_NULL_U64",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 26
+          "startLine": 24
         },
         {
           "name": "VK_NULL_U64",
@@ -8545,132 +8550,132 @@
         {
           "name": "VK_NULL_U64",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 23
+          "startLine": 24
         },
         {
           "name": "VK_PRIMITIVE_TOPOLOGY_POINT_LIST",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 25
+          "startLine": 26
         },
         {
           "name": "VK_PRIMITIVE_TOPOLOGY_LINE_LIST",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 26
+          "startLine": 27
         },
         {
           "name": "VK_PRIMITIVE_TOPOLOGY_LINE_STRIP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 27
+          "startLine": 28
         },
         {
           "name": "VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 28
+          "startLine": 29
         },
         {
           "name": "VK_CULL_MODE_FRONT_BIT",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 29
+          "startLine": 30
         },
         {
           "name": "VK_CULL_MODE_BACK_BIT",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 30
+          "startLine": 31
         },
         {
           "name": "VK_FRONT_FACE_CLOCKWISE",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 31
+          "startLine": 32
         },
         {
           "name": "VK_COMPARE_OP_LESS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 32
+          "startLine": 33
         },
         {
           "name": "VK_COMPARE_OP_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 33
+          "startLine": 34
         },
         {
           "name": "VK_COMPARE_OP_LESS_OR_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 34
+          "startLine": 35
         },
         {
           "name": "VK_COMPARE_OP_GREATER",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 35
+          "startLine": 36
         },
         {
           "name": "VK_COMPARE_OP_NOT_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 36
+          "startLine": 37
         },
         {
           "name": "VK_COMPARE_OP_GREATER_OR_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 37
+          "startLine": 38
         },
         {
           "name": "VK_COMPARE_OP_ALWAYS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 38
+          "startLine": 39
         },
         {
           "name": "VK_STENCIL_OP_KEEP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 39
+          "startLine": 40
         },
         {
           "name": "VK_STENCIL_OP_ZERO",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 40
+          "startLine": 41
         },
         {
           "name": "VK_STENCIL_OP_REPLACE",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 41
+          "startLine": 42
         },
         {
           "name": "VK_STENCIL_OP_INCREMENT_AND_CLAMP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 42
+          "startLine": 43
         },
         {
           "name": "VK_STENCIL_OP_DECREMENT_AND_CLAMP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 43
+          "startLine": 44
         },
         {
           "name": "VK_STENCIL_OP_INVERT",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 44
+          "startLine": 45
         },
         {
           "name": "VK_STENCIL_OP_INCREMENT_AND_WRAP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 45
+          "startLine": 46
         },
         {
           "name": "VK_STENCIL_OP_DECREMENT_AND_WRAP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 46
+          "startLine": 47
         },
         {
           "name": "VK_VERTEX_INPUT_RATE_VERTEX",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 47
+          "startLine": 48
         },
         {
           "name": "VK_VERTEX_INPUT_RATE_INSTANCE",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 48
+          "startLine": 49
         },
         {
           "name": "VK_SHADER_STAGE_ALL_GRAPHICS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 491
+          "startLine": 492
         },
         {
           "name": "VK_NULL_U64",
@@ -16622,7 +16627,7 @@
         {
           "name": "common_errors",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 21
+          "startLine": 20
         },
         {
           "name": "common_timing",
@@ -16780,32 +16785,32 @@
         {
           "name": "compute_layout_hash",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 38
+          "startLine": 34
         },
         {
           "name": "compute_descriptor_bindings_hash",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 39
+          "startLine": 35
         },
         {
           "name": "compute_pipeline_hash",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 40
+          "startLine": 36
         },
         {
           "name": "compute_spirv_words_hash",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 41
+          "startLine": 37
         },
         {
           "name": "compute_pipeline_hash_from_spirv_hash",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 42
+          "startLine": 38
         },
         {
           "name": "compute_pipeline_hash_from_layout_hash",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 43
+          "startLine": 39
         },
         {
           "name": "compute_commands",
@@ -16816,6 +16821,11 @@
           "name": "compute_services",
           "path": "src/cli/module_runner_cli.zig",
           "startLine": 2
+        },
+        {
+          "name": "compute_runtime_robustness_config",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 11
         },
         {
           "name": "compute_commands",
@@ -17842,13 +17852,23 @@
         },
         {
           "name": "emit_msl",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
           "startLine": 7
         },
         {
           "name": "emit_spirv",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
           "startLine": 8
+        },
+        {
+          "name": "emit_spirv",
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 6
+        },
+        {
+          "name": "emit_msl",
+          "path": "src/compiler/wgsl/runtime/runtime_translation_info.zig",
+          "startLine": 4
         },
         {
           "name": "emit_msl",
@@ -18198,7 +18218,7 @@
         {
           "name": "has_active_compute_state",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 138
+          "startLine": 134
         },
         {
           "name": "has_vulkan",
@@ -18695,13 +18715,18 @@
         },
         {
           "name": "lean_proof",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+          "startLine": 2
+        },
+        {
+          "name": "lean_proof",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
           "startLine": 3
         },
         {
           "name": "lean_proof",
-          "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
-          "startLine": 2
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 3
         },
         {
           "name": "lean_proof",
@@ -20097,12 +20122,12 @@
         {
           "name": "model_gpu_types",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 20
+          "startLine": 21
         },
         {
           "name": "model_render_types",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 21
+          "startLine": 22
         },
         {
           "name": "model_binding_types",
@@ -21632,7 +21657,7 @@
         },
         {
           "name": "override_values",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
           "startLine": 5
         }
       ],
@@ -21938,8 +21963,8 @@
         },
         {
           "name": "path_utils",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 22
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 3
         },
         {
           "name": "path_engine",
@@ -22357,12 +22382,12 @@
         {
           "name": "release_cached_compute_states",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 139
+          "startLine": 135
         },
         {
           "name": "release_descriptor_state_cache",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 140
+          "startLine": 136
         }
       ],
       "prefix": "release",
@@ -22388,7 +22413,7 @@
         {
           "name": "render_bundle",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 25
+          "startLine": 26
         },
         {
           "name": "render_bundle",
@@ -23215,8 +23240,8 @@
       "members": [
         {
           "name": "spirv_translation",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 20
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 2
         },
         {
           "name": "spirv_translation",
@@ -23319,7 +23344,7 @@
         {
           "name": "surface_ops",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 24
+          "startLine": 25
         },
         {
           "name": "surface_procs_mod",
@@ -23879,44 +23904,49 @@
           "startLine": 16
         },
         {
-          "name": "vk_pipeline_cache_persistent",
+          "name": "vk_shader_source",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 17
         },
         {
-          "name": "vk_resources",
+          "name": "vk_pipeline_cache_persistent",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 18
         },
         {
-          "name": "vk_compute_sync",
+          "name": "vk_resources",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 19
         },
         {
-          "name": "vk_render",
+          "name": "vk_compute_sync",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 20
         },
         {
-          "name": "vk_dispatch_repeat",
+          "name": "vk_render",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 21
         },
         {
-          "name": "vk_metrics",
+          "name": "vk_dispatch_repeat",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 22
         },
         {
-          "name": "vk_command_buffers",
+          "name": "vk_metrics",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 23
         },
         {
+          "name": "vk_command_buffers",
+          "path": "src/backend/vulkan/native_runtime.zig",
+          "startLine": 24
+        },
+        {
           "name": "vk_texture_commands",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 26
+          "startLine": 27
         },
         {
           "name": "vk_device",
@@ -24094,14 +24124,19 @@
           "startLine": 8
         },
         {
-          "name": "vk_pipeline_cache_persistent",
+          "name": "vk_shader_source",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
           "startLine": 9
         },
         {
-          "name": "vk_resources",
+          "name": "vk_pipeline_cache_persistent",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
           "startLine": 10
+        },
+        {
+          "name": "vk_resources",
+          "path": "src/backend/vulkan/vk_render_pipeline.zig",
+          "startLine": 11
         },
         {
           "name": "vk_device",
@@ -24303,6 +24338,11 @@
           "name": "vulkan_errors",
           "path": "src/backend/vulkan/vulkan_surface.zig",
           "startLine": 14
+        },
+        {
+          "name": "vulkan_compute_runtime_robustness_config",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 12
         },
         {
           "name": "vulkan_compute",
@@ -24532,10 +24572,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
+  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe",
+  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07",
   "status": "captured"
 }

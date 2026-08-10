@@ -3,15 +3,15 @@
   "candidates": [
     {
       "fanIn": 5,
-      "fanOut": 23,
-      "lineCount": 986,
+      "fanOut": 24,
+      "lineCount": 987,
       "path": "src/backend/vulkan/native_runtime.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
       "fanIn": 6,
-      "fanOut": 16,
-      "lineCount": 1008,
+      "fanOut": 14,
+      "lineCount": 891,
       "path": "src/backend/vulkan/vk_pipeline.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -135,7 +135,7 @@
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
-      "fanIn": 4,
+      "fanIn": 5,
       "fanOut": 6,
       "lineCount": 951,
       "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
@@ -153,13 +153,6 @@
       "fanOut": 3,
       "lineCount": 878,
       "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-      "reason": "handwritten module exceeds the 800-line architecture review signal"
-    },
-    {
-      "fanIn": 7,
-      "fanOut": 7,
-      "lineCount": 920,
-      "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
@@ -213,9 +206,9 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
+  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe"
+  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07"
 }

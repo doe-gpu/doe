@@ -2,7 +2,7 @@ const builtin = @import("builtin");
 const std = @import("std");
 const build_options = @import("build_options");
 const pipeline_cache = @import("../../runtime/cache/pipeline_cache.zig");
-const wgsl_runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compile.zig");
+const wgsl_runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compute_translation.zig");
 const ir = @import("../../compiler/wgsl/ir/ir.zig");
 
 const PipelineCache = pipeline_cache.PipelineCache;

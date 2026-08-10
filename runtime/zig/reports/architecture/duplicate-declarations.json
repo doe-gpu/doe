@@ -1677,11 +1677,11 @@
     {
       "locations": [
         {
-          "endLine": 19,
+          "endLine": 20,
           "kind": "constant",
           "name": "vk_compute_sync",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 19,
+          "startLine": 20,
           "tokenCount": 7
         },
         {
@@ -2902,8 +2902,24 @@
           "endLine": 4,
           "kind": "constant",
           "name": "analysis",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
           "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/runtime/runtime_translation_info.zig",
+          "startLine": 3,
           "tokenCount": 7
         },
         {
@@ -2954,36 +2970,6 @@
         }
       ],
       "normalizedTokenSha256": "11dd851f6e84a33f323a9b3cd375ade8988f1601b0db5019aa9bfb0bd50adc0e",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 8,
-          "kind": "constant",
-          "name": "wgsl_runtime_compile",
-          "path": "src/backend/metal/metal_runtime_resources.zig",
-          "startLine": 8,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 12,
-          "kind": "constant",
-          "name": "wgsl_runtime_compile",
-          "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 12,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 5,
-          "kind": "constant",
-          "name": "wgsl_runtime_compile",
-          "path": "src/native/shader/doe_shader_translation_cache.zig",
-          "startLine": 5,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "11f965516877ca27469c11997bddd24d13fa2867e6066bbea78004f7e1e179af",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -3711,11 +3697,11 @@
           "tokenCount": 10
         },
         {
-          "endLine": 28,
+          "endLine": 5,
           "kind": "constant",
           "name": "MAX_KERNEL_SOURCE_BYTES",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 28,
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 5,
           "tokenCount": 10
         }
       ],
@@ -4067,11 +4053,11 @@
     {
       "locations": [
         {
-          "endLine": 24,
+          "endLine": 22,
           "kind": "constant",
           "name": "VkBuffer",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 24,
+          "startLine": 22,
           "tokenCount": 6
         },
         {
@@ -4978,6 +4964,28 @@
         }
       ],
       "normalizedTokenSha256": "234b6198a0a577972ff09f5aea47dd1b221dd45c965ca11b2e64fead6bae6834",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "TranslationResult",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 12,
+          "kind": "constant",
+          "name": "TranslationResult",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+          "startLine": 12,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "23658ce8446cc0f935e396e47b9ee60bd7c758cf3d15323154b12a0646cb525e",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -6231,11 +6239,11 @@
     {
       "locations": [
         {
-          "endLine": 37,
+          "endLine": 38,
           "kind": "constant",
           "name": "VK_COMPARE_OP_GREATER_OR_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 37,
+          "startLine": 38,
           "tokenCount": 6
         },
         {
@@ -6248,28 +6256,6 @@
         }
       ],
       "normalizedTokenSha256": "2e6ea75060eecb44810e47096602a1252a2994d7b0dddc31582a5375965e6caf",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 13,
-          "kind": "constant",
-          "name": "runtime_compile",
-          "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 13,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 6,
-          "kind": "constant",
-          "name": "runtime_compile",
-          "path": "src/native/vulkan/vulkan_render_pipeline_native.zig",
-          "startLine": 6,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "2e7f5a36985d545ac4c77e4076760ab24ee248ec0b0a3956027ce37df7da6fca",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -7889,11 +7875,11 @@
     {
       "locations": [
         {
-          "endLine": 35,
+          "endLine": 36,
           "kind": "constant",
           "name": "VK_COMPARE_OP_GREATER",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 35,
+          "startLine": 36,
           "tokenCount": 6
         },
         {
@@ -8404,6 +8390,28 @@
         }
       ],
       "normalizedTokenSha256": "4053b942d63b4058b8cf1d67ab4ca450279f1b4f8911cbb918f6e6cee51066cf",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "TranslationInfo",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "TranslationInfo",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "40b171bc86438bf9a817d3b37abd6b93e044cf5417b28ceb7cc56c10e315b46c",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -9943,6 +9951,28 @@
     {
       "locations": [
         {
+          "endLine": 17,
+          "kind": "constant",
+          "name": "vk_shader_source",
+          "path": "src/backend/vulkan/native_runtime.zig",
+          "startLine": 17,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "vk_shader_source",
+          "path": "src/backend/vulkan/vk_render_pipeline.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "4c92fb2db394c04b12792f4a615a4df58d79a3a293e59374e7db0f3ebdc0561c",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 9,
           "kind": "constant",
           "name": "metal_bridge_release",
@@ -10593,11 +10623,11 @@
     {
       "locations": [
         {
-          "endLine": 38,
+          "endLine": 39,
           "kind": "constant",
           "name": "VK_COMPARE_OP_ALWAYS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 38,
+          "startLine": 39,
           "tokenCount": 6
         },
         {
@@ -11107,11 +11137,11 @@
     {
       "locations": [
         {
-          "endLine": 32,
+          "endLine": 33,
           "kind": "constant",
           "name": "VK_COMPARE_OP_LESS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 32,
+          "startLine": 33,
           "tokenCount": 6
         },
         {
@@ -12109,11 +12139,11 @@
     {
       "locations": [
         {
-          "endLine": 18,
+          "endLine": 19,
           "kind": "constant",
           "name": "vk_resources",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 18,
+          "startLine": 19,
           "tokenCount": 7
         },
         {
@@ -12149,11 +12179,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 10,
+          "endLine": 11,
           "kind": "constant",
           "name": "vk_resources",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 10,
+          "startLine": 11,
           "tokenCount": 7
         },
         {
@@ -12832,8 +12862,16 @@
           "endLine": 6,
           "kind": "constant",
           "name": "robustness",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
           "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "robustness",
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 5,
           "tokenCount": 7
         },
         {
@@ -12919,11 +12957,11 @@
     {
       "locations": [
         {
-          "endLine": 34,
+          "endLine": 35,
           "kind": "constant",
           "name": "VK_COMPARE_OP_LESS_OR_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 34,
+          "startLine": 35,
           "tokenCount": 6
         },
         {
@@ -13313,11 +13351,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 22,
+          "endLine": 3,
           "kind": "constant",
           "name": "path_utils",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 22,
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 3,
           "tokenCount": 7
         }
       ],
@@ -14437,6 +14475,28 @@
     {
       "locations": [
         {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "emit_spirv",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "emit_spirv",
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "6d945f918935fec5138ac415865033800855fba699b3b85769676b3419f9520a",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 63,
           "kind": "constant",
           "name": "WGPUTextureFormat_RGBA8Sint",
@@ -14489,11 +14549,11 @@
     {
       "locations": [
         {
-          "endLine": 33,
+          "endLine": 34,
           "kind": "constant",
           "name": "VK_COMPARE_OP_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 33,
+          "startLine": 34,
           "tokenCount": 6
         },
         {
@@ -14511,11 +14571,11 @@
     {
       "locations": [
         {
-          "endLine": 28,
+          "endLine": 29,
           "kind": "constant",
           "name": "VK_NULL_U64",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 28,
+          "startLine": 29,
           "tokenCount": 6
         },
         {
@@ -14551,11 +14611,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 26,
+          "endLine": 24,
           "kind": "constant",
           "name": "VK_NULL_U64",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 26,
+          "startLine": 24,
           "tokenCount": 6
         },
         {
@@ -14575,11 +14635,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 23,
+          "endLine": 24,
           "kind": "constant",
           "name": "VK_NULL_U64",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 23,
+          "startLine": 24,
           "tokenCount": 6
         },
         {
@@ -16127,11 +16187,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 25,
+          "endLine": 26,
           "kind": "constant",
           "name": "render_bundle",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 25,
+          "startLine": 26,
           "tokenCount": 7
         },
         {
@@ -16393,11 +16453,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 21,
+          "endLine": 20,
           "kind": "constant",
           "name": "common_errors",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 21,
+          "startLine": 20,
           "tokenCount": 7
         },
         {
@@ -16737,11 +16797,11 @@
           "tokenCount": 16
         },
         {
-          "endLine": 38,
+          "endLine": 19,
           "kind": "function",
           "name": "nowNs",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 36,
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+          "startLine": 17,
           "tokenCount": 16
         }
       ],
@@ -17362,8 +17422,16 @@
           "endLine": 7,
           "kind": "constant",
           "name": "emit_msl",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
           "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "emit_msl",
+          "path": "src/compiler/wgsl/runtime/runtime_translation_info.zig",
+          "startLine": 4,
           "tokenCount": 7
         },
         {
@@ -17381,11 +17449,11 @@
     {
       "locations": [
         {
-          "endLine": 86,
+          "endLine": 87,
           "kind": "function",
           "name": "wgpu_compare_to_vk",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 75,
+          "startLine": 76,
           "tokenCount": 53
         },
         {
@@ -18633,11 +18701,33 @@
     {
       "locations": [
         {
-          "endLine": 36,
+          "endLine": 10,
+          "kind": "constant",
+          "name": "TimedTranslationResult",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 10,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 13,
+          "kind": "constant",
+          "name": "TimedTranslationResult",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+          "startLine": 13,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "927702a14d6de6694b35033b6fd1ed94e208771c4fd75bf4c873949a9eebea16",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 37,
           "kind": "constant",
           "name": "VK_COMPARE_OP_NOT_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 36,
+          "startLine": 37,
           "tokenCount": 6
         },
         {
@@ -19375,11 +19465,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 17,
+          "endLine": 18,
           "kind": "constant",
           "name": "vk_pipeline_cache_persistent",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 17,
+          "startLine": 18,
           "tokenCount": 7
         },
         {
@@ -19399,11 +19489,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 9,
+          "endLine": 10,
           "kind": "constant",
           "name": "vk_pipeline_cache_persistent",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 9,
+          "startLine": 10,
           "tokenCount": 7
         }
       ],
@@ -20119,6 +20209,36 @@
     {
       "locations": [
         {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "wgsl_runtime_compile",
+          "path": "src/backend/metal/metal_runtime_resources.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 12,
+          "kind": "constant",
+          "name": "wgsl_runtime_compile",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 12,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "wgsl_runtime_compile",
+          "path": "src/native/shader/doe_shader_translation_cache.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "a2a77676b01b9d0ceff97fb85866835ba1c77376e0810c7cd66a9beabb6d88bb",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 26,
           "kind": "constant",
           "name": "DIAG_RENDER_TARGET_HANDLE",
@@ -20257,11 +20377,11 @@
     {
       "locations": [
         {
-          "endLine": 25,
+          "endLine": 23,
           "kind": "constant",
           "name": "VkDeviceMemory",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 25,
+          "startLine": 23,
           "tokenCount": 6
         },
         {
@@ -22147,11 +22267,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 21,
+          "endLine": 22,
           "kind": "constant",
           "name": "model_render_types",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 21,
+          "startLine": 22,
           "tokenCount": 7
         },
         {
@@ -23174,7 +23294,23 @@
           "endLine": 2,
           "kind": "constant",
           "name": "ir",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/runtime/runtime_translation_info.zig",
           "startLine": 2,
           "tokenCount": 7
         }
@@ -23941,6 +24077,14 @@
           "kind": "constant",
           "name": "std",
           "path": "src/backend/vulkan/vk_samplers.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/vulkan/vk_shader_source.zig",
           "startLine": 1,
           "tokenCount": 7
         },
@@ -25212,7 +25356,7 @@
           "endLine": 1,
           "kind": "constant",
           "name": "std",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
           "startLine": 1,
           "tokenCount": 7
         },
@@ -25220,7 +25364,23 @@
           "endLine": 1,
           "kind": "constant",
           "name": "std",
-          "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/runtime/runtime_translation_info.zig",
           "startLine": 1,
           "tokenCount": 7
         },
@@ -27137,11 +27297,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 20,
+          "endLine": 21,
           "kind": "constant",
           "name": "model_gpu_types",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 20,
+          "startLine": 21,
           "tokenCount": 7
         },
         {
@@ -30787,11 +30947,11 @@
     {
       "locations": [
         {
-          "endLine": 20,
+          "endLine": 2,
           "kind": "constant",
           "name": "spirv_translation",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 20,
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 2,
           "tokenCount": 7
         },
         {
@@ -33069,11 +33229,19 @@
     {
       "locations": [
         {
-          "endLine": 29,
+          "endLine": 26,
           "kind": "constant",
           "name": "SPIRV_MAGIC",
           "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 29,
+          "startLine": 26,
+          "tokenCount": 6
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "SPIRV_MAGIC",
+          "path": "src/backend/vulkan/vk_shader_source.zig",
+          "startLine": 6,
           "tokenCount": 6
         },
         {
@@ -33729,11 +33897,11 @@
     {
       "locations": [
         {
-          "endLine": 22,
+          "endLine": 23,
           "kind": "constant",
           "name": "vk_metrics",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 22,
+          "startLine": 23,
           "tokenCount": 7
         },
         {
@@ -34513,19 +34681,27 @@
           "tokenCount": 7
         },
         {
-          "endLine": 3,
-          "kind": "constant",
-          "name": "lean_proof",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 3,
-          "tokenCount": 7
-        },
-        {
           "endLine": 2,
           "kind": "constant",
           "name": "lean_proof",
           "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
           "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "lean_proof",
+          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "lean_proof",
+          "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+          "startLine": 3,
           "tokenCount": 7
         }
       ],
@@ -34557,9 +34733,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
+  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe"
+  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07"
 }

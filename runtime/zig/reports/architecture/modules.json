@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
+  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
   "modules": [
     {
       "containsCImport": false,
@@ -470,7 +470,7 @@
       "reachable": true,
       "reverseImports": [
         "src/backend/d3d12/d3d12_runtime_compute.zig",
-        "src/backend/vulkan/vk_pipeline.zig"
+        "src/backend/vulkan/vk_shader_source.zig"
       ],
       "roles": [],
       "sha256": "62c3b7a6fe8c59199cd652593a0c724814e09c322bee51110eafe2a334482d51",
@@ -4727,7 +4727,7 @@
         "src/backend/metal/metal_pipeline_cache.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
         "src/compiler/wgsl/pipeline/translate_msl.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig"
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig"
       ],
       "isProductionRoot": false,
       "layer": "backend-metal",
@@ -4803,7 +4803,7 @@
         "src/backend/metal/metal_native_runtime.zig"
       ],
       "roles": [],
-      "sha256": "e2c4c21b579e9c4a0ea203d5a3880dc5846c0b9ad7eb21760360f3653c3c4048",
+      "sha256": "c9e91c9f10b6872edbf39a6859cc13445e5545b03d4af2da0da13bebb4e6ba2a",
       "testBlockCount": 6,
       "topLevelDeclarationCount": 57
     },
@@ -5891,7 +5891,7 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 5,
-      "fanOut": 23,
+      "fanOut": 24,
       "imports": [
         "src/backend/backend_policy.zig",
         "src/backend/common/timing.zig",
@@ -5908,6 +5908,7 @@
         "src/backend/vulkan/vk_resources.zig",
         "src/backend/vulkan/vk_runtime_probe_ops.zig",
         "src/backend/vulkan/vk_runtime_surface_ops.zig",
+        "src/backend/vulkan/vk_shader_source.zig",
         "src/backend/vulkan/vk_sync.zig",
         "src/backend/vulkan/vk_texture_commands.zig",
         "src/backend/vulkan/vk_upload.zig",
@@ -5919,7 +5920,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 986,
+      "lineCount": 987,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/native_runtime.zig",
@@ -5927,27 +5928,27 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 31,
+          "line": 32,
           "name": "upload_uses_fast_path"
         },
         {
           "kind": "const",
-          "line": 32,
+          "line": 33,
           "name": "upload_uses_direct_path"
         },
         {
           "kind": "const",
-          "line": 34,
+          "line": 35,
           "name": "DispatchMetrics"
         },
         {
           "kind": "const",
-          "line": 35,
+          "line": 36,
           "name": "AsyncProbeResult"
         },
         {
           "kind": "const",
-          "line": 37,
+          "line": 38,
           "name": "NativeVulkanRuntime"
         }
       ],
@@ -5966,9 +5967,9 @@
         "src/backend/vulkan/vk_feature_probe.zig"
       ],
       "roles": [],
-      "sha256": "f224af10cd1727d0cf009ca278a98831ab4de126a83d756f2b2669b2b9274472",
+      "sha256": "943122430ebb1de757bd3af89ea5fe6226efb05b0fe0af34140ecc5fd32531e5",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 29
+      "topLevelDeclarationCount": 30
     },
     {
       "containsCImport": false,
@@ -9652,9 +9653,8 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 6,
-      "fanOut": 16,
+      "fanOut": 14,
       "imports": [
-        "src/backend/common/path_utils.zig",
         "src/backend/vulkan/vk_compute_sync.zig",
         "src/backend/vulkan/vk_constants.zig",
         "src/backend/vulkan/vk_device.zig",
@@ -9664,7 +9664,6 @@
         "src/backend/vulkan/vk_resources.zig",
         "src/backend/vulkan/vk_spirv_inspect.zig",
         "src/backend/vulkan/vk_upload.zig",
-        "src/compiler/wgsl/pipeline/translate_spirv.zig",
         "src/contracts/execution.zig",
         "src/contracts/model/model_binding_value_types.zig",
         "src/contracts/model/model_compute_types.zig",
@@ -9673,196 +9672,166 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 1008,
+      "lineCount": 891,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/vk_pipeline.zig",
-      "publicDeclarationCount": 37,
+      "publicDeclarationCount": 31,
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 38,
+          "line": 34,
           "name": "compute_layout_hash"
         },
         {
           "kind": "const",
-          "line": 39,
+          "line": 35,
           "name": "compute_descriptor_bindings_hash"
         },
         {
           "kind": "const",
-          "line": 40,
+          "line": 36,
           "name": "compute_pipeline_hash"
         },
         {
           "kind": "const",
-          "line": 41,
+          "line": 37,
           "name": "compute_spirv_words_hash"
         },
         {
           "kind": "const",
-          "line": 42,
+          "line": 38,
           "name": "compute_pipeline_hash_from_spirv_hash"
         },
         {
           "kind": "const",
-          "line": 43,
+          "line": 39,
           "name": "compute_pipeline_hash_from_layout_hash"
         },
         {
           "kind": "const",
-          "line": 106,
+          "line": 102,
           "name": "DescriptorInfoKind"
         },
         {
           "kind": "const",
-          "line": 111,
+          "line": 107,
           "name": "PendingDescriptorWrite"
         },
         {
           "kind": "const",
-          "line": 119,
+          "line": 115,
           "name": "RetiredPipelineState"
         },
         {
           "kind": "const",
-          "line": 125,
+          "line": 121,
           "name": "RetiredDescriptorState"
         },
         {
           "kind": "const",
-          "line": 131,
+          "line": 127,
           "name": "CachedDescriptorState"
         },
         {
           "kind": "const",
-          "line": 132,
+          "line": 128,
           "name": "CachedComputeState"
         },
         {
           "kind": "const",
-          "line": 133,
+          "line": 129,
           "name": "HOT_COMPUTE_STATE_CACHE_CAPACITY"
         },
         {
           "kind": "const",
-          "line": 134,
+          "line": 130,
           "name": "HOT_DESCRIPTOR_STATE_CACHE_CAPACITY"
         },
         {
           "kind": "const",
-          "line": 139,
+          "line": 135,
           "name": "release_cached_compute_states"
         },
         {
           "kind": "const",
-          "line": 140,
+          "line": 136,
           "name": "release_descriptor_state_cache"
         },
         {
           "kind": "fn",
-          "line": 232,
+          "line": 228,
           "name": "release_retired_states"
         },
         {
           "kind": "fn",
-          "line": 249,
-          "name": "load_kernel_source"
-        },
-        {
-          "kind": "fn",
-          "line": 256,
-          "name": "load_kernel_spirv"
-        },
-        {
-          "kind": "fn",
-          "line": 260,
-          "name": "ensure_kernel_spirv_cached"
-        },
-        {
-          "kind": "fn",
-          "line": 270,
-          "name": "release_kernel_spirv_cache"
-        },
-        {
-          "kind": "fn",
-          "line": 292,
-          "name": "load_kernel_spirv_cached"
-        },
-        {
-          "kind": "fn",
-          "line": 309,
+          "line": 245,
           "name": "set_compute_shader_spirv"
         },
         {
           "kind": "fn",
-          "line": 321,
+          "line": 257,
           "name": "set_compute_shader_spirv_prehashed"
         },
         {
           "kind": "fn",
-          "line": 334,
+          "line": 270,
           "name": "set_compute_shader_spirv_with_hashes"
         },
         {
           "kind": "fn",
-          "line": 361,
+          "line": 297,
           "name": "rebuild_compute_shader_spirv"
         },
         {
           "kind": "fn",
-          "line": 367,
+          "line": 303,
           "name": "build_pipeline_for_words"
         },
         {
           "kind": "fn",
-          "line": 484,
+          "line": 420,
           "name": "destroy_pipeline_objects"
         },
         {
           "kind": "fn",
-          "line": 502,
+          "line": 438,
           "name": "destroy_descriptor_state"
         },
         {
           "kind": "fn",
-          "line": 526,
+          "line": 462,
           "name": "bind_descriptor_sets"
         },
         {
           "kind": "fn",
-          "line": 540,
+          "line": 476,
           "name": "reset_bound_compute_state"
         },
         {
           "kind": "fn",
-          "line": 547,
+          "line": 483,
           "name": "bind_compute_pipeline_if_needed"
         },
         {
           "kind": "fn",
-          "line": 553,
+          "line": 489,
           "name": "bind_descriptor_sets_if_needed"
         },
         {
           "kind": "fn",
-          "line": 826,
+          "line": 762,
           "name": "descriptor_type_for_binding"
         },
         {
           "kind": "fn",
-          "line": 841,
+          "line": 777,
           "name": "validate_texture_binding"
         },
         {
           "kind": "fn",
-          "line": 891,
+          "line": 827,
           "name": "descriptor_range"
-        },
-        {
-          "kind": "fn",
-          "line": 957,
-          "name": "words_from_spirv_bytes"
         }
       ],
       "reachabilityViewRoots": [],
@@ -9881,9 +9850,9 @@
         "src/backend/vulkan/vk_texture_commands.zig"
       ],
       "roles": [],
-      "sha256": "a146c2c7bd238c7f4d3468a72ce94680107e72983b8a3ad71576446059440e6c",
+      "sha256": "2c6a11297d81dafb17e463f6388cc7debe65dddf4475142d465edec1b54b5e83",
       "testBlockCount": 3,
-      "topLevelDeclarationCount": 93
+      "topLevelDeclarationCount": 79
     },
     {
       "containsCImport": false,
@@ -10182,19 +10151,20 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 7,
+      "fanOut": 8,
       "imports": [
         "src/backend/vulkan/vk_constants.zig",
         "src/backend/vulkan/vk_formats.zig",
         "src/backend/vulkan/vk_pipeline.zig",
         "src/backend/vulkan/vk_pipeline_cache_persistent.zig",
         "src/backend/vulkan/vk_resources.zig",
+        "src/backend/vulkan/vk_shader_source.zig",
         "src/contracts/model/model_render_types.zig",
         "src/contracts/model/model_texture_value_types.zig"
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 668,
+      "lineCount": 669,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/vk_render_pipeline.zig",
@@ -10202,72 +10172,72 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 60,
+          "line": 61,
           "name": "VkPipelineDepthStencilStateCreateInfo"
         },
         {
           "kind": "fn",
-          "line": 75,
+          "line": 76,
           "name": "wgpu_compare_to_vk"
         },
         {
           "kind": "fn",
-          "line": 88,
+          "line": 89,
           "name": "wgpu_stencil_op_to_vk"
         },
         {
           "kind": "fn",
-          "line": 101,
+          "line": 102,
           "name": "format_has_stencil"
         },
         {
           "kind": "fn",
-          "line": 111,
+          "line": 112,
           "name": "resolve_entry_point_name"
         },
         {
           "kind": "fn",
-          "line": 119,
+          "line": 120,
           "name": "topology_to_vk"
         },
         {
           "kind": "fn",
-          "line": 129,
+          "line": 130,
           "name": "vertex_step_mode_to_vk"
         },
         {
           "kind": "fn",
-          "line": 133,
+          "line": 134,
           "name": "front_face_to_vk"
         },
         {
           "kind": "fn",
-          "line": 140,
+          "line": 141,
           "name": "cull_mode_to_vk"
         },
         {
           "kind": "fn",
-          "line": 148,
+          "line": 149,
           "name": "sample_count_to_vk"
         },
         {
           "kind": "fn",
-          "line": 158,
+          "line": 159,
           "name": "blend_factor_to_vk"
         },
         {
           "kind": "fn",
-          "line": 181,
+          "line": 182,
           "name": "blend_operation_to_vk"
         },
         {
           "kind": "fn",
-          "line": 191,
+          "line": 192,
           "name": "color_write_mask_to_vk"
         },
         {
           "kind": "fn",
-          "line": 200,
+          "line": 201,
           "name": "create_graphics_pipeline"
         }
       ],
@@ -10282,9 +10252,9 @@
         "src/backend/vulkan/vk_render.zig"
       ],
       "roles": [],
-      "sha256": "581feb52713ae73a782c525e55868cce2c804aa7cfbc5f084c17c3374ac86ee3",
+      "sha256": "d1487804709470a104c639a8f6572b15a1f600b8caddd71b8e9a65c10b74e518",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 54
+      "topLevelDeclarationCount": 55
     },
     {
       "containsCImport": false,
@@ -10757,6 +10727,70 @@
       "sha256": "bb967bb30e861024028a35ca82a5a2bbb305eac44112c92be51da423d66ee550",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 32
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 2,
+      "fanOut": 2,
+      "imports": [
+        "src/backend/common/path_utils.zig",
+        "src/compiler/wgsl/pipeline/translate_spirv.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "backend-vulkan",
+      "lineCount": 121,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/vulkan/vk_shader_source.zig",
+      "publicDeclarationCount": 6,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 9,
+          "name": "load_kernel_source"
+        },
+        {
+          "kind": "fn",
+          "line": 16,
+          "name": "load_kernel_spirv"
+        },
+        {
+          "kind": "fn",
+          "line": 20,
+          "name": "ensure_kernel_spirv_cached"
+        },
+        {
+          "kind": "fn",
+          "line": 30,
+          "name": "release_kernel_spirv_cache"
+        },
+        {
+          "kind": "fn",
+          "line": 52,
+          "name": "load_kernel_spirv_cached"
+        },
+        {
+          "kind": "fn",
+          "line": 70,
+          "name": "words_from_spirv_bytes"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/vulkan/native_runtime.zig",
+        "src/backend/vulkan/vk_render_pipeline.zig"
+      ],
+      "roles": [],
+      "sha256": "15248bca81ecd48517fdbf4e28f33a2572ff5fa1e05f95456118f0be72c798a7",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 16
     },
     {
       "containsCImport": false,
@@ -20871,7 +20905,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 5,
+      "fanIn": 6,
       "fanOut": 2,
       "imports": [
         "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
@@ -20918,7 +20952,8 @@
         "src/compiler/mod.zig",
         "src/compiler/wgsl/mod.zig",
         "src/compiler/wgsl/pipeline/translate_msl.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_translation_info.zig",
         "src/compiler/wgsl/runtime/shader_info.zig"
       ],
       "roles": [],
@@ -21546,7 +21581,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 4,
+      "fanIn": 5,
       "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
@@ -21611,7 +21646,8 @@
         "src/compiler/mod.zig",
         "src/compiler/wgsl/mod.zig",
         "src/compiler/wgsl/pipeline/translate_spirv.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig"
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_graphics_translation.zig"
       ],
       "roles": [],
       "sha256": "6ee3dc4d9b0506e84fe9da0f5672e6cc4819ee3ff28978b23e774611a1c2ccc5",
@@ -23521,7 +23557,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 95,
+      "fanIn": 97,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -23869,7 +23905,9 @@
         "src/compiler/wgsl/proof/dispatch_proof_match.zig",
         "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
         "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_translation_info.zig",
         "src/core/compute/dispatch_preconditions.zig",
         "src/native/compute/doe_compute_preconditions_native.zig",
         "src/native/shader/doe_shader_native.zig",
@@ -24229,7 +24267,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 4,
+      "fanIn": 5,
       "fanOut": 6,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
@@ -24274,7 +24312,8 @@
       "reverseImports": [
         "src/compiler/wgsl/mod.zig",
         "src/compiler/wgsl/pipeline/analysis.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
         "src/compiler/wgsl/runtime/shader_info.zig"
       ],
       "roles": [],
@@ -25012,7 +25051,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 14,
+      "fanIn": 16,
       "fanOut": 10,
       "imports": [
         "src/compiler/wgsl/frontend/ast.zig",
@@ -25161,7 +25200,9 @@
         "src/compiler/wgsl/pipeline/translate_hlsl.zig",
         "src/compiler/wgsl/pipeline/translate_msl.zig",
         "src/compiler/wgsl/pipeline/translate_spirv.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_translation_info.zig",
         "src/compiler/wgsl/runtime/shader_info.zig",
         "src/native/shader/doe_shader_compilation_info_native.zig",
         "src/native/shader/doe_shader_native.zig",
@@ -25270,7 +25311,7 @@
         "src/compiler/wgsl/mod.zig",
         "src/compiler/wgsl/pipeline/translate_hlsl.zig",
         "src/compiler/wgsl/pipeline/translate_msl.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig"
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig"
       ],
       "roles": [],
       "sha256": "83d04375464f3baf89e82fa68a9ae0fc783e520184f52592d46abbbe05dd447f",
@@ -25616,7 +25657,7 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/backend/vulkan/vk_pipeline.zig",
+        "src/backend/vulkan/vk_shader_source.zig",
         "src/compiler/wgsl/mod.zig",
         "src/compiler/wgsl/runtime/runtime_compile_report.zig",
         "src/native/vulkan/vulkan_compute_native.zig"
@@ -25812,116 +25853,117 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 7,
-      "fanOut": 7,
+      "fanIn": 1,
+      "fanOut": 3,
       "imports": [
-        "src/compiler/wgsl/emit/msl/emit_msl.zig",
-        "src/compiler/wgsl/emit/spirv/emit_spirv.zig",
-        "src/compiler/wgsl/ir/ir.zig",
-        "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-        "src/compiler/wgsl/pipeline/analysis.zig",
-        "src/compiler/wgsl/pipeline/overrides.zig",
-        "src/verification/lean_proof.zig"
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_translation_info.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 920,
-      "onlyReexports": false,
+      "lineCount": 22,
+      "onlyReexports": true,
       "owner": "compiler",
       "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-      "publicDeclarationCount": 14,
+      "publicDeclarationCount": 17,
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 12,
+          "line": 4,
+          "name": "translation_info"
+        },
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "compute"
+        },
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "graphics"
+        },
+        {
+          "kind": "const",
+          "line": 8,
           "name": "TranslationInfo"
         },
         {
           "kind": "const",
-          "line": 25,
+          "line": 9,
           "name": "TranslationResult"
         },
         {
           "kind": "const",
-          "line": 30,
+          "line": 10,
           "name": "TimedTranslationResult"
         },
         {
-          "kind": "fn",
-          "line": 46,
+          "kind": "const",
+          "line": 11,
           "name": "compute_runtime_robustness_config"
         },
         {
-          "kind": "fn",
-          "line": 67,
+          "kind": "const",
+          "line": 12,
           "name": "vulkan_compute_runtime_robustness_config"
         },
         {
-          "kind": "fn",
-          "line": 77,
+          "kind": "const",
+          "line": 13,
           "name": "translateToMslForComputeRuntime"
         },
         {
-          "kind": "fn",
-          "line": 97,
+          "kind": "const",
+          "line": 14,
           "name": "translateToMslForComputeRuntimeTimed"
         },
         {
-          "kind": "fn",
-          "line": 128,
+          "kind": "const",
+          "line": 15,
           "name": "translateToSpirvForComputeRuntime"
         },
         {
-          "kind": "fn",
-          "line": 152,
+          "kind": "const",
+          "line": 16,
           "name": "translateToSpirvTimed"
         },
         {
-          "kind": "fn",
-          "line": 185,
+          "kind": "const",
+          "line": 17,
           "name": "translateToSpirvForVulkanComputeRuntime"
         },
         {
           "kind": "const",
-          "line": 210,
+          "line": 19,
           "name": "VertexInputAttr"
         },
         {
           "kind": "const",
-          "line": 216,
+          "line": 20,
           "name": "InterStageVar"
         },
         {
           "kind": "const",
-          "line": 225,
+          "line": 21,
           "name": "GraphicsTranslationResult"
         },
         {
-          "kind": "fn",
-          "line": 254,
+          "kind": "const",
+          "line": 22,
           "name": "translateToSpirvForGraphicsRuntime"
         }
       ],
       "reachabilityViewRoots": [],
-      "reachabilityViews": [
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
-      ],
+      "reachabilityViews": [],
       "reachable": true,
       "reverseImports": [
-        "src/backend/metal/metal_runtime_resources.zig",
-        "src/compiler/mod.zig",
-        "src/compiler/wgsl/runtime/runtime_compile_report.zig",
-        "src/native/shader/doe_shader_native.zig",
-        "src/native/shader/doe_shader_translation_cache.zig",
-        "src/native/vulkan/vulkan_compute_native.zig",
-        "src/native/vulkan/vulkan_render_pipeline_native.zig"
+        "src/compiler/mod.zig"
       ],
       "roles": [],
-      "sha256": "9a44a6954663f3543ff7926cbd562d37a60633d7bf8f99862c39a0b782508a7c",
-      "testBlockCount": 14,
-      "topLevelDeclarationCount": 47
+      "sha256": "e708235962e90ee57a9b7055e966066863f68e091c32d497ed3990604f6d97a7",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 17
     },
     {
       "containsCImport": false,
@@ -25931,7 +25973,7 @@
       "imports": [
         "src/compiler/wgsl/pipeline/translate_msl.zig",
         "src/compiler/wgsl/pipeline/translate_spirv.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
         "src/verification/lean_proof.zig"
       ],
       "isProductionRoot": false,
@@ -25959,9 +26001,214 @@
         "src/compiler/mod.zig"
       ],
       "roles": [],
-      "sha256": "4093566fa2b23de6669f85333a3e915ad2201497723f7f0b209f294b2298c178",
+      "sha256": "4465176049041f2556578838febe0c9454fc69e5de76cd1a7cb10830525d74de",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 13
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 6,
+      "fanOut": 8,
+      "imports": [
+        "src/compiler/wgsl/emit/msl/emit_msl.zig",
+        "src/compiler/wgsl/emit/spirv/emit_spirv.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/overrides.zig",
+        "src/compiler/wgsl/runtime/runtime_translation_info.zig",
+        "src/verification/lean_proof.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 174,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+      "publicDeclarationCount": 10,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "TranslationInfo"
+        },
+        {
+          "kind": "const",
+          "line": 12,
+          "name": "TranslationResult"
+        },
+        {
+          "kind": "const",
+          "line": 13,
+          "name": "TimedTranslationResult"
+        },
+        {
+          "kind": "fn",
+          "line": 27,
+          "name": "compute_runtime_robustness_config"
+        },
+        {
+          "kind": "fn",
+          "line": 48,
+          "name": "vulkan_compute_runtime_robustness_config"
+        },
+        {
+          "kind": "fn",
+          "line": 71,
+          "name": "translateToMslForComputeRuntime"
+        },
+        {
+          "kind": "fn",
+          "line": 91,
+          "name": "translateToMslForComputeRuntimeTimed"
+        },
+        {
+          "kind": "fn",
+          "line": 122,
+          "name": "translateToSpirvForComputeRuntime"
+        },
+        {
+          "kind": "fn",
+          "line": 137,
+          "name": "translateToSpirvTimed"
+        },
+        {
+          "kind": "fn",
+          "line": 161,
+          "name": "translateToSpirvForVulkanComputeRuntime"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/metal/metal_runtime_resources.zig",
+        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+        "src/native/shader/doe_shader_native.zig",
+        "src/native/shader/doe_shader_translation_cache.zig",
+        "src/native/vulkan/vulkan_compute_native.zig"
+      ],
+      "roles": [],
+      "sha256": "d81ce0feac4e6bcc13f26d7e3d073a24e9645f6f4ea4c803faadf794326e151a",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 23
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 2,
+      "fanOut": 5,
+      "imports": [
+        "src/compiler/wgsl/emit/spirv/emit_spirv.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/verification/lean_proof.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 203,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "VertexInputAttr"
+        },
+        {
+          "kind": "const",
+          "line": 14,
+          "name": "InterStageVar"
+        },
+        {
+          "kind": "const",
+          "line": 23,
+          "name": "GraphicsTranslationResult"
+        },
+        {
+          "kind": "fn",
+          "line": 52,
+          "name": "translateToSpirvForGraphicsRuntime"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "dropin-compatibility",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/native/vulkan/vulkan_render_pipeline_native.zig"
+      ],
+      "roles": [],
+      "sha256": "2315cd8b8c8fef42902060ecabc8bb501181373387950181ae67a6d0cab7d642",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 16
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 2,
+      "fanOut": 3,
+      "imports": [
+        "src/compiler/wgsl/emit/msl/emit_msl.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 53,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/runtime/runtime_translation_info.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "TranslationInfo"
+        },
+        {
+          "kind": "const",
+          "line": 19,
+          "name": "TranslationResult"
+        },
+        {
+          "kind": "const",
+          "line": 24,
+          "name": "TimedTranslationResult"
+        },
+        {
+          "kind": "fn",
+          "line": 30,
+          "name": "buildTranslationInfo"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig"
+      ],
+      "roles": [],
+      "sha256": "8d009694fbb8d1cb28588c6ff7e00e9b17afa3fb3afcd3051cc707e02134a7d2",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 9
     },
     {
       "containsCImport": false,
@@ -48073,7 +48320,7 @@
         "src/compiler/wgsl/pipeline/analysis.zig",
         "src/compiler/wgsl/pipeline/binding_reflection.zig",
         "src/compiler/wgsl/pipeline/translate_msl.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
         "src/core/abi/wgpu_callback_descriptor_types.zig",
         "src/core/abi/wgpu_core_base_types.zig",
         "src/core/abi/wgpu_pipeline_descriptor_types.zig",
@@ -48112,7 +48359,7 @@
         "src/native/compute/doe_compute_ext_native.zig"
       ],
       "roles": [],
-      "sha256": "533654405024b618be5a385e03e293821f1e66ee11c6ef5d4de791dc00487889",
+      "sha256": "0a34ef35839ef6f42dc1e11a1e057f0476e3f67e15c359e3ec5b665dcddfbfc6",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 93
     },
@@ -48123,7 +48370,7 @@
       "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
         "src/runtime/cache/pipeline_cache.zig"
       ],
       "isProductionRoot": false,
@@ -48176,7 +48423,7 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "353c479f525527cc2deb6eff972808a115759de6277587155cd86d9baaea7622",
+      "sha256": "31487ba7ae2ea83224fad2c9c9533256c14eaba66c81a8f40ffb7e69a8e2d877",
       "testBlockCount": 4,
       "topLevelDeclarationCount": 54
     },
@@ -49174,7 +49421,7 @@
         "src/compiler/wgsl/pipeline/analysis.zig",
         "src/compiler/wgsl/pipeline/binding_reflection.zig",
         "src/compiler/wgsl/pipeline/translate_spirv.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
         "src/contracts/binding.zig",
         "src/contracts/model/model_binding_value_types.zig",
         "src/contracts/model/model_compute_types.zig",
@@ -49280,7 +49527,7 @@
         "src/native/shader/doe_shader_native.zig"
       ],
       "roles": [],
-      "sha256": "89783231d899800b0f5b4c74ee2a8c9fd4ed3346ca977d40a3833462a20ab8e9",
+      "sha256": "06e57dda7181c76eadc03d0d86437b03215f44d51cfb153c5cabeb00b33afd31",
       "testBlockCount": 1,
       "topLevelDeclarationCount": 97
     },
@@ -49648,7 +49895,7 @@
       "fanOut": 6,
       "imports": [
         "src/compiler/wgsl/pipeline/analysis.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
         "src/core/abi/wgpu_core_base_types.zig",
         "src/native/support/doe_native_object_helpers.zig",
         "src/native/support/doe_native_shared_types.zig",
@@ -49688,7 +49935,7 @@
         "src/native/vulkan/vulkan_render_native.zig"
       ],
       "roles": [],
-      "sha256": "4bc2ec3ce2aea5cc7b670a705794ab790c70ca5c0707e3e000820e1f7b994b7b",
+      "sha256": "18fb879cca750862c5ce64911eafb80b2c104dce73265367f16a0452639fefd0",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 10
     },
@@ -54604,7 +54851,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 7,
+      "fanIn": 8,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": true,
@@ -54685,8 +54932,9 @@
         "src/compiler/wgsl/ir/ir_transform_robustness.zig",
         "src/compiler/wgsl/pipeline/analysis.zig",
         "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
         "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+        "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
+        "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
         "src/mod.zig",
         "src/quirk/runtime.zig"
       ],
@@ -54699,5 +54947,5 @@
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe"
+  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07"
 }

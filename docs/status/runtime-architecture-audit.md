@@ -13,6 +13,15 @@ The latest source-layout evidence incorporates two boundary corrections:
   diagnostics, binding reflection, override application, and per-target
   translation live under `src/compiler/wgsl/pipeline/`; shipped backend and
   native consumers import only the stage and target they execute.
+- Runtime translation now has separate compute, graphics/reflection, and
+  shared-metadata owners under `src/compiler/wgsl/runtime/`.
+  `runtime_compile.zig` retains the exercised public aggregation surface while
+  shipped consumers import the narrow owner they execute; its integration
+  workloads live under `runtime/zig/tests/wgsl/`.
+- Vulkan kernel path resolution, SPIR-V file loading, WGSL fallback
+  compilation, and the owned kernel-source cache now live in
+  `src/backend/vulkan/vk_shader_source.zig`; compute pipeline and descriptor
+  lifetime management no longer owns repository-path or compiler concerns.
 - Metal kernel dispatch no longer writes CSL and HostPlan files under
   `bench/out/` or silently ignores generation failures. HostPlan creation stays
   in the explicit spatial, plan-executor, and benchmark lanes; the shared

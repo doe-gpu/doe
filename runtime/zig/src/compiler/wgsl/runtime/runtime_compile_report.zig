@@ -2,7 +2,7 @@ const std = @import("std");
 const lean_proof = @import("../../../verification/lean_proof.zig");
 const msl_translation = @import("../pipeline/translate_msl.zig");
 const spirv_translation = @import("../pipeline/translate_spirv.zig");
-const runtime_compile = @import("runtime_compile.zig");
+const runtime_compile = @import("runtime_compute_translation.zig");
 
 const Config = struct {
     shader_path: []const u8,

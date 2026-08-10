@@ -586,6 +586,10 @@
           "kind": "integration"
         },
         {
+          "path": "tests/wgsl/runtime_compile_test.zig",
+          "kind": "integration"
+        },
+        {
           "path": "tests/wgsl/ir_transform_robustness_test.zig",
           "kind": "integration"
         },
