@@ -131,9 +131,11 @@ identity, timing, trace, and error taxonomy.
    deterministic contract results are never promoted as physical GPU evidence.
 3. Move test-only compatibility aggregators out of production source after
    their consumers import narrow canonical contracts.
-4. Continue with high-confidence backend artifact/timing and module request
-   parsing helpers only when semantic tests cover every consumer; keep
-   platform API mechanics separate.
+4. Review the remaining high-confidence seams named by the duplicate report:
+   WGSL proof builtin/stride queries, CSL storage exports, TSIR global-base
+   lookup, backend artifact/timing, and module request parsing. Consolidate
+   only when semantic tests cover every consumer, and keep platform API
+   mechanics separate.
 5. Split only the files that exceed the advisory architecture signal when the
    split follows a real responsibility boundary.
 6. Re-run import-fence, source-layout, core tests, WGSL tests, and package tests
