@@ -627,6 +627,7 @@ typedef void (*FnRenderBundleEncoderPopDebugGroup)(void* encoder);
 typedef void (*FnRenderBundleEncoderInsertDebugMarker)(void* encoder, const char* label, size_t label_len);
 typedef void (*FnAdapterGetInfo)(void* adapter, const char** out_vendor, const char** out_arch, const char** out_device, const char** out_desc, char** out_block);
 typedef void (*FnAdapterFreeInfo)(char* block);
+typedef void (*FnAdapterGetPciIdentity)(void* adapter, uint32_t* out_vendor_id, uint32_t* out_device_id, uint32_t* out_driver_version);
 typedef const char* (*FnShaderModuleGetCompilationInfo)(void* module);
 typedef void (*FnDevicePushErrorScope)(void* device, uint32_t filter);
 typedef WGPUFuture (*FnDevicePopErrorScope)(void* device, WGPUPopErrorScopeCallbackInfo2 callback_info);
@@ -675,6 +676,7 @@ extern FnRenderBundleEncoderPopDebugGroup pfn_doeNativeRenderBundleEncoderPopDeb
 extern FnRenderBundleEncoderInsertDebugMarker pfn_doeNativeRenderBundleEncoderInsertDebugMarker;
 extern FnAdapterGetInfo pfn_doeNativeAdapterGetInfo;
 extern FnAdapterFreeInfo pfn_doeNativeAdapterFreeInfo;
+extern FnAdapterGetPciIdentity pfn_doeNativeAdapterGetPciIdentity;
 extern FnShaderModuleGetCompilationInfo pfn_doeNativeShaderModuleGetCompilationInfo;
 extern FnDevicePushErrorScope pfn_doeNativeDevicePushErrorScope;
 extern FnDevicePopErrorScope pfn_doeNativeDevicePopErrorScope;

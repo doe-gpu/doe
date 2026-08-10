@@ -1,9 +1,4 @@
-"""compare_assessment: the full comparability verdict for a workload pair.
-
-Extracted from comparability_runtime.py to keep both files under the
-1200-line Python cap. Depends on the helper + assess_* functions that
-remain in comparability_runtime.py.
-"""
+"""Full comparability verdict for a workload pair."""
 
 from __future__ import annotations
 
@@ -23,6 +18,7 @@ from native_compare_modules.comparability_runtime import (
     assess_submit_scope_equivalence,
     assess_timing_phase_equivalence,
 )
+from native_compare_modules.compare_hardware_assessment import record_hardware_path_obligation
 from native_compare_modules.compare_assessment_helpers import (
     assess_effective_readback_path_equivalence,
     assess_readback_capture_equivalence,
@@ -636,27 +632,17 @@ def compare_assessment(
         failure_reason=readback_capture_failure_reason,
         details=readback_capture_details,
     )
-    hardware_path_match_applies = comparability_mode == "strict" and is_dawn_vs_doe
-    hardware_path_failure_reason = (
-        "workload contract marks pathAsymmetry=true: baseline/comparison use hardware-specific "
-        "execution paths that are not structurally equivalent"
-    )
-    if workload_path_asymmetry_note:
-        hardware_path_failure_reason += f" ({workload_path_asymmetry_note})"
-    _record_obligation(
-        obligations,
-        reasons,
-        obligation_id="baseline_comparison_hardware_path_match",
-        blocking=True,
-        applicable=hardware_path_match_applies,
-        passes=not workload_path_asymmetry,
-        failure_reason=hardware_path_failure_reason,
-        details={
-            "comparabilityMode": comparability_mode,
-            "isDawnVsDoe": is_dawn_vs_doe,
-            "workloadPathAsymmetry": bool(workload_path_asymmetry),
-            "workloadPathAsymmetryNote": workload_path_asymmetry_note,
-        },
+    record_hardware_path_obligation(
+        record_obligation=_record_obligation,
+        obligations=obligations,
+        reasons=reasons,
+        comparability_mode=comparability_mode,
+        is_dawn_vs_doe=is_dawn_vs_doe,
+        package_execution_applies=package_execution_applies,
+        workload_path_asymmetry=workload_path_asymmetry,
+        workload_path_asymmetry_note=workload_path_asymmetry_note,
+        left_samples=left_samples,
+        right_samples=right_samples,
     )
     (
         native_shader_artifact_match_applies,

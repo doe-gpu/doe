@@ -1,0 +1,42 @@
+{
+  "artifactKind": "claim-report",
+  "claimPolicy": {
+    "benchmarkPolicy": {
+      "path": "config/benchmark-methodology-thresholds.json",
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+    },
+    "minTimedSamples": 15,
+    "mode": "local",
+    "policyHash": "c58a192437af59287575fce3f015778332963288b8b28830021b35a502fceb0f"
+  },
+  "claimStatus": "diagnostic",
+  "compareReport": {
+    "path": "reports/benchmarks/amd-vulkan/20260810T160953Z/gemma64.node-package.warm.ir.compare.json",
+    "sha256": "42076a435c5e148335da6c9b4edeeae8fd7f10ec8e42d5fd571757bd6a801b9d"
+  },
+  "comparisonStatus": "diagnostic",
+  "generatedAt": "2026-08-10T16:16:28.586692+00:00",
+  "pass": false,
+  "reasons": [
+    "inference_gemma3_270m_prefill_64tok_decode_64tok: workload is non-comparable; reliability claimability requires comparability"
+  ],
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": false,
+      "evaluated": true,
+      "reasons": [
+        "workload is non-comparable; reliability claimability requires comparability"
+      ],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "inference_gemma3_270m_prefill_64tok_decode_64tok"
+    }
+  ]
+}

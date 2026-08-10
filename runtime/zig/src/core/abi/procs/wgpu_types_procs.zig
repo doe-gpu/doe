@@ -59,6 +59,7 @@ pub const FnWgpuDeviceCreateBuffer = *const fn (types.WGPUDevice, ?*const types.
 pub const FnWgpuDeviceCreateShaderModule = *const fn (types.WGPUDevice, ?*const types.WGPUShaderModuleDescriptor) callconv(.c) types.WGPUShaderModule;
 pub const FnWgpuShaderModuleRelease = *const fn (types.WGPUShaderModule) callconv(.c) void;
 pub const FnWgpuDeviceCreateComputePipeline = *const fn (types.WGPUDevice, ?*const types.WGPUComputePipelineDescriptor) callconv(.c) types.WGPUComputePipeline;
+pub const FnWgpuComputePipelineGetBindGroupLayout = *const fn (types.WGPUComputePipeline, u32) callconv(.c) types.WGPUBindGroupLayout;
 pub const FnWgpuComputePipelineRelease = *const fn (types.WGPUComputePipeline) callconv(.c) void;
 pub const FnWgpuRenderPipelineRelease = *const fn (types.WGPURenderPipeline) callconv(.c) void;
 pub const FnWgpuDeviceCreateCommandEncoder = *const fn (types.WGPUDevice, ?*const types.WGPUCommandEncoderDescriptor) callconv(.c) types.WGPUCommandEncoder;
@@ -129,6 +130,7 @@ pub const Procs = struct {
     wgpuDeviceCreateShaderModule: FnWgpuDeviceCreateShaderModule,
     wgpuShaderModuleRelease: FnWgpuShaderModuleRelease,
     wgpuDeviceCreateComputePipeline: FnWgpuDeviceCreateComputePipeline,
+    wgpuComputePipelineGetBindGroupLayout: FnWgpuComputePipelineGetBindGroupLayout,
     wgpuComputePipelineRelease: FnWgpuComputePipelineRelease,
     wgpuRenderPipelineRelease: ?FnWgpuRenderPipelineRelease,
     wgpuDeviceCreateCommandEncoder: FnWgpuDeviceCreateCommandEncoder,

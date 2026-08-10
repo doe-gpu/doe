@@ -64,6 +64,7 @@ class BenchmarkIrTests(unittest.TestCase):
         oracle = {
             "schema_version": 2,
             "scope": "command_graph",
+            "reference_class": "independent_v1",
             "kind": "sha256_exact_v1",
             "initialization": "zero_fill_v1",
             "binding_group": 0,

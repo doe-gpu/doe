@@ -4,6 +4,7 @@ const std = @import("std");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const model_texture_types = @import("../../contracts/model/model_texture_types.zig");
+const backend_contract = @import("../../contracts/backend.zig");
 const backend_policy = @import("../backend_policy.zig");
 const common_timing = @import("../common/timing.zig");
 const webgpu = @import("../runtime_types.zig");
@@ -34,6 +35,14 @@ pub const upload_uses_direct_path = vk_upload.upload_uses_direct_path;
 
 pub const DispatchMetrics = vk_metrics.DispatchMetrics;
 pub const AsyncProbeResult = probe_ops.AsyncProbeResult;
+
+pub const AdapterIdentity = struct {
+    vendor_id: u32,
+    device_id: u32,
+    driver_version: u32,
+    device_name: [backend_contract.ADAPTER_DEVICE_NAME_BYTES]u8,
+    device_name_len: usize,
+};
 
 pub const NativeVulkanRuntime = struct {
     allocator: std.mem.Allocator,
@@ -159,6 +168,36 @@ pub const NativeVulkanRuntime = struct {
     /// sibling .spv file for `shader_artifact_gate.py --require-spirv-validation`
     /// to validate with spirv-val, then frees the allocation.
     pending_spirv_bytes_owned: ?[]u8 = null,
+
+    pub fn probe_adapter_identity(
+        allocator: std.mem.Allocator,
+        queue_family_policy: webgpu.QueueFamilyPolicy,
+    ) !AdapterIdentity {
+        var probe = NativeVulkanRuntime{
+            .allocator = allocator,
+            .kernel_root = null,
+            .queue_family_policy = queue_family_policy,
+        };
+        try vk_device.create_instance(&probe);
+        defer vk_device.destroy_instance_only(&probe);
+        try vk_device.select_physical_device(&probe);
+
+        var properties2 = std.mem.zeroes(c.VkPhysicalDeviceProperties2);
+        properties2.sType = c.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        c.vkGetPhysicalDeviceProperties2(probe.physical_device, &properties2);
+        const properties = properties2.properties;
+        return .{
+            .vendor_id = properties.vendorID,
+            .device_id = properties.deviceID,
+            .driver_version = properties.driverVersion,
+            .device_name = properties.deviceName,
+            .device_name_len = std.mem.indexOfScalar(
+                u8,
+                properties.deviceName[0..],
+                0,
+            ) orelse properties.deviceName.len,
+        };
+    }
 
     pub fn init(allocator: std.mem.Allocator, kernel_root: ?[]const u8) !NativeVulkanRuntime {
         return init_with_backend_policy(allocator, kernel_root, .prefer_graphics_compute, .prefer_timeline_semaphore, .fixed_32_when_supported);

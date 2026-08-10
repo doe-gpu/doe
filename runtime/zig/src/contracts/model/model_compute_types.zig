@@ -43,9 +43,15 @@ pub const KernelDispatchOutputOracleScope = enum(u8) {
     command_graph,
 };
 
+pub const KernelDispatchOutputOracleReferenceClass = enum(u8) {
+    independent,
+    cross_runtime_consensus,
+};
+
 pub const KernelDispatchOutputOracle = struct {
     schema_version: u32,
     scope: KernelDispatchOutputOracleScope,
+    reference_class: KernelDispatchOutputOracleReferenceClass,
     kind: []const u8,
     initialization: []const u8,
     binding_group: u32,

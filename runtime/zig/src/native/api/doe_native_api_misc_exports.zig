@@ -25,6 +25,7 @@ comptime {
 
 pub const doeNativeAdapterGetInfo = adapter_info.doeNativeAdapterGetInfo;
 pub const doeNativeAdapterFreeInfo = adapter_info.doeNativeAdapterFreeInfo;
+pub const doeNativeAdapterGetPciIdentity = adapter_info.doeNativeAdapterGetPciIdentity;
 
 pub const doeNativeShaderModuleGetCompilationInfo = shader_compilation_info.doeNativeShaderModuleGetCompilationInfo;
 

@@ -9,6 +9,7 @@ pub const FnWgpuDeviceCreateBuffer = procs.FnWgpuDeviceCreateBuffer;
 pub const FnWgpuDeviceCreateShaderModule = procs.FnWgpuDeviceCreateShaderModule;
 pub const FnWgpuShaderModuleRelease = procs.FnWgpuShaderModuleRelease;
 pub const FnWgpuDeviceCreateComputePipeline = procs.FnWgpuDeviceCreateComputePipeline;
+pub const FnWgpuComputePipelineGetBindGroupLayout = procs.FnWgpuComputePipelineGetBindGroupLayout;
 pub const FnWgpuComputePipelineRelease = procs.FnWgpuComputePipelineRelease;
 pub const FnWgpuRenderPipelineRelease = procs.FnWgpuRenderPipelineRelease;
 pub const FnWgpuDeviceCreateCommandEncoder = procs.FnWgpuDeviceCreateCommandEncoder;

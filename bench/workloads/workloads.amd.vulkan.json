@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "ownership": "generated",
   "generatorId": "bench.tools.generate_backend_workloads:materialize_lane",
-  "generatorInputHash": "2b54bfaefbe2197259bddcf52616d611ee5a963b5057fab817c2b097c9c4e3e8",
-  "generatedAt": "2026-06-04T21:50:48.048578+00:00",
+  "generatorInputHash": "328fefc60bd96e6bc716354a4f29f4dcbc3184a929ebcb9c433069579f727015",
+  "generatedAt": "2026-08-10T15:52:04.270866+00:00",
   "workloads": [
     {
       "id": "compute_matvec_32768x2048_f32",
@@ -614,8 +614,8 @@
     {
       "id": "upload_write_buffer_16mb",
       "api": "vulkan",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "dawnFilter": "BufferUploadPerf.Run/Vulkan_AMD_Radeon_Graphics__RADV_GFX1151__WriteBuffer_BufferSize_16MB",
       "default": true,
       "description": "Single upload command aligned with Dawn BufferUploadPerf WriteBuffer 16MB.",
@@ -630,7 +630,7 @@
       "comparisonTimingDivisor": 1,
       "comparisonUploadBufferUsage": "copy-dst",
       "comparisonUploadSubmitEvery": 1,
-      "comparabilityNotes": "Matched single queue write upload shape on both sides.",
+      "comparabilityNotes": "Command shape matches, but Doe may use host-visible writes while Dawn stages and copies; this row is diagnostic until effective upload paths match.",
       "commandsPath": "examples/upload_16mb_commands.json",
       "quirksPath": "examples/quirks/amd_radv_noop_list.json",
       "vendor": "amd",
@@ -639,19 +639,22 @@
       "comparisonCommandRepeat": 50,
       "comparisonIgnoreFirstOps": 1,
       "timingNormalizationNote": "Strict Dawn-vs-Doe operation comparability uses direct timing (baseline/comparison divisors fixed to 1.0).",
-      "benchmarkClass": "comparable",
+      "pathAsymmetry": true,
+      "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark",
       "cohorts": [
-        "governed",
-        "regression"
+        "regression",
+        "exploration"
       ]
     },
     {
       "id": "upload_write_buffer_1gb",
       "api": "vulkan",
-      "benchmarkClass": "comparable",
-      "claimEligible": true,
-      "comparable": true,
+      "benchmarkClass": "directional",
+      "claimEligible": false,
+      "comparable": false,
       "dawnFilter": "@autodiscover",
       "default": false,
       "description": "Single upload command for large-payload directional profiling (1GB).",
@@ -669,22 +672,25 @@
       "comparisonUploadBufferUsage": "copy-dst",
       "comparisonUploadSubmitEvery": 1,
       "timingNormalizationNote": "Strict Dawn-vs-Doe operation comparability uses direct timing (baseline/comparison divisors fixed to 1.0).",
-      "comparabilityNotes": "Apples-to-apples upload contract via command-stream Dawn delegate lane; both sides execute the same 1GB WriteBuffer workload with strict normalization.",
+      "comparabilityNotes": "Command shape matches, but Doe may use host-visible writes while Dawn stages and copies; this row is diagnostic until effective upload paths match.",
       "commandsPath": "examples/upload_1gb_commands.json",
       "quirksPath": "examples/quirks/amd_radv_noop_list.json",
       "vendor": "amd",
       "family": "gfx11",
       "driver": "24.0.0",
+      "pathAsymmetry": true,
+      "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_autodiscovered",
       "cohorts": [
-        "governed"
+        "exploration"
       ]
     },
     {
       "id": "upload_write_buffer_1kb",
       "api": "vulkan",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "dawnFilter": "BufferUploadPerf.Run/Vulkan_AMD_Radeon_Graphics__RADV_GFX1151__WriteBuffer_BufferSize_1KB",
       "default": true,
       "description": "Single upload command used to align with Dawn BufferUploadPerf WriteBuffer 1KB.",
@@ -699,7 +705,7 @@
       "comparisonTimingDivisor": 1,
       "comparisonUploadBufferUsage": "copy-dst",
       "comparisonUploadSubmitEvery": 1,
-      "comparabilityNotes": "Matched single queue write upload shape on both sides; Fawn uses deferred queue sync to avoid per-command wait inflation at tiny payload size while preserving per-upload timing normalization.",
+      "comparabilityNotes": "Command shape matches, but Doe may use host-visible writes while Dawn stages and copies; this row is diagnostic until effective upload paths match.",
       "commandsPath": "examples/upload_1kb_commands.json",
       "quirksPath": "examples/quirks/amd_radv_noop_list.json",
       "vendor": "amd",
@@ -708,18 +714,21 @@
       "comparisonCommandRepeat": 50000,
       "comparisonIgnoreFirstOps": 1,
       "timingNormalizationNote": "Strict Dawn-vs-Doe operation comparability uses direct timing (baseline/comparison divisors fixed to 1.0).",
-      "benchmarkClass": "comparable",
+      "pathAsymmetry": true,
+      "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark",
       "cohorts": [
-        "governed",
-        "regression"
+        "regression",
+        "exploration"
       ]
     },
     {
       "id": "upload_write_buffer_1mb",
       "api": "vulkan",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "dawnFilter": "BufferUploadPerf.Run/Vulkan_AMD_Radeon_Graphics__RADV_GFX1151__WriteBuffer_BufferSize_1MB",
       "default": true,
       "description": "Single upload command aligned with Dawn BufferUploadPerf WriteBuffer 1MB.",
@@ -734,7 +743,7 @@
       "comparisonTimingDivisor": 1,
       "comparisonUploadBufferUsage": "copy-dst",
       "comparisonUploadSubmitEvery": 1,
-      "comparabilityNotes": "Matched single queue write upload shape on both sides.",
+      "comparabilityNotes": "Command shape matches, but Doe may use host-visible writes while Dawn stages and copies; this row is diagnostic until effective upload paths match.",
       "commandsPath": "examples/upload_1mb_commands.json",
       "quirksPath": "examples/quirks/amd_radv_noop_list.json",
       "vendor": "amd",
@@ -743,19 +752,22 @@
       "comparisonCommandRepeat": 50,
       "comparisonIgnoreFirstOps": 1,
       "timingNormalizationNote": "Strict Dawn-vs-Doe operation comparability uses direct timing (baseline/comparison divisors fixed to 1.0).",
-      "benchmarkClass": "comparable",
+      "pathAsymmetry": true,
+      "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark",
       "cohorts": [
-        "governed",
-        "regression"
+        "regression",
+        "exploration"
       ]
     },
     {
       "id": "upload_write_buffer_256mb",
       "api": "vulkan",
-      "benchmarkClass": "comparable",
-      "claimEligible": true,
-      "comparable": true,
+      "benchmarkClass": "directional",
+      "claimEligible": false,
+      "comparable": false,
       "dawnFilter": "@autodiscover",
       "default": false,
       "description": "Single upload command for large-payload directional profiling (256MB).",
@@ -773,21 +785,24 @@
       "comparisonUploadBufferUsage": "copy-dst",
       "comparisonUploadSubmitEvery": 1,
       "timingNormalizationNote": "Strict Dawn-vs-Doe operation comparability uses direct timing (baseline/comparison divisors fixed to 1.0).",
-      "comparabilityNotes": "Apples-to-apples upload contract via command-stream Dawn delegate lane; both sides execute the same 256MB WriteBuffer workload with strict normalization.",
+      "comparabilityNotes": "Command shape matches, but Doe may use host-visible writes while Dawn stages and copies; this row is diagnostic until effective upload paths match.",
       "commandsPath": "examples/upload_256mb_commands.json",
       "quirksPath": "examples/quirks/amd_radv_noop_list.json",
       "vendor": "amd",
       "family": "gfx11",
       "driver": "24.0.0",
+      "pathAsymmetry": true,
+      "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_autodiscovered",
       "cohorts": [
-        "governed"
+        "exploration"
       ]
     },
     {
       "id": "upload_write_buffer_4gb",
       "api": "vulkan",
-      "claimEligible": true,
+      "claimEligible": false,
       "dawnFilter": "@autodiscover",
       "default": false,
       "description": "Single upload command for large-payload directional profiling (4GB).",
@@ -813,7 +828,7 @@
       "driver": "24.0.0",
       "comparable": false,
       "benchmarkClass": "directional",
-      "directionalReason": "path_asymmetry",
+      "directionalReason": "hardware_path_asymmetry",
       "pathAsymmetry": true,
       "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
       "workloadOrigin": "dawn_autodiscovered",
@@ -824,8 +839,8 @@
     {
       "id": "upload_write_buffer_4mb",
       "api": "vulkan",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "dawnFilter": "BufferUploadPerf.Run/Vulkan_AMD_Radeon_Graphics__RADV_GFX1151__WriteBuffer_BufferSize_4MB",
       "default": true,
       "description": "Single upload command aligned with Dawn BufferUploadPerf WriteBuffer 4MB.",
@@ -840,7 +855,7 @@
       "comparisonTimingDivisor": 1,
       "comparisonUploadBufferUsage": "copy-dst",
       "comparisonUploadSubmitEvery": 1,
-      "comparabilityNotes": "Matched single queue write upload shape on both sides.",
+      "comparabilityNotes": "Command shape matches, but Doe may use host-visible writes while Dawn stages and copies; this row is diagnostic until effective upload paths match.",
       "commandsPath": "examples/upload_4mb_commands.json",
       "quirksPath": "examples/quirks/amd_radv_noop_list.json",
       "vendor": "amd",
@@ -849,17 +864,20 @@
       "comparisonCommandRepeat": 50,
       "comparisonIgnoreFirstOps": 1,
       "timingNormalizationNote": "Strict Dawn-vs-Doe operation comparability uses direct timing (baseline/comparison divisors fixed to 1.0).",
-      "benchmarkClass": "comparable",
+      "pathAsymmetry": true,
+      "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark",
       "cohorts": [
-        "governed",
-        "regression"
+        "regression",
+        "exploration"
       ]
     },
     {
       "id": "upload_write_buffer_64kb",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "default": true,
       "domain": "upload",
       "baselineCommandRepeat": 10000,
@@ -872,7 +890,7 @@
       "comparisonUploadSubmitEvery": 1,
       "name": "buffer-upload 64KB",
       "description": "Single upload command aligned with Dawn BufferUploadPerf WriteBuffer 64KB.",
-      "comparabilityNotes": "Matched single queue write upload shape on both sides.",
+      "comparabilityNotes": "Command shape matches, but Doe may use host-visible writes while Dawn stages and copies; this row is diagnostic until effective upload paths match.",
       "commandsPath": "examples/upload_64kb_commands.json",
       "quirksPath": "examples/quirks/amd_radv_noop_list.json",
       "vendor": "amd",
@@ -884,12 +902,15 @@
       "comparisonCommandRepeat": 10000,
       "comparisonIgnoreFirstOps": 0,
       "timingNormalizationNote": "Strict Dawn-vs-Doe operation comparability uses direct timing (baseline/comparison divisors fixed to 1.0).",
-      "benchmarkClass": "comparable",
+      "pathAsymmetry": true,
+      "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark",
       "cohorts": [
         "smoke",
-        "governed",
-        "regression"
+        "regression",
+        "exploration"
       ]
     },
     {
@@ -2450,13 +2471,13 @@
       "workloadOrigin": "doe_contract_with_dawn_mapping",
       "planPath": "bench/plans/generated/compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces.plan.json",
       "planSchemaVersion": 1,
-      "planHash": "11e34f944dce9a5432c11803bd67bc5f59f62e5d83a014c562dedb213e94ee5e",
+      "planHash": "441ac3236f40b99d871421054ba860b7b954a7027f8c1b35dc5c7009edc2655b",
       "planCommandCount": 8,
       "planDispatchCount": 4,
       "planBufferWriteCount": 4,
       "planBufferLoadCount": 0,
-      "compatibilityCommandHash": "ef6754412ce99dd8a2f84a6dbaa627e4394eccdd06ea40a3ffa069cb8ca3f4ab",
-      "sourceIrSha256": "f0e6bf05fae21cba82499ef06c7776755060958ced4c0eb7b67e9876a740169a",
+      "compatibilityCommandHash": "2f0c15722a1367f4a59a7f6b4ac6d5597891f7561b2167ef62b6e2e1417af4d6",
+      "sourceIrSha256": "1732c9e3e2e3eba24cc648d4764523c84178dd9f508eeab8b9370ee675ec4912",
       "commandsPath": "bench/plans/generated/compat/compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces_commands.json",
       "cohorts": [
         "governed"
@@ -2487,13 +2508,13 @@
       "workloadOrigin": "doe_contract_with_dawn_mapping",
       "planPath": "bench/plans/generated/compute_stable_fluids_multistage_256grid_18pressure_4steps.plan.json",
       "planSchemaVersion": 1,
-      "planHash": "bf72511a26defa3882adec42875ffdeb894f01c28bf1c2e12eacbef2f17f3673",
+      "planHash": "5c657399b7837fd665f49c70282c02e20ee9dd35fa70834ee7d35c8dd70f5a82",
       "planCommandCount": 94,
       "planDispatchCount": 93,
       "planBufferWriteCount": 1,
       "planBufferLoadCount": 0,
-      "compatibilityCommandHash": "99ce6f2b6a450bf7ea5aeec6fc8e9f3e6a453c5801da57f6459ff00275cd982c",
-      "sourceIrSha256": "f0e6bf05fae21cba82499ef06c7776755060958ced4c0eb7b67e9876a740169a",
+      "compatibilityCommandHash": "199d706b32b59f131ab3a6d1864e5f021f6239a6eb6b034836a99ad432866a2f",
+      "sourceIrSha256": "1732c9e3e2e3eba24cc648d4764523c84178dd9f508eeab8b9370ee675ec4912",
       "commandsPath": "bench/plans/generated/compat/compute_stable_fluids_multistage_256grid_18pressure_4steps_commands.json",
       "cohorts": [
         "governed"

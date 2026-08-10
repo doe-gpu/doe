@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "ownership": "generated",
   "generatorId": "bench.tools.generate_backend_workloads:materialize_lane",
-  "generatorInputHash": "2b54bfaefbe2197259bddcf52616d611ee5a963b5057fab817c2b097c9c4e3e8",
-  "generatedAt": "2026-06-04T21:50:48.048578+00:00",
+  "generatorInputHash": "328fefc60bd96e6bc716354a4f29f4dcbc3184a929ebcb9c433069579f727015",
+  "generatedAt": "2026-08-10T15:52:04.270866+00:00",
   "workloads": [
     {
       "id": "compute_kernel_dispatch_100",
@@ -660,8 +660,8 @@
     {
       "id": "upload_write_buffer_16mb",
       "api": "vulkan",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "dawnFilter": "BufferUploadPerf.Run/Vulkan_AMD_Radeon_Graphics__RADV_GFX1151__WriteBuffer_BufferSize_16MB",
       "default": true,
       "description": "Single upload command aligned with Dawn BufferUploadPerf WriteBuffer 16MB.",
@@ -689,15 +689,16 @@
         "release",
         "regression"
       ],
-      "benchmarkClass": "comparable",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark"
     },
     {
       "id": "upload_write_buffer_1gb",
       "api": "vulkan",
-      "benchmarkClass": "comparable",
-      "claimEligible": true,
-      "comparable": true,
+      "benchmarkClass": "directional",
+      "claimEligible": false,
+      "comparable": false,
       "dawnFilter": "@autodiscover",
       "default": false,
       "description": "Single upload command for large-payload directional profiling (1GB).",
@@ -728,13 +729,14 @@
         "regression",
         "extended"
       ],
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_autodiscovered"
     },
     {
       "id": "upload_write_buffer_1kb",
       "api": "vulkan",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "dawnFilter": "BufferUploadPerf.Run/Vulkan_AMD_Radeon_Graphics__RADV_GFX1151__WriteBuffer_BufferSize_1KB",
       "default": true,
       "description": "Single upload command used to align with Dawn BufferUploadPerf WriteBuffer 1KB.",
@@ -762,14 +764,15 @@
         "release",
         "regression"
       ],
-      "benchmarkClass": "comparable",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark"
     },
     {
       "id": "upload_write_buffer_1mb",
       "api": "vulkan",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "dawnFilter": "BufferUploadPerf.Run/Vulkan_AMD_Radeon_Graphics__RADV_GFX1151__WriteBuffer_BufferSize_1MB",
       "default": true,
       "description": "Single upload command aligned with Dawn BufferUploadPerf WriteBuffer 1MB.",
@@ -797,15 +800,16 @@
         "release",
         "regression"
       ],
-      "benchmarkClass": "comparable",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark"
     },
     {
       "id": "upload_write_buffer_256mb",
       "api": "vulkan",
-      "benchmarkClass": "comparable",
-      "claimEligible": true,
-      "comparable": true,
+      "benchmarkClass": "directional",
+      "claimEligible": false,
+      "comparable": false,
       "dawnFilter": "@autodiscover",
       "default": false,
       "description": "Single upload command for large-payload directional profiling (256MB).",
@@ -836,12 +840,13 @@
         "regression",
         "extended"
       ],
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_autodiscovered"
     },
     {
       "id": "upload_write_buffer_4gb",
       "api": "vulkan",
-      "claimEligible": true,
+      "claimEligible": false,
       "dawnFilter": "@autodiscover",
       "default": false,
       "description": "Single upload command for large-payload directional profiling (4GB).",
@@ -865,21 +870,22 @@
       "vendor": "intel",
       "family": "gen12",
       "driver": "31.0.101",
-      "comparable": true,
-      "benchmarkClass": "comparable",
+      "comparable": false,
+      "benchmarkClass": "directional",
       "pathAsymmetry": true,
       "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
       "suiteTags": [
         "release",
         "extended"
       ],
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_autodiscovered"
     },
     {
       "id": "upload_write_buffer_4mb",
       "api": "vulkan",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "dawnFilter": "BufferUploadPerf.Run/Vulkan_AMD_Radeon_Graphics__RADV_GFX1151__WriteBuffer_BufferSize_4MB",
       "default": true,
       "description": "Single upload command aligned with Dawn BufferUploadPerf WriteBuffer 4MB.",
@@ -907,13 +913,14 @@
         "release",
         "regression"
       ],
-      "benchmarkClass": "comparable",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark"
     },
     {
       "id": "upload_write_buffer_64kb",
-      "comparable": true,
-      "claimEligible": true,
+      "comparable": false,
+      "claimEligible": false,
       "default": true,
       "domain": "upload",
       "baselineTimingDivisor": 1,
@@ -942,7 +949,8 @@
         "release",
         "regression"
       ],
-      "benchmarkClass": "comparable",
+      "benchmarkClass": "directional",
+      "directionalReason": "hardware_path_asymmetry",
       "workloadOrigin": "dawn_benchmark"
     },
     {

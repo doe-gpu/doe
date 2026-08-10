@@ -13,8 +13,6 @@ const p0_procs_mod = @import("../abi/procs/wgpu_p0_procs.zig");
 const resources = @import("../resource/wgpu_resources.zig");
 
 const BARRIER_SCRATCH_BUFFER_HANDLE: u64 = 0xFFFF_FFFF_FFFF_FFFB;
-const DISPATCH_INDIRECT_ARGS_HANDLE: u64 = 0xFFFF_FFFF_FFFF_FFFA;
-const BUFFER_USAGE_INDIRECT: abi_base.WGPUBufferUsage = 0x0000000000000100;
 const MAX_KERNEL_SOURCE_BYTES: usize = 4 * 1024 * 1024;
 const WHOLE_BUFFER_BINDING_MIN_BYTES: u64 = 4;
 const DEFAULT_DISPATCH_WGSL_KERNEL = "dispatch_noop.wgsl";
@@ -117,16 +115,76 @@ pub fn executeKernelDispatch(self: anytype, kernel: model_compute_types.KernelDi
     );
 }
 
-pub fn pipelineCacheKey(source_bytes: []const u8, entry_point: []const u8) u64 {
+fn mixPipelineCacheValue(hash: *u64, value: u64) void {
+    hash.* = (hash.* ^ value) *% 0x517cc1b727220a95;
+}
+
+pub fn pipelineCacheKey(
+    source_bytes: []const u8,
+    entry_point: []const u8,
+    bindings: ?[]const model_compute_types.KernelBinding,
+) u64 {
     var h: u64 = 0x9e3779b97f4a7c15;
     for (source_bytes) |b| {
-        h = (h ^ b) *% 0x517cc1b727220a95;
+        mixPipelineCacheValue(&h, b);
     }
-    h ^= 0xff;
+    mixPipelineCacheValue(&h, 0xff);
     for (entry_point) |b| {
-        h = (h ^ b) *% 0x517cc1b727220a95;
+        mixPipelineCacheValue(&h, b);
+    }
+    mixPipelineCacheValue(&h, 0xfe);
+    if (bindings) |bound| {
+        mixPipelineCacheValue(&h, bound.len);
+        for (bound) |binding| {
+            mixPipelineCacheValue(&h, binding.group);
+            mixPipelineCacheValue(&h, binding.binding);
+            mixPipelineCacheValue(&h, @intFromEnum(binding.resource_kind));
+            mixPipelineCacheValue(&h, binding.visibility);
+            mixPipelineCacheValue(&h, binding.buffer_size);
+            mixPipelineCacheValue(&h, binding.buffer_type);
+            mixPipelineCacheValue(&h, binding.texture_sample_type);
+            mixPipelineCacheValue(&h, binding.texture_view_dimension);
+            mixPipelineCacheValue(&h, binding.storage_texture_access);
+            mixPipelineCacheValue(&h, binding.texture_aspect);
+            mixPipelineCacheValue(&h, binding.texture_format);
+            mixPipelineCacheValue(&h, @intFromBool(binding.texture_multisampled));
+        }
     }
     return h;
+}
+
+test "pipeline cache identity follows binding layout not resource handle" {
+    const source = "@compute @workgroup_size(1) fn main() {}";
+    const first = [_]model_compute_types.KernelBinding{.{
+        .binding = 0,
+        .resource_kind = .buffer,
+        .resource_handle = 11,
+        .buffer_size = 1024,
+        .buffer_type = model_gpu_types.WGPUBufferBindingType_Storage,
+    }};
+    const same_layout = [_]model_compute_types.KernelBinding{.{
+        .binding = 0,
+        .resource_kind = .buffer,
+        .resource_handle = 22,
+        .buffer_size = 1024,
+        .buffer_type = model_gpu_types.WGPUBufferBindingType_Storage,
+    }};
+    const different_layout = [_]model_compute_types.KernelBinding{.{
+        .binding = 0,
+        .resource_kind = .buffer,
+        .resource_handle = 11,
+        .buffer_size = 512,
+        .buffer_type = model_gpu_types.WGPUBufferBindingType_Storage,
+    }};
+
+    const first_key = pipelineCacheKey(source, "main", first[0..]);
+    try std.testing.expectEqual(
+        first_key,
+        pipelineCacheKey(source, "main", same_layout[0..]),
+    );
+    try std.testing.expect(
+        first_key != pipelineCacheKey(source, "main", different_layout[0..]),
+    );
 }
 
 pub fn executeKernelDispatchKernel(
@@ -154,7 +212,7 @@ pub fn executeKernelDispatchKernel(
     const procs = self.core.procs orelse return error.ProceduralNotReady;
     const p0_procs = p0_procs_mod.loadP0Procs(self.core.dyn_lib);
 
-    const cache_key = pipelineCacheKey(source.source, entry_point);
+    const cache_key = pipelineCacheKey(source.source, entry_point, bindings);
     const cached = self.core.pipeline_cache.get(cache_key);
 
     var artifacts: ?abi_records.DispatchPassArtifacts = null;
@@ -166,7 +224,15 @@ pub fn executeKernelDispatchKernel(
                     .status_message = status_message,
                 };
             }
-            artifacts = try resources.buildDispatchPassGroups(self, bound, initialize_buffers_on_create);
+            artifacts = if (cached) |hit|
+                try resources.buildDispatchPassGroupsForPipeline(
+                    self,
+                    bound,
+                    initialize_buffers_on_create,
+                    hit.pipeline,
+                )
+            else
+                try resources.buildDispatchPassGroups(self, bound, initialize_buffers_on_create);
         }
     }
     defer {
@@ -242,10 +308,7 @@ pub fn executeKernelDispatchKernel(
     var query_set: abi_base.WGPUQuerySet = null;
     var resolve_buffer: abi_base.WGPUBuffer = null;
     var readback_buffer: abi_base.WGPUBuffer = null;
-    const dispatch_indirect_proc = if (p0_procs) |loaded| loaded.compute_pass_encoder_dispatch_workgroups_indirect else null;
-    const command_encoder_write_buffer = if (p0_procs) |loaded| loaded.command_encoder_write_buffer else null;
     const compute_pass_write_timestamp = if (p0_procs) |loaded| loaded.compute_pass_encoder_write_timestamp else null;
-    var dispatch_indirect_buffer: abi_base.WGPUBuffer = null;
 
     if (use_timestamps) {
         query_set = procs.wgpuDeviceCreateQuerySet(self.core.device.?, &abi_descriptor.WGPUQuerySetDescriptor{
@@ -277,14 +340,6 @@ pub fn executeKernelDispatchKernel(
                 .mappedAtCreation = abi_base.WGPU_FALSE,
             });
         }
-    }
-    if (dispatch_indirect_proc != null and command_encoder_write_buffer != null) {
-        dispatch_indirect_buffer = resources.getOrCreateBuffer(
-            self,
-            DISPATCH_INDIRECT_ARGS_HANDLE,
-            @sizeOf([3]u32),
-            BUFFER_USAGE_INDIRECT | abi_base.WGPUBufferUsage_CopyDst,
-        ) catch null;
     }
     const timestamps_active = query_set != null and resolve_buffer != null and readback_buffer != null;
     self.timestampLog(
@@ -327,12 +382,6 @@ pub fn executeKernelDispatchKernel(
         }
         defer procs.wgpuCommandEncoderRelease(warmup_encoder);
 
-        if (dispatch_indirect_proc != null and command_encoder_write_buffer != null and dispatch_indirect_buffer != null) {
-            const dispatch_args = [3]u32{ x, y, z };
-            const dispatch_args_bytes = std.mem.asBytes(&dispatch_args);
-            command_encoder_write_buffer.?(warmup_encoder, dispatch_indirect_buffer, 0, dispatch_args_bytes.ptr, @as(u64, dispatch_args_bytes.len));
-        }
-
         const warmup_pass = procs.wgpuCommandEncoderBeginComputePass(
             warmup_encoder,
             &abi_descriptor.WGPUComputePassDescriptor{
@@ -362,11 +411,7 @@ pub fn executeKernelDispatchKernel(
         }
         var warmup_dispatch_index: u32 = 0;
         while (warmup_dispatch_index < warmup_dispatch_count) : (warmup_dispatch_index += 1) {
-            if (dispatch_indirect_proc != null and dispatch_indirect_buffer != null) {
-                dispatch_indirect_proc.?(warmup_pass, dispatch_indirect_buffer, 0);
-            } else {
-                procs.wgpuComputePassEncoderDispatchWorkgroups(warmup_pass, x, y, z);
-            }
+            procs.wgpuComputePassEncoderDispatchWorkgroups(warmup_pass, x, y, z);
         }
         procs.wgpuComputePassEncoderEnd(warmup_pass);
 
@@ -415,12 +460,6 @@ pub fn executeKernelDispatchKernel(
     if (use_command_encoder_timestamps) {
         command_encoder_write_timestamp.?(encoder, query_set, 0);
     }
-    if (dispatch_indirect_proc != null and command_encoder_write_buffer != null and dispatch_indirect_buffer != null) {
-        const dispatch_args = [3]u32{ x, y, z };
-        const dispatch_args_bytes = std.mem.asBytes(&dispatch_args);
-        command_encoder_write_buffer.?(encoder, dispatch_indirect_buffer, 0, dispatch_args_bytes.ptr, @as(u64, dispatch_args_bytes.len));
-    }
-
     const pass = procs.wgpuCommandEncoderBeginComputePass(
         encoder,
         &abi_descriptor.WGPUComputePassDescriptor{
@@ -453,11 +492,7 @@ pub fn executeKernelDispatchKernel(
     }
     var dispatch_index: u32 = 0;
     while (dispatch_index < repeat_count) : (dispatch_index += 1) {
-        if (dispatch_indirect_proc != null and dispatch_indirect_buffer != null) {
-            dispatch_indirect_proc.?(pass, dispatch_indirect_buffer, 0);
-        } else {
-            procs.wgpuComputePassEncoderDispatchWorkgroups(pass, x, y, z);
-        }
+        procs.wgpuComputePassEncoderDispatchWorkgroups(pass, x, y, z);
     }
     if (use_compute_pass_timestamps) {
         compute_pass_write_timestamp.?(pass, query_set, 1);

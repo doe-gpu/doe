@@ -17,6 +17,9 @@ const adapterIdentity = info ? Object.fromEntries([
   'adapterType',
   'driver',
   'driverDescription',
+  'vendorID',
+  'deviceID',
+  'driverVersion',
 ].flatMap((key) => info[key] === undefined ? [] : [[key, info[key]]])) : null;
 console.log(`DOE_VGPU_PROVIDER_PROBE=${JSON.stringify({
   provider: __doeHarnessProviderIdentity,

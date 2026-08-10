@@ -361,6 +361,18 @@
             },
             "description": {
               "type": "string"
+            },
+            "vendorID": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "deviceID": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "driverVersion": {
+              "type": "integer",
+              "minimum": 0
             }
           }
         }

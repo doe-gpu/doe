@@ -100,6 +100,9 @@ def _make_run_result() -> dict:
                         "device": "gfx1100",
                         "architecture": "rdna3",
                         "description": "AMD Radeon Graphics",
+                        "vendorID": 0x1002,
+                        "deviceID": 0x744C,
+                        "driverVersion": 109051904,
                     },
                 },
             }
@@ -191,6 +194,8 @@ class TestRunReceiptRoundTrip(unittest.TestCase):
         self.assertEqual(artifact["invocation"]["iterations"], 2)
         self.assertEqual(len(artifact["samples"]), 1)
         self.assertEqual(artifact["execution"]["timedSampleCount"], 1)
+        self.assertEqual(artifact["hostIdentity"]["driver"], "109051904")
+        self.assertEqual(artifact["hostIdentity"]["adapter"]["vendorID"], 0x1002)
 
     def test_command_only_receipt_is_not_timed_execution_evidence(self) -> None:
         artifact = build_run_artifact(

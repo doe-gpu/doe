@@ -35,6 +35,7 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         oracle_match: bool = True,
         oracle_dispatch_count: int = 3,
         oracle_on_final_dispatch: bool = True,
+        oracle_reference_class: str | None = None,
     ):
         kernel_root = root / "bench" / "kernels"
         kernel_root.mkdir(parents=True)
@@ -55,6 +56,10 @@ class NativeShaderComparabilityTests(unittest.TestCase):
                 "dispatch_count": oracle_dispatch_count,
             },
         }
+        if oracle_reference_class is not None:
+            dispatch_command["output_oracle"]["reference_class"] = (
+                oracle_reference_class
+            )
         commands_payload = [dispatch_command]
         if duplicate_dispatch:
             command_without_oracle = dict(dispatch_command)
@@ -149,6 +154,20 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         self.assertTrue(applies)
         self.assertFalse(passes)
         self.assertIn("final kernel_dispatch", reason)
+
+    def test_cross_runtime_consensus_is_not_an_independent_oracle(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            applies, passes, details, reason = self._assess(
+                Path(tmpdir),
+                oracle_reference_class="cross_runtime_consensus_v1",
+            )
+        self.assertTrue(applies)
+        self.assertFalse(passes)
+        self.assertEqual(
+            details["finalKernelDispatchOracleReferenceClass"],
+            "cross_runtime_consensus_v1",
+        )
+        self.assertIn("independent output oracle", reason)
 
     def test_multistage_manifests_are_collected_from_dispatch_trace_rows(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

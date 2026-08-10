@@ -232,6 +232,7 @@ pub fn loadProcs(lib: std.DynLib) !abi_proc_aliases.Procs {
         .wgpuDeviceCreateShaderModule = try loadProc(lib, "wgpuDeviceCreateShaderModule", abi_proc_aliases.FnWgpuDeviceCreateShaderModule),
         .wgpuShaderModuleRelease = try loadProc(lib, "wgpuShaderModuleRelease", abi_proc_aliases.FnWgpuShaderModuleRelease),
         .wgpuDeviceCreateComputePipeline = try loadProc(lib, "wgpuDeviceCreateComputePipeline", abi_proc_aliases.FnWgpuDeviceCreateComputePipeline),
+        .wgpuComputePipelineGetBindGroupLayout = try loadProc(lib, "wgpuComputePipelineGetBindGroupLayout", abi_proc_aliases.FnWgpuComputePipelineGetBindGroupLayout),
         .wgpuComputePipelineRelease = try loadProc(lib, "wgpuComputePipelineRelease", abi_proc_aliases.FnWgpuComputePipelineRelease),
         .wgpuRenderPipelineRelease = try loadOptionalProc(lib, "wgpuRenderPipelineRelease", abi_proc_aliases.FnWgpuRenderPipelineRelease),
         .wgpuDeviceCreateCommandEncoder = try loadProc(lib, "wgpuDeviceCreateCommandEncoder", abi_proc_aliases.FnWgpuDeviceCreateCommandEncoder),

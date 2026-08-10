@@ -122,19 +122,21 @@ class BackendWorkloadCatalogTests(unittest.TestCase):
                     msg=f"{row['id']} must have benchmarkClass=comparable in the governed cohort for {lane_id}",
                 )
 
-    def test_amd_vulkan_governed_upload_rows_do_not_carry_path_asymmetry(self) -> None:
+    def test_amd_vulkan_path_asymmetric_upload_rows_are_diagnostic(self) -> None:
         materialized = self.generator.materialize_lane(self.catalog, "amd_vulkan")
         for row in materialized["workloads"]:
             if row.get("domain") != "upload":
                 continue
-            if "governed" not in row.get("cohorts", []):
-                continue
-            if not row.get("comparable"):
+            if not row.get("pathAsymmetry", False):
                 continue
             self.assertFalse(
-                row.get("pathAsymmetry", False),
-                msg=f"{row['id']} must not carry pathAsymmetry in the governed AMD Vulkan comparable cohort",
+                row.get("comparable"),
+                msg=f"{row['id']} cannot be comparable while its upload path is asymmetric",
             )
+            self.assertFalse(row.get("claimEligible"))
+            self.assertEqual(row.get("benchmarkClass"), "directional")
+            self.assertEqual(row.get("directionalReason"), "hardware_path_asymmetry")
+            self.assertNotIn("governed", row.get("cohorts", []))
 
     def test_amd_vulkan_non_vetted_non_app_domains_remain_directional(self) -> None:
         materialized = self.generator.materialize_lane(self.catalog, "amd_vulkan")

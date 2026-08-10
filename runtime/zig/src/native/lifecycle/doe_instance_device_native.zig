@@ -50,6 +50,7 @@ const WGPU_REQUEST_STATUS_UNAVAILABLE: u32 = 3;
 const WGPU_REQUEST_STATUS_ERROR: u32 = 4;
 const MSG_ADAPTER_UNAVAILABLE = "metal default device unavailable";
 const MSG_ADAPTER_ALLOCATION_FAILED = "adapter allocation failed";
+const MSG_VK_ADAPTER_PROBE_FAILED = "vulkan physical adapter probe failed";
 const MSG_INVALID_ADAPTER = "invalid adapter handle";
 const MSG_QUEUE_UNAVAILABLE = "metal command queue unavailable";
 const MSG_DEVICE_ALLOCATION_FAILED = "device allocation failed";
@@ -219,6 +220,7 @@ const CreateDeviceError = error{
 const CreateAdapterError = error{
     AdapterUnavailable,
     AdapterAllocationFailed,
+    VkAdapterProbeFailed,
 };
 
 fn create_device_error_message(err: CreateDeviceError) abi_base.WGPUStringView {
@@ -237,6 +239,7 @@ fn create_adapter_error_message(err: CreateAdapterError) abi_base.WGPUStringView
     return switch (err) {
         error.AdapterUnavailable => stringView(MSG_ADAPTER_UNAVAILABLE),
         error.AdapterAllocationFailed => stringView(MSG_ADAPTER_ALLOCATION_FAILED),
+        error.VkAdapterProbeFailed => stringView(MSG_VK_ADAPTER_PROBE_FAILED),
     };
 }
 
@@ -253,9 +256,24 @@ fn create_adapter_for_instance(inst: ?*anyopaque) CreateAdapterError!*DoeAdapter
         },
         .vulkan => {
             if (comptime has_vulkan) {
+                const selected_policy = selected_vulkan_policy() catch {
+                    return error.VkAdapterProbeFailed;
+                };
+                const identity = NativeVulkanRuntime.probe_adapter_identity(
+                    alloc,
+                    selected_policy.queue_family_policy,
+                ) catch return error.VkAdapterProbeFailed;
                 const adapter = make(DoeAdapter) orelse return error.AdapterAllocationFailed;
                 if (retained_instance) |instance_ref| instance_add_ref(instance_ref);
-                adapter.* = .{ .backend = .vulkan, .instance = retained_instance };
+                adapter.* = .{
+                    .backend = .vulkan,
+                    .instance = retained_instance,
+                    .vendor_id = identity.vendor_id,
+                    .device_id = identity.device_id,
+                    .driver_version = identity.driver_version,
+                    .device_name = identity.device_name,
+                    .device_name_len = identity.device_name_len,
+                };
                 return adapter;
             }
         },
@@ -459,7 +477,7 @@ pub export fn doeNativeRequestAdapterFlat(
     const adapter = create_adapter_for_instance(inst) catch |err| {
         const status: u32 = switch (err) {
             error.AdapterUnavailable => WGPU_REQUEST_STATUS_UNAVAILABLE,
-            error.AdapterAllocationFailed => WGPU_REQUEST_STATUS_ERROR,
+            error.AdapterAllocationFailed, error.VkAdapterProbeFailed => WGPU_REQUEST_STATUS_ERROR,
         };
         if (callback) |cb| cb(status, null, create_adapter_error_message(err), userdata1, userdata2);
         return .{ .id = 1 };
@@ -487,7 +505,7 @@ pub export fn doeNativeInstanceRequestAdapter(
     const adapter = create_adapter_for_instance(inst) catch |err| {
         const status: abi_callback.WGPURequestAdapterStatus = switch (err) {
             error.AdapterUnavailable => .unavailable,
-            error.AdapterAllocationFailed => .@"error",
+            error.AdapterAllocationFailed, error.VkAdapterProbeFailed => .@"error",
         };
         call_request_adapter_callback(info, status, null, create_adapter_error_message(err));
         return .{ .id = 1 };

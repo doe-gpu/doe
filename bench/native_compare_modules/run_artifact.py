@@ -401,18 +401,29 @@ def _host_identity(
     adapter_info = trace_meta.get("adapterInfo", {})
     if not isinstance(adapter_info, dict):
         adapter_info = {}
+    vendor_id = reporting_mod.safe_int(adapter_info.get("vendorID"))
+    device_id = reporting_mod.safe_int(adapter_info.get("deviceID"))
+    driver_version = reporting_mod.safe_int(adapter_info.get("driverVersion"))
+    runtime_driver = (
+        str(driver_version)
+        if driver_version > 0
+        else ""
+    )
     return {
         "hostname": platform.node(),
         "os": platform.system().lower(),
         "kernel": platform.release(),
         "arch": platform.machine(),
         "api": workload_spec.api,
-        "driver": str(trace_meta.get("driver", "")).strip() or workload_spec.driver,
+        "driver": runtime_driver or str(trace_meta.get("driver", "")).strip() or workload_spec.driver,
         "adapter": {
             "vendor": str(adapter_info.get("vendor", "")).strip() or workload_spec.vendor,
             "device": str(adapter_info.get("device", "")).strip(),
             "architecture": str(adapter_info.get("architecture", "")).strip(),
             "description": str(adapter_info.get("description", "")).strip(),
+            "vendorID": vendor_id,
+            "deviceID": device_id,
+            "driverVersion": driver_version,
         },
     }
 

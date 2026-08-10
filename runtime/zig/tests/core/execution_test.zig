@@ -335,44 +335,44 @@ test "ExecutionResult default construction has correct zero values" {
 // pipelineCacheKey — determinism and sensitivity
 
 test "pipelineCacheKey is deterministic for identical inputs" {
-    const key_a = compute_commands.pipelineCacheKey("@compute fn main() {}", "main");
-    const key_b = compute_commands.pipelineCacheKey("@compute fn main() {}", "main");
+    const key_a = compute_commands.pipelineCacheKey("@compute fn main() {}", "main", null);
+    const key_b = compute_commands.pipelineCacheKey("@compute fn main() {}", "main", null);
     try testing.expectEqual(key_a, key_b);
 }
 
 test "pipelineCacheKey differs for different source" {
-    const key_a = compute_commands.pipelineCacheKey("@compute fn main() {}", "main");
-    const key_b = compute_commands.pipelineCacheKey("@compute fn other() {}", "main");
+    const key_a = compute_commands.pipelineCacheKey("@compute fn main() {}", "main", null);
+    const key_b = compute_commands.pipelineCacheKey("@compute fn other() {}", "main", null);
     try testing.expect(key_a != key_b);
 }
 
 test "pipelineCacheKey differs for different entry point" {
-    const key_a = compute_commands.pipelineCacheKey("@compute fn main() {}", "main");
-    const key_b = compute_commands.pipelineCacheKey("@compute fn main() {}", "dispatch");
+    const key_a = compute_commands.pipelineCacheKey("@compute fn main() {}", "main", null);
+    const key_b = compute_commands.pipelineCacheKey("@compute fn main() {}", "dispatch", null);
     try testing.expect(key_a != key_b);
 }
 
 test "pipelineCacheKey handles empty source" {
-    const key_a = compute_commands.pipelineCacheKey("", "main");
-    const key_b = compute_commands.pipelineCacheKey("x", "main");
+    const key_a = compute_commands.pipelineCacheKey("", "main", null);
+    const key_b = compute_commands.pipelineCacheKey("x", "main", null);
     try testing.expect(key_a != key_b);
 }
 
 test "pipelineCacheKey handles empty entry point" {
-    const key_a = compute_commands.pipelineCacheKey("@compute fn main() {}", "");
-    const key_b = compute_commands.pipelineCacheKey("@compute fn main() {}", "main");
+    const key_a = compute_commands.pipelineCacheKey("@compute fn main() {}", "", null);
+    const key_b = compute_commands.pipelineCacheKey("@compute fn main() {}", "main", null);
     try testing.expect(key_a != key_b);
 }
 
 test "pipelineCacheKey is order-sensitive between source and entry point" {
     // Ensure the separator (h ^= 0xff) prevents source/entry collisions
-    const key_a = compute_commands.pipelineCacheKey("abc", "def");
-    const key_b = compute_commands.pipelineCacheKey("abcdef", "");
+    const key_a = compute_commands.pipelineCacheKey("abc", "def", null);
+    const key_b = compute_commands.pipelineCacheKey("abcdef", "", null);
     try testing.expect(key_a != key_b);
 }
 
 test "pipelineCacheKey produces non-zero values" {
-    const key = compute_commands.pipelineCacheKey("@compute fn main() {}", "main");
+    const key = compute_commands.pipelineCacheKey("@compute fn main() {}", "main", null);
     try testing.expect(key != 0);
 }
 

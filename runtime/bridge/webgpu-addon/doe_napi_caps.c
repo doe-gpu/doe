@@ -395,6 +395,19 @@ napi_value doe_adapter_get_info(napi_env env, napi_callback_info info) {
         napi_set_named_property(env, obj, "isFallbackAdapter", v_is_fallback);
         napi_set_named_property(env, obj, "subgroupMinSize", v_sg_min);
         napi_set_named_property(env, obj, "subgroupMaxSize", v_sg_max);
+        if (pfn_doeNativeAdapterGetPciIdentity) {
+            uint32_t vendor_id = 0;
+            uint32_t device_id = 0;
+            uint32_t driver_version = 0;
+            napi_value v_vendor_id, v_device_id, v_driver_version;
+            pfn_doeNativeAdapterGetPciIdentity(adapter, &vendor_id, &device_id, &driver_version);
+            napi_create_uint32(env, vendor_id, &v_vendor_id);
+            napi_create_uint32(env, device_id, &v_device_id);
+            napi_create_uint32(env, driver_version, &v_driver_version);
+            napi_set_named_property(env, obj, "vendorID", v_vendor_id);
+            napi_set_named_property(env, obj, "deviceID", v_device_id);
+            napi_set_named_property(env, obj, "driverVersion", v_driver_version);
+        }
         pfn_doeNativeAdapterFreeInfo(block);
         return obj;
     }

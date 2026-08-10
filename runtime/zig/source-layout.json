@@ -964,9 +964,9 @@
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "943122430ebb1de757bd3af89ea5fe6226efb05b0fe0af34140ecc5fd32531e5",
+        "moduleSha256": "742ab4b261ee6cb06b3496545bc13d997a60e1a4328700857059abfba17df26d",
         "reason": "Keep: owns Vulkan device/queue runtime lifetime and synchronization; adjacent resource, pipeline, upload, render, and surface capsules already own the separable domains.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
       "src/backend/vulkan/vk_async_dispatch.zig": {
         "decision": "Keep",
@@ -1186,9 +1186,9 @@
       },
       "src/backend/webgpu_backend_ops.zig": {
         "decision": "Keep",
-        "moduleSha256": "75c6d8f11e1f8bcf83f5c211d2bdac2f57e64fe03a23a7143990a5b1f01d8f71",
+        "moduleSha256": "038863534f4f675d62ffbbe07cf87bd50908c9925d6ad671c03654541d4df814",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-dawn-layout-cache-key/2026-08-10"
       },
       "src/backend/webgpu_backend_support.zig": {
         "decision": "Keep",
@@ -1330,9 +1330,9 @@
       },
       "src/command/command_json_raw.zig": {
         "decision": "Keep",
-        "moduleSha256": "c0c737f389f505c034e7d7af27298cb96e01519d95adb19bf43c308d98f0c1ca",
+        "moduleSha256": "807830dec4ac1394e616b0ecaf8b9f55334ce89b7e503561e58e4b316fb726a3",
         "reason": "Keep: reachable command implementation shared by 6 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-output-oracle-graph/2026-08-10"
+        "reviewer": "codex-oracle-reference-class/2026-08-10"
       },
       "src/command/command_kind.zig": {
         "decision": "Keep",
@@ -1348,9 +1348,9 @@
       },
       "src/command/command_parse_dispatch.zig": {
         "decision": "Keep",
-        "moduleSha256": "14f2ce226168f944d67d76aec16ba7e3e722184cbfc2c6249b126cb4a6c68e86",
+        "moduleSha256": "bfef873c36c562be06afa4d1c058b84ba65bb9f8bd1bdc2c082bc2b1fb60d3d3",
         "reason": "Keep: reachable command implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-output-oracle-graph/2026-08-10"
+        "reviewer": "codex-oracle-reference-class/2026-08-10"
       },
       "src/command/command_parse_helpers.zig": {
         "decision": "Keep",
@@ -2356,9 +2356,9 @@
       },
       "src/contracts/backend.zig": {
         "decision": "Keep",
-        "moduleSha256": "5173629ff659facd649af05bc5adfe0995ba4ef984768ed9108142894c30dec7",
+        "moduleSha256": "e2308200b84d3b8845e38ef98c5ade97ac88acc8c490d4f2698c87d8aebdc570",
         "reason": "Keep: reachable neutral contract owner at src/contracts/backend.zig.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
       "src/contracts/binding.zig": {
         "decision": "Keep",
@@ -2416,9 +2416,9 @@
       },
       "src/contracts/model/model_compute_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "cc7f1a1e5c330efb13bac1690c18b11edbec2cc6f21f247b829ea56b7f7faee7",
+        "moduleSha256": "2da2a6c0c73bb60d0a7634eede357dbe5ea1d1f2c78affd42aecc9bd7e5d6fdc",
         "reason": "Keep: reachable neutral contract owner at src/contracts/model/model_compute_types.zig.",
-        "reviewer": "codex-output-oracle-graph/2026-08-10"
+        "reviewer": "codex-oracle-reference-class/2026-08-10"
       },
       "src/contracts/model/model_gpu_types.zig": {
         "decision": "Keep",
@@ -2566,9 +2566,9 @@
       },
       "src/core/abi/procs/wgpu_types_procs.zig": {
         "decision": "Keep",
-        "moduleSha256": "eeea684782da17046c299c6bfd8dbd50285eb10e903088c8db41d2671a8c3018",
+        "moduleSha256": "f89c8fb66c044fa76cef78de827726a9526151c24c69decb0510f2036a08b1bc",
         "reason": "Keep: reachable core implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-dawn-compatible-bind-groups/2026-08-10"
       },
       "src/core/abi/wgpu_binding_base_types.zig": {
         "decision": "Keep",
@@ -2614,9 +2614,9 @@
       },
       "src/core/abi/wgpu_loader.zig": {
         "decision": "Keep",
-        "moduleSha256": "a58871e1ed4bb94e2cc63445dcac393616288a199d191047a4777c2a41eceb2a",
-        "reason": "Keep: reachable core implementation shared by 27 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "70021bb92a69688a40a3c3af41bdbe8708d1f2362a572d30653b3f47e430c616",
+        "reason": "Keep: reachable core implementation shared by 25 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-dawn-compatible-bind-groups/2026-08-10"
       },
       "src/core/abi/wgpu_pipeline_descriptor_types.zig": {
         "decision": "Keep",
@@ -2680,9 +2680,9 @@
       },
       "src/core/abi/wgpu_type_proc_aliases.zig": {
         "decision": "Keep",
-        "moduleSha256": "360aa080718678ef4fdc5ba2b707007c0f1770c63e15328ab0384155252fa5da",
+        "moduleSha256": "c7a176c779522566b1050fbdb797c65f2a7cd044bff37a643d7588df1356e795",
         "reason": "Keep: reachable core implementation shared by 12 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-dawn-compatible-bind-groups/2026-08-10"
       },
       "src/core/abi/wgpu_type_records.zig": {
         "decision": "Keep",
@@ -2704,9 +2704,9 @@
       },
       "src/core/compute/wgpu_commands_compute.zig": {
         "decision": "Keep",
-        "moduleSha256": "f91dca6cc24dc11eeb3133b9055dbc806a1c6328c3cc30c991f587f876959087",
-        "reason": "Keep: reachable core implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "00959532f4484cacae2d029c76c9669c4c29dffa14d8d9bba475608db588ebfc",
+        "reason": "Keep: reachable core implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-oracle-reference-class/2026-08-10"
       },
       "src/core/queue/wgpu_ffi_capture.zig": {
         "decision": "Keep",
@@ -2734,9 +2734,9 @@
       },
       "src/core/resource/wgpu_resources.zig": {
         "decision": "Keep",
-        "moduleSha256": "4930a15507becd850391cb9989b5040d8474618aafd7967a61be470a12317b27",
-        "reason": "Keep: reachable core implementation shared by 14 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "8b91d3ee5e1422ccfc0a5d970f9e5fea0fddbfad1ba32e3d06bec923bf8c7f14",
+        "reason": "Keep: reachable core implementation shared by 12 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-dawn-compatible-bind-groups/2026-08-10"
       },
       "src/core/resource/wgpu_texture_commands.zig": {
         "decision": "Keep",
@@ -2818,9 +2818,9 @@
       },
       "src/dropin/wgpu_dropin_ext_a_core.zig": {
         "decision": "Keep",
-        "moduleSha256": "5af06022690ca4041dfe70270183c29a824ff283e04622674ca4da6e52ed2b85",
+        "moduleSha256": "16b53f94691a402bd5d4617fc88fc9ced0b6730d4cf3fca25574eac97181e044",
         "reason": "Keep: reachable dropin implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
       "src/dropin/wgpu_dropin_ext_a_exports.zig": {
         "decision": "Keep",
@@ -3046,9 +3046,9 @@
       },
       "src/native/api/doe_native_api_misc_exports.zig": {
         "decision": "Keep",
-        "moduleSha256": "9c083f3e8cc63258b37cf8776ea645f560a608718cae9ccf23acac2af1268b4f",
+        "moduleSha256": "862eb2e80a3a4f0df4e133cdfb78f761e66183baa0edef5fa63bd38722807b55",
         "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
       "src/native/api/doe_native_api_render_exports.zig": {
         "decision": "Keep",
@@ -3130,15 +3130,15 @@
       },
       "src/native/lifecycle/doe_instance_device_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "e6add742b112fb26bad26e952d26a72d2241fd46735394c79ccc593abee5f3b6",
+        "moduleSha256": "0291b9c5a647322807016083b0723f12465f36ce563c663abe942cf8c61eaef0",
         "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
       "src/native/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "89f1e084c365610fb9d12fb6db2fe2340a8a50f3bbbeb9a477465c8380823769",
+        "moduleSha256": "443b63b8d5cbfdd89b3db9cee418ff9699e9ee700444cba733f99d76b9eb2edb",
         "reason": "Keep: reachable native implementation shared by 7 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
       "src/native/queue/doe_queue_copy_native.zig": {
         "decision": "Keep",
@@ -3286,9 +3286,9 @@
       },
       "src/native/support/doe_adapter_info_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "a367f5c1bf39b721c21b5c1284a28b20072632ea8e4e412a0aae7941569d228e",
+        "moduleSha256": "c4bbce3c74437940c5b8620760fbbfd74a0285adca0e5244c05fb3eca2a2d1de",
         "reason": "Keep: adapter-info native marshaling and ownership boundary.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
       "src/native/support/doe_device_caps.zig": {
         "decision": "Keep",
@@ -3328,9 +3328,9 @@
       },
       "src/native/support/doe_native_object_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "3e21635cad13cb97d31d030a469990773d74049d946477efb30e3671528488fc",
+        "moduleSha256": "e7072c6316f1e988b013a5a252254d7728831aa034f725202794b36a4292ecf9",
         "reason": "Keep: reachable native implementation shared by 43 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
       "src/native/support/doe_native_runtime_helpers.zig": {
         "decision": "Keep",

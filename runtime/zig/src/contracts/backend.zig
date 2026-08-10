@@ -17,6 +17,8 @@ pub const NativeBackendKind = enum(u8) {
     d3d12 = 2,
 };
 
+pub const ADAPTER_DEVICE_NAME_BYTES: usize = 256;
+
 pub fn backendIdName(id: BackendId) []const u8 {
     return @tagName(id);
 }

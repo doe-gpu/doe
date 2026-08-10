@@ -63,7 +63,9 @@ not a universal performance claim.
 | Backend | Surface or workload | Comparator | Result | Evidence state | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | Apple Metal | Native and Node/Bun package lanes | Declared Dawn-backed lanes | Artifact-specific | `claim-indexed` | [`claim index`](reports/claim-index.json) |
-| AMD Vulkan | Native and Node/Bun release rows | Declared Dawn-backed lanes | Not evaluated | `scaffolded` | [`claim index`](reports/claim-index.json) |
+| AMD Vulkan | Bun warm application row | Declared Bun WebGPU provider | Artifact-specific | `claim-indexed` | [`claim index`](reports/claim-index.json) |
+| AMD Vulkan | Node warm application row | Declared Node WebGPU provider | Hardware identity incomplete | `diagnostic` | [`claim index`](reports/claim-index.json) |
+| AMD Vulkan | Native release rows | Declared Dawn-backed lanes | Artifact-specific | Mixed | [`claim index`](reports/claim-index.json) |
 | AMD Vulkan | Physical recomposition diagnostic | Dawn delegate | Output-oracled capture | `diagnostic` | [`backend evidence`](runtime/zig/reports/recomposition/backend-evidence.json) |
 | Intel Tiger Lake Vulkan | Native compute diagnostics | Declared Dawn-backed lane | Host-specific only | `diagnostic` | [`backend status`](docs/status/runtime-backends-and-bench.md) |
 | Windows D3D12 | Native runtime | Dawn D3D12 | Evidence incomplete | `scaffolded` | [`support matrix`](docs/doe-support-matrix.md) |

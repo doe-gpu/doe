@@ -130,6 +130,19 @@ pub fn static_string_view(comptime text: []const u8) abi_core.WGPUStringView {
     return .{ .data = text.ptr, .length = text.len };
 }
 
+fn slice_string_view(text: []const u8) abi_core.WGPUStringView {
+    return .{ .data = text.ptr, .length = text.len };
+}
+
+fn vulkan_vendor_name(vendor_id: u32) abi_core.WGPUStringView {
+    return switch (vendor_id) {
+        0x1002 => static_string_view("AMD"),
+        0x10de => static_string_view("NVIDIA"),
+        0x8086 => static_string_view("Intel"),
+        else => static_string_view("Unknown Vulkan vendor"),
+    };
+}
+
 const abi_callback = @import("../core/abi/wgpu_callback_descriptor_types.zig");
 pub fn backend_type_for(adapter: *native.DoeAdapter) abi_callback.WGPUBackendType {
     return switch (adapter.backend) {
@@ -142,7 +155,10 @@ pub fn backend_type_for(adapter: *native.DoeAdapter) abi_callback.WGPUBackendTyp
 pub fn fill_adapter_info_struct(adapter_raw: abi_core.WGPUAdapter, out: *p1cap.AdapterInfo) abi_core.WGPUStatus {
     const adapter = native.cast(native.DoeAdapter, adapter_raw) orelse return 0;
     out.* = p1cap.initAdapterInfo(out.nextInChain);
-    out.vendor = static_string_view("Doe");
+    out.vendor = if (adapter.backend == .vulkan)
+        vulkan_vendor_name(adapter.vendor_id)
+    else
+        static_string_view("Doe");
     out.architecture = switch (adapter.backend) {
         .metal => static_string_view("metal"),
         .vulkan => static_string_view("vulkan"),
@@ -150,14 +166,14 @@ pub fn fill_adapter_info_struct(adapter_raw: abi_core.WGPUAdapter, out: *p1cap.A
     };
     out.device = switch (adapter.backend) {
         .metal => static_string_view("Doe Metal Adapter"),
-        .vulkan => static_string_view("Doe Vulkan Adapter"),
+        .vulkan => slice_string_view(adapter.device_name[0..adapter.device_name_len]),
         .d3d12 => static_string_view("Doe D3D12 Adapter"),
     };
     out.description = out.device;
     out.backendType = backend_type_for(adapter);
     out.adapterType = 0x00000004; // Unknown
-    out.vendorID = 0;
-    out.deviceID = 0;
+    out.vendorID = adapter.vendor_id;
+    out.deviceID = adapter.device_id;
     out.subgroupMinSize = 0;
     out.subgroupMaxSize = 0;
     return abi_core.WGPUStatus_Success;

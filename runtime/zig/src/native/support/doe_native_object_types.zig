@@ -48,6 +48,11 @@ pub const DoeAdapter = struct {
     instance: ?*DoeInstance = null,
     mtl_device: ?*anyopaque = null,
     backend: backend_contract.NativeBackendKind = .metal,
+    vendor_id: u32 = 0,
+    device_id: u32 = 0,
+    driver_version: u32 = 0,
+    device_name: [backend_contract.ADAPTER_DEVICE_NAME_BYTES]u8 = [_]u8{0} ** backend_contract.ADAPTER_DEVICE_NAME_BYTES,
+    device_name_len: usize = 0,
 };
 
 pub const DoeDevice = struct {

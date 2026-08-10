@@ -301,6 +301,7 @@ function openLibrary(path) {
         doeNativeAdapterGetLimits:  { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
         doeNativeAdapterGetInfo:    { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.void },
         doeNativeAdapterFreeInfo:   { args: [FFIType.ptr], returns: FFIType.void },
+        doeNativeAdapterGetPciIdentity: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.void },
         doeNativeDeviceHasFeature:  { args: [FFIType.ptr, FFIType.u32], returns: FFIType.u32 },
         doeNativeDeviceGetLimits:   { args: [FFIType.ptr, FFIType.ptr], returns: FFIType.u32 },
         doeNativeDevicePushErrorScope: { args: [FFIType.ptr, FFIType.u32], returns: FFIType.void },
@@ -2508,6 +2509,13 @@ function readAdapterInfo(native) {
     const descOut = new BigUint64Array(1);
     const blockOut = new BigUint64Array(1);
     getInfo(native, vendorOut, archOut, deviceOut, descOut, blockOut);
+    const pciIdentity = wgpu?.symbols?.doeNativeAdapterGetPciIdentity;
+    const vendorIdOut = new Uint32Array(1);
+    const deviceIdOut = new Uint32Array(1);
+    const driverVersionOut = new Uint32Array(1);
+    if (typeof pciIdentity === "function") {
+        pciIdentity(native, vendorIdOut, deviceIdOut, driverVersionOut);
+    }
     const block = Number(blockOut[0] ?? 0n);
     try {
         return Object.freeze({
@@ -2515,6 +2523,9 @@ function readAdapterInfo(native) {
             architecture: decodeCString(Number(archOut[0] ?? 0n)),
             device: decodeCString(Number(deviceOut[0] ?? 0n)),
             description: decodeCString(Number(descOut[0] ?? 0n)),
+            vendorID: vendorIdOut[0],
+            deviceID: deviceIdOut[0],
+            driverVersion: driverVersionOut[0],
             subgroupMinSize: process.platform === "darwin"
                 ? METAL_WEBGPU_SUBGROUP_MIN_SIZE
                 : 32,

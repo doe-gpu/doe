@@ -168,6 +168,7 @@ FnRenderBundleEncoderPopDebugGroup pfn_doeNativeRenderBundleEncoderPopDebugGroup
 FnRenderBundleEncoderInsertDebugMarker pfn_doeNativeRenderBundleEncoderInsertDebugMarker = NULL;
 FnAdapterGetInfo pfn_doeNativeAdapterGetInfo = NULL;
 FnAdapterFreeInfo pfn_doeNativeAdapterFreeInfo = NULL;
+FnAdapterGetPciIdentity pfn_doeNativeAdapterGetPciIdentity = NULL;
 FnShaderModuleGetCompilationInfo pfn_doeNativeShaderModuleGetCompilationInfo = NULL;
 FnDevicePushErrorScope pfn_doeNativeDevicePushErrorScope = NULL;
 FnDevicePopErrorScope pfn_doeNativeDevicePopErrorScope = NULL;
@@ -438,6 +439,7 @@ napi_value doe_load_library(napi_env env, napi_callback_info info) {
     pfn_wgpuAdapterInfoFreeMembers = (PFN_wgpuAdapterInfoFreeMembers)LIB_SYM(g_lib, "wgpuAdapterInfoFreeMembers");
     pfn_doeNativeAdapterGetInfo = (FnAdapterGetInfo)LIB_SYM(g_lib, "doeNativeAdapterGetInfo");
     pfn_doeNativeAdapterFreeInfo = (FnAdapterFreeInfo)LIB_SYM(g_lib, "doeNativeAdapterFreeInfo");
+    pfn_doeNativeAdapterGetPciIdentity = (FnAdapterGetPciIdentity)LIB_SYM(g_lib, "doeNativeAdapterGetPciIdentity");
     pfn_doeNativeShaderModuleGetCompilationInfo = (FnShaderModuleGetCompilationInfo)LIB_SYM(g_lib, "doeNativeShaderModuleGetCompilationInfo");
     pfn_doeNativeDevicePushErrorScope = (FnDevicePushErrorScope)LIB_SYM(g_lib, "doeNativeDevicePushErrorScope");
     pfn_doeNativeDevicePopErrorScope = (FnDevicePopErrorScope)LIB_SYM(g_lib, "doeNativeDevicePopErrorScope");

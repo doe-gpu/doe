@@ -139,6 +139,7 @@
       "required": [
         "schema_version",
         "scope",
+        "reference_class",
         "kind",
         "initialization",
         "binding_group",
@@ -150,6 +151,10 @@
       "properties": {
         "schema_version": { "type": "integer", "const": 2 },
         "scope": { "type": "string", "const": "command_graph" },
+        "reference_class": {
+          "type": "string",
+          "enum": ["independent_v1", "cross_runtime_consensus_v1"]
+        },
         "kind": { "type": "string", "const": "sha256_exact_v1" },
         "initialization": { "type": "string", "const": "zero_fill_v1" },
         "binding_group": { "type": "integer", "minimum": 0 },

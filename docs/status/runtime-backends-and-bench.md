@@ -36,27 +36,46 @@ file only names the promoted boundary and open admission gates.
   manifest produced by actual shader execution still requires its emitted
   backend artifact under strict validation.
 - The fresh AMD Vulkan release matrix at
-  `bench/out/amd-vulkan/20260809T224800Z/dawn-vs-doe.amd.vulkan.release.json`
-  validates source-bound receipts and independent output oracles for the
-  single-stage release workloads. The multi-stage Monte Carlo and stable-fluids
-  rows exposed borrowed per-command telemetry and prewarm-to-execution SPIR-V
-  binding defects. Buffered trace rows now own their telemetry, cached pipeline
-  execution refreshes the pending binary receipt, and strict comparison reads
-  every dispatch manifest from the trace. The fresh full matrix resolves every
-  source-bound shader artifact in both rows; they remain diagnostic only because
-  their command graphs do not yet declare per-dispatch output oracles.
-- `reports/claim-index.json` therefore scaffolds the AMD Vulkan native release,
-  AMD package, browser ORT, and Linux Vulkan drop-in rows instead of borrowing
-  older measured status after stricter evidence checks or artifact pruning.
+  `bench/out/amd-vulkan/20260810T155306Z/dawn-vs-doe.amd.vulkan.release.json`
+  validates source-bound receipts and rejects evidence that is only
+  superficially matched. The multistage graphs now execute their full command
+  prefixes in one oracle context and produce exact Doe/Dawn output parity.
+  During that work, the Dawn delegate's internal `kernel_dispatch` path was
+  corrected to use direct dispatch, and its pipeline-cache identity now includes
+  layout-visible binding fields. The retained graph hashes are explicitly
+  source-bound cross-runtime consensus, so those rows remain diagnostic until
+  an independent semantic reference exists.
+- The same AMD matrix marks upload rows as hardware-path-asymmetric because Doe
+  may write host-visible memory while Dawn stages and copies. Their large timing
+  deltas are diagnostic and non-transferable. The remaining strictly comparable
+  compute rows preserve the same selected-timing and workload-wall sign through
+  the release percentiles, and none crosses the configured suspicious-speedup
+  ratio; the report owns the current values.
+- The retained AMD Vulkan Bun warm Gemma application row is now claim-indexed
+  through `reports/claim-index.json`. Both package providers bind the same
+  physical vendor, device, driver, execution shape, shader-source receipts,
+  effective readback path, and final captured token. The corresponding Node row
+  is retained as diagnostic because its incumbent provider omits adapter and
+  driver identity. Positive timings do not override that missing hardware
+  evidence.
+- Strict Vulkan package comparison now folds physical adapter identity into the
+  existing hardware-path obligation. A row cannot remain comparable unless both
+  sides expose one matching vendor ID, device ID, and normalized driver version.
+  Doe's package bridge obtains those fields from the selected Vulkan physical
+  device for both Node and Bun.
+- `reports/claim-index.json` continues to scaffold the AMD Vulkan native
+  release, browser ORT, and Linux Vulkan drop-in rows instead of borrowing older
+  measured status after stricter evidence checks or artifact pruning.
 - The fresh Linux Vulkan drop-in gate passes symbol, behavior,
   proc-resolution, and benchmark checks at
   `bench/out/dropin/20260809T221600Z/dropin_report.json`. It remains diagnostic
   until a cutover rehearsal receipt and rollback-side claim evidence are
   retained and indexed.
 - `config/dawn-replacement-frontier.json` keeps claimable Apple slices visible
-  but marks their mixed-platform product rows diagnostic while the AMD slices
-  are unindexed; the generated readiness report now passes its coherence gate
-  without treating scaffolded entries as claim evidence.
+  but marks mixed-platform product rows diagnostic. Its named AMD frontier
+  slices remain separate from the claim-indexed Bun application row; the
+  generated readiness report passes its coherence gate without treating
+  scaffolded entries as claim evidence.
 - External-project harness schema version 4 replaces one inferred installation
   command with ordered named steps, each owning its working-directory scope and
   timeout. The pinned vGPU workspace and isolated ORT experiment now prepare
@@ -96,13 +115,15 @@ file only names the promoted boundary and open admission gates.
 
 ## Admission blockers
 
-- Every promoted workload needs an independent output oracle on both products.
+- Every promoted workload needs an independent output oracle on both products;
+  exact cross-runtime consensus does not satisfy that obligation.
 - Node and Bun need downstream-project compatibility evidence, not only package
   harness coverage. The vGPU Node/ORT lane now supplies one diagnostic Node
   application result; it is not yet a promoted release dependency.
-- Doe's Node adapter receipt still exposes a generic Vulkan adapter label. The
-  physical host probe binds the selected Radeon ICD for diagnostics, but exact
-  runtime adapter/driver provenance remains required before promotion.
+- The incumbent Node WebGPU package still exposes no physical adapter or driver
+  identity. Doe now records the selected Vulkan PCI and raw driver identity, but
+  a strict Node comparison remains diagnostic until the comparator supplies
+  equivalent evidence.
 - End-to-end application latency, memory, concurrency, crash, hang, and leak
   evidence must become release-blocking for the promoted developer wedge.
 - Installation must pass from clean npm environments on every supported

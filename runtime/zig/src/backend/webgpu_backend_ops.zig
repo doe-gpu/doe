@@ -58,7 +58,7 @@ pub fn prewarmKernelPipeline(self: anytype, kernel: []const u8, bindings: anytyp
     const source = compute_commands.resolveKernelSource(self, kernel) catch return;
     defer if (source.owned) self.core.allocator.free(source.source);
     const entry_point = "main";
-    const cache_key = compute_commands.pipelineCacheKey(source.source, entry_point);
+    const cache_key = compute_commands.pipelineCacheKey(source.source, entry_point, bindings);
     if (self.core.pipeline_cache.get(cache_key) != null) return;
     const procs = self.core.procs orelse return;
     const shader_module = resources.createShaderModule(self, source.source) catch return;

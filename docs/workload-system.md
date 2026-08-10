@@ -37,6 +37,40 @@ Compilation, process exit, or schema validity can be an oracle only when that
 is the declared outcome. A GPU performance workload needs a semantic output
 oracle before it can enter claim-bearing comparison and promotion gates.
 
+## Native command-graph oracle migration
+
+Native output-oracle schema version 1 remains the compatibility contract for
+one isolated kernel dispatch. It creates a fresh zero-filled execution context,
+runs the oracle-owned dispatch count, and captures that dispatch's declared
+binding.
+
+Schema version 2 adds `scope=command_graph`. The runtime replays buffer writes
+and every preceding dispatch in one context, then captures the declared binding
+from the final oracle-bearing dispatch. The scenario-level benchmark IR field
+is materialized only onto the final expanded dispatch, so nested repeat
+structure remains source-owned rather than duplicated.
+
+Version 2 also requires an explicit `reference_class`. An
+`independent_v1` reference can satisfy strict claim admission.
+`cross_runtime_consensus_v1` records exact provider parity and is useful
+structural evidence, but it cannot satisfy the independent semantic-oracle
+obligation. Migration is additive: version 1 inputs retain their original
+isolated behavior and do not gain a new required field.
+
+## Package adapter identity migration
+
+Run-receipt schema version 1 now permits additive `vendorID`, `deviceID`, and
+`driverVersion` fields under `hostIdentity.adapter`. Package traces carry the
+same fields in `adapterInfo`. Vulkan records the native packed driver version;
+comparison normalizes that value to its semantic version before checking an
+incumbent provider's textual driver description.
+
+Older receipts remain schema-readable and use zero for absent numeric identity
+fields. That compatibility does not make them claimable: strict Vulkan package
+comparison requires one matching nonzero vendor/device identity and driver
+version on both providers. This migration closes the previous path where a
+generic adapter label could pass hardware-path comparability.
+
 ## Executors
 
 Executors are adapters beneath the workload law:

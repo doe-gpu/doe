@@ -35,11 +35,13 @@
       "runtimeHost": "node",
       "backend": "amd-vulkan",
       "comparison": "doe-vs-node-webgpu",
-      "metricDirection": "status-only",
-      "claimState": "scaffolded",
-      "comparisonStatus": "not-evaluated",
-      "claimStatus": "not-evaluated",
-      "blocker": "AMD Vulkan Node package evidence was removed from checkout; this lane is scaffolded until the new package compare artifacts are regenerated."
+      "metricDirection": "lower-is-better",
+      "claimState": "diagnostic",
+      "comparisonStatus": "diagnostic",
+      "claimStatus": "diagnostic",
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T160953Z/gemma64.node-package.warm.ir.compare.json",
+      "claimPath": "reports/benchmarks/amd-vulkan/20260810T160953Z/gemma64.node-package.warm.ir.claim.json",
+      "blocker": "The incumbent Node WebGPU provider omits physical adapter and driver identity, so strict Vulkan hardware parity cannot be proven."
     },
     {
       "id": "package-bun-amd-vulkan",
@@ -47,11 +49,12 @@
       "runtimeHost": "bun",
       "backend": "amd-vulkan",
       "comparison": "doe-vs-bun-webgpu",
-      "metricDirection": "status-only",
-      "claimState": "scaffolded",
-      "comparisonStatus": "not-evaluated",
-      "claimStatus": "not-evaluated",
-      "blocker": "AMD Vulkan Bun package evidence was removed from checkout; this lane is scaffolded until the new package compare artifacts are regenerated."
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T162200Z/gemma64.bun-package.warm.ir.compare.json",
+      "claimPath": "reports/benchmarks/amd-vulkan/20260810T162200Z/gemma64.bun-package.warm.ir.claim.json"
     },
     {
       "id": "native-strict-apple-metal",

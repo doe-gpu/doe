@@ -356,6 +356,34 @@ pub fn buildDispatchPassGroups(
     bindings: []const model_compute_types.KernelBinding,
     initialize_buffers_on_create: bool,
 ) !abi_records.DispatchPassArtifacts {
+    return buildDispatchPassGroupsInternal(
+        self,
+        bindings,
+        initialize_buffers_on_create,
+        null,
+    );
+}
+
+pub fn buildDispatchPassGroupsForPipeline(
+    self: anytype,
+    bindings: []const model_compute_types.KernelBinding,
+    initialize_buffers_on_create: bool,
+    pipeline: abi_base.WGPUComputePipeline,
+) !abi_records.DispatchPassArtifacts {
+    return buildDispatchPassGroupsInternal(
+        self,
+        bindings,
+        initialize_buffers_on_create,
+        pipeline,
+    );
+}
+
+fn buildDispatchPassGroupsInternal(
+    self: anytype,
+    bindings: []const model_compute_types.KernelBinding,
+    initialize_buffers_on_create: bool,
+    compatible_pipeline: abi_base.WGPUComputePipeline,
+) !abi_records.DispatchPassArtifacts {
     const procs = self.core.procs orelse return error.ProceduralNotReady;
     var max_group: u32 = 0;
     for (bindings) |binding| {
@@ -415,7 +443,11 @@ pub fn buildDispatchPassGroups(
     }
 
     for (groups, 0..) |*group, index| {
-        const layout = try createBindGroupLayout(self, group.layout_entries.items);
+        const layout = if (compatible_pipeline) |pipeline|
+            procs.wgpuComputePipelineGetBindGroupLayout(pipeline, @intCast(index))
+        else
+            try createBindGroupLayout(self, group.layout_entries.items);
+        if (layout == null) return error.BindGroupLayoutCreationFailed;
         pending_group_layouts[index] = layout;
         if (group.bind_entries.items.len > 0) {
             const bind_group = try createBindGroup(self, layout, group.bind_entries.items);

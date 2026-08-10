@@ -420,6 +420,16 @@ def is_amd_vulkan_config(config_path: Path) -> bool:
     return ".amd.vulkan" in config_name or ".local.vulkan" in config_name
 
 
+def is_package_surface_config(config_path: Path) -> bool:
+    payload = load_json(config_path)
+    executor_ids = []
+    for side_name in ("baseline", "comparison"):
+        side = payload.get(side_name, {})
+        if isinstance(side, dict):
+            executor_ids.append(str(side.get("executorId", "")).strip())
+    return any("package" in executor_id for executor_id in executor_ids)
+
+
 def infer_apple_metal_lane(config_path: Path, explicit_lane: str) -> str:
     if explicit_lane.strip():
         return explicit_lane.strip()
@@ -528,6 +538,10 @@ def main() -> int:
             return 1
     is_apple_metal = is_apple_metal_config(config_path)
     is_amd_vulkan = is_amd_vulkan_config(config_path)
+    is_package_surface = is_package_surface_config(config_path)
+    with_native_vulkan_gates = (
+        is_amd_vulkan and args.with_local_vulkan_gates and not is_package_surface
+    )
     apple_metal_lane = infer_apple_metal_lane(config_path, args.local_metal_lane) if is_apple_metal else ""
     amd_vulkan_lane = (
         infer_amd_vulkan_lane(config_path, args.local_vulkan_lane)
@@ -555,7 +569,7 @@ def main() -> int:
                 "Set --local-metal-lane explicitly."
             )
             return 1
-    if is_amd_vulkan and args.with_local_vulkan_gates:
+    if with_native_vulkan_gates:
         local_runtime_policy_path = Path(args.local_vulkan_backend_policy)
         local_timing_policy_path = Path(args.local_vulkan_timing_policy)
         local_shader_schema_path = Path(args.local_vulkan_shader_artifact_schema)
@@ -583,7 +597,7 @@ def main() -> int:
                 f"FAIL: missing --local-metal-symbol-ownership: {local_symbol_ownership_path}"
             )
             return 1
-    if is_amd_vulkan and args.with_local_vulkan_gates and args.with_dropin_gate:
+    if with_native_vulkan_gates and args.with_dropin_gate:
         local_symbol_ownership_path = Path(args.local_vulkan_symbol_ownership)
         if not local_symbol_ownership_path.exists():
             print(
@@ -817,7 +831,7 @@ def main() -> int:
                             args.local_metal_symbol_ownership,
                         ]
                     )
-            if is_amd_vulkan and args.with_local_vulkan_gates:
+            if with_native_vulkan_gates:
                 gates_cmd.extend(
                     [
                         "--with-backend-selection-gate",
@@ -903,8 +917,7 @@ def main() -> int:
                         ]
                     )
                 if (
-                    is_amd_vulkan
-                    and args.with_local_vulkan_gates
+                    with_native_vulkan_gates
                     and amd_vulkan_requires_shader_manifest(amd_vulkan_lane)
                 ):
                     gates_cmd.extend(

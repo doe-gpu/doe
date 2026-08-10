@@ -240,6 +240,7 @@ pub const doeNativeExternalTextureRefresh = m2.doeNativeExternalTextureRefresh;
 pub const doeNativeExternalTextureSetLabel = m2.doeNativeExternalTextureSetLabel;
 pub const doeNativeAdapterGetInfo = m2.doeNativeAdapterGetInfo;
 pub const doeNativeAdapterFreeInfo = m2.doeNativeAdapterFreeInfo;
+pub const doeNativeAdapterGetPciIdentity = m2.doeNativeAdapterGetPciIdentity;
 pub const doeNativeShaderModuleGetCompilationInfo = m2.doeNativeShaderModuleGetCompilationInfo;
 pub const label_store = m2.label_store;
 pub const doeNativeObjectSetLabel = m2.doeNativeObjectSetLabel;

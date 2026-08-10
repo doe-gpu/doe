@@ -23,14 +23,7 @@
         "inference_gemma3_270m_literal_prefill_32tok_decode_1tok",
         "inference_gemma3_270m_prefill_32tok",
         "inference_gemma3_270m_prefill_64tok_decode_64tok",
-        "pipeline_compile_stress",
-        "upload_write_buffer_16mb",
-        "upload_write_buffer_1gb",
-        "upload_write_buffer_1kb",
-        "upload_write_buffer_1mb",
-        "upload_write_buffer_256mb",
-        "upload_write_buffer_4mb",
-        "upload_write_buffer_64kb"
+    "pipeline_compile_stress"
       ],
       "regression": [
         "compute_workgroup_atomic_1024",

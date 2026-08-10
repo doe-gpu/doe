@@ -85,6 +85,20 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
             return ParseError.InvalidCommandPayload,
         else => return ParseError.InvalidCommandPayload,
     };
+    const raw_reference_class = raw.reference_class orelse raw.referenceClass;
+    const reference_class: model_compute_types.KernelDispatchOutputOracleReferenceClass = switch (schema_version) {
+        1 => if (raw_reference_class == null)
+            .independent
+        else
+            return ParseError.InvalidCommandPayload,
+        2 => if (std.mem.eql(u8, raw_reference_class orelse return ParseError.InvalidCommandPayload, "independent_v1"))
+            .independent
+        else if (std.mem.eql(u8, raw_reference_class.?, "cross_runtime_consensus_v1"))
+            .cross_runtime_consensus
+        else
+            return ParseError.InvalidCommandPayload,
+        else => return ParseError.InvalidCommandPayload,
+    };
     const kind = raw.kind orelse return ParseError.InvalidCommandPayload;
     const initialization = raw.initialization orelse return ParseError.InvalidCommandPayload;
     const binding_group = raw.binding_group orelse raw.bindingGroup orelse return ParseError.InvalidCommandPayload;
@@ -107,6 +121,7 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
     return .{
         .schema_version = schema_version,
         .scope = scope,
+        .reference_class = reference_class,
         .kind = owned_kind,
         .initialization = owned_initialization,
         .binding_group = binding_group,
@@ -198,6 +213,7 @@ test "output oracle schema v2 declares command graph scope" {
     const oracle = try parseOutputOracle(std.testing.allocator, .{
         .schema_version = 2,
         .scope = "command_graph",
+        .reference_class = "independent_v1",
         .kind = "sha256_exact_v1",
         .initialization = "zero_fill_v1",
         .binding_group = 0,
@@ -219,6 +235,7 @@ test "output oracle schema v2 rejects missing graph scope" {
         ParseError.InvalidCommandPayload,
         parseOutputOracle(std.testing.allocator, .{
             .schema_version = 2,
+            .reference_class = "independent_v1",
             .kind = "sha256_exact_v1",
             .initialization = "zero_fill_v1",
             .binding_group = 0,

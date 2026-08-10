@@ -487,6 +487,11 @@ def materialize_lane(catalog: dict[str, Any], lane_id: str) -> dict[str, Any]:
         for key, value in lane_override.items():
             if key not in row:
                 row[key] = value
+        if row.get("pathAsymmetry") is True:
+            row["comparable"] = False
+            row["claimEligible"] = False
+            row["benchmarkClass"] = "directional"
+            row["directionalReason"] = "hardware_path_asymmetry"
         if "benchmarkClass" not in row:
             row["benchmarkClass"] = "comparable" if bool(row.get("comparable", False)) else "directional"
         row[WORKLOAD_ORIGIN_KEY] = resolve_workload_origin(item, source_lane)

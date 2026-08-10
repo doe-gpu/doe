@@ -517,6 +517,9 @@ export function summarizeAdapterInfo(adapter, device) {
     architecture: normalizeString(raw.architecture) ?? '',
     device: normalizeString(raw.device) ?? '',
     description: normalizeString(raw.description) ?? '',
+    vendorID: Number.isInteger(raw.vendorID) ? raw.vendorID : 0,
+    deviceID: Number.isInteger(raw.deviceID) ? raw.deviceID : 0,
+    driverVersion: Number.isInteger(raw.driverVersion) ? raw.driverVersion : 0,
     subgroupMinSize: Number.isInteger(raw.subgroupMinSize) ? raw.subgroupMinSize : 0,
     subgroupMaxSize: Number.isInteger(raw.subgroupMaxSize) ? raw.subgroupMaxSize : 0,
   };
