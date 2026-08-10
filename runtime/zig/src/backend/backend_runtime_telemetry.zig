@@ -72,8 +72,6 @@ pub fn refresh(backend: *backend_iface.BackendIface) void {
             if (comptime builtin.os.tag == .macos) {
                 backend.telemetry.shader_artifact_manifest_path = metal_backend.manifest_path_from_context(backend.context);
                 backend.telemetry.shader_artifact_manifest_hash = metal_backend.manifest_hash_from_context(backend.context);
-                backend.telemetry.host_plan_artifact_path = metal_backend.host_plan_path_from_context(backend.context);
-                backend.telemetry.host_plan_artifact_hash = metal_backend.host_plan_hash_from_context(backend.context);
                 const cache_telemetry = metal_backend.pipeline_cache_warmup_telemetry_from_context(backend.context);
                 backend.telemetry.pipeline_cache_warmup_count = cache_telemetry.count;
                 backend.telemetry.pipeline_cache_warmup_ns = cache_telemetry.ns;

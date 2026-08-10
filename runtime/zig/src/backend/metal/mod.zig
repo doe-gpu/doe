@@ -17,7 +17,6 @@ const artifact_meta = @import("../../contracts/artifact.zig");
 const hash_utils = @import("../../contracts/artifact.zig");
 const artifact_emit = @import("artifact_emit.zig");
 const backend_execute = @import("backend_execute.zig");
-const host_plan_artifact = @import("metal_host_plan_artifact.zig");
 const native_runtime = @import("metal_native_runtime.zig");
 const metal_pipeline_cache = @import("metal_pipeline_cache.zig");
 const backend_policy = @import("../backend_policy.zig");
@@ -81,11 +80,6 @@ pub const ZigMetalBackend = struct {
     manifest_path_len: usize = 0,
     manifest_hash_storage: [HASH_HEX_SIZE]u8 = std.mem.zeroes([HASH_HEX_SIZE]u8),
     manifest_hash_len: usize = 0,
-    host_plan_emit_count: u64 = 0,
-    host_plan_path_storage: [MANIFEST_PATH_CAPACITY]u8 = std.mem.zeroes([MANIFEST_PATH_CAPACITY]u8),
-    host_plan_path_len: usize = 0,
-    host_plan_hash_storage: [HASH_HEX_SIZE]u8 = std.mem.zeroes([HASH_HEX_SIZE]u8),
-    host_plan_hash_len: usize = 0,
     last_manifest_meta: ?artifact_meta.ArtifactMeta = null,
     last_manifest_module_storage: [MANIFEST_MODULE_CAPACITY]u8 = std.mem.zeroes([MANIFEST_MODULE_CAPACITY]u8),
     last_manifest_module_len: usize = 0,
@@ -148,11 +142,6 @@ pub const ZigMetalBackend = struct {
             .manifest_path_len = 0,
             .manifest_hash_storage = std.mem.zeroes([HASH_HEX_SIZE]u8),
             .manifest_hash_len = 0,
-            .host_plan_emit_count = 0,
-            .host_plan_path_storage = std.mem.zeroes([MANIFEST_PATH_CAPACITY]u8),
-            .host_plan_path_len = 0,
-            .host_plan_hash_storage = std.mem.zeroes([HASH_HEX_SIZE]u8),
-            .host_plan_hash_len = 0,
             .last_manifest_meta = null,
             .last_manifest_module_storage = std.mem.zeroes([MANIFEST_MODULE_CAPACITY]u8),
             .last_manifest_module_len = 0,
@@ -207,14 +196,6 @@ pub const ZigMetalBackend = struct {
 
     fn manifest_hash(self: *const ZigMetalBackend) ?[]const u8 {
         return artifact_emit.manifest_hash(self);
-    }
-
-    fn host_plan_path(self: *const ZigMetalBackend) ?[]const u8 {
-        return host_plan_artifact.hostPlanPath(self);
-    }
-
-    fn host_plan_hash(self: *const ZigMetalBackend) ?[]const u8 {
-        return host_plan_artifact.hostPlanHash(self);
     }
 
     fn flush_pending_artifact(self: *ZigMetalBackend) void {
@@ -310,14 +291,6 @@ pub fn manifest_path_from_context(ctx: *anyopaque) ?[]const u8 {
 
 pub fn manifest_hash_from_context(ctx: *anyopaque) ?[]const u8 {
     return cast(ctx).manifest_hash();
-}
-
-pub fn host_plan_path_from_context(ctx: *anyopaque) ?[]const u8 {
-    return cast(ctx).host_plan_path();
-}
-
-pub fn host_plan_hash_from_context(ctx: *anyopaque) ?[]const u8 {
-    return cast(ctx).host_plan_hash();
 }
 
 pub fn pipeline_cache_warmup_telemetry_from_context(ctx: *anyopaque) metal_pipeline_cache.WarmupTelemetry {

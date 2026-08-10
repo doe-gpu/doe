@@ -31,6 +31,7 @@ compiler/wgsl/
   emit/
   frontend/
   ir/
+  pipeline/
   proof/
   runtime/
 ```

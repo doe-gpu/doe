@@ -17,7 +17,6 @@ const artifact_meta = @import("../../contracts/artifact.zig");
 const artifact_policy = @import("../common/artifact_policy.zig");
 const submit_count_policy = @import("../common/submit_count_policy.zig");
 const bridge = @import("metal_bridge_decls.zig");
-const host_plan_artifact = @import("metal_host_plan_artifact.zig");
 
 const model = struct {
     pub const AsyncDiagnosticsCommand = model_async_types.AsyncDiagnosticsCommand;
@@ -178,7 +177,6 @@ fn execute_kernel_dispatch(comptime Backend: type, self: *Backend, request: comp
     r.gpu_timestamp_ns = result.gpu_elapsed_ns;
     r.gpu_timestamp_attempted = result.gpu_timestamps_attempted;
     r.gpu_timestamp_valid = result.gpu_timestamps_valid;
-    host_plan_artifact.emitForKernelDispatch(self, request.toCommand()) catch {};
     return r;
 }
 
@@ -337,7 +335,6 @@ fn execute_native_command(
     command: model.Command,
     promoted_dispatch: ?compute_contract.DispatchRequest,
 ) !webgpu.NativeExecutionResult {
-    host_plan_artifact.clearHostPlanArtifact(self);
     try self.check_timestamp_requirement();
 
     const requirements = command_requirements.requirements(command);
