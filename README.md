@@ -40,10 +40,11 @@ node node_modules/doe-gpu/examples/node-first-kernel.mjs
 Package entrypoints and public exports are documented in
 [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md).
 
-For a Doe change, choose one workload and one correctness or performance
-question. Change [`runtime/zig/`](runtime/zig/) or
+Contributors making a Doe change should choose one workload and one correctness
+or performance question. Change [`runtime/zig/`](runtime/zig/) or
 [`packages/doe-gpu/`](packages/doe-gpu/), run the smallest relevant correctness
-test, then run the physical backend lane:
+test, then run the physical backend lane that matches the host: Metal on macOS,
+Vulkan on Linux, or D3D12 on Windows.
 
 ```bash
 python3 bench/runners/run_recomposition_backend_evidence.py --backend metal
@@ -59,13 +60,14 @@ Measured results belong to [`reports/claim-index.json`](reports/claim-index.json
 and the artifacts named by its rows. The table records evidence classes; it is
 not a universal performance claim.
 
-| Backend | Surface or workload | Comparator | Result | Evidence state | Source |
+| Backend | Surface or workload | Comparator | Result | Evidence state | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| Apple Metal | Native and Node/Bun package lanes | Declared Dawn-backed lanes | Artifact-specific | Claim-indexed | [`claim index`](reports/claim-index.json) |
-| AMD Vulkan | Native and Node/Bun package lanes | Declared Dawn-backed lanes | Artifact-specific | Claim-indexed | [`claim index`](reports/claim-index.json) |
-| Intel Tiger Lake Vulkan | Native compute diagnostics | Declared Dawn-backed lane | Host-specific only | Diagnostic | [`backend status`](docs/status/runtime-backends-and-bench.md) |
-| Windows D3D12 | Native runtime | Dawn D3D12 | Evidence incomplete | Scaffolded | [`support matrix`](docs/doe-support-matrix.md) |
-| Chromium | Forced-Doe browser lane | Chromium/Dawn | Diagnostic only | Diagnostic | [`browser milestones`](browser/chromium/bench/workflows/browser-milestones.json) |
+| Apple Metal | Native and Node/Bun package lanes | Declared Dawn-backed lanes | Artifact-specific | `claim-indexed` | [`claim index`](reports/claim-index.json) |
+| AMD Vulkan | Native and Node/Bun release rows | Declared Dawn-backed lanes | Not evaluated | `scaffolded` | [`claim index`](reports/claim-index.json) |
+| AMD Vulkan | Physical recomposition diagnostic | Dawn delegate | Output-oracled capture | `diagnostic` | [`backend evidence`](runtime/zig/reports/recomposition/backend-evidence.json) |
+| Intel Tiger Lake Vulkan | Native compute diagnostics | Declared Dawn-backed lane | Host-specific only | `diagnostic` | [`backend status`](docs/status/runtime-backends-and-bench.md) |
+| Windows D3D12 | Native runtime | Dawn D3D12 | Evidence incomplete | `scaffolded` | [`support matrix`](docs/doe-support-matrix.md) |
+| Chromium | Forced-Doe browser lane | Chromium/Dawn | Diagnostic only | `diagnostic` | [`browser milestones`](browser/chromium/bench/workflows/browser-milestones.json) |
 
 The latest physical backend bundle is
 [`backend-evidence.json`](runtime/zig/reports/recomposition/backend-evidence.json).

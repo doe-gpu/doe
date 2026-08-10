@@ -60,6 +60,57 @@ class BenchmarkIrTests(unittest.TestCase):
         self.assertTrue(plan["planSha256"])
         self.assertTrue(plan["compatibilityCommandsSha256"])
 
+    def test_scenario_output_oracle_binds_final_expanded_dispatch(self) -> None:
+        oracle = {
+            "schema_version": 2,
+            "scope": "command_graph",
+            "kind": "sha256_exact_v1",
+            "initialization": "zero_fill_v1",
+            "binding_group": 0,
+            "binding": 0,
+            "dispatch_count": 1,
+            "expected_sha256": "a" * 64,
+            "reference_id": "unit-test",
+        }
+        payload = {
+            "schemaVersion": 1,
+            "kind": "benchmark_ir",
+            "scenarios": [
+                {
+                    "id": "alpha",
+                    "description": "alpha scenario",
+                    "planPath": "bench/plans/generated/alpha.plan.json",
+                    "commandsPath": (
+                        "bench/plans/generated/compat/alpha_commands.json"
+                    ),
+                    "outputOracle": oracle,
+                    "commands": [
+                        {
+                            "kind": "repeat",
+                            "count": 2,
+                            "commands": [
+                                {
+                                    "kind": "kernel_dispatch",
+                                    "kernel": "alpha.wgsl",
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1,
+                                    "bindings": [],
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory(prefix="doe-benchmark-ir-") as tmpdir:
+            ir_path = Path(tmpdir) / "test_ir.json"
+            ir_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+            plan = benchmark_ir.materialize_plan(ir_path, "alpha")
+
+        self.assertNotIn("output_oracle", plan["commands"][0])
+        self.assertEqual(plan["commands"][1]["output_oracle"], oracle)
+
     def test_materialize_plan_injects_deterministic_buffer_loads_for_readonly_weights(self) -> None:
         payload = {
             "schemaVersion": 1,

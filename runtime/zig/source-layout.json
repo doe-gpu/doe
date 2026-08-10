@@ -1288,9 +1288,9 @@
       },
       "src/cli/runtime_cli.zig": {
         "decision": "Keep",
-        "moduleSha256": "475f38b3ea72d9b5f1060c96d9e7da4b9a14a2a503ee486651e76337a57bbd7f",
+        "moduleSha256": "b1f52fe0e2dcd7469b82881a112caf9d0146d77f5668b13918efba9d405fd4d0",
         "reason": "Keep: reachable cli implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "reviewer": "codex-output-oracle-graph/2026-08-10"
       },
       "src/cli/runtime_cli_args.zig": {
         "decision": "Keep",
@@ -1330,9 +1330,9 @@
       },
       "src/command/command_json_raw.zig": {
         "decision": "Keep",
-        "moduleSha256": "25fa492a6b3f907e07ab46a81b162d0fa261fb6b1e6056992336a2c13b93161a",
+        "moduleSha256": "c0c737f389f505c034e7d7af27298cb96e01519d95adb19bf43c308d98f0c1ca",
         "reason": "Keep: reachable command implementation shared by 6 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-output-oracle-graph/2026-08-10"
       },
       "src/command/command_kind.zig": {
         "decision": "Keep",
@@ -1348,9 +1348,9 @@
       },
       "src/command/command_parse_dispatch.zig": {
         "decision": "Keep",
-        "moduleSha256": "fe2a5319401eef6cad6cd080d22343009740ecc11533ab3460f16edbb9381d9d",
-        "reason": "Keep: reachable command implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "14f2ce226168f944d67d76aec16ba7e3e722184cbfc2c6249b126cb4a6c68e86",
+        "reason": "Keep: reachable command implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-output-oracle-graph/2026-08-10"
       },
       "src/command/command_parse_helpers.zig": {
         "decision": "Keep",
@@ -2416,9 +2416,9 @@
       },
       "src/contracts/model/model_compute_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "06651f3e56cb1c798e923c929d16e9cdcc0109b04f1e54464825a1ede525e2f9",
+        "moduleSha256": "cc7f1a1e5c330efb13bac1690c18b11edbec2cc6f21f247b829ea56b7f7faee7",
         "reason": "Keep: reachable neutral contract owner at src/contracts/model/model_compute_types.zig.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-output-oracle-graph/2026-08-10"
       },
       "src/contracts/model/model_gpu_types.zig": {
         "decision": "Keep",

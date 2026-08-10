@@ -180,6 +180,17 @@
         "buffer_size": 16,
         "visibility": "compute"
       }
-    ]
+    ],
+    "output_oracle": {
+      "schema_version": 2,
+      "scope": "command_graph",
+      "kind": "sha256_exact_v1",
+      "initialization": "zero_fill_v1",
+      "binding_group": 0,
+      "binding": 2,
+      "dispatch_count": 1,
+      "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "reference_id": "bench/oracles/compute_heavy_graph_v1.py#monte_carlo_final"
+    }
   }
 ]

@@ -255,6 +255,7 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
     seen: set[str] = set()
     kernel_dispatch_command_count = 0
     output_oracle_count = 0
+    final_kernel_dispatch_has_output_oracle = False
     output_oracle_dispatch_mismatches: list[dict[str, int]] = []
     for index, command in enumerate(payload):
         if not isinstance(command, dict):
@@ -265,6 +266,7 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
         output_oracle = command.get("output_oracle") or command.get("outputOracle")
         if isinstance(output_oracle, dict):
             output_oracle_count += 1
+            final_kernel_dispatch_has_output_oracle = True
             timed_dispatch_count = safe_int(command.get("repeat"), default=1)
             oracle_dispatch_count = safe_int(
                 output_oracle.get("dispatch_count", output_oracle.get("dispatchCount")),
@@ -276,6 +278,8 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
                     "timedDispatchCount": timed_dispatch_count,
                     "oracleDispatchCount": oracle_dispatch_count,
                 })
+        else:
+            final_kernel_dispatch_has_output_oracle = False
         kernel = str(command.get("kernel", "")).strip()
         if not kernel:
             return [], details, f"kernel_dispatch command at index {index} is missing kernel"
@@ -285,6 +289,7 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
     details["kernelDispatchCount"] = len(kernels)
     details["kernelDispatchCommandCount"] = kernel_dispatch_command_count
     details["kernelDispatchOutputOracleCount"] = output_oracle_count
+    details["finalKernelDispatchHasOutputOracle"] = final_kernel_dispatch_has_output_oracle
     details["kernelDispatchOutputOracleDispatchMismatches"] = output_oracle_dispatch_mismatches
     details["kernelDispatchKernels"] = kernels
     return kernels, details, ""
@@ -444,11 +449,14 @@ def assess_native_shader_artifact_equivalence(
     kernel_dispatch_command_count = int(
         command_details.get("kernelDispatchCommandCount", 0) or 0
     )
-    if declared_oracle_count != kernel_dispatch_command_count:
+    if declared_oracle_count == 0 or not bool(
+        command_details.get("finalKernelDispatchHasOutputOracle", False)
+    ):
         oracle_failures.append({
             "kernel": "<commands>",
             "reason": (
-                "every strict native kernel_dispatch requires an output oracle: "
+                "strict native command graphs require an output oracle on the final "
+                "kernel_dispatch: "
                 f"commands={kernel_dispatch_command_count} "
                 f"uniqueKernels={len(kernels)} oracles={declared_oracle_count}"
             ),

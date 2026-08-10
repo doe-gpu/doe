@@ -34,6 +34,7 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         stale_source: bool = False,
         oracle_match: bool = True,
         oracle_dispatch_count: int = 3,
+        oracle_on_final_dispatch: bool = True,
     ):
         kernel_root = root / "bench" / "kernels"
         kernel_root.mkdir(parents=True)
@@ -54,12 +55,17 @@ class NativeShaderComparabilityTests(unittest.TestCase):
                 "dispatch_count": oracle_dispatch_count,
             },
         }
+        commands_payload = [dispatch_command]
+        if duplicate_dispatch:
+            command_without_oracle = dict(dispatch_command)
+            command_without_oracle.pop("output_oracle")
+            commands_payload = (
+                [command_without_oracle, dispatch_command]
+                if oracle_on_final_dispatch
+                else [dispatch_command, command_without_oracle]
+            )
         commands.write_text(
-            json.dumps(
-                [dispatch_command, dispatch_command]
-                if duplicate_dispatch
-                else [dispatch_command]
-            ),
+            json.dumps(commands_payload),
             encoding="utf-8",
         )
         manifest = root / "manifest.json"
@@ -72,16 +78,16 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         doe_sample = {"traceMeta": {
             "executionBackend": "doe_vulkan",
             "shaderArtifactManifestPath": str(manifest),
-            "outputOracleCount": 2 if duplicate_dispatch else 1,
-            "outputOracleMatchedCount": (2 if duplicate_dispatch else 1) if oracle_match else 0,
+            "outputOracleCount": 1,
+            "outputOracleMatchedCount": 1 if oracle_match else 0,
             "outputOracleFailedCount": 0 if oracle_match else 1,
             "outputOracleExpectedSha256": expected,
             "outputOracleActualSha256": expected if oracle_match else "b" * 64,
         }}
         dawn_sample = {"traceMeta": {
             "executionBackend": "dawn_delegate",
-            "outputOracleCount": 2 if duplicate_dispatch else 1,
-            "outputOracleMatchedCount": 2 if duplicate_dispatch else 1,
+            "outputOracleCount": 1,
+            "outputOracleMatchedCount": 1,
             "outputOracleFailedCount": 0,
             "outputOracleExpectedSha256": expected,
             "outputOracleActualSha256": expected,
@@ -123,7 +129,7 @@ class NativeShaderComparabilityTests(unittest.TestCase):
             )
         )
 
-    def test_each_dispatch_command_requires_its_own_oracle(self) -> None:
+    def test_multistage_graph_requires_oracle_on_final_dispatch(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             applies, passes, details, reason = self._assess(
                 Path(tmpdir), duplicate_dispatch=True
@@ -132,6 +138,17 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         self.assertTrue(passes, reason)
         self.assertEqual(details["kernelDispatchCommandCount"], 2)
         self.assertEqual(details["kernelDispatchCount"], 1)
+
+    def test_multistage_graph_rejects_oracle_only_before_final_dispatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            applies, passes, _, reason = self._assess(
+                Path(tmpdir),
+                duplicate_dispatch=True,
+                oracle_on_final_dispatch=False,
+            )
+        self.assertTrue(applies)
+        self.assertFalse(passes)
+        self.assertIn("final kernel_dispatch", reason)
 
     def test_multistage_manifests_are_collected_from_dispatch_trace_rows(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -56,7 +56,72 @@
         "kind": {
           "type": "string",
           "minLength": 1
+        },
+        "output_oracle": {
+          "$ref": "#/$defs/outputOracle"
         }
+      }
+    },
+    "outputOracle": {
+      "oneOf": [
+        { "$ref": "#/$defs/outputOracleV1" },
+        { "$ref": "#/$defs/outputOracleV2" }
+      ]
+    },
+    "outputOracleV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "kind",
+        "initialization",
+        "binding_group",
+        "binding",
+        "dispatch_count",
+        "expected_sha256",
+        "reference_id"
+      ],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1 },
+        "kind": { "type": "string", "const": "sha256_exact_v1" },
+        "initialization": { "type": "string", "const": "zero_fill_v1" },
+        "binding_group": { "type": "integer", "minimum": 0 },
+        "binding": { "type": "integer", "minimum": 0 },
+        "dispatch_count": { "type": "integer", "minimum": 1 },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reference_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "outputOracleV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "scope",
+        "kind",
+        "initialization",
+        "binding_group",
+        "binding",
+        "dispatch_count",
+        "expected_sha256",
+        "reference_id"
+      ],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 2 },
+        "scope": { "type": "string", "const": "command_graph" },
+        "kind": { "type": "string", "const": "sha256_exact_v1" },
+        "initialization": { "type": "string", "const": "zero_fill_v1" },
+        "binding_group": { "type": "integer", "minimum": 0 },
+        "binding": { "type": "integer", "minimum": 0 },
+        "dispatch_count": { "type": "integer", "minimum": 1 },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reference_id": { "type": "string", "minLength": 1 }
       }
     },
     "scenario": {
@@ -99,6 +164,9 @@
             "default",
             "row2_helper_exact"
           ]
+        },
+        "outputOracle": {
+          "$ref": "#/$defs/outputOracleV2"
         },
         "commands": {
           "type": "array",

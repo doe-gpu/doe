@@ -13,6 +13,17 @@
       "planPath": "bench/plans/generated/compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces.plan.json",
       "commandsPath": "bench/plans/generated/compat/compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces_commands.json",
       "timingScope": "operation",
+      "outputOracle": {
+        "schema_version": 2,
+        "scope": "command_graph",
+        "kind": "sha256_exact_v1",
+        "initialization": "zero_fill_v1",
+        "binding_group": 0,
+        "binding": 2,
+        "dispatch_count": 1,
+        "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "reference_id": "bench/oracles/compute_heavy_graph_v1.py#monte_carlo_final"
+      },
       "commands": [
         {
           "kind": "buffer_write",
@@ -205,6 +216,17 @@
       "planPath": "bench/plans/generated/compute_stable_fluids_multistage_256grid_18pressure_4steps.plan.json",
       "commandsPath": "bench/plans/generated/compat/compute_stable_fluids_multistage_256grid_18pressure_4steps_commands.json",
       "timingScope": "operation",
+      "outputOracle": {
+        "schema_version": 2,
+        "scope": "command_graph",
+        "kind": "sha256_exact_v1",
+        "initialization": "zero_fill_v1",
+        "binding_group": 0,
+        "binding": 2,
+        "dispatch_count": 1,
+        "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "reference_id": "bench/oracles/compute_heavy_graph_v1.py#stable_fluids_final_dye"
+      },
       "commands": [
         {
           "kind": "buffer_write",

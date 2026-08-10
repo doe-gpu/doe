@@ -94,12 +94,57 @@ fn validateOutputOracles(
     options: runtime_cli_args.RunOptions,
 ) !OutputOracleEvidence {
     var evidence = OutputOracleEvidence{};
+    var command_graph_context: ?execution.ExecutionContext = null;
+    defer if (command_graph_context) |*ctx| ctx.deinit();
+
+    const has_command_graph_oracle = for (commands) |command| {
+        switch (command) {
+            .kernel_dispatch => |dispatch| {
+                if (dispatch.output_oracle) |oracle| {
+                    if (oracle.scope == .command_graph) break true;
+                }
+            },
+            else => {},
+        }
+    } else false;
+    if (has_command_graph_oracle) {
+        command_graph_context = try execution.ExecutionContext.init(
+            allocator,
+            .native,
+            profile,
+            kernel_root,
+            backend_lane,
+        );
+        const ctx = &command_graph_context.?;
+        ctx.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
+        ctx.configureGpuTimestampMode(.off);
+        ctx.configureQueueWaitMode(options.queue_wait_mode);
+        ctx.configureWebgpuFfiQueueWaitTimeoutNs(options.webgpu_ffi_queue_wait_timeout_ns);
+        ctx.configureQueueSyncMode(.per_command);
+        prewarmKernelDispatches(ctx, commands);
+    }
+
     for (commands) |command| {
         const original = switch (command) {
             .kernel_dispatch => |kd| kd,
-            else => continue,
+            else => {
+                if (command_graph_context) |*ctx| {
+                    const result = try ctx.execute(command);
+                    if (result.status != .ok) return error.OutputOracleExecutionFailed;
+                }
+                continue;
+            },
         };
-        const oracle = original.output_oracle orelse continue;
+        const oracle = original.output_oracle orelse {
+            if (command_graph_context) |*ctx| {
+                const result = try ctx.execute(command);
+                if (result.status != .ok) return error.OutputOracleExecutionFailed;
+            }
+            continue;
+        };
+        if (oracle.scope == .command_graph and oracle.dispatch_count != original.repeat) {
+            return error.OutputOracleDispatchCountMismatch;
+        }
         evidence.count += 1;
         evidence.expected_sha256 = oracle.expected_sha256;
         evidence.reference_id = oracle.reference_id;
@@ -117,30 +162,42 @@ fn validateOutputOracles(
             return error.OutputOracleBufferSizeInvalid;
         }
 
-        var oracle_context = try execution.ExecutionContext.init(
-            allocator,
-            .native,
-            profile,
-            kernel_root,
-            backend_lane,
-        );
-        defer oracle_context.deinit();
-        oracle_context.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
-        oracle_context.configureGpuTimestampMode(.off);
-        oracle_context.configureQueueWaitMode(options.queue_wait_mode);
-        oracle_context.configureWebgpuFfiQueueWaitTimeoutNs(options.webgpu_ffi_queue_wait_timeout_ns);
-        oracle_context.configureQueueSyncMode(.per_command);
-        try oracle_context.prewarmKernelDispatch(
-            original.kernel,
-            original.entry_point,
-            original.bindings,
-            true,
-        );
+        var isolated_context: ?execution.ExecutionContext = null;
+        defer if (isolated_context) |*ctx| ctx.deinit();
+        const oracle_context = switch (oracle.scope) {
+            .isolated_dispatch => blk: {
+                isolated_context = try execution.ExecutionContext.init(
+                    allocator,
+                    .native,
+                    profile,
+                    kernel_root,
+                    backend_lane,
+                );
+                const ctx = &isolated_context.?;
+                ctx.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
+                ctx.configureGpuTimestampMode(.off);
+                ctx.configureQueueWaitMode(options.queue_wait_mode);
+                ctx.configureWebgpuFfiQueueWaitTimeoutNs(options.webgpu_ffi_queue_wait_timeout_ns);
+                ctx.configureQueueSyncMode(.per_command);
+                try ctx.prewarmKernelDispatch(
+                    original.kernel,
+                    original.entry_point,
+                    original.bindings,
+                    true,
+                );
+                break :blk ctx;
+            },
+            .command_graph => blk: {
+                break :blk &command_graph_context.?;
+            },
+        };
 
         var oracle_dispatch = original;
-        oracle_dispatch.repeat = oracle.dispatch_count;
-        oracle_dispatch.warmup_dispatch_count = 0;
-        oracle_dispatch.initialize_buffers_on_create = true;
+        if (oracle.scope == .isolated_dispatch) {
+            oracle_dispatch.repeat = oracle.dispatch_count;
+            oracle_dispatch.warmup_dispatch_count = 0;
+            oracle_dispatch.initialize_buffers_on_create = true;
+        }
         oracle_dispatch.output_oracle = null;
         const result = try oracle_context.execute(.{ .kernel_dispatch = oracle_dispatch });
         if (result.status != .ok) return error.OutputOracleExecutionFailed;
@@ -160,6 +217,12 @@ fn validateOutputOracles(
             evidence.matched_count += 1;
         } else {
             evidence.failed_count += 1;
+        }
+        if (oracle.scope == .isolated_dispatch) {
+            if (command_graph_context) |*ctx| {
+                const graph_result = try ctx.execute(command);
+                if (graph_result.status != .ok) return error.OutputOracleExecutionFailed;
+            }
         }
     }
     return evidence;

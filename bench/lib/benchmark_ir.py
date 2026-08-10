@@ -104,6 +104,33 @@ def _expand_commands(commands: list[Any]) -> list[dict[str, Any]]:
     return expanded
 
 
+def _apply_scenario_output_oracle(
+    commands: list[dict[str, Any]],
+    *,
+    scenario: dict[str, Any],
+) -> list[dict[str, Any]]:
+    output_oracle = scenario.get("outputOracle")
+    if output_oracle is None:
+        return commands
+    if not isinstance(output_oracle, dict):
+        raise ValueError("scenario outputOracle must be an object")
+    if not commands or _command_kind(commands[-1]) != "kernel_dispatch":
+        raise ValueError(
+            "scenario outputOracle requires the final expanded command to be "
+            "kernel_dispatch"
+        )
+    if "output_oracle" in commands[-1] or "outputOracle" in commands[-1]:
+        raise ValueError(
+            "scenario outputOracle conflicts with the final command output oracle"
+        )
+
+    materialized = list(commands)
+    final_command = dict(materialized[-1])
+    final_command["output_oracle"] = dict(output_oracle)
+    materialized[-1] = final_command
+    return materialized
+
+
 def _count_commands(commands: list[dict[str, Any]]) -> dict[str, int]:
     counts = {"buffer_write": 0, "buffer_load": 0, "kernel_dispatch": 0}
     for command in commands:
@@ -459,6 +486,7 @@ def materialize_plan(ir_path: Path, scenario_id: str) -> dict[str, Any]:
         commands=_expand_commands(scenario["commands"]),
     )
     commands = _apply_matmul_gemv_variant(commands, scenario=scenario)
+    commands = _apply_scenario_output_oracle(commands, scenario=scenario)
     _validate_command_semantics(commands)
     counts = _count_commands(commands)
     ir_hash = json_sha256(ir_doc)

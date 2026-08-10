@@ -38,8 +38,14 @@ pub const KernelDispatchRepeatSynchronization = enum(u8) {
     independent,
 };
 
+pub const KernelDispatchOutputOracleScope = enum(u8) {
+    isolated_dispatch,
+    command_graph,
+};
+
 pub const KernelDispatchOutputOracle = struct {
     schema_version: u32,
+    scope: KernelDispatchOutputOracleScope,
     kind: []const u8,
     initialization: []const u8,
     binding_group: u32,

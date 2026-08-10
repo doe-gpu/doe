@@ -11,8 +11,8 @@
   "bufferWriteCount": 1,
   "bufferLoadCount": 0,
   "dispatchCount": 93,
-  "sourceIrSha256": "3e9657ce96b86d4f21d138eab798d1fc28c1b1c098d1f8322193461b61b07046",
-  "compatibilityCommandsSha256": "e0b20c474d91f892dfdca7318e9b8ff8bb8fdc98ef98dc7440ed135c799241e4",
+  "sourceIrSha256": "f0e6bf05fae21cba82499ef06c7776755060958ced4c0eb7b67e9876a740169a",
+  "compatibilityCommandsSha256": "99ce6f2b6a450bf7ea5aeec6fc8e9f3e6a453c5801da57f6459ff00275cd982c",
   "commands": [
     {
       "kind": "buffer_write",
@@ -4206,8 +4206,19 @@
           "buffer_size": 262144,
           "visibility": "compute"
         }
-      ]
+      ],
+      "output_oracle": {
+        "schema_version": 2,
+        "scope": "command_graph",
+        "kind": "sha256_exact_v1",
+        "initialization": "zero_fill_v1",
+        "binding_group": 0,
+        "binding": 2,
+        "dispatch_count": 1,
+        "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "reference_id": "bench/oracles/compute_heavy_graph_v1.py#stable_fluids_final_dye"
+      }
     }
   ],
-  "planSha256": "dac4e56fe43fe3e4abfb60e0fbf86232e25dc06b79d78a9cf9514382631aee91"
+  "planSha256": "bf72511a26defa3882adec42875ffdeb894f01c28bf1c2e12eacbef2f17f3673"
 }

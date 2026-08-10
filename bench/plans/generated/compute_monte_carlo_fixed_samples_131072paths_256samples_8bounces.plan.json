@@ -11,8 +11,8 @@
   "bufferWriteCount": 4,
   "bufferLoadCount": 0,
   "dispatchCount": 4,
-  "sourceIrSha256": "3e9657ce96b86d4f21d138eab798d1fc28c1b1c098d1f8322193461b61b07046",
-  "compatibilityCommandsSha256": "d64baccb3e9463203ee2645119d11b5a3f27d627f5672bbe5da46f11ac90cb5e",
+  "sourceIrSha256": "f0e6bf05fae21cba82499ef06c7776755060958ced4c0eb7b67e9876a740169a",
+  "compatibilityCommandsSha256": "ef6754412ce99dd8a2f84a6dbaa627e4394eccdd06ea40a3ffa069cb8ca3f4ab",
   "commands": [
     {
       "kind": "buffer_write",
@@ -195,8 +195,19 @@
           "buffer_size": 16,
           "visibility": "compute"
         }
-      ]
+      ],
+      "output_oracle": {
+        "schema_version": 2,
+        "scope": "command_graph",
+        "kind": "sha256_exact_v1",
+        "initialization": "zero_fill_v1",
+        "binding_group": 0,
+        "binding": 2,
+        "dispatch_count": 1,
+        "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "reference_id": "bench/oracles/compute_heavy_graph_v1.py#monte_carlo_final"
+      }
     }
   ],
-  "planSha256": "cdb0ea7071e057821d48076c6717258e64a27385f502cc18eec7b33dc221ac1b"
+  "planSha256": "11e34f944dce9a5432c11803bd67bc5f59f62e5d83a014c562dedb213e94ee5e"
 }

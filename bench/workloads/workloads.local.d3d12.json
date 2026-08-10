@@ -1590,13 +1590,13 @@
       "workloadOrigin": "doe_contract_with_dawn_mapping",
       "planPath": "bench/plans/generated/compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces.plan.json",
       "planSchemaVersion": 1,
-      "planHash": "cdb0ea7071e057821d48076c6717258e64a27385f502cc18eec7b33dc221ac1b",
+      "planHash": "11e34f944dce9a5432c11803bd67bc5f59f62e5d83a014c562dedb213e94ee5e",
       "planCommandCount": 8,
       "planDispatchCount": 4,
       "planBufferWriteCount": 4,
       "planBufferLoadCount": 0,
-      "compatibilityCommandHash": "d64baccb3e9463203ee2645119d11b5a3f27d627f5672bbe5da46f11ac90cb5e",
-      "sourceIrSha256": "3e9657ce96b86d4f21d138eab798d1fc28c1b1c098d1f8322193461b61b07046",
+      "compatibilityCommandHash": "ef6754412ce99dd8a2f84a6dbaa627e4394eccdd06ea40a3ffa069cb8ca3f4ab",
+      "sourceIrSha256": "f0e6bf05fae21cba82499ef06c7776755060958ced4c0eb7b67e9876a740169a",
       "commandsPath": "bench/plans/generated/compat/compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces_commands.json",
       "cohorts": [
         "exploration"
@@ -1627,13 +1627,13 @@
       "workloadOrigin": "doe_contract_with_dawn_mapping",
       "planPath": "bench/plans/generated/compute_stable_fluids_multistage_256grid_18pressure_4steps.plan.json",
       "planSchemaVersion": 1,
-      "planHash": "dac4e56fe43fe3e4abfb60e0fbf86232e25dc06b79d78a9cf9514382631aee91",
+      "planHash": "bf72511a26defa3882adec42875ffdeb894f01c28bf1c2e12eacbef2f17f3673",
       "planCommandCount": 94,
       "planDispatchCount": 93,
       "planBufferWriteCount": 1,
       "planBufferLoadCount": 0,
-      "compatibilityCommandHash": "e0b20c474d91f892dfdca7318e9b8ff8bb8fdc98ef98dc7440ed135c799241e4",
-      "sourceIrSha256": "3e9657ce96b86d4f21d138eab798d1fc28c1b1c098d1f8322193461b61b07046",
+      "compatibilityCommandHash": "99ce6f2b6a450bf7ea5aeec6fc8e9f3e6a453c5801da57f6459ff00275cd982c",
+      "sourceIrSha256": "f0e6bf05fae21cba82499ef06c7776755060958ced4c0eb7b67e9876a740169a",
       "commandsPath": "bench/plans/generated/compat/compute_stable_fluids_multistage_256grid_18pressure_4steps_commands.json",
       "cohorts": [
         "exploration"

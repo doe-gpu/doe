@@ -78,6 +78,7 @@ pub const RawNumericStability = struct {
 pub const RawKernelDispatchOutputOracle = struct {
     schema_version: ?u32 = null,
     schemaVersion: ?u32 = null,
+    scope: ?[]const u8 = null,
     kind: ?[]const u8 = null,
     initialization: ?[]const u8 = null,
     binding_group: ?u32 = null,

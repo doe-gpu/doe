@@ -74,6 +74,17 @@ fn parseKernelBindings(allocator: Allocator, raw_bindings: []const RawKernelBind
 
 fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !model_compute_types.KernelDispatchOutputOracle {
     const schema_version = raw.schema_version orelse raw.schemaVersion orelse return ParseError.InvalidCommandPayload;
+    const scope: model_compute_types.KernelDispatchOutputOracleScope = switch (schema_version) {
+        1 => if (raw.scope == null)
+            .isolated_dispatch
+        else
+            return ParseError.InvalidCommandPayload,
+        2 => if (std.mem.eql(u8, raw.scope orelse return ParseError.InvalidCommandPayload, "command_graph"))
+            .command_graph
+        else
+            return ParseError.InvalidCommandPayload,
+        else => return ParseError.InvalidCommandPayload,
+    };
     const kind = raw.kind orelse return ParseError.InvalidCommandPayload;
     const initialization = raw.initialization orelse return ParseError.InvalidCommandPayload;
     const binding_group = raw.binding_group orelse raw.bindingGroup orelse return ParseError.InvalidCommandPayload;
@@ -81,7 +92,7 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
     const dispatch_count = raw.dispatch_count orelse raw.dispatchCount orelse return ParseError.InvalidCommandPayload;
     const expected_sha256 = raw.expected_sha256 orelse raw.expectedSha256 orelse return ParseError.InvalidCommandPayload;
     const reference_id = raw.reference_id orelse raw.referenceId orelse return ParseError.InvalidCommandPayload;
-    if (schema_version != 1 or dispatch_count == 0 or expected_sha256.len != 64) return ParseError.InvalidCommandPayload;
+    if (dispatch_count == 0 or expected_sha256.len != 64) return ParseError.InvalidCommandPayload;
     if (!std.mem.eql(u8, kind, "sha256_exact_v1") or !std.mem.eql(u8, initialization, "zero_fill_v1")) {
         return ParseError.InvalidCommandPayload;
     }
@@ -95,6 +106,7 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
     errdefer allocator.free(owned_reference);
     return .{
         .schema_version = schema_version,
+        .scope = scope,
         .kind = owned_kind,
         .initialization = owned_initialization,
         .binding_group = binding_group,
@@ -154,4 +166,66 @@ pub fn parseDispatchCommand(allocator: Allocator, kind: command_kind.NormalizedK
         return .{ .dispatch_indirect = dispatch };
     }
     return .{ .dispatch = dispatch };
+}
+
+fn freeOutputOracle(allocator: Allocator, oracle: model_compute_types.KernelDispatchOutputOracle) void {
+    allocator.free(oracle.kind);
+    allocator.free(oracle.initialization);
+    allocator.free(oracle.expected_sha256);
+    allocator.free(oracle.reference_id);
+}
+
+test "output oracle schema v1 retains isolated dispatch scope" {
+    const oracle = try parseOutputOracle(std.testing.allocator, .{
+        .schema_version = 1,
+        .kind = "sha256_exact_v1",
+        .initialization = "zero_fill_v1",
+        .binding_group = 0,
+        .binding = 1,
+        .dispatch_count = 1,
+        .expected_sha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        .reference_id = "unit-test",
+    });
+    defer freeOutputOracle(std.testing.allocator, oracle);
+
+    try std.testing.expectEqual(
+        model_compute_types.KernelDispatchOutputOracleScope.isolated_dispatch,
+        oracle.scope,
+    );
+}
+
+test "output oracle schema v2 declares command graph scope" {
+    const oracle = try parseOutputOracle(std.testing.allocator, .{
+        .schema_version = 2,
+        .scope = "command_graph",
+        .kind = "sha256_exact_v1",
+        .initialization = "zero_fill_v1",
+        .binding_group = 0,
+        .binding = 1,
+        .dispatch_count = 1,
+        .expected_sha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        .reference_id = "unit-test",
+    });
+    defer freeOutputOracle(std.testing.allocator, oracle);
+
+    try std.testing.expectEqual(
+        model_compute_types.KernelDispatchOutputOracleScope.command_graph,
+        oracle.scope,
+    );
+}
+
+test "output oracle schema v2 rejects missing graph scope" {
+    try std.testing.expectError(
+        ParseError.InvalidCommandPayload,
+        parseOutputOracle(std.testing.allocator, .{
+            .schema_version = 2,
+            .kind = "sha256_exact_v1",
+            .initialization = "zero_fill_v1",
+            .binding_group = 0,
+            .binding = 1,
+            .dispatch_count = 1,
+            .expected_sha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            .reference_id = "unit-test",
+        }),
+    );
 }
