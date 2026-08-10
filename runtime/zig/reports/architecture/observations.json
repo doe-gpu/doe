@@ -11,9 +11,66 @@
       "status": "diagnostic-only"
     },
     "buildMeasurements": {
-      "capturedSourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
-      "currentSourceTreeSha256": "b5c10b176cb7c1dcbe01716a4aea3ca38780d3b1771c724a2a5522d9f0c68e6d",
-      "status": "stale-source-mismatch"
+      "artifacts": [
+        {
+          "path": "$MEASUREMENT_ROOT/prefix/bin/doe-zig-runtime",
+          "sha256": "42a12563e1abf3a33ee431e81fb791a0973fb3f1b5b6c6bbac6b6cf4e5a46f67",
+          "sizeBytes": 11212840
+        }
+      ],
+      "buildStep": "doe-runtime",
+      "captureToolChangedDuringCapture": false,
+      "captureToolSha256": "897fe525b858db9269d5b8bc624d6a42b07e1283f7bfa26cf0d12ef9152a2c66",
+      "cleanCompile": {
+        "elapsedNs": 60781269866,
+        "exitCode": 0,
+        "stderr": "",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout": "",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "/home/x/.local/zig/zig-x86_64-linux-0.15.2/zig",
+        "build",
+        "doe-runtime",
+        "-Doptimize=ReleaseSafe",
+        "-j1",
+        "--seed",
+        "0",
+        "--summary",
+        "none",
+        "--cache-dir",
+        "$MEASUREMENT_ROOT/cache",
+        "--global-cache-dir",
+        "$MEASUREMENT_ROOT/global-cache",
+        "--prefix",
+        "$MEASUREMENT_ROOT/prefix"
+      ],
+      "host": {
+        "machine": "x86_64",
+        "operatingSystem": "Linux",
+        "release": "7.0.0-28-generic"
+      },
+      "incrementalCompile": {
+        "elapsedNs": 48776416,
+        "exitCode": 0,
+        "stderr": "",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout": "",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "measurementClass": "diagnostic-only",
+      "optimize": "ReleaseSafe",
+      "schemaVersion": 2,
+      "sourceChangedBeforeIncremental": false,
+      "sourceChangedDuringCapture": false,
+      "sourceTreeSha256": "b5c10b176cb7c1dcbe01716a4aea3ca38780d3b1771c724a2a5522d9f0c68e6d",
+      "status": "captured",
+      "toolchain": {
+        "path": "/home/x/.local/zig/zig-x86_64-linux-0.15.2/zig",
+        "sha256": "2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51",
+        "version": "0.15.2"
+      }
     },
     "coChange": {
       "commitsConsidered": 153,

@@ -4,7 +4,7 @@
     "reason": null
   },
   "baselineCommit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
-  "candidateCommit": "WORKTREE:3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
+  "candidateCommit": "WORKTREE:b5c10b176cb7c1dcbe01716a4aea3ca38780d3b1771c724a2a5522d9f0c68e6d",
   "classification": "failure",
   "differences": [
     {
