@@ -2,12 +2,13 @@ const std = @import("std");
 const ir = @import("../ir/ir.zig");
 const ir_const_eval = @import("../ir/ir_const_eval.zig");
 const ir_query = @import("../ir/ir_query.zig");
-const layout_utils = @import("../ir/layout_utils.zig");
 
+const classify_builtin_component = ir_query.classifyBuiltinComponent;
 const expr_contains_expr = ir_query.exprContainsExpr;
 const is_local_ref = ir_query.isLocalRef;
+const match_u32_literal_value = ir_query.matchIntLiteral;
 const resolve_const_local_initializer = ir_query.resolveConstLocalInitializer;
-const resolve_indexable_type = ir_query.resolveIndexableType;
+const resolve_runtime_array_element_stride = ir_query.resolveRuntimeArrayElementStride;
 const resolve_value_alias = ir_query.resolveValueAlias;
 
 const UniformField = struct {
@@ -770,30 +771,6 @@ fn match_param_ref(function: *const ir.Function, expr_id: ir.ExprId) ?u32 {
     };
 }
 
-fn classify_builtin_component(
-    function: *const ir.Function,
-    expr_id: ir.ExprId,
-    builtin: ir.Builtin,
-) ?u8 {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    const member = switch (expr.data) {
-        .member => |value| value,
-        else => return null,
-    };
-    const base = function.exprs.items[resolve_value_alias(function, member.base)];
-    const param_idx = switch (base.data) {
-        .param_ref => |value| value,
-        else => return null,
-    };
-    if (param_idx >= function.params.items.len) return null;
-    const io = function.params.items[param_idx].io orelse return null;
-    if (io.builtin != builtin) return null;
-    if (std.mem.eql(u8, member.field_name, "x")) return 0;
-    if (std.mem.eql(u8, member.field_name, "y")) return 1;
-    if (std.mem.eql(u8, member.field_name, "z")) return 2;
-    return null;
-}
-
 fn match_u32_mask_4(module: *const ir.Module, function: *const ir.Function, expr_id: ir.ExprId) bool {
     const canonical = resolve_value_alias(function, expr_id);
     if (ir_const_eval.resolve_constant_int(module, function, canonical) == 0xffff_fffc) return true;
@@ -818,14 +795,6 @@ fn same_value_expr(function: *const ir.Function, a: ir.ExprId, b: ir.ExprId) boo
 
 fn same_affine_expr(a: AffineExpr, b: AffineExpr) bool {
     return a.base == b.base and a.offset == b.offset;
-}
-
-fn match_u32_literal_value(function: *const ir.Function, expr_id: ir.ExprId) ?u64 {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    return switch (expr.data) {
-        .int_lit => |value| value,
-        else => null,
-    };
 }
 
 fn is_single_break_block(function: *const ir.Function, stmt_id: ir.StmtId) bool {
@@ -887,22 +856,6 @@ fn stmt_contains_expr(function: *const ir.Function, stmt_id: ir.StmtId, target_e
         .loop_ => |loop_stmt| return stmt_contains_expr(function, loop_stmt.body, target_expr_id),
         else => return false,
     }
-}
-
-fn resolve_runtime_array_element_stride(
-    module: *const ir.Module,
-    function: *const ir.Function,
-    base_id: ir.ExprId,
-) ?u64 {
-    const base_ty = resolve_indexable_type(&module.types, function.exprs.items[base_id].ty);
-    const arr = switch (module.types.get(base_ty)) {
-        .array => |value| value,
-        else => return null,
-    };
-    if (arr.len != null) return null;
-    const elem_size = layout_utils.type_size(module, arr.elem);
-    const elem_align = layout_utils.type_alignment(module, arr.elem);
-    return layout_utils.round_up(elem_size, elem_align);
 }
 
 fn resolve_storage_binding(

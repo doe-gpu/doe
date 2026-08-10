@@ -9,9 +9,11 @@
 
 const ir = @import("../../ir/ir.zig");
 const classify = @import("emit_csl_classify.zig");
+const storage_emit = @import("csl_storage_emit.zig");
 const W = @import("emit_csl_ir_walk.zig");
 
 pub const EmitError = W.EmitError;
+const emitStorageExports = storage_emit.emitPointerExports;
 
 pub fn emit(
     buf: []u8,
@@ -134,17 +136,4 @@ fn emitStoragePtrs(buf: []u8, pos: *usize, module: *const ir.Module) EmitError!v
         try W.write(buf, pos, ";\n");
     }
     try W.write(buf, pos, "\n");
-}
-
-fn emitStorageExports(buf: []u8, pos: *usize, module: *const ir.Module) EmitError!void {
-    for (module.globals.items) |global| {
-        if (global.binding == null) continue;
-        const space = global.addr_space orelse continue;
-        if (space != .storage) continue;
-        try W.write(buf, pos, "    @export_symbol(");
-        try W.write(buf, pos, global.name);
-        try W.write(buf, pos, "_ptr, \"");
-        try W.write(buf, pos, global.name);
-        try W.write(buf, pos, "\");\n");
-    }
 }

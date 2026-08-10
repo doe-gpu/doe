@@ -7,6 +7,7 @@
 
 const std = @import("std");
 const ir = @import("../wgsl/ir/ir.zig");
+const ir_query = @import("../wgsl/ir/ir_query.zig");
 const layout_utils = @import("../wgsl/ir/layout_utils.zig");
 const family_hint = @import("family_hint.zig");
 const frontend_body = @import("frontend_body.zig");
@@ -18,6 +19,7 @@ const frontend_rejections = @import("frontend_rejections.zig");
 const frontend_types = @import("frontend_types.zig");
 
 pub const FrontendError = frontend_types.FrontendError;
+const findGlobalBase = ir_query.findGlobalBase;
 
 pub fn lowerIrToTsir(
     allocator: std.mem.Allocator,
@@ -810,25 +812,6 @@ fn scalarKindFromIr(s: ir.ScalarType) tsir.schema.ScalarKind {
         .abstract_float => .f32,
         .bool, .void => .u32,
     };
-}
-
-/// Walk an lhs chain (index / member / bare global_ref) down to
-/// the first `global_ref` and return the global's module index.
-/// Returns `null` if the chain terminates at something other than
-/// a global reference (e.g. a local variable, parameter, or
-/// function call result).
-fn findGlobalBase(function: *const ir.Function, expr_id: ir.ExprId) ?u32 {
-    var cursor = expr_id;
-    while (true) {
-        const node = function.exprs.items[cursor];
-        switch (node.data) {
-            .global_ref => |idx| return idx,
-            .index => |idx_expr| cursor = idx_expr.base,
-            .member => |m| cursor = m.base,
-            .load => |inner| cursor = inner,
-            else => return null,
-        }
-    }
 }
 
 /// Convert a `module.globals` index into a position within the

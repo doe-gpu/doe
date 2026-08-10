@@ -1,8 +1,10 @@
 const std = @import("std");
 const ir = @import("../wgsl/ir/ir.zig");
+const ir_query = @import("../wgsl/ir/ir_query.zig");
 const types = @import("frontend_types.zig");
 
 const FrontendError = types.FrontendError;
+const findGlobalBase = ir_query.findGlobalBase;
 
 /// Extract a literal upper bound from a for-loop condition
 /// shaped as any of `i < N`, `i <= N`, `N > i`, or `N >= i`
@@ -629,20 +631,6 @@ fn extractUniformFieldAccess(
                     }
                 }
             },
-            else => return null,
-        }
-    }
-}
-
-fn findGlobalBase(function: *const ir.Function, expr_id: ir.ExprId) ?u32 {
-    var cursor = expr_id;
-    while (true) {
-        const node = function.exprs.items[cursor];
-        switch (node.data) {
-            .global_ref => |idx| return idx,
-            .index => |idx_expr| cursor = idx_expr.base,
-            .member => |m| cursor = m.base,
-            .load => |inner| cursor = inner,
             else => return null,
         }
     }

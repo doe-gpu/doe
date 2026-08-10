@@ -52,10 +52,12 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
 const classify = @import("emit_csl_classify.zig");
+const storage_emit = @import("csl_storage_emit.zig");
 const spec = @import("csl_spec.zig");
 const W = @import("emit_csl_ir_walk.zig");
 
 pub const EmitError = W.EmitError;
+const emitStorageExports = storage_emit.emitPointerExports;
 
 // ---------------------------------------------------------------------------
 // Streaming attention — per-PE, no fabric
@@ -580,19 +582,6 @@ fn isKvStorageName(name: []const u8) bool {
         std.mem.indexOf(u8, name, "val") != null or
         std.mem.indexOf(u8, name, "_k") != null or
         std.mem.indexOf(u8, name, "_v") != null;
-}
-
-fn emitStorageExports(buf: []u8, pos: *usize, module: *const ir.Module) EmitError!void {
-    for (module.globals.items) |global| {
-        if (global.binding == null) continue;
-        const space = global.addr_space orelse continue;
-        if (space != .storage) continue;
-        try W.write(buf, pos, "    @export_symbol(");
-        try W.write(buf, pos, global.name);
-        try W.write(buf, pos, "_ptr, \"");
-        try W.write(buf, pos, global.name);
-        try W.write(buf, pos, "\");\n");
-    }
 }
 
 fn emitComptime(buf: []u8, pos: *usize, module: *const ir.Module) EmitError!void {

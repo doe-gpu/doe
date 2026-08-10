@@ -5,6 +5,7 @@ const loop_match = @import("dispatch_proof_loop_match.zig");
 
 const expr_contains_expr = ir_query.exprContainsExpr;
 const is_local_ref = ir_query.isLocalRef;
+const match_u32_literal_value = ir_query.matchIntLiteral;
 const resolve_const_local_initializer = ir_query.resolveConstLocalInitializer;
 const resolve_value_alias = ir_query.resolveValueAlias;
 const stmt_contains_expr = ir_query.stmtContainsExpr;
@@ -512,23 +513,7 @@ fn local_expr_is_nonincreasing_update(
 }
 
 fn classify_local_invocation_axis(function: *const ir.Function, expr_id: ir.ExprId) ?u8 {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    const member = switch (expr.data) {
-        .member => |value| value,
-        else => return null,
-    };
-    const base = function.exprs.items[resolve_value_alias(function, member.base)];
-    const param_idx = switch (base.data) {
-        .param_ref => |value| value,
-        else => return null,
-    };
-    if (param_idx >= function.params.items.len) return null;
-    const io = function.params.items[param_idx].io orelse return null;
-    if (io.builtin != .local_invocation_id) return null;
-    if (std.mem.eql(u8, member.field_name, "x")) return 0;
-    if (std.mem.eql(u8, member.field_name, "y")) return 1;
-    if (std.mem.eql(u8, member.field_name, "z")) return 2;
-    return null;
+    return ir_query.classifyBuiltinComponent(function, expr_id, .local_invocation_id);
 }
 
 fn match_plain_local_ref(function: *const ir.Function, expr_id: ir.ExprId) ?u32 {
@@ -621,15 +606,6 @@ fn upper_bound_for_binary(
             }
             return rhs;
         },
-        else => return null,
-    }
-}
-
-fn match_u32_literal_value(function: *const ir.Function, expr_id: ir.ExprId) ?u64 {
-    const canonical = resolve_value_alias(function, expr_id);
-    const expr = function.exprs.items[canonical];
-    switch (expr.data) {
-        .int_lit => |value| return value,
         else => return null,
     }
 }

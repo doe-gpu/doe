@@ -2,11 +2,12 @@ const ir = @import("../ir/ir.zig");
 const ir_const_eval = @import("../ir/ir_const_eval.zig");
 const ir_query = @import("../ir/ir_query.zig");
 const loop_match = @import("dispatch_proof_loop_match.zig");
-const layout_utils = @import("../ir/layout_utils.zig");
 const lean_proof = @import("../../../verification/lean_proof.zig");
 
 const resolve_const_local_initializer = ir_query.resolveConstLocalInitializer;
-const resolve_indexable_type = ir_query.resolveIndexableType;
+const classify_builtin_component = ir_query.classifyBuiltinComponent;
+const match_u32_literal_value = ir_query.matchIntLiteral;
+const resolve_runtime_array_element_stride = ir_query.resolveRuntimeArrayElementStride;
 const resolve_value_alias = ir_query.resolveValueAlias;
 
 pub fn try_elide_storage_index(
@@ -247,22 +248,6 @@ fn try_elide_dispatch_validated_builtin_index(
     }
 
     return null;
-}
-
-fn resolve_runtime_array_element_stride(
-    module: *const ir.Module,
-    function: *const ir.Function,
-    base_id: ir.ExprId,
-) ?u64 {
-    const base_ty = resolve_indexable_type(&module.types, function.exprs.items[base_id].ty);
-    const arr = switch (module.types.get(base_ty)) {
-        .array => |value| value,
-        else => return null,
-    };
-    if (arr.len != null) return null;
-    const elem_size = layout_utils.type_size(module, arr.elem);
-    const elem_align = layout_utils.type_alignment(module, arr.elem);
-    return layout_utils.round_up(elem_size, elem_align);
 }
 
 fn resolve_storage_binding(
@@ -506,14 +491,6 @@ fn match_u32_literal(function: *const ir.Function, expr_id: ir.ExprId, expected:
     return switch (expr.data) {
         .int_lit => |value| value == expected,
         else => false,
-    };
-}
-
-fn match_u32_literal_value(function: *const ir.Function, expr_id: ir.ExprId) ?u64 {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    return switch (expr.data) {
-        .int_lit => |value| value,
-        else => null,
     };
 }
 
@@ -915,30 +892,6 @@ fn match_gid_component_mod_tile(
             if (tile_width > 0) return .{ .axis = axis, .tile_width = tile_width };
         }
     }
-    return null;
-}
-
-fn classify_builtin_component(
-    function: *const ir.Function,
-    expr_id: ir.ExprId,
-    builtin: ir.Builtin,
-) ?u8 {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    const member = switch (expr.data) {
-        .member => |value| value,
-        else => return null,
-    };
-    const base = function.exprs.items[resolve_value_alias(function, member.base)];
-    const param_idx = switch (base.data) {
-        .param_ref => |value| value,
-        else => return null,
-    };
-    if (param_idx >= function.params.items.len) return null;
-    const io = function.params.items[param_idx].io orelse return null;
-    if (io.builtin != builtin) return null;
-    if (std.mem.eql(u8, member.field_name, "x")) return 0;
-    if (std.mem.eql(u8, member.field_name, "y")) return 1;
-    if (std.mem.eql(u8, member.field_name, "z")) return 2;
     return null;
 }
 

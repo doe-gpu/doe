@@ -1,8 +1,10 @@
 const std = @import("std");
 const ir = @import("../wgsl/ir/ir.zig");
+const ir_query = @import("../wgsl/ir/ir_query.zig");
 const schema = @import("schema.zig");
 
 const MAX_INDIRECT_LOCAL_ALIAS_DEPTH: u32 = 8;
+const findGlobalBase = ir_query.findGlobalBase;
 
 /// Infer a coarse `KernelFamilyHint` from the observable TSIR shape of one
 /// function. Hints are tiebreakers only: they must not change feasibility or
@@ -178,18 +180,4 @@ fn localInitializerContainsBufferIndex(
         return indexFieldContainsBufferIndexDepth(function, init, depth);
     }
     return false;
-}
-
-fn findGlobalBase(function: *const ir.Function, expr_id: ir.ExprId) ?u32 {
-    var cursor = expr_id;
-    while (true) {
-        const node = function.exprs.items[cursor];
-        switch (node.data) {
-            .global_ref => |idx| return idx,
-            .index => |idx_expr| cursor = idx_expr.base,
-            .member => |m| cursor = m.base,
-            .load => |inner| cursor = inner,
-            else => return null,
-        }
-    }
 }
