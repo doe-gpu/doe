@@ -7,6 +7,7 @@
 
 const builtin = @import("builtin");
 const std = @import("std");
+const toolchain = @import("../toolchain.zig");
 const spec = @import("csl_spec.zig");
 
 pub const Error = error{
@@ -23,25 +24,8 @@ const MAX_ERRORS: usize = 16;
 const LAST_ERROR_CAP: usize = 1024;
 const MAX_CSLC_OUTPUT_BYTES: usize = 64 * 1024;
 
-pub const ToolchainDiscovery = enum {
-    explicit_config,
-    env_path,
-    env_path_lookup,
-    implicit_path_lookup,
-};
-
-pub const ToolchainConfig = struct {
-    executable: []const u8,
-    discovery: ToolchainDiscovery = .explicit_config,
-    owned_value: ?[]u8 = null,
-
-    pub fn deinit(self: *ToolchainConfig, alloc: std.mem.Allocator) void {
-        if (self.owned_value) |value| {
-            alloc.free(value);
-            self.owned_value = null;
-        }
-    }
-};
+pub const ToolchainDiscovery = toolchain.Discovery;
+pub const ToolchainConfig = toolchain.Config;
 
 pub const ValidationResult = struct {
     valid: bool,
@@ -180,7 +164,7 @@ pub fn validateToolchainConfig(config: ToolchainConfig) Error!void {
         else => {
             setLastErrorFmt(
                 "failed to start cslc via {s} `{s}`: {s}",
-                .{ discoveryLabel(config.discovery), config.executable, @errorName(err) },
+                .{ toolchain.discoveryLabel(config.discovery), config.executable, @errorName(err) },
             );
             return error.ShaderToolchainUnavailable;
         },
@@ -191,16 +175,16 @@ pub fn validateToolchainConfig(config: ToolchainConfig) Error!void {
     switch (result.term) {
         .Exited => |code| {
             if (code != 0) {
-                const detail = trimmedDiagnostic(result.stderr, result.stdout);
+                const detail = toolchain.diagnosticOutput(result.stderr, result.stdout);
                 if (detail.len == 0) {
                     setLastErrorFmt(
                         "cslc failed via {s} `{s}` with exit code {d}",
-                        .{ discoveryLabel(config.discovery), config.executable, code },
+                        .{ toolchain.discoveryLabel(config.discovery), config.executable, code },
                     );
                 } else {
                     setLastErrorFmt(
                         "cslc failed via {s} `{s}` with exit code {d}: {s}",
-                        .{ discoveryLabel(config.discovery), config.executable, code, detail },
+                        .{ toolchain.discoveryLabel(config.discovery), config.executable, code, detail },
                     );
                 }
                 return error.InvalidIr;
@@ -209,7 +193,7 @@ pub fn validateToolchainConfig(config: ToolchainConfig) Error!void {
         else => {
             setLastErrorFmt(
                 "cslc terminated unexpectedly via {s} `{s}`",
-                .{ discoveryLabel(config.discovery), config.executable },
+                .{ toolchain.discoveryLabel(config.discovery), config.executable },
             );
             return error.InvalidIr;
         },
@@ -469,21 +453,6 @@ fn setLastErrorFmt(comptime fmt: []const u8, args: anytype) void {
 
 fn defaultCslcExecutable() []const u8 {
     return if (builtin.os.tag == .windows) "cslc.exe" else "cslc";
-}
-
-fn discoveryLabel(discovery: ToolchainDiscovery) []const u8 {
-    return switch (discovery) {
-        .explicit_config => "explicit-config",
-        .env_path => "environment-path",
-        .env_path_lookup => "environment-PATH",
-        .implicit_path_lookup => "implicit-PATH",
-    };
-}
-
-fn trimmedDiagnostic(stderr: []const u8, stdout: []const u8) []const u8 {
-    const trimmed_stderr = std.mem.trim(u8, stderr, " \t\r\n");
-    if (trimmed_stderr.len != 0) return trimmed_stderr;
-    return std.mem.trim(u8, stdout, " \t\r\n");
 }
 
 test "element_wise pattern rejects fabric usage" {

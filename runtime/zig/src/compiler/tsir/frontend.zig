@@ -181,7 +181,7 @@ fn extractElemAndShape(
     const t = module.types.get(cursor);
     switch (t) {
         .scalar => |s| {
-            return .{ .shape = &.{}, .elem = scalarKindFromIr(s) };
+            return .{ .shape = &.{}, .elem = frontend_types.scalarKindFromIr(s) };
         },
         .array => |arr| {
             const nested = (try extractNumericShape(allocator, module, arr.elem)) orelse return null;
@@ -797,20 +797,8 @@ fn resolveAccumulationKind(
     if (maybe_ref == .ref) cursor = maybe_ref.ref.elem;
     const t = module.types.get(cursor);
     return switch (t) {
-        .scalar => |s| scalarKindFromIr(s),
+        .scalar => |s| frontend_types.scalarKindFromIr(s),
         else => null,
-    };
-}
-
-fn scalarKindFromIr(s: ir.ScalarType) tsir.schema.ScalarKind {
-    return switch (s) {
-        .f32 => .f32,
-        .f16 => .f16,
-        .i32 => .i32,
-        .u32 => .u32,
-        .abstract_int => .i32,
-        .abstract_float => .f32,
-        .bool, .void => .u32,
     };
 }
 

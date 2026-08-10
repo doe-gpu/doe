@@ -60,7 +60,7 @@
     {
       "fanIn": 1,
       "fanOut": 10,
-      "lineCount": 897,
+      "lineCount": 885,
       "path": "src/compiler/tsir/frontend.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -81,7 +81,7 @@
     {
       "fanIn": 1,
       "fanOut": 24,
-      "lineCount": 915,
+      "lineCount": 895,
       "path": "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -137,7 +137,7 @@
     {
       "fanIn": 1,
       "fanOut": 6,
-      "lineCount": 959,
+      "lineCount": 951,
       "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -151,7 +151,7 @@
     {
       "fanIn": 1,
       "fanOut": 5,
-      "lineCount": 898,
+      "lineCount": 890,
       "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -220,9 +220,9 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "db3ec8bba68056a4b72a1703f8b25f2f08448c196b62ffc348228194ae03cae0",
+  "manifestSha256": "8990f85173273a2903be00f6127356348be51d9ed7048af47251dad5d426313f",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "b5c10b176cb7c1dcbe01716a4aea3ca38780d3b1771c724a2a5522d9f0c68e6d"
+  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6"
 }

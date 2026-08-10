@@ -1,4 +1,5 @@
 const ir = @import("../../ir/ir.zig");
+const ir_query = @import("../../ir/ir_query.zig");
 const maps = @import("emit_hlsl_maps.zig");
 
 const CLIP_DISTANCE_RESULT_NAME = "_doe_clip_distance";
@@ -8,7 +9,7 @@ pub fn emit_stage_function(self: anytype, function_index: ir.FunctionId) !void {
     const stage = function.stage orelse return error.InvalidIr;
     if (stage == .compute) return error.InvalidIr;
     // Need either scalar return with IO attr, or struct return with IO fields.
-    if (function.return_io == null and !is_io_struct(self, function.return_type)) return error.InvalidIr;
+    if (function.return_io == null and !ir_query.typeHasIoStructField(self.module, function.return_type)) return error.InvalidIr;
 
     if (function.return_io != null and function.return_io.?.builtin == .clip_distances) {
         try emit_clip_distance_impl_function(self, function_index);
@@ -17,19 +18,6 @@ pub fn emit_stage_function(self: anytype, function_index: ir.FunctionId) !void {
     }
     try emit_output_struct(self, function, stage);
     try emit_wrapper_function(self, function_index, stage);
-}
-
-fn is_io_struct(self: anytype, ty: ir.TypeId) bool {
-    return switch (self.module.types.get(ty)) {
-        .struct_ => |struct_id| {
-            const struct_def = self.module.structs.items[struct_id];
-            for (struct_def.fields.items) |field| {
-                if (field.io != null) return true;
-            }
-            return false;
-        },
-        else => false,
-    };
 }
 
 fn get_struct_def(self: anytype, ty: ir.TypeId) ?ir.StructDef {

@@ -318,14 +318,6 @@ fn classify_gid_scalar(function: *const ir.Function, expr_id: ir.ExprId) ?u8 {
     }
 }
 
-fn match_u32_literal(function: *const ir.Function, expr_id: ir.ExprId, expected: u32) bool {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    return switch (expr.data) {
-        .int_lit => |value| value == expected,
-        else => false,
-    };
-}
-
 fn match_u32_literal_value(function: *const ir.Function, expr_id: ir.ExprId) ?u32 {
     const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
     return switch (expr.data) {

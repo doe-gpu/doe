@@ -1,5 +1,6 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const ir_query = @import("../../ir/ir_query.zig");
 const maps = @import("emit_hlsl_maps.zig");
 
 pub const EmitError = error{
@@ -53,7 +54,7 @@ pub fn emit_texture_builtin(
         if (args.len != 3) return error.InvalidIr;
         const level_expr = function.expr_args.items[args.start + 2];
         if (texture_global_name(module, function, texture_expr)) |global_name| {
-            if (is_texture_1d(module, function, texture_expr)) {
+            if (ir_query.exprIsTexture1D(module, &function, texture_expr)) {
                 // 1D texture: scalar coord, Load takes int2(coord, level)
                 try ctx.write("((int(");
                 try ctx.emit_expr(function, coord_expr);
@@ -88,7 +89,7 @@ pub fn emit_texture_builtin(
                 try ctx.write("))) : float4(0.0, 0.0, 0.0, 0.0))");
             }
         } else {
-            if (is_texture_1d(module, function, texture_expr)) {
+            if (ir_query.exprIsTexture1D(module, &function, texture_expr)) {
                 try ctx.emit_expr(function, texture_expr);
                 try ctx.write(".Load(int2(");
                 try ctx.emit_expr(function, coord_expr);
@@ -410,13 +411,6 @@ fn texture_global_name(module: *const ir.Module, function: ir.Function, expr_id:
     return switch (function.exprs.items[expr_id].data) {
         .global_ref => |index| module.globals.items[index].name,
         else => null,
-    };
-}
-
-fn is_texture_1d(module: *const ir.Module, function: ir.Function, expr_id: ir.ExprId) bool {
-    return switch (module.types.get(function.exprs.items[expr_id].ty)) {
-        .texture_1d => true,
-        else => false,
     };
 }
 

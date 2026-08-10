@@ -190,6 +190,7 @@ digraph doe_zig_architecture {
   "src/compiler/tsir/schema.zig" [label="src/compiler/tsir/schema.zig\ncompiler"];
   "src/compiler/tsir/tools/tsir_bootstrap_manifest_inputs.zig" [label="src/compiler/tsir/tools/tsir_bootstrap_manifest_inputs.zig\ncompiler"];
   "src/compiler/tsir/tools/tsir_bootstrap_oracle.zig" [label="src/compiler/tsir/tools/tsir_bootstrap_oracle.zig\ncompiler"];
+  "src/compiler/wgsl/emit/csl/csl_compile_sections.zig" [label="src/compiler/wgsl/emit/csl/csl_compile_sections.zig\ncompiler"];
   "src/compiler/wgsl/emit/csl/csl_spec.zig" [label="src/compiler/wgsl/emit/csl/csl_spec.zig\ncompiler"];
   "src/compiler/wgsl/emit/csl/csl_storage_emit.zig" [label="src/compiler/wgsl/emit/csl/csl_storage_emit.zig\ncompiler"];
   "src/compiler/wgsl/emit/csl/csl_text_buffer.zig" [label="src/compiler/wgsl/emit/csl/csl_text_buffer.zig\ncompiler"];
@@ -262,6 +263,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig" [label="src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig\ncompiler"];
   "src/compiler/wgsl/emit/spirv/spirv_builder.zig" [label="src/compiler/wgsl/emit/spirv/spirv_builder.zig\ncompiler"];
   "src/compiler/wgsl/emit/spirv/spirv_spec.zig" [label="src/compiler/wgsl/emit/spirv/spirv_spec.zig\ncompiler"];
+  "src/compiler/wgsl/emit/toolchain.zig" [label="src/compiler/wgsl/emit/toolchain.zig\ncompiler"];
   "src/compiler/wgsl/frontend/ast.zig" [label="src/compiler/wgsl/frontend/ast.zig\ncompiler"];
   "src/compiler/wgsl/frontend/lexer.zig" [label="src/compiler/wgsl/frontend/lexer.zig\ncompiler"];
   "src/compiler/wgsl/frontend/parser.zig" [label="src/compiler/wgsl/frontend/parser.zig\ncompiler"];
@@ -1363,6 +1365,8 @@ digraph doe_zig_architecture {
   "src/compiler/tsir/frontend_rejections.zig" -> "src/compiler/tsir/frontend_expr.zig";
   "src/compiler/tsir/frontend_rejections.zig" -> "src/compiler/tsir/schema.zig";
   "src/compiler/tsir/frontend_rejections.zig" -> "src/compiler/tsir/frontend_types.zig";
+  "src/compiler/tsir/frontend_types.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/tsir/frontend_types.zig" -> "src/compiler/tsir/schema.zig";
   "src/compiler/tsir/mod.zig" -> "src/compiler/tsir/schema.zig";
   "src/compiler/tsir/mod.zig" -> "src/compiler/tsir/digest.zig";
   "src/compiler/tsir/mod.zig" -> "src/compiler/tsir/reference_interpreter.zig";
@@ -1396,6 +1400,8 @@ digraph doe_zig_architecture {
   "src/compiler/tsir/reference_reduction.zig" -> "src/compiler/tsir/reference_types.zig";
   "src/compiler/tsir/reference_scalar.zig" -> "src/compiler/tsir/schema.zig";
   "src/compiler/tsir/reference_types.zig" -> "src/compiler/tsir/schema.zig";
+  "src/compiler/wgsl/emit/csl/csl_compile_sections.zig" -> "src/compiler/wgsl/emit/csl/csl_spec.zig";
+  "src/compiler/wgsl/emit/csl/csl_compile_sections.zig" -> "src/compiler/wgsl/emit/csl/csl_text_buffer.zig";
   "src/compiler/wgsl/emit/csl/csl_spec.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/csl/csl_storage_emit.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/csl/csl_storage_emit.zig" -> "src/compiler/wgsl/emit/csl/csl_text_buffer.zig";
@@ -1412,6 +1418,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/csl/emit_csl_classify.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_classify.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_maps.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/emit/csl/csl_compile_sections.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/emit/csl/csl_spec.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_classify.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_validate.zig";
@@ -1430,7 +1437,6 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_sample.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_fused.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_fused_ffn.zig";
-  "src/compiler/wgsl/emit/csl/emit_csl_core.zig" -> "src/compiler/wgsl/emit/csl/csl_text_buffer.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_dense_gemv.zig" -> "src/compiler/wgsl/emit/csl/csl_spec.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_dense_gemv.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig" -> "src/compiler/wgsl/ir/ir.zig";
@@ -1457,6 +1463,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/csl/emit_csl_gather.zig" -> "src/compiler/wgsl/emit/csl/csl_storage_emit.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host.zig" -> "src/compiler/wgsl/emit/csl/csl_text_buffer.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/mod.zig";
+  "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/emit/csl/csl_compile_sections.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_classify.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_layout.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_elementwise.zig";
@@ -1479,7 +1486,6 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_validate.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/emit/csl/csl_spec.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/ir/ir.zig";
-  "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig" -> "src/compiler/wgsl/emit/csl/csl_text_buffer.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_host.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig" -> "src/compiler/wgsl/emit/csl/csl_spec.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig" -> "src/compiler/wgsl/emit/csl/csl_text_buffer.zig";
@@ -1546,6 +1552,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig" -> "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig" -> "src/compiler/wgsl/emit/csl/csl_spec.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig" -> "src/compiler/wgsl/emit/csl/csl_text_buffer.zig";
+  "src/compiler/wgsl/emit/csl/emit_csl_validate.zig" -> "src/compiler/wgsl/emit/toolchain.zig";
   "src/compiler/wgsl/emit/csl/emit_csl_validate.zig" -> "src/compiler/wgsl/emit/csl/csl_spec.zig";
   "src/compiler/wgsl/emit/dxil/dxil_bitcode.zig" -> "src/compiler/wgsl/emit/dxil/dxil_spec.zig";
   "src/compiler/wgsl/emit/dxil/dxil_builder.zig" -> "src/compiler/wgsl/emit/dxil/dxil_spec.zig";
@@ -1557,6 +1564,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/dxil/dxil_validate.zig" -> "src/compiler/wgsl/emit/dxil/dxil_spec.zig";
   "src/compiler/wgsl/emit/dxil/dxil_validate.zig" -> "src/compiler/wgsl/emit/dxil/dxil_container.zig";
   "src/compiler/wgsl/emit/dxil/emit_dxil.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/dxil/emit_dxil.zig" -> "src/compiler/wgsl/emit/toolchain.zig";
   "src/compiler/wgsl/emit/dxil/emit_dxil.zig" -> "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig";
   "src/compiler/wgsl/emit/dxil/emit_dxil.zig" -> "src/compiler/wgsl/emit/dxil/emit_dxil_native.zig";
   "src/compiler/wgsl/emit/dxil/emit_dxil.zig" -> "src/compiler/wgsl/emit/dxil/dxil_validate.zig";
@@ -1579,8 +1587,10 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig" -> "src/compiler/wgsl/emit/operator_text.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl_stage.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/hlsl/emit_hlsl_stage.zig" -> "src/compiler/wgsl/ir/ir_query.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl_stage.zig" -> "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl_texture.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/hlsl/emit_hlsl_texture.zig" -> "src/compiler/wgsl/ir/ir_query.zig";
   "src/compiler/wgsl/emit/hlsl/emit_hlsl_texture.zig" -> "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig";
   "src/compiler/wgsl/emit/msl/emit_msl.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_ir.zig";
   "src/compiler/wgsl/emit/msl/emit_msl.zig" -> "src/compiler/wgsl/ir/ir.zig";
@@ -1603,10 +1613,12 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/msl/emit_msl_shared.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_shared.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_maps.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_stage.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/msl/emit_msl_stage.zig" -> "src/compiler/wgsl/ir/ir_query.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_stage.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_maps.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_stage.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_shared.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_subgroups.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_texture.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/msl/emit_msl_texture.zig" -> "src/compiler/wgsl/ir/ir_query.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_vertex.zig" -> "src/compiler/wgsl/ir/ir.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_vertex.zig" -> "src/compiler/wgsl/emit/msl/emit_msl_shared.zig";
   "src/compiler/wgsl/emit/msl/emit_msl_workgroup_zero.zig" -> "src/compiler/wgsl/ir/ir.zig";

@@ -240,19 +240,7 @@ fn collectiveDtypeFromReturn(
     if (maybe_ref == .ref) cursor = maybe_ref.ref.elem;
     const t = module.types.get(cursor);
     return switch (t) {
-        .scalar => |s| scalarKindFromIr(s),
+        .scalar => |s| types.scalarKindFromIr(s),
         else => null,
-    };
-}
-
-fn scalarKindFromIr(s: ir.ScalarType) tsir.schema.ScalarKind {
-    return switch (s) {
-        .f32 => .f32,
-        .f16 => .f16,
-        .i32 => .i32,
-        .u32 => .u32,
-        .abstract_int => .i32,
-        .abstract_float => .f32,
-        .bool, .void => .u32, // placeholder; bool/void are not resource dtypes in practice
     };
 }

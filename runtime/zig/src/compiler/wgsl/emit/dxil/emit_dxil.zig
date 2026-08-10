@@ -14,6 +14,7 @@
 const builtin = @import("builtin");
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const toolchain = @import("../toolchain.zig");
 const emit_hlsl = @import("../hlsl/emit_hlsl.zig");
 const emit_dxil_native = @import("emit_dxil_native.zig");
 const dxil_validate = @import("dxil_validate.zig");
@@ -57,25 +58,8 @@ pub const Module = struct {
     entry_point: EntryPoint = .{},
 };
 
-pub const ToolchainDiscovery = enum {
-    explicit_config,
-    env_path,
-    env_path_lookup,
-    implicit_path_lookup,
-};
-
-pub const ToolchainConfig = struct {
-    executable: []const u8,
-    discovery: ToolchainDiscovery = .explicit_config,
-    owned_value: ?[]u8 = null,
-
-    pub fn deinit(self: *ToolchainConfig, alloc: std.mem.Allocator) void {
-        if (self.owned_value) |value| {
-            alloc.free(value);
-            self.owned_value = null;
-        }
-    }
-};
+pub const ToolchainDiscovery = toolchain.Discovery;
+pub const ToolchainConfig = toolchain.Config;
 
 var last_error_buf: [LAST_ERROR_CAP]u8 = undefined;
 var last_error_len: usize = 0;
@@ -148,7 +132,7 @@ pub fn emitWithToolchainConfig(module: *const ir.Module, out: []u8, config: Tool
         error.FileNotFound => {
             setLastErrorFmt(
                 "DXC reported success via {s} `{s}` but did not write `{s}`",
-                .{ discoveryLabel(config.discovery), config.executable, dxil_path },
+                .{ toolchain.discoveryLabel(config.discovery), config.executable, dxil_path },
             );
             return error.InvalidIr;
         },
@@ -262,7 +246,7 @@ fn runDxc(
         else => {
             setLastErrorFmt(
                 "failed to start DXC via {s} `{s}`: {s}",
-                .{ discoveryLabel(config.discovery), config.executable, @errorName(err) },
+                .{ toolchain.discoveryLabel(config.discovery), config.executable, @errorName(err) },
             );
             return error.ShaderToolchainUnavailable;
         },
@@ -272,16 +256,16 @@ fn runDxc(
     switch (result.term) {
         .Exited => |code| {
             if (code != 0) {
-                const detail = trimmedDiagnostic(result.stderr, result.stdout);
+                const detail = toolchain.diagnosticOutput(result.stderr, result.stdout);
                 if (detail.len == 0) {
                     setLastErrorFmt(
                         "DXC failed via {s} `{s}` with exit code {d} for profile `{s}` and entry `{s}`",
-                        .{ discoveryLabel(config.discovery), config.executable, code, profile, lowered.entry_point.name },
+                        .{ toolchain.discoveryLabel(config.discovery), config.executable, code, profile, lowered.entry_point.name },
                     );
                 } else {
                     setLastErrorFmt(
                         "DXC failed via {s} `{s}` with exit code {d} for profile `{s}` and entry `{s}`: {s}",
-                        .{ discoveryLabel(config.discovery), config.executable, code, profile, lowered.entry_point.name, detail },
+                        .{ toolchain.discoveryLabel(config.discovery), config.executable, code, profile, lowered.entry_point.name, detail },
                     );
                 }
                 return error.InvalidIr;
@@ -290,7 +274,7 @@ fn runDxc(
         else => {
             setLastErrorFmt(
                 "DXC terminated unexpectedly via {s} `{s}` for profile `{s}` and entry `{s}`",
-                .{ discoveryLabel(config.discovery), config.executable, profile, lowered.entry_point.name },
+                .{ toolchain.discoveryLabel(config.discovery), config.executable, profile, lowered.entry_point.name },
             );
             return error.InvalidIr;
         },
@@ -332,21 +316,6 @@ fn setLastErrorFmt(comptime fmt: []const u8, args: anytype) void {
 
 fn defaultDxcExecutable() []const u8 {
     return if (builtin.os.tag == .windows) "dxc.exe" else "dxc";
-}
-
-fn discoveryLabel(discovery: ToolchainDiscovery) []const u8 {
-    return switch (discovery) {
-        .explicit_config => "explicit-config",
-        .env_path => "environment-path",
-        .env_path_lookup => "environment-PATH",
-        .implicit_path_lookup => "implicit-PATH",
-    };
-}
-
-fn trimmedDiagnostic(stderr: []const u8, stdout: []const u8) []const u8 {
-    const trimmed_stderr = std.mem.trim(u8, stderr, " \t\r\n");
-    if (trimmed_stderr.len != 0) return trimmed_stderr;
-    return std.mem.trim(u8, stdout, " \t\r\n");
 }
 
 test "toolchain config parses explicit env contract" {

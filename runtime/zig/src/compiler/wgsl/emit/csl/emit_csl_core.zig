@@ -10,6 +10,7 @@
 //   ir.Module → classify → layout emitter + PE program emitter → buffer
 
 const ir = @import("../../ir/ir.zig");
+const compile_sections = @import("csl_compile_sections.zig");
 const spec = @import("csl_spec.zig");
 const classify = @import("emit_csl_classify.zig");
 const validate = @import("emit_csl_validate.zig");
@@ -28,9 +29,6 @@ const dequant = @import("emit_csl_dequant.zig");
 const sample = @import("emit_csl_sample.zig");
 const fused = @import("emit_csl_fused.zig");
 const fused_ffn = @import("emit_csl_fused_ffn.zig");
-const text_buffer = @import("csl_text_buffer.zig");
-
-const write = text_buffer.write;
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -63,11 +61,11 @@ pub fn emit(module: *const ir.Module, out: []u8) EmitError!usize {
     }
 
     // Emit layout section.
-    try writeSection(out, &pos, spec.LAYOUT_FILENAME);
+    try compile_sections.write(out, &pos, spec.LAYOUT_FILENAME);
     try emitLayout(out, &pos, module, entry, pattern);
 
     // Emit PE program section.
-    try writeSection(out, &pos, spec.PE_PROGRAM_FILENAME);
+    try compile_sections.write(out, &pos, spec.PE_PROGRAM_FILENAME);
     try emitPeProgram(out, &pos, module, entry, pattern);
 
     const validation_pattern = patternToValidationKind(pattern) catch return error.UnsupportedPattern;
@@ -167,10 +165,4 @@ fn emitPeProgram(
         .fused_ffn => |info| try fused_ffn.emit(out, pos, module, info),
         .unsupported => return error.UnsupportedPattern,
     }
-}
-
-fn writeSection(buf: []u8, pos: *usize, filename: []const u8) EmitError!void {
-    try write(buf, pos, spec.SECTION_SEPARATOR);
-    try write(buf, pos, filename);
-    try write(buf, pos, spec.SECTION_SEPARATOR_END);
 }

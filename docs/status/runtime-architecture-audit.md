@@ -15,11 +15,17 @@ consolidation of repeated Zig implementation details:
 - plan command counting and declared-count validation are owned by
   `src/plan/plan_validation.zig`;
 - shared WGSL IR queries, proof-oriented builtin and stride resolution, and
-  semantic type-syntax parsing are owned by narrow modules next to the IR and
-  frontend consumers;
+  stage-IO and texture classification are owned by narrow modules next to the
+  IR, while semantic type-syntax parsing remains with frontend consumers;
+- TSIR frontend passes share one WGSL-to-TSIR scalar-kind mapping instead of
+  carrying per-pass copies;
 - CSL bounded text writing, storage declaration emission, pointer exports, and
   storage-export naming are shared by the target emitters instead of copied
   into each operation module;
+- CSL compile-section serialization and extraction are one round-trip-tested
+  contract shared by core and host compile-source emission;
+- CSL and DXIL external compiler lanes share one toolchain discovery,
+  allocation-ownership, label, and diagnostic-selection contract;
 - target-neutral C-family operator spellings are shared by HLSL and MSL, while
   the MSL literal-cast policy remains target-owned in its maps module;
 - uncached SPIR-V result-instruction assembly is owned by the shared SPIR-V
@@ -140,10 +146,10 @@ identity, timing, trace, and error taxonomy.
 3. Move test-only compatibility aggregators out of production source after
    their consumers import narrow canonical contracts.
 4. Review the remaining high-confidence seams named by the duplicate report:
-   TSIR emitter selection and identity assembly, cross-target IO and texture
-   queries, backend artifact/timing, and module request parsing. Consolidate
-   only when semantic tests cover every consumer, and keep platform API and
-   target-specific lowering mechanics separate.
+   TSIR emitter selection and identity assembly, backend artifact/timing, and
+   module request parsing. Consolidate only when semantic tests cover every
+   consumer, and keep platform API and target-specific lowering mechanics
+   separate.
 5. Split only the files that exceed the advisory architecture signal when the
    split follows a real responsibility boundary.
 6. Re-run import-fence, source-layout, core tests, WGSL tests, and package tests

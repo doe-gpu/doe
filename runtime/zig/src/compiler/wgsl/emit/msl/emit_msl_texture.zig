@@ -1,5 +1,6 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const ir_query = @import("../../ir/ir_query.zig");
 
 pub fn emit_builtin(self: anytype, function: ir.Function, call: @FieldType(ir.Expr, "call")) !bool {
     if (std.mem.eql(u8, call.name, "textureLoad")) {
@@ -25,7 +26,7 @@ pub fn emit_builtin(self: anytype, function: ir.Function, call: @FieldType(ir.Ex
         }
         if (call.args.len != 3) return error.InvalidIr;
         const level_expr = function.expr_args.items[call.args.start + 2];
-        if (is_texture_1d(self.module, function, texture_expr)) {
+        if (ir_query.exprIsTexture1D(self.module, &function, texture_expr)) {
             // 1D texture: scalar coord bounds check
             try self.write("((int(");
             try self.emit_expr(function, coord_expr);
@@ -342,13 +343,6 @@ fn emit_texture_dimensions_level(self: anytype, function: ir.Function, call: @Fi
         return;
     }
     try self.write("0");
-}
-
-fn is_texture_1d(module: *const ir.Module, function: ir.Function, expr_id: ir.ExprId) bool {
-    return switch (module.types.get(function.exprs.items[expr_id].ty)) {
-        .texture_1d => true,
-        else => false,
-    };
 }
 
 fn is_texture_2d(module: *const ir.Module, function: ir.Function, expr_id: ir.ExprId) bool {

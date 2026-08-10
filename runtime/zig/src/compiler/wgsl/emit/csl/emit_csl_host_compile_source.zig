@@ -1,6 +1,7 @@
 const std = @import("std");
 
 const mod = @import("../../mod.zig");
+const compile_sections = @import("csl_compile_sections.zig");
 const classify = @import("emit_csl_classify.zig");
 const layout = @import("emit_csl_layout.zig");
 const elementwise = @import("emit_csl_elementwise.zig");
@@ -23,9 +24,6 @@ const rewrite = @import("emit_csl_host_compile_rewrite.zig");
 const validate = @import("emit_csl_validate.zig");
 const spec = @import("csl_spec.zig");
 const ir = @import("../../ir/ir.zig");
-const text_buffer = @import("csl_text_buffer.zig");
-
-const write = text_buffer.write;
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -85,10 +83,10 @@ pub fn emitPatternSectionsForElem(
     var pos: usize = 0;
     const pattern_info = try resolvePattern(pattern, &module_ir, entry);
 
-    try writeSection(out, &pos, spec.LAYOUT_FILENAME);
+    try compile_sections.write(out, &pos, spec.LAYOUT_FILENAME);
     try emitLayout(out, &pos, &module_ir, entry, pattern_info);
 
-    try writeSection(out, &pos, spec.PE_PROGRAM_FILENAME);
+    try compile_sections.write(out, &pos, spec.PE_PROGRAM_FILENAME);
     try emitPeProgram(out, &pos, &module_ir, entry, pattern_info, elem);
 
     const validation_kind = try validationKind(pattern);
@@ -112,10 +110,10 @@ pub fn emitPatternSectionsForElem(
 fn emitDenseGemvSections(out: []u8) EmitError!CompileSourceSections {
     var pos: usize = 0;
 
-    try writeSection(out, &pos, spec.LAYOUT_FILENAME);
+    try compile_sections.write(out, &pos, spec.LAYOUT_FILENAME);
     try dense_gemv.emitLayout(out, &pos);
 
-    try writeSection(out, &pos, spec.PE_PROGRAM_FILENAME);
+    try compile_sections.write(out, &pos, spec.PE_PROGRAM_FILENAME);
     try dense_gemv.emitPeProgram(out, &pos);
 
     const validation = validate.validatePattern(out[0..pos], .dense_gemv);
@@ -144,10 +142,10 @@ fn emitSemanticPatternSectionsForElem(
 ) EmitError!CompileSourceSections {
     var pos: usize = 0;
 
-    try writeSection(out, &pos, spec.LAYOUT_FILENAME);
+    try compile_sections.write(out, &pos, spec.LAYOUT_FILENAME);
     try semantic_ops.emitLayout(out, &pos, pattern);
 
-    try writeSection(out, &pos, spec.PE_PROGRAM_FILENAME);
+    try compile_sections.write(out, &pos, spec.PE_PROGRAM_FILENAME);
     try semantic_ops.emitPeProgram(out, &pos, pattern);
 
     if (elem == .f16) {
@@ -323,25 +321,7 @@ fn isGatedSemanticPattern(pattern: []const u8) bool {
         std.mem.eql(u8, pattern, "sigmoid_gated");
 }
 
-pub fn sectionBody(csl: []const u8, filename: []const u8) ?[]const u8 {
-    var marker_buf: [128]u8 = undefined;
-    const marker = std.fmt.bufPrint(
-        &marker_buf,
-        "{s}{s}{s}",
-        .{ spec.SECTION_SEPARATOR, filename, spec.SECTION_SEPARATOR_END },
-    ) catch return null;
-
-    const header_index = std.mem.indexOf(u8, csl, marker) orelse return null;
-    const body_start = header_index + marker.len;
-    const next_header = std.mem.indexOfPos(u8, csl, body_start, spec.SECTION_SEPARATOR) orelse csl.len;
-    return csl[body_start..next_header];
-}
-
-fn writeSection(buf: []u8, pos: *usize, filename: []const u8) EmitError!void {
-    try write(buf, pos, spec.SECTION_SEPARATOR);
-    try write(buf, pos, filename);
-    try write(buf, pos, spec.SECTION_SEPARATOR_END);
-}
+pub const sectionBody = compile_sections.body;
 
 const ELEMENT_WISE_WGSL =
     \\struct Uniforms {

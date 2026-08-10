@@ -432,9 +432,9 @@ fn match_dispatch_width(
     };
     if (binary.op != .mul) return false;
     return (classify_builtin_component(function, binary.lhs, .num_workgroups) == 0 and
-        match_u32_literal(function, binary.rhs, workgroup_size[0])) or
+        ir_query.matchesIntLiteral(function, binary.rhs, workgroup_size[0])) or
         (classify_builtin_component(function, binary.rhs, .num_workgroups) == 0 and
-            match_u32_literal(function, binary.lhs, workgroup_size[0]));
+            ir_query.matchesIntLiteral(function, binary.lhs, workgroup_size[0]));
 }
 
 fn match_dispatch_height(
@@ -455,9 +455,9 @@ fn match_dispatch_height(
     };
     if (binary.op != .mul) return false;
     return (classify_builtin_component(function, binary.lhs, .num_workgroups) == 1 and
-        match_u32_literal(function, binary.rhs, workgroup_size[1])) or
+        ir_query.matchesIntLiteral(function, binary.rhs, workgroup_size[1])) or
         (classify_builtin_component(function, binary.rhs, .num_workgroups) == 1 and
-            match_u32_literal(function, binary.lhs, workgroup_size[1]));
+            ir_query.matchesIntLiteral(function, binary.lhs, workgroup_size[1]));
 }
 
 fn match_dispatch_area_xy(
@@ -484,14 +484,6 @@ fn workgroup_size_for_function(module: *const ir.Module, function_id: ir.Functio
         if (entry.function == function_id) return entry.workgroup_size;
     }
     return .{ 1, 1, 1 };
-}
-
-fn match_u32_literal(function: *const ir.Function, expr_id: ir.ExprId, expected: u32) bool {
-    const expr = function.exprs.items[resolve_value_alias(function, expr_id)];
-    return switch (expr.data) {
-        .int_lit => |value| value == expected,
-        else => false,
-    };
 }
 
 fn match_u32_literal_value_with_module(

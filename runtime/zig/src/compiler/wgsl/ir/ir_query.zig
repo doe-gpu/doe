@@ -75,6 +75,29 @@ pub fn matchIntLiteral(function: *const ir.Function, expr_id: ir.ExprId) ?u64 {
     };
 }
 
+pub fn matchesIntLiteral(function: *const ir.Function, expr_id: ir.ExprId, expected: u64) bool {
+    return matchIntLiteral(function, expr_id) == expected;
+}
+
+pub fn typeHasIoStructField(module: *const ir.Module, ty: ir.TypeId) bool {
+    return switch (module.types.get(ty)) {
+        .struct_ => |struct_id| {
+            for (module.structs.items[struct_id].fields.items) |field| {
+                if (field.io != null) return true;
+            }
+            return false;
+        },
+        else => false,
+    };
+}
+
+pub fn exprIsTexture1D(module: *const ir.Module, function: *const ir.Function, expr_id: ir.ExprId) bool {
+    return switch (module.types.get(function.exprs.items[expr_id].ty)) {
+        .texture_1d => true,
+        else => false,
+    };
+}
+
 pub fn resolveRuntimeArrayElementStride(
     module: *const ir.Module,
     function: *const ir.Function,
@@ -220,6 +243,18 @@ test "canonical IR queries resolve builtin, literal, global base, and runtime st
         .elem = scalar_type,
         .len = null,
     } });
+    const texture_1d_type = try module.types.intern(.{ .texture_1d = scalar_type });
+    {
+        var io_struct = ir.StructDef{ .name = try ir.dup_string(allocator, "StageOutput") };
+        errdefer io_struct.deinit(allocator);
+        try io_struct.fields.append(allocator, .{
+            .name = try ir.dup_string(allocator, "position"),
+            .ty = scalar_type,
+            .io = .{ .builtin = .position },
+        });
+        try module.structs.append(allocator, io_struct);
+    }
+    const io_struct_type = try module.types.intern(.{ .struct_ = 0 });
 
     var function = ir.Function{
         .name = try ir.dup_string(allocator, "main"),
@@ -251,6 +286,11 @@ test "canonical IR queries resolve builtin, literal, global base, and runtime st
         .category = .value,
         .data = .{ .int_lit = 7 },
     });
+    const texture_id = try function.append_expr(allocator, .{
+        .ty = texture_1d_type,
+        .category = .value,
+        .data = .{ .global_ref = 4 },
+    });
     const global_id = try function.append_expr(allocator, .{
         .ty = runtime_array_type,
         .category = .ref,
@@ -269,6 +309,9 @@ test "canonical IR queries resolve builtin, literal, global base, and runtime st
 
     try std.testing.expectEqual(@as(?u8, 1), classifyBuiltinComponent(&function, component_id, .global_invocation_id));
     try std.testing.expectEqual(@as(?u64, 7), matchIntLiteral(&function, literal_id));
+    try std.testing.expect(matchesIntLiteral(&function, literal_id, 7));
+    try std.testing.expect(typeHasIoStructField(&module, io_struct_type));
+    try std.testing.expect(exprIsTexture1D(&module, &function, texture_id));
     try std.testing.expectEqual(@as(?u32, 3), findGlobalBase(&function, load_id));
     try std.testing.expectEqual(@as(?u64, 4), resolveRuntimeArrayElementStride(&module, &function, global_id));
 }
