@@ -3807,7 +3807,7 @@
         {
           "name": "MAX_INDIRECT_LOCAL_ALIAS_DEPTH",
           "path": "src/compiler/tsir/family_hint.zig",
-          "startLine": 5
+          "startLine": 6
         },
         {
           "name": "MAX_BOOTSTRAP_WGSL_BYTES",
@@ -4012,7 +4012,7 @@
         {
           "name": "MAX_RECURSION_DEPTH",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 13
+          "startLine": 14
         },
         {
           "name": "MAX_VERTEX_INPUT_ATTRS",
@@ -18023,27 +18023,27 @@
         {
           "name": "frontend_body",
           "path": "src/compiler/tsir/frontend.zig",
-          "startLine": 12
+          "startLine": 13
         },
         {
           "name": "frontend_collectives",
           "path": "src/compiler/tsir/frontend.zig",
-          "startLine": 15
+          "startLine": 16
         },
         {
           "name": "frontend_expr",
           "path": "src/compiler/tsir/frontend.zig",
-          "startLine": 16
+          "startLine": 17
         },
         {
           "name": "frontend_rejections",
           "path": "src/compiler/tsir/frontend.zig",
-          "startLine": 17
+          "startLine": 18
         },
         {
           "name": "frontend_types",
           "path": "src/compiler/tsir/frontend.zig",
-          "startLine": 18
+          "startLine": 19
         },
         {
           "name": "frontend_expr",
@@ -18332,6 +18332,21 @@
     {
       "members": [
         {
+          "name": "ir_query",
+          "path": "src/compiler/tsir/family_hint.zig",
+          "startLine": 3
+        },
+        {
+          "name": "ir_query",
+          "path": "src/compiler/tsir/frontend.zig",
+          "startLine": 10
+        },
+        {
+          "name": "ir_query",
+          "path": "src/compiler/tsir/frontend_expr.zig",
+          "startLine": 3
+        },
+        {
           "name": "ir_builder",
           "path": "src/compiler/tsir/tools/tsir_bootstrap_manifest_inputs.zig",
           "startLine": 9
@@ -18548,7 +18563,7 @@
         {
           "name": "layout_utils",
           "path": "src/compiler/tsir/frontend.zig",
-          "startLine": 10
+          "startLine": 11
         },
         {
           "name": "layout_utils",
@@ -18557,18 +18572,13 @@
         },
         {
           "name": "layout_utils",
+          "path": "src/compiler/wgsl/ir/ir_query.zig",
+          "startLine": 4
+        },
+        {
+          "name": "layout_utils",
           "path": "src/compiler/wgsl/mod.zig",
           "startLine": 51
-        },
-        {
-          "name": "layout_utils",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 5
-        },
-        {
-          "name": "layout_utils",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 5
         }
       ],
       "prefix": "layout",
@@ -18589,7 +18599,7 @@
         {
           "name": "lean_proof",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 6
+          "startLine": 5
         },
         {
           "name": "lean_proof",
@@ -18675,6 +18685,27 @@
         }
       ],
       "prefix": "map",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "match_u32_literal_value",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
+          "startLine": 9
+        },
+        {
+          "name": "match_u32_literal_value",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 9
+        },
+        {
+          "name": "match_u32_literal_value",
+          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
+          "startLine": 8
+        }
+      ],
+      "prefix": "match",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -22453,42 +22484,42 @@
         {
           "name": "resolve_const_local_initializer",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 8
+          "startLine": 7
         },
         {
-          "name": "resolve_indexable_type",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 9
-        },
-        {
-          "name": "resolve_value_alias",
+          "name": "resolve_runtime_array_element_stride",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
           "startLine": 10
         },
         {
-          "name": "resolve_const_local_initializer",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 9
-        },
-        {
-          "name": "resolve_indexable_type",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 10
-        },
-        {
           "name": "resolve_value_alias",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
           "startLine": 11
         },
         {
           "name": "resolve_const_local_initializer",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 10
+        },
+        {
+          "name": "resolve_runtime_array_element_stride",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 11
+        },
+        {
+          "name": "resolve_value_alias",
+          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
+          "startLine": 12
+        },
+        {
+          "name": "resolve_const_local_initializer",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 8
+          "startLine": 9
         },
         {
           "name": "resolve_value_alias",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 9
+          "startLine": 10
         }
       ],
       "prefix": "resolve",
@@ -23040,12 +23071,12 @@
         {
           "name": "stmt_contains_expr",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 10
+          "startLine": 11
         },
         {
           "name": "stmt_writes_local",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 11
+          "startLine": 12
         }
       ],
       "prefix": "stmt",
@@ -23055,6 +23086,11 @@
       "members": [
         {
           "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
+          "startLine": 55
+        },
+        {
+          "name": "storage_emit",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
           "startLine": 14
         },
@@ -23062,6 +23098,11 @@
           "name": "storage_emit",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
           "startLine": 43
+        },
+        {
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_fused_ffn.zig",
+          "startLine": 12
         },
         {
           "name": "storage_emit",
@@ -23184,7 +23225,7 @@
         {
           "name": "text_buffer",
           "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
-          "startLine": 1
+          "startLine": 4
         },
         {
           "name": "text_buffer",
@@ -24238,10 +24279,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "43df04528f2b172e2fe02e7363826bce724f2b2ec6f261f592e165e1abbb2a72",
+  "manifestSha256": "5468465d86690dd7e299844ed0a4dbb7663e1702a33af4eba0ea96e9895792de",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
+  "sourceTreeSha256": "f8c4b9338190c60aa527df74d09cd89a8ca48cd3ae6b2c9f527a57fa51750b95",
   "status": "captured"
 }

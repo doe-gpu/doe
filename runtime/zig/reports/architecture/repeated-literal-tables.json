@@ -244,11 +244,11 @@
           "startLine": 62
         },
         {
-          "endLine": 663,
+          "endLine": 664,
           "literalCount": 4,
           "name": "row_param_guarded_by_uniform_rows",
           "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 634
+          "startLine": 635
         },
         {
           "endLine": 72,
@@ -643,11 +643,11 @@
           "startLine": 103
         },
         {
-          "endLine": 502,
+          "endLine": 487,
           "literalCount": 4,
           "name": "workgroup_size_for_function",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 497
+          "startLine": 482
         },
         {
           "endLine": 426,
@@ -1379,11 +1379,11 @@
           "startLine": 21
         },
         {
-          "endLine": 765,
+          "endLine": 767,
           "literalCount": 4,
           "name": "containsAliasLoad",
           "path": "src/compiler/tsir/frontend.zig",
-          "startLine": 723
+          "startLine": 725
         },
         {
           "endLine": 170,
@@ -1414,11 +1414,11 @@
           "startLine": 197
         },
         {
-          "endLine": 251,
+          "endLine": 252,
           "literalCount": 4,
           "name": "match_simple_exclusive_limit",
           "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 223
+          "startLine": 224
         },
         {
           "endLine": 703,
@@ -1475,11 +1475,11 @@
       "literalTokenSha256": "a1a37be46194b8ce0c54108572d10ae05413fdce44b4a4e2d777f5ba688d8f8c",
       "locations": [
         {
-          "endLine": 23,
+          "endLine": 26,
           "literalCount": 4,
           "name": "emitPointer",
           "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
-          "startLine": 15
+          "startLine": 18
         },
         {
           "endLine": 137,
@@ -2083,11 +2083,11 @@
       "literalTokenSha256": "d336bcbbe6bd4ef965654e68955fed76662f6728412cf4d05679ed3666b37366",
       "locations": [
         {
-          "endLine": 476,
+          "endLine": 461,
           "literalCount": 7,
           "name": "match_dispatch_height",
           "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 455
+          "startLine": 440
         },
         {
           "endLine": 177,
@@ -2318,11 +2318,11 @@
       "literalTokenSha256": "e1f122d3817638fc03df5f67b384ebf3b331fb78fab06fe4c1a5f2beba6384ba",
       "locations": [
         {
-          "endLine": 13,
+          "endLine": 16,
           "literalCount": 4,
           "name": "emitBuffer",
           "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
-          "startLine": 5
+          "startLine": 8
         },
         {
           "endLine": 256,
@@ -2578,33 +2578,6 @@
       "reason": "identical ordered sequence of at least four literal tokens"
     },
     {
-      "literalTokenSha256": "ffd5200cbdcf1cb48a357aa7b716b77f2d194b5041a746edd477959b14813111",
-      "locations": [
-        {
-          "endLine": 943,
-          "literalCount": 6,
-          "name": "classify_builtin_component",
-          "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-          "startLine": 921
-        },
-        {
-          "endLine": 795,
-          "literalCount": 6,
-          "name": "classify_builtin_component",
-          "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
-          "startLine": 773
-        },
-        {
-          "endLine": 532,
-          "literalCount": 6,
-          "name": "classify_local_invocation_axis",
-          "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
-          "startLine": 514
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
       "literalTokenSha256": "ffff44d9cb315ac3347d6e162f4235eabbbb1365dba1c3251a2bbcada46098e2",
       "locations": [
         {
@@ -2626,10 +2599,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "43df04528f2b172e2fe02e7363826bce724f2b2ec6f261f592e165e1abbb2a72",
+  "manifestSha256": "5468465d86690dd7e299844ed0a4dbb7663e1702a33af4eba0ea96e9895792de",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
+  "sourceTreeSha256": "f8c4b9338190c60aa527df74d09cd89a8ca48cd3ae6b2c9f527a57fa51750b95",
   "status": "captured"
 }

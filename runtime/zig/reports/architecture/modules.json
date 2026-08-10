@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "43df04528f2b172e2fe02e7363826bce724f2b2ec6f261f592e165e1abbb2a72",
+  "manifestSha256": "5468465d86690dd7e299844ed0a4dbb7663e1702a33af4eba0ea96e9895792de",
   "modules": [
     {
       "containsCImport": false,
@@ -15928,14 +15928,15 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
         "src/compiler/tsir/schema.zig",
-        "src/compiler/wgsl/ir/ir.zig"
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_query.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 195,
+      "lineCount": 183,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/family_hint.zig",
@@ -15943,7 +15944,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 10,
+          "line": 12,
           "name": "infer"
         }
       ],
@@ -15956,15 +15957,15 @@
         "src/compiler/tsir/frontend.zig"
       ],
       "roles": [],
-      "sha256": "f21411fb6463e283622e304279e67a1877e6b7666346f35c9573c42bc2c6dced",
+      "sha256": "8930881cd2ff70a8b6b384ce43a0912fcc946afdeecd1fbfc4f85ba09dc1e64b",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 16
+      "topLevelDeclarationCount": 17
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 9,
+      "fanOut": 10,
       "imports": [
         "src/compiler/tsir/family_hint.zig",
         "src/compiler/tsir/frontend_body.zig",
@@ -15974,11 +15975,12 @@
         "src/compiler/tsir/frontend_types.zig",
         "src/compiler/tsir/schema.zig",
         "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_query.zig",
         "src/compiler/wgsl/ir/layout_utils.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 914,
+      "lineCount": 897,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/frontend.zig",
@@ -15986,12 +15988,12 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 20,
+          "line": 21,
           "name": "FrontendError"
         },
         {
           "kind": "fn",
-          "line": 22,
+          "line": 24,
           "name": "lowerIrToTsir"
         }
       ],
@@ -16004,9 +16006,9 @@
         "src/compiler/tsir/mod.zig"
       ],
       "roles": [],
-      "sha256": "2babfc32991d8f13367dc9677030aa62a39f960c8e9cf6d9db1a5e72bd83ff91",
+      "sha256": "9bce77b5c55276cae05db81c412caacd4c1ae7fe822f566cc79d4685478ddd1b",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 32
+      "topLevelDeclarationCount": 33
     },
     {
       "containsCImport": false,
@@ -16087,14 +16089,15 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 2,
+      "fanOut": 3,
       "imports": [
         "src/compiler/tsir/frontend_types.zig",
-        "src/compiler/wgsl/ir/ir.zig"
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_query.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 649,
+      "lineCount": 637,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/tsir/frontend_expr.zig",
@@ -16102,42 +16105,42 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 25,
+          "line": 27,
           "name": "extractLiteralUpperBound"
         },
         {
           "kind": "fn",
-          "line": 92,
+          "line": 94,
           "name": "extractSymbolicUpperBound"
         },
         {
           "kind": "fn",
-          "line": 185,
+          "line": 187,
           "name": "extractStep"
         },
         {
           "kind": "fn",
-          "line": 276,
+          "line": 278,
           "name": "extractInitBound"
         },
         {
           "kind": "fn",
-          "line": 333,
+          "line": 335,
           "name": "scanForDispatchGuard"
         },
         {
           "kind": "const",
-          "line": 478,
+          "line": 480,
           "name": "StepSign"
         },
         {
           "kind": "fn",
-          "line": 494,
+          "line": 496,
           "name": "detectStepSign"
         },
         {
           "kind": "fn",
-          "line": 563,
+          "line": 565,
           "name": "tryExtractDispatchAxisLetter"
         }
       ],
@@ -16152,9 +16155,9 @@
         "src/compiler/tsir/frontend_rejections.zig"
       ],
       "roles": [],
-      "sha256": "4b455d2afaed2002a807888e69a457c80f2e9dd4b874c106d75d3acf61211d30",
+      "sha256": "e550fe3d090d2b1fb8c9b053285e486f31c2004059d2a003bb38be24e519b317",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 16
+      "topLevelDeclarationCount": 17
     },
     {
       "containsCImport": false,
@@ -17621,38 +17624,44 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 5,
-      "fanOut": 1,
+      "fanIn": 7,
+      "fanOut": 2,
       "imports": [
-        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig"
+        "src/compiler/wgsl/emit/csl/csl_text_buffer.zig",
+        "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 31,
+      "lineCount": 72,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
-      "publicDeclarationCount": 4,
+      "publicDeclarationCount": 5,
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 3,
+          "line": 6,
           "name": "Error"
         },
         {
           "kind": "fn",
-          "line": 5,
+          "line": 8,
           "name": "emitBuffer"
         },
         {
           "kind": "fn",
-          "line": 15,
+          "line": 18,
           "name": "emitPointer"
         },
         {
           "kind": "fn",
-          "line": 25,
+          "line": 28,
           "name": "emitExport"
+        },
+        {
+          "kind": "fn",
+          "line": 36,
+          "name": "emitPointerExports"
         }
       ],
       "reachabilityViewRoots": [],
@@ -17664,16 +17673,18 @@
       ],
       "reachable": true,
       "reverseImports": [
+        "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_dequant.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_fused.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_fused_ffn.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_gather.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_sample.zig"
       ],
       "roles": [],
-      "sha256": "c6fe1ed942c65cf9e5e3d21e314cf54ca6313f1151a2eae0fe363f7681523d2a",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 5
+      "sha256": "c937ecec15d2c9a10f2ffd0f4c55e01a1df3e9aa197f61fa3e26816cea1cf2ef",
+      "testBlockCount": 1,
+      "topLevelDeclarationCount": 9
     },
     {
       "containsCImport": false,
@@ -17868,16 +17879,17 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 4,
+      "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 612,
+      "lineCount": 601,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
@@ -17885,22 +17897,22 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 58,
+          "line": 59,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 64,
+          "line": 66,
           "name": "emitStreaming"
         },
         {
           "kind": "fn",
-          "line": 160,
+          "line": 162,
           "name": "emitDecode"
         },
         {
           "kind": "fn",
-          "line": 305,
+          "line": 307,
           "name": "emitTiled"
         }
       ],
@@ -17918,9 +17930,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "1fb26ca446501326da874c8e67bbf457ec530dbc6459e900eb1f198977e5e758",
+      "sha256": "33a1457290883a6ab410bb71eb1b95166828a8da97cacae216ce2df7c4e6413d",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 21
+      "topLevelDeclarationCount": 22
     },
     {
       "containsCImport": false,
@@ -18430,15 +18442,16 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_ir_walk.zig",
         "src/compiler/wgsl/ir/ir.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 150,
+      "lineCount": 139,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_fused_ffn.zig",
@@ -18446,12 +18459,12 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 14,
+          "line": 15,
           "name": "EmitError"
         },
         {
           "kind": "fn",
-          "line": 16,
+          "line": 18,
           "name": "emit"
         }
       ],
@@ -18469,9 +18482,9 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "05cba69ef4bd65642cb036a9f07e2f1b08b84f220945d3e23641a6a1c910096a",
+      "sha256": "82692ef94547ab4b2f0fd1ec68af03dc0cfce499f4fd9a8688559c67828db858",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 7
+      "topLevelDeclarationCount": 8
     },
     {
       "containsCImport": false,
@@ -23622,7 +23635,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 81,
+      "fanIn": 82,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -23891,6 +23904,7 @@
         "src/compiler/tsir/frontend_expr.zig",
         "src/compiler/tsir/frontend_rejections.zig",
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
+        "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
         "src/compiler/wgsl/emit/csl/emit_csl.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_classify.zig",
@@ -24202,52 +24216,73 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 5,
-      "fanOut": 1,
+      "fanIn": 8,
+      "fanOut": 2,
       "imports": [
-        "src/compiler/wgsl/ir/ir.zig"
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/layout_utils.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 146,
+      "lineCount": 274,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_query.zig",
-      "publicDeclarationCount": 7,
+      "publicDeclarationCount": 11,
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 3,
+          "line": 6,
           "name": "resolveValueAlias"
         },
         {
           "kind": "fn",
-          "line": 21,
+          "line": 24,
           "name": "resolveConstLocalInitializer"
         },
         {
           "kind": "fn",
-          "line": 33,
+          "line": 36,
           "name": "resolveIndexableType"
         },
         {
           "kind": "fn",
-          "line": 43,
+          "line": 46,
+          "name": "classifyBuiltinComponent"
+        },
+        {
+          "kind": "fn",
+          "line": 70,
+          "name": "matchIntLiteral"
+        },
+        {
+          "kind": "fn",
+          "line": 78,
+          "name": "resolveRuntimeArrayElementStride"
+        },
+        {
+          "kind": "fn",
+          "line": 94,
+          "name": "findGlobalBase"
+        },
+        {
+          "kind": "fn",
+          "line": 108,
           "name": "isLocalRef"
         },
         {
           "kind": "fn",
-          "line": 51,
+          "line": 116,
           "name": "stmtWritesLocal"
         },
         {
           "kind": "fn",
-          "line": 79,
+          "line": 144,
           "name": "stmtContainsExpr"
         },
         {
           "kind": "fn",
-          "line": 120,
+          "line": 185,
           "name": "exprContainsExpr"
         }
       ],
@@ -24260,6 +24295,9 @@
       ],
       "reachable": true,
       "reverseImports": [
+        "src/compiler/tsir/family_hint.zig",
+        "src/compiler/tsir/frontend.zig",
+        "src/compiler/tsir/frontend_expr.zig",
         "src/compiler/wgsl/ir/ir_transform_robustness.zig",
         "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
         "src/compiler/wgsl/proof/dispatch_proof_match.zig",
@@ -24267,9 +24305,9 @@
         "src/compiler/wgsl/proof/robustness_static_bounds.zig"
       ],
       "roles": [],
-      "sha256": "a944c59d5f57bcc43ebebae43d39980bb7731af8ae6fbd31903961f818cc4aee",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 8
+      "sha256": "a15329c9cc4e685bb7fd46aedcd7c1701313e64a99d7b1ac3887c91dc46a0c97",
+      "testBlockCount": 1,
+      "topLevelDeclarationCount": 15
     },
     {
       "containsCImport": false,
@@ -24371,7 +24409,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 9,
+      "fanIn": 8,
       "fanOut": 1,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig"
@@ -24425,9 +24463,8 @@
         "src/compiler/wgsl/emit/hlsl/emit_hlsl_builtins.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig",
-        "src/compiler/wgsl/mod.zig",
-        "src/compiler/wgsl/proof/dispatch_proof_match.zig",
-        "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig"
+        "src/compiler/wgsl/ir/ir_query.zig",
+        "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
       "sha256": "5d40810293b87d015f50ac9dee31d705d803c67120a38db6b4be315c6880b4cb",
@@ -25065,18 +25102,17 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 6,
+      "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
         "src/compiler/wgsl/ir/ir_const_eval.zig",
         "src/compiler/wgsl/ir/ir_query.zig",
-        "src/compiler/wgsl/ir/layout_utils.zig",
         "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
         "src/verification/lean_proof.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 945,
+      "lineCount": 898,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
@@ -25084,27 +25120,27 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 12,
+          "line": 13,
           "name": "try_elide_storage_index"
         },
         {
           "kind": "fn",
-          "line": 169,
+          "line": 170,
           "name": "try_elide_dispatch_validated_storage_index"
         },
         {
           "kind": "fn",
-          "line": 528,
+          "line": 505,
           "name": "match_gid_component_plus_offset"
         },
         {
           "kind": "fn",
-          "line": 576,
+          "line": 553,
           "name": "match_gid_component_times_stride_plus_offset"
         },
         {
           "kind": "fn",
-          "line": 603,
+          "line": 580,
           "name": "match_gid_component_tiled_plus_offset"
         }
       ],
@@ -25120,24 +25156,23 @@
         "src/compiler/wgsl/ir/ir_transform_robustness.zig"
       ],
       "roles": [],
-      "sha256": "4e2a956bdda83367f2ed6d9a7696a9b65683a0c648b507ed92e858351c21dba0",
+      "sha256": "4641569b6b19025db3b097dba62d91800f2fbb81502dd62ac9d6cd871b983279",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 44
+      "topLevelDeclarationCount": 42
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 4,
+      "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
         "src/compiler/wgsl/ir/ir_const_eval.zig",
-        "src/compiler/wgsl/ir/ir_query.zig",
-        "src/compiler/wgsl/ir/layout_utils.zig"
+        "src/compiler/wgsl/ir/ir_query.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 925,
+      "lineCount": 878,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
@@ -25145,7 +25180,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 24,
+          "line": 25,
           "name": "try_elide_uniform_validated_storage_index"
         }
       ],
@@ -25161,9 +25196,9 @@
         "src/compiler/wgsl/ir/ir_transform_robustness.zig"
       ],
       "roles": [],
-      "sha256": "bfb7b3c834baabc26c1db990e3b680539af1ac37bf6d71d8c907ce1c80fce78c",
+      "sha256": "9cc297ecadfc5b042b8926714c7f4e1f8fcd951c166f6adcc6508ab777b3d4e9",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 60
+      "topLevelDeclarationCount": 58
     },
     {
       "containsCImport": false,
@@ -25177,7 +25212,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 635,
+      "lineCount": 611,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
@@ -25185,7 +25220,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 15,
+          "line": 16,
           "name": "sizedArrayIndexProvablyInBounds"
         }
       ],
@@ -25201,7 +25236,7 @@
         "src/compiler/wgsl/ir/ir_transform_robustness.zig"
       ],
       "roles": [],
-      "sha256": "284820b196920c722e669b9bc06f66dcce7b7ab9668fddad30f4f403f53ad8aa",
+      "sha256": "739e20f3a7202faa6ad5c4e9dbecc8a7599064b72e45edebfd424bfad8c900cd",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 39
     },
@@ -54087,5 +54122,5 @@
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e"
+  "sourceTreeSha256": "f8c4b9338190c60aa527df74d09cd89a8ca48cd3ae6b2c9f527a57fa51750b95"
 }

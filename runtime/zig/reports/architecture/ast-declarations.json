@@ -72349,8 +72349,23 @@
           "tokenCount": 7
         },
         {
-          "contractTokenSha256": "784091f3a891f8ea58baff8b99c20330cf293a77f7ea90b86593a72aeced90c0",
+          "contractTokenSha256": "7962c351b657682d5cebd5584ac4a011bf9bf07944de05fc689dc86fe4e345f2",
           "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "d725b3b5b143d67d666220e5f42a0703ce4f6bada54526d8d7a135f8354007f8",
+          "literalTokens": [
+            "\"../wgsl/ir/ir_query.zig\""
+          ],
+          "name": "ir_query",
+          "normalizedTokenSha256": "7962c351b657682d5cebd5584ac4a011bf9bf07944de05fc689dc86fe4e345f2",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "784091f3a891f8ea58baff8b99c20330cf293a77f7ea90b86593a72aeced90c0",
+          "endLine": 4,
           "kind": "constant",
           "literalTokenSha256": "98c661b92ad204de6918e4c88b0219429f1507ea1bf0413b30623f9fed91d443",
           "literalTokens": [
@@ -72359,13 +72374,13 @@
           "name": "schema",
           "normalizedTokenSha256": "784091f3a891f8ea58baff8b99c20330cf293a77f7ea90b86593a72aeced90c0",
           "public": false,
-          "startLine": 3,
+          "startLine": 4,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "50a54d3bc99536ac443b73b52d41ebb107d9effd8193af25e556d9cdde722a37",
-          "endLine": 5,
+          "endLine": 6,
           "kind": "constant",
           "literalTokenSha256": "57169aa88ddf6a354d71bd94425e015dae78c1199f8a041a926bbbd25beecf13",
           "literalTokens": [
@@ -72374,13 +72389,26 @@
           "name": "MAX_INDIRECT_LOCAL_ALIAS_DEPTH",
           "normalizedTokenSha256": "50a54d3bc99536ac443b73b52d41ebb107d9effd8193af25e556d9cdde722a37",
           "public": false,
-          "startLine": 5,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
+          "contractTokenSha256": "360dcac459dc04caebad3f2ba1b7bd11f929a12c380598f9051c3daac18460e6",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "findGlobalBase",
+          "normalizedTokenSha256": "360dcac459dc04caebad3f2ba1b7bd11f929a12c380598f9051c3daac18460e6",
+          "public": false,
+          "startLine": 7,
           "switchTags": [],
           "tokenCount": 6
         },
         {
           "contractTokenSha256": "b6a7591bfc172d60156994333008684330dbbacef9cac70265470f074860e7bc",
-          "endLine": 24,
+          "endLine": 26,
           "kind": "function",
           "literalTokenSha256": "55816864334a72ad5b1171c4232f337eacfdb488f878cdc5df7a9067442046cf",
           "literalTokens": [
@@ -72390,13 +72418,13 @@
           "name": "infer",
           "normalizedTokenSha256": "aa82fa0e98065b83e98fcbd2b43ffab837e449f78748f992fa1fdf88af689716",
           "public": true,
-          "startLine": 10,
+          "startLine": 12,
           "switchTags": [],
           "tokenCount": 94
         },
         {
           "contractTokenSha256": "5bf042aaa8a84c74b8e27596dd97a5a887d1e32d7c17cbf7656350569cb135d8",
-          "endLine": 37,
+          "endLine": 39,
           "kind": "function",
           "literalTokenSha256": "b9b28f012e765e3787aab17586c1ea59f3c8f6d4c82ea7e28083e4ccc8a1e79e",
           "literalTokens": [
@@ -72412,13 +72440,13 @@
           "name": "isFusedGemvShape",
           "normalizedTokenSha256": "ef4ddb81ecc1a1435eb9e703ce8bd429f854d83da73a5f94bea37e583123fd88",
           "public": false,
-          "startLine": 26,
+          "startLine": 28,
           "switchTags": [],
           "tokenCount": 94
         },
         {
           "contractTokenSha256": "5fc89b929af9d74f902726e5112667be5dafb0c9bb50075a1b0acfd0d12816d5",
-          "endLine": 45,
+          "endLine": 47,
           "kind": "function",
           "literalTokenSha256": "50ea14e428c483f93f37cf1bacc30e6b018f8b4f8efe43a544d6749cc8e15d99",
           "literalTokens": [
@@ -72431,26 +72459,26 @@
           "name": "isNontrivialBoundString",
           "normalizedTokenSha256": "421338a47ae2bda1f0e4d8b35c79ee782d34db8ce7779320b86df7ce8b1063f5",
           "public": false,
-          "startLine": 39,
+          "startLine": 41,
           "switchTags": [],
           "tokenCount": 79
         },
         {
           "contractTokenSha256": "665c993dc5fa7cc80b67e10533cf390ef5af13c74511df50384ca3d985d3e824",
-          "endLine": 72,
+          "endLine": 74,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "hasIndexedAccessCoveringAxes",
           "normalizedTokenSha256": "96a732d8be9610d90b7a481d501be368c5ba839b68f390ea8e25b11e09f534c6",
           "public": false,
-          "startLine": 52,
+          "startLine": 54,
           "switchTags": [],
           "tokenCount": 141
         },
         {
           "contractTokenSha256": "d98792760d61769cc0fe4264055535ca123e9f2ef2ab21bc0655c4a0fc26fada",
-          "endLine": 79,
+          "endLine": 81,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -72459,13 +72487,13 @@
           "name": "findLocalByName",
           "normalizedTokenSha256": "fab487fed8addad1ee2ac185c719ed2886a02585a95223556e7d43262a8a7258",
           "public": false,
-          "startLine": 74,
+          "startLine": 76,
           "switchTags": [],
           "tokenCount": 66
         },
         {
           "contractTokenSha256": "0449a56c346601c0233342b5be4eada39fbf2077176c1847feaa0a3f34fdaf17",
-          "endLine": 106,
+          "endLine": 108,
           "kind": "function",
           "literalTokenSha256": "7c1a89113769ac7150287df45cfa57dd8bffdbc557d23a4cfa8489e020ee31dd",
           "literalTokens": [
@@ -72475,7 +72503,7 @@
           "name": "exprTreeContainsLocalRef",
           "normalizedTokenSha256": "5a108effcbfbe61cbdb99754f024ad739fff367ec0b2a1f907a65933df775785",
           "public": false,
-          "startLine": 81,
+          "startLine": 83,
           "switchTags": [
             "base",
             "binary",
@@ -72494,7 +72522,7 @@
         },
         {
           "contractTokenSha256": "6025c791852b4a0516745c9e1cd29273717af10dcb8ebf6354ae6e869040bb33",
-          "endLine": 127,
+          "endLine": 129,
           "kind": "function",
           "literalTokenSha256": "7c1a89113769ac7150287df45cfa57dd8bffdbc557d23a4cfa8489e020ee31dd",
           "literalTokens": [
@@ -72504,7 +72532,7 @@
           "name": "exprTreeContainsIndex",
           "normalizedTokenSha256": "87e2377591134435fd70ed0fb2d9f93c55d8c0e7a9638b21032fcf3149569c79",
           "public": false,
-          "startLine": 108,
+          "startLine": 110,
           "switchTags": [
             "base",
             "binary",
@@ -72522,20 +72550,20 @@
         },
         {
           "contractTokenSha256": "b38231b9cb10e1d0bfbc0828b98624844739e703acbe14a919e477d3dd54a951",
-          "endLine": 135,
+          "endLine": 137,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "hasIndirectBufferAccess",
           "normalizedTokenSha256": "0682e97b430ea86830e29ba738bbd7ef52fb6d84d48c81c4837db55fb56a4856",
           "public": false,
-          "startLine": 129,
+          "startLine": 131,
           "switchTags": [],
           "tokenCount": 59
         },
         {
           "contractTokenSha256": "e28c93f44d573589fa06d25f56bffe44fd8a32abf4d7774f455344376ad9f11c",
-          "endLine": 139,
+          "endLine": 141,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -72544,13 +72572,13 @@
           "name": "indexFieldContainsBufferIndex",
           "normalizedTokenSha256": "85b6fc26193cff85deb7b6b24b69b147ca7e9ab2c2c1c62bfc142118afc2ff6b",
           "public": false,
-          "startLine": 137,
+          "startLine": 139,
           "switchTags": [],
           "tokenCount": 30
         },
         {
           "contractTokenSha256": "d94669aece99ff8064a2b3661bf3c20de3f9ab918c236574e4e669a791ba8102",
-          "endLine": 165,
+          "endLine": 167,
           "kind": "function",
           "literalTokenSha256": "c86b0e5ab54a00d45c12478129668e281701359cae05bee2d284db45fb5e3dd6",
           "literalTokens": [
@@ -72561,7 +72589,7 @@
           "name": "indexFieldContainsBufferIndexDepth",
           "normalizedTokenSha256": "3a3849da906f18a6a0c25bfcdabc50d270a91b180a62bcb5782e7be3814cdd9c",
           "public": false,
-          "startLine": 141,
+          "startLine": 143,
           "switchTags": [
             "base",
             "binary",
@@ -72580,36 +72608,16 @@
         },
         {
           "contractTokenSha256": "73ea0b117153fe85dd9f90bd2a75de55fa63499ce2ecc78745a9f0e621de0015",
-          "endLine": 181,
+          "endLine": 183,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "localInitializerContainsBufferIndex",
           "normalizedTokenSha256": "92668bcce08fd6f98a933082792275cfdb5e6165f0f41b3992a9b1e654716e86",
           "public": false,
-          "startLine": 167,
+          "startLine": 169,
           "switchTags": [],
           "tokenCount": 94
-        },
-        {
-          "contractTokenSha256": "39ac5724c462c3dc3d9b8e1226488615f5ecc928b63bc50d2e494674338740fd",
-          "endLine": 195,
-          "kind": "function",
-          "literalTokenSha256": null,
-          "literalTokens": [],
-          "name": "findGlobalBase",
-          "normalizedTokenSha256": "ff84561cb41ce20aba56f5139fe765f0746b829df55c79b267a88ca3d88ac6f7",
-          "public": false,
-          "startLine": 183,
-          "switchTags": [
-            "base",
-            "else",
-            "global_ref",
-            "index",
-            "load",
-            "member"
-          ],
-          "tokenCount": 100
         }
       ],
       "parseErrorCount": 0,
@@ -72648,8 +72656,23 @@
           "tokenCount": 7
         },
         {
-          "contractTokenSha256": "9a2b43efa2d458cbe4d1de6450847ed97eca2f05cd40191ee69298687323fea7",
+          "contractTokenSha256": "7962c351b657682d5cebd5584ac4a011bf9bf07944de05fc689dc86fe4e345f2",
           "endLine": 10,
+          "kind": "constant",
+          "literalTokenSha256": "d725b3b5b143d67d666220e5f42a0703ce4f6bada54526d8d7a135f8354007f8",
+          "literalTokens": [
+            "\"../wgsl/ir/ir_query.zig\""
+          ],
+          "name": "ir_query",
+          "normalizedTokenSha256": "7962c351b657682d5cebd5584ac4a011bf9bf07944de05fc689dc86fe4e345f2",
+          "public": false,
+          "startLine": 10,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "9a2b43efa2d458cbe4d1de6450847ed97eca2f05cd40191ee69298687323fea7",
+          "endLine": 11,
           "kind": "constant",
           "literalTokenSha256": "e060916398428306b7e3f953eea82f732f5bc6d6eb9d8aeccb399e2b3699470c",
           "literalTokens": [
@@ -72658,13 +72681,13 @@
           "name": "layout_utils",
           "normalizedTokenSha256": "9a2b43efa2d458cbe4d1de6450847ed97eca2f05cd40191ee69298687323fea7",
           "public": false,
-          "startLine": 10,
+          "startLine": 11,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "be0bd3d55b5b31629a82f61d319797c2405aed032663344b82cf40747f9c5740",
-          "endLine": 11,
+          "endLine": 12,
           "kind": "constant",
           "literalTokenSha256": "7cbb405f52b9f1a08c900a120428f9abcfb671fc4ba43885f937c6e9f32de783",
           "literalTokens": [
@@ -72673,13 +72696,13 @@
           "name": "family_hint",
           "normalizedTokenSha256": "be0bd3d55b5b31629a82f61d319797c2405aed032663344b82cf40747f9c5740",
           "public": false,
-          "startLine": 11,
+          "startLine": 12,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "dbad931aa95664ba7c786002c4c2bcb92dcafe0cb0f56dd7b2253e17c910db93",
-          "endLine": 12,
+          "endLine": 13,
           "kind": "constant",
           "literalTokenSha256": "f3429d23b22ab921fedc0f81f68525276d3841d3e6ade5ddc39610ff2a26829b",
           "literalTokens": [
@@ -72688,13 +72711,13 @@
           "name": "frontend_body",
           "normalizedTokenSha256": "dbad931aa95664ba7c786002c4c2bcb92dcafe0cb0f56dd7b2253e17c910db93",
           "public": false,
-          "startLine": 12,
+          "startLine": 13,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "4b3af1e0886e6465c8acf900498914fd7f1500e9fb8084e5df7798bc7045afb4",
-          "endLine": 13,
+          "endLine": 14,
           "kind": "constant",
           "literalTokenSha256": "98c661b92ad204de6918e4c88b0219429f1507ea1bf0413b30623f9fed91d443",
           "literalTokens": [
@@ -72703,13 +72726,13 @@
           "name": "tsir",
           "normalizedTokenSha256": "4b3af1e0886e6465c8acf900498914fd7f1500e9fb8084e5df7798bc7045afb4",
           "public": false,
-          "startLine": 13,
+          "startLine": 14,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "dbc734164d2f187caa3fa56663c9b9732453306a968c6e8498a1e49f0bfeb303",
-          "endLine": 15,
+          "endLine": 16,
           "kind": "constant",
           "literalTokenSha256": "af2e32dec5a0ca5c277622306dc35479f7386b7943a26537739c9900fc712bfe",
           "literalTokens": [
@@ -72718,13 +72741,13 @@
           "name": "frontend_collectives",
           "normalizedTokenSha256": "dbc734164d2f187caa3fa56663c9b9732453306a968c6e8498a1e49f0bfeb303",
           "public": false,
-          "startLine": 15,
+          "startLine": 16,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "249b52b11c81a189b2e4cb1a5ccdff40db6ee571bb568c9ae629542db58d2ef3",
-          "endLine": 16,
+          "endLine": 17,
           "kind": "constant",
           "literalTokenSha256": "8d3eb11bf0e40b17f77e2809c09d1ad34f8c72faf2de090718b8fdeca57d0cd6",
           "literalTokens": [
@@ -72733,13 +72756,13 @@
           "name": "frontend_expr",
           "normalizedTokenSha256": "249b52b11c81a189b2e4cb1a5ccdff40db6ee571bb568c9ae629542db58d2ef3",
           "public": false,
-          "startLine": 16,
+          "startLine": 17,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "080ab1164847a197322cd7cc2ae9c1e53152e24b972645329eeadcfd077778da",
-          "endLine": 17,
+          "endLine": 18,
           "kind": "constant",
           "literalTokenSha256": "a6e4808d7ad8600b825e5b45e3d1ca6023796e3aa7e001dd054122cfee50203a",
           "literalTokens": [
@@ -72748,13 +72771,13 @@
           "name": "frontend_rejections",
           "normalizedTokenSha256": "080ab1164847a197322cd7cc2ae9c1e53152e24b972645329eeadcfd077778da",
           "public": false,
-          "startLine": 17,
+          "startLine": 18,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "dc3b8933ef6ca145bff3282f51f1855e7d47fca8f18186ec344a0a940d3ae036",
-          "endLine": 18,
+          "endLine": 19,
           "kind": "constant",
           "literalTokenSha256": "d2b4f773d5c27d8f27906ce3031d539c89fc0720e4833705c40035ec1855ed69",
           "literalTokens": [
@@ -72763,26 +72786,39 @@
           "name": "frontend_types",
           "normalizedTokenSha256": "dc3b8933ef6ca145bff3282f51f1855e7d47fca8f18186ec344a0a940d3ae036",
           "public": false,
-          "startLine": 18,
+          "startLine": 19,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "68b4f9109db924c53bff9b85f0d5eb3bf4da63e823e7b8ead238d87ff69e0792",
-          "endLine": 20,
+          "endLine": 21,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "FrontendError",
           "normalizedTokenSha256": "68b4f9109db924c53bff9b85f0d5eb3bf4da63e823e7b8ead238d87ff69e0792",
           "public": true,
-          "startLine": 20,
+          "startLine": 21,
           "switchTags": [],
           "tokenCount": 7
         },
         {
+          "contractTokenSha256": "360dcac459dc04caebad3f2ba1b7bd11f929a12c380598f9051c3daac18460e6",
+          "endLine": 22,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "findGlobalBase",
+          "normalizedTokenSha256": "360dcac459dc04caebad3f2ba1b7bd11f929a12c380598f9051c3daac18460e6",
+          "public": false,
+          "startLine": 22,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
           "contractTokenSha256": "e70e692a07b7923cecfad418107dd24b23fbbfe4d36e76768d110ec0f2699911",
-          "endLine": 81,
+          "endLine": 83,
           "kind": "function",
           "literalTokenSha256": "d3d1bf041a94d3093374d7f03b7f3f6902133ab2af0dff7741d9680f1e784ef2",
           "literalTokens": [
@@ -72792,26 +72828,26 @@
           "name": "lowerIrToTsir",
           "normalizedTokenSha256": "ee91de6751086c1f292849206b761ee08369de1fb4b3aae5d424abf53008ba51",
           "public": true,
-          "startLine": 22,
+          "startLine": 24,
           "switchTags": [],
           "tokenCount": 368
         },
         {
           "contractTokenSha256": "800de8764a6e2c4ab9dde7c8b7bd51f5a732439f2c214344864e3b13153e9e1d",
-          "endLine": 90,
+          "endLine": 92,
           "kind": "struct",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "PerFunctionBindings",
           "normalizedTokenSha256": "800de8764a6e2c4ab9dde7c8b7bd51f5a732439f2c214344864e3b13153e9e1d",
           "public": false,
-          "startLine": 83,
+          "startLine": 85,
           "switchTags": [],
           "tokenCount": 26
         },
         {
           "contractTokenSha256": "5f7232e976b8b5f8ce8b624525bf39c451717190be7372606e8a0f01df0e452e",
-          "endLine": 156,
+          "endLine": 158,
           "kind": "function",
           "literalTokenSha256": "1a42795fff0263bae593007d8187f9dc42dd96fe86801b2a309a4117b3c98799",
           "literalTokens": [
@@ -72821,26 +72857,26 @@
           "name": "extractFunctionBindings",
           "normalizedTokenSha256": "0b65755f56d48ca29ba9e10cee5c6542c744a5bbb4b99899d19bab233deb09ab",
           "public": false,
-          "startLine": 100,
+          "startLine": 102,
           "switchTags": [],
           "tokenCount": 427
         },
         {
           "contractTokenSha256": "20df304a865c4d15ddc7c318309c16c6ea366b7c9eeb2642d855ba4cac119449",
-          "endLine": 161,
+          "endLine": 163,
           "kind": "struct",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ShapeAndElem",
           "normalizedTokenSha256": "20df304a865c4d15ddc7c318309c16c6ea366b7c9eeb2642d855ba4cac119449",
           "public": false,
-          "startLine": 158,
+          "startLine": 160,
           "switchTags": [],
           "tokenCount": 21
         },
         {
           "contractTokenSha256": "6bbe2b24e2637fe342112b843ee6b84dd15fb843a22a89a1111fb5e0085a0188",
-          "endLine": 217,
+          "endLine": 219,
           "kind": "function",
           "literalTokenSha256": "411c8b5a37d051adb0851aeba057a5ecc54395553ae19728ef4befa4b755b718",
           "literalTokens": [
@@ -72864,7 +72900,7 @@
           "name": "extractElemAndShape",
           "normalizedTokenSha256": "9175be2b8c992912ba2c504901e917d6decda48b1e6557c5e388717433ab4937",
           "public": false,
-          "startLine": 169,
+          "startLine": 171,
           "switchTags": [
             "array",
             "else",
@@ -72877,7 +72913,7 @@
         },
         {
           "contractTokenSha256": "c457246b75f9e28a44df5af9634caa43437e8661da3f0f9960946ed824a98d22",
-          "endLine": 230,
+          "endLine": 232,
           "kind": "function",
           "literalTokenSha256": "9a021084fbb5ee7d3e851c2f2cbef1f1b779dc534addca5f1d8c43f17f7c5c28",
           "literalTokens": [
@@ -72886,13 +72922,13 @@
           "name": "extractNumericShape",
           "normalizedTokenSha256": "a42541493c67b96e936782a0d57f8d8e21b424a0a6247ac8f31e8681448ba665",
           "public": false,
-          "startLine": 219,
+          "startLine": 221,
           "switchTags": [],
           "tokenCount": 67
         },
         {
           "contractTokenSha256": "8d55f53a9eb58a370a29cac94c3e38aa207fcf85f89e718049d577d389cb4a4d",
-          "endLine": 246,
+          "endLine": 248,
           "kind": "function",
           "literalTokenSha256": "f7bcd6a9b4eb7ab6ffaf008ecf2b645656da755836f47ad9f4c8f957d1192690",
           "literalTokens": [
@@ -72902,26 +72938,26 @@
           "name": "bindingTypeDetail",
           "normalizedTokenSha256": "359a26d89dfa631bed23f4ab6e48f73ff3ae45495fbf01e42d02499e5b01ef67",
           "public": false,
-          "startLine": 232,
+          "startLine": 234,
           "switchTags": [],
           "tokenCount": 154
         },
         {
           "contractTokenSha256": "16d0ad349837c0bad0586695a9ed62fa544534c57b7f3096a49e42bacc2ccb1a",
-          "endLine": 274,
+          "endLine": 276,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "recoverIterationAxes",
           "normalizedTokenSha256": "897d8a75fcc80faa97a77b17eaf80c7e8b7d8a946c3c38420823cc4b79aefc62",
           "public": false,
-          "startLine": 264,
+          "startLine": 266,
           "switchTags": [],
           "tokenCount": 93
         },
         {
           "contractTokenSha256": "01e522cbcd59519ce8a6b82a27627df31c2a2873b341a4bf95dd40915af1af42",
-          "endLine": 430,
+          "endLine": 432,
           "kind": "function",
           "literalTokenSha256": "6c584adca4c5e8a0254a8bf5ed5d1f9165e67a3c855874897123eb1055e64f88",
           "literalTokens": [
@@ -72938,7 +72974,7 @@
           "name": "walkAxesInStmt",
           "normalizedTokenSha256": "78749f873f27a5b1026271726ffa897ca3333a92a9a8756435818ec44cd5bf74",
           "public": false,
-          "startLine": 283,
+          "startLine": 285,
           "switchTags": [
             "block",
             "else",
@@ -72949,7 +72985,7 @@
         },
         {
           "contractTokenSha256": "a158fabb7e5709357940058622eed08fb93ddfbe5aad560c8c400875e3c6f483",
-          "endLine": 478,
+          "endLine": 480,
           "kind": "function",
           "literalTokenSha256": "55816864334a72ad5b1171c4232f337eacfdb488f878cdc5df7a9067442046cf",
           "literalTokens": [
@@ -72959,26 +72995,26 @@
           "name": "recoverReductions",
           "normalizedTokenSha256": "c57c99606ab8ae45d917b571f3d3c6d393ab60373104dfae2b0e28b89fd7ad75",
           "public": false,
-          "startLine": 455,
+          "startLine": 457,
           "switchTags": [],
           "tokenCount": 163
         },
         {
           "contractTokenSha256": "808e90e1bf48af944b7ae809cfe26933a5cbcead8819448e554fde892e9062ce",
-          "endLine": 493,
+          "endLine": 495,
           "kind": "struct",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ReductionWalkCtx",
           "normalizedTokenSha256": "808e90e1bf48af944b7ae809cfe26933a5cbcead8819448e554fde892e9062ce",
           "public": false,
-          "startLine": 480,
+          "startLine": 482,
           "switchTags": [],
           "tokenCount": 77
         },
         {
           "contractTokenSha256": "d1a16553910982e03d0cb46224feeafcf5bce35a06d178f594c33cda7a357e24",
-          "endLine": 557,
+          "endLine": 559,
           "kind": "function",
           "literalTokenSha256": "86736227cfa8d503de4edd015a02dce739c42b2253c3447a55d27542afbe4e4c",
           "literalTokens": [
@@ -72994,7 +73030,7 @@
           "name": "walkReductionsInStmt",
           "normalizedTokenSha256": "78bdf818524874b756dbf4a8751001e2c2aa1488c29f383dc24619119f147165",
           "public": false,
-          "startLine": 495,
+          "startLine": 497,
           "switchTags": [
             "block",
             "else",
@@ -73006,7 +73042,7 @@
         },
         {
           "contractTokenSha256": "d0dd7c0ee505b0f8e0f702df81914462186cd23b26efbaee24dba71e6c94f4c6",
-          "endLine": 645,
+          "endLine": 647,
           "kind": "function",
           "literalTokenSha256": "fd859fe4f73b6830e7f703e07903c86d4d649e263ce68f5f7494ae59b4dd7d37",
           "literalTokens": [
@@ -73021,13 +73057,13 @@
           "name": "scanDirectBodyForReduction",
           "normalizedTokenSha256": "aceeb728e1d451bb0e61112f5ea0f8019d77f82ab0060e6f927a3aaa210fd3b7",
           "public": false,
-          "startLine": 565,
+          "startLine": 567,
           "switchTags": [],
           "tokenCount": 496
         },
         {
           "contractTokenSha256": "159aa98704ee6ce240e631491dd37cb4531fb25da596452e59ba3a24617124ed",
-          "endLine": 712,
+          "endLine": 714,
           "kind": "function",
           "literalTokenSha256": "2f035ced91cdf0aa6a6d9d04231d9f91df84a944535a477b3a7f1ca639a2cb5e",
           "literalTokens": [
@@ -73043,7 +73079,7 @@
           "name": "resolveTargetBinding",
           "normalizedTokenSha256": "44725cc61f18ef2d5c72943fc0bda35f49b3481f3d47ee49cefb7d8b8f2e58ee",
           "public": false,
-          "startLine": 664,
+          "startLine": 666,
           "switchTags": [
             "assign",
             "else",
@@ -73053,7 +73089,7 @@
         },
         {
           "contractTokenSha256": "c9314d1420d12677bb5f379a768a610042dfad15e2b0dd63f3d157d19b4aa099",
-          "endLine": 765,
+          "endLine": 767,
           "kind": "function",
           "literalTokenSha256": "9dd77ca398a9a5d5558cba042e43005b5e2281ad5b312d34fb56956281cda793",
           "literalTokens": [
@@ -73065,7 +73101,7 @@
           "name": "containsAliasLoad",
           "normalizedTokenSha256": "76396946368d8bdf3b5ba16c923f1efe12b2a728a6b87e6a4d4dd76fe10f9dbd",
           "public": false,
-          "startLine": 723,
+          "startLine": 725,
           "switchTags": [
             "base",
             "binary",
@@ -73082,27 +73118,27 @@
         },
         {
           "contractTokenSha256": "681fb615eefe187374766d9e9a451e72f0ef0a9a3cf87e1765fd1f325817fcc1",
-          "endLine": 772,
+          "endLine": 774,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "isInAliasSet",
           "normalizedTokenSha256": "783efb960c3cfb4118480b143ee200ac83bc723d20dd3967a744e62431e476e2",
           "public": false,
-          "startLine": 767,
+          "startLine": 769,
           "switchTags": [],
           "tokenCount": 38
         },
         {
           "contractTokenSha256": "2e7694390d2bd060a0c3b0b298553defed6fe4d84b5b2fcad45f714f44ee3c11",
-          "endLine": 801,
+          "endLine": 803,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "resolveAccumulationKind",
           "normalizedTokenSha256": "ed066940fb37838ff7d287be7784bc1ac56bb074e24faaf9bd7265db709aa9fe",
           "public": false,
-          "startLine": 787,
+          "startLine": 789,
           "switchTags": [
             "else",
             "scalar"
@@ -73111,14 +73147,14 @@
         },
         {
           "contractTokenSha256": "ed2f986e65ae8f8f67aa74bb37cd08120240988ca618eed64b03e850d0f7a036",
-          "endLine": 813,
+          "endLine": 815,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "scalarKindFromIr",
           "normalizedTokenSha256": "94a91914122ed8f09ff214c7c82135823eb92ec52b378a98dfcc2ccdc1da0f72",
           "public": false,
-          "startLine": 803,
+          "startLine": 805,
           "switchTags": [
             "abstract_float",
             "abstract_int",
@@ -73132,28 +73168,8 @@
           "tokenCount": 69
         },
         {
-          "contractTokenSha256": "39ac5724c462c3dc3d9b8e1226488615f5ecc928b63bc50d2e494674338740fd",
-          "endLine": 832,
-          "kind": "function",
-          "literalTokenSha256": null,
-          "literalTokens": [],
-          "name": "findGlobalBase",
-          "normalizedTokenSha256": "ff84561cb41ce20aba56f5139fe765f0746b829df55c79b267a88ca3d88ac6f7",
-          "public": false,
-          "startLine": 820,
-          "switchTags": [
-            "base",
-            "else",
-            "global_ref",
-            "index",
-            "load",
-            "member"
-          ],
-          "tokenCount": 100
-        },
-        {
           "contractTokenSha256": "bf32707412772fb310fc70a61da8a19c2b9939c8c022319e5b8ed5aa7c5c6d32",
-          "endLine": 850,
+          "endLine": 833,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -73162,13 +73178,13 @@
           "name": "mapGlobalIndexToBinding",
           "normalizedTokenSha256": "2bfd75515cfffd15529c8d83b4d0a03fa29c763062c9aab1d6b104ba62d3df5d",
           "public": false,
-          "startLine": 842,
+          "startLine": 825,
           "switchTags": [],
           "tokenCount": 48
         },
         {
           "contractTokenSha256": "463405c8c8879e837898235c56272d6e29ee20fa2dc04b13cc193f9eca4a3deb",
-          "endLine": 914,
+          "endLine": 897,
           "kind": "function",
           "literalTokenSha256": "c4b27c80aa22b1280d568f18afa8e85b81293bd1e0255bf147f8c5901b9b7a03",
           "literalTokens": [
@@ -73181,7 +73197,7 @@
           "name": "detectReductionOp",
           "normalizedTokenSha256": "30ef4776a16632a6da54b4606f2ff5caad5ac9564a0daca242ccd197c722dbfb",
           "public": false,
-          "startLine": 852,
+          "startLine": 835,
           "switchTags": [
             "add",
             "else",
@@ -73764,8 +73780,23 @@
           "tokenCount": 7
         },
         {
-          "contractTokenSha256": "6e4c35953df2fbb4d75397bacb23d8cff872d144ca92d33a81aae01663fa36c4",
+          "contractTokenSha256": "7962c351b657682d5cebd5584ac4a011bf9bf07944de05fc689dc86fe4e345f2",
           "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "d725b3b5b143d67d666220e5f42a0703ce4f6bada54526d8d7a135f8354007f8",
+          "literalTokens": [
+            "\"../wgsl/ir/ir_query.zig\""
+          ],
+          "name": "ir_query",
+          "normalizedTokenSha256": "7962c351b657682d5cebd5584ac4a011bf9bf07944de05fc689dc86fe4e345f2",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "6e4c35953df2fbb4d75397bacb23d8cff872d144ca92d33a81aae01663fa36c4",
+          "endLine": 4,
           "kind": "constant",
           "literalTokenSha256": "d2b4f773d5c27d8f27906ce3031d539c89fc0720e4833705c40035ec1855ed69",
           "literalTokens": [
@@ -73774,26 +73805,39 @@
           "name": "types",
           "normalizedTokenSha256": "6e4c35953df2fbb4d75397bacb23d8cff872d144ca92d33a81aae01663fa36c4",
           "public": false,
-          "startLine": 3,
+          "startLine": 4,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "a7b5df33a4635c0529c16c6284754da49d09385edcb7ca8acb37ca17d2a24a50",
-          "endLine": 5,
+          "endLine": 6,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "FrontendError",
           "normalizedTokenSha256": "a7b5df33a4635c0529c16c6284754da49d09385edcb7ca8acb37ca17d2a24a50",
           "public": false,
-          "startLine": 5,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
+          "contractTokenSha256": "360dcac459dc04caebad3f2ba1b7bd11f929a12c380598f9051c3daac18460e6",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "findGlobalBase",
+          "normalizedTokenSha256": "360dcac459dc04caebad3f2ba1b7bd11f929a12c380598f9051c3daac18460e6",
+          "public": false,
+          "startLine": 7,
           "switchTags": [],
           "tokenCount": 6
         },
         {
           "contractTokenSha256": "6eac963bf28deda03547b17a51f36dde5bb81fe58eefabbd06e592691e50df03",
-          "endLine": 73,
+          "endLine": 75,
           "kind": "function",
           "literalTokenSha256": "3f7da30ed58cb148d861509896851db8394f83ff8fc5f7f5a47753fad6f8cf01",
           "literalTokens": [
@@ -73802,7 +73846,7 @@
           "name": "extractLiteralUpperBound",
           "normalizedTokenSha256": "2be180726807b43f23759645a2a2bda5e07a8647fd6ad4e8bdb70183ddeabe9d",
           "public": true,
-          "startLine": 25,
+          "startLine": 27,
           "switchTags": [
             "else",
             "greater",
@@ -73815,7 +73859,7 @@
         },
         {
           "contractTokenSha256": "e8d8341947c130c445a44e42bf2e5debef7398fece4463205becae596a987d25",
-          "endLine": 163,
+          "endLine": 165,
           "kind": "function",
           "literalTokenSha256": "387b4a2d9179c7191dffe508d8439b72f60428483af96757ceca1f68048c04c9",
           "literalTokens": [
@@ -73827,7 +73871,7 @@
           "name": "extractSymbolicUpperBound",
           "normalizedTokenSha256": "9166c0292180727a82a7c6b9980e0032d07ad7c002eae79441c173036ee97d35",
           "public": true,
-          "startLine": 92,
+          "startLine": 94,
           "switchTags": [
             "else",
             "greater",
@@ -73841,7 +73885,7 @@
         },
         {
           "contractTokenSha256": "b314ae5303408b37dfcf8d3808423d7986b6939c55fb5bbe47fe597e25fa7ced",
-          "endLine": 264,
+          "endLine": 266,
           "kind": "function",
           "literalTokenSha256": "5dc3c1883d53798047844ce3ca2a08ba24cda2c1d1d58488869e171948296f76",
           "literalTokens": [
@@ -73856,7 +73900,7 @@
           "name": "extractStep",
           "normalizedTokenSha256": "ae16350f51aa740eb0920980cadfd4d79cda3b48cb1769c1770a7b99798fb797",
           "public": true,
-          "startLine": 185,
+          "startLine": 187,
           "switchTags": [
             "add",
             "assign",
@@ -73867,7 +73911,7 @@
         },
         {
           "contractTokenSha256": "a4cfa546ae605aabd7b3bf5edac35f34b311bd76feaec26cbf1f9c5a13a9aebe",
-          "endLine": 312,
+          "endLine": 314,
           "kind": "function",
           "literalTokenSha256": "c7ae295478f1f00cbc8dc9cc3fb6f25bc37c51f1be8f0c5627b04e446e2ec808",
           "literalTokens": [
@@ -73877,13 +73921,13 @@
           "name": "extractInitBound",
           "normalizedTokenSha256": "ad165b8df7396ab7aa8657a05d12eeb7688e1fa59a463dc1e553f3d2d7a3997b",
           "public": true,
-          "startLine": 276,
+          "startLine": 278,
           "switchTags": [],
           "tokenCount": 246
         },
         {
           "contractTokenSha256": "391dd12b8b3b022ead808cbe00d73b80034a4ff4a4bd329bc5619db67e2c44a7",
-          "endLine": 379,
+          "endLine": 381,
           "kind": "function",
           "literalTokenSha256": "39749c9f43f37d5de10483af9b9cf0141b805aaeb7190319577cc6d8b3b9a5cb",
           "literalTokens": [
@@ -73894,7 +73938,7 @@
           "name": "scanForDispatchGuard",
           "normalizedTokenSha256": "8c5f9f5443a921f05e0c381a16d005988da6ed290ac1fe3f17e809aa6a638972",
           "public": true,
-          "startLine": 333,
+          "startLine": 335,
           "switchTags": [
             "block",
             "else",
@@ -73906,7 +73950,7 @@
         },
         {
           "contractTokenSha256": "8a08b2905c138c6db6f04797085bcb3bd647baa789372f8e3c7cd0e63b20bfd6",
-          "endLine": 476,
+          "endLine": 478,
           "kind": "function",
           "literalTokenSha256": "6b83ac2f7a215dddb6425fb0d02bb5679f78dbbcec2ae6e5e0cfbb89b5eb5b7e",
           "literalTokens": [
@@ -73920,7 +73964,7 @@
           "name": "extractDispatchBoundFromGuard",
           "normalizedTokenSha256": "76bd873801c685084c6368d48f1eea29647c465def544ac6eebbf6f00ba07248",
           "public": false,
-          "startLine": 401,
+          "startLine": 403,
           "switchTags": [
             "block",
             "else",
@@ -73930,27 +73974,27 @@
         },
         {
           "contractTokenSha256": "d35d1aac3a2924dd1928415336a7f1b4b7e4fec0d8f0478d4e96196cc95eb861",
-          "endLine": 478,
+          "endLine": 480,
           "kind": "enum",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "StepSign",
           "normalizedTokenSha256": "d35d1aac3a2924dd1928415336a7f1b4b7e4fec0d8f0478d4e96196cc95eb861",
           "public": true,
-          "startLine": 478,
+          "startLine": 480,
           "switchTags": [],
           "tokenCount": 12
         },
         {
           "contractTokenSha256": "13cb38fc810dadafcb37bffeaaf77bd77d4982b580ddc5a10a5bd9d265cc320b",
-          "endLine": 528,
+          "endLine": 530,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "detectStepSign",
           "normalizedTokenSha256": "864416b60aa8297d54129ef51a3564ee84fadf41ec299ba48ff0029bc992f7fb",
           "public": true,
-          "startLine": 494,
+          "startLine": 496,
           "switchTags": [
             "add",
             "assign",
@@ -73963,7 +74007,7 @@
         },
         {
           "contractTokenSha256": "58c0922fcf266db04f30da7542b5a2c52406c213136d134a72b1515e8ca05ee4",
-          "endLine": 552,
+          "endLine": 554,
           "kind": "function",
           "literalTokenSha256": "fb4435171673ecb9ae7154e4331e714b341deb93e1a49ed1f386430cf7bd3299",
           "literalTokens": [
@@ -73974,7 +74018,7 @@
           "name": "writeOverrideOrConstName",
           "normalizedTokenSha256": "a548c31d73753ede0a13db36e4d0bc5746f71c1f0f140b8f8f1052924824b957",
           "public": false,
-          "startLine": 538,
+          "startLine": 540,
           "switchTags": [
             "const_",
             "else",
@@ -73985,14 +74029,14 @@
         },
         {
           "contractTokenSha256": "c007977372ed56269131fdff009cf62adf37315bca0997d3f7f0270fbb54c57c",
-          "endLine": 600,
+          "endLine": 602,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "tryExtractDispatchAxisLetter",
           "normalizedTokenSha256": "73512c44156fec53cb18d6877b24a0f98e6188b831e313cb343039f25b73bd5b",
           "public": true,
-          "startLine": 563,
+          "startLine": 565,
           "switchTags": [
             "else",
             "load",
@@ -74003,14 +74047,14 @@
         },
         {
           "contractTokenSha256": "278b5e31d1270bc4953d4fbc8d4311e4b9c3872c0cb264f23427698290ea9c27",
-          "endLine": 635,
+          "endLine": 637,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "extractUniformFieldAccess",
           "normalizedTokenSha256": "844e08d3b50230b6e7b727e5a3e860cb4cc6746956905ae0d00eefcbd3372cae",
           "public": false,
-          "startLine": 609,
+          "startLine": 611,
           "switchTags": [
             "else",
             "field_name",
@@ -74020,26 +74064,6 @@
             "member"
           ],
           "tokenCount": 160
-        },
-        {
-          "contractTokenSha256": "39ac5724c462c3dc3d9b8e1226488615f5ecc928b63bc50d2e494674338740fd",
-          "endLine": 649,
-          "kind": "function",
-          "literalTokenSha256": null,
-          "literalTokens": [],
-          "name": "findGlobalBase",
-          "normalizedTokenSha256": "ff84561cb41ce20aba56f5139fe765f0746b829df55c79b267a88ca3d88ac6f7",
-          "public": false,
-          "startLine": 637,
-          "switchTags": [
-            "base",
-            "else",
-            "global_ref",
-            "index",
-            "load",
-            "member"
-          ],
-          "tokenCount": 100
         }
       ],
       "parseErrorCount": 0,
@@ -79900,8 +79924,38 @@
     {
       "declarations": [
         {
-          "contractTokenSha256": "4f8b2f45c98e2e65e1d5244fd6c7641d293c9dad4449f6be467e4d4e48361d6d",
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
           "endLine": 1,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 1,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "697006043137d02ac6331f39ccb60b7b216c9c057e30adbc24a71fb50d667731",
+          "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "f0e0b10bf5c6fee236354971b6c0bef8b0da685f5950fe808930957c6014e941",
+          "literalTokens": [
+            "\"../../ir/ir.zig\""
+          ],
+          "name": "ir",
+          "normalizedTokenSha256": "697006043137d02ac6331f39ccb60b7b216c9c057e30adbc24a71fb50d667731",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "4f8b2f45c98e2e65e1d5244fd6c7641d293c9dad4449f6be467e4d4e48361d6d",
+          "endLine": 4,
           "kind": "constant",
           "literalTokenSha256": "faeb3a502afb6c059f519fcc0aad1b84c19c196cc665162d0fbf7b5ce085e963",
           "literalTokens": [
@@ -79910,26 +79964,26 @@
           "name": "text_buffer",
           "normalizedTokenSha256": "4f8b2f45c98e2e65e1d5244fd6c7641d293c9dad4449f6be467e4d4e48361d6d",
           "public": false,
-          "startLine": 1,
+          "startLine": 4,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "22f7e4f5b946f41ff57e80273bc8b772db07193642eb48f9a71a9f25a47f46c8",
-          "endLine": 3,
+          "endLine": 6,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "Error",
           "normalizedTokenSha256": "22f7e4f5b946f41ff57e80273bc8b772db07193642eb48f9a71a9f25a47f46c8",
           "public": true,
-          "startLine": 3,
+          "startLine": 6,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "cd47a0eaa6113461697be24975f663094fb03141ba026207179ed063c928eccb",
-          "endLine": 13,
+          "endLine": 16,
           "kind": "function",
           "literalTokenSha256": "e1f122d3817638fc03df5f67b384ebf3b331fb78fab06fe4c1a5f2beba6384ba",
           "literalTokens": [
@@ -79941,13 +79995,13 @@
           "name": "emitBuffer",
           "normalizedTokenSha256": "00c7f597df7ef6d2cdc65dd5252df75ebdf111b7b58883bb22acf63c040755b7",
           "public": true,
-          "startLine": 5,
+          "startLine": 8,
           "switchTags": [],
           "tokenCount": 118
         },
         {
           "contractTokenSha256": "b95cbcc521c2bb408c40880ad954cadcdc9da5a8159cebe41ffd3160d23d3ada",
-          "endLine": 23,
+          "endLine": 26,
           "kind": "function",
           "literalTokenSha256": "a1a37be46194b8ce0c54108572d10ae05413fdce44b4a4e2d777f5ba688d8f8c",
           "literalTokens": [
@@ -79959,13 +80013,13 @@
           "name": "emitPointer",
           "normalizedTokenSha256": "ce91a3ca25f531869df4446bda72e828477fc53d86c43f40a818a9852feaeded",
           "public": true,
-          "startLine": 15,
+          "startLine": 18,
           "switchTags": [],
           "tokenCount": 118
         },
         {
           "contractTokenSha256": "7edba76ca7ca3d8951701ac4c0f1291f7f08dce4865b88ccbae9301e734b915a",
-          "endLine": 31,
+          "endLine": 34,
           "kind": "function",
           "literalTokenSha256": "6a91bb63eb4ad548184f6a04ce8e7a12cda0c0f5b2ad814d4fc126c169e2314b",
           "literalTokens": [
@@ -79976,9 +80030,47 @@
           "name": "emitExport",
           "normalizedTokenSha256": "6262bb5e30689a82af132d625719d415ba61e94d8b3992ae7a932fcdc8e52c4b",
           "public": true,
-          "startLine": 25,
+          "startLine": 28,
           "switchTags": [],
           "tokenCount": 87
+        },
+        {
+          "contractTokenSha256": "4d1ae8a0652410776f0fa69f699452e8d4a5ef8f236de7f04a0900515a82e3c0",
+          "endLine": 43,
+          "kind": "function",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "emitPointerExports",
+          "normalizedTokenSha256": "0551aca6e99f1b78d8d0f474719dfaed526db9e5e1b0a3130ef5a9b5bcb6f81f",
+          "public": true,
+          "startLine": 36,
+          "switchTags": [],
+          "tokenCount": 81
+        },
+        {
+          "contractTokenSha256": "ddad420437bebbb0434e52217f858c1251006ba380707cccf10afa92ae0655ea",
+          "endLine": 72,
+          "kind": "test",
+          "literalTokenSha256": "82439773e497cf06aeb53ce28870d93aad55ba23c8d7ebd1f97fc48133ee8cfc",
+          "literalTokens": [
+            "\"pointer exports include bound storage globals only\"",
+            "\"values\"",
+            "0",
+            "0",
+            "\"params\"",
+            "0",
+            "1",
+            "128",
+            "0",
+            "\"    @export_symbol(values_ptr, \\\"values\\\");\\n\"",
+            "0"
+          ],
+          "name": null,
+          "normalizedTokenSha256": "ddad420437bebbb0434e52217f858c1251006ba380707cccf10afa92ae0655ea",
+          "public": false,
+          "startLine": 45,
+          "switchTags": [],
+          "tokenCount": 204
         }
       ],
       "parseErrorCount": 0,
@@ -80635,8 +80727,23 @@
           "tokenCount": 7
         },
         {
-          "contractTokenSha256": "3b975a76b994ee62f0f6ada3f325fd5183c8b85d5eea4e15324eacda4f658d12",
+          "contractTokenSha256": "6f31a137a3172c46a235f9e5636a6fa241dad2d55d056eda680024b563c667e6",
           "endLine": 55,
+          "kind": "constant",
+          "literalTokenSha256": "38aa1f2279ab99926e0b95a70f61dfc8f9c03848d4a61d7173c7a61f08854605",
+          "literalTokens": [
+            "\"csl_storage_emit.zig\""
+          ],
+          "name": "storage_emit",
+          "normalizedTokenSha256": "6f31a137a3172c46a235f9e5636a6fa241dad2d55d056eda680024b563c667e6",
+          "public": false,
+          "startLine": 55,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "3b975a76b994ee62f0f6ada3f325fd5183c8b85d5eea4e15324eacda4f658d12",
+          "endLine": 56,
           "kind": "constant",
           "literalTokenSha256": "db70d008141c09b7919a90db2b4a6ad47671eb5d3d1ba1673e6781608897fb42",
           "literalTokens": [
@@ -80645,13 +80752,13 @@
           "name": "spec",
           "normalizedTokenSha256": "3b975a76b994ee62f0f6ada3f325fd5183c8b85d5eea4e15324eacda4f658d12",
           "public": false,
-          "startLine": 55,
+          "startLine": 56,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "661cd71d69a0ee3492f83250b7c1a84e8ac1fc76156603fae59101579953289a",
-          "endLine": 56,
+          "endLine": 57,
           "kind": "constant",
           "literalTokenSha256": "6924731f1785be2bedb204ca5c24fb84368cb01d1c653054768ad5e96e2b064a",
           "literalTokens": [
@@ -80660,26 +80767,39 @@
           "name": "W",
           "normalizedTokenSha256": "661cd71d69a0ee3492f83250b7c1a84e8ac1fc76156603fae59101579953289a",
           "public": false,
-          "startLine": 56,
+          "startLine": 57,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
-          "endLine": 58,
+          "endLine": 59,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "EmitError",
           "normalizedTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
           "public": true,
-          "startLine": 58,
+          "startLine": 59,
           "switchTags": [],
           "tokenCount": 7
         },
         {
+          "contractTokenSha256": "0be5ec0a30c259d1116646c1cd6b809370c6c33f6a276884cff63aa592dd0d0e",
+          "endLine": 60,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "emitStorageExports",
+          "normalizedTokenSha256": "0be5ec0a30c259d1116646c1cd6b809370c6c33f6a276884cff63aa592dd0d0e",
+          "public": false,
+          "startLine": 60,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
           "contractTokenSha256": "907b473390b70652662e8675ed91bc602edcfc4df8182f2cdb1dcee10adfc4ee",
-          "endLine": 154,
+          "endLine": 156,
           "kind": "function",
           "literalTokenSha256": "c22d04c9c703af250495ddd8c11a715fa29aae174abb2683e74b96ad5d7f5219",
           "literalTokens": [
@@ -80745,13 +80865,13 @@
           "name": "emitStreaming",
           "normalizedTokenSha256": "881c5a3694058f697735b89c245dc3a51d7efc381a2c22663c4cfd5c56b6530c",
           "public": true,
-          "startLine": 64,
+          "startLine": 66,
           "switchTags": [],
           "tokenCount": 899
         },
         {
           "contractTokenSha256": "267519f8a3c0e13f601c8573f73194aef15546f92e3e5a3e7de4c97b747fed17",
-          "endLine": 299,
+          "endLine": 301,
           "kind": "function",
           "literalTokenSha256": "673116c79656c4e8cbc9904bcf4127dcd68ae9f416c35b0e1668d4e4b4ffbe0f",
           "literalTokens": [
@@ -80847,13 +80967,13 @@
           "name": "emitDecode",
           "normalizedTokenSha256": "4dd70e64ac42470f61c8bae527621c8f4e1cb2b2319de18575866383d986fa03",
           "public": true,
-          "startLine": 160,
+          "startLine": 162,
           "switchTags": [],
           "tokenCount": 1253
         },
         {
           "contractTokenSha256": "5691b2fd8760664024221f5b4a272050826faa20b8b6d5c1d87662e185f53a44",
-          "endLine": 413,
+          "endLine": 415,
           "kind": "function",
           "literalTokenSha256": "e3b116e203c5405c4c22f06beceb03a24611b20aec67ee2d4ea8987c74b096a1",
           "literalTokens": [
@@ -80928,13 +81048,13 @@
           "name": "emitTiled",
           "normalizedTokenSha256": "1b92b7c0731e2d04f1f354f4ca795c114afa1c49ad4dc498b2951e4b37b03ab4",
           "public": true,
-          "startLine": 305,
+          "startLine": 307,
           "switchTags": [],
           "tokenCount": 995
         },
         {
           "contractTokenSha256": "63a1d91a0d122f4977ae004b276bf00e22eec4e45e77ebf727dcbac147218032",
-          "endLine": 444,
+          "endLine": 446,
           "kind": "function",
           "literalTokenSha256": "757249f9a888503b02aed307419ec60cb8aeac431100627656b742b34b85d577",
           "literalTokens": [
@@ -80953,13 +81073,13 @@
           "name": "emitTiledStoragePtrs",
           "normalizedTokenSha256": "dd9191007809a958957c4f7a3162e1f015df489ecdbe98f8704dff299ee24d7d",
           "public": false,
-          "startLine": 419,
+          "startLine": 421,
           "switchTags": [],
           "tokenCount": 277
         },
         {
           "contractTokenSha256": "c1794e0a8478d1c51af3b4c4019e8581302d4f069f74ebffed0dfbe20f37f7fc",
-          "endLine": 452,
+          "endLine": 454,
           "kind": "function",
           "literalTokenSha256": "eedd7f23c247e9815fbe7731cbabb1ae8eee74dc0c8ebbf22113849953dbfa01",
           "literalTokens": [
@@ -80971,13 +81091,13 @@
           "name": "emitTiledComptime",
           "normalizedTokenSha256": "c2671f8674d28aac17fb6325cc1f4687219ebea534900af7b4f654cab1003652",
           "public": false,
-          "startLine": 446,
+          "startLine": 448,
           "switchTags": [],
           "tokenCount": 85
         },
         {
           "contractTokenSha256": "3daceb2c8c9d4d7ab27ca5374fb28fb7b621c2d9d3308a9426e5fc6f0226b60a",
-          "endLine": 479,
+          "endLine": 481,
           "kind": "function",
           "literalTokenSha256": "b5be38f70e7335cb2dfa2d41995ee307af7ec250f949d28463318b3ff2565fb4",
           "literalTokens": [
@@ -81003,13 +81123,13 @@
           "name": "emitScoreLoop",
           "normalizedTokenSha256": "6b8e992c3a83fdc086d158bba4ea032a1f715745c01ff8e39c7e504150f77dd8",
           "public": false,
-          "startLine": 458,
+          "startLine": 460,
           "switchTags": [],
           "tokenCount": 280
         },
         {
           "contractTokenSha256": "8534a5d17ce5e16f761ffbd5fa21eb650344e6d30675cd1dc749c3f4970e3a41",
-          "endLine": 496,
+          "endLine": 498,
           "kind": "function",
           "literalTokenSha256": "a69d2bf933ada68f212ff1d497311aa6df6f34019208df936c2e07edd7a293dc",
           "literalTokens": [
@@ -81024,13 +81144,13 @@
           "name": "emitSlidingWindowGuard",
           "normalizedTokenSha256": "81e3caeeaf4613c82c4085ee9265f948dfb6e1e04e66197254864965675d912d",
           "public": false,
-          "startLine": 481,
+          "startLine": 483,
           "switchTags": [],
           "tokenCount": 201
         },
         {
           "contractTokenSha256": "cc75904290160056b38f99eab0cb92dbbaa064e556416f8aca66ce169a356e1e",
-          "endLine": 503,
+          "endLine": 505,
           "kind": "function",
           "literalTokenSha256": "6a4df2973c95acdcd1ba2c59c996579fb52f0336a54970c89e0537bde5b55391",
           "literalTokens": [
@@ -81042,13 +81162,13 @@
           "name": "emitDecodeRuntimeState",
           "normalizedTokenSha256": "0530e1896b1834c5deb24369df31045f6f12c89261620b0bb42d26008982c91e",
           "public": false,
-          "startLine": 498,
+          "startLine": 500,
           "switchTags": [],
           "tokenCount": 67
         },
         {
           "contractTokenSha256": "3af368fd98df68213c39eb2dc2accf10e066e65b4589f309275f7bd68c58be63",
-          "endLine": 508,
+          "endLine": 510,
           "kind": "function",
           "literalTokenSha256": "417ad15595ee1548e9a2b757a58a5466ac57f57acfc177d3cc6a7008bcbe72ce",
           "literalTokens": [
@@ -81058,13 +81178,13 @@
           "name": "emitDecodeRuntimeExports",
           "normalizedTokenSha256": "f2dd34e677edc34d5072e8f809012df8108f63b5bb83a9c556abb8b82704e491",
           "public": false,
-          "startLine": 505,
+          "startLine": 507,
           "switchTags": [],
           "tokenCount": 43
         },
         {
           "contractTokenSha256": "a6a202c5241b0745d194e4c60ef68586bb8a912ebd4d658cb9dc1b9d3a887e65",
-          "endLine": 544,
+          "endLine": 546,
           "kind": "function",
           "literalTokenSha256": "d2f9c8beec8e20781e66e33348ac5fd11fb164d964ffdc6050455ed9469a35e3",
           "literalTokens": [
@@ -81083,13 +81203,13 @@
           "name": "emitStoragePtrs",
           "normalizedTokenSha256": "0f5abc2ef305668498ddeb0a8c3c2673514ab0480351bd5bfb9babe5a03a2a6e",
           "public": false,
-          "startLine": 510,
+          "startLine": 512,
           "switchTags": [],
           "tokenCount": 277
         },
         {
           "contractTokenSha256": "67b32c355a1a7a5b836e0bd22bd74c58fa9c1f5051223d618f18573ffb0b3bdb",
-          "endLine": 571,
+          "endLine": 573,
           "kind": "function",
           "literalTokenSha256": "daedc18c75e316e87a158a9218d622436d9e3653e6332509c48caaa247b7ace8",
           "literalTokens": [
@@ -81108,13 +81228,13 @@
           "name": "emitDecodeStoragePtrs",
           "normalizedTokenSha256": "27d4ef8675650cf9ce224a0f47d2d0a35b6d3f341cfb582fbdccff595fb6e497",
           "public": false,
-          "startLine": 546,
+          "startLine": 548,
           "switchTags": [],
           "tokenCount": 277
         },
         {
           "contractTokenSha256": "9e1133a48ea5d354edd9967bf4ecb7a87f1b022d3bb6ac80765a1f9325c568bf",
-          "endLine": 583,
+          "endLine": 585,
           "kind": "function",
           "literalTokenSha256": "219358ac7c1d061e7aaadd17794d9bfdce2572fa798839f056f5d808b25be715",
           "literalTokens": [
@@ -81128,30 +81248,13 @@
           "name": "isKvStorageName",
           "normalizedTokenSha256": "c1579df65076ae3b6190e4cd5790af93222f79dc6ff7207b53b4b27c39f26d4e",
           "public": false,
-          "startLine": 573,
+          "startLine": 575,
           "switchTags": [],
           "tokenCount": 104
         },
         {
-          "contractTokenSha256": "a3033eedd752c0af8d7bc6f028665b4c333eff3d8bff95047a43c87005b2515d",
-          "endLine": 596,
-          "kind": "function",
-          "literalTokenSha256": "6a91bb63eb4ad548184f6a04ce8e7a12cda0c0f5b2ad814d4fc126c169e2314b",
-          "literalTokens": [
-            "\"    @export_symbol(\"",
-            "\"_ptr, \\\"\"",
-            "\"\\\");\\n\""
-          ],
-          "name": "emitStorageExports",
-          "normalizedTokenSha256": "939779b7d89c9300989975b0c33a482c603756a900667f668def07111cac29a1",
-          "public": false,
-          "startLine": 585,
-          "switchTags": [],
-          "tokenCount": 132
-        },
-        {
           "contractTokenSha256": "c2ec2db23de2eaf04c161fd47db9cb362c88713c910ea10853aa9aa00a17e677",
-          "endLine": 603,
+          "endLine": 592,
           "kind": "function",
           "literalTokenSha256": "c470623e2d65b1661a8b1cdd6bb35cb7e12840e17221566e9d2f722871626450",
           "literalTokens": [
@@ -81162,13 +81265,13 @@
           "name": "emitComptime",
           "normalizedTokenSha256": "45d96b0c916ecce6e6cbe29bb5d552e6af44b19a76b163542a29fc9e503758c0",
           "public": false,
-          "startLine": 598,
+          "startLine": 587,
           "switchTags": [],
           "tokenCount": 73
         },
         {
           "contractTokenSha256": "afdc41991572c2dc4a23ca224a0a70868cd48a2e164704dcc52bcf38d73942f2",
-          "endLine": 612,
+          "endLine": 601,
           "kind": "function",
           "literalTokenSha256": "86e51ba9ebc5d69b69c639cc4860d9d76aef41b3ec008d4236997ae9b9de528c",
           "literalTokens": [
@@ -81177,7 +81280,7 @@
           "name": "writeScalarType",
           "normalizedTokenSha256": "a5548bfa68dd59cce980620be33e585d7b2f9558e7f0a0272e6fbbcf3a347807",
           "public": false,
-          "startLine": 605,
+          "startLine": 594,
           "switchTags": [
             "array",
             "elem",
@@ -84506,8 +84609,23 @@
           "tokenCount": 7
         },
         {
-          "contractTokenSha256": "661cd71d69a0ee3492f83250b7c1a84e8ac1fc76156603fae59101579953289a",
+          "contractTokenSha256": "6f31a137a3172c46a235f9e5636a6fa241dad2d55d056eda680024b563c667e6",
           "endLine": 12,
+          "kind": "constant",
+          "literalTokenSha256": "38aa1f2279ab99926e0b95a70f61dfc8f9c03848d4a61d7173c7a61f08854605",
+          "literalTokens": [
+            "\"csl_storage_emit.zig\""
+          ],
+          "name": "storage_emit",
+          "normalizedTokenSha256": "6f31a137a3172c46a235f9e5636a6fa241dad2d55d056eda680024b563c667e6",
+          "public": false,
+          "startLine": 12,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "661cd71d69a0ee3492f83250b7c1a84e8ac1fc76156603fae59101579953289a",
+          "endLine": 13,
           "kind": "constant",
           "literalTokenSha256": "6924731f1785be2bedb204ca5c24fb84368cb01d1c653054768ad5e96e2b064a",
           "literalTokens": [
@@ -84516,26 +84634,39 @@
           "name": "W",
           "normalizedTokenSha256": "661cd71d69a0ee3492f83250b7c1a84e8ac1fc76156603fae59101579953289a",
           "public": false,
-          "startLine": 12,
+          "startLine": 13,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
-          "endLine": 14,
+          "endLine": 15,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "EmitError",
           "normalizedTokenSha256": "42c9657b221b4df13b98259cd460cc47faab7c2ad697062ee323c3b3c74e8fe2",
           "public": true,
-          "startLine": 14,
+          "startLine": 15,
           "switchTags": [],
           "tokenCount": 7
         },
         {
+          "contractTokenSha256": "0be5ec0a30c259d1116646c1cd6b809370c6c33f6a276884cff63aa592dd0d0e",
+          "endLine": 16,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "emitStorageExports",
+          "normalizedTokenSha256": "0be5ec0a30c259d1116646c1cd6b809370c6c33f6a276884cff63aa592dd0d0e",
+          "public": false,
+          "startLine": 16,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
           "contractTokenSha256": "0f10f98da27c4b95e64f0f81154b80365bd836fa8750920a04cd03dcf6685493",
-          "endLine": 120,
+          "endLine": 122,
           "kind": "function",
           "literalTokenSha256": "1837faf156070b433731399071a77dd5906ecc280550cc28b99f063884d513ac",
           "literalTokens": [
@@ -84615,13 +84746,13 @@
           "name": "emit",
           "normalizedTokenSha256": "a0dc0333e912d401e3abc14333d720884ad443d42ba5d7ea29a612ff3d13b322",
           "public": true,
-          "startLine": 16,
+          "startLine": 18,
           "switchTags": [],
           "tokenCount": 1043
         },
         {
           "contractTokenSha256": "a6a202c5241b0745d194e4c60ef68586bb8a912ebd4d658cb9dc1b9d3a887e65",
-          "endLine": 137,
+          "endLine": 139,
           "kind": "function",
           "literalTokenSha256": "7c3e9cfb3bc5449e6dc6ede500cc387019b98f6ae4363ad0dbf2d3b0878bac86",
           "literalTokens": [
@@ -84635,26 +84766,9 @@
           "name": "emitStoragePtrs",
           "normalizedTokenSha256": "c6e2be32971a5fe747dafb950fd848cc68dba391b67279f93238634be8a884b1",
           "public": false,
-          "startLine": 122,
+          "startLine": 124,
           "switchTags": [],
           "tokenCount": 182
-        },
-        {
-          "contractTokenSha256": "a3033eedd752c0af8d7bc6f028665b4c333eff3d8bff95047a43c87005b2515d",
-          "endLine": 150,
-          "kind": "function",
-          "literalTokenSha256": "6a91bb63eb4ad548184f6a04ce8e7a12cda0c0f5b2ad814d4fc126c169e2314b",
-          "literalTokens": [
-            "\"    @export_symbol(\"",
-            "\"_ptr, \\\"\"",
-            "\"\\\");\\n\""
-          ],
-          "name": "emitStorageExports",
-          "normalizedTokenSha256": "939779b7d89c9300989975b0c33a482c603756a900667f668def07111cac29a1",
-          "public": false,
-          "startLine": 139,
-          "switchTags": [],
-          "tokenCount": 132
         }
       ],
       "parseErrorCount": 0,
@@ -119752,8 +119866,23 @@
     {
       "declarations": [
         {
-          "contractTokenSha256": "d5115718cd25e773f9c734508843785f26fe22a475d618a8c2d242faf7999358",
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
           "endLine": 1,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 1,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "d5115718cd25e773f9c734508843785f26fe22a475d618a8c2d242faf7999358",
+          "endLine": 3,
           "kind": "constant",
           "literalTokenSha256": "f92f524adb9f2b36a99ef8cde0e5c52627c6b4fae889cce0d2906c664755d6c3",
           "literalTokens": [
@@ -119762,13 +119891,28 @@
           "name": "ir",
           "normalizedTokenSha256": "d5115718cd25e773f9c734508843785f26fe22a475d618a8c2d242faf7999358",
           "public": false,
-          "startLine": 1,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "5f45f1e7bda3a181397961ec418084c882d5f3f6c75a85f6008b1ef51176ebc8",
+          "endLine": 4,
+          "kind": "constant",
+          "literalTokenSha256": "f571e9f8a09f8b73f2e4790c4b5d574512bcf77f822f29aeebbd5d24be100d13",
+          "literalTokens": [
+            "\"layout_utils.zig\""
+          ],
+          "name": "layout_utils",
+          "normalizedTokenSha256": "5f45f1e7bda3a181397961ec418084c882d5f3f6c75a85f6008b1ef51176ebc8",
+          "public": false,
+          "startLine": 4,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "057910751dd09b32a1fef06d67c786eb2a45aca3bb7b66dd4eb07fd385fa3bd3",
-          "endLine": 19,
+          "endLine": 22,
           "kind": "function",
           "literalTokenSha256": "3f7da30ed58cb148d861509896851db8394f83ff8fc5f7f5a47753fad6f8cf01",
           "literalTokens": [
@@ -119777,7 +119921,7 @@
           "name": "resolveValueAlias",
           "normalizedTokenSha256": "ba859e06e17b47b6fd20dfd25d7086c5a1936f6c967133892961a02f1209219d",
           "public": true,
-          "startLine": 3,
+          "startLine": 6,
           "switchTags": [
             "construct",
             "else",
@@ -119788,14 +119932,14 @@
         },
         {
           "contractTokenSha256": "0cea08141df41dde7df9434bd03dc2e33690274cadca2a92f65a7f54e52886a5",
-          "endLine": 31,
+          "endLine": 34,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "resolveConstLocalInitializer",
           "normalizedTokenSha256": "45b187855eab8991601b30ff7685ce7273da9e63838df9e9f88f529e898a31e4",
           "public": true,
-          "startLine": 21,
+          "startLine": 24,
           "switchTags": [
             "else",
             "local_decl"
@@ -119804,14 +119948,14 @@
         },
         {
           "contractTokenSha256": "875767e343c19703b0f13a729e4f73128942f30b14fd619aaa42dddc901a42e6",
-          "endLine": 41,
+          "endLine": 44,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "resolveIndexableType",
           "normalizedTokenSha256": "1ebced76f164940b30769a1d54ffed6b506a66ce2e352b4ed0ab1277ca646707",
           "public": true,
-          "startLine": 33,
+          "startLine": 36,
           "switchTags": [
             "elem",
             "else",
@@ -119820,15 +119964,91 @@
           "tokenCount": 62
         },
         {
+          "contractTokenSha256": "0640ca80ef4aa0f5f2adae5edaa66fe4651abb20cd4af1adcfa9eba4199b5643",
+          "endLine": 68,
+          "kind": "function",
+          "literalTokenSha256": "ffd5200cbdcf1cb48a357aa7b716b77f2d194b5041a746edd477959b14813111",
+          "literalTokens": [
+            "\"x\"",
+            "0",
+            "\"y\"",
+            "1",
+            "\"z\"",
+            "2"
+          ],
+          "name": "classifyBuiltinComponent",
+          "normalizedTokenSha256": "89223083b63a87952bf2ca0c7e30f315963946e37273cbcce7abc1b6752ff64c",
+          "public": true,
+          "startLine": 46,
+          "switchTags": [
+            "else",
+            "member",
+            "param_ref"
+          ],
+          "tokenCount": 221
+        },
+        {
+          "contractTokenSha256": "71f4509b7d759aeac2dfddb21d05f7986026a6ac96abc57d31128473ca1e7805",
+          "endLine": 76,
+          "kind": "function",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "matchIntLiteral",
+          "normalizedTokenSha256": "9c5d677188b20b75d8c0ee00f68f7cd9472ab44455e97b3fc404d37105e9085b",
+          "public": true,
+          "startLine": 70,
+          "switchTags": [
+            "else",
+            "int_lit"
+          ],
+          "tokenCount": 61
+        },
+        {
+          "contractTokenSha256": "2a33a5dd12cca44ddbeed5152737a9c2d8978668ed820226d7993da22362be7e",
+          "endLine": 92,
+          "kind": "function",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "resolveRuntimeArrayElementStride",
+          "normalizedTokenSha256": "4b9aba48b450ae12eb1649ca2c37adb4c3d0c09b2e6d464fdc29cbcbc42e3630",
+          "public": true,
+          "startLine": 78,
+          "switchTags": [
+            "array",
+            "else"
+          ],
+          "tokenCount": 132
+        },
+        {
+          "contractTokenSha256": "bc2b82268f882aa9ba17147efdafc8c7a4e53a86656367697f69fdcf0dfffae8",
+          "endLine": 106,
+          "kind": "function",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "findGlobalBase",
+          "normalizedTokenSha256": "2da312daea755d4b6f5f730cd5c467def9b327b47ae46b96b2ad49dbe8f3aa9f",
+          "public": true,
+          "startLine": 94,
+          "switchTags": [
+            "base",
+            "else",
+            "global_ref",
+            "index",
+            "load",
+            "member"
+          ],
+          "tokenCount": 101
+        },
+        {
           "contractTokenSha256": "2982d1ac8baab9f903cd4c85e61a7b0ea3d674fd6f2bc4412c1b5911116321f2",
-          "endLine": 49,
+          "endLine": 114,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "isLocalRef",
           "normalizedTokenSha256": "8a24374fa406a85d1653ea413f11487ed3d2e9186b72510aa0b098290ebc6955",
           "public": true,
-          "startLine": 43,
+          "startLine": 108,
           "switchTags": [
             "else",
             "local_ref"
@@ -119837,14 +120057,14 @@
         },
         {
           "contractTokenSha256": "1b9b820e49f71620137d4fc0b9b81fbb2f29fb5f5418647e6515812abe8155bc",
-          "endLine": 77,
+          "endLine": 142,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "stmtWritesLocal",
           "normalizedTokenSha256": "031ce06b9e93cac7409b359a80dd98ac14a9945b78817431c9890bfc99dd8088",
           "public": true,
-          "startLine": 51,
+          "startLine": 116,
           "switchTags": [
             "assign",
             "block",
@@ -119860,14 +120080,14 @@
         },
         {
           "contractTokenSha256": "f9c8223f95c43b2071ee2a185e38f1aedad50bad668987bf1fdd95dc7e5f5a5f",
-          "endLine": 118,
+          "endLine": 183,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "stmtContainsExpr",
           "normalizedTokenSha256": "230baa2ae502ced6db014f38f31420dedc073de3f16d13a39bf5e1283549ab33",
           "public": true,
-          "startLine": 79,
+          "startLine": 144,
           "switchTags": [
             "assign",
             "block",
@@ -119888,14 +120108,14 @@
         },
         {
           "contractTokenSha256": "29013a2d9af44c7ecc690712b055329ac4395d5c225a730523c3c66c260c0d93",
-          "endLine": 146,
+          "endLine": 211,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "exprContainsExpr",
           "normalizedTokenSha256": "073927ec8cb05761f739b5fde5960cba3102af78d712fa105218ee754fd18a77",
           "public": true,
-          "startLine": 120,
+          "startLine": 185,
           "switchTags": [
             "base",
             "binary",
@@ -119911,6 +120131,32 @@
             "unary"
           ],
           "tokenCount": 302
+        },
+        {
+          "contractTokenSha256": "9dbd9cbb8604feff38b82d2db8c9d444e0161a8f40d6502ac5aa869980b1d1c3",
+          "endLine": 274,
+          "kind": "test",
+          "literalTokenSha256": "77d0d7b8fe140dc190d9471fb12182031df61044a5b7c78c57187ffd213cc7e9",
+          "literalTokens": [
+            "\"canonical IR queries resolve builtin, literal, global base, and runtime stride\"",
+            "\"main\"",
+            "\"gid\"",
+            "0",
+            "\"y\"",
+            "1",
+            "7",
+            "3",
+            "1",
+            "7",
+            "3",
+            "4"
+          ],
+          "name": null,
+          "normalizedTokenSha256": "9dbd9cbb8604feff38b82d2db8c9d444e0161a8f40d6502ac5aa869980b1d1c3",
+          "public": false,
+          "startLine": 213,
+          "switchTags": [],
+          "tokenCount": 532
         }
       ],
       "parseErrorCount": 0,
@@ -124185,23 +124431,8 @@
           "tokenCount": 7
         },
         {
-          "contractTokenSha256": "80b122641c9f42a48b76cfc95def6e4b93b424d7b4b643915ab013438f865046",
-          "endLine": 5,
-          "kind": "constant",
-          "literalTokenSha256": "9e0f3409eb89b2b2422e0528a4c807adf8416496260e84207cd61c472550ec11",
-          "literalTokens": [
-            "\"../ir/layout_utils.zig\""
-          ],
-          "name": "layout_utils",
-          "normalizedTokenSha256": "80b122641c9f42a48b76cfc95def6e4b93b424d7b4b643915ab013438f865046",
-          "public": false,
-          "startLine": 5,
-          "switchTags": [],
-          "tokenCount": 7
-        },
-        {
           "contractTokenSha256": "ff9d7a644dbb6cdbba762c671deb239b79669470a8721a8b1bbfea605b747d56",
-          "endLine": 6,
+          "endLine": 5,
           "kind": "constant",
           "literalTokenSha256": "73200cb13fea1278ff6f7d347b131864a8caa047ce0678a41c33a1111b45453f",
           "literalTokens": [
@@ -124210,52 +124441,78 @@
           "name": "lean_proof",
           "normalizedTokenSha256": "ff9d7a644dbb6cdbba762c671deb239b79669470a8721a8b1bbfea605b747d56",
           "public": false,
-          "startLine": 6,
+          "startLine": 5,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
-          "endLine": 8,
+          "endLine": 7,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "resolve_const_local_initializer",
           "normalizedTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
           "public": false,
+          "startLine": 7,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
+          "contractTokenSha256": "3311ebd625c35127a5d95db9798ba25869444d00de3280f086d8a7404be70e1b",
+          "endLine": 8,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "classify_builtin_component",
+          "normalizedTokenSha256": "3311ebd625c35127a5d95db9798ba25869444d00de3280f086d8a7404be70e1b",
+          "public": false,
           "startLine": 8,
           "switchTags": [],
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "4ea5729135546642897233895cd32ee72c7724e52006dfc8a4c760f159fd0b63",
+          "contractTokenSha256": "544f639ab1f6567d59854fb579bc86932e5e71def3ff113f79f4506a18d8a5b0",
           "endLine": 9,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "resolve_indexable_type",
-          "normalizedTokenSha256": "4ea5729135546642897233895cd32ee72c7724e52006dfc8a4c760f159fd0b63",
+          "name": "match_u32_literal_value",
+          "normalizedTokenSha256": "544f639ab1f6567d59854fb579bc86932e5e71def3ff113f79f4506a18d8a5b0",
           "public": false,
           "startLine": 9,
           "switchTags": [],
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "contractTokenSha256": "819e040d4c959a6debf87104232e072dd0c7e1d06e1e7692db47a3eb62909bf4",
           "endLine": 10,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "resolve_value_alias",
-          "normalizedTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "name": "resolve_runtime_array_element_stride",
+          "normalizedTokenSha256": "819e040d4c959a6debf87104232e072dd0c7e1d06e1e7692db47a3eb62909bf4",
           "public": false,
           "startLine": 10,
           "switchTags": [],
           "tokenCount": 6
         },
         {
+          "contractTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "endLine": 11,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "resolve_value_alias",
+          "normalizedTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "public": false,
+          "startLine": 11,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
           "contractTokenSha256": "202f358e2ae08c96d48b98a1da92e5a881fcfeecda239d280e6505463fbb485a",
-          "endLine": 167,
+          "endLine": 168,
           "kind": "function",
           "literalTokenSha256": "79f382ed005bab74555bd58ca3c78fa1e77a852b70af9be8016cff71502cf8ad",
           "literalTokens": [
@@ -124283,13 +124540,13 @@
           "name": "try_elide_storage_index",
           "normalizedTokenSha256": "148bcf88fcafa0e79a51e58ea32398b7e43d7f93a8752fa71833f88dfe14be98",
           "public": true,
-          "startLine": 12,
+          "startLine": 13,
           "switchTags": [],
           "tokenCount": 979
         },
         {
           "contractTokenSha256": "3486b7e24b97b215419cfc4e234e09c51f945645e01b1214b3af54fccb1a8cee",
-          "endLine": 202,
+          "endLine": 203,
           "kind": "function",
           "literalTokenSha256": "880605857dcfe110fa88107fd6394388324891ca80fd010e4aa1c9dd3904be07",
           "literalTokens": [
@@ -124298,13 +124555,13 @@
           "name": "try_elide_dispatch_validated_storage_index",
           "normalizedTokenSha256": "11923cebca70f0cda0df3dd67620e5b55fb86008bf47bbbcfbd6fd7d269350c3",
           "public": true,
-          "startLine": 169,
+          "startLine": 170,
           "switchTags": [],
           "tokenCount": 224
         },
         {
           "contractTokenSha256": "a9c023046ff499dbb3172f171dcbf1b783928ed1b8bd532acf024d8424b241f8",
-          "endLine": 250,
+          "endLine": 251,
           "kind": "function",
           "literalTokenSha256": "b1a23e03eb5fe9cb33bdb5ab486e0560f9c57e6a3361fc977497a85ed3de6fbf",
           "literalTokens": [
@@ -124314,36 +124571,20 @@
           "name": "try_elide_dispatch_validated_builtin_index",
           "normalizedTokenSha256": "7b949f3d32975eac252a33b20e8f197f4893e7ed8a2112fbe27a2c8d866c66fc",
           "public": false,
-          "startLine": 204,
+          "startLine": 205,
           "switchTags": [],
           "tokenCount": 264
         },
         {
-          "contractTokenSha256": "255b4d0bdcd6e849e2e6be268063242b688ca5eb189db40321227bca86488323",
-          "endLine": 266,
-          "kind": "function",
-          "literalTokenSha256": null,
-          "literalTokens": [],
-          "name": "resolve_runtime_array_element_stride",
-          "normalizedTokenSha256": "3bff58646442df000e5d5d7e34810fb52c149e37fd71c28b783c62859b17b87c",
-          "public": false,
-          "startLine": 252,
-          "switchTags": [
-            "array",
-            "else"
-          ],
-          "tokenCount": 131
-        },
-        {
           "contractTokenSha256": "de543c2f9d5437cac9350cf48a7cfb65ac51fb661d22c1eabf4a55602fad624d",
-          "endLine": 286,
+          "endLine": 271,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "resolve_storage_binding",
           "normalizedTokenSha256": "118bdf99db67bc413d2b0242c0c66f693450d17a9fd1777a6324765d2d220052",
           "public": false,
-          "startLine": 268,
+          "startLine": 253,
           "switchTags": [
             "base",
             "else",
@@ -124355,7 +124596,7 @@
         },
         {
           "contractTokenSha256": "62b9f0f8563d3af6810de6d231ae4cfde0d84bef85bbb69d3d4d2424df6745f1",
-          "endLine": 309,
+          "endLine": 294,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -124364,7 +124605,7 @@
           "name": "match_flat_index_2d_dispatch_x",
           "normalizedTokenSha256": "5a6ac89a29ab37c5f069201e8465dc7f3f9b30df5ac6ce74a135df815f295207",
           "public": false,
-          "startLine": 288,
+          "startLine": 273,
           "switchTags": [
             "binary",
             "else"
@@ -124373,7 +124614,7 @@
         },
         {
           "contractTokenSha256": "8e98aaad89a542b71cb275cab5024afdc892c26fb3e341d79055c5d4208e0804",
-          "endLine": 328,
+          "endLine": 313,
           "kind": "function",
           "literalTokenSha256": "55816864334a72ad5b1171c4232f337eacfdb488f878cdc5df7a9067442046cf",
           "literalTokens": [
@@ -124383,7 +124624,7 @@
           "name": "match_flat_index_2d_dispatch_x_base",
           "normalizedTokenSha256": "377cb8cbe3e3997b9380fbc0d31d6202be6ff1ed5f2aa441416e50c34c8f754d",
           "public": false,
-          "startLine": 311,
+          "startLine": 296,
           "switchTags": [
             "binary",
             "else"
@@ -124392,7 +124633,7 @@
         },
         {
           "contractTokenSha256": "2cdaa9d4a594715d00a8a528d0142a56384d602706109a8e4b0f37f8752441be",
-          "endLine": 351,
+          "endLine": 336,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -124401,7 +124642,7 @@
           "name": "match_flat_index_3d_dispatch_xy",
           "normalizedTokenSha256": "6a34fd2e0ec7e9b1705b92c808e54d4bb6b28473d34be9b7be7ca34e069b7611",
           "public": false,
-          "startLine": 330,
+          "startLine": 315,
           "switchTags": [
             "binary",
             "else"
@@ -124410,7 +124651,7 @@
         },
         {
           "contractTokenSha256": "9dc9e075a12f57c55f5fb88e432c5509d007dda0fc2098a4232955fc3de744af",
-          "endLine": 373,
+          "endLine": 358,
           "kind": "function",
           "literalTokenSha256": "55816864334a72ad5b1171c4232f337eacfdb488f878cdc5df7a9067442046cf",
           "literalTokens": [
@@ -124420,7 +124661,7 @@
           "name": "match_flat_index_3d_dispatch_xy_base",
           "normalizedTokenSha256": "2bdc76e8062befa14b702a5a110aecf5e955080597f26c4a1cfbac73884a3259",
           "public": false,
-          "startLine": 353,
+          "startLine": 338,
           "switchTags": [
             "binary",
             "else"
@@ -124429,14 +124670,14 @@
         },
         {
           "contractTokenSha256": "716d9b526fd1d0afda41d0c27c661c19519f05a5ff3244cfb9c70575516e7107",
-          "endLine": 392,
+          "endLine": 377,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_flat_index_3d_dispatch_xy_without_x",
           "normalizedTokenSha256": "2367f3d4e85f14fa2e9821abf85cd5c97aebea8a16144f4f2c74eac0f98952df",
           "public": false,
-          "startLine": 375,
+          "startLine": 360,
           "switchTags": [
             "binary",
             "else"
@@ -124445,7 +124686,7 @@
         },
         {
           "contractTokenSha256": "54577019dbba2646369ecdda10847a413cb5be8575d3ccc0bc0fb2e13c59862e",
-          "endLine": 411,
+          "endLine": 396,
           "kind": "function",
           "literalTokenSha256": "97573daa44e56c81c08bb4057a113291b51b48adb08e4108073b9811ac93ece4",
           "literalTokens": [
@@ -124455,7 +124696,7 @@
           "name": "match_gid_y_times_dispatch_width",
           "normalizedTokenSha256": "05ae1b81c4f0cb0367c326a4d1850c93dbbc00bd9fa3dccb6aa56d06d73c6a7b",
           "public": false,
-          "startLine": 394,
+          "startLine": 379,
           "switchTags": [
             "binary",
             "else"
@@ -124464,7 +124705,7 @@
         },
         {
           "contractTokenSha256": "6f383fb19b5336d1305de1cb1977b9e40a479bf9974f9387b81ca229854a66be",
-          "endLine": 430,
+          "endLine": 415,
           "kind": "function",
           "literalTokenSha256": "faa743b419bfa57f9bb58b15976dca36f95913717adca4df09f70ce117715b10",
           "literalTokens": [
@@ -124474,7 +124715,7 @@
           "name": "match_gid_z_times_dispatch_area_xy",
           "normalizedTokenSha256": "dc96bc54ac1d60fcd72e0b7677dfd5306be123750b860608d51f385ce919cfc0",
           "public": false,
-          "startLine": 413,
+          "startLine": 398,
           "switchTags": [
             "binary",
             "else"
@@ -124483,7 +124724,7 @@
         },
         {
           "contractTokenSha256": "a3b8c8e3146cfb85d24c50e618b27e84b60c4a5b71022c3bf49d194b6aa46eae",
-          "endLine": 453,
+          "endLine": 438,
           "kind": "function",
           "literalTokenSha256": "f9cfc1739c2befabf33d838edc7a4fc700c74c34da979a441781b3176d06d08c",
           "literalTokens": [
@@ -124498,7 +124739,7 @@
           "name": "match_dispatch_width",
           "normalizedTokenSha256": "8fd0df16e29bb62febc534646fe464e6253d7aa7269f4d7a4c935943deae7dc9",
           "public": false,
-          "startLine": 432,
+          "startLine": 417,
           "switchTags": [
             "binary",
             "else"
@@ -124507,7 +124748,7 @@
         },
         {
           "contractTokenSha256": "02ec8e1e383c5b03cadb06ae418c2947430491691bdf3aedacfe4edec69f8f39",
-          "endLine": 476,
+          "endLine": 461,
           "kind": "function",
           "literalTokenSha256": "d336bcbbe6bd4ef965654e68955fed76662f6728412cf4d05679ed3666b37366",
           "literalTokens": [
@@ -124522,7 +124763,7 @@
           "name": "match_dispatch_height",
           "normalizedTokenSha256": "4790739924b925116c3eed3859c438232a29760ae1ddfd32d0baf77fc1ea2414",
           "public": false,
-          "startLine": 455,
+          "startLine": 440,
           "switchTags": [
             "binary",
             "else"
@@ -124531,14 +124772,14 @@
         },
         {
           "contractTokenSha256": "685793f729f2afe2941b0cc867059af302affb640e5debc7e856f433a14ef7d4",
-          "endLine": 495,
+          "endLine": 480,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_dispatch_area_xy",
           "normalizedTokenSha256": "4cfa334c75ec7aad70054d4a49b934f73b4c55f9dce618a79549c9828aaa4c55",
           "public": false,
-          "startLine": 478,
+          "startLine": 463,
           "switchTags": [
             "binary",
             "else"
@@ -124547,7 +124788,7 @@
         },
         {
           "contractTokenSha256": "a99a29adffc5edf2f58afe87f706db80dc17d069be38e76edbde78c044056042",
-          "endLine": 502,
+          "endLine": 487,
           "kind": "function",
           "literalTokenSha256": "54fbb1dd8d0324fda022a9f984b04fbe450522fd40455f414664f72e5fe3c4f5",
           "literalTokens": [
@@ -124559,20 +124800,20 @@
           "name": "workgroup_size_for_function",
           "normalizedTokenSha256": "eb2ebb79e6663736f264b584fe163dc0ac44849610f817a74512f37e2edca5c7",
           "public": false,
-          "startLine": 497,
+          "startLine": 482,
           "switchTags": [],
           "tokenCount": 59
         },
         {
           "contractTokenSha256": "3c24ceced183a27463bac0ce88ae1db68f9ff3b4dc717a7fd3874736bebbc7c6",
-          "endLine": 510,
+          "endLine": 495,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_u32_literal",
           "normalizedTokenSha256": "ea95ab37ddd4b0fc8cad821a0713cfbfad4df077fbf241a264dc69dca3730bf0",
           "public": false,
-          "startLine": 504,
+          "startLine": 489,
           "switchTags": [
             "else",
             "int_lit"
@@ -124580,44 +124821,28 @@
           "tokenCount": 65
         },
         {
-          "contractTokenSha256": "6996c1f16c7b5a58f1adc828f232c84f2adc66ee91bad52b8f0b137495e14f96",
-          "endLine": 518,
-          "kind": "function",
-          "literalTokenSha256": null,
-          "literalTokens": [],
-          "name": "match_u32_literal_value",
-          "normalizedTokenSha256": "eb30ce157f22e4efc4b65a9151a63321f8d61ea2c29f8ee5b91c4c12518cf94b",
-          "public": false,
-          "startLine": 512,
-          "switchTags": [
-            "else",
-            "int_lit"
-          ],
-          "tokenCount": 60
-        },
-        {
           "contractTokenSha256": "2c36c82445394ae7c2ee8fcf71d8348ba9c07ad97bd33da4410c35f1ec053257",
-          "endLine": 526,
+          "endLine": 503,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_u32_literal_value_with_module",
           "normalizedTokenSha256": "05c9262afb3cf9bb795bf12b27a8a02c4023f447b55dfa08bed68207d6286d43",
           "public": false,
-          "startLine": 520,
+          "startLine": 497,
           "switchTags": [],
           "tokenCount": 47
         },
         {
           "contractTokenSha256": "7ab65a285d3f291954b4ea5a48bc241ed3f97dab0258fdf576ade06d333e166d",
-          "endLine": 550,
+          "endLine": 527,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_gid_component_plus_offset",
           "normalizedTokenSha256": "d114d2b94bffc6c1b0fd1db0a0170efe1a72ff5851a9c1575ca8ce4964cc2693",
           "public": true,
-          "startLine": 528,
+          "startLine": 505,
           "switchTags": [
             "binary",
             "else"
@@ -124626,7 +124851,7 @@
         },
         {
           "contractTokenSha256": "111e9a4867e15ceffa711c447ee07216b0bf37ce630cb0c92fe2dcdbf42321ce",
-          "endLine": 574,
+          "endLine": 551,
           "kind": "function",
           "literalTokenSha256": "55816864334a72ad5b1171c4232f337eacfdb488f878cdc5df7a9067442046cf",
           "literalTokens": [
@@ -124636,7 +124861,7 @@
           "name": "match_gid_component_times_stride",
           "normalizedTokenSha256": "ab034a49434623ec15dfa609c3c3c13269409c8cc610e1b23ca63d9ab6e805f7",
           "public": false,
-          "startLine": 552,
+          "startLine": 529,
           "switchTags": [
             "binary",
             "else"
@@ -124645,7 +124870,7 @@
         },
         {
           "contractTokenSha256": "185f47b64cfdbc89e641b8d29e61fd7a1870580d24246c081ee792aebf54f0a8",
-          "endLine": 601,
+          "endLine": 578,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -124654,7 +124879,7 @@
           "name": "match_gid_component_times_stride_plus_offset",
           "normalizedTokenSha256": "58097991ba0cbcf1f77c91d98765dfe756b12a906575eeb13eda0e0e554488fb",
           "public": true,
-          "startLine": 576,
+          "startLine": 553,
           "switchTags": [
             "binary",
             "else"
@@ -124663,7 +124888,7 @@
         },
         {
           "contractTokenSha256": "ea9e64e77c64f9515027baa1366d926bdc246ebad787286cd1aad11e56cd8e7d",
-          "endLine": 645,
+          "endLine": 622,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -124672,7 +124897,7 @@
           "name": "match_gid_component_tiled_plus_offset",
           "normalizedTokenSha256": "d0c46638424ae4aaf50b44f9e269d8aebe44245db8baf4865091d1ee393dbd7d",
           "public": true,
-          "startLine": 603,
+          "startLine": 580,
           "switchTags": [
             "binary",
             "else"
@@ -124681,7 +124906,7 @@
         },
         {
           "contractTokenSha256": "a1b31dc1dd5a48d04b79fdc13f6bf29dc335a3a322b596e2df7605fa30d288b4",
-          "endLine": 663,
+          "endLine": 640,
           "kind": "function",
           "literalTokenSha256": "55816864334a72ad5b1171c4232f337eacfdb488f878cdc5df7a9067442046cf",
           "literalTokens": [
@@ -124691,13 +124916,13 @@
           "name": "match_gid_component_loop_affine_plus_offset",
           "normalizedTokenSha256": "014daab0df72d6918af9e8bd6cac09fd3024b39a925cca7e09eaea5c613f4f4c",
           "public": false,
-          "startLine": 647,
+          "startLine": 624,
           "switchTags": [],
           "tokenCount": 147
         },
         {
           "contractTokenSha256": "717cb07a6a29729a8513bc7ac277ac83dfd32985cb9f0c1f6869978624e32c81",
-          "endLine": 681,
+          "endLine": 658,
           "kind": "function",
           "literalTokenSha256": "55816864334a72ad5b1171c4232f337eacfdb488f878cdc5df7a9067442046cf",
           "literalTokens": [
@@ -124707,13 +124932,13 @@
           "name": "match_loop_only_affine_plus_offset",
           "normalizedTokenSha256": "346d56fbbefbe1d326e9e5de8e817d1c8d425f9ae8a2643dbe8e589bf0d31333",
           "public": false,
-          "startLine": 668,
+          "startLine": 645,
           "switchTags": [],
           "tokenCount": 117
         },
         {
           "contractTokenSha256": "e5c8234c0f12c65d9528d75b9bf9bb7edf913c85337e9a4b4c05e9ed468e4b57",
-          "endLine": 689,
+          "endLine": 666,
           "kind": "struct",
           "literalTokenSha256": "27f27223c250572cd81a771b71d818298410780780c9eb52172a380db6593d92",
           "literalTokens": [
@@ -124724,13 +124949,13 @@
           "name": "AdditiveLoopIndexState",
           "normalizedTokenSha256": "e5c8234c0f12c65d9528d75b9bf9bb7edf913c85337e9a4b4c05e9ed468e4b57",
           "public": false,
-          "startLine": 683,
+          "startLine": 660,
           "switchTags": [],
           "tokenCount": 38
         },
         {
           "contractTokenSha256": "36fbd3e2fbf11ee846c7f16682e900709c46342351a0cf84deac0118ab87c601",
-          "endLine": 738,
+          "endLine": 715,
           "kind": "function",
           "literalTokenSha256": "97573daa44e56c81c08bb4057a113291b51b48adb08e4108073b9811ac93ece4",
           "literalTokens": [
@@ -124740,7 +124965,7 @@
           "name": "collect_additive_loop_terms",
           "normalizedTokenSha256": "69d6002582e70b7117920837cc420c4998c8708c69988cd5c8515f3161a7919a",
           "public": false,
-          "startLine": 691,
+          "startLine": 668,
           "switchTags": [
             "binary",
             "else",
@@ -124751,7 +124976,7 @@
         },
         {
           "contractTokenSha256": "9019c92388ff7baa5c60ceb004573d5c704174e62e74982ded2578ea19575f2b",
-          "endLine": 777,
+          "endLine": 754,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -124760,7 +124985,7 @@
           "name": "collect_scaled_loop_term",
           "normalizedTokenSha256": "24ce5b8eb0dd5fa94e1fb910c2bbbd490b550727c7fbc9513a21b3003b0b8411",
           "public": false,
-          "startLine": 740,
+          "startLine": 717,
           "switchTags": [
             "else",
             "local_ref"
@@ -124769,27 +124994,27 @@
         },
         {
           "contractTokenSha256": "402ff3253132779d9423ea82351d0c0b4c56c75e1251cf77565d55d79b482eaa",
-          "endLine": 805,
+          "endLine": 782,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "merge_scaled_loop_terms",
           "normalizedTokenSha256": "1d3ea845e605106f5e61eed25a02ef919a7d4b7324ee91486791db3017f0d3a8",
           "public": false,
-          "startLine": 779,
+          "startLine": 756,
           "switchTags": [],
           "tokenCount": 232
         },
         {
           "contractTokenSha256": "7fcc419e8ee7380a436466bfca99deb787d8eed67a2036eb74d88848af1318b8",
-          "endLine": 842,
+          "endLine": 819,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_gid_component_tiled",
           "normalizedTokenSha256": "b5161c891041b7a66d73bafda9430bdde4d9ee7499eb2469199998fffbf511d3",
           "public": false,
-          "startLine": 807,
+          "startLine": 784,
           "switchTags": [
             "binary",
             "else"
@@ -124798,14 +125023,14 @@
         },
         {
           "contractTokenSha256": "7d280be434a2d19e8c2b34ddf93e6278570cd7d63dfed01a71d11db6bae72d57",
-          "endLine": 879,
+          "endLine": 856,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_gid_component_div_stride",
           "normalizedTokenSha256": "6e9288e1f6d1d8539bd52dab514c097a7f0daa3c6cc1de9289da12272506afa7",
           "public": false,
-          "startLine": 844,
+          "startLine": 821,
           "switchTags": [
             "binary",
             "else"
@@ -124814,7 +125039,7 @@
         },
         {
           "contractTokenSha256": "c00dcaaa6c43af3d15db2e2ee7d23e4ac8ea095f702538111bc1d9a853d4800a",
-          "endLine": 899,
+          "endLine": 876,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -124823,7 +125048,7 @@
           "name": "match_gid_component_div_tile",
           "normalizedTokenSha256": "298b649018824294101389e1fb8c66cfd720846f84c5d775d8eea3edd1a24050",
           "public": false,
-          "startLine": 881,
+          "startLine": 858,
           "switchTags": [
             "binary",
             "else"
@@ -124832,7 +125057,7 @@
         },
         {
           "contractTokenSha256": "5ccacb8ebcccc55ea3120efd47372560bc4de7402e76b39b879238586ada9507",
-          "endLine": 919,
+          "endLine": 896,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -124841,7 +125066,7 @@
           "name": "match_gid_component_mod_tile",
           "normalizedTokenSha256": "0b64b4985bd562ec7f8d1e218e2379a0ced413496be71b708f6c40028474387b",
           "public": false,
-          "startLine": 901,
+          "startLine": 878,
           "switchTags": [
             "binary",
             "else"
@@ -124849,32 +125074,8 @@
           "tokenCount": 148
         },
         {
-          "contractTokenSha256": "30ff5a08869805b9ec1228c3342af6e0ea574039b541c0af18aa049252c0cd79",
-          "endLine": 943,
-          "kind": "function",
-          "literalTokenSha256": "ffd5200cbdcf1cb48a357aa7b716b77f2d194b5041a746edd477959b14813111",
-          "literalTokens": [
-            "\"x\"",
-            "0",
-            "\"y\"",
-            "1",
-            "\"z\"",
-            "2"
-          ],
-          "name": "classify_builtin_component",
-          "normalizedTokenSha256": "f14c44161ed27723b71902ea71359419c011bd5d2a50fc337dc6fc54d9d4ffe5",
-          "public": false,
-          "startLine": 921,
-          "switchTags": [
-            "else",
-            "member",
-            "param_ref"
-          ],
-          "tokenCount": 220
-        },
-        {
           "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
-          "endLine": 945,
+          "endLine": 898,
           "kind": "constant",
           "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
           "literalTokens": [
@@ -124883,7 +125084,7 @@
           "name": "std",
           "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
           "public": false,
-          "startLine": 945,
+          "startLine": 898,
           "switchTags": [],
           "tokenCount": 7
         }
@@ -124954,19 +125155,17 @@
           "tokenCount": 7
         },
         {
-          "contractTokenSha256": "80b122641c9f42a48b76cfc95def6e4b93b424d7b4b643915ab013438f865046",
-          "endLine": 5,
+          "contractTokenSha256": "3311ebd625c35127a5d95db9798ba25869444d00de3280f086d8a7404be70e1b",
+          "endLine": 6,
           "kind": "constant",
-          "literalTokenSha256": "9e0f3409eb89b2b2422e0528a4c807adf8416496260e84207cd61c472550ec11",
-          "literalTokens": [
-            "\"../ir/layout_utils.zig\""
-          ],
-          "name": "layout_utils",
-          "normalizedTokenSha256": "80b122641c9f42a48b76cfc95def6e4b93b424d7b4b643915ab013438f865046",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "classify_builtin_component",
+          "normalizedTokenSha256": "3311ebd625c35127a5d95db9798ba25869444d00de3280f086d8a7404be70e1b",
           "public": false,
-          "startLine": 5,
+          "startLine": 6,
           "switchTags": [],
-          "tokenCount": 7
+          "tokenCount": 6
         },
         {
           "contractTokenSha256": "485eb0eac856ed67ec8586e9029d262c0f500b293d46baaa33daa4ecaad233d5",
@@ -124995,73 +125194,86 @@
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
+          "contractTokenSha256": "544f639ab1f6567d59854fb579bc86932e5e71def3ff113f79f4506a18d8a5b0",
           "endLine": 9,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "resolve_const_local_initializer",
-          "normalizedTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
+          "name": "match_u32_literal_value",
+          "normalizedTokenSha256": "544f639ab1f6567d59854fb579bc86932e5e71def3ff113f79f4506a18d8a5b0",
           "public": false,
           "startLine": 9,
           "switchTags": [],
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "4ea5729135546642897233895cd32ee72c7724e52006dfc8a4c760f159fd0b63",
+          "contractTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
           "endLine": 10,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "resolve_indexable_type",
-          "normalizedTokenSha256": "4ea5729135546642897233895cd32ee72c7724e52006dfc8a4c760f159fd0b63",
+          "name": "resolve_const_local_initializer",
+          "normalizedTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
           "public": false,
           "startLine": 10,
           "switchTags": [],
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "contractTokenSha256": "819e040d4c959a6debf87104232e072dd0c7e1d06e1e7692db47a3eb62909bf4",
           "endLine": 11,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "resolve_value_alias",
-          "normalizedTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "name": "resolve_runtime_array_element_stride",
+          "normalizedTokenSha256": "819e040d4c959a6debf87104232e072dd0c7e1d06e1e7692db47a3eb62909bf4",
           "public": false,
           "startLine": 11,
           "switchTags": [],
           "tokenCount": 6
         },
         {
+          "contractTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "endLine": 12,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "resolve_value_alias",
+          "normalizedTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "public": false,
+          "startLine": 12,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
           "contractTokenSha256": "99d192e5bd8e728c7e5e7cd6d449553048a9f9fe6095dd60e36220ed1ff339d2",
-          "endLine": 17,
+          "endLine": 18,
           "kind": "struct",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "UniformField",
           "normalizedTokenSha256": "99d192e5bd8e728c7e5e7cd6d449553048a9f9fe6095dd60e36220ed1ff339d2",
           "public": false,
-          "startLine": 13,
+          "startLine": 14,
           "switchTags": [],
           "tokenCount": 23
         },
         {
           "contractTokenSha256": "719ee701f2bfbfcced5c5347b54f2b2b55949607eb1d2e4cd260f69ba6948046",
-          "endLine": 22,
+          "endLine": 23,
           "kind": "struct",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "LoopLimit",
           "normalizedTokenSha256": "719ee701f2bfbfcced5c5347b54f2b2b55949607eb1d2e4cd260f69ba6948046",
           "public": false,
-          "startLine": 19,
+          "startLine": 20,
           "switchTags": [],
           "tokenCount": 14
         },
         {
           "contractTokenSha256": "56b346dbcaa6c10fe5385a2969df7c6a73d097223c526a1cac6c9bcf7ff4ca2a",
-          "endLine": 83,
+          "endLine": 84,
           "kind": "function",
           "literalTokenSha256": "34998c18364d16be2505705c743b8274f4cbd227fb8f51784b4967a9216fa80c",
           "literalTokens": [
@@ -125080,33 +125292,33 @@
           "name": "try_elide_uniform_validated_storage_index",
           "normalizedTokenSha256": "fc371a6af9dde5206aa9a3f5570d49a0a7e73badae0297fd222d60091a6bc989",
           "public": true,
-          "startLine": 24,
+          "startLine": 25,
           "switchTags": [],
           "tokenCount": 385
         },
         {
           "contractTokenSha256": "c5e34ddd619c3d10c1dd9ea754e7b102d840deeca45224119d32040c4ed56ac8",
-          "endLine": 93,
+          "endLine": 94,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_uniform_guarded_gid_access",
           "normalizedTokenSha256": "c0334c00aad0a3cabb9cb1917831d5387acbfa7b6a7ac847ac8c4198ed91aa55",
           "public": false,
-          "startLine": 85,
+          "startLine": 86,
           "switchTags": [],
           "tokenCount": 71
         },
         {
           "contractTokenSha256": "e3e759aabfc9e1b30f5c8c0794535f1d6c9a76c792291a2c4bacf036e35ffd6b",
-          "endLine": 141,
+          "endLine": 142,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "find_uniform_guard_before_expr",
           "normalizedTokenSha256": "169e8422291b830a9e4742cdb075f98f75000d29ed03be41040423800f392b3f",
           "public": false,
-          "startLine": 95,
+          "startLine": 96,
           "switchTags": [
             "block",
             "else",
@@ -125118,14 +125330,14 @@
         },
         {
           "contractTokenSha256": "0960c80177860014fd4b80d130672325f8366b82dc4a4338b28d78fb04ddbed1",
-          "endLine": 156,
+          "endLine": 157,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "stmt_matches_uniform_return_guard",
           "normalizedTokenSha256": "b0fb50339696ba1ff4b1e489c90ce9910fbbddd3e661735815775134fb6c5828",
           "public": false,
-          "startLine": 143,
+          "startLine": 144,
           "switchTags": [
             "else",
             "if_"
@@ -125134,14 +125346,14 @@
         },
         {
           "contractTokenSha256": "dba0850deb86e916f52c28a3869cbd7f6fe3bf31b80b094a77f0055424657785",
-          "endLine": 176,
+          "endLine": 177,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_index_ge_uniform",
           "normalizedTokenSha256": "6784fce85f067247d644ac0f265065a5f720a23405d76b8d1ae73481b16f1fdd",
           "public": false,
-          "startLine": 158,
+          "startLine": 159,
           "switchTags": [
             "binary",
             "else"
@@ -125150,7 +125362,7 @@
         },
         {
           "contractTokenSha256": "cbbc4009b2e41bbf1014a11e2533c8a3a7a5c78af367d0707a6e797278914015",
-          "endLine": 193,
+          "endLine": 194,
           "kind": "function",
           "literalTokenSha256": "e57fbd4954763894a18654de5cc87f75a8e38ef06d38c83c2b7d85cf2bced262",
           "literalTokens": [
@@ -125161,13 +125373,13 @@
           "name": "match_vector_cols_access",
           "normalizedTokenSha256": "7f7c47f74eb6818fcf45245f1a19b94ebc405aa5789b86431d4bb3775e9192d3",
           "public": false,
-          "startLine": 178,
+          "startLine": 179,
           "switchTags": [],
           "tokenCount": 129
         },
         {
           "contractTokenSha256": "846f83be9737680356b94fbf547375b45621cf1dbd5a74102d8a6b98b572e77d",
-          "endLine": 218,
+          "endLine": 219,
           "kind": "function",
           "literalTokenSha256": "e57fbd4954763894a18654de5cc87f75a8e38ef06d38c83c2b7d85cf2bced262",
           "literalTokens": [
@@ -125178,13 +125390,13 @@
           "name": "match_matrix_rows_cols_access",
           "normalizedTokenSha256": "ab138cf91a387a53b8b6d7a00937ef08ce6392a010de03dbfe5e088f3bc1bd63",
           "public": false,
-          "startLine": 195,
+          "startLine": 196,
           "switchTags": [],
           "tokenCount": 250
         },
         {
           "contractTokenSha256": "0a8b75b90559558221d792b1dd9eb3350d4b0ef9d5cb44d5fea8605be03721a3",
-          "endLine": 225,
+          "endLine": 226,
           "kind": "struct",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -125193,13 +125405,13 @@
           "name": "MatrixIndexState",
           "normalizedTokenSha256": "0a8b75b90559558221d792b1dd9eb3350d4b0ef9d5cb44d5fea8605be03721a3",
           "public": false,
-          "startLine": 220,
+          "startLine": 221,
           "switchTags": [],
           "tokenCount": 33
         },
         {
           "contractTokenSha256": "936d7cadbefb76fbd0e31c7618ea139c9f0df79d1a6693b0c238b84732534549",
-          "endLine": 230,
+          "endLine": 231,
           "kind": "struct",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -125208,33 +125420,33 @@
           "name": "AffineExpr",
           "normalizedTokenSha256": "936d7cadbefb76fbd0e31c7618ea139c9f0df79d1a6693b0c238b84732534549",
           "public": false,
-          "startLine": 227,
+          "startLine": 228,
           "switchTags": [],
           "tokenCount": 18
         },
         {
           "contractTokenSha256": "3d0323488ce2fef1b2b5f288f15044ef79a0013bbd0070668e046ab5c21d7ac3",
-          "endLine": 242,
+          "endLine": 243,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_uniform_product_guarded_access",
           "normalizedTokenSha256": "51745587d3404c7097ae661ab13316efa430de3c3474870239b627e25ae04b61",
           "public": false,
-          "startLine": 232,
+          "startLine": 233,
           "switchTags": [],
           "tokenCount": 124
         },
         {
           "contractTokenSha256": "51bd7138820e3dc50a8d2deea13cac368058a61404d820e66a7d69eb9f6415f4",
-          "endLine": 275,
+          "endLine": 276,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_uniform_product_index",
           "normalizedTokenSha256": "ac14a0096fd090f3c91e64cd4de6b31d154dc8ba1b7cb08c9ccab059f9aa2c79",
           "public": false,
-          "startLine": 244,
+          "startLine": 245,
           "switchTags": [
             "binary",
             "else"
@@ -125243,14 +125455,14 @@
         },
         {
           "contractTokenSha256": "ada248ac704b6acfdaa1a1beb80eebe79c98d6afa39de19b32fbd270b395240e",
-          "endLine": 297,
+          "endLine": 298,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_major_stride_term",
           "normalizedTokenSha256": "1f7915934b8d624a8e7f09ea4fff018c1e239080d37ae974ebc44239348595db",
           "public": false,
-          "startLine": 277,
+          "startLine": 278,
           "switchTags": [
             "binary",
             "else"
@@ -125259,14 +125471,14 @@
         },
         {
           "contractTokenSha256": "a621ddda0c65caccb95d7b9035ff5dad99f34dce1f842c8b68704193b20e4695",
-          "endLine": 314,
+          "endLine": 315,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_affine_expr",
           "normalizedTokenSha256": "6d4b3f0b887e4c3d3982e9aefe74b0bfdedec4f07f48d12177d2523d67fcb849",
           "public": false,
-          "startLine": 299,
+          "startLine": 300,
           "switchTags": [
             "binary",
             "else"
@@ -125275,14 +125487,14 @@
         },
         {
           "contractTokenSha256": "57145a66a9108743758f4c25f65b5eb91ee20621e00924f5c591973c63ffb64b",
-          "endLine": 347,
+          "endLine": 348,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "find_guard_for_expr",
           "normalizedTokenSha256": "e8de8e3c94b69e43e3b6b7cb0820d6fcbb1728197f465d0c12e84ddc8bae0272",
           "public": false,
-          "startLine": 316,
+          "startLine": 317,
           "switchTags": [
             "block",
             "body",
@@ -125295,40 +125507,40 @@
         },
         {
           "contractTokenSha256": "a4b95a4eb76a41cc95d3963a21ffb99266a28a398e82a046cdfb976abf19b146",
-          "endLine": 363,
+          "endLine": 364,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_product_guard",
           "normalizedTokenSha256": "95c1c97137cf322f2f408deaacb38a61699691c74f3e7691b88980ce77957cb0",
           "public": false,
-          "startLine": 349,
+          "startLine": 350,
           "switchTags": [],
           "tokenCount": 147
         },
         {
           "contractTokenSha256": "3d633ea9c3c630ee037d738f73d4ae73280072c6034250a977d2a6bf62f3eaeb",
-          "endLine": 371,
+          "endLine": 372,
           "kind": "struct",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ProductGuardState",
           "normalizedTokenSha256": "3d633ea9c3c630ee037d738f73d4ae73280072c6034250a977d2a6bf62f3eaeb",
           "public": false,
-          "startLine": 365,
+          "startLine": 366,
           "switchTags": [],
           "tokenCount": 31
         },
         {
           "contractTokenSha256": "7f25db5a2f5a2500093a97a86ea8dc5dddbbca4bb3ceaec0bf08af7f4816db75",
-          "endLine": 396,
+          "endLine": 397,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "collect_product_guard_terms",
           "normalizedTokenSha256": "40779aab2b414422fe801b9cd30385ebe639bdac552d8d0c54cfbd5f5176517f",
           "public": false,
-          "startLine": 373,
+          "startLine": 374,
           "switchTags": [
             "binary",
             "else"
@@ -125337,14 +125549,14 @@
         },
         {
           "contractTokenSha256": "8a95cf3a4fc62c51b3292360c826f3ac6ef387e1336ccf8488112415771242c4",
-          "endLine": 428,
+          "endLine": 429,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "collect_matrix_index_terms",
           "normalizedTokenSha256": "aaaa02c650559cde30ebf685279f9a05c400a1177bdef5df6049a144a97af4c7",
           "public": false,
-          "startLine": 398,
+          "startLine": 399,
           "switchTags": [
             "binary",
             "else",
@@ -125355,7 +125567,7 @@
         },
         {
           "contractTokenSha256": "7cc9daad018cb5251218664a1a035bdf6a7e5934e6681c9e0f7712d60b8a0686",
-          "endLine": 451,
+          "endLine": 452,
           "kind": "function",
           "literalTokenSha256": "9a8ccd96fe3ab59c25c15c1f0ff4abbfbcfb23621c9bcccd66424b20611ba704",
           "literalTokens": [
@@ -125364,13 +125576,13 @@
           "name": "collect_row_times_cols",
           "normalizedTokenSha256": "1d96741a24cd9372bc925e6472699eeeec9f06048a2f38cc7e0a88d98749ef4d",
           "public": false,
-          "startLine": 430,
+          "startLine": 431,
           "switchTags": [],
           "tokenCount": 154
         },
         {
           "contractTokenSha256": "64a7bc48c4df3dfb9243584255b91c8953b8f7d5d4d5caf96d0ab7d36d217b60",
-          "endLine": 461,
+          "endLine": 462,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -125379,20 +125591,20 @@
           "name": "match_local_plus_offset",
           "normalizedTokenSha256": "00af77d2bcc5e1ba9c36f811a9cae149ba6e8b34f793b4350bdf9d97a90978c8",
           "public": false,
-          "startLine": 453,
+          "startLine": 454,
           "switchTags": [],
           "tokenCount": 82
         },
         {
           "contractTokenSha256": "93a5fe875f431f294402823548a043fbb2dea5533489f7853de519f8d9316f8a",
-          "endLine": 487,
+          "endLine": 488,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "collect_local_plus_offset",
           "normalizedTokenSha256": "1a1bd38b7e9966c27b6dbb70c5e9ff4524b390a2d0397886f7a4c69a9587048d",
           "public": false,
-          "startLine": 463,
+          "startLine": 464,
           "switchTags": [
             "binary",
             "else",
@@ -125403,27 +125615,27 @@
         },
         {
           "contractTokenSha256": "67f12fc1e89b92d5d59b6f439f02fce2a7b456bd0d7263931907c0085a1f6480",
-          "endLine": 496,
+          "endLine": 497,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "find_loop_limit_for_local",
           "normalizedTokenSha256": "eb4c423f5396cf300851b462ae53a6475732b193f6a38c42feb8fe2742a13f43",
           "public": false,
-          "startLine": 489,
+          "startLine": 490,
           "switchTags": [],
           "tokenCount": 50
         },
         {
           "contractTokenSha256": "20b47ddfe4610ce61daebc831cce4f8c3b09633738ed8b0dc6fa944b7bebcd2a",
-          "endLine": 533,
+          "endLine": 534,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "find_loop_limit_in_stmt",
           "normalizedTokenSha256": "c37338f8adebf5eda079342c73d0b3d1759a7baad5282a31930213cc5a47642d",
           "public": false,
-          "startLine": 498,
+          "startLine": 499,
           "switchTags": [
             "block",
             "else",
@@ -125435,7 +125647,7 @@
         },
         {
           "contractTokenSha256": "f7d29ff1034d92abc28d65245c9bcf28875b3146b1e11738b13057f9b0a4c769",
-          "endLine": 553,
+          "endLine": 554,
           "kind": "function",
           "literalTokenSha256": "54f5b2a1653c3b1d18d891359447005fd7c617d380d21c82e6644e3bd67f6c5e",
           "literalTokens": [
@@ -125447,7 +125659,7 @@
           "name": "match_guarded_loop_limit",
           "normalizedTokenSha256": "68042c536e1d7a0f2fac4fee95b92db8295b5328c07d8bc16ec255f47f205673",
           "public": false,
-          "startLine": 535,
+          "startLine": 536,
           "switchTags": [
             "block",
             "else"
@@ -125456,27 +125668,27 @@
         },
         {
           "contractTokenSha256": "e5a5cc705bbf9078805a3f226bfeacc52f0659b6ecadc569bb1abd4e40f1fb56",
-          "endLine": 566,
+          "endLine": 567,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "expr_before_first_local_write",
           "normalizedTokenSha256": "322a48858c57e277e4cf2a84f63f543eb289577b22829ea69041b1a0fb15d96b",
           "public": false,
-          "startLine": 555,
+          "startLine": 556,
           "switchTags": [],
           "tokenCount": 74
         },
         {
           "contractTokenSha256": "96381e1a08d464f142b7e1abaee281eb037a8acc9f81c5f5d6ba4339c290ad23",
-          "endLine": 582,
+          "endLine": 583,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_break_guard_stmt",
           "normalizedTokenSha256": "7f48f26b54c84b096ed55388d6e3ef4f8812a32f81b826a11c592a3f6865eea9",
           "public": false,
-          "startLine": 568,
+          "startLine": 569,
           "switchTags": [
             "else",
             "if_"
@@ -125485,14 +125697,14 @@
         },
         {
           "contractTokenSha256": "d99a67fb44adba6eaf51c931c2c955b072c0b9233480a3261f629c114eedb92a",
-          "endLine": 602,
+          "endLine": 603,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_local_ge_uniform_limit",
           "normalizedTokenSha256": "ed4fb13aabc7a3b0e11d62758366fb4eaba4dc71eb1c5336583e9f3a43086b07",
           "public": false,
-          "startLine": 584,
+          "startLine": 585,
           "switchTags": [
             "binary",
             "else"
@@ -125501,27 +125713,27 @@
         },
         {
           "contractTokenSha256": "ecf98bdbad6c9aaf6c56c2d4336fabe2ffbd10e1e8904c43135f7a801f7926b6",
-          "endLine": 612,
+          "endLine": 613,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_uniform_limit",
           "normalizedTokenSha256": "d682fb20f6463aaf48400d70a08b598c7a232dadfe1e1c8d6a7bbaf168fa70d2",
           "public": false,
-          "startLine": 604,
+          "startLine": 605,
           "switchTags": [],
           "tokenCount": 92
         },
         {
           "contractTokenSha256": "8195304acf2b983b73b2e6b2dbdd5a2d584946355c2f5d95f804c033b2fdecc5",
-          "endLine": 632,
+          "endLine": 633,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_uniform_field_masked_to_multiple_of_4",
           "normalizedTokenSha256": "1b7b51281d0cc28a285cf8b5dedfe620a1a403357caf99d629b740af94ff2d1e",
           "public": false,
-          "startLine": 614,
+          "startLine": 615,
           "switchTags": [
             "binary",
             "else"
@@ -125530,7 +125742,7 @@
         },
         {
           "contractTokenSha256": "81588a5c4f57412244a9a601e05fdcbb04209bbad96ee7097a42783d0012ac29",
-          "endLine": 663,
+          "endLine": 664,
           "kind": "function",
           "literalTokenSha256": "39d503ec2784a41196531acd2ad4d0ab5fb87ad6cb0d39bdb48369fddf1fb81c",
           "literalTokens": [
@@ -125542,7 +125754,7 @@
           "name": "row_param_guarded_by_uniform_rows",
           "normalizedTokenSha256": "a729fb6bb077235fed9ad7fd1f6e9b50d086db1a9b6c504095a49da97510b54c",
           "public": false,
-          "startLine": 634,
+          "startLine": 635,
           "switchTags": [
             "call",
             "else"
@@ -125551,27 +125763,27 @@
         },
         {
           "contractTokenSha256": "31d4ca2dd47e51c3813d9a45fe13349a71d3f406978753790c76cf31b5fa115f",
-          "endLine": 673,
+          "endLine": 674,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "call_arg_guarded_by_rows",
           "normalizedTokenSha256": "75fc92e3b1baec26b2cb2e7d2d27ea8ab357814e4141d6d38b2e47728075c2b1",
           "public": false,
-          "startLine": 665,
+          "startLine": 666,
           "switchTags": [],
           "tokenCount": 61
         },
         {
           "contractTokenSha256": "b7e26b865fbd0b7e19312e4c9f1d6623472558b703ecdd33b4d1dab1007c985e",
-          "endLine": 705,
+          "endLine": 706,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "find_call_guard_in_stmt",
           "normalizedTokenSha256": "bc0d8cc1e7c4a388def5c71a16d4222642ff9cc325179d645dfe755bc53300b0",
           "public": false,
-          "startLine": 675,
+          "startLine": 676,
           "switchTags": [
             "block",
             "body",
@@ -125583,14 +125795,14 @@
         },
         {
           "contractTokenSha256": "743d570fb12b79ebe7c4375b3b9dfc27277e8b57cce38222309880f837db8163",
-          "endLine": 720,
+          "endLine": 721,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "stmt_matches_return_guard",
           "normalizedTokenSha256": "4ecd4ac0c05aa556e6ee31e625456b3ce13cbfd5dab6aab6adfe7464d6173f6f",
           "public": false,
-          "startLine": 707,
+          "startLine": 708,
           "switchTags": [
             "else",
             "if_"
@@ -125599,7 +125811,7 @@
         },
         {
           "contractTokenSha256": "4edc412c9f83a3591af67a46abe758d0e56ba5efc043fb41c78775a54b87470b",
-          "endLine": 742,
+          "endLine": 743,
           "kind": "function",
           "literalTokenSha256": "39cf551b340f484af63e3f558d10e3b7cb5fdc2060f7a9d18680d4852507bbd6",
           "literalTokens": [
@@ -125609,7 +125821,7 @@
           "name": "match_arg_ge_rows",
           "normalizedTokenSha256": "d37d667042f01bd44610db668cd31654902a20f957443c61acf05bd39a655d95",
           "public": false,
-          "startLine": 722,
+          "startLine": 723,
           "switchTags": [
             "binary",
             "else"
@@ -125618,14 +125830,14 @@
         },
         {
           "contractTokenSha256": "9a4b416f3785bf1bb442f28c4d2710c366998550225cfe43a04e675f60b0392c",
-          "endLine": 763,
+          "endLine": 764,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_uniform_field",
           "normalizedTokenSha256": "bce9f853479d4a3206feedeb25aa3c44a005527ee4d914f00714affe69f5c568",
           "public": false,
-          "startLine": 744,
+          "startLine": 745,
           "switchTags": [
             "else",
             "global_ref",
@@ -125635,14 +125847,14 @@
         },
         {
           "contractTokenSha256": "b7d43b6e0b438abaf4a383d59bb2390133503174bd5684a3b3116847a79e8a07",
-          "endLine": 771,
+          "endLine": 772,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_param_ref",
           "normalizedTokenSha256": "9cb9454f23f011343b7fb1676bc1608e763c87ad55d820e1716e5288e80497a7",
           "public": false,
-          "startLine": 765,
+          "startLine": 766,
           "switchTags": [
             "else",
             "param_ref"
@@ -125650,32 +125862,8 @@
           "tokenCount": 60
         },
         {
-          "contractTokenSha256": "30ff5a08869805b9ec1228c3342af6e0ea574039b541c0af18aa049252c0cd79",
-          "endLine": 795,
-          "kind": "function",
-          "literalTokenSha256": "ffd5200cbdcf1cb48a357aa7b716b77f2d194b5041a746edd477959b14813111",
-          "literalTokens": [
-            "\"x\"",
-            "0",
-            "\"y\"",
-            "1",
-            "\"z\"",
-            "2"
-          ],
-          "name": "classify_builtin_component",
-          "normalizedTokenSha256": "f14c44161ed27723b71902ea71359419c011bd5d2a50fc337dc6fc54d9d4ffe5",
-          "public": false,
-          "startLine": 773,
-          "switchTags": [
-            "else",
-            "member",
-            "param_ref"
-          ],
-          "tokenCount": 220
-        },
-        {
           "contractTokenSha256": "feebdbabbefb5882e68024e7b3f6e50a0803629aea9fe1b7396275555333a7ef",
-          "endLine": 806,
+          "endLine": 783,
           "kind": "function",
           "literalTokenSha256": "22cb958a67910b51ef3ace9d767a0c2883385adbe79999d16af70c2dfb74f8bf",
           "literalTokens": [
@@ -125685,7 +125873,7 @@
           "name": "match_u32_mask_4",
           "normalizedTokenSha256": "7ea40242c58a651357099807a55f4bfcf265dbe2182692cbcbbf21d4879a1a21",
           "public": false,
-          "startLine": 797,
+          "startLine": 774,
           "switchTags": [
             "else",
             "unary"
@@ -125694,62 +125882,46 @@
         },
         {
           "contractTokenSha256": "a0d78a3dc76410b7ab002210b084290bdafeba3bed90f73e42b4eb2bac7c916b",
-          "endLine": 813,
+          "endLine": 790,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "same_uniform_field",
           "normalizedTokenSha256": "35f28c647dfb233c730fbc2ac91fdc120c07eec413cafd3bca4586361a67d2ff",
           "public": false,
-          "startLine": 808,
+          "startLine": 785,
           "switchTags": [],
           "tokenCount": 64
         },
         {
           "contractTokenSha256": "4701958c66b45c028dd105753bf553001171d6fede5c62cade60cdbcff60a0e9",
-          "endLine": 817,
+          "endLine": 794,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "same_value_expr",
           "normalizedTokenSha256": "b7850710606d592fb1e7d1ca79c5c1aac0dc9078662caff15211b3584a3618bd",
           "public": false,
-          "startLine": 815,
+          "startLine": 792,
           "switchTags": [],
           "tokenCount": 41
         },
         {
           "contractTokenSha256": "ec0d5ee02ab55922bad494445fed24a63a2b5c0bad99a4f9854fb48feeb93ebf",
-          "endLine": 821,
+          "endLine": 798,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "same_affine_expr",
           "normalizedTokenSha256": "8bc9e0482d87654fdb61743b4bf547adc1b3a75926117f9d7dc466b3b53abd99",
           "public": false,
-          "startLine": 819,
+          "startLine": 796,
           "switchTags": [],
           "tokenCount": 31
         },
         {
-          "contractTokenSha256": "6996c1f16c7b5a58f1adc828f232c84f2adc66ee91bad52b8f0b137495e14f96",
-          "endLine": 829,
-          "kind": "function",
-          "literalTokenSha256": null,
-          "literalTokens": [],
-          "name": "match_u32_literal_value",
-          "normalizedTokenSha256": "eb30ce157f22e4efc4b65a9151a63321f8d61ea2c29f8ee5b91c4c12518cf94b",
-          "public": false,
-          "startLine": 823,
-          "switchTags": [
-            "else",
-            "int_lit"
-          ],
-          "tokenCount": 60
-        },
-        {
           "contractTokenSha256": "d6997ad4acef25d59560b43cbafe8ea453052f3cdffcbdc3a90b62d0c9b63d6d",
-          "endLine": 839,
+          "endLine": 808,
           "kind": "function",
           "literalTokenSha256": "3f7da30ed58cb148d861509896851db8394f83ff8fc5f7f5a47753fad6f8cf01",
           "literalTokens": [
@@ -125758,7 +125930,7 @@
           "name": "is_single_break_block",
           "normalizedTokenSha256": "327c64cbe42eb90ec133ca0ac9c5035a732cefff80a84ddc89eefc330554f755",
           "public": false,
-          "startLine": 831,
+          "startLine": 800,
           "switchTags": [
             "block",
             "else"
@@ -125767,7 +125939,7 @@
         },
         {
           "contractTokenSha256": "d75d7b2e3960a81955e818abf6dd3e554b10335e4d4185ebae1f5b0c5e148717",
-          "endLine": 849,
+          "endLine": 818,
           "kind": "function",
           "literalTokenSha256": "3f7da30ed58cb148d861509896851db8394f83ff8fc5f7f5a47753fad6f8cf01",
           "literalTokens": [
@@ -125776,7 +125948,7 @@
           "name": "is_single_return_block",
           "normalizedTokenSha256": "a3dd199e80a11397edddc3653c2e85cb9b219aa5734c63c00868929b4ccb3a52",
           "public": false,
-          "startLine": 841,
+          "startLine": 810,
           "switchTags": [
             "block",
             "else"
@@ -125785,14 +125957,14 @@
         },
         {
           "contractTokenSha256": "2dd0bb6d4444e50d6d82702c73bb56026a530ad9e6ea86ab5264d8945f854f28",
-          "endLine": 867,
+          "endLine": 836,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "stmt_writes_local",
           "normalizedTokenSha256": "6f9c3c0b1263b9db53cb9910dc9e82e5cf3e57390ede831fb045b3b4a3f168c4",
           "public": false,
-          "startLine": 851,
+          "startLine": 820,
           "switchTags": [
             "assign",
             "block",
@@ -125808,14 +125980,14 @@
         },
         {
           "contractTokenSha256": "a7eb2a9e446461ea59743e6c78d1611d450173126155e6a035a5dd50ce39f3a0",
-          "endLine": 890,
+          "endLine": 859,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "stmt_contains_expr",
           "normalizedTokenSha256": "9cd1c1043b49ed352629eac2b40dfffb348fb013246cf283fce1ea75596ef02d",
           "public": false,
-          "startLine": 869,
+          "startLine": 838,
           "switchTags": [
             "assign",
             "block",
@@ -125836,31 +126008,15 @@
           "tokenCount": 277
         },
         {
-          "contractTokenSha256": "255b4d0bdcd6e849e2e6be268063242b688ca5eb189db40321227bca86488323",
-          "endLine": 906,
-          "kind": "function",
-          "literalTokenSha256": null,
-          "literalTokens": [],
-          "name": "resolve_runtime_array_element_stride",
-          "normalizedTokenSha256": "3bff58646442df000e5d5d7e34810fb52c149e37fd71c28b783c62859b17b87c",
-          "public": false,
-          "startLine": 892,
-          "switchTags": [
-            "array",
-            "else"
-          ],
-          "tokenCount": 131
-        },
-        {
           "contractTokenSha256": "de543c2f9d5437cac9350cf48a7cfb65ac51fb661d22c1eabf4a55602fad624d",
-          "endLine": 925,
+          "endLine": 878,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "resolve_storage_binding",
           "normalizedTokenSha256": "e844d77ed37f74549fbe56af1254522516e0adf8d0bffb35251e63fd94eefa3f",
           "public": false,
-          "startLine": 908,
+          "startLine": 861,
           "switchTags": [
             "base",
             "else",
@@ -125963,60 +126119,73 @@
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
+          "contractTokenSha256": "544f639ab1f6567d59854fb579bc86932e5e71def3ff113f79f4506a18d8a5b0",
           "endLine": 8,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "resolve_const_local_initializer",
-          "normalizedTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
+          "name": "match_u32_literal_value",
+          "normalizedTokenSha256": "544f639ab1f6567d59854fb579bc86932e5e71def3ff113f79f4506a18d8a5b0",
           "public": false,
           "startLine": 8,
           "switchTags": [],
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "contractTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
           "endLine": 9,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "resolve_value_alias",
-          "normalizedTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
+          "name": "resolve_const_local_initializer",
+          "normalizedTokenSha256": "1f56a13420e3628668b2dfc9781ccea25659d514262999f97668f2fcb51a7c7f",
           "public": false,
           "startLine": 9,
           "switchTags": [],
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "712de724f72f77f5dd3497702f0459f59a42dacd55a4e69b6bc5311ea537816d",
+          "contractTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
           "endLine": 10,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "stmt_contains_expr",
-          "normalizedTokenSha256": "712de724f72f77f5dd3497702f0459f59a42dacd55a4e69b6bc5311ea537816d",
+          "name": "resolve_value_alias",
+          "normalizedTokenSha256": "0140df6c82bd040feb4095e049f58fcb52c1126f394bd79f925a601ab1601448",
           "public": false,
           "startLine": 10,
           "switchTags": [],
           "tokenCount": 6
         },
         {
-          "contractTokenSha256": "4471274d05b172550f9dc5386205aa17e50e6ba2727b97ae0bd368dbddd2e8cd",
+          "contractTokenSha256": "712de724f72f77f5dd3497702f0459f59a42dacd55a4e69b6bc5311ea537816d",
           "endLine": 11,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
-          "name": "stmt_writes_local",
-          "normalizedTokenSha256": "4471274d05b172550f9dc5386205aa17e50e6ba2727b97ae0bd368dbddd2e8cd",
+          "name": "stmt_contains_expr",
+          "normalizedTokenSha256": "712de724f72f77f5dd3497702f0459f59a42dacd55a4e69b6bc5311ea537816d",
           "public": false,
           "startLine": 11,
           "switchTags": [],
           "tokenCount": 6
         },
         {
+          "contractTokenSha256": "4471274d05b172550f9dc5386205aa17e50e6ba2727b97ae0bd368dbddd2e8cd",
+          "endLine": 12,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "stmt_writes_local",
+          "normalizedTokenSha256": "4471274d05b172550f9dc5386205aa17e50e6ba2727b97ae0bd368dbddd2e8cd",
+          "public": false,
+          "startLine": 12,
+          "switchTags": [],
+          "tokenCount": 6
+        },
+        {
           "contractTokenSha256": "811fc61057d409bcfa438656e0b219e769989f55f7b2fd355dca886d417d5f50",
-          "endLine": 13,
+          "endLine": 14,
           "kind": "constant",
           "literalTokenSha256": "02242e2503ff249ceb629e9fe9bb44b90ec1d737935d4538a30e320ce74251f0",
           "literalTokens": [
@@ -126025,13 +126194,13 @@
           "name": "MAX_RECURSION_DEPTH",
           "normalizedTokenSha256": "811fc61057d409bcfa438656e0b219e769989f55f7b2fd355dca886d417d5f50",
           "public": false,
-          "startLine": 13,
+          "startLine": 14,
           "switchTags": [],
           "tokenCount": 6
         },
         {
           "contractTokenSha256": "51056132deed43651282f0c62213f50f35051e242e27e660d70dfb824b26b550",
-          "endLine": 36,
+          "endLine": 37,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -126040,20 +126209,20 @@
           "name": "sizedArrayIndexProvablyInBounds",
           "normalizedTokenSha256": "64173943b21f16a1ef43d5d4db4a5277e30370b2b860501be11fca428eecfc83",
           "public": true,
-          "startLine": 15,
+          "startLine": 16,
           "switchTags": [],
           "tokenCount": 125
         },
         {
           "contractTokenSha256": "f863951a7495804fe02ea988167535c587b64fe5e710edad4b38a098825a2295",
-          "endLine": 44,
+          "endLine": 45,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "eligible_for_static_elision",
           "normalizedTokenSha256": "6197457d631284ef2ef263a12642d87b7c966560ce6113fcc8d311194ad3b737",
           "public": false,
-          "startLine": 38,
+          "startLine": 39,
           "switchTags": [
             "else",
             "function",
@@ -126065,14 +126234,14 @@
         },
         {
           "contractTokenSha256": "9df6d597e2c6fe24056b94d8f596368c829ca5fd55b24babe46c955e764f45af",
-          "endLine": 77,
+          "endLine": 78,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "resolve_access_address_space",
           "normalizedTokenSha256": "5ea6eab07c229f57bc94919e7ba464f51b97e99e6195c92f53129a18e8a49298",
           "public": false,
-          "startLine": 46,
+          "startLine": 47,
           "switchTags": [
             "addr_space",
             "base",
@@ -126089,7 +126258,7 @@
         },
         {
           "contractTokenSha256": "86437ed4e0bd41c431e6e638fdca31d364a245bb449a37d95b9230937dfacc56",
-          "endLine": 99,
+          "endLine": 100,
           "kind": "function",
           "literalTokenSha256": "97573daa44e56c81c08bb4057a113291b51b48adb08e4108073b9811ac93ece4",
           "literalTokens": [
@@ -126099,7 +126268,7 @@
           "name": "upper_bound_for_expr",
           "normalizedTokenSha256": "e8eab7efc94221c10632cf535a2b0c1907261e9de5d1a3371ae57e4af002962b",
           "public": false,
-          "startLine": 79,
+          "startLine": 80,
           "switchTags": [
             "binary",
             "else",
@@ -126113,7 +126282,7 @@
         },
         {
           "contractTokenSha256": "a0a32d139d057fea4f03984911f1bb288cbbdf10cabda8c29ead28206bbaa86d",
-          "endLine": 112,
+          "endLine": 113,
           "kind": "function",
           "literalTokenSha256": "7c1a89113769ac7150287df45cfa57dd8bffdbc557d23a4cfa8489e020ee31dd",
           "literalTokens": [
@@ -126123,20 +126292,20 @@
           "name": "upper_bound_for_local",
           "normalizedTokenSha256": "560aa87d36b28bebfaac152a0780d8e851d113e27c68e435a8c62732377819a7",
           "public": false,
-          "startLine": 101,
+          "startLine": 102,
           "switchTags": [],
           "tokenCount": 82
         },
         {
           "contractTokenSha256": "5d25ef12a6b4cd6b47f34359a37d86f6930bf6f49f1b50d6a05efda115421f46",
-          "endLine": 123,
+          "endLine": 124,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "upper_bound_for_const_global",
           "normalizedTokenSha256": "bd9873acdd3cbe19ec302a0e60e93cba15e089df194c2e24ab4ea53b09abaff4",
           "public": false,
-          "startLine": 114,
+          "startLine": 115,
           "switchTags": [
             "else",
             "int"
@@ -126145,14 +126314,14 @@
         },
         {
           "contractTokenSha256": "f913ed004019d357f1105f97213164713d0b4d7b8647afcdb92d5bb396e12dd3",
-          "endLine": 160,
+          "endLine": 161,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "find_simple_for_loop_limit",
           "normalizedTokenSha256": "c4bdcd37c919ec4e46d0b744aa09bb7a0ce5be4e6e2a080973e95f7397032025",
           "public": false,
-          "startLine": 125,
+          "startLine": 126,
           "switchTags": [
             "block",
             "else",
@@ -126164,7 +126333,7 @@
         },
         {
           "contractTokenSha256": "44a563bbe6f57a36e48384b3da64a4b38edc6ada4ce0028f4931fc54adf3f738",
-          "endLine": 176,
+          "endLine": 177,
           "kind": "function",
           "literalTokenSha256": "bfde577409d92fc2409cfbe42853ca8a258aca3f3a112ece94e6f13f7fbb0de1",
           "literalTokens": [
@@ -126173,20 +126342,20 @@
           "name": "match_simple_for_loop",
           "normalizedTokenSha256": "f845668e94999170fb8482a8ca7717a54d70a01c96f4dddde0aa722e2bac7b68",
           "public": false,
-          "startLine": 162,
+          "startLine": 163,
           "switchTags": [],
           "tokenCount": 127
         },
         {
           "contractTokenSha256": "71fe8681d0dcea98b8f9d8c133ba0653d118f9d9c006a8ffb4c6845fbefd728d",
-          "endLine": 186,
+          "endLine": 187,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_simple_local_init",
           "normalizedTokenSha256": "22be9b704889fefd4b6af4e117d5605b3dfec697e6b9e56afe53c6bfa147597d",
           "public": false,
-          "startLine": 178,
+          "startLine": 179,
           "switchTags": [
             "assign",
             "else",
@@ -126201,7 +126370,7 @@
         },
         {
           "contractTokenSha256": "e08b3d4e538a3f7b7d05507ecf94f21a24ab96c227fff5a2de21ef2943dcb80c",
-          "endLine": 205,
+          "endLine": 206,
           "kind": "function",
           "literalTokenSha256": "3f7da30ed58cb148d861509896851db8394f83ff8fc5f7f5a47753fad6f8cf01",
           "literalTokens": [
@@ -126210,7 +126379,7 @@
           "name": "match_simple_local_positive_step",
           "normalizedTokenSha256": "2fc7175b8e7d40d408ad0ebdf74d6718033e6ef28a098433de47d77e3f9769f4",
           "public": false,
-          "startLine": 188,
+          "startLine": 189,
           "switchTags": [
             "add",
             "assign",
@@ -126222,14 +126391,14 @@
         },
         {
           "contractTokenSha256": "2dcc4d5883aab6261d30f64efb7003b4136349b7dac1ef27de5680d1a0ba2169",
-          "endLine": 216,
+          "endLine": 217,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_simple_plus_literal",
           "normalizedTokenSha256": "fd6577a91d55dc6e3cbf9ef0fc1398f0dc8275020d01490fa15e8dc3804dec22",
           "public": false,
-          "startLine": 207,
+          "startLine": 208,
           "switchTags": [
             "binary",
             "else"
@@ -126238,7 +126407,7 @@
         },
         {
           "contractTokenSha256": "f9e72acafdbf01611ae4722146f15ff01e6b209f0b345c2d50d812df5073060b",
-          "endLine": 221,
+          "endLine": 222,
           "kind": "function",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -126247,13 +126416,13 @@
           "name": "match_positive_const_literal",
           "normalizedTokenSha256": "78c8ace3577460a27573fbd4c5733ad442860580388f705b997a3ec22a54f696",
           "public": false,
-          "startLine": 218,
+          "startLine": 219,
           "switchTags": [],
           "tokenCount": 38
         },
         {
           "contractTokenSha256": "f66aafae66ab61249af07eb30168507edb02e5b19aaff960ab86184634a8b442",
-          "endLine": 251,
+          "endLine": 252,
           "kind": "function",
           "literalTokenSha256": "9dd77ca398a9a5d5558cba042e43005b5e2281ad5b312d34fb56956281cda793",
           "literalTokens": [
@@ -126265,7 +126434,7 @@
           "name": "match_simple_exclusive_limit",
           "normalizedTokenSha256": "2359f9c6bbd41eb2a4ac306779bf829db3d959ad66a428324b39dabd874fa98f",
           "public": false,
-          "startLine": 223,
+          "startLine": 224,
           "switchTags": [
             "add",
             "binary",
@@ -126280,20 +126449,20 @@
         },
         {
           "contractTokenSha256": "3ab26e68c3cde844f13643a8fd97a1ef40fc1dafef9a6ce4316b3812e14f498e",
-          "endLine": 256,
+          "endLine": 257,
           "kind": "struct",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "LaneStrideIndex",
           "normalizedTokenSha256": "3ab26e68c3cde844f13643a8fd97a1ef40fc1dafef9a6ce4316b3812e14f498e",
           "public": false,
-          "startLine": 253,
+          "startLine": 254,
           "switchTags": [],
           "tokenCount": 14
         },
         {
           "contractTokenSha256": "ded037a5e0bff1a9258748d7ba63c7b21db65b92fe1cbaaa1b488dfa9a65fc72",
-          "endLine": 276,
+          "endLine": 277,
           "kind": "function",
           "literalTokenSha256": "3ca2929b0361d976716c1e2d3ee2ad61f2ce56138ca61d42ad573cfb0f769d45",
           "literalTokens": [
@@ -126302,20 +126471,20 @@
           "name": "guarded_local_invocation_stride_index_in_bounds",
           "normalizedTokenSha256": "1bbdc43383c2f0eb79d5f8d364b4484290f566599cdd2227118209fd0c485697",
           "public": false,
-          "startLine": 258,
+          "startLine": 259,
           "switchTags": [],
           "tokenCount": 115
         },
         {
           "contractTokenSha256": "0ab9e34f9320673ac37e1a0709c09d372bf023f4ba5b0fea0d6a192f7e282b57",
-          "endLine": 296,
+          "endLine": 297,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_lane_plus_stride_local",
           "normalizedTokenSha256": "8ce846a50a33544f11b39f664ca01d1a75a85498eb5483318fb5bedbcb9f3543",
           "public": false,
-          "startLine": 278,
+          "startLine": 279,
           "switchTags": [
             "binary",
             "else"
@@ -126324,14 +126493,14 @@
         },
         {
           "contractTokenSha256": "37c4a0c2e4c205f5ef7ea410d6653efe5a5595ab4eda6a20d8bc20213e95f5c4",
-          "endLine": 395,
+          "endLine": 396,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "access_guarded_by_lane_less_than_stride",
           "normalizedTokenSha256": "a0ed3820ca3bbab3fee6621285711969118e67c1badc33894c46c07060604ed0",
           "public": false,
-          "startLine": 298,
+          "startLine": 299,
           "switchTags": [
             "block",
             "else",
@@ -126343,14 +126512,14 @@
         },
         {
           "contractTokenSha256": "0bf49a5a18ff0ade06732758de66c18b71907ab5dc4e0b7c02d4482fc0a95ab7",
-          "endLine": 415,
+          "endLine": 416,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "lane_less_than_stride_guard",
           "normalizedTokenSha256": "c008612d29354afa5655b9eeb9aedc60731d70692a1b572292e6f965de994ebb",
           "public": false,
-          "startLine": 397,
+          "startLine": 398,
           "switchTags": [
             "binary",
             "else",
@@ -126363,27 +126532,27 @@
         },
         {
           "contractTokenSha256": "63fe2c0c075158c38992ef0437ee41aec0967a1b85d48a02fb1149536e3a4525",
-          "endLine": 421,
+          "endLine": 422,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "nonincreasing_local_upper_bound",
           "normalizedTokenSha256": "c3f7475694b8e57fa9db6c583bb2dc1c613cb42a11dd06c7068f65875d8e7fa7",
           "public": false,
-          "startLine": 417,
+          "startLine": 418,
           "switchTags": [],
           "tokenCount": 52
         },
         {
           "contractTokenSha256": "69d2565b65228fa6d0a5fe86485eb7c4e2d7c467253b04cc39dc1be0dafb4518",
-          "endLine": 435,
+          "endLine": 436,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "local_initializer_u64",
           "normalizedTokenSha256": "75b92061bf3beb7984875e81e0f264a0382b60cefb8c2ec2d59c578b780a0220",
           "public": false,
-          "startLine": 423,
+          "startLine": 424,
           "switchTags": [
             "else",
             "local_decl"
@@ -126392,14 +126561,14 @@
         },
         {
           "contractTokenSha256": "7364ff980ac0464f745599aaedb3ce2cd686be30bbb74b4aee64ecda9b8ece33",
-          "endLine": 481,
+          "endLine": 482,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "local_writes_are_nonincreasing",
           "normalizedTokenSha256": "42479b0354d0935c24edcd6f0b290421d91925483bb7c7fe99079859b9396aef",
           "public": false,
-          "startLine": 437,
+          "startLine": 438,
           "switchTags": [
             "assign",
             "block",
@@ -126415,7 +126584,7 @@
         },
         {
           "contractTokenSha256": "efc92035501129f8c24eab4f00b70aa626689e97679881cfc7e162c6840ab525",
-          "endLine": 493,
+          "endLine": 494,
           "kind": "function",
           "literalTokenSha256": "ecf9cc884132056affb297a11c6ae0d802a3b97cf6a27330f24c397c2597423c",
           "literalTokens": [
@@ -126424,7 +126593,7 @@
           "name": "local_assign_is_nonincreasing",
           "normalizedTokenSha256": "376d36821f58ec8e69b7ab9f748a78cf89fc521fa0b5b28131ae72d4f369d5de",
           "public": false,
-          "startLine": 483,
+          "startLine": 484,
           "switchTags": [
             "assign",
             "div",
@@ -126435,14 +126604,14 @@
         },
         {
           "contractTokenSha256": "9e138e663a65b36ff99ae22ff480cdd70fae848e8df332ff4d0003bae3a9cd61",
-          "endLine": 512,
+          "endLine": 513,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "local_expr_is_nonincreasing_update",
           "normalizedTokenSha256": "70c38dbd92c81dcd0184ef25d71972ff23c70815e5450902d653282cc6eb679e",
           "public": false,
-          "startLine": 495,
+          "startLine": 496,
           "switchTags": [
             "binary",
             "div",
@@ -126454,38 +126623,27 @@
         },
         {
           "contractTokenSha256": "3abb707ce1fa56dd5dd354152f29fb63cc1949bb5624e826346a1d88862e0139",
-          "endLine": 532,
+          "endLine": 517,
           "kind": "function",
-          "literalTokenSha256": "ffd5200cbdcf1cb48a357aa7b716b77f2d194b5041a746edd477959b14813111",
-          "literalTokens": [
-            "\"x\"",
-            "0",
-            "\"y\"",
-            "1",
-            "\"z\"",
-            "2"
-          ],
+          "literalTokenSha256": null,
+          "literalTokens": [],
           "name": "classify_local_invocation_axis",
-          "normalizedTokenSha256": "899ddf5c4abf73fd5ec0a16ac791be111479903d9bae6a9d193470f24f34728b",
+          "normalizedTokenSha256": "0a0f2d39eb12ae4f0d0eb79d1ff7491f2b9f3490ae2e32fe4f21f04592a9ad69",
           "public": false,
-          "startLine": 514,
-          "switchTags": [
-            "else",
-            "member",
-            "param_ref"
-          ],
-          "tokenCount": 214
+          "startLine": 515,
+          "switchTags": [],
+          "tokenCount": 34
         },
         {
           "contractTokenSha256": "609e7a3c91313a4a50872c8abb3adcf0e170c37bcc822e4cb86dd8219a95f4a9",
-          "endLine": 540,
+          "endLine": 525,
           "kind": "function",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "match_plain_local_ref",
           "normalizedTokenSha256": "49379e4413d0ad265f666144a56c740b8dbc80fbaf6ef246be8e54c27444d097",
           "public": false,
-          "startLine": 534,
+          "startLine": 519,
           "switchTags": [
             "else",
             "local_ref"
@@ -126494,7 +126652,7 @@
         },
         {
           "contractTokenSha256": "40a538be02bbc4a01ce201772cc89ebd749d852c73a2ab73ab7ba5d00018f2bf",
-          "endLine": 571,
+          "endLine": 556,
           "kind": "function",
           "literalTokenSha256": "c498362ea4d6a23b55449d34dd40ec166c6e2332e9ca9297d1bceca4802deb6f",
           "literalTokens": [
@@ -126510,7 +126668,7 @@
           "name": "upper_bound_for_builtin_member",
           "normalizedTokenSha256": "28218d1bdb92db18a78fa802354065666aa19f9467ab75c475c0ee31d4aa6aca",
           "public": false,
-          "startLine": 542,
+          "startLine": 527,
           "switchTags": [
             "else",
             "local_invocation_id",
@@ -126521,7 +126679,7 @@
         },
         {
           "contractTokenSha256": "ca1840c7a03c89ac03a2d73aa67243296e7e8554ad61206ea9b07016895a4214",
-          "endLine": 626,
+          "endLine": 611,
           "kind": "function",
           "literalTokenSha256": "4d798fec69ee1114042539dab825ea317b9ee9eb3dfb0de772fd641bc831c1a2",
           "literalTokens": [
@@ -126535,7 +126693,7 @@
           "name": "upper_bound_for_binary",
           "normalizedTokenSha256": "c5d3d30e9bbe07cf38b6ed154689b8af9d0553b0796f6898919515288270e081",
           "public": false,
-          "startLine": 573,
+          "startLine": 558,
           "switchTags": [
             "add",
             "bit_and",
@@ -126547,22 +126705,6 @@
             "shift_right"
           ],
           "tokenCount": 520
-        },
-        {
-          "contractTokenSha256": "6996c1f16c7b5a58f1adc828f232c84f2adc66ee91bad52b8f0b137495e14f96",
-          "endLine": 635,
-          "kind": "function",
-          "literalTokenSha256": null,
-          "literalTokens": [],
-          "name": "match_u32_literal_value",
-          "normalizedTokenSha256": "b049561bc0d1343fe059337ec41d4da89407c1c3ff9daa06bda67871f045c2a8",
-          "public": false,
-          "startLine": 628,
-          "switchTags": [
-            "else",
-            "int_lit"
-          ],
-          "tokenCount": 65
         }
       ],
       "parseErrorCount": 0,
@@ -245652,11 +245794,11 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "43df04528f2b172e2fe02e7363826bce724f2b2ec6f261f592e165e1abbb2a72",
+  "manifestSha256": "5468465d86690dd7e299844ed0a4dbb7663e1702a33af4eba0ea96e9895792de",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
+  "sourceTreeSha256": "f8c4b9338190c60aa527df74d09cd89a8ca48cd3ae6b2c9f527a57fa51750b95",
   "status": "captured",
   "tool": "tools/source_ast_inventory.zig",
   "toolSha256": "df0a1d5a086cf2191cdda3f252de5109fcdac9075c8fe0e9487e690787ab8a7c"

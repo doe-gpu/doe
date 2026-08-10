@@ -2077,11 +2077,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "f21411fb6463e283622e304279e67a1877e6b7666346f35c9573c42bc2c6dced",
+      "moduleSha256": "8930881cd2ff70a8b6b384ce43a0912fcc946afdeecd1fbfc4f85ba09dc1e64b",
       "path": "src/compiler/tsir/family_hint.zig",
       "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -2089,11 +2089,11 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "2babfc32991d8f13367dc9677030aa62a39f960c8e9cf6d9db1a5e72bd83ff91",
+      "moduleSha256": "9bce77b5c55276cae05db81c412caacd4c1ae7fe822f566cc79d4685478ddd1b",
       "path": "src/compiler/tsir/frontend.zig",
       "reason": "Keep: TSIR frontend orchestration and public entry surface; body, collective, context, and rejection responsibilities already live in named siblings.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Recompose"
     },
     {
@@ -2125,11 +2125,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "4b455d2afaed2002a807888e69a457c80f2e9dd4b874c106d75d3acf61211d30",
+      "moduleSha256": "e550fe3d090d2b1fb8c9b053285e486f31c2004059d2a003bb38be24e519b317",
       "path": "src/compiler/tsir/frontend_expr.zig",
       "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -2320,9 +2320,9 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "c6fe1ed942c65cf9e5e3d21e314cf54ca6313f1151a2eae0fe363f7681523d2a",
+      "moduleSha256": "c937ecec15d2c9a10f2ffd0f4c55e01a1df3e9aa197f61fa3e26816cea1cf2ef",
       "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
-      "reason": "Keep: reachable compiler implementation shared by 5 production consumers with no conflicting ownership signal.",
+      "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
@@ -2368,11 +2368,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "1fb26ca446501326da874c8e67bbf457ec530dbc6459e900eb1f198977e5e758",
+      "moduleSha256": "33a1457290883a6ab410bb71eb1b95166828a8da97cacae216ce2df7c4e6413d",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
       "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -2464,11 +2464,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "05cba69ef4bd65642cb036a9f07e2f1b08b84f220945d3e23641a6a1c910096a",
+      "moduleSha256": "82692ef94547ab4b2f0fd1ec68af03dc0cfce499f4fd9a8688559c67828db858",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_fused_ffn.zig",
       "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -3412,9 +3412,9 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "a944c59d5f57bcc43ebebae43d39980bb7731af8ae6fbd31903961f818cc4aee",
+      "moduleSha256": "a15329c9cc4e685bb7fd46aedcd7c1701313e64a99d7b1ac3887c91dc46a0c97",
       "path": "src/compiler/wgsl/ir/ir_query.zig",
-      "reason": "Keep: reachable compiler implementation shared by 5 production consumers with no conflicting ownership signal.",
+      "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
@@ -3484,7 +3484,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "4e2a956bdda83367f2ed6d9a7696a9b65683a0c648b507ed92e858351c21dba0",
+      "moduleSha256": "4641569b6b19025db3b097dba62d91800f2fbb81502dd62ac9d6cd871b983279",
       "path": "src/compiler/wgsl/proof/dispatch_proof_match.zig",
       "reason": "Keep: independently meaningful dispatch-proof matching algorithm.",
       "reviewStatus": "reviewed",
@@ -3496,7 +3496,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "bfb7b3c834baabc26c1db990e3b680539af1ac37bf6d71d8c907ce1c80fce78c",
+      "moduleSha256": "9cc297ecadfc5b042b8926714c7f4e1f8fcd951c166f6adcc6508ab777b3d4e9",
       "path": "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
       "reason": "Keep: independently meaningful uniform-bounds proof algorithm.",
       "reviewStatus": "reviewed",
@@ -3508,7 +3508,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "284820b196920c722e669b9bc06f66dcce7b7ab9668fddad30f4f403f53ad8aa",
+      "moduleSha256": "739e20f3a7202faa6ad5c4e9dbecc8a7599064b72e45edebfd424bfad8c900cd",
       "path": "src/compiler/wgsl/proof/robustness_static_bounds.zig",
       "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -6435,13 +6435,13 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "43df04528f2b172e2fe02e7363826bce724f2b2ec6f261f592e165e1abbb2a72",
+  "manifestSha256": "5468465d86690dd7e299844ed0a4dbb7663e1702a33af4eba0ea96e9895792de",
   "pendingCount": 0,
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "reviewedCount": 533,
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "3766b8065d2aed4205502be8c3127186faad4c318e72f8a58525c30806b2b50e",
+  "sourceTreeSha256": "f8c4b9338190c60aa527df74d09cd89a8ca48cd3ae6b2c9f527a57fa51750b95",
   "status": "complete",
   "totalCount": 533
 }
