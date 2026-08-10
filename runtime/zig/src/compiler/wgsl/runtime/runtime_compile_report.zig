@@ -1,6 +1,7 @@
 const std = @import("std");
 const lean_proof = @import("../../../verification/lean_proof.zig");
-const mod = @import("../mod.zig");
+const msl_translation = @import("../pipeline/translate_msl.zig");
+const spirv_translation = @import("../pipeline/translate_spirv.zig");
 const runtime_compile = @import("runtime_compile.zig");
 
 const Config = struct {
@@ -112,8 +113,8 @@ pub fn main() !void {
         std.fs.path.stem(std.fs.path.basename(config.shader_path));
 
     const out_buf_len = switch (config.target) {
-        .msl => mod.MAX_OUTPUT,
-        .spirv => mod.MAX_SPIRV_OUTPUT,
+        .msl => msl_translation.MAX_OUTPUT,
+        .spirv => spirv_translation.MAX_OUTPUT,
     };
     var out_buf = try allocator.alloc(u8, out_buf_len);
     defer allocator.free(out_buf);

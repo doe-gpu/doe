@@ -1,5 +1,7 @@
 const std = @import("std");
-const mod = @import("../mod.zig");
+const analysis = @import("../pipeline/analysis.zig");
+const robustness = @import("../ir/ir_transform_robustness.zig");
+const emit_msl = @import("../emit/msl/emit_msl.zig");
 
 // Extract @workgroup_size(x[,y[,z]]) from WGSL source via string search.
 pub fn extractWorkgroupSize(wgsl: []const u8) struct { x: u32, y: u32, z: u32 } {
@@ -27,20 +29,20 @@ pub fn extractWorkgroupSize(wgsl: []const u8) struct { x: u32, y: u32, z: u32 } 
 pub fn mslNeedsSizesBuffer(
     allocator: std.mem.Allocator,
     wgsl: []const u8,
-) mod.TranslateError!bool {
+) analysis.TranslateError!bool {
     return mslNeedsSizesBufferWithConfig(
         allocator,
         wgsl,
-        mod.default_translation_robustness_config(),
+        analysis.default_translation_robustness_config(),
     );
 }
 
 pub fn mslNeedsSizesBufferWithConfig(
     allocator: std.mem.Allocator,
     wgsl: []const u8,
-    config: mod.ir_transform_robustness.Config,
-) mod.TranslateError!bool {
-    var module = try mod.analyzeToIrWithConfig(allocator, wgsl, config);
+    config: robustness.Config,
+) analysis.TranslateError!bool {
+    var module = try analysis.analyzeToIrWithConfig(allocator, wgsl, config);
     defer module.deinit();
-    return mod.emit_msl.moduleNeedsSizesParam(&module);
+    return emit_msl.moduleNeedsSizesParam(&module);
 }

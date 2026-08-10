@@ -1,7 +1,11 @@
 const std = @import("std");
 const ir = @import("../ir/ir.zig");
 const lean_proof = @import("../../../verification/lean_proof.zig");
-const mod = @import("../mod.zig");
+const analysis = @import("../pipeline/analysis.zig");
+const override_values = @import("../pipeline/overrides.zig");
+const robustness = @import("../ir/ir_transform_robustness.zig");
+const emit_msl = @import("../emit/msl/emit_msl.zig");
+const emit_spirv = @import("../emit/spirv/emit_spirv.zig");
 
 const MIN_RECORDED_PHASE_NS: u64 = 1;
 
@@ -26,7 +30,7 @@ pub const TranslationResult = struct {
 pub const TimedTranslationResult = struct {
     len: usize,
     info: TranslationInfo,
-    phase_timings_ns: mod.CompilePhaseTimingsNs,
+    phase_timings_ns: analysis.CompilePhaseTimingsNs,
 };
 
 fn nowNs() i128 {
@@ -39,7 +43,7 @@ fn elapsedNs(start: i128, end: i128) u64 {
     return @max(elapsed, MIN_RECORDED_PHASE_NS);
 }
 
-pub fn compute_runtime_robustness_config() mod.ir_transform_robustness.Config {
+pub fn compute_runtime_robustness_config() robustness.Config {
     return .{
         .elide_proven_bounds = lean_proof.bounds_elimination_available,
         .elide_dispatch_validated_bounds = true,
@@ -60,7 +64,7 @@ pub fn compute_runtime_robustness_config() mod.ir_transform_robustness.Config {
     };
 }
 
-pub fn vulkan_compute_runtime_robustness_config() mod.ir_transform_robustness.Config {
+pub fn vulkan_compute_runtime_robustness_config() robustness.Config {
     return .{
         .elide_proven_bounds = lean_proof.bounds_elimination_available,
         .elide_dispatch_validated_bounds = true,
@@ -76,7 +80,7 @@ pub fn translateToMslForComputeRuntime(
     out: []u8,
     overrides: ?[*]const ir.OverrideEntry,
     override_count: usize,
-) mod.TranslateError!TranslationResult {
+) analysis.TranslateError!TranslationResult {
     const timed = try translateToMslForComputeRuntimeTimed(
         allocator,
         wgsl,
@@ -96,27 +100,27 @@ pub fn translateToMslForComputeRuntimeTimed(
     out: []u8,
     overrides: ?[*]const ir.OverrideEntry,
     override_count: usize,
-) mod.TranslateError!TimedTranslationResult {
+) analysis.TranslateError!TimedTranslationResult {
     const total_start_ns = nowNs();
-    var analysis = try mod.analyzeToIrWithConfigTimed(allocator, wgsl, compute_runtime_robustness_config());
-    defer analysis.module.deinit();
+    var analyzed = try analysis.analyzeToIrWithConfigTimed(allocator, wgsl, compute_runtime_robustness_config());
+    defer analyzed.module.deinit();
 
     if (overrides != null and override_count > 0) {
-        mod.applyOverrides(&analysis.module, overrides.?[0..override_count]);
+        override_values.applyOverrides(&analyzed.module, overrides.?[0..override_count]);
     }
 
     const emit_start_ns = nowNs();
-    const len = mod.emit_msl.emit(&analysis.module, out) catch |err| return switch (err) {
-        error.OutputTooLarge => mod.TranslateError.OutputTooLarge,
-        error.InvalidIr => mod.TranslateError.InvalidIr,
+    const len = emit_msl.emit(&analyzed.module, out) catch |err| return switch (err) {
+        error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
+        error.InvalidIr => analysis.TranslateError.InvalidIr,
     };
     const emit_end_ns = nowNs();
-    var phase_timings_ns = analysis.phase_timings_ns;
+    var phase_timings_ns = analyzed.phase_timings_ns;
     phase_timings_ns.emit = elapsedNs(emit_start_ns, emit_end_ns);
     phase_timings_ns.total = elapsedNs(total_start_ns, emit_end_ns);
     return .{
         .len = len,
-        .info = try build_translation_info(allocator, &analysis.module),
+        .info = try build_translation_info(allocator, &analyzed.module),
         .phase_timings_ns = phase_timings_ns,
     };
 }
@@ -125,18 +129,18 @@ pub fn translateToSpirvForComputeRuntime(
     allocator: std.mem.Allocator,
     wgsl: []const u8,
     out: []u8,
-) mod.TranslateError!TranslationResult {
-    var module_ir = try mod.analyzeToIrWithConfig(allocator, wgsl, compute_runtime_robustness_config());
+) analysis.TranslateError!TranslationResult {
+    var module_ir = try analysis.analyzeToIrWithConfig(allocator, wgsl, compute_runtime_robustness_config());
     defer module_ir.deinit();
 
-    const len = mod.emit_spirv.emit(&module_ir, out) catch |err| {
-        const kind: mod.TranslateError = switch (err) {
-            error.OutputTooLarge => mod.TranslateError.OutputTooLarge,
-            error.UnsupportedConstruct => mod.TranslateError.UnsupportedConstruct,
-            error.InvalidIr => mod.TranslateError.InvalidIr,
-            error.OutOfMemory => mod.TranslateError.OutOfMemory,
+    const len = emit_spirv.emit(&module_ir, out) catch |err| {
+        const kind: analysis.TranslateError = switch (err) {
+            error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
+            error.UnsupportedConstruct => analysis.TranslateError.UnsupportedConstruct,
+            error.InvalidIr => analysis.TranslateError.InvalidIr,
+            error.OutOfMemory => analysis.TranslateError.OutOfMemory,
         };
-        mod.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
+        analysis.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
         return kind;
     };
     return .{
@@ -149,31 +153,31 @@ pub fn translateToSpirvTimed(
     allocator: std.mem.Allocator,
     wgsl: []const u8,
     out: []u8,
-) mod.TranslateError!TimedTranslationResult {
+) analysis.TranslateError!TimedTranslationResult {
     var arena = std.heap.ArenaAllocator.init(allocator);
     defer arena.deinit();
 
     const total_start_ns = nowNs();
-    var analysis = try mod.analyzeToIrTimed(arena.allocator(), wgsl);
+    var analyzed = try analysis.analyzeToIrTimed(arena.allocator(), wgsl);
 
     const emit_start_ns = nowNs();
-    const len = mod.emit_spirv.emit(&analysis.module, out) catch |err| {
-        const kind: mod.TranslateError = switch (err) {
-            error.OutputTooLarge => mod.TranslateError.OutputTooLarge,
-            error.UnsupportedConstruct => mod.TranslateError.UnsupportedConstruct,
-            error.InvalidIr => mod.TranslateError.InvalidIr,
-            error.OutOfMemory => mod.TranslateError.OutOfMemory,
+    const len = emit_spirv.emit(&analyzed.module, out) catch |err| {
+        const kind: analysis.TranslateError = switch (err) {
+            error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
+            error.UnsupportedConstruct => analysis.TranslateError.UnsupportedConstruct,
+            error.InvalidIr => analysis.TranslateError.InvalidIr,
+            error.OutOfMemory => analysis.TranslateError.OutOfMemory,
         };
-        mod.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
+        analysis.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
         return kind;
     };
     const emit_end_ns = nowNs();
-    var phase_timings_ns = analysis.phase_timings_ns;
+    var phase_timings_ns = analyzed.phase_timings_ns;
     phase_timings_ns.emit = elapsedNs(emit_start_ns, emit_end_ns);
     phase_timings_ns.total = elapsedNs(total_start_ns, emit_end_ns);
     return .{
         .len = len,
-        .info = try build_translation_info(allocator, &analysis.module),
+        .info = try build_translation_info(allocator, &analyzed.module),
         .phase_timings_ns = phase_timings_ns,
     };
 }
@@ -182,18 +186,18 @@ pub fn translateToSpirvForVulkanComputeRuntime(
     allocator: std.mem.Allocator,
     wgsl: []const u8,
     out: []u8,
-) mod.TranslateError!TranslationResult {
-    var module_ir = try mod.analyzeToIrWithConfig(allocator, wgsl, vulkan_compute_runtime_robustness_config());
+) analysis.TranslateError!TranslationResult {
+    var module_ir = try analysis.analyzeToIrWithConfig(allocator, wgsl, vulkan_compute_runtime_robustness_config());
     defer module_ir.deinit();
 
-    const len = mod.emit_spirv.emit(&module_ir, out) catch |err| {
-        const kind: mod.TranslateError = switch (err) {
-            error.OutputTooLarge => mod.TranslateError.OutputTooLarge,
-            error.UnsupportedConstruct => mod.TranslateError.UnsupportedConstruct,
-            error.InvalidIr => mod.TranslateError.InvalidIr,
-            error.OutOfMemory => mod.TranslateError.OutOfMemory,
+    const len = emit_spirv.emit(&module_ir, out) catch |err| {
+        const kind: analysis.TranslateError = switch (err) {
+            error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
+            error.UnsupportedConstruct => analysis.TranslateError.UnsupportedConstruct,
+            error.InvalidIr => analysis.TranslateError.InvalidIr,
+            error.OutOfMemory => analysis.TranslateError.OutOfMemory,
         };
-        mod.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
+        analysis.setLastErrorDetailPublic(.spirv_emit, kind, @errorName(err));
         return kind;
     };
     return .{
@@ -237,7 +241,7 @@ pub const GraphicsTranslationResult = struct {
 
 /// Graphics shaders use the same robustness config as compute — Lean proof
 /// elimination applies to any array bounds regardless of pipeline stage.
-fn graphics_runtime_robustness_config() mod.ir_transform_robustness.Config {
+fn graphics_runtime_robustness_config() robustness.Config {
     return .{
         .elide_proven_bounds = lean_proof.bounds_elimination_available,
     };
@@ -250,8 +254,8 @@ fn graphics_runtime_robustness_config() mod.ir_transform_robustness.Config {
 pub fn translateToSpirvForGraphicsRuntime(
     allocator: std.mem.Allocator,
     wgsl: []const u8,
-) mod.TranslateError!GraphicsTranslationResult {
-    var module_ir = try mod.analyzeToIrWithConfig(allocator, wgsl, graphics_runtime_robustness_config());
+) analysis.TranslateError!GraphicsTranslationResult {
+    var module_ir = try analysis.analyzeToIrWithConfig(allocator, wgsl, graphics_runtime_robustness_config());
     defer module_ir.deinit();
 
     var result = GraphicsTranslationResult{};
@@ -282,21 +286,21 @@ fn emit_stage_spirv_words(
     allocator: std.mem.Allocator,
     module_ir: *const ir.Module,
     stage: ir.ShaderStage,
-) mod.TranslateError![]const u32 {
-    var spirv_buf = allocator.alloc(u8, mod.MAX_SPIRV_OUTPUT) catch return mod.TranslateError.OutOfMemory;
+) analysis.TranslateError![]const u32 {
+    var spirv_buf = allocator.alloc(u8, emit_spirv.MAX_OUTPUT) catch return analysis.TranslateError.OutOfMemory;
     defer allocator.free(spirv_buf);
 
-    const len = mod.emit_spirv.emitForStage(module_ir, stage, spirv_buf) catch |err| return switch (err) {
-        error.OutputTooLarge => mod.TranslateError.OutputTooLarge,
-        error.UnsupportedConstruct => mod.TranslateError.UnsupportedConstruct,
-        error.InvalidIr => mod.TranslateError.InvalidIr,
-        error.OutOfMemory => mod.TranslateError.OutOfMemory,
+    const len = emit_spirv.emitForStage(module_ir, stage, spirv_buf) catch |err| return switch (err) {
+        error.OutputTooLarge => analysis.TranslateError.OutputTooLarge,
+        error.UnsupportedConstruct => analysis.TranslateError.UnsupportedConstruct,
+        error.InvalidIr => analysis.TranslateError.InvalidIr,
+        error.OutOfMemory => analysis.TranslateError.OutOfMemory,
     };
 
-    if (len == 0 or (len % 4) != 0) return mod.TranslateError.InvalidIr;
+    if (len == 0 or (len % 4) != 0) return analysis.TranslateError.InvalidIr;
 
     const word_count = len / 4;
-    const words = allocator.alloc(u32, word_count) catch return mod.TranslateError.OutOfMemory;
+    const words = allocator.alloc(u32, word_count) catch return analysis.TranslateError.OutOfMemory;
     for (words, 0..) |*w, i| {
         const offset = i * 4;
         const chunk: *const [4]u8 = @ptrCast(spirv_buf[offset .. offset + 4].ptr);
@@ -313,7 +317,7 @@ const MAX_INTER_STAGE_VARS: usize = 32;
 fn extract_vertex_inputs(
     allocator: std.mem.Allocator,
     module_ir: *const ir.Module,
-) mod.TranslateError![]const VertexInputAttr {
+) analysis.TranslateError![]const VertexInputAttr {
     var attrs_buf: [MAX_VERTEX_INPUT_ATTRS]VertexInputAttr = undefined;
     var count: usize = 0;
 
@@ -349,7 +353,7 @@ fn extract_vertex_inputs(
     }
 
     if (count == 0) return &.{};
-    return allocator.dupe(VertexInputAttr, attrs_buf[0..count]) catch return mod.TranslateError.OutOfMemory;
+    return allocator.dupe(VertexInputAttr, attrs_buf[0..count]) catch return analysis.TranslateError.OutOfMemory;
 }
 
 /// Extract inter-stage interface variables from vertex output / fragment input.
@@ -357,7 +361,7 @@ fn extract_vertex_inputs(
 fn extract_inter_stage_vars(
     allocator: std.mem.Allocator,
     module_ir: *const ir.Module,
-) mod.TranslateError![]const InterStageVar {
+) analysis.TranslateError![]const InterStageVar {
     var vars_buf: [MAX_INTER_STAGE_VARS]InterStageVar = undefined;
     var count: usize = 0;
 
@@ -397,24 +401,24 @@ fn extract_inter_stage_vars(
     }
 
     if (count == 0) return &.{};
-    return allocator.dupe(InterStageVar, vars_buf[0..count]) catch return mod.TranslateError.OutOfMemory;
+    return allocator.dupe(InterStageVar, vars_buf[0..count]) catch return analysis.TranslateError.OutOfMemory;
 }
 
 fn build_translation_info(
     allocator: std.mem.Allocator,
     module_ir: *const ir.Module,
-) mod.TranslateError!TranslationInfo {
+) analysis.TranslateError!TranslationInfo {
     return .{
         .workgroup_size = compute_workgroup_size(module_ir),
-        .needs_sizes_buf = mod.emit_msl.moduleNeedsSizesParam(module_ir),
+        .needs_sizes_buf = emit_msl.moduleNeedsSizesParam(module_ir),
         .dispatch_preconditions = if (module_ir.dispatch_preconditions.items.len == 0)
             &.{}
         else
-            allocator.dupe(ir.DispatchPrecondition, module_ir.dispatch_preconditions.items) catch return mod.TranslateError.OutOfMemory,
+            allocator.dupe(ir.DispatchPrecondition, module_ir.dispatch_preconditions.items) catch return analysis.TranslateError.OutOfMemory,
         .texture_dispatch_preconditions = if (module_ir.texture_dispatch_preconditions.items.len == 0)
             &.{}
         else
-            allocator.dupe(ir.TextureDispatchPrecondition, module_ir.texture_dispatch_preconditions.items) catch return mod.TranslateError.OutOfMemory,
+            allocator.dupe(ir.TextureDispatchPrecondition, module_ir.texture_dispatch_preconditions.items) catch return analysis.TranslateError.OutOfMemory,
     };
 }
 
@@ -433,7 +437,7 @@ test "timed compute runtime translation reports compiler phases" {
         \\    data[id.x] = data[id.x] * 2.0;
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -460,7 +464,7 @@ test "compute runtime elides workgroup id storage clamp with dispatch preconditi
         \\    data[wid.x] = 1.0;
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -487,7 +491,7 @@ test "compute runtime elides global id storage clamp with dispatch precondition"
         \\    data[id.x] = 1.0;
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -521,7 +525,7 @@ test "compute runtime elides local invocation loop storage clamp with dispatch p
         \\    }
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -559,7 +563,7 @@ test "compute runtime emits zero for unwritten workgroup reads" {
         \\    }
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -594,7 +598,7 @@ test "compute runtime preserves written workgroup storage" {
         \\    }
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -620,7 +624,7 @@ test "compute runtime lowers single invocation scalar workgroup storage to threa
         \\    data[0] = wg_data;
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -650,7 +654,7 @@ test "compute runtime preserves single invocation workgroup arrays" {
         \\    data[0] = wg_data[0];
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -683,7 +687,7 @@ test "compute runtime elides bitmasked workgroup array clamp" {
         \\    inout_data[0] = accum;
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -712,7 +716,7 @@ test "vulkan compute runtime elides global id storage clamp with dispatch precon
         \\    output_values[id.x] = input_values[id.x] * 2.0;
         \\}
     ;
-    var out: [mod.MAX_SPIRV_OUTPUT]u8 = undefined;
+    var out: [emit_spirv.MAX_OUTPUT]u8 = undefined;
     var result = try translateToSpirvForVulkanComputeRuntime(
         std.testing.allocator,
         source,
@@ -748,7 +752,7 @@ test "vulkan compute runtime elides uniform product guarded storage clamp" {
         \\    }
         \\}
     ;
-    var out: [mod.MAX_SPIRV_OUTPUT]u8 = undefined;
+    var out: [emit_spirv.MAX_OUTPUT]u8 = undefined;
     var result = try translateToSpirvForVulkanComputeRuntime(
         std.testing.allocator,
         source,
@@ -810,7 +814,7 @@ test "compute runtime elides uniform guarded GEMV storage clamps" {
         \\    if (lane == 0u) { output[row] = partial_sums[0]; }
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -849,7 +853,7 @@ test "compute runtime elides uniform guarded gid storage clamps" {
         \\    output_values[index] = (input_values[index] * 1.5) + 0.25;
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
@@ -901,7 +905,7 @@ test "compute runtime emits Metal max total threads from workgroup size" {
         \\    data[gid.x] = gid.y + gid.z;
         \\}
     ;
-    var out: [mod.MAX_OUTPUT]u8 = undefined;
+    var out: [emit_msl.MAX_OUTPUT]u8 = undefined;
     var result = try translateToMslForComputeRuntimeTimed(
         std.testing.allocator,
         source,
