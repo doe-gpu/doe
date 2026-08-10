@@ -4,7 +4,6 @@ const has_vulkan = builtin.os.tag == .linux;
 const backend_lifecycle = @import("../../backend/dropin_lifecycle.zig");
 const abi_binding = @import("../../core/abi/wgpu_binding_base_types.zig");
 const abi_texture = @import("../../core/abi/wgpu_texture_base_types.zig");
-const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
 const binding_contract = @import("../../contracts/binding.zig");
 
 pub const NativeVulkanRuntime = if (has_vulkan) backend_lifecycle.NativeVulkanRuntime else void;

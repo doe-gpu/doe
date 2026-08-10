@@ -29,6 +29,7 @@
     "emit",
     "frontend",
     "ir",
+    "pipeline",
     "proof",
     "runtime"
   ],

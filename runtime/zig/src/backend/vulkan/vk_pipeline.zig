@@ -17,7 +17,7 @@ const model_compute_types = @import("../../contracts/model/model_compute_types.z
 const model_texture_types = @import("../../contracts/model/model_texture_value_types.zig");
 const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
 const hash_contract = @import("../../native/vulkan/vulkan_pipeline_hash.zig");
-const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
+const spirv_translation = @import("../../compiler/wgsl/pipeline/translate_spirv.zig");
 const common_errors = @import("../../contracts/execution.zig");
 const path_utils = @import("../common/path_utils.zig");
 
@@ -301,9 +301,9 @@ fn compile_kernel_wgsl_to_spirv(self: anytype, allocator: std.mem.Allocator, ker
     const wgsl = std.fs.cwd().readFileAlloc(allocator, source_path, MAX_KERNEL_SOURCE_BYTES) catch return error.ShaderCompileFailed;
     defer allocator.free(wgsl);
 
-    var spirv_buf = try allocator.alloc(u8, doe_wgsl.MAX_SPIRV_OUTPUT);
+    var spirv_buf = try allocator.alloc(u8, spirv_translation.MAX_OUTPUT);
     defer allocator.free(spirv_buf);
-    const spirv_len = doe_wgsl.translateToSpirv(allocator, wgsl, spirv_buf) catch return error.ShaderCompileFailed;
+    const spirv_len = spirv_translation.translateToSpirv(allocator, wgsl, spirv_buf) catch return error.ShaderCompileFailed;
     return try words_from_spirv_bytes(allocator, spirv_buf[0..spirv_len]);
 }
 pub fn set_compute_shader_spirv(

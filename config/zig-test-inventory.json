@@ -582,6 +582,10 @@
           "kind": "integration"
         },
         {
+          "path": "tests/wgsl/translation_facade_test.zig",
+          "kind": "integration"
+        },
+        {
           "path": "tests/wgsl/ir_transform_robustness_test.zig",
           "kind": "integration"
         },

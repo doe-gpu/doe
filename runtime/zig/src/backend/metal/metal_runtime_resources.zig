@@ -3,7 +3,7 @@ const builtin = @import("builtin");
 const bridge = @import("metal_bridge_decls.zig");
 const metal_buffer_pool = @import("metal_buffer_pool.zig");
 const metal_pipeline_cache = @import("metal_pipeline_cache.zig");
-const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
+const msl_translation = @import("../../compiler/wgsl/pipeline/translate_msl.zig");
 const emit_msl_maps = @import("../../compiler/wgsl/emit/msl/emit_msl_maps.zig");
 const wgsl_runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compile.zig");
 const HAS_PIPELINE_CACHE = builtin.os.tag == .macos;
@@ -207,7 +207,7 @@ fn compile_kernel_library(
     };
     defer self.allocator.free(wgsl_source);
 
-    const msl_buf = try self.allocator.alloc(u8, wgsl_compiler.MAX_OUTPUT);
+    const msl_buf = try self.allocator.alloc(u8, msl_translation.MAX_OUTPUT);
     defer self.allocator.free(msl_buf);
 
     const translated_len = blk: {
@@ -218,7 +218,7 @@ fn compile_kernel_library(
             null,
             0,
         ) catch {
-            break :blk wgsl_compiler.translateToMsl(self.allocator, wgsl_source, msl_buf) catch {
+            break :blk msl_translation.translateToMsl(self.allocator, wgsl_source, msl_buf) catch {
                 return error.ShaderCompileFailed;
             };
         };

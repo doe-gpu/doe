@@ -17,6 +17,7 @@ const test_tests_wgsl_coverage_builtin_spec_test_zig_5e9e3a9e = @import("tests/w
 const test_tests_wgsl_coverage_resource_test_zig_8699aaef = @import("tests/wgsl/coverage_resource_test.zig");
 const test_tests_wgsl_coverage_stage_texture_test_zig_07c584c2 = @import("tests/wgsl/coverage_stage_texture_test.zig");
 const test_tests_wgsl_mod_api_test_zig_a1cf5b77 = @import("tests/wgsl/mod_api_test.zig");
+const test_tests_wgsl_translation_facade_test_zig_d67e99f1 = @import("tests/wgsl/translation_facade_test.zig");
 const test_tests_wgsl_ir_transform_robustness_test_zig_291cbc07 = @import("tests/wgsl/ir_transform_robustness_test.zig");
 const test_tests_wgsl_mod_bounds_local_test_zig_3f86e795 = @import("tests/wgsl/mod_bounds_local_test.zig");
 const test_tests_wgsl_mod_bounds_loop_test_zig_0fbbd206 = @import("tests/wgsl/mod_bounds_loop_test.zig");
@@ -74,6 +75,7 @@ comptime {
     _ = test_tests_wgsl_coverage_resource_test_zig_8699aaef;
     _ = test_tests_wgsl_coverage_stage_texture_test_zig_07c584c2;
     _ = test_tests_wgsl_mod_api_test_zig_a1cf5b77;
+    _ = test_tests_wgsl_translation_facade_test_zig_d67e99f1;
     _ = test_tests_wgsl_ir_transform_robustness_test_zig_291cbc07;
     _ = test_tests_wgsl_mod_bounds_local_test_zig_3f86e795;
     _ = test_tests_wgsl_mod_bounds_loop_test_zig_0fbbd206;

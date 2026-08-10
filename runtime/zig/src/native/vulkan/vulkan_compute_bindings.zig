@@ -1,7 +1,7 @@
 //! Collect WebGPU bind-group resources into Vulkan compute descriptor bindings.
 
 const std = @import("std");
-const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
+const wgsl_ir = @import("../../compiler/wgsl/ir/ir.zig");
 const native_types = @import("../support/doe_native_object_types.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
@@ -28,11 +28,11 @@ const DoeTextureView = native_types.DoeTextureView;
 const DoeSampler = native_types.DoeSampler;
 const DoeBindGroupLayoutEntry = native_shared.DoeBindGroupLayoutEntry;
 
-const BINDING_KIND_BUFFER: u32 = @intFromEnum(doe_wgsl.BindingKind.buffer);
-const ADDRESS_SPACE_STORAGE: u32 = @intFromEnum(doe_wgsl.ir.AddressSpace.storage);
-const ADDRESS_SPACE_UNIFORM: u32 = @intFromEnum(doe_wgsl.ir.AddressSpace.uniform);
-const ACCESS_READ: u32 = @intFromEnum(doe_wgsl.ir.AccessMode.read);
-const ACCESS_READ_WRITE: u32 = @intFromEnum(doe_wgsl.ir.AccessMode.read_write);
+const BINDING_KIND_BUFFER: u32 = @intFromEnum(binding_contract.ShaderKind.buffer);
+const ADDRESS_SPACE_STORAGE: u32 = @intFromEnum(wgsl_ir.AddressSpace.storage);
+const ADDRESS_SPACE_UNIFORM: u32 = @intFromEnum(wgsl_ir.AddressSpace.uniform);
+const ACCESS_READ: u32 = @intFromEnum(wgsl_ir.AccessMode.read);
+const ACCESS_READ_WRITE: u32 = @intFromEnum(wgsl_ir.AccessMode.read_write);
 const RESOURCE_KIND_SAMPLER = binding_contract.layoutResourceKindCode(.sampler);
 const RESOURCE_KIND_TEXTURE = binding_contract.layoutResourceKindCode(.texture);
 const RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.storage_texture);

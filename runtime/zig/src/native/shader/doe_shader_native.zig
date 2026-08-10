@@ -5,7 +5,9 @@ const std = @import("std");
 const abi_core = @import("../../core/abi/wgpu_core_base_types.zig");
 const abi_callback = @import("../../core/abi/wgpu_callback_descriptor_types.zig");
 const abi_pipeline = @import("../../core/abi/wgpu_pipeline_descriptor_types.zig");
-const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
+const wgsl_analysis = @import("../../compiler/wgsl/pipeline/analysis.zig");
+const wgsl_bindings = @import("../../compiler/wgsl/pipeline/binding_reflection.zig");
+const msl_translation = @import("../../compiler/wgsl/pipeline/translate_msl.zig");
 const wgsl_ir = @import("../../compiler/wgsl/ir/ir.zig");
 const wgsl_runtime_compile = @import("../../compiler/wgsl/runtime/runtime_compile.zig");
 const shader_translation_cache = @import("doe_shader_translation_cache.zig");
@@ -174,7 +176,7 @@ fn set_last_error_stage_name(stage: []const u8) void {
     set_last_error_meta(&last_error_stage_buf, &last_error_stage_len, stage);
 }
 
-fn set_last_error_stage(stage: wgsl_compiler.CompilationStage) void {
+fn set_last_error_stage(stage: wgsl_analysis.CompilationStage) void {
     if (stage == .none) {
         last_error_stage_len = 0;
         return;
@@ -187,8 +189,8 @@ fn set_last_error_kind(kind: []const u8) void {
 }
 
 fn capture_wgsl_error_location() void {
-    last_error_line = wgsl_compiler.lastErrorLine();
-    last_error_col = wgsl_compiler.lastErrorColumn();
+    last_error_line = wgsl_analysis.lastErrorLine();
+    last_error_col = wgsl_analysis.lastErrorColumn();
 }
 
 pub export fn doeNativeCopyLastErrorMessage(out_ptr: ?[*]u8, out_len: usize) callconv(.c) usize {
@@ -235,16 +237,16 @@ pub export fn doeNativeCheckShaderSource(code_ptr: ?[*]const u8, code_len: usize
         return 0;
     };
     const wgsl = ptr[0..code_len];
-    var msl_buf: [wgsl_compiler.MAX_OUTPUT]u8 = undefined;
-    _ = wgsl_compiler.translateToMsl(alloc, wgsl, &msl_buf) catch |err| {
-        set_last_error_stage(wgsl_compiler.lastErrorStage());
+    var msl_buf: [msl_translation.MAX_OUTPUT]u8 = undefined;
+    _ = msl_translation.translateToMsl(alloc, wgsl, &msl_buf) catch |err| {
+        set_last_error_stage(wgsl_analysis.lastErrorStage());
         set_last_error_kind(@errorName(err));
         capture_wgsl_error_location();
-        const detail = wgsl_compiler.lastErrorMessage();
+        const detail = wgsl_analysis.lastErrorMessage();
         if (detail.len > 0) {
             set_last_error(detail);
         } else {
-            set_last_error_fmt("{s}: {s}", .{ @tagName(wgsl_compiler.lastErrorStage()), @errorName(err) });
+            set_last_error_fmt("{s}: {s}", .{ @tagName(wgsl_analysis.lastErrorStage()), @errorName(err) });
         }
         return 0;
     };
@@ -272,8 +274,8 @@ pub export fn doeNativeShaderModuleGetBindingsForEntryPoint(
     const sm = cast(DoeShaderModule, raw) orelse return 0;
     const wgsl = sm.wgsl_source orelse return 0;
     const entry_point = (entry_ptr orelse return 0)[0..entry_len];
-    var metadata: [native_shared.MAX_SHADER_BINDINGS]wgsl_compiler.BindingMeta = undefined;
-    const count = wgsl_compiler.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch return 0;
+    var metadata: [native_shared.MAX_SHADER_BINDINGS]wgsl_bindings.BindingMeta = undefined;
+    const count = wgsl_bindings.extractBindingsForEntryPoint(alloc, wgsl, entry_point, &metadata) catch return 0;
     if (out_ptr) |out| for (metadata[0..@min(count, out_len)], 0..) |binding, index| {
         out[index] = .{
             .group = binding.group,
@@ -419,7 +421,7 @@ fn createFromWGSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct)
     if (tryCreateCachedWgslShaderModule(wgsl, source_hash)) |cached_module| return cached_module;
 
     var cached_translation: ?shader_translation_cache.CachedTranslation = shader_translation_cache.lookupComputeTranslation(alloc, wgsl);
-    var msl_buf: [wgsl_compiler.MAX_OUTPUT]u8 = undefined;
+    var msl_buf: [msl_translation.MAX_OUTPUT]u8 = undefined;
     var translation_info = wgsl_runtime_compile.TranslationInfo{};
     var msl_source: []const u8 = undefined;
     defer {
@@ -438,10 +440,10 @@ fn createFromWGSL(dev: *DoeDevice, chain: *const abi_callback.WGPUChainedStruct)
             null,
             0,
         ) catch |err| {
-            set_last_error_stage(wgsl_compiler.lastErrorStage());
+            set_last_error_stage(wgsl_analysis.lastErrorStage());
             set_last_error_kind(@errorName(err));
             capture_wgsl_error_location();
-            const detail = wgsl_compiler.lastErrorMessage();
+            const detail = wgsl_analysis.lastErrorMessage();
             if (detail.len > 0) {
                 set_last_error_fmt("WGSL→MSL translation failed: {s}", .{detail});
             } else {
@@ -799,7 +801,7 @@ fn recompileWithOverrides(
         return null;
     };
 
-    var msl_buf: [wgsl_compiler.MAX_OUTPUT]u8 = undefined;
+    var msl_buf: [msl_translation.MAX_OUTPUT]u8 = undefined;
     var translation = wgsl_runtime_compile.translateToMslForComputeRuntime(
         alloc,
         wgsl,
@@ -807,10 +809,10 @@ fn recompileWithOverrides(
         override_slice.ptr,
         override_slice.len,
     ) catch |err| {
-        set_last_error_stage(wgsl_compiler.lastErrorStage());
+        set_last_error_stage(wgsl_analysis.lastErrorStage());
         set_last_error_kind(@errorName(err));
         capture_wgsl_error_location();
-        const detail = wgsl_compiler.lastErrorMessage();
+        const detail = wgsl_analysis.lastErrorMessage();
         if (detail.len > 0) {
             set_last_error_fmt("WGSL→MSL re-translation with overrides failed: {s}", .{detail});
         } else {

@@ -1,7 +1,8 @@
 const std = @import("std");
 const model_transfer_types = @import("../../contracts/model/model_compute_types.zig");
 const hash_utils = @import("../../contracts/artifact.zig");
-const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
+const csl_translation = @import("../../compiler/wgsl/pipeline/translate_csl.zig");
+const msl_translation = @import("../../compiler/wgsl/pipeline/translate_msl.zig");
 const host = @import("../../compiler/wgsl/emit/csl/emit_csl_host.zig");
 const host_plan = @import("../../compiler/wgsl/emit/csl/emit_csl_host_plan.zig");
 const csl_spec = @import("../../compiler/wgsl/emit/csl/csl_spec.zig");
@@ -48,14 +49,14 @@ pub fn emitForKernelDispatch(self: anytype, kd: model.KernelDispatchCommand) !vo
     defer self.allocator.free(artifact_dir);
     try std.fs.cwd().makePath(artifact_dir);
 
-    var csl_output: [doe_wgsl.MAX_CSL_OUTPUT]u8 = undefined;
+    var csl_output: [csl_translation.MAX_OUTPUT]u8 = undefined;
     var layout_stub: [512]u8 = undefined;
     var pe_program_stub: [512]u8 = undefined;
     var kernel_pattern: []const u8 = "kernel_dispatch_translated";
     var layout_body: []const u8 = undefined;
     var pe_program_body: []const u8 = undefined;
     var csl_len: usize = 0;
-    csl_len = doe_wgsl.translateToCsl(self.allocator, wgsl_source, csl_output[0..]) catch |err| blk: {
+    csl_len = csl_translation.translateToCsl(self.allocator, wgsl_source, csl_output[0..]) catch |err| blk: {
         kernel_pattern = "kernel_dispatch_translation_unavailable";
         const layout_text = try std.fmt.bufPrint(
             &layout_stub,
@@ -111,7 +112,7 @@ pub fn emitForKernelDispatch(self: anytype, kd: model.KernelDispatchCommand) !vo
     };
     const cslc_plan = try host_plan.makeCslcPlan(null);
 
-    var artifact_json: [doe_wgsl.MAX_OUTPUT]u8 = undefined;
+    var artifact_json: [msl_translation.MAX_OUTPUT]u8 = undefined;
     var artifact_pos: usize = 0;
     try host_plan.emitHostPlanArtifactJson(artifact_json[0..], &artifact_pos, plan, &targets, cslc_plan);
     const artifact_bytes = artifact_json[0..artifact_pos];

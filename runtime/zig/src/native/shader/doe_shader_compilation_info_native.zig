@@ -25,7 +25,7 @@ const DoeShaderModule = native_types.DoeShaderModule;
 // Imports from the WGSL compiler — error metadata query
 // ============================================================
 
-const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
+const wgsl_analysis = @import("../../compiler/wgsl/pipeline/analysis.zig");
 
 // ============================================================
 // Static output buffer
@@ -179,13 +179,13 @@ pub export fn doeNativeShaderModuleGetCompilationInfo(
     }
 
     // Module is null: the creation call failed.  Surface the last WGSL error.
-    const msg = wgsl_compiler.lastErrorMessage();
+    const msg = wgsl_analysis.lastErrorMessage();
     if (msg.len == 0) {
         return EMPTY_JSON;
     }
 
-    const line = wgsl_compiler.lastErrorLine();
-    const col = wgsl_compiler.lastErrorColumn();
+    const line = wgsl_analysis.lastErrorLine();
+    const col = wgsl_analysis.lastErrorColumn();
 
     // Build escaped message: replace " with \", \ with \\, control chars with space.
     var escaped: [OUT_CAP]u8 = undefined;

@@ -3,7 +3,7 @@ const builtin = @import("builtin");
 const common_timing = @import("../common/timing.zig");
 const path_utils = @import("../common/path_utils.zig");
 const webgpu = @import("../runtime_types.zig");
-const doe_wgsl = @import("../../compiler/wgsl/mod.zig");
+const hlsl_translation = @import("../../compiler/wgsl/pipeline/translate_hlsl.zig");
 const dispatch_info = @import("../../contracts/shader_abi/dispatch_info.zig");
 const execution_contract = @import("../../contracts/execution.zig");
 const d3d12_descriptors = @import("d3d12_descriptors.zig");
@@ -180,9 +180,9 @@ fn compileHlslSource(self: anytype, alloc: std.mem.Allocator, hlsl_source: []con
 }
 
 fn compileWgslSource(self: anytype, alloc: std.mem.Allocator, wgsl_source: []const u8) ![]u8 {
-    var hlsl_buf = try alloc.alloc(u8, doe_wgsl.MAX_HLSL_OUTPUT);
+    var hlsl_buf = try alloc.alloc(u8, hlsl_translation.MAX_OUTPUT);
     defer alloc.free(hlsl_buf);
-    const hlsl_len = doe_wgsl.translateToHlsl(alloc, wgsl_source, hlsl_buf) catch return error.ShaderCompileFailed;
+    const hlsl_len = hlsl_translation.translateToHlsl(alloc, wgsl_source, hlsl_buf) catch return error.ShaderCompileFailed;
     return try compileHlslSource(self, alloc, hlsl_buf[0..hlsl_len]);
 }
 

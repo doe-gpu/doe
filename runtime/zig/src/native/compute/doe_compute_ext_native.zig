@@ -11,7 +11,6 @@ const compute_preconditions = @import("doe_compute_preconditions_native.zig");
 const vulkan_compute = @import("../vulkan/vulkan_compute_native.zig");
 const shader_native = @import("../shader/doe_shader_native.zig");
 const query_native = @import("../resource/doe_query_native.zig");
-const wgsl_compiler = @import("../../compiler/wgsl/mod.zig");
 const binding_contract = @import("../../contracts/binding.zig");
 const resource_ops = @import("../../backend/dropin_resource_ops.zig");
 const bridge = resource_ops.metal_bridge;
@@ -85,16 +84,16 @@ fn synthesize_layout_entry(binding: native_shared.BindingInfo) DoeBindGroupLayou
         .resource_kind = RESOURCE_KIND_NONE,
     };
     switch (binding.kind) {
-        @intFromEnum(wgsl_compiler.BindingKind.buffer) => {
+        @intFromEnum(binding_contract.ShaderKind.buffer) => {
             entry.resource_kind = RESOURCE_KIND_BUFFER;
         },
-        @intFromEnum(wgsl_compiler.BindingKind.sampler) => {
+        @intFromEnum(binding_contract.ShaderKind.sampler) => {
             entry.resource_kind = RESOURCE_KIND_SAMPLER;
         },
-        @intFromEnum(wgsl_compiler.BindingKind.texture) => {
+        @intFromEnum(binding_contract.ShaderKind.texture) => {
             entry.resource_kind = RESOURCE_KIND_TEXTURE;
         },
-        @intFromEnum(wgsl_compiler.BindingKind.storage_texture) => {
+        @intFromEnum(binding_contract.ShaderKind.storage_texture) => {
             entry.resource_kind = RESOURCE_KIND_STORAGE_TEXTURE;
             entry.texture_sample_type = binding.access;
         },
