@@ -37,7 +37,6 @@ REVIEWED_SIGNALS: dict[str, str] = {
     "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig": "Keep: SPIR-V function/control-flow lowering state machine; builtin, stage, texture, and serialization responsibilities are separate.",
     "src/compiler/wgsl/frontend/parser_expr.zig": "Keep: cohesive recursive-descent expression grammar with an independent parser responsibility.",
     "src/compiler/wgsl/ir/ir_transform_robustness.zig": "Keep: one named WGSL IR robustness transform pass with proof-backed precondition emission.",
-    "src/compiler/wgsl/mod.zig": "Keep: public WGSL compiler API, phase orchestration, diagnostics, and compatibility boundary; implementation phases remain in narrow modules.",
     "src/compiler/wgsl/proof/dispatch_proof_match.zig": "Keep: independently meaningful dispatch-proof matching algorithm.",
     "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig": "Keep: independently meaningful uniform-bounds proof algorithm.",
     "src/compiler/wgsl/runtime/runtime_compile.zig": "Keep: cohesive runtime shader compilation and cache admission state machine.",

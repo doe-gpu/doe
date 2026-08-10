@@ -113,11 +113,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 21,
+          "endLine": 23,
           "kind": "constant",
           "name": "metal_bridge_device_new_library_msl",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 21,
+          "startLine": 23,
           "tokenCount": 6
         }
       ],
@@ -143,11 +143,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 27,
+          "endLine": 26,
           "kind": "constant",
           "name": "DoeBuffer",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 27,
+          "startLine": 26,
           "tokenCount": 6
         },
         {
@@ -247,11 +247,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 37,
+          "endLine": 40,
           "kind": "constant",
           "name": "DoeBuffer",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 37,
+          "startLine": 40,
           "tokenCount": 6
         }
       ],
@@ -543,11 +543,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 34,
+          "endLine": 37,
           "kind": "constant",
           "name": "NativeVulkanRuntime",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 34,
+          "startLine": 37,
           "tokenCount": 6
         }
       ],
@@ -1271,11 +1271,11 @@
     {
       "locations": [
         {
-          "endLine": 479,
+          "endLine": 476,
           "kind": "function",
           "name": "set_gpu_timestamp_mode",
           "path": "src/backend/metal/backend_execute.zig",
-          "startLine": 476,
+          "startLine": 473,
           "tokenCount": 33
         },
         {
@@ -1633,28 +1633,6 @@
     {
       "locations": [
         {
-          "endLine": 20,
-          "kind": "constant",
-          "name": "host_plan_artifact",
-          "path": "src/backend/metal/backend_execute.zig",
-          "startLine": 20,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 20,
-          "kind": "constant",
-          "name": "host_plan_artifact",
-          "path": "src/backend/metal/mod.zig",
-          "startLine": 20,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "0943b07e4d87dafd637bc13f8b0366f701428f63f37a9ff7ba571f51f6ec47c4",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 10,
           "kind": "constant",
           "name": "operator_artifacts",
@@ -1767,6 +1745,28 @@
     {
       "locations": [
         {
+          "endLine": 32,
+          "kind": "constant",
+          "name": "ADDRESS_SPACE_STORAGE",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 32,
+          "tokenCount": 13
+        },
+        {
+          "endLine": 53,
+          "kind": "constant",
+          "name": "ADDRESS_SPACE_STORAGE",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 53,
+          "tokenCount": 13
+        }
+      ],
+      "normalizedTokenSha256": "0ace153363df8e37fa78ccf7938bfd358954b429d7b8a639b5a00b6d9b80cc1d",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 79,
           "kind": "variable",
           "name": "global_cache",
@@ -1789,53 +1789,23 @@
     {
       "locations": [
         {
-          "endLine": 136,
+          "endLine": 65,
           "kind": "variable",
           "name": "last_error_line",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 136,
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 65,
           "tokenCount": 6
         },
         {
-          "endLine": 50,
+          "endLine": 52,
           "kind": "variable",
           "name": "last_error_line",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 50,
+          "startLine": 52,
           "tokenCount": 6
         }
       ],
       "normalizedTokenSha256": "0af01efa0ac5d2f2d41c9fa97531afee1de23aaab198083670f894117f381261",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "mod",
-          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 4,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 3,
-          "kind": "constant",
-          "name": "mod",
-          "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
-          "startLine": 3,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 2,
-          "kind": "constant",
-          "name": "mod",
-          "path": "src/compiler/wgsl/runtime/shader_info.zig",
-          "startLine": 2,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "0b81c4613da7d1e1339f1341388c1504b8de5f33567baaf041a07e62ea17c9c8",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -2185,11 +2155,11 @@
           "tokenCount": 37
         },
         {
-          "endLine": 309,
+          "endLine": 290,
           "kind": "function",
           "name": "manifest_path_from_context",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 305,
+          "startLine": 286,
           "tokenCount": 37
         },
         {
@@ -2308,6 +2278,36 @@
         }
       ],
       "normalizedTokenSha256": "0e8fa1ce02f8ea38a99df877b1d3cade2c56bb92bea1400b55f632891c524ebe",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "wgsl_bindings",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "wgsl_bindings",
+          "path": "src/native/shader/shader_binding_reflection.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "wgsl_bindings",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 10,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "0ec55af9b7d9e1b90a69412e3a41dde1c6b36a9a84916345988ea3edf5e1bb7f",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -2581,11 +2581,11 @@
           "tokenCount": 4
         },
         {
-          "endLine": 32,
+          "endLine": 31,
           "kind": "constant",
           "name": "BOOTSTRAP_MANIFEST_STATUS_CODE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 32,
+          "startLine": 31,
           "tokenCount": 4
         },
         {
@@ -2899,6 +2899,28 @@
     {
       "locations": [
         {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/runtime/shader_info.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "11d1eb516dc0d19d71df79f56d22a8b0e1a49c08c1b5587c120e33bb6dfc2d88",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 1,
           "kind": "constant",
           "name": "runtime_types",
@@ -2945,11 +2967,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 10,
+          "endLine": 12,
           "kind": "constant",
           "name": "wgsl_runtime_compile",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 10,
+          "startLine": 12,
           "tokenCount": 7
         },
         {
@@ -3175,11 +3197,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 21,
+          "endLine": 20,
           "kind": "constant",
           "name": "cast",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 21,
+          "startLine": 20,
           "tokenCount": 6
         },
         {
@@ -3327,11 +3349,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 28,
+          "endLine": 30,
           "kind": "constant",
           "name": "cast",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 28,
+          "startLine": 30,
           "tokenCount": 6
         },
         {
@@ -3359,11 +3381,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 28,
+          "endLine": 31,
           "kind": "constant",
           "name": "cast",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 28,
+          "startLine": 31,
           "tokenCount": 6
         }
       ],
@@ -3471,11 +3493,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 28,
+          "endLine": 27,
           "kind": "constant",
           "name": "MANIFEST_MODULE_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 28,
+          "startLine": 27,
           "tokenCount": 6
         },
         {
@@ -3953,11 +3975,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 27,
+          "endLine": 26,
           "kind": "constant",
           "name": "HASH_HEX_SIZE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 27,
+          "startLine": 26,
           "tokenCount": 8
         },
         {
@@ -4369,11 +4391,11 @@
           "tokenCount": 26
         },
         {
-          "endLine": 313,
+          "endLine": 294,
           "kind": "function",
           "name": "manifest_hash_from_context",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 311,
+          "startLine": 292,
           "tokenCount": 26
         },
         {
@@ -4399,11 +4421,11 @@
           "tokenCount": 23
         },
         {
-          "endLine": 379,
+          "endLine": 352,
           "kind": "function",
           "name": "set_webgpu_ffi_queue_wait_timeout_ns",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 376,
+          "startLine": 349,
           "tokenCount": 23
         },
         {
@@ -4437,19 +4459,19 @@
           "tokenCount": 9
         },
         {
-          "endLine": 132,
+          "endLine": 61,
           "kind": "variable",
           "name": "last_error_buf",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 132,
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 61,
           "tokenCount": 9
         },
         {
-          "endLine": 44,
+          "endLine": 46,
           "kind": "variable",
           "name": "last_error_buf",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 44,
+          "startLine": 46,
           "tokenCount": 9
         }
       ],
@@ -4579,11 +4601,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 18,
+          "endLine": 17,
           "kind": "constant",
           "name": "MAX_VERTEX_BUFFERS",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 18,
+          "startLine": 17,
           "tokenCount": 7
         }
       ],
@@ -4623,11 +4645,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 22,
+          "endLine": 21,
           "kind": "constant",
           "name": "toOpaque",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 22,
+          "startLine": 21,
           "tokenCount": 6
         },
         {
@@ -4711,11 +4733,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 29,
+          "endLine": 31,
           "kind": "constant",
           "name": "toOpaque",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 29,
+          "startLine": 31,
           "tokenCount": 6
         },
         {
@@ -4735,11 +4757,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 29,
+          "endLine": 32,
           "kind": "constant",
           "name": "toOpaque",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 29,
+          "startLine": 32,
           "tokenCount": 6
         }
       ],
@@ -4883,19 +4905,19 @@
           "tokenCount": 7
         },
         {
-          "endLine": 15,
+          "endLine": 17,
           "kind": "constant",
           "name": "native_shared",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 15,
+          "startLine": 17,
           "tokenCount": 7
         },
         {
-          "endLine": 7,
+          "endLine": 8,
           "kind": "constant",
           "name": "native_shared",
           "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 7,
+          "startLine": 8,
           "tokenCount": 7
         },
         {
@@ -4915,11 +4937,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 13,
+          "endLine": 16,
           "kind": "constant",
           "name": "native_shared",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 13,
+          "startLine": 16,
           "tokenCount": 7
         },
         {
@@ -5119,11 +5141,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 19,
+          "endLine": 18,
           "kind": "constant",
           "name": "alloc",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 19,
+          "startLine": 18,
           "tokenCount": 6
         },
         {
@@ -5215,19 +5237,19 @@
           "tokenCount": 6
         },
         {
-          "endLine": 26,
+          "endLine": 28,
           "kind": "constant",
           "name": "alloc",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 26,
+          "startLine": 28,
           "tokenCount": 6
         },
         {
-          "endLine": 10,
+          "endLine": 11,
           "kind": "constant",
           "name": "alloc",
           "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 10,
+          "startLine": 11,
           "tokenCount": 6
         },
         {
@@ -5247,11 +5269,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 27,
+          "endLine": 30,
           "kind": "constant",
           "name": "alloc",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 27,
+          "startLine": 30,
           "tokenCount": 6
         }
       ],
@@ -6009,6 +6031,28 @@
     {
       "locations": [
         {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "sema",
+          "path": "src/compiler/wgsl/ir/ir_builder.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "sema",
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "2c633a3137a438e9fcd216e7a403172a48e4c592bc0f0df6b6b6535e917d7c1e",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 17,
           "kind": "constant",
           "name": "render_api_mod",
@@ -6209,11 +6253,11 @@
     {
       "locations": [
         {
-          "endLine": 10,
+          "endLine": 13,
           "kind": "constant",
           "name": "runtime_compile",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 10,
+          "startLine": 13,
           "tokenCount": 7
         },
         {
@@ -6403,11 +6447,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 30,
+          "endLine": 29,
           "kind": "constant",
           "name": "STATUS_MESSAGE_BYTES",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 30,
+          "startLine": 29,
           "tokenCount": 6
         },
         {
@@ -6554,28 +6598,6 @@
         }
       ],
       "normalizedTokenSha256": "31b78c3101b53515c0226912d7d0dcc794997cb68004716cfde117a2b2f49b81",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 34,
-          "kind": "constant",
-          "name": "ACCESS_READ",
-          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 34,
-          "tokenCount": 15
-        },
-        {
-          "endLine": 52,
-          "kind": "constant",
-          "name": "ACCESS_READ",
-          "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 52,
-          "tokenCount": 15
-        }
-      ],
-      "normalizedTokenSha256": "31e8071de03e831e5cbcd93a3930fc8b530a17a5c8203b0f78300fc9712892e2",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -7009,11 +7031,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 20,
+          "endLine": 22,
           "kind": "constant",
           "name": "metal_bridge_device_new_compute_pipeline",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 20,
+          "startLine": 22,
           "tokenCount": 6
         }
       ],
@@ -7097,11 +7119,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 13,
+          "endLine": 15,
           "kind": "constant",
           "name": "package_metal_pipeline_cache",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 13,
+          "startLine": 15,
           "tokenCount": 7
         }
       ],
@@ -7453,11 +7475,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 16,
+          "endLine": 15,
           "kind": "constant",
           "name": "resource_ops",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 16,
+          "startLine": 15,
           "tokenCount": 7
         },
         {
@@ -7517,11 +7539,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 18,
+          "endLine": 20,
           "kind": "constant",
           "name": "resource_ops",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 18,
+          "startLine": 20,
           "tokenCount": 7
         },
         {
@@ -7533,11 +7555,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 21,
+          "endLine": 24,
           "kind": "constant",
           "name": "resource_ops",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 21,
+          "startLine": 24,
           "tokenCount": 7
         },
         {
@@ -7815,11 +7837,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 33,
+          "endLine": 35,
           "kind": "constant",
           "name": "DoeDevice",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 33,
+          "startLine": 35,
           "tokenCount": 6
         },
         {
@@ -7943,11 +7965,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 43,
+          "endLine": 46,
           "kind": "constant",
           "name": "DoeSampler",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 43,
+          "startLine": 46,
           "tokenCount": 6
         }
       ],
@@ -8001,11 +8023,11 @@
     {
       "locations": [
         {
-          "endLine": 39,
+          "endLine": 38,
           "kind": "constant",
           "name": "RESOURCE_KIND_BUFFER",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 39,
+          "startLine": 38,
           "tokenCount": 10
         },
         {
@@ -8293,11 +8315,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 20,
+          "endLine": 19,
           "kind": "constant",
           "name": "make",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 20,
+          "startLine": 19,
           "tokenCount": 6
         },
         {
@@ -8365,11 +8387,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 27,
+          "endLine": 29,
           "kind": "constant",
           "name": "make",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 27,
+          "startLine": 29,
           "tokenCount": 6
         },
         {
@@ -8412,6 +8434,28 @@
         }
       ],
       "normalizedTokenSha256": "414a2b8480ab4b38bb9cb05b6c76f2096c05280563c4aba4c300970c4f3f5d8f",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "override_values",
+          "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "override_values",
+          "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "414a8f55b2e73fce6c1794700f8b081051c2c4d2e153484f879f2bcb5b42f21d",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -8469,11 +8513,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 22,
+          "endLine": 25,
           "kind": "constant",
           "name": "pipeline_hash",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 22,
+          "startLine": 25,
           "tokenCount": 7
         }
       ],
@@ -8751,11 +8795,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 24,
+          "endLine": 23,
           "kind": "constant",
           "name": "bridge",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 24,
+          "startLine": 23,
           "tokenCount": 7
         }
       ],
@@ -8795,11 +8839,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 26,
+          "endLine": 25,
           "kind": "constant",
           "name": "DoeComputePass",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 26,
+          "startLine": 25,
           "tokenCount": 6
         }
       ],
@@ -8921,11 +8965,11 @@
     {
       "locations": [
         {
-          "endLine": 370,
+          "endLine": 343,
           "kind": "function",
           "name": "set_upload_behavior",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 368,
+          "startLine": 341,
           "tokenCount": 35
         },
         {
@@ -9086,60 +9130,6 @@
         }
       ],
       "normalizedTokenSha256": "4654578dc1c799465b926baf1339f85280949ccafb5cbc12a4ff20711b9a8ae7",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 6,
-          "kind": "constant",
-          "name": "doe_wgsl",
-          "path": "src/backend/d3d12/d3d12_runtime_compute.zig",
-          "startLine": 6,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "doe_wgsl",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 4,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 20,
-          "kind": "constant",
-          "name": "doe_wgsl",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 20,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "doe_wgsl",
-          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 4,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 9,
-          "kind": "constant",
-          "name": "doe_wgsl",
-          "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 9,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 5,
-          "kind": "constant",
-          "name": "doe_wgsl",
-          "path": "src/native/vulkan/vulkan_render_pipeline_native.zig",
-          "startLine": 5,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "467331f5630f31c7f8969f03d08cda1c82b658f2ba9c7a331b5bc86d98830e65",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -9351,11 +9341,11 @@
     {
       "locations": [
         {
-          "endLine": 415,
+          "endLine": 388,
           "kind": "function",
           "name": "capture_buffer",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 413,
+          "startLine": 386,
           "tokenCount": 54
         },
         {
@@ -9931,6 +9921,28 @@
     {
       "locations": [
         {
+          "endLine": 35,
+          "kind": "constant",
+          "name": "ACCESS_READ_WRITE",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 35,
+          "tokenCount": 13
+        },
+        {
+          "endLine": 56,
+          "kind": "constant",
+          "name": "ACCESS_READ_WRITE",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 56,
+          "tokenCount": 13
+        }
+      ],
+      "normalizedTokenSha256": "4c85ff00dd6dccbc8b7e9ae83f957f2b0824e152fd54beaec4822be9a21f0bae",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 9,
           "kind": "constant",
           "name": "metal_bridge_release",
@@ -10043,11 +10055,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 24,
+          "endLine": 26,
           "kind": "constant",
           "name": "metal_bridge_release",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 24,
+          "startLine": 26,
           "tokenCount": 6
         }
       ],
@@ -10112,6 +10124,60 @@
         }
       ],
       "normalizedTokenSha256": "4d443f32166a8631b7e4b6177fede2f373232b1c2a08a063cb4e7fa49a762064",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/pipeline/binding_reflection.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "analysis",
+          "path": "src/compiler/wgsl/pipeline/translate_spirv.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "4e225463f20f4fffa5d7335afb07323b866d76e42cedd455f25d5593def90abd",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -10335,11 +10401,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 20,
+          "endLine": 23,
           "kind": "constant",
           "name": "shader_binding_reflection",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 20,
+          "startLine": 23,
           "tokenCount": 7
         }
       ],
@@ -11101,19 +11167,19 @@
           "tokenCount": 6
         },
         {
-          "endLine": 133,
+          "endLine": 62,
           "kind": "variable",
           "name": "last_error_len",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 133,
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 62,
           "tokenCount": 6
         },
         {
-          "endLine": 45,
+          "endLine": 47,
           "kind": "variable",
           "name": "last_error_len",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 45,
+          "startLine": 47,
           "tokenCount": 6
         }
       ],
@@ -11305,11 +11371,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 18,
+          "endLine": 21,
           "kind": "constant",
           "name": "model_binding_types",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 18,
+          "startLine": 21,
           "tokenCount": 7
         }
       ],
@@ -11319,11 +11385,11 @@
     {
       "locations": [
         {
-          "endLine": 474,
+          "endLine": 471,
           "kind": "function",
           "name": "set_queue_sync_mode",
           "path": "src/backend/metal/backend_execute.zig",
-          "startLine": 471,
+          "startLine": 468,
           "tokenCount": 33
         },
         {
@@ -11835,11 +11901,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 17,
+          "endLine": 20,
           "kind": "constant",
           "name": "model_compute_types",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 17,
+          "startLine": 20,
           "tokenCount": 7
         },
         {
@@ -12265,19 +12331,11 @@
     {
       "locations": [
         {
-          "endLine": 53,
-          "kind": "constant",
-          "name": "binding_contract",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 53,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 15,
+          "endLine": 14,
           "kind": "constant",
           "name": "binding_contract",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 15,
+          "startLine": 14,
           "tokenCount": 7
         },
         {
@@ -12289,11 +12347,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 8,
+          "endLine": 7,
           "kind": "constant",
           "name": "binding_contract",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 8,
+          "startLine": 7,
           "tokenCount": 7
         },
         {
@@ -12305,15 +12363,61 @@
           "tokenCount": 7
         },
         {
-          "endLine": 19,
+          "endLine": 22,
           "kind": "constant",
           "name": "binding_contract",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 19,
+          "startLine": 22,
           "tokenCount": 7
         }
       ],
       "normalizedTokenSha256": "6006cb2d870df1704a96c5a1c06d11976bdd79d5a5c2af640c9ef9831ce2df9d",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 28,
+          "kind": "constant",
+          "name": "wgsl_analysis",
+          "path": "src/native/shader/doe_shader_compilation_info_native.zig",
+          "startLine": 28,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "wgsl_analysis",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "wgsl_analysis",
+          "path": "src/native/shader/shader_binding_reflection.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "wgsl_analysis",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "wgsl_analysis",
+          "path": "src/native/vulkan/vulkan_render_pipeline_native.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "600da835d90e63e951f5117ac449620a1a1a74f702fccdeb1d8babb47db9fe47",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -12327,11 +12431,11 @@
           "tokenCount": 21
         },
         {
-          "endLine": 335,
+          "endLine": 308,
           "kind": "function",
           "name": "last_submit_count_from_context",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 333,
+          "startLine": 306,
           "tokenCount": 21
         }
       ],
@@ -12505,6 +12609,52 @@
         {
           "endLine": 6,
           "kind": "constant",
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+          "startLine": 6,
+          "tokenCount": 9
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+          "startLine": 5,
+          "tokenCount": 9
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+          "startLine": 7,
+          "tokenCount": 9
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+          "startLine": 7,
+          "tokenCount": 9
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_spirv.zig",
+          "startLine": 5,
+          "tokenCount": 9
+        }
+      ],
+      "normalizedTokenSha256": "61d68a65263718c03ba723d817df6e0c59f31b91de95c41622aaa56f8cb2df90",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 6,
+          "kind": "constant",
           "name": "abi_pipeline",
           "path": "src/full/lifecycle/wgpu_async_pixel_local_storage.zig",
           "startLine": 6,
@@ -12665,15 +12815,37 @@
           "tokenCount": 7
         },
         {
-          "endLine": 17,
+          "endLine": 19,
           "kind": "constant",
           "name": "bind_group",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 17,
+          "startLine": 19,
           "tokenCount": 7
         }
       ],
       "normalizedTokenSha256": "6267b2adf99d7f10e5e47048996bc442351509f96f676ea2cd0fc02b0bf15398",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "robustness",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "robustness",
+          "path": "src/compiler/wgsl/runtime/shader_info.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "62ef1f746ca8e11d9941dc1c4259c6d4227f7be9f4093ab5099c27d52c3ffb95",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -12769,11 +12941,11 @@
     {
       "locations": [
         {
-          "endLine": 33,
+          "endLine": 32,
           "kind": "constant",
           "name": "RecordedCmd",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 33,
+          "startLine": 32,
           "tokenCount": 6
         },
         {
@@ -12791,11 +12963,11 @@
     {
       "locations": [
         {
-          "endLine": 29,
+          "endLine": 28,
           "kind": "constant",
           "name": "DoeBindGroupLayout",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 29,
+          "startLine": 28,
           "tokenCount": 6
         },
         {
@@ -12815,11 +12987,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 37,
+          "endLine": 39,
           "kind": "constant",
           "name": "DoeBindGroupLayout",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 37,
+          "startLine": 39,
           "tokenCount": 6
         },
         {
@@ -12831,11 +13003,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 39,
+          "endLine": 42,
           "kind": "constant",
           "name": "DoeBindGroupLayout",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 39,
+          "startLine": 42,
           "tokenCount": 6
         }
       ],
@@ -13089,11 +13261,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 26,
+          "endLine": 25,
           "kind": "constant",
           "name": "MANIFEST_PATH_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 26,
+          "startLine": 25,
           "tokenCount": 6
         },
         {
@@ -13283,11 +13455,11 @@
     {
       "locations": [
         {
-          "endLine": 431,
+          "endLine": 404,
           "kind": "constant",
           "name": "VTABLE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 417,
+          "startLine": 390,
           "tokenCount": 73
         },
         {
@@ -13327,6 +13499,28 @@
     {
       "locations": [
         {
+          "endLine": 34,
+          "kind": "constant",
+          "name": "ACCESS_READ",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 34,
+          "tokenCount": 13
+        },
+        {
+          "endLine": 55,
+          "kind": "constant",
+          "name": "ACCESS_READ",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 55,
+          "tokenCount": 13
+        }
+      ],
+      "normalizedTokenSha256": "685cce07a705aa4d887b060f12b8f2c7d6efbeccf5b429b593b0156288b45d64",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 21,
           "kind": "constant",
           "name": "writeResidency",
@@ -13352,6 +13546,44 @@
         }
       ],
       "normalizedTokenSha256": "68742ff3eb3a642abd2fb9c11b31c86bc432e4b457cb6083eab0ed80c5ce34c8",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "wgsl_ir",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "wgsl_ir",
+          "path": "src/native/support/doe_native_object_types.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "wgsl_ir",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 12,
+          "kind": "constant",
+          "name": "wgsl_ir",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 12,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "687db90fa80547e7e45c4cdd069a3e8822ef515c41e80a9472a22230731a2539",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -13895,11 +14127,11 @@
           "tokenCount": 4
         },
         {
-          "endLine": 31,
+          "endLine": 30,
           "kind": "constant",
           "name": "BOOTSTRAP_MANIFEST_MODULE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 31,
+          "startLine": 30,
           "tokenCount": 4
         },
         {
@@ -13934,28 +14166,6 @@
         }
       ],
       "normalizedTokenSha256": "6a415dfbd015ed0d6a5a765cb1e196ead41d10a4b10a200d4f1005df174aac92",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 9,
-          "kind": "constant",
-          "name": "DEFAULT_KERNEL_ROOT",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 9,
-          "tokenCount": 9
-        },
-        {
-          "endLine": 24,
-          "kind": "constant",
-          "name": "DEFAULT_KERNEL_ROOT",
-          "path": "src/backend/metal/metal_runtime_resources.zig",
-          "startLine": 24,
-          "tokenCount": 9
-        }
-      ],
-      "normalizedTokenSha256": "6aa00855c32f690dac3f9b5b1cd52db828d84e4b0cf9bd62bb4474c166a05dfb",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -14169,11 +14379,11 @@
           "tokenCount": 19
         },
         {
-          "endLine": 280,
+          "endLine": 209,
           "kind": "function",
           "name": "lastErrorMessage",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 278,
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 207,
           "tokenCount": 19
         }
       ],
@@ -14533,33 +14743,11 @@
     {
       "locations": [
         {
-          "endLine": 33,
-          "kind": "constant",
-          "name": "ADDRESS_SPACE_UNIFORM",
-          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 33,
-          "tokenCount": 15
-        },
-        {
-          "endLine": 51,
-          "kind": "constant",
-          "name": "ADDRESS_SPACE_UNIFORM",
-          "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 51,
-          "tokenCount": 15
-        }
-      ],
-      "normalizedTokenSha256": "6fb10104c56b79a6a2eb33730c97fdaf5a4ca8dc92ddfe41d50430ff9a5a61d6",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 25,
+          "endLine": 24,
           "kind": "constant",
           "name": "DoeComputePipeline",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 25,
+          "startLine": 24,
           "tokenCount": 6
         },
         {
@@ -14579,11 +14767,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 35,
+          "endLine": 37,
           "kind": "constant",
           "name": "DoeComputePipeline",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 35,
+          "startLine": 37,
           "tokenCount": 6
         },
         {
@@ -14595,11 +14783,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 36,
+          "endLine": 39,
           "kind": "constant",
           "name": "DoeComputePipeline",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 36,
+          "startLine": 39,
           "tokenCount": 6
         }
       ],
@@ -14939,11 +15127,11 @@
           "tokenCount": 81
         },
         {
-          "endLine": 353,
+          "endLine": 326,
           "kind": "function",
           "name": "deinit",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 341,
+          "startLine": 314,
           "tokenCount": 81
         }
       ],
@@ -15001,11 +15189,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 42,
+          "endLine": 45,
           "kind": "constant",
           "name": "DoeTextureView",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 42,
+          "startLine": 45,
           "tokenCount": 6
         }
       ],
@@ -15175,11 +15363,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 19,
+          "endLine": 18,
           "kind": "constant",
           "name": "MAX_VERTEX_ATTRIBUTES",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 19,
+          "startLine": 18,
           "tokenCount": 7
         }
       ],
@@ -15260,28 +15448,6 @@
         }
       ],
       "normalizedTokenSha256": "745ca6e6479b15360960ddb16311cc466bbdd569d33bff977d28fa85590b9ca0",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 2,
-          "kind": "constant",
-          "name": "csl_spec",
-          "path": "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
-          "startLine": 2,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 26,
-          "kind": "constant",
-          "name": "csl_spec",
-          "path": "src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig",
-          "startLine": 26,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "74bee90fd00e344e7b3611990b41a378ebef2dff584885aaaa4e35a81a5ab23e",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -15372,6 +15538,28 @@
         }
       ],
       "normalizedTokenSha256": "75118fa4a20856d56702b4c7eb2fd5dbf63e1771e097af07bd8278b7c99d1eea",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 33,
+          "kind": "constant",
+          "name": "ADDRESS_SPACE_UNIFORM",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 33,
+          "tokenCount": 13
+        },
+        {
+          "endLine": 54,
+          "kind": "constant",
+          "name": "ADDRESS_SPACE_UNIFORM",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 54,
+          "tokenCount": 13
+        }
+      ],
+      "normalizedTokenSha256": "754bfc7f82970f0bac006b6d2473555b9cf8b8c39839a69e97db58af4e51e9a7",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -15486,14 +15674,6 @@
           "name": "hash_utils",
           "path": "src/backend/d3d12/mod.zig",
           "startLine": 20,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 3,
-          "kind": "constant",
-          "name": "hash_utils",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 3,
           "tokenCount": 7
         },
         {
@@ -16475,36 +16655,6 @@
     {
       "locations": [
         {
-          "endLine": 31,
-          "kind": "constant",
-          "name": "BINDING_KIND_BUFFER",
-          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 31,
-          "tokenCount": 13
-        },
-        {
-          "endLine": 49,
-          "kind": "constant",
-          "name": "BINDING_KIND_BUFFER",
-          "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 49,
-          "tokenCount": 13
-        }
-      ],
-      "normalizedTokenSha256": "80bc3230b43f5423b0f64db2fe8798c5be2c479c29446b8370e73ea5a66d515c",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 2,
-          "kind": "constant",
-          "name": "model_transfer_types",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 2,
-          "tokenCount": 7
-        },
-        {
           "endLine": 3,
           "kind": "constant",
           "name": "model_transfer_types",
@@ -16579,19 +16729,19 @@
     {
       "locations": [
         {
-          "endLine": 298,
+          "endLine": 227,
           "kind": "function",
           "name": "nowNs",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 296,
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 225,
           "tokenCount": 16
         },
         {
-          "endLine": 34,
+          "endLine": 38,
           "kind": "function",
           "name": "nowNs",
           "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 32,
+          "startLine": 36,
           "tokenCount": 16
         }
       ],
@@ -16662,28 +16812,6 @@
         }
       ],
       "normalizedTokenSha256": "827a43a483b87995e527eeebf6d2e6740edffbd5e9ca55589424be816a663e59",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 32,
-          "kind": "constant",
-          "name": "ADDRESS_SPACE_STORAGE",
-          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 32,
-          "tokenCount": 15
-        },
-        {
-          "endLine": 50,
-          "kind": "constant",
-          "name": "ADDRESS_SPACE_STORAGE",
-          "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 50,
-          "tokenCount": 15
-        }
-      ],
-      "normalizedTokenSha256": "828afb37b28b38ed1e1491fe6e05729dae206a7de5ddb8e0c1a97f516cdf314d",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -17163,11 +17291,11 @@
     {
       "locations": [
         {
-          "endLine": 395,
+          "endLine": 368,
           "kind": "function",
           "name": "prewarm_upload_path",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 393,
+          "startLine": 366,
           "tokenCount": 30
         },
         {
@@ -17231,6 +17359,28 @@
     {
       "locations": [
         {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "emit_msl",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "emit_msl",
+          "path": "src/compiler/wgsl/runtime/shader_info.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "84b1e9dd3d84404a3190dd972a1853ce547fb44fe74bbd10cb0c5f02200eed42",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 86,
           "kind": "function",
           "name": "wgpu_compare_to_vk",
@@ -17275,11 +17425,11 @@
     {
       "locations": [
         {
-          "endLine": 32,
+          "endLine": 31,
           "kind": "constant",
           "name": "DoeShaderModule",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 32,
+          "startLine": 31,
           "tokenCount": 6
         },
         {
@@ -17299,19 +17449,19 @@
           "tokenCount": 6
         },
         {
-          "endLine": 34,
+          "endLine": 36,
           "kind": "constant",
           "name": "DoeShaderModule",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 34,
+          "startLine": 36,
           "tokenCount": 6
         },
         {
-          "endLine": 11,
+          "endLine": 12,
           "kind": "constant",
           "name": "DoeShaderModule",
           "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 11,
+          "startLine": 12,
           "tokenCount": 6
         },
         {
@@ -17323,11 +17473,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 35,
+          "endLine": 38,
           "kind": "constant",
           "name": "DoeShaderModule",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 35,
+          "startLine": 38,
           "tokenCount": 6
         }
       ],
@@ -17337,11 +17487,11 @@
     {
       "locations": [
         {
-          "endLine": 35,
+          "endLine": 34,
           "kind": "constant",
           "name": "MAX_FLAT_BIND",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 35,
+          "startLine": 34,
           "tokenCount": 6
         },
         {
@@ -17359,11 +17509,11 @@
     {
       "locations": [
         {
-          "endLine": 391,
+          "endLine": 364,
           "kind": "function",
           "name": "flush_queue",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 389,
+          "startLine": 362,
           "tokenCount": 24
         },
         {
@@ -17833,11 +17983,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 29,
+          "endLine": 28,
           "kind": "constant",
           "name": "MANIFEST_STATUS_CODE_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 29,
+          "startLine": 28,
           "tokenCount": 6
         },
         {
@@ -18217,68 +18367,6 @@
     {
       "locations": [
         {
-          "endLine": 6,
-          "kind": "constant",
-          "name": "wgsl_compiler",
-          "path": "src/backend/metal/metal_runtime_resources.zig",
-          "startLine": 6,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 14,
-          "kind": "constant",
-          "name": "wgsl_compiler",
-          "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 14,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 28,
-          "kind": "constant",
-          "name": "wgsl_compiler",
-          "path": "src/native/shader/doe_shader_compilation_info_native.zig",
-          "startLine": 28,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 8,
-          "kind": "constant",
-          "name": "wgsl_compiler",
-          "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 8,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 5,
-          "kind": "constant",
-          "name": "wgsl_compiler",
-          "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 5,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 8,
-          "kind": "constant",
-          "name": "wgsl_compiler",
-          "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 8,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 7,
-          "kind": "constant",
-          "name": "wgsl_compiler",
-          "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 7,
-          "tokenCount": 7
-        }
-      ],
-      "normalizedTokenSha256": "8f085a3a7a66ba065e4c6190f506605198e38c757f0ff4f99a55b4bc89b24693",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
           "endLine": 2,
           "kind": "constant",
           "name": "artifact_meta",
@@ -18373,11 +18461,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 31,
+          "endLine": 30,
           "kind": "constant",
           "name": "DoePipelineLayout",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 31,
+          "startLine": 30,
           "tokenCount": 6
         },
         {
@@ -18397,11 +18485,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 36,
+          "endLine": 38,
           "kind": "constant",
           "name": "DoePipelineLayout",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 36,
+          "startLine": 38,
           "tokenCount": 6
         },
         {
@@ -18413,11 +18501,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 40,
+          "endLine": 43,
           "kind": "constant",
           "name": "DoePipelineLayout",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 40,
+          "startLine": 43,
           "tokenCount": 6
         }
       ],
@@ -18597,11 +18685,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 22,
+          "endLine": 24,
           "kind": "constant",
           "name": "metal_bridge_library_new_function",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 22,
+          "startLine": 24,
           "tokenCount": 6
         }
       ],
@@ -18921,11 +19009,11 @@
     {
       "locations": [
         {
-          "endLine": 383,
+          "endLine": 356,
           "kind": "function",
           "name": "set_queue_sync_mode",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 381,
+          "startLine": 354,
           "tokenCount": 29
         },
         {
@@ -19093,11 +19181,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 30,
+          "endLine": 33,
           "kind": "constant",
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 30,
+          "startLine": 33,
           "tokenCount": 6
         }
       ],
@@ -19733,11 +19821,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 28,
+          "endLine": 27,
           "kind": "constant",
           "name": "DoeBindGroup",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 28,
+          "startLine": 27,
           "tokenCount": 6
         },
         {
@@ -19781,11 +19869,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 38,
+          "endLine": 41,
           "kind": "constant",
           "name": "DoeBindGroup",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 38,
+          "startLine": 41,
           "tokenCount": 6
         }
       ],
@@ -19979,11 +20067,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 41,
+          "endLine": 44,
           "kind": "constant",
           "name": "DoeTexture",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 41,
+          "startLine": 44,
           "tokenCount": 6
         }
       ],
@@ -20253,11 +20341,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 23,
+          "endLine": 22,
           "kind": "constant",
           "name": "metal_bridge_buffer_contents",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 23,
+          "startLine": 22,
           "tokenCount": 6
         },
         {
@@ -21251,11 +21339,33 @@
     {
       "locations": [
         {
-          "endLine": 38,
+          "endLine": 6,
+          "kind": "constant",
+          "name": "msl_translation",
+          "path": "src/backend/metal/metal_runtime_resources.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 10,
+          "kind": "constant",
+          "name": "msl_translation",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 10,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "aefb253b9ebfa14135cc4512ce8f54aa3b9d283c0140cb75029ecc7876e49511",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 37,
           "kind": "constant",
           "name": "RESOURCE_KIND_NONE",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 38,
+          "startLine": 37,
           "tokenCount": 10
         },
         {
@@ -21320,6 +21430,28 @@
         }
       ],
       "normalizedTokenSha256": "b035363845864c8b6dc66901a487a2748e09980eb841d15a43b9296725e40361",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 31,
+          "kind": "constant",
+          "name": "BINDING_KIND_BUFFER",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 31,
+          "tokenCount": 13
+        },
+        {
+          "endLine": 52,
+          "kind": "constant",
+          "name": "BINDING_KIND_BUFFER",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 52,
+          "tokenCount": 13
+        }
+      ],
+      "normalizedTokenSha256": "b07a057d154d1d95eef7fa75acb84d63c659dcfd8b94e27b52733a67e3534eb6",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -21615,11 +21747,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 31,
+          "endLine": 33,
           "kind": "constant",
           "name": "label_store",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 31,
+          "startLine": 33,
           "tokenCount": 6
         }
       ],
@@ -22951,6 +23083,62 @@
           "tokenCount": 7
         },
         {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/pipeline/binding_reflection.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/pipeline/overrides.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "ir",
+          "path": "src/compiler/wgsl/pipeline/translate_spirv.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
           "endLine": 2,
           "kind": "constant",
           "name": "ir",
@@ -23529,14 +23717,6 @@
           "kind": "constant",
           "name": "std",
           "path": "src/backend/metal/metal_dispatch_runtime.zig",
-          "startLine": 1,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 1,
-          "kind": "constant",
-          "name": "std",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
           "startLine": 1,
           "tokenCount": 7
         },
@@ -24333,14 +24513,6 @@
           "tokenCount": 7
         },
         {
-          "endLine": 1,
-          "kind": "constant",
-          "name": "std",
-          "path": "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
-          "startLine": 1,
-          "tokenCount": 7
-        },
-        {
           "endLine": 52,
           "kind": "constant",
           "name": "std",
@@ -24941,11 +25113,67 @@
           "tokenCount": 7
         },
         {
-          "endLine": 54,
+          "endLine": 1,
           "kind": "constant",
           "name": "std",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 54,
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/pipeline/binding_reflection.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/pipeline/overrides.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+          "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 1,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/compiler/wgsl/pipeline/translate_spirv.zig",
+          "startLine": 1,
           "tokenCount": 7
         },
         {
@@ -26755,11 +26983,11 @@
     {
       "locations": [
         {
-          "endLine": 387,
+          "endLine": 360,
           "kind": "function",
           "name": "set_gpu_timestamp_mode",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 385,
+          "startLine": 358,
           "tokenCount": 29
         },
         {
@@ -27359,11 +27587,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 22,
+          "endLine": 21,
           "kind": "constant",
           "name": "metal_pipeline_cache",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 22,
+          "startLine": 21,
           "tokenCount": 7
         }
       ],
@@ -27405,11 +27633,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 31,
+          "endLine": 34,
           "kind": "constant",
           "name": "MAX_BIND",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 31,
+          "startLine": 34,
           "tokenCount": 6
         }
       ],
@@ -27479,11 +27707,11 @@
     {
       "locations": [
         {
-          "endLine": 23,
+          "endLine": 22,
           "kind": "constant",
           "name": "backend_policy",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 23,
+          "startLine": 22,
           "tokenCount": 7
         },
         {
@@ -27901,11 +28129,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 30,
+          "endLine": 32,
           "kind": "constant",
           "name": "ERR_CAP",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 30,
+          "startLine": 32,
           "tokenCount": 6
         }
       ],
@@ -28329,11 +28557,11 @@
     {
       "locations": [
         {
-          "endLine": 42,
+          "endLine": 41,
           "kind": "constant",
           "name": "RESOURCE_KIND_STORAGE_TEXTURE",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 42,
+          "startLine": 41,
           "tokenCount": 10
         },
         {
@@ -28989,11 +29217,11 @@
     {
       "locations": [
         {
-          "endLine": 374,
+          "endLine": 347,
           "kind": "function",
           "name": "set_queue_wait_mode",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 372,
+          "startLine": 345,
           "tokenCount": 29
         },
         {
@@ -29157,11 +29385,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 14,
+          "endLine": 17,
           "kind": "constant",
           "name": "native_cmds",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 14,
+          "startLine": 17,
           "tokenCount": 7
         }
       ],
@@ -29569,11 +29797,11 @@
     {
       "locations": [
         {
-          "endLine": 34,
+          "endLine": 33,
           "kind": "constant",
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 34,
+          "startLine": 33,
           "tokenCount": 6
         },
         {
@@ -30559,6 +30787,28 @@
     {
       "locations": [
         {
+          "endLine": 20,
+          "kind": "constant",
+          "name": "spirv_translation",
+          "path": "src/backend/vulkan/vk_pipeline.zig",
+          "startLine": 20,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "spirv_translation",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "e6831a233e143fa040befdeaae70f0b3269b9a840904bc4d66993e5bc5047dd9",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 41,
           "kind": "constant",
           "name": "WGPUTextureFormat_R8Sint",
@@ -30625,11 +30875,11 @@
     {
       "locations": [
         {
-          "endLine": 30,
+          "endLine": 29,
           "kind": "constant",
           "name": "DoeBindGroupLayoutEntry",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 30,
+          "startLine": 29,
           "tokenCount": 6
         },
         {
@@ -30649,11 +30899,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 44,
+          "endLine": 47,
           "kind": "constant",
           "name": "DoeBindGroupLayoutEntry",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 44,
+          "startLine": 47,
           "tokenCount": 6
         }
       ],
@@ -31225,11 +31475,11 @@
     {
       "locations": [
         {
-          "endLine": 411,
+          "endLine": 384,
           "kind": "function",
           "name": "prewarm_kernel_dispatch",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 397,
+          "startLine": 370,
           "tokenCount": 63
         },
         {
@@ -31745,19 +31995,19 @@
           "tokenCount": 7
         },
         {
-          "endLine": 16,
+          "endLine": 18,
           "kind": "constant",
           "name": "native_helpers",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 16,
+          "startLine": 18,
           "tokenCount": 7
         },
         {
-          "endLine": 8,
+          "endLine": 9,
           "kind": "constant",
           "name": "native_helpers",
           "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 8,
+          "startLine": 9,
           "tokenCount": 7
         },
         {
@@ -31777,11 +32027,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 15,
+          "endLine": 18,
           "kind": "constant",
           "name": "native_helpers",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 15,
+          "startLine": 18,
           "tokenCount": 7
         },
         {
@@ -31807,11 +32057,11 @@
     {
       "locations": [
         {
-          "endLine": 41,
+          "endLine": 40,
           "kind": "constant",
           "name": "RESOURCE_KIND_TEXTURE",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 41,
+          "startLine": 40,
           "tokenCount": 10
         },
         {
@@ -32635,33 +32885,11 @@
     {
       "locations": [
         {
-          "endLine": 35,
-          "kind": "constant",
-          "name": "ACCESS_READ_WRITE",
-          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 35,
-          "tokenCount": 15
-        },
-        {
-          "endLine": 53,
-          "kind": "constant",
-          "name": "ACCESS_READ_WRITE",
-          "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 53,
-          "tokenCount": 15
-        }
-      ],
-      "normalizedTokenSha256": "f3e1a746413be96c868441251314b3c0ba565cdc3a11271d732c27d98957afd4",
-      "reason": "identical normalized Zig declaration token stream"
-    },
-    {
-      "locations": [
-        {
-          "endLine": 17,
+          "endLine": 16,
           "kind": "constant",
           "name": "bridge",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 17,
+          "startLine": 16,
           "tokenCount": 6
         },
         {
@@ -32697,11 +32925,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 19,
+          "endLine": 21,
           "kind": "constant",
           "name": "bridge",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 19,
+          "startLine": 21,
           "tokenCount": 6
         },
         {
@@ -32849,11 +33077,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 58,
+          "endLine": 61,
           "kind": "constant",
           "name": "SPIRV_MAGIC",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 58,
+          "startLine": 61,
           "tokenCount": 6
         }
       ],
@@ -32915,11 +33143,11 @@
     {
       "locations": [
         {
-          "endLine": 40,
+          "endLine": 39,
           "kind": "constant",
           "name": "RESOURCE_KIND_SAMPLER",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 40,
+          "startLine": 39,
           "tokenCount": 10
         },
         {
@@ -33455,14 +33683,6 @@
     {
       "locations": [
         {
-          "endLine": 4,
-          "kind": "constant",
-          "name": "host",
-          "path": "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
-          "startLine": 4,
-          "tokenCount": 7
-        },
-        {
           "endLine": 24,
           "kind": "constant",
           "name": "host",
@@ -33737,11 +33957,11 @@
     {
       "locations": [
         {
-          "endLine": 469,
+          "endLine": 466,
           "kind": "function",
           "name": "set_queue_wait_mode",
           "path": "src/backend/metal/backend_execute.zig",
-          "startLine": 466,
+          "startLine": 463,
           "tokenCount": 33
         },
         {
@@ -34215,19 +34435,19 @@
           "tokenCount": 7
         },
         {
-          "endLine": 14,
+          "endLine": 16,
           "kind": "constant",
           "name": "native_types",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 14,
+          "startLine": 16,
           "tokenCount": 7
         },
         {
-          "endLine": 6,
+          "endLine": 7,
           "kind": "constant",
           "name": "native_types",
           "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 6,
+          "startLine": 7,
           "tokenCount": 7
         },
         {
@@ -34247,11 +34467,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 12,
+          "endLine": 15,
           "kind": "constant",
           "name": "native_types",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 12,
+          "startLine": 15,
           "tokenCount": 7
         },
         {
@@ -34274,6 +34494,14 @@
           "name": "lean_proof",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
           "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "lean_proof",
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 11,
           "tokenCount": 7
         },
         {
@@ -34329,9 +34557,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "8990f85173273a2903be00f6127356348be51d9ed7048af47251dad5d426313f",
+  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6"
+  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe"
 }

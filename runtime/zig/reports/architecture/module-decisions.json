@@ -54,7 +54,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "9501587dad21476c5c9877af7c862724af5e077930c48e6c349c0c100a7d615e",
+      "moduleSha256": "8f32ebe387b7ef156e01a09009a4dfa2e043f7d54f6983ec7ea2627bd6e542ac",
       "path": "src/backend/backend_runtime_telemetry.zig",
       "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -354,7 +354,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "560e02ade2b3e278be345aa4b5311f070535f75c9b66993b5cb01258e149d26e",
+      "moduleSha256": "b22bf6cd74d5c39c79ef262efb9c13b425ef177c0b899f07ce3226cbe28fa848",
       "path": "src/backend/d3d12/d3d12_runtime_compute.zig",
       "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -571,7 +571,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "fdc31544933336571d516d8cae08506957606fb06fbfc215d1578639fa49a968",
+      "moduleSha256": "f4c383b1dc8ac8cac5a21263d9c22138272c4191e1f36801f4e8e2e883ece424",
       "path": "src/backend/metal/backend_execute.zig",
       "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -691,18 +691,6 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "cf52c3e2dc79b454cd161575da8463303c50a8e6c210dd6d89330d5d2a75dad8",
-      "path": "src/backend/metal/metal_host_plan_artifact.zig",
-      "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-      "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
-      "suggestedDecision": "Keep"
-    },
-    {
-      "decision": "Keep",
-      "evidence": [
-        "no mechanical merge, elevation, deletion, or split signal"
-      ],
       "moduleSha256": "e1be711ec4daca7e2ac33b405a9e6f3ccf745fa24607f0b66a88ec170648c6a8",
       "path": "src/backend/metal/metal_kernel_dispatch.zig",
       "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
@@ -799,7 +787,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "ddff84b7f2d888a6879c415e96a1c4cb2b1736428a9e796b4167c768d69f6e5a",
+      "moduleSha256": "e2c4c21b579e9c4a0ea203d5a3880dc5846c0b9ad7eb21760360f3653c3c4048",
       "path": "src/backend/metal/metal_runtime_resources.zig",
       "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -836,7 +824,7 @@
         "declared production root",
         "special roles: package-root"
       ],
-      "moduleSha256": "bb872ecfcc14e7b6c7070a240ed21e55072da5f3b8e903e8e1dcb4195ab6e85c",
+      "moduleSha256": "33002a90b3239117fce1c24ce812a753e3264627e65ffb952da7be4fb5fa0812",
       "path": "src/backend/metal/mod.zig",
       "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -1126,7 +1114,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "85099c62a20e0f80df068c1d01558571dcb4bbad2992f81ac160659d697c6bfd",
+      "moduleSha256": "a146c2c7bd238c7f4d3468a72ce94680107e72983b8a3ad71576446059440e6c",
       "path": "src/backend/vulkan/vk_pipeline.zig",
       "reason": "Keep: independently tested Vulkan compute-pipeline and descriptor-cache capsule shared by six production consumers.",
       "reviewStatus": "reviewed",
@@ -2356,18 +2344,6 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "ac4914b7ac74b3bde607cfb658478cad7da6bb2e2960badcfc180b4d1178672e",
-      "path": "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
-      "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-      "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
-      "suggestedDecision": "Keep"
-    },
-    {
-      "decision": "Keep",
-      "evidence": [
-        "no mechanical merge, elevation, deletion, or split signal"
-      ],
       "moduleSha256": "a06a490f444ee267e1cde9b1b145cdd7424be05d040178548ccaed1aa743e20d",
       "path": "src/compiler/wgsl/emit/csl/emit_csl.zig",
       "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
@@ -3494,14 +3470,111 @@
     {
       "decision": "Keep",
       "evidence": [
-        "exceeds the 800-line architecture review signal"
+        "declared production root",
+        "special roles: package-root"
       ],
-      "moduleSha256": "bedc09f19f2b26522d95c58ab4bc9bfdfc2145c1237910d6087153555ab51244",
+      "moduleSha256": "144dd739b734b3feb58587e9b3d01b09c35994e7a03662b73f4733defe03ca8f",
       "path": "src/compiler/wgsl/mod.zig",
       "reason": "Keep: public WGSL compiler API, phase orchestration, diagnostics, and compatibility boundary; implementation phases remain in narrow modules.",
       "reviewStatus": "reviewed",
       "reviewer": "codex-recomposition-review/2026-08-08",
-      "suggestedDecision": "Recompose"
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "c3ac6724046966ded0c66fc523737efb207ed387bfe28924a7d977071f4d1f44",
+      "path": "src/compiler/wgsl/pipeline/analysis.zig",
+      "reason": "Keep: reachable compiler implementation shared by 14 production consumers with no conflicting ownership signal.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "baba7244ef80d30b25d13e0cf029fce14f021e34cef70c788a192e3753d62b43",
+      "path": "src/compiler/wgsl/pipeline/binding_reflection.zig",
+      "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "83d04375464f3baf89e82fa68a9ae0fc783e520184f52592d46abbbe05dd447f",
+      "path": "src/compiler/wgsl/pipeline/overrides.zig",
+      "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "3018e386c795f6ab01ac450e6ff9564205a92eba4efdd13ecf0d6bc88ed79f50",
+      "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+      "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "dcd0a8018388ff518cbfb48fefa091c92335255f574a3554dda42a9789f40e13",
+      "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+      "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "6a9da71eceebcbdaf3124fc00596e0aee33376c194b738f12ae5ab9c59848080",
+      "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+      "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "9621196bb55ef1ad7ecc4c634c8220359ab926141efa85ef0800ab48b37628a5",
+      "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+      "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "38b658fe883a1358dd71a4a067f8d7dc8f22a547b5a61979984863583e6e173f",
+      "path": "src/compiler/wgsl/pipeline/translate_spirv.zig",
+      "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-recomposition-review/2026-08-09",
+      "suggestedDecision": "Keep"
     },
     {
       "decision": "Keep",
@@ -3556,7 +3629,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "16744af5c36984acc70315fcc30a4d7c6d2ff843455febbb6346af9a19411643",
+      "moduleSha256": "9a44a6954663f3543ff7926cbd562d37a60633d7bf8f99862c39a0b782508a7c",
       "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
       "reason": "Keep: cohesive runtime shader compilation and cache admission state machine.",
       "reviewStatus": "reviewed",
@@ -3568,7 +3641,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "53dae67f995f4fe72dc960580617a0ac7c55bf603300a3b5defe584edae487f5",
+      "moduleSha256": "4093566fa2b23de6669f85333a3e915ad2201497723f7f0b209f294b2298c178",
       "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
       "reason": "Keep: executable process root at src/compiler/wgsl/runtime/runtime_compile_report.zig.",
       "reviewStatus": "reviewed",
@@ -3580,7 +3653,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "c9b6463597f2bd4815f56dc9e0e979b99960b723a888b43a2e6639d0a8b36def",
+      "moduleSha256": "8fef0777d5a4064ef228ec3abbb55a1c5eaa3356eed80a157ad5e8700dc1619a",
       "path": "src/compiler/wgsl/runtime/shader_info.zig",
       "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -5075,7 +5148,7 @@
       "evidence": [
         "one production consumer with no public declaration, local test, or special role"
       ],
-      "moduleSha256": "831530f5a09ea5d6f65b72a8ecb453f9dc7844caa73e28f8bde2819ab480cd23",
+      "moduleSha256": "0e086cad3bb6015733a28a73712cf3ddfb9a00b053874957731d0e809f8caa43",
       "path": "src/native/compute/doe_compute_ext_native.zig",
       "reason": "Keep: native compute extension ABI boundary consumed by the core export surface.",
       "reviewStatus": "reviewed",
@@ -5424,7 +5497,7 @@
       "evidence": [
         "one production consumer with no public declaration, local test, or special role"
       ],
-      "moduleSha256": "355798b6da04706b2c8169e9b8974b3fc608510d15605c84370fb6e66858a37a",
+      "moduleSha256": "a2b769f592e4d0e2272acaf52eab102d3236fd6dccb9661e61899a9db4f74a10",
       "path": "src/native/shader/doe_shader_compilation_info_native.zig",
       "reason": "Keep: asynchronous shader compilation-info callback ABI and lifetime capsule.",
       "reviewStatus": "reviewed",
@@ -5436,7 +5509,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "6836f5c7c6ede2bca672d95a0978b59025b8c1e697569e81f833f51c4104be24",
+      "moduleSha256": "533654405024b618be5a385e03e293821f1e66ee11c6ef5d4de791dc00487889",
       "path": "src/native/shader/doe_shader_native.zig",
       "reason": "Keep: native shader-module creation, translation, cache, diagnostics, and object-lifetime boundary.",
       "reviewStatus": "reviewed",
@@ -5460,7 +5533,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "7bcf30ee1c9cb8b32094000c1bfa7e4c0494bf54e852dde7bba87d060aafffc2",
+      "moduleSha256": "2966273b7256b5327ccdb303c2c29e5166d086d092c165cfc1fa79e297a7301a",
       "path": "src/native/shader/shader_binding_reflection.zig",
       "reason": "Keep: reachable native implementation shared by 3 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -5556,7 +5629,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "c413fe0bd1e6b8dba098f2d805e8c26a4aac861d687ffc929ad4ce31a4169867",
+      "moduleSha256": "3e21635cad13cb97d31d030a469990773d74049d946477efb30e3671528488fc",
       "path": "src/native/support/doe_native_object_types.zig",
       "reason": "Keep: reachable native implementation shared by 43 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -5580,7 +5653,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "435927f89d2598b3c4857aee183460b1b6f5ce8522e3ef0b3e5b10b2b099801a",
+      "moduleSha256": "e61eedc58eb914bf7ac3fe3b3c32459d7518dbd01d085ac6a97bde666bbbb801",
       "path": "src/native/support/doe_native_shared_types.zig",
       "reason": "Keep: reachable native implementation shared by 28 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -5604,7 +5677,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "33bd6968334e6c22d3e5e9ba2261a88082c059a302227c92252090fe0084a2c0",
+      "moduleSha256": "175df83707b40f4c3857f24f2091ce0f6366d6d790635e6ad13f0685b7d8f2f3",
       "path": "src/native/vulkan/vulkan_compute_bindings.zig",
       "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -5616,7 +5689,7 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "64e78477fda0424f128d5d524f43ff0c4e73947e94c124b83f64bf3a4f083884",
+      "moduleSha256": "89783231d899800b0f5b4c74ee2a8c9fd4ed3346ca977d40a3833462a20ab8e9",
       "path": "src/native/vulkan/vulkan_compute_native.zig",
       "reason": "Keep: native WebGPU-to-Vulkan compute command orchestration and lifetime boundary.",
       "reviewStatus": "reviewed",
@@ -5688,7 +5761,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "8adf2b50c40ac286cf195191a7afa3d5023efedd05227a5125c34c59fe60a654",
+      "moduleSha256": "4bc2ec3ce2aea5cc7b670a705794ab790c70ca5c0707e3e000820e1f7b994b7b",
       "path": "src/native/vulkan/vulkan_render_pipeline_native.zig",
       "reason": "Keep: reachable native implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -6471,13 +6544,13 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "8990f85173273a2903be00f6127356348be51d9ed7048af47251dad5d426313f",
+  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
   "pendingCount": 0,
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
-  "reviewedCount": 536,
+  "reviewedCount": 542,
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6",
+  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe",
   "status": "complete",
-  "totalCount": 536
+  "totalCount": 542
 }

@@ -7,8 +7,27 @@ page records the lifecycle interpretation and follow-up decisions.
 
 ## Current canonicalization pass
 
-The latest source-layout evidence incorporates a behavior-preserving
-consolidation of repeated Zig implementation details:
+The latest source-layout evidence incorporates two boundary corrections:
+
+- `src/compiler/wgsl/mod.zig` is now a compatibility facade. Analysis,
+  diagnostics, binding reflection, override application, and per-target
+  translation live under `src/compiler/wgsl/pipeline/`; shipped backend and
+  native consumers import only the stage and target they execute.
+- Metal kernel dispatch no longer writes CSL and HostPlan files under
+  `bench/out/` or silently ignores generation failures. HostPlan creation stays
+  in the explicit spatial, plan-executor, and benchmark lanes; the shared
+  receipt fields remain available for those paths.
+- WGSL translation integration tests and their shared fixture now live under
+  `runtime/zig/tests/wgsl/`, rather than making test support reachable from the
+  production compiler graph.
+
+See `runtime/zig/reports/architecture/reachability-views.json` for the measured
+change to the shipped runtime graph. CSL target modules are now confined to the
+compiler/TSIR/spatial toolchain view rather than arriving through runtime
+facade imports.
+
+The same evidence also incorporates a behavior-preserving consolidation of
+repeated Zig implementation details:
 
 - execution result construction and telemetry snapshots are owned by
   `src/runtime/execution_receipt.zig`;
@@ -83,7 +102,7 @@ production-shaped roots.
 | Surface | Classification | Boundary decision |
 | --- | --- | --- |
 | `src/contracts/` | Canonical | Shared semantic contracts. New consumers should import these rather than backend or model-specific copies. |
-| `src/compiler/wgsl/` | Canonical | WGSL parsing, IR, transforms, proofs, and target emission. Keep lowering separate from native execution. |
+| `src/compiler/wgsl/` | Canonical | WGSL parsing, IR, transforms, proofs, and target emission. `mod.zig` is the compatibility facade; runtime code imports narrow `pipeline/` stages. Keep lowering separate from native execution. |
 | `src/compiler/tsir/` | Diagnostic/canonical research path | Doe-owned portability path with real contracts, but broad target execution is not yet promoted. |
 | `src/backend/common/` | Canonical shared implementation | The current helpers import canonical contracts and are reused by backend paths; no merge is justified from this audit. |
 | `src/backend/metal/`, `vulkan/`, `d3d12/` | Canonical platform components | Keep separate because the native APIs, synchronization, memory, and failure models differ. Reuse policy, contracts, tracing, and common helpers. |
@@ -155,8 +174,9 @@ identity, timing, trace, and error taxonomy.
 6. Re-run import-fence, source-layout, core tests, WGSL tests, and package tests
    after each migration.
 
-The correction deletes only the disconnected barrels and unconsumed
-render-runtime chain named above; it does not change a shipped execution path.
-The evidence currently supports “layered with module-incubation separation and
-targeted file review,” not “rewrite the runtime” or “everything is already
-optimally abstracted.”
+The earlier correction deleted only disconnected barrels and the unconsumed
+render-runtime chain. The current correction also removes an undocumented
+Metal-dispatch side effect: HostPlan evidence must now be produced by an
+explicit plan or benchmark lane. The evidence supports “layered with
+module-incubation separation and targeted file review,” not “rewrite the
+runtime” or “everything is already optimally abstracted.”

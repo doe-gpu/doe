@@ -1,6 +1,6 @@
 const std = @import("std");
 const api = @import("../../src/compiler/wgsl/mod.zig");
-const csl_tests = @import("../../src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig");
+const csl_tests = @import("translation_test_support.zig");
 const lean_proof = @import("../../src/verification/lean_proof.zig");
 
 const TranslateError = api.TranslateError;

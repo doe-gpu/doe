@@ -816,6 +816,13 @@
       "consumers": [
         "tests/wgsl/shader_emit_test.zig"
       ]
+    },
+    {
+      "path": "tests/wgsl/translation_test_support.zig",
+      "kind": "domain-fixture",
+      "consumers": [
+        "tests/wgsl/translation_facade_test.zig"
+      ]
     }
   ]
 }

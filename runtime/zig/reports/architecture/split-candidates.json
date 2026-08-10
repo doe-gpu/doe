@@ -72,7 +72,7 @@
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 3,
       "lineCount": 989,
       "path": "src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig",
@@ -135,17 +135,10 @@
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
-      "fanIn": 1,
+      "fanIn": 4,
       "fanOut": 6,
       "lineCount": 951,
       "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-      "reason": "handwritten module exceeds the 800-line architecture review signal"
-    },
-    {
-      "fanIn": 18,
-      "fanOut": 48,
-      "lineCount": 912,
-      "path": "src/compiler/wgsl/mod.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
@@ -164,8 +157,8 @@
     },
     {
       "fanIn": 7,
-      "fanOut": 3,
-      "lineCount": 916,
+      "fanOut": 7,
+      "lineCount": 920,
       "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -192,15 +185,15 @@
     },
     {
       "fanIn": 2,
-      "fanOut": 16,
-      "lineCount": 964,
+      "fanOut": 18,
+      "lineCount": 966,
       "path": "src/native/shader/doe_shader_native.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
     {
       "fanIn": 4,
-      "fanOut": 15,
-      "lineCount": 993,
+      "fanOut": 18,
+      "lineCount": 996,
       "path": "src/native/vulkan/vulkan_compute_native.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -220,9 +213,9 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "8990f85173273a2903be00f6127356348be51d9ed7048af47251dad5d426313f",
+  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6"
+  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe"
 }

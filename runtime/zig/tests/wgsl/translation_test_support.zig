@@ -1,7 +1,7 @@
 const std = @import("std");
-const csl_spec = @import("csl_spec.zig");
-const exec_v1 = @import("emit_csl_exec_v1.zig");
-const host = @import("emit_csl_host.zig");
+const csl_spec = @import("../../src/compiler/wgsl/emit/csl/csl_spec.zig");
+const exec_v1 = @import("../../src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig");
+const host = @import("../../src/compiler/wgsl/emit/csl/emit_csl_host.zig");
 
 pub fn expectArrayLengthInComparisonCompiles(
     allocator: std.mem.Allocator,

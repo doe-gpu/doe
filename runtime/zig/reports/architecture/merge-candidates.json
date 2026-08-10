@@ -24,7 +24,7 @@
     },
     {
       "consumer": "src/native/api/doe_native_api_core_exports.zig",
-      "lineCount": 382,
+      "lineCount": 381,
       "owner": "native",
       "path": "src/native/compute/doe_compute_ext_native.zig",
       "reason": "one production consumer, no public declaration, no local test, and no special role"
@@ -73,9 +73,9 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "8990f85173273a2903be00f6127356348be51d9ed7048af47251dad5d426313f",
+  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6"
+  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe"
 }

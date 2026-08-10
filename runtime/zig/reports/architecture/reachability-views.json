@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
-  "classifiedLineCount": 141373,
-  "classifiedModuleCount": 530,
+  "classifiedLineCount": 140769,
+  "classifiedModuleCount": 536,
   "facadeOnlyFiles": [
     {
       "aggregateProductionRoot": true,
@@ -42,19 +42,19 @@
   ],
   "facadeOnlyLineCount": 240,
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "8990f85173273a2903be00f6127356348be51d9ed7048af47251dad5d426313f",
+  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6",
+  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe",
   "unclassifiedFiles": [],
   "unclassifiedLineCount": 0,
   "views": [
     {
       "description": "WGSL compiler, TSIR, CSL, proof-consumer, and spatial toolchain roots selected by repository build targets",
       "name": "compiler-tsir-spatial-toolchains",
-      "reachableLineCount": 55104,
-      "reachableModuleCount": 168,
+      "reachableLineCount": 54680,
+      "reachableModuleCount": 175,
       "rootPatterns": [
         "src/cli/entrypoints/main_emit*.zig",
         "src/compiler/wgsl/mod.zig",
@@ -88,8 +88,8 @@
     {
       "description": "Drop-in WebGPU ABI routing and the declared legacy flat compatibility facade",
       "name": "dropin-compatibility",
-      "reachableLineCount": 103156,
-      "reachableModuleCount": 364,
+      "reachableLineCount": 84350,
+      "reachableModuleCount": 312,
       "rootPatterns": [
         "src/dropin/root.zig",
         "src/dropin/wgpu_dropin_lib.zig",
@@ -104,8 +104,8 @@
     {
       "description": "Module incubation, plan comparison, and repo-only integration executables used for evidence rather than shipped runtime claims",
       "name": "module-incubation-evidence-tools",
-      "reachableLineCount": 95931,
-      "reachableModuleCount": 348,
+      "reachableLineCount": 76787,
+      "reachableModuleCount": 293,
       "rootPatterns": [
         "src/cli/entrypoints/module_runner.zig",
         "src/cli/module_runner_cli.zig",
@@ -135,8 +135,8 @@
     {
       "description": "Implementation roots selected by the shipped runtime CLI and libwebgpu_doe package artifact",
       "name": "shipped-native-package-runtime",
-      "reachableLineCount": 123133,
-      "reachableModuleCount": 448,
+      "reachableLineCount": 104136,
+      "reachableModuleCount": 395,
       "rootPatterns": [
         "src/cli/entrypoints/main.zig",
         "src/cli/runtime_cli.zig",

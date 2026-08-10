@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "8990f85173273a2903be00f6127356348be51d9ed7048af47251dad5d426313f",
+  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
   "modules": [
     {
       "containsCImport": false,
@@ -262,7 +262,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-interface",
-      "lineCount": 91,
+      "lineCount": 89,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/backend_runtime_telemetry.zig",
@@ -300,7 +300,7 @@
         "src/cli/runtime_cli.zig"
       ],
       "roles": [],
-      "sha256": "9501587dad21476c5c9877af7c862724af5e077930c48e6c349c0c100a7d615e",
+      "sha256": "8f32ebe387b7ef156e01a09009a4dfa2e043f7d54f6983ec7ea2627bd6e542ac",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 11
     },
@@ -2384,7 +2384,7 @@
         "src/backend/d3d12/d3d12_constants.zig",
         "src/backend/d3d12/d3d12_descriptors.zig",
         "src/backend/runtime_types.zig",
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_hlsl.zig",
         "src/contracts/execution.zig",
         "src/contracts/shader_abi/dispatch_info.zig"
       ],
@@ -2468,7 +2468,7 @@
         "src/backend/d3d12/d3d12_native_runtime.zig"
       ],
       "roles": [],
-      "sha256": "560e02ade2b3e278be345aa4b5311f070535f75c9b66993b5cb01258e149d26e",
+      "sha256": "b22bf6cd74d5c39c79ef262efb9c13b425ef177c0b899f07ce3226cbe28fa848",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 35
     },
@@ -3564,13 +3564,12 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 17,
+      "fanOut": 16,
       "imports": [
         "src/backend/common/artifact_policy.zig",
         "src/backend/common/submit_count_policy.zig",
         "src/backend/common/timing.zig",
         "src/backend/metal/metal_bridge_decls.zig",
-        "src/backend/metal/metal_host_plan_artifact.zig",
         "src/backend/runtime_types.zig",
         "src/contracts/artifact.zig",
         "src/contracts/capability.zig",
@@ -3586,7 +3585,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-metal",
-      "lineCount": 521,
+      "lineCount": 518,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/metal/backend_execute.zig",
@@ -3594,57 +3593,57 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 410,
+          "line": 407,
           "name": "execute_command"
         },
         {
           "kind": "fn",
-          "line": 426,
+          "line": 423,
           "name": "execute_dispatch_request"
         },
         {
           "kind": "fn",
-          "line": 443,
+          "line": 440,
           "name": "execute_buffer_write_bytes_iface"
         },
         {
           "kind": "fn",
-          "line": 458,
+          "line": 455,
           "name": "set_upload_behavior"
         },
         {
           "kind": "fn",
-          "line": 466,
+          "line": 463,
           "name": "set_queue_wait_mode"
         },
         {
           "kind": "fn",
-          "line": 471,
+          "line": 468,
           "name": "set_queue_sync_mode"
         },
         {
           "kind": "fn",
-          "line": 476,
+          "line": 473,
           "name": "set_gpu_timestamp_mode"
         },
         {
           "kind": "fn",
-          "line": 481,
+          "line": 478,
           "name": "flush_queue"
         },
         {
           "kind": "fn",
-          "line": 487,
+          "line": 484,
           "name": "prewarm_upload_path"
         },
         {
           "kind": "fn",
-          "line": 492,
+          "line": 489,
           "name": "prewarm_kernel_dispatch"
         },
         {
           "kind": "fn",
-          "line": 513,
+          "line": 510,
           "name": "capture_buffer"
         }
       ],
@@ -3658,9 +3657,9 @@
         "src/backend/metal/mod.zig"
       ],
       "roles": [],
-      "sha256": "fdc31544933336571d516d8cae08506957606fb06fbfc215d1578639fa49a968",
+      "sha256": "f4c383b1dc8ac8cac5a21263d9c22138272c4191e1f36801f4e8e2e883ece424",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 57
+      "topLevelDeclarationCount": 56
     },
     {
       "containsCImport": false,
@@ -4198,63 +4197,6 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
-      "fanOut": 6,
-      "imports": [
-        "src/compiler/wgsl/emit/csl/csl_spec.zig",
-        "src/compiler/wgsl/emit/csl/emit_csl_host.zig",
-        "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
-        "src/compiler/wgsl/mod.zig",
-        "src/contracts/artifact.zig",
-        "src/contracts/model/model_compute_types.zig"
-      ],
-      "isProductionRoot": false,
-      "layer": "backend-metal",
-      "lineCount": 159,
-      "onlyReexports": false,
-      "owner": "backend",
-      "path": "src/backend/metal/metal_host_plan_artifact.zig",
-      "publicDeclarationCount": 4,
-      "publicDeclarations": [
-        {
-          "kind": "fn",
-          "line": 18,
-          "name": "hostPlanPath"
-        },
-        {
-          "kind": "fn",
-          "line": 23,
-          "name": "hostPlanHash"
-        },
-        {
-          "kind": "fn",
-          "line": 28,
-          "name": "clearHostPlanArtifact"
-        },
-        {
-          "kind": "fn",
-          "line": 33,
-          "name": "emitForKernelDispatch"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
-      ],
-      "reachable": true,
-      "reverseImports": [
-        "src/backend/metal/backend_execute.zig",
-        "src/backend/metal/mod.zig"
-      ],
-      "roles": [],
-      "sha256": "cf52c3e2dc79b454cd161575da8463303c50a8e6c210dd6d89330d5d2a75dad8",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 19
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
       "fanIn": 1,
       "fanOut": 5,
       "imports": [
@@ -4784,7 +4726,7 @@
         "src/backend/metal/metal_buffer_pool.zig",
         "src/backend/metal/metal_pipeline_cache.zig",
         "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_msl.zig",
         "src/compiler/wgsl/runtime/runtime_compile.zig"
       ],
       "isProductionRoot": false,
@@ -4861,7 +4803,7 @@
         "src/backend/metal/metal_native_runtime.zig"
       ],
       "roles": [],
-      "sha256": "ddff84b7f2d888a6879c415e96a1c4cb2b1736428a9e796b4167c768d69f6e5a",
+      "sha256": "e2c4c21b579e9c4a0ea203d5a3880dc5846c0b9ad7eb21760360f3653c3c4048",
       "testBlockCount": 6,
       "topLevelDeclarationCount": 57
     },
@@ -5003,14 +4945,13 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
-      "fanOut": 21,
+      "fanOut": 20,
       "imports": [
         "src/backend/backend_iface.zig",
         "src/backend/backend_policy.zig",
         "src/backend/metal/artifact_emit.zig",
         "src/backend/metal/backend_execute.zig",
         "src/backend/metal/metal_bridge_decls.zig",
-        "src/backend/metal/metal_host_plan_artifact.zig",
         "src/backend/metal/metal_native_runtime.zig",
         "src/backend/metal/metal_pipeline_cache.zig",
         "src/backend/runtime_types.zig",
@@ -5029,55 +4970,45 @@
       ],
       "isProductionRoot": true,
       "layer": "backend-metal",
-      "lineCount": 431,
+      "lineCount": 404,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/metal/mod.zig",
-      "publicDeclarationCount": 9,
+      "publicDeclarationCount": 7,
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 61,
+          "line": 60,
           "name": "ZigMetalBackend"
         },
         {
           "kind": "fn",
-          "line": 305,
+          "line": 286,
           "name": "manifest_path_from_context"
         },
         {
           "kind": "fn",
-          "line": 311,
+          "line": 292,
           "name": "manifest_hash_from_context"
         },
         {
           "kind": "fn",
-          "line": 315,
-          "name": "host_plan_path_from_context"
-        },
-        {
-          "kind": "fn",
-          "line": 319,
-          "name": "host_plan_hash_from_context"
-        },
-        {
-          "kind": "fn",
-          "line": 323,
+          "line": 296,
           "name": "pipeline_cache_warmup_telemetry_from_context"
         },
         {
           "kind": "fn",
-          "line": 328,
+          "line": 301,
           "name": "pipeline_cache_active_from_context"
         },
         {
           "kind": "fn",
-          "line": 333,
+          "line": 306,
           "name": "last_submit_count_from_context"
         },
         {
           "kind": "fn",
-          "line": 337,
+          "line": 310,
           "name": "set_pipeline_cache_disabled"
         }
       ],
@@ -5094,9 +5025,9 @@
       "roles": [
         "package-root"
       ],
-      "sha256": "bb872ecfcc14e7b6c7070a240ed21e55072da5f3b8e903e8e1dcb4195ab6e85c",
+      "sha256": "33002a90b3239117fce1c24ce812a753e3264627e65ffb952da7be4fb5fa0812",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 57
+      "topLevelDeclarationCount": 54
     },
     {
       "containsCImport": false,
@@ -9733,7 +9664,7 @@
         "src/backend/vulkan/vk_resources.zig",
         "src/backend/vulkan/vk_spirv_inspect.zig",
         "src/backend/vulkan/vk_upload.zig",
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_spirv.zig",
         "src/contracts/execution.zig",
         "src/contracts/model/model_binding_value_types.zig",
         "src/contracts/model/model_compute_types.zig",
@@ -9950,7 +9881,7 @@
         "src/backend/vulkan/vk_texture_commands.zig"
       ],
       "roles": [],
-      "sha256": "85099c62a20e0f80df068c1d01558571dcb4bbad2992f81ac160659d697c6bfd",
+      "sha256": "a146c2c7bd238c7f4d3468a72ce94680107e72983b8a3ad71576446059440e6c",
       "testBlockCount": 3,
       "topLevelDeclarationCount": 93
     },
@@ -14959,10 +14890,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15017,10 +14945,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15222,10 +15147,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15266,10 +15188,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15305,10 +15224,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15349,10 +15265,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15393,10 +15306,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15432,10 +15342,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15471,10 +15378,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -15580,10 +15484,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -17192,10 +17093,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -17340,10 +17238,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -17358,7 +17253,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 19,
+      "fanIn": 17,
       "fanOut": 1,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig"
@@ -17644,17 +17539,12 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/backend/metal/metal_host_plan_artifact.zig",
         "src/compiler/mod.zig",
         "src/compiler/wgsl/emit/csl/csl_compile_sections.zig",
-        "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_dense_gemv.zig",
@@ -17726,10 +17616,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -17785,10 +17672,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -17815,82 +17699,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
-      "fanOut": 3,
-      "imports": [
-        "src/compiler/wgsl/emit/csl/csl_spec.zig",
-        "src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig",
-        "src/compiler/wgsl/emit/csl/emit_csl_host.zig"
-      ],
-      "isProductionRoot": false,
-      "layer": "compiler",
-      "lineCount": 292,
-      "onlyReexports": false,
-      "owner": "compiler",
-      "path": "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
-      "publicDeclarationCount": 8,
-      "publicDeclarations": [
-        {
-          "kind": "fn",
-          "line": 6,
-          "name": "expectArrayLengthInComparisonCompiles"
-        },
-        {
-          "kind": "fn",
-          "line": 23,
-          "name": "expectRuntimeSizedConstantIndexCoercesAbstractIntForMslMin"
-        },
-        {
-          "kind": "fn",
-          "line": 42,
-          "name": "expectVertexArrayClampCoercesU32LiteralForMslMin"
-        },
-        {
-          "kind": "fn",
-          "line": 64,
-          "name": "expectArrayLengthOnStructMemberCompilesToMsl"
-        },
-        {
-          "kind": "fn",
-          "line": 90,
-          "name": "expectArrayLengthOnStructMemberCompilesToHlsl"
-        },
-        {
-          "kind": "fn",
-          "line": 115,
-          "name": "expectArrayLengthOnStructMemberCompilesToSpirv"
-        },
-        {
-          "kind": "fn",
-          "line": 140,
-          "name": "expectElementWiseComputeShaderCompilesToCsl"
-        },
-        {
-          "kind": "fn",
-          "line": 184,
-          "name": "expectVertexShaderRejectedForCsl"
-        }
-      ],
-      "reachabilityViewRoots": [],
-      "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
-      ],
-      "reachable": true,
-      "reverseImports": [
-        "src/compiler/wgsl/mod.zig"
-      ],
-      "roles": [],
-      "sha256": "ac4914b7ac74b3bde607cfb658478cad7da6bb2e2960badcfc180b4d1178672e",
-      "testBlockCount": 3,
-      "topLevelDeclarationCount": 15
-    },
-    {
-      "containsCImport": false,
-      "definesMain": false,
-      "fanIn": 1,
+      "fanIn": 2,
       "fanOut": 2,
       "imports": [
         "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
@@ -17922,14 +17731,12 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_csl.zig"
       ],
       "roles": [],
       "sha256": "a06a490f444ee267e1cde9b1b145cdd7424be05d040178548ccaed1aa743e20d",
@@ -17979,10 +17786,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18105,10 +17909,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18187,10 +17988,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18236,10 +18034,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18283,10 +18078,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18330,10 +18122,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18348,7 +18137,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 1,
       "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
@@ -18431,14 +18220,10 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
@@ -18483,10 +18268,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18531,10 +18313,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18579,10 +18358,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -18598,7 +18374,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 9,
+      "fanIn": 7,
       "fanOut": 1,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_text_buffer.zig"
@@ -18689,15 +18465,10 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/backend/metal/metal_host_plan_artifact.zig",
-        "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host_plan.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host_runtime.zig",
@@ -18842,7 +18613,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 4,
+      "fanIn": 3,
       "fanOut": 3,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
@@ -18935,14 +18706,10 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/backend/metal/metal_host_plan_artifact.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_toolchain.zig",
         "src/compiler/wgsl/mod.zig"
@@ -19009,10 +18776,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19107,10 +18871,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19170,10 +18931,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19293,10 +19051,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19339,10 +19094,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19404,10 +19156,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19451,10 +19200,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19518,10 +19264,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19619,10 +19362,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19671,10 +19411,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19717,10 +19454,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19807,10 +19541,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -19855,10 +19586,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20012,10 +19740,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20087,10 +19812,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20104,7 +19826,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 4,
       "fanOut": 2,
       "imports": [
         "src/compiler/wgsl/emit/csl/csl_spec.zig",
@@ -20186,16 +19908,14 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
         "src/compiler/wgsl/emit/csl/emit_csl_core.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_csl.zig"
       ],
       "roles": [],
       "sha256": "3eca551e42ddfb8f71086e07e702b263822c114ecbbf69a417c2ce17e95b64d1",
@@ -20231,10 +19951,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20341,10 +20058,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20410,10 +20124,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20456,10 +20167,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20657,10 +20365,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20711,10 +20416,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20728,7 +20430,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
+      "fanIn": 2,
       "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/emit/dxil/dxil_validate.zig",
@@ -20823,14 +20525,12 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_dxil.zig"
       ],
       "roles": [],
       "sha256": "1de3802dfa69e07cff574720ef8f44ddae5b8253decbee888d65374faedc3d1b",
@@ -20875,10 +20575,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -20892,7 +20589,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 4,
       "fanOut": 7,
       "imports": [
         "src/compiler/wgsl/emit/hlsl/emit_hlsl_builtins.zig",
@@ -20938,7 +20635,8 @@
       "reverseImports": [
         "src/compiler/mod.zig",
         "src/compiler/wgsl/emit/dxil/emit_dxil.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_hlsl.zig"
       ],
       "roles": [],
       "sha256": "3fbfea318365dda4758685f3a6734738e9f9e47492d359e7d925b8de2c27c724",
@@ -21173,7 +20871,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 5,
       "fanOut": 2,
       "imports": [
         "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
@@ -21218,7 +20916,10 @@
       "reachable": true,
       "reverseImports": [
         "src/compiler/mod.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_msl.zig",
+        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/shader_info.zig"
       ],
       "roles": [],
       "sha256": "d0aba6e2597a4041019ad25f46ca2fe878cd48564715a7c3f56a24875924394b",
@@ -21255,10 +20956,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -21731,10 +21429,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -21851,7 +21546,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 4,
       "fanOut": 5,
       "imports": [
         "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
@@ -21914,7 +21609,9 @@
       "reachable": true,
       "reverseImports": [
         "src/compiler/mod.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_spirv.zig",
+        "src/compiler/wgsl/runtime/runtime_compile.zig"
       ],
       "roles": [],
       "sha256": "6ee3dc4d9b0506e84fe9da0f5672e6cc4819ee3ff28978b23e774611a1c2ccc5",
@@ -22688,10 +22385,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -22706,7 +22400,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 12,
+      "fanIn": 13,
       "fanOut": 1,
       "imports": [
         "src/compiler/wgsl/frontend/token.zig"
@@ -22785,7 +22479,8 @@
         "src/compiler/wgsl/frontend/sema_types.zig",
         "src/compiler/wgsl/frontend/sema_typeutils.zig",
         "src/compiler/wgsl/ir/ir_builder.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
       "sha256": "7310628172880b75e7c84ccfaaccf52b9f0e10919badd646da72c0d33c98efd6",
@@ -22836,7 +22531,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 3,
       "fanOut": 7,
       "imports": [
         "src/compiler/wgsl/frontend/ast.zig",
@@ -22901,7 +22596,8 @@
       "reachable": true,
       "reverseImports": [
         "src/compiler/mod.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
       "sha256": "ff8bdae50dc0e0b5f5584027bddd26607b959a0b9f61dc423d4c09fb36962428",
@@ -23134,7 +22830,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 4,
       "fanOut": 9,
       "imports": [
         "src/compiler/wgsl/frontend/ast.zig",
@@ -23242,7 +22938,8 @@
       "reverseImports": [
         "src/compiler/mod.zig",
         "src/compiler/wgsl/ir/ir_builder.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
       "sha256": "7915fb266c7540c1e58bb0d18f61b1d66ee1616602c623e00de8d2b9f79f5946",
@@ -23767,7 +23464,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 11,
+      "fanIn": 12,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -23813,7 +23510,8 @@
         "src/compiler/wgsl/frontend/sema_expr.zig",
         "src/compiler/wgsl/frontend/sema_types.zig",
         "src/compiler/wgsl/ir/ir_builder.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
       "sha256": "8f5b47431dd37246ce29e32093292b76d71691ccdd4fc364acde9799ce283329",
@@ -23823,7 +23521,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 84,
+      "fanIn": 95,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -24159,6 +23857,14 @@
         "src/compiler/wgsl/ir/ir_validate.zig",
         "src/compiler/wgsl/ir/layout_utils.zig",
         "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/binding_reflection.zig",
+        "src/compiler/wgsl/pipeline/overrides.zig",
+        "src/compiler/wgsl/pipeline/translate_csl.zig",
+        "src/compiler/wgsl/pipeline/translate_dxil.zig",
+        "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+        "src/compiler/wgsl/pipeline/translate_msl.zig",
+        "src/compiler/wgsl/pipeline/translate_spirv.zig",
         "src/compiler/wgsl/proof/dispatch_proof_loop_match.zig",
         "src/compiler/wgsl/proof/dispatch_proof_match.zig",
         "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig",
@@ -24167,7 +23873,10 @@
         "src/core/compute/dispatch_preconditions.zig",
         "src/native/compute/doe_compute_preconditions_native.zig",
         "src/native/shader/doe_shader_native.zig",
-        "src/native/shader/doe_shader_translation_cache.zig"
+        "src/native/shader/doe_shader_translation_cache.zig",
+        "src/native/support/doe_native_object_types.zig",
+        "src/native/vulkan/vulkan_compute_bindings.zig",
+        "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
       "sha256": "7cc074d7b1bd1919c0cdf0d6f92bd4d08daca3d769cc6385a23ff36aec473e75",
@@ -24177,7 +23886,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 3,
       "fanOut": 6,
       "imports": [
         "src/compiler/wgsl/frontend/ast.zig",
@@ -24231,7 +23940,8 @@
       "reachable": true,
       "reverseImports": [
         "src/compiler/mod.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
       "sha256": "26901c59b943a51f71a4d3fb56e76e94ac4013724f90d25822c1c3cbfc80832f",
@@ -24329,10 +24039,7 @@
       ],
       "reachabilityViewRoots": [],
       "reachabilityViews": [
-        "compiler-tsir-spatial-toolchains",
-        "dropin-compatibility",
-        "module-incubation-evidence-tools",
-        "shipped-native-package-runtime"
+        "compiler-tsir-spatial-toolchains"
       ],
       "reachable": true,
       "reverseImports": [
@@ -24346,7 +24053,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 3,
       "fanOut": 2,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
@@ -24396,7 +24103,8 @@
       "reachable": true,
       "reverseImports": [
         "src/compiler/mod.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
       "sha256": "1db1561f05ece98080d3ac8bfe0cac1e05b881d8d05c38e226808e6a00730d13",
@@ -24521,7 +24229,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
+      "fanIn": 4,
       "fanOut": 6,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
@@ -24564,7 +24272,10 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/shader_info.zig"
       ],
       "roles": [],
       "sha256": "4fbe0ad5e76bf2428f9806452fb50ce07eafbd05b82c404faf59e0c69fdc9e8b",
@@ -24574,7 +24285,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 2,
+      "fanIn": 3,
       "fanOut": 1,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig"
@@ -24608,7 +24319,8 @@
       "reachable": true,
       "reverseImports": [
         "src/compiler/mod.zig",
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
       "sha256": "c81a82f65a37658f0b19ab104b5bf0b03b8747eacf5fc5ed767eb9174f019771",
@@ -24683,10 +24395,9 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 18,
-      "fanOut": 48,
+      "fanIn": 2,
+      "fanOut": 53,
       "imports": [
-        "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
         "src/compiler/wgsl/emit/csl/emit_csl.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_attention.zig",
         "src/compiler/wgsl/emit/csl/emit_csl_dense_gemv.zig",
@@ -24731,507 +24442,1062 @@
         "src/compiler/wgsl/ir/ir_transform_robustness.zig",
         "src/compiler/wgsl/ir/ir_validate.zig",
         "src/compiler/wgsl/ir/layout_utils.zig",
-        "src/contracts/binding.zig",
-        "src/contracts/shader_abi/dispatch_info.zig",
-        "src/verification/lean_proof.zig"
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/binding_reflection.zig",
+        "src/compiler/wgsl/pipeline/overrides.zig",
+        "src/compiler/wgsl/pipeline/translate_csl.zig",
+        "src/compiler/wgsl/pipeline/translate_dxil.zig",
+        "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+        "src/compiler/wgsl/pipeline/translate_msl.zig",
+        "src/compiler/wgsl/pipeline/translate_spirv.zig",
+        "src/contracts/shader_abi/dispatch_info.zig"
       ],
       "isProductionRoot": true,
       "layer": "compiler",
-      "lineCount": 912,
-      "onlyReexports": false,
+      "lineCount": 113,
+      "onlyReexports": true,
       "owner": "compiler",
       "path": "src/compiler/wgsl/mod.zig",
-      "publicDeclarationCount": 97,
+      "publicDeclarationCount": 106,
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 6,
+          "line": 4,
           "name": "token"
         },
         {
           "kind": "const",
-          "line": 7,
+          "line": 5,
           "name": "lexer"
         },
         {
           "kind": "const",
-          "line": 8,
+          "line": 6,
           "name": "ast"
         },
         {
           "kind": "const",
-          "line": 9,
+          "line": 7,
           "name": "parser"
         },
         {
           "kind": "const",
-          "line": 10,
+          "line": 8,
           "name": "sema"
         },
         {
           "kind": "const",
-          "line": 11,
+          "line": 9,
           "name": "ir"
         },
         {
           "kind": "const",
-          "line": 12,
+          "line": 10,
           "name": "ir_digest"
         },
         {
           "kind": "const",
-          "line": 13,
+          "line": 11,
           "name": "ir_builder"
         },
         {
           "kind": "const",
-          "line": 14,
+          "line": 12,
           "name": "ir_validate"
         },
         {
           "kind": "const",
-          "line": 15,
+          "line": 13,
           "name": "ir_opt_rewrite"
         },
         {
           "kind": "const",
-          "line": 16,
+          "line": 14,
           "name": "ir_transform_robustness"
         },
         {
           "kind": "const",
-          "line": 17,
+          "line": 15,
           "name": "emit_msl"
         },
         {
           "kind": "const",
-          "line": 18,
+          "line": 16,
           "name": "emit_msl_subgroups"
         },
         {
           "kind": "const",
-          "line": 19,
+          "line": 17,
           "name": "emit_msl_shared"
         },
         {
           "kind": "const",
-          "line": 20,
+          "line": 18,
           "name": "emit_msl_vertex"
         },
         {
           "kind": "const",
-          "line": 21,
+          "line": 19,
           "name": "emit_msl_fragment"
         },
         {
           "kind": "const",
-          "line": 22,
+          "line": 20,
           "name": "emit_hlsl"
         },
         {
           "kind": "const",
-          "line": 23,
+          "line": 21,
           "name": "hlsl_dispatch_contract"
         },
         {
           "kind": "const",
-          "line": 24,
+          "line": 22,
           "name": "emit_hlsl_texture"
         },
         {
           "kind": "const",
-          "line": 25,
+          "line": 23,
           "name": "emit_spirv"
         },
         {
           "kind": "const",
-          "line": 26,
+          "line": 24,
           "name": "emit_spirv_fn"
         },
         {
           "kind": "const",
-          "line": 27,
+          "line": 25,
           "name": "emit_spirv_stages"
         },
         {
           "kind": "const",
-          "line": 28,
+          "line": 26,
           "name": "emit_spirv_texture"
         },
         {
           "kind": "const",
-          "line": 29,
+          "line": 27,
           "name": "emit_dxil"
         },
         {
           "kind": "const",
-          "line": 30,
+          "line": 28,
           "name": "emit_csl"
         },
         {
           "kind": "const",
-          "line": 31,
+          "line": 29,
           "name": "emit_csl_reduce_dist"
         },
         {
           "kind": "const",
-          "line": 32,
+          "line": 30,
           "name": "emit_csl_attention"
         },
         {
           "kind": "const",
-          "line": 33,
+          "line": 31,
           "name": "emit_csl_gather"
         },
         {
           "kind": "const",
-          "line": 34,
+          "line": 32,
           "name": "emit_csl_rope"
         },
         {
           "kind": "const",
-          "line": 35,
+          "line": 33,
           "name": "emit_csl_dequant"
         },
         {
           "kind": "const",
-          "line": 36,
+          "line": 34,
           "name": "emit_csl_sample"
         },
         {
           "kind": "const",
-          "line": 37,
+          "line": 35,
           "name": "emit_csl_fused"
         },
         {
           "kind": "const",
-          "line": 38,
+          "line": 36,
           "name": "emit_csl_dense_gemv"
         },
         {
           "kind": "const",
-          "line": 39,
+          "line": 37,
           "name": "emit_csl_linear_attn"
         },
         {
           "kind": "const",
-          "line": 40,
+          "line": 38,
           "name": "emit_csl_kv_cache"
         },
         {
           "kind": "const",
-          "line": 41,
+          "line": 39,
           "name": "emit_csl_fused_ffn"
         },
         {
           "kind": "const",
-          "line": 42,
+          "line": 40,
           "name": "emit_csl_host"
         },
         {
           "kind": "const",
-          "line": 43,
+          "line": 41,
           "name": "emit_csl_host_plan"
         },
         {
           "kind": "const",
-          "line": 44,
+          "line": 42,
           "name": "emit_csl_toolchain"
         },
         {
           "kind": "const",
-          "line": 45,
+          "line": 43,
           "name": "emit_csl_simulator"
         },
         {
           "kind": "const",
-          "line": 46,
+          "line": 44,
           "name": "emit_csl_mem_plan"
         },
         {
           "kind": "const",
-          "line": 47,
+          "line": 45,
           "name": "emit_csl_exec_v1"
         },
         {
           "kind": "const",
-          "line": 48,
+          "line": 46,
           "name": "emit_csl_host_runtime"
         },
         {
           "kind": "const",
-          "line": 49,
+          "line": 47,
           "name": "emit_csl_validate"
         },
         {
           "kind": "const",
-          "line": 51,
+          "line": 48,
           "name": "layout_utils"
         },
         {
           "kind": "const",
+          "line": 50,
+          "name": "analysis"
+        },
+        {
+          "kind": "const",
+          "line": 51,
+          "name": "binding_reflection"
+        },
+        {
+          "kind": "const",
+          "line": 52,
+          "name": "overrides"
+        },
+        {
+          "kind": "const",
+          "line": 53,
+          "name": "translate_msl"
+        },
+        {
+          "kind": "const",
+          "line": 54,
+          "name": "translate_hlsl"
+        },
+        {
+          "kind": "const",
+          "line": 55,
+          "name": "translate_spirv"
+        },
+        {
+          "kind": "const",
           "line": 56,
+          "name": "translate_dxil"
+        },
+        {
+          "kind": "const",
+          "line": 57,
+          "name": "translate_csl"
+        },
+        {
+          "kind": "const",
+          "line": 59,
           "name": "TranslateError"
         },
         {
           "kind": "const",
-          "line": 75,
-          "name": "MAX_OUTPUT"
-        },
-        {
-          "kind": "const",
-          "line": 76,
-          "name": "MAX_HLSL_OUTPUT"
-        },
-        {
-          "kind": "const",
-          "line": 77,
-          "name": "MAX_SPIRV_OUTPUT"
-        },
-        {
-          "kind": "const",
-          "line": 78,
-          "name": "MAX_DXIL_OUTPUT"
-        },
-        {
-          "kind": "const",
-          "line": 79,
-          "name": "MAX_CSL_OUTPUT"
-        },
-        {
-          "kind": "const",
-          "line": 80,
-          "name": "DXIL_DXC_ENV_VAR"
-        },
-        {
-          "kind": "const",
-          "line": 81,
-          "name": "DXIL_DXC_PATH_SENTINEL"
-        },
-        {
-          "kind": "const",
-          "line": 82,
-          "name": "DxilToolchainConfig"
-        },
-        {
-          "kind": "const",
-          "line": 83,
-          "name": "DxilToolchainDiscovery"
-        },
-        {
-          "kind": "const",
-          "line": 84,
-          "name": "CslValidationError"
-        },
-        {
-          "kind": "const",
-          "line": 85,
-          "name": "CslPatternKind"
-        },
-        {
-          "kind": "const",
-          "line": 86,
-          "name": "CslValidationResult"
-        },
-        {
-          "kind": "const",
-          "line": 87,
-          "name": "CslToolchainConfig"
-        },
-        {
-          "kind": "const",
-          "line": 88,
-          "name": "CslToolchainDiscovery"
-        },
-        {
-          "kind": "const",
-          "line": 89,
-          "name": "CSLC_ENV_VAR"
-        },
-        {
-          "kind": "const",
-          "line": 90,
-          "name": "CSLC_PATH_SENTINEL"
-        },
-        {
-          "kind": "const",
-          "line": 91,
-          "name": "MAX_BINDINGS"
-        },
-        {
-          "kind": "const",
-          "line": 93,
-          "name": "BindingKind"
-        },
-        {
-          "kind": "const",
-          "line": 95,
-          "name": "BindingMeta"
-        },
-        {
-          "kind": "const",
-          "line": 103,
+          "line": 60,
           "name": "CompilationStage"
         },
         {
           "kind": "const",
-          "line": 117,
+          "line": 61,
           "name": "CompilePhaseTimingsNs"
         },
         {
           "kind": "const",
-          "line": 125,
+          "line": 62,
           "name": "TimedAnalyzeResult"
         },
         {
           "kind": "const",
-          "line": 141,
+          "line": 63,
           "name": "SourceLocation"
         },
         {
           "kind": "const",
-          "line": 146,
+          "line": 64,
           "name": "LastErrorInfo"
         },
         {
-          "kind": "fn",
-          "line": 185,
-          "name": "setLastErrorDetailPublic"
-        },
-        {
-          "kind": "fn",
-          "line": 254,
-          "name": "lastErrorKind"
-        },
-        {
-          "kind": "fn",
-          "line": 258,
-          "name": "lastErrorContext"
-        },
-        {
-          "kind": "fn",
-          "line": 262,
-          "name": "lastErrorInfo"
-        },
-        {
-          "kind": "fn",
-          "line": 274,
-          "name": "lastErrorStage"
-        },
-        {
-          "kind": "fn",
-          "line": 278,
-          "name": "lastErrorMessage"
-        },
-        {
-          "kind": "fn",
-          "line": 282,
-          "name": "lastErrorLine"
-        },
-        {
-          "kind": "fn",
-          "line": 286,
-          "name": "lastErrorColumn"
-        },
-        {
-          "kind": "fn",
-          "line": 305,
+          "kind": "const",
+          "line": 65,
           "name": "analyzeToIr"
         },
         {
-          "kind": "fn",
-          "line": 309,
+          "kind": "const",
+          "line": 66,
           "name": "analyzeToIrTimed"
         },
         {
-          "kind": "fn",
-          "line": 313,
+          "kind": "const",
+          "line": 67,
           "name": "analyzeToIrWithConfig"
         },
         {
-          "kind": "fn",
-          "line": 322,
+          "kind": "const",
+          "line": 68,
           "name": "analyzeToIrWithConfigTimed"
         },
         {
-          "kind": "fn",
-          "line": 426,
+          "kind": "const",
+          "line": 69,
+          "name": "default_translation_robustness_config"
+        },
+        {
+          "kind": "const",
+          "line": 70,
+          "name": "lastErrorKind"
+        },
+        {
+          "kind": "const",
+          "line": 71,
+          "name": "lastErrorContext"
+        },
+        {
+          "kind": "const",
+          "line": 72,
+          "name": "lastErrorInfo"
+        },
+        {
+          "kind": "const",
+          "line": 73,
+          "name": "lastErrorStage"
+        },
+        {
+          "kind": "const",
+          "line": 74,
+          "name": "lastErrorMessage"
+        },
+        {
+          "kind": "const",
+          "line": 75,
+          "name": "lastErrorLine"
+        },
+        {
+          "kind": "const",
+          "line": 76,
+          "name": "lastErrorColumn"
+        },
+        {
+          "kind": "const",
+          "line": 77,
+          "name": "setLastErrorDetailPublic"
+        },
+        {
+          "kind": "const",
+          "line": 79,
+          "name": "MAX_BINDINGS"
+        },
+        {
+          "kind": "const",
+          "line": 80,
+          "name": "BindingKind"
+        },
+        {
+          "kind": "const",
+          "line": 81,
+          "name": "BindingMeta"
+        },
+        {
+          "kind": "const",
+          "line": 82,
           "name": "extractBindingsForEntryPoint"
         },
         {
-          "kind": "fn",
-          "line": 456,
+          "kind": "const",
+          "line": 83,
           "name": "extractBindings"
         },
         {
-          "kind": "fn",
-          "line": 469,
-          "name": "translateToMsl"
-        },
-        {
-          "kind": "fn",
-          "line": 473,
-          "name": "translateToMslWithOverrides"
-        },
-        {
-          "kind": "fn",
-          "line": 496,
+          "kind": "const",
+          "line": 84,
           "name": "applyOverrides"
         },
         {
-          "kind": "fn",
-          "line": 526,
+          "kind": "const",
+          "line": 86,
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "kind": "const",
+          "line": 87,
+          "name": "translateToMsl"
+        },
+        {
+          "kind": "const",
+          "line": 88,
+          "name": "translateToMslWithOverrides"
+        },
+        {
+          "kind": "const",
+          "line": 89,
+          "name": "MAX_HLSL_OUTPUT"
+        },
+        {
+          "kind": "const",
+          "line": 90,
           "name": "translateToHlsl"
         },
         {
-          "kind": "fn",
-          "line": 530,
+          "kind": "const",
+          "line": 91,
           "name": "translateToHlslWithOverrides"
         },
         {
-          "kind": "fn",
-          "line": 556,
+          "kind": "const",
+          "line": 92,
+          "name": "MAX_SPIRV_OUTPUT"
+        },
+        {
+          "kind": "const",
+          "line": 93,
           "name": "translateToSpirv"
         },
         {
-          "kind": "fn",
-          "line": 573,
+          "kind": "const",
+          "line": 94,
+          "name": "MAX_DXIL_OUTPUT"
+        },
+        {
+          "kind": "const",
+          "line": 95,
+          "name": "DXIL_DXC_ENV_VAR"
+        },
+        {
+          "kind": "const",
+          "line": 96,
+          "name": "DXIL_DXC_PATH_SENTINEL"
+        },
+        {
+          "kind": "const",
+          "line": 97,
+          "name": "DxilToolchainConfig"
+        },
+        {
+          "kind": "const",
+          "line": 98,
+          "name": "DxilToolchainDiscovery"
+        },
+        {
+          "kind": "const",
+          "line": 99,
           "name": "translateToDxil"
         },
         {
-          "kind": "fn",
-          "line": 596,
+          "kind": "const",
+          "line": 100,
           "name": "translateToDxilWithToolchainConfig"
         },
         {
-          "kind": "fn",
-          "line": 623,
+          "kind": "const",
+          "line": 101,
+          "name": "MAX_CSL_OUTPUT"
+        },
+        {
+          "kind": "const",
+          "line": 102,
+          "name": "CslValidationError"
+        },
+        {
+          "kind": "const",
+          "line": 103,
+          "name": "CslPatternKind"
+        },
+        {
+          "kind": "const",
+          "line": 104,
+          "name": "CslValidationResult"
+        },
+        {
+          "kind": "const",
+          "line": 105,
+          "name": "CslToolchainConfig"
+        },
+        {
+          "kind": "const",
+          "line": 106,
+          "name": "CslToolchainDiscovery"
+        },
+        {
+          "kind": "const",
+          "line": 107,
+          "name": "CSLC_ENV_VAR"
+        },
+        {
+          "kind": "const",
+          "line": 108,
+          "name": "CSLC_PATH_SENTINEL"
+        },
+        {
+          "kind": "const",
+          "line": 109,
           "name": "translateToCsl"
         },
         {
-          "kind": "fn",
-          "line": 640,
+          "kind": "const",
+          "line": 110,
           "name": "loadCslToolchainConfig"
         },
         {
-          "kind": "fn",
-          "line": 644,
+          "kind": "const",
+          "line": 111,
           "name": "validateCslPattern"
         },
         {
-          "kind": "fn",
-          "line": 648,
+          "kind": "const",
+          "line": 112,
           "name": "validateCslPatternWithToolchainConfig"
         },
         {
-          "kind": "fn",
-          "line": 656,
+          "kind": "const",
+          "line": 113,
           "name": "validateCslToolchainConfig"
         }
       ],
       "reachabilityViewRoots": [
         "compiler-tsir-spatial-toolchains"
       ],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/mod.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig"
+      ],
+      "roles": [
+        "package-root"
+      ],
+      "sha256": "144dd739b734b3feb58587e9b3d01b09c35994e7a03662b73f4733defe03ca8f",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 106
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 14,
+      "fanOut": 10,
+      "imports": [
+        "src/compiler/wgsl/frontend/ast.zig",
+        "src/compiler/wgsl/frontend/parser.zig",
+        "src/compiler/wgsl/frontend/sema.zig",
+        "src/compiler/wgsl/frontend/token.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/ir/ir_builder.zig",
+        "src/compiler/wgsl/ir/ir_opt_rewrite.zig",
+        "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+        "src/compiler/wgsl/ir/ir_validate.zig",
+        "src/verification/lean_proof.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 341,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/pipeline/analysis.zig",
+      "publicDeclarationCount": 22,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "ir"
+        },
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "ir_transform_robustness"
+        },
+        {
+          "kind": "const",
+          "line": 13,
+          "name": "TranslateError"
+        },
+        {
+          "kind": "const",
+          "line": 32,
+          "name": "CompilationStage"
+        },
+        {
+          "kind": "const",
+          "line": 46,
+          "name": "CompilePhaseTimingsNs"
+        },
+        {
+          "kind": "const",
+          "line": 54,
+          "name": "TimedAnalyzeResult"
+        },
+        {
+          "kind": "const",
+          "line": 70,
+          "name": "SourceLocation"
+        },
+        {
+          "kind": "const",
+          "line": 75,
+          "name": "LastErrorInfo"
+        },
+        {
+          "kind": "fn",
+          "line": 91,
+          "name": "setLastError"
+        },
+        {
+          "kind": "fn",
+          "line": 114,
+          "name": "setLastErrorDetailPublic"
+        },
+        {
+          "kind": "fn",
+          "line": 183,
+          "name": "lastErrorKind"
+        },
+        {
+          "kind": "fn",
+          "line": 187,
+          "name": "lastErrorContext"
+        },
+        {
+          "kind": "fn",
+          "line": 191,
+          "name": "lastErrorInfo"
+        },
+        {
+          "kind": "fn",
+          "line": 203,
+          "name": "lastErrorStage"
+        },
+        {
+          "kind": "fn",
+          "line": 207,
+          "name": "lastErrorMessage"
+        },
+        {
+          "kind": "fn",
+          "line": 211,
+          "name": "lastErrorLine"
+        },
+        {
+          "kind": "fn",
+          "line": 215,
+          "name": "lastErrorColumn"
+        },
+        {
+          "kind": "fn",
+          "line": 219,
+          "name": "default_translation_robustness_config"
+        },
+        {
+          "kind": "fn",
+          "line": 234,
+          "name": "analyzeToIr"
+        },
+        {
+          "kind": "fn",
+          "line": 238,
+          "name": "analyzeToIrTimed"
+        },
+        {
+          "kind": "fn",
+          "line": 242,
+          "name": "analyzeToIrWithConfig"
+        },
+        {
+          "kind": "fn",
+          "line": 251,
+          "name": "analyzeToIrWithConfigTimed"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/binding_reflection.zig",
+        "src/compiler/wgsl/pipeline/translate_csl.zig",
+        "src/compiler/wgsl/pipeline/translate_dxil.zig",
+        "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+        "src/compiler/wgsl/pipeline/translate_msl.zig",
+        "src/compiler/wgsl/pipeline/translate_spirv.zig",
+        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/runtime/shader_info.zig",
+        "src/native/shader/doe_shader_compilation_info_native.zig",
+        "src/native/shader/doe_shader_native.zig",
+        "src/native/shader/shader_binding_reflection.zig",
+        "src/native/vulkan/vulkan_compute_native.zig",
+        "src/native/vulkan/vulkan_render_pipeline_native.zig"
+      ],
+      "roles": [],
+      "sha256": "c3ac6724046966ded0c66fc523737efb207ed387bfe28924a7d977071f4d1f44",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 49
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 4,
+      "fanOut": 3,
+      "imports": [
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/contracts/binding.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 96,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/pipeline/binding_reflection.zig",
+      "publicDeclarationCount": 5,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "MAX_BINDINGS"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "BindingKind"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "BindingMeta"
+        },
+        {
+          "kind": "fn",
+          "line": 55,
+          "name": "extractBindingsForEntryPoint"
+        },
+        {
+          "kind": "fn",
+          "line": 85,
+          "name": "extractBindings"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/mod.zig",
+        "src/native/shader/doe_shader_native.zig",
+        "src/native/shader/shader_binding_reflection.zig",
+        "src/native/vulkan/vulkan_compute_native.zig"
+      ],
+      "roles": [],
+      "sha256": "baba7244ef80d30b25d13e0cf029fce14f021e34cef70c788a192e3753d62b43",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 11
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 4,
+      "fanOut": 1,
+      "imports": [
+        "src/compiler/wgsl/ir/ir.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 32,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/pipeline/overrides.zig",
+      "publicDeclarationCount": 1,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 4,
+          "name": "applyOverrides"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+        "src/compiler/wgsl/pipeline/translate_msl.zig",
+        "src/compiler/wgsl/runtime/runtime_compile.zig"
+      ],
+      "roles": [],
+      "sha256": "83d04375464f3baf89e82fa68a9ae0fc783e520184f52592d46abbbe05dd447f",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 3
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 4,
+      "imports": [
+        "src/compiler/wgsl/emit/csl/emit_csl.zig",
+        "src/compiler/wgsl/emit/csl/emit_csl_validate.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 50,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+      "publicDeclarationCount": 15,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "emitter"
+        },
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "validation"
+        },
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "ValidationError"
+        },
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "PatternKind"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "ValidationResult"
+        },
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "ToolchainConfig"
+        },
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "ToolchainDiscovery"
+        },
+        {
+          "kind": "const",
+          "line": 12,
+          "name": "CSLC_ENV_VAR"
+        },
+        {
+          "kind": "const",
+          "line": 13,
+          "name": "CSLC_PATH_SENTINEL"
+        },
+        {
+          "kind": "fn",
+          "line": 15,
+          "name": "translateToCsl"
+        },
+        {
+          "kind": "fn",
+          "line": 32,
+          "name": "loadCslToolchainConfig"
+        },
+        {
+          "kind": "fn",
+          "line": 36,
+          "name": "validateCslPattern"
+        },
+        {
+          "kind": "fn",
+          "line": 40,
+          "name": "validateCslPatternWithToolchainConfig"
+        },
+        {
+          "kind": "fn",
+          "line": 48,
+          "name": "validateCslToolchainConfig"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "3018e386c795f6ab01ac450e6ff9564205a92eba4efdd13ecf0d6bc88ed79f50",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 18
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 3,
+      "imports": [
+        "src/compiler/wgsl/emit/dxil/emit_dxil.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 59,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+      "publicDeclarationCount": 8,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "emitter"
+        },
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "DXC_ENV_VAR"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "DXC_PATH_SENTINEL"
+        },
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "ToolchainConfig"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "ToolchainDiscovery"
+        },
+        {
+          "kind": "fn",
+          "line": 11,
+          "name": "translateToDxil"
+        },
+        {
+          "kind": "fn",
+          "line": 34,
+          "name": "translateToDxilWithToolchainConfig"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/compiler/wgsl/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "dcd0a8018388ff518cbfb48fefa091c92335255f574a3554dda42a9789f40e13",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 11
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 2,
+      "fanOut": 4,
+      "imports": [
+        "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/overrides.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 37,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "emitter"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "kind": "fn",
+          "line": 9,
+          "name": "translateToHlsl"
+        },
+        {
+          "kind": "fn",
+          "line": 13,
+          "name": "translateToHlslWithOverrides"
+        }
+      ],
+      "reachabilityViewRoots": [],
       "reachabilityViews": [
         "compiler-tsir-spatial-toolchains",
         "dropin-compatibility",
@@ -25241,30 +25507,124 @@
       "reachable": true,
       "reverseImports": [
         "src/backend/d3d12/d3d12_runtime_compute.zig",
-        "src/backend/metal/metal_host_plan_artifact.zig",
+        "src/compiler/wgsl/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "6a9da71eceebcbdaf3124fc00596e0aee33376c194b738f12ae5ab9c59848080",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 8
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 4,
+      "fanOut": 4,
+      "imports": [
+        "src/compiler/wgsl/emit/msl/emit_msl.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/overrides.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 30,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "emitter"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "kind": "fn",
+          "line": 9,
+          "name": "translateToMsl"
+        },
+        {
+          "kind": "fn",
+          "line": 13,
+          "name": "translateToMslWithOverrides"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
         "src/backend/metal/metal_runtime_resources.zig",
-        "src/backend/vulkan/vk_pipeline.zig",
-        "src/compiler/mod.zig",
-        "src/compiler/wgsl/emit/csl/emit_csl_host_compile_source.zig",
-        "src/compiler/wgsl/runtime/runtime_compile.zig",
+        "src/compiler/wgsl/mod.zig",
         "src/compiler/wgsl/runtime/runtime_compile_report.zig",
-        "src/compiler/wgsl/runtime/shader_info.zig",
-        "src/native/compute/doe_compute_ext_native.zig",
-        "src/native/shader/doe_shader_compilation_info_native.zig",
-        "src/native/shader/doe_shader_native.zig",
-        "src/native/shader/shader_binding_reflection.zig",
-        "src/native/support/doe_native_object_types.zig",
-        "src/native/support/doe_native_shared_types.zig",
-        "src/native/vulkan/vulkan_compute_bindings.zig",
-        "src/native/vulkan/vulkan_compute_native.zig",
-        "src/native/vulkan/vulkan_render_pipeline_native.zig"
+        "src/native/shader/doe_shader_native.zig"
       ],
-      "roles": [
-        "package-root"
+      "roles": [],
+      "sha256": "9621196bb55ef1ad7ecc4c634c8220359ab926141efa85ef0800ab48b37628a5",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 8
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 4,
+      "fanOut": 3,
+      "imports": [
+        "src/compiler/wgsl/emit/spirv/emit_spirv.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
-      "sha256": "bedc09f19f2b26522d95c58ab4bc9bfdfc2145c1237910d6087153555ab51244",
-      "testBlockCount": 15,
-      "topLevelDeclarationCount": 139
+      "isProductionRoot": false,
+      "layer": "compiler",
+      "lineCount": 22,
+      "onlyReexports": false,
+      "owner": "compiler",
+      "path": "src/compiler/wgsl/pipeline/translate_spirv.zig",
+      "publicDeclarationCount": 3,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "emitter"
+        },
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "MAX_OUTPUT"
+        },
+        {
+          "kind": "fn",
+          "line": 7,
+          "name": "translateToSpirv"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "compiler-tsir-spatial-toolchains",
+        "dropin-compatibility",
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/vulkan/vk_pipeline.zig",
+        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+        "src/native/vulkan/vulkan_compute_native.zig"
+      ],
+      "roles": [],
+      "sha256": "38b658fe883a1358dd71a4a067f8d7dc8f22a547b5a61979984863583e6e173f",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
     },
     {
       "containsCImport": false,
@@ -25453,15 +25813,19 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 7,
-      "fanOut": 3,
+      "fanOut": 7,
       "imports": [
+        "src/compiler/wgsl/emit/msl/emit_msl.zig",
+        "src/compiler/wgsl/emit/spirv/emit_spirv.zig",
         "src/compiler/wgsl/ir/ir.zig",
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/overrides.zig",
         "src/verification/lean_proof.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 916,
+      "lineCount": 920,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
@@ -25469,72 +25833,72 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 8,
+          "line": 12,
           "name": "TranslationInfo"
         },
         {
           "kind": "const",
-          "line": 21,
+          "line": 25,
           "name": "TranslationResult"
         },
         {
           "kind": "const",
-          "line": 26,
+          "line": 30,
           "name": "TimedTranslationResult"
         },
         {
           "kind": "fn",
-          "line": 42,
+          "line": 46,
           "name": "compute_runtime_robustness_config"
         },
         {
           "kind": "fn",
-          "line": 63,
+          "line": 67,
           "name": "vulkan_compute_runtime_robustness_config"
         },
         {
           "kind": "fn",
-          "line": 73,
+          "line": 77,
           "name": "translateToMslForComputeRuntime"
         },
         {
           "kind": "fn",
-          "line": 93,
+          "line": 97,
           "name": "translateToMslForComputeRuntimeTimed"
         },
         {
           "kind": "fn",
-          "line": 124,
+          "line": 128,
           "name": "translateToSpirvForComputeRuntime"
         },
         {
           "kind": "fn",
-          "line": 148,
+          "line": 152,
           "name": "translateToSpirvTimed"
         },
         {
           "kind": "fn",
-          "line": 181,
+          "line": 185,
           "name": "translateToSpirvForVulkanComputeRuntime"
         },
         {
           "kind": "const",
-          "line": 206,
+          "line": 210,
           "name": "VertexInputAttr"
         },
         {
           "kind": "const",
-          "line": 212,
+          "line": 216,
           "name": "InterStageVar"
         },
         {
           "kind": "const",
-          "line": 221,
+          "line": 225,
           "name": "GraphicsTranslationResult"
         },
         {
           "kind": "fn",
-          "line": 250,
+          "line": 254,
           "name": "translateToSpirvForGraphicsRuntime"
         }
       ],
@@ -25555,23 +25919,24 @@
         "src/native/vulkan/vulkan_render_pipeline_native.zig"
       ],
       "roles": [],
-      "sha256": "16744af5c36984acc70315fcc30a4d7c6d2ff843455febbb6346af9a19411643",
+      "sha256": "9a44a6954663f3543ff7926cbd562d37a60633d7bf8f99862c39a0b782508a7c",
       "testBlockCount": 14,
-      "topLevelDeclarationCount": 43
+      "topLevelDeclarationCount": 47
     },
     {
       "containsCImport": false,
       "definesMain": true,
       "fanIn": 1,
-      "fanOut": 3,
+      "fanOut": 4,
       "imports": [
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/translate_msl.zig",
+        "src/compiler/wgsl/pipeline/translate_spirv.zig",
         "src/compiler/wgsl/runtime/runtime_compile.zig",
         "src/verification/lean_proof.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 187,
+      "lineCount": 188,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
@@ -25579,7 +25944,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 87,
+          "line": 88,
           "name": "main"
         }
       ],
@@ -25594,21 +25959,23 @@
         "src/compiler/mod.zig"
       ],
       "roles": [],
-      "sha256": "53dae67f995f4fe72dc960580617a0ac7c55bf603300a3b5defe584edae487f5",
+      "sha256": "4093566fa2b23de6669f85333a3e915ad2201497723f7f0b209f294b2298c178",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 12
+      "topLevelDeclarationCount": 13
     },
     {
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 1,
+      "fanOut": 3,
       "imports": [
-        "src/compiler/wgsl/mod.zig"
+        "src/compiler/wgsl/emit/msl/emit_msl.zig",
+        "src/compiler/wgsl/ir/ir_transform_robustness.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 46,
+      "lineCount": 48,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/runtime/shader_info.zig",
@@ -25616,17 +25983,17 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 5,
+          "line": 7,
           "name": "extractWorkgroupSize"
         },
         {
           "kind": "fn",
-          "line": 27,
+          "line": 29,
           "name": "mslNeedsSizesBuffer"
         },
         {
           "kind": "fn",
-          "line": 38,
+          "line": 40,
           "name": "mslNeedsSizesBufferWithConfig"
         }
       ],
@@ -25640,14 +26007,14 @@
         "src/native/support/doe_native_shared_types.zig"
       ],
       "roles": [],
-      "sha256": "c9b6463597f2bd4815f56dc9e0e979b99960b723a888b43a2e6639d0a8b36def",
+      "sha256": "8fef0777d5a4064ef228ec3abbb55a1c5eaa3356eed80a157ad5e8700dc1619a",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 5
+      "topLevelDeclarationCount": 7
     },
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 25,
+      "fanIn": 24,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -25752,7 +26119,6 @@
         "src/backend/d3d12/mod.zig",
         "src/backend/metal/artifact_emit.zig",
         "src/backend/metal/backend_execute.zig",
-        "src/backend/metal/metal_host_plan_artifact.zig",
         "src/backend/metal/mod.zig",
         "src/backend/vulkan/artifact_emit.zig",
         "src/backend/vulkan/backend_execute.zig",
@@ -25971,12 +26337,11 @@
       "reachabilityViews": [
         "compiler-tsir-spatial-toolchains",
         "dropin-compatibility",
-        "module-incubation-evidence-tools",
         "shipped-native-package-runtime"
       ],
       "reachable": true,
       "reverseImports": [
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/binding_reflection.zig",
         "src/contracts/mod.zig",
         "src/native/compute/doe_compute_ext_native.zig",
         "src/native/resource/doe_bind_group_native.zig",
@@ -26849,7 +27214,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 35,
+      "fanIn": 34,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
@@ -26915,7 +27280,6 @@
         "src/backend/d3d12/mod.zig",
         "src/backend/dawn_delegate_backend.zig",
         "src/backend/metal/backend_execute.zig",
-        "src/backend/metal/metal_host_plan_artifact.zig",
         "src/backend/metal/metal_kernel_dispatch.zig",
         "src/backend/metal/metal_native_runtime.zig",
         "src/backend/metal/mod.zig",
@@ -44646,10 +45010,9 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 12,
+      "fanOut": 11,
       "imports": [
         "src/backend/dropin_resource_ops.zig",
-        "src/compiler/wgsl/mod.zig",
         "src/contracts/binding.zig",
         "src/native/compute/doe_compute_bind_groups.zig",
         "src/native/compute/doe_compute_preconditions_native.zig",
@@ -44663,7 +45026,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 382,
+      "lineCount": 381,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/compute/doe_compute_ext_native.zig",
@@ -44679,9 +45042,9 @@
         "src/native/api/doe_native_api_core_exports.zig"
       ],
       "roles": [],
-      "sha256": "831530f5a09ea5d6f65b72a8ecb453f9dc7844caa73e28f8bde2819ab480cd23",
+      "sha256": "0e086cad3bb6015733a28a73712cf3ddfb9a00b053874957731d0e809f8caa43",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 59
+      "topLevelDeclarationCount": 58
     },
     {
       "containsCImport": false,
@@ -47673,7 +48036,7 @@
       "fanIn": 1,
       "fanOut": 3,
       "imports": [
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
         "src/native/support/doe_native_object_helpers.zig",
         "src/native/support/doe_native_object_types.zig"
       ],
@@ -47695,7 +48058,7 @@
         "src/native/api/doe_native_api_misc_exports.zig"
       ],
       "roles": [],
-      "sha256": "355798b6da04706b2c8169e9b8974b3fc608510d15605c84370fb6e66858a37a",
+      "sha256": "a2b769f592e4d0e2272acaf52eab102d3236fd6dccb9661e61899a9db4f74a10",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 16
     },
@@ -47703,11 +48066,13 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 2,
-      "fanOut": 16,
+      "fanOut": 18,
       "imports": [
         "src/backend/dropin_resource_ops.zig",
         "src/compiler/wgsl/ir/ir.zig",
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/binding_reflection.zig",
+        "src/compiler/wgsl/pipeline/translate_msl.zig",
         "src/compiler/wgsl/runtime/runtime_compile.zig",
         "src/core/abi/wgpu_callback_descriptor_types.zig",
         "src/core/abi/wgpu_core_base_types.zig",
@@ -47724,7 +48089,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 964,
+      "lineCount": 966,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/shader/doe_shader_native.zig",
@@ -47732,7 +48097,7 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 347,
+          "line": 349,
           "name": "ensureShaderBindings"
         }
       ],
@@ -47747,9 +48112,9 @@
         "src/native/compute/doe_compute_ext_native.zig"
       ],
       "roles": [],
-      "sha256": "6836f5c7c6ede2bca672d95a0978b59025b8c1e697569e81f833f51c4104be24",
+      "sha256": "533654405024b618be5a385e03e293821f1e66ee11c6ef5d4de791dc00487889",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 91
+      "topLevelDeclarationCount": 93
     },
     {
       "containsCImport": false,
@@ -47819,16 +48184,17 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 4,
+      "fanOut": 5,
       "imports": [
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/binding_reflection.zig",
         "src/native/support/doe_native_object_helpers.zig",
         "src/native/support/doe_native_object_types.zig",
         "src/native/support/doe_native_shared_types.zig"
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 44,
+      "lineCount": 45,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/shader/shader_binding_reflection.zig",
@@ -47836,7 +48202,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 13,
+          "line": 14,
           "name": "ensureShaderBindings"
         }
       ],
@@ -47852,9 +48218,9 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "7bcf30ee1c9cb8b32094000c1bfa7e4c0494bf54e852dde7bba87d060aafffc2",
+      "sha256": "2966273b7256b5327ccdb303c2c29e5166d086d092c165cfc1fa79e297a7301a",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 9
+      "topLevelDeclarationCount": 10
     },
     {
       "containsCImport": false,
@@ -48298,7 +48664,7 @@
       "fanIn": 43,
       "fanOut": 11,
       "imports": [
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/ir/ir.zig",
         "src/contracts/backend.zig",
         "src/contracts/model/model_compute_types.zig",
         "src/contracts/model/model_render_types.zig",
@@ -48476,7 +48842,7 @@
         "src/native/vulkan/vulkan_render_shared.zig"
       ],
       "roles": [],
-      "sha256": "c413fe0bd1e6b8dba098f2d805e8c26a4aac861d687ffc929ad4ce31a4169867",
+      "sha256": "3e21635cad13cb97d31d030a469990773d74049d946477efb30e3671528488fc",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 51
     },
@@ -48538,10 +48904,9 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 28,
-      "fanOut": 6,
+      "fanOut": 5,
       "imports": [
         "src/backend/dropin_lifecycle.zig",
-        "src/compiler/wgsl/mod.zig",
         "src/compiler/wgsl/runtime/shader_info.zig",
         "src/contracts/binding.zig",
         "src/core/abi/wgpu_binding_base_types.zig",
@@ -48549,7 +48914,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 49,
+      "lineCount": 48,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/support/doe_native_shared_types.zig",
@@ -48557,82 +48922,82 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 10,
+          "line": 9,
           "name": "NativeVulkanRuntime"
         },
         {
           "kind": "const",
-          "line": 11,
+          "line": 10,
           "name": "NativeD3D12Runtime"
         },
         {
           "kind": "const",
-          "line": 13,
+          "line": 12,
           "name": "MAX_BIND"
         },
         {
           "kind": "const",
-          "line": 14,
+          "line": 13,
           "name": "MAX_RENDER_BIND_GROUPS"
         },
         {
           "kind": "const",
-          "line": 15,
+          "line": 14,
           "name": "MAX_COMPUTE_BIND_GROUPS"
         },
         {
           "kind": "const",
-          "line": 16,
+          "line": 15,
           "name": "MAX_FLAT_BIND"
         },
         {
           "kind": "const",
-          "line": 17,
+          "line": 16,
           "name": "VULKAN_PREPARED_BINDING_CACHE_CAPACITY"
         },
         {
           "kind": "const",
-          "line": 18,
+          "line": 17,
           "name": "MAX_VERTEX_BUFFERS"
         },
         {
           "kind": "const",
-          "line": 19,
+          "line": 18,
           "name": "MAX_VERTEX_ATTRIBUTES"
         },
         {
           "kind": "const",
-          "line": 20,
+          "line": 19,
           "name": "VERTEX_BUFFER_SLOT_BASE"
         },
         {
           "kind": "const",
-          "line": 21,
+          "line": 20,
           "name": "ERR_CAP"
         },
         {
           "kind": "const",
-          "line": 23,
+          "line": 22,
           "name": "extractWorkgroupSize"
         },
         {
           "kind": "const",
-          "line": 25,
+          "line": 24,
           "name": "BindingInfo"
         },
         {
           "kind": "const",
-          "line": 33,
+          "line": 32,
           "name": "MAX_SHADER_BINDINGS"
         },
         {
           "kind": "const",
-          "line": 35,
+          "line": 34,
           "name": "CompilationMessageKind"
         },
         {
           "kind": "const",
-          "line": 42,
+          "line": 41,
           "name": "DoeBindGroupLayoutEntry"
         }
       ],
@@ -48673,9 +49038,9 @@
         "src/native/vulkan/vulkan_render_shared.zig"
       ],
       "roles": [],
-      "sha256": "435927f89d2598b3c4857aee183460b1b6f5ce8522e3ef0b3e5b10b2b099801a",
+      "sha256": "e61eedc58eb914bf7ac3fe3b3c32459d7518dbd01d085ac6a97bde666bbbb801",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 23
+      "topLevelDeclarationCount": 22
     },
     {
       "containsCImport": false,
@@ -48750,7 +49115,7 @@
       "fanIn": 1,
       "fanOut": 9,
       "imports": [
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/ir/ir.zig",
         "src/contracts/binding.zig",
         "src/contracts/model/model_binding_value_types.zig",
         "src/contracts/model/model_compute_types.zig",
@@ -48794,7 +49159,7 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "33bd6968334e6c22d3e5e9ba2261a88082c059a302227c92252090fe0084a2c0",
+      "sha256": "175df83707b40f4c3857f24f2091ce0f6366d6d790635e6ad13f0685b7d8f2f3",
       "testBlockCount": 1,
       "topLevelDeclarationCount": 43
     },
@@ -48802,10 +49167,13 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 4,
-      "fanOut": 15,
+      "fanOut": 18,
       "imports": [
         "src/backend/dropin_resource_ops.zig",
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/ir/ir.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
+        "src/compiler/wgsl/pipeline/binding_reflection.zig",
+        "src/compiler/wgsl/pipeline/translate_spirv.zig",
         "src/compiler/wgsl/runtime/runtime_compile.zig",
         "src/contracts/binding.zig",
         "src/contracts/model/model_binding_value_types.zig",
@@ -48822,7 +49190,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 993,
+      "lineCount": 996,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/vulkan/vulkan_compute_native.zig",
@@ -48830,72 +49198,72 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 64,
+          "line": 67,
           "name": "VulkanDispatchBindingState"
         },
         {
           "kind": "fn",
-          "line": 335,
+          "line": 338,
           "name": "vulkan_create_shader_module"
         },
         {
           "kind": "fn",
-          "line": 383,
+          "line": 386,
           "name": "vulkan_copy_pipeline_spirv"
         },
         {
           "kind": "fn",
-          "line": 396,
+          "line": 399,
           "name": "vulkan_release_compute_pipeline"
         },
         {
           "kind": "fn",
-          "line": 501,
+          "line": 504,
           "name": "vulkan_collect_recorded_binding_state"
         },
         {
           "kind": "fn",
-          "line": 797,
+          "line": 800,
           "name": "vulkan_prepare_dispatch_bind_groups"
         },
         {
           "kind": "fn",
-          "line": 813,
+          "line": 816,
           "name": "vulkan_collect_dispatch_binding_state"
         },
         {
           "kind": "fn",
-          "line": 831,
+          "line": 834,
           "name": "vulkan_collect_recorded_bind_group_state"
         },
         {
           "kind": "fn",
-          "line": 848,
+          "line": 851,
           "name": "vulkan_prepare_dispatch_binding_state"
         },
         {
           "kind": "fn",
-          "line": 864,
+          "line": 867,
           "name": "vulkan_prepare_recorded_dispatch"
         },
         {
           "kind": "fn",
-          "line": 891,
+          "line": 894,
           "name": "vulkan_run_prepared_dispatch"
         },
         {
           "kind": "fn",
-          "line": 912,
+          "line": 915,
           "name": "vulkan_submit_recorded_dispatch"
         },
         {
           "kind": "fn",
-          "line": 918,
+          "line": 921,
           "name": "vulkan_run_prepared_dispatch_indirect"
         },
         {
           "kind": "fn",
-          "line": 931,
+          "line": 934,
           "name": "vulkan_submit_recorded_dispatch_indirect"
         }
       ],
@@ -48912,9 +49280,9 @@
         "src/native/shader/doe_shader_native.zig"
       ],
       "roles": [],
-      "sha256": "64e78477fda0424f128d5d524f43ff0c4e73947e94c124b83f64bf3a4f083884",
+      "sha256": "89783231d899800b0f5b4c74ee2a8c9fd4ed3346ca977d40a3833462a20ab8e9",
       "testBlockCount": 1,
-      "topLevelDeclarationCount": 94
+      "topLevelDeclarationCount": 97
     },
     {
       "containsCImport": false,
@@ -49279,7 +49647,7 @@
       "fanIn": 1,
       "fanOut": 6,
       "imports": [
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
         "src/compiler/wgsl/runtime/runtime_compile.zig",
         "src/core/abi/wgpu_core_base_types.zig",
         "src/native/support/doe_native_object_helpers.zig",
@@ -49320,7 +49688,7 @@
         "src/native/vulkan/vulkan_render_native.zig"
       ],
       "roles": [],
-      "sha256": "8adf2b50c40ac286cf195191a7afa3d5023efedd05227a5125c34c59fe60a654",
+      "sha256": "4bc2ec3ce2aea5cc7b670a705794ab790c70ca5c0707e3e000820e1f7b994b7b",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 10
     },
@@ -54315,7 +54683,7 @@
       "reachable": true,
       "reverseImports": [
         "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-        "src/compiler/wgsl/mod.zig",
+        "src/compiler/wgsl/pipeline/analysis.zig",
         "src/compiler/wgsl/proof/dispatch_proof_match.zig",
         "src/compiler/wgsl/runtime/runtime_compile.zig",
         "src/compiler/wgsl/runtime/runtime_compile_report.zig",
@@ -54331,5 +54699,5 @@
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6"
+  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe"
 }

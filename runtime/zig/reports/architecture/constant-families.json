@@ -16,12 +16,12 @@
         {
           "name": "ACCESS_READ",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 52
+          "startLine": 55
         },
         {
           "name": "ACCESS_READ_WRITE",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 53
+          "startLine": 56
         }
       ],
       "prefix": "ACCESS",
@@ -42,36 +42,15 @@
         {
           "name": "ADDRESS_SPACE_STORAGE",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 50
+          "startLine": 53
         },
         {
           "name": "ADDRESS_SPACE_UNIFORM",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 51
+          "startLine": 54
         }
       ],
       "prefix": "ADDRESS",
-      "reason": "shared constant-name prefix; ownership and value similarity require review"
-    },
-    {
-      "members": [
-        {
-          "name": "ARTIFACT_JSON_FILENAME",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 11
-        },
-        {
-          "name": "ARTIFACT_PATH_BYTES",
-          "path": "src/runtime/trace/trace_jsonl_emit.zig",
-          "startLine": 15
-        },
-        {
-          "name": "ARTIFACT_HASH_BYTES",
-          "path": "src/runtime/trace/trace_jsonl_emit.zig",
-          "startLine": 16
-        }
-      ],
-      "prefix": "ARTIFACT",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -254,22 +233,22 @@
         {
           "name": "BIND_GROUP_LAYOUT_RESOURCE_KIND_BUFFER",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 54
+          "startLine": 57
         },
         {
           "name": "BIND_GROUP_LAYOUT_RESOURCE_KIND_SAMPLER",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 55
+          "startLine": 58
         },
         {
           "name": "BIND_GROUP_LAYOUT_RESOURCE_KIND_TEXTURE",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 56
+          "startLine": 59
         },
         {
           "name": "BIND_GROUP_LAYOUT_RESOURCE_KIND_STORAGE_TEXTURE",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 57
+          "startLine": 60
         }
       ],
       "prefix": "BIND",
@@ -437,12 +416,12 @@
         {
           "name": "BOOTSTRAP_MANIFEST_MODULE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 31
+          "startLine": 30
         },
         {
           "name": "BOOTSTRAP_MANIFEST_STATUS_CODE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 32
+          "startLine": 31
         },
         {
           "name": "BOOTSTRAP_MANIFEST_MODULE",
@@ -860,12 +839,22 @@
         {
           "name": "CSLC_ENV_VAR",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 89
+          "startLine": 107
         },
         {
           "name": "CSLC_PATH_SENTINEL",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 90
+          "startLine": 108
+        },
+        {
+          "name": "CSLC_ENV_VAR",
+          "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+          "startLine": 12
+        },
+        {
+          "name": "CSLC_PATH_SENTINEL",
+          "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+          "startLine": 13
         }
       ],
       "prefix": "CSLC",
@@ -1014,11 +1003,6 @@
           "name": "DEFAULT_WORKGROUP_SIZE",
           "path": "src/backend/metal/metal_dispatch_runtime.zig",
           "startLine": 18
-        },
-        {
-          "name": "DEFAULT_KERNEL_ROOT",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 9
         },
         {
           "name": "DEFAULT_CACHE_DIR",
@@ -1565,7 +1549,7 @@
         {
           "name": "DIAGNOSTIC_DIRECTIVE_INFO",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 41
+          "startLine": 43
         }
       ],
       "prefix": "DIAGNOSTIC",
@@ -1717,12 +1701,12 @@
         {
           "name": "DISPATCH_INDIRECT_ARGS_BYTES",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 59
+          "startLine": 62
         },
         {
           "name": "DISPATCH_INDIRECT_ARGS_ALIGNMENT",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 60
+          "startLine": 63
         }
       ],
       "prefix": "DISPATCH",
@@ -1873,6 +1857,16 @@
           "name": "DXC_PATH_SENTINEL",
           "path": "src/compiler/wgsl/emit/dxil/emit_dxil.zig",
           "startLine": 24
+        },
+        {
+          "name": "DXC_ENV_VAR",
+          "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+          "startLine": 6
+        },
+        {
+          "name": "DXC_PATH_SENTINEL",
+          "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+          "startLine": 7
         }
       ],
       "prefix": "DXC",
@@ -2274,12 +2268,12 @@
         {
           "name": "DXIL_DXC_ENV_VAR",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 80
+          "startLine": 95
         },
         {
           "name": "DXIL_DXC_PATH_SENTINEL",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 81
+          "startLine": 96
         }
       ],
       "prefix": "DXIL",
@@ -2357,12 +2351,12 @@
         {
           "name": "ERR_CAP",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 30
+          "startLine": 32
         },
         {
           "name": "ERR_CAP",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 21
+          "startLine": 20
         }
       ],
       "prefix": "ERR",
@@ -2979,7 +2973,7 @@
         {
           "name": "HASH_HEX_SIZE",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 27
+          "startLine": 26
         },
         {
           "name": "HASH_HEX_SIZE",
@@ -3038,11 +3032,6 @@
     },
     {
       "members": [
-        {
-          "name": "HOST_PLAN_ARTIFACT_DIR",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 10
-        },
         {
           "name": "HOST_PLAN_SCHEMA_VERSION",
           "path": "src/compiler/wgsl/emit/csl/csl_spec.zig",
@@ -3241,23 +3230,23 @@
         },
         {
           "name": "LAST_ERROR_CAP",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 130
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 59
         },
         {
           "name": "LAST_CONTEXT_CAP",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 131
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 60
         },
         {
           "name": "LAST_ERROR_CAP",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 39
+          "startLine": 41
         },
         {
           "name": "LAST_ERROR_META_CAP",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 40
+          "startLine": 42
         }
       ],
       "prefix": "LAST",
@@ -3480,17 +3469,17 @@
         {
           "name": "MANIFEST_PATH_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 26
+          "startLine": 25
         },
         {
           "name": "MANIFEST_MODULE_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 28
+          "startLine": 27
         },
         {
           "name": "MANIFEST_STATUS_CODE_CAPACITY",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 29
+          "startLine": 28
         },
         {
           "name": "MANIFEST_PATH_CAPACITY",
@@ -3643,11 +3632,6 @@
           "name": "MAX_POOL_ENTRIES_PER_SIZE",
           "path": "src/backend/metal/metal_buffer_pool.zig",
           "startLine": 7
-        },
-        {
-          "name": "MAX_WGSL_SOURCE_BYTES",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 12
         },
         {
           "name": "MAX_BINDING_SLOTS",
@@ -3975,34 +3959,64 @@
           "startLine": 14
         },
         {
-          "name": "MAX_OUTPUT",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 75
-        },
-        {
-          "name": "MAX_HLSL_OUTPUT",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 76
-        },
-        {
-          "name": "MAX_SPIRV_OUTPUT",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 77
-        },
-        {
-          "name": "MAX_DXIL_OUTPUT",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 78
-        },
-        {
-          "name": "MAX_CSL_OUTPUT",
+          "name": "MAX_BINDINGS",
           "path": "src/compiler/wgsl/mod.zig",
           "startLine": 79
         },
         {
-          "name": "MAX_BINDINGS",
+          "name": "MAX_OUTPUT",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 91
+          "startLine": 86
+        },
+        {
+          "name": "MAX_HLSL_OUTPUT",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 89
+        },
+        {
+          "name": "MAX_SPIRV_OUTPUT",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 92
+        },
+        {
+          "name": "MAX_DXIL_OUTPUT",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 94
+        },
+        {
+          "name": "MAX_CSL_OUTPUT",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 101
+        },
+        {
+          "name": "MAX_BINDINGS",
+          "path": "src/compiler/wgsl/pipeline/binding_reflection.zig",
+          "startLine": 6
+        },
+        {
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_csl.zig",
+          "startLine": 6
+        },
+        {
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_dxil.zig",
+          "startLine": 5
+        },
+        {
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+          "startLine": 7
+        },
+        {
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+          "startLine": 7
+        },
+        {
+          "name": "MAX_OUTPUT",
+          "path": "src/compiler/wgsl/pipeline/translate_spirv.zig",
+          "startLine": 5
         },
         {
           "name": "MAX_U32_VALUE",
@@ -4017,12 +4031,12 @@
         {
           "name": "MAX_VERTEX_INPUT_ATTRS",
           "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 308
+          "startLine": 312
         },
         {
           "name": "MAX_INTER_STAGE_VARS",
           "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
-          "startLine": 309
+          "startLine": 313
         },
         {
           "name": "MAX_LANE_NAME_BYTES",
@@ -4137,17 +4151,17 @@
         {
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 34
+          "startLine": 33
         },
         {
           "name": "MAX_FLAT_BIND",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 35
+          "startLine": 34
         },
         {
           "name": "MAX_SHADER_BINDINGS",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 36
+          "startLine": 35
         },
         {
           "name": "MAX_COMPUTE_BIND_GROUPS",
@@ -4277,7 +4291,7 @@
         {
           "name": "MAX_OVERRIDE_ENTRIES",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 754
+          "startLine": 756
         },
         {
           "name": "MAX_DEFERRED_COPIES",
@@ -4297,37 +4311,37 @@
         {
           "name": "MAX_BIND",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 13
+          "startLine": 12
         },
         {
           "name": "MAX_RENDER_BIND_GROUPS",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 14
+          "startLine": 13
         },
         {
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 15
+          "startLine": 14
         },
         {
           "name": "MAX_FLAT_BIND",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 16
+          "startLine": 15
         },
         {
           "name": "MAX_VERTEX_BUFFERS",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 18
+          "startLine": 17
         },
         {
           "name": "MAX_VERTEX_ATTRIBUTES",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 19
+          "startLine": 18
         },
         {
           "name": "MAX_SHADER_BINDINGS",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 33
+          "startLine": 32
         },
         {
           "name": "MAX_SURFACE_DESCRIPTOR_CHAIN_NODES",
@@ -4352,22 +4366,22 @@
         {
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 30
+          "startLine": 33
         },
         {
           "name": "MAX_BIND",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 31
+          "startLine": 34
         },
         {
           "name": "MAX_KERNEL_BINDINGS",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 46
+          "startLine": 49
         },
         {
           "name": "MAX_FLAT_BIND",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 47
+          "startLine": 50
         },
         {
           "name": "MAX_CACHE_SIZE_BYTES",
@@ -5563,27 +5577,27 @@
         {
           "name": "RESOURCE_KIND_NONE",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 38
+          "startLine": 37
         },
         {
           "name": "RESOURCE_KIND_BUFFER",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 39
+          "startLine": 38
         },
         {
           "name": "RESOURCE_KIND_SAMPLER",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 40
+          "startLine": 39
         },
         {
           "name": "RESOURCE_KIND_TEXTURE",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 41
+          "startLine": 40
         },
         {
           "name": "RESOURCE_KIND_STORAGE_TEXTURE",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 42
+          "startLine": 41
         },
         {
           "name": "RESOURCE_KIND_NONE",
@@ -5968,7 +5982,7 @@
         {
           "name": "SPIRV_MAGIC",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 58
+          "startLine": 61
         }
       ],
       "prefix": "SPIRV",
@@ -6096,7 +6110,7 @@
         {
           "name": "STATUS_MESSAGE_BYTES",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 30
+          "startLine": 29
         },
         {
           "name": "STATUS_MESSAGE_BYTES",
@@ -6514,7 +6528,7 @@
         {
           "name": "VERTEX_BUFFER_SLOT_BASE",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 20
+          "startLine": 19
         }
       ],
       "prefix": "VERTEX",
@@ -9102,7 +9116,7 @@
         {
           "name": "VULKAN_PREPARED_BINDING_CACHE_CAPACITY",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 17
+          "startLine": 16
         }
       ],
       "prefix": "VULKAN",
@@ -15849,7 +15863,7 @@
         {
           "name": "backend_policy",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 23
+          "startLine": 22
         },
         {
           "name": "backend_contract",
@@ -16071,12 +16085,12 @@
         {
           "name": "bind_group",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 17
+          "startLine": 19
         },
         {
           "name": "bind_group_native",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 16
+          "startLine": 19
         }
       ],
       "prefix": "bind",
@@ -16085,9 +16099,14 @@
     {
       "members": [
         {
-          "name": "binding_contract",
+          "name": "binding_reflection",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 53
+          "startLine": 51
+        },
+        {
+          "name": "binding_contract",
+          "path": "src/compiler/wgsl/pipeline/binding_reflection.zig",
+          "startLine": 4
         },
         {
           "name": "binding_values",
@@ -16097,7 +16116,7 @@
         {
           "name": "binding_contract",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 15
+          "startLine": 14
         },
         {
           "name": "binding_contract",
@@ -16107,7 +16126,7 @@
         {
           "name": "binding_contract",
           "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 8
+          "startLine": 7
         },
         {
           "name": "binding_contract",
@@ -16117,7 +16136,7 @@
         {
           "name": "binding_contract",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 19
+          "startLine": 22
         }
       ],
       "prefix": "binding",
@@ -16846,7 +16865,7 @@
         {
           "name": "compute_bindings",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 23
+          "startLine": 26
         },
         {
           "name": "compute_contract",
@@ -16917,29 +16936,14 @@
     {
       "members": [
         {
-          "name": "csl_spec",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 7
-        },
-        {
           "name": "csl_f16_pack",
           "path": "src/compiler/tsir/emit_kernel_body.zig",
           "startLine": 107
         },
         {
           "name": "csl_spec",
-          "path": "src/compiler/wgsl/emit/csl/doe_wgsl_csl_tests.zig",
-          "startLine": 2
-        },
-        {
-          "name": "csl_spec",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_exec_v1.zig",
           "startLine": 26
-        },
-        {
-          "name": "csl_tests",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 50
         },
         {
           "name": "csl_spec",
@@ -17243,6 +17247,11 @@
           "name": "default_config",
           "path": "src/compiler/tsir/emit_kernel_context.zig",
           "startLine": 34
+        },
+        {
+          "name": "default_translation_robustness_config",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 69
         }
       ],
       "prefix": "default",
@@ -17344,16 +17353,6 @@
     {
       "members": [
         {
-          "name": "doe_wgsl",
-          "path": "src/backend/d3d12/d3d12_runtime_compute.zig",
-          "startLine": 6
-        },
-        {
-          "name": "doe_wgsl",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 4
-        },
-        {
           "name": "doe_surface_acquire_drawable",
           "path": "src/backend/metal/metal_surface_runtime.zig",
           "startLine": 8
@@ -17404,11 +17403,6 @@
           "startLine": 17
         },
         {
-          "name": "doe_wgsl",
-          "path": "src/backend/vulkan/vk_pipeline.zig",
-          "startLine": 20
-        },
-        {
           "name": "doe_plan_executor",
           "path": "src/cli/doe_plan_executor_cli.zig",
           "startLine": 3
@@ -17427,21 +17421,6 @@
           "name": "doe_surface_supports_format",
           "path": "src/native/lifecycle/doe_canvas_event_native.zig",
           "startLine": 15
-        },
-        {
-          "name": "doe_wgsl",
-          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 4
-        },
-        {
-          "name": "doe_wgsl",
-          "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 9
-        },
-        {
-          "name": "doe_wgsl",
-          "path": "src/native/vulkan/vulkan_render_pipeline_native.zig",
-          "startLine": 5
         },
         {
           "name": "doe_wgsl",
@@ -17704,162 +17683,177 @@
         {
           "name": "emit_msl",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 17
+          "startLine": 15
         },
         {
           "name": "emit_msl_subgroups",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 18
+          "startLine": 16
         },
         {
           "name": "emit_msl_shared",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 19
+          "startLine": 17
         },
         {
           "name": "emit_msl_vertex",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 20
+          "startLine": 18
         },
         {
           "name": "emit_msl_fragment",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 21
+          "startLine": 19
         },
         {
           "name": "emit_hlsl",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 22
+          "startLine": 20
         },
         {
           "name": "emit_hlsl_texture",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 24
+          "startLine": 22
         },
         {
           "name": "emit_spirv",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 25
+          "startLine": 23
         },
         {
           "name": "emit_spirv_fn",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 26
+          "startLine": 24
         },
         {
           "name": "emit_spirv_stages",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 27
+          "startLine": 25
         },
         {
           "name": "emit_spirv_texture",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 28
+          "startLine": 26
         },
         {
           "name": "emit_dxil",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 29
+          "startLine": 27
         },
         {
           "name": "emit_csl",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 30
+          "startLine": 28
         },
         {
           "name": "emit_csl_reduce_dist",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 31
+          "startLine": 29
         },
         {
           "name": "emit_csl_attention",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 32
+          "startLine": 30
         },
         {
           "name": "emit_csl_gather",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 33
+          "startLine": 31
         },
         {
           "name": "emit_csl_rope",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 34
+          "startLine": 32
         },
         {
           "name": "emit_csl_dequant",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 35
+          "startLine": 33
         },
         {
           "name": "emit_csl_sample",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 36
+          "startLine": 34
         },
         {
           "name": "emit_csl_fused",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 37
+          "startLine": 35
         },
         {
           "name": "emit_csl_dense_gemv",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 38
+          "startLine": 36
         },
         {
           "name": "emit_csl_linear_attn",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 39
+          "startLine": 37
         },
         {
           "name": "emit_csl_kv_cache",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 40
+          "startLine": 38
         },
         {
           "name": "emit_csl_fused_ffn",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 41
+          "startLine": 39
         },
         {
           "name": "emit_csl_host",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 42
+          "startLine": 40
         },
         {
           "name": "emit_csl_host_plan",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 43
+          "startLine": 41
         },
         {
           "name": "emit_csl_toolchain",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 44
+          "startLine": 42
         },
         {
           "name": "emit_csl_simulator",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 45
+          "startLine": 43
         },
         {
           "name": "emit_csl_mem_plan",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 46
+          "startLine": 44
         },
         {
           "name": "emit_csl_exec_v1",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 47
+          "startLine": 45
         },
         {
           "name": "emit_csl_host_runtime",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 48
+          "startLine": 46
         },
         {
           "name": "emit_csl_validate",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 49
+          "startLine": 47
+        },
+        {
+          "name": "emit_msl",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 7
+        },
+        {
+          "name": "emit_spirv",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 8
+        },
+        {
+          "name": "emit_msl",
+          "path": "src/compiler/wgsl/runtime/shader_info.zig",
+          "startLine": 4
         },
         {
           "name": "emit_msl",
@@ -18304,11 +18298,6 @@
         },
         {
           "name": "hash_utils",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 3
-        },
-        {
-          "name": "hash_utils",
           "path": "src/backend/metal/mod.zig",
           "startLine": 17
         },
@@ -18333,21 +18322,6 @@
     },
     {
       "members": [
-        {
-          "name": "host_plan_artifact",
-          "path": "src/backend/metal/backend_execute.zig",
-          "startLine": 20
-        },
-        {
-          "name": "host_plan",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 6
-        },
-        {
-          "name": "host_plan_artifact",
-          "path": "src/backend/metal/mod.zig",
-          "startLine": 20
-        },
         {
           "name": "host_plan",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_simulator.zig",
@@ -18467,27 +18441,47 @@
         {
           "name": "ir_digest",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 12
+          "startLine": 10
         },
         {
           "name": "ir_builder",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 13
+          "startLine": 11
         },
         {
           "name": "ir_validate",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 14
+          "startLine": 12
         },
         {
           "name": "ir_opt_rewrite",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 15
+          "startLine": 13
         },
         {
           "name": "ir_transform_robustness",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 16
+          "startLine": 14
+        },
+        {
+          "name": "ir_builder",
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 7
+        },
+        {
+          "name": "ir_validate",
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 8
+        },
+        {
+          "name": "ir_opt_rewrite",
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 9
+        },
+        {
+          "name": "ir_transform_robustness",
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 10
         },
         {
           "name": "ir_const_eval",
@@ -18645,7 +18639,7 @@
         {
           "name": "label_store",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 31
+          "startLine": 33
         },
         {
           "name": "label_store",
@@ -18676,7 +18670,7 @@
         {
           "name": "layout_utils",
           "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 51
+          "startLine": 48
         }
       ],
       "prefix": "layout",
@@ -18691,8 +18685,8 @@
         },
         {
           "name": "lean_proof",
-          "path": "src/compiler/wgsl/mod.zig",
-          "startLine": 52
+          "path": "src/compiler/wgsl/pipeline/analysis.zig",
+          "startLine": 11
         },
         {
           "name": "lean_proof",
@@ -19377,7 +19371,7 @@
         {
           "name": "metal_pipeline_cache",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 22
+          "startLine": 21
         },
         {
           "name": "metal_pipeline_cache",
@@ -19407,7 +19401,7 @@
         {
           "name": "metal_bridge_buffer_contents",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 23
+          "startLine": 22
         },
         {
           "name": "metal_bridge_compute_dispatch_copy_signal_commit",
@@ -19577,27 +19571,27 @@
         {
           "name": "metal_bridge_device_new_compute_pipeline",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 20
+          "startLine": 22
         },
         {
           "name": "metal_bridge_device_new_library_msl",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 21
+          "startLine": 23
         },
         {
           "name": "metal_bridge_library_new_function",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 22
+          "startLine": 24
         },
         {
           "name": "metal_bridge_retain",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 23
+          "startLine": 25
         },
         {
           "name": "metal_bridge_release",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 24
+          "startLine": 26
         },
         {
           "name": "metal_bridge_adapter_get_info_string",
@@ -19864,11 +19858,6 @@
           "name": "model_render_types",
           "path": "src/backend/metal/metal_deferred_release.zig",
           "startLine": 21
-        },
-        {
-          "name": "model_transfer_types",
-          "path": "src/backend/metal/metal_host_plan_artifact.zig",
-          "startLine": 2
         },
         {
           "name": "model_transfer_types",
@@ -20543,12 +20532,12 @@
         {
           "name": "model_compute_types",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 17
+          "startLine": 20
         },
         {
           "name": "model_binding_types",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 18
+          "startLine": 21
         },
         {
           "name": "model_compute_types",
@@ -20732,6 +20721,27 @@
     {
       "members": [
         {
+          "name": "msl_translation",
+          "path": "src/backend/metal/metal_runtime_resources.zig",
+          "startLine": 6
+        },
+        {
+          "name": "msl_translation",
+          "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+          "startLine": 3
+        },
+        {
+          "name": "msl_translation",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 10
+        }
+      ],
+      "prefix": "msl",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
           "name": "native_cmds",
           "path": "src/backend/d3d12/commands/d3d12_native_render_pass.zig",
           "startLine": 4
@@ -20764,7 +20774,7 @@
         {
           "name": "native_runtime",
           "path": "src/backend/metal/mod.zig",
-          "startLine": 21
+          "startLine": 20
         },
         {
           "name": "native_runtime",
@@ -21299,32 +21309,32 @@
         {
           "name": "native_types",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 14
+          "startLine": 16
         },
         {
           "name": "native_shared",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 15
+          "startLine": 17
         },
         {
           "name": "native_helpers",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 16
+          "startLine": 18
         },
         {
           "name": "native_types",
           "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 6
+          "startLine": 7
         },
         {
           "name": "native_shared",
           "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 7
+          "startLine": 8
         },
         {
           "name": "native_helpers",
           "path": "src/native/shader/shader_binding_reflection.zig",
-          "startLine": 8
+          "startLine": 9
         },
         {
           "name": "native_types",
@@ -21389,22 +21399,22 @@
         {
           "name": "native_types",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 12
+          "startLine": 15
         },
         {
           "name": "native_shared",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 13
+          "startLine": 16
         },
         {
           "name": "native_cmds",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 14
+          "startLine": 17
         },
         {
           "name": "native_helpers",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 15
+          "startLine": 18
         },
         {
           "name": "native_shared",
@@ -21606,6 +21616,27 @@
         }
       ],
       "prefix": "operator",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "override_values",
+          "path": "src/compiler/wgsl/pipeline/translate_hlsl.zig",
+          "startLine": 5
+        },
+        {
+          "name": "override_values",
+          "path": "src/compiler/wgsl/pipeline/translate_msl.zig",
+          "startLine": 5
+        },
+        {
+          "name": "override_values",
+          "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
+          "startLine": 5
+        }
+      ],
+      "prefix": "override",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -21954,7 +21985,7 @@
         {
           "name": "pipeline_hash",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 22
+          "startLine": 25
         },
         {
           "name": "pipeline_cache",
@@ -22674,7 +22705,7 @@
         {
           "name": "resource_ops",
           "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 16
+          "startLine": 15
         },
         {
           "name": "resource_ops",
@@ -22714,7 +22745,7 @@
         {
           "name": "resource_ops",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 18
+          "startLine": 20
         },
         {
           "name": "resource_ops",
@@ -22724,7 +22755,7 @@
         {
           "name": "resource_ops",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 21
+          "startLine": 24
         },
         {
           "name": "resource_ops",
@@ -22820,7 +22851,7 @@
         {
           "name": "runtime_compile",
           "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
-          "startLine": 4
+          "startLine": 5
         },
         {
           "name": "runtime_state",
@@ -22885,7 +22916,7 @@
         {
           "name": "runtime_compile",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 10
+          "startLine": 13
         },
         {
           "name": "runtime_compile",
@@ -23128,12 +23159,12 @@
         {
           "name": "shader_translation_cache",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 11
+          "startLine": 13
         },
         {
           "name": "shader_binding_reflection",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 12
+          "startLine": 14
         },
         {
           "name": "shader_binding_reflection",
@@ -23143,12 +23174,12 @@
         {
           "name": "shader_translation_cache",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 11
+          "startLine": 14
         },
         {
           "name": "shader_binding_reflection",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 20
+          "startLine": 23
         }
       ],
       "prefix": "shader",
@@ -23178,6 +23209,27 @@
         }
       ],
       "prefix": "shared",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "spirv_translation",
+          "path": "src/backend/vulkan/vk_pipeline.zig",
+          "startLine": 20
+        },
+        {
+          "name": "spirv_translation",
+          "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
+          "startLine": 4
+        },
+        {
+          "name": "spirv_translation",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 11
+        }
+      ],
+      "prefix": "spirv",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -23653,6 +23705,37 @@
         }
       ],
       "prefix": "trace",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "translate_msl",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 53
+        },
+        {
+          "name": "translate_hlsl",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 54
+        },
+        {
+          "name": "translate_spirv",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 55
+        },
+        {
+          "name": "translate_dxil",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 56
+        },
+        {
+          "name": "translate_csl",
+          "path": "src/compiler/wgsl/mod.zig",
+          "startLine": 57
+        }
+      ],
+      "prefix": "translate",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -24158,7 +24241,7 @@
         {
           "name": "vk_dispatch_indirect",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 26
+          "startLine": 29
         },
         {
           "name": "vk_feature_caps",
@@ -24369,39 +24452,34 @@
     {
       "members": [
         {
-          "name": "wgsl_compiler",
-          "path": "src/backend/metal/metal_runtime_resources.zig",
-          "startLine": 6
-        },
-        {
           "name": "wgsl_runtime_compile",
           "path": "src/backend/metal/metal_runtime_resources.zig",
           "startLine": 8
         },
         {
-          "name": "wgsl_compiler",
-          "path": "src/native/compute/doe_compute_ext_native.zig",
-          "startLine": 14
-        },
-        {
-          "name": "wgsl_compiler",
+          "name": "wgsl_analysis",
           "path": "src/native/shader/doe_shader_compilation_info_native.zig",
           "startLine": 28
         },
         {
-          "name": "wgsl_compiler",
+          "name": "wgsl_analysis",
           "path": "src/native/shader/doe_shader_native.zig",
           "startLine": 8
         },
         {
-          "name": "wgsl_ir",
+          "name": "wgsl_bindings",
           "path": "src/native/shader/doe_shader_native.zig",
           "startLine": 9
         },
         {
+          "name": "wgsl_ir",
+          "path": "src/native/shader/doe_shader_native.zig",
+          "startLine": 11
+        },
+        {
           "name": "wgsl_runtime_compile",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 10
+          "startLine": 12
         },
         {
           "name": "wgsl_runtime_compile",
@@ -24409,19 +24487,44 @@
           "startLine": 5
         },
         {
-          "name": "wgsl_compiler",
+          "name": "wgsl_analysis",
           "path": "src/native/shader/shader_binding_reflection.zig",
           "startLine": 5
         },
         {
-          "name": "wgsl_compiler",
+          "name": "wgsl_bindings",
+          "path": "src/native/shader/shader_binding_reflection.zig",
+          "startLine": 6
+        },
+        {
+          "name": "wgsl_ir",
           "path": "src/native/support/doe_native_object_types.zig",
           "startLine": 8
         },
         {
-          "name": "wgsl_compiler",
-          "path": "src/native/support/doe_native_shared_types.zig",
-          "startLine": 7
+          "name": "wgsl_ir",
+          "path": "src/native/vulkan/vulkan_compute_bindings.zig",
+          "startLine": 4
+        },
+        {
+          "name": "wgsl_analysis",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 9
+        },
+        {
+          "name": "wgsl_bindings",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 10
+        },
+        {
+          "name": "wgsl_ir",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 12
+        },
+        {
+          "name": "wgsl_analysis",
+          "path": "src/native/vulkan/vulkan_render_pipeline_native.zig",
+          "startLine": 5
         }
       ],
       "prefix": "wgsl",
@@ -24429,10 +24532,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "8990f85173273a2903be00f6127356348be51d9ed7048af47251dad5d426313f",
+  "manifestSha256": "19f79dde14f234fc35cfda7799bea8b42d1914322e9c70ecdfdef7005d761909",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6",
+  "sourceTreeSha256": "bb61ea350c5d3b955de51fe613cdebb3cfb55fd60f97507d92385ebb05f261fe",
   "status": "captured"
 }
