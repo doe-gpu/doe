@@ -41,7 +41,10 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
 const classify = @import("emit_csl_classify.zig");
+const storage_emit = @import("csl_storage_emit.zig");
 const text_buffer = @import("csl_text_buffer.zig");
+
+const storageExportName = storage_emit.storageExportName;
 
 const write = text_buffer.write;
 
@@ -337,21 +340,4 @@ pub fn emit(
     try write(buf, pos, "\");\n");
     try write(buf, pos, "    @export_symbol(compute);\n");
     try write(buf, pos, "}\n");
-}
-
-// ---------------------------------------------------------------------------
-// Write helper (kept local to the module; mirrors emit_csl_matmul.zig
-// rather than crossing a new module boundary at this point).
-// ---------------------------------------------------------------------------
-
-fn storageExportName(module: *const ir.Module, target_index: usize, fallback: []const u8) []const u8 {
-    var index: usize = 0;
-    for (module.globals.items) |global| {
-        if (global.binding == null) continue;
-        const space = global.addr_space orelse continue;
-        if (space != .storage) continue;
-        if (index == target_index) return global.name;
-        index += 1;
-    }
-    return fallback;
 }

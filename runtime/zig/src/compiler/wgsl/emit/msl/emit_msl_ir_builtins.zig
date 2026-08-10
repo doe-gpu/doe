@@ -11,6 +11,8 @@ const texture_builtins = @import("emit_msl_texture.zig");
 const layout = @import("../../ir/layout_utils.zig");
 const workgroup_policy = @import("emit_msl_workgroup_zero.zig");
 
+const should_force_literal_cast = maps.shouldForceLiteralCast;
+
 pub const EmitError = error{
     OutputTooLarge,
     InvalidIr,
@@ -456,14 +458,6 @@ pub fn emit_expr_coerced(self: anytype, function: ir.Function, expr_id: ir.ExprI
         return;
     }
     try self.emit_expr(function, expr_id);
-}
-
-fn should_force_literal_cast(module: *const ir.Module, function: ir.Function, expr_id: ir.ExprId, target_ty: ir.TypeId) bool {
-    if (function.exprs.items[expr_id].data != .int_lit) return false;
-    return switch (module.types.get(target_ty)) {
-        .scalar => |scalar| scalar == .u32,
-        else => false,
-    };
 }
 
 fn emit_atomic_compare_exchange_weak(self: anytype, function: ir.Function, call: @FieldType(ir.Expr, "call")) EmitError!void {

@@ -1,9 +1,28 @@
+const std = @import("std");
+
 const ir = @import("../../ir/ir.zig");
 const spirv = @import("spirv_builder.zig");
 
 pub const EmitError = spirv.EmitError || error{
     InvalidIr,
 };
+
+pub fn emitUncachedResultInst(
+    builder: *spirv.Builder,
+    allocator: std.mem.Allocator,
+    opcode: u16,
+    result_type: u32,
+    operands: []const u32,
+) EmitError!u32 {
+    const result_id = builder.reserve_id();
+    var words = std.ArrayListUnmanaged(u32){};
+    defer words.deinit(allocator);
+    try words.append(allocator, result_type);
+    try words.append(allocator, result_id);
+    try words.appendSlice(allocator, operands);
+    try builder.append_function_inst(opcode, words.items);
+    return result_id;
+}
 
 pub fn addr_space_to_storage_class(addr_space: ir.AddressSpace) u32 {
     return switch (addr_space) {
@@ -36,4 +55,24 @@ pub fn builtin_to_spirv(builtin: ir.Builtin) EmitError!u32 {
         .primitive_index => spirv.Builtin.PrimitiveId,
         .none => error.InvalidIr,
     };
+}
+
+test "uncached result instruction reserves id and writes canonical operands" {
+    const allocator = std.testing.allocator;
+    var builder = spirv.Builder.init(allocator);
+    defer builder.deinit();
+
+    const result_id = try emitUncachedResultInst(
+        &builder,
+        allocator,
+        spirv.Opcode.IAdd,
+        9,
+        &.{ 4, 5 },
+    );
+    try std.testing.expectEqual(@as(u32, 1), result_id);
+    try std.testing.expectEqualSlices(
+        u32,
+        &.{ (@as(u32, 5) << 16) | spirv.Opcode.IAdd, 9, 1, 4, 5 },
+        builder.functions.items,
+    );
 }

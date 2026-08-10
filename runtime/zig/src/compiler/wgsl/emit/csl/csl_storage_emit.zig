@@ -42,6 +42,22 @@ pub fn emitPointerExports(buf: []u8, pos: *usize, module: *const ir.Module) Erro
     }
 }
 
+pub fn storageExportName(
+    module: *const ir.Module,
+    target_index: usize,
+    fallback: []const u8,
+) []const u8 {
+    var index: usize = 0;
+    for (module.globals.items) |global| {
+        if (global.binding == null) continue;
+        const address_space = global.addr_space orelse continue;
+        if (address_space != .storage) continue;
+        if (index == target_index) return global.name;
+        index += 1;
+    }
+    return fallback;
+}
+
 test "pointer exports include bound storage globals only" {
     const allocator = std.testing.allocator;
     var module = ir.Module.init(allocator);
@@ -69,4 +85,6 @@ test "pointer exports include bound storage globals only" {
         "    @export_symbol(values_ptr, \"values\");\n",
         output[0..position],
     );
+    try std.testing.expectEqualStrings("values", storageExportName(&module, 0, "missing"));
+    try std.testing.expectEqualStrings("missing", storageExportName(&module, 1, "missing"));
 }

@@ -1,50 +1,10 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const operator_text = @import("../operator_text.zig");
 
-pub fn unary_op_text(op: ir.UnaryOp) []const u8 {
-    return switch (op) {
-        .neg => "-",
-        .not => "!",
-        .bit_not => "~",
-    };
-}
-
-pub fn binary_op_text(op: ir.BinaryOp) []const u8 {
-    return switch (op) {
-        .add => "+",
-        .sub => "-",
-        .mul => "*",
-        .div => "/",
-        .rem => "%",
-        .bit_and => "&",
-        .bit_or => "|",
-        .bit_xor => "^",
-        .shift_left => "<<",
-        .shift_right => ">>",
-        .equal => "==",
-        .not_equal => "!=",
-        .less => "<",
-        .less_equal => "<=",
-        .greater => ">",
-        .greater_equal => ">=",
-        .logical_and => "&&",
-        .logical_or => "||",
-    };
-}
-
-pub fn assign_op_text(op: ir.AssignOp) []const u8 {
-    return switch (op) {
-        .assign => "=",
-        .add => "+=",
-        .sub => "-=",
-        .mul => "*=",
-        .div => "/=",
-        .rem => "%=",
-        .bit_and => "&=",
-        .bit_or => "|=",
-        .bit_xor => "^=",
-    };
-}
+pub const unary_op_text = operator_text.unaryOp;
+pub const binary_op_text = operator_text.binaryOp;
+pub const assign_op_text = operator_text.assignOp;
 
 pub fn hlsl_builtin_name(builtin: ir.Builtin) []const u8 {
     return switch (builtin) {

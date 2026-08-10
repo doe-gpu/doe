@@ -6,6 +6,12 @@
 
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const maps = @import("emit_msl_maps.zig");
+
+const assign_op_text = maps.assign_op_text;
+const binary_op_text = maps.binary_op_text;
+const should_force_literal_cast = maps.shouldForceLiteralCast;
+const unary_op_text = maps.unary_op_text;
 
 pub const EmitError = error{
     OutputTooLarge,
@@ -418,14 +424,6 @@ fn write_expr_coerced(module: *const ir.Module, function: ir.Function, expr_id: 
     try write_expr(module, function, expr_id, buf, pos);
 }
 
-fn should_force_literal_cast(module: *const ir.Module, function: ir.Function, expr_id: ir.ExprId, target_ty: ir.TypeId) bool {
-    if (function.exprs.items[expr_id].data != .int_lit) return false;
-    return switch (module.types.get(target_ty)) {
-        .scalar => |scalar| scalar == .u32,
-        else => false,
-    };
-}
-
 fn write_call(module: *const ir.Module, function: ir.Function, result_ty: ir.TypeId, call: @FieldType(ir.Expr, "call"), buf: []u8, pos: *usize) EmitError!void {
     if (call.kind == .builtin) {
         if (try try_write_special_builtin(module, function, result_ty, call, buf, pos)) return;
@@ -633,48 +631,3 @@ fn write_float(buf: []u8, pos: *usize, value: f64) EmitError!void {
 // ──────────────────────────────────────────────────────────────────────────────
 // Operator text tables
 // ──────────────────────────────────────────────────────────────────────────────
-
-fn unary_op_text(op: ir.UnaryOp) []const u8 {
-    return switch (op) {
-        .neg => "-",
-        .not => "!",
-        .bit_not => "~",
-    };
-}
-
-fn binary_op_text(op: ir.BinaryOp) []const u8 {
-    return switch (op) {
-        .add => "+",
-        .sub => "-",
-        .mul => "*",
-        .div => "/",
-        .rem => "%",
-        .bit_and => "&",
-        .bit_or => "|",
-        .bit_xor => "^",
-        .shift_left => "<<",
-        .shift_right => ">>",
-        .equal => "==",
-        .not_equal => "!=",
-        .less => "<",
-        .less_equal => "<=",
-        .greater => ">",
-        .greater_equal => ">=",
-        .logical_and => "&&",
-        .logical_or => "||",
-    };
-}
-
-fn assign_op_text(op: ir.AssignOp) []const u8 {
-    return switch (op) {
-        .assign => "=",
-        .add => "+=",
-        .sub => "-=",
-        .mul => "*=",
-        .div => "/=",
-        .rem => "%=",
-        .bit_and => "&=",
-        .bit_or => "|=",
-        .bit_xor => "^=",
-    };
-}

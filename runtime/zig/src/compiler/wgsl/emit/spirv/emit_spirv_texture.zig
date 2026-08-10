@@ -1,16 +1,16 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
 const spirv = @import("spirv_builder.zig");
+const emit_spirv_shared = @import("emit_spirv_shared.zig");
 
 fn emit_result_inst(self: anytype, opcode: u16, result_type: u32, operands: []const u32) !u32 {
-    const result_id = self.emitter.builder.reserve_id();
-    var words = std.ArrayListUnmanaged(u32){};
-    defer words.deinit(self.emitter.alloc);
-    try words.append(self.emitter.alloc, result_type);
-    try words.append(self.emitter.alloc, result_id);
-    try words.appendSlice(self.emitter.alloc, operands);
-    try self.emitter.builder.append_function_inst(opcode, words.items);
-    return result_id;
+    return emit_spirv_shared.emitUncachedResultInst(
+        &self.emitter.builder,
+        self.emitter.alloc,
+        opcode,
+        result_type,
+        operands,
+    );
 }
 
 fn emit_sampled_image(self: anytype, call: anytype, texture_arg: u32, sampler_arg: u32) !struct { id: u32, texture_expr: ir.ExprId } {
