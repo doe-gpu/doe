@@ -1653,7 +1653,7 @@
       },
       "src/compiler/wgsl/emit/csl/csl_storage_emit.zig": {
         "decision": "Keep",
-        "moduleSha256": "9e26906e90479af3f2745d43a104273d8fa1a40bb7252663eac15e3006ac4667",
+        "moduleSha256": "9e26906e83664469b93cdfd0438f54b73954b5a6f4484937a654d83cfb5a5f74",
         "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
@@ -1797,13 +1797,13 @@
       },
       "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig": {
         "decision": "Keep",
-        "moduleSha256": "6d9a968860120ff299928d3523186152ce4e6535714972c3d52f0e86a2400b73",
+        "moduleSha256": "6d9a9688f797c95ea9554df5cb67a8809ab38f88efd1f4c5929a9dd4394b71d8",
         "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
       "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig": {
         "decision": "Keep",
-        "moduleSha256": "ac463cc7bec22c05017d3480f40e9d42c4bbcebb30c416e0188657f3310c8a22",
+        "moduleSha256": "ac463cc71e7a02cbfc2c239b1c9f68fa14d0081fee6388c2764139a50e9239c5",
         "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
@@ -1929,7 +1929,7 @@
       },
       "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig": {
         "decision": "Keep",
-        "moduleSha256": "db615460bc7de12bb3c2cba028ea8515698363e23116925a121bdf0a28cec18c",
+        "moduleSha256": "db615460ff486aa5025fca18b05647809362eb01d593a4c818157fd41410daa4",
         "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
@@ -1965,19 +1965,19 @@
       },
       "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig": {
         "decision": "Keep",
-        "moduleSha256": "2caae41a78bbd83b850d5ff2bca6d33e1c8eff6ea71d46fcd2cc8c08166fe2f7",
+        "moduleSha256": "2caae41aec4c86e5e73d9800e66eb30719ad79dc07095d57f6102e69904e7127",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
       "src/compiler/wgsl/emit/msl/emit_msl_maps.zig": {
         "decision": "Keep",
-        "moduleSha256": "75461e63cf88d0508a6d49388092884f863a42d1dc1a9f3a48d3ecb21b93e728",
+        "moduleSha256": "75461e63d43e9d657c87c620566ea3db1c64a2706748eac86a9d07266aa861bc",
         "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
       "src/compiler/wgsl/emit/msl/emit_msl_shared.zig": {
         "decision": "Keep",
-        "moduleSha256": "4175e5443548e1f483545169493933715c1602549766038552d520669f8abc56",
+        "moduleSha256": "4175e54423674fc0bdf8b3a994e8e659e0544d5544783f450acab38de1f50a18",
         "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
@@ -2025,7 +2025,7 @@
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig": {
         "decision": "Keep",
-        "moduleSha256": "b5435c1db37654d6f12469dd2bfe27994fa2d8af9a0b51bd98c1105520525216",
+        "moduleSha256": "b5435c1da9e9d1cb10ac24826276e17de08a06561af2baf07a70cfccd663b52f",
         "reason": "Keep: authoritative SPIR-V builtin lowering family independent from function and texture lowering.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
@@ -2049,7 +2049,7 @@
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_shared.zig": {
         "decision": "Keep",
-        "moduleSha256": "4ad4b822584888122f5b6486021ac5cd40ddbe6b23f0390bd8f09993753c7681",
+        "moduleSha256": "4ad4b822584888122f5b6486021ac5cd40ddbe6b23c0390bd8f09993753c7681",
         "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },
@@ -2061,7 +2061,7 @@
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig": {
         "decision": "Keep",
-        "moduleSha256": "10b76592e4ea7bc371125525f9c3f5a8a94b5d175087f07d6b1bb91ea71052bb",
+        "moduleSha256": "10b765925b71afc31d3abfd6d54e67597610e72d85747c1cdca4f6397b685c40",
         "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-dry-recomposition/2026-08-09"
       },

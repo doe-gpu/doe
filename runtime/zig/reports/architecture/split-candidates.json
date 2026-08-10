@@ -115,7 +115,7 @@
     },
     {
       "fanIn": 1,
-      "fanOut": 3,
+      "fanOut": 4,
       "lineCount": 804,
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
@@ -220,9 +220,9 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "5468465d86690dd7e299844ed0a4dbb7663e1702a33af4eba0ea96e9895792de",
+  "manifestSha256": "db3ec8bba68056a4b72a1703f8b25f2f08448c196b62ffc348228194ae03cae0",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "f8c4b9338190c60aa527df74d09cd89a8ca48cd3ae6b2c9f527a57fa51750b95"
+  "sourceTreeSha256": "b5c10b176cb7c1dcbe01716a4aea3ca38780d3b1771c724a2a5522d9f0c68e6d"
 }

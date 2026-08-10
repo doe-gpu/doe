@@ -2320,7 +2320,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "c937ecec15d2c9a10f2ffd0f4c55e01a1df3e9aa197f61fa3e26816cea1cf2ef",
+      "moduleSha256": "9e26906e83664469b93cdfd0438f54b73954b5a6f4484937a654d83cfb5a5f74",
       "path": "src/compiler/wgsl/emit/csl/csl_storage_emit.zig",
       "reason": "Keep: reachable compiler implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
@@ -2608,7 +2608,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "4927e1ca5ce57461a54b7a2666b14e6af35c21c1a25ceae93a48d4d7a056edd8",
+      "moduleSha256": "6d9a9688f797c95ea9554df5cb67a8809ab38f88efd1f4c5929a9dd4394b71d8",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
       "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -2620,7 +2620,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "9324f407cd7ead480ba3465b5254033e12824bbf2564095ec049660f0d2b0663",
+      "moduleSha256": "ac463cc71e7a02cbfc2c239b1c9f68fa14d0081fee6388c2764139a50e9239c5",
       "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
       "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -2872,11 +2872,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "0cbe4e0497cc3f147bb75a3bbb495fb3d6e1fa6516cb6b08cd129e04eb4824e0",
+      "moduleSha256": "db615460ff486aa5025fca18b05647809362eb01d593a4c818157fd41410daa4",
       "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig",
       "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -2944,11 +2944,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "c1025e49d1d2193806ccf2646ba579ed09ed5923aa2b70589ae3d343c8b9a296",
+      "moduleSha256": "2caae41aec4c86e5e73d9800e66eb30719ad79dc07095d57f6102e69904e7127",
       "path": "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig",
       "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -2956,11 +2956,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "5e7543fa125b2e7fe025692685a63ec67c16c400df6af7d8992105d5d92953ce",
+      "moduleSha256": "75461e63d43e9d657c87c620566ea3db1c64a2706748eac86a9d07266aa861bc",
       "path": "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
       "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -2968,11 +2968,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "4e5c2c06142324d80faca95cdfabd6b01573483efd9b756163b06f4078a60187",
+      "moduleSha256": "4175e54423674fc0bdf8b3a994e8e659e0544d5544783f450acab38de1f50a18",
       "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
       "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -3040,6 +3040,18 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
+      "moduleSha256": "a8a4a6e899af927daa0fbeb2e14c494345496854672d391a3e587fca88f0bef9",
+      "path": "src/compiler/wgsl/emit/operator_text.zig",
+      "reason": "Keep: canonical target-neutral operator spellings shared by the HLSL and MSL emitters.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
+      "suggestedDecision": "Keep"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
       "moduleSha256": "6ee3dc4d9b0506e84fe9da0f5672e6cc4819ee3ff28978b23e774611a1c2ccc5",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv.zig",
       "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
@@ -3052,11 +3064,11 @@
       "evidence": [
         "exceeds the 800-line architecture review signal"
       ],
-      "moduleSha256": "9015a19b4d19223b22302acdbf5e83554bb35bb2ab3452a31bcd7f84e6ceb21d",
+      "moduleSha256": "b5435c1da9e9d1cb10ac24826276e17de08a06561af2baf07a70cfccd663b52f",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig",
       "reason": "Keep: authoritative SPIR-V builtin lowering family independent from function and texture lowering.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Recompose"
     },
     {
@@ -3100,11 +3112,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "020826bf79a9c292d491327e5ab85c00d6bea61cec47acd7bf5246dfa4be85fd",
+      "moduleSha256": "4ad4b822584888122f5b6486021ac5cd40ddbe6b23c0390bd8f09993753c7681",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_shared.zig",
       "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -3124,11 +3136,11 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "242005690130e4f3371e027a18404a57e15823d3601a91186c4b6bd632bbe9d9",
+      "moduleSha256": "10b765925b71afc31d3abfd6d54e67597610e72d85747c1cdca4f6397b685c40",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig",
       "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
-      "reviewer": "codex-recomposition-review/2026-08-08",
+      "reviewer": "codex-dry-recomposition/2026-08-09",
       "suggestedDecision": "Keep"
     },
     {
@@ -6435,13 +6447,13 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "5468465d86690dd7e299844ed0a4dbb7663e1702a33af4eba0ea96e9895792de",
+  "manifestSha256": "db3ec8bba68056a4b72a1703f8b25f2f08448c196b62ffc348228194ae03cae0",
   "pendingCount": 0,
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
-  "reviewedCount": 533,
+  "reviewedCount": 534,
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "f8c4b9338190c60aa527df74d09cd89a8ca48cd3ae6b2c9f527a57fa51750b95",
+  "sourceTreeSha256": "b5c10b176cb7c1dcbe01716a4aea3ca38780d3b1771c724a2a5522d9f0c68e6d",
   "status": "complete",
-  "totalCount": 533
+  "totalCount": 534
 }

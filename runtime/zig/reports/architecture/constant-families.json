@@ -5022,22 +5022,22 @@
         {
           "name": "Q4_K_M_BLOCK_BYTES",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 57
+          "startLine": 60
         },
         {
           "name": "Q4_K_M_SUBBLOCKS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 61
+          "startLine": 64
         },
         {
           "name": "Q4_K_M_SUBBLOCK_ELEMENTS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 62
+          "startLine": 65
         },
         {
           "name": "Q4_K_M_BLOCK_ELEMENTS",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 63
+          "startLine": 66
         }
       ],
       "prefix": "Q4",
@@ -15589,6 +15589,32 @@
     {
       "members": [
         {
+          "name": "assign_op_text",
+          "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig",
+          "startLine": 7
+        },
+        {
+          "name": "assign_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
+          "startLine": 7
+        },
+        {
+          "name": "assign_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
+          "startLine": 11
+        },
+        {
+          "name": "assign_op_to_binary",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
+          "startLine": 20
+        }
+      ],
+      "prefix": "assign",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
           "name": "ast_mod",
           "path": "src/compiler/wgsl/frontend/parser.zig",
           "startLine": 18
@@ -16012,6 +16038,27 @@
         }
       ],
       "prefix": "backend",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "binary_op_text",
+          "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig",
+          "startLine": 6
+        },
+        {
+          "name": "binary_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
+          "startLine": 6
+        },
+        {
+          "name": "binary_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
+          "startLine": 12
+        }
+      ],
+      "prefix": "binary",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -17600,6 +17647,11 @@
         },
         {
           "name": "emit_spirv_shared",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig",
+          "startLine": 4
+        },
+        {
+          "name": "emit_spirv_shared",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
           "startLine": 5
         },
@@ -17622,6 +17674,11 @@
           "name": "emit_spirv_shared",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_stages.zig",
           "startLine": 10
+        },
+        {
+          "name": "emit_spirv_shared",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig",
+          "startLine": 4
         },
         {
           "name": "emit_msl",
@@ -21487,6 +21544,32 @@
     {
       "members": [
         {
+          "name": "operator_artifacts",
+          "path": "src/cli/runtime_cli.zig",
+          "startLine": 10
+        },
+        {
+          "name": "operator_artifacts",
+          "path": "src/cli/runtime_cli_artifacts.zig",
+          "startLine": 7
+        },
+        {
+          "name": "operator_text",
+          "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig",
+          "startLine": 3
+        },
+        {
+          "name": "operator_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
+          "startLine": 3
+        }
+      ],
+      "prefix": "operator",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
           "name": "p0_procs_mod",
           "path": "src/backend/webgpu_backend_lifecycle.zig",
           "startLine": 8
@@ -23111,6 +23194,16 @@
         },
         {
           "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
+          "startLine": 19
+        },
+        {
+          "name": "storage_emit",
+          "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
+          "startLine": 44
+        },
+        {
+          "name": "storage_emit",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_rope.zig",
           "startLine": 13
         },
@@ -23265,12 +23358,12 @@
         {
           "name": "text_buffer",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul.zig",
-          "startLine": 19
+          "startLine": 20
         },
         {
           "name": "text_buffer",
           "path": "src/compiler/wgsl/emit/csl/emit_csl_matmul_q4k.zig",
-          "startLine": 44
+          "startLine": 45
         },
         {
           "name": "text_buffer",
@@ -23571,6 +23664,27 @@
         }
       ],
       "prefix": "tsir",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "unary_op_text",
+          "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl_maps.zig",
+          "startLine": 5
+        },
+        {
+          "name": "unary_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_maps.zig",
+          "startLine": 5
+        },
+        {
+          "name": "unary_op_text",
+          "path": "src/compiler/wgsl/emit/msl/emit_msl_shared.zig",
+          "startLine": 14
+        }
+      ],
+      "prefix": "unary",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -24279,10 +24393,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "5468465d86690dd7e299844ed0a4dbb7663e1702a33af4eba0ea96e9895792de",
+  "manifestSha256": "db3ec8bba68056a4b72a1703f8b25f2f08448c196b62ffc348228194ae03cae0",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "f8c4b9338190c60aa527df74d09cd89a8ca48cd3ae6b2c9f527a57fa51750b95",
+  "sourceTreeSha256": "b5c10b176cb7c1dcbe01716a4aea3ca38780d3b1771c724a2a5522d9f0c68e6d",
   "status": "captured"
 }

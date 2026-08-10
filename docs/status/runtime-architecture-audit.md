@@ -14,10 +14,18 @@ consolidation of repeated Zig implementation details:
   `src/runtime/execution_receipt.zig`;
 - plan command counting and declared-count validation are owned by
   `src/plan/plan_validation.zig`;
-- shared WGSL IR queries and semantic type-syntax parsing are owned by narrow
-  modules next to the IR and frontend consumers;
-- CSL bounded text writing and storage declaration emission are shared by the
-  target emitters instead of copied into each operation module;
+- shared WGSL IR queries, proof-oriented builtin and stride resolution, and
+  semantic type-syntax parsing are owned by narrow modules next to the IR and
+  frontend consumers;
+- CSL bounded text writing, storage declaration emission, pointer exports, and
+  storage-export naming are shared by the target emitters instead of copied
+  into each operation module;
+- target-neutral C-family operator spellings are shared by HLSL and MSL, while
+  the MSL literal-cast policy remains target-owned in its maps module;
+- uncached SPIR-V result-instruction assembly is owned by the shared SPIR-V
+  emitter layer, with builtin and texture emitters retaining narrow wrappers;
+- TSIR global-base lookup delegates to the canonical WGSL IR query rather than
+  carrying frontend-specific copies;
 - TSIR semantic metadata serialization is shared across the CSL, WebGPU, and
   text-skeleton emitters, and its source is included in the affected emitter
   identity digests.
@@ -132,10 +140,10 @@ identity, timing, trace, and error taxonomy.
 3. Move test-only compatibility aggregators out of production source after
    their consumers import narrow canonical contracts.
 4. Review the remaining high-confidence seams named by the duplicate report:
-   WGSL proof builtin/stride queries, CSL storage exports, TSIR global-base
-   lookup, backend artifact/timing, and module request parsing. Consolidate
-   only when semantic tests cover every consumer, and keep platform API
-   mechanics separate.
+   TSIR emitter selection and identity assembly, cross-target IO and texture
+   queries, backend artifact/timing, and module request parsing. Consolidate
+   only when semantic tests cover every consumer, and keep platform API and
+   target-specific lowering mechanics separate.
 5. Split only the files that exceed the advisory architecture signal when the
    split follows a real responsibility boundary.
 6. Re-run import-fence, source-layout, core tests, WGSL tests, and package tests
