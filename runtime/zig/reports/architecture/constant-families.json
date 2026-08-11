@@ -512,11 +512,6 @@
           "startLine": 74
         },
         {
-          "name": "BUFFER_USAGE_INDIRECT",
-          "path": "src/core/compute/wgpu_commands_compute.zig",
-          "startLine": 17
-        },
-        {
           "name": "BUFFER_ZERO_INIT_CHUNK_BYTES",
           "path": "src/core/resource/wgpu_resources.zig",
           "startLine": 14
@@ -1127,7 +1122,7 @@
         {
           "name": "DEFAULT_DISPATCH_WGSL_KERNEL",
           "path": "src/core/compute/wgpu_commands_compute.zig",
-          "startLine": 20
+          "startLine": 18
         },
         {
           "name": "DEFAULT_MAX_DRAW_COUNT",
@@ -1692,11 +1687,6 @@
           "name": "DISPATCH_INFO_PAD_FIELD_NAME",
           "path": "src/contracts/shader_abi/dispatch_info.zig",
           "startLine": 13
-        },
-        {
-          "name": "DISPATCH_INDIRECT_ARGS_HANDLE",
-          "path": "src/core/compute/wgpu_commands_compute.zig",
-          "startLine": 16
         },
         {
           "name": "DISPATCH_INDIRECT_ARGS_BYTES",
@@ -4041,7 +4031,7 @@
         {
           "name": "MAX_LANE_NAME_BYTES",
           "path": "src/contracts/backend.zig",
-          "startLine": 79
+          "startLine": 81
         },
         {
           "name": "MAX_SHADER_BINDINGS",
@@ -4066,7 +4056,7 @@
         {
           "name": "MAX_KERNEL_SOURCE_BYTES",
           "path": "src/core/compute/wgpu_commands_compute.zig",
-          "startLine": 18
+          "startLine": 16
         },
         {
           "name": "MAX_DIAGNOSTIC_RECORDS",
@@ -4658,44 +4648,49 @@
           "startLine": 52
         },
         {
-          "name": "MSG_INVALID_ADAPTER",
+          "name": "MSG_VK_ADAPTER_PROBE_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 53
         },
         {
-          "name": "MSG_QUEUE_UNAVAILABLE",
+          "name": "MSG_INVALID_ADAPTER",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 54
         },
         {
-          "name": "MSG_DEVICE_ALLOCATION_FAILED",
+          "name": "MSG_QUEUE_UNAVAILABLE",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 55
         },
         {
-          "name": "MSG_VK_RUNTIME_INIT_FAILED",
+          "name": "MSG_DEVICE_ALLOCATION_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 56
         },
         {
-          "name": "MSG_D3D12_RUNTIME_INIT_FAILED",
+          "name": "MSG_VK_RUNTIME_INIT_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 57
         },
         {
-          "name": "MSG_RUNTIME_POLICY_INVALID",
+          "name": "MSG_D3D12_RUNTIME_INIT_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 58
         },
         {
-          "name": "MSG_DEVICE_DESCRIPTOR_INVALID",
+          "name": "MSG_RUNTIME_POLICY_INVALID",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 59
         },
         {
-          "name": "MSG_REQUIRED_FEATURE_UNSUPPORTED",
+          "name": "MSG_DEVICE_DESCRIPTOR_INVALID",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
           "startLine": 60
+        },
+        {
+          "name": "MSG_REQUIRED_FEATURE_UNSUPPORTED",
+          "path": "src/native/lifecycle/doe_instance_device_native.zig",
+          "startLine": 61
         }
       ],
       "prefix": "MSG",
@@ -6580,7 +6575,7 @@
         {
           "name": "VK_NULL_U64",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 29
+          "startLine": 30
         },
         {
           "name": "VK_NULL_U64",
@@ -9098,6 +9093,21 @@
     },
     {
       "members": [
+        {
+          "name": "VULKAN_VENDOR_AMD",
+          "path": "src/native/support/doe_adapter_info_native.zig",
+          "startLine": 12
+        },
+        {
+          "name": "VULKAN_VENDOR_NVIDIA",
+          "path": "src/native/support/doe_adapter_info_native.zig",
+          "startLine": 13
+        },
+        {
+          "name": "VULKAN_VENDOR_INTEL",
+          "path": "src/native/support/doe_adapter_info_native.zig",
+          "startLine": 14
+        },
         {
           "name": "VULKAN_MAX_STORAGE_BUFFER_BINDING_SIZE",
           "path": "src/native/support/doe_device_caps.zig",
@@ -15013,7 +15023,7 @@
         {
           "name": "abi_callback",
           "path": "src/dropin/wgpu_dropin_ext_a_core.zig",
-          "startLine": 133
+          "startLine": 146
         },
         {
           "name": "abi_core",
@@ -15891,9 +15901,14 @@
           "startLine": 20
         },
         {
-          "name": "backend_policy",
+          "name": "backend_contract",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 7
+        },
+        {
+          "name": "backend_policy",
+          "path": "src/backend/vulkan/native_runtime.zig",
+          "startLine": 8
         },
         {
           "name": "backend_policy",
@@ -15943,7 +15958,7 @@
         {
           "name": "backend_id_name",
           "path": "src/contracts/backend.zig",
-          "startLine": 177
+          "startLine": 179
         },
         {
           "name": "backend_contract",
@@ -16049,6 +16064,11 @@
           "name": "backend_telemetry",
           "path": "src/runtime/execution_receipt.zig",
           "startLine": 3
+        },
+        {
+          "name": "backend_policy",
+          "path": "src/runtime/output_oracle.zig",
+          "startLine": 2
         },
         {
           "name": "backend_contract",
@@ -16607,7 +16627,7 @@
         {
           "name": "common_timing",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 8
+          "startLine": 9
         },
         {
           "name": "common_timing",
@@ -18552,7 +18572,7 @@
         {
           "name": "is_handle_type",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 771
+          "startLine": 777
         },
         {
           "name": "is_local_ref",
@@ -18619,7 +18639,7 @@
         {
           "name": "label_store",
           "path": "src/native/api/doe_native_api_misc_exports.zig",
-          "startLine": 31
+          "startLine": 32
         },
         {
           "name": "label_store",
@@ -18634,7 +18654,7 @@
         {
           "name": "label_store",
           "path": "src/native/mod.zig",
-          "startLine": 244
+          "startLine": 245
         },
         {
           "name": "label_store",
@@ -19621,12 +19641,7 @@
         {
           "name": "metal_bridge_adapter_get_info_string",
           "path": "src/native/support/doe_adapter_info_native.zig",
-          "startLine": 24
-        },
-        {
-          "name": "metal_bridge_free_string",
-          "path": "src/native/support/doe_adapter_info_native.zig",
-          "startLine": 25
+          "startLine": 20
         }
       ],
       "prefix": "metal",
@@ -20711,6 +20726,21 @@
         },
         {
           "name": "model_commands",
+          "path": "src/runtime/output_oracle.zig",
+          "startLine": 3
+        },
+        {
+          "name": "model_compute_types",
+          "path": "src/runtime/output_oracle.zig",
+          "startLine": 4
+        },
+        {
+          "name": "model_profile",
+          "path": "src/runtime/output_oracle.zig",
+          "startLine": 5
+        },
+        {
+          "name": "model_commands",
           "path": "src/runtime/trace/command_output.zig",
           "startLine": 1
         },
@@ -21364,12 +21394,12 @@
         {
           "name": "native_types",
           "path": "src/native/support/doe_adapter_info_native.zig",
-          "startLine": 9
+          "startLine": 4
         },
         {
           "name": "native_helpers",
           "path": "src/native/support/doe_adapter_info_native.zig",
-          "startLine": 10
+          "startLine": 5
         },
         {
           "name": "native_shared",
@@ -21817,17 +21847,17 @@
         {
           "name": "parse_address_space",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 775
+          "startLine": 781
         },
         {
           "name": "parse_access",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 776
+          "startLine": 782
         },
         {
           "name": "parse_vector_swizzle",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 777
+          "startLine": 783
         },
         {
           "name": "parse_access",
@@ -21892,12 +21922,12 @@
         {
           "name": "parse_backend_id",
           "path": "src/contracts/backend.zig",
-          "startLine": 178
+          "startLine": 180
         },
         {
           "name": "parse_lane",
           "path": "src/contracts/backend.zig",
-          "startLine": 180
+          "startLine": 182
         }
       ],
       "prefix": "parse",
@@ -22413,7 +22443,7 @@
         {
           "name": "render_bundle",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 26
+          "startLine": 27
         },
         {
           "name": "render_bundle",
@@ -22775,7 +22805,7 @@
         {
           "name": "resource_ops",
           "path": "src/native/support/doe_adapter_info_native.zig",
-          "startLine": 11
+          "startLine": 6
         },
         {
           "name": "resource_ops",
@@ -22851,17 +22881,17 @@
         {
           "name": "runtime_cli_args",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 15
+          "startLine": 16
         },
         {
           "name": "runtime_cli_artifacts",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 16
+          "startLine": 17
         },
         {
           "name": "runtime_cli_inputs",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 17
+          "startLine": 18
         },
         {
           "name": "runtime_cli_args",
@@ -23344,7 +23374,7 @@
         {
           "name": "surface_ops",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 25
+          "startLine": 26
         },
         {
           "name": "surface_procs_mod",
@@ -23660,7 +23690,7 @@
         {
           "name": "tooling_io_context",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 13
+          "startLine": 14
         },
         {
           "name": "tooling_io_context",
@@ -23886,67 +23916,67 @@
         {
           "name": "vk_device",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 13
+          "startLine": 14
         },
         {
           "name": "vk_sync",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 14
+          "startLine": 15
         },
         {
           "name": "vk_upload",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 15
+          "startLine": 16
         },
         {
           "name": "vk_pipeline",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 16
+          "startLine": 17
         },
         {
           "name": "vk_shader_source",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 17
+          "startLine": 18
         },
         {
           "name": "vk_pipeline_cache_persistent",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 18
+          "startLine": 19
         },
         {
           "name": "vk_resources",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 19
+          "startLine": 20
         },
         {
           "name": "vk_compute_sync",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 20
+          "startLine": 21
         },
         {
           "name": "vk_render",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 21
+          "startLine": 22
         },
         {
           "name": "vk_dispatch_repeat",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 22
+          "startLine": 23
         },
         {
           "name": "vk_metrics",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 23
+          "startLine": 24
         },
         {
           "name": "vk_command_buffers",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 24
+          "startLine": 25
         },
         {
           "name": "vk_texture_commands",
           "path": "src/backend/vulkan/native_runtime.zig",
-          "startLine": 27
+          "startLine": 28
         },
         {
           "name": "vk_device",
@@ -24572,10 +24602,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
+  "manifestSha256": "48fe072a0cac49068a50b77b7f86d8dd3eddecdbe224a6afcf3b88b19d780fc1",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07",
+  "sourceTreeSha256": "8160f0b9b0b7d94e589a3e71eb4071015e58cf29756c501916d9ad9c2a2b4cb2",
   "status": "captured"
 }

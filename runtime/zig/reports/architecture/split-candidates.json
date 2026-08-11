@@ -3,8 +3,8 @@
   "candidates": [
     {
       "fanIn": 5,
-      "fanOut": 24,
-      "lineCount": 987,
+      "fanOut": 25,
+      "lineCount": 1026,
       "path": "src/backend/vulkan/native_runtime.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -193,7 +193,7 @@
     {
       "fanIn": 6,
       "fanOut": 8,
-      "lineCount": 840,
+      "lineCount": 883,
       "path": "src/runtime/trace/trace.zig",
       "reason": "handwritten module exceeds the 800-line architecture review signal"
     },
@@ -206,9 +206,9 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
+  "manifestSha256": "48fe072a0cac49068a50b77b7f86d8dd3eddecdbe224a6afcf3b88b19d780fc1",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07"
+  "sourceTreeSha256": "8160f0b9b0b7d94e589a3e71eb4071015e58cf29756c501916d9ad9c2a2b4cb2"
 }

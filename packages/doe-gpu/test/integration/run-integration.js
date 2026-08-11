@@ -10,6 +10,7 @@ const VALID_EXTENSIONS = new Set([".js"]);
 const ENTRYPOINT_PREFIX = "test-integration-";
 const RUNTIME_NODE = "node";
 const RUNTIME_BUN = "bun";
+const RUNTIME_DENO = "deno";
 
 function parseArgs(argv) {
   const options = {
@@ -35,7 +36,7 @@ function parseArgs(argv) {
     throw new Error(`Unknown argument: ${arg}`);
   }
 
-  if (options.runtime !== RUNTIME_NODE && options.runtime !== RUNTIME_BUN) {
+  if (![RUNTIME_NODE, RUNTIME_BUN, RUNTIME_DENO].includes(options.runtime)) {
     throw new Error(`Unsupported runtime: ${options.runtime}`);
   }
 
@@ -43,6 +44,9 @@ function parseArgs(argv) {
 }
 
 function classifyEntrypoint(fileName) {
+  if (/-deno(?:[.-]|$)/.test(fileName)) {
+    return RUNTIME_DENO;
+  }
   if (/-bun(?:[.-]|$)/.test(fileName)) {
     return RUNTIME_BUN;
   }
@@ -69,16 +73,25 @@ async function discoverEntrypoints(runtime) {
     .sort();
 }
 
-function runtimeCommand(runtime) {
+function runtimeInvocation(runtime, filePath) {
   if (runtime === RUNTIME_BUN) {
-    return typeof Bun !== "undefined" ? process.execPath : "bun";
+    return {
+      command: typeof Bun !== "undefined" ? process.execPath : "bun",
+      args: [filePath],
+    };
   }
-  return process.execPath;
+  if (runtime === RUNTIME_DENO) {
+    return {
+      command: typeof Deno !== "undefined" ? Deno.execPath() : "deno",
+      args: ["run", "--allow-all", filePath],
+    };
+  }
+  return { command: process.execPath, args: [filePath] };
 }
 
-function runEntrypoint(command, filePath) {
+function runEntrypoint(command, args, filePath) {
   return new Promise((resolve) => {
-    execFile(command, [filePath], (error, stdout, stderr) => {
+    execFile(command, args, (error, stdout, stderr) => {
       resolve({
         filePath,
         code: error?.code ?? 0,
@@ -105,13 +118,13 @@ async function main() {
     return;
   }
 
-  const command = runtimeCommand(options.runtime);
   let failed = 0;
 
   for (const fileName of entrypoints) {
     const filePath = join(__dirname, fileName);
+    const invocation = runtimeInvocation(options.runtime, filePath);
     process.stdout.write(`\n=== ${options.runtime} integration: ${fileName} ===\n`);
-    const result = await runEntrypoint(command, filePath);
+    const result = await runEntrypoint(invocation.command, invocation.args, filePath);
     if (result.stdout) {
       process.stdout.write(result.stdout);
       if (!result.stdout.endsWith("\n")) {

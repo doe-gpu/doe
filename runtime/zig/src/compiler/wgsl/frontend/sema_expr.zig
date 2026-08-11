@@ -20,6 +20,27 @@ pub fn analyze_binary_type(self: anytype, lhs_ty: ir.TypeId, rhs_ty: ir.TypeId, 
     };
 }
 
+pub fn analyze_assignment_value_type(
+    self: anytype,
+    lhs_ty: ir.TypeId,
+    rhs_ty: ir.TypeId,
+    assignment_op: Tag,
+) !ir.TypeId {
+    const binary_op: Tag = switch (assignment_op) {
+        .@"=" => return rhs_ty,
+        .plus_eq => .@"+",
+        .minus_eq => .@"-",
+        .star_eq => .@"*",
+        .slash_eq => .@"/",
+        .percent_eq => .@"%",
+        .amp_eq => .@"&",
+        .pipe_eq => .@"|",
+        .caret_eq => .@"^",
+        else => return error.InvalidWgsl,
+    };
+    return analyze_binary_type(self, lhs_ty, rhs_ty, binary_op);
+}
+
 pub fn logical_not_result_type(self: anytype, operand_ty: ir.TypeId) !ir.TypeId {
     return switch (self.module.types.get(operand_ty)) {
         .scalar => if (operand_ty == self.module.bool_type) operand_ty else error.TypeMismatch,

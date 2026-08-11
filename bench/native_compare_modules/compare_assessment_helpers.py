@@ -37,6 +37,8 @@ _PACKAGE_EXECUTION_BACKENDS = frozenset({
     "doe_node_native_direct",
     "bun_webgpu_package",
     "doe_bun_package",
+    "deno_webgpu_package",
+    "doe_deno_package",
 })
 _DOE_EXECUTION_BACKENDS = frozenset({
     "doe_metal",
@@ -45,6 +47,7 @@ _DOE_EXECUTION_BACKENDS = frozenset({
     "doe_node_webgpu",
     "doe_node_native_direct",
     "doe_bun_package",
+    "doe_deno_package",
     "webgpu-ffi",
     "native",
 })

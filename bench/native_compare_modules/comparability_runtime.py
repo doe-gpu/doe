@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import statistics
 from pathlib import Path
 from typing import Any
@@ -257,6 +258,11 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
     output_oracle_count = 0
     final_kernel_dispatch_has_output_oracle = False
     final_kernel_dispatch_oracle_reference_class = ""
+    final_kernel_dispatch_oracle_kind = ""
+    final_kernel_dispatch_oracle_reference_path = ""
+    final_kernel_dispatch_oracle_reference_sha256 = ""
+    final_kernel_dispatch_oracle_absolute_tolerance = 0.0
+    final_kernel_dispatch_oracle_relative_tolerance = 0.0
     output_oracle_dispatch_mismatches: list[dict[str, int]] = []
     for index, command in enumerate(payload):
         if not isinstance(command, dict):
@@ -281,6 +287,31 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
                     ),
                 )
             )
+            final_kernel_dispatch_oracle_kind = str(output_oracle.get("kind", ""))
+            final_kernel_dispatch_oracle_reference_path = str(
+                output_oracle.get(
+                    "reference_path",
+                    output_oracle.get("referencePath", ""),
+                )
+            )
+            final_kernel_dispatch_oracle_reference_sha256 = str(
+                output_oracle.get(
+                    "reference_sha256",
+                    output_oracle.get("referenceSha256", ""),
+                )
+            )
+            final_kernel_dispatch_oracle_absolute_tolerance = float(
+                output_oracle.get(
+                    "absolute_tolerance",
+                    output_oracle.get("absoluteTolerance", 0),
+                )
+            )
+            final_kernel_dispatch_oracle_relative_tolerance = float(
+                output_oracle.get(
+                    "relative_tolerance",
+                    output_oracle.get("relativeTolerance", 0),
+                )
+            )
             timed_dispatch_count = safe_int(command.get("repeat"), default=1)
             oracle_dispatch_count = safe_int(
                 output_oracle.get("dispatch_count", output_oracle.get("dispatchCount")),
@@ -295,6 +326,11 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
         else:
             final_kernel_dispatch_has_output_oracle = False
             final_kernel_dispatch_oracle_reference_class = ""
+            final_kernel_dispatch_oracle_kind = ""
+            final_kernel_dispatch_oracle_reference_path = ""
+            final_kernel_dispatch_oracle_reference_sha256 = ""
+            final_kernel_dispatch_oracle_absolute_tolerance = 0.0
+            final_kernel_dispatch_oracle_relative_tolerance = 0.0
         kernel = str(command.get("kernel", "")).strip()
         if not kernel:
             return [], details, f"kernel_dispatch command at index {index} is missing kernel"
@@ -307,6 +343,19 @@ def _load_kernel_dispatch_kernels(commands_path: str) -> tuple[list[str], dict[s
     details["finalKernelDispatchHasOutputOracle"] = final_kernel_dispatch_has_output_oracle
     details["finalKernelDispatchOracleReferenceClass"] = (
         final_kernel_dispatch_oracle_reference_class
+    )
+    details["finalKernelDispatchOracleKind"] = final_kernel_dispatch_oracle_kind
+    details["finalKernelDispatchOracleReferencePath"] = (
+        final_kernel_dispatch_oracle_reference_path
+    )
+    details["finalKernelDispatchOracleReferenceSha256"] = (
+        final_kernel_dispatch_oracle_reference_sha256
+    )
+    details["finalKernelDispatchOracleAbsoluteTolerance"] = (
+        final_kernel_dispatch_oracle_absolute_tolerance
+    )
+    details["finalKernelDispatchOracleRelativeTolerance"] = (
+        final_kernel_dispatch_oracle_relative_tolerance
     )
     details["kernelDispatchOutputOracleDispatchMismatches"] = output_oracle_dispatch_mismatches
     details["kernelDispatchKernels"] = kernels
@@ -502,6 +551,36 @@ def assess_native_shader_artifact_equivalence(
                 f"{oracle_dispatch_mismatches}"
             ),
         })
+    oracle_kind = str(command_details.get("finalKernelDispatchOracleKind", ""))
+    oracle_reference_path = str(
+        command_details.get("finalKernelDispatchOracleReferencePath", "")
+    )
+    oracle_reference_sha256 = str(
+        command_details.get("finalKernelDispatchOracleReferenceSha256", "")
+    )
+    oracle_absolute_tolerance = float(
+        command_details.get("finalKernelDispatchOracleAbsoluteTolerance", 0)
+    )
+    oracle_relative_tolerance = float(
+        command_details.get("finalKernelDispatchOracleRelativeTolerance", 0)
+    )
+    if oracle_kind == "float32_reference_tolerance_v1":
+        resolved_reference_path = (REPO_ROOT / oracle_reference_path).resolve()
+        if not resolved_reference_path.is_relative_to(REPO_ROOT.resolve()):
+            oracle_failures.append({
+                "kernel": "<output-oracle>",
+                "reason": "float32 output oracle reference path escapes the repository",
+            })
+        elif not resolved_reference_path.is_file():
+            oracle_failures.append({
+                "kernel": "<output-oracle>",
+                "reason": f"float32 output oracle reference is missing: {oracle_reference_path}",
+            })
+        elif file_sha256(resolved_reference_path) != oracle_reference_sha256:
+            oracle_failures.append({
+                "kernel": "<output-oracle>",
+                "reason": "float32 output oracle reference hash does not match its contract",
+            })
     for side_name, samples in (("baseline", left_command_samples), ("comparison", right_command_samples)):
         for sample in samples:
             if not isinstance(sample, dict):
@@ -514,12 +593,45 @@ def assess_native_shader_artifact_equivalence(
             failed = safe_int(trace_meta.get("outputOracleFailedCount"), default=0)
             expected = str(trace_meta.get("outputOracleExpectedSha256", ""))
             actual = str(trace_meta.get("outputOracleActualSha256", ""))
-            if count != declared_oracle_count or matched != declared_oracle_count or failed != 0 or expected != actual:
+            exact_hash_match = bool(expected) and expected == actual
+            tolerance_match = (
+                oracle_kind == "float32_reference_tolerance_v1"
+                and trace_meta.get("outputOracleKind") == oracle_kind
+                and trace_meta.get("outputOracleReferenceClass") == "independent_v1"
+                and trace_meta.get("outputOracleReferencePath") == oracle_reference_path
+                and trace_meta.get("outputOracleReferenceSha256") == oracle_reference_sha256
+                and safe_int(
+                    trace_meta.get("outputOracleComparedValueCount"), default=0
+                ) > 0
+                and safe_int(trace_meta.get("outputOracleMismatchCount"), default=-1)
+                == 0
+                and math.isclose(
+                    float(trace_meta.get("outputOracleAbsoluteTolerance", -1)),
+                    oracle_absolute_tolerance,
+                    rel_tol=0.000001,
+                    abs_tol=1e-12,
+                )
+                and math.isclose(
+                    float(trace_meta.get("outputOracleRelativeTolerance", -1)),
+                    oracle_relative_tolerance,
+                    rel_tol=0.000001,
+                    abs_tol=1e-12,
+                )
+                and len(actual) == 64
+            )
+            if (
+                count != declared_oracle_count
+                or matched != declared_oracle_count
+                or failed != 0
+                or not (exact_hash_match or tolerance_match)
+            ):
                 oracle_failures.append({
                     "kernel": "<output-oracle>",
                     "reason": (
                         f"{side_name} output oracle evidence is missing or failed: "
-                        f"count={count} matched={matched} failed={failed} hashesMatch={bool(expected) and expected == actual}"
+                        f"count={count} matched={matched} failed={failed} "
+                        f"exactHashesMatch={exact_hash_match} "
+                        f"toleranceEvidenceMatch={tolerance_match}"
                     ),
                 })
 

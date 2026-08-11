@@ -79,7 +79,7 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
             .isolated_dispatch
         else
             return ParseError.InvalidCommandPayload,
-        2 => if (std.mem.eql(u8, raw.scope orelse return ParseError.InvalidCommandPayload, "command_graph"))
+        2, 3 => if (std.mem.eql(u8, raw.scope orelse return ParseError.InvalidCommandPayload, "command_graph"))
             .command_graph
         else
             return ParseError.InvalidCommandPayload,
@@ -91,7 +91,7 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
             .independent
         else
             return ParseError.InvalidCommandPayload,
-        2 => if (std.mem.eql(u8, raw_reference_class orelse return ParseError.InvalidCommandPayload, "independent_v1"))
+        2, 3 => if (std.mem.eql(u8, raw_reference_class orelse return ParseError.InvalidCommandPayload, "independent_v1"))
             .independent
         else if (std.mem.eql(u8, raw_reference_class.?, "cross_runtime_consensus_v1"))
             .cross_runtime_consensus
@@ -104,10 +104,28 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
     const binding_group = raw.binding_group orelse raw.bindingGroup orelse return ParseError.InvalidCommandPayload;
     const binding = raw.binding orelse return ParseError.InvalidCommandPayload;
     const dispatch_count = raw.dispatch_count orelse raw.dispatchCount orelse return ParseError.InvalidCommandPayload;
-    const expected_sha256 = raw.expected_sha256 orelse raw.expectedSha256 orelse return ParseError.InvalidCommandPayload;
+    const expected_sha256 = if (schema_version == 3)
+        raw.reference_sha256 orelse raw.referenceSha256 orelse return ParseError.InvalidCommandPayload
+    else
+        raw.expected_sha256 orelse raw.expectedSha256 orelse return ParseError.InvalidCommandPayload;
     const reference_id = raw.reference_id orelse raw.referenceId orelse return ParseError.InvalidCommandPayload;
+    const reference_path = raw.reference_path orelse raw.referencePath;
+    const absolute_tolerance = raw.absolute_tolerance orelse raw.absoluteTolerance orelse 0;
+    const relative_tolerance = raw.relative_tolerance orelse raw.relativeTolerance orelse 0;
     if (dispatch_count == 0 or expected_sha256.len != 64) return ParseError.InvalidCommandPayload;
-    if (!std.mem.eql(u8, kind, "sha256_exact_v1") or !std.mem.eql(u8, initialization, "zero_fill_v1")) {
+    if (!std.mem.eql(u8, initialization, "zero_fill_v1")) {
+        return ParseError.InvalidCommandPayload;
+    }
+    if (schema_version <= 2 and !std.mem.eql(u8, kind, "sha256_exact_v1")) {
+        return ParseError.InvalidCommandPayload;
+    }
+    if (schema_version == 3 and
+        (!std.mem.eql(u8, kind, "float32_reference_tolerance_v1") or
+            reference_path == null or reference_path.?.len == 0 or
+            !std.math.isFinite(absolute_tolerance) or absolute_tolerance < 0 or
+            !std.math.isFinite(relative_tolerance) or relative_tolerance < 0 or
+            (absolute_tolerance == 0 and relative_tolerance == 0)))
+    {
         return ParseError.InvalidCommandPayload;
     }
     const owned_kind = try allocator.dupe(u8, kind);
@@ -118,6 +136,8 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
     errdefer allocator.free(owned_expected);
     const owned_reference = try allocator.dupe(u8, reference_id);
     errdefer allocator.free(owned_reference);
+    const owned_reference_path = if (reference_path) |path| try allocator.dupe(u8, path) else null;
+    errdefer if (owned_reference_path) |path| allocator.free(path);
     return .{
         .schema_version = schema_version,
         .scope = scope,
@@ -129,6 +149,9 @@ fn parseOutputOracle(allocator: Allocator, raw: RawKernelDispatchOutputOracle) !
         .dispatch_count = dispatch_count,
         .expected_sha256 = owned_expected,
         .reference_id = owned_reference,
+        .reference_path = owned_reference_path,
+        .absolute_tolerance = absolute_tolerance,
+        .relative_tolerance = relative_tolerance,
     };
 }
 
@@ -160,6 +183,7 @@ pub fn parseDispatchCommand(allocator: Allocator, kind: command_kind.NormalizedK
             allocator.free(oracle.initialization);
             allocator.free(oracle.expected_sha256);
             allocator.free(oracle.reference_id);
+            if (oracle.reference_path) |path| allocator.free(path);
         };
         return .{
             .kernel_dispatch = .{
@@ -188,6 +212,7 @@ fn freeOutputOracle(allocator: Allocator, oracle: model_compute_types.KernelDisp
     allocator.free(oracle.initialization);
     allocator.free(oracle.expected_sha256);
     allocator.free(oracle.reference_id);
+    if (oracle.reference_path) |path| allocator.free(path);
 }
 
 test "output oracle schema v1 retains isolated dispatch scope" {
@@ -243,6 +268,57 @@ test "output oracle schema v2 rejects missing graph scope" {
             .dispatch_count = 1,
             .expected_sha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             .reference_id = "unit-test",
+        }),
+    );
+}
+
+test "output oracle schema v3 declares an independent float32 reference" {
+    const oracle = try parseOutputOracle(std.testing.allocator, .{
+        .schema_version = 3,
+        .scope = "command_graph",
+        .reference_class = "independent_v1",
+        .kind = "float32_reference_tolerance_v1",
+        .initialization = "zero_fill_v1",
+        .binding_group = 0,
+        .binding = 2,
+        .dispatch_count = 1,
+        .reference_sha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        .reference_id = "unit-test-reference",
+        .reference_path = "bench/oracles/data/unit-test.f32le.bin",
+        .absolute_tolerance = 0.000001,
+        .relative_tolerance = 0.00001,
+    });
+    defer freeOutputOracle(std.testing.allocator, oracle);
+
+    try std.testing.expectEqual(
+        model_compute_types.KernelDispatchOutputOracleScope.command_graph,
+        oracle.scope,
+    );
+    try std.testing.expectEqual(
+        model_compute_types.KernelDispatchOutputOracleReferenceClass.independent,
+        oracle.reference_class,
+    );
+    try std.testing.expectEqualStrings(
+        "bench/oracles/data/unit-test.f32le.bin",
+        oracle.reference_path.?,
+    );
+}
+
+test "output oracle schema v3 rejects zero tolerance" {
+    try std.testing.expectError(
+        ParseError.InvalidCommandPayload,
+        parseOutputOracle(std.testing.allocator, .{
+            .schema_version = 3,
+            .scope = "command_graph",
+            .reference_class = "independent_v1",
+            .kind = "float32_reference_tolerance_v1",
+            .initialization = "zero_fill_v1",
+            .binding_group = 0,
+            .binding = 2,
+            .dispatch_count = 1,
+            .reference_sha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            .reference_id = "unit-test-reference",
+            .reference_path = "bench/oracles/data/unit-test.f32le.bin",
         }),
     );
 }

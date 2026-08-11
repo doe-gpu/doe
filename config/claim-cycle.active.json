@@ -6,19 +6,19 @@
   "contracts": {
     "workloadContract": {
       "path": "bench/workloads/workloads.amd.vulkan.json",
-      "sha256": "4bee85ff2509759eb71ae3f2da75b5ccde1cc8be35edaacba14f7c1906dd6d3d"
+      "sha256": "07ef6b5e9d5d6a87161a35e0bab133e7e6cdde90ac6071ad278149e6cce97c46"
     },
     "benchmarkPolicy": {
       "path": "config/benchmark-methodology-thresholds.json",
-      "sha256": "32e0942cc8f4114210ee2010f524bcbd4c9548a123fc75d29bc699c698262355"
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
     },
     "compareConfig": {
       "path": "bench/native-compare/compare.config.amd.vulkan.release.json",
-      "sha256": "c10526db8b75b47e1352fd659bde79a39dfdbe235e4529a44c2a93278f06ca62"
+      "sha256": "d2c80054ea448a37cea568170422f9c3b1b88d75d9e0fa67719332858acd7ca9"
     },
     "substantiationPolicy": {
       "path": "config/substantiation-policy.json",
-      "sha256": "aeefc16b083ac1510964158e98957a440935627b4fb6da2aa97b0468767937dd"
+      "sha256": "6b099dc53038928ea54f390f77607901b534776d11fc0329eff2ce1b0c932158"
     }
   },
   "workloadSets": {
@@ -27,20 +27,18 @@
       "compute_matvec_32768x2048_f32",
       "compute_matvec_32768x2048_f32_swizzle1",
       "compute_matvec_32768x2048_f32_workgroupshared_swizzle1",
+      "compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces",
+      "compute_stable_fluids_multistage_256grid_18pressure_4steps",
       "compute_workgroup_atomic_1024",
       "compute_workgroup_non_atomic_1024",
-      "pipeline_compile_stress",
-      "upload_write_buffer_1kb",
-      "upload_write_buffer_1mb",
-      "upload_write_buffer_4mb",
-      "upload_write_buffer_64kb"
+      "pipeline_compile_stress"
     ],
     "directionalIds": [
     ]
   },
   "methodology": {
-    "iterations": 16,
-    "warmup": 1,
+    "iterations": 18,
+    "warmup": 3,
     "comparabilityMode": "strict",
     "requireTimingClass": "operation",
     "claimabilityMode": "release",

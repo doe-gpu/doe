@@ -66,16 +66,16 @@
     },
     {
       "consumer": "src/native/api/doe_native_api_misc_exports.zig",
-      "lineCount": 79,
+      "lineCount": 139,
       "owner": "native",
       "path": "src/native/support/doe_adapter_info_native.zig",
       "reason": "one production consumer, no public declaration, no local test, and no special role"
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
+  "manifestSha256": "48fe072a0cac49068a50b77b7f86d8dd3eddecdbe224a6afcf3b88b19d780fc1",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07"
+  "sourceTreeSha256": "8160f0b9b0b7d94e589a3e71eb4071015e58cf29756c501916d9ad9c2a2b4cb2"
 }

@@ -148,7 +148,7 @@ const DEFAULT_DISPATCH_ITERS = 200;
 const DEFAULT_SUITE_TIMEOUT_MS = 120000;
 const DEFAULT_OPERATION_TIMEOUT_MS = 30000;
 const DEFAULT_BROWSER_CLOSE_TIMEOUT_MS = 10000;
-const REPORT_SCHEMA_VERSION = 1;
+const REPORT_SCHEMA_VERSION = 2;
 const REPORT_KIND = "chromium-webgpu-playwright-smoke";
 const BENCHMARK_CLASS = "diagnostic";
 const TIMING_CLASS = "browser-operation-proxy";
@@ -1289,6 +1289,39 @@ function adapterIdentityFromSmokeResult(result, profile = {}) {
   return identity;
 }
 
+function expectedDoeAdapterArchitecture() {
+  if (process.platform === "darwin") return "metal";
+  if (process.platform === "win32") return "d3d12";
+  return "vulkan";
+}
+
+function activeRuntimeProof(selectedRuntime, result) {
+  const adapterInfo =
+    result?.adapterInfo && typeof result.adapterInfo === "object" ? result.adapterInfo : {};
+  const observed = {
+    vendor: typeof adapterInfo.vendor === "string" ? adapterInfo.vendor : "",
+    architecture:
+      typeof adapterInfo.architecture === "string" ? adapterInfo.architecture : "",
+    device: typeof adapterInfo.device === "string" ? adapterInfo.device : "",
+    description:
+      typeof adapterInfo.description === "string" ? adapterInfo.description : "",
+  };
+  const expected = selectedRuntime === "doe"
+    ? { vendor: "Doe", architecture: expectedDoeAdapterArchitecture() }
+    : { vendorMustNotEqual: "Doe", vendorMustBeNonEmpty: true };
+  const matched = selectedRuntime === "doe"
+    ? observed.vendor === expected.vendor && observed.architecture === expected.architecture
+    : observed.vendor.length > 0 && observed.vendor !== "Doe";
+  return {
+    schemaVersion: 1,
+    identitySource: "wgpuAdapterGetInfo",
+    selectedRuntime,
+    expected,
+    observed,
+    matched,
+  };
+}
+
 function smokeWorkloadIdentity() {
   const workloadIds = [
     "compute_increment",
@@ -1653,7 +1686,15 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
           result.adapterAvailable = true;
           result.features = Array.from(adapter.features).sort();
           if ("info" in adapter) {
-            result.adapterInfo = adapter.info;
+            const info = adapter.info;
+            result.adapterInfo = {
+              vendor: typeof info?.vendor === "string" ? info.vendor : "",
+              architecture: typeof info?.architecture === "string" ? info.architecture : "",
+              device: typeof info?.device === "string" ? info.device : "",
+              description: typeof info?.description === "string" ? info.description : "",
+              subgroupMinSize: Number.isInteger(info?.subgroupMinSize) ? info.subgroupMinSize : 0,
+              subgroupMaxSize: Number.isInteger(info?.subgroupMaxSize) ? info.subgroupMaxSize : 0,
+            };
           }
           for (const key of adapterLimitKeys) {
             const value = adapter.limits[key];
@@ -2492,6 +2533,7 @@ async function runMode(chromium, mode, args, localUrl, localPort) {
       ...suite,
       fawnPrismaticLifecycle,
       adapterIdentity: adapterIdentityFromSmokeResult(suite, runtimeSelection.profile),
+      activeRuntimeProof: activeRuntimeProof(selection.selectedRuntime, suite),
     };
   } catch (error) {
     result = makeFailedResult(mode, args, launchArgs, browserVersion, startMs, error);
@@ -2542,6 +2584,7 @@ function computeComparison(modeResults) {
 
 function hasFailure(result) {
   if (!result.webgpuAvailable || !result.adapterAvailable) return true;
+  if (result.activeRuntimeProof?.matched !== true) return true;
   if (!result.smoke.computeIncrement.pass) return true;
   if (!result.smoke.renderTriangle.pass) return true;
   if (!result.smoke.renderBundle.pass) return true;

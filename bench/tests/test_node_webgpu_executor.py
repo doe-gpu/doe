@@ -319,6 +319,40 @@ def write_resident_buffer_load_command_plan(path: Path) -> None:
 
 
 class NodeWebGPUExecutorTests(unittest.TestCase):
+    def test_adapter_info_snapshot_materializes_non_enumerable_webgpu_fields(self) -> None:
+        script = f"""
+import {{ snapshotAdapterInfo }} from {json.dumps(EXECUTOR_MODULE_URL)};
+const prototype = {{
+  get vendor() {{ return 'amd'; }},
+  get architecture() {{ return 'rdna-3'; }},
+  get device() {{ return 'radeon-8060s-graphics-radv-strix-halo-'; }},
+  get description() {{ return 'radv: Mesa 26.0.3-1ubuntu1'; }},
+}};
+const info = Object.create(prototype);
+info.subgroupMatrixConfigs = [];
+console.log(JSON.stringify({{
+  direct: info,
+  snapshot: snapshotAdapterInfo(info),
+}}));
+"""
+        result = subprocess.run(
+            ["node", "--input-type=module", "-e", script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["direct"], {"subgroupMatrixConfigs": []})
+        self.assertEqual(payload["snapshot"]["vendor"], "amd")
+        self.assertEqual(payload["snapshot"]["architecture"], "rdna-3")
+        self.assertEqual(
+            payload["snapshot"]["device"],
+            "radeon-8060s-graphics-radv-strix-halo-",
+        )
+        self.assertEqual(payload["snapshot"]["description"], "radv: Mesa 26.0.3-1ubuntu1")
+
     def test_node_package_encoder_backend_elides_duplicate_pipeline_and_bind_group_sets(self) -> None:
         source = PACKAGE_INDEX_PATH.read_text(encoding="utf-8")
 

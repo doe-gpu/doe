@@ -270,3 +270,19 @@ test "scalar * vector chained with vector accumulate lowers" {
     const len = try translateToSpirv(allocator, source, &out);
     try expect_spirv_magic(out[0..len]);
 }
+
+test "vector compound assignment accepts scalar broadcast" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> output: array<f32>;
+        \\
+        \\@compute @workgroup_size(1, 1, 1)
+        \\fn main() {
+        \\    var p3 = vec3<f32>(1.0, 2.0, 3.0);
+        \\    p3 += dot(p3, p3.yzx + 33.33);
+        \\    output[0] = p3.x;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try expect_spirv_magic(out[0..len]);
+}

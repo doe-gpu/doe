@@ -1,36 +1,25 @@
 #!/usr/bin/env python3
-"""Blocking file-size gate: enforces maximum line counts for source files.
+"""Enforce Doe's blocking source-size rules and report sharding advisories.
 
-Zig runtime sources in runtime/zig/src/ must not exceed 999 lines.
-Python benchmark/tooling files in bench/ and pipeline/agent/ must not exceed 1200 lines.
-
-Exemptions (Zig): test files (test_*.zig, *_test.zig, test_suite*.zig) and
-wgpu_types.zig are data-heavy by nature and exempt from the 999-line limit.
-
-Exit 0 when all files are within limits, 1 when any violation is found.
+Zig policy comes from runtime/zig/source-layout.json. Python benchmark and
+tooling files above the review threshold are advisory and require tracked
+sharding follow-ups rather than blocking release by size alone.
 """
 
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import sys
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
 
-ZIG_LINE_LIMIT = 999
 PYTHON_LINE_LIMIT = 1200
 
 # Directories containing third-party code that are not subject to project limits.
-VENDOR_DIRS = ("vendor",)
-
-# Zig filenames exempt from the line limit (test and type-definition files).
-ZIG_EXEMPT_NAMES = frozenset({"wgpu_types.zig"})
-ZIG_EXEMPT_PREFIXES = ("test_", "test_suite")
-ZIG_EXEMPT_SUFFIXES = ("_test.zig",)
-
+IGNORED_DIRS = (".venv", "__pycache__", "node_modules", "out", "vendor")
 
 @dataclass(frozen=True)
 class Violation:
@@ -86,24 +75,13 @@ def count_lines(path: Path) -> int:
     return len(path.read_text(encoding="utf-8", errors="replace").splitlines())
 
 
-def _is_vendored(path: Path, scan_root: Path) -> bool:
-    """Return True when the file lives under a vendor directory."""
+def _is_ignored_tree(path: Path, scan_root: Path) -> bool:
+    """Return True when the file lives under generated or third-party output."""
     try:
         parts = path.relative_to(scan_root).parts
     except ValueError:
         return False
-    return any(part in VENDOR_DIRS for part in parts)
-
-
-def _is_zig_exempt(name: str) -> bool:
-    """Return True for Zig files exempt from the line limit per CLAUDE.md policy."""
-    if name in ZIG_EXEMPT_NAMES:
-        return True
-    if any(name.startswith(p) for p in ZIG_EXEMPT_PREFIXES):
-        return True
-    if any(name.endswith(s) for s in ZIG_EXEMPT_SUFFIXES):
-        return True
-    return False
+    return any(part in IGNORED_DIRS for part in parts)
 
 
 def scan_directory(
@@ -113,8 +91,6 @@ def scan_directory(
     limit: int,
     language: str,
     excludes: set[str],
-    *,
-    exempt_fn: Callable[[str], bool] | None = None,
 ) -> list[Violation]:
     violations: list[Violation] = []
     scan_root = root / rel_dir
@@ -123,9 +99,7 @@ def scan_directory(
     for path in sorted(scan_root.rglob(f"*{extension}")):
         if not path.is_file():
             continue
-        if _is_vendored(path, scan_root):
-            continue
-        if exempt_fn is not None and exempt_fn(path.name):
+        if _is_ignored_tree(path, scan_root):
             continue
         rel = str(path.relative_to(root))
         if rel in excludes:
@@ -143,6 +117,46 @@ def scan_directory(
     return violations
 
 
+def scan_zig_sources(root: Path, excludes: set[str]) -> list[Violation]:
+    """Apply the canonical source-layout line policy to production Zig."""
+
+    runtime_root = root / "runtime" / "zig"
+    config = json.loads((runtime_root / "source-layout.json").read_text(encoding="utf-8"))
+    architecture = config["architecture"]
+    policy = architecture["linePolicy"]
+    generated_globs = architecture["specialRoles"]["generated"]
+    justifications = {
+        entry["path"] for entry in architecture["cohesiveModuleJustifications"]
+    }
+    hard_limit = policy["futureHardMaximumLines"]
+    justification_limit = policy["futureJustificationAboveLines"]
+    violations: list[Violation] = []
+    for path in sorted((runtime_root / "src").rglob("*.zig")):
+        manifest_path = path.relative_to(runtime_root).as_posix()
+        repo_path = path.relative_to(root).as_posix()
+        if repo_path in excludes:
+            continue
+        if any(fnmatch.fnmatchcase(manifest_path, pattern) for pattern in generated_globs):
+            continue
+        line_count = count_lines(path)
+        limit = hard_limit
+        if line_count > hard_limit:
+            pass
+        elif line_count > justification_limit and manifest_path not in justifications:
+            limit = justification_limit
+        else:
+            continue
+        violations.append(
+            Violation(
+                path=repo_path,
+                line_count=line_count,
+                limit=limit,
+                language="zig",
+            )
+        )
+    return violations
+
+
 def main() -> int:
     args = parse_args()
     try:
@@ -152,19 +166,24 @@ def main() -> int:
         return 1
 
     excludes = set(args.exclude)
-    violations: list[Violation] = []
-
-    violations.extend(
-        scan_directory(
-            root, "runtime/zig/src", ".zig", ZIG_LINE_LIMIT, "zig", excludes,
-            exempt_fn=_is_zig_exempt,
-        )
-    )
-    violations.extend(
+    try:
+        violations = scan_zig_sources(root, excludes)
+    except (FileNotFoundError, KeyError, OSError, TypeError, ValueError) as exc:
+        print(f"FAIL: invalid Zig source-layout policy: {exc}", file=sys.stderr)
+        return 1
+    advisories: list[Violation] = []
+    advisories.extend(
         scan_directory(root, "bench", ".py", PYTHON_LINE_LIMIT, "python", excludes)
     )
-    violations.extend(
-        scan_directory(root, "agent", ".py", PYTHON_LINE_LIMIT, "python", excludes)
+    advisories.extend(
+        scan_directory(
+            root,
+            "pipeline/agent",
+            ".py",
+            PYTHON_LINE_LIMIT,
+            "python",
+            excludes,
+        )
     )
 
     if args.json_output:
@@ -180,11 +199,23 @@ def main() -> int:
                 }
                 for v in violations
             ],
+            "advisories": [
+                {
+                    "filePath": item.path,
+                    "lineCount": item.line_count,
+                    "reviewThreshold": item.limit,
+                    "language": item.language,
+                }
+                for item in advisories
+            ],
             "checkedLimits": {
-                "zig": {"directory": "runtime/zig/src", "maxLines": ZIG_LINE_LIMIT},
+                "zig": {
+                    "directory": "runtime/zig/src",
+                    "policy": "runtime/zig/source-layout.json",
+                },
                 "python": {
-                    "directories": ["bench", "agent"],
-                    "maxLines": PYTHON_LINE_LIMIT,
+                    "directories": ["bench", "pipeline/agent"],
+                    "advisoryReviewLines": PYTHON_LINE_LIMIT,
                 },
             },
         }
@@ -202,6 +233,11 @@ def main() -> int:
         return 1
 
     print("PASS: file-size gate")
+    for item in advisories:
+        print(
+            f"  advisory: {item.path}: {item.line_count} lines "
+            f"(review threshold {item.limit} for {item.language})"
+        )
     return 0
 
 

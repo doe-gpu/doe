@@ -1,0 +1,32 @@
+{
+  "artifactKind": "claim-report",
+  "claimPolicy": {
+    "benchmarkPolicy": {
+      "path": "config/benchmark-methodology-thresholds.json",
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+    },
+    "minTimedSamples": 0,
+    "mode": "release",
+    "policyHash": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+  },
+  "claimStatus": "claimable",
+  "compareReport": {
+    "path": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin-cutover-rehearsal-receipt.json",
+    "sha256": "4691e8b32437d49b54eb860572505d5bf91f0d39295645e8dd20cb88380138df"
+  },
+  "comparisonStatus": "comparable",
+  "generatedAt": "2026-08-10T22:16:20.619506Z",
+  "pass": true,
+  "reasons": [],
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "claimMetricField": "status",
+      "claimMetricScope": "dropin-cutover-rehearsal",
+      "claimable": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [],
+      "workloadId": "dropin_cutover_rehearsal"
+    }
+  ]
+}

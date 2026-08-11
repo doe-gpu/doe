@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe WebGPU CTS run report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "generatedAtUtc",
+    "configPath",
+    "workdir",
+    "commandTemplate",
+    "requirementsNote",
+    "identityProbe",
+    "summary",
+    "rows"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 2 },
+    "generatedAtUtc": { "type": "string", "minLength": 1 },
+    "configPath": { "type": "string", "minLength": 1 },
+    "workdir": { "type": "string", "minLength": 1 },
+    "commandTemplate": { "type": "string", "minLength": 1 },
+    "requirementsNote": { "type": "string" },
+    "identityProbe": { "$ref": "#/$defs/IdentityProbe" },
+    "summary": { "$ref": "#/$defs/Summary" },
+    "rows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/QueryRow" }
+    }
+  },
+  "$defs": {
+    "AdapterInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vendor", "device", "description"],
+      "properties": {
+        "vendor": { "type": "string", "minLength": 1 },
+        "architecture": { "type": "string" },
+        "device": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "isFallbackAdapter": { "type": "boolean" },
+        "subgroupMinSize": { "type": "integer", "minimum": 0 },
+        "subgroupMaxSize": { "type": "integer", "minimum": 0 },
+        "subgroupMatrixConfigs": { "type": "array" },
+        "vendorID": { "type": "integer", "minimum": 0 },
+        "deviceID": { "type": "integer", "minimum": 0 },
+        "driverVersion": { "type": ["integer", "string"] }
+      }
+    },
+    "Identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "artifactKind", "provider", "adapterInfo"],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "artifactKind": {
+          "type": "string",
+          "const": "webgpu_cts_adapter_identity"
+        },
+        "provider": { "type": "string", "minLength": 1 },
+        "adapterInfo": { "$ref": "#/$defs/AdapterInfo" }
+      }
+    },
+    "IdentityProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "configured",
+        "required",
+        "pass",
+        "command",
+        "exitCode",
+        "wallMs",
+        "stdoutTail",
+        "stderrTail",
+        "error",
+        "identity"
+      ],
+      "properties": {
+        "configured": { "type": "boolean" },
+        "required": { "type": "boolean" },
+        "pass": { "type": ["boolean", "null"] },
+        "command": { "$ref": "#/$defs/StringArray" },
+        "exitCode": { "type": ["integer", "null"] },
+        "wallMs": { "type": ["number", "null"], "minimum": 0 },
+        "stdoutTail": { "$ref": "#/$defs/StringArray" },
+        "stderrTail": { "$ref": "#/$defs/StringArray" },
+        "error": { "type": "string" },
+        "identity": {
+          "oneOf": [
+            { "$ref": "#/$defs/Identity" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "BucketStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["queryCount", "passCount", "failCount"],
+      "properties": {
+        "queryCount": { "type": "integer", "minimum": 0 },
+        "passCount": { "type": "integer", "minimum": 0 },
+        "failCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "Summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "queryCount",
+        "passCount",
+        "failCount",
+        "dryRun",
+        "bucketSummary",
+        "identityBound"
+      ],
+      "properties": {
+        "queryCount": { "type": "integer", "minimum": 0 },
+        "passCount": { "type": "integer", "minimum": 0 },
+        "failCount": { "type": "integer", "minimum": 0 },
+        "dryRun": { "type": "boolean" },
+        "bucketSummary": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/BucketStats" }
+        },
+        "identityBound": { "type": "boolean" }
+      }
+    },
+    "StringArray": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "QueryRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "bucket",
+        "query",
+        "notes",
+        "command",
+        "exitCode",
+        "wallMs",
+        "pass",
+        "stdoutTail",
+        "stderrTail"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "bucket": { "type": "string" },
+        "query": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" },
+        "command": { "$ref": "#/$defs/StringArray" },
+        "exitCode": { "type": ["integer", "null"] },
+        "wallMs": { "type": ["number", "null"], "minimum": 0 },
+        "pass": { "type": ["boolean", "null"] },
+        "stdoutTail": { "$ref": "#/$defs/StringArray" },
+        "stderrTail": { "$ref": "#/$defs/StringArray" }
+      }
+    }
+  }
+}

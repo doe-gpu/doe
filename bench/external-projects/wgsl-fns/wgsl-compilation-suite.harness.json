@@ -71,6 +71,12 @@
         "command": ["npm", "ci"],
         "workingDirectory": { "scope": "upstream", "path": "." },
         "timeoutSeconds": 1800
+      },
+      {
+        "id": "upstream-build",
+        "command": ["npm", "run", "build"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
       }
     ],
     "validationCommand": ["node", "bench/external-projects/wgsl-fns/run-suite.mjs", "--require-all-pass"],

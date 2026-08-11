@@ -1,0 +1,51 @@
+{
+  "artifact": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+  "compileCommand": [
+    "cc",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-I",
+    "/home/x/deco/doe/bench/vendor/dawn/third_party/webgpu-headers/src",
+    "/home/x/deco/doe/bench/drop-in/dropin_behavior_suite.c",
+    "-L",
+    "/home/x/deco/doe/runtime/zig/zig-out/lib",
+    "-Wl,-rpath,/home/x/deco/doe/runtime/zig/zig-out/lib",
+    "-l:libwebgpu_doe.so",
+    "-o",
+    "/tmp/doe-dropin-behavior-x_ug50lh/dropin_behavior_suite"
+  ],
+  "compileReturnCode": 0,
+  "compileStderr": "",
+  "compileStdout": "",
+  "generatedAtUtc": "2026-08-10T22:11:59.219654Z",
+  "headerDir": "bench/vendor/dawn/third_party/webgpu-headers/src",
+  "outputTimestamp": "",
+  "pass": true,
+  "runCommand": [
+    "/tmp/doe-dropin-behavior-x_ug50lh/dropin_behavior_suite"
+  ],
+  "runReturnCode": 0,
+  "runStderr": "",
+  "runStdout": "{\"schemaVersion\":1,\"pass\":true,\"instanceCreate\":true,\"adapterRequest\":true,\"deviceRequest\":true,\"queueOps\":true,\"errorCapture\":true,\"lifecycle\":true,\"adapterStatus\":1,\"deviceStatus\":1,\"queueWorkDoneStatus\":1,\"popErrorScopeStatus\":1,\"popErrorType\":2,\"failure\":\"none\"}\n",
+  "schemaVersion": 1,
+  "source": "bench/drop-in/dropin_behavior_suite.c",
+  "suiteResult": {
+    "adapterRequest": true,
+    "adapterStatus": 1,
+    "deviceRequest": true,
+    "deviceStatus": 1,
+    "errorCapture": true,
+    "failure": "none",
+    "instanceCreate": true,
+    "lifecycle": true,
+    "pass": true,
+    "popErrorScopeStatus": 1,
+    "popErrorType": 2,
+    "queueOps": true,
+    "queueWorkDoneStatus": 1,
+    "schemaVersion": 1
+  }
+}

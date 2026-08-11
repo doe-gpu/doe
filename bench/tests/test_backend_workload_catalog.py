@@ -135,7 +135,7 @@ class BackendWorkloadCatalogTests(unittest.TestCase):
             )
             self.assertFalse(row.get("claimEligible"))
             self.assertEqual(row.get("benchmarkClass"), "directional")
-            self.assertEqual(row.get("directionalReason"), "hardware_path_asymmetry")
+            self.assertEqual(row.get("directionalReason"), "path_asymmetry")
             self.assertNotIn("governed", row.get("cohorts", []))
 
     def test_amd_vulkan_non_vetted_non_app_domains_remain_directional(self) -> None:

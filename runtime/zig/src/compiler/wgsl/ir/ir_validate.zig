@@ -64,7 +64,11 @@ pub fn validate(module: *const ir.Module) ValidateError!void {
                     const lhs = function.exprs.items[assign.lhs];
                     const rhs = function.exprs.items[assign.rhs];
                     if (lhs.category != .ref) return error.InvalidIr;
-                    if (!type_compatible(module, lhs.ty, rhs.ty)) return error.InvalidIr;
+                    if (assign.op == .assign) {
+                        if (!type_compatible(module, lhs.ty, rhs.ty)) return error.InvalidIr;
+                    } else if (!compound_assignment_compatible(module, lhs.ty, rhs.ty)) {
+                        return error.InvalidIr;
+                    }
                     if (!reference_is_mutable(module, function, assign.lhs)) return error.InvalidIr;
                 },
                 .return_ => |value| if (value) |expr_id| {
@@ -101,6 +105,25 @@ pub fn validate(module: *const ir.Module) ValidateError!void {
             }
         }
     }
+}
+
+fn compound_assignment_compatible(
+    module: *const ir.Module,
+    lhs_ty: ir.TypeId,
+    rhs_ty: ir.TypeId,
+) bool {
+    if (type_compatible(module, lhs_ty, rhs_ty)) return true;
+    return switch (module.types.get(lhs_ty)) {
+        .vector => |vector| switch (module.types.get(rhs_ty)) {
+            .scalar => type_compatible(module, vector.elem, rhs_ty),
+            else => false,
+        },
+        .matrix => |matrix| switch (module.types.get(rhs_ty)) {
+            .scalar => type_compatible(module, matrix.elem, rhs_ty),
+            else => false,
+        },
+        else => false,
+    };
 }
 
 fn find_function(module: *const ir.Module, name: []const u8) ?*const ir.Function {

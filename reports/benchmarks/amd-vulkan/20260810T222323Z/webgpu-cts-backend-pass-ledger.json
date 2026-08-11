@@ -1,0 +1,139 @@
+{
+  "artifactKind": "webgpu_cts_backend_pass_ledger",
+  "backendLedgers": [
+    {
+      "artifactPaths": [
+        "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json"
+      ],
+      "backend": "doe_vulkan",
+      "host": "128",
+      "ledgerStatus": "pass",
+      "os": "linux-7.0.0-28-generic",
+      "queryCoverage": [
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "adapter",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,adapter,requestAdapter:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "adapter",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,adapter,requestDevice:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "buffer",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,buffers,map:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "buffer",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,buffers,createBindGroup:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "command_buffer",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,command_buffer,basic:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "command_buffer",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,command_buffer,copyBufferToBuffer:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "queue",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,queue,writeBuffer:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "queue",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,onSubmittedWorkDone:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "compute",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,operation,compute,basic:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "validation",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,validation,error_scope:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "validation",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:api,validation,buffer,create:*",
+          "status": "pass"
+        },
+        {
+          "artifactPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json",
+          "bucket": "shader_execution",
+          "notes": "Retained AMD Vulkan run through the actual vendored CTS runner with a hash-bound physical adapter identity; broader conformance scope remains incomplete.",
+          "query": "webgpu:shader,execution,expression,call,builtin,textureDimensions:*",
+          "status": "pass"
+        }
+      ],
+      "summary": {
+        "allBackendLedgersPass": true,
+        "backendLedgerCount": 1,
+        "coverageRowCount": 12,
+        "failCount": 0,
+        "failingBackendLedgerCount": 0,
+        "notRunCount": 0,
+        "passCount": 12,
+        "skipCount": 0
+      },
+      "surface": "package"
+    }
+  ],
+  "claimLanguage": "diagnostic_until_full_published_pass_ledger",
+  "claimScope": "published_subset_backend_pass_ledger",
+  "fullConformanceClaimAllowed": false,
+  "ledgerId": "webgpu-cts-backend-pass-ledger-20260810-amd-vulkan",
+  "ledgerStatus": "pass",
+  "replacementClaimAllowed": false,
+  "schemaVersion": 1,
+  "sourceEvidence": {
+    "artifactKind": "webgpu_cts_evidence",
+    "path": "config/webgpu-cts-evidence.json",
+    "sha256": "0d56e7ef9b51e83e791602883b3cba3a696a198ad0555e48f25e65fdcc2edb46"
+  },
+  "sourceReceipt": {
+    "artifactKind": "webgpu_cts_subset_receipt",
+    "path": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset-receipt.json",
+    "receiptId": "webgpu-cts-subset-20260810-amd-vulkan",
+    "sha256": "6632152106af46db0a43eb684105476a169e1c652e53babda62b1012293d36ed"
+  },
+  "summary": {
+    "allBackendLedgersPass": true,
+    "backendLedgerCount": 1,
+    "coverageRowCount": 12,
+    "failCount": 0,
+    "failingBackendLedgerCount": 0,
+    "notRunCount": 0,
+    "passCount": 12,
+    "skipCount": 0
+  }
+}

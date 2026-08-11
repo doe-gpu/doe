@@ -90,8 +90,16 @@ pub const RawKernelDispatchOutputOracle = struct {
     dispatchCount: ?u32 = null,
     expected_sha256: ?[]const u8 = null,
     expectedSha256: ?[]const u8 = null,
+    reference_sha256: ?[]const u8 = null,
+    referenceSha256: ?[]const u8 = null,
     reference_id: ?[]const u8 = null,
     referenceId: ?[]const u8 = null,
+    reference_path: ?[]const u8 = null,
+    referencePath: ?[]const u8 = null,
+    absolute_tolerance: ?f32 = null,
+    absoluteTolerance: ?f32 = null,
+    relative_tolerance: ?f32 = null,
+    relativeTolerance: ?f32 = null,
 };
 
 pub const RawCommand = struct {

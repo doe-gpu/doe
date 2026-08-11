@@ -90,4 +90,32 @@ async function assertRejectsOperationError(promise) {
   ]);
 }
 
+{
+  let viewDescriptor = null;
+  const device = createTestDevice({
+    deviceFeatures() {
+      return new Set();
+    },
+    deviceCreateTexture() {
+      return { kind: 'texture' };
+    },
+    textureCreateView(_texture, _native, descriptor) {
+      viewDescriptor = descriptor;
+      return { kind: 'texture-view' };
+    },
+  });
+  const texture = device.createTexture({
+    size: { width: 8, height: 4, depthOrArrayLayers: 3 },
+    dimension: '3d',
+    format: 'rgba8unorm',
+    usage: 4,
+  });
+
+  texture.createView();
+
+  assert.equal(viewDescriptor.dimension, '3d');
+  assert.equal(viewDescriptor.baseArrayLayer, 0);
+  assert.equal(viewDescriptor.arrayLayerCount, 1);
+}
+
 console.log('full-surface-lifecycle.test: ok');

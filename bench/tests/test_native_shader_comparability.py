@@ -36,6 +36,7 @@ class NativeShaderComparabilityTests(unittest.TestCase):
         oracle_dispatch_count: int = 3,
         oracle_on_final_dispatch: bool = True,
         oracle_reference_class: str | None = None,
+        tolerance_oracle: bool = False,
     ):
         kernel_root = root / "bench" / "kernels"
         kernel_root.mkdir(parents=True)
@@ -60,6 +61,22 @@ class NativeShaderComparabilityTests(unittest.TestCase):
             dispatch_command["output_oracle"]["reference_class"] = (
                 oracle_reference_class
             )
+        reference_sha256 = ""
+        if tolerance_oracle:
+            reference_path = root / "reference.f32le.bin"
+            reference_path.write_bytes(b"\x00\x00\x80?" * 4)
+            reference_sha256 = _sha256(reference_path.read_bytes())
+            dispatch_command["output_oracle"] = {
+                "schema_version": 3,
+                "scope": "command_graph",
+                "reference_class": "independent_v1",
+                "kind": "float32_reference_tolerance_v1",
+                "dispatch_count": oracle_dispatch_count,
+                "reference_path": "reference.f32le.bin",
+                "reference_sha256": reference_sha256,
+                "absolute_tolerance": 0.000001,
+                "relative_tolerance": 0.00001,
+            }
         commands_payload = [dispatch_command]
         if duplicate_dispatch:
             command_without_oracle = dict(dispatch_command)
@@ -97,6 +114,21 @@ class NativeShaderComparabilityTests(unittest.TestCase):
             "outputOracleExpectedSha256": expected,
             "outputOracleActualSha256": expected,
         }}
+        if tolerance_oracle:
+            for sample in (doe_sample, dawn_sample):
+                trace_meta = sample["traceMeta"]
+                trace_meta.update({
+                    "outputOracleExpectedSha256": reference_sha256,
+                    "outputOracleActualSha256": "b" * 64,
+                    "outputOracleKind": "float32_reference_tolerance_v1",
+                    "outputOracleReferenceClass": "independent_v1",
+                    "outputOracleReferencePath": "reference.f32le.bin",
+                    "outputOracleReferenceSha256": reference_sha256,
+                    "outputOracleComparedValueCount": 4,
+                    "outputOracleMismatchCount": 0,
+                    "outputOracleAbsoluteTolerance": 0.000001,
+                    "outputOracleRelativeTolerance": 0.00001,
+                })
         return kernel_root, commands, doe_sample, dawn_sample
 
     def _assess(self, root: Path, **kwargs):
@@ -120,6 +152,18 @@ class NativeShaderComparabilityTests(unittest.TestCase):
             applies, passes, _, reason = self._assess(Path(tmpdir))
         self.assertTrue(applies)
         self.assertTrue(passes, reason)
+
+    def test_independent_float32_tolerance_oracle_passes_without_exact_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            applies, passes, details, reason = self._assess(
+                Path(tmpdir), tolerance_oracle=True
+            )
+        self.assertTrue(applies)
+        self.assertTrue(passes, reason)
+        self.assertEqual(
+            details["finalKernelDispatchOracleKind"],
+            "float32_reference_tolerance_v1",
+        )
 
     def test_extensionless_kernel_resolves_wgsl_source_and_spirv(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

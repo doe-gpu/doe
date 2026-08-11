@@ -1,0 +1,401 @@
+{
+  "artifact": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+  "benchmarkHtml": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.html",
+  "failedStepLabels": [],
+  "generatedAtUtc": "2026-08-10T22:12:00.500179Z",
+  "outputTimestamp": "",
+  "pass": true,
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/x/deco/doe/bench/drop-in/dropin_symbol_gate.py",
+        "--artifact",
+        "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        "--symbols",
+        "config/dropin_abi.symbols.txt",
+        "--ownership",
+        "config/dropin-symbol-ownership.json",
+        "--report",
+        "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_symbol_report.json",
+        "--no-timestamp-output"
+      ],
+      "label": "symbol_gate",
+      "pass": true,
+      "report": {
+        "artifact": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        "exportedSymbolCount": 241,
+        "extraSymbolCount": 42,
+        "generatedAtUtc": "2026-08-10T22:11:59.166439Z",
+        "missingSymbolCount": 0,
+        "missingSymbols": [],
+        "outputTimestamp": "",
+        "ownershipPath": "config/dropin-symbol-ownership.json",
+        "pass": true,
+        "requiredSymbolCount": 199,
+        "schemaVersion": 1,
+        "symbolsPath": "config/dropin_abi.symbols.txt",
+        "toolAttempts": [
+          "nm -D --defined-only runtime/zig/zig-out/lib/libwebgpu_doe.so"
+        ],
+        "toolCommandUsed": "nm -D --defined-only runtime/zig/zig-out/lib/libwebgpu_doe.so"
+      },
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_symbol_report.json",
+      "returnCode": 0,
+      "runtimeSeconds": 0.053582,
+      "stderr": "",
+      "stdout": "PASS: drop-in symbol gate (199 required)\nreport: reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_symbol_report.json\n"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/x/deco/doe/bench/drop-in/dropin_behavior_suite.py",
+        "--artifact",
+        "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        "--report",
+        "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_behavior_report.json",
+        "--no-timestamp-output"
+      ],
+      "label": "behavior_suite",
+      "pass": true,
+      "report": {
+        "artifact": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        "compileCommand": [
+          "cc",
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-I",
+          "/home/x/deco/doe/bench/vendor/dawn/third_party/webgpu-headers/src",
+          "/home/x/deco/doe/bench/drop-in/dropin_behavior_suite.c",
+          "-L",
+          "/home/x/deco/doe/runtime/zig/zig-out/lib",
+          "-Wl,-rpath,/home/x/deco/doe/runtime/zig/zig-out/lib",
+          "-l:libwebgpu_doe.so",
+          "-o",
+          "/tmp/doe-dropin-behavior-x_ug50lh/dropin_behavior_suite"
+        ],
+        "compileReturnCode": 0,
+        "compileStderr": "",
+        "compileStdout": "",
+        "generatedAtUtc": "2026-08-10T22:11:59.219654Z",
+        "headerDir": "bench/vendor/dawn/third_party/webgpu-headers/src",
+        "outputTimestamp": "",
+        "pass": true,
+        "runCommand": [
+          "/tmp/doe-dropin-behavior-x_ug50lh/dropin_behavior_suite"
+        ],
+        "runReturnCode": 0,
+        "runStderr": "",
+        "runStdout": "{\"schemaVersion\":1,\"pass\":true,\"instanceCreate\":true,\"adapterRequest\":true,\"deviceRequest\":true,\"queueOps\":true,\"errorCapture\":true,\"lifecycle\":true,\"adapterStatus\":1,\"deviceStatus\":1,\"queueWorkDoneStatus\":1,\"popErrorScopeStatus\":1,\"popErrorType\":2,\"failure\":\"none\"}\n",
+        "schemaVersion": 1,
+        "source": "bench/drop-in/dropin_behavior_suite.c",
+        "suiteResult": {
+          "adapterRequest": true,
+          "adapterStatus": 1,
+          "deviceRequest": true,
+          "deviceStatus": 1,
+          "errorCapture": true,
+          "failure": "none",
+          "instanceCreate": true,
+          "lifecycle": true,
+          "pass": true,
+          "popErrorScopeStatus": 1,
+          "popErrorType": 2,
+          "queueOps": true,
+          "queueWorkDoneStatus": 1,
+          "schemaVersion": 1
+        }
+      },
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_behavior_report.json",
+      "returnCode": 0,
+      "runtimeSeconds": 0.181813,
+      "stderr": "",
+      "stdout": "PASS: drop-in behavior suite\nreport: reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_behavior_report.json\n"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/x/deco/doe/bench/drop-in/dropin_proc_resolution_tests.py",
+        "--artifact",
+        "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        "--ownership",
+        "config/dropin-symbol-ownership.json"
+      ],
+      "label": "proc_resolution",
+      "pass": true,
+      "returnCode": 0,
+      "runtimeSeconds": 0.038701,
+      "stderr": "",
+      "stdout": "PASS: dropin proc resolution\n"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/x/deco/doe/bench/drop-in/dropin_benchmark_suite.py",
+        "--artifact",
+        "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        "--micro-iterations",
+        "30",
+        "--e2e-iterations",
+        "10",
+        "--report",
+        "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.json",
+        "--no-timestamp-output"
+      ],
+      "label": "benchmark_suite",
+      "pass": true,
+      "report": {
+        "artifact": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+        "compileCommand": [
+          "cc",
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-I",
+          "/home/x/deco/doe/bench/vendor/dawn/third_party/webgpu-headers/src",
+          "/home/x/deco/doe/bench/drop-in/dropin_benchmark_harness.c",
+          "/home/x/deco/doe/bench/drop-in/dropin_benchmark_ops.c",
+          "-L",
+          "/home/x/deco/doe/runtime/zig/zig-out/lib",
+          "-Wl,-rpath,/home/x/deco/doe/runtime/zig/zig-out/lib",
+          "-l:libwebgpu_doe.so",
+          "-o",
+          "/tmp/doe-dropin-bench-joxdek1h/dropin_benchmark_suite"
+        ],
+        "compileReturnCode": 0,
+        "compileStderr": "",
+        "compileStdout": "",
+        "e2eIterations": 10,
+        "generatedAtUtc": "2026-08-10T22:11:59.442735Z",
+        "headerDir": "bench/vendor/dawn/third_party/webgpu-headers/src",
+        "microIterations": 30,
+        "opsSource": "bench/drop-in/dropin_benchmark_ops.c",
+        "outputTimestamp": "",
+        "pass": true,
+        "runCommand": [
+          "/tmp/doe-dropin-bench-joxdek1h/dropin_benchmark_suite",
+          "--micro-iterations",
+          "30",
+          "--e2e-iterations",
+          "10"
+        ],
+        "runReturnCode": 0,
+        "runStderr": "",
+        "runStdout": "{\"schemaVersion\":1,\"pass\":true,\"failure\":\"none\",\"microIterationsRequested\":30,\"e2eIterationsRequested\":10,\"benchmarks\":[{\"id\":\"instance_create_destroy\",\"class\":\"micro\",\"unit\":\"ns\",\"samples\":30,\"stats\":{\"minNs\":4408,\"maxNs\":32161,\"meanNs\":7764.90,\"p50Ns\":5340,\"p95Ns\":9808}},{\"id\":\"command_encoder_finish_empty\",\"class\":\"micro\",\"unit\":\"ns\",\"samples\":30,\"stats\":{\"minNs\":7044,\"maxNs\":51337,\"meanNs\":10550.93,\"p50Ns\":8035,\"p95Ns\":14748}},{\"id\":\"queue_submit_empty\",\"class\":\"micro\",\"unit\":\"ns\",\"samples\":30,\"stats\":{\"minNs\":1021616,\"maxNs\":1128218,\"meanNs\":1076382.40,\"p50Ns\":1066661,\"p95Ns\":1098061}},{\"id\":\"queue_write_buffer_1kb\",\"class\":\"micro\",\"unit\":\"ns\",\"samples\":30,\"stats\":{\"minNs\":1005767,\"maxNs\":1083854,\"meanNs\":1052576.83,\"p50Ns\":1053937,\"p95Ns\":1055250}},{\"id\":\"queue_write_buffer_4kb\",\"class\":\"micro\",\"unit\":\"ns\",\"samples\":30,\"stats\":{\"minNs\":1018110,\"maxNs\":1055911,\"meanNs\":1053094.47,\"p50Ns\":1054218,\"p95Ns\":1055781}},{\"id\":\"queue_write_buffer_64kb\",\"class\":\"micro\",\"unit\":\"ns\",\"samples\":30,\"stats\":{\"minNs\":1011527,\"maxNs\":1059007,\"meanNs\":1054314.73,\"p50Ns\":1055471,\"p95Ns\":1058185}},{\"id\":\"buffer_create_destroy_4kb\",\"class\":\"micro\",\"unit\":\"ns\",\"samples\":30,\"stats\":{\"minNs\":8366,\"maxNs\":2712585,\"meanNs\":102732.40,\"p50Ns\":9979,\"p95Ns\":22783}},{\"id\":\"buffer_create_destroy_64kb\",\"class\":\"micro\",\"unit\":\"ns\",\"samples\":30,\"stats\":{\"minNs\":9528,\"maxNs\":159120,\"meanNs\":17823.87,\"p50Ns\":11792,\"p95Ns\":15759}},{\"id\":\"full_lifecycle_device_only\",\"class\":\"end_to_end\",\"unit\":\"ns\",\"samples\":10,\"stats\":{\"minNs\":10737828,\"maxNs\":14916286,\"meanNs\":12294346.80,\"p50Ns\":12018623,\"p95Ns\":13750448}},{\"id\":\"full_lifecycle_queue_submit\",\"class\":\"end_to_end\",\"unit\":\"ns\",\"samples\":10,\"stats\":{\"minNs\":12246603,\"maxNs\":14775261,\"meanNs\":13476317.50,\"p50Ns\":13292204,\"p95Ns\":13981724}},{\"id\":\"full_lifecycle_write_4kb\",\"class\":\"end_to_end\",\"unit\":\"ns\",\"samples\":10,\"stats\":{\"minNs\":11011083,\"maxNs\":14019375,\"meanNs\":12704125.40,\"p50Ns\":12964577,\"p95Ns\":13982055}},{\"id\":\"full_lifecycle_write_64kb\",\"class\":\"end_to_end\",\"unit\":\"ns\",\"samples\":10,\"stats\":{\"minNs\":11110791,\"maxNs\":13784282,\"meanNs\":12720075.50,\"p50Ns\":12980367,\"p95Ns\":13306922}},{\"id\":\"full_lifecycle_queue_ops\",\"class\":\"end_to_end\",\"unit\":\"ns\",\"samples\":10,\"stats\":{\"minNs\":12799374,\"maxNs\":16012584,\"meanNs\":14482672.10,\"p50Ns\":14057508,\"p95Ns\":15982567}}]}\n",
+        "schemaVersion": 1,
+        "source": "bench/drop-in/dropin_benchmark_harness.c",
+        "sources": [
+          "bench/drop-in/dropin_benchmark_harness.c",
+          "bench/drop-in/dropin_benchmark_ops.c"
+        ],
+        "suiteResult": {
+          "benchmarks": [
+            {
+              "class": "micro",
+              "id": "instance_create_destroy",
+              "samples": 30,
+              "stats": {
+                "maxNs": 32161,
+                "meanNs": 7764.9,
+                "minNs": 4408,
+                "p50Ns": 5340,
+                "p95Ns": 9808
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "micro",
+              "id": "command_encoder_finish_empty",
+              "samples": 30,
+              "stats": {
+                "maxNs": 51337,
+                "meanNs": 10550.93,
+                "minNs": 7044,
+                "p50Ns": 8035,
+                "p95Ns": 14748
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "micro",
+              "id": "queue_submit_empty",
+              "samples": 30,
+              "stats": {
+                "maxNs": 1128218,
+                "meanNs": 1076382.4,
+                "minNs": 1021616,
+                "p50Ns": 1066661,
+                "p95Ns": 1098061
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "micro",
+              "id": "queue_write_buffer_1kb",
+              "samples": 30,
+              "stats": {
+                "maxNs": 1083854,
+                "meanNs": 1052576.83,
+                "minNs": 1005767,
+                "p50Ns": 1053937,
+                "p95Ns": 1055250
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "micro",
+              "id": "queue_write_buffer_4kb",
+              "samples": 30,
+              "stats": {
+                "maxNs": 1055911,
+                "meanNs": 1053094.47,
+                "minNs": 1018110,
+                "p50Ns": 1054218,
+                "p95Ns": 1055781
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "micro",
+              "id": "queue_write_buffer_64kb",
+              "samples": 30,
+              "stats": {
+                "maxNs": 1059007,
+                "meanNs": 1054314.73,
+                "minNs": 1011527,
+                "p50Ns": 1055471,
+                "p95Ns": 1058185
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "micro",
+              "id": "buffer_create_destroy_4kb",
+              "samples": 30,
+              "stats": {
+                "maxNs": 2712585,
+                "meanNs": 102732.4,
+                "minNs": 8366,
+                "p50Ns": 9979,
+                "p95Ns": 22783
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "micro",
+              "id": "buffer_create_destroy_64kb",
+              "samples": 30,
+              "stats": {
+                "maxNs": 159120,
+                "meanNs": 17823.87,
+                "minNs": 9528,
+                "p50Ns": 11792,
+                "p95Ns": 15759
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "end_to_end",
+              "id": "full_lifecycle_device_only",
+              "samples": 10,
+              "stats": {
+                "maxNs": 14916286,
+                "meanNs": 12294346.8,
+                "minNs": 10737828,
+                "p50Ns": 12018623,
+                "p95Ns": 13750448
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "end_to_end",
+              "id": "full_lifecycle_queue_submit",
+              "samples": 10,
+              "stats": {
+                "maxNs": 14775261,
+                "meanNs": 13476317.5,
+                "minNs": 12246603,
+                "p50Ns": 13292204,
+                "p95Ns": 13981724
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "end_to_end",
+              "id": "full_lifecycle_write_4kb",
+              "samples": 10,
+              "stats": {
+                "maxNs": 14019375,
+                "meanNs": 12704125.4,
+                "minNs": 11011083,
+                "p50Ns": 12964577,
+                "p95Ns": 13982055
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "end_to_end",
+              "id": "full_lifecycle_write_64kb",
+              "samples": 10,
+              "stats": {
+                "maxNs": 13784282,
+                "meanNs": 12720075.5,
+                "minNs": 11110791,
+                "p50Ns": 12980367,
+                "p95Ns": 13306922
+              },
+              "unit": "ns"
+            },
+            {
+              "class": "end_to_end",
+              "id": "full_lifecycle_queue_ops",
+              "samples": 10,
+              "stats": {
+                "maxNs": 16012584,
+                "meanNs": 14482672.1,
+                "minNs": 12799374,
+                "p50Ns": 14057508,
+                "p95Ns": 15982567
+              },
+              "unit": "ns"
+            }
+          ],
+          "e2eIterationsRequested": 10,
+          "failure": "none",
+          "microIterationsRequested": 30,
+          "pass": true,
+          "schemaVersion": 1
+        }
+      },
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.json",
+      "returnCode": 0,
+      "runtimeSeconds": 1.055937,
+      "stderr": "",
+      "stdout": "PASS: drop-in benchmark suite\nreport: reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.json\n"
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/x/deco/doe/bench/drop-in/visualize_dropin_benchmark.py",
+        "--report",
+        "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.json",
+        "--out",
+        "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.html"
+      ],
+      "label": "benchmark_visualization",
+      "pass": true,
+      "returnCode": 0,
+      "runtimeSeconds": 0.037508,
+      "stderr": "",
+      "stdout": "{\n  \"report\": \"reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.json\",\n  \"out\": \"reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.html\",\n  \"benchmarkCount\": 13,\n  \"sections\": [\n    \"micro\",\n    \"end_to_end\"\n  ]\n}\n"
+    }
+  ],
+  "symbols": "config/dropin_abi.symbols.txt",
+  "totalRuntimeSeconds": 1.367541
+}

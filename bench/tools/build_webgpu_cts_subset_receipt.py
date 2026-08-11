@@ -27,6 +27,9 @@ EVIDENCE_KIND = "webgpu_cts_evidence"
 CLAIM_POLICY_KIND = "webgpu_cts_conformance_claim_policy"
 CLAIM_LANGUAGE = "diagnostic_until_full_published_pass_ledger"
 REMAINING_PROMOTION_REQUIREMENTS = ["backend_specific_cts_pass_ledger"]
+EVIDENCE_SCHEMA_VERSION = 2
+RECEIPT_SCHEMA_VERSION = 2
+IDENTITY_KIND = "webgpu_cts_adapter_identity"
 STATUS_KEYS = ("pass", "fail", "skip", "not_run")
 REQUIRED_ROW_FIELDS = (
     "query",
@@ -129,6 +132,78 @@ def evidence_rows(payload: dict[str, Any]) -> list[dict[str, str]]:
     return normalized
 
 
+def published_artifacts(payload: dict[str, Any], root: Path) -> list[dict[str, Any]]:
+    if payload.get("schemaVersion") != EVIDENCE_SCHEMA_VERSION:
+        raise ValueError(
+            f"CTS evidence schemaVersion must be {EVIDENCE_SCHEMA_VERSION} for publication"
+        )
+    artifacts = payload.get("publishedArtifacts")
+    if not isinstance(artifacts, list) or not artifacts:
+        raise ValueError("CTS evidence publishedArtifacts must contain at least one artifact")
+    normalized: list[dict[str, Any]] = []
+    seen_paths: set[str] = set()
+    for index, artifact in enumerate(artifacts):
+        if not isinstance(artifact, dict):
+            raise ValueError(f"CTS published artifact {index} must be an object")
+        path_value = artifact.get("path")
+        expected_hash = artifact.get("sha256")
+        identity = artifact.get("identity")
+        if not isinstance(path_value, str) or not path_value:
+            raise ValueError(f"CTS published artifact {index} path must be a non-empty string")
+        if path_value in seen_paths:
+            raise ValueError(f"CTS published artifact path is duplicated: {path_value}")
+        seen_paths.add(path_value)
+        if not isinstance(expected_hash, str) or not re.fullmatch(r"[a-f0-9]{64}", expected_hash):
+            raise ValueError(f"CTS published artifact {index} sha256 must be lowercase hex")
+        artifact_path = root / path_value
+        if not artifact_path.is_file():
+            raise ValueError(f"CTS published artifact does not exist: {path_value}")
+        actual_hash = sha256_file(artifact_path)
+        if actual_hash != expected_hash:
+            raise ValueError(
+                f"CTS published artifact hash mismatch for {path_value}: "
+                f"expected {expected_hash}, got {actual_hash}"
+            )
+        if not isinstance(identity, dict) or identity.get("artifactKind") != IDENTITY_KIND:
+            raise ValueError(
+                f"CTS published artifact {index} identity.artifactKind must be {IDENTITY_KIND}"
+            )
+        adapter_info = identity.get("adapterInfo")
+        if not isinstance(adapter_info, dict):
+            raise ValueError(f"CTS published artifact {index} identity.adapterInfo must be an object")
+        for field in ("vendor", "device", "description"):
+            value = adapter_info.get(field)
+            if not isinstance(value, str) or not value:
+                raise ValueError(
+                    f"CTS published artifact {index} identity.adapterInfo.{field} "
+                    "must be a non-empty string"
+                )
+        normalized.append(
+            {
+                "path": path_value,
+                "sha256": actual_hash,
+                "identity": identity,
+            }
+        )
+    return normalized
+
+
+def published_evidence_rows(
+    rows: list[dict[str, str]], artifacts: list[dict[str, Any]]
+) -> list[dict[str, str]]:
+    artifact_paths = {artifact["path"] for artifact in artifacts}
+    published_rows = [row for row in rows if row["artifactPath"] in artifact_paths]
+    used_paths = {row["artifactPath"] for row in published_rows}
+    unused_paths = sorted(artifact_paths - used_paths)
+    if unused_paths:
+        raise ValueError(
+            "CTS published artifacts have no evidence rows: " + ", ".join(unused_paths)
+        )
+    if not published_rows:
+        raise ValueError("CTS evidence has no rows for its published artifacts")
+    return published_rows
+
+
 def receipt_id_from_payload(payload: dict[str, Any], rows: list[dict[str, str]]) -> str:
     last_updated = require_string(payload, "lastUpdated")
     date_slug = re.sub(r"[^a-zA-Z0-9]+", "", last_updated).lower() or "undated"
@@ -191,13 +266,15 @@ def build_receipt(
         raise ValueError(f"CTS evidence artifactKind must be {EVIDENCE_KIND}")
     policy = validate_claim_policy(payload.get("claimPolicy"))
     rows = evidence_rows(payload)
+    artifacts = published_artifacts(payload, root)
+    rows = published_evidence_rows(rows, artifacts)
     cts_source = require_string(payload, "ctsSource")
     cts_revision = require_string(payload, "ctsRevision")
     resolved_receipt_id = receipt_id or receipt_id_from_payload(payload, rows)
     if not publication_channel:
         raise ValueError("publication_channel must be a non-empty string")
     return {
-        "schemaVersion": 1,
+        "schemaVersion": RECEIPT_SCHEMA_VERSION,
         "artifactKind": RECEIPT_KIND,
         "receiptId": resolved_receipt_id,
         "publicationStatus": "repo_published",
@@ -215,6 +292,7 @@ def build_receipt(
         "conformanceClaimAllowed": False,
         "claimLanguage": CLAIM_LANGUAGE,
         "remainingPromotionRequirements": REMAINING_PROMOTION_REQUIREMENTS,
+        "artifactReceipts": artifacts,
         "summary": summary_for_rows(rows),
         "backendCoverage": build_backend_coverage(rows),
         "queryCoverage": rows,

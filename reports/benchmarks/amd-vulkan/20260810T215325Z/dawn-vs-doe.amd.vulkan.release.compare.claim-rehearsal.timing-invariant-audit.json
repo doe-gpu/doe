@@ -1,0 +1,314 @@
+{
+  "failureCounts": {
+    "baselineComparisonTimingClassMatch": 0,
+    "baselineSingleTimingClass": 0,
+    "commandRepeatPositive": 0,
+    "comparisonSingleTimingClass": 0,
+    "ignoreFirstNonNegative": 0,
+    "normalizationDivisorsPositive": 0,
+    "requiredTimingClassSatisfied": 0,
+    "submitCadencePositive": 0
+  },
+  "generatedAtUtc": "2026-08-10T21:55:43.817244Z",
+  "requiredTimingClass": "",
+  "rows": [
+    {
+      "baselineTimingClasses": [
+        "operation"
+      ],
+      "baselineTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "comparable": true,
+      "comparisonTimingClasses": [
+        "operation"
+      ],
+      "comparisonTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "invariants": {
+        "baselineComparisonTimingClassMatch": true,
+        "baselineSingleTimingClass": true,
+        "commandRepeatPositive": true,
+        "comparisonSingleTimingClass": true,
+        "ignoreFirstNonNegative": true,
+        "normalizationDivisorsPositive": true,
+        "requiredTimingClassSatisfied": true,
+        "submitCadencePositive": true
+      },
+      "requiredTimingClass": "",
+      "timingNormalization": {
+        "baselineCommandRepeat": 1,
+        "baselineDivisor": 1.0,
+        "baselineIgnoreFirstOps": 0,
+        "baselineUploadSubmitEvery": 1,
+        "comparisonCommandRepeat": 1,
+        "comparisonDivisor": 1.0,
+        "comparisonIgnoreFirstOps": 0,
+        "comparisonUploadSubmitEvery": 1
+      },
+      "workloadId": "compute_concurrent_execution_single"
+    },
+    {
+      "baselineTimingClasses": [
+        "operation"
+      ],
+      "baselineTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "comparable": true,
+      "comparisonTimingClasses": [
+        "operation"
+      ],
+      "comparisonTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "invariants": {
+        "baselineComparisonTimingClassMatch": true,
+        "baselineSingleTimingClass": true,
+        "commandRepeatPositive": true,
+        "comparisonSingleTimingClass": true,
+        "ignoreFirstNonNegative": true,
+        "normalizationDivisorsPositive": true,
+        "requiredTimingClassSatisfied": true,
+        "submitCadencePositive": true
+      },
+      "requiredTimingClass": "",
+      "timingNormalization": {
+        "baselineCommandRepeat": 1,
+        "baselineDivisor": 1.0,
+        "baselineIgnoreFirstOps": 0,
+        "baselineUploadSubmitEvery": 1,
+        "comparisonCommandRepeat": 1,
+        "comparisonDivisor": 1.0,
+        "comparisonIgnoreFirstOps": 0,
+        "comparisonUploadSubmitEvery": 1
+      },
+      "workloadId": "compute_matvec_32768x2048_f32"
+    },
+    {
+      "baselineTimingClasses": [
+        "operation"
+      ],
+      "baselineTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "comparable": true,
+      "comparisonTimingClasses": [
+        "operation"
+      ],
+      "comparisonTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "invariants": {
+        "baselineComparisonTimingClassMatch": true,
+        "baselineSingleTimingClass": true,
+        "commandRepeatPositive": true,
+        "comparisonSingleTimingClass": true,
+        "ignoreFirstNonNegative": true,
+        "normalizationDivisorsPositive": true,
+        "requiredTimingClassSatisfied": true,
+        "submitCadencePositive": true
+      },
+      "requiredTimingClass": "",
+      "timingNormalization": {
+        "baselineCommandRepeat": 1,
+        "baselineDivisor": 1.0,
+        "baselineIgnoreFirstOps": 0,
+        "baselineUploadSubmitEvery": 1,
+        "comparisonCommandRepeat": 1,
+        "comparisonDivisor": 1.0,
+        "comparisonIgnoreFirstOps": 0,
+        "comparisonUploadSubmitEvery": 1
+      },
+      "workloadId": "compute_matvec_32768x2048_f32_swizzle1"
+    },
+    {
+      "baselineTimingClasses": [
+        "operation"
+      ],
+      "baselineTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "comparable": true,
+      "comparisonTimingClasses": [
+        "operation"
+      ],
+      "comparisonTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "invariants": {
+        "baselineComparisonTimingClassMatch": true,
+        "baselineSingleTimingClass": true,
+        "commandRepeatPositive": true,
+        "comparisonSingleTimingClass": true,
+        "ignoreFirstNonNegative": true,
+        "normalizationDivisorsPositive": true,
+        "requiredTimingClassSatisfied": true,
+        "submitCadencePositive": true
+      },
+      "requiredTimingClass": "",
+      "timingNormalization": {
+        "baselineCommandRepeat": 1,
+        "baselineDivisor": 1.0,
+        "baselineIgnoreFirstOps": 0,
+        "baselineUploadSubmitEvery": 1,
+        "comparisonCommandRepeat": 1,
+        "comparisonDivisor": 1.0,
+        "comparisonIgnoreFirstOps": 0,
+        "comparisonUploadSubmitEvery": 1
+      },
+      "workloadId": "compute_matvec_32768x2048_f32_workgroupshared_swizzle1"
+    },
+    {
+      "baselineTimingClasses": [
+        "operation"
+      ],
+      "baselineTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "comparable": true,
+      "comparisonTimingClasses": [
+        "operation"
+      ],
+      "comparisonTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "invariants": {
+        "baselineComparisonTimingClassMatch": true,
+        "baselineSingleTimingClass": true,
+        "commandRepeatPositive": true,
+        "comparisonSingleTimingClass": true,
+        "ignoreFirstNonNegative": true,
+        "normalizationDivisorsPositive": true,
+        "requiredTimingClassSatisfied": true,
+        "submitCadencePositive": true
+      },
+      "requiredTimingClass": "",
+      "timingNormalization": {
+        "baselineCommandRepeat": 1,
+        "baselineDivisor": 1.0,
+        "baselineIgnoreFirstOps": 0,
+        "baselineUploadSubmitEvery": 1,
+        "comparisonCommandRepeat": 1,
+        "comparisonDivisor": 1.0,
+        "comparisonIgnoreFirstOps": 0,
+        "comparisonUploadSubmitEvery": 1
+      },
+      "workloadId": "compute_stable_fluids_multistage_256grid_18pressure_4steps"
+    },
+    {
+      "baselineTimingClasses": [
+        "operation"
+      ],
+      "baselineTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "comparable": true,
+      "comparisonTimingClasses": [
+        "operation"
+      ],
+      "comparisonTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "invariants": {
+        "baselineComparisonTimingClassMatch": true,
+        "baselineSingleTimingClass": true,
+        "commandRepeatPositive": true,
+        "comparisonSingleTimingClass": true,
+        "ignoreFirstNonNegative": true,
+        "normalizationDivisorsPositive": true,
+        "requiredTimingClassSatisfied": true,
+        "submitCadencePositive": true
+      },
+      "requiredTimingClass": "",
+      "timingNormalization": {
+        "baselineCommandRepeat": 1,
+        "baselineDivisor": 1.0,
+        "baselineIgnoreFirstOps": 0,
+        "baselineUploadSubmitEvery": 1,
+        "comparisonCommandRepeat": 1,
+        "comparisonDivisor": 1.0,
+        "comparisonIgnoreFirstOps": 0,
+        "comparisonUploadSubmitEvery": 1
+      },
+      "workloadId": "compute_workgroup_atomic_1024"
+    },
+    {
+      "baselineTimingClasses": [
+        "operation"
+      ],
+      "baselineTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "comparable": true,
+      "comparisonTimingClasses": [
+        "operation"
+      ],
+      "comparisonTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "invariants": {
+        "baselineComparisonTimingClassMatch": true,
+        "baselineSingleTimingClass": true,
+        "commandRepeatPositive": true,
+        "comparisonSingleTimingClass": true,
+        "ignoreFirstNonNegative": true,
+        "normalizationDivisorsPositive": true,
+        "requiredTimingClassSatisfied": true,
+        "submitCadencePositive": true
+      },
+      "requiredTimingClass": "",
+      "timingNormalization": {
+        "baselineCommandRepeat": 1,
+        "baselineDivisor": 1.0,
+        "baselineIgnoreFirstOps": 0,
+        "baselineUploadSubmitEvery": 1,
+        "comparisonCommandRepeat": 1,
+        "comparisonDivisor": 1.0,
+        "comparisonIgnoreFirstOps": 0,
+        "comparisonUploadSubmitEvery": 1
+      },
+      "workloadId": "compute_workgroup_non_atomic_1024"
+    },
+    {
+      "baselineTimingClasses": [
+        "operation"
+      ],
+      "baselineTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "comparable": true,
+      "comparisonTimingClasses": [
+        "operation"
+      ],
+      "comparisonTimingSources": [
+        "doe-execution-total-ns"
+      ],
+      "invariants": {
+        "baselineComparisonTimingClassMatch": true,
+        "baselineSingleTimingClass": true,
+        "commandRepeatPositive": true,
+        "comparisonSingleTimingClass": true,
+        "ignoreFirstNonNegative": true,
+        "normalizationDivisorsPositive": true,
+        "requiredTimingClassSatisfied": true,
+        "submitCadencePositive": true
+      },
+      "requiredTimingClass": "",
+      "timingNormalization": {
+        "baselineCommandRepeat": 1,
+        "baselineDivisor": 1.0,
+        "baselineIgnoreFirstOps": 0,
+        "baselineUploadSubmitEvery": 1,
+        "comparisonCommandRepeat": 1,
+        "comparisonDivisor": 1.0,
+        "comparisonIgnoreFirstOps": 0,
+        "comparisonUploadSubmitEvery": 1
+      },
+      "workloadId": "pipeline_compile_stress"
+    }
+  ],
+  "schemaVersion": 1,
+  "workloadCount": 8
+}

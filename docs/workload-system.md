@@ -57,6 +57,22 @@ structural evidence, but it cannot satisfy the independent semantic-oracle
 obligation. Migration is additive: version 1 inputs retain their original
 isolated behavior and do not gain a new required field.
 
+Schema version 3 adds `float32_reference_tolerance_v1` for complete floating-
+point buffers whose independently generated reference is stable semantically
+but not byte-identical across GPU implementations. The contract binds the
+reference file path and SHA-256, requires `independent_v1`, and declares both
+absolute and relative tolerances. Each finite output value passes when its
+absolute error is no greater than `absolute_tolerance + relative_tolerance *
+abs(reference)`. A missing, changed, non-finite, wrongly sized, or out-of-
+tolerance reference fails the oracle. Trace evidence records compared and
+mismatched values plus maximum errors; the mismatch count owns the verdict
+because near-zero values can have a high diagnostic relative error while still
+passing the absolute tolerance.
+
+Version 3 is additive. Exact version 1 and 2 oracles keep their byte-hash
+behavior, and consensus output cannot be relabeled as an independent tolerant
+reference.
+
 ## Package adapter identity migration
 
 Run-receipt schema version 1 now permits additive `vendorID`, `deviceID`, and

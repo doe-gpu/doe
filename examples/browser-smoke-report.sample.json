@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "reportKind": "chromium-webgpu-playwright-smoke",
   "benchmarkClass": "diagnostic",
   "comparisonStatus": "diagnostic",
@@ -110,6 +110,22 @@
         "adapter": "sample-adapter",
         "device": "sample-device"
       },
+      "activeRuntimeProof": {
+        "schemaVersion": 1,
+        "identitySource": "wgpuAdapterGetInfo",
+        "selectedRuntime": "dawn",
+        "expected": {
+          "vendorMustNotEqual": "Doe",
+          "vendorMustBeNonEmpty": true
+        },
+        "observed": {
+          "vendor": "sample",
+          "architecture": "sample-architecture",
+          "device": "sample-device",
+          "description": "sample-adapter"
+        },
+        "matched": true
+      },
       "errors": [],
       "smoke": {
         "computeIncrement": {
@@ -138,7 +154,7 @@
         }
       },
       "previousHash": null,
-      "hash": "118b01afeb33239af384e0ecd565a41be041ac2563a6483c988d88a7c739cf6b"
+      "hash": "cf0dbd56006bdfec1fab72a8ff8597144410be0ff444f1e949e8586f9c360709"
     },
     {
       "mode": "doe",
@@ -181,6 +197,22 @@
         "adapter": "sample-adapter",
         "device": "sample-device"
       },
+      "activeRuntimeProof": {
+        "schemaVersion": 1,
+        "identitySource": "wgpuAdapterGetInfo",
+        "selectedRuntime": "doe",
+        "expected": {
+          "vendor": "Doe",
+          "architecture": "vulkan"
+        },
+        "observed": {
+          "vendor": "Doe",
+          "architecture": "vulkan",
+          "device": "sample-device",
+          "description": "sample-adapter"
+        },
+        "matched": true
+      },
       "errors": [],
       "smoke": {
         "computeIncrement": {
@@ -208,8 +240,8 @@
           "pass": true
         }
       },
-      "previousHash": "118b01afeb33239af384e0ecd565a41be041ac2563a6483c988d88a7c739cf6b",
-      "hash": "76b64402fdfb1f72fdff690152c9b8bc754747c5dc591c1c7987ddd30ea45aa7"
+      "previousHash": "cf0dbd56006bdfec1fab72a8ff8597144410be0ff444f1e949e8586f9c360709",
+      "hash": "5f6d054fc869efb6b1e81b90a8fe2cb5d1d4e6b56846d822ba12416d6941bd7e"
     }
   ],
   "comparison": {
@@ -219,5 +251,5 @@
     "bothRenderIndirectSmokePass": true,
     "bothTimestampQuerySmokePass": true
   },
-  "reportHash": "ba7476e4520bb2206fe54b59163ce58898b828e5f1604a3783028c6ea49fb416"
+  "reportHash": "0cc600f8b72121a6a53ab75d96ebb11eaf0370335616b46f19cd60415a281e35"
 }

@@ -20,7 +20,7 @@
     "queryCoverage"
   ],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 1 },
+    "schemaVersion": { "type": "integer", "enum": [1, 2] },
     "artifactKind": { "type": "string", "const": "webgpu_cts_subset_receipt" },
     "receiptId": { "type": "string", "minLength": 1 },
     "publicationStatus": { "type": "string", "const": "repo_published" },
@@ -39,6 +39,11 @@
       "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 }
     },
+    "artifactReceipts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/ArtifactReceipt" }
+    },
     "summary": { "$ref": "#/$defs/Summary" },
     "backendCoverage": {
       "type": "array",
@@ -51,10 +56,61 @@
       "items": { "$ref": "#/$defs/QueryCoverage" }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "schemaVersion": { "const": 2 } },
+        "required": ["schemaVersion"]
+      },
+      "then": { "required": ["artifactReceipts"] }
+    }
+  ],
   "$defs": {
     "Hash": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
+    },
+    "AdapterInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vendor", "device", "description"],
+      "properties": {
+        "vendor": { "type": "string", "minLength": 1 },
+        "architecture": { "type": "string" },
+        "device": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "isFallbackAdapter": { "type": "boolean" },
+        "subgroupMinSize": { "type": "integer", "minimum": 0 },
+        "subgroupMaxSize": { "type": "integer", "minimum": 0 },
+        "subgroupMatrixConfigs": { "type": "array" },
+        "vendorID": { "type": "integer", "minimum": 0 },
+        "deviceID": { "type": "integer", "minimum": 0 },
+        "driverVersion": { "type": ["integer", "string"] }
+      }
+    },
+    "Identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "artifactKind", "provider", "adapterInfo"],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "artifactKind": {
+          "type": "string",
+          "const": "webgpu_cts_adapter_identity"
+        },
+        "provider": { "type": "string", "minLength": 1 },
+        "adapterInfo": { "$ref": "#/$defs/AdapterInfo" }
+      }
+    },
+    "ArtifactReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "identity"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "identity": { "$ref": "#/$defs/Identity" }
+      }
     },
     "SourceEvidence": {
       "type": "object",

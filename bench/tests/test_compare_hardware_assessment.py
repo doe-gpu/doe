@@ -23,6 +23,8 @@ def _sample(adapter_info: dict[str, object]) -> dict[str, object]:
 def _assessment(
     left_info: dict[str, object],
     right_info: dict[str, object],
+    *,
+    is_dawn_vs_doe: bool = True,
 ) -> tuple[list[dict[str, object]], list[str]]:
     obligations: list[dict[str, object]] = []
     reasons: list[str] = []
@@ -31,7 +33,7 @@ def _assessment(
         obligations=obligations,
         reasons=reasons,
         comparability_mode="strict",
-        is_dawn_vs_doe=True,
+        is_dawn_vs_doe=is_dawn_vs_doe,
         package_execution_applies=True,
         workload_path_asymmetry=False,
         workload_path_asymmetry_note="",
@@ -78,7 +80,82 @@ class CompareHardwareAssessmentTests(unittest.TestCase):
             {"vendor": "generic", "architecture": "", "device": ""},
         )
         self.assertFalse(obligations[0]["passes"])
-        self.assertIn("matching physical vendorID/deviceID/driverVersion", reasons[0])
+        self.assertIn("matching physical identity reported by both runtimes", reasons[0])
+
+    def test_vulkan_webgpu_text_identity_matches_when_ids_are_not_exposed(self) -> None:
+        obligations, reasons = _assessment(
+            {
+                "vendor": "AMD",
+                "vendorID": 0x1002,
+                "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+                "deviceID": 0x1586,
+                "architecture": "vulkan",
+                "driverVersion": 109051907,
+            },
+            {
+                "vendor": "amd",
+                "device": "radeon-8060s-graphics-radv-strix-halo-",
+                "architecture": "rdna-3",
+                "description": "radv: Mesa 26.0.3-1ubuntu1",
+            },
+        )
+        self.assertEqual(reasons, [])
+        self.assertTrue(obligations[0]["passes"])
+        self.assertEqual(
+            obligations[0]["details"]["physicalAdapterIdentityMatchBasis"],
+            "webgpu_reported_vendor_device_driver",
+        )
+
+    def test_vulkan_numeric_identity_mismatch_does_not_fall_back_to_text(self) -> None:
+        obligations, reasons = _assessment(
+            {
+                "vendor": "AMD",
+                "vendorID": 0x1002,
+                "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+                "deviceID": 0x1586,
+                "architecture": "vulkan",
+                "driverVersion": 109051907,
+            },
+            {
+                "vendor": "AMD",
+                "vendorID": 0x1002,
+                "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+                "deviceID": 0x9999,
+                "architecture": "vulkan",
+                "driverVersion": 109051907,
+            },
+        )
+        self.assertFalse(obligations[0]["passes"])
+        self.assertTrue(reasons)
+
+    def test_strict_deno_package_requires_driver_identity(self) -> None:
+        obligations, reasons = _assessment(
+            {
+                "vendor": "AMD",
+                "vendorID": 0x1002,
+                "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+                "deviceID": 0x1586,
+                "architecture": "vulkan",
+                "driverVersion": 109051907,
+            },
+            {
+                "vendor": "4098",
+                "device": "5510",
+                "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            },
+            is_dawn_vs_doe=False,
+        )
+        self.assertTrue(obligations[0]["applicable"])
+        self.assertFalse(obligations[0]["passes"])
+        self.assertEqual(
+            obligations[0]["details"]["comparisonAdapterIdentities"][0]["vendorID"],
+            0x1002,
+        )
+        self.assertEqual(
+            obligations[0]["details"]["comparisonAdapterIdentities"][0]["deviceID"],
+            0x1586,
+        )
+        self.assertTrue(reasons)
 
 
 if __name__ == "__main__":

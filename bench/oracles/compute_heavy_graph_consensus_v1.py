@@ -2,9 +2,9 @@
 """Source-bound cross-runtime golden oracles for compute-heavy command graphs.
 
 These exact hashes record byte-identical outputs from the Doe native Vulkan and
-Dawn Vulkan execution paths. They prove cross-runtime output parity for the
-bound source graph; they are not an independent CPU model of the floating-point
-algorithms.
+Dawn Vulkan execution paths. They preserve the reviewed physical graph-output
+history. Independent CPU reference artifacts, when available, are owned by the
+workload oracle contract rather than this consensus ledger.
 """
 
 from __future__ import annotations

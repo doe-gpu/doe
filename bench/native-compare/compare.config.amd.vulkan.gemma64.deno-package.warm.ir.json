@@ -1,0 +1,45 @@
+{
+  "workloads": "bench/workloads/workloads.package.inference.json",
+  "baseline": {
+    "name": "doe_gpu_deno_package_prepared",
+    "executorId": "doe_deno_package_prepared"
+  },
+  "comparison": {
+    "name": "deno_webgpu_package_prepared",
+    "executorId": "deno_webgpu_package_prepared"
+  },
+  "run": {
+    "iterations": 16,
+    "warmup": 1,
+    "out": "bench/out/amd-vulkan/gemma64.deno-package.warm.ir.compare.json",
+    "workspace": "bench/out/amd-vulkan/gemma64.deno-package.warm.ir.workspace",
+    "workloadFilter": "",
+    "emitShell": false
+  },
+  "comparability": {
+    "mode": "strict",
+    "requireTimingClass": "operation",
+    "allowBaselineNoExecution": false
+  },
+  "claimability": {
+    "mode": "local",
+    "minTimedSamples": 15
+  },
+  "resource": {
+    "probe": "none",
+    "sampleMs": 100,
+    "sampleTargetCount": 0
+  },
+  "selector": {
+    "cohorts": [],
+    "benchmarkClass": [
+      "comparable"
+    ],
+    "claimEligibleOnly": false,
+    "domains": [],
+    "ids": [
+      "inference_gemma3_270m_prefill_64tok_decode_64tok"
+    ],
+    "excludeIds": []
+  }
+}

@@ -20,6 +20,9 @@ if str(REPO_ROOT) not in sys.path:
 
 from bench.lib.bench_utils import load_json_object, write_json_object
 
+CTS_REPORT_SCHEMA_VERSION = 2
+IDENTITY_ARTIFACT_KIND = "webgpu_cts_adapter_identity"
+
 
 def normalize_label(value: str) -> str:
     return "".join(ch if ch.isalnum() else "_" for ch in value).strip("_") or "query"
@@ -89,6 +92,112 @@ def ensure_optional_string_list(value: Any, *, field: str) -> list[str]:
             raise ValueError(f"invalid {field}[{index}]: expected non-empty string")
         out.append(item.strip())
     return out
+
+
+def load_identity_probe(value: Any) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise ValueError("invalid identityProbe: expected object")
+    command_template = value.get("commandTemplate")
+    required = value.get("required")
+    if not isinstance(command_template, str) or not command_template.strip():
+        raise ValueError("invalid identityProbe.commandTemplate: expected non-empty string")
+    if not isinstance(required, bool):
+        raise ValueError("invalid identityProbe.required: expected boolean")
+    return {
+        "commandTemplate": command_template.strip(),
+        "required": required,
+    }
+
+
+def parse_adapter_identity(stdout_lines: list[str]) -> dict[str, Any]:
+    for line in reversed(stdout_lines):
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("artifactKind") != IDENTITY_ARTIFACT_KIND:
+            continue
+        adapter_info = payload.get("adapterInfo")
+        if not isinstance(adapter_info, dict):
+            raise ValueError("identity probe adapterInfo must be an object")
+        required_fields = ("vendor", "device", "description")
+        missing = [
+            field
+            for field in required_fields
+            if not isinstance(adapter_info.get(field), str) or not adapter_info[field].strip()
+        ]
+        if missing:
+            raise ValueError(
+                "identity probe adapterInfo missing non-empty fields: " + ", ".join(missing)
+            )
+        return payload
+    raise ValueError("identity probe stdout did not contain a valid identity artifact")
+
+
+def run_identity_probe(
+    probe: dict[str, Any] | None,
+    *,
+    config_path: Path,
+    workdir: Path,
+    dry_run: bool,
+) -> dict[str, Any]:
+    if probe is None:
+        return {
+            "configured": False,
+            "required": False,
+            "pass": False,
+            "command": [],
+            "exitCode": None,
+            "wallMs": None,
+            "stdoutTail": [],
+            "stderrTail": [],
+            "error": "identity probe is not configured",
+            "identity": None,
+        }
+    rendered = probe["commandTemplate"].format(
+        repo_root=str(REPO_ROOT),
+        config_dir=str(config_path.resolve().parent),
+    )
+    command = shlex.split(rendered)
+    if dry_run:
+        return {
+            "configured": True,
+            "required": probe["required"],
+            "pass": None,
+            "command": command,
+            "exitCode": None,
+            "wallMs": None,
+            "stdoutTail": [],
+            "stderrTail": [],
+            "error": "",
+            "identity": None,
+        }
+    run = run_query(command, workdir)
+    identity = None
+    error = ""
+    if run["exitCode"] == 0:
+        try:
+            identity = parse_adapter_identity(run["stdoutTail"])
+        except ValueError as exc:
+            error = str(exc)
+    else:
+        error = f"identity probe exited with code {run['exitCode']}"
+    return {
+        "configured": True,
+        "required": probe["required"],
+        "pass": run["exitCode"] == 0 and identity is not None,
+        "command": command,
+        "exitCode": run["exitCode"],
+        "wallMs": run["wallMs"],
+        "stdoutTail": run["stdoutTail"],
+        "stderrTail": run["stderrTail"],
+        "error": error,
+        "identity": identity,
+    }
 
 
 def load_query_entries(value: Any) -> list[dict[str, str]]:
@@ -163,6 +272,9 @@ def markdown(payload: dict[str, Any]) -> str:
     lines.append(f"- Config: `{payload.get('configPath', '')}`")
     lines.append(f"- Workdir: `{payload.get('workdir', '')}`")
     lines.append(f"- Command template: `{payload.get('commandTemplate', '')}`")
+    identity_probe = payload.get("identityProbe")
+    if isinstance(identity_probe, dict):
+        lines.append(f"- Adapter identity bound: `{identity_probe.get('pass') is True}`")
     lines.append("")
     summary = payload.get("summary", {})
     if not isinstance(summary, dict):
@@ -244,6 +356,7 @@ def main() -> int:
     try:
         queries = load_query_entries(config.get("queries"))
         required_paths = ensure_optional_string_list(config.get("requiredPaths"), field="requiredPaths")
+        identity_probe_config = load_identity_probe(config.get("identityProbe"))
     except ValueError as exc:
         print(f"FAIL: {exc}")
         return 1
@@ -270,7 +383,15 @@ def main() -> int:
     fail_count = 0
     pass_count = 0
 
-    for entry in queries:
+    identity_probe = run_identity_probe(
+        identity_probe_config,
+        config_path=config_path,
+        workdir=workdir,
+        dry_run=args.dry_run,
+    )
+    identity_blocked = identity_probe["required"] and identity_probe["pass"] is False
+
+    for entry in [] if identity_blocked else queries:
         rendered = command_template.format(
             query=entry["query"],
             id=entry["id"],
@@ -326,14 +447,16 @@ def main() -> int:
         "failCount": fail_count,
         "dryRun": bool(args.dry_run),
         "bucketSummary": summarize_buckets(rows),
+        "identityBound": identity_probe["pass"] is True,
     }
     payload = {
-        "schemaVersion": 1,
+        "schemaVersion": CTS_REPORT_SCHEMA_VERSION,
         "generatedAtUtc": utc_now(),
         "configPath": str(config_path),
         "workdir": str(workdir),
         "commandTemplate": command_template,
         "requirementsNote": requirement_note if isinstance(requirement_note, str) else "",
+        "identityProbe": identity_probe,
         "summary": summary,
         "rows": rows,
     }
@@ -352,12 +475,15 @@ def main() -> int:
                 "passCount": summary["passCount"],
                 "failCount": summary["failCount"],
                 "dryRun": summary["dryRun"],
+                "identityBound": summary["identityBound"],
             },
             indent=2,
         )
     )
     if args.dry_run:
         return 0
+    if identity_blocked:
+        return 2
     return 0 if fail_count == 0 else 2
 
 

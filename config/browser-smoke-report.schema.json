@@ -20,7 +20,7 @@
     "reportHash"
   ],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 1 },
+    "schemaVersion": { "type": "integer", "const": 2 },
     "reportKind": {
       "type": "string",
       "const": "chromium-webgpu-playwright-smoke"
@@ -205,6 +205,19 @@
         }
       }
     },
+    "ActiveRuntimeProof": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["schemaVersion", "identitySource", "selectedRuntime", "expected", "observed", "matched"],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "identitySource": { "type": "string", "const": "wgpuAdapterGetInfo" },
+        "selectedRuntime": { "$ref": "#/$defs/RuntimeMode" },
+        "expected": { "type": "object" },
+        "observed": { "type": "object" },
+        "matched": { "type": "boolean", "const": true }
+      }
+    },
     "SmokeChecks": {
       "type": "object",
       "additionalProperties": true,
@@ -247,6 +260,7 @@
         "webgpuAvailable",
         "adapterAvailable",
         "adapterIdentity",
+        "activeRuntimeProof",
         "errors",
         "smoke",
         "previousHash",
@@ -259,6 +273,7 @@
         "webgpuAvailable": { "type": "boolean", "const": true },
         "adapterAvailable": { "type": "boolean", "const": true },
         "adapterIdentity": { "$ref": "#/$defs/AdapterIdentity" },
+        "activeRuntimeProof": { "$ref": "#/$defs/ActiveRuntimeProof" },
         "errors": {
           "type": "array",
           "maxItems": 0

@@ -1,0 +1,477 @@
+{
+  "activeContractHash": "b9f910254245b5945db10c77dff703cbeff092c3f07f6ef566c1f225a39bde9c",
+  "benchmarkPolicy": {
+    "path": "config/benchmark-methodology-thresholds.json",
+    "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+  },
+  "claimReport": {
+    "claimStatus": "claimable",
+    "mode": "release",
+    "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+    "sha256": "97a7cd30d40ce65f8508ba2a677281b21ac70489e94008ab9c5ad1a41d16391d"
+  },
+  "generatedAtUtc": "2026-08-10T21:55:43.817299Z",
+  "reportPath": "reports/benchmarks/amd-vulkan/20260810T215325Z/dawn-vs-doe.amd.vulkan.release.compare.json",
+  "reportSha256": "a94b99a8621a57d15c918c749801bb9b3e1b922a76430cdad7a872cdd3add25d",
+  "runParameters": {
+    "iterations": 18,
+    "warmup": 3
+  },
+  "schemaVersion": 1,
+  "workloadContract": {
+    "path": "bench/workloads/workloads.amd.vulkan.json",
+    "sha256": "13500cd7b67eebee66372e835a20043ad0bdf72c4d221aba973d990796da81a3"
+  },
+  "workloadReceipts": [
+    {
+      "left": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/doe/doe-compute_concurrent_execution_single-20260810T215333Z.run.json",
+        "product": "doe",
+        "sha256": "1dca8910a8190aa2ce0816482e105d05f36a6e7edb6ebb8b7c5bd4c69a9e273a"
+      },
+      "right": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/dawn_delegate/dawn_delegate-compute_concurrent_execution_single-20260810T215408Z.run.json",
+        "product": "dawn_delegate",
+        "sha256": "6e598178d548966fa3bf18b960a121c3b2ee49c67033a59a3d55793a53471e08"
+      },
+      "workloadId": "compute_concurrent_execution_single"
+    },
+    {
+      "left": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/doe/doe-compute_matvec_32768x2048_f32-20260810T215333Z.run.json",
+        "product": "doe",
+        "sha256": "e77acdb9dc4d17f7d46a999591e485c4c6c20ce572b8f04a19a2e345b507b1da"
+      },
+      "right": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/dawn_delegate/dawn_delegate-compute_matvec_32768x2048_f32-20260810T215408Z.run.json",
+        "product": "dawn_delegate",
+        "sha256": "5854f717a3bd9957a16ef55848997c71d17d95b7c3dc1459a0869b300ca2dd2c"
+      },
+      "workloadId": "compute_matvec_32768x2048_f32"
+    },
+    {
+      "left": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/doe/doe-compute_matvec_32768x2048_f32_swizzle1-20260810T215333Z.run.json",
+        "product": "doe",
+        "sha256": "75fce92b8d141f562fb680ed9d36008ac97200c8e67d312d0f6062ab36daed76"
+      },
+      "right": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/dawn_delegate/dawn_delegate-compute_matvec_32768x2048_f32_swizzle1-20260810T215408Z.run.json",
+        "product": "dawn_delegate",
+        "sha256": "b1a260386549609892668b18df36e125155b8a37c5ca72aa965f8bc3435a2aea"
+      },
+      "workloadId": "compute_matvec_32768x2048_f32_swizzle1"
+    },
+    {
+      "left": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/doe/doe-compute_matvec_32768x2048_f32_workgroupshared_swizzle1-20260810T215333Z.run.json",
+        "product": "doe",
+        "sha256": "134ea6e217799f9a35c4da89774c1f3967ffdc9ed7ffccd17030bbdefe74e7a9"
+      },
+      "right": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/dawn_delegate/dawn_delegate-compute_matvec_32768x2048_f32_workgroupshared_swizzle1-20260810T215408Z.run.json",
+        "product": "dawn_delegate",
+        "sha256": "11bae986f700e02d210eba5be4dc7ffb44fb5022d585f2af11e61553ed6d9c9d"
+      },
+      "workloadId": "compute_matvec_32768x2048_f32_workgroupshared_swizzle1"
+    },
+    {
+      "left": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/doe/doe-compute_stable_fluids_multistage_256grid_18pressure_4steps-20260810T215333Z.run.json",
+        "product": "doe",
+        "sha256": "71d53d42330cfc82fe9991c82753c99b0422ee81df7fd5a2a94b8f9b4dde5255"
+      },
+      "right": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/dawn_delegate/dawn_delegate-compute_stable_fluids_multistage_256grid_18pressure_4steps-20260810T215408Z.run.json",
+        "product": "dawn_delegate",
+        "sha256": "25caaccb545b47ab24e889c8cc158b24a08d2e505e7e3e397dafa983cd37631f"
+      },
+      "workloadId": "compute_stable_fluids_multistage_256grid_18pressure_4steps"
+    },
+    {
+      "left": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/doe/doe-compute_workgroup_atomic_1024-20260810T215333Z.run.json",
+        "product": "doe",
+        "sha256": "8e7cddad38c6f4168edef045b2787ea4fb8275555ac0c3c2db77122ab3f44a95"
+      },
+      "right": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/dawn_delegate/dawn_delegate-compute_workgroup_atomic_1024-20260810T215408Z.run.json",
+        "product": "dawn_delegate",
+        "sha256": "34cad4b16321bb872d8f349fefffaa5577105ad60741f9f7c6ab32fc7fbf4025"
+      },
+      "workloadId": "compute_workgroup_atomic_1024"
+    },
+    {
+      "left": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/doe/doe-compute_workgroup_non_atomic_1024-20260810T215333Z.run.json",
+        "product": "doe",
+        "sha256": "9cd84a1be4f3c96acaa7406c9fc93a2626dd482fdda86abd278c12ab33cf27ce"
+      },
+      "right": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/dawn_delegate/dawn_delegate-compute_workgroup_non_atomic_1024-20260810T215408Z.run.json",
+        "product": "dawn_delegate",
+        "sha256": "94e3241772a5ddabc0ee3c6beadbff6c6122a558748b3c73b1ea0655f45cae7e"
+      },
+      "workloadId": "compute_workgroup_non_atomic_1024"
+    },
+    {
+      "left": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/doe/doe-pipeline_compile_stress-20260810T215333Z.run.json",
+        "product": "doe",
+        "sha256": "56e778c943593a8d67b93a1a47dfceda13a4057d1ee61d8d862c1473566ff3a1"
+      },
+      "right": {
+        "path": "reports/benchmarks/amd-vulkan/20260810T215325Z/run-artifacts/run-artifacts/dawn_delegate/dawn_delegate-pipeline_compile_stress-20260810T215408Z.run.json",
+        "product": "dawn_delegate",
+        "sha256": "f444814f373666c57d30bafc701c1a64b3018ca90056bb8e434b86703fe23974"
+      },
+      "workloadId": "pipeline_compile_stress"
+    }
+  ],
+  "workloadTraceMetaHashes": [
+    {
+      "baselineTraceMetaSha256": [
+        "02d07317ef20075d6ef009e25f346acde9165f355fb4256051d6c767a837a47b",
+        "49254c397b3acbbca6764affdb121fa120dbba28ec3c64cbf8a8962bdc04b4cb",
+        "fce7c98eca247e69f55104f837a9b5644df28897eab581cf04ef943124a62800",
+        "60ce5d50cabb724d90547970a906fcf86d88844b91b1f23e7eb218d4652fad23",
+        "d3a69585d41668f2faf1d3c9539f77543e49991307a40dc26368e10e6aeed3af",
+        "5cda0bc9a73f8ace1eecf94aff79cc976a1fd6f31fc8e27b77c16382d022a532",
+        "2e3d367914bc45df7b7b60a9b73ee42fec0e7e75df0809f0b6ef2da550b06c0f",
+        "8e1017ccc68c052c8759942e18037bf762c782970e6f3d9463d2afdec38c6f3f",
+        "88b4bc5305da70a63f13511d9604de5a2ff32410baf815258de952feb3a27666",
+        "fd10e4062a3f0904942b39d978648551f7763e6185413f9f42ef4e8ad6039ba3",
+        "0fdc4ffcbb09d10a7f849ad61cd3af3c9f5356ad68825f638271a509d8e557fb",
+        "24cf9fa42183bbe1c2627e51768d8276c9be00a50bc6c2215d88aafc542924e4",
+        "643335b092375acb17c6ca7e4c79c6f8dc20c73b448c7e4b6c8cedd7996f0503",
+        "d3623fbe3fa4e8dacf482fa7ed50b9e60e4f226c863db1ba2a94c2170d52becd",
+        "66386497383eeefce67f708b9128144a5f156b7421529e463ff102f80fe82374",
+        "a3af643ea29906b6b19d67cc23837b4ae725400ca1d94db3f370c16905368f83",
+        "c21316ccba2efdfd7636e175dcc9f611b2d0db810ae67c128cd03b97c14b39ef",
+        "bf705a31ed3130d05d19b4cc6027bc2facb7ddb6231ff8ad8de8eae43e80326b"
+      ],
+      "comparisonTraceMetaSha256": [
+        "05487a37597c97185a104833edfd9c4d809d40a515597a34b8239b125155976c",
+        "7107067d17dd2656772c19d3bef32d3b5a2bdb8248db28fceebe640ae0d09048",
+        "1811dfe567dee6be667e5502bf1d1c4544e9b1a9792db95af5eeaa6fe6bec2ed",
+        "31c09de9bb97a3f0dff0ca47fc4baff6b121f834006ef0548d0e264ca46dbb53",
+        "f0622a12cb6b6c15b94d70b1fb26c46d77c22f6601c28ee80b79718b35963960",
+        "7dfe11da30b86ab5a0a9c60a9576f84ff3a77eb02515617334e9aa1f909c1758",
+        "e12e9f6c72486012e27f5aa45c812e4e2ad6f702a162e04024dbe7db17c30725",
+        "5c81aa210799d2f3d5b7c38c0422f5607aef5720072d59d186bd7f56d99112d5",
+        "1f75ba78562e752a5411ce5448b74e5c31b44ed1bc08e3107230766740ef7be2",
+        "36ab82a8e2f023549adaad7b15fd3d72034489152c7e7f0d8eb52bb0b38e24d5",
+        "41147357b542763a3dd0a655895e496e4f614eff50a4281acaad562377bfbd74",
+        "08f4829f78d55baaca27e034af7ea2c942ecea3fb3a46f604bed4ab1c4fdeb74",
+        "b55a6bacef1d445470981d8027f3442494069a0dbebdb29d28a1a25df2b819ac",
+        "57b32ec86aba2c6ac3277a0a4c73e587e7758685c90974172a13e2ab499ba30b",
+        "357a6d6fd3b0761f8b76b3bcd68766489074c0fc5e0b823242f248a184c4addb",
+        "f326d20ac5085c47da6dce7583533dc1118ad0ddb281669661dc3a349146080f",
+        "f5be7be85019caae64c2bcb7c4b8f0cbfe7107bc443c27c1b571564686537973",
+        "13c54440463ee96bba7d158b452068b806a9fc5f18cb7b3f11029b4ecbfcd1c7"
+      ],
+      "workloadId": "compute_concurrent_execution_single"
+    },
+    {
+      "baselineTraceMetaSha256": [
+        "74ba39153ed668c99869123c679c0486dc0d37c383224a638e76d7015ec8851d",
+        "3e2f657449743587cfe02e8451c0870a1e82d8ff714db8b7481e59861e3a7d66",
+        "37313c7a8db6064b61e94a97c1337b228faeb1777e4e6fe87d603c7393d37abd",
+        "080dd11b61512a87d6bc5b76a00c39e03af4d3132f55cfb959dec82bc8c3371c",
+        "b0c9680df88d62eeef17747e262b901fe1216063c6c1979721a7d3e966c90817",
+        "2f09c3ff3d20ac1de68d40fb27a3803ed7d960448ff9184feec3487a5706fafe",
+        "2436c600956ee8c1ee80d756748adada13626efc7edd2caa2a20877eb55c1d4c",
+        "b6aefe5b94a3ec5cfa9c46f211f9b22b5791b9a40afe3535591a67478864d6d5",
+        "07742bfeb6da49ec9257f536345a9ef29d2edc3f998dcdd50369ba77f2fd2fd8",
+        "a3b03a0f33598e5583e085ea79288056db3fb7882a499c607eb4870f17a34659",
+        "cb0f451a86d841357efd8f423ca12874cdde712db805edfd1a66e314d4129f1e",
+        "9932bfa07c4da3e158d8880752e4b3b7663154654708fb324442f747ca2fdef7",
+        "f965ada0e5e8b6e911d169f65576f7aa0dda83fed06f4d888994fa658e0c1979",
+        "99d9518cf3b6034ccbd5c1cb2938ad2979966f2c8a538c1906b9850663cead59",
+        "96220db7abe6a6158d1b34afd94b0d2145d4ae210539b454911bdad2d98011c1",
+        "abaed1ea28a94a468e997823004751ec7d194a424535f043344bfffcd5885e6d",
+        "a7872028855457804c3689811c48486ec7913be0bcf51b3a1a51a1e9922d49dc",
+        "672c2d5b75c5130e13bf6cad7c917189d3bafa23377913353574f403870ae062"
+      ],
+      "comparisonTraceMetaSha256": [
+        "135565fc72678afc7feea042b13f77516179432f4352c2ecdf0a5990f3d92d6b",
+        "5cb4e5480079034e950919cfcce048b41c0c5b56149c4328c6b754d3f78b8557",
+        "1eba8ea6be78906f593ec204c6d71a61107eb82f54807318c6fc381927147fd6",
+        "030d4f0d168cced021949615d027e48c236eb26a91c99ab1087e6c6f83cbb988",
+        "a0a153db2cbc042a03288f7dc96c762b88db5d7a18a6f0ff0903f3232d15c13f",
+        "3371500f46cc6b38fa2bbb9e625c0ac6b8341e577237fe2fe975424bd0db0afe",
+        "62143bdc04d88337ad0a1d3612cea93b8b0397ec84422df795d6c5b5ae69be06",
+        "9b3b8955a405e9670f4d8a7ce45cc9bd9f6bf996ccea24313e5188de66f9a05e",
+        "394e490b47416254f4d8e2686245d8c2e07a30473707dd7d9a8af85711e1d990",
+        "6331e7d00112f62673d5f33060a8752237f48b4d1006ccc613a07e892d7625b3",
+        "92a79bff99f21585d1c3fe777d13303570e1f18939c55bea1fc74f06e06590b8",
+        "974af72fa8ea92716c6b980294888399fb7ca9448847308df5dd40877884cd36",
+        "553e5bad0b3923330311b274fe65f129ecc1bbb803ca2168cbe6736cda4462af",
+        "f9dcadd47de2f9252c6f2aaeb27dde253db47bdf33fb3a37392f73ec3b622e25",
+        "305ef579692f42f89973510fc25037d2b461ae481f75c3aa95689918ced0faaf",
+        "c46e690220b710df5f1382131cd9daf2ed242e00eb093bc3adef9164dac73e04",
+        "93465b631c22709ef217b4b001c4767ce19a9cdf7e25eab679673556fcdebc08",
+        "e5ca329384e3a8d0ce5f60f2f922482d84b1a5a1f6f63e21aeeb61940a609935"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32"
+    },
+    {
+      "baselineTraceMetaSha256": [
+        "031f9d93dad4db95391250f9ae8ceaf0a56ee4b77aa907c2fc865752b0ecb035",
+        "8d84955aefa6fe7819eefa274fc23b2b73849bb3481fcc29b78e68bbd4873dbc",
+        "16179bddc3f5a68987c5efd5adbf28eb10ddda54ea792b81053a4003b34e9c34",
+        "0c9616fd416ec35a7074934f8f01e342f8b079b7bba84979981a6853e7525418",
+        "da234e2d1bf4c95c164e2b0b4f9c3eb413dbc476567a1619580e99b3b393fd54",
+        "0cd87cf327764b795e1450fc28d33bf803a5f88b8d470a2ba08235f5fbfc506a",
+        "8575c63ef857c0b67a6daf77c9ef652076ba210431001b842d6246a1dba5dca6",
+        "bd6c502082e4438ea612a9a99b585a5e0d11efdf49fb78ea8fe4117c010cec43",
+        "791b7d5a3c484510355e2999cdb734c8576c2f1d468521b9c1f7c6dc771ed19c",
+        "d4c5ba6bb12c3c0a3c14badd6e584f42e2e18a131fa861c8a295d8fadeb49931",
+        "f14d429ccfb694df2440ec7a8c15a3595c7f6ec289f52a314c4b783c60a92f71",
+        "bb76c74bca63cc86c6db00cec76f495bc549aac70a096a8d67d5b718ef6ef8ec",
+        "400b8eadcf9972dc592825dc8ba2e8bf22884b5957e6aef7bdd1f37861969451",
+        "449aa361965a4e93a06416df23b26331bccb0faa05f560a75281e306441cd5b6",
+        "fc1baa8a76d7c15002cbc3b9f2c9194a85c56c0ab4ec8dc5686692c4e28bbf93",
+        "0430c71d9eee42d1c8b0db8b35e451d84f04555822187e73da39dcd62ff574e3",
+        "cde7229e3e33b83191c8f3b69a9a88d3ac762151f9299339664b1aac0505a763",
+        "c5dfb456caa4445276b78be6056b4db9f95b77b9cf9699944fc1ac980f35a613"
+      ],
+      "comparisonTraceMetaSha256": [
+        "0711fa08e4a5f77f8f6983cc1c428dabad3c1d009b68d12fe01022f55002472b",
+        "2bed97fa10cc003e682430933c379b72142409dc934cac8210386cf219c1572d",
+        "356ff5fe8aedc89ff7fc303f6de33f7a632b13dfdf9b883a038f58a242f1b774",
+        "5a66038dd7cf7fea296ad64f93366bc93e5bdabc36fa04307323111486e2fef8",
+        "39c8837d91895138efb78fd4ee237cf28dc5bd6490ffac1d3b744b50d47f4daa",
+        "8dac7d93b2d97b90aa3fd77b8fb6c9dddfa9c5b31ff0f560c235550d59f3f537",
+        "dcfa843eacd03c078335a1634c16cb5498f3827881476cbd1451e63810028507",
+        "a8e636693085ca3035c7c7c31f113f48e67a01598ba60f4a070146e4c2376004",
+        "01b95e226666429f138dc39b70d416ea16df563c53ef5c9e11ec740c1f0946d3",
+        "3b80a1eb66f3a657f51e520492502ce913efd8f5a7309d019d982150f3691d8e",
+        "28729c20154e027520bddb32af8c6ec4c07c038d57ae5a597f444fa3a54cc508",
+        "c15388dc7eacfd808d661c75ee80aa1d1bcca6d78031c42299680a1c78bb7151",
+        "a2d586257e95f74c888027c4c91618692a8b5471148ce02682aba57599f48f6a",
+        "68c0854bfae0f9739ea204d191af229f33a1fe6e5f1ba42e83f1e6d17b36a8c2",
+        "26d78037fc8678ae0ac065cd71ae1470cb8508291c682e76ffc90056552d17fb",
+        "ad749fc40f0a5c1499dddf698122880568d8465ee89e9441da0a221871377558",
+        "72e479bf038e7b600a447059bc546de2cb0283b9caa95b62919e8069caabcdd1",
+        "136dd6a0c1e5317f105517b9bddd856dd22480bf26e096ce00a71543ba061ecd"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32_swizzle1"
+    },
+    {
+      "baselineTraceMetaSha256": [
+        "38bbdc1b628908cdd756bb52b63e3a8672dc1758be0ddec3a3a5641888d957c8",
+        "3710a0cb27c18724e2c310b25ccd58a994f6de0e78d7e53394f8d08c177f5b4e",
+        "c82d73162a10a54fc9e992c9b612fbd186c6de16ba78007e04b97d6af962f728",
+        "13fb4a0abc37ebcc60298c1b1cc9a7108ee0822fcb757fbdf3f41a5c312e5536",
+        "a4c3ce6f27418d398538ec2a53753c17b7d4b53d01c0294f376ea0de0216137f",
+        "559936be8627fca4c1e567e2819e3a51d3da84ffa2f5043c0ca69a6983f3b1bc",
+        "61da4c481d611627dfe7dfafc64dcad5cde718fe3dc4a50760fba3d0eac43ce2",
+        "f0a02772f774c0c7613ebdb357aef79606be73a7459c0efeb4fcdf7ee7d7c396",
+        "cccd2ae18a06bc68672f449620f128a88c35ac0352bd697c2d18b8885a79b987",
+        "437c855888b31d9258598eef66077f1d6eca2cacf5a78ddd74ab7cf1db24952b",
+        "49d95397b1f6fee05c2a2f11938361d1131fd999f2b9e767129763cac2b6b6d9",
+        "b6a9b4eb74670298f01c6721c4311865060f595c2c615cd69a57800bd51baddf",
+        "4151c8957b6859c8e898ef446b809bd83f8c3d7cabb5d4248131fc1333f107e2",
+        "920c7909b29a0eaade26743d9bc073e751ae5175d25d0fc6ee1a4d65adcc2d45",
+        "b827afc93378c346347b66ec39ffb2828597c55a6b991f7afe217cf7869fb00a",
+        "00a9e56014f28e5cdc3992563f680bf962c98b35f445a2752ef19b1c31ded044",
+        "aa70f6dc31bf9aa82689b6dc0ed7a8da5ee8098f2fd6cba5c26163cb7625144b",
+        "2062966130e13fd997fe59350b416b426eeb89e73b4b0e800888acaa67b2906b"
+      ],
+      "comparisonTraceMetaSha256": [
+        "adf59362b78a3e1d24c8c56bb86883842ee4cb980b74cb96835334a1fb143045",
+        "badb12f0e4cc12ce862efa553ef125a4d4fafdbd7a6af3c8b7f703fcfcf4161e",
+        "b17405b5f28b5ebfcf7e8ce80a617ff66c1a39474022f2b9ff252275219c3aed",
+        "b9d2ccf4970e30fc9d498635eab2d94253f48645f3e498031733f87dfad36564",
+        "d24709c592fc9c2219a32867b0baad7f74d917dedef0b9a3c127c95874e7b628",
+        "2390b9eb79c5633f890ab956212fb462cd2176d39c0ab8ea7d969cd0197080b7",
+        "4f62e85ea44a15dd48c44ea3242265faa7e469ae9a531f226d7dee726ca31a72",
+        "335315b06e8ecc04a815d13a34536c7dcd239bb7598345b2efabca4ac5092488",
+        "987bdc1c46f844713bc6ccc1cd61378e36ed35884dbbc33dd7c82feff32ac5cc",
+        "3599e0fd834195cefd929e2d6aabd69d3e58e599d136612ccec5c59c6068113b",
+        "a3a75e0dcda9f6dc6379b48b0f03ee6608696823a293ff533a654274c5fd0100",
+        "271b5b48b207b915995d9d4101e7c16b6452c10df69ab679cd54ebe8adb4bb4e",
+        "0d20d8c8ddb22f617a262c91506a5fc9a0cd13873386f6191cf1ea53b0635ec8",
+        "631fd6d864d648816318d110f0685e1544f5763c791c69d127992edfaa9a64a4",
+        "48d3be2ad920f686f4b3aed3a4dd5012b97be0020bbce9423ee4e6f6cf8428ef",
+        "262e2ceb60cecf494c0d50aa69e8ac26cf1dc87a017262285fdc46d40a1b659b",
+        "8b9cb347fa54149fb826d364474cc442d9bf3aa56dbf9aa892a276e692a86ae0",
+        "ee8508a217deec6c2125bcb62025665918b23274ccd60eb13fc3916d27380787"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32_workgroupshared_swizzle1"
+    },
+    {
+      "baselineTraceMetaSha256": [
+        "b3a7f7eb5bcc2877fe25176db4a32cf2ae8ae88106abbc025c73717296aa8921",
+        "73b2967530626cd5c775d6d8266760677a4f48bd2e0ecf9c8d3968088d0f9a5a",
+        "834dd88ef03ffe471201698ac4aa9c1218523d1c48946aa3670ff131de283e17",
+        "e75f0ab5d786dc8080c9bd7ddb340976431bcd4e8a8153d9e7a90070f7edcbe8",
+        "d9e8a9575c36f41cff4b16a05742bdf285090fffb8308b256f0decb8ef27d381",
+        "096e00a5496feb580a7c575108189618bba212fa49cf37c323e457d4537d0319",
+        "07bb9293ccbfff946f67818424878c24452f25b67ee8658fdcb3aa0ddc7f93dc",
+        "9f03ebee3413cdb521eb76d24c3da8f716e684063e6d433e13dcffeb6e0c5cbb",
+        "84ffc4649ae830efab0305ad84b8a62196b0b8954433a543c60417a9f4bfced6",
+        "7af31ff7de1acdfae9d3d6018c3d150150cc3ca74b8b858dadaa93a74a34b650",
+        "ce9a9877141ecfc6c7daf76fd0d96bc58ce5609483509fa1fb459d738d038b3b",
+        "20c7e6a0fa157785ce62f8b8415dfb73c8cb256ad3d0b32c12fc7bce47ef8ecd",
+        "61d3e85b73a6a57ab18bb85b8052351a2647f905f307ed2f81283f1051af22f6",
+        "995b001c31fd6418479205eb04729adc0fdc4347b0e464b22c9b877fd587cf99",
+        "24997233ba3104b8c6a981f1c9b938d789e60f2107462d7331db6dec8e3c680f",
+        "3339ad81d7ce2ecb0116f9b887fde5c7d061e241bfaf8f4863117d9464fd44bd",
+        "2d7e1b74384d3fff7216f109063bce33e66add2cc2c6df846c691dbe380a7466",
+        "b7accac54c01662b2f7e1eda7c921953d45177b26d461f1beadecf73f08cdea6"
+      ],
+      "comparisonTraceMetaSha256": [
+        "83e4222a5f6cb36849beb578a4accd89dc47c1aba1ef07adfbf15d5436950b98",
+        "d7efcc363a8fcb3244bd6a2ce724e6fb79d75de2978bbed6722bca29c0eaa725",
+        "ac08eefd64cbc355222322fe199a72c3c84b0c9dc41994c5ad3caba2c8890ca0",
+        "334d09b1ff376defe767577febb9ebcf62680272e785108a469a0bd422879294",
+        "c14cdbdabb7916dac0b044afbcd45b3d58f019bf29ede83b189b397d60d568a8",
+        "726737c7ef1a892f212eafc73a13e03f5afd83c816ee1a2a3f0b386ca6b2bf4a",
+        "a5c728d89b831273b713d1f7c4e237887f884e4195620d0ccb7916263032aad7",
+        "7aa944c17eca9d1025ca9cadc2d31a5ec23a588a9a14e2e9b4ea28f8eaf5fd05",
+        "b9bdcc0551f49256ed4fda59dc37b274ec1cb6df891a3ea78475ecbfdf4ccecb",
+        "6222cd6bd56672a69ee16fa9e4525918ca8d09a2dba3604d892e4efa77abf00e",
+        "74f54a16169db51c5ea8bfc2be7282d3086fb310ac5b17695200eb0602fb3443",
+        "b95acd3b0c0c476c4b79cc9b11955660886bfbe8acec08a4f91541b5aa4c5c3f",
+        "169521de1f15910fa1e870607e1d99fa7aef9bf3d93cc38440b295790e41ac86",
+        "c79949dd3ee5bb1e33d5979c07b3be354b1b9f420bd69a2e804ee103b1f39f39",
+        "09a96add74be24de68a339256ddb502db1eb065b10a40c364eac7bd5c4847919",
+        "d1e947d8306e70d15c187be699c4e67f84d81710e127e37f7626a02f6b6aebbe",
+        "e45b40b5005244ca43065daef967469e47f8e83197bf68454feb17a0f35268c6",
+        "32f8b745d14e75c9e11c6c61682e86c59bbaa8659417a8243f90f24a03aeb039"
+      ],
+      "workloadId": "compute_stable_fluids_multistage_256grid_18pressure_4steps"
+    },
+    {
+      "baselineTraceMetaSha256": [
+        "532bc3b2056dc50ab31c2430a8bf8e1a3b5d45a752e55f1b4b8a162d9d100824",
+        "349b8637c21ff08c1564f6b95f7eafab89469746dd972a2011cd1bfbd6d10451",
+        "877991b4c68ee701e4d3a3cb51933b8bcd1cd6cf72917ca0f16fda264d17729c",
+        "602366aad6b8c9c7e2204cd5586616a6e2d985d20c029f53893d3369b8326591",
+        "ec4e0a50a3bff0aefa9e231fa7c21f1b9c388e1c3c726d6b317af62c3b6b9b96",
+        "b15258bb365ac76d914477bc51defd4c9c3281c0fa091ed05b618e2b3f660292",
+        "8a0b6ed5bedb7c60278ae8ced281c810188e4543017b70632a12b3827467f314",
+        "8747948c64c8589115fd6415fccc64c86effb6283ed4fe2e8523d06a22d0dcc7",
+        "16515a04939073952b200c298634a329e186ceece0444be4afbf51c0f3079e36",
+        "7e5aac7958ef50d3631f270918077c4b4eafa788a7a3c2c8c226f28cea767d3b",
+        "11c7338fd5c363df715cb07c00975f5cadc53bd931fdd8d0dc63a64785da098b",
+        "2d992f615864668cdb34612a98599955a47df8c017ea61d0cf7d6dc8adbc027b",
+        "65a958e6aad01192e019094329ed8db52090ce09ba7961cbaeb88a2008bbdddc",
+        "8c8a3d35bbe2465ad7655bc7f9633328dc620c287fc643f8faeaa8a03842ee38",
+        "18677c154c12a43123ba6102e820a81b3200ab20e110853b35cde8c17a154e4d",
+        "1a7f32c6b814ba8eec815f3c0c9b0bad8fc27e42212bac7b8de6844aca9628e6",
+        "63af7960d2cca3ac0614700fd7d56ad959186abbe52e39b793887e9d1264efeb",
+        "5ce2b435e0ed19eda1ba514724e07cd4f2b6ef0b7a8835098a9081f39b56720e"
+      ],
+      "comparisonTraceMetaSha256": [
+        "d3f1fc098c458bff4a64de44c9529001ba51fe651d04de64f9967b65cf1a7b18",
+        "97167de53bbacd5e50e67dcdb5317037c123dd4b01e1095e0f0f47498a079744",
+        "bd4f1002ed6d220a30aa9345030393024ec0648b6ebbd9a4416e4273b2bae262",
+        "3d5bd6dcfd41c407c79de5999abc9e2321cc49f2923efea4765f6fe96ad597d4",
+        "f66f336b0fc6bc6def9761292315d213f4e5b4ac84dbef792f5df6687bee66d7",
+        "737b165bf1b50ca44f9edd4e9850cb93d5878ac8b7c66efeb96faf7b4a60248c",
+        "4f623f189ba96c47cdd0d24d0213c443df07fa4b12fbef157acac3de030c3729",
+        "e35f5eb01f360b6e598c65527a38c78ad0597a9d893c3ebc53098f49c672b5bf",
+        "71edc47ef1508768e774f87bbf766546fa7d36fe411cbeb63a148c09c70d1603",
+        "5f9b648f6ed12b34e95204a369e76034c1b6b89ddf0f609c230e0ccab919cac8",
+        "9342c1c59e763e4bf1fdf3714aab50350f1eb128b04a8a6e2e3973e9a4c16518",
+        "1b5b0167002a40962448abf8237cba6c2ba0f5d0b209d3ce9a97bd9c3ac03cea",
+        "20286a4b414ce16af96c2d7329c8da118e934085a14341c4d81bdfb97686e179",
+        "5fedd9096ec56a6dcf32b305d10c37dbfac79e6e4c7f36f1fc9719eef1700b16",
+        "215f94266016d58dc5d535678701fbeb20efed7c0d5b1c68de67b45127d64289",
+        "b1ec21570b56c19c9d78165a071723c21e8727fc6cb74207c3803af94a104528",
+        "5ec08202e31e0807b83b483ddb7ea0c9adfcf7689c37263e105d0bafd3e022d2",
+        "9d5d58af11c74de3b8df5aa1ff924531c4b87fa2a00cb4443e5c7a4cd134dd2e"
+      ],
+      "workloadId": "compute_workgroup_atomic_1024"
+    },
+    {
+      "baselineTraceMetaSha256": [
+        "004760cad487bd55cf9456f6e70b63280a2e7d874ce428be7926c0749f9b4cdb",
+        "f72236aa33617a35f0d67484e5d3241a3a7e8dd24d90c1aa7f3a5387d72374ac",
+        "feb642b7923bb88ed57a44a00018009c788deac1619bdf514b6c78a8d38abc40",
+        "8d9e3840da6a0a827f96f09af3f94ffbf67e9f1933074a9aea2a38a9820c9db8",
+        "c446fe955a344ee21945dd2321ccfe9f5a6df4b2a6a2fc30aa57aceca6deca5d",
+        "b6450f0bca138c73514848c87335f72e46b1769630bec6c689b6f75593577462",
+        "b880a366abc015d21b51b9718a3fffceea0a3b9b092f60e70cc5a81e79dada8b",
+        "7188f63ceb249486f3de72c2241e481d9b3cc36de3de70d121c5381cbac3ac4e",
+        "fc24abdda17d2313da0c7c98f093bae59871232cf6aefcf4e84779130d07e1bf",
+        "1de413bcb35350f5f242664a0e9509f019b222b19a835b8a3a109bdd4ab2611e",
+        "91f43751053db558b3d79de1f3ca31f09279b107ec8c5805ef960687d4ac6ce1",
+        "6dc9a81fd3657563929613b40bf0623b8bc67300961ef72dd906ffeae443d989",
+        "126e8e852a698ce5500802dfc722a8bbb5c478bd0eaaa31444fd7f7f047207fe",
+        "f010a9b7ff722e1102aeae237f6f00523f6fab9e177d9f362396b2b5f5549afc",
+        "63e4038b6fe9b461ce8eadafb8fa5acd2f76645fffbe95f86496bc3dd81c7a8a",
+        "53e05777b36fc0c223672d31c96ba6c6a94255190c1b199969eb626858466ce0",
+        "868458289a2eb2e43f5c61f8cb043fe98a2fb24c10c02f893303c9c866841c97",
+        "8c526e2d8e22763fb42a1ab7addf0ad526a208929c73a654bef74b55002493d5"
+      ],
+      "comparisonTraceMetaSha256": [
+        "b0ae98f28f951bd0dd2a597aa30fd137cce7eb22aeb19d75d001d32a3cbb2566",
+        "e16d59dda788441f272355efe5cb3cf93ca19c870121f8e82df20424aebbe5f6",
+        "a856914ab68163096f332da286528764dcb3f3aa9b8250298a4180dd41a69293",
+        "ed1919e8500f21fbb1ac9f0b7ca394b23f65a9926d6b82e01a8cec67682fc0ee",
+        "ee7ab26fdeb5031441afba2683892eafafa88d53fc45091ea410b0924de44289",
+        "e51cbcff13648a8290e12c2e08da564e8abea05be4c2278d747ef96a8b448426",
+        "3cbff0da56b52987de9b106459a5eb0cdac9a148c292feeb2f7d40ce6b8298a7",
+        "07fd5c3ee5fd618b51c5cc439cd3612703be897ff329d4a4060cc4a4042a9a69",
+        "7403b132b4eab7d59de61bdad2ea69d7a4c1b4964bdaca8e3cf520100ef0a492",
+        "0f99edfb275b9b5ca62a21a05dba750f746bc9718b12f45510c32a150fe2af04",
+        "815434148e38595a2c29cc60ee0951beac428d6749ec636892084e3e4ee8e351",
+        "63452e46020bc77de645795e552661541cf7a53fefdd24191404bb9e4995376b",
+        "e290c81e60087878f2c3a0618b681e9e9f623071c43e1ac2a647fd4075d7da47",
+        "6b78b378f874fe3620dc0c2a1232742a410e315748be05cb1e14fbd24211a9b1",
+        "1ee071980620f3e84387d211293498a29ae96d6846c9c5b3328e58147939a7c1",
+        "51c9ce2eeabcec7bafa10f285f54fdbe170b610ceebb75e390653fac1d099170",
+        "48bd4e8cfc3a0373a93889e4f8ec446b38b3ee050b36968a64d8a4d8d4f3f34c",
+        "a993b3c84696bde0c2b3a092fc297544fee2ae561ec2304a04cac66b4c531ba9"
+      ],
+      "workloadId": "compute_workgroup_non_atomic_1024"
+    },
+    {
+      "baselineTraceMetaSha256": [
+        "aaf56ab1ebef16561b10a409c4658f5dc0bb4f2e87ea7223abf5cafd5063667e",
+        "8cae0f58086b4b40ebd04223251bdfc2143fc43a44a428487161e49a553b3d4a",
+        "a5c0f8adf8421f78ceb04d8afd6b4a8d5ee8514851ec9da30ca700c183005185",
+        "ad69231f6e569de801fcbcf4796df5b5daf90c330b41fe00eaf769b189f08131",
+        "d90aae2d3cc48b251d47ce308de6ffffb1a3536e5580f4ef14492cfe4d9cd845",
+        "1bf74bbf65ecc0c60ac6d1bc317c40251ca681e746a2bbea56364f9c79764526",
+        "226e16abed618c0a4affdd4113ac270177bf5262555340cfbe8408de7e9fd46f",
+        "66ea17628fdadab7fae868015c86a1f527f6e2323d64755b15482bba883d6b63",
+        "b497cea26cc10e1d537ae2a0041453b158817121380e849cc0aced046ca906ea",
+        "bf3ab0b94a78f933edf6591495b02727115ac7411259395532ed45e5c41cb50b",
+        "6ff168a8ae5c195049cc38b44fdab3d7232a5f949429f42383f94ed3199d1179",
+        "01020c8da65ff094e6516ff3867c76d83e32d91451d84c29bd34e8c9751f1746",
+        "2d6f1cdb077c3b9a43ee102e7ef1e05e40e5295dad5bf9d8c467e093a110c988",
+        "95131f6b393c2aaf1d91e572214dd7ae2248473a24104a5833dfe4ae68235833",
+        "dc1fbda5f241b6af34e9a0a79dea247724e9c07ad48aaab365e6c59d94d846f8",
+        "8297e1433b8f0915d181b14872f73695c8784028f78c68ded125095dffbefd89",
+        "545fc2bce0ed21f051053eaf774c4739006aeb7b7250ef4f23927f2c40a335cb",
+        "f38dd3e717db997e348f82b4d1a1dd8a0b262ed6008b44dd2c30b184f384f216"
+      ],
+      "comparisonTraceMetaSha256": [
+        "0521372b86755240452a5ea89e8bb4807517827627a0b6a4ca99c61989a34a62",
+        "cc676d467943b62a4200c9a32929000f5c61a2c2c3029d346556246ded1356ac",
+        "8e6c9419bdf79cbe16ca067248c2d54df69436a32658092b5c7f76abae1892bc",
+        "34713180ff967da35783172842f0acb58978215b945d1a9386f247244051c8b2",
+        "7da217158f4b163146f565ca7f199ba1aa82bc0452f98c7883508257aacdddc5",
+        "6348217e8ec90ddab92724efbb3be031889bdd02ff03f5043c62656cad5a4b12",
+        "5e7d7ce4ee614c07906f73929549b55dfc8b3473bbc84ed19301972c9464a0c0",
+        "df2f14f6b103851a480e2f9798a41e1f4470aefea101c53780cedc5c760ca1b5",
+        "41d0cd683b78b79ab528c355f02efe0339f3c12e57df74c092ad5641f07223e5",
+        "d53a5749b1d0b668a71d4dc59b4e0fe8dd8c5a7e819138b7a3472d5e2519af10",
+        "0bc7a0fd0bf0eeb1fb6b2a4bd3feb6a4b578a8a49d8070330fab750fae7b9f4a",
+        "a158fd1ca161069c8ae8a389597f6984a1d376dc546eed74520d739a14a3e172",
+        "29ad72d970ffd66fcf67b715501683c6e811d8f571ff2264137076a43af11b89",
+        "56a93991e6f0ca3ed43db5c0b77dfbaa623e9ac585ef664b32ec9de9f6d0c2e0",
+        "bf138ef187f8da8876ae1d7498c5813476c9f29830a9160f3b6c2721cadb500c",
+        "9c128e76e9fa3ec08140e9d1144d2c4c0f652a8171efa9b8e4597b9c6046bf32",
+        "05bd1ff74349c5e0ac3ae4251ce0f5bff26f33da05df3355c7c5b6bfda993eca",
+        "1d9cf1af40449e672ae9198c4fb6258b65a372ba81f640aa994ac2493c556c92"
+      ],
+      "workloadId": "pipeline_compile_stress"
+    }
+  ]
+}

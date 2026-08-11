@@ -5,6 +5,47 @@ architecture review, not a claim that every line is promoted product code.
 The import fence and source-layout gates are the structural authority; this
 page records the lifecycle interpretation and follow-up decisions.
 
+## Current Python sharding advisories
+
+The canonical Zig size policy remains blocking through
+`runtime/zig/source-layout.json`. The repository-level file-size gate now uses
+that contract directly and treats Python files above the review threshold as
+tracked architecture advisories. It ignores generated output, virtual
+environments, vendored trees, and package installations rather than counting
+them as Doe source.
+
+The current advisory owners and next semantic split targets are:
+
+- Browser-release evidence owner: split browser claim admission, proof-surface
+  inspection, receipt validation, runtime-frontier bundle validation, and
+  their fixture-heavy tests by artifact family. This covers
+  `bench/gates/claim_index_browser_release*.py`,
+  `bench/tools/check_browser_published_proof_surface.py`,
+  `bench/tools/check_browser_release_artifact_bundle.py`, and the matching
+  browser release/frontier tests.
+- Replacement-readiness owner: split readiness report construction and tests
+  into backend, package, browser, CTS, ecosystem, and claim-summary sections.
+  This covers `bench/tools/build_dawn_replacement_readiness_report.py` and
+  `bench/tests/test_dawn_replacement_readiness_report.py`.
+- Benchmark orchestration owner: separate argument families from profile and
+  gate assembly in `bench/runners/blocking_gates_args.py`; separate Tint
+  compilation setup, execution, comparison, and receipt emission in
+  `bench/native-compare/compare_doe_vs_tint_compilation.py` and
+  `bench/tools/check_tint_compiler_frontier_bundle.py`.
+- Ecosystem and Node evidence owner: split registry parsing, contract
+  validation, and receipt projection in `bench/lib/ecosystem_registry.py`;
+  split the Node executor tests by adapter identity, package execution,
+  readback, and failure taxonomy.
+- Cerebras runner owner: continue the already tracked splits of manifest
+  probing, dense-tile materialization, transcript execution, layer-block
+  smoke, scheduler readiness, and their fixture-heavy tests by launch,
+  artifact, receipt, and timeout responsibility.
+
+The live gate output is the source of truth for which files currently trigger
+these advisories. A follow-up closes only when the named responsibility has
+moved to a focused module and the original file falls below the review signal;
+line-only sharding is not sufficient.
+
 ## Current canonicalization pass
 
 The latest source-layout evidence incorporates two boundary corrections:

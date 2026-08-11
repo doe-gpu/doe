@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "cutover": {
+    "targetLane": "vulkan_doe_release",
+    "defaultBackend": "doe_vulkan",
+    "requiredComparablePasses": 9,
+    "requiredClaimablePasses": 9,
+    "requireRollbackRehearsal": true
+  },
+  "rollback": {
+    "switchName": "strict_no_runtime_fallback",
+    "switchBackend": "dawn_delegate",
+    "requiredCiValidation": false
+  }
+}

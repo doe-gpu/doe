@@ -8,6 +8,7 @@ const model_policy = @import("../contracts/model/model_policy.zig");
 const model_profile = @import("../contracts/model/model_profile.zig");
 const numeric_stability = @import("../runtime/numeric_stability/mod.zig");
 const operator_artifacts = @import("../runtime/trace/operator_artifacts.zig");
+const output_oracle = @import("../runtime/output_oracle.zig");
 const quirk = @import("../quirk/mod.zig");
 const replay = @import("../runtime/trace/replay.zig");
 const tooling_io_context = @import("../tooling/tooling_io_context.zig");
@@ -73,172 +74,6 @@ fn prewarmKernelDispatches(ctx: *execution.ExecutionContext, commands: []const m
             else => {},
         }
     }
-}
-
-const OutputOracleEvidence = struct {
-    count: u64 = 0,
-    matched_count: u64 = 0,
-    failed_count: u64 = 0,
-    expected_sha256: ?[]const u8 = null,
-    actual_sha256: [64]u8 = [_]u8{'0'} ** 64,
-    has_actual_sha256: bool = false,
-    reference_id: ?[]const u8 = null,
-};
-
-fn validateOutputOracles(
-    allocator: std.mem.Allocator,
-    commands: []const model.Command,
-    profile: model.DeviceProfile,
-    kernel_root: ?[]const u8,
-    backend_lane: backend_policy.BackendLane,
-    options: runtime_cli_args.RunOptions,
-) !OutputOracleEvidence {
-    var evidence = OutputOracleEvidence{};
-    var command_graph_context: ?execution.ExecutionContext = null;
-    defer if (command_graph_context) |*ctx| ctx.deinit();
-
-    const has_command_graph_oracle = for (commands) |command| {
-        switch (command) {
-            .kernel_dispatch => |dispatch| {
-                if (dispatch.output_oracle) |oracle| {
-                    if (oracle.scope == .command_graph) break true;
-                }
-            },
-            else => {},
-        }
-    } else false;
-    if (has_command_graph_oracle) {
-        command_graph_context = try execution.ExecutionContext.init(
-            allocator,
-            .native,
-            profile,
-            kernel_root,
-            backend_lane,
-        );
-        const ctx = &command_graph_context.?;
-        ctx.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
-        ctx.configureGpuTimestampMode(.off);
-        ctx.configureQueueWaitMode(options.queue_wait_mode);
-        ctx.configureWebgpuFfiQueueWaitTimeoutNs(options.webgpu_ffi_queue_wait_timeout_ns);
-        ctx.configureQueueSyncMode(.per_command);
-        prewarmKernelDispatches(ctx, commands);
-    }
-
-    for (commands) |command| {
-        const original = switch (command) {
-            .kernel_dispatch => |kd| kd,
-            else => {
-                if (command_graph_context) |*ctx| {
-                    const result = try ctx.execute(command);
-                    if (result.status != .ok) return error.OutputOracleExecutionFailed;
-                }
-                continue;
-            },
-        };
-        const oracle = original.output_oracle orelse {
-            if (command_graph_context) |*ctx| {
-                const result = try ctx.execute(command);
-                if (result.status != .ok) return error.OutputOracleExecutionFailed;
-            }
-            continue;
-        };
-        if (oracle.scope == .command_graph and oracle.dispatch_count != original.repeat) {
-            return error.OutputOracleDispatchCountMismatch;
-        }
-        evidence.count += 1;
-        evidence.expected_sha256 = oracle.expected_sha256;
-        evidence.reference_id = oracle.reference_id;
-
-        const bindings = original.bindings orelse return error.OutputOracleBindingMissing;
-        var target_binding: ?@TypeOf(bindings[0]) = null;
-        for (bindings) |binding| {
-            if (binding.group == oracle.binding_group and binding.binding == oracle.binding and binding.resource_kind == .buffer) {
-                target_binding = binding;
-                break;
-            }
-        }
-        const binding = target_binding orelse return error.OutputOracleBindingMissing;
-        if (binding.buffer_size == 0 or binding.buffer_size == std.math.maxInt(u64)) {
-            return error.OutputOracleBufferSizeInvalid;
-        }
-
-        var isolated_context: ?execution.ExecutionContext = null;
-        defer if (isolated_context) |*ctx| ctx.deinit();
-        const oracle_context = switch (oracle.scope) {
-            .isolated_dispatch => blk: {
-                isolated_context = try execution.ExecutionContext.init(
-                    allocator,
-                    .native,
-                    profile,
-                    kernel_root,
-                    backend_lane,
-                );
-                const ctx = &isolated_context.?;
-                ctx.configureUploadBehavior(options.upload_buffer_usage_mode, options.upload_submit_every);
-                ctx.configureGpuTimestampMode(.off);
-                ctx.configureQueueWaitMode(options.queue_wait_mode);
-                ctx.configureWebgpuFfiQueueWaitTimeoutNs(options.webgpu_ffi_queue_wait_timeout_ns);
-                ctx.configureQueueSyncMode(.per_command);
-                try ctx.prewarmKernelDispatch(
-                    original.kernel,
-                    original.entry_point,
-                    original.bindings,
-                    true,
-                );
-                break :blk ctx;
-            },
-            .command_graph => blk: {
-                break :blk &command_graph_context.?;
-            },
-        };
-
-        var oracle_dispatch = original;
-        if (oracle.scope == .isolated_dispatch) {
-            oracle_dispatch.repeat = oracle.dispatch_count;
-            oracle_dispatch.warmup_dispatch_count = 0;
-            oracle_dispatch.initialize_buffers_on_create = true;
-        }
-        oracle_dispatch.output_oracle = null;
-        const result = try oracle_context.execute(.{ .kernel_dispatch = oracle_dispatch });
-        if (result.status != .ok) return error.OutputOracleExecutionFailed;
-        _ = try oracle_context.flushQueue();
-        const bytes = try oracle_context.captureBuffer(
-            allocator,
-            binding.resource_handle,
-            binding.buffer_offset,
-            binding.buffer_size,
-        );
-        defer allocator.free(bytes);
-        var digest: [32]u8 = undefined;
-        std.crypto.hash.sha2.Sha256.hash(bytes, &digest, .{});
-        evidence.actual_sha256 = std.fmt.bytesToHex(digest, .lower);
-        evidence.has_actual_sha256 = true;
-        if (std.mem.eql(u8, oracle.expected_sha256, evidence.actual_sha256[0..])) {
-            evidence.matched_count += 1;
-        } else {
-            evidence.failed_count += 1;
-        }
-        if (oracle.scope == .isolated_dispatch) {
-            if (command_graph_context) |*ctx| {
-                const graph_result = try ctx.execute(command);
-                if (graph_result.status != .ok) return error.OutputOracleExecutionFailed;
-            }
-        }
-    }
-    return evidence;
-}
-
-fn outputOracleNeedsLibraryLifetimeGuard(backend_lane: backend_policy.BackendLane) bool {
-    return switch (backend_policy.default_policy_for_lane(backend_lane).default_backend) {
-        .dawn_delegate, .webkit_delegate => true,
-        else => false,
-    };
-}
-
-test "output oracle library lifetime guard applies only to delegate lanes" {
-    try std.testing.expect(outputOracleNeedsLibraryLifetimeGuard(.vulkan_dawn_release));
-    try std.testing.expect(outputOracleNeedsLibraryLifetimeGuard(.metal_webkit_release));
-    try std.testing.expect(!outputOracleNeedsLibraryLifetimeGuard(.vulkan_doe_comparable));
 }
 
 fn executionRowTotalNs(executed: execution.ExecutionResult) u64 {
@@ -349,24 +184,29 @@ pub fn runCli() !void {
         return;
     } else execution.defaultBackendLane(profile);
 
-    var output_oracle_evidence = OutputOracleEvidence{};
+    var output_oracle_evidence = output_oracle.Evidence{};
     if (options.validate_output_oracles and options.emit_normalized) {
         return error.OutputOracleRequiresNativeExecution;
     }
     var output_oracle_library_guard: ?std.DynLib = null;
-    if (options.validate_output_oracles and outputOracleNeedsLibraryLifetimeGuard(backend_lane)) {
+    if (options.validate_output_oracles and output_oracle.needsLibraryLifetimeGuard(backend_lane)) {
         output_oracle_library_guard = try wgpu_loader.openLibrary();
     }
     defer if (output_oracle_library_guard) |*library| library.close();
     if (options.validate_output_oracles) {
         if (!options.execute or options.backend_mode != .native) return error.OutputOracleRequiresNativeExecution;
-        output_oracle_evidence = try validateOutputOracles(
+        output_oracle_evidence = try output_oracle.validate(
             allocator,
             commands,
             profile,
             options.kernel_root,
             backend_lane,
-            options,
+            .{
+                .upload_buffer_usage_mode = options.upload_buffer_usage_mode,
+                .upload_submit_every = options.upload_submit_every,
+                .queue_wait_mode = options.queue_wait_mode,
+                .webgpu_ffi_queue_wait_timeout_ns = options.webgpu_ffi_queue_wait_timeout_ns,
+            },
         );
     }
 
@@ -500,6 +340,16 @@ pub fn runCli() !void {
     else
         null;
     trace_summary.output_oracle_reference_id = output_oracle_evidence.reference_id;
+    trace_summary.output_oracle_kind = output_oracle_evidence.kind;
+    trace_summary.output_oracle_reference_class = output_oracle_evidence.reference_class;
+    trace_summary.output_oracle_reference_sha256 = output_oracle_evidence.reference_sha256;
+    trace_summary.output_oracle_reference_path = output_oracle_evidence.reference_path;
+    trace_summary.output_oracle_compared_value_count = output_oracle_evidence.compared_value_count;
+    trace_summary.output_oracle_mismatch_count = output_oracle_evidence.mismatch_count;
+    trace_summary.output_oracle_max_absolute_error = output_oracle_evidence.max_absolute_error;
+    trace_summary.output_oracle_max_relative_error = output_oracle_evidence.max_relative_error;
+    trace_summary.output_oracle_absolute_tolerance = output_oracle_evidence.absolute_tolerance;
+    trace_summary.output_oracle_relative_tolerance = output_oracle_evidence.relative_tolerance;
 
     const command_loop_start_ns = nowNs();
     var repeat_idx: usize = 0;

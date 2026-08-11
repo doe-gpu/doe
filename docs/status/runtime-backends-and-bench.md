@@ -35,56 +35,102 @@ file only names the promoted boundary and open admission gates.
   as structural bootstrap evidence with no executed binary to validate. Any
   manifest produced by actual shader execution still requires its emitted
   backend artifact under strict validation.
-- The fresh AMD Vulkan release matrix at
-  `bench/out/amd-vulkan/20260810T155306Z/dawn-vs-doe.amd.vulkan.release.json`
-  validates source-bound receipts and rejects evidence that is only
-  superficially matched. The multistage graphs now execute their full command
-  prefixes in one oracle context and produce exact Doe/Dawn output parity.
-  During that work, the Dawn delegate's internal `kernel_dispatch` path was
-  corrected to use direct dispatch, and its pipeline-cache identity now includes
-  layout-visible binding fields. The retained graph hashes are explicitly
-  source-bound cross-runtime consensus, so those rows remain diagnostic until
-  an independent semantic reference exists.
-- The same AMD matrix marks upload rows as hardware-path-asymmetric because Doe
+- The retained AMD Vulkan native release matrix at
+  `reports/benchmarks/amd-vulkan/20260810T222323Z/dawn-vs-doe.amd.vulkan.release.compare.json`
+  passes strict source binding, output verification, replay, structural
+  equivalence, backend selection, shader-artifact validation, Vulkan sync and
+  timing policy, release claim, and active-cycle gates. The claim sidecar at
+  `reports/benchmarks/amd-vulkan/20260810T222323Z/dawn-vs-doe.amd.vulkan.release.claim.json`
+  owns the promoted verdict. The release warmup contract now excludes observed
+  pipeline-preparation transients while preserving the configured timed-sample
+  floor on both providers.
+- Stable fluids now executes its complete multistage command prefix and checks
+  the final dye field against a hash-bound independent CPU reference using the
+  schema-version-3 float32 tolerance oracle. Monte Carlo now uses a separately
+  compiled C reference generator and an exact hash-bound output oracle. The
+  retained native report owns both verdicts and their current cohort state.
+- The AMD workload contract marks upload rows as hardware-path-asymmetric because Doe
   may write host-visible memory while Dawn stages and copies. Their large timing
-  deltas are diagnostic and non-transferable. The remaining strictly comparable
-  compute rows preserve the same selected-timing and workload-wall sign through
-  the release percentiles, and none crosses the configured suspicious-speedup
-  ratio; the report owns the current values.
-- The retained AMD Vulkan Bun warm Gemma application row is now claim-indexed
-  through `reports/claim-index.json`. Both package providers bind the same
-  physical vendor, device, driver, execution shape, shader-source receipts,
-  effective readback path, and final captured token. The corresponding Node row
-  is retained as diagnostic because its incumbent provider omits adapter and
-  driver identity. Positive timings do not override that missing hardware
-  evidence.
+  deltas are diagnostic and non-transferable. The governed release rows preserve
+  the same selected-timing and workload-wall sign through the required release
+  percentiles, and none crosses the configured suspicious-speedup ratio; the
+  retained report owns the current row set and values.
+- The retained AMD Vulkan Node and Bun warm Gemma application rows are
+  claim-indexed through `reports/claim-index.json`. The Node comparator now
+  materializes non-enumerable `GPUAdapterInfo` fields before serialization, and
+  the strict hardware gate accepts either matching numeric PCI identity or an
+  exact normalized runtime-reported vendor, device, and driver triple. Numeric
+  conflicts never fall back to text.
+- Deno now has a hardware-backed package entrypoint, a config-backed Doe-vs-Deno
+  wgpu executor lane, and matched `mapAsync` readback policy. Its retained AMD
+  Vulkan comparison at
+  `reports/benchmarks/amd-vulkan/20260810T224707Z/gemma64.deno-package.warm.ir.compare.json`
+  remains diagnostic for one explicit reason: Deno wgpu exposes matching AMD
+  vendor and device IDs but no driver version.
 - Strict Vulkan package comparison now folds physical adapter identity into the
   existing hardware-path obligation. A row cannot remain comparable unless both
   sides expose one matching vendor ID, device ID, and normalized driver version.
   Doe's package bridge obtains those fields from the selected Vulkan physical
   device for both Node and Bun.
-- `reports/claim-index.json` continues to scaffold the AMD Vulkan native
-  release, browser ORT, and Linux Vulkan drop-in rows instead of borrowing older
-  measured status after stricter evidence checks or artifact pruning.
-- The fresh Linux Vulkan drop-in gate passes symbol, behavior,
-  proc-resolution, and benchmark checks at
-  `bench/out/dropin/20260809T221600Z/dropin_report.json`. It remains diagnostic
-  until a cutover rehearsal receipt and rollback-side claim evidence are
-  retained and indexed.
-- `config/dawn-replacement-frontier.json` keeps claimable Apple slices visible
-  but marks mixed-platform product rows diagnostic. Its named AMD frontier
-  slices remain separate from the claim-indexed Bun application row; the
-  generated readiness report passes its coherence gate without treating
-  scaffolded entries as claim evidence.
+- `reports/claim-index.json` indexes the AMD Vulkan native release, Node and Bun
+  package rows, and Linux Vulkan drop-in cutover. Deno is indexed diagnostically;
+  browser ORT and Chromium release surfaces remain scaffolded.
+- The Linux Vulkan drop-in rehearsal at
+  `reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin-cutover-rehearsal-receipt.json`
+  passes ABI, behavior, proc-resolution, benchmark, strict no-fallback cutover,
+  and Dawn rollback checks. Its hash-linked claim sidecar owns the indexed
+  verdict.
+- `config/dawn-replacement-frontier.json` keeps every platform slice explicit.
+  Its native, Node, Bun, Deno, CTS, browser, and drop-in AMD entries point to
+  their current retained artifacts without allowing diagnostic or scaffolded
+  slices to inherit claim status. The frontier coherence gate passes.
 - External-project harness schema version 4 replaces one inferred installation
   command with ordered named steps, each owning its working-directory scope and
   timeout. The pinned vGPU workspace and isolated ORT experiment now prepare
   without modifying upstream source.
-- The pinned vGPU Node/ORT workload passes its physical AMD Vulkan diagnostic
-  matrix on Dawn and Doe after closing native callback export, TypeScript-loader,
-  and post-destroy event-handler lifecycle gaps. Its governed receipts remain
-  diagnostic until support-target, replay, reliability, and promotion floors
-  are independently satisfied.
+- The pinned vGPU Node/ORT workload passes a fresh offline physical AMD Vulkan
+  reproduction recorded by
+  `reports/ecosystem/vercel-labs-vgpu/vgpu-node-ort-snapshot-amd-vulkan-2026-08-10-diagnostic.json`.
+  The reviewed report hash-links its manifest, preparation, raw matrix, summary,
+  and gate outputs; maturity remains diagnostic until downstream promotion
+  policy is satisfied.
+- The pinned wgsl-fns compilation application now declares its upstream build
+  as a separate installation step. The reviewed diagnostic at
+  `reports/ecosystem/wgsl-fns/wgsl-fns-compilation-suite-amd-vulkan-2026-08-10-diagnostic.json`
+  binds the retained raw suite and records clean Doe process success across the
+  unchanged upstream assertion and generated-shader corpus with physical
+  adapter identity and no native compiler diagnostics. The overall reproduction
+  remains failed and diagnostic because the pinned Node/Dawn comparator aborts
+  during adapter probing and test execution on this host.
+- That workload exposed a vector-scalar compound-assignment gap in WGSL
+  semantic analysis and IR validation. Compound assignments now validate the
+  underlying binary operation before checking assignability, and the minimized
+  SPIR-V regression lives in
+  `runtime/zig/tests/wgsl/emit_spirv_mixed_binary_test.zig`.
+- The actual vendored WebGPU CTS subset runner passes its configured AMD Vulkan
+  queries at
+  `reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json`.
+  Its published subset receipt and backend pass ledger live beside the run as
+  `webgpu-cts-subset-receipt.json` and
+  `webgpu-cts-backend-pass-ledger.json`. This remains diagnostic evidence, not
+  a conformance claim, because it does not cover the policy-defined full
+  required query scope. CTS run-report schema version 2 adds a required
+  same-provider adapter probe, and evidence-ledger schema version 2 hash-binds
+  that physical identity and the raw report into the published receipt.
+  Version-1 CTS run reports and evidence ledgers remain readable diagnostics but
+  are not accepted by the version-2 publication builder.
+- Browser smoke report schema version 2 adds an active-runtime proof derived
+  from `wgpuAdapterGetInfo`. A stock Chrome run at
+  `browser/chromium/artifacts/20260810T223700Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json`
+  correctly fails the forced-Doe lane because Chrome ignores Doe runtime flags
+  and continues to report the AMD/RDNA incumbent. No local Fawn-patched Chromium
+  binary exists, so Track A advanced through a stronger false-positive gate,
+  not through a browser-replacement claim. Version-1 smoke reports are legacy
+  diagnostics and must be regenerated to satisfy the current gate.
+- Package execution policy and its schema now admit Deno as an explicit runtime
+  host. The public claim-index comparison taxonomy likewise admits the
+  diagnostic Doe-vs-Deno-wgpu row. These are additive contract migrations;
+  Node and Bun policy entries retain their previous meaning.
 - The AMD Vulkan external-project handoff has returned a reviewed diagnostic
   report with physical-adapter, native-output, and GPU-resource evidence at
   `reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic.json`.
@@ -115,15 +161,19 @@ file only names the promoted boundary and open admission gates.
 
 ## Admission blockers
 
-- Every promoted workload needs an independent output oracle on both products;
-  exact cross-runtime consensus does not satisfy that obligation.
 - Node and Bun need downstream-project compatibility evidence, not only package
-  harness coverage. The vGPU Node/ORT lane now supplies one diagnostic Node
-  application result; it is not yet a promoted release dependency.
-- The incumbent Node WebGPU package still exposes no physical adapter or driver
-  identity. Doe now records the selected Vulkan PCI and raw driver identity, but
-  a strict Node comparison remains diagnostic until the comparator supplies
-  equivalent evidence.
+  harness coverage. The vGPU Node/ORT and wgsl-fns lanes now supply diagnostic
+  application results; neither is yet a promoted release dependency, and the
+  wgsl-fns incumbent comparator currently crashes before a fair paired verdict.
+- Deno wgpu must expose driver-version telemetry before its AMD Vulkan package
+  row can satisfy strict physical identity and become claimable.
+- The CTS lane needs completion of its policy-defined required query scope
+  before it supports public conformance language. The AMD Vulkan raw run,
+  physical adapter identity, subset receipt, and backend pass ledger are now
+  hash-bound published diagnostic evidence.
+- Chromium Track A needs a locally built Fawn-patched browser artifact before a
+  forced-Doe run can prove Doe is active. Stock Chrome is only a negative
+  runtime-selection control.
 - End-to-end application latency, memory, concurrency, crash, hang, and leak
   evidence must become release-blocking for the promoted developer wedge.
 - Installation must pass from clean npm environments on every supported

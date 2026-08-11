@@ -59,6 +59,9 @@ pub const KernelDispatchOutputOracle = struct {
     dispatch_count: u32,
     expected_sha256: []const u8,
     reference_id: []const u8,
+    reference_path: ?[]const u8 = null,
+    absolute_tolerance: f32 = 0,
+    relative_tolerance: f32 = 0,
 };
 
 pub const KernelDispatchCommand = struct {

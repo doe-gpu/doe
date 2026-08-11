@@ -101,6 +101,22 @@ _DOE_BUN_PACKAGE_FFI_PREPARED_TEMPLATE = (
     "--command-repeat {command_repeat}"
 )
 
+_DENO_WEBGPU_PACKAGE_PREPARED_TEMPLATE = (
+    "npx --yes deno run --unstable-webgpu --allow-all "
+    "bench/executors/run-deno-webgpu-plan.js "
+    "--provider deno-webgpu --prepared-session --plan {plan} "
+    "--trace-jsonl {trace_jsonl} --trace-meta {trace_meta} --workload {workload} "
+    "--command-repeat {command_repeat}"
+)
+
+_DOE_DENO_PACKAGE_PREPARED_TEMPLATE = (
+    "npx --yes deno run --unstable-webgpu --allow-all "
+    "bench/executors/run-deno-webgpu-plan.js "
+    "--provider doe --prepared-session --plan {plan} --trace-jsonl {trace_jsonl} "
+    "--trace-meta {trace_meta} --workload {workload} "
+    "--command-repeat {command_repeat}"
+)
+
 def _resident_buffer_load_template(command_template: str) -> str:
     return f"{command_template} --resident-buffer-loads"
 
@@ -349,6 +365,36 @@ _REGISTRY: dict[str, ExecutorSpec] = {
             "--provider doe-ffi --plan {plan} --trace-jsonl {trace_jsonl} "
             "--trace-meta {trace_meta} --workload {workload}"
         ),
+        execution_boundary="plan",
+    ),
+    "deno_webgpu_package": ExecutorSpec(
+        executor_id="deno_webgpu_package",
+        command_template=(
+            "npx --yes deno run --unstable-webgpu --allow-all "
+            "bench/executors/run-deno-webgpu-plan.js "
+            "--provider deno-webgpu --plan {plan} --trace-jsonl {trace_jsonl} "
+            "--trace-meta {trace_meta} --workload {workload}"
+        ),
+        execution_boundary="plan",
+    ),
+    "doe_deno_package": ExecutorSpec(
+        executor_id="doe_deno_package",
+        command_template=(
+            "npx --yes deno run --unstable-webgpu --allow-all "
+            "bench/executors/run-deno-webgpu-plan.js "
+            "--provider doe --plan {plan} --trace-jsonl {trace_jsonl} "
+            "--trace-meta {trace_meta} --workload {workload}"
+        ),
+        execution_boundary="plan",
+    ),
+    "deno_webgpu_package_prepared": ExecutorSpec(
+        executor_id="deno_webgpu_package_prepared",
+        command_template=_DENO_WEBGPU_PACKAGE_PREPARED_TEMPLATE,
+        execution_boundary="plan",
+    ),
+    "doe_deno_package_prepared": ExecutorSpec(
+        executor_id="doe_deno_package_prepared",
+        command_template=_DOE_DENO_PACKAGE_PREPARED_TEMPLATE,
         execution_boundary="plan",
     ),
     "bun_webgpu_package_prepared": ExecutorSpec(

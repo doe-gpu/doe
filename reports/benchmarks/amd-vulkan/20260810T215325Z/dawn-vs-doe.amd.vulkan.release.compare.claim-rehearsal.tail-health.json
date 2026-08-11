@@ -1,0 +1,180 @@
+{
+  "allRequiredPositiveCount": 8,
+  "claimableWorkloadCount": 8,
+  "generatedAtUtc": "2026-08-10T21:55:43.817201Z",
+  "nonPositiveCounts": {
+    "p50Percent": 0,
+    "p95Percent": 0,
+    "p99Percent": 0
+  },
+  "reportPath": "reports/benchmarks/amd-vulkan/20260810T215325Z/dawn-vs-doe.amd.vulkan.release.compare.json",
+  "requiredPositivePercentiles": [
+    "p50Percent",
+    "p95Percent",
+    "p99Percent"
+  ],
+  "rows": [
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 11.573404920164746,
+        "p95Percent": 12.512477359461785,
+        "p99Percent": 12.512477359461785
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_concurrent_execution_single"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 45.950354809310475,
+        "p95Percent": 46.10920575552637,
+        "p99Percent": 46.10920575552637
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 51.29008325308071,
+        "p95Percent": 51.490084079741436,
+        "p99Percent": 51.490084079741436
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32_swizzle1"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 33.2542777290136,
+        "p95Percent": 33.00896413428345,
+        "p99Percent": 33.00896413428345
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32_workgroupshared_swizzle1"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 85.11902490053907,
+        "p95Percent": 84.92483900817706,
+        "p99Percent": 84.92483900817706
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_stable_fluids_multistage_256grid_18pressure_4steps"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 61.01775946764011,
+        "p95Percent": 63.7674665975611,
+        "p99Percent": 63.7674665975611
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_workgroup_atomic_1024"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 61.37469865507603,
+        "p95Percent": 62.02435988579668,
+        "p99Percent": 62.02435988579668
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_workgroup_non_atomic_1024"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 67.35903223298313,
+        "p95Percent": 67.01381106480301,
+        "p99Percent": 67.01381106480301
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "pipeline_compile_stress"
+    }
+  ],
+  "schemaVersion": 1,
+  "workloadCount": 8
+}

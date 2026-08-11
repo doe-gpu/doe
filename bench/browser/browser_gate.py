@@ -568,8 +568,8 @@ def validate_smoke_report(
     required_mode_set = set(required_modes)
     if required_mode_set - {"dawn", "doe"}:
         errors.append(f"smoke required_modes invalid: {sorted(required_mode_set)}")
-    if payload.get("schemaVersion") != 1:
-        errors.append("smoke schemaVersion must be 1")
+    if payload.get("schemaVersion") != 2:
+        errors.append("smoke schemaVersion must be 2")
     if payload.get("reportKind") != "chromium-webgpu-playwright-smoke":
         errors.append("smoke reportKind must be chromium-webgpu-playwright-smoke")
     if payload.get("benchmarkClass") != "diagnostic":
@@ -639,6 +639,16 @@ def validate_smoke_report(
             errors.append(f"smoke mode {mode} adapterAvailable must be true")
         else:
             errors.extend(validate_adapter_identity(row.get("adapterIdentity"), f"smoke mode {mode}"))
+        active_proof = row.get("activeRuntimeProof")
+        if not isinstance(active_proof, dict):
+            errors.append(f"smoke mode {mode} activeRuntimeProof must be object")
+        else:
+            if active_proof.get("identitySource") != "wgpuAdapterGetInfo":
+                errors.append(f"smoke mode {mode} activeRuntimeProof.identitySource must be wgpuAdapterGetInfo")
+            if active_proof.get("selectedRuntime") != mode:
+                errors.append(f"smoke mode {mode} activeRuntimeProof.selectedRuntime must be {mode}")
+            if active_proof.get("matched") is not True:
+                errors.append(f"smoke mode {mode} activeRuntimeProof.matched must be true")
         if row.get("errors"):
             errors.append(f"smoke mode {mode} errors must be empty")
         browser_close = row.get("browserClose")

@@ -520,6 +520,7 @@ digraph doe_zig_architecture {
   "src/runtime/numeric_stability/service/numeric_stability_io.zig" [label="src/runtime/numeric_stability/service/numeric_stability_io.zig\nruntime"];
   "src/runtime/numeric_stability/service/numeric_stability_types.zig" [label="src/runtime/numeric_stability/service/numeric_stability_types.zig\nruntime"];
   "src/runtime/numeric_stability/trace_meta.zig" [label="src/runtime/numeric_stability/trace_meta.zig\nruntime"];
+  "src/runtime/output_oracle.zig" [label="src/runtime/output_oracle.zig\nruntime"];
   "src/runtime/pipeline_cache_integration.zig" [label="src/runtime/pipeline_cache_integration.zig\nruntime"];
   "src/runtime/pipeline_singleflight.zig" [label="src/runtime/pipeline_singleflight.zig\nruntime"];
   "src/runtime/process_roots.zig" [label="src/runtime/process_roots.zig\nruntime"];
@@ -936,6 +937,7 @@ digraph doe_zig_architecture {
   "src/backend/vulkan/native_runtime.zig" -> "src/contracts/model/model_compute_types.zig";
   "src/backend/vulkan/native_runtime.zig" -> "src/contracts/model/model_render_types.zig";
   "src/backend/vulkan/native_runtime.zig" -> "src/contracts/model/model_texture_types.zig";
+  "src/backend/vulkan/native_runtime.zig" -> "src/contracts/backend.zig";
   "src/backend/vulkan/native_runtime.zig" -> "src/backend/backend_policy.zig";
   "src/backend/vulkan/native_runtime.zig" -> "src/backend/common/timing.zig";
   "src/backend/vulkan/native_runtime.zig" -> "src/backend/runtime_types.zig";
@@ -1180,6 +1182,7 @@ digraph doe_zig_architecture {
   "src/cli/runtime_cli.zig" -> "src/contracts/model/model_profile.zig";
   "src/cli/runtime_cli.zig" -> "src/runtime/numeric_stability/mod.zig";
   "src/cli/runtime_cli.zig" -> "src/runtime/trace/operator_artifacts.zig";
+  "src/cli/runtime_cli.zig" -> "src/runtime/output_oracle.zig";
   "src/cli/runtime_cli.zig" -> "src/quirk/mod.zig";
   "src/cli/runtime_cli.zig" -> "src/runtime/trace/replay.zig";
   "src/cli/runtime_cli.zig" -> "src/tooling/tooling_io_context.zig";
@@ -2813,6 +2816,11 @@ digraph doe_zig_architecture {
   "src/runtime/numeric_stability/service/numeric_stability_types.zig" -> "src/runtime/numeric_stability/trace_meta.zig";
   "src/runtime/numeric_stability/service/numeric_stability_types.zig" -> "src/contracts/artifact.zig";
   "src/runtime/numeric_stability/trace_meta.zig" -> "src/runtime/trace/trace_text.zig";
+  "src/runtime/output_oracle.zig" -> "src/backend/backend_policy.zig";
+  "src/runtime/output_oracle.zig" -> "src/contracts/command.zig";
+  "src/runtime/output_oracle.zig" -> "src/contracts/model/model_compute_types.zig";
+  "src/runtime/output_oracle.zig" -> "src/contracts/model/model_profile.zig";
+  "src/runtime/output_oracle.zig" -> "src/runtime/execution.zig";
   "src/runtime/pipeline_cache_integration.zig" -> "src/runtime/cache/pipeline_cache.zig";
   "src/runtime/queue/gpu_timeline.zig" -> "src/core/abi/wgpu_handle_types.zig";
   "src/runtime/queue/gpu_timeline.zig" -> "src/core/abi/wgpu_callback_descriptor_types.zig";

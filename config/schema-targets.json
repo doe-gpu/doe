@@ -210,6 +210,10 @@
       "data": "config/webgpu-cts-evidence.json"
     },
     {
+      "schema": "config/webgpu-cts-run-report.schema.json",
+      "data": "reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset.json"
+    },
+    {
       "schema": "config/webgpu-cts-subset-receipt.schema.json",
       "data": "examples/webgpu-cts-subset-receipt.sample.json"
     },
@@ -292,6 +296,10 @@
     {
       "schema": "config/backend-cutover-policy.schema.json",
       "data": "config/backend-cutover-policy.json"
+    },
+    {
+      "schema": "config/backend-cutover-policy.schema.json",
+      "data": "config/backend-cutover-policy.amd-vulkan.json"
     },
     {
       "schema": "config/dropin-cutover-rehearsal-receipt.schema.json",

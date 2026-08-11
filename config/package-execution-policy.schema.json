@@ -18,7 +18,7 @@
         ],
         "properties": {
           "id": { "type": "string", "minLength": 1 },
-          "runtimeHost": { "type": "string", "enum": ["node", "bun"] },
+          "runtimeHost": { "type": "string", "enum": ["node", "bun", "deno"] },
           "provider": { "type": "string", "minLength": 1 },
           "method": { "type": "string", "minLength": 1 },
           "minConsecutiveWrites": { "type": "integer", "minimum": 2 },
@@ -43,7 +43,7 @@
         ],
         "properties": {
           "id": { "type": "string", "minLength": 1 },
-          "runtimeHost": { "type": "string", "enum": ["node", "bun"] },
+          "runtimeHost": { "type": "string", "enum": ["node", "bun", "deno"] },
           "provider": { "type": "string", "minLength": 1 },
           "workloadId": {
             "oneOf": [
@@ -82,7 +82,7 @@
         ],
         "properties": {
           "id": { "type": "string", "minLength": 1 },
-          "runtimeHost": { "type": "string", "enum": ["node", "bun"] },
+          "runtimeHost": { "type": "string", "enum": ["node", "bun", "deno"] },
           "provider": { "type": "string", "minLength": 1 },
           "workloadId": { "type": "string", "minLength": 1 },
           "host": {

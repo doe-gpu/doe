@@ -1,0 +1,18 @@
+{
+  "artifact": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+  "exportedSymbolCount": 241,
+  "extraSymbolCount": 42,
+  "generatedAtUtc": "2026-08-10T22:11:59.166439Z",
+  "missingSymbolCount": 0,
+  "missingSymbols": [],
+  "outputTimestamp": "",
+  "ownershipPath": "config/dropin-symbol-ownership.json",
+  "pass": true,
+  "requiredSymbolCount": 199,
+  "schemaVersion": 1,
+  "symbolsPath": "config/dropin_abi.symbols.txt",
+  "toolAttempts": [
+    "nm -D --defined-only runtime/zig/zig-out/lib/libwebgpu_doe.so"
+  ],
+  "toolCommandUsed": "nm -D --defined-only runtime/zig/zig-out/lib/libwebgpu_doe.so"
+}

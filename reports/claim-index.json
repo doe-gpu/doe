@@ -36,12 +36,11 @@
       "backend": "amd-vulkan",
       "comparison": "doe-vs-node-webgpu",
       "metricDirection": "lower-is-better",
-      "claimState": "diagnostic",
-      "comparisonStatus": "diagnostic",
-      "claimStatus": "diagnostic",
-      "reportPath": "reports/benchmarks/amd-vulkan/20260810T160953Z/gemma64.node-package.warm.ir.compare.json",
-      "claimPath": "reports/benchmarks/amd-vulkan/20260810T160953Z/gemma64.node-package.warm.ir.claim.json",
-      "blocker": "The incumbent Node WebGPU provider omits physical adapter and driver identity, so strict Vulkan hardware parity cannot be proven."
+      "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T223806Z/gemma64.node-package.warm.ir.compare.json",
+      "claimPath": "reports/benchmarks/amd-vulkan/20260810T223806Z/gemma64.node-package.warm.ir.claim.json"
     },
     {
       "id": "package-bun-amd-vulkan",
@@ -55,6 +54,20 @@
       "claimStatus": "claimable",
       "reportPath": "reports/benchmarks/amd-vulkan/20260810T162200Z/gemma64.bun-package.warm.ir.compare.json",
       "claimPath": "reports/benchmarks/amd-vulkan/20260810T162200Z/gemma64.bun-package.warm.ir.claim.json"
+    },
+    {
+      "id": "package-deno-amd-vulkan",
+      "surface": "package",
+      "runtimeHost": "deno",
+      "backend": "amd-vulkan",
+      "comparison": "doe-vs-deno-webgpu",
+      "metricDirection": "lower-is-better",
+      "claimState": "diagnostic",
+      "comparisonStatus": "diagnostic",
+      "claimStatus": "diagnostic",
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T224707Z/gemma64.deno-package.warm.ir.compare.json",
+      "claimPath": "reports/benchmarks/amd-vulkan/20260810T224707Z/gemma64.deno-package.warm.ir.claim.json",
+      "blocker": "Deno wgpu reports matching AMD vendor and device IDs but does not expose the Vulkan driver version required by strict physical-identity comparison."
     },
     {
       "id": "native-strict-apple-metal",
@@ -153,11 +166,12 @@
       "surface": "native",
       "backend": "amd-vulkan",
       "comparison": "doe-vs-dawn",
-      "metricDirection": "status-only",
-      "claimState": "scaffolded",
-      "comparisonStatus": "not-evaluated",
-      "claimStatus": "not-evaluated",
-      "blocker": "The fresh AMD Vulkan strict matrix is diagnostic under current source-bound shader and output-oracle checks; this lane remains scaffolded until every release workload satisfies those checks."
+      "metricDirection": "lower-is-better",
+      "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/dawn-vs-doe.amd.vulkan.release.compare.json",
+      "claimPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/dawn-vs-doe.amd.vulkan.release.claim.json"
     },
     {
       "id": "dropin-cutover-linux-vulkan",
@@ -165,10 +179,11 @@
       "backend": "amd-vulkan",
       "comparison": "doe-vs-dawn",
       "metricDirection": "status-only",
-      "claimState": "scaffolded",
-      "comparisonStatus": "not-evaluated",
-      "claimStatus": "not-evaluated",
-      "blocker": "Drop-in cutover rehearsal artifacts were not present in checkout; this lane is scaffolded until a fresh drop-in rehearsal receipt and claim sidecar are published."
+      "claimState": "claim-indexed",
+      "comparisonStatus": "comparable",
+      "claimStatus": "claimable",
+      "reportPath": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin-cutover-rehearsal-receipt.json",
+      "claimPath": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin-cutover-rehearsal.claim.json"
     },
     {
       "id": "native-d3d12",

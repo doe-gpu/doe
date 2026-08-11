@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "ownership": "generated",
   "generatorId": "bench.tools.generate_backend_workloads:materialize_lane",
-  "generatorInputHash": "328fefc60bd96e6bc716354a4f29f4dcbc3184a929ebcb9c433069579f727015",
-  "generatedAt": "2026-08-10T15:52:04.270866+00:00",
+  "generatorInputHash": "a1e3dedff98a9bde38420ecd3a75ae2bc56c08d90da42acdf95114fe4fce1f13",
+  "generatedAt": "2026-08-10T22:07:57.886324+00:00",
   "workloads": [
     {
       "id": "compute_workgroup_atomic_1024",
@@ -97,7 +97,7 @@
       "pathAsymmetry": true,
       "pathAsymmetryNote": "Doe upload may resolve to host-visible CPU writes without an equivalent GPU copy, while Dawn performs staging+copy. This hardware-path-specific advantage is non-transferable and non-claimable until structural equivalence is restored.",
       "benchmarkClass": "directional",
-      "directionalReason": "hardware_path_asymmetry",
+      "directionalReason": "path_asymmetry",
       "workloadOrigin": "dawn_autodiscovered",
       "cohorts": [
         "smoke",

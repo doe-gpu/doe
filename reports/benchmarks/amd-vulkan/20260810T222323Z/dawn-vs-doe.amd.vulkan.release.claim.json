@@ -1,0 +1,159 @@
+{
+  "artifactKind": "claim-report",
+  "claimPolicy": {
+    "benchmarkPolicy": {
+      "path": "config/benchmark-methodology-thresholds.json",
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+    },
+    "minTimedSamples": 15,
+    "mode": "release",
+    "policyHash": "2cc9f05f59fff1071358eebe8605e20c4ed67101ab2c8ec3ee64f96b710b2cf9"
+  },
+  "claimStatus": "claimable",
+  "compareReport": {
+    "path": "reports/benchmarks/amd-vulkan/20260810T222323Z/dawn-vs-doe.amd.vulkan.release.compare.json",
+    "sha256": "5e5f9a43e6e3b87ef329850487f6a57d29c140fdfe754bff6819ab764ed6671c"
+  },
+  "comparisonStatus": "comparable",
+  "generatedAt": "2026-08-10T22:16:05.092222+00:00",
+  "pass": true,
+  "reasons": [],
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_concurrent_execution_single"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_matvec_32768x2048_f32"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_matvec_32768x2048_f32_swizzle1"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_matvec_32768x2048_f32_workgroupshared_swizzle1"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_stable_fluids_multistage_256grid_18pressure_4steps"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_workgroup_atomic_1024"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "compute_workgroup_non_atomic_1024"
+    },
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "pipeline_compile_stress"
+    }
+  ]
+}

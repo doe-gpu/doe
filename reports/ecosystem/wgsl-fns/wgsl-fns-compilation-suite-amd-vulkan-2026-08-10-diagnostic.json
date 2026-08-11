@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "wgsl-fns-compilation-suite-amd-vulkan-2026-08-10-diagnostic",
+  "actorId": "wgsl-fns",
+  "harnessId": "wgsl-compilation-suite",
+  "generatedAt": "2026-08-10T23:14:46.139Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-10T23:20:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "10",
+  "upstream": {
+    "repositoryUrl": "https://github.com/koole/wgsl-fns",
+    "commit": "e1068da8c1ad213842c6332440fe1308def091cc",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "receipt-explained-failure",
+  "findings": [
+    {
+      "id": "doe-vector-scalar-compound-assignment-fixed",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "The pinned corpus exposed Doe rejecting WGSL vector-scalar compound assignment. Semantic analysis and IR validation now apply the underlying binary-operation rules, and the unchanged Doe workload completes without native compiler diagnostics.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-02/raw-suite.json",
+          "sha256": "10a6ee8166894e6073b2a02fe47832bac71d7a1ef6159bd8fc203d442f4ce2df"
+        },
+        {
+          "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/raw-suite.json",
+          "sha256": "775a5fa51d627bf520febd43ceeda3ff50e9ed107c298b46986a96f25e02aa2e"
+        }
+      ]
+    },
+    {
+      "id": "doe-physical-compilation-application-pass",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "Doe passes every clean-process run of the unchanged upstream assertion and generated-shader corpus on the bound physical AMD Vulkan adapter without crashes, timeouts, or native shader compilation failures.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/raw-suite.json",
+          "sha256": "775a5fa51d627bf520febd43ceeda3ff50e9ed107c298b46986a96f25e02aa2e"
+        },
+        {
+          "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/receipt-summary.json",
+          "sha256": "1f5f9bc0fa3ec977b44c70c35a890d96ad930965974519bd876a532c388e532f"
+        }
+      ]
+    },
+    {
+      "id": "pinned-dawn-native-worker-crash",
+      "category": "reliability",
+      "status": "discovered",
+      "summary": "The pinned Node/Dawn provider aborts during adapter probing and every clean test process around its WGSL-language-feature binding, so it supplies no complete comparator identity or successful workload row on this host.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/raw-suite.json",
+          "sha256": "775a5fa51d627bf520febd43ceeda3ff50e9ed107c298b46986a96f25e02aa2e"
+        }
+      ]
+    },
+    {
+      "id": "paired-verdict-ineligible",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "Doe's application result is retained as compatibility evidence, but the comparator crash prevents structural equivalence, reliability comparison, performance comparison, or a replacement claim.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/reproduction.json",
+          "sha256": "1bdbc34826ead0815a7a2b33b6fb3a5a52ce01499e95826a8e4c6902c9713057"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The pinned incumbent provider crashes before it can produce complete adapter identity or a successful workload process.",
+    "The workload validates generated shader compilation and process stability but does not dispatch the generated functions or verify semantic output values.",
+    "The application harness is diagnostic and is not a promoted release dependency.",
+    "No performance claim is allowed because the incumbent did not complete equivalent work."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "fail",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "pinned-dawn-worker-crash",
+      "dawn-provider-identity-incomplete",
+      "no-qualified-baseline",
+      "compilation-only-no-output-oracle"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 0,
+      "crashes": 3,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 68837376
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 69074944
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The pinned comparator crashed and the workload is compilation-only, so process durations are not a fair operation-speed comparison."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The harness did not run matched traced and untraced samples."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The provider loader is a controlled harness substitution rather than a production installation path."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "Doe binds the physical AMD adapter, but the comparator crashes before binding a usable identity."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic run uses sequential clean processes."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Doe completes upstream cleanup, but no promotion-scale teardown lane ran."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The diagnostic clean-process matrix does not satisfy the promotion stress policy."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak memory is recorded, but bounded-growth leak testing did not run."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "The run binds Doe identity, upstream sources, process results, and compiler diagnostics but lacks a complete incumbent receipt and semantic output identity."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No matched successful comparator row exists."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is not promoted and has no qualifying provider baseline."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/preparation.json",
+      "sha256": "a37ae6c85dd1848338d7fe74e3c9b663adadfb4a5295736f303b9a7194dd24a3"
+    },
+    {
+      "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/reproduction.json",
+      "sha256": "1bdbc34826ead0815a7a2b33b6fb3a5a52ce01499e95826a8e4c6902c9713057"
+    },
+    {
+      "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/receipt-summary.json",
+      "sha256": "1f5f9bc0fa3ec977b44c70c35a890d96ad930965974519bd876a532c388e532f"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/raw-suite.json",
+      "sha256": "775a5fa51d627bf520febd43ceeda3ff50e9ed107c298b46986a96f25e02aa2e"
+    }
+  ]
+}

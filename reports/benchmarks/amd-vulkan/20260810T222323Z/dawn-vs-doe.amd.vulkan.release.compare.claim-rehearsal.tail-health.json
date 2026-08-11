@@ -1,0 +1,200 @@
+{
+  "allRequiredPositiveCount": 9,
+  "claimableWorkloadCount": 9,
+  "generatedAtUtc": "2026-08-10T22:16:12.134372Z",
+  "nonPositiveCounts": {
+    "p50Percent": 0,
+    "p95Percent": 0,
+    "p99Percent": 0
+  },
+  "reportPath": "reports/benchmarks/amd-vulkan/20260810T222323Z/dawn-vs-doe.amd.vulkan.release.compare.json",
+  "requiredPositivePercentiles": [
+    "p50Percent",
+    "p95Percent",
+    "p99Percent"
+  ],
+  "rows": [
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 11.540728918292178,
+        "p95Percent": 12.0694530063612,
+        "p99Percent": 12.0694530063612
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_concurrent_execution_single"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 45.45219285496121,
+        "p95Percent": 45.672462456746416,
+        "p99Percent": 45.672462456746416
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 51.46685751829479,
+        "p95Percent": 51.597365671876325,
+        "p99Percent": 51.597365671876325
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32_swizzle1"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 32.388042849885565,
+        "p95Percent": 31.845983856712813,
+        "p99Percent": 31.845983856712813
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_matvec_32768x2048_f32_workgroupshared_swizzle1"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 62.54836301340877,
+        "p95Percent": 63.500903891335746,
+        "p99Percent": 63.500903891335746
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 84.37192317787616,
+        "p95Percent": 83.45740016672384,
+        "p99Percent": 83.45740016672384
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_stable_fluids_multistage_256grid_18pressure_4steps"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 58.896398496731415,
+        "p95Percent": 61.18731506264439,
+        "p99Percent": 61.18731506264439
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_workgroup_atomic_1024"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 59.37828996654632,
+        "p95Percent": 61.837492745099354,
+        "p99Percent": 61.837492745099354
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "compute_workgroup_non_atomic_1024"
+    },
+    {
+      "allRequiredPositive": true,
+      "claimable": true,
+      "deltaPercent": {
+        "p50Percent": 65.27898036808232,
+        "p95Percent": 66.119589176052,
+        "p99Percent": 66.119589176052
+      },
+      "positiveTailFlags": {
+        "p50Percent": true,
+        "p95Percent": true,
+        "p99Percent": true
+      },
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent",
+        "p99Percent"
+      ],
+      "workloadId": "pipeline_compile_stress"
+    }
+  ],
+  "schemaVersion": 1,
+  "workloadCount": 9
+}

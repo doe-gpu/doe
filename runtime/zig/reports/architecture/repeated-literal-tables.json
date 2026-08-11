@@ -741,11 +741,11 @@
           "startLine": 11
         },
         {
-          "endLine": 505,
+          "endLine": 537,
           "literalCount": 5,
           "name": "dispatchPassLayoutEntry",
           "path": "src/core/resource/wgpu_resources.zig",
-          "startLine": 447
+          "startLine": 479
         },
         {
           "endLine": 85,
@@ -762,11 +762,11 @@
           "startLine": 84
         },
         {
-          "endLine": 300,
+          "endLine": 318,
           "literalCount": 5,
           "name": "copy_enabled_features",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 276
+          "startLine": 294
         },
         {
           "endLine": 151,
@@ -957,11 +957,11 @@
           "startLine": 31
         },
         {
-          "endLine": 114,
+          "endLine": 119,
           "literalCount": 5,
           "name": "DoeBuffer",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 96
+          "startLine": 101
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1053,11 +1053,11 @@
           "startLine": 23
         },
         {
-          "endLine": 444,
+          "endLine": 462,
           "literalCount": 4,
           "name": "doeNativeInstanceWaitAny",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 430
+          "startLine": 448
         },
         {
           "endLine": 149,
@@ -1203,11 +1203,18 @@
           "startLine": 47
         },
         {
-          "endLine": 223,
+          "endLine": 56,
+          "literalCount": 6,
+          "name": "DoeAdapter",
+          "path": "src/native/support/doe_native_object_types.zig",
+          "startLine": 44
+        },
+        {
+          "endLine": 228,
           "literalCount": 6,
           "name": "DoeBindGroup",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 205
+          "startLine": 210
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1297,11 +1304,11 @@
       "literalTokenSha256": "971571cb58f761fce53e553a043a34e7a3bb67068bf6cd3638261573ec6b7c85",
       "locations": [
         {
-          "endLine": 209,
+          "endLine": 107,
           "literalCount": 5,
           "name": "applyDeferredFlushToTraceRows",
           "path": "src/cli/runtime_cli.zig",
-          "startLine": 189
+          "startLine": 87
         },
         {
           "endLine": 106,
@@ -1639,26 +1646,6 @@
       "reason": "identical ordered sequence of at least four literal tokens"
     },
     {
-      "literalTokenSha256": "adf15b39ca4cb61b4f2568813677f90a74ae41294ddff7117a198101f0a9db92",
-      "locations": [
-        {
-          "endLine": 73,
-          "literalCount": 6,
-          "name": "doeNativeAdapterGetInfo",
-          "path": "src/native/support/doe_adapter_info_native.zig",
-          "startLine": 41
-        },
-        {
-          "endLine": 260,
-          "literalCount": 6,
-          "name": "tryMergeDispatchIntoLast",
-          "path": "src/native/support/doe_native_command_types.zig",
-          "startLine": 243
-        }
-      ],
-      "reason": "identical ordered sequence of at least four literal tokens"
-    },
-    {
       "literalTokenSha256": "ae1a4ebab96d27d47f5e6d69a704da1394f0ecb0dc154b6660b1592a318358d3",
       "locations": [
         {
@@ -1702,11 +1689,11 @@
       "literalTokenSha256": "af766062ee86baac410db4f49e9be7b93d0f9fcae7c333f6c02d259da9dbe62b",
       "locations": [
         {
-          "endLine": 182,
+          "endLine": 198,
           "literalCount": 7,
           "name": "fill_supported_features_from_adapter",
           "path": "src/dropin/wgpu_dropin_ext_a_core.zig",
-          "startLine": 166
+          "startLine": 182
         },
         {
           "endLine": 335,
@@ -1762,18 +1749,18 @@
       "literalTokenSha256": "b9d27b129ae29e7a7f73cb25db1a7e8b50e6066fc8f2096695a96236b266bdaa",
       "locations": [
         {
-          "endLine": 94,
+          "endLine": 99,
           "literalCount": 9,
           "name": "DoeQueue",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 71
+          "startLine": 76
         },
         {
-          "endLine": 295,
+          "endLine": 300,
           "literalCount": 9,
           "name": "DoeTextureView",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 280
+          "startLine": 285
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2257,18 +2244,18 @@
       "literalTokenSha256": "ddbdd8dce3c63d170cdd1b872e45d80751019dc391bf72f4b0cdcfe1a632f258",
       "locations": [
         {
-          "endLine": 547,
+          "endLine": 565,
           "literalCount": 4,
           "name": "doeNativeAdapterRequestDevice",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 532
+          "startLine": 550
         },
         {
-          "endLine": 581,
+          "endLine": 599,
           "literalCount": 4,
           "name": "doeNativeRequestDeviceFlat",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 559
+          "startLine": 577
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2365,11 +2352,11 @@
           "startLine": 35
         },
         {
-          "endLine": 445,
+          "endLine": 477,
           "literalCount": 5,
-          "name": "buildDispatchPassGroups",
+          "name": "buildDispatchPassGroupsInternal",
           "path": "src/core/resource/wgpu_resources.zig",
-          "startLine": 354
+          "startLine": 381
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2517,18 +2504,18 @@
       "reason": "identical ordered sequence of at least four literal tokens"
     },
     {
-      "literalTokenSha256": "fce4f3bdbf9d1f10ed04c692209b59d08e493bb053cab5ebd638f91ccf5921c0",
+      "literalTokenSha256": "fb4a4317586353cc169695b636626309ebbaa29675c09482afddd36f93a83ef3",
       "locations": [
         {
-          "endLine": 586,
-          "literalCount": 19,
-          "name": "doeBufferMapReadCopyUnmapFlat",
-          "path": "src/dropin/dropin_abi_procs.zig",
-          "startLine": 483
+          "endLine": 66,
+          "literalCount": 25,
+          "name": "validateCommand",
+          "path": "src/runtime/security/wgpu_sandbox_guard.zig",
+          "startLine": 23
         },
         {
-          "endLine": 121,
-          "literalCount": 19,
+          "endLine": 131,
+          "literalCount": 25,
           "name": "TraceRunSummary",
           "path": "src/runtime/trace/trace.zig",
           "startLine": 31
@@ -2538,10 +2525,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
+  "manifestSha256": "48fe072a0cac49068a50b77b7f86d8dd3eddecdbe224a6afcf3b88b19d780fc1",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07",
+  "sourceTreeSha256": "8160f0b9b0b7d94e589a3e71eb4071015e58cf29756c501916d9ad9c2a2b4cb2",
   "status": "captured"
 }

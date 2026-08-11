@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "4b1f7c3d086ba8b1a4434ee3b1a727334c8b5ebf25abcc50b199ac8f2e8bedab",
+  "manifestSha256": "48fe072a0cac49068a50b77b7f86d8dd3eddecdbe224a6afcf3b88b19d780fc1",
   "modules": [
     {
       "containsCImport": false,
@@ -59,7 +59,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 15,
+      "fanIn": 16,
       "fanOut": 2,
       "imports": [
         "src/backend/runtime_types.zig",
@@ -151,7 +151,8 @@
         "src/dropin/dropin_runtime_config.zig",
         "src/native/lifecycle/doe_instance_device_native.zig",
         "src/plan/doe_plan_executor.zig",
-        "src/runtime/execution.zig"
+        "src/runtime/execution.zig",
+        "src/runtime/output_oracle.zig"
       ],
       "roles": [],
       "sha256": "3973fb1beda7b5909627706dc55e936c12d3b55865b1e2d35f2f6e6a5ca31ec1",
@@ -5891,7 +5892,7 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 5,
-      "fanOut": 24,
+      "fanOut": 25,
       "imports": [
         "src/backend/backend_policy.zig",
         "src/backend/common/timing.zig",
@@ -5913,6 +5914,7 @@
         "src/backend/vulkan/vk_texture_commands.zig",
         "src/backend/vulkan/vk_upload.zig",
         "src/backend/vulkan/vulkan_timing.zig",
+        "src/contracts/backend.zig",
         "src/contracts/model/model_compute_types.zig",
         "src/contracts/model/model_render_types.zig",
         "src/contracts/model/model_texture_types.zig",
@@ -5920,35 +5922,40 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 987,
+      "lineCount": 1026,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/native_runtime.zig",
-      "publicDeclarationCount": 5,
+      "publicDeclarationCount": 6,
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 32,
+          "line": 33,
           "name": "upload_uses_fast_path"
         },
         {
           "kind": "const",
-          "line": 33,
+          "line": 34,
           "name": "upload_uses_direct_path"
         },
         {
           "kind": "const",
-          "line": 35,
+          "line": 36,
           "name": "DispatchMetrics"
         },
         {
           "kind": "const",
-          "line": 36,
+          "line": 37,
           "name": "AsyncProbeResult"
         },
         {
           "kind": "const",
-          "line": 38,
+          "line": 39,
+          "name": "AdapterIdentity"
+        },
+        {
+          "kind": "const",
+          "line": 47,
           "name": "NativeVulkanRuntime"
         }
       ],
@@ -5967,9 +5974,9 @@
         "src/backend/vulkan/vk_feature_probe.zig"
       ],
       "roles": [],
-      "sha256": "943122430ebb1de757bd3af89ea5fe6226efb05b0fe0af34140ecc5fd32531e5",
+      "sha256": "742ab4b261ee6cb06b3496545bc13d997a60e1a4328700857059abfba17df26d",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 30
+      "topLevelDeclarationCount": 32
     },
     {
       "containsCImport": false,
@@ -12599,7 +12606,7 @@
         "src/backend/webgpu_backend.zig"
       ],
       "roles": [],
-      "sha256": "75c6d8f11e1f8bcf83f5c211d2bdac2f57e64fe03a23a7143990a5b1f01d8f71",
+      "sha256": "038863534f4f675d62ffbbe07cf87bd50908c9925d6ad671c03654541d4df814",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 33
     },
@@ -13334,7 +13341,7 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 17,
+      "fanOut": 18,
       "imports": [
         "src/backend/backend_policy.zig",
         "src/backend/backend_runtime_telemetry.zig",
@@ -13348,6 +13355,7 @@
         "src/quirk/mod.zig",
         "src/runtime/execution.zig",
         "src/runtime/numeric_stability/mod.zig",
+        "src/runtime/output_oracle.zig",
         "src/runtime/trace/command_output.zig",
         "src/runtime/trace/operator_artifacts.zig",
         "src/runtime/trace/replay.zig",
@@ -13356,7 +13364,7 @@
       ],
       "isProductionRoot": false,
       "layer": "cli",
-      "lineCount": 705,
+      "lineCount": 618,
       "onlyReexports": false,
       "owner": "cli",
       "path": "src/cli/runtime_cli.zig",
@@ -13364,7 +13372,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 211,
+          "line": 109,
           "name": "runCli"
         }
       ],
@@ -13379,9 +13387,9 @@
         "src/mod.zig"
       ],
       "roles": [],
-      "sha256": "475f38b3ea72d9b5f1060c96d9e7da4b9a14a2a503ee486651e76337a57bbd7f",
-      "testBlockCount": 1,
-      "topLevelDeclarationCount": 32
+      "sha256": "a4475273b777ee4a827f8ad13e63287f27dee768f5f561f68468076f9c82bea9",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 29
     },
     {
       "containsCImport": false,
@@ -13614,7 +13622,7 @@
       ],
       "isProductionRoot": false,
       "layer": "command",
-      "lineCount": 152,
+      "lineCount": 153,
       "onlyReexports": false,
       "owner": "command",
       "path": "src/command/command_json.zig",
@@ -13645,7 +13653,7 @@
         "src/command/command_stream.zig"
       ],
       "roles": [],
-      "sha256": "53ace023c1f9548c95a02cfb3a916a80a9dd214dba7c3825badf1f1977b8e1a7",
+      "sha256": "13d4508f653d06b28465949839e1f476031f795fd720a7a4759f6f7e0249b92d",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 17
     },
@@ -13770,7 +13778,7 @@
       ],
       "isProductionRoot": false,
       "layer": "command",
-      "lineCount": 346,
+      "lineCount": 357,
       "onlyReexports": false,
       "owner": "command",
       "path": "src/command/command_json_raw.zig",
@@ -13808,12 +13816,12 @@
         },
         {
           "kind": "const",
-          "line": 94,
+          "line": 105,
           "name": "RawCommand"
         },
         {
           "kind": "const",
-          "line": 341,
+          "line": 352,
           "name": "ParseError"
         }
       ],
@@ -13831,7 +13839,7 @@
         "src/command/command_stream.zig"
       ],
       "roles": [],
-      "sha256": "25fa492a6b3f907e07ab46a81b162d0fa261fb6b1e6056992336a2c13b93161a",
+      "sha256": "3b56a24af2c83ab6940524c4c395c06f2d334aa52b18399e4e0e1ccc3fc1d3e6",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 9
     },
@@ -13960,7 +13968,7 @@
       ],
       "isProductionRoot": false,
       "layer": "command",
-      "lineCount": 157,
+      "lineCount": 324,
       "onlyReexports": false,
       "owner": "command",
       "path": "src/command/command_parse_dispatch.zig",
@@ -13973,7 +13981,7 @@
         },
         {
           "kind": "fn",
-          "line": 108,
+          "line": 158,
           "name": "parseDispatchCommand"
         }
       ],
@@ -13986,9 +13994,9 @@
         "src/command/command_json.zig"
       ],
       "roles": [],
-      "sha256": "fe2a5319401eef6cad6cd080d22343009740ecc11533ab3460f16edbb9381d9d",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 18
+      "sha256": "c3bf60c1b72246bfade9e2efa32762a4200bb91bce66e4f2e3f1c61c271bdacf",
+      "testBlockCount": 5,
+      "topLevelDeclarationCount": 24
     },
     {
       "containsCImport": false,
@@ -22881,7 +22889,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 777,
+      "lineCount": 783,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema.zig",
@@ -22978,7 +22986,7 @@
         "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
-      "sha256": "7915fb266c7540c1e58bb0d18f61b1d66ee1616602c623e00de8d2b9f79f5946",
+      "sha256": "ed0d6ab243fe16bd5051b5ea304ad9a0844a1318b5b3058a31a6062085923b57",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 43
     },
@@ -23073,11 +23081,11 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 426,
+      "lineCount": 447,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema_expr.zig",
-      "publicDeclarationCount": 5,
+      "publicDeclarationCount": 6,
       "publicDeclarations": [
         {
           "kind": "fn",
@@ -23087,21 +23095,26 @@
         {
           "kind": "fn",
           "line": 23,
-          "name": "logical_not_result_type"
-        },
-        {
-          "kind": "fn",
-          "line": 31,
-          "name": "analyze_unary_type"
+          "name": "analyze_assignment_value_type"
         },
         {
           "kind": "fn",
           "line": 44,
+          "name": "logical_not_result_type"
+        },
+        {
+          "kind": "fn",
+          "line": 52,
+          "name": "analyze_unary_type"
+        },
+        {
+          "kind": "fn",
+          "line": 65,
           "name": "infer_constructor_call"
         },
         {
           "kind": "fn",
-          "line": 60,
+          "line": 81,
           "name": "validate_construct"
         }
       ],
@@ -23117,9 +23130,9 @@
         "src/compiler/wgsl/frontend/sema.zig"
       ],
       "roles": [],
-      "sha256": "b4728de91ec11269fe8d641d540252447968dcd9608ec4993159dbab6bfb02fb",
+      "sha256": "801d5cf5317598fbe6ce8994082b6e665ae503c53fb420ddaf5bbf8020083503",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 33
+      "topLevelDeclarationCount": 34
     },
     {
       "containsCImport": false,
@@ -24331,7 +24344,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 172,
+      "lineCount": 195,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_validate.zig",
@@ -24362,9 +24375,9 @@
         "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
-      "sha256": "c81a82f65a37658f0b19ab104b5bf0b03b8747eacf5fc5ed767eb9174f019771",
+      "sha256": "f4b9598ebd95f410c007f377e0e2aafa1aed10883957c4a14ef7a11b80a7c329",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 10
+      "topLevelDeclarationCount": 11
     },
     {
       "containsCImport": false,
@@ -26393,18 +26406,18 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 16,
+      "fanIn": 17,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_profile.zig"
       ],
       "isProductionRoot": false,
       "layer": "contracts",
-      "lineCount": 187,
+      "lineCount": 189,
       "onlyReexports": false,
       "owner": "contracts",
       "path": "src/contracts/backend.zig",
-      "publicDeclarationCount": 20,
+      "publicDeclarationCount": 21,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -26417,93 +26430,98 @@
           "name": "NativeBackendKind"
         },
         {
-          "kind": "fn",
+          "kind": "const",
           "line": 20,
+          "name": "ADAPTER_DEVICE_NAME_BYTES"
+        },
+        {
+          "kind": "fn",
+          "line": 22,
           "name": "backendIdName"
         },
         {
           "kind": "fn",
-          "line": 24,
+          "line": 26,
           "name": "parseBackendId"
         },
         {
           "kind": "const",
-          "line": 31,
+          "line": 33,
           "name": "BackendLane"
         },
         {
           "kind": "fn",
-          "line": 88,
+          "line": 90,
           "name": "laneName"
         },
         {
           "kind": "fn",
-          "line": 93,
+          "line": 95,
           "name": "parseLane"
         },
         {
           "kind": "const",
-          "line": 105,
+          "line": 107,
           "name": "UploadPathPolicy"
         },
         {
           "kind": "const",
-          "line": 106,
+          "line": 108,
           "name": "VulkanSubgroupSizePolicy"
         },
         {
           "kind": "const",
-          "line": 111,
+          "line": 113,
           "name": "QueueFamilyPolicy"
         },
         {
           "kind": "const",
-          "line": 120,
+          "line": 122,
           "name": "QueueFamilyKind"
         },
         {
           "kind": "const",
-          "line": 128,
+          "line": 130,
           "name": "DeferredSubmissionSyncPolicy"
         },
         {
           "kind": "const",
-          "line": 137,
+          "line": 139,
           "name": "SelectionPolicy"
         },
         {
           "kind": "const",
-          "line": 149,
+          "line": 151,
           "name": "Selection"
         },
         {
           "kind": "fn",
-          "line": 155,
+          "line": 157,
           "name": "select"
         },
         {
           "kind": "const",
-          "line": 177,
+          "line": 179,
           "name": "backend_id_name"
         },
         {
           "kind": "const",
-          "line": 178,
+          "line": 180,
           "name": "parse_backend_id"
         },
         {
           "kind": "const",
-          "line": 179,
+          "line": 181,
           "name": "lane_name"
         },
         {
           "kind": "const",
-          "line": 180,
+          "line": 182,
           "name": "parse_lane"
         },
         {
           "kind": "const",
-          "line": 181,
+          "line": 183,
           "name": "select_backend"
         }
       ],
@@ -26523,6 +26541,7 @@
         "src/backend/backend_telemetry.zig",
         "src/backend/dawn_delegate_backend.zig",
         "src/backend/runtime_types.zig",
+        "src/backend/vulkan/native_runtime.zig",
         "src/cli/runtime_cli_artifacts.zig",
         "src/contracts/compute.zig",
         "src/contracts/mod.zig",
@@ -26534,9 +26553,9 @@
         "src/runtime/render/render_bundle.zig"
       ],
       "roles": [],
-      "sha256": "5173629ff659facd649af05bc5adfe0995ba4ef984768ed9108142894c30dec7",
+      "sha256": "e2308200b84d3b8845e38ef98c5ade97ac88acc8c490d4f2698c87d8aebdc570",
       "testBlockCount": 1,
-      "topLevelDeclarationCount": 26
+      "topLevelDeclarationCount": 27
     },
     {
       "containsCImport": false,
@@ -26661,7 +26680,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 38,
+      "fanIn": 39,
       "fanOut": 7,
       "imports": [
         "src/contracts/capability.zig",
@@ -26904,6 +26923,7 @@
         "src/runtime/numeric_stability/runtime.zig",
         "src/runtime/numeric_stability/runtime_decode.zig",
         "src/runtime/numeric_stability/runtime_plan.zig",
+        "src/runtime/output_oracle.zig",
         "src/runtime/security/wgpu_sandbox_guard.zig",
         "src/runtime/trace/command_output.zig",
         "src/runtime/trace/operator_artifacts.zig",
@@ -27461,7 +27481,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 34,
+      "fanIn": 35,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
@@ -27469,11 +27489,11 @@
       ],
       "isProductionRoot": false,
       "layer": "contracts",
-      "lineCount": 64,
+      "lineCount": 79,
       "onlyReexports": false,
       "owner": "contracts",
       "path": "src/contracts/model/model_compute_types.zig",
-      "publicDeclarationCount": 7,
+      "publicDeclarationCount": 9,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -27503,11 +27523,21 @@
         {
           "kind": "const",
           "line": 41,
+          "name": "KernelDispatchOutputOracleScope"
+        },
+        {
+          "kind": "const",
+          "line": 46,
+          "name": "KernelDispatchOutputOracleReferenceClass"
+        },
+        {
+          "kind": "const",
+          "line": 51,
           "name": "KernelDispatchOutputOracle"
         },
         {
           "kind": "const",
-          "line": 52,
+          "line": 67,
           "name": "KernelDispatchCommand"
         }
       ],
@@ -27553,12 +27583,13 @@
         "src/plan/doe_plan_executor.zig",
         "src/runtime/execution.zig",
         "src/runtime/numeric_stability/runtime_decode.zig",
-        "src/runtime/numeric_stability/runtime_plan.zig"
+        "src/runtime/numeric_stability/runtime_plan.zig",
+        "src/runtime/output_oracle.zig"
       ],
       "roles": [],
-      "sha256": "06651f3e56cb1c798e923c929d16e9cdcc0109b04f1e54464825a1ede525e2f9",
+      "sha256": "82725cf0634913fa227d99b5b7ea11ad00b2b3961c2d5db1149c434793644352",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 9
+      "topLevelDeclarationCount": 11
     },
     {
       "containsCImport": false,
@@ -28469,7 +28500,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 16,
+      "fanIn": 17,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_policy.zig"
@@ -28517,7 +28548,8 @@
         "src/plan/doe_plan_executor.zig",
         "src/quirk/mod.zig",
         "src/quirk/runtime.zig",
-        "src/runtime/execution.zig"
+        "src/runtime/execution.zig",
+        "src/runtime/output_oracle.zig"
       ],
       "roles": [],
       "sha256": "71f7892a7cc1249b436850a000a4b99753b6f3c29b9bf56aebd994a8f1c8c26f",
@@ -32958,11 +32990,11 @@
       ],
       "isProductionRoot": false,
       "layer": "core",
-      "lineCount": 189,
+      "lineCount": 191,
       "onlyReexports": false,
       "owner": "core",
       "path": "src/core/abi/procs/wgpu_types_procs.zig",
-      "publicDeclarationCount": 69,
+      "publicDeclarationCount": 70,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -33012,301 +33044,306 @@
         {
           "kind": "const",
           "line": 62,
-          "name": "FnWgpuComputePipelineRelease"
+          "name": "FnWgpuComputePipelineGetBindGroupLayout"
         },
         {
           "kind": "const",
           "line": 63,
-          "name": "FnWgpuRenderPipelineRelease"
+          "name": "FnWgpuComputePipelineRelease"
         },
         {
           "kind": "const",
           "line": 64,
-          "name": "FnWgpuDeviceCreateCommandEncoder"
+          "name": "FnWgpuRenderPipelineRelease"
         },
         {
           "kind": "const",
           "line": 65,
-          "name": "FnWgpuCommandEncoderBeginComputePass"
+          "name": "FnWgpuDeviceCreateCommandEncoder"
         },
         {
           "kind": "const",
           "line": 66,
-          "name": "FnWgpuDeviceCreateRenderPipeline"
+          "name": "FnWgpuCommandEncoderBeginComputePass"
         },
         {
           "kind": "const",
           "line": 67,
-          "name": "FnWgpuCommandEncoderBeginRenderPass"
+          "name": "FnWgpuDeviceCreateRenderPipeline"
         },
         {
           "kind": "const",
           "line": 68,
-          "name": "FnWgpuCommandEncoderWriteTimestamp"
+          "name": "FnWgpuCommandEncoderBeginRenderPass"
         },
         {
           "kind": "const",
           "line": 69,
-          "name": "FnWgpuCommandEncoderCopyBufferToBuffer"
+          "name": "FnWgpuCommandEncoderWriteTimestamp"
         },
         {
           "kind": "const",
           "line": 70,
-          "name": "FnWgpuCommandEncoderCopyBufferToTexture"
+          "name": "FnWgpuCommandEncoderCopyBufferToBuffer"
         },
         {
           "kind": "const",
           "line": 71,
-          "name": "FnWgpuCommandEncoderCopyTextureToBuffer"
+          "name": "FnWgpuCommandEncoderCopyBufferToTexture"
         },
         {
           "kind": "const",
           "line": 72,
-          "name": "FnWgpuCommandEncoderCopyTextureToTexture"
+          "name": "FnWgpuCommandEncoderCopyTextureToBuffer"
         },
         {
           "kind": "const",
           "line": 73,
-          "name": "FnWgpuComputePassEncoderSetPipeline"
+          "name": "FnWgpuCommandEncoderCopyTextureToTexture"
         },
         {
           "kind": "const",
           "line": 74,
-          "name": "FnWgpuComputePassEncoderSetBindGroup"
+          "name": "FnWgpuComputePassEncoderSetPipeline"
         },
         {
           "kind": "const",
           "line": 75,
-          "name": "FnWgpuComputePassEncoderDispatchWorkgroups"
+          "name": "FnWgpuComputePassEncoderSetBindGroup"
         },
         {
           "kind": "const",
           "line": 76,
-          "name": "FnWgpuComputePassEncoderEnd"
+          "name": "FnWgpuComputePassEncoderDispatchWorkgroups"
         },
         {
           "kind": "const",
           "line": 77,
-          "name": "FnWgpuComputePassEncoderRelease"
+          "name": "FnWgpuComputePassEncoderEnd"
         },
         {
           "kind": "const",
           "line": 78,
-          "name": "FnWgpuRenderPassEncoderSetPipeline"
+          "name": "FnWgpuComputePassEncoderRelease"
         },
         {
           "kind": "const",
           "line": 79,
-          "name": "FnWgpuRenderPassEncoderSetVertexBuffer"
+          "name": "FnWgpuRenderPassEncoderSetPipeline"
         },
         {
           "kind": "const",
           "line": 80,
-          "name": "FnWgpuRenderPassEncoderSetIndexBuffer"
+          "name": "FnWgpuRenderPassEncoderSetVertexBuffer"
         },
         {
           "kind": "const",
           "line": 81,
-          "name": "FnWgpuRenderPassEncoderSetBindGroup"
+          "name": "FnWgpuRenderPassEncoderSetIndexBuffer"
         },
         {
           "kind": "const",
           "line": 82,
-          "name": "FnWgpuRenderPassEncoderDraw"
+          "name": "FnWgpuRenderPassEncoderSetBindGroup"
         },
         {
           "kind": "const",
           "line": 83,
-          "name": "FnWgpuRenderPassEncoderDrawIndexed"
+          "name": "FnWgpuRenderPassEncoderDraw"
         },
         {
           "kind": "const",
           "line": 84,
-          "name": "FnWgpuRenderPassEncoderDrawIndirect"
+          "name": "FnWgpuRenderPassEncoderDrawIndexed"
         },
         {
           "kind": "const",
           "line": 85,
-          "name": "FnWgpuRenderPassEncoderDrawIndexedIndirect"
+          "name": "FnWgpuRenderPassEncoderDrawIndirect"
         },
         {
           "kind": "const",
           "line": 86,
-          "name": "FnWgpuRenderPassEncoderEnd"
+          "name": "FnWgpuRenderPassEncoderDrawIndexedIndirect"
         },
         {
           "kind": "const",
           "line": 87,
-          "name": "FnWgpuRenderPassEncoderRelease"
+          "name": "FnWgpuRenderPassEncoderEnd"
         },
         {
           "kind": "const",
           "line": 88,
-          "name": "FnWgpuCommandEncoderFinish"
+          "name": "FnWgpuRenderPassEncoderRelease"
         },
         {
           "kind": "const",
           "line": 89,
-          "name": "FnWgpuDeviceGetQueue"
+          "name": "FnWgpuCommandEncoderFinish"
         },
         {
           "kind": "const",
           "line": 90,
-          "name": "FnWgpuQueueSubmit"
+          "name": "FnWgpuDeviceGetQueue"
         },
         {
           "kind": "const",
           "line": 91,
-          "name": "FnWgpuQueueOnSubmittedWorkDone"
+          "name": "FnWgpuQueueSubmit"
         },
         {
           "kind": "const",
           "line": 92,
-          "name": "FnWgpuQueueWriteBuffer"
+          "name": "FnWgpuQueueOnSubmittedWorkDone"
         },
         {
           "kind": "const",
           "line": 93,
-          "name": "FnWgpuDeviceCreateTexture"
+          "name": "FnWgpuQueueWriteBuffer"
         },
         {
           "kind": "const",
           "line": 94,
-          "name": "FnWgpuTextureCreateView"
+          "name": "FnWgpuDeviceCreateTexture"
         },
         {
           "kind": "const",
           "line": 95,
-          "name": "FnWgpuDeviceCreateBindGroupLayout"
+          "name": "FnWgpuTextureCreateView"
         },
         {
           "kind": "const",
           "line": 96,
-          "name": "FnWgpuBindGroupLayoutRelease"
+          "name": "FnWgpuDeviceCreateBindGroupLayout"
         },
         {
           "kind": "const",
           "line": 97,
-          "name": "FnWgpuDeviceCreateBindGroup"
+          "name": "FnWgpuBindGroupLayoutRelease"
         },
         {
           "kind": "const",
           "line": 98,
-          "name": "FnWgpuBindGroupRelease"
+          "name": "FnWgpuDeviceCreateBindGroup"
         },
         {
           "kind": "const",
           "line": 99,
-          "name": "FnWgpuDeviceCreatePipelineLayout"
+          "name": "FnWgpuBindGroupRelease"
         },
         {
           "kind": "const",
           "line": 100,
-          "name": "FnWgpuPipelineLayoutRelease"
+          "name": "FnWgpuDeviceCreatePipelineLayout"
         },
         {
           "kind": "const",
           "line": 101,
-          "name": "FnWgpuTextureRelease"
+          "name": "FnWgpuPipelineLayoutRelease"
         },
         {
           "kind": "const",
           "line": 102,
-          "name": "FnWgpuTextureViewRelease"
+          "name": "FnWgpuTextureRelease"
         },
         {
           "kind": "const",
           "line": 103,
-          "name": "FnWgpuInstanceRelease"
+          "name": "FnWgpuTextureViewRelease"
         },
         {
           "kind": "const",
           "line": 104,
-          "name": "FnWgpuAdapterRelease"
+          "name": "FnWgpuInstanceRelease"
         },
         {
           "kind": "const",
           "line": 105,
-          "name": "FnWgpuDeviceRelease"
+          "name": "FnWgpuAdapterRelease"
         },
         {
           "kind": "const",
           "line": 106,
-          "name": "FnWgpuQueueRelease"
+          "name": "FnWgpuDeviceRelease"
         },
         {
           "kind": "const",
           "line": 107,
-          "name": "FnWgpuCommandEncoderRelease"
+          "name": "FnWgpuQueueRelease"
         },
         {
           "kind": "const",
           "line": 108,
-          "name": "FnWgpuCommandBufferRelease"
+          "name": "FnWgpuCommandEncoderRelease"
         },
         {
           "kind": "const",
           "line": 109,
-          "name": "FnWgpuBufferRelease"
+          "name": "FnWgpuCommandBufferRelease"
         },
         {
           "kind": "const",
           "line": 110,
-          "name": "FnWgpuAdapterHasFeature"
+          "name": "FnWgpuBufferRelease"
         },
         {
           "kind": "const",
           "line": 111,
-          "name": "FnWgpuDeviceHasFeature"
+          "name": "FnWgpuAdapterHasFeature"
         },
         {
           "kind": "const",
           "line": 112,
-          "name": "FnWgpuDeviceCreateQuerySet"
+          "name": "FnWgpuDeviceHasFeature"
         },
         {
           "kind": "const",
           "line": 113,
-          "name": "FnWgpuCommandEncoderResolveQuerySet"
+          "name": "FnWgpuDeviceCreateQuerySet"
         },
         {
           "kind": "const",
           "line": 114,
-          "name": "FnWgpuQuerySetRelease"
+          "name": "FnWgpuCommandEncoderResolveQuerySet"
         },
         {
           "kind": "const",
           "line": 115,
-          "name": "FnWgpuBufferMapAsync"
+          "name": "FnWgpuQuerySetRelease"
         },
         {
           "kind": "const",
           "line": 116,
-          "name": "FnWgpuBufferGetConstMappedRange"
+          "name": "FnWgpuBufferMapAsync"
         },
         {
           "kind": "const",
           "line": 117,
-          "name": "FnWgpuBufferGetMappedRange"
+          "name": "FnWgpuBufferGetConstMappedRange"
         },
         {
           "kind": "const",
           "line": 118,
-          "name": "FnWgpuBufferUnmap"
+          "name": "FnWgpuBufferGetMappedRange"
         },
         {
           "kind": "const",
           "line": 119,
-          "name": "FnWgpuDeviceCreateSampler"
+          "name": "FnWgpuBufferUnmap"
         },
         {
           "kind": "const",
           "line": 120,
+          "name": "FnWgpuDeviceCreateSampler"
+        },
+        {
+          "kind": "const",
+          "line": 121,
           "name": "FnWgpuSamplerRelease"
         },
         {
           "kind": "const",
-          "line": 122,
+          "line": 123,
           "name": "Procs"
         }
       ],
@@ -33323,9 +33360,9 @@
         "src/dropin/dropin_abi_procs.zig"
       ],
       "roles": [],
-      "sha256": "eeea684782da17046c299c6bfd8dbd50285eb10e903088c8db41d2671a8c3018",
+      "sha256": "f89c8fb66c044fa76cef78de827726a9526151c24c69decb0510f2036a08b1bc",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 72
+      "topLevelDeclarationCount": 73
     },
     {
       "containsCImport": false,
@@ -34663,7 +34700,7 @@
       ],
       "isProductionRoot": false,
       "layer": "core",
-      "lineCount": 421,
+      "lineCount": 422,
       "onlyReexports": false,
       "owner": "core",
       "path": "src/core/abi/wgpu_loader.zig",
@@ -34726,57 +34763,57 @@
         },
         {
           "kind": "fn",
-          "line": 297,
+          "line": 298,
           "name": "preloadOptionalApiSurfaceSymbols"
         },
         {
           "kind": "fn",
-          "line": 322,
+          "line": 323,
           "name": "queueWorkDoneCallback"
         },
         {
           "kind": "fn",
-          "line": 335,
+          "line": 336,
           "name": "adapterCallback"
         },
         {
           "kind": "fn",
-          "line": 350,
+          "line": 351,
           "name": "deviceRequestCallback"
         },
         {
           "kind": "fn",
-          "line": 365,
+          "line": 366,
           "name": "bufferMapCallback"
         },
         {
           "kind": "fn",
-          "line": 378,
+          "line": 379,
           "name": "uncapturedErrorCallback"
         },
         {
           "kind": "fn",
-          "line": 392,
+          "line": 393,
           "name": "alignTo"
         },
         {
           "kind": "fn",
-          "line": 398,
+          "line": 399,
           "name": "emptyStringView"
         },
         {
           "kind": "fn",
-          "line": 402,
+          "line": 403,
           "name": "stringView"
         },
         {
           "kind": "fn",
-          "line": 410,
+          "line": 411,
           "name": "normalizeCopyLayoutValue"
         },
         {
           "kind": "fn",
-          "line": 415,
+          "line": 416,
           "name": "normalizeTextureAspect"
         }
       ],
@@ -34816,7 +34853,7 @@
         "src/runtime/execution.zig"
       ],
       "roles": [],
-      "sha256": "a58871e1ed4bb94e2cc63445dcac393616288a199d191047a4777c2a41eceb2a",
+      "sha256": "70021bb92a69688a40a3c3af41bdbe8708d1f2362a572d30653b3f47e430c616",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 39
     },
@@ -38496,11 +38533,11 @@
       ],
       "isProductionRoot": false,
       "layer": "core",
-      "lineCount": 71,
+      "lineCount": 72,
       "onlyReexports": true,
       "owner": "core",
       "path": "src/core/abi/wgpu_type_proc_aliases.zig",
-      "publicDeclarationCount": 69,
+      "publicDeclarationCount": 70,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -38550,301 +38587,306 @@
         {
           "kind": "const",
           "line": 12,
-          "name": "FnWgpuComputePipelineRelease"
+          "name": "FnWgpuComputePipelineGetBindGroupLayout"
         },
         {
           "kind": "const",
           "line": 13,
-          "name": "FnWgpuRenderPipelineRelease"
+          "name": "FnWgpuComputePipelineRelease"
         },
         {
           "kind": "const",
           "line": 14,
-          "name": "FnWgpuDeviceCreateCommandEncoder"
+          "name": "FnWgpuRenderPipelineRelease"
         },
         {
           "kind": "const",
           "line": 15,
-          "name": "FnWgpuCommandEncoderBeginComputePass"
+          "name": "FnWgpuDeviceCreateCommandEncoder"
         },
         {
           "kind": "const",
           "line": 16,
-          "name": "FnWgpuDeviceCreateRenderPipeline"
+          "name": "FnWgpuCommandEncoderBeginComputePass"
         },
         {
           "kind": "const",
           "line": 17,
-          "name": "FnWgpuCommandEncoderBeginRenderPass"
+          "name": "FnWgpuDeviceCreateRenderPipeline"
         },
         {
           "kind": "const",
           "line": 18,
-          "name": "FnWgpuCommandEncoderWriteTimestamp"
+          "name": "FnWgpuCommandEncoderBeginRenderPass"
         },
         {
           "kind": "const",
           "line": 19,
-          "name": "FnWgpuCommandEncoderCopyBufferToBuffer"
+          "name": "FnWgpuCommandEncoderWriteTimestamp"
         },
         {
           "kind": "const",
           "line": 20,
-          "name": "FnWgpuCommandEncoderCopyBufferToTexture"
+          "name": "FnWgpuCommandEncoderCopyBufferToBuffer"
         },
         {
           "kind": "const",
           "line": 21,
-          "name": "FnWgpuCommandEncoderCopyTextureToBuffer"
+          "name": "FnWgpuCommandEncoderCopyBufferToTexture"
         },
         {
           "kind": "const",
           "line": 22,
-          "name": "FnWgpuCommandEncoderCopyTextureToTexture"
+          "name": "FnWgpuCommandEncoderCopyTextureToBuffer"
         },
         {
           "kind": "const",
           "line": 23,
-          "name": "FnWgpuComputePassEncoderSetPipeline"
+          "name": "FnWgpuCommandEncoderCopyTextureToTexture"
         },
         {
           "kind": "const",
           "line": 24,
-          "name": "FnWgpuComputePassEncoderSetBindGroup"
+          "name": "FnWgpuComputePassEncoderSetPipeline"
         },
         {
           "kind": "const",
           "line": 25,
-          "name": "FnWgpuComputePassEncoderDispatchWorkgroups"
+          "name": "FnWgpuComputePassEncoderSetBindGroup"
         },
         {
           "kind": "const",
           "line": 26,
-          "name": "FnWgpuComputePassEncoderEnd"
+          "name": "FnWgpuComputePassEncoderDispatchWorkgroups"
         },
         {
           "kind": "const",
           "line": 27,
-          "name": "FnWgpuComputePassEncoderRelease"
+          "name": "FnWgpuComputePassEncoderEnd"
         },
         {
           "kind": "const",
           "line": 28,
-          "name": "FnWgpuRenderPassEncoderSetPipeline"
+          "name": "FnWgpuComputePassEncoderRelease"
         },
         {
           "kind": "const",
           "line": 29,
-          "name": "FnWgpuRenderPassEncoderSetVertexBuffer"
+          "name": "FnWgpuRenderPassEncoderSetPipeline"
         },
         {
           "kind": "const",
           "line": 30,
-          "name": "FnWgpuRenderPassEncoderSetIndexBuffer"
+          "name": "FnWgpuRenderPassEncoderSetVertexBuffer"
         },
         {
           "kind": "const",
           "line": 31,
-          "name": "FnWgpuRenderPassEncoderSetBindGroup"
+          "name": "FnWgpuRenderPassEncoderSetIndexBuffer"
         },
         {
           "kind": "const",
           "line": 32,
-          "name": "FnWgpuRenderPassEncoderDraw"
+          "name": "FnWgpuRenderPassEncoderSetBindGroup"
         },
         {
           "kind": "const",
           "line": 33,
-          "name": "FnWgpuRenderPassEncoderDrawIndexed"
+          "name": "FnWgpuRenderPassEncoderDraw"
         },
         {
           "kind": "const",
           "line": 34,
-          "name": "FnWgpuRenderPassEncoderDrawIndirect"
+          "name": "FnWgpuRenderPassEncoderDrawIndexed"
         },
         {
           "kind": "const",
           "line": 35,
-          "name": "FnWgpuRenderPassEncoderDrawIndexedIndirect"
+          "name": "FnWgpuRenderPassEncoderDrawIndirect"
         },
         {
           "kind": "const",
           "line": 36,
-          "name": "FnWgpuRenderPassEncoderEnd"
+          "name": "FnWgpuRenderPassEncoderDrawIndexedIndirect"
         },
         {
           "kind": "const",
           "line": 37,
-          "name": "FnWgpuRenderPassEncoderRelease"
+          "name": "FnWgpuRenderPassEncoderEnd"
         },
         {
           "kind": "const",
           "line": 38,
-          "name": "FnWgpuCommandEncoderFinish"
+          "name": "FnWgpuRenderPassEncoderRelease"
         },
         {
           "kind": "const",
           "line": 39,
-          "name": "FnWgpuDeviceGetQueue"
+          "name": "FnWgpuCommandEncoderFinish"
         },
         {
           "kind": "const",
           "line": 40,
-          "name": "FnWgpuQueueSubmit"
+          "name": "FnWgpuDeviceGetQueue"
         },
         {
           "kind": "const",
           "line": 41,
-          "name": "FnWgpuQueueOnSubmittedWorkDone"
+          "name": "FnWgpuQueueSubmit"
         },
         {
           "kind": "const",
           "line": 42,
-          "name": "FnWgpuQueueWriteBuffer"
+          "name": "FnWgpuQueueOnSubmittedWorkDone"
         },
         {
           "kind": "const",
           "line": 43,
-          "name": "FnWgpuDeviceCreateTexture"
+          "name": "FnWgpuQueueWriteBuffer"
         },
         {
           "kind": "const",
           "line": 44,
-          "name": "FnWgpuTextureCreateView"
+          "name": "FnWgpuDeviceCreateTexture"
         },
         {
           "kind": "const",
           "line": 45,
-          "name": "FnWgpuDeviceCreateBindGroupLayout"
+          "name": "FnWgpuTextureCreateView"
         },
         {
           "kind": "const",
           "line": 46,
-          "name": "FnWgpuBindGroupLayoutRelease"
+          "name": "FnWgpuDeviceCreateBindGroupLayout"
         },
         {
           "kind": "const",
           "line": 47,
-          "name": "FnWgpuDeviceCreateBindGroup"
+          "name": "FnWgpuBindGroupLayoutRelease"
         },
         {
           "kind": "const",
           "line": 48,
-          "name": "FnWgpuBindGroupRelease"
+          "name": "FnWgpuDeviceCreateBindGroup"
         },
         {
           "kind": "const",
           "line": 49,
-          "name": "FnWgpuDeviceCreatePipelineLayout"
+          "name": "FnWgpuBindGroupRelease"
         },
         {
           "kind": "const",
           "line": 50,
-          "name": "FnWgpuPipelineLayoutRelease"
+          "name": "FnWgpuDeviceCreatePipelineLayout"
         },
         {
           "kind": "const",
           "line": 51,
-          "name": "FnWgpuTextureRelease"
+          "name": "FnWgpuPipelineLayoutRelease"
         },
         {
           "kind": "const",
           "line": 52,
-          "name": "FnWgpuTextureViewRelease"
+          "name": "FnWgpuTextureRelease"
         },
         {
           "kind": "const",
           "line": 53,
-          "name": "FnWgpuInstanceRelease"
+          "name": "FnWgpuTextureViewRelease"
         },
         {
           "kind": "const",
           "line": 54,
-          "name": "FnWgpuAdapterRelease"
+          "name": "FnWgpuInstanceRelease"
         },
         {
           "kind": "const",
           "line": 55,
-          "name": "FnWgpuDeviceRelease"
+          "name": "FnWgpuAdapterRelease"
         },
         {
           "kind": "const",
           "line": 56,
-          "name": "FnWgpuQueueRelease"
+          "name": "FnWgpuDeviceRelease"
         },
         {
           "kind": "const",
           "line": 57,
-          "name": "FnWgpuCommandEncoderRelease"
+          "name": "FnWgpuQueueRelease"
         },
         {
           "kind": "const",
           "line": 58,
-          "name": "FnWgpuCommandBufferRelease"
+          "name": "FnWgpuCommandEncoderRelease"
         },
         {
           "kind": "const",
           "line": 59,
-          "name": "FnWgpuBufferRelease"
+          "name": "FnWgpuCommandBufferRelease"
         },
         {
           "kind": "const",
           "line": 60,
-          "name": "FnWgpuAdapterHasFeature"
+          "name": "FnWgpuBufferRelease"
         },
         {
           "kind": "const",
           "line": 61,
-          "name": "FnWgpuDeviceHasFeature"
+          "name": "FnWgpuAdapterHasFeature"
         },
         {
           "kind": "const",
           "line": 62,
-          "name": "FnWgpuDeviceCreateQuerySet"
+          "name": "FnWgpuDeviceHasFeature"
         },
         {
           "kind": "const",
           "line": 63,
-          "name": "FnWgpuCommandEncoderResolveQuerySet"
+          "name": "FnWgpuDeviceCreateQuerySet"
         },
         {
           "kind": "const",
           "line": 64,
-          "name": "FnWgpuQuerySetRelease"
+          "name": "FnWgpuCommandEncoderResolveQuerySet"
         },
         {
           "kind": "const",
           "line": 65,
-          "name": "FnWgpuBufferMapAsync"
+          "name": "FnWgpuQuerySetRelease"
         },
         {
           "kind": "const",
           "line": 66,
-          "name": "FnWgpuBufferGetConstMappedRange"
+          "name": "FnWgpuBufferMapAsync"
         },
         {
           "kind": "const",
           "line": 67,
-          "name": "FnWgpuBufferGetMappedRange"
+          "name": "FnWgpuBufferGetConstMappedRange"
         },
         {
           "kind": "const",
           "line": 68,
-          "name": "FnWgpuBufferUnmap"
+          "name": "FnWgpuBufferGetMappedRange"
         },
         {
           "kind": "const",
           "line": 69,
-          "name": "FnWgpuDeviceCreateSampler"
+          "name": "FnWgpuBufferUnmap"
         },
         {
           "kind": "const",
           "line": 70,
-          "name": "FnWgpuSamplerRelease"
+          "name": "FnWgpuDeviceCreateSampler"
         },
         {
           "kind": "const",
           "line": 71,
+          "name": "FnWgpuSamplerRelease"
+        },
+        {
+          "kind": "const",
+          "line": 72,
           "name": "Procs"
         }
       ],
@@ -38871,9 +38913,9 @@
         "src/full/render/wgpu_render_p0.zig"
       ],
       "roles": [],
-      "sha256": "360aa080718678ef4fdc5ba2b707007c0f1770c63e15328ab0384155252fa5da",
+      "sha256": "c7a176c779522566b1050fbdb797c65f2a7cd044bff37a643d7588df1356e795",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 70
+      "topLevelDeclarationCount": 71
     },
     {
       "containsCImport": false,
@@ -39024,7 +39066,7 @@
       ],
       "isProductionRoot": false,
       "layer": "core",
-      "lineCount": 682,
+      "lineCount": 717,
       "onlyReexports": false,
       "owner": "core",
       "path": "src/core/compute/wgpu_commands_compute.zig",
@@ -39032,87 +39074,87 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 22,
+          "line": 20,
           "name": "executeBarrier"
         },
         {
           "kind": "fn",
-          "line": 65,
+          "line": 63,
           "name": "executeDispatch"
         },
         {
           "kind": "fn",
-          "line": 81,
+          "line": 79,
           "name": "executeDispatchIndirect"
         },
         {
           "kind": "fn",
-          "line": 97,
+          "line": 95,
           "name": "executeKernelDispatch"
         },
         {
           "kind": "fn",
-          "line": 120,
+          "line": 122,
           "name": "pipelineCacheKey"
         },
         {
           "kind": "fn",
-          "line": 132,
+          "line": 190,
           "name": "executeKernelDispatchKernel"
         },
         {
           "kind": "fn",
-          "line": 557,
+          "line": 592,
           "name": "validateKernelBindingsAgainstLimits"
         },
         {
           "kind": "fn",
-          "line": 591,
+          "line": 626,
           "name": "bindingRangeSize"
         },
         {
           "kind": "fn",
-          "line": 603,
+          "line": 638,
           "name": "bindingBufferLimit"
         },
         {
           "kind": "fn",
-          "line": 613,
+          "line": 648,
           "name": "minPositiveLimit"
         },
         {
           "kind": "fn",
-          "line": 619,
+          "line": 654,
           "name": "timestampReadbackStatus"
         },
         {
           "kind": "fn",
-          "line": 629,
+          "line": 664,
           "name": "resolveKernelSource"
         },
         {
           "kind": "fn",
-          "line": 638,
+          "line": 673,
           "name": "openKernelFile"
         },
         {
           "kind": "fn",
-          "line": 654,
+          "line": 689,
           "name": "openKernelFromRoot"
         },
         {
           "kind": "fn",
-          "line": 670,
+          "line": 705,
           "name": "hasValidTextureExtent"
         },
         {
           "kind": "fn",
-          "line": 674,
+          "line": 709,
           "name": "hasMatchingTextureExtent"
         },
         {
           "kind": "fn",
-          "line": 680,
+          "line": 715,
           "name": "sourceContainsComputeStage"
         }
       ],
@@ -39129,8 +39171,8 @@
         "src/core/command_dispatch.zig"
       ],
       "roles": [],
-      "sha256": "f91dca6cc24dc11eeb3133b9055dbc806a1c6328c3cc30c991f587f876959087",
-      "testBlockCount": 0,
+      "sha256": "00959532f4484cacae2d029c76c9669c4c29dffa14d8d9bba475608db588ebfc",
+      "testBlockCount": 1,
       "topLevelDeclarationCount": 36
     },
     {
@@ -39450,11 +39492,11 @@
       ],
       "isProductionRoot": false,
       "layer": "core",
-      "lineCount": 661,
+      "lineCount": 693,
       "onlyReexports": false,
       "owner": "core",
       "path": "src/core/resource/wgpu_resources.zig",
-      "publicDeclarationCount": 15,
+      "publicDeclarationCount": 16,
       "publicDeclarations": [
         {
           "kind": "fn",
@@ -39503,32 +39545,37 @@
         },
         {
           "kind": "fn",
-          "line": 557,
+          "line": 367,
+          "name": "buildDispatchPassGroupsForPipeline"
+        },
+        {
+          "kind": "fn",
+          "line": 589,
           "name": "createBindGroupLayout"
         },
         {
           "kind": "fn",
-          "line": 570,
+          "line": 602,
           "name": "createBindGroup"
         },
         {
           "kind": "fn",
-          "line": 584,
+          "line": 616,
           "name": "createShaderModule"
         },
         {
           "kind": "fn",
-          "line": 602,
+          "line": 634,
           "name": "createComputePipeline"
         },
         {
           "kind": "fn",
-          "line": 640,
+          "line": 672,
           "name": "createPipelineLayout"
         },
         {
           "kind": "fn",
-          "line": 654,
+          "line": 686,
           "name": "bindingUsageForBufferKind"
         }
       ],
@@ -39555,9 +39602,9 @@
         "src/full/surface/wgpu_surface_commands.zig"
       ],
       "roles": [],
-      "sha256": "4930a15507becd850391cb9989b5040d8474618aafd7967a61be470a12317b27",
+      "sha256": "8b91d3ee5e1422ccfc0a5d970f9e5fea0fddbfad1ba32e3d06bec923bf8c7f14",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 37
+      "topLevelDeclarationCount": 39
     },
     {
       "containsCImport": false,
@@ -40498,7 +40545,7 @@
       ],
       "isProductionRoot": false,
       "layer": "dropin",
-      "lineCount": 205,
+      "lineCount": 221,
       "onlyReexports": false,
       "owner": "dropin",
       "path": "src/dropin/wgpu_dropin_ext_a_core.zig",
@@ -40676,32 +40723,32 @@
         },
         {
           "kind": "fn",
-          "line": 134,
+          "line": 147,
           "name": "backend_type_for"
         },
         {
           "kind": "fn",
-          "line": 142,
+          "line": 155,
           "name": "fill_adapter_info_struct"
         },
         {
           "kind": "fn",
-          "line": 166,
+          "line": 182,
           "name": "fill_supported_features_from_adapter"
         },
         {
           "kind": "fn",
-          "line": 184,
+          "line": 200,
           "name": "fill_supported_features_from_device"
         },
         {
           "kind": "fn",
-          "line": 197,
+          "line": 213,
           "name": "symbolView"
         },
         {
           "kind": "fn",
-          "line": 201,
+          "line": 217,
           "name": "resolveRequiredProc"
         }
       ],
@@ -40717,9 +40764,9 @@
         "src/dropin/wgpu_dropin_ext_a_pipeline.zig"
       ],
       "roles": [],
-      "sha256": "5af06022690ca4041dfe70270183c29a824ff283e04622674ca4da6e52ed2b85",
+      "sha256": "16b53f94691a402bd5d4617fc88fc9ced0b6730d4cf3fca25574eac97181e044",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 43
+      "topLevelDeclarationCount": 45
     },
     {
       "containsCImport": false,
@@ -44500,11 +44547,11 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 34,
+      "lineCount": 35,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/api/doe_native_api_misc_exports.zig",
-      "publicDeclarationCount": 19,
+      "publicDeclarationCount": 20,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -44578,27 +44625,32 @@
         },
         {
           "kind": "const",
-          "line": 29,
+          "line": 28,
+          "name": "doeNativeAdapterGetPciIdentity"
+        },
+        {
+          "kind": "const",
+          "line": 30,
           "name": "doeNativeShaderModuleGetCompilationInfo"
         },
         {
           "kind": "const",
-          "line": 31,
+          "line": 32,
           "name": "label_store"
         },
         {
           "kind": "const",
-          "line": 32,
+          "line": 33,
           "name": "doeNativeObjectSetLabel"
         },
         {
           "kind": "const",
-          "line": 33,
+          "line": 34,
           "name": "doeNativeObjectGetLabel"
         },
         {
           "kind": "const",
-          "line": 34,
+          "line": 35,
           "name": "doeNativeObjectRemoveLabel"
         }
       ],
@@ -44612,9 +44664,9 @@
         "src/native/mod.zig"
       ],
       "roles": [],
-      "sha256": "9c083f3e8cc63258b37cf8776ea645f560a608718cae9ccf23acac2af1268b4f",
+      "sha256": "862eb2e80a3a4f0df4e133cdfb78f761e66183baa0edef5fa63bd38722807b55",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 23
+      "topLevelDeclarationCount": 24
     },
     {
       "containsCImport": false,
@@ -45610,7 +45662,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 658,
+      "lineCount": 676,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/lifecycle/doe_instance_device_native.zig",
@@ -45627,9 +45679,9 @@
         "src/native/surface/doe_surface_native.zig"
       ],
       "roles": [],
-      "sha256": "e6add742b112fb26bad26e952d26a72d2241fd46735394c79ccc593abee5f3b6",
+      "sha256": "0291b9c5a647322807016083b0723f12465f36ce563c663abe942cf8c61eaef0",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 89
+      "topLevelDeclarationCount": 90
     },
     {
       "containsCImport": false,
@@ -45645,11 +45697,11 @@
       ],
       "isProductionRoot": true,
       "layer": "native",
-      "lineCount": 260,
+      "lineCount": 261,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/mod.zig",
-      "publicDeclarationCount": 241,
+      "publicDeclarationCount": 242,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -46834,26 +46886,31 @@
         {
           "kind": "const",
           "line": 243,
-          "name": "doeNativeShaderModuleGetCompilationInfo"
+          "name": "doeNativeAdapterGetPciIdentity"
         },
         {
           "kind": "const",
           "line": 244,
-          "name": "label_store"
+          "name": "doeNativeShaderModuleGetCompilationInfo"
         },
         {
           "kind": "const",
           "line": 245,
-          "name": "doeNativeObjectSetLabel"
+          "name": "label_store"
         },
         {
           "kind": "const",
           "line": 246,
-          "name": "doeNativeObjectGetLabel"
+          "name": "doeNativeObjectSetLabel"
         },
         {
           "kind": "const",
           "line": 247,
+          "name": "doeNativeObjectGetLabel"
+        },
+        {
+          "kind": "const",
+          "line": 248,
           "name": "doeNativeObjectRemoveLabel"
         }
       ],
@@ -46875,9 +46932,9 @@
       "roles": [
         "package-root"
       ],
-      "sha256": "89f1e084c365610fb9d12fb6db2fe2340a8a50f3bbbeb9a477465c8380823769",
+      "sha256": "443b63b8d5cbfdd89b3db9cee418ff9699e9ee700444cba733f99d76b9eb2edb",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 245
+      "topLevelDeclarationCount": 246
     },
     {
       "containsCImport": false,
@@ -48481,7 +48538,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 79,
+      "lineCount": 139,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/support/doe_adapter_info_native.zig",
@@ -48497,9 +48554,9 @@
         "src/native/api/doe_native_api_misc_exports.zig"
       ],
       "roles": [],
-      "sha256": "a367f5c1bf39b721c21b5c1284a28b20072632ea8e4e412a0aae7941569d228e",
+      "sha256": "c4bbce3c74437940c5b8620760fbbfd74a0285adca0e5244c05fb3eca2a2d1de",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 11
+      "topLevelDeclarationCount": 17
     },
     {
       "containsCImport": false,
@@ -48925,7 +48982,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 414,
+      "lineCount": 419,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/support/doe_native_object_types.zig",
@@ -48958,82 +49015,82 @@
         },
         {
           "kind": "const",
-          "line": 53,
+          "line": 58,
           "name": "DoeDevice"
         },
         {
           "kind": "const",
-          "line": 71,
+          "line": 76,
           "name": "DoeQueue"
         },
         {
           "kind": "const",
-          "line": 96,
+          "line": 101,
           "name": "DoeBuffer"
         },
         {
           "kind": "const",
-          "line": 116,
+          "line": 121,
           "name": "DoeShaderModule"
         },
         {
           "kind": "const",
-          "line": 142,
+          "line": 147,
           "name": "DoeComputePipeline"
         },
         {
           "kind": "const",
-          "line": 186,
+          "line": 191,
           "name": "DoeBindGroupLayout"
         },
         {
           "kind": "const",
-          "line": 196,
+          "line": 201,
           "name": "DoePipelineLayout"
         },
         {
           "kind": "const",
-          "line": 205,
+          "line": 210,
           "name": "DoeBindGroup"
         },
         {
           "kind": "const",
-          "line": 225,
+          "line": 230,
           "name": "DoeCommandEncoder"
         },
         {
           "kind": "const",
-          "line": 233,
+          "line": 238,
           "name": "DoeComputePass"
         },
         {
           "kind": "const",
-          "line": 251,
+          "line": 256,
           "name": "DoeCommandBuffer"
         },
         {
           "kind": "const",
-          "line": 259,
+          "line": 264,
           "name": "DoeTexture"
         },
         {
           "kind": "const",
-          "line": 280,
+          "line": 285,
           "name": "DoeTextureView"
         },
         {
           "kind": "const",
-          "line": 297,
+          "line": 302,
           "name": "DoeSampler"
         },
         {
           "kind": "const",
-          "line": 306,
+          "line": 311,
           "name": "DoeRenderPipeline"
         },
         {
           "kind": "const",
-          "line": 356,
+          "line": 361,
           "name": "DoeRenderPass"
         }
       ],
@@ -49089,7 +49146,7 @@
         "src/native/vulkan/vulkan_render_shared.zig"
       ],
       "roles": [],
-      "sha256": "3e21635cad13cb97d31d030a469990773d74049d946477efb30e3671528488fc",
+      "sha256": "e7072c6316f1e988b013a5a252254d7728831aa034f725202794b36a4292ecf9",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 51
     },
@@ -51864,7 +51921,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 14,
+      "fanIn": 15,
       "fanOut": 13,
       "imports": [
         "src/backend/backend_policy.zig",
@@ -52017,6 +52074,7 @@
         "src/runtime/numeric_stability/runtime_decode.zig",
         "src/runtime/numeric_stability/runtime_eval.zig",
         "src/runtime/numeric_stability/runtime_plan.zig",
+        "src/runtime/output_oracle.zig",
         "src/runtime/trace/command_output.zig",
         "src/runtime/trace/operator_artifacts.zig",
         "src/runtime/trace/trace.zig",
@@ -53375,6 +53433,60 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
+      "fanOut": 5,
+      "imports": [
+        "src/backend/backend_policy.zig",
+        "src/contracts/command.zig",
+        "src/contracts/model/model_compute_types.zig",
+        "src/contracts/model/model_profile.zig",
+        "src/runtime/execution.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "runtime",
+      "lineCount": 323,
+      "onlyReexports": false,
+      "owner": "runtime",
+      "path": "src/runtime/output_oracle.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "Evidence"
+        },
+        {
+          "kind": "const",
+          "line": 28,
+          "name": "ValidationOptions"
+        },
+        {
+          "kind": "fn",
+          "line": 114,
+          "name": "validate"
+        },
+        {
+          "kind": "fn",
+          "line": 293,
+          "name": "needsLibraryLifetimeGuard"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/cli/runtime_cli.zig"
+      ],
+      "roles": [],
+      "sha256": "01a3e328cd0c125b727958ddbad02783add0883335ccce1848403debd52de03f",
+      "testBlockCount": 3,
+      "topLevelDeclarationCount": 17
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
       "fanOut": 1,
       "imports": [
         "src/runtime/cache/pipeline_cache.zig"
@@ -54170,7 +54282,7 @@
       ],
       "isProductionRoot": false,
       "layer": "runtime",
-      "lineCount": 840,
+      "lineCount": 883,
       "onlyReexports": false,
       "owner": "runtime",
       "path": "src/runtime/trace/trace.zig",
@@ -54188,77 +54300,77 @@
         },
         {
           "kind": "const",
-          "line": 123,
+          "line": 133,
           "name": "writef"
         },
         {
           "kind": "fn",
-          "line": 125,
+          "line": 135,
           "name": "writeJsonString"
         },
         {
           "kind": "fn",
-          "line": 129,
+          "line": 139,
           "name": "normalizeExecutionStatusCode"
         },
         {
           "kind": "fn",
-          "line": 137,
+          "line": 147,
           "name": "actionName"
         },
         {
           "kind": "fn",
-          "line": 142,
+          "line": 152,
           "name": "scopeName"
         },
         {
           "kind": "fn",
-          "line": 147,
+          "line": 157,
           "name": "safetyClassName"
         },
         {
           "kind": "fn",
-          "line": 152,
+          "line": 162,
           "name": "proofLevelName"
         },
         {
           "kind": "fn",
-          "line": 157,
+          "line": 167,
           "name": "verificationModeName"
         },
         {
           "kind": "fn",
-          "line": 162,
+          "line": 172,
           "name": "apiName"
         },
         {
           "kind": "fn",
-          "line": 200,
+          "line": 210,
           "name": "commandToTag"
         },
         {
           "kind": "fn",
-          "line": 226,
+          "line": 236,
           "name": "tracePayloadHash"
         },
         {
           "kind": "fn",
-          "line": 237,
+          "line": 247,
           "name": "tracePayloadHashWithSemantic"
         },
         {
           "kind": "fn",
-          "line": 271,
+          "line": 281,
           "name": "printTraceLine"
         },
         {
           "kind": "fn",
-          "line": 285,
+          "line": 295,
           "name": "printTraceLineWithSemantic"
         },
         {
           "kind": "fn",
-          "line": 610,
+          "line": 620,
           "name": "writeTraceMeta"
         }
       ],
@@ -54277,7 +54389,7 @@
         "src/runtime/trace/trace_jsonl_emit.zig"
       ],
       "roles": [],
-      "sha256": "9467c01fe4f024b4ce76419e361785043dd6072693197422539004233a117831",
+      "sha256": "7ca998d82e1521e609eec13f7ecb09fcf3ef59bb0e3d93e8c562d44d15d9bb65",
       "testBlockCount": 21,
       "topLevelDeclarationCount": 55
     },
@@ -54947,5 +55059,5 @@
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "e20ec266a04b93e68e003a37a7ae0b9a820a5c1928a054e380d3767a622f2e07"
+  "sourceTreeSha256": "8160f0b9b0b7d94e589a3e71eb4071015e58cf29756c501916d9ad9c2a2b4cb2"
 }

@@ -127,6 +127,7 @@
     "hostPlanArtifactHash": { "type": "string" },
     "queueSyncMode": { "type": "string" },
     "queueWaitMode": { "type": "string" },
+    "quirkMode": { "type": "string", "enum": ["off", "trace", "active"] },
     "webgpuFfiQueueWaitTimeoutNs": { "type": "integer", "minimum": 1 },
     "queueWaitScope": { "type": "string" },
     "queueWaitSubmitCadence": { "type": "integer", "minimum": 0 },
@@ -167,6 +168,37 @@
     "semanticReproCount": { "type": "integer", "minimum": 0 },
     "operatorRecordManifestPath": { "type": "string" },
     "operatorRecordManifestHash": { "type": "string" },
+    "outputOracleCount": { "type": "integer", "minimum": 0 },
+    "outputOracleMatchedCount": { "type": "integer", "minimum": 0 },
+    "outputOracleFailedCount": { "type": "integer", "minimum": 0 },
+    "outputOracleExpectedSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "outputOracleActualSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "outputOracleReferenceId": { "type": "string", "minLength": 1 },
+    "outputOracleKind": {
+      "type": "string",
+      "enum": ["sha256_exact_v1", "float32_reference_tolerance_v1"]
+    },
+    "outputOracleReferenceClass": {
+      "type": "string",
+      "enum": ["independent_v1", "cross_runtime_consensus_v1"]
+    },
+    "outputOracleReferenceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "outputOracleReferencePath": { "type": "string", "minLength": 1 },
+    "outputOracleComparedValueCount": { "type": "integer", "minimum": 0 },
+    "outputOracleMismatchCount": { "type": "integer", "minimum": 0 },
+    "outputOracleMaxAbsoluteError": { "type": "number", "minimum": 0 },
+    "outputOracleMaxRelativeError": { "type": "number", "minimum": 0 },
+    "outputOracleAbsoluteTolerance": { "type": "number", "minimum": 0 },
+    "outputOracleRelativeTolerance": { "type": "number", "minimum": 0 },
     "schema": { "type": "string" },
     "workload": { "type": "string" },
     "canonicalWorkloadId": { "type": "string" },

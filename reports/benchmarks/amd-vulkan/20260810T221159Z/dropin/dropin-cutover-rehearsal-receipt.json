@@ -1,0 +1,79 @@
+{
+  "abiValidation": {
+    "behaviorPass": true,
+    "benchmarkPass": true,
+    "exportedSymbolCount": 241,
+    "extraSymbolCount": 42,
+    "missingSymbolCount": 0,
+    "procResolutionPass": true,
+    "requiredSymbolCount": 199,
+    "symbolGatePass": true
+  },
+  "artifactKind": "dropin-cutover-rehearsal-receipt",
+  "claimStatus": "claimable",
+  "comparisonStatus": "comparable",
+  "cutoverPolicy": {
+    "defaultBackend": "doe_vulkan",
+    "path": "config/backend-cutover-policy.amd-vulkan.json",
+    "requireRollbackRehearsal": true,
+    "requiredCiValidation": false,
+    "rollbackBackend": "dawn_delegate",
+    "rollbackSwitchName": "strict_no_runtime_fallback",
+    "sha256": "5f3fb6921bf50c11183262892f97bb5a761cd531077308f1842ed54fc11fcf1f",
+    "targetLane": "vulkan_doe_release"
+  },
+  "dropinGate": {
+    "artifact": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+    "artifactSha256": "61a9e457cb994b5839e25de575e08ffba14ab6164f5d70eb45985a11a4e47565",
+    "benchmarkHtml": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_benchmark_report.html",
+    "outputTimestamp": "",
+    "pass": true,
+    "path": "reports/benchmarks/amd-vulkan/20260810T221159Z/dropin/dropin_report.json",
+    "sha256": "1ddd76ceccbdef1b7ee8fe7d0258b3296dd279e2d7cddbf7f838e0b28a941739",
+    "stepLabels": [
+      "symbol_gate",
+      "behavior_suite",
+      "proc_resolution",
+      "benchmark_suite",
+      "benchmark_visualization"
+    ]
+  },
+  "generatedAt": "2026-08-10T22:16:20.609456Z",
+  "pass": true,
+  "platform": {
+    "machine": "x86_64",
+    "os": "linux",
+    "pythonVersion": "3.14.4"
+  },
+  "reasons": [],
+  "receiptId": "dropin-cutover-amd-vulkan-20260810T221159Z",
+  "rehearsal": {
+    "dropinCandidateValid": true,
+    "rollbackBackend": "dawn_delegate",
+    "rollbackCandidateValid": true,
+    "rollbackRehearsed": true,
+    "stagedDefaultBackend": "doe_vulkan",
+    "strictNoRuntimeFallback": true,
+    "switchName": "strict_no_runtime_fallback"
+  },
+  "rollbackBackendEvidence": {
+    "claim": {
+      "artifactKind": "claim-report",
+      "path": "reports/benchmarks/amd-vulkan/20260810T222323Z/dawn-vs-doe.amd.vulkan.release.claim.json",
+      "sha256": "0e5805f91b2b65e4812d5a2690bd4ab32661fb784fad61ab89e651044c938816"
+    },
+    "claimStatus": "claimable",
+    "comparisonStatus": "comparable",
+    "observedExecutionBackends": [
+      "dawn_delegate",
+      "doe_vulkan"
+    ],
+    "report": {
+      "artifactKind": "compare-report",
+      "path": "reports/benchmarks/amd-vulkan/20260810T222323Z/dawn-vs-doe.amd.vulkan.release.compare.json",
+      "sha256": "5e5f9a43e6e3b87ef329850487f6a57d29c140fdfe754bff6819ab764ed6671c"
+    },
+    "rollbackBackend": "dawn_delegate"
+  },
+  "schemaVersion": 1
+}

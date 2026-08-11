@@ -65,6 +65,7 @@ fn freeCommandPayload(allocator: Allocator, command: model.Command) void {
                 allocator.free(oracle.initialization);
                 allocator.free(oracle.expected_sha256);
                 allocator.free(oracle.reference_id);
+                if (oracle.reference_path) |path| allocator.free(path);
             }
         },
         .buffer_write => |buffer_write| allocator.free(buffer_write.data),

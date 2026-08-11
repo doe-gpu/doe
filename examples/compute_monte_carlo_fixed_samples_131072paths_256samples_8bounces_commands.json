@@ -182,16 +182,19 @@
       }
     ],
     "output_oracle": {
-      "schema_version": 2,
+      "schema_version": 3,
       "scope": "command_graph",
-      "reference_class": "cross_runtime_consensus_v1",
-      "kind": "sha256_exact_v1",
+      "reference_class": "independent_v1",
+      "kind": "float32_reference_tolerance_v1",
       "initialization": "zero_fill_v1",
       "binding_group": 0,
       "binding": 2,
       "dispatch_count": 1,
-      "expected_sha256": "f47066faec78e7459a09529f45ef9a09c1dd538e6688176599e545e915f78818",
-      "reference_id": "bench/oracles/compute_heavy_graph_consensus_v1.py#compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces"
+      "reference_sha256": "f47066faec78e7459a09529f45ef9a09c1dd538e6688176599e545e915f78818",
+      "reference_id": "bench/oracles/monte_carlo_reference_v1.c#final-radiance",
+      "reference_path": "bench/oracles/data/monte_carlo_fixed_samples_131072paths_256samples_8bounces.f32le.bin",
+      "absolute_tolerance": 1e-06,
+      "relative_tolerance": 1e-05
     }
   }
 ]

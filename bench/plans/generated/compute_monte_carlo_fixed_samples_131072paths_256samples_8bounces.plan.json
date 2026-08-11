@@ -11,8 +11,8 @@
   "bufferWriteCount": 4,
   "bufferLoadCount": 0,
   "dispatchCount": 4,
-  "sourceIrSha256": "1732c9e3e2e3eba24cc648d4764523c84178dd9f508eeab8b9370ee675ec4912",
-  "compatibilityCommandsSha256": "2f0c15722a1367f4a59a7f6b4ac6d5597891f7561b2167ef62b6e2e1417af4d6",
+  "sourceIrSha256": "e5aef709ca246b16cdfda6a5d197588730818ac1dc6e6ab002c2ea5d49da45b0",
+  "compatibilityCommandsSha256": "683daa23023383da2320f0886f59ff406f6e2603bf74b0b7f6865c940c31c3ba",
   "commands": [
     {
       "kind": "buffer_write",
@@ -197,18 +197,21 @@
         }
       ],
       "output_oracle": {
-        "schema_version": 2,
+        "schema_version": 3,
         "scope": "command_graph",
-        "reference_class": "cross_runtime_consensus_v1",
-        "kind": "sha256_exact_v1",
+        "reference_class": "independent_v1",
+        "kind": "float32_reference_tolerance_v1",
         "initialization": "zero_fill_v1",
         "binding_group": 0,
         "binding": 2,
         "dispatch_count": 1,
-        "expected_sha256": "f47066faec78e7459a09529f45ef9a09c1dd538e6688176599e545e915f78818",
-        "reference_id": "bench/oracles/compute_heavy_graph_consensus_v1.py#compute_monte_carlo_fixed_samples_131072paths_256samples_8bounces"
+        "reference_sha256": "f47066faec78e7459a09529f45ef9a09c1dd538e6688176599e545e915f78818",
+        "reference_id": "bench/oracles/monte_carlo_reference_v1.c#final-radiance",
+        "reference_path": "bench/oracles/data/monte_carlo_fixed_samples_131072paths_256samples_8bounces.f32le.bin",
+        "absolute_tolerance": 1e-06,
+        "relative_tolerance": 1e-05
       }
     }
   ],
-  "planSha256": "441ac3236f40b99d871421054ba860b7b954a7027f8c1b35dc5c7009edc2655b"
+  "planSha256": "02e6f49c8f9cee2d4b954595a9b0addeb0414fedaea54334ebe58720a9645c7d"
 }

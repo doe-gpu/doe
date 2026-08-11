@@ -4193,16 +4193,19 @@
       }
     ],
     "output_oracle": {
-      "schema_version": 2,
+      "schema_version": 3,
       "scope": "command_graph",
-      "reference_class": "cross_runtime_consensus_v1",
-      "kind": "sha256_exact_v1",
+      "reference_class": "independent_v1",
+      "kind": "float32_reference_tolerance_v1",
       "initialization": "zero_fill_v1",
       "binding_group": 0,
       "binding": 2,
       "dispatch_count": 1,
-      "expected_sha256": "d9d5f00c8c762f00b0539cdbf7474bb4288ef1d4c86d00297b0db0ba5a971839",
-      "reference_id": "bench/oracles/compute_heavy_graph_consensus_v1.py#compute_stable_fluids_multistage_256grid_18pressure_4steps"
+      "reference_sha256": "0f173a647dcc8235045e7fa74f4a2da99a6c290cf5e0092498a3e2c582c5a1a3",
+      "reference_id": "bench/oracles/stable_fluids_reference_v1.c#final-dye",
+      "reference_path": "bench/oracles/data/stable_fluids_multistage_256grid_18pressure_4steps.f32le.bin",
+      "absolute_tolerance": 1e-06,
+      "relative_tolerance": 1e-05
     }
   }
 ]

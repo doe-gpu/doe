@@ -737,6 +737,16 @@ def run_workload(
                 "outputOracleExpectedSha256",
                 "outputOracleActualSha256",
                 "outputOracleReferenceId",
+                "outputOracleKind",
+                "outputOracleReferenceClass",
+                "outputOracleReferenceSha256",
+                "outputOracleReferencePath",
+                "outputOracleComparedValueCount",
+                "outputOracleMismatchCount",
+                "outputOracleMaxAbsoluteError",
+                "outputOracleMaxRelativeError",
+                "outputOracleAbsoluteTolerance",
+                "outputOracleRelativeTolerance",
             )
             if key in preflight_meta
         }

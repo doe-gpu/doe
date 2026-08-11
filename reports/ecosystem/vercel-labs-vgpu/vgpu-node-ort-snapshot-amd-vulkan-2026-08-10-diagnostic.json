@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "vgpu-node-ort-snapshot-amd-vulkan-2026-08-10-diagnostic",
+  "actorId": "vercel-labs-vgpu",
+  "harnessId": "node-ort-snapshot",
+  "generatedAt": "2026-08-10T22:40:28.021Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-10T23:25:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "10",
+  "upstream": {
+    "repositoryUrl": "https://github.com/vercel-labs/vgpu",
+    "commit": "86f2cadbd7a087f1695d736a12e218ab1ea2fc63",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "physical-amd-vulkan-providers",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "The preparation probe and both provider probes reject software rendering and bind the run to the accessible AMD Vulkan adapter; Doe additionally reports numeric PCI and driver identity.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/preparation.json",
+          "sha256": "e80d97618ed8a3b74ef729ff5b5980ad7dd563957f785242633d4d567c36e257"
+        },
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/receipt-summary.json",
+          "sha256": "1fe8b81d3bd26cc994e141e46882efd45be7b1fa11bf36db30036a329d9ff8bd"
+        }
+      ]
+    },
+    {
+      "id": "doe-node-ort-application-pass",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "Doe and the pinned Node/Dawn provider each complete every clean application process with matching dispatch shape, synchronization, readback, numeric output, copy-count, zero-copy identity, and lifecycle assertions.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/raw-matrix.json",
+          "sha256": "c8c82d834f504140af621b2ee608db27e039743fb939751a05f8885e6d7b4c49"
+        },
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/receipt-summary.json",
+          "sha256": "1fe8b81d3bd26cc994e141e46882efd45be7b1fa11bf36db30036a329d9ff8bd"
+        }
+      ]
+    },
+    {
+      "id": "release-promotion-not-attempted",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "The application result is retained as downstream compatibility evidence only; the harness support target is diagnostic and the run does not satisfy release stress, replay, leak, concurrency, or operation-timing requirements.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/reproduction.json",
+          "sha256": "3c812031b0ae2819a17e029e5ad5bdaa573a6bb3e50c80cc4b023f9df06f2854"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The harness and its matched Linux support target remain diagnostic rather than promoted release dependencies.",
+    "Clean-process duration is not a selected GPU operation timing scope and supports no performance claim.",
+    "The run does not provide concurrency, stress, bounded-growth leak, or receipt-driven replay evidence.",
+    "The result covers the pinned Node ONNX Runtime integration workload, not vgpu's browser renderer or complete API surface."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 411586560
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 419065856
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The harness records diagnostic clean-process latency, not matched selected GPU operation timing."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The harness did not run matched traced and untraced application samples."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The isolated pinned workspace installation passed, but the provider loader is a controlled harness substitution rather than a production installation path."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "The physical AMD Vulkan preflight and both runtime provider probes passed without software rendering."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic matrix uses sequential clean processes."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Every process passed the workload's device, wrapper, GPU, and ONNX Runtime lifecycle assertions."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The clean-process matrix does not satisfy the promotion stress policy."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak memory is recorded, but bounded-growth leak testing did not run."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "Preparation, source, provider identity, runtime artifacts, process results, dispatch shape, synchronization, readback, and output identity are hash-linked."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "The workload did not collect matched selected-operation GPU timing."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is diagnostic and is not a promoted release dependency."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/preparation.json",
+      "sha256": "e80d97618ed8a3b74ef729ff5b5980ad7dd563957f785242633d4d567c36e257"
+    },
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/reproduction.json",
+      "sha256": "3c812031b0ae2819a17e029e5ad5bdaa573a6bb3e50c80cc4b023f9df06f2854"
+    },
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/receipt-summary.json",
+      "sha256": "1fe8b81d3bd26cc994e141e46882efd45be7b1fa11bf36db30036a329d9ff8bd"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/raw-matrix.json",
+      "sha256": "c8c82d834f504140af621b2ee608db27e039743fb939751a05f8885e6d7b4c49"
+    }
+  ]
+}

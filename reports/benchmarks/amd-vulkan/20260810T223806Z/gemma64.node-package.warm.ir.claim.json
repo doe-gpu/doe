@@ -1,0 +1,38 @@
+{
+  "artifactKind": "claim-report",
+  "claimPolicy": {
+    "benchmarkPolicy": {
+      "path": "config/benchmark-methodology-thresholds.json",
+      "sha256": "12c066c708f697a5ff2a508f4a240bc4a2da711051a58184b3cd31c1112c2981"
+    },
+    "minTimedSamples": 15,
+    "mode": "local",
+    "policyHash": "c58a192437af59287575fce3f015778332963288b8b28830021b35a502fceb0f"
+  },
+  "claimStatus": "claimable",
+  "compareReport": {
+    "path": "reports/benchmarks/amd-vulkan/20260810T223806Z/gemma64.node-package.warm.ir.compare.json",
+    "sha256": "20fadbd389cb93759c9375de54657ad089a0c9b4a4c682d6b8e94ca7a4fb2eac"
+  },
+  "comparisonStatus": "comparable",
+  "generatedAt": "2026-08-10T22:39:22.189543+00:00",
+  "pass": true,
+  "reasons": [],
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "auditNotes": [],
+      "claimMetricField": "deltaPercent",
+      "claimMetricScope": "selectedTiming",
+      "claimable": true,
+      "evaluated": true,
+      "reasons": [],
+      "requiredPositivePercentiles": [
+        "p50Percent",
+        "p95Percent"
+      ],
+      "skipReason": "",
+      "workloadId": "inference_gemma3_270m_prefill_64tok_decode_64tok"
+    }
+  ]
+}

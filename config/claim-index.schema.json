@@ -45,7 +45,7 @@
         },
         "comparison": {
           "type": "string",
-          "enum": ["doe-vs-dawn", "doe-vs-node-webgpu", "doe-vs-bun-webgpu"]
+          "enum": ["doe-vs-dawn", "doe-vs-node-webgpu", "doe-vs-bun-webgpu", "doe-vs-deno-webgpu"]
         },
         "metricDirection": {
           "type": "string",

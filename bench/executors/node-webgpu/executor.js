@@ -36,6 +36,10 @@ const DOE_BUN_PACKAGE_PATH = join(
   REPO_ROOT,
   'packages/doe-gpu/src/bun.js',
 );
+const DOE_DENO_PACKAGE_PATH = join(
+  REPO_ROOT,
+  'packages/doe-gpu/src/deno.js',
+);
 const DOE_BUN_FFI_PACKAGE_PATH = join(
   REPO_ROOT,
   'packages/doe-gpu/src/vendor/webgpu/bun-ffi.js',
@@ -94,6 +98,20 @@ const PROVIDERS_BY_RUNTIME = Object.freeze({
       loader: 'bun-doe-ffi',
     },
   }),
+  deno: Object.freeze({
+    'deno-webgpu': {
+      provider: 'deno-webgpu',
+      providerName: 'deno-webgpu',
+      executionBackend: 'deno_webgpu_package',
+      loader: 'deno-webgpu',
+    },
+    doe: {
+      provider: 'doe',
+      providerName: 'doe-gpu',
+      executionBackend: 'doe_deno_package',
+      loader: 'deno-doe',
+    },
+  }),
 });
 
 const TRACE_META_PROCESS_WALL_SOURCE = 'trace-meta-process-wall';
@@ -119,6 +137,19 @@ const PACKAGE_READBACK_MODE_MAP_ASYNC = 'mapAsync';
 const PACKAGE_READBACK_RESULT_NATIVE = 'map-read-copy-unmap';
 const TRACE_REPLAY_SEED = '0x9e3779b97f4a7c15';
 const PACKAGE_TRACE_MODULE = 'package-webgpu-executor';
+const ADAPTER_INFO_FIELDS = Object.freeze([
+  'vendor',
+  'architecture',
+  'device',
+  'description',
+  'isFallbackAdapter',
+  'subgroupMinSize',
+  'subgroupMaxSize',
+  'subgroupMatrixConfigs',
+  'vendorID',
+  'deviceID',
+  'driverVersion',
+]);
 let packageExecutionPolicyPromise = null;
 
 export const PROVIDER_FAILURE_REASONS = Object.freeze([
@@ -136,6 +167,20 @@ const PROVIDER_FAILURE_REASON_SET = new Set(PROVIDER_FAILURE_REASONS);
 
 export function normalizeProviderFailureReason(reason) {
   return PROVIDER_FAILURE_REASON_SET.has(reason) ? reason : 'runner_error';
+}
+
+export function snapshotAdapterInfo(adapterInfo) {
+  if (adapterInfo === null || typeof adapterInfo !== 'object') {
+    return null;
+  }
+  const snapshot = {};
+  for (const fieldName of ADAPTER_INFO_FIELDS) {
+    const value = adapterInfo[fieldName];
+    if (value !== undefined) {
+      snapshot[fieldName] = value;
+    }
+  }
+  return snapshot;
 }
 
 export function providerAvailabilityFailure({
@@ -2078,7 +2123,7 @@ function packageWriteBatchMinConsecutiveWrites(policy, {
   return Number.isInteger(value) && value >= 2 ? value : 2;
 }
 
-function globalsFromGlobalThis() {
+function webGpuGlobalsFromGlobalThis() {
   const required = [
     'GPUBufferUsage',
     'GPUShaderStage',
@@ -2089,7 +2134,7 @@ function globalsFromGlobalThis() {
   for (const name of required) {
     const value = globalThis[name];
     if (value === undefined) {
-      throw new Error(`global ${name} is not available after Bun WebGPU setup`);
+      throw new Error(`global ${name} is not available after WebGPU setup`);
     }
     globals[name] = value;
   }
@@ -2145,7 +2190,19 @@ async function resolveBunWebGpuModule() {
   }
   return {
     create: () => navigator.gpu,
-    globals: globalsFromGlobalThis(),
+    globals: webGpuGlobalsFromGlobalThis(),
+  };
+}
+
+function resolveDenoWebGpuModule() {
+  if (typeof navigator === 'undefined' || !navigator.gpu) {
+    throw new Error(
+      'Deno WebGPU is unavailable; run with --unstable-webgpu on a supported host',
+    );
+  }
+  return {
+    create: () => navigator.gpu,
+    globals: webGpuGlobalsFromGlobalThis(),
   };
 }
 
@@ -2175,6 +2232,10 @@ async function resolveProviderModule(spec) {
       return await import(pathToFileURL(DOE_BUN_FFI_PACKAGE_PATH).href);
     case 'bun-webgpu':
       return await resolveBunWebGpuModule();
+    case 'deno-doe':
+      return await import(pathToFileURL(DOE_DENO_PACKAGE_PATH).href);
+    case 'deno-webgpu':
+      return resolveDenoWebGpuModule();
     default:
       throw new Error(`unsupported provider loader: ${spec.loader}`);
   }
@@ -2464,6 +2525,7 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
       }),
     });
   }
+  const adapterInfo = snapshotAdapterInfo(device?.adapterInfo ?? adapter?.info ?? null);
   const hostExecutorInitTotalNs = nsDelta(executorInitStartedAt);
   const queue = device.queue;
   const queueWaitMode = queueWaitModeForRuntimeHost(runtimeHost);
@@ -2648,6 +2710,7 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
     providerModule: webgpu,
     providerRoot: gpu,
     adapter,
+    adapterInfo,
     device,
     queue,
     queueWaitMode,
@@ -3423,7 +3486,7 @@ async function executeSample(
     canonicalWorkloadId: normalizedPlan.workloadId,
     planId: normalizedPlan.planId,
     planHash: normalizedPlan.planHash,
-    adapterInfo: runtime.adapter.info ?? null,
+    adapterInfo: runtime.adapterInfo,
     adapterLimits: runtime.adapter.limits ?? null,
     planSummary: planSummary(normalizedPlan),
     executionShape: normalizedPlan.executionShape,

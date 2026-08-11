@@ -1,0 +1,336 @@
+{
+  "commandTemplate": "node tools/run_node --quiet --gpu-provider {repo_root}/bench/cts/fawn-node-gpu-provider.cjs {query}",
+  "configPath": "bench/fixtures/cts_subset.fawn-node.json",
+  "generatedAtUtc": "2026-08-10T23:00:41.701519Z",
+  "identityProbe": {
+    "command": [
+      "node",
+      "/home/x/deco/doe/bench/cts/probe-fawn-node-adapter.cjs"
+    ],
+    "configured": true,
+    "error": "",
+    "exitCode": 0,
+    "identity": {
+      "adapterInfo": {
+        "architecture": "vulkan",
+        "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+        "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+        "deviceID": 5510,
+        "driverVersion": 109051907,
+        "isFallbackAdapter": false,
+        "subgroupMaxSize": 32,
+        "subgroupMinSize": 32,
+        "vendor": "AMD",
+        "vendorID": 4098
+      },
+      "artifactKind": "webgpu_cts_adapter_identity",
+      "provider": "fawn-node-gpu-provider",
+      "schemaVersion": 1
+    },
+    "pass": true,
+    "required": true,
+    "stderrTail": [],
+    "stdoutTail": [
+      "{\"schemaVersion\":1,\"artifactKind\":\"webgpu_cts_adapter_identity\",\"provider\":\"fawn-node-gpu-provider\",\"adapterInfo\":{\"vendor\":\"AMD\",\"architecture\":\"vulkan\",\"device\":\"Radeon 8060S Graphics (RADV STRIX_HALO)\",\"description\":\"Radeon 8060S Graphics (RADV STRIX_HALO)\",\"isFallbackAdapter\":false,\"subgroupMinSize\":32,\"subgroupMaxSize\":32,\"vendorID\":4098,\"deviceID\":5510,\"driverVersion\":109051907}}"
+    ],
+    "wallMs": 152.72959193680435
+  },
+  "requirementsNote": "Install vendored CTS dependencies first: cd bench/vendor/dawn/third_party/webgpu-cts && npm install",
+  "rows": [
+    {
+      "bucket": "adapter",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,adapter,requestAdapter:*"
+      ],
+      "exitCode": 0,
+      "id": "adapter_request",
+      "notes": "RequestAdapter behavior and option handling.",
+      "pass": true,
+      "query": "webgpu:api,operation,adapter,requestAdapter:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 1052.1731389453635
+    },
+    {
+      "bucket": "adapter",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,adapter,requestDevice:*"
+      ],
+      "exitCode": 0,
+      "id": "adapter_request_device",
+      "notes": "RequestDevice behavior and feature/limit negotiation.",
+      "pass": true,
+      "query": "webgpu:api,operation,adapter,requestDevice:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 4792.934753000736
+    },
+    {
+      "bucket": "buffer",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,buffers,map:*"
+      ],
+      "exitCode": 0,
+      "id": "buffer_map",
+      "notes": "Core mapAsync and mapped range behavior.",
+      "pass": true,
+      "query": "webgpu:api,operation,buffers,map:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 1542.0058600138873
+    },
+    {
+      "bucket": "buffer",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,buffers,createBindGroup:*"
+      ],
+      "exitCode": 0,
+      "id": "buffer_bind_group",
+      "notes": "Buffer binding compatibility inside bind groups.",
+      "pass": true,
+      "query": "webgpu:api,operation,buffers,createBindGroup:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 1248.5269969329238
+    },
+    {
+      "bucket": "command_buffer",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,command_buffer,basic:*"
+      ],
+      "exitCode": 0,
+      "id": "command_buffer_basic",
+      "notes": "Encoder lifecycle and basic command-buffer execution.",
+      "pass": true,
+      "query": "webgpu:api,operation,command_buffer,basic:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 1256.8394760601223
+    },
+    {
+      "bucket": "command_buffer",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,command_buffer,copyBufferToBuffer:*"
+      ],
+      "exitCode": 0,
+      "id": "command_copy_buffer_to_buffer",
+      "notes": "Core buffer copy semantics.",
+      "pass": true,
+      "query": "webgpu:api,operation,command_buffer,copyBufferToBuffer:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 1305.134855909273
+    },
+    {
+      "bucket": "queue",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,queue,writeBuffer:*"
+      ],
+      "exitCode": 0,
+      "id": "queue_write_buffer",
+      "notes": "CPU-to-GPU upload path correctness.",
+      "pass": true,
+      "query": "webgpu:api,operation,queue,writeBuffer:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 1267.3736939905211
+    },
+    {
+      "bucket": "queue",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,onSubmittedWorkDone:*"
+      ],
+      "exitCode": 0,
+      "id": "queue_on_submitted_work_done",
+      "notes": "Queue completion semantics.",
+      "pass": true,
+      "query": "webgpu:api,operation,onSubmittedWorkDone:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 1248.4867119928822
+    },
+    {
+      "bucket": "compute",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,operation,compute,basic:*"
+      ],
+      "exitCode": 0,
+      "id": "compute_basic",
+      "notes": "Basic compute pipeline and dispatch behavior.",
+      "pass": true,
+      "query": "webgpu:api,operation,compute,basic:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 24594.61673197802
+    },
+    {
+      "bucket": "validation",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,validation,error_scope:*"
+      ],
+      "exitCode": 0,
+      "id": "validation_error_scope",
+      "notes": "Error scope push/pop correctness.",
+      "pass": true,
+      "query": "webgpu:api,validation,error_scope:*",
+      "stderrTail": [
+        "radv/amdgpu: Failed to allocate a buffer:",
+        "radv/amdgpu:    size      : 8796093022208 bytes",
+        "radv/amdgpu:    alignment : 262144 bytes",
+        "radv/amdgpu:    domains   : 4",
+        "radv/amdgpu: Failed to allocate a buffer:",
+        "radv/amdgpu:    size      : 8796093022208 bytes",
+        "radv/amdgpu:    alignment : 262144 bytes",
+        "radv/amdgpu:    domains   : 4",
+        "radv/amdgpu: Failed to allocate a buffer:",
+        "radv/amdgpu:    size      : 8796093022208 bytes",
+        "radv/amdgpu:    alignment : 262144 bytes",
+        "radv/amdgpu:    domains   : 4",
+        "radv/amdgpu: Failed to allocate a buffer:",
+        "radv/amdgpu:    size      : 8796093022208 bytes",
+        "radv/amdgpu:    alignment : 262144 bytes",
+        "radv/amdgpu:    domains   : 4",
+        "radv/amdgpu: Failed to allocate a buffer:",
+        "radv/amdgpu:    size      : 8796093022208 bytes",
+        "radv/amdgpu:    alignment : 262144 bytes",
+        "radv/amdgpu:    domains   : 4"
+      ],
+      "stdoutTail": [],
+      "wallMs": 1167.075271019712
+    },
+    {
+      "bucket": "validation",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:api,validation,buffer,create:*"
+      ],
+      "exitCode": 0,
+      "id": "validation_buffer_create",
+      "notes": "Buffer descriptor validation.",
+      "pass": true,
+      "query": "webgpu:api,validation,buffer,create:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 1295.3196680173278
+    },
+    {
+      "bucket": "shader_execution",
+      "command": [
+        "node",
+        "tools/run_node",
+        "--quiet",
+        "--gpu-provider",
+        "/home/x/deco/doe/bench/cts/fawn-node-gpu-provider.cjs",
+        "webgpu:shader,execution,expression,call,builtin,textureDimensions:*"
+      ],
+      "exitCode": 0,
+      "id": "shader_texture_dimensions",
+      "notes": "WGSL builtin execution coverage already used in the prior subset.",
+      "pass": true,
+      "query": "webgpu:shader,execution,expression,call,builtin,textureDimensions:*",
+      "stderrTail": [],
+      "stdoutTail": [],
+      "wallMs": 24741.652533994056
+    }
+  ],
+  "schemaVersion": 2,
+  "summary": {
+    "bucketSummary": {
+      "adapter": {
+        "failCount": 0,
+        "passCount": 2,
+        "queryCount": 2
+      },
+      "buffer": {
+        "failCount": 0,
+        "passCount": 2,
+        "queryCount": 2
+      },
+      "command_buffer": {
+        "failCount": 0,
+        "passCount": 2,
+        "queryCount": 2
+      },
+      "compute": {
+        "failCount": 0,
+        "passCount": 1,
+        "queryCount": 1
+      },
+      "queue": {
+        "failCount": 0,
+        "passCount": 2,
+        "queryCount": 2
+      },
+      "shader_execution": {
+        "failCount": 0,
+        "passCount": 1,
+        "queryCount": 1
+      },
+      "validation": {
+        "failCount": 0,
+        "passCount": 2,
+        "queryCount": 2
+      }
+    },
+    "dryRun": false,
+    "failCount": 0,
+    "identityBound": true,
+    "passCount": 12,
+    "queryCount": 12
+  },
+  "workdir": "/home/x/deco/doe/bench/vendor/dawn/third_party/webgpu-cts"
+}

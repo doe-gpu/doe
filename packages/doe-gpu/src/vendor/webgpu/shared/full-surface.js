@@ -1053,7 +1053,10 @@ function createFullSurfaceClasses({
       const baseMipLevel = assertIntegerInRange(viewDescriptor.baseMipLevel ?? 0, 'GPUTexture.createView', 'descriptor.baseMipLevel', { min: 0, max: UINT32_MAX });
       const baseArrayLayer = assertIntegerInRange(viewDescriptor.baseArrayLayer ?? 0, 'GPUTexture.createView', 'descriptor.baseArrayLayer', { min: 0, max: UINT32_MAX });
       const mipLevelCount = assertIntegerInRange(viewDescriptor.mipLevelCount ?? Math.max(1, this.mipLevelCount - baseMipLevel), 'GPUTexture.createView', 'descriptor.mipLevelCount', { min: 1, max: UINT32_MAX });
-      const arrayLayerCount = assertIntegerInRange(viewDescriptor.arrayLayerCount ?? Math.max(1, this.depthOrArrayLayers - baseArrayLayer), 'GPUTexture.createView', 'descriptor.arrayLayerCount', { min: 1, max: UINT32_MAX });
+      const defaultArrayLayerCount = this.dimension === '3d'
+        ? 1
+        : Math.max(1, this.depthOrArrayLayers - baseArrayLayer);
+      const arrayLayerCount = assertIntegerInRange(viewDescriptor.arrayLayerCount ?? defaultArrayLayerCount, 'GPUTexture.createView', 'descriptor.arrayLayerCount', { min: 1, max: UINT32_MAX });
       const format = viewDescriptor.format ?? this.format;
       if (format !== this.format && !this.viewFormats.includes(format)) {
         failValidation('GPUTexture.createView', 'descriptor.format must match texture.format or one of texture.viewFormats');

@@ -5,10 +5,11 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from native_compare_modules.reporting import safe_int
+from native_compare_modules.reporting import parse_int, safe_int
 
 
 _DRIVER_VERSION_PATTERN = re.compile(r"(?<!\d)(\d+)\.(\d+)\.(\d+)(?!\d)")
+_HARDWARE_TEXT_PATTERN = re.compile(r"[^a-z0-9]+")
 
 
 def _vulkan_driver_version(raw_version: int) -> str:
@@ -45,6 +46,10 @@ def _adapter_identities(samples: list[dict[str, Any]]) -> list[dict[str, Any]]:
         )
         vendor_id = safe_int(adapter_info.get("vendorID"), default=0)
         device_id = safe_int(adapter_info.get("deviceID"), default=0)
+        if vendor_id <= 0:
+            vendor_id = parse_int(adapter_info.get("vendor")) or 0
+        if device_id <= 0:
+            device_id = parse_int(adapter_info.get("device")) or 0
         key = (vendor_id, device_id, driver_version)
         identities[key] = {
             "vendor": str(adapter_info.get("vendor", "")).strip(),
@@ -62,6 +67,42 @@ def _is_vulkan_identity(identity: dict[str, Any]) -> bool:
     architecture = str(identity.get("architecture", "")).lower()
     device = str(identity.get("device", "")).lower()
     return architecture == "vulkan" or "radv" in device
+
+
+def _normalized_hardware_text(value: Any) -> str:
+    return _HARDWARE_TEXT_PATTERN.sub("", str(value).strip().lower())
+
+
+def _physical_identity_match(
+    left: dict[str, Any],
+    right: dict[str, Any],
+) -> tuple[bool, str]:
+    left_numeric = left["vendorID"] > 0 and left["deviceID"] > 0
+    right_numeric = right["vendorID"] > 0 and right["deviceID"] > 0
+    driver_match = bool(left["driverVersion"]) and (
+        left["driverVersion"] == right["driverVersion"]
+    )
+    if left_numeric and right_numeric:
+        return (
+            driver_match
+            and left["vendorID"] == right["vendorID"]
+            and left["deviceID"] == right["deviceID"],
+            "numeric_vendor_device_driver",
+        )
+
+    left_vendor = _normalized_hardware_text(left["vendor"])
+    right_vendor = _normalized_hardware_text(right["vendor"])
+    left_device = _normalized_hardware_text(left["device"])
+    right_device = _normalized_hardware_text(right["device"])
+    return (
+        driver_match
+        and bool(left_vendor)
+        and left_vendor not in {"generic", "unknown"}
+        and left_vendor == right_vendor
+        and bool(left_device)
+        and left_device == right_device,
+        "webgpu_reported_vendor_device_driver",
+    )
 
 
 def record_hardware_path_obligation(
@@ -84,26 +125,26 @@ def record_hardware_path_obligation(
         and any(_is_vulkan_identity(identity) for identity in left_identities + right_identities)
     )
     identity_match = True
+    identity_match_basis = "not_applicable"
     identity_failure = ""
     if vulkan_package_identity_applies:
-        identity_match = (
-            len(left_identities) == 1
-            and len(right_identities) == 1
-            and left_identities[0]["vendorID"] > 0
-            and left_identities[0]["deviceID"] > 0
-            and bool(left_identities[0]["driverVersion"])
-            and left_identities[0]["vendorID"] == right_identities[0]["vendorID"]
-            and left_identities[0]["deviceID"] == right_identities[0]["deviceID"]
-            and left_identities[0]["driverVersion"] == right_identities[0]["driverVersion"]
-        )
+        identity_match = len(left_identities) == 1 and len(right_identities) == 1
+        if identity_match:
+            identity_match, identity_match_basis = _physical_identity_match(
+                left_identities[0], right_identities[0]
+            )
         if not identity_match:
             identity_failure = (
                 "strict Vulkan package comparison requires one matching physical "
-                "vendorID/deviceID/driverVersion identity on both sides: "
+                "identity reported by both runtimes: use vendorID/deviceID/driverVersion "
+                "when both expose numeric IDs, otherwise require exact normalized "
+                "vendor/device/driverVersion text: "
                 f"baseline={left_identities} comparison={right_identities}"
             )
 
-    hardware_path_match_applies = comparability_mode == "strict" and is_dawn_vs_doe
+    hardware_path_match_applies = comparability_mode == "strict" and (
+        is_dawn_vs_doe or package_execution_applies
+    )
     path_failure = ""
     if workload_path_asymmetry:
         path_failure = (
@@ -124,11 +165,13 @@ def record_hardware_path_obligation(
         details={
             "comparabilityMode": comparability_mode,
             "isDawnVsDoe": is_dawn_vs_doe,
+            "packageExecutionApplies": package_execution_applies,
             "workloadPathAsymmetry": bool(workload_path_asymmetry),
             "workloadPathAsymmetryNote": workload_path_asymmetry_note,
             "vulkanPackageIdentityApplies": vulkan_package_identity_applies,
             "baselineAdapterIdentities": left_identities,
             "comparisonAdapterIdentities": right_identities,
             "physicalAdapterIdentityMatch": identity_match,
+            "physicalAdapterIdentityMatchBasis": identity_match_basis,
         },
     )

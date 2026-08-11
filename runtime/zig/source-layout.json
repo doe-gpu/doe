@@ -1288,9 +1288,9 @@
       },
       "src/cli/runtime_cli.zig": {
         "decision": "Keep",
-        "moduleSha256": "b1f52fe0e2dcd7469b82881a112caf9d0146d77f5668b13918efba9d405fd4d0",
-        "reason": "Keep: reachable cli implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-output-oracle-graph/2026-08-10"
+        "moduleSha256": "a4475273b777ee4a827f8ad13e63287f27dee768f5f561f68468076f9c82bea9",
+        "reason": "Keep: process-facing runtime orchestration after output-oracle execution and comparison moved to its runtime owner.",
+        "reviewer": "codex-output-oracle-module/2026-08-10"
       },
       "src/cli/runtime_cli_args.zig": {
         "decision": "Keep",
@@ -1318,9 +1318,9 @@
       },
       "src/command/command_json.zig": {
         "decision": "Keep",
-        "moduleSha256": "53ace023c1f9548c95a02cfb3a916a80a9dd214dba7c3825badf1f1977b8e1a7",
+        "moduleSha256": "13d4508f653d06b28465949839e1f476031f795fd720a7a4759f6f7e0249b92d",
         "reason": "Keep: reachable command implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-independent-float32-oracle/2026-08-10"
       },
       "src/command/command_json_extra.zig": {
         "decision": "Keep",
@@ -1330,9 +1330,9 @@
       },
       "src/command/command_json_raw.zig": {
         "decision": "Keep",
-        "moduleSha256": "807830dec4ac1394e616b0ecaf8b9f55334ce89b7e503561e58e4b316fb726a3",
+        "moduleSha256": "3b56a24af2c83ab6940524c4c395c06f2d334aa52b18399e4e0e1ccc3fc1d3e6",
         "reason": "Keep: reachable command implementation shared by 6 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-oracle-reference-class/2026-08-10"
+        "reviewer": "codex-independent-float32-oracle/2026-08-10"
       },
       "src/command/command_kind.zig": {
         "decision": "Keep",
@@ -1348,9 +1348,9 @@
       },
       "src/command/command_parse_dispatch.zig": {
         "decision": "Keep",
-        "moduleSha256": "bfef873c36c562be06afa4d1c058b84ba65bb9f8bd1bdc2c082bc2b1fb60d3d3",
+        "moduleSha256": "c3bf60c1b72246bfade9e2efa32762a4200bb91bce66e4f2e3f1c61c271bdacf",
         "reason": "Keep: reachable command implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-oracle-reference-class/2026-08-10"
+        "reviewer": "codex-independent-float32-oracle/2026-08-10"
       },
       "src/command/command_parse_helpers.zig": {
         "decision": "Keep",
@@ -2128,9 +2128,9 @@
       },
       "src/compiler/wgsl/frontend/sema.zig": {
         "decision": "Keep",
-        "moduleSha256": "7915fb266c7540c1e58bb0d18f61b1d66ee1616602c623e00de8d2b9f79f5946",
-        "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "ed0d6ab243fe16bd5051b5ea304ad9a0844a1318b5b3058a31a6062085923b57",
+        "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-doe-development/2026-08-10"
       },
       "src/compiler/wgsl/frontend/sema_attrs.zig": {
         "decision": "Keep",
@@ -2140,9 +2140,9 @@
       },
       "src/compiler/wgsl/frontend/sema_expr.zig": {
         "decision": "Keep",
-        "moduleSha256": "b4728de91ec11269fe8d641d540252447968dcd9608ec4993159dbab6bfb02fb",
+        "moduleSha256": "801d5cf5317598fbe6ce8994082b6e665ae503c53fb420ddaf5bbf8020083503",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-doe-development/2026-08-10"
       },
       "src/compiler/wgsl/frontend/sema_helpers.zig": {
         "decision": "Keep",
@@ -2224,9 +2224,9 @@
       },
       "src/compiler/wgsl/ir/ir_validate.zig": {
         "decision": "Keep",
-        "moduleSha256": "c81a82f65a37658f0b19ab104b5bf0b03b8747eacf5fc5ed767eb9174f019771",
-        "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "f4b9598ebd95f410c007f377e0e2aafa1aed10883957c4a14ef7a11b80a7c329",
+        "reason": "Keep: reachable compiler implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-doe-development/2026-08-10"
       },
       "src/compiler/wgsl/ir/layout_utils.zig": {
         "decision": "Keep",
@@ -2416,9 +2416,9 @@
       },
       "src/contracts/model/model_compute_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "2da2a6c0c73bb60d0a7634eede357dbe5ea1d1f2c78affd42aecc9bd7e5d6fdc",
+        "moduleSha256": "82725cf0634913fa227d99b5b7ea11ad00b2b3961c2d5db1149c434793644352",
         "reason": "Keep: reachable neutral contract owner at src/contracts/model/model_compute_types.zig.",
-        "reviewer": "codex-oracle-reference-class/2026-08-10"
+        "reviewer": "codex-independent-float32-oracle/2026-08-10"
       },
       "src/contracts/model/model_gpu_types.zig": {
         "decision": "Keep",
@@ -3626,6 +3626,12 @@
         "reason": "Keep: reachable runtime implementation shared by 5 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/runtime/output_oracle.zig": {
+        "decision": "Keep",
+        "moduleSha256": "01a3e328cd0c125b727958ddbad02783add0883335ccce1848403debd52de03f",
+        "reason": "Keep: owns output-oracle execution, independent reference verification, and full-buffer comparison outside the CLI boundary.",
+        "reviewer": "codex-output-oracle-module/2026-08-10"
+      },
       "src/runtime/pipeline_cache_integration.zig": {
         "decision": "Keep",
         "moduleSha256": "ddeab4398e719bed70bbefe09e4470a499de744b804b1de00e93e8ae2f6ce0c1",
@@ -3700,9 +3706,9 @@
       },
       "src/runtime/trace/trace.zig": {
         "decision": "Keep",
-        "moduleSha256": "9467c01fe4f024b4ce76419e361785043dd6072693197422539004233a117831",
+        "moduleSha256": "7ca998d82e1521e609eec13f7ecb09fcf3ef59bb0e3d93e8c562d44d15d9bb65",
         "reason": "Keep: authoritative trace state, hash-chain, replay, and trace receipt model; format emitters are separate.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-independent-float32-oracle/2026-08-10"
       },
       "src/runtime/trace/trace_determinism.zig": {
         "decision": "Keep",

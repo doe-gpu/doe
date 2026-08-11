@@ -30,15 +30,21 @@ def test_build_receipt_binds_cts_evidence_rows_and_policy() -> None:
 
     jsonschema.validate(receipt, _load(SCHEMA_PATH))
     assert receipt["artifactKind"] == "webgpu_cts_subset_receipt"
+    assert receipt["schemaVersion"] == 2
     assert receipt["publicationStatus"] == "repo_published"
     assert receipt["sourceEvidence"]["path"] == "config/webgpu-cts-evidence.json"
     assert receipt["sourceEvidence"]["sha256"] == builder.sha256_file(EVIDENCE_PATH)
     assert receipt["sourceEvidence"]["policyId"] == evidence["claimPolicy"]["policyId"]
     assert receipt["conformanceClaimAllowed"] is False
     assert receipt["remainingPromotionRequirements"] == ["backend_specific_cts_pass_ledger"]
-    assert receipt["queryCoverage"] == evidence["evidence"]
-    assert receipt["summary"]["coverageRowCount"] == len(evidence["evidence"])
-    assert receipt["summary"]["passCount"] == len(evidence["evidence"])
+    published_paths = {item["path"] for item in evidence["publishedArtifacts"]}
+    expected_rows = [
+        row for row in evidence["evidence"] if row["artifactPath"] in published_paths
+    ]
+    assert receipt["queryCoverage"] == expected_rows
+    assert receipt["artifactReceipts"] == evidence["publishedArtifacts"]
+    assert receipt["summary"]["coverageRowCount"] == len(expected_rows)
+    assert receipt["summary"]["passCount"] == len(expected_rows)
     assert receipt["summary"]["failCount"] == 0
 
 
@@ -70,3 +76,18 @@ def test_build_receipt_rejects_malformed_evidence_row() -> None:
             assert "backend must be a non-empty string" in str(exc)
         else:
             raise AssertionError("malformed CTS evidence row should reject receipt build")
+
+
+def test_build_receipt_rejects_stale_published_artifact_hash() -> None:
+    payload = _load(EVIDENCE_PATH)
+    payload["publishedArtifacts"][0]["sha256"] = "0" * 64
+    with tempfile.TemporaryDirectory(dir=REPO_ROOT) as tmpdir:
+        evidence_path = Path(tmpdir) / "webgpu-cts-evidence.json"
+        evidence_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        rel_path = evidence_path.relative_to(REPO_ROOT)
+        try:
+            builder.build_receipt(root=REPO_ROOT, evidence_path=rel_path)
+        except ValueError as exc:
+            assert "published artifact hash mismatch" in str(exc)
+        else:
+            raise AssertionError("stale published CTS artifact hash should be rejected")

@@ -10177,6 +10177,7 @@
         "comparabilityNotes",
         "comparable",
         "benchmarkClass",
+        "directionalReason",
         "claimEligible",
         "default",
         "description",
@@ -10580,12 +10581,12 @@
         }
       },
       "shared": {
-        "benchmarkClass": "comparable",
-        "claimEligible": true,
-        "comparabilityNotes": "Doe-owned apples-to-apples Monte Carlo compute contract. Both sides execute the same deterministic fixed-sample path-tracing command stream and identical reduction passes under the runtime compare harness.",
-        "comparable": true,
+      "benchmarkClass": "comparable",
+      "claimEligible": true,
+      "comparabilityNotes": "Both sides execute the same deterministic fixed-sample path-tracing command stream and reduction passes and validate the final radiance against a hash-bound independent CPU reference.",
+      "comparable": true,
         "default": false,
-        "description": "Fixed-shape Monte Carlo compute workload with 131072 path threads, 256 samples per path, 8 bounces per sample, and a deterministic reduction over accumulated path radiance.",
+      "description": "Fixed-shape Monte Carlo compute workload with 131072 path threads, 256 samples per path, 8 bounces per sample, and a deterministic reduction over accumulated path radiance.",
         "domain": "compute",
         "extraArgs": [
           "--kernel-root",

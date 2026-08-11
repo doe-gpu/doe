@@ -66,6 +66,16 @@ pub const TraceRunSummary = struct {
     output_oracle_expected_sha256: ?[]const u8 = null,
     output_oracle_actual_sha256: ?[]const u8 = null,
     output_oracle_reference_id: ?[]const u8 = null,
+    output_oracle_kind: ?[]const u8 = null,
+    output_oracle_reference_class: ?[]const u8 = null,
+    output_oracle_reference_sha256: ?[]const u8 = null,
+    output_oracle_reference_path: ?[]const u8 = null,
+    output_oracle_compared_value_count: u64 = 0,
+    output_oracle_mismatch_count: u64 = 0,
+    output_oracle_max_absolute_error: f64 = 0,
+    output_oracle_max_relative_error: f64 = 0,
+    output_oracle_absolute_tolerance: f64 = 0,
+    output_oracle_relative_tolerance: f64 = 0,
     execution_gpu_timestamp_total_ns: u64,
     execution_gpu_timestamp_attempted_count: u64,
     execution_gpu_timestamp_valid_count: u64,
@@ -675,6 +685,39 @@ pub fn writeTraceMeta(path: []const u8, summary: TraceRunSummary) !void {
         try writer.writeAll("\"outputOracleReferenceId\":");
         try writeJsonString(&writer, value);
         try writer.writeAll(",");
+    }
+    if (summary.output_oracle_kind) |value| {
+        try writer.writeAll("\"outputOracleKind\":");
+        try writeJsonString(&writer, value);
+        try writer.writeAll(",");
+    }
+    if (summary.output_oracle_reference_class) |value| {
+        try writer.writeAll("\"outputOracleReferenceClass\":");
+        try writeJsonString(&writer, value);
+        try writer.writeAll(",");
+    }
+    if (summary.output_oracle_reference_sha256) |value| {
+        try writer.writeAll("\"outputOracleReferenceSha256\":");
+        try writeJsonString(&writer, value);
+        try writer.writeAll(",");
+    }
+    if (summary.output_oracle_reference_path) |value| {
+        try writer.writeAll("\"outputOracleReferencePath\":");
+        try writeJsonString(&writer, value);
+        try writer.writeAll(",");
+    }
+    if (summary.output_oracle_kind != null) {
+        try writef(writer,
+            "\"outputOracleComparedValueCount\":{},\"outputOracleMismatchCount\":{},\"outputOracleMaxAbsoluteError\":{d},\"outputOracleMaxRelativeError\":{d},\"outputOracleAbsoluteTolerance\":{d},\"outputOracleRelativeTolerance\":{d},",
+            .{
+                summary.output_oracle_compared_value_count,
+                summary.output_oracle_mismatch_count,
+                summary.output_oracle_max_absolute_error,
+                summary.output_oracle_max_relative_error,
+                summary.output_oracle_absolute_tolerance,
+                summary.output_oracle_relative_tolerance,
+            },
+        );
     }
     if (summary.execution_backend) |backend| {
         try writer.writeAll("\"executionBackend\":");
