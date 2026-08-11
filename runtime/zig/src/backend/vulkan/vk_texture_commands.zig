@@ -78,7 +78,7 @@ pub fn texture_write(self: anytype, cmd_arg: model_texture_types.TextureWriteCom
     );
     try c.check_vk(c.vkEndCommandBuffer(self.primary_command_buffer));
     try submit_and_wait_timeline(self);
-    resource.layout = c.VK_IMAGE_LAYOUT_GENERAL;
+    vk_resources.mark_texture_image_layout(self, resource.image, c.VK_IMAGE_LAYOUT_GENERAL);
 }
 
 pub fn texture_read(self: anytype, args: struct {
@@ -151,7 +151,7 @@ pub fn texture_read(self: anytype, args: struct {
     );
     try c.check_vk(c.vkEndCommandBuffer(self.primary_command_buffer));
     try submit_and_wait_timeline(self);
-    texture.layout = c.VK_IMAGE_LAYOUT_GENERAL;
+    vk_resources.mark_texture_image_layout(self, texture.image, c.VK_IMAGE_LAYOUT_GENERAL);
     if (staging.mapped) |raw| {
         const dst: [*]u8 = @ptrCast(args.dst_buffer);
         const off: usize = @intCast(args.dst_offset);
@@ -207,8 +207,8 @@ pub fn texture_copy(self: anytype, args: struct {
     vk_resources.transition_texture_layout(self.primary_command_buffer, dst.*, c.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, c.VK_IMAGE_LAYOUT_GENERAL, c.VK_ACCESS_TRANSFER_WRITE_BIT, c.VK_ACCESS_SHADER_READ_BIT | c.VK_ACCESS_SHADER_WRITE_BIT, c.VK_PIPELINE_STAGE_TRANSFER_BIT, c.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
     try c.check_vk(c.vkEndCommandBuffer(self.primary_command_buffer));
     try submit_and_wait_timeline(self);
-    src.layout = c.VK_IMAGE_LAYOUT_GENERAL;
-    dst.layout = c.VK_IMAGE_LAYOUT_GENERAL;
+    vk_resources.mark_texture_image_layout(self, src.image, c.VK_IMAGE_LAYOUT_GENERAL);
+    vk_resources.mark_texture_image_layout(self, dst.image, c.VK_IMAGE_LAYOUT_GENERAL);
 }
 
 pub fn texture_query(self: anytype, cmd_arg: model_texture_types.TextureQueryCommand) !void {

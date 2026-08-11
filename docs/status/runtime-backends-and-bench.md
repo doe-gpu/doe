@@ -19,12 +19,34 @@ file only names the promoted boundary and open admission gates.
   entrypoint with exact source pinning and separate hash-bound preparation and
   execution receipts. Promotion remains downstream of reviewed application
   evidence and a claim-eligible physical support target.
+- External-project source preparation now forces byte-preserving Git checkout
+  semantics across host configurations and ignores package-manager executable-
+  bit normalization while continuing to reject content changes. The retained
+  HoloScript preparation receipt exercises the corrected boundary.
+- The reviewed HoloScript physical AMD Vulkan result at
+  `reports/ecosystem/holoscript-snn-webgpu/holoscript-tropical-spmv-amd-vulkan-2026-08-11-diagnostic.json`
+  binds the real provider and adapter identities, the unchanged upstream CPU
+  oracle, exact output hashes, and the validated host tuple. It is a passing
+  application compatibility wedge, not a performance or release claim.
+- The reviewed UMAP-GPU physical AMD Vulkan result at
+  `reports/ecosystem/umap-gpu/umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic.json`
+  retains the unchanged structural application oracle under both providers.
+  Exact embedding identity and concrete primary dispatch identity remain open,
+  and Doe's process timing is a measured disadvantage rather than a speed wedge.
+- The reviewed Gigi physical matrix at
+  `reports/ecosystem/electronicarts-gigi/gigi-generated-webgpu-suite-amd-vulkan-2026-08-11-diagnostic.json`
+  is a gap map: shared fixture failures are separated from the cases that pass
+  under Dawn and fail under Doe. It does not support a Gigi product claim.
 - Strict Linux Vulkan profiles declare ordered distro-specific ICD path
   candidates. Preflight selects only the first installed declared candidate;
   it does not scan for or fall back to an undeclared software ICD.
 - GPU smoke configs that select claim-eligible catalog workloads use the full
   comparability sample floor. The lower diagnostic smoke floor applies only to
   workloads that are not claim-eligible.
+- The AMD GPU smoke workflow selects the strict comparable workgroup-atomic
+  compute row. It no longer selects the large upload row, whose declared
+  hardware-path asymmetry makes it directional rather than a valid strict
+  smoke comparison.
 - GPU smoke verification resolves current compare-report receipt references,
   verifies their file hashes and identities, and checks every bound sample for
   successful GPU resource evidence. Legacy inline samples remain readable.

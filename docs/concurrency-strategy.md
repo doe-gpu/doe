@@ -23,7 +23,8 @@ The runtime should converge on:
 2. thread-confined encoders and pass encoders
 3. explicit callback-thread semantics
 
-The contract source is [threading_contract.zig](../runtime/zig/src/runtime/threading_contract.zig).
+This document owns the contract until the runtime exposes a replacement
+schema-backed object-thread classification surface.
 
 ## Tooling I/O contexts
 

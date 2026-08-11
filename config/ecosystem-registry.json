@@ -173,6 +173,13 @@
           "sha256": "0886b5f4f34358a9da8101f0845b48d9b96b0d54119db10f9b1806175b7d58dd",
           "reviewedAt": "2026-08-08T19:35:30Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "holoscript-tropical-spmv-amd-vulkan-2026-08-11-diagnostic",
+          "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-tropical-spmv-amd-vulkan-2026-08-11-diagnostic.json",
+          "sha256": "fe3b0245549bf0ca1d31014a64ee3cb3b72318fd2ce5e72546248763e77784e7",
+          "reviewedAt": "2026-08-11T12:30:00Z",
+          "reviewer": "codex"
         }
       ],
       "failureRecords": [
@@ -180,7 +187,7 @@
         "bench/external-projects/holoscript-snn-webgpu/failures/labeled-compute-pass-semantics.failure.json"
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-09T01:08:00Z"
+      "lastReviewedAt": "2026-08-11T12:30:00Z"
     },
     {
       "id": "electronicarts-gigi",
@@ -296,6 +303,13 @@
           "sha256": "37daf8eee2cb21328c002b05450fefa28604acd808feb42667b708d8c905c6a9",
           "reviewedAt": "2026-08-08T22:02:53Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "gigi-generated-webgpu-suite-amd-vulkan-2026-08-11-diagnostic",
+          "path": "reports/ecosystem/electronicarts-gigi/gigi-generated-webgpu-suite-amd-vulkan-2026-08-11-diagnostic.json",
+          "sha256": "00c346a11dcdfad62735d96567715d028ab49ff603100412a7ce08c7835cfab9",
+          "reviewedAt": "2026-08-11T12:31:00Z",
+          "reviewer": "codex"
         }
       ],
       "failureRecords": [
@@ -306,7 +320,7 @@
         "bench/external-projects/electronicarts-gigi/failures/texture-copy-bridge-abi.failure.json"
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-08T22:02:53Z"
+      "lastReviewedAt": "2026-08-11T12:31:00Z"
     },
     {
       "id": "vercel-labs-vgpu",
@@ -416,10 +430,17 @@
           "sha256": "18c5a920db520407df784f0553c51e0ba373bb83f44deff7c4a49d62198151f2",
           "reviewedAt": "2026-08-09T01:11:00Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "vgpu-node-ort-snapshot-amd-vulkan-2026-08-10-diagnostic",
+          "path": "reports/ecosystem/vercel-labs-vgpu/vgpu-node-ort-snapshot-amd-vulkan-2026-08-10-diagnostic.json",
+          "sha256": "5cf8b5cec14f386a63775b36f0637c8d8b470e64bd2bc2f461172be95b995fd0",
+          "reviewedAt": "2026-08-10T23:25:00Z",
+          "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-09T01:11:00Z"
+      "lastReviewedAt": "2026-08-10T23:25:00Z"
     },
     {
       "id": "umap-gpu",
@@ -543,10 +564,17 @@
           "sha256": "3cad13f8a9e671d803b90eb11af6a476bf9d481f3677b6269590b9759d40096f",
           "reviewedAt": "2026-08-09T01:19:00Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic",
+          "path": "reports/ecosystem/umap-gpu/umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic.json",
+          "sha256": "a51fce9efa405d64bea6fbf3231301e2a9f8134da5a23a5b44a46d2f6f37e07c",
+          "reviewedAt": "2026-08-11T12:30:00Z",
+          "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-09T01:19:00Z"
+      "lastReviewedAt": "2026-08-11T12:30:00Z"
     },
     {
       "id": "world-lab-runtime-webgpu",
@@ -832,10 +860,17 @@
           "sha256": "9871f28587249826b551a71d5b1132c79d7ddb612f02e849c7e64d2d18490b0c",
           "reviewedAt": "2026-08-09T01:37:10Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "wgsl-fns-compilation-suite-amd-vulkan-2026-08-10-diagnostic",
+          "path": "reports/ecosystem/wgsl-fns/wgsl-fns-compilation-suite-amd-vulkan-2026-08-10-diagnostic.json",
+          "sha256": "0f5e7b953fe99c77c4126f44d0642817ba44ba6aa081d0faee4f014872354309",
+          "reviewedAt": "2026-08-10T23:20:00Z",
+          "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-09T01:37:10Z"
+      "lastReviewedAt": "2026-08-10T23:20:00Z"
     },
     {
       "id": "electronicarts-cpp-ml-intro",
@@ -970,6 +1005,11 @@
           "reviewedAt": "2026-08-09T02:49:56Z",
           "reviewer": "codex"
         }
+      ],
+      "failureRecords": [
+        "bench/external-projects/electronicarts-cpp-ml-intro/failures/submit-ordered-texture-to-texture-copy.failure.json",
+        "bench/external-projects/electronicarts-cpp-ml-intro/failures/vulkan-compute-texture-view-identity.failure.json",
+        "bench/external-projects/electronicarts-cpp-ml-intro/failures/wgsl-switch-selector-trailing-comma.failure.json"
       ],
       "claimIndexRefs": [],
       "lastReviewedAt": "2026-08-09T02:49:56Z"

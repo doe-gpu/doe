@@ -9,6 +9,25 @@ const MAX_OUTPUT = mod.MAX_OUTPUT;
 const MAX_HLSL_OUTPUT = mod.MAX_HLSL_OUTPUT;
 const MAX_SPIRV_OUTPUT = mod.MAX_SPIRV_OUTPUT;
 
+test "translate switch selector with trailing comma" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> data: array<i32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    switch (data[0]) {
+        \\        case i32(0), : { data[0] = 1; }
+        \\        case default, : { data[0] = 2; }
+        \\    }
+        \\}
+    ;
+
+    var spirv_out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    try std.testing.expect(
+        try translateToSpirv(std.testing.allocator, source, &spirv_out) > 0,
+    );
+}
+
 test "translate explicit numeric and bool scalar conversions" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;

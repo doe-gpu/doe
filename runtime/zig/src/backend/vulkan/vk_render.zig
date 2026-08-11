@@ -531,13 +531,6 @@ fn surface_sync_for_target(self: anytype, target_handle: u64) SurfaceSubmitSync 
     return .{};
 }
 
-fn mark_texture_image_layout(self: anytype, image: c.VkImage, layout: u32) void {
-    var iterator = self.textures.valueIterator();
-    while (iterator.next()) |texture| {
-        if (texture.image == image) texture.layout = layout;
-    }
-}
-
 fn transition_bound_sampled_textures(self: anytype, cmd: model_render_types.RenderDrawCommand) void {
     var ti: u32 = 0;
     while (ti < cmd.bind_texture_count and ti < model_render_types.MAX_RENDER_BIND_ENTRIES) : (ti += 1) {
@@ -554,7 +547,7 @@ fn transition_bound_sampled_textures(self: anytype, cmd: model_render_types.Rend
             source.src_stage,
             VK_PIPELINE_STAGE_GRAPHICS_SHADER_BITS,
         );
-        mark_texture_image_layout(self, texture.image, c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        vk_resources.mark_texture_image_layout(self, texture.image, c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 }
 

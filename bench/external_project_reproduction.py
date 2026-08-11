@@ -514,6 +514,10 @@ def _ensure_upstream(
                 "clone-upstream",
                 [
                     "git",
+                    "-c",
+                    "core.autocrlf=false",
+                    "-c",
+                    "core.fileMode=false",
                     "clone",
                     "--no-checkout",
                     str(upstream["repositoryUrl"]),
@@ -535,7 +539,16 @@ def _ensure_upstream(
         result = recorder.run(
             _command_spec(
                 process_id,
-                ["git", "-C", str(selection.upstream_root), *arguments],
+                [
+                    "git",
+                    "-c",
+                    "core.autocrlf=false",
+                    "-c",
+                    "core.fileMode=false",
+                    "-C",
+                    str(selection.upstream_root),
+                    *arguments,
+                ],
                 ".",
                 timeout_seconds,
             )
@@ -819,6 +832,8 @@ def prepare_external_project(
                 "verify-upstream-clean-after-install",
                 [
                     "git",
+                    "-c",
+                    "core.fileMode=false",
                     "-C",
                     str(selection.upstream_root),
                     "status",

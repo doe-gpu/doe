@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "holoscript-tropical-spmv-amd-vulkan-2026-08-11-diagnostic",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "tropical-spmv",
+  "generatedAt": "2026-08-11T12:23:46.233Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-11T12:30:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "10",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "physical-amd-oracle-parity",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "Dawn and Doe each completed every clean process on the selected Radeon Vulkan adapter. Every configured seeded graph topology matched the unchanged HoloScript CPU oracle exactly in every recorded output hash.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/raw-matrix.json",
+          "sha256": "99ba3c7da7b8bacd7774a6b46b491c991b2f6fd8f8e0bcdb165855f992d2cd9a"
+        },
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/receipt-summary.json",
+          "sha256": "6908c6817c67363cc631a0a578b95c7682c2464b57382981a1d7a90798446575"
+        }
+      ]
+    },
+    {
+      "id": "real-provider-hardware-identity",
+      "category": "compatibility",
+      "status": "fixed",
+      "summary": "The harness now binds provider identity separately from adapter identity, accepts Doe reporting the real AMD device instead of a synthetic Doe vendor, and does not mistake an installed llvmpipe ICD for the adapter selected by either provider.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/preparation.json",
+          "sha256": "93768303bb88c8c033b298e5d818ecd8e8da0335c59304121870617828c4052d"
+        },
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/receipt-summary.json",
+          "sha256": "6908c6817c67363cc631a0a578b95c7682c2464b57382981a1d7a90798446575"
+        }
+      ]
+    },
+    {
+      "id": "portable-byte-clean-preparation",
+      "category": "reliability",
+      "status": "fixed",
+      "summary": "External-project preparation now preserves intentional CRLF blobs and evaluates source cleanliness by content rather than pnpm-created executable-bit normalization. The pinned checkout, installation, and package builds complete without modifying upstream source bytes.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/preparation.json",
+          "sha256": "93768303bb88c8c033b298e5d818ecd8e8da0335c59304121870617828c4052d"
+        }
+      ]
+    },
+    {
+      "id": "performance-not-promotable",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "The physical run records cold, warm, and receipt-boundary samples, but it does not satisfy the promotion sample, concurrency, teardown, stress, memory-growth, replay, production-installation, or blocking-release requirements.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/raw-matrix.json",
+          "sha256": "99ba3c7da7b8bacd7774a6b46b491c991b2f6fd8f8e0bcdb165855f992d2cd9a"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The result covers the pinned tropical-SpMV application boundary, not HoloScript's complete WebGPU surface.",
+    "The ESM provider loader remains a controlled harness substitution rather than a published production installation path.",
+    "The retained clean-process and dispatch repetitions are diagnostic and remain below the external-project promotion floor.",
+    "No performance superiority claim is made from this run."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 161075200
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 165343232
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Operation timings were captured diagnostically, but the external-project promotion reliability and release gates were not run."
+  },
+  "receiptOverhead": {
+    "unit": "ms",
+    "untracedP50": 63.28801299999998,
+    "receiptEnabledP50": 66.280464
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The byte-clean pinned build is reproducible, but the provider loader is not a validated production installation route."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Both providers selected the validated Radeon 8060S and RADV support target without software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The retained matrix uses sequential clean processes."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Application cleanup succeeds, but no promotion-scale teardown-cycle lane ran."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The application repetitions remain below the promotion stress floor."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS is retained, but bounded memory growth was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The receipt binds source, provider, real adapter, shader, dispatch, synchronization, readback, and exact oracle/output identity."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "The release reliability floor and material-win requirements are unsatisfied."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is validated evidence, not a blocking release command."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/preparation.json",
+      "sha256": "93768303bb88c8c033b298e5d818ecd8e8da0335c59304121870617828c4052d"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/reproduction.json",
+      "sha256": "e1e2808055954e7764055ff224301505e7870d151ce36eef4956d92191dd945a"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/receipt-summary.json",
+      "sha256": "6908c6817c67363cc631a0a578b95c7682c2464b57382981a1d7a90798446575"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/raw-matrix.json",
+      "sha256": "99ba3c7da7b8bacd7774a6b46b491c991b2f6fd8f8e0bcdb165855f992d2cd9a"
+    }
+  ]
+}

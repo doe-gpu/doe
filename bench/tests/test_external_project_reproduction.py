@@ -138,7 +138,8 @@ class ExternalProjectReproductionExecutionTests(unittest.TestCase):
         self._run_git(source_root, "init")
         (source_root / ".gitignore").write_text("installed*.txt\n", encoding="utf-8")
         (source_root / "README.md").write_text("fixture\n", encoding="utf-8")
-        self._run_git(source_root, "add", ".gitignore", "README.md")
+        (source_root / "crlf.txt").write_bytes(b"first\r\nsecond\r\n")
+        self._run_git(source_root, "add", ".gitignore", "README.md", "crlf.txt")
         self._run_git(
             source_root,
             "-c",
@@ -342,6 +343,18 @@ class ExternalProjectReproductionExecutionTests(unittest.TestCase):
         self.assertEqual(preparation["status"], "passed")
         self.assertEqual(preparation["receiptSha256"], _payload_sha256(preparation))
         self.assertTrue(preparation["source"]["clean"])
+        self.assertEqual(
+            (selection.upstream_root / "crlf.txt").read_bytes(),
+            b"first\r\nsecond\r\n",
+        )
+        source_steps = {
+            step["id"]: step["command"]
+            for step in preparation["steps"]
+            if step["id"] in {"clone-upstream", "checkout-pinned-commit"}
+        }
+        for command in source_steps.values():
+            self.assertEqual(command[1:3], ["-c", "core.autocrlf=false"])
+            self.assertEqual(command[3:5], ["-c", "core.fileMode=false"])
         self.assertTrue(preparation["supportTarget"]["claimEligible"])
         install_step_ids = [
             step["id"]

@@ -43,6 +43,11 @@ pub const BindingCollection = struct {
     descriptor_hash: u64,
 };
 
+pub fn textureResourceHandle(view: *const DoeTextureView) u64 {
+    if (view.handle) |handle| return @intFromPtr(handle);
+    return view.tex.vk_id;
+}
+
 fn shaderBufferBindingType(
     shader_module: ?*DoeShaderModule,
     group: u32,
@@ -222,6 +227,8 @@ fn bindingAtSlot(
     if (group.texture_views[binding_index]) |raw_view| {
         const view = cast(DoeTextureView, raw_view) orelse return null;
         if (view.tex.error_object or view.tex.vk_id == 0) return null;
+        const resource_handle = textureResourceHandle(view);
+        if (resource_handle == 0) return null;
         const entry = layout_entry orelse return null;
         const resource_kind: model_compute_types.KernelBindingResourceKind =
             switch (entry.resource_kind) {
@@ -233,7 +240,7 @@ fn bindingAtSlot(
             .group = group_u32,
             .binding = binding_u32,
             .resource_kind = resource_kind,
-            .resource_handle = view.tex.vk_id,
+            .resource_handle = resource_handle,
             .texture_sample_type = if (resource_kind == .texture)
                 entry.texture_sample_type
             else
@@ -377,6 +384,7 @@ test "collectBindGroupBindings includes readonly storage textures" {
     var view = DoeTextureView{
         .backend = .vulkan,
         .tex = &texture,
+        .handle = @ptrFromInt(99),
         .format = 18,
         .dimension = 2,
     };
@@ -392,7 +400,7 @@ test "collectBindGroupBindings includes readonly storage textures" {
         model_compute_types.KernelBindingResourceKind.storage_texture,
         storage[0].resource_kind,
     );
-    try std.testing.expectEqual(@as(u64, 77), storage[0].resource_handle);
+    try std.testing.expectEqual(@as(u64, 99), storage[0].resource_handle);
     try std.testing.expectEqual(
         model_binding_types.WGPUStorageTextureAccess_ReadOnly,
         storage[0].storage_texture_access,

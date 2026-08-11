@@ -348,15 +348,22 @@ fn parseSwitchStmt(self: anytype) @TypeOf(self.*).Error!u32 {
 }
 
 fn parseSwitchCase(self: anytype) @TypeOf(self.*).Error!u32 {
-    const main_token = self.token_idx;
+    var main_token = self.token_idx;
     var selectors = std.ArrayListUnmanaged(u32){};
     defer selectors.deinit(self.allocator);
     if (self.peekTag() == .kw_case) {
         self.advance(); // consume `case`
-        while (true) {
-            try selectors.append(self.allocator, try parser_expr.parseExpr(self));
-            if (self.peekTag() != .@",") break;
+        if (self.peekTag() == .kw_default) {
+            main_token = self.token_idx;
             self.advance();
+            if (self.peekTag() == .@",") self.advance();
+        } else {
+            while (true) {
+                try selectors.append(self.allocator, try parser_expr.parseExpr(self));
+                if (self.peekTag() != .@",") break;
+                self.advance();
+                if (self.peekTag() == .@":") break;
+            }
         }
     } else if (self.peekTag() == .kw_default) {
         self.advance(); // consume `default`

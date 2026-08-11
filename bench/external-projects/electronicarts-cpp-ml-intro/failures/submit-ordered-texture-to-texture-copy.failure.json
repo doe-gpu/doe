@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "submit-ordered-texture-to-texture-copy",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Vulkan texture-to-texture copies executed during command encoding instead of at queue submission, so they could run before earlier encoded compute dispatches. The copy is now retained in the command stream and flushes recorded compute replay at its queue-order boundary.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-06/raw-suite.json",
+      "sha256": "4bbd2c336e0ac9178a5dab8b86c82bd021f1a851eb296ceb184304f88cbba811"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/native/resource/doe_command_texture_native.zig",
+    "runtime/zig/src/native/queue/doe_queue_submit_vulkan.zig"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-native-texture-commands.js"
+  ],
+  "verifiedAt": "2026-08-11T12:04:34Z"
+}

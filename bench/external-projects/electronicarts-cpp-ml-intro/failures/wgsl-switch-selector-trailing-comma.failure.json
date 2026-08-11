@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "wgsl-switch-selector-trailing-comma",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "category": "compatibility",
+  "status": "fixed-regression-protected",
+  "summary": "The generated cpp-ml Presentation shader uses constructor-valued and default switch selectors with optional trailing commas. Doe now parses both forms and resolves constructor-wrapped integer selectors for SPIR-V switch emission.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-02/raw-suite.json",
+      "sha256": "3c164837b24c0a7792d275e764e28479431725d0cb540b6e9156f8eeac9df6b2"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-03/raw-suite.json",
+      "sha256": "4e562faa41d18c54f75e344de290d9c30d4c4c1e4040b69170c89879e5ed4d96"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/tests/wgsl/mod_feature_translation_test.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/compiler/wgsl/frontend/parser_stmt.zig",
+    "runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/tests/wgsl/mod_feature_translation_test.zig"
+  ],
+  "verifiedAt": "2026-08-11T12:04:34Z"
+}

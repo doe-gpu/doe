@@ -1,5 +1,6 @@
 const std = @import("std");
 const ir = @import("../../ir/ir.zig");
+const ir_const_eval = @import("../../ir/ir_const_eval.zig");
 const sema_helpers = @import("../../frontend/sema_helpers.zig");
 const spirv = @import("spirv_builder.zig");
 const emit_spirv_shared = @import("emit_spirv_shared.zig");
@@ -960,9 +961,13 @@ pub fn FunctionState(comptime EmitterT: type) type {
         }
 
         fn switch_selector_literal(self: *@This(), expr_id: ir.ExprId) EmitError!u32 {
+            if (ir_const_eval.resolve_constant_int(
+                self.emitter.module,
+                self.function,
+                expr_id,
+            )) |value| return @truncate(value);
             const expr = self.function.exprs.items[expr_id];
             return switch (expr.data) {
-                .int_lit => |value| @truncate(value),
                 .bool_lit => |value| if (value) 1 else 0,
                 .unary => |unary| if (unary.op == .neg) blk: {
                     const inner = self.function.exprs.items[unary.operand];

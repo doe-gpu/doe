@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "vulkan-compute-texture-view-identity",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Vulkan compute descriptor collection discarded the registered texture-view handle and bound the parent texture resource, losing view identity and rejecting valid application pipelines. Current and recorded binding paths now select the explicit view handle and keep aliased image layouts coherent.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/amd-vulkan-cpp-ml-04/raw-suite.json",
+      "sha256": "8505b281479940c0538aa69289223c9e034e2a82400bba5b95eba0dca0394305"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/src/native/vulkan/vulkan_compute_bindings.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/native/vulkan/vulkan_compute_bindings.zig",
+    "runtime/zig/src/native/vulkan/vulkan_compute_native.zig",
+    "runtime/zig/src/backend/vulkan/vk_resources.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/src/native/vulkan/vulkan_compute_bindings.zig"
+  ],
+  "verifiedAt": "2026-08-11T12:04:34Z"
+}

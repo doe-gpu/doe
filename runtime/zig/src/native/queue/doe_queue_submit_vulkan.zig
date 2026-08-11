@@ -244,9 +244,36 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
                         );
                     };
                 },
+                .copy_texture_to_texture => |copy_cmd| {
+                    if (!flushRecordedReplay(q, rt, &recorded_replay_work, "before copy_texture_to_texture")) continue;
+                    resetPreparedDispatchState(&prepared_dispatch);
+                    const src_texture = cast(native_types.DoeTexture, copy_cmd.src_texture) orelse continue;
+                    const dst_texture = cast(native_types.DoeTexture, copy_cmd.dst_texture) orelse continue;
+                    if (src_texture.vk_id == 0 or dst_texture.vk_id == 0) continue;
+                    rt.texture_copy(.{
+                        .src_handle = src_texture.vk_id,
+                        .src_mip = copy_cmd.src_mip,
+                        .src_x = copy_cmd.src_x,
+                        .src_y = copy_cmd.src_y,
+                        .src_z = copy_cmd.src_z,
+                        .dst_handle = dst_texture.vk_id,
+                        .dst_mip = copy_cmd.dst_mip,
+                        .dst_x = copy_cmd.dst_x,
+                        .dst_y = copy_cmd.dst_y,
+                        .dst_z = copy_cmd.dst_z,
+                        .width = copy_cmd.width,
+                        .height = copy_cmd.height,
+                        .depth_or_layers = copy_cmd.depth_or_layers,
+                    }) catch |err| {
+                        shared.deliverInternalError(
+                            q.dev,
+                            "doe_queue_submit: vulkan copy_texture_to_texture: {s}",
+                            .{@errorName(err)},
+                        );
+                    };
+                },
                 .copy_buffer_to_texture,
                 .clear_buffer,
-                .copy_texture_to_texture,
                 .render_pass,
                 => {},
                 .write_timestamp => |timestamp_cmd| {

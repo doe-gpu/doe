@@ -67,7 +67,25 @@
     "installSteps": [
       {
         "id": "upstream-dependencies",
-        "command": ["npm", "install"],
+        "command": ["corepack", "pnpm", "install", "--frozen-lockfile"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      },
+      {
+        "id": "upstream-core-build",
+        "command": ["corepack", "pnpm", "--filter", "@holoscript/core", "exec", "tsup"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      },
+      {
+        "id": "upstream-core-declarations",
+        "command": ["node", "scripts/generate-types.mjs"],
+        "workingDirectory": { "scope": "upstream", "path": "packages/core" },
+        "timeoutSeconds": 1800
+      },
+      {
+        "id": "upstream-snn-webgpu-build",
+        "command": ["corepack", "pnpm", "--filter", "@holoscript/snn-webgpu", "exec", "tsup"],
         "workingDirectory": { "scope": "upstream", "path": "." },
         "timeoutSeconds": 1800
       }
@@ -83,7 +101,17 @@
       { "id": "receipt-summary", "path": "receipt-summary.json" }
     ]
   },
-  "supportTargets": [],
+  "supportTargets": [
+    {
+      "id": "linux-x64-radeon-8060s-radv-26-0-3",
+      "os": "linux",
+      "arch": "x86_64",
+      "runtime": "node-22",
+      "adapter": "Radeon 8060S Graphics",
+      "driver": "Mesa 26.0.3",
+      "status": "validated"
+    }
+  ],
   "reliabilityPolicy": {
     "cleanProcessRunsPerProvider": 3,
     "concurrencyLevel": 1,

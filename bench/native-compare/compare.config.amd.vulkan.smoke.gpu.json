@@ -11,9 +11,9 @@
   "run": {
     "iterations": 7,
     "warmup": 0,
-    "out": "bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.16mb.json",
-    "workspace": "bench/out/runtime-comparisons.amd.vulkan.smoke.gpu.16mb",
-    "workloadFilter": "upload_write_buffer_16mb",
+    "out": "bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.compute.json",
+    "workspace": "bench/out/runtime-comparisons.amd.vulkan.smoke.gpu.compute",
+    "workloadFilter": "compute_workgroup_atomic_1024",
     "includeExtendedWorkloads": true,
     "includeNoncomparableWorkloads": false,
     "emitShell": false
@@ -43,7 +43,7 @@
     "claimEligibleOnly": false,
     "domains": [],
     "ids": [
-      "upload_write_buffer_16mb"
+      "compute_workgroup_atomic_1024"
     ],
     "excludeIds": []
   }

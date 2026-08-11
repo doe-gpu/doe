@@ -9,6 +9,7 @@ const bridge = resource_ops.metal_bridge;
 
 const alloc = native_helpers.alloc;
 const cast = native_helpers.cast;
+const toOpaque = native_helpers.toOpaque;
 
 const DoeBuffer = native_types.DoeBuffer;
 const DoeCommandEncoder = native_types.DoeCommandEncoder;
@@ -72,34 +73,14 @@ pub export fn doeNativeCommandEncoderCopyTextureToTexture(
     const src = cast(DoeTexture, src_texture_raw) orelse return;
     const dst = cast(DoeTexture, dst_texture_raw) orelse return;
     if (src.error_object or dst.error_object) return;
-    if (resource_ops.handleVulkanCopyTextureToTexture(
-        enc,
-        src,
-        src_mip,
-        src_slice,
-        src_x,
-        src_y,
-        src_z,
-        dst,
-        dst_mip,
-        dst_slice,
-        dst_x,
-        dst_y,
-        dst_z,
-        width,
-        height,
-        depth_or_layers,
-    )) {
-        return;
-    }
     enc.cmds.append(alloc, .{ .copy_texture_to_texture = .{
-        .src_texture = src.mtl,
+        .src_texture = if (enc.dev.backend == .vulkan) toOpaque(src) else src.mtl,
         .src_mip = src_mip,
         .src_slice = src_slice,
         .src_x = src_x,
         .src_y = src_y,
         .src_z = src_z,
-        .dst_texture = dst.mtl,
+        .dst_texture = if (enc.dev.backend == .vulkan) toOpaque(dst) else dst.mtl,
         .dst_mip = dst_mip,
         .dst_slice = dst_slice,
         .dst_x = dst_x,

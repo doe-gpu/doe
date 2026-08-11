@@ -119,7 +119,7 @@ def _make_receipt(product: str, manifest_hash: str = "a" * 64) -> dict:
                 "command": ["runtime/zig/zig-out/bin/doe-zig-runtime"],
                 "wallMs": wall_ms + index * 0.1,
                 "measuredRawMs": measured_ms + index * 0.1,
-                "measuredMs": measured_ms + index * 0.1,
+                "measuredMs": (measured_ms + index * 0.1) / 2.0,
                 "timingSource": "doe-execution-total-ns",
                 "timingClass": "operation",
                 "timing": {
@@ -134,7 +134,7 @@ def _make_receipt(product: str, manifest_hash: str = "a" * 64) -> dict:
                     "metaPath": f"bench/out/{product}.{index}.meta.json",
                 },
                 "subphasesMs": {
-                    "executionMs": measured_ms + index * 0.1,
+                    "executionMs": (measured_ms + index * 0.1) / 2.0,
                     "setupMs": 1.0,
                     "encodeMs": 2.0,
                     "submitWaitMs": 3.0,
@@ -153,7 +153,9 @@ def _make_receipt(product: str, manifest_hash: str = "a" * 64) -> dict:
                     "executionDispatchCount": 1,
                     "executionRowCount": 1,
                     "executionSuccessCount": 1,
-                    "executionTotalNs": int((measured_ms + index * 0.1) * 1_000_000),
+                    "executionTotalNs": int(
+                        ((measured_ms + index * 0.1) / 2.0) * 1_000_000
+                    ),
                     "executionSetupTotalNs": 1_000_000,
                     "executionEncodeTotalNs": 2_000_000,
                     "executionSubmitWaitTotalNs": 3_000_000,

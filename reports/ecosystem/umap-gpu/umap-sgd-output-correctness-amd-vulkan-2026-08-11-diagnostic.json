@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic",
+  "actorId": "umap-gpu",
+  "harnessId": "sgd-output-correctness",
+  "generatedAt": "2026-08-11T12:23:54.640Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-11T12:30:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "10",
+  "upstream": {
+    "repositoryUrl": "https://github.com/Achuttarsing/umap-gpu",
+    "commit": "7884b287f49bc057df7e0856c5539f130a20e0ad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "physical-amd-structural-oracle-parity",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "Dawn and Doe each passed every clean process of the unchanged UMAP-GPU SGD output suite on the selected Radeon Vulkan adapter. Both providers retained identical assertion identities for finite output, non-collapsed embeddings, cluster separation, nearest-neighbor labels, and controlled epoch behavior.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/raw-suite.json",
+          "sha256": "464b09ee4590c27d154db1e0f69591e3862d3ae0d0e6286ad2db72c996d12f32"
+        },
+        {
+          "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/receipt-summary.json",
+          "sha256": "d2478fac29fa6d29016d7222016775f9a93ed83f4c5e17389a92287360562af3"
+        }
+      ]
+    },
+    {
+      "id": "validated-radeon-support-target",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "The preparation receipt matches the validated Linux, Node, Radeon 8060S, and RADV support target; both provider probes record physical adapter identities and reject software fallback.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/preparation.json",
+          "sha256": "1ea325c074095c7806975c74df4530e767b422fdaaf300f1658c9cd6e97dae6f"
+        },
+        {
+          "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/receipt-summary.json",
+          "sha256": "d2478fac29fa6d29016d7222016775f9a93ed83f4c5e17389a92287360562af3"
+        }
+      ]
+    },
+    {
+      "id": "doe-process-latency-regression",
+      "category": "performance",
+      "status": "discovered",
+      "summary": "Doe's clean-process latency is slower than Dawn's in the retained physical run. The result is a compatibility and evidence wedge, not a performance advantage.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/receipt-summary.json",
+          "sha256": "d2478fac29fa6d29016d7222016775f9a93ed83f4c5e17389a92287360562af3"
+        }
+      ]
+    },
+    {
+      "id": "exact-output-and-dispatch-identity-incomplete",
+      "category": "diagnosis",
+      "status": "discovered",
+      "summary": "The unchanged upstream oracle emits structural assertions rather than exact embedding bytes, and the primary runtime graph edge count is not retained. Those gaps prevent strict output and dispatch-shape equivalence despite both providers passing the application oracle.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/receipt-summary.json",
+          "sha256": "d2478fac29fa6d29016d7222016775f9a93ed83f4c5e17389a92287360562af3"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The result covers the pinned SGD output suite, not the package's full UMAP pipeline.",
+    "The upstream oracle validates structural embedding properties but does not emit exact cross-provider embedding bytes.",
+    "The primary runtime graph edge count is not retained, so strict concrete dispatch-count identity is incomplete.",
+    "The Vitest provider alias is a controlled harness substitution rather than a published production installation route.",
+    "Doe is slower in the retained clean-process timing and no speed claim is permitted."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "exact-output-identity-unavailable",
+      "primary-edge-count-unrecorded"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 128491520
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 169852928
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Clean-process latency is retained for diagnosis, but exact output identity, concrete dispatch identity, warm samples, and the promotion reliability floor are incomplete."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched traced and untraced application runs were executed."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The controlled Vitest alias is not a validated production installation route."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Both providers bind the validated physical Radeon and RADV support target without fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The retained matrix runs clean processes sequentially."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Process cleanup succeeds, but no promotion-scale teardown-cycle lane ran."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The clean-process matrix remains below the promotion stress floor."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS is retained, but bounded memory growth was not measured."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "Provider, adapter, shaders, synchronization, readback, and assertion identities are retained, but exact output bytes and the primary dispatch count are missing."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "fail",
+      "summary": "Doe loses the retained process timing and strict work identity is incomplete."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness is validated diagnostic evidence, not a blocking release command."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/preparation.json",
+      "sha256": "1ea325c074095c7806975c74df4530e767b422fdaaf300f1658c9cd6e97dae6f"
+    },
+    {
+      "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/reproduction.json",
+      "sha256": "6df006d20fc3bc739bf2b7c73efb27523b5c0bc5e68cecbcbe96436f793c59e2"
+    },
+    {
+      "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/receipt-summary.json",
+      "sha256": "d2478fac29fa6d29016d7222016775f9a93ed83f4c5e17389a92287360562af3"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/raw-suite.json",
+      "sha256": "464b09ee4590c27d154db1e0f69591e3862d3ae0d0e6286ad2db72c996d12f32"
+    }
+  ]
+}

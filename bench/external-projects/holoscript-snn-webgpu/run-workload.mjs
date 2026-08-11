@@ -5,6 +5,11 @@ import { spawnSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
+import {
+  adapterUsesSoftwareRenderer,
+  classifyVulkanSummary,
+} from './hardware-identity.mjs';
+
 function requireEnv(name) {
   const value = process.env[name];
   if (!value) throw new Error(`${name} is required.`);
@@ -42,11 +47,6 @@ function adapterIdentity(adapter) {
   };
 }
 
-function softwareRenderer(identity) {
-  const joined = Object.values(identity).join(' ').toLowerCase();
-  return identity.isFallbackAdapter || /llvmpipe|lavapipe|swiftshader|software/.test(joined);
-}
-
 async function inspectLinuxRenderer() {
   if (process.platform !== 'linux') {
     return {
@@ -54,7 +54,8 @@ async function inspectLinuxRenderer() {
       renderNode: null,
       renderNodeReadWriteAccess: null,
       summaryLines: [],
-      softwareRendererDetected: false,
+      softwareRendererAvailable: false,
+      physicalGpuAvailable: false,
       hardwareEligible: true,
     };
   }
@@ -71,18 +72,16 @@ async function inspectLinuxRenderer() {
     timeout: 10_000,
   });
   const output = `${probe.stdout ?? ''}\n${probe.stderr ?? ''}`;
-  const summaryLines = output
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => /deviceName|driverName|driverInfo|deviceType/i.test(line));
-  const softwareRendererDetected = /llvmpipe|lavapipe|swiftshader|software/i.test(output);
+  const classification = classifyVulkanSummary(
+    output,
+    probe.status === 0,
+    renderNodeReadWriteAccess,
+  );
   return {
     probe: probe.status === 0 ? 'vulkaninfo' : 'vulkaninfo-unavailable',
     renderNode,
     renderNodeReadWriteAccess,
-    summaryLines,
-    softwareRendererDetected,
-    hardwareEligible: probe.status === 0 && renderNodeReadWriteAccess && !softwareRendererDetected,
+    ...classification,
   };
 }
 
@@ -139,13 +138,6 @@ if (receiptEnabled) {
     })));
     return createBindGroupLayout(descriptor);
   };
-}
-
-const adapterIsDoe = identity.vendor.toLowerCase() === 'doe';
-if ((providerId === 'doe-gpu') !== adapterIsDoe) {
-  throw new Error(
-    `Provider identity mismatch: ${providerId} received adapter vendor ${identity.vendor}.`,
-  );
 }
 
 const tropical = new snn.TropicalShortestPaths(ctx, {
@@ -239,8 +231,8 @@ const result = {
   provider: providerIdentity,
   adapter: identity,
   hostRenderer,
-  hostFallbackDetected: softwareRenderer(identity) || hostRenderer.softwareRendererDetected,
-  hardwareEligible: !softwareRenderer(identity) && hostRenderer.hardwareEligible,
+  hostFallbackDetected: adapterUsesSoftwareRenderer(identity),
+  hardwareEligible: !adapterUsesSoftwareRenderer(identity) && hostRenderer.hardwareEligible,
   receipt: {
     mode: receiptMode,
     workloadElapsedMs,

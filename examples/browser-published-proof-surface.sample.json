@@ -260,7 +260,7 @@
       },
       "comparisonArtifact": {
         "path": "examples/browser-smoke-report.sample.json",
-        "sha256": "291a1f34db21c91928c3a8234e7665c852670d9ad546f36b27cad9dc58c9170d",
+        "sha256": "0f58881872b27dbf52b60e0405552ecb904770832f1aa5479a8fe338023a520c",
         "kind": "chromium-webgpu-playwright-smoke"
       },
       "dawnReceipt": {

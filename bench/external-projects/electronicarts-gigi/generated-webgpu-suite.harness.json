@@ -72,10 +72,15 @@
           "install",
           "--no-save",
           "--no-package-lock",
+          "--prefix",
+          ".",
           "webgpu",
           "pngjs"
         ],
-        "workingDirectory": { "scope": "upstream", "path": "." },
+        "workingDirectory": {
+          "scope": "upstream",
+          "path": "_GeneratedCode/UnitTests/WebGPU"
+        },
         "timeoutSeconds": 1800
       }
     ],

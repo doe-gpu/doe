@@ -16,7 +16,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--report",
-        default="bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.16mb.json",
+        default="bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.compute.json",
         help="Path to a compare-lane report JSON.",
     )
     parser.add_argument(

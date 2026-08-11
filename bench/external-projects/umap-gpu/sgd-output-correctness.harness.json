@@ -84,7 +84,17 @@
       { "id": "receipt-summary", "path": "receipt-summary.json" }
     ]
   },
-  "supportTargets": [],
+  "supportTargets": [
+    {
+      "id": "linux-x64-radeon-8060s-radv-26-0-3",
+      "os": "linux",
+      "arch": "x86_64",
+      "runtime": "node-22",
+      "adapter": "Radeon 8060S Graphics",
+      "driver": "Mesa 26.0.3",
+      "status": "validated"
+    }
+  ],
   "reliabilityPolicy": {
     "cleanProcessRunsPerProvider": 3,
     "concurrencyLevel": 1,

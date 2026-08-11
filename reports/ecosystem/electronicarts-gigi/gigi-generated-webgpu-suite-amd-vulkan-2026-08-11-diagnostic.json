@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "gigi-generated-webgpu-suite-amd-vulkan-2026-08-11-diagnostic",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "generatedAt": "2026-08-11T12:21:35.049Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-11T12:31:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "10",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/gigi",
+    "commit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "receipt-explained-failure",
+  "findings": [
+    {
+      "id": "generated-suite-install-boundary-fixed",
+      "category": "reliability",
+      "status": "fixed",
+      "summary": "The manifest now installs the Node WebGPU dependencies into Gigi's generated WebGPU suite directory instead of allowing npm to walk to Doe's parent workspace. Both provider probes and the unchanged generated cases now execute.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/amd-vulkan-gigi-03/preparation.json",
+          "sha256": "4fd586932dde04d60c3a7e6a5d7ef680b0c57b1d4c0da1bd921ec12cfbaef69a"
+        }
+      ]
+    },
+    {
+      "id": "shared-generated-case-passes",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "Dawn and Doe both pass the retained structured-buffer, buffer, atomic, readback-sequence, subgraph, and texture-format cases on the physical Vulkan host.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/amd-vulkan-gigi-03/raw-suite.json",
+          "sha256": "c97f49c661de5969d52c18dcbf81af6aa5793064cc2777f9a5e0d96954009396"
+        }
+      ]
+    },
+    {
+      "id": "shared-fixture-and-gold-image-failures",
+      "category": "diagnosis",
+      "status": "discovered",
+      "summary": "Most generated cases fail under both providers, commonly from exact gold-image byte differences or missing relative assets. Those shared failures are harness and portability gaps, not Doe regressions.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/amd-vulkan-gigi-03/raw-suite.json",
+          "sha256": "c97f49c661de5969d52c18dcbf81af6aa5793064cc2777f9a5e0d96954009396"
+        }
+      ]
+    },
+    {
+      "id": "dawn-pass-doe-fail-frontier",
+      "category": "compatibility",
+      "status": "discovered",
+      "summary": "Four generated cases pass under Dawn and fail under Doe: AnyHitSimple, simpleRT, simpleRTDynamic, and Mips_VSPS_2D_WebGPU. Doe also crashes in two processes. This is the next application-driven runtime frontier and prevents any Gigi wedge claim.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/amd-vulkan-gigi-03/raw-suite.json",
+          "sha256": "c97f49c661de5969d52c18dcbf81af6aa5793064cc2777f9a5e0d96954009396"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The suite contains shared exact-image and missing-asset failures that prevent a complete comparator baseline.",
+    "Doe fails cases the incumbent passes and records process crashes, so no Gigi compatibility or reliability advantage is established.",
+    "The generated cases execute as separate clean processes and do not provide a matched application-level performance contract.",
+    "The harness remains diagnostic and is not a blocking release dependency."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "shared-gold-image-mismatch",
+      "shared-missing-assets",
+      "dawn-pass-doe-fail-cases",
+      "doe-process-crashes"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 50,
+      "successes": 10,
+      "failures": 40,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 2167435264
+    },
+    "comparison": {
+      "cleanProcessRuns": 50,
+      "successes": 6,
+      "failures": 42,
+      "crashes": 2,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 2168905728
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The providers do not complete the same successful case set and the suite is dominated by correctness and fixture failures."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched traced and untraced application runs were executed."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.0.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The corrected generated-suite installation is reproducible but remains a harness-only provider substitution."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Both provider probes execute on the accessible physical Vulkan host without a detected software adapter."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "Cases run sequentially rather than under the promotion concurrency floor."
+    },
+    "teardown": {
+      "status": "fail",
+      "summary": "Doe records process crashes in the retained case matrix."
+    },
+    "stress": {
+      "status": "fail",
+      "summary": "The broad matrix exposes correctness failures and crashes before promotion stress can qualify."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak per-process memory is retained, but bounded growth was not measured."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "The raw matrix binds source, provider, case, process, and failure identity, but successful structural and output equivalence is absent."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "The successful work sets differ and Doe has correctness regressions."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The Gigi lane is an application gap map, not a release gate."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/amd-vulkan-gigi-03/preparation.json",
+      "sha256": "4fd586932dde04d60c3a7e6a5d7ef680b0c57b1d4c0da1bd921ec12cfbaef69a"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/amd-vulkan-gigi-03/reproduction.json",
+      "sha256": "66e12a426250bc4502b0de7c02259fde04dd06cdc39f9324b48620906a7946b2"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/amd-vulkan-gigi-03/raw-suite.json",
+      "sha256": "c97f49c661de5969d52c18dcbf81af6aa5793064cc2777f9a5e0d96954009396"
+    }
+  ]
+}

@@ -151,10 +151,10 @@ Use the same native smoke command as the self-hosted AMD workflow:
 cd "$DOE_ROOT"
 python3 bench/runners/run_release_pipeline.py \
   --config bench/native-compare/compare.config.amd.vulkan.smoke.gpu.json \
-  --report bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.16mb.json \
+  --report bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.compute.json \
   --strict-amd-vulkan \
   --local-vulkan-lane vulkan_doe_comparable \
-  --verify-smoke-report bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.16mb.json \
+  --verify-smoke-report bench/out/dawn-vs-doe.amd.vulkan.smoke.gpu.compute.json \
   --verify-smoke-require-comparable
 ```
 

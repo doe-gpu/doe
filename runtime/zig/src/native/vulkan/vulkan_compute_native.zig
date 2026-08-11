@@ -562,6 +562,8 @@ fn append_bind_group_binding_at_slot(
         if (bg.texture_views[binding_index]) |raw_view| {
             const view = cast(DoeTextureView, raw_view) orelse return;
             if (view.tex.error_object or view.tex.vk_id == 0) return;
+            const resource_handle = compute_bindings.textureResourceHandle(view);
+            if (resource_handle == 0) return;
             const entry = layout_entry orelse return;
             const resource_kind: model_compute_types.KernelBindingResourceKind = switch (entry.resource_kind) {
                 BIND_GROUP_LAYOUT_RESOURCE_KIND_TEXTURE => .texture,
@@ -572,7 +574,7 @@ fn append_bind_group_binding_at_slot(
                 .group = group_u32,
                 .binding = binding_u32,
                 .resource_kind = resource_kind,
-                .resource_handle = view.tex.vk_id,
+                .resource_handle = resource_handle,
                 .texture_sample_type = if (resource_kind == .texture)
                     entry.texture_sample_type
                 else

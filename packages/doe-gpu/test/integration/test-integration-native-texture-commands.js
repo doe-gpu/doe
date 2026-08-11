@@ -151,6 +151,50 @@ for (let iteration = 0; iteration < 3; iteration += 1) {
     `storage texture dispatch/readback iteration ${iteration}`,
   );
 }
+
+const orderedCopyTexture = device.createTexture({
+  size: TEXTURE_SIZE,
+  format: 'rgba8unorm',
+  usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC,
+});
+const orderedReadback = device.createBuffer({
+  size: COPY_BYTES_PER_ROW,
+  usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+});
+const orderedBindGroup = device.createBindGroup({
+  layout: bindGroupLayout,
+  entries: [{ binding: 0, resource: storageTexture.createView() }],
+});
+const orderedEncoder = device.createCommandEncoder();
+const orderedPass = orderedEncoder.beginComputePass();
+orderedPass.setPipeline(pipeline);
+orderedPass.setBindGroup(0, orderedBindGroup);
+orderedPass.dispatchWorkgroups(1);
+orderedPass.end();
+orderedEncoder.copyTextureToTexture(
+  { texture: storageTexture },
+  { texture: orderedCopyTexture },
+  TEXTURE_SIZE,
+);
+orderedEncoder.copyTextureToBuffer(
+  { texture: orderedCopyTexture },
+  {
+    buffer: orderedReadback,
+    bytesPerRow: COPY_BYTES_PER_ROW,
+    rowsPerImage: TEXTURE_SIZE.height,
+  },
+  TEXTURE_SIZE,
+);
+device.queue.submit([orderedEncoder.finish()]);
+await orderedReadback.mapAsync(GPUMapMode.READ);
+expectBytes(
+  new Uint8Array(orderedReadback.getMappedRange()).slice(0, 4),
+  new Uint8Array([64, 128, 191, 255]),
+  'storage dispatch followed by texture copy and readback',
+);
+orderedReadback.unmap();
+orderedReadback.destroy();
+orderedCopyTexture.destroy();
 storageTexture.destroy();
 
 device.destroy();

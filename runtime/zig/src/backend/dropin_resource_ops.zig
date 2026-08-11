@@ -155,50 +155,6 @@ pub fn handleVulkanCopyTextureToBuffer(
     return true;
 }
 
-pub fn handleVulkanCopyTextureToTexture(
-    enc: *DoeCommandEncoder,
-    src_texture: *DoeTexture,
-    src_mip: u32,
-    src_slice: u32,
-    src_x: u32,
-    src_y: u32,
-    src_z: u32,
-    dst_texture: *DoeTexture,
-    dst_mip: u32,
-    dst_slice: u32,
-    dst_x: u32,
-    dst_y: u32,
-    dst_z: u32,
-    width: u32,
-    height: u32,
-    depth_or_layers: u32,
-) bool {
-    _ = src_slice;
-    _ = dst_slice;
-    if (enc.dev.backend != .vulkan) return false;
-    if (comptime !has_vulkan) return failVulkanResourceOp(enc.dev, "copyTextureToTexture", "backend compiled without Vulkan support");
-    const rt = native_rt_helpers.device_vk_runtime(enc.dev) orelse
-        return failVulkanResourceOp(enc.dev, "copyTextureToTexture", "device has no Vulkan runtime");
-    if (src_texture.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyTextureToTexture", "source texture has no Vulkan resource");
-    if (dst_texture.vk_id == 0) return failVulkanResourceOp(enc.dev, "copyTextureToTexture", "destination texture has no Vulkan resource");
-    rt.texture_copy(.{
-        .src_handle = src_texture.vk_id,
-        .src_mip = src_mip,
-        .src_x = src_x,
-        .src_y = src_y,
-        .src_z = src_z,
-        .dst_handle = dst_texture.vk_id,
-        .dst_mip = dst_mip,
-        .dst_x = dst_x,
-        .dst_y = dst_y,
-        .dst_z = dst_z,
-        .width = width,
-        .height = height,
-        .depth_or_layers = depth_or_layers,
-    }) catch |err| return failVulkanResourceError(enc.dev, "copyTextureToTexture", err);
-    return true;
-}
-
 pub fn handleVulkanQueueWriteTexture(
     queue: ?*DoeQueue,
     texture: *DoeTexture,

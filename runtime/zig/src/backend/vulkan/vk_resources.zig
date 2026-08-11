@@ -581,7 +581,14 @@ pub fn ensure_texture_shader_layout(self: anytype, texture: *TextureResource) !v
     try c.check_vk(c.vkResetFences(self.device, 1, @ptrCast(&self.fence)));
     try c.check_vk(c.vkQueueSubmit(self.queue, 1, @ptrCast(&submit_info), self.fence));
     try c.check_vk(c.vkWaitForFences(self.device, 1, @ptrCast(&self.fence), c.VK_TRUE, vk_upload.WAIT_TIMEOUT_NS));
-    texture.layout = c.VK_IMAGE_LAYOUT_GENERAL;
+    mark_texture_image_layout(self, texture.image, c.VK_IMAGE_LAYOUT_GENERAL);
+}
+
+pub fn mark_texture_image_layout(self: anytype, image: c.VkImage, layout: u32) void {
+    var iterator = self.textures.valueIterator();
+    while (iterator.next()) |texture| {
+        if (texture.image == image) texture.layout = layout;
+    }
 }
 
 pub fn create_texture_resource(
