@@ -1,7 +1,5 @@
 const std = @import("std");
 const runtime_compile = @import("../../src/compiler/wgsl/runtime/runtime_compile.zig");
-const ir = @import("../../src/compiler/wgsl/ir/ir.zig");
-const lean_proof = @import("../../src/verification/lean_proof.zig");
 const emit_msl = @import("../../src/compiler/wgsl/emit/msl/emit_msl.zig");
 const emit_spirv = @import("../../src/compiler/wgsl/emit/spirv/emit_spirv.zig");
 
@@ -35,7 +33,7 @@ test "timed compute runtime translation reports compiler phases" {
     try std.testing.expect(result.phase_timings_ns.total >= result.phase_timings_ns.emit);
 }
 
-test "compute runtime elides workgroup id storage clamp with dispatch precondition" {
+test "compute runtime preserves workgroup id storage clamp without fallback artifact" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<f32>;
         \\@compute @workgroup_size(64)
@@ -53,16 +51,13 @@ test "compute runtime elides workgroup id storage clamp with dispatch preconditi
     );
     defer result.info.deinit(std.testing.allocator);
 
-    try std.testing.expectEqual(@as(usize, 1), result.info.dispatch_preconditions.len);
-    const precondition = result.info.dispatch_preconditions[0];
-    try std.testing.expectEqual(ir.DispatchPreconditionKind.workgroup_component, precondition.kind);
-    try std.testing.expectEqual(@as(u8, 0), precondition.gid_axis);
+    try std.testing.expectEqual(@as(usize, 0), result.info.dispatch_preconditions.len);
     const msl = out[0..result.len];
-    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") != null);
 }
 
-test "compute runtime elides global id storage clamp with dispatch precondition" {
+test "compute runtime preserves global id storage clamp without fallback artifact" {
     const source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<f32>;
         \\@compute @workgroup_size(64)
@@ -80,16 +75,13 @@ test "compute runtime elides global id storage clamp with dispatch precondition"
     );
     defer result.info.deinit(std.testing.allocator);
 
-    try std.testing.expectEqual(@as(usize, 1), result.info.dispatch_preconditions.len);
-    const precondition = result.info.dispatch_preconditions[0];
-    try std.testing.expectEqual(ir.DispatchPreconditionKind.gid_component, precondition.kind);
-    try std.testing.expectEqual(@as(u8, 0), precondition.gid_axis);
+    try std.testing.expectEqual(@as(usize, 0), result.info.dispatch_preconditions.len);
     const msl = out[0..result.len];
-    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") != null);
 }
 
-test "compute runtime elides local invocation loop storage clamp with dispatch precondition" {
+test "compute runtime preserves local invocation loop storage clamp without fallback artifact" {
     const source =
         \\const K_WORKGROUP_SIZE: u32 = 256u;
         \\const K_WORKGROUP_ARRAY_SIZE: u32 = 2048u;
@@ -114,17 +106,11 @@ test "compute runtime elides local invocation loop storage clamp with dispatch p
     );
     defer result.info.deinit(std.testing.allocator);
 
-    try std.testing.expectEqual(@as(usize, 1), result.info.dispatch_preconditions.len);
-    const precondition = result.info.dispatch_preconditions[0];
-    try std.testing.expectEqual(ir.DispatchPreconditionKind.local_invocation_component, precondition.kind);
-    try std.testing.expectEqual(@as(u8, 0), precondition.gid_axis);
-    try std.testing.expectEqual(@as(u64, 8), precondition.element_multiplier);
-    try std.testing.expectEqual(@as(u64, 8), precondition.loop_limit);
-    try std.testing.expectEqual(@as(u64, 1), precondition.loop_limit_multiplier);
-    try std.testing.expect(!result.info.needs_sizes_buf);
+    try std.testing.expectEqual(@as(usize, 0), result.info.dispatch_preconditions.len);
+    try std.testing.expect(result.info.needs_sizes_buf);
     const msl = out[0..result.len];
-    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") != null);
 }
 
 test "compute runtime emits zero for unwritten workgroup reads" {
@@ -152,13 +138,13 @@ test "compute runtime emits zero for unwritten workgroup reads" {
     );
     defer result.info.deinit(std.testing.allocator);
 
-    try std.testing.expect(!result.info.needs_sizes_buf);
+    try std.testing.expect(result.info.needs_sizes_buf);
     const msl = out[0..result.len];
     try std.testing.expect(std.mem.indexOf(u8, msl, "threadgroup float wg") == null);
     try std.testing.expect(std.mem.indexOf(u8, msl, "wg[") == null);
     try std.testing.expect(std.mem.indexOf(u8, msl, "= 0.0") != null);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") != null);
 }
 
 test "compute runtime preserves written workgroup storage" {
@@ -286,7 +272,7 @@ test "compute runtime elides bitmasked workgroup array clamp" {
         std.mem.indexOf(u8, msl, "inout_data[0]") != null);
 }
 
-test "vulkan compute runtime elides global id storage clamp with dispatch precondition" {
+test "vulkan compute runtime preserves global id storage clamp without fallback artifact" {
     const source =
         \\@group(0) @binding(0) var<storage, read> input_values: array<f32>;
         \\@group(0) @binding(1) var<storage, read_write> output_values: array<f32>;
@@ -303,16 +289,10 @@ test "vulkan compute runtime elides global id storage clamp with dispatch precon
     );
     defer result.info.deinit(std.testing.allocator);
 
-    var gid_preconditions: usize = 0;
-    for (result.info.dispatch_preconditions) |precondition| {
-        if (precondition.kind != .gid_component) continue;
-        try std.testing.expectEqual(@as(u8, 0), precondition.gid_axis);
-        gid_preconditions += 1;
-    }
-    try std.testing.expectEqual(@as(usize, 2), gid_preconditions);
+    try std.testing.expectEqual(@as(usize, 0), result.info.dispatch_preconditions.len);
 }
 
-test "vulkan compute runtime elides uniform product guarded storage clamp" {
+test "vulkan compute runtime preserves uniform product guarded storage clamp" {
     const source =
         \\struct Dims {
         \\    M: u32,
@@ -339,20 +319,10 @@ test "vulkan compute runtime elides uniform product guarded storage clamp" {
     );
     defer result.info.deinit(std.testing.allocator);
 
-    var saw_c_extent = false;
-    for (result.info.dispatch_preconditions) |precondition| {
-        if (precondition.kind != .uniform_extent) continue;
-        if (precondition.storage_binding.binding != 2) continue;
-        try std.testing.expectEqual(@as(u32, 3), precondition.uniform_binding.binding);
-        try std.testing.expectEqual(@as(u32, 0), precondition.uniform_u32_offsets[0]);
-        try std.testing.expectEqual(@as(u32, 8), precondition.uniform_u32_offsets[1]);
-        try std.testing.expectEqual(@as(u8, 2), precondition.uniform_u32_count);
-        saw_c_extent = true;
-    }
-    try std.testing.expect(saw_c_extent);
+    try std.testing.expectEqual(@as(usize, 0), result.info.dispatch_preconditions.len);
 }
 
-test "compute runtime elides uniform guarded GEMV storage clamps" {
+test "compute runtime preserves uniform guarded GEMV storage clamps" {
     const source =
         \\struct Uniforms {
         \\    rows: u32,
@@ -403,18 +373,14 @@ test "compute runtime elides uniform guarded GEMV storage clamps" {
     );
     defer result.info.deinit(std.testing.allocator);
 
-    var saw_uniform_extent = false;
-    for (result.info.dispatch_preconditions) |precondition| {
-        if (precondition.kind == .uniform_extent) saw_uniform_extent = true;
-    }
-    try std.testing.expect(saw_uniform_extent);
+    try std.testing.expectEqual(@as(usize, 0), result.info.dispatch_preconditions.len);
     const msl = out[0..result.len];
-    try std.testing.expect(!result.info.needs_sizes_buf);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+    try std.testing.expect(result.info.needs_sizes_buf);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") != null);
 }
 
-test "compute runtime elides uniform guarded gid storage clamps" {
+test "compute runtime preserves uniform guarded gid storage clamps" {
     const source =
         \\struct Params {
         \\    count: u32,
@@ -442,38 +408,12 @@ test "compute runtime elides uniform guarded gid storage clamps" {
     );
     defer result.info.deinit(std.testing.allocator);
 
-    const proof_backed = lean_proof.boundsProven(.gid_1d_storage_buffer);
-    var precondition_count: usize = 0;
-    var saw_input = false;
-    var saw_output = false;
-    for (result.info.dispatch_preconditions) |precondition| {
-        if (proof_backed) {
-            if (precondition.kind != .gid_component) continue;
-            try std.testing.expectEqual(@as(u8, 0), precondition.gid_axis);
-            try std.testing.expectEqual(@as(u64, 1), precondition.element_multiplier);
-        } else {
-            if (precondition.kind != .uniform_extent) continue;
-            try std.testing.expectEqual(@as(u32, 0), precondition.uniform_binding.group);
-            try std.testing.expectEqual(@as(u32, 0), precondition.uniform_binding.binding);
-            try std.testing.expectEqual(@as(u32, 0), precondition.uniform_u32_offsets[0]);
-            try std.testing.expectEqual(@as(u8, 1), precondition.uniform_u32_count);
-        }
-        try std.testing.expectEqual(@as(u32, 0), precondition.storage_binding.group);
-        switch (precondition.storage_binding.binding) {
-            1 => saw_input = true,
-            2 => saw_output = true,
-            else => return error.TestUnexpectedResult,
-        }
-        precondition_count += 1;
-    }
-    try std.testing.expectEqual(@as(usize, 2), precondition_count);
-    try std.testing.expect(saw_input);
-    try std.testing.expect(saw_output);
+    try std.testing.expectEqual(@as(usize, 0), result.info.dispatch_preconditions.len);
 
     const msl = out[0..result.len];
-    try std.testing.expect(!result.info.needs_sizes_buf);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") == null);
-    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") == null);
+    try std.testing.expect(result.info.needs_sizes_buf);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "_doe_sizes") != null);
+    try std.testing.expect(std.mem.indexOf(u8, msl, "min(") != null);
 }
 
 test "compute runtime emits Metal max total threads from workgroup size" {

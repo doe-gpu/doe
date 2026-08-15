@@ -223,11 +223,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 13,
+          "endLine": 14,
           "kind": "constant",
           "name": "DoeBuffer",
           "path": "src/native/resource/doe_command_texture_native.zig",
-          "startLine": 13,
+          "startLine": 14,
           "tokenCount": 6
         },
         {
@@ -1071,11 +1071,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 15,
+          "endLine": 16,
           "kind": "constant",
           "name": "DoeQueue",
           "path": "src/native/resource/doe_command_texture_native.zig",
-          "startLine": 15,
+          "startLine": 16,
           "tokenCount": 6
         }
       ],
@@ -2915,11 +2915,11 @@
     {
       "locations": [
         {
-          "endLine": 4,
+          "endLine": 3,
           "kind": "constant",
           "name": "analysis",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 4,
+          "startLine": 3,
           "tokenCount": 7
         },
         {
@@ -4727,6 +4727,14 @@
           "tokenCount": 6
         },
         {
+          "endLine": 12,
+          "kind": "constant",
+          "name": "toOpaque",
+          "path": "src/native/resource/doe_command_texture_native.zig",
+          "startLine": 12,
+          "tokenCount": 6
+        },
+        {
           "endLine": 21,
           "kind": "constant",
           "name": "toOpaque",
@@ -4993,11 +5001,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 12,
+          "endLine": 11,
           "kind": "constant",
           "name": "TranslationResult",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 12,
+          "startLine": 11,
           "tokenCount": 7
         }
       ],
@@ -5475,11 +5483,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 5,
+          "endLine": 6,
           "kind": "constant",
           "name": "emit_spirv_shared",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 5,
+          "startLine": 6,
           "tokenCount": 7
         },
         {
@@ -8419,11 +8427,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 11,
+          "endLine": 10,
           "kind": "constant",
           "name": "TranslationInfo",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 11,
+          "startLine": 10,
           "tokenCount": 7
         }
       ],
@@ -12883,11 +12891,11 @@
     {
       "locations": [
         {
-          "endLine": 6,
+          "endLine": 5,
           "kind": "constant",
           "name": "robustness",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 6,
+          "startLine": 5,
           "tokenCount": 7
         },
         {
@@ -14507,11 +14515,11 @@
     {
       "locations": [
         {
-          "endLine": 8,
+          "endLine": 7,
           "kind": "constant",
           "name": "emit_spirv",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 8,
+          "startLine": 7,
           "tokenCount": 7
         },
         {
@@ -16301,11 +16309,11 @@
     {
       "locations": [
         {
-          "endLine": 778,
+          "endLine": 787,
           "kind": "constant",
           "name": "materialize_inferred_local_type",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 778,
+          "startLine": 787,
           "tokenCount": 6
         },
         {
@@ -16777,11 +16785,11 @@
     {
       "locations": [
         {
-          "endLine": 782,
+          "endLine": 791,
           "kind": "constant",
           "name": "parse_access",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 782,
+          "startLine": 791,
           "tokenCount": 6
         },
         {
@@ -16829,11 +16837,11 @@
           "tokenCount": 16
         },
         {
-          "endLine": 19,
+          "endLine": 18,
           "kind": "function",
           "name": "nowNs",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 17,
+          "startLine": 16,
           "tokenCount": 16
         }
       ],
@@ -17451,11 +17459,11 @@
     {
       "locations": [
         {
-          "endLine": 7,
+          "endLine": 6,
           "kind": "constant",
           "name": "emit_msl",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 7,
+          "startLine": 6,
           "tokenCount": 7
         },
         {
@@ -18053,11 +18061,11 @@
     {
       "locations": [
         {
-          "endLine": 10,
+          "endLine": 11,
           "kind": "constant",
           "name": "EmitError",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 10,
+          "startLine": 11,
           "tokenCount": 6
         },
         {
@@ -18741,11 +18749,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 13,
+          "endLine": 12,
           "kind": "constant",
           "name": "TimedTranslationResult",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 13,
+          "startLine": 12,
           "tokenCount": 7
         }
       ],
@@ -20157,11 +20165,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 16,
+          "endLine": 17,
           "kind": "constant",
           "name": "DoeTexture",
           "path": "src/native/resource/doe_command_texture_native.zig",
-          "startLine": 16,
+          "startLine": 17,
           "tokenCount": 6
         },
         {
@@ -20363,11 +20371,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 4,
+          "endLine": 5,
           "kind": "constant",
           "name": "spirv",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 4,
+          "startLine": 5,
           "tokenCount": 7
         },
         {
@@ -28285,11 +28293,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 14,
+          "endLine": 15,
           "kind": "constant",
           "name": "DoeCommandEncoder",
           "path": "src/native/resource/doe_command_texture_native.zig",
-          "startLine": 14,
+          "startLine": 15,
           "tokenCount": 6
         }
       ],
@@ -30313,11 +30321,11 @@
     {
       "locations": [
         {
-          "endLine": 781,
+          "endLine": 790,
           "kind": "constant",
           "name": "parse_address_space",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 781,
+          "startLine": 790,
           "tokenCount": 6
         },
         {
@@ -34740,14 +34748,6 @@
           "endLine": 3,
           "kind": "constant",
           "name": "lean_proof",
-          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 3,
-          "tokenCount": 7
-        },
-        {
-          "endLine": 3,
-          "kind": "constant",
-          "name": "lean_proof",
           "path": "src/compiler/wgsl/runtime/runtime_graphics_translation.zig",
           "startLine": 3,
           "tokenCount": 7
@@ -34781,9 +34781,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "48fe072a0cac49068a50b77b7f86d8dd3eddecdbe224a6afcf3b88b19d780fc1",
+  "manifestSha256": "d715c362fc26c72f4dad66f1bed84e4adf126b16290055125b2087a70777987f",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "8160f0b9b0b7d94e589a3e71eb4071015e58cf29756c501916d9ad9c2a2b4cb2"
+  "sourceTreeSha256": "9a0511c58ac6f6bc59ec7509e2bb32990c95913c8dafc0105c1561c110352326"
 }

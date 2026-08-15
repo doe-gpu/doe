@@ -679,6 +679,7 @@ pub export fn doeNativeShaderModuleRelease(raw: ?*anyopaque) callconv(.c) void {
             if (!sm.mtl_library_borrowed) metal_bridge_release(l);
         }
         if (sm.dispatch_preconditions.len > 0) alloc.free(sm.dispatch_preconditions);
+        if (sm.texture_dispatch_preconditions.len > 0) alloc.free(sm.texture_dispatch_preconditions);
         if (sm.spirv_data) |s| alloc.free(s);
         if (sm.vertex_spirv_data) |s| alloc.free(s);
         if (sm.fragment_spirv_data) |s| alloc.free(s);
@@ -693,23 +694,39 @@ pub export fn doeNativeShaderModuleRelease(raw: ?*anyopaque) callconv(.c) void {
 // Compute Pipeline
 // ============================================================
 
-fn createComputePipelineVulkan(sm: *DoeShaderModule, layout: ?*DoePipelineLayout, entry_point: ?[]const u8) ?*anyopaque {
+fn createComputePipelineVulkan(
+    sm: *DoeShaderModule,
+    layout: ?*DoePipelineLayout,
+    entry_point: ?[]const u8,
+    overrides: []const wgsl_ir.OverrideEntry,
+) ?*anyopaque {
     const cp = make(DoeComputePipeline) orelse return null;
     cp.* = .{};
     if (layout) |pipeline_layout| {
-        native_helpers.object_add_ref(DoePipelineLayout, toOpaque(pipeline_layout));
         cp.layout = pipeline_layout;
     }
-    native_helpers.object_add_ref(DoeShaderModule, toOpaque(sm));
     cp.shader_module = sm;
     cp.wg_x = sm.wg_x;
     cp.wg_y = sm.wg_y;
     cp.wg_z = sm.wg_z;
     cp.needs_sizes_buf = sm.needs_sizes_buf;
-    cp.dispatch_preconditions = alloc.dupe(wgsl_ir.DispatchPrecondition, sm.dispatch_preconditions) catch {
-        alloc.destroy(cp);
-        return null;
-    };
+    if (overrides.len == 0) {
+        cp.dispatch_preconditions = if (sm.dispatch_preconditions.len == 0)
+            &.{}
+        else
+            alloc.dupe(wgsl_ir.DispatchPrecondition, sm.dispatch_preconditions) catch {
+                alloc.destroy(cp);
+                return null;
+            };
+        cp.texture_dispatch_preconditions = if (sm.texture_dispatch_preconditions.len == 0)
+            &.{}
+        else
+            alloc.dupe(wgsl_ir.TextureDispatchPrecondition, sm.texture_dispatch_preconditions) catch {
+                if (cp.dispatch_preconditions.len > 0) alloc.free(cp.dispatch_preconditions);
+                alloc.destroy(cp);
+                return null;
+            };
+    }
     // Capture the descriptor's entry-point name as an owned,
     // null-terminated string so the Vulkan submit path can match
     // against the SPIR-V's OpEntryPoint. See DoeComputePipeline.vk_entry_point_owned.
@@ -720,22 +737,34 @@ fn createComputePipelineVulkan(sm: *DoeShaderModule, layout: ?*DoePipelineLayout
                 set_last_error_kind("OutOfMemory");
                 set_last_error("Vulkan compute pipeline creation failed: OOM duplicating entry point name");
                 if (cp.dispatch_preconditions.len > 0) alloc.free(cp.dispatch_preconditions);
+                if (cp.texture_dispatch_preconditions.len > 0) alloc.free(cp.texture_dispatch_preconditions);
                 alloc.destroy(cp);
                 return null;
             };
         }
     }
     const vk_compute = @import("../vulkan/vulkan_compute_native.zig");
-    vk_compute.vulkan_copy_pipeline_spirv(cp, sm) catch {
+    const compile_result = if (overrides.len > 0)
+        vk_compute.vulkan_compile_pipeline_spirv_with_overrides(cp, sm, overrides)
+    else
+        vk_compute.vulkan_copy_pipeline_spirv(cp, sm);
+    compile_result catch |err| {
         set_last_error_stage_name("native_compile");
-        set_last_error_kind("OutOfMemory");
-        set_last_error("Vulkan compute pipeline creation failed: OOM duplicating SPIR-V");
-        std.log.err("doe: createComputePipeline (Vulkan) failed: OOM duplicating SPIR-V", .{});
-        if (cp.vk_entry_point_owned) |ep| alloc.free(ep);
+        set_last_error_kind(@errorName(err));
+        const detail = wgsl_analysis.lastErrorMessage();
+        if (detail.len > 0) {
+            set_last_error_fmt("Vulkan compute pipeline creation failed: {s}", .{detail});
+        } else {
+            set_last_error_fmt("Vulkan compute pipeline creation failed: {s}", .{@errorName(err)});
+        }
         if (cp.dispatch_preconditions.len > 0) alloc.free(cp.dispatch_preconditions);
+        if (cp.texture_dispatch_preconditions.len > 0) alloc.free(cp.texture_dispatch_preconditions);
+        vk_compute.vulkan_release_compute_pipeline(cp);
         alloc.destroy(cp);
         return null;
     };
+    if (layout) |pipeline_layout| native_helpers.object_add_ref(DoePipelineLayout, toOpaque(pipeline_layout));
+    native_helpers.object_add_ref(DoeShaderModule, toOpaque(sm));
     return toOpaque(cp);
 }
 
@@ -839,18 +868,40 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
         return null;
     };
 
+    if (sm.compilation_message_kind == .@"error") {
+        set_last_error_stage_name("native_compile");
+        set_last_error_kind("InvalidShaderModule");
+        if (sm.compilation_message) |message| {
+            set_last_error_fmt("compute pipeline creation rejected invalid shader module: {s}", .{message});
+        } else {
+            set_last_error("compute pipeline creation rejected invalid shader module");
+        }
+        return null;
+    }
+
+    var entries: [MAX_OVERRIDE_ENTRIES]wgsl_ir.OverrideEntry = undefined;
+    const override_slice = if (d.compute.constantCount > 0 and d.compute.constants != null)
+        buildOverrideEntries(d.compute.constants.?, d.compute.constantCount, &entries) orelse {
+            set_last_error_stage_name("native_compile");
+            set_last_error_kind("InvalidOverrideConstants");
+            set_last_error("pipeline override constants: invalid key pointer or too many entries");
+            return null;
+        }
+    else
+        entries[0..0];
+
     if (dev.backend == .vulkan) {
         // Resolve the entry-point name from the descriptor so the
         // Vulkan submit path can match against the SPIR-V's actual
         // OpEntryPoint. Null/empty descriptor → default to "main".
         const entry_slice = stringViewSlice(d.compute.entryPoint);
-        const result = createComputePipelineVulkan(sm, cast(DoePipelineLayout, d.layout), entry_slice);
+        const result = createComputePipelineVulkan(sm, cast(DoePipelineLayout, d.layout), entry_slice, override_slice);
         if (result != null) label_store.set(result, d.label.data, d.label.length);
         return result;
     }
 
     // If override constants are provided, re-translate the WGSL with overrides applied.
-    const has_overrides = d.compute.constantCount > 0 and d.compute.constants != null;
+    const has_overrides = override_slice.len > 0;
     var override_lib: ?*anyopaque = null;
     if (has_overrides) {
         override_lib = recompileWithOverrides(dev, sm, d.compute.constants.?, d.compute.constantCount);
@@ -930,6 +981,12 @@ pub export fn doeNativeDeviceCreateComputePipeline(dev_raw: ?*anyopaque, desc: ?
         alloc.destroy(cp);
         return null;
     };
+    cp.texture_dispatch_preconditions = alloc.dupe(wgsl_ir.TextureDispatchPrecondition, sm.texture_dispatch_preconditions) catch {
+        metal_bridge_release(pso);
+        if (cp.dispatch_preconditions.len > 0) alloc.free(cp.dispatch_preconditions);
+        alloc.destroy(cp);
+        return null;
+    };
     const result = toOpaque(cp);
     label_store.set(result, d.label.data, d.label.length);
     return result;
@@ -957,6 +1014,7 @@ pub export fn doeNativeComputePipelineRelease(raw: ?*anyopaque) callconv(.c) voi
         label_store.remove(raw);
         if (p.mtl_pso) |pso| metal_bridge_release(pso);
         if (p.dispatch_preconditions.len > 0) alloc.free(p.dispatch_preconditions);
+        if (p.texture_dispatch_preconditions.len > 0) alloc.free(p.texture_dispatch_preconditions);
         if (p.layout) |layout| bind_group.doeNativePipelineLayoutRelease(toOpaque(layout));
         if (p.shader_module) |shader_module| doeNativeShaderModuleRelease(toOpaque(shader_module));
         const vk_compute = @import("../vulkan/vulkan_compute_native.zig");

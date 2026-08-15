@@ -4281,7 +4281,7 @@
         {
           "name": "MAX_OVERRIDE_ENTRIES",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 756
+          "startLine": 785
         },
         {
           "name": "MAX_DEFERRED_COPIES",
@@ -15635,7 +15635,7 @@
         {
           "name": "assign_op_to_binary",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 20
+          "startLine": 21
         }
       ],
       "prefix": "assign",
@@ -17683,22 +17683,22 @@
         {
           "name": "emit_spirv_shared",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 5
+          "startLine": 6
         },
         {
           "name": "emit_spirv_builtins",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 6
+          "startLine": 7
         },
         {
           "name": "emit_spirv_fn_helpers",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 7
+          "startLine": 8
         },
         {
           "name": "emit_spirv_matrix",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 8
+          "startLine": 9
         },
         {
           "name": "emit_spirv_shared",
@@ -17873,12 +17873,12 @@
         {
           "name": "emit_msl",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 7
+          "startLine": 6
         },
         {
           "name": "emit_spirv",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 8
+          "startLine": 7
         },
         {
           "name": "emit_spirv",
@@ -18465,6 +18465,11 @@
         },
         {
           "name": "ir_const_eval",
+          "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
+          "startLine": 3
+        },
+        {
+          "name": "ir_const_eval",
           "path": "src/compiler/wgsl/ir/ir_builder.zig",
           "startLine": 4
         },
@@ -18572,7 +18577,7 @@
         {
           "name": "is_handle_type",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 777
+          "startLine": 786
         },
         {
           "name": "is_local_ref",
@@ -18737,11 +18742,6 @@
           "name": "lean_proof",
           "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
           "startLine": 2
-        },
-        {
-          "name": "lean_proof",
-          "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 3
         },
         {
           "name": "lean_proof",
@@ -21688,7 +21688,7 @@
         {
           "name": "override_values",
           "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
-          "startLine": 5
+          "startLine": 4
         }
       ],
       "prefix": "override",
@@ -21847,17 +21847,17 @@
         {
           "name": "parse_address_space",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 781
+          "startLine": 790
         },
         {
           "name": "parse_access",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 782
+          "startLine": 791
         },
         {
           "name": "parse_vector_swizzle",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 783
+          "startLine": 792
         },
         {
           "name": "parse_access",
@@ -23017,7 +23017,7 @@
         {
           "name": "sema_helpers",
           "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
-          "startLine": 3
+          "startLine": 4
         },
         {
           "name": "sema_types",
@@ -24602,10 +24602,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "48fe072a0cac49068a50b77b7f86d8dd3eddecdbe224a6afcf3b88b19d780fc1",
+  "manifestSha256": "d715c362fc26c72f4dad66f1bed84e4adf126b16290055125b2087a70777987f",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "8160f0b9b0b7d94e589a3e71eb4071015e58cf29756c501916d9ad9c2a2b4cb2",
+  "sourceTreeSha256": "9a0511c58ac6f6bc59ec7509e2bb32990c95913c8dafc0105c1561c110352326",
   "status": "captured"
 }

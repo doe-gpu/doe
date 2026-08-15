@@ -25,6 +25,15 @@
       "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
       "runtimeProfile": null,
       "runtimeConfig": {
+        "shared": {
+          "harness": {
+            "referenceTranscript": {
+              "enabled": true,
+              "captureLogits": true,
+              "captureKvBytes": false
+            }
+          }
+        },
         "inference": {
           "kernelPathPolicy": {
             "mode": "capability-aware",

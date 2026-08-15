@@ -249,7 +249,7 @@ test "compute runtime translation drops _doe_sizes for proof-covered affine boun
     try std.testing.expect(direct_translation.info.needs_sizes_buf);
 }
 
-test "compute runtime translation drops _doe_sizes for dispatch-validated strided affine bounds" {
+test "compute runtime translation retains clamps for strided affine bounds" {
     const affine_source =
         \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
         \\@compute @workgroup_size(8)
@@ -268,8 +268,8 @@ test "compute runtime translation drops _doe_sizes for dispatch-validated stride
     );
     defer affine_translation.info.deinit(std.testing.allocator);
 
-    try std.testing.expect(!affine_translation.info.needs_sizes_buf);
-    try std.testing.expect(affine_translation.info.dispatch_preconditions.len > 0);
+    try std.testing.expect(affine_translation.info.needs_sizes_buf);
+    try std.testing.expectEqual(@as(usize, 0), affine_translation.info.dispatch_preconditions.len);
 }
 
 test "analyzeToIrWithConfig records flat 2d offset preconditions" {
@@ -500,7 +500,7 @@ test "analyzeToIrWithConfig records tiled 1d texture dispatch-fit preconditions"
     try std.testing.expect(!has_clamp);
 }
 
-test "compute runtime robustness config records texture dispatch-fit preconditions" {
+test "compute runtime robustness config retains texture clamps without a fallback artifact" {
     const source =
         \\@group(0) @binding(0) var src_tex: texture_2d<f32>;
         \\@group(0) @binding(1) var dst_tex: texture_storage_2d<rgba8unorm, write>;
@@ -518,13 +518,7 @@ test "compute runtime robustness config records texture dispatch-fit preconditio
     );
     defer module_ir.deinit();
 
-    const proofs_available = lean_proof.boundsProven(.gid_texture_2d_dispatch_fit);
-    if (!proofs_available) {
-        try std.testing.expectEqual(@as(usize, 0), module_ir.texture_dispatch_preconditions.items.len);
-        return;
-    }
-
-    try std.testing.expectEqual(@as(usize, 2), module_ir.texture_dispatch_preconditions.items.len);
+    try std.testing.expectEqual(@as(usize, 0), module_ir.texture_dispatch_preconditions.items.len);
 
     var has_clamp = false;
     for (module_ir.functions.items[0].exprs.items) |expr| {
@@ -533,5 +527,5 @@ test "compute runtime robustness config records texture dispatch-fit preconditio
             break;
         }
     }
-    try std.testing.expect(!has_clamp);
+    try std.testing.expect(has_clamp);
 }

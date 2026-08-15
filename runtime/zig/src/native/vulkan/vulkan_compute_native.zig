@@ -386,11 +386,53 @@ pub fn vulkan_create_shader_module(
 pub fn vulkan_copy_pipeline_spirv(
     pip: *DoeComputePipeline,
     shader: *DoeShaderModule,
-) error{OutOfMemory}!void {
-    const src = shader.spirv_data orelse return;
+) error{ OutOfMemory, InvalidShaderModule }!void {
+    const src = shader.spirv_data orelse return error.InvalidShaderModule;
     pip.spirv_data = alloc.dupe(u32, src) catch return error.OutOfMemory;
     pip.vk_spirv_hash = std.hash.Wyhash.hash(0, std.mem.sliceAsBytes(src));
     pip.vk_spirv_hash_ready = true;
+    populate_pipeline_buffer_binding_types(pip, shader);
+    precompute_pipeline_static_hashes(pip);
+}
+
+pub fn vulkan_compile_pipeline_spirv_with_overrides(
+    pip: *DoeComputePipeline,
+    shader: *DoeShaderModule,
+    overrides: []const wgsl_ir.OverrideEntry,
+) error{ OutOfMemory, ShaderCompileFailed, InvalidShaderModule }!void {
+    const wgsl = shader.wgsl_source orelse return error.InvalidShaderModule;
+    var spirv_buf = alloc.alloc(u8, spirv_translation.MAX_OUTPUT) catch return error.OutOfMemory;
+    defer alloc.free(spirv_buf);
+
+    var translation = runtime_compile.translateToSpirvForVulkanComputeRuntimeWithOverrides(
+        alloc,
+        wgsl,
+        spirv_buf,
+        overrides.ptr,
+        overrides.len,
+    ) catch return error.ShaderCompileFailed;
+    defer translation.info.deinit(alloc);
+    if (translation.len == 0 or (translation.len % 4) != 0) return error.ShaderCompileFailed;
+
+    const word_count = translation.len / 4;
+    const words = alloc.alloc(u32, word_count) catch return error.OutOfMemory;
+    errdefer alloc.free(words);
+    for (words, 0..) |*word, index| {
+        const offset = index * 4;
+        const chunk: *const [4]u8 = @ptrCast(spirv_buf[offset .. offset + 4].ptr);
+        word.* = std.mem.readInt(u32, chunk, .little);
+    }
+    pip.spirv_data = words;
+    pip.vk_spirv_hash = std.hash.Wyhash.hash(0, std.mem.sliceAsBytes(words));
+    pip.vk_spirv_hash_ready = true;
+    pip.wg_x = translation.info.workgroup_size[0];
+    pip.wg_y = translation.info.workgroup_size[1];
+    pip.wg_z = translation.info.workgroup_size[2];
+    pip.needs_sizes_buf = translation.info.needs_sizes_buf;
+    pip.dispatch_preconditions = translation.info.dispatch_preconditions;
+    pip.texture_dispatch_preconditions = translation.info.texture_dispatch_preconditions;
+    translation.info.dispatch_preconditions = &.{};
+    translation.info.texture_dispatch_preconditions = &.{};
     populate_pipeline_buffer_binding_types(pip, shader);
     precompute_pipeline_static_hashes(pip);
 }

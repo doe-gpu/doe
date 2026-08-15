@@ -55,6 +55,9 @@ fn resolve_named_attr_u32_const(self: anytype, name: []const u8, depth: u8) Anal
     const global_index = self.module.global_map.get(name) orelse return error.InvalidAttribute;
     const global_info = self.module.globals.items[global_index];
     if (global_info.class != .const_ and global_info.class != .override_) return error.InvalidAttribute;
+    if (global_info.class == .override_) {
+        if (resolve_override_u32(self, global_info) catch return error.InvalidAttribute) |value| return value;
+    }
     const global_node = self.module.tree.nodes.items[global_info.node_idx];
     const init_node = switch (global_node.tag) {
         .const_decl => global_node.data.rhs,
@@ -63,6 +66,26 @@ fn resolve_named_attr_u32_const(self: anytype, name: []const u8, depth: u8) Anal
     };
     if (init_node == ast_mod.NULL_NODE) return error.InvalidAttribute;
     return resolve_attr_u32_const(self, init_node, depth);
+}
+
+fn resolve_override_u32(self: anytype, global_info: sema_types.GlobalInfo) AnalyzeError!?u32 {
+    for (self.overrides) |entry| {
+        const numeric_id = std.fmt.parseInt(u32, entry.key, 10) catch null;
+        const matches = if (numeric_id) |id|
+            global_info.override_id != null and global_info.override_id.? == id
+        else
+            std.mem.eql(u8, global_info.name, entry.key);
+        if (!matches) continue;
+        if (!std.math.isFinite(entry.value) or
+            entry.value < 1.0 or
+            entry.value > @as(f64, @floatFromInt(std.math.maxInt(u32))) or
+            @floor(entry.value) != entry.value)
+        {
+            return error.InvalidAttribute;
+        }
+        return @as(u32, @intFromFloat(entry.value));
+    }
+    return null;
 }
 
 fn resolve_attr_u32_binary(self: anytype, node: ast_mod.Node, depth: u8) AnalyzeError!u32 {

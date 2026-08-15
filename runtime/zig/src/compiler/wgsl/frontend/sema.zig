@@ -41,6 +41,14 @@ pub fn lastFailureContext() FailureContext {
     return last_failure_context;
 }
 pub fn analyze(allocator: std.mem.Allocator, tree: *const Ast) !SemanticModule {
+    return analyzeWithOverrides(allocator, tree, &.{});
+}
+
+pub fn analyzeWithOverrides(
+    allocator: std.mem.Allocator,
+    tree: *const Ast,
+    overrides: []const ir.OverrideEntry,
+) !SemanticModule {
     resetLastFailureContext();
     var module = SemanticModule{
         .allocator = allocator,
@@ -53,7 +61,7 @@ pub fn analyze(allocator: std.mem.Allocator, tree: *const Ast) !SemanticModule {
     try module.node_info.resize(allocator, tree.nodes.items.len);
     @memset(module.node_info.items, NodeInfo{});
 
-    var analyzer = Analyzer{ .module = &module };
+    var analyzer = Analyzer{ .module = &module, .overrides = overrides };
     try analyzer.run();
     return module;
 }
@@ -107,6 +115,7 @@ const BodyAnalyzer = struct {
 
 const Analyzer = struct {
     module: *SemanticModule,
+    overrides: []const ir.OverrideEntry = &.{},
 
     fn run(self: *Analyzer) !void {
         const root = self.module.tree.nodes.items[0];

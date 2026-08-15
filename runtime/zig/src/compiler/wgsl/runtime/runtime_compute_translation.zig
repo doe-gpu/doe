@@ -1,6 +1,5 @@
 const std = @import("std");
 const ir = @import("../ir/ir.zig");
-const lean_proof = @import("../../../verification/lean_proof.zig");
 const analysis = @import("../pipeline/analysis.zig");
 const override_values = @import("../pipeline/overrides.zig");
 const robustness = @import("../ir/ir_transform_robustness.zig");
@@ -26,32 +25,27 @@ fn elapsedNs(start: i128, end: i128) u64 {
 
 pub fn compute_runtime_robustness_config() robustness.Config {
     return .{
-        .elide_proven_bounds = lean_proof.bounds_elimination_available,
-        .elide_dispatch_validated_bounds = true,
-        .elide_dispatch_validated_global_bounds = true,
+        // Dispatch-dependent elision is unsafe until the runtime can execute a
+        // retained robust artifact when a host precondition fails. Rejecting
+        // the optimized dispatch after encoding has begun silently drops GPU
+        // work and changes source semantics. Keep compile-time static elision,
+        // but preserve runtime clamps for dispatch- and uniform-sized access.
+        .elide_proven_bounds = false,
+        .elide_dispatch_validated_bounds = false,
+        .elide_dispatch_validated_global_bounds = false,
         .elide_static_storage_bounds = true,
-        .elide_uniform_validated_bounds = true,
-        // Runtime translation carries dispatch preconditions into pipeline
-        // metadata, so it can safely consume proof-backed texture clamp elision.
-        .elide_proven_texture_bounds = lean_proof.boundsProven(.gid_texture_1d_dispatch_fit) or
-            lean_proof.boundsProven(.gid_texture_2d_dispatch_fit) or
-            lean_proof.boundsProven(.gid_texture_3d_dispatch_fit) or
-            lean_proof.boundsProven(.gid_texture_1d_affine_dispatch_fit) or
-            lean_proof.boundsProven(.gid_texture_2d_affine_dispatch_fit) or
-            lean_proof.boundsProven(.gid_texture_3d_affine_dispatch_fit) or
-            lean_proof.boundsProven(.gid_texture_1d_tiled_dispatch_fit) or
-            lean_proof.boundsProven(.gid_texture_2d_tiled_dispatch_fit) or
-            lean_proof.boundsProven(.gid_texture_3d_tiled_dispatch_fit),
+        .elide_uniform_validated_bounds = false,
+        .elide_proven_texture_bounds = false,
     };
 }
 
 pub fn vulkan_compute_runtime_robustness_config() robustness.Config {
     return .{
-        .elide_proven_bounds = lean_proof.bounds_elimination_available,
-        .elide_dispatch_validated_bounds = true,
-        .elide_dispatch_validated_global_bounds = true,
+        .elide_proven_bounds = false,
+        .elide_dispatch_validated_bounds = false,
+        .elide_dispatch_validated_global_bounds = false,
         .elide_static_storage_bounds = true,
-        .elide_uniform_validated_bounds = true,
+        .elide_uniform_validated_bounds = false,
     };
 }
 
@@ -96,12 +90,19 @@ pub fn translateToMslForComputeRuntimeTimed(
     override_count: usize,
 ) analysis.TranslateError!TimedTranslationResult {
     const total_start_ns = nowNs();
-    var analyzed = try analysis.analyzeToIrWithConfigTimed(allocator, wgsl, compute_runtime_robustness_config());
+    const override_slice = if (overrides != null and override_count > 0)
+        overrides.?[0..override_count]
+    else
+        &.{};
+    var analyzed = try analysis.analyzeToIrWithConfigTimedAndOverrides(
+        allocator,
+        wgsl,
+        compute_runtime_robustness_config(),
+        override_slice,
+    );
     defer analyzed.module.deinit();
 
-    if (overrides != null and override_count > 0) {
-        override_values.applyOverrides(&analyzed.module, overrides.?[0..override_count]);
-    }
+    if (override_slice.len > 0) override_values.applyOverrides(&analyzed.module, override_slice);
 
     const emit_start_ns = nowNs();
     const len = emit_msl.emit(&analyzed.module, out) catch |err| return switch (err) {
@@ -163,8 +164,29 @@ pub fn translateToSpirvForVulkanComputeRuntime(
     wgsl: []const u8,
     out: []u8,
 ) analysis.TranslateError!TranslationResult {
-    var module_ir = try analysis.analyzeToIrWithConfig(allocator, wgsl, vulkan_compute_runtime_robustness_config());
+    return translateToSpirvForVulkanComputeRuntimeWithOverrides(allocator, wgsl, out, null, 0);
+}
+
+pub fn translateToSpirvForVulkanComputeRuntimeWithOverrides(
+    allocator: std.mem.Allocator,
+    wgsl: []const u8,
+    out: []u8,
+    overrides: ?[*]const ir.OverrideEntry,
+    override_count: usize,
+) analysis.TranslateError!TranslationResult {
+    const override_slice = if (overrides != null and override_count > 0)
+        overrides.?[0..override_count]
+    else
+        &.{};
+    var module_ir = try analysis.analyzeToIrWithConfigAndOverrides(
+        allocator,
+        wgsl,
+        vulkan_compute_runtime_robustness_config(),
+        override_slice,
+    );
     defer module_ir.deinit();
+
+    if (override_slice.len > 0) override_values.applyOverrides(&module_ir, override_slice);
 
     const len = try emitSpirv(&module_ir, out);
     return .{

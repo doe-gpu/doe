@@ -1637,6 +1637,7 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig" -> "src/compiler/wgsl/emit/spirv/emit_spirv_shared.zig";
   "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig" -> "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig";
   "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig" -> "src/compiler/wgsl/ir/ir.zig";
+  "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig" -> "src/compiler/wgsl/ir/ir_const_eval.zig";
   "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig" -> "src/compiler/wgsl/frontend/sema_helpers.zig";
   "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig" -> "src/compiler/wgsl/emit/spirv/spirv_builder.zig";
   "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig" -> "src/compiler/wgsl/emit/spirv/emit_spirv_shared.zig";
@@ -1839,7 +1840,6 @@ digraph doe_zig_architecture {
   "src/compiler/wgsl/runtime/runtime_compile_report.zig" -> "src/compiler/wgsl/pipeline/translate_spirv.zig";
   "src/compiler/wgsl/runtime/runtime_compile_report.zig" -> "src/compiler/wgsl/runtime/runtime_compute_translation.zig";
   "src/compiler/wgsl/runtime/runtime_compute_translation.zig" -> "src/compiler/wgsl/ir/ir.zig";
-  "src/compiler/wgsl/runtime/runtime_compute_translation.zig" -> "src/verification/lean_proof.zig";
   "src/compiler/wgsl/runtime/runtime_compute_translation.zig" -> "src/compiler/wgsl/pipeline/analysis.zig";
   "src/compiler/wgsl/runtime/runtime_compute_translation.zig" -> "src/compiler/wgsl/pipeline/overrides.zig";
   "src/compiler/wgsl/runtime/runtime_compute_translation.zig" -> "src/compiler/wgsl/ir/ir_transform_robustness.zig";

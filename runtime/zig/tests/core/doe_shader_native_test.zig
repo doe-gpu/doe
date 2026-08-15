@@ -526,6 +526,32 @@ test "createComputePipeline: null module sets InvalidShaderModule error" {
     try std.testing.expectEqualStrings("InvalidShaderModule", kind);
 }
 
+test "createComputePipeline: error shader module fails closed" {
+    var dev = native.DoeDevice{};
+    var sm = native.DoeShaderModule{
+        .compilation_message_kind = .@"error",
+        .compilation_message = "fixture shader compilation failed",
+    };
+    const pipeline_desc = types.WGPUComputePipelineDescriptor{
+        .nextInChain = null,
+        .label = .{ .data = null, .length = 0 },
+        .layout = null,
+        .compute = .{
+            .nextInChain = null,
+            .module = @ptrCast(&sm),
+            .entryPoint = .{ .data = "main".ptr, .length = 4 },
+            .constantCount = 0,
+            .constants = null,
+        },
+    };
+    const result = shader.doeNativeDeviceCreateComputePipeline(@ptrCast(&dev), &pipeline_desc);
+    try std.testing.expectEqual(@as(?*anyopaque, null), result);
+
+    var kind_buf: [64]u8 = undefined;
+    const kind = readErrorKind(&kind_buf);
+    try std.testing.expectEqualStrings("InvalidShaderModule", kind);
+}
+
 // ============================================================
 // 13. Various WGSL patterns through the check API
 // ============================================================

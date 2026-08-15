@@ -175,18 +175,18 @@
           "startLine": 45
         },
         {
-          "endLine": 800,
+          "endLine": 807,
           "literalCount": 6,
           "name": "create_texture_view",
           "path": "src/backend/vulkan/vk_resources.zig",
-          "startLine": 753
+          "startLine": 760
         },
         {
-          "endLine": 864,
+          "endLine": 871,
           "literalCount": 6,
           "name": "transition_texture_layout",
           "path": "src/backend/vulkan/vk_resources.zig",
-          "startLine": 824
+          "startLine": 831
         },
         {
           "endLine": 156,
@@ -460,11 +460,11 @@
           "startLine": 243
         },
         {
-          "endLine": 779,
+          "endLine": 808,
           "literalCount": 4,
           "name": "buildOverrideEntries",
           "path": "src/native/shader/doe_shader_native.zig",
-          "startLine": 760
+          "startLine": 789
         },
         {
           "endLine": 272,
@@ -685,11 +685,11 @@
           "startLine": 427
         },
         {
-          "endLine": 962,
+          "endLine": 969,
           "literalCount": 5,
           "name": "image_usage_for_texture",
           "path": "src/backend/vulkan/vk_resources.zig",
-          "startLine": 949
+          "startLine": 956
         },
         {
           "endLine": 441,
@@ -937,11 +937,11 @@
           "startLine": 31
         },
         {
-          "endLine": 353,
+          "endLine": 360,
           "literalCount": 7,
           "name": "collectBindGroupBindings",
           "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 302
+          "startLine": 309
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1311,11 +1311,11 @@
           "startLine": 87
         },
         {
-          "endLine": 106,
+          "endLine": 114,
           "literalCount": 5,
           "name": "BodyAnalyzer",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 68
+          "startLine": 76
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1488,18 +1488,18 @@
       "literalTokenSha256": "a2fccfbc9b5eb0d34fc03c64bef842485ac32ccbfe381667771f5ab6a49a0210",
       "locations": [
         {
-          "endLine": 164,
+          "endLine": 169,
           "literalCount": 6,
           "name": "collectRecordedBindings",
           "path": "src/native/vulkan/vulkan_compute_bindings.zig",
-          "startLine": 114
+          "startLine": 119
         },
         {
-          "endLine": 502,
+          "endLine": 544,
           "literalCount": 6,
           "name": "collect_recorded_bindings",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 458
+          "startLine": 500
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -1769,11 +1769,11 @@
       "literalTokenSha256": "ba68babaa7ed3bd96693b3916cecb9599d89ecfb702f2ddfd286942917a7f472",
       "locations": [
         {
-          "endLine": 470,
+          "endLine": 493,
           "literalCount": 17,
           "name": "parse_builtin_attr",
           "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
-          "startLine": 446
+          "startLine": 469
         },
         {
           "endLine": 75,
@@ -2231,11 +2231,11 @@
           "startLine": 83
         },
         {
-          "endLine": 996,
+          "endLine": 1040,
           "literalCount": 8,
           "name": "assignSpirvWords",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 980
+          "startLine": 1024
         }
       ],
       "reason": "identical ordered sequence of at least four literal tokens"
@@ -2385,11 +2385,11 @@
       "literalTokenSha256": "e7e7a1f0053a160e21361d403b39d874141e37ef025d53840776fb74670821dd",
       "locations": [
         {
-          "endLine": 840,
+          "endLine": 833,
           "literalCount": 8,
           "name": "submit_and_wait",
           "path": "src/backend/vulkan/vk_render.zig",
-          "startLine": 815
+          "startLine": 808
         },
         {
           "endLine": 301,
@@ -2525,10 +2525,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "48fe072a0cac49068a50b77b7f86d8dd3eddecdbe224a6afcf3b88b19d780fc1",
+  "manifestSha256": "d715c362fc26c72f4dad66f1bed84e4adf126b16290055125b2087a70777987f",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "8160f0b9b0b7d94e589a3e71eb4071015e58cf29756c501916d9ad9c2a2b4cb2",
+  "sourceTreeSha256": "9a0511c58ac6f6bc59ec7509e2bb32990c95913c8dafc0105c1561c110352326",
   "status": "captured"
 }

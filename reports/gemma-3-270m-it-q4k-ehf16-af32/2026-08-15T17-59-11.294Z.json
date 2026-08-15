@@ -1,0 +1,5150 @@
+{
+  "mode": "bench",
+  "workload": "inference",
+  "suite": "bench",
+  "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+  "runtimeProfile": null,
+  "deviceInfo": {
+    "hasSubgroups": true,
+    "hasSubgroupsF16": true,
+    "hasF16": true,
+    "hasTimestampQuery": true,
+    "maxBufferSize": 134217728,
+    "maxWorkgroupSize": 1024,
+    "maxWorkgroupStorageSize": 32768,
+    "adapterInfo": {
+      "vendor": "AMD",
+      "architecture": "vulkan",
+      "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+      "description": "Radeon 8060S Graphics (RADV STRIX_HALO)"
+    },
+    "submitProbeMs": 1.8916760000001887
+  },
+  "results": [
+    {
+      "name": "benchmark",
+      "passed": true,
+      "duration": 310600.725315
+    }
+  ],
+  "durationMs": 542651.633606,
+  "timestamp": "2026-08-15T17:59:11.294Z",
+  "metrics": {
+    "warmupRuns": 2,
+    "timedRuns": 3,
+    "prompt": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+    "maxTokens": 64,
+    "decodeTokensPerSec": 0.68,
+    "avgTokensGenerated": 64,
+    "avgPrefillTokens": 72,
+    "avgDecodeTokens": 64,
+    "medianPrefillTokensPerSec": 8.35,
+    "avgPrefillTokensPerSec": 8.43,
+    "medianPrefillTokensPerSecTtft": 8.32,
+    "avgPrefillTokensPerSecTtft": 8.39,
+    "avgDecodeTokensPerSec": 0.67,
+    "firstTokenMs": 8653.58,
+    "firstResponseMs": 32458.79,
+    "prefillMs": 8618.39,
+    "decodeMs": 94464.7,
+    "totalRunMs": 103240.06,
+    "decodeMsPerTokenP50": 1476.01,
+    "decodeMsPerTokenP95": 1517.37,
+    "decodeMsPerTokenP99": 1521.04,
+    "avgPrefillMs": 8549.9,
+    "wallRunMs": 103280.74,
+    "modelLoadMs": 23805.21,
+    "throughput": {
+      "tokensPerSec": {
+        "mean": 0.6183795142360987,
+        "median": 0.6196702215560406,
+        "min": 0.6034334817400839,
+        "max": 0.6320348394121715,
+        "p95": 0.6307983776265584,
+        "p99": 0.6317875470550489,
+        "stdDev": 0.014344297097138805,
+        "ci95": 0.02484505137110717,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillTokensPerSec": {
+        "mean": 8.426669421601206,
+        "median": 8.354232904099076,
+        "min": 8.204793838507635,
+        "max": 8.72098152219691,
+        "p95": 8.684306660387126,
+        "p99": 8.713646549834953,
+        "stdDev": 0.2656082039376834,
+        "ci95": 0.46004690412718363,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillTokensPerSecTtft": {
+        "mean": 8.388577199403692,
+        "median": 8.320256463289402,
+        "min": 8.167706301954977,
+        "max": 8.677768832966697,
+        "p95": 8.642017595998967,
+        "p99": 8.67061858557315,
+        "stdDev": 0.26180477196361257,
+        "ci95": 0.45345916670496095,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeTokensPerSec": {
+        "mean": 0.6743331485808982,
+        "median": 0.6775017668447897,
+        "min": 0.6570474269665025,
+        "max": 0.6884502519314025,
+        "p95": 0.6873554034227413,
+        "p99": 0.6882312822296702,
+        "stdDev": 0.015939399619205746,
+        "ci95": 0.02760784998260837,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "latency": {
+      "totalMs": {
+        "mean": 103494.08676499997,
+        "median": 103240.05589999998,
+        "min": 101218.36931099999,
+        "max": 106023.83508399996,
+        "p95": 105745.45716559996,
+        "p99": 105968.15950031996,
+        "stdDev": 2412.7834722883954,
+        "ci95": 4179.063561665956,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "wallRunMs": {
+        "mean": 103533.575105,
+        "median": 103280.74155199999,
+        "min": 101260.24074799998,
+        "max": 106059.74301500001,
+        "p95": 105781.84286870001,
+        "p99": 106004.16298574001,
+        "stdDev": 2409.7197154184896,
+        "ci95": 4173.75697910524,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillMs": {
+        "mean": 8549.898193999989,
+        "median": 8618.385532999993,
+        "min": 8255.951445000013,
+        "max": 8775.35760399996,
+        "p95": 8759.660396899964,
+        "p99": 8772.218162579962,
+        "stdDev": 266.38989508659256,
+        "ci95": 461.40083291292115,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeMs": {
+        "mean": 94944.18857099999,
+        "median": 94464.69829600002,
+        "min": 92962.41786599997,
+        "max": 97405.44955099997,
+        "p95": 97111.37442549998,
+        "p99": 97346.63452589996,
+        "stdDev": 2259.992440549997,
+        "ci95": 3914.42173175418,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "firstTokenMs": {
+        "mean": 8588.615784333311,
+        "median": 8653.57940799999,
+        "min": 8297.063609999983,
+        "max": 8815.204334999959,
+        "p95": 8799.041842299961,
+        "p99": 8811.97183645996,
+        "stdDev": 265.1087645209124,
+        "ci95": 459.18184968203377,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "tokens": {
+      "generated": {
+        "mean": 64,
+        "median": 64,
+        "min": 64,
+        "max": 64,
+        "p95": 64,
+        "p99": 64,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefill": {
+        "mean": 72,
+        "median": 72,
+        "min": 72,
+        "max": 72,
+        "p95": 72,
+        "p99": 72,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decode": {
+        "mean": 64,
+        "median": 64,
+        "min": 64,
+        "max": 64,
+        "p95": 64,
+        "p99": 64,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "gpu": {
+      "prefillMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeRecordOps": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPasses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerOp": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerPass": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPassesPerOp": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordOpsPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPassesPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordUniqueOpLabels": null,
+      "decodeRecordTopOps": [],
+      "decodeRecordTopOpGroups": [],
+      "decodeSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackMapWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackCleanupMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackCopyMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeOrchestrationMs": {
+        "mean": 94944.18857099999,
+        "median": 94464.69829600002,
+        "min": 92962.41786599997,
+        "max": 97405.44955099997,
+        "p95": 97111.37442549998,
+        "p99": 97346.63452589996,
+        "stdDev": 2259.992440549997,
+        "ci95": 3914.42173175418,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillRecordMs": {
+        "mean": 148.36801966669736,
+        "median": 139.21902600012254,
+        "min": 101.51667199999793,
+        "max": 204.36836099997163,
+        "p95": 197.8534274999867,
+        "p99": 203.06537429997465,
+        "stdDev": 52.0326392408659,
+        "ci95": 90.12317481708183,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillRecordOps": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillRecordPasses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillRecordUniqueOpLabels": null,
+      "prefillRecordTopOps": [],
+      "prefillRecordTopOpGroups": [],
+      "prefillSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "uniformCache": {
+        "hits": 45878,
+        "misses": 202,
+        "totalLookups": 46080,
+        "hitRateRatio": 0.9956163194444444,
+        "hitRate": "99.6%",
+        "evictions": 0,
+        "currentSize": 202,
+        "pendingDestruction": 0
+      },
+      "singleTokenSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackMapWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackCleanupMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackCopyMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenOrchestrationMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "batching": {
+      "batchedForwardCalls": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "unbatchedForwardCalls": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "totalBatchedTimeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "totalUnbatchedTimeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "gpuSubmissions": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "requestedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "effectiveBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "executedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "resolvedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "maxBatchTokenCap": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "batchClampCount": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "decodeCadence": null,
+    "plePreparedTokenCache": {
+      "hits": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "misses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "entries": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "bytes": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "decodeMode": "single_token",
+    "batchGuardReason": "cpu_weights",
+    "executionPlan": {
+      "primary": {
+        "id": "primary",
+        "kernelPathId": "gemma-3-270m-it-q4k-ehf16-af32-execution-inline",
+        "kernelPathSource": "execution-v1",
+        "activationDtype": "f32",
+        "readbackInterval": 1,
+        "readbackMode": "sequential",
+        "maxBatchDecodeTokens": null,
+        "batchSize": 1,
+        "stopCheckMode": "batch",
+        "disableCommandBatching": false,
+        "ringTokens": 1,
+        "ringStop": 1,
+        "ringStaging": 1
+      },
+      "fallback": null,
+      "activePlanIdAtStart": null,
+      "finalActivePlanId": null,
+      "transitions": []
+    },
+    "prefillProfileSteps": [],
+    "decodeProfileSteps": [],
+    "generatedText": " ألمانياлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендлендленд responsible vouchersлендävлендлендлендлендлендлендлендлендлендлендлендresponsible responsible responsible responsible responsible responsible responsible responsible responsible responsible responsible responsible responsible responsible responsible responsible responsible",
+    "referenceTranscript": {
+      "schema": "doppler.reference-transcript/v1",
+      "source": {
+        "kind": "inline-browser-suite",
+        "path": "inline",
+        "hash": "sha256:a2aab2a1d4284ae416b44b71e61b3120616b46e40606cd7a7872521d564d966d"
+      },
+      "executionGraphHash": "sha256:eeb1a27bbb2c81c10aec5f498c746e1f804152952e1497c8c0c0513c60c8de94",
+      "surface": "browser-webgpu",
+      "prompt": {
+        "identity": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+        "hash": "sha256:993fa1e7b83530b02ee1801373974b132096899a7ec27d281448e58276fb7753",
+        "tokenIdsHash": "sha256:058e3a5cf6a92eae7b6657acdcb25831941795a97ada7a95184a97e56fc3c18d",
+        "tokenCount": 72
+      },
+      "output": {
+        "textHash": "sha256:ae7d2723c4d7f6096008e7e0dcb8b614d3288c25931672d9b44b331ccbaeae8a",
+        "tokensGenerated": 64,
+        "stopReason": "max-tokens",
+        "stopTokenId": null
+      },
+      "tokens": {
+        "ids": [
+          230300,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          7757,
+          89515,
+          204078,
+          68484,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          204078,
+          79598,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757,
+          7757
+        ],
+        "generatedTokenIdsHash": "sha256:e1ea742f3ac1432f13ad5f3d1b2c4a46c0af62d35f3a155d68e580658bcaeb94",
+        "generatedTextHash": "sha256:ae7d2723c4d7f6096008e7e0dcb8b614d3288c25931672d9b44b331ccbaeae8a",
+        "preview": [
+          {
+            "id": 230300,
+            "text": " ألمانيا",
+            "fallbackText": " ألمانيا"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          },
+          {
+            "id": 204078,
+            "text": "ленд",
+            "fallbackText": "ленд"
+          }
+        ],
+        "perStep": [
+          {
+            "index": 0,
+            "tokenId": 230300,
+            "tokenHash": "sha256:e148f691acbaf00ecb635342a62af15ed554de6258088760f520c4d68a075bf5"
+          },
+          {
+            "index": 1,
+            "tokenId": 204078,
+            "tokenHash": "sha256:5b3e67566a478a005a689b0143634729ced69ea91e12c7b3e2d70a3ecf0b53aa"
+          },
+          {
+            "index": 2,
+            "tokenId": 204078,
+            "tokenHash": "sha256:0baa4044faded0f4ba241a3486c3aa3a975877895b242a1cd0f9229d25fa6ac7"
+          },
+          {
+            "index": 3,
+            "tokenId": 204078,
+            "tokenHash": "sha256:25067f96d57760f6091da92c1a92c24461032b764d303b1908b35922cba1d245"
+          },
+          {
+            "index": 4,
+            "tokenId": 204078,
+            "tokenHash": "sha256:1bf3a4e21d61e1c80a2c42330bf332cec978661accf4445f4015f26cde079a23"
+          },
+          {
+            "index": 5,
+            "tokenId": 204078,
+            "tokenHash": "sha256:231a861615d1b3d5d3e99eac1032bdbc8e1d46ae240c0797c96ec50eb99b67e4"
+          },
+          {
+            "index": 6,
+            "tokenId": 204078,
+            "tokenHash": "sha256:90715b9e20bcd9a198d7dd171723d729bfe6d6e3d1645628b91393bafad6b25f"
+          },
+          {
+            "index": 7,
+            "tokenId": 204078,
+            "tokenHash": "sha256:b0eeba0c7b5099d93ced597076202efd03b8c27aad51707da4351b0d5808ac61"
+          },
+          {
+            "index": 8,
+            "tokenId": 204078,
+            "tokenHash": "sha256:55cf52471fa4ff8fad7c6d33fabbfb188b94ae91732f92f52864332358fe894c"
+          },
+          {
+            "index": 9,
+            "tokenId": 204078,
+            "tokenHash": "sha256:d06d6aa5fcf0b4a35a95a4440fba3667b4b5846bc087247dc80ee6d73b0c32a1"
+          },
+          {
+            "index": 10,
+            "tokenId": 204078,
+            "tokenHash": "sha256:560661261598f1de0051b0f48c08ac5da80c867d32fe95d7b8f36117764eddff"
+          },
+          {
+            "index": 11,
+            "tokenId": 204078,
+            "tokenHash": "sha256:46ddc567ab2de2ec6244c49e393e1e66e97feff3e341befeaac994344cbc23d0"
+          },
+          {
+            "index": 12,
+            "tokenId": 204078,
+            "tokenHash": "sha256:e6982ffd3c4d3fd3d3ae9718c741eb239917f6a1cfadc7bd092ce42592dd3a50"
+          },
+          {
+            "index": 13,
+            "tokenId": 204078,
+            "tokenHash": "sha256:a2d17f56fa0cebc664927f88b7e8c9de32fa06bfe9b5bbac095a096e98db3dec"
+          },
+          {
+            "index": 14,
+            "tokenId": 204078,
+            "tokenHash": "sha256:ba6babe875f00c835cfbfa12d1b72d7e8a0d8b963c54d7c1086f4978fbff06aa"
+          },
+          {
+            "index": 15,
+            "tokenId": 204078,
+            "tokenHash": "sha256:d9a10e89705c4180118857333f9b91a9fc53e7158e694e7637fee215d10c62f7"
+          },
+          {
+            "index": 16,
+            "tokenId": 204078,
+            "tokenHash": "sha256:bd1d035b8c13181600df94a81585aa015da24d992fd5cd693b55eee3e4fc399b"
+          },
+          {
+            "index": 17,
+            "tokenId": 204078,
+            "tokenHash": "sha256:cf79d646e5a0e57a3b002b99e8a9fccf59445361e534bd2044cbb20441b8abc2"
+          },
+          {
+            "index": 18,
+            "tokenId": 204078,
+            "tokenHash": "sha256:79644c25da10da5e2a70426a21e032aec81a42a530658dc1da4e37a1c72df32c"
+          },
+          {
+            "index": 19,
+            "tokenId": 204078,
+            "tokenHash": "sha256:bbfc48d2b3e2d7e4bd8a378592472728ad2ddedfc8f7f5339993bfe75aa0968a"
+          },
+          {
+            "index": 20,
+            "tokenId": 204078,
+            "tokenHash": "sha256:bc5d08ea4fff7e43b74f4dc71231e7d9996818a9ba0964c887177457cb46c365"
+          },
+          {
+            "index": 21,
+            "tokenId": 204078,
+            "tokenHash": "sha256:671aeeacc08afb6b5c303f25f1b6e5f085f114cbc2f5d68903e25e431c635312"
+          },
+          {
+            "index": 22,
+            "tokenId": 204078,
+            "tokenHash": "sha256:c2e7afd4c9910c12f3abed863ca64a945d9e6320d231593e8d411411864b051e"
+          },
+          {
+            "index": 23,
+            "tokenId": 204078,
+            "tokenHash": "sha256:593707117fab375779e75f08d1cfcc872e58242cb4d74df554bd8430790ee6ee"
+          },
+          {
+            "index": 24,
+            "tokenId": 204078,
+            "tokenHash": "sha256:58a4bf70fab62e2294bea1a2dcf155d74e2a1ecdd70611591354f0c12fb057db"
+          },
+          {
+            "index": 25,
+            "tokenId": 204078,
+            "tokenHash": "sha256:aca4b816d168550f95362a3ef1e42ad191480083d39e27573b3e07c88b26671c"
+          },
+          {
+            "index": 26,
+            "tokenId": 204078,
+            "tokenHash": "sha256:5b2a0cef86743a9ee66b0857be4f3a58653f56dfa120f019293b59d638131870"
+          },
+          {
+            "index": 27,
+            "tokenId": 204078,
+            "tokenHash": "sha256:f2f95010ded1a4aab521fbb7a7fa7c6994f8259f48d43f8f3909eea18fc87f54"
+          },
+          {
+            "index": 28,
+            "tokenId": 204078,
+            "tokenHash": "sha256:4398d3290c4fb73030b07d0b664987a143323c03a13eef9c37fd0c9551309e4f"
+          },
+          {
+            "index": 29,
+            "tokenId": 204078,
+            "tokenHash": "sha256:b1af480bd301567111d7943d8f1253b49bba3245bce5eae2f70164b8fd555dd0"
+          },
+          {
+            "index": 30,
+            "tokenId": 204078,
+            "tokenHash": "sha256:f926dbf0b39316504ca5898dec682eb7eb03448f7420b17dcdb39a91cb41140d"
+          },
+          {
+            "index": 31,
+            "tokenId": 204078,
+            "tokenHash": "sha256:12fbb54f5f6006484a9709a69eefd1e2e423e6cac85ac542a0e9a65308279018"
+          },
+          {
+            "index": 32,
+            "tokenId": 7757,
+            "tokenHash": "sha256:746e69b5290a1f83fee70543bd96ddfb3e28f7bd5ec516f305165fd9d3d3d2a9"
+          },
+          {
+            "index": 33,
+            "tokenId": 89515,
+            "tokenHash": "sha256:92cf92d89aa347b2d08a98737b88d39c040ba15b226b797bf1629e193a49b0c0"
+          },
+          {
+            "index": 34,
+            "tokenId": 204078,
+            "tokenHash": "sha256:ef3662f7cd94ba33b1d4207094b618155679ee6b027085c1e6902fbe71d6f844"
+          },
+          {
+            "index": 35,
+            "tokenId": 68484,
+            "tokenHash": "sha256:bec4ef2624814ecec59f85e22aacb125431bbb29131f06a4201800258c15419a"
+          },
+          {
+            "index": 36,
+            "tokenId": 204078,
+            "tokenHash": "sha256:7d9a823ca31faafe93edc5f4fca01d80469855282ed5e93d8cedc7717a3d9a79"
+          },
+          {
+            "index": 37,
+            "tokenId": 204078,
+            "tokenHash": "sha256:43c474a72d9438bd9525c8765e8ca5f7eee0c908cd341d867b71930babfaab44"
+          },
+          {
+            "index": 38,
+            "tokenId": 204078,
+            "tokenHash": "sha256:baebbed5a20a26ab6c013278bb191a2bdfc01584427c494bd48197fff31a5f0f"
+          },
+          {
+            "index": 39,
+            "tokenId": 204078,
+            "tokenHash": "sha256:93d869e34c7c0addb3c6e7893f6fc7866c4da6e0031132959944c0771796ab2d"
+          },
+          {
+            "index": 40,
+            "tokenId": 204078,
+            "tokenHash": "sha256:9a7c23c5b7c8b44f0108511be8008768861311662d355aaadafa0ffbbc7f0629"
+          },
+          {
+            "index": 41,
+            "tokenId": 204078,
+            "tokenHash": "sha256:76def45b2d987de205b6b5fc7d2339936149605fa8e395a1f575b7d4e3a300e6"
+          },
+          {
+            "index": 42,
+            "tokenId": 204078,
+            "tokenHash": "sha256:988696929e82c323b2c4d66bd80a20b564044e3c7b741cb574dfacdb60e8b9e4"
+          },
+          {
+            "index": 43,
+            "tokenId": 204078,
+            "tokenHash": "sha256:05ec499f40bf523fbf2633f4472944394b73e756e1771f80776b3df96aa7b6bd"
+          },
+          {
+            "index": 44,
+            "tokenId": 204078,
+            "tokenHash": "sha256:7d8ba14b39d8516419d7244c9c237cf489fce3f59e51fdeb374303c0551661bb"
+          },
+          {
+            "index": 45,
+            "tokenId": 204078,
+            "tokenHash": "sha256:6e8da4fcf18ba07904fbd0a0d480486c3b5b7bd6e04c72201950da28db6d0628"
+          },
+          {
+            "index": 46,
+            "tokenId": 204078,
+            "tokenHash": "sha256:d345cf9c55ac5ad16195195f13c391105e1d8b504533bfb204fe897ddca9089c"
+          },
+          {
+            "index": 47,
+            "tokenId": 79598,
+            "tokenHash": "sha256:d635504ac22b8051553aff9b8cfdedb7a3e353f342c8595fc095c3b9a6765a15"
+          },
+          {
+            "index": 48,
+            "tokenId": 7757,
+            "tokenHash": "sha256:b61caef359ded70c154b2f3fbb76bcd7885f5f8dd120c40f1857573fed603b5b"
+          },
+          {
+            "index": 49,
+            "tokenId": 7757,
+            "tokenHash": "sha256:a1b44c18beb1eefd438e4cc7b863a6e23e117958b4d9c9d0edd5063fbf63fbf1"
+          },
+          {
+            "index": 50,
+            "tokenId": 7757,
+            "tokenHash": "sha256:8c20da7dbefdf54191a8d9edbd6db8769fc63a47168d035286cc639f9f99d529"
+          },
+          {
+            "index": 51,
+            "tokenId": 7757,
+            "tokenHash": "sha256:a26cd30313a48d9e52cc22e1c895aa876f9b917029eebecce8a629b9e2a0bcb2"
+          },
+          {
+            "index": 52,
+            "tokenId": 7757,
+            "tokenHash": "sha256:22531c24293501660ea81b41105f576dd95da8ca8f5eaf4cd847c0651b720f27"
+          },
+          {
+            "index": 53,
+            "tokenId": 7757,
+            "tokenHash": "sha256:f3691c58537a52b14cb7f2a8169b8bc9bb1572b6f840cf0c84ea9f794d79c7c3"
+          },
+          {
+            "index": 54,
+            "tokenId": 7757,
+            "tokenHash": "sha256:36e1b8b2c794dcf46f5a27638a74f7be849bdd9e40fbc29b7e21f78f8dafb683"
+          },
+          {
+            "index": 55,
+            "tokenId": 7757,
+            "tokenHash": "sha256:4eccf142f49a6beb432ae1d2e9f7e21a9a72c29d9dfb8953d853e264e95a7eaf"
+          },
+          {
+            "index": 56,
+            "tokenId": 7757,
+            "tokenHash": "sha256:98c300870f05c8da5c9053106a3462eedc41ef7cecde285ac5ce86e454aa8ac6"
+          },
+          {
+            "index": 57,
+            "tokenId": 7757,
+            "tokenHash": "sha256:d697dd483576a28bd718922f917d27625d6192e0ea9ee88b39a14507e76221ab"
+          },
+          {
+            "index": 58,
+            "tokenId": 7757,
+            "tokenHash": "sha256:f2eafd8eafcafc55855bbb94513e1f8c273f0a0ddef66c726a17ab0d6381e45c"
+          },
+          {
+            "index": 59,
+            "tokenId": 7757,
+            "tokenHash": "sha256:2bf452af506ac63f0ba5eeb922e05c4965d952a6e5426122072e576bab9ed956"
+          },
+          {
+            "index": 60,
+            "tokenId": 7757,
+            "tokenHash": "sha256:ffa7d50fc9f2659e5a44bddee936596d66563043632b2e448796f7c9eb24491b"
+          },
+          {
+            "index": 61,
+            "tokenId": 7757,
+            "tokenHash": "sha256:fd62a28572b3fcfb356bafb51326c68f3111702ab451b45ef68680f451eab84d"
+          },
+          {
+            "index": 62,
+            "tokenId": 7757,
+            "tokenHash": "sha256:90e8322ca4772b968e6a629a8932268594c7c4dd11c19472d1376475e00e34fc"
+          },
+          {
+            "index": 63,
+            "tokenId": 7757,
+            "tokenHash": "sha256:6fc00c4bde008bc890f920fde721a71b135f20cc279dc34160a7ba40dcbd7f59"
+          }
+        ],
+        "coverage": {
+          "mode": "full-token-ids",
+          "omitted": 0
+        }
+      },
+      "phase": {
+        "prefillMs": 8618.385532999993,
+        "decodeMs": 97405.44955099997,
+        "prefillTokens": 72,
+        "decodeTokens": 64
+      },
+      "kvCache": {
+        "mode": "stats",
+        "layout": "contiguous",
+        "kvDtype": "f16",
+        "seqLen": 135,
+        "maxSeqLen": 4096,
+        "usedBytes": 2488320,
+        "allocatedBytes": 75497472,
+        "counters": {
+          "updateCalls": 0,
+          "gpuUpdateCalls": 0,
+          "recordedGpuUpdateCalls": 5760,
+          "tokensWritten": 12150
+        },
+        "byteDigestMode": null,
+        "byteDigest": null,
+        "byteDigests": null,
+        "stateHash": "sha256:9e4d984cd42f4ace0186f310aa0d54024e80138786e18c2e43b62ae80c5263e1"
+      },
+      "logits": {
+        "mode": "sha256-per-step",
+        "perStepDigests": [
+          "sha256:be2483fb5e84d561b4a085d99dfaf6c31fe6ade21287994a5bcd701b8a18a27c",
+          "sha256:b3093ccff6df50656d95ec2ed5273652afca9b51e75b22ff0b30ddfcc8e0bc0d",
+          "sha256:a80238b740c1a2e37d0e70e8f09fe743103561790cf4c9e4f7725fad46ed7b0e",
+          "sha256:2ed16fecb0c02228464c05c85bfea1c96bd01534470bdb931e26ba7c14d7c82c",
+          "sha256:3532357df3891dc0c0747e87712d825e47a00abdb58e5c2d91c91456ef56a778",
+          "sha256:ddf6a9fb9af2d5f32f788a1a74016f2f4a2a687a5a36bc726b3e84f5495ce39b",
+          "sha256:c987ef884ef15de9070e615b4295e4c5e45dc92579260a7754c7919c7d41763d",
+          "sha256:91440e06fded42d33559ae73b9b4c69d4cceb40f7492e5551a6d5e41ab08cc6d",
+          "sha256:b1dd812fb236922c28ca2e59ac4d74d013532c50822a2770efdc826a935a410c",
+          "sha256:101b22f26bc670effb77883958d87fdb09440f40ab6e0897221ab2a8ca61a755",
+          "sha256:239bef5dc93483063c4955a3b4083529e47a372e7ef2a4ac094af62aaf6e1942",
+          "sha256:0a1062d283901c00017d3917392c915807a806ad36038fa4197e0ffd125714f3",
+          "sha256:67c72773912044f92994bf22d9b70f7c174a4eccc128925c79bda8d2af691e41",
+          "sha256:063a56559a4b6a7e0b802728b23837e3094714d3ca8537610b2ef6258cbc54ef",
+          "sha256:9b71b7d717d406f6e0b868a07e01f2813aac4e1ce01f997eae5f7a2da89d52aa",
+          "sha256:634090f773b53f212099a575243ffebe27a6daf38db38a76606600edba96aece",
+          "sha256:2585e925f52d2f992b23a14b1c257041a60ac4eb89d67212e28be8010dc9da6d",
+          "sha256:dcc2e9d32ffeafca7551e993250a3d0d19f97af7282bcee8b8084a3881b1124d",
+          "sha256:7d228d39b4c712fe924a687b85e3f55935e576607346ae1f05765e942063cd99",
+          "sha256:31884a9bffc69324af7acbd05cf1d3118f4a0d078da2f3990e75462001d74c52",
+          "sha256:3844c4cf4647bdc9850396460bd16647649499742b7c3f14805df370bf390776",
+          "sha256:1985791e72289cec8cd25315c85e7f3e666f929945fee251881c1c28c27caa4e",
+          "sha256:8fd4e9c4f86106f19a153e965a813a4d3cc7f7303d0205007670c5e91ab8f6ea",
+          "sha256:44b7c582b299fead936efc41c3e519d09ab11fae6b1a22cd48453d90e5640759",
+          "sha256:945fb2e4f3071785707c0a189ab2053becdfe35621b4fcd77aaf4043d30e19af",
+          "sha256:fcbf65a750dd451ab46d2e6bc0a216feb25021a502980b3ebdd07ee949d0dd59",
+          "sha256:457b2e346589985173aae502fccd5a091efa623471a66dde8774421041aa41db",
+          "sha256:c86baff942273cdc3bf3ebb28ff4c49f91e1b74107d2cec4d6d51850634a2447",
+          "sha256:f01c3c25b62765c7bec500b68b93888eb94947cfb9e4b7a87888f0159d591c5c",
+          "sha256:e0bedb6ff1759262b622e8946eb73bd6f82852b05bffd9de3e0e12f4226b92ba",
+          "sha256:094c2e302990e3cf03b1ad4a603097eec3b19071484389230b18322e3c35ce78",
+          "sha256:192e926d5e88aa5d15732e2fff49141f0096a3c557393f2b639b00e1119a2b00",
+          "sha256:8b90f4781f192a0de5a640dc45d5872da51ce7d180fcef47fb6e5146fed0bd7e",
+          "sha256:130a1caf2f1b3d2d009459074d216718ca4f6c2a250af1b10d1987bff996871b",
+          "sha256:a321d6b66e740c9c342a1e754c5a7894384e40dcbc536617cfffc2272edd7525",
+          "sha256:ea7865a585d526e2f804893c71ef7af00ccdaec319854a20e20f4d8c659fff5e",
+          "sha256:5a0b8bd45d38229661ca8e359a012d5138ce450a7869d8fbddf01f878579b301",
+          "sha256:3f9a716723691c8354df8184b1cff8314a776e1fabbaf6975dd984528481f084",
+          "sha256:b846d40aaa0b4ff2de02e9debb0ca3b10408ec69c351e487d8c775fbc1256ffc",
+          "sha256:b373085d7ff133409804a9918ba9b4c19f92366e7a13587e3ba7811703ac759e",
+          "sha256:57ba174fba983fea16deebd624f32275eeb4aab6e732dfeeb8a9d645dc6a78d3",
+          "sha256:bfcf1316332d74ba04f67d0578c2a8be864718d673201aa2792092daf28610c7",
+          "sha256:7d85863d815659891fff9bfec7424737f3bdbf8f3fe59f35130545b573198389",
+          "sha256:cc33fc36c41bedfec13acb395f002cd898622f394c472040d15faed0d4a8c61c",
+          "sha256:74d2e2bc5f299b679da4521664b41a8876df8251b63a00b6f4ea6de89dc0abdf",
+          "sha256:8af7f357f5de43f110336c697041d69a382b47935115defdc094f525d1a4fc07",
+          "sha256:1efc40f3b89a98ee7511987e1d6bf03c9a2f236262143595a7818bd80e408201",
+          "sha256:f5cf6b62bd14061067644f808eeda48e1a5b55a45fd88f8755eb4a7c82239340",
+          "sha256:ca3e8a90596a98da509ad66e38072d7840ce267e4f6ce5a10536c52a9f25c717",
+          "sha256:eec16245dce86cc80881668badf922118ff7e20619526094f10ef0fb982d3128",
+          "sha256:a45fb8525c721594fcbc6148696d1445bc7e0c331e0c90edbb28e832c1c61369",
+          "sha256:b930935f01bfa56bcaf3caa2380ba527b8631d36c86d45f1ea85a7e3400c128a",
+          "sha256:e76743caf9914ce4305806646ce172b063b77039f53968d0d07282b0b85b1254",
+          "sha256:793c400c1716098fc285797d20807074b6b8b9c6744430b62f65754b94227082",
+          "sha256:40a415751710758db85591859a4e4be194af3f7e5477791638ad6736ff4d4c73",
+          "sha256:226ba99fcbf7d30d11df5c9336f49b03f825bbbc7448133c37a6ea6186eb4949",
+          "sha256:738c90fee072f2fe58c549b64b22120d5749ad40bb6d9eddd30c200e81714c3b",
+          "sha256:5bcfa0eb8414369e2df1d8823ae4ccc6946d3a179e4a236b6c42f1331ae6791f",
+          "sha256:bc725ee31fc9bcefbb9d2b034fba369308f3b723fd2bd6231b652d769c2adb4c",
+          "sha256:a20527fc16fe6c8ff2544b9b6319ae1366d643d6cc01901ce0fd846882edcf2e",
+          "sha256:a18feaa8f05e2836c3ba4daf8d3815b657d328d3c8ebabf8d4652e3aba448cff",
+          "sha256:13e08ddf13c78541f925e0b55ba9a4e4771d48c43138d8914e65f2d9bb21c5eb",
+          "sha256:59fa139a36f0d496ff76f0f873a7e6b6191c109036df706ae51d85fc9d6d97e5",
+          "sha256:1a780bd01449f1aa4600809fc0f867159b36a997c0d0bdbeb18017df97702cad"
+        ],
+        "steps": [
+          {
+            "index": 0,
+            "tokenId": 230300,
+            "inputTokenCount": 72,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:be2483fb5e84d561b4a085d99dfaf6c31fe6ade21287994a5bcd701b8a18a27c",
+            "top": [
+              {
+                "tokenId": 230300,
+                "logit": 27.212444305419922,
+                "text": " ألمانيا"
+              },
+              {
+                "tokenId": 126831,
+                "logit": 25.79723358154297,
+                "text": " هولندا"
+              },
+              {
+                "tokenId": 233021,
+                "logit": 23.530302047729492,
+                "text": " الهولندي"
+              },
+              {
+                "tokenId": 118928,
+                "logit": 23.367351531982422,
+                "text": " escalating"
+              },
+              {
+                "tokenId": 14845,
+                "logit": 23.154708862304688,
+                "text": " sessions"
+              },
+              {
+                "tokenId": 188117,
+                "logit": 23.12696647644043,
+                "text": " Γερμαν"
+              },
+              {
+                "tokenId": 205015,
+                "logit": 22.760820388793945,
+                "text": "لمانيا"
+              },
+              {
+                "tokenId": 11730,
+                "logit": 22.432483673095703,
+                "text": "hesis"
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "tokenId": 204078,
+            "inputTokenCount": 73,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:b3093ccff6df50656d95ec2ed5273652afca9b51e75b22ff0b30ddfcc8e0bc0d",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 39.446067810058594,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 37.264286041259766,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 13992,
+                "logit": 36.225276947021484,
+                "text": " differential"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 35.23788070678711,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 34.71030044555664,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 10198,
+                "logit": 34.67257308959961,
+                "text": "onal"
+              },
+              {
+                "tokenId": 195043,
+                "logit": 34.62240982055664,
+                "text": " COMPET"
+              },
+              {
+                "tokenId": 17121,
+                "logit": 34.55634307861328,
+                "text": "ktion"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "tokenId": 204078,
+            "inputTokenCount": 74,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:a80238b740c1a2e37d0e70e8f09fe743103561790cf4c9e4f7725fad46ed7b0e",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.31405258178711,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.100154876708984,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 13992,
+                "logit": 31.097267150878906,
+                "text": " differential"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.996938705444336,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 158606,
+                "logit": 30.850635528564453,
+                "text": "pmod"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.766021728515625,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.64808464050293,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.25145721435547,
+                "text": " responsible"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "tokenId": 204078,
+            "inputTokenCount": 75,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:2ed16fecb0c02228464c05c85bfea1c96bd01534470bdb931e26ba7c14d7c82c",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.60048294067383,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.1990966796875,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.676166534423828,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 13992,
+                "logit": 31.192981719970703,
+                "text": " differential"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.142675399780273,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 158606,
+                "logit": 30.836641311645508,
+                "text": "pmod"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.738012313842773,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.55307388305664,
+                "text": " diffé"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "tokenId": 204078,
+            "inputTokenCount": 76,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:3532357df3891dc0c0747e87712d825e47a00abdb58e5c2d91c91456ef56a778",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.638248443603516,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.111305236816406,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.911123275756836,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.26888656616211,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 13992,
+                "logit": 31.049480438232422,
+                "text": " differential"
+              },
+              {
+                "tokenId": 158606,
+                "logit": 30.757463455200195,
+                "text": "pmod"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.746440887451172,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.694339752197266,
+                "text": " diffé"
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "tokenId": 204078,
+            "inputTokenCount": 77,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:ddf6a9fb9af2d5f32f788a1a74016f2f4a2a687a5a36bc726b3e84f5495ce39b",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.68356704711914,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.021873474121094,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.991727828979492,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.307825088500977,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.821489334106445,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 13992,
+                "logit": 30.762462615966797,
+                "text": " differential"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.750356674194336,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.670804977416992,
+                "text": " responsible"
+              }
+            ]
+          },
+          {
+            "index": 6,
+            "tokenId": 204078,
+            "inputTokenCount": 78,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:c987ef884ef15de9070e615b4295e4c5e45dc92579260a7754c7919c7d41763d",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.70302200317383,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.84984588623047,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.965290069580078,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.233293533325195,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.876333236694336,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.81494140625,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.608051300048828,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 56434,
+                "logit": 30.464580535888672,
+                "text": " shoppers"
+              }
+            ]
+          },
+          {
+            "index": 7,
+            "tokenId": 204078,
+            "inputTokenCount": 79,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:91440e06fded42d33559ae73b9b4c69d4cceb40f7492e5551a6d5e41ab08cc6d",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.62252426147461,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.639671325683594,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.7904052734375,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.133380889892578,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.94509506225586,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.602954864501953,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.561931610107422,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 56434,
+                "logit": 30.150955200195312,
+                "text": " shoppers"
+              }
+            ]
+          },
+          {
+            "index": 8,
+            "tokenId": 204078,
+            "inputTokenCount": 80,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:b1dd812fb236922c28ca2e59ac4d74d013532c50822a2770efdc826a935a410c",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.3974609375,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.31844711303711,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.503055572509766,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.927900314331055,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.844127655029297,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.388355255126953,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.272634506225586,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.850723266601562,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 9,
+            "tokenId": 204078,
+            "inputTokenCount": 81,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:101b22f26bc670effb77883958d87fdb09440f40ab6e0897221ab2a8ca61a755",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.490203857421875,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.300697326660156,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.440153121948242,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.943513870239258,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.83776092529297,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.317935943603516,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.139934539794922,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.824844360351562,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 10,
+            "tokenId": 204078,
+            "inputTokenCount": 82,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:239bef5dc93483063c4955a3b4083529e47a372e7ef2a4ac094af62aaf6e1942",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.47406005859375,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.255760192871094,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.37596321105957,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.9378719329834,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.66754150390625,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.289533615112305,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.206226348876953,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.71134376525879,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 11,
+            "tokenId": 204078,
+            "inputTokenCount": 83,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:0a1062d283901c00017d3917392c915807a806ad36038fa4197e0ffd125714f3",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.6125373840332,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.316444396972656,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.42160415649414,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.116785049438477,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.780590057373047,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.45389175415039,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.32445526123047,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.8846378326416,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 12,
+            "tokenId": 204078,
+            "inputTokenCount": 84,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:67c72773912044f92994bf22d9b70f7c174a4eccc128925c79bda8d2af691e41",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.89226531982422,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.26113510131836,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.423744201660156,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.27769660949707,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.88011932373047,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.665203094482422,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.256637573242188,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.888307571411133,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "tokenId": 204078,
+            "inputTokenCount": 85,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:063a56559a4b6a7e0b802728b23837e3094714d3ca8537610b2ef6258cbc54ef",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.16105651855469,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.13877487182617,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.757057189941406,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.86574935913086,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.82012939453125,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.77701187133789,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.243274688720703,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.92118263244629,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 14,
+            "tokenId": 204078,
+            "inputTokenCount": 86,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:9b71b7d717d406f6e0b868a07e01f2813aac4e1ce01f997eae5f7a2da89d52aa",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.086544036865234,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 31.889490127563477,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.782257080078125,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.867780685424805,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.605072021484375,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.4923038482666,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.079082489013672,
+                "text": " diffé"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.868919372558594,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 15,
+            "tokenId": 204078,
+            "inputTokenCount": 87,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:634090f773b53f212099a575243ffebe27a6daf38db38a76606600edba96aece",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.98206329345703,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 31.77446174621582,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.665008544921875,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.86661720275879,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.565900802612305,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.473196029663086,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.939104080200195,
+                "text": " logins"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 29.93227767944336,
+                "text": " diffé"
+              }
+            ]
+          },
+          {
+            "index": 16,
+            "tokenId": 204078,
+            "inputTokenCount": 88,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:2585e925f52d2f992b23a14b1c257041a60ac4eb89d67212e28be8010dc9da6d",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.09452819824219,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 31.872602462768555,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.698631286621094,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 31.07901382446289,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.815263748168945,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.766571044921875,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.24753189086914,
+                "text": " logins"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 30.117460250854492,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 17,
+            "tokenId": 204078,
+            "inputTokenCount": 89,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:dcc2e9d32ffeafca7551e993250a3d0d19f97af7282bcee8b8084a3881b1124d",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.44336700439453,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.1515998840332,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.95825958251953,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 31.63093376159668,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.202444076538086,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.08574867248535,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.685712814331055,
+                "text": " logins"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 30.465999603271484,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 18,
+            "tokenId": 204078,
+            "inputTokenCount": 90,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:7d228d39b4c712fe924a687b85e3f55935e576607346ae1f05765e942063cd99",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.74021911621094,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.253353118896484,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.21982192993164,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 32.13594055175781,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.386293411254883,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.194612503051758,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 30.828710556030273,
+                "text": "äv"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.78782081604004,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 19,
+            "tokenId": 204078,
+            "inputTokenCount": 91,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:31884a9bffc69324af7acbd05cf1d3118f4a0d078da2f3990e75462001d74c52",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 35.0222053527832,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 32.66130065917969,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.51576614379883,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.3006706237793,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.68976593017578,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 31.222196578979492,
+                "text": "äv"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.193246841430664,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.794164657592773,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 20,
+            "tokenId": 204078,
+            "inputTokenCount": 92,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:3844c4cf4647bdc9850396460bd16647649499742b7c3f14805df370bf390776",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 35.01430130004883,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 32.86027908325195,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.61875915527344,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.2639274597168,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.937597274780273,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 31.432758331298828,
+                "text": "äv"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.044143676757812,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 17788,
+                "logit": 30.71050262451172,
+                "text": " diffé"
+              }
+            ]
+          },
+          {
+            "index": 21,
+            "tokenId": 204078,
+            "inputTokenCount": 93,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:1985791e72289cec8cd25315c85e7f3e666f929945fee251881c1c28c27caa4e",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.71323013305664,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 32.89033126831055,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.45417785644531,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.10039520263672,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.986478805541992,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 31.353967666625977,
+                "text": "äv"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.037038803100586,
+                "text": "ôle"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.994598388671875,
+                "text": " abstinence"
+              }
+            ]
+          },
+          {
+            "index": 22,
+            "tokenId": 204078,
+            "inputTokenCount": 94,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:8fd4e9c4f86106f19a153e965a813a4d3cc7f7303d0205007670c5e91ab8f6ea",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.30449676513672,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 32.977455139160156,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.22193908691406,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.07752227783203,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 32.04485321044922,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.12094497680664,
+                "text": "ôle"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 31.0742244720459,
+                "text": "äv"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.047632217407227,
+                "text": " abstinence"
+              }
+            ]
+          },
+          {
+            "index": 23,
+            "tokenId": 204078,
+            "inputTokenCount": 95,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:44b7c582b299fead936efc41c3e519d09ab11fae6b1a22cd48453d90e5640759",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.95212173461914,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 33.13074493408203,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 32.17058181762695,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.15781021118164,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.035125732421875,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.192197799682617,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.1154842376709,
+                "text": "ôle"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 31.04257583618164,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 24,
+            "tokenId": 204078,
+            "inputTokenCount": 96,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:945fb2e4f3071785707c0a189ab2053becdfe35621b4fcd77aaf4043d30e19af",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.79365921020508,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 33.30105209350586,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.336029052734375,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 32.23725128173828,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.98598861694336,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.282560348510742,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 31.212602615356445,
+                "text": "äv"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.13505744934082,
+                "text": "ôle"
+              }
+            ]
+          },
+          {
+            "index": 25,
+            "tokenId": 204078,
+            "inputTokenCount": 97,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:fcbf65a750dd451ab46d2e6bc0a216feb25021a502980b3ebdd07ee949d0dd59",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.1006965637207,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 33.76235580444336,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.917152404785156,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 32.699581146240234,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.402767181396484,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 31.726160049438477,
+                "text": "äv"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.59550666809082,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.53653907775879,
+                "text": "ôle"
+              }
+            ]
+          },
+          {
+            "index": 26,
+            "tokenId": 204078,
+            "inputTokenCount": 98,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:457b2e346589985173aae502fccd5a091efa623471a66dde8774421041aa41db",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.41499328613281,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 34.11466598510742,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.44512939453125,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 33.16766357421875,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.88901901245117,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 32.32683181762695,
+                "text": "äv"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.873374938964844,
+                "text": "ôle"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 31.82398223876953,
+                "text": " logins"
+              }
+            ]
+          },
+          {
+            "index": 27,
+            "tokenId": 204078,
+            "inputTokenCount": 99,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:c86baff942273cdc3bf3ebb28ff4c49f91e1b74107d2cec4d6d51850634a2447",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.57604217529297,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 34.2802848815918,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.55389404296875,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 33.273216247558594,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 33.01265335083008,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 32.72978973388672,
+                "text": "äv"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 32.02280807495117,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.987714767456055,
+                "text": "ôle"
+              }
+            ]
+          },
+          {
+            "index": 28,
+            "tokenId": 204078,
+            "inputTokenCount": 100,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:f01c3c25b62765c7bec500b68b93888eb94947cfb9e4b7a87888f0159d591c5c",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.74060821533203,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 34.42377471923828,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.4897575378418,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 33.24652862548828,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 32.96278381347656,
+                "text": "äv"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.906455993652344,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 32.270748138427734,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 32.06977844238281,
+                "text": "ôle"
+              }
+            ]
+          },
+          {
+            "index": 29,
+            "tokenId": 204078,
+            "inputTokenCount": 101,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:e0bedb6ff1759262b622e8946eb73bd6f82852b05bffd9de3e0e12f4226b92ba",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.79536056518555,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 34.4323616027832,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.29369354248047,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 33.198001861572266,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 33.10423278808594,
+                "text": "äv"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.720035552978516,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 32.3619270324707,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 32.1725959777832,
+                "text": "ôle"
+              }
+            ]
+          },
+          {
+            "index": 30,
+            "tokenId": 204078,
+            "inputTokenCount": 102,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:094c2e302990e3cf03b1ad4a603097eec3b19071484389230b18322e3c35ce78",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.67218780517578,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 34.36366653442383,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 33.03089904785156,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 33.00087356567383,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 32.9984130859375,
+                "text": "äv"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.536888122558594,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 32.338191986083984,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 32.14751434326172,
+                "text": "ôle"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "tokenId": 204078,
+            "inputTokenCount": 103,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:192e926d5e88aa5d15732e2fff49141f0096a3c557393f2b639b00e1119a2b00",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 34.207359313964844,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 34.12295913696289,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 32.67838668823242,
+                "text": "äv"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.57337188720703,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 32.56850051879883,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.263118743896484,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 32.05975341796875,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.793508529663086,
+                "text": "ôle"
+              }
+            ]
+          },
+          {
+            "index": 32,
+            "tokenId": 7757,
+            "inputTokenCount": 104,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:8b90f4781f192a0de5a640dc45d5872da51ce7d180fcef47fb6e5146fed0bd7e",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 33.94733428955078,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 33.76780319213867,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 32.59385299682617,
+                "text": "äv"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 32.3211555480957,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 89515,
+                "logit": 32.20828628540039,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 32.121177673339844,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 31.90947914123535,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 28433,
+                "logit": 31.445003509521484,
+                "text": "ôle"
+              }
+            ]
+          },
+          {
+            "index": 33,
+            "tokenId": 89515,
+            "inputTokenCount": 105,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:130a1caf2f1b3d2d009459074d216718ca4f6c2a250af1b10d1987bff996871b",
+            "top": [
+              {
+                "tokenId": 89515,
+                "logit": 32.9929313659668,
+                "text": " vouchers"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 32.56196594238281,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 32.31303787231445,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 32.182308197021484,
+                "text": "äv"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 32.17524719238281,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 32.144954681396484,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 31.9539794921875,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.680328369140625,
+                "text": " abstinence"
+              }
+            ]
+          },
+          {
+            "index": 34,
+            "tokenId": 204078,
+            "inputTokenCount": 106,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:a321d6b66e740c9c342a1e754c5a7894384e40dcbc536617cfffc2272edd7525",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 35.26533889770508,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 34.076255798339844,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 33.92320251464844,
+                "text": " logins"
+              },
+              {
+                "tokenId": 10198,
+                "logit": 33.434410095214844,
+                "text": "onal"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 33.255191802978516,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 33.21189880371094,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 48252,
+                "logit": 33.20635986328125,
+                "text": " Tickets"
+              },
+              {
+                "tokenId": 229517,
+                "logit": 32.93648147583008,
+                "text": " Lomond"
+              }
+            ]
+          },
+          {
+            "index": 35,
+            "tokenId": 68484,
+            "inputTokenCount": 107,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:ea7865a585d526e2f804893c71ef7af00ccdaec319854a20e20f4d8c659fff5e",
+            "top": [
+              {
+                "tokenId": 68484,
+                "logit": 33.381103515625,
+                "text": "äv"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 33.198753356933594,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.91366195678711,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 31.735885620117188,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 31.271804809570312,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 31.106393814086914,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.894866943359375,
+                "text": " logins"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 30.374755859375,
+                "text": " responsible"
+              }
+            ]
+          },
+          {
+            "index": 36,
+            "tokenId": 204078,
+            "inputTokenCount": 108,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:5a0b8bd45d38229661ca8e359a012d5138ce450a7869d8fbddf01f878579b301",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 33.15291213989258,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 32.2498779296875,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 40369,
+                "logit": 31.62576675415039,
+                "text": " обяза"
+              },
+              {
+                "tokenId": 48252,
+                "logit": 31.604442596435547,
+                "text": " Tickets"
+              },
+              {
+                "tokenId": 30916,
+                "logit": 31.450542449951172,
+                "text": " schedules"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.434619903564453,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 31.353008270263672,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 31.149757385253906,
+                "text": " responsible"
+              }
+            ]
+          },
+          {
+            "index": 37,
+            "tokenId": 204078,
+            "inputTokenCount": 109,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:3f9a716723691c8354df8184b1cff8314a776e1fabbaf6975dd984528481f084",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 31.56928062438965,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.886011123657227,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 29.995141983032227,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 29.740360260009766,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.701032638549805,
+                "text": " logins"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.627681732177734,
+                "text": "äv"
+              },
+              {
+                "tokenId": 48252,
+                "logit": 29.299436569213867,
+                "text": " Tickets"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.054460525512695,
+                "text": " abstinence"
+              }
+            ]
+          },
+          {
+            "index": 38,
+            "tokenId": 204078,
+            "inputTokenCount": 110,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:b846d40aaa0b4ff2de02e9debb0ca3b10408ec69c351e487d8c775fbc1256ffc",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 32.16624069213867,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.269981384277344,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 30.754638671875,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.499595642089844,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 30.393798828125,
+                "text": "äv"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.3638973236084,
+                "text": " logins"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.00996971130371,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.75528907775879,
+                "text": "욜"
+              }
+            ]
+          },
+          {
+            "index": 39,
+            "tokenId": 204078,
+            "inputTokenCount": 111,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:b373085d7ff133409804a9918ba9b4c19f92366e7a13587e3ba7811703ac759e",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 32.51279067993164,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.436100006103516,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 31.37967872619629,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 30.868703842163086,
+                "text": "äv"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.778350830078125,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.76390838623047,
+                "text": " logins"
+              },
+              {
+                "tokenId": 221832,
+                "logit": 30.57110023498535,
+                "text": " صعب"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.561050415039062,
+                "text": " abstinence"
+              }
+            ]
+          },
+          {
+            "index": 40,
+            "tokenId": 204078,
+            "inputTokenCount": 112,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:57ba174fba983fea16deebd624f32275eeb4aab6e732dfeeb8a9d645dc6a78d3",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 32.32768249511719,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 31.381343841552734,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.18707275390625,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 30.882234573364258,
+                "text": "äv"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.61705207824707,
+                "text": " logins"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.60051918029785,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 221832,
+                "logit": 30.5700626373291,
+                "text": " صعب"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 30.44312858581543,
+                "text": "욜"
+              }
+            ]
+          },
+          {
+            "index": 41,
+            "tokenId": 204078,
+            "inputTokenCount": 113,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:bfcf1316332d74ba04f67d0578c2a8be864718d673201aa2792092daf28610c7",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 31.940664291381836,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 31.08635902404785,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.799087524414062,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 30.558250427246094,
+                "text": "äv"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 30.291494369506836,
+                "text": "욜"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 30.253068923950195,
+                "text": " logins"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 30.209163665771484,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 221832,
+                "logit": 30.020315170288086,
+                "text": " صعب"
+              }
+            ]
+          },
+          {
+            "index": 42,
+            "tokenId": 204078,
+            "inputTokenCount": 114,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:7d85863d815659891fff9bfec7424737f3bdbf8f3fe59f35130545b573198389",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 31.552654266357422,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 30.783023834228516,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.564496994018555,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 30.22553253173828,
+                "text": "äv"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 30.011327743530273,
+                "text": "욜"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.966413497924805,
+                "text": " logins"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 29.74955177307129,
+                "text": "ktionen"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.655113220214844,
+                "text": " abstinence"
+              }
+            ]
+          },
+          {
+            "index": 43,
+            "tokenId": 204078,
+            "inputTokenCount": 115,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:cc33fc36c41bedfec13acb395f002cd898622f394c472040d15faed0d4a8c61c",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 31.050216674804688,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.54193115234375,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 30.498655319213867,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.86571502685547,
+                "text": "욜"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.813928604125977,
+                "text": " logins"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.80963897705078,
+                "text": "äv"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.408836364746094,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 46413,
+                "logit": 29.336990356445312,
+                "text": "ktionen"
+              }
+            ]
+          },
+          {
+            "index": 44,
+            "tokenId": 204078,
+            "inputTokenCount": 116,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:74d2e2bc5f299b679da4521664b41a8876df8251b63a00b6f4ea6de89dc0abdf",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 30.813377380371094,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.577295303344727,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 30.42878532409668,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.704570770263672,
+                "text": " logins"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.691116333007812,
+                "text": "욜"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.477954864501953,
+                "text": "äv"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.390335083007812,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 29.29859161376953,
+                "text": " responsible"
+              }
+            ]
+          },
+          {
+            "index": 45,
+            "tokenId": 204078,
+            "inputTokenCount": 117,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:8af7f357f5de43f110336c697041d69a382b47935115defdc094f525d1a4fc07",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 30.7591495513916,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.53825569152832,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 30.49854850769043,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.600385665893555,
+                "text": " logins"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.5643253326416,
+                "text": "욜"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 29.446435928344727,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.4191951751709,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.249353408813477,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 46,
+            "tokenId": 204078,
+            "inputTokenCount": 118,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:1efc40f3b89a98ee7511987e1d6bf03c9a2f236262143595a7818bd80e408201",
+            "top": [
+              {
+                "tokenId": 204078,
+                "logit": 30.564016342163086,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 79598,
+                "logit": 30.496723175048828,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.367267608642578,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 29.482587814331055,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.469501495361328,
+                "text": "욜"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.279693603515625,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.261699676513672,
+                "text": " logins"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.065603256225586,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 47,
+            "tokenId": 79598,
+            "inputTokenCount": 119,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:f5cf6b62bd14061067644f808eeda48e1a5b55a45fd88f8755eb4a7c82239340",
+            "top": [
+              {
+                "tokenId": 79598,
+                "logit": 30.600914001464844,
+                "text": "responsible"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 30.466915130615234,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.307342529296875,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.558448791503906,
+                "text": "욜"
+              },
+              {
+                "tokenId": 7757,
+                "logit": 29.54705047607422,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.188419342041016,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 159870,
+                "logit": 29.08842658996582,
+                "text": " logins"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.04779815673828,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 48,
+            "tokenId": 7757,
+            "inputTokenCount": 120,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:ca3e8a90596a98da509ad66e38072d7840ce267e4f6ce5a10536c52a9f25c717",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 31.183734893798828,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 31.151378631591797,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 31.09433937072754,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.63094139099121,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 30.480403900146484,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 30.320968627929688,
+                "text": "욜"
+              },
+              {
+                "tokenId": 182718,
+                "logit": 29.910091400146484,
+                "text": "lls"
+              },
+              {
+                "tokenId": 183395,
+                "logit": 29.653823852539062,
+                "text": " مسؤول"
+              }
+            ]
+          },
+          {
+            "index": 49,
+            "tokenId": 7757,
+            "inputTokenCount": 121,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:eec16245dce86cc80881668badf922118ff7e20619526094f10ef0fb982d3128",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 30.891643524169922,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.48919677734375,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.456327438354492,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.94927406311035,
+                "text": "тур"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 29.784631729125977,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.70522117614746,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.688369750976562,
+                "text": "욜"
+              },
+              {
+                "tokenId": 183395,
+                "logit": 29.413721084594727,
+                "text": " مسؤول"
+              }
+            ]
+          },
+          {
+            "index": 50,
+            "tokenId": 7757,
+            "inputTokenCount": 122,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:a45fb8525c721594fcbc6148696d1445bc7e0c331e0c90edbb28e832c1c61369",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 30.89257049560547,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.389005661010742,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.378870010375977,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.992679595947266,
+                "text": "тур"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 29.829538345336914,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.74184799194336,
+                "text": "욜"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.68707275390625,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 40369,
+                "logit": 29.435150146484375,
+                "text": " обяза"
+              }
+            ]
+          },
+          {
+            "index": 51,
+            "tokenId": 7757,
+            "inputTokenCount": 123,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:b930935f01bfa56bcaf3caa2380ba527b8631d36c86d45f1ea85a7e3400c128a",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 30.96367645263672,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.46381378173828,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.355587005615234,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 30.030540466308594,
+                "text": "тур"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 29.910573959350586,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.70195960998535,
+                "text": "욜"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.697214126586914,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 40369,
+                "logit": 29.43736457824707,
+                "text": " обяза"
+              }
+            ]
+          },
+          {
+            "index": 52,
+            "tokenId": 7757,
+            "inputTokenCount": 124,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:e76743caf9914ce4305806646ce172b063b77039f53968d0d07282b0b85b1254",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 31.099153518676758,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.615514755249023,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.3013858795166,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 30.1156063079834,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 30.09181022644043,
+                "text": "тур"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.69329071044922,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.66404151916504,
+                "text": "욜"
+              },
+              {
+                "tokenId": 40369,
+                "logit": 29.443099975585938,
+                "text": " обяза"
+              }
+            ]
+          },
+          {
+            "index": 53,
+            "tokenId": 7757,
+            "inputTokenCount": 125,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:793c400c1716098fc285797d20807074b6b8b9c6744430b62f65754b94227082",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 31.23946762084961,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.71784210205078,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.246912002563477,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 30.140592575073242,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 30.063169479370117,
+                "text": "тур"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.746435165405273,
+                "text": "욜"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.637958526611328,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 183395,
+                "logit": 29.42413902282715,
+                "text": " مسؤول"
+              }
+            ]
+          },
+          {
+            "index": 54,
+            "tokenId": 7757,
+            "inputTokenCount": 126,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:40a415751710758db85591859a4e4be194af3f7e5477791638ad6736ff4d4c73",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 31.442420959472656,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.816987991333008,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.373708724975586,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 30.18505096435547,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 30.176368713378906,
+                "text": "тур"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.973241806030273,
+                "text": "욜"
+              },
+              {
+                "tokenId": 183395,
+                "logit": 29.741060256958008,
+                "text": " مسؤول"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.649944305419922,
+                "text": " ریس"
+              }
+            ]
+          },
+          {
+            "index": 55,
+            "tokenId": 7757,
+            "inputTokenCount": 127,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:226ba99fcbf7d30d11df5c9336f49b03f825bbbc7448133c37a6ea6186eb4949",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 31.444223403930664,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.787944793701172,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.34109115600586,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 30.11941146850586,
+                "text": "тур"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 29.9658203125,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.952978134155273,
+                "text": "욜"
+              },
+              {
+                "tokenId": 183395,
+                "logit": 29.63446807861328,
+                "text": " مسؤول"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.550094604492188,
+                "text": " ریس"
+              }
+            ]
+          },
+          {
+            "index": 56,
+            "tokenId": 7757,
+            "inputTokenCount": 128,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:738c90fee072f2fe58c549b64b22120d5749ad40bb6d9eddd30c200e81714c3b",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 31.216943740844727,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.608469009399414,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 30.11490249633789,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.82665252685547,
+                "text": "тур"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.796846389770508,
+                "text": "욜"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.46868324279785,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 29.46721076965332,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.27290916442871,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 57,
+            "tokenId": 7757,
+            "inputTokenCount": 129,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:5bcfa0eb8414369e2df1d8823ae4ccc6946d3a179e4a236b6c42f1331ae6791f",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 31.060821533203125,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.415863037109375,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 29.986038208007812,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.803178787231445,
+                "text": "욜"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.699594497680664,
+                "text": "тур"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.53044891357422,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.240903854370117,
+                "text": "äv"
+              },
+              {
+                "tokenId": 183395,
+                "logit": 29.04802703857422,
+                "text": " مسؤول"
+              }
+            ]
+          },
+          {
+            "index": 58,
+            "tokenId": 7757,
+            "inputTokenCount": 130,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:bc725ee31fc9bcefbb9d2b034fba369308f3b723fd2bd6231b652d769c2adb4c",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 30.909025192260742,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.30335235595703,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 29.864505767822266,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.78873062133789,
+                "text": "욜"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.53471565246582,
+                "text": "тур"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.496232986450195,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.137229919433594,
+                "text": "äv"
+              },
+              {
+                "tokenId": 183395,
+                "logit": 28.90666389465332,
+                "text": " مسؤول"
+              }
+            ]
+          },
+          {
+            "index": 59,
+            "tokenId": 7757,
+            "inputTokenCount": 131,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:a20527fc16fe6c8ff2544b9b6319ae1366d643d6cc01901ce0fd846882edcf2e",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 30.76997947692871,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.17210578918457,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 29.704465866088867,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.554758071899414,
+                "text": "욜"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.452329635620117,
+                "text": "тур"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.307750701904297,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 28.969602584838867,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 28.953327178955078,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 60,
+            "tokenId": 7757,
+            "inputTokenCount": 132,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:a18feaa8f05e2836c3ba4daf8d3815b657d328d3c8ebabf8d4652e3aba448cff",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 31.04010772705078,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.18931770324707,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 29.844524383544922,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.81466293334961,
+                "text": "тур"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.70001983642578,
+                "text": "욜"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 29.31396484375,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.30153465270996,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.2286434173584,
+                "text": "äv"
+              }
+            ]
+          },
+          {
+            "index": 61,
+            "tokenId": 7757,
+            "inputTokenCount": 133,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:13e08ddf13c78541f925e0b55ba9a4e4771d48c43138d8914e65f2d9bb21c5eb",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 30.845849990844727,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 30.120407104492188,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.88656234741211,
+                "text": "тур"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 29.823183059692383,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.76651382446289,
+                "text": "욜"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 29.282272338867188,
+                "text": "ленд"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.262123107910156,
+                "text": "äv"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 29.232955932617188,
+                "text": " ریس"
+              }
+            ]
+          },
+          {
+            "index": 62,
+            "tokenId": 7757,
+            "inputTokenCount": 134,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:59fa139a36f0d496ff76f0f873a7e6b6191c109036df706ae51d85fc9d6d97e5",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 30.317001342773438,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.860780715942383,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.63629913330078,
+                "text": "욜"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.59410858154297,
+                "text": "тур"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 29.454320907592773,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.099592208862305,
+                "text": "äv"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 28.952274322509766,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 28.917551040649414,
+                "text": "ленд"
+              }
+            ]
+          },
+          {
+            "index": 63,
+            "tokenId": 7757,
+            "inputTokenCount": 135,
+            "dtype": "f32",
+            "elementCount": 262144,
+            "digest": "sha256:1a780bd01449f1aa4600809fc0f867159b36a997c0d0bdbeb18017df97702cad",
+            "top": [
+              {
+                "tokenId": 7757,
+                "logit": 30.20136070251465,
+                "text": " responsible"
+              },
+              {
+                "tokenId": 185486,
+                "logit": 29.74191665649414,
+                "text": " abstinence"
+              },
+              {
+                "tokenId": 247338,
+                "logit": 29.642478942871094,
+                "text": "욜"
+              },
+              {
+                "tokenId": 26069,
+                "logit": 29.335124969482422,
+                "text": "тур"
+              },
+              {
+                "tokenId": 80947,
+                "logit": 29.193504333496094,
+                "text": "iggers"
+              },
+              {
+                "tokenId": 68484,
+                "logit": 29.020160675048828,
+                "text": "äv"
+              },
+              {
+                "tokenId": 192511,
+                "logit": 28.711942672729492,
+                "text": " ریس"
+              },
+              {
+                "tokenId": 204078,
+                "logit": 28.707170486450195,
+                "text": "ленд"
+              }
+            ]
+          }
+        ]
+      },
+      "tolerance": {
+        "tokenPolicy": "exact generated token IDs",
+        "logitsPolicy": "exact sha256 digest per generated step over finalized f32 logits before sampling",
+        "kvPolicy": "metadata hash only; KV tensor bytes are not read back by default"
+      }
+    },
+    "promptInput": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+    "decodeBottleneck": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "dominant": {
+        "id": "orchestration",
+        "label": "decode orchestration",
+        "ms": 94464.7,
+        "shareOfDecode": 1
+      },
+      "bottleneckClass": "orchestration",
+      "decodeWallMs": 94464.7,
+      "componentsMs": {
+        "commandRecordMs": 0,
+        "submitWaitMs": 0,
+        "readbackWaitMs": 0,
+        "effectiveSubmitReadbackWaitMs": 0,
+        "readbackMapWaitMs": 0,
+        "readbackCleanupMs": 0,
+        "readbackCopyMs": 0,
+        "readbackUnattributedMs": null,
+        "gpuTimestampMs": null,
+        "submitReadbackSlackMs": null,
+        "orchestrationMs": 94464.7,
+        "residualMs": 0
+      },
+      "recording": {
+        "opCount": 0,
+        "passCount": 0,
+        "uniqueOpLabels": null,
+        "msPerOp": null,
+        "msPerPass": null,
+        "passesPerOp": null,
+        "msPerExecutedBatchToken": null,
+        "opsPerExecutedBatchToken": null,
+        "passesPerExecutedBatchToken": null,
+        "topOps": [],
+        "topOpGroups": [],
+        "uniformCache": {
+          "hits": 45878,
+          "misses": 202,
+          "totalLookups": 46080,
+          "hitRateRatio": 0.9956163194444444,
+          "evictions": 0,
+          "currentSize": 202,
+          "pendingDestruction": 0,
+          "hitRate": "99.6%"
+        }
+      },
+      "shares": {
+        "commandRecord": 0,
+        "submitWait": 0,
+        "readbackWait": 0,
+        "effectiveSubmitReadbackWait": 0,
+        "readbackMapWait": 0,
+        "readbackCleanup": 0,
+        "readbackCopy": 0,
+        "readbackUnattributed": null,
+        "gpuTimestamp": null,
+        "submitReadbackSlack": null,
+        "orchestration": 1,
+        "residual": 0
+      },
+      "semantics": {
+        "effectiveSubmitReadbackWaitMs": "max(decodeSubmitWaitMs, decodeReadbackWaitMs); submit and readback waits overlap.",
+        "readbackMapWaitMs": "Wall time awaiting staging-buffer mapAsync; usually includes GPU completion behind the readback.",
+        "gpuTimestampMs": "Timestamp-query GPU work when available; null means it was not captured.",
+        "topOps": "Highest-count exact compute-pass labels observed during command recording.",
+        "topOpGroups": "Highest-count compute-pass labels after grouping repeated per-layer labels.",
+        "uniformCache": "Current uniform-buffer cache counters at the end of the measured suite."
+      }
+    },
+    "load": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "semantics": {
+        "modelLoadMs": "suite initialization time before generation",
+        "loaderTotalMs": "DopplerLoader.load() weight-loader wall time",
+        "pipelineTotalMs": "InferencePipeline.loadModel() wall time",
+        "modelLoadMinusPipelineMs": "modelLoadMs - pipeline.totalMs; harness, storage, manifest, GPU init, and pipeline construction",
+        "pipelineMinusLoaderMs": "pipeline.totalMs - loader.totalMs; config, tokenizer, KV, RoPE, and other pipeline setup",
+        "modelLoadMinusLoaderMs": "modelLoadMs - loader.totalMs"
+      },
+      "modelLoadMs": 23805.21,
+      "loader": {
+        "schemaVersion": 1,
+        "source": "doppler-loader",
+        "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+        "status": "complete",
+        "customShardLoader": true,
+        "byteAccountingMode": "custom-loader-read-progress",
+        "totalBytes": 399357184,
+        "totalShards": 6,
+        "bytesLoaded": 63812864,
+        "shardsLoaded": 1,
+        "bytesPerSecond": 2930830,
+        "phasesMs": {
+          "preflight": 1.45,
+          "tensorLocations": 1.27,
+          "embeddings": 1.07,
+          "layers": 21691.2,
+          "finalWeights": 77.27,
+          "cleanup": 0.05
+        },
+        "layers": {
+          "count": 18,
+          "totalMs": 21600.05,
+          "meanMs": 1200,
+          "maxMs": 3024.72,
+          "maxLayer": 0
+        },
+        "totalMs": 21772.97,
+        "failedPhase": null,
+        "error": null
+      },
+      "pipeline": {
+        "schemaVersion": 1,
+        "source": "doppler-pipeline",
+        "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+        "status": "complete",
+        "phasesMs": {
+          "reset": 0.07,
+          "configResolution": 4.73,
+          "kernelWarmup": 0.06,
+          "tokenizer": 713.11,
+          "executionSetup": 60.44,
+          "loadWeights": 22752.13,
+          "rope": 156.64,
+          "convStates": 0.53
+        },
+        "details": {
+          "tokenizer": {
+            "schemaVersion": 1,
+            "source": "doppler-tokenizer",
+            "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+            "status": "complete",
+            "tokenizerType": "bundled",
+            "tokenizerFile": "tokenizer.json",
+            "backend": "bundled",
+            "assetSource": "custom-loader",
+            "cacheHit": false,
+            "phasesMs": {
+              "configResolution": 0.04,
+              "cacheLookup": 0.06,
+              "backendCreate": 0.1,
+              "assetLoad": 252.73,
+              "assetParse": 0.24,
+              "backendLoad": 459.41,
+              "cacheStore": 0.01
+            },
+            "totalMs": 712.79,
+            "error": null
+          }
+        },
+        "totalMs": 23687.98
+      },
+      "residualsMs": {
+        "modelLoadMinusLoaderMs": 2032.24,
+        "modelLoadMinusPipelineMs": 117.23,
+        "pipelineMinusLoaderMs": 1915.01
+      },
+      "consistent": {
+        "loaderWithinModelLoad": true,
+        "pipelineWithinModelLoad": true,
+        "loaderWithinPipeline": true
+      }
+    },
+    "schemaVersion": 1,
+    "source": "doppler",
+    "suite": "bench",
+    "executionContractArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "ok": true,
+      "checks": [
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.steps",
+          "ok": true
+        },
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.session",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "session": {
+        "layout": "contiguous",
+        "disableCommandBatching": false,
+        "decodeBatchSize": 1,
+        "headDim": 256,
+        "kvLen": 32768,
+        "coldQuantMode": "none",
+        "contiguousQuantMode": "none"
+      },
+      "steps": {
+        "total": 35,
+        "attention": 2,
+        "attentionPhases": {
+          "prefill": 1,
+          "decode": 1,
+          "both": 0
+        }
+      }
+    },
+    "layerPatternContractArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "ok": true,
+      "checks": [
+        {
+          "id": "inference.layerPattern.patternKind.shape",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.patternKind.semantics",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.layerType.shape",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.layerType.semantics",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.even",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.odd",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.every_n_offset",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.every_n_negative_offset",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "stats": {
+        "patternKindRules": 4,
+        "layerTypeRules": 6,
+        "patternKindContexts": 16,
+        "layerTypeContexts": 12
+      }
+    },
+    "requiredInferenceFieldsArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "scope": "manifest",
+      "label": "gemma-3-270m-it-q4k-ehf16-af32.inference",
+      "ok": true,
+      "checks": [
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.inference.requiredInferenceFields",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "stats": {
+        "fieldCases": 51,
+        "nullableCases": 27,
+        "nonNullableCases": 24
+      }
+    },
+    "tokenCostLedger": {
+      "schema": "doppler.token-cost-ledger/v1",
+      "identity": {
+        "artifactDigest": "sha256:dee4ca03cbb4ca70cd827a06107e840c78c05573eb049f6025d038b705538bf9",
+        "manifestDigest": "sha256:78c95f517be22e969e945ce900969956e98b6edac2c68f0d0385cd5e28726807",
+        "executionGraphDigest": "sha256:eeb1a27bbb2c81c10aec5f498c746e1f804152952e1497c8c0c0513c60c8de94",
+        "runtimeConfigDigest": "sha256:05ac293aaf962e53c26087d128669626f8bcedb1e0db2a2232d68648677ce5ba",
+        "kernelSetDigest": "sha256:04e0e534f6d70514eb95678ee5df46f4f709c05c15df022ff398f6a7c99d9cb8",
+        "wrapperDigest": "sha256:85c85b813c61ffa90f6062254c8a91f1d073d26c3b6e2e6d43d6bacd61282e6d",
+        "browserDigest": "sha256:7900fb727da53cb728e51e61a12aa3d39989a987d6f68567a0916fb58f7d314d",
+        "adapterDigest": "sha256:a612ee6a56f6e601cd664382ddc5d3ed113c67e6e03f8773858f89f3f5389c4e"
+      },
+      "device": {
+        "hasSubgroups": true,
+        "hasSubgroupsF16": true,
+        "hasF16": true,
+        "hasTimestampQuery": true,
+        "maxBufferSize": 134217728,
+        "maxWorkgroupSize": 1024,
+        "maxWorkgroupStorageSize": 32768,
+        "adapterInfo": {
+          "vendor": "AMD",
+          "architecture": "vulkan",
+          "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+          "description": "Radeon 8060S Graphics (RADV STRIX_HALO)"
+        },
+        "submitProbeMs": 1.8916760000001887
+      },
+      "browser": {
+        "userAgent": "Node.js/22",
+        "platform": "Linux x86_64",
+        "vendor": null
+      },
+      "phases": [
+        {
+          "phase": "prefill",
+          "measurementSource": "cpu-wall-estimate",
+          "wallMs": 8618.39,
+          "attributedGpuMs": null,
+          "unattributedWallMs": null,
+          "timestampCoverageRatio": null,
+          "overlapSemantics": "Operation GPU timestamps are additive pass durations. They are not asserted to equal wall time.",
+          "hostCosts": {
+            "recordMs": 139.21902600012254,
+            "submitWaitMs": 0,
+            "readbackWaitMs": null,
+            "fenceWaitMs": 0,
+            "orchestrationMs": null,
+            "readbackBreakdown": {
+              "mapWaitMs": null,
+              "cleanupMs": null,
+              "copyMs": null
+            },
+            "observedSerialMs": 139.21902600012254,
+            "dominantWall": "command-recording",
+            "overlapSemantics": "submitWaitMs and readbackWaitMs may observe the same submitted GPU work; fenceWaitMs is their maximum. Readback breakdown fields are nested observations and are not added again."
+          },
+          "operations": [],
+          "dispatches": 0,
+          "unattributedDispatches": 0,
+          "dispatchGeometryCoverage": null,
+          "commandBufferSubmissions": 0,
+          "observerReadbacks": 0,
+          "executionReadbacks": {
+            "value": null,
+            "status": "not-attributed-by-observer"
+          },
+          "estimatedBytesMoved": {
+            "value": null,
+            "unit": "bytes",
+            "status": "unavailable",
+            "semantics": "estimated-not-measured"
+          }
+        },
+        {
+          "phase": "decode",
+          "measurementSource": "cpu-wall-estimate",
+          "wallMs": 94464.7,
+          "attributedGpuMs": null,
+          "unattributedWallMs": null,
+          "timestampCoverageRatio": null,
+          "overlapSemantics": "Operation GPU timestamps are additive pass durations. They are not asserted to equal wall time.",
+          "hostCosts": {
+            "recordMs": 0,
+            "submitWaitMs": 0,
+            "readbackWaitMs": 0,
+            "fenceWaitMs": 0,
+            "orchestrationMs": 94464.69829600002,
+            "readbackBreakdown": {
+              "mapWaitMs": 0,
+              "cleanupMs": 0,
+              "copyMs": 0
+            },
+            "observedSerialMs": 94464.69829600002,
+            "dominantWall": "host-orchestration",
+            "overlapSemantics": "submitWaitMs and readbackWaitMs may observe the same submitted GPU work; fenceWaitMs is their maximum. Readback breakdown fields are nested observations and are not added again."
+          },
+          "operations": [],
+          "dispatches": 0,
+          "unattributedDispatches": 0,
+          "dispatchGeometryCoverage": null,
+          "commandBufferSubmissions": 0,
+          "observerReadbacks": 0,
+          "executionReadbacks": {
+            "value": null,
+            "status": "not-attributed-by-observer"
+          },
+          "estimatedBytesMoved": {
+            "value": null,
+            "unit": "bytes",
+            "status": "unavailable",
+            "semantics": "estimated-not-measured"
+          }
+        }
+      ],
+      "selectedVariants": {
+        "kernelPathId": null,
+        "kernelPathSource": null,
+        "executionPlan": {
+          "primary": {
+            "id": "primary",
+            "kernelPathId": "gemma-3-270m-it-q4k-ehf16-af32-execution-inline",
+            "kernelPathSource": "execution-v1",
+            "activationDtype": "f32",
+            "readbackInterval": 1,
+            "readbackMode": "sequential",
+            "maxBatchDecodeTokens": null,
+            "batchSize": 1,
+            "stopCheckMode": "batch",
+            "disableCommandBatching": false,
+            "ringTokens": 1,
+            "ringStop": 1,
+            "ringStaging": 1
+          },
+          "fallback": null,
+          "activePlanIdAtStart": null,
+          "finalActivePlanId": null,
+          "transitions": []
+        }
+      },
+      "rejectedOrFallbackVariants": [],
+      "dominantOperation": null,
+      "dominantObservedWall": {
+        "phase": "decode",
+        "wall": "host-orchestration",
+        "ms": 94464.69829600002
+      },
+      "digest": "sha256:9d6dfb759968e4fed15f465cad646e40978e99ed507e896e42c64bfdb8a9d563"
+    }
+  },
+  "output": null,
+  "memory": {
+    "used": 444774912,
+    "pool": {
+      "allocations": 276,
+      "reuses": 104803,
+      "totalBytesAllocated": 369277440,
+      "peakBytesAllocated": 369277440,
+      "currentBytesAllocated": 369277440,
+      "totalBytesRequested": 368533760,
+      "peakBytesRequested": 329092352,
+      "currentBytesRequested": 267872768,
+      "activeBuffers": 239,
+      "pooledBuffers": 37,
+      "budgetMaxBytes": 0,
+      "budgetUtilization": 0,
+      "hitRate": "99.7%"
+    },
+    "kvCache": {
+      "theoretical": 75497472,
+      "allocated": 75497472,
+      "used": 2488320,
+      "efficiency": 0.032958984375,
+      "seqLen": 135,
+      "maxSeqLen": 4096,
+      "layout": "contiguous",
+      "kvDtype": "f16",
+      "counters": {
+        "updateCalls": 0,
+        "gpuUpdateCalls": 0,
+        "recordedGpuUpdateCalls": 5760,
+        "tokensWritten": 12150
+      }
+    }
+  },
+  "debugSnapshot": null
+}

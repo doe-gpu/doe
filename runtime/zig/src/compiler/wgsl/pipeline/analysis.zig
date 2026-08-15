@@ -244,7 +244,7 @@ pub fn analyzeToIrWithConfig(
     wgsl: []const u8,
     config: ir_transform_robustness.Config,
 ) TranslateError!ir.Module {
-    const result = try analyzeToIrWithConfigTimed(allocator, wgsl, config);
+    const result = try analyzeToIrWithConfigTimedAndOverrides(allocator, wgsl, config, &.{});
     return result.module;
 }
 
@@ -252,6 +252,25 @@ pub fn analyzeToIrWithConfigTimed(
     allocator: std.mem.Allocator,
     wgsl: []const u8,
     config: ir_transform_robustness.Config,
+) TranslateError!TimedAnalyzeResult {
+    return analyzeToIrWithConfigTimedAndOverrides(allocator, wgsl, config, &.{});
+}
+
+pub fn analyzeToIrWithConfigAndOverrides(
+    allocator: std.mem.Allocator,
+    wgsl: []const u8,
+    config: ir_transform_robustness.Config,
+    overrides: []const ir.OverrideEntry,
+) TranslateError!ir.Module {
+    const result = try analyzeToIrWithConfigTimedAndOverrides(allocator, wgsl, config, overrides);
+    return result.module;
+}
+
+pub fn analyzeToIrWithConfigTimedAndOverrides(
+    allocator: std.mem.Allocator,
+    wgsl: []const u8,
+    config: ir_transform_robustness.Config,
+    overrides: []const ir.OverrideEntry,
 ) TranslateError!TimedAnalyzeResult {
     clearLastError();
     const total_start_ns = nowNs();
@@ -269,7 +288,7 @@ pub fn analyzeToIrWithConfigTimed(
     defer tree.deinit();
 
     const sema_start_ns = parse_end_ns;
-    var semantic = sema.analyze(allocator, &tree) catch |err| {
+    var semantic = sema.analyzeWithOverrides(allocator, &tree, overrides) catch |err| {
         const kind = mapSemanticError(err);
         setLastError(.sema, kind, tree.source, tokenLoc(&tree, sema.lastFailureContext().token_idx));
         return kind;

@@ -34,6 +34,7 @@
     "runtime"
   ],
   "wgslRootFiles": [
+    "CATSCAN.md",
     "WGSL_SUPPORT.md",
     "mod.zig"
   ],
@@ -2128,15 +2129,15 @@
       },
       "src/compiler/wgsl/frontend/sema.zig": {
         "decision": "Keep",
-        "moduleSha256": "ed0d6ab243fe16bd5051b5ea304ad9a0844a1318b5b3058a31a6062085923b57",
+        "moduleSha256": "454ae32c405a69e25155bc6480a0e7781f45278f422636f225c71788fc3e8da2",
         "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-doe-development/2026-08-10"
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/compiler/wgsl/frontend/sema_attrs.zig": {
         "decision": "Keep",
-        "moduleSha256": "f0d4feff6ced03cebf75852ccbde34551972bea149c5e8811bdc3db15740cd0d",
+        "moduleSha256": "7cccfaf48b66f98e320c63528ccfcf419f2a45497953f71d87a1d2182fdee3a0",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/compiler/wgsl/frontend/sema_expr.zig": {
         "decision": "Keep",
@@ -2152,9 +2153,9 @@
       },
       "src/compiler/wgsl/frontend/sema_resolve.zig": {
         "decision": "Keep",
-        "moduleSha256": "0920877f81922e41430ed119ced1ab92123d3949791b1249b7c196dd75c2f832",
+        "moduleSha256": "caa79c30da1869e9ab21e8ee61dfb454f8b03c02b7bb1c0ebba6b13fe89db841",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/compiler/wgsl/frontend/sema_type_syntax.zig": {
         "decision": "Keep",
@@ -2242,9 +2243,9 @@
       },
       "src/compiler/wgsl/pipeline/analysis.zig": {
         "decision": "Keep",
-        "moduleSha256": "c3ac6724046966ded0c66fc523737efb207ed387bfe28924a7d977071f4d1f44",
-        "reason": "Keep: reachable compiler implementation shared by 14 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "moduleSha256": "1027ba90db4d0febb3d093e2377ae2bb27578d0954e78c9eae42c4267f7a4cad",
+        "reason": "Keep: reachable compiler implementation shared by 16 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/compiler/wgsl/pipeline/binding_reflection.zig": {
         "decision": "Keep",
@@ -2272,15 +2273,15 @@
       },
       "src/compiler/wgsl/pipeline/translate_hlsl.zig": {
         "decision": "Keep",
-        "moduleSha256": "6a9da71eceebcbdaf3124fc00596e0aee33376c194b738f12ae5ab9c59848080",
+        "moduleSha256": "327ad70745a47e01d483c183786ef5fa850dccb366d1d614d5f94cc2db2f3ff6",
         "reason": "Keep: reachable compiler implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/compiler/wgsl/pipeline/translate_msl.zig": {
         "decision": "Keep",
-        "moduleSha256": "9621196bb55ef1ad7ecc4c634c8220359ab926141efa85ef0800ab48b37628a5",
+        "moduleSha256": "2306700393cf4c33c21c35999dbce92d08d4caf433587fbacf052cd460ac5aa8",
         "reason": "Keep: reachable compiler implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/compiler/wgsl/pipeline/translate_spirv.zig": {
         "decision": "Keep",
@@ -2326,9 +2327,9 @@
       },
       "src/compiler/wgsl/runtime/runtime_compute_translation.zig": {
         "decision": "Keep",
-        "moduleSha256": "d81ce0feac4e6bcc13f26d7e3d073a24e9645f6f4ea4c803faadf794326e151a",
+        "moduleSha256": "cb99508663442e825bf68eb7a0ac5191fb45ab23571ce363c75bd5049e0c1679",
         "reason": "Keep: runtime compute lowering policy and MSL/SPIR-V emission boundary shared by native backend consumers.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/compiler/wgsl/runtime/runtime_graphics_translation.zig": {
         "decision": "Keep",
@@ -3268,9 +3269,9 @@
       },
       "src/native/shader/doe_shader_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "0a34ef35839ef6f42dc1e11a1e057f0476e3f67e15c359e3ec5b665dcddfbfc6",
+        "moduleSha256": "797644dc65789325bfd5cc2980e4f942e3baed8aa91b733f76a4972d547f8474",
         "reason": "Keep: native shader-module creation, translation, cache, diagnostics, and object-lifetime boundary.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/native/shader/doe_shader_translation_cache.zig": {
         "decision": "Keep",
@@ -3358,9 +3359,9 @@
       },
       "src/native/vulkan/vulkan_compute_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "faff6a2bf84d430c32a85ac498ca9505743ff1b9b66f0a68b8c7cf2b958e89bf",
+        "moduleSha256": "396ccab9c29a91f6a0474b4ced2b1bc00f155f54a7e0db8ac586aea5b5e00f6b",
         "reason": "Keep: native WebGPU-to-Vulkan compute command orchestration and lifetime boundary.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/native/vulkan/vulkan_feature_cache.zig": {
         "decision": "Keep",

@@ -21,11 +21,17 @@ function normalizeImmediateDataInput(data, dataOffset = 0, size) {
   return bytes.subarray(start, end);
 }
 
-function wrapBuffer(raw) {
-  return {
-    _raw: raw,
-    size: raw.size,
-    usage: raw.usage,
+// Keep compute-surface buffers as a stable resource class. Consumers such as
+// Doppler establish the WebGPU constructor from the first returned buffer and
+// use `instanceof GPUBuffer` when deciding whether GPU metadata may be attached.
+// A plain object facade makes that valid provider-discovery pattern impossible.
+export class DoeComputeGPUBuffer {
+  constructor(raw) {
+    this._raw = raw;
+    this.size = raw.size;
+    this.usage = raw.usage;
+  }
+
     /**
      * Map the wrapped compute-surface buffer for host access.
      *
@@ -41,9 +47,10 @@ function wrapBuffer(raw) {
      * - This forwards directly to the underlying Doe buffer.
      * - The compute facade keeps the same mapping semantics as the full surface.
      */
-    async mapAsync(mode, offset, size) {
-      return raw.mapAsync(mode, offset, size);
-    },
+  async mapAsync(mode, offset, size) {
+    return this._raw.mapAsync(mode, offset, size);
+  }
+
     /**
      * Return the currently mapped byte range.
      *
@@ -59,9 +66,10 @@ function wrapBuffer(raw) {
      * - Call this only while the buffer is mapped.
      * - The returned bytes come from the wrapped full-surface buffer object.
      */
-    getMappedRange(offset, size) {
-      return raw.getMappedRange(offset, size);
-    },
+  getMappedRange(offset, size) {
+    return this._raw.getMappedRange(offset, size);
+  }
+
     /**
      * Compare a mapped `f32` prefix against expected values.
      *
@@ -77,9 +85,10 @@ function wrapBuffer(raw) {
      * - The buffer must already be mapped.
      * - This helper is most useful in tests and smoke checks.
      */
-    assertMappedPrefixF32(expected, count) {
-      return raw.assertMappedPrefixF32(expected, count);
-    },
+  assertMappedPrefixF32(expected, count) {
+    return this._raw.assertMappedPrefixF32(expected, count);
+  }
+
     /**
      * Release the current mapping.
      *
@@ -94,9 +103,10 @@ function wrapBuffer(raw) {
      *
      * - This forwards directly to the wrapped Doe buffer.
      */
-    unmap() {
-      return raw.unmap();
-    },
+  unmap() {
+    return this._raw.unmap();
+  }
+
     /**
      * Release the wrapped native buffer.
      *
@@ -110,10 +120,13 @@ function wrapBuffer(raw) {
      *
      * - Reusing the buffer after destruction is unsupported.
      */
-    destroy() {
-      return raw.destroy();
-    },
-  };
+  destroy() {
+    return this._raw.destroy();
+  }
+}
+
+function wrapBuffer(raw) {
+  return new DoeComputeGPUBuffer(raw);
 }
 
 function wrapBindGroupLayout(raw) {

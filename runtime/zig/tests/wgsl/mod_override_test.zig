@@ -11,6 +11,7 @@ const MAX_HLSL_OUTPUT = mod.MAX_HLSL_OUTPUT;
 const MAX_OUTPUT = mod.MAX_OUTPUT;
 const ir = mod.ir;
 const applyOverrides = mod.applyOverrides;
+const runtime_compile = @import("../../src/compiler/wgsl/runtime/runtime_compute_translation.zig");
 
 test "override with @id attribute is parsed and stored in IR" {
     const source =
@@ -136,6 +137,58 @@ test "translateToSpirv accepts override-backed workgroup size defaults" {
     var out: [mod.MAX_SPIRV_OUTPUT]u8 = undefined;
     const len = try mod.translateToSpirv(std.testing.allocator, source, &out);
     try std.testing.expect(len > 0);
+}
+
+test "override-backed workgroup array uses default and pipeline-specialized sizes" {
+    const source =
+        \\override SHARED_INPUT_SIZE: u32 = 256u;
+        \\var<workgroup> shared_input: array<f32, SHARED_INPUT_SIZE>;
+        \\@group(0) @binding(0) var<storage, read_write> data: array<f32>;
+        \\@compute @workgroup_size(SHARED_INPUT_SIZE, 1, 1)
+        \\fn main(@builtin(local_invocation_id) lid: vec3u) {
+        \\    shared_input[lid.x] = f32(lid.x);
+        \\    workgroupBarrier();
+        \\    data[lid.x] = shared_input[lid.x];
+        \\}
+    ;
+    var out: [MAX_OUTPUT]u8 = undefined;
+
+    var default_translation = try runtime_compile.translateToMslForComputeRuntime(
+        std.testing.allocator,
+        source,
+        &out,
+        null,
+        0,
+    );
+    defer default_translation.info.deinit(std.testing.allocator);
+    try std.testing.expectEqual(@as(u32, 256), default_translation.info.workgroup_size[0]);
+    try std.testing.expect(std.mem.indexOf(u8, out[0..default_translation.len], "shared_input[256]") != null);
+
+    const overrides = [_]ir.OverrideEntry{.{ .key = "SHARED_INPUT_SIZE", .value = 128.0 }};
+    var specialized_translation = try runtime_compile.translateToMslForComputeRuntime(
+        std.testing.allocator,
+        source,
+        &out,
+        &overrides,
+        overrides.len,
+    );
+    defer specialized_translation.info.deinit(std.testing.allocator);
+    try std.testing.expectEqual(@as(u32, 128), specialized_translation.info.workgroup_size[0]);
+    const specialized_msl = out[0..specialized_translation.len];
+    try std.testing.expect(std.mem.indexOf(u8, specialized_msl, "shared_input[128]") != null);
+    try std.testing.expect(std.mem.indexOf(u8, specialized_msl, "shared_input[256]") == null);
+
+    var spirv_out: [mod.MAX_SPIRV_OUTPUT]u8 = undefined;
+    var specialized_spirv = try runtime_compile.translateToSpirvForVulkanComputeRuntimeWithOverrides(
+        std.testing.allocator,
+        source,
+        &spirv_out,
+        &overrides,
+        overrides.len,
+    );
+    defer specialized_spirv.info.deinit(std.testing.allocator);
+    try std.testing.expect(specialized_spirv.len > 0);
+    try std.testing.expectEqual(@as(u32, 128), specialized_spirv.info.workgroup_size[0]);
 }
 
 test "translateToHlslWithOverrides emits overridden render-stage constant values" {

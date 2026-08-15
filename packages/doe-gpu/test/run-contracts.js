@@ -6,6 +6,7 @@ const contracts = [
   './unit/root-export-parity.test.js',
   './unit/program-bundle-runner.test.js',
   './unit/full-surface-lifecycle.test.js',
+  './unit/compute-buffer-identity.test.js',
   './unit/stage-platform-freshness.test.js',
   './unit/plan-contracts.test.js',
   './unit/plan-refactor-receipt.test.js',

@@ -111,10 +111,38 @@ fn resolve_array_length_expr(self: anytype, node_idx: u32, depth: u8) AnalyzeErr
 fn resolve_named_array_length_const(self: anytype, name: []const u8, depth: u8) AnalyzeError!u32 {
     const global_index = self.module.global_map.get(name) orelse return error.InvalidType;
     const global_info = self.module.globals.items[global_index];
-    if (global_info.class != .const_) return error.InvalidType;
+    if (global_info.class != .const_ and global_info.class != .override_) return error.InvalidType;
+    if (global_info.class == .override_) {
+        if (try resolve_override_u32(self, global_info)) |value| return value;
+    }
     const global_node = self.module.tree.nodes.items[global_info.node_idx];
-    if (global_node.tag != .const_decl or global_node.data.rhs == ast_mod.NULL_NODE) return error.InvalidType;
-    return resolve_array_length_expr(self, global_node.data.rhs, depth);
+    const init_node = switch (global_node.tag) {
+        .const_decl => global_node.data.rhs,
+        .override_decl => self.module.tree.extra_data.items[global_node.data.lhs + 2],
+        else => ast_mod.NULL_NODE,
+    };
+    if (init_node == ast_mod.NULL_NODE) return error.InvalidType;
+    return resolve_array_length_expr(self, init_node, depth);
+}
+
+fn resolve_override_u32(self: anytype, global_info: sema_types.GlobalInfo) AnalyzeError!?u32 {
+    for (self.overrides) |entry| {
+        const numeric_id = std.fmt.parseInt(u32, entry.key, 10) catch null;
+        const matches = if (numeric_id) |id|
+            global_info.override_id != null and global_info.override_id.? == id
+        else
+            std.mem.eql(u8, global_info.name, entry.key);
+        if (!matches) continue;
+        if (!std.math.isFinite(entry.value) or
+            entry.value < 1.0 or
+            entry.value > @as(f64, @floatFromInt(std.math.maxInt(u32))) or
+            @floor(entry.value) != entry.value)
+        {
+            return error.InvalidType;
+        }
+        return @as(u32, @intFromFloat(entry.value));
+    }
+    return null;
 }
 
 fn resolve_array_length_binary(self: anytype, node: Node, depth: u8) AnalyzeError!u32 {
