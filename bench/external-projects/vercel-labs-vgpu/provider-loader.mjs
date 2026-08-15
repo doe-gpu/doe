@@ -9,10 +9,11 @@ const providerModules = {
 
 export async function resolve(specifier, context, nextResolve) {
   if (specifier !== 'webgpu') return nextResolve(specifier, context);
+  if (provider === 'ambient-node-webgpu') return nextResolve(specifier, context);
   const url = providerModules[provider];
   if (!url) {
     throw new Error(
-      `DOE_EXTERNAL_WEBGPU_PROVIDER must be one of ${Object.keys(providerModules).join(', ')}; received ${JSON.stringify(provider)}`,
+      `DOE_EXTERNAL_WEBGPU_PROVIDER must be ambient-node-webgpu or one of ${Object.keys(providerModules).join(', ')}; received ${JSON.stringify(provider)}`,
     );
   }
   return { url, shortCircuit: true };

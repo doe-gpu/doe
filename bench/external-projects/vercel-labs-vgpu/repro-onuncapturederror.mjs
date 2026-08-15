@@ -2,10 +2,12 @@ import { create, globals } from 'webgpu';
 
 Object.assign(globalThis, globals);
 const result = {
-  schemaVersion: 1,
-  capability: 'GPUDevice.onuncapturederror setter',
+  schemaVersion: 2,
+  capability: 'GPUDevice.onuncapturederror post-destroy lifecycle',
   setterAccepted: false,
-  error: '',
+  postDestroySetterAccepted: false,
+  postDestroyClearAccepted: false,
+  errors: [],
 };
 let device;
 try {
@@ -14,10 +16,19 @@ try {
   device = await adapter.requestDevice();
   device.onuncapturederror = () => {};
   result.setterAccepted = true;
+  device.destroy();
+  device.onuncapturederror = () => {};
+  result.postDestroySetterAccepted = true;
+  device.onuncapturederror = null;
+  result.postDestroyClearAccepted = true;
 } catch (error) {
-  result.error = `${error?.name ?? 'Error'}: ${error?.message ?? String(error)}`;
+  result.errors.push(`${error?.name ?? 'Error'}: ${error?.message ?? String(error)}`);
 } finally {
   try { device?.destroy(); } catch {}
 }
 console.log(`DOE_VGPU_COMPATIBILITY_REPRO=${JSON.stringify(result)}`);
-if (!result.setterAccepted) process.exitCode = 1;
+if (!result.setterAccepted
+  || !result.postDestroySetterAccepted
+  || !result.postDestroyClearAccepted) {
+  process.exitCode = 1;
+}

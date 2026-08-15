@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "registryRevision": "11",
+  "registryRevision": "12",
   "scoringPolicyVersion": "1.0.0",
   "promotionPolicyVersion": "1.1.0",
   "evaluationQueue": [
@@ -553,10 +553,17 @@
           "sha256": "729a48148831abd10d28d2e3699e7c38a8a2ac3385f73faf1fd9ed5fecd8af02",
           "reviewedAt": "2026-08-10T23:25:00Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "vgpu-runtime-ownership-2026-08-15-diagnostic",
+          "path": "reports/ecosystem/vercel-labs-vgpu/vgpu-runtime-ownership-2026-08-15-diagnostic.json",
+          "sha256": "REPORT_SHA256_PENDING",
+          "reviewedAt": "2026-08-15T16:21:01Z",
+          "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-10T23:25:00Z"
+      "lastReviewedAt": "2026-08-15T16:21:01Z"
     },
     {
       "id": "umap-gpu",

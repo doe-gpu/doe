@@ -175,6 +175,11 @@ function providerEnvironment(provider, modules) {
   };
 }
 
+function providerModulePath(provider, modules) {
+  if (provider === 'ambient-node-webgpu') return 'ambient-resolution:webgpu';
+  return provider === 'dawn-node-webgpu' ? modules.dawn : modules.doe;
+}
+
 async function probeProvider(options, experimentRoot, provider, modules, hostHardware) {
   const result = await runProcess(
     process.execPath,
@@ -244,7 +249,9 @@ async function runCompatibilityRepro(options, experimentRoot, provider, modules)
     success: result.exitCode === 0
       && !result.timedOut
       && !result.crashed
-      && evidence?.setterAccepted === true,
+      && evidence?.setterAccepted === true
+      && evidence?.postDestroySetterAccepted === true
+      && evidence?.postDestroyClearAccepted === true,
   };
 }
 
@@ -252,6 +259,72 @@ function upstreamPass(evidence) {
   return evidence?.status === 'PASS'
     && Object.keys(evidence.assertions ?? {}).length > 0
     && Object.values(evidence.assertions).every(Boolean);
+}
+
+function replayEvidence(evidence) {
+  return {
+    status: evidence?.status ?? null,
+    assertions: evidence?.assertions ?? null,
+    snapshot: evidence?.snapshot ?? null,
+    reference: evidence?.reference ?? null,
+    lifecycle: evidence?.lifecycle ?? null,
+    errors: evidence?.errors ?? null,
+  };
+}
+
+async function runReceiptReplay({
+  options,
+  experimentRoot,
+  outDir,
+  laneId,
+  provider,
+  modules,
+  sourceRun,
+  immutableInputs,
+}) {
+  const relativeReceiptPath = `replay-receipts/${laneId}.json`;
+  const receiptPath = resolve(outDir, relativeReceiptPath);
+  await mkdir(dirname(receiptPath), { recursive: true });
+  const expectedEvidenceSha256 = sha256Text(JSON.stringify(
+    replayEvidence(sourceRun.upstreamEvidence),
+  ));
+  const receipt = {
+    schemaVersion: 1,
+    artifactKind: 'vgpu-node-ort-snapshot-replay-receipt',
+    laneId,
+    provider,
+    providerModulePath: providerModulePath(provider, modules),
+    workloadPath: immutableInputs.workload.path,
+    immutableInputs,
+    expectedEvidenceSha256,
+  };
+  await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+
+  const loadedReceipt = JSON.parse(await readFile(receiptPath, 'utf8'));
+  const expectedProviderModule = providerModulePath(provider, modules);
+  if (loadedReceipt.provider !== provider
+    || loadedReceipt.providerModulePath !== expectedProviderModule
+    || loadedReceipt.expectedEvidenceSha256 !== expectedEvidenceSha256) {
+    throw new Error(`${laneId} replay receipt did not preserve the frozen execution contract`);
+  }
+  const run = await runWorkload(
+    options,
+    experimentRoot,
+    outDir,
+    laneId,
+    provider,
+    options.cleanProcessRuns,
+    modules,
+  );
+  const actualEvidenceSha256 = sha256Text(JSON.stringify(replayEvidence(run.upstreamEvidence)));
+  return {
+    status: run.success && actualEvidenceSha256 === expectedEvidenceSha256 ? 'passed' : 'failed',
+    receiptPath: relativeReceiptPath,
+    receiptSha256: await sha256(receiptPath),
+    expectedEvidenceSha256,
+    actualEvidenceSha256,
+    run,
+  };
 }
 
 async function runWorkload(
@@ -311,7 +384,7 @@ async function runWorkload(
   return {
     laneId,
     provider,
-    providerModulePath: provider === 'dawn-node-webgpu' ? modules.dawn : modules.doe,
+    providerModulePath: providerModulePath(provider, modules),
     cleanProcessIndex: index + 1,
     success,
     ...result,
@@ -397,8 +470,6 @@ async function main() {
     typescript: resolve(experimentRoot, 'node_modules/typescript/lib/typescript.js'),
   };
   await Promise.all(Object.values(modules).map((modulePath) => access(modulePath)));
-  const ambientDawnModule = process.env.DOE_EXTERNAL_AMBIENT_DAWN_MODULE?.trim() || null;
-  if (ambientDawnModule !== null) await access(ambientDawnModule);
 
   const hostHardware = await inspectHostHardware();
   const providerIds = ['dawn-node-webgpu', 'doe-gpu'];
@@ -426,7 +497,24 @@ async function main() {
       runs.push(run);
       process.stdout.write(`[${provider}] process ${index + 1}: ${run.success ? 'PASS' : 'FAIL'}\n`);
     }
-    providers[provider] = { probe, compatibilityRepro, summary: summarize(runs), runs };
+    const replay = await runReceiptReplay({
+      options,
+      experimentRoot,
+      outDir,
+      laneId,
+      provider,
+      modules,
+      sourceRun: runs[0],
+      immutableInputs,
+    });
+    process.stdout.write(`[${provider}] receipt replay: ${replay.status.toUpperCase()}\n`);
+    providers[provider] = {
+      probe,
+      compatibilityRepro,
+      replay,
+      summary: summarize(runs),
+      runs,
+    };
   }
 
   const ownershipRuns = [];
@@ -441,24 +529,17 @@ async function main() {
       modules,
     ));
   }
-  if (ambientDawnModule !== null) {
-    const ambientModules = { ...modules, dawn: ambientDawnModule };
-    for (let index = 0; index < options.cleanProcessRuns; index += 1) {
-      ownershipRuns.push(await runWorkload(
-        options,
-        experimentRoot,
-        outDir,
-        'I0',
-        'dawn-node-webgpu',
-        index,
-        ambientModules,
-      ));
-    }
+  for (let index = 0; index < options.cleanProcessRuns; index += 1) {
+    ownershipRuns.push(await runWorkload(
+      options,
+      experimentRoot,
+      outDir,
+      'I0',
+      'ambient-node-webgpu',
+      index,
+      modules,
+    ));
   }
-  const incompleteGovernance = [
-    'receipt-driven replay not exercised',
-    'frozen lifecycle failure-injection suite not exercised',
-  ];
   for (const [provider, laneId] of [
     ['dawn-node-webgpu', 'W0'],
     ['doe-gpu', 'D0'],
@@ -467,14 +548,24 @@ async function main() {
     ownershipRuns.push({
       laneId,
       provider,
-      providerModulePath: provider === 'dawn-node-webgpu' ? modules.dawn : modules.doe,
+      providerModulePath: providerModulePath(provider, modules),
       success: providerResult.probe.hardwareEligible
         && providerResult.compatibilityRepro.success
+        && providerResult.replay.status === 'passed'
         && providerResult.summary.failures === 0,
-      contractComplete: false,
-      constructionIssues: incompleteGovernance,
+      contractComplete: providerResult.compatibilityRepro.success
+        && providerResult.replay.status === 'passed',
+      constructionIssues: [
+        ...(providerResult.compatibilityRepro.success
+          ? []
+          : ['frozen lifecycle failure-injection suite failed']),
+        ...(providerResult.replay.status === 'passed'
+          ? []
+          : ['receipt-driven replay failed']),
+      ],
       probe: providerResult.probe,
       compatibilityRepro: providerResult.compatibilityRepro,
+      replay: providerResult.replay,
       reliability: providerResult.summary,
     });
   }
@@ -482,7 +573,7 @@ async function main() {
     runs: ownershipRuns,
     plan: harness.runtimeOwnershipPlan,
     planSha256: sha256Text(JSON.stringify(harness.runtimeOwnershipPlan)),
-    ambientModuleSupplied: ambientDawnModule !== null,
+    ambientModuleSupplied: true,
   });
 
   const generatedAt = new Date().toISOString();
@@ -540,6 +631,7 @@ async function main() {
       softwareRenderer: providers[provider].probe.softwareRenderer,
       hardwareEligible: providers[provider].probe.hardwareEligible,
       compatibilityRepro: providers[provider].compatibilityRepro,
+      replay: providers[provider].replay,
       reliability: providers[provider].summary,
     }])),
     shader: immutableInputs.shader,

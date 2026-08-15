@@ -39,10 +39,10 @@ HoloScript is the reference partial-matrix implementation. Its runner emits
 `I1`, `W0`, and `D0` separately and accepts an ambient incumbent module only
 through the explicit `DOE_EXTERNAL_AMBIENT_DAWN_MODULE` input. The vGPU runner
 uses the same shared lane summarizer, but marks its governed `W0` and `D0`
-constructions partial until receipt-driven replay and the frozen lifecycle
-failure-injection suite execute. Both runners record absent or incomplete
-lanes rather than aliasing a pinned incumbent into `I0` or promoting a partial
-matrix.
+constructions partial unless a hash-bound application receipt reproduces the
+same oracle evidence and the frozen post-destroy error-handler regression
+passes. Both runners record absent or incomplete lanes rather than aliasing a
+pinned incumbent into `I0` or promoting a partial matrix.
 
 ## Portable preparation and reproduction
 

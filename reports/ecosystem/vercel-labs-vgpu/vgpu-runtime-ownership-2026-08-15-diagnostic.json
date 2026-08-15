@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "vgpu-runtime-ownership-2026-08-15-diagnostic",
+  "actorId": "vercel-labs-vgpu",
+  "harnessId": "node-ort-snapshot",
+  "generatedAt": "2026-08-15T16:20:06.465Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-15T16:21:01Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "12",
+  "upstream": {
+    "repositoryUrl": "https://github.com/vercel-labs/vgpu",
+    "commit": "86f2cadbd7a087f1695d736a12e218ab1ea2fc63",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "complete-runtime-ownership-matrix",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "I0, I1, W0, and D0 all passed the exact ORT/vGPU oracle. W0 and D0 also passed hash-bound application replay and the frozen post-destroy error-handler lifecycle regression on the physical AMD Vulkan adapter.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/raw-matrix.json",
+          "sha256": "44aed4942d163ec8b7bdc65dee3c407ec2dddf052ef4fcad2ab79ee1274dbbb2"
+        },
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/receipt-summary.json",
+          "sha256": "83f520cff6cd5b832aa4993f0aa3048101cdff6ccf08030252f6c0cb56a2ae43"
+        }
+      ]
+    },
+    {
+      "id": "owned-runtime-not-distinguished",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "D0 did not produce a lifecycle outcome unavailable from W0. Both governed lanes passed the same oracle, post-destroy regression, and replay identity, so this diagnostic assigns no unique lifecycle-control value to DoeRuntime.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/receipt-summary.json",
+          "sha256": "83f520cff6cd5b832aa4993f0aa3048101cdff6ccf08030252f6c0cb56a2ae43"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Three clean processes per lane remain diagnostic and do not satisfy the promotion reliability floor.",
+    "The selected failure injection covers the retained post-destroy error-handler regression, not device loss, concurrency, leak growth, or the full lifecycle surface.",
+    "Clean-process durations are diagnostic and do not constitute matched selected-operation performance evidence.",
+    "P0 is conditional for lifecycle control and was not required because no bounded incumbent correction claim was adjudicated.",
+    "The result does not justify making vGPU a DoeRuntime release blocker."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 429789184
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 382537728
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The diagnostic records clean-process durations but does not run the frozen selected-operation performance protocol."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "Matched traced and untraced receipt-overhead samples were not collected."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "retain-diagnostic",
+    "claimedProperty": "lifecycle-control",
+    "lanes": {
+      "I0": {
+        "status": "pass",
+        "summary": "The unchanged application resolved its ordinary workspace WebGPU provider and passed three clean oracle runs."
+      },
+      "I1": {
+        "status": "pass",
+        "summary": "The explicitly pinned Dawn module passed three clean oracle runs."
+      },
+      "W0": {
+        "status": "pass",
+        "summary": "Pinned Dawn plus governed identity, lifecycle injection, receipt, and replay passed."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "DoeRuntime under the identical governed contract passed."
+      },
+      "P0": {
+        "status": "not-run",
+        "summary": "The lifecycle-control hypothesis did not require an independent-correction patch control."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "D0 did not materially exceed W0 on the frozen lifecycle outcome; both passed every exercised obligation."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "No unique application benefit was measured to repay DoeRuntime's additional source, compatibility, security, packaging, and support obligations."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The diagnostic reused a prepared workspace and provider-loader substitution rather than a production installation path."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "The preparation receipt and governed provider probes bind execution to the physical Radeon 8060S RADV adapter."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic uses sequential clean processes."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Every workload and replay passed the existing vGPU teardown assertions and the post-destroy handler regression."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Promotion-scale stress and device-loss injection were not run."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process memory was recorded, but bounded-growth leak testing was not run."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The reviewed raw matrix, summary, and per-provider replay receipts are hash-bound."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "W0 and D0 each reproduced the exact frozen application evidence hash from a persisted replay receipt."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No selected-operation performance decision was run."
+    },
+    "ownership": {
+      "status": "fail",
+      "summary": "The matrix is complete, but D0 supplies no measured lifecycle advantage over W0."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "vGPU remains a diagnostic integration and is not a DoeRuntime release blocker."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/receipt-summary.json",
+      "sha256": "83f520cff6cd5b832aa4993f0aa3048101cdff6ccf08030252f6c0cb56a2ae43"
+    },
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/replay-receipts/W0.json",
+      "sha256": "2718236e948dd420acfefba9be325ac7225e558632aefd11346ba02e55c6c71f"
+    },
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/replay-receipts/D0.json",
+      "sha256": "3c6c54866b8f230519fe175e73f89a91cf2ef4b6c55c7e71c6badbdcc352f949"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/raw-matrix.json",
+      "sha256": "44aed4942d163ec8b7bdc65dee3c407ec2dddf052ef4fcad2ab79ee1274dbbb2"
+    }
+  ]
+}
