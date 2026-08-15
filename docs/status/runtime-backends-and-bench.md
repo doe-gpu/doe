@@ -162,6 +162,13 @@ file only names the promoted boundary and open admission gates.
   The reviewed report hash-links its manifest, preparation, raw matrix, summary,
   and gate outputs; maturity remains diagnostic until downstream promotion
   policy is satisfied.
+- The reviewed vGPU ownership diagnostic at
+  `reports/ecosystem/vercel-labs-vgpu/vgpu-runtime-ownership-2026-08-15-diagnostic.json`
+  completes `I0`, `I1`, `W0`, and `D0` on the same application oracle. Both
+  governed lanes reproduce a hash-bound application receipt and pass the
+  retained post-destroy error-handler regression. DoeRuntime does not exceed
+  the governed incumbent on the frozen lifecycle outcome, so the report keeps
+  vGPU diagnostic and assigns no runtime-ownership credit.
 - The pinned wgsl-fns compilation application now declares its upstream build
   as a separate installation step. The reviewed diagnostic at
   `reports/ecosystem/wgsl-fns/wgsl-fns-compilation-suite-amd-vulkan-2026-08-10-diagnostic.json`

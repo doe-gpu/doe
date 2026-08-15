@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import { access, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -176,7 +177,7 @@ function providerEnvironment(provider, modules) {
 }
 
 function providerModulePath(provider, modules) {
-  if (provider === 'ambient-node-webgpu') return 'ambient-resolution:webgpu';
+  if (provider === 'ambient-node-webgpu') return modules.ambient;
   return provider === 'dawn-node-webgpu' ? modules.dawn : modules.doe;
 }
 
@@ -465,6 +466,7 @@ async function main() {
   };
   const preparationEvidence = await readPreparationEvidence(options.preparationReceipt);
   const modules = {
+    ambient: createRequire(resolve(experimentRoot, 'package.json')).resolve('webgpu'),
     dawn: resolve(experimentRoot, 'node_modules/webgpu/index.js'),
     doe: resolve(repoRoot, 'packages/doe-gpu/src/index.js'),
     typescript: resolve(experimentRoot, 'node_modules/typescript/lib/typescript.js'),

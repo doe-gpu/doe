@@ -74,6 +74,13 @@ predeclared runtime-ownership plan and reviewed attribution showing whether the
 application should use DoeRuntime or DoeProof after the governed incumbent
 controls and ownership costs are considered.
 
+The current vGPU diagnostic completes its required `I0`, `I1`, `W0`, and `D0`
+execution matrix, including application-level replay and its retained
+post-destroy lifecycle regression. DoeRuntime and the governed incumbent pass
+the same exercised lifecycle outcome, so the reviewed decision assigns no
+runtime-ownership credit and keeps vGPU diagnostic. A complete lane matrix is
+evidence; it is not a promotion when the material outcome fails.
+
 ## Evidence routing
 
 - Checked-in harness manifests, minimal patches, immutable inputs, and reviewed
