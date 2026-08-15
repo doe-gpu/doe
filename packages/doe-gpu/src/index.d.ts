@@ -58,6 +58,20 @@ export interface FastPathStats {
   commandBufferBuild: number;
 }
 
+export interface ProviderDiagnostics {
+  fastPathStats: FastPathStats;
+  queueSubmitCalls: number;
+  submittedCommandBuffers: number;
+  submittedBatchedCommands: number;
+  queueWriteBufferCalls: number;
+  queueWriteBufferBytes: number;
+  queueWriteBufferTotalNs: number;
+  queueWriteBufferBatchCalls: number;
+  queueWriteBufferBatchTotalNs: number;
+  mapReadCalls: number;
+  submitBreakdownNs: Record<string, number>;
+}
+
 export interface NativeFastPathInfo {
   appleFastPathCompiled: boolean;
   queueFlush: boolean;
@@ -268,6 +282,7 @@ export const requestRawDevice: typeof requestDevice;
 export function requestBoundDevice(options?: RequestDeviceOptions): Promise<FullBoundDoeNamespace>;
 export function providerInfo(): ProviderInfo;
 export function nativeFastPathInfo(): NativeFastPathInfo | null;
+export function providerDiagnostics(): ProviderDiagnostics;
 export function prewarmPreparedDispatches(
   queue: GPUQueue,
   dispatchCommands: PreparedDispatchPrewarmCommand[]
@@ -347,6 +362,7 @@ declare const _default: {
   requestBoundDevice: typeof requestBoundDevice;
   providerInfo: typeof providerInfo;
   nativeFastPathInfo: typeof nativeFastPathInfo;
+  providerDiagnostics: typeof providerDiagnostics;
   prewarmPreparedDispatches: typeof prewarmPreparedDispatches;
   nativeQueueSyncInfo: typeof nativeQueueSyncInfo;
   nativePipelineCacheInfo: typeof nativePipelineCacheInfo;

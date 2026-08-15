@@ -55,6 +55,18 @@ function resolveProvider(providerId) {
   return provider;
 }
 
+async function captureProviderDiagnostics(provider) {
+  if (provider.executionProvider !== 'doe') {
+    return null;
+  }
+  const diagnosticsModule = await importFromPath(
+    resolveRepoPath('packages/doe-gpu/src/vendor/webgpu/index.js'),
+  );
+  return typeof diagnosticsModule.providerDiagnostics === 'function'
+    ? diagnosticsModule.providerDiagnostics()
+    : null;
+}
+
 function resolveDopplerSourceIdentity(scenario) {
   const sourceCommit = execFileSync(
     'git',
@@ -302,14 +314,6 @@ async function main() {
     const runStartedMs = nowMs();
     const envelope = await dopplerRunner.runNodeCommand(requestBundle.request, {});
     const runResolvedMs = nowMs();
-    const providerRelease = typeof releaseProvider === 'function'
-      ? await releaseProvider()
-      : {
-          supported: false,
-          reason: 'pinned Doppler source predates explicit provider release contract',
-        };
-    releaseProvider = null;
-
     const resultSummary = {
       modelId: scenario.doppler.modelId,
       ...summarizeDopplerEnvelope(envelope),
@@ -330,6 +334,63 @@ async function main() {
       promptSynthesisMs: promptResolvedMs - promptStartedMs,
       commandRunMs: runResolvedMs - runStartedMs,
     };
+    const providerDiagnosticsBeforeRelease = await captureProviderDiagnostics(provider);
+    const commonExtraMeta = {
+      vendorStack: 'doppler-node',
+      cacheMode: scenario.cacheMode,
+      loadMode: requestBundle.modelSource.loadMode,
+      modelSource: requestBundle.modelSource.modelSource,
+      runtimeProfile: scenario.doppler.runtimeProfile,
+      providerModulePath: provider.modulePath,
+      providerModuleSha256,
+      providerContractPath,
+      providerContractSha256,
+      providerReceipt,
+      ...dopplerSourceIdentity,
+      modelManifestPath,
+      modelManifestSha256,
+    };
+
+    // Persist the completed inference before provider teardown. Some native
+    // incumbents can terminate the process inside close(); retaining this
+    // provisional trace keeps correctness evidence distinct from lifecycle
+    // failure instead of losing both claims at once.
+    await writeVendorNodeSuccessTrace({
+      benchmarkLane,
+      executionProvider: provider.executionProvider,
+      executionProviderName: provider.executionProviderName,
+      traceMetaPath: args.traceMetaPath,
+      traceJsonlPath: args.traceJsonlPath,
+      workloadId: args.workloadId,
+      scenarioId,
+      executionBackend: provider.executionBackend,
+      executionLabel: provider.executionLabel,
+      processWallMs: nowMs() - startedMs,
+      adapterInfo: null,
+      phaseTimingsMs,
+      promptSummary,
+      resultSummary,
+      extraMeta: {
+        ...commonExtraMeta,
+        lifecycleEvidenceState: 'inference-complete-release-pending',
+        providerRelease: {
+          released: false,
+          provider: providerReceipt?.selectedProviderId ?? null,
+          reason: 'pending',
+          receipt: providerReceipt,
+        },
+        providerDiagnostics: providerDiagnosticsBeforeRelease,
+      },
+    });
+
+    const providerRelease = typeof releaseProvider === 'function'
+      ? await releaseProvider()
+      : {
+          supported: false,
+          reason: 'pinned Doppler source predates explicit provider release contract',
+        };
+    releaseProvider = null;
+    const providerDiagnostics = await captureProviderDiagnostics(provider);
 
     await writeVendorNodeSuccessTrace({
       benchmarkLane,
@@ -347,20 +408,10 @@ async function main() {
       promptSummary,
       resultSummary,
       extraMeta: {
-        vendorStack: 'doppler-node',
-        cacheMode: scenario.cacheMode,
-        loadMode: requestBundle.modelSource.loadMode,
-        modelSource: requestBundle.modelSource.modelSource,
-        runtimeProfile: scenario.doppler.runtimeProfile,
-        providerModulePath: provider.modulePath,
-        providerModuleSha256,
-        providerContractPath,
-        providerContractSha256,
-        providerReceipt,
+        ...commonExtraMeta,
+        lifecycleEvidenceState: 'release-complete',
         providerRelease,
-        ...dopplerSourceIdentity,
-        modelManifestPath,
-        modelManifestSha256,
+        providerDiagnostics,
       },
     });
   } catch (error) {

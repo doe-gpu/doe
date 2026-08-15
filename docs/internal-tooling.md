@@ -6,11 +6,17 @@ the manifest disagree, the manifest wins.
 ## Public surface
 
 `packages/doe-gpu/` is the public npm package. Its `package.json` owns exports
-and packaged files; its README owns user-facing installation and examples.
+and packaged files, including the `doe-proof-node` executable; its README owns
+user-facing installation, contract, and examples.
 
 Advanced JavaScript helpers remain public when exported by the manifest, even
 when their primary use is repository evidence. That is semver surface, not
 authorization to describe repo-only CLIs as npm product features.
+
+`doe-proof-node` is the narrow public exception: it operates only on the
+provider-neutral governed process contract and cannot promote benchmark,
+runtime-ownership, or release claims. Other benchmark and release CLIs remain
+repo-only.
 
 ## Repo-only surface
 

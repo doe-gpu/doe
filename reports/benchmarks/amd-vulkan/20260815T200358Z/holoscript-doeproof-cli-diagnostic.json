@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doeproof-cli-integration-diagnostic",
+  "evidenceMaturity": "diagnostic",
+  "status": "passed",
+  "workload": {
+    "actorId": "holoscript-snn-webgpu",
+    "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "application": "unchanged pinned HoloScript tropical-SpMV workload",
+    "oracle": "independent CPU tropical min-plus SpMV with frozen exact output identity"
+  },
+  "plan": {
+    "id": "holoscript-tropical-spmv-doeproof-cli-qm0-v1",
+    "path": "bench/external-projects/holoscript-snn-webgpu/doeproof-cli-integration.plan.json",
+    "sha256": "2e37cc0b9fb46ae3943297eb0b841314894b642fb9c6d1ab7ac31c7a1f4e97ef"
+  },
+  "evidence": {
+    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-qm0-v1-retry3/result.json",
+    "sha256": "9f63c1d1ca978361f02027b676a24b6a20b4626422b622f91601a25a7858649d"
+  },
+  "implementation": {
+    "bin": {
+      "path": "packages/doe-gpu/bin/doe-proof-node.js",
+      "sha256": "6881fbef17168a5893c1f78e39537d0b708518001282c0b5fa2e60ec24fd2b95"
+    },
+    "cli": {
+      "path": "packages/doe-gpu/src/node-webgpu-process-cli.js",
+      "sha256": "c1c4b841d8398f08f04d6cd7ead910b995d0ffeeb67d7fd42f7c99147388fefc"
+    },
+    "processRunner": {
+      "path": "packages/doe-gpu/src/node-webgpu-process.js",
+      "sha256": "ca6f162c4b10a417783fc4af7ecd85517e566194bcef9303babead8de165d0b8"
+    },
+    "loader": {
+      "path": "packages/doe-gpu/src/node-webgpu-loader.js",
+      "sha256": "c76023c803e868d66bf95cd7d90efc91b4cb35459684e7d0a0c28e8b607b34ab"
+    },
+    "contractSchema": {
+      "path": "packages/doe-gpu/assets/governed-node-webgpu-process-contract.schema.json",
+      "sha256": "178bc4b5b81c0a3b925fb99aa07d865003a0b6d740cee42a84486ba39d0c4f54"
+    },
+    "evaluator": {
+      "path": "bench/external-projects/holoscript-snn-webgpu/evaluate-doeproof-cli-output.mjs",
+      "sha256": "6959f0c60d634700e3f4ef2974d76f8ce478cf1847fe4812a96803534119e658"
+    },
+    "runner": {
+      "path": "bench/external-projects/holoscript-snn-webgpu/run-doeproof-cli-integration.mjs",
+      "sha256": "55c837ba977c7dc37318045cc492486b42440cc75a8fcb21bd81591e20620472"
+    }
+  },
+  "commands": {
+    "run": "passed for W0 and D0",
+    "verify": "passed for W0, D0, and D0 replay without evaluator execution",
+    "inspect": "passed for W0 and D0",
+    "compare": "W0/D0 and D0/replay exact-output comparisons passed",
+    "replay": "D0 semantic workload and execution identities reproduced"
+  },
+  "lanes": {
+    "W0": {
+      "providerId": "dawn-node-webgpu",
+      "artifactSha256": "33fb36781216f254be66fe0941a46477dbaceed846bba2a5a7ed079e1ad8a69e",
+      "receiptValid": true,
+      "oracle": "pass",
+      "workloadReplaySha256": "sha256:1063db8739e1e6e3d5fa552b10c3bee208353ff9e9df3147e2ccb203983eee7d"
+    },
+    "D0": {
+      "providerId": "doe-gpu",
+      "artifactSha256": "67cd122b5b80b5a5a32b533beaad7a5dd656b4bc6e7d7bfe2eb02d00746314d8",
+      "replayArtifactSha256": "36968c4d28f1f04f9871b07c9d6074cd1875f887c9581d016ab21e4c7662cba2",
+      "receiptValid": true,
+      "oracle": "pass",
+      "workloadReplaySha256": "sha256:1063db8739e1e6e3d5fa552b10c3bee208353ff9e9df3147e2ccb203983eee7d",
+      "executionReplayMatched": true
+    }
+  },
+  "comparison": {
+    "comparable": true,
+    "sameWorkload": true,
+    "sameOutput": true,
+    "performanceInterpretable": false,
+    "runtimeOwnershipCredit": false
+  },
+  "decision": {
+    "publicDoeProofCli": "authorized",
+    "runtimeOwnershipCredit": false,
+    "performanceCredit": false,
+    "releaseCredit": false,
+    "terminalOwnershipDecisionChanged": false
+  },
+  "limitations": [
+    "This is one real-application diagnostic, not the promotion reliability floor.",
+    "The contract binds provider entrypoint files, not complete transitive dependency closures.",
+    "The run does not establish application adoption or release-blocker status.",
+    "The terminal HoloScript runtime-ownership rejection remains authoritative."
+  ]
+}

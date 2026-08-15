@@ -154,7 +154,11 @@ function publishLimits(queried) {
   for (const name of DOE_LIMIT_NAMES) {
     const value = queried[name];
     if (isPublishedLimitValue(value)) {
-      published[name] = ALIGNMENT_LIMIT_NAMES.has(name) ? value : Math.min(value, DOE_LIMITS[name]);
+      // Native adapter/device queries are the authority for the selected
+      // backend. DOE_LIMITS is a fallback contract, not a ceiling: clamping a
+      // larger hardware limit silently changes application path selection
+      // (for example, forcing large GPU-resident weights into CPU streaming).
+      published[name] = value;
       sawNativeValue = true;
       continue;
     }

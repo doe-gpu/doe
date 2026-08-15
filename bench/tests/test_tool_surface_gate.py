@@ -108,6 +108,31 @@ def test_complete_package_exports_pass() -> None:
     assert result["ok"], result["failures"]
 
 
+def test_package_bin_must_be_declared_and_then_passes() -> None:
+    surface = _surface()
+    surface["entrypoints"].append("packages/doe-gpu/src/node-webgpu.js")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        root = Path(tmpdir)
+        _write_package_fixture(root)
+        package_path = root / "packages/doe-gpu/package.json"
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+        package["bin"] = {"doe-proof-node": "./bin/doe-proof-node.js"}
+        _write_json(package_path, package)
+        bin_path = root / "packages/doe-gpu/bin/doe-proof-node.js"
+        bin_path.parent.mkdir(parents=True, exist_ok=True)
+        bin_path.write_text("", encoding="utf-8")
+
+        missing = gate.evaluate_manifest(_manifest(surface), root)
+        surface["entrypoints"].append("packages/doe-gpu/bin/doe-proof-node.js")
+        complete = gate.evaluate_manifest(_manifest(surface), root)
+
+    assert any(
+        item["code"] == "package_bin_missing_from_surface"
+        for item in missing["failures"]
+    )
+    assert complete["ok"], complete["failures"]
+
+
 def test_missing_declared_entrypoint_fails() -> None:
     surface = _surface()
     surface["entrypoints"].append("packages/doe-gpu/src/missing.js")

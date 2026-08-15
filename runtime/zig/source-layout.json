@@ -737,7 +737,7 @@
       },
       "src/backend/dropin_capabilities.zig": {
         "decision": "Keep",
-        "moduleSha256": "677fd749f918f998663361b90ecf613efc8c08b19bf870c8b9ef5de76e5f846e",
+        "moduleSha256": "962553f15d24f363a0b1ee45e16fb57a4590c9e7f23cbf7d16cafa2744abe1d7",
         "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
@@ -968,6 +968,12 @@
         "moduleSha256": "742ab4b261ee6cb06b3496545bc13d997a60e1a4328700857059abfba17df26d",
         "reason": "Keep: owns Vulkan device/queue runtime lifetime and synchronization; adjacent resource, pipeline, upload, render, and surface capsules already own the separable domains.",
         "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
+      },
+      "src/backend/vulkan/vk_adapter_probe.zig": {
+        "decision": "Keep",
+        "moduleSha256": "f3470c80c3cdfc7da3c2f0a03d7653c68782239813a85ae2169c50bffe5b0ff2",
+        "reason": "Keep: owns the single-selection binding between Vulkan adapter identity, feature capabilities, and hardware limits.",
+        "reviewer": "codex-runtime-ownership/2026-08-15"
       },
       "src/backend/vulkan/vk_async_dispatch.zig": {
         "decision": "Keep",
@@ -3131,7 +3137,7 @@
       },
       "src/native/lifecycle/doe_instance_device_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "0291b9c5a647322807016083b0723f12465f36ce563c663abe942cf8c61eaef0",
+        "moduleSha256": "752d7f68c886a553cc40c9082610d34df69115c6298a6f74fbbd3c4d52d347c0",
         "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
       },
@@ -3293,7 +3299,7 @@
       },
       "src/native/support/doe_device_caps.zig": {
         "decision": "Keep",
-        "moduleSha256": "555fdf13c91a0e7bfa84e306656c6ca3875b4f344f488cf6a379ce1941603760",
+        "moduleSha256": "15734661555ecb65ae12998ce4e4648e07099176e8dd4671b25877c26a9885eb",
         "reason": "Keep: reachable native implementation shared by 3 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },

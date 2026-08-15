@@ -187,15 +187,42 @@ credit. Select a new ownership candidate only from a measured property that a
 governed incumbent wrapper cannot reproduce; do not weaken or reinterpret a
 completed gate.
 
-The next admitted experiment is the Doppler local-AI package path, and only for
+The Doppler local-AI package experiment was admitted only for
 `persistent-performance-control`. The admission receipt at
 [`../reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json`](../reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json)
 records a comparable 16-sample AMD Vulkan control in which Doe retains an
 11.81% p50 and 16.30% p95 workload-wall advantage over prepared Node WebGPU
-after Doe's native dispatch-binding prewarm is explicitly disabled. This is a
-mechanism antecedent, not application credit: promotion still requires an
-unchanged, oracle-bound Doppler workload through the complete `I0/I1/W0/D0`
-contract, with a public-API incumbent optimization control if one is available.
+after Doe's native dispatch-binding prewarm is explicitly disabled.
+
+The application result at
+[`../reports/benchmarks/amd-vulkan/20260815T182649Z/doppler-provider-runtime-ownership-diagnostic.json`](../reports/benchmarks/amd-vulkan/20260815T182649Z/doppler-provider-runtime-ownership-diagnostic.json)
+is terminal for that frozen hypothesis. Doe runs the unchanged Doppler workload
+correctly and releases its provider cleanly, but it is materially slower than
+the governed incumbent on the selected user-visible operation. The synthetic
+antecedent therefore does not transfer and supplies no runtime-ownership
+credit. The incumbent teardown abort is retained as lifecycle evidence only;
+it cannot be repurposed into a lifecycle-control win without a separately
+frozen hypothesis, bounded-patch control, and lifecycle acceptance rule.
+
+A later bounded diagnostic found that the package provider was clamping native
+Radeon limits to Doe's conservative fallback table. The corrected provider
+binds limits and features to the selected physical-device identity and publishes
+the queried limits without that ceiling. On the exact bounded one-token case,
+the corrected path preserves output identity and reduces prefill from
+14,676.65 ms to 175.99 ms while increasing model-load time from 22,180.23 ms to
+41,618.68 ms. The receipt is
+[`../reports/benchmarks/amd-vulkan/20260815T190434Z/doppler-provider-capability-publication-diagnostic.json`](../reports/benchmarks/amd-vulkan/20260815T190434Z/doppler-provider-capability-publication-diagnostic.json).
+This mechanism result does not reopen or reinterpret the prior gate. It may
+admit only a new, versioned W0/D0 comparison whose frozen user-visible operation
+includes model load, repeated inference, exact output, and teardown.
+
+That new comparison is terminal at
+[`../reports/benchmarks/amd-vulkan/20260815T190434Z/doppler-provider-corrected-runtime-result.json`](../reports/benchmarks/amd-vulkan/20260815T190434Z/doppler-provider-corrected-runtime-result.json).
+W0 and D0 produce identical output, and Doe releases cleanly. Doe nevertheless
+takes 67,683.30 ms versus W0's 50,481.15 ms on the complete session and
+5,535.60 ms versus 1,334.69 ms on median timed inference. It misses both frozen
+5% requirements, so the corrected Doppler performance family is retired without
+tuning. W0's post-release native abort remains lifecycle evidence only.
 
 ## Expansion admission
 

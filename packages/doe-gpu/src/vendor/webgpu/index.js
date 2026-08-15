@@ -128,6 +128,18 @@ const TEXTURE_SWIZZLE_COMPONENT_MAP = Object.freeze({
 const NS_PER_MS = 1_000_000;
 const WHOLE_SIZE_SENTINEL = -1;
 const fastPathStats = { dispatchFlush: 0, flushAndMap: 0, commandBufferBuild: 0 };
+const providerDiagnosticStats = {
+  queueSubmitCalls: 0,
+  submittedCommandBuffers: 0,
+  submittedBatchedCommands: 0,
+  queueWriteBufferCalls: 0,
+  queueWriteBufferBytes: 0,
+  queueWriteBufferTotalNs: 0,
+  queueWriteBufferBatchCalls: 0,
+  queueWriteBufferBatchTotalNs: 0,
+  mapReadCalls: 0,
+  submitBreakdownNs: zeroQueueSubmitBreakdown(),
+};
 const PROVIDER_FAILURE_REASONS = Object.freeze([
   'native_webgpu_unavailable',
   'native_addon_unavailable',
@@ -1689,25 +1701,40 @@ function zeroQueueSubmitBreakdown() {
 
 function accumulateQueueSubmitBreakdown(queue, field, startedAtMs) {
   if (!startedAtMs) return;
-  queue._submitBreakdownNs[field] += elapsedNsSince(startedAtMs);
+  accumulateQueueSubmitValue(queue, field, elapsedNsSince(startedAtMs));
+}
+
+function accumulateQueueSubmitValue(queue, field, value) {
+  const normalized = Number(value ?? 0);
+  queue._submitBreakdownNs[field] += normalized;
+  providerDiagnosticStats.submitBreakdownNs[field] += normalized;
+}
+
+function accumulateProviderDiagnosticTime(field, startedAtMs) {
+  if (!startedAtMs) return;
+  providerDiagnosticStats[field] += elapsedNsSince(startedAtMs);
 }
 
 function accumulateAddonSubmitBreakdown(queue, addonBreakdown) {
   if (!addonBreakdown || typeof addonBreakdown !== 'object') {
     return;
   }
-  queue._submitBreakdownNs.submitAddonCommandReplayTotalNs += Number(addonBreakdown.commandReplayNs ?? 0);
-  queue._submitBreakdownNs.submitAddonCommandReplayPrepareTotalNs += Number(addonBreakdown.commandReplayPrepareNs ?? 0);
-  queue._submitBreakdownNs.submitAddonCommandReplayRecordTotalNs += Number(addonBreakdown.commandReplayRecordNs ?? 0);
-  queue._submitBreakdownNs.submitAddonCommandReplayCopyTotalNs += Number(addonBreakdown.commandReplayCopyNs ?? 0);
-  queue._submitBreakdownNs.submitAddonQueueSubmitTotalNs += Number(addonBreakdown.queueSubmitNs ?? 0);
-  queue._submitBreakdownNs.submitAddonCommandBufferEndTotalNs += Number(addonBreakdown.commandBufferEndNs ?? 0);
-  queue._submitBreakdownNs.submitAddonSyncPrepareTotalNs += Number(addonBreakdown.syncPrepareNs ?? 0);
-  queue._submitBreakdownNs.submitAddonDriverSubmitTotalNs += Number(addonBreakdown.driverSubmitNs ?? 0);
-  queue._submitBreakdownNs.submitAddonFlushTotalNs += Number(addonBreakdown.flushNs ?? 0);
-  queue._submitBreakdownNs.submitQueueFlushWaitCompletedTotalNs += Number(addonBreakdown.waitCompletedNs ?? 0);
-  queue._submitBreakdownNs.submitQueueFlushDeferredCopyTotalNs += Number(addonBreakdown.deferredCopyNs ?? 0);
-  queue._submitBreakdownNs.submitQueueFlushDeferredResolveTotalNs += Number(addonBreakdown.deferredResolveNs ?? 0);
+  for (const [field, sourceField] of [
+    ['submitAddonCommandReplayTotalNs', 'commandReplayNs'],
+    ['submitAddonCommandReplayPrepareTotalNs', 'commandReplayPrepareNs'],
+    ['submitAddonCommandReplayRecordTotalNs', 'commandReplayRecordNs'],
+    ['submitAddonCommandReplayCopyTotalNs', 'commandReplayCopyNs'],
+    ['submitAddonQueueSubmitTotalNs', 'queueSubmitNs'],
+    ['submitAddonCommandBufferEndTotalNs', 'commandBufferEndNs'],
+    ['submitAddonSyncPrepareTotalNs', 'syncPrepareNs'],
+    ['submitAddonDriverSubmitTotalNs', 'driverSubmitNs'],
+    ['submitAddonFlushTotalNs', 'flushNs'],
+    ['submitQueueFlushWaitCompletedTotalNs', 'waitCompletedNs'],
+    ['submitQueueFlushDeferredCopyTotalNs', 'deferredCopyNs'],
+    ['submitQueueFlushDeferredResolveTotalNs', 'deferredResolveNs'],
+  ]) {
+    accumulateQueueSubmitValue(queue, field, addonBreakdown[sourceField]);
+  }
 }
 
 function addonSubmitBreakdownIndicatesDispatchFlush(addonBreakdown) {
@@ -1735,9 +1762,9 @@ function accumulateQueueFlushBreakdown(queue, flushBreakdown) {
   if (!flushBreakdown || typeof flushBreakdown !== 'object') {
     return;
   }
-  queue._submitBreakdownNs.submitQueueFlushWaitCompletedTotalNs += Number(flushBreakdown.waitCompletedNs ?? 0);
-  queue._submitBreakdownNs.submitQueueFlushDeferredCopyTotalNs += Number(flushBreakdown.deferredCopyNs ?? 0);
-  queue._submitBreakdownNs.submitQueueFlushDeferredResolveTotalNs += Number(flushBreakdown.deferredResolveNs ?? 0);
+  accumulateQueueSubmitValue(queue, 'submitQueueFlushWaitCompletedTotalNs', flushBreakdown.waitCompletedNs);
+  accumulateQueueSubmitValue(queue, 'submitQueueFlushDeferredCopyTotalNs', flushBreakdown.deferredCopyNs);
+  accumulateQueueSubmitValue(queue, 'submitQueueFlushDeferredResolveTotalNs', flushBreakdown.deferredResolveNs);
 }
 
 function updatePassPipelineState(pass, pipelineNative) {
@@ -2592,6 +2619,7 @@ const fullSurfaceBackend = {
     if (mode !== globals.GPUMapMode.READ) {
       failValidation('GPUBuffer._mapReadCopyUnmap', 'only MAP_READ mode is supported');
     }
+    providerDiagnosticStats.mapReadCalls += 1;
     if (size === 0) {
       wrapper.__doe_readback_breakdown_ns = ZERO_READBACK_BREAKDOWN_NS;
       wrapper._mapMode = 0;
@@ -2778,6 +2806,13 @@ const fullSurfaceBackend = {
   queueSubmit(queue, queueNative, buffers) {
     const deviceNative = assertLiveResource(queue._device, 'GPUQueue.submit', 'GPUDevice');
     queue._submittedSerial += 1;
+    providerDiagnosticStats.queueSubmitCalls += 1;
+    providerDiagnosticStats.submittedCommandBuffers += buffers.length;
+    for (const commandBuffer of buffers) {
+      if (commandBuffer?._batched && Array.isArray(commandBuffer._commands)) {
+        providerDiagnosticStats.submittedBatchedCommands += commandBuffer._commands.length;
+      }
+    }
     if (buffers.length === 1 && buffers[0]?._batched && Array.isArray(buffers[0]._commands)) {
       const prepStartedAt = submitTimingStart();
       failIfSubmittedCommandBuffer(buffers[0], 0);
@@ -2970,12 +3005,24 @@ const fullSurfaceBackend = {
     if (view.byteLength === 0) {
       return;
     }
+    providerDiagnosticStats.queueWriteBufferCalls += 1;
+    providerDiagnosticStats.queueWriteBufferBytes += view.byteLength;
+    const writeStartedAt = submitTimingStart();
     addon.queueWriteBuffer(queueNative, bufferNative, bufferOffset, view);
     writeBufferHostShadowByNative(bufferNative, bufferOffset, view);
+    accumulateProviderDiagnosticTime('queueWriteBufferTotalNs', writeStartedAt);
   },
   queueWriteBufferBatch(_queue, queueNative, entries) {
     if (!entries.length) {
       return;
+    }
+    const batchStartedAt = submitTimingStart();
+    providerDiagnosticStats.queueWriteBufferBatchCalls += 1;
+    for (const entry of entries) {
+      if (entry.view.byteLength > 0) {
+        providerDiagnosticStats.queueWriteBufferCalls += 1;
+        providerDiagnosticStats.queueWriteBufferBytes += entry.view.byteLength;
+      }
     }
     const hasDataPtrBatch = typeof addon.queueWriteBufferBatchDataPtrs === 'function';
     const hasCompactBatch = typeof addon.queueWriteBufferBatch === 'function';
@@ -2986,10 +3033,12 @@ const fullSurfaceBackend = {
           writeBufferHostShadowByNative(entry.bufferNative, entry.bufferOffset, entry.view);
         }
       }
+      accumulateProviderDiagnosticTime('queueWriteBufferBatchTotalNs', batchStartedAt);
       return;
     }
     const nonEmptyEntries = entries.filter(entry => entry.view.byteLength > 0);
     if (!nonEmptyEntries.length) {
+      accumulateProviderDiagnosticTime('queueWriteBufferBatchTotalNs', batchStartedAt);
       return;
     }
     let byteLength = 0;
@@ -3016,6 +3065,7 @@ const fullSurfaceBackend = {
         writeBufferHostShadowByNative(entry.bufferNative, entry.bufferOffset, entry.view);
       }
       addon.queueWriteBufferBatchDataPtrs(queueNative, buffers, offsets, sizes, dataViews);
+      accumulateProviderDiagnosticTime('queueWriteBufferBatchTotalNs', batchStartedAt);
       return;
     }
     const data = new Uint8Array(byteLength);
@@ -3030,6 +3080,7 @@ const fullSurfaceBackend = {
       writeBufferHostShadowByNative(entry.bufferNative, entry.bufferOffset, entry.view);
     }
     addon.queueWriteBufferBatch(queueNative, buffers, offsets, sizes, data);
+    accumulateProviderDiagnosticTime('queueWriteBufferBatchTotalNs', batchStartedAt);
   },
   queueWriteTexture(_queue, queueNative, destination, data, dataLayout, size) {
     addon.queueWriteTexture(
@@ -3698,6 +3749,22 @@ export function nativeFastPathInfo() {
   return nativeAddon.nativeFastPathInfo();
 }
 
+export function providerDiagnostics() {
+  return {
+    fastPathStats: { ...fastPathStats },
+    queueSubmitCalls: providerDiagnosticStats.queueSubmitCalls,
+    submittedCommandBuffers: providerDiagnosticStats.submittedCommandBuffers,
+    submittedBatchedCommands: providerDiagnosticStats.submittedBatchedCommands,
+    queueWriteBufferCalls: providerDiagnosticStats.queueWriteBufferCalls,
+    queueWriteBufferBytes: providerDiagnosticStats.queueWriteBufferBytes,
+    queueWriteBufferTotalNs: providerDiagnosticStats.queueWriteBufferTotalNs,
+    queueWriteBufferBatchCalls: providerDiagnosticStats.queueWriteBufferBatchCalls,
+    queueWriteBufferBatchTotalNs: providerDiagnosticStats.queueWriteBufferBatchTotalNs,
+    mapReadCalls: providerDiagnosticStats.mapReadCalls,
+    submitBreakdownNs: { ...providerDiagnosticStats.submitBreakdownNs },
+  };
+}
+
 function commandNativeResource(value, path, label) {
   if (value === null || value === undefined) {
     return null;
@@ -3884,6 +3951,7 @@ export default {
   requestDevice,
   providerInfo,
   nativeFastPathInfo,
+  providerDiagnostics,
   prewarmPreparedDispatches,
   nativeQueueSyncInfo,
   nativePipelineCacheInfo,

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-doeproof-loader-integration-plan",
+  "planId": "holoscript-tropical-spmv-doeproof-loader-qm0-v1",
+  "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+  "publicLoader": "packages/doe-gpu/src/node-webgpu-loader.js",
+  "workload": "unchanged pinned HoloScript tropical-SpMV application and shader over the frozen topology inputs",
+  "expectedComparableSha256": "51cda2a94da7edad85499240ac8cc5744598fb4227f4f38535a8c97880f585f4",
+  "lanes": {
+    "W0": "pinned webgpu@0.3.10 selected through the public DoeProof loader",
+    "D0": "Doe package provider selected through the same public DoeProof loader"
+  },
+  "acceptance": [
+    "both processes exit zero without timeout",
+    "both lanes expose doe.node-webgpu-loader/v1 effective provider identity",
+    "both provider-neutral process receipts pass independent validation",
+    "both lanes bind the physical non-software adapter",
+    "every topology output hash equals its independent CPU-oracle hash",
+    "shader, dispatch, oracle, topology, and output identities match across lanes"
+  ],
+  "decision": {
+    "pass": "authorize the public loader and governed process receipt as the unchanged-application DoeProof substitution seam",
+    "fail": "return the loader to package-only status and preserve the first failing boundary"
+  },
+  "nonGoals": [
+    "runtime-ownership credit",
+    "performance interpretation",
+    "application promotion",
+    "release-blocker status",
+    "reinterpretation of the terminal HoloScript ownership decision"
+  ]
+}

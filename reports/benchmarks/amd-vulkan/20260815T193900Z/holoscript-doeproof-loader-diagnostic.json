@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doeproof-loader-integration-diagnostic",
+  "evidenceMaturity": "diagnostic",
+  "status": "passed",
+  "workload": {
+    "actorId": "holoscript-snn-webgpu",
+    "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "application": "unchanged pinned HoloScript tropical-SpMV workload",
+    "topologyCount": 4,
+    "oracle": "independent CPU tropical min-plus SpMV with exact output hashes"
+  },
+  "plan": {
+    "id": "holoscript-tropical-spmv-doeproof-loader-qm0-v1",
+    "path": "bench/external-projects/holoscript-snn-webgpu/doeproof-loader-integration.plan.json",
+    "sha256": "f040bb0f19735ee18b604a87c380a631147edf0cdd4b6c08361373d55e4b3472"
+  },
+  "evidence": {
+    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-loader-qm0-v1/result.json",
+    "sha256": "81e1ff981445fdcb5f3f20ff9765cd57e0483145e7fda77183cdebf744949fa8"
+  },
+  "implementation": {
+    "publicLoader": {
+      "path": "packages/doe-gpu/src/node-webgpu-loader.js",
+      "sha256": "c76023c803e868d66bf95cd7d90efc91b4cb35459684e7d0a0c28e8b607b34ab"
+    },
+    "governedProcessRunner": {
+      "path": "packages/doe-gpu/src/node-webgpu-process.js",
+      "sha256": "ca6f162c4b10a417783fc4af7ecd85517e566194bcef9303babead8de165d0b8"
+    },
+    "runner": {
+      "path": "bench/external-projects/holoscript-snn-webgpu/run-doeproof-loader-integration.mjs",
+      "sha256": "1b39a5181195ac362b1b11bd77feba66469205a9108da944542dff6e98c1e20a"
+    }
+  },
+  "lanes": {
+    "W0": {
+      "providerId": "dawn-node-webgpu",
+      "loaderContract": "doe.node-webgpu-loader/v1",
+      "processReceiptSchema": "doe.governed-node-webgpu-process-receipt/v1",
+      "processReceiptValidation": "passed",
+      "processExit": 0,
+      "hardwareEligible": true,
+      "adapter": "Radeon 8060S Graphics via RADV/Mesa 26.0.3",
+      "oraclePassingTopologies": 4
+    },
+    "D0": {
+      "providerId": "doe-gpu",
+      "loaderContract": "doe.node-webgpu-loader/v1",
+      "processReceiptSchema": "doe.governed-node-webgpu-process-receipt/v1",
+      "processReceiptValidation": "passed",
+      "processExit": 0,
+      "hardwareEligible": true,
+      "adapter": "Radeon 8060S Graphics via Doe Vulkan",
+      "oraclePassingTopologies": 4
+    }
+  },
+  "comparability": {
+    "status": "passed",
+    "W0": "51cda2a94da7edad85499240ac8cc5744598fb4227f4f38535a8c97880f585f4",
+    "D0": "51cda2a94da7edad85499240ac8cc5744598fb4227f4f38535a8c97880f585f4",
+    "fields": [
+      "shader",
+      "dispatch",
+      "synchronization",
+      "readback",
+      "oracle",
+      "topology identities",
+      "oracle hashes",
+      "output hashes"
+    ]
+  },
+  "decision": {
+    "publicDoeProofLoader": "authorized",
+    "publicDoeProofProcess": "authorized",
+    "runtimeOwnershipCredit": false,
+    "performanceCredit": false,
+    "releaseCredit": false,
+    "terminalOwnershipDecisionChanged": false
+  },
+  "limitations": [
+    "One process per lane is an integration diagnostic, not the promotion reliability floor.",
+    "The run does not establish a performance comparison.",
+    "The result does not make HoloScript an adopter or release blocker.",
+    "The earlier terminal HoloScript ownership rejection remains authoritative."
+  ]
+}

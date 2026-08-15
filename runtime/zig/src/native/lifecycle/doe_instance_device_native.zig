@@ -34,6 +34,7 @@ const NativeD3D12Runtime = backend_lifecycle.NativeD3D12Runtime;
 const d3d12_device_caps = backend_capabilities.d3d12_device_caps;
 const vk_feature_caps = if (has_vulkan) backend_capabilities.vk_feature_caps else struct {};
 const vk_device_caps = if (has_vulkan) backend_capabilities.vk_device_caps else struct {};
+const vk_adapter_probe = if (has_vulkan) backend_capabilities.vk_adapter_probe else struct {};
 const vulkan_feature_cache = if (has_vulkan) @import("../vulkan/vulkan_feature_cache.zig") else struct {};
 const backend_policy = @import("../../backend/backend_policy.zig");
 const runtime_types = @import("../../backend/runtime_types.zig");
@@ -259,10 +260,11 @@ fn create_adapter_for_instance(inst: ?*anyopaque) CreateAdapterError!*DoeAdapter
                 const selected_policy = selected_vulkan_policy() catch {
                     return error.VkAdapterProbeFailed;
                 };
-                const identity = NativeVulkanRuntime.probe_adapter_identity(
+                const adapter_probe = vk_adapter_probe.probe_selected_adapter(
                     alloc,
                     selected_policy.queue_family_policy,
                 ) catch return error.VkAdapterProbeFailed;
+                const identity = adapter_probe.identity;
                 const adapter = make(DoeAdapter) orelse return error.AdapterAllocationFailed;
                 if (retained_instance) |instance_ref| instance_add_ref(instance_ref);
                 adapter.* = .{
@@ -274,6 +276,8 @@ fn create_adapter_for_instance(inst: ?*anyopaque) CreateAdapterError!*DoeAdapter
                     .device_name = identity.device_name,
                     .device_name_len = identity.device_name_len,
                 };
+                vulkan_feature_cache.set_adapter(toOpaque(adapter), adapter_probe.feature_caps);
+                vulkan_feature_cache.set_adapter_device_caps(toOpaque(adapter), adapter_probe.device_caps);
                 return adapter;
             }
         },
@@ -344,6 +348,19 @@ fn create_device_for_adapter(
                 alloc.destroy(dev);
                 return error.VkRuntimeInitFailed;
             };
+            const runtime_identity = vk_adapter_probe.query_identity(rt.physical_device);
+            if (!vk_adapter_probe.identity_matches_fields(
+                adapter.vendor_id,
+                adapter.device_id,
+                adapter.driver_version,
+                adapter.device_name[0..adapter.device_name_len],
+                runtime_identity,
+            )) {
+                rt.deinit();
+                alloc.destroy(rt);
+                alloc.destroy(dev);
+                return error.VkRuntimeInitFailed;
+            }
             adapter_add_ref(adapter);
             dev.* = .{
                 .backend = .vulkan,

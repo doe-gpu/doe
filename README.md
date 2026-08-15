@@ -1,31 +1,36 @@
 # Doe
 
-Doe is a source-preserving WebGPU runtime and compiler for applications that
-choose their GPU provider. It runs Node and Bun workloads, keeps shader and
-program bodies inspectable, and emits receipts for the work that actually ran.
+Doe is a source-preserving GPU execution and evidence system for applications
+that choose their provider. DoeProof governs an explicit incumbent or Doe
+provider; DoeRuntime supplies the owned compiler and execution backend where a
+matched application comparison proves that ownership is worthwhile.
 
 ## Mission, goal, and value
 
 Doe’s mission is to make GPU execution inspectable and controllable at the
 runtime boundary.
 
-The current product goal has two independently gated surfaces: a Node/Bun
-runtime lane and a Fawn/Chromium browser lane. Each must run a named unchanged
-workload correctly against a declared incumbent on a declared support matrix.
-The receipt, replay artifact, and runtime policy must identify the workload,
+The current product goal has independently gated DoeProof, Node/Bun runtime,
+and Fawn/Chromium browser surfaces. Each must run a named unchanged workload
+correctly against a declared incumbent on a declared support matrix. The
+receipt, replay artifact, and runtime policy must identify the workload,
 provider, physical hardware, backend, and validation result. Browser evidence
-does not inherit package claim status.
+does not inherit package claim status, and wrapper evidence does not become
+runtime-ownership credit.
 
 Doe serves several audiences:
 
-- Application developers get a package and runtime for explicit GPU execution.
+- Application developers get governed provider selection, exact-output
+  evidence, and an optional owned runtime for explicit GPU execution.
 - Runtime and compiler engineers can inspect lowering, backend selection, and
   generated work.
 - Benchmark and release reviewers can trace a claim to its receipt and raw
   artifact.
 
-Doe owns the runtime, compiler, workload contract, execution policy, evidence
-classification, and release decision. Doppler, Dream, Columbo/Valera,
+Doe owns the workload contract, execution policy, evidence classification, and
+release decision. It owns the runtime and compiler implementation but claims
+application value for them only after DoeRuntime beats the governed incumbent.
+Doppler, Dream, Columbo/Valera,
 Reploid/Poolday, Cerebras, Chromium/Fawn, and outside projects may provide
 workloads, hosts, baselines, or integration surfaces; they do not define Doe’s
 runtime claim.
@@ -37,10 +42,16 @@ Install the public package and run the Node example:
 ```bash
 npm install doe-gpu
 node node_modules/doe-gpu/examples/node-first-kernel.mjs
+node node_modules/doe-gpu/examples/node-governed-first-kernel.mjs
 ```
 
 Package entrypoints and public exports are documented in
 [`packages/doe-gpu/README.md`](packages/doe-gpu/README.md).
+Provider-neutral DoeProof supports both an in-process exact-output callback and
+an unchanged Node application executed through the fail-closed `webgpu` loader
+with a self-validating process receipt.
+The packaged `doe-proof-node` command exposes the same contract to CI with
+hash-bound run, verification, inspection, replay, and exact-output comparison.
 
 Contributors making a Doe change should choose one workload and one correctness
 or performance question. Change [`runtime/zig/`](runtime/zig/) or

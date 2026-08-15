@@ -1,0 +1,1884 @@
+{
+  "mode": "bench",
+  "workload": "inference",
+  "suite": "bench",
+  "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+  "runtimeProfile": null,
+  "deviceInfo": {
+    "hasSubgroups": true,
+    "hasSubgroupsF16": true,
+    "hasF16": true,
+    "hasTimestampQuery": true,
+    "maxBufferSize": 4294967292,
+    "maxWorkgroupSize": 1024,
+    "maxWorkgroupStorageSize": 65536,
+    "adapterInfo": {
+      "vendor": "amd",
+      "architecture": "rdna-3",
+      "device": "radeon-8060s-graphics-radv-strix-halo-",
+      "description": "radv: Mesa 26.0.3-1ubuntu1"
+    },
+    "submitProbeMs": 0.47411299999998846
+  },
+  "results": [
+    {
+      "name": "benchmark",
+      "passed": true,
+      "duration": 4192.189222000008
+    }
+  ],
+  "durationMs": 49219.00634,
+  "timestamp": "2026-08-15T19:11:22.099Z",
+  "metrics": {
+    "warmupRuns": 2,
+    "timedRuns": 3,
+    "prompt": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+    "maxTokens": 64,
+    "decodeTokensPerSec": 50.4,
+    "avgTokensGenerated": 64,
+    "avgPrefillTokens": 72,
+    "avgDecodeTokens": 64,
+    "medianPrefillTokensPerSec": 1127.37,
+    "avgPrefillTokensPerSec": 1127.07,
+    "medianPrefillTokensPerSecTtft": 1103.73,
+    "avgPrefillTokensPerSecTtft": 1103.16,
+    "avgDecodeTokensPerSec": 48.29,
+    "firstTokenMs": 65.23,
+    "firstResponseMs": 41577.95,
+    "prefillMs": 63.87,
+    "decodeMs": 1269.72,
+    "totalRunMs": 1334.69,
+    "decodeMsPerTokenP50": 19.84,
+    "decodeMsPerTokenP95": 22.61,
+    "decodeMsPerTokenP99": 22.85,
+    "avgPrefillMs": 63.89,
+    "wallRunMs": 1336.45,
+    "modelLoadMs": 41512.72,
+    "throughput": {
+      "tokensPerSec": {
+        "mean": 46.00405348026413,
+        "median": 47.8878957171274,
+        "min": 41.773255970185645,
+        "max": 48.35100875347936,
+        "p95": 48.30469744984416,
+        "p99": 48.34174649275232,
+        "stdDev": 3.671287798521733,
+        "ci95": 6.358856996247335,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillTokensPerSec": {
+        "mean": 1127.0737489995615,
+        "median": 1127.3668362121603,
+        "min": 1108.1486433036716,
+        "max": 1145.7057674828527,
+        "p95": 1143.8718743557833,
+        "p99": 1145.3389888574388,
+        "stdDev": 18.78027740046053,
+        "ci95": 32.5283946378352,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillTokensPerSecTtft": {
+        "mean": 1103.155142556976,
+        "median": 1103.7308986338314,
+        "min": 1083.354759682989,
+        "max": 1122.379769354107,
+        "p95": 1120.5148822820795,
+        "p99": 1122.0067919397015,
+        "stdDev": 19.518874615426558,
+        "ci95": 33.80768254048523,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeTokensPerSec": {
+        "mean": 48.28990587793788,
+        "median": 50.4048323175748,
+        "min": 43.64257626620149,
+        "max": 50.82230905003737,
+        "p95": 50.78056137679111,
+        "p99": 50.81395951538812,
+        "stdDev": 4.030114898564109,
+        "ci95": 6.980363764653329,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "latency": {
+      "totalMs": {
+        "mean": 1395.716379666667,
+        "median": 1334.692762999999,
+        "min": 1322.1328569999969,
+        "max": 1530.323519000005,
+        "p95": 1510.7604434000045,
+        "p99": 1526.410903880005,
+        "stdDev": 116.74223434263511,
+        "ci95": 202.20348127055627,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "wallRunMs": {
+        "mean": 1397.3964073333361,
+        "median": 1336.4546310000005,
+        "min": 1323.653873000003,
+        "max": 1532.0807180000047,
+        "p95": 1512.5181093000042,
+        "p99": 1528.1681962600046,
+        "stdDev": 116.8155062744686,
+        "ci95": 202.33039197926058,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillMs": {
+        "mean": 63.89407633333273,
+        "median": 63.86563600000227,
+        "min": 62.84335999999894,
+        "max": 64.97323299999698,
+        "p95": 64.8624732999975,
+        "p99": 64.95108105999708,
+        "stdDev": 1.0652212861420514,
+        "ci95": 1.8450173889018984,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeMs": {
+        "mean": 1331.8223033333343,
+        "median": 1269.7195300000021,
+        "min": 1259.289496999998,
+        "max": 1466.4578830000028,
+        "p95": 1446.7840477000027,
+        "p99": 1462.5231159400028,
+        "stdDev": 116.71439877423082,
+        "ci95": 202.15526865182247,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "firstTokenMs": {
+        "mean": 65.2809753333325,
+        "median": 65.23329199999716,
+        "min": 64.14940999999817,
+        "max": 66.4602240000022,
+        "p95": 66.3375308000017,
+        "p99": 66.4356853600021,
+        "stdDev": 1.1561447188229217,
+        "ci95": 2.002501393903734,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "tokens": {
+      "generated": {
+        "mean": 64,
+        "median": 64,
+        "min": 64,
+        "max": 64,
+        "p95": 64,
+        "p99": 64,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefill": {
+        "mean": 72,
+        "median": 72,
+        "min": 72,
+        "max": 72,
+        "p95": 72,
+        "p99": 72,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decode": {
+        "mean": 64,
+        "median": 64,
+        "min": 64,
+        "max": 64,
+        "p95": 64,
+        "p99": 64,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "gpu": {
+      "prefillMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeRecordOps": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPasses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerOp": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerPass": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPassesPerOp": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordOpsPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPassesPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordUniqueOpLabels": null,
+      "decodeRecordTopOps": [],
+      "decodeRecordTopOpGroups": [],
+      "decodeSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackMapWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackCleanupMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackCopyMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "decodeOrchestrationMs": {
+        "mean": 1331.8223033333343,
+        "median": 1269.7195300000021,
+        "min": 1259.289496999998,
+        "max": 1466.4578830000028,
+        "p95": 1446.7840477000027,
+        "p99": 1462.5231159400028,
+        "stdDev": 116.71439877423082,
+        "ci95": 202.15526865182247,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillRecordMs": {
+        "mean": 36.18262733333055,
+        "median": 36.18275399999402,
+        "min": 36.130167000002984,
+        "max": 36.234960999994655,
+        "p95": 36.22974029999459,
+        "p99": 36.23391685999464,
+        "stdDev": 0.052397114824160845,
+        "ci95": 0.090754465045467,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillRecordOps": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillRecordPasses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "prefillRecordUniqueOpLabels": null,
+      "prefillRecordTopOps": [],
+      "prefillRecordTopOpGroups": [],
+      "prefillSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "uniformCache": {
+        "hits": 45878,
+        "misses": 202,
+        "totalLookups": 46080,
+        "hitRateRatio": 0.9956163194444444,
+        "hitRate": "99.6%",
+        "evictions": 0,
+        "currentSize": 202,
+        "pendingDestruction": 0
+      },
+      "singleTokenSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackMapWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackCleanupMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackCopyMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "singleTokenOrchestrationMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "batching": {
+      "batchedForwardCalls": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "unbatchedForwardCalls": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "totalBatchedTimeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "totalUnbatchedTimeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "gpuSubmissions": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "requestedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "effectiveBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "executedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "resolvedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "maxBatchTokenCap": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "batchClampCount": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "decodeCadence": null,
+    "plePreparedTokenCache": {
+      "hits": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "misses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "entries": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      },
+      "bytes": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 3,
+        "samplesAfterOutlierRemoval": 3,
+        "outliersRemoved": 0
+      }
+    },
+    "decodeMode": "single_token",
+    "batchGuardReason": "command_batching_disabled",
+    "executionPlan": {
+      "primary": {
+        "id": "primary",
+        "kernelPathId": "gemma-3-270m-it-q4k-ehf16-af32-execution-inline",
+        "kernelPathSource": "execution-v1",
+        "activationDtype": "f32",
+        "readbackInterval": 1,
+        "readbackMode": "sequential",
+        "maxBatchDecodeTokens": null,
+        "batchSize": 1,
+        "stopCheckMode": "batch",
+        "disableCommandBatching": false,
+        "ringTokens": 1,
+        "ringStop": 1,
+        "ringStaging": 1
+      },
+      "fallback": null,
+      "activePlanIdAtStart": null,
+      "finalActivePlanId": null,
+      "transitions": []
+    },
+    "prefillProfileSteps": [],
+    "decodeProfileSteps": [],
+    "generatedText": "The provided text states that the system should allow review when:\n\n* **Policy clarity:** The policy is clear and not obstructive.\n* **evidence supports the request:** There is sufficient evidence to support the request.\n\nThis is a good example of a system that allows for a review when the policy is clear and the",
+    "referenceTranscript": {
+      "schema": "doppler.reference-transcript/v1",
+      "source": {
+        "kind": "inline-browser-suite",
+        "path": "inline",
+        "hash": "sha256:e46e879241e0ca6761456ba2647f520c5bd1a1cb010f7532ccfbf7394ac96045"
+      },
+      "executionGraphHash": "sha256:eeb1a27bbb2c81c10aec5f498c746e1f804152952e1497c8c0c0513c60c8de94",
+      "surface": "browser-webgpu",
+      "prompt": {
+        "identity": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+        "hash": "sha256:993fa1e7b83530b02ee1801373974b132096899a7ec27d281448e58276fb7753",
+        "tokenIdsHash": "sha256:058e3a5cf6a92eae7b6657acdcb25831941795a97ada7a95184a97e56fc3c18d",
+        "tokenCount": 72
+      },
+      "output": {
+        "textHash": "sha256:13673dd69e6e9b6a62fed62abd3f024e5115074bc09f0a6866e7351b74e4228d",
+        "tokensGenerated": 64,
+        "stopReason": "max-tokens",
+        "stopTokenId": null
+      },
+      "tokens": {
+        "ids": [
+          818,
+          3847,
+          1816,
+          5022,
+          600,
+          506,
+          1458,
+          1374,
+          2174,
+          3540,
+          1056,
+          236787,
+          108,
+          236829,
+          5213,
+          20884,
+          29972,
+          53121,
+          669,
+          4957,
+          563,
+          3582,
+          532,
+          711,
+          139432,
+          236761,
+          107,
+          236829,
+          5213,
+          128010,
+          12765,
+          506,
+          2864,
+          53121,
+          2085,
+          563,
+          7271,
+          4914,
+          531,
+          1894,
+          506,
+          2864,
+          236761,
+          108,
+          2094,
+          563,
+          496,
+          1535,
+          2591,
+          529,
+          496,
+          1458,
+          600,
+          5862,
+          573,
+          496,
+          3540,
+          1056,
+          506,
+          4957,
+          563,
+          3582,
+          532,
+          506
+        ],
+        "generatedTokenIdsHash": "sha256:f7257555de30a242ad0e1992c37d82d922e492bcd445b7f3655c189511c80427",
+        "generatedTextHash": "sha256:13673dd69e6e9b6a62fed62abd3f024e5115074bc09f0a6866e7351b74e4228d",
+        "preview": [
+          {
+            "id": 818,
+            "text": "The",
+            "fallbackText": "The"
+          },
+          {
+            "id": 3847,
+            "text": " provided",
+            "fallbackText": " provided"
+          },
+          {
+            "id": 1816,
+            "text": " text",
+            "fallbackText": " text"
+          },
+          {
+            "id": 5022,
+            "text": " states",
+            "fallbackText": " states"
+          },
+          {
+            "id": 600,
+            "text": " that",
+            "fallbackText": " that"
+          },
+          {
+            "id": 506,
+            "text": " the",
+            "fallbackText": " the"
+          },
+          {
+            "id": 1458,
+            "text": " system",
+            "fallbackText": " system"
+          },
+          {
+            "id": 1374,
+            "text": " should",
+            "fallbackText": " should"
+          },
+          {
+            "id": 2174,
+            "text": " allow",
+            "fallbackText": " allow"
+          },
+          {
+            "id": 3540,
+            "text": " review",
+            "fallbackText": " review"
+          },
+          {
+            "id": 1056,
+            "text": " when",
+            "fallbackText": " when"
+          },
+          {
+            "id": 236787,
+            "text": ":",
+            "fallbackText": ":"
+          },
+          {
+            "id": 108,
+            "text": "\n\n",
+            "fallbackText": "\n\n"
+          },
+          {
+            "id": 236829,
+            "text": "*",
+            "fallbackText": "*"
+          },
+          {
+            "id": 5213,
+            "text": " **",
+            "fallbackText": " **"
+          },
+          {
+            "id": 20884,
+            "text": "Policy",
+            "fallbackText": "Policy"
+          },
+          {
+            "id": 29972,
+            "text": " clarity",
+            "fallbackText": " clarity"
+          },
+          {
+            "id": 53121,
+            "text": ":**",
+            "fallbackText": ":**"
+          },
+          {
+            "id": 669,
+            "text": " The",
+            "fallbackText": " The"
+          },
+          {
+            "id": 4957,
+            "text": " policy",
+            "fallbackText": " policy"
+          },
+          {
+            "id": 563,
+            "text": " is",
+            "fallbackText": " is"
+          },
+          {
+            "id": 3582,
+            "text": " clear",
+            "fallbackText": " clear"
+          },
+          {
+            "id": 532,
+            "text": " and",
+            "fallbackText": " and"
+          },
+          {
+            "id": 711,
+            "text": " not",
+            "fallbackText": " not"
+          },
+          {
+            "id": 139432,
+            "text": " obstructive",
+            "fallbackText": " obstructive"
+          },
+          {
+            "id": 236761,
+            "text": ".",
+            "fallbackText": "."
+          },
+          {
+            "id": 107,
+            "text": "\n",
+            "fallbackText": "\n"
+          },
+          {
+            "id": 236829,
+            "text": "*",
+            "fallbackText": "*"
+          },
+          {
+            "id": 5213,
+            "text": " **",
+            "fallbackText": " **"
+          },
+          {
+            "id": 128010,
+            "text": "evidence",
+            "fallbackText": "evidence"
+          },
+          {
+            "id": 12765,
+            "text": " supports",
+            "fallbackText": " supports"
+          },
+          {
+            "id": 506,
+            "text": " the",
+            "fallbackText": " the"
+          }
+        ],
+        "perStep": [
+          {
+            "index": 0,
+            "tokenId": 818,
+            "tokenHash": "sha256:a720503f3310752f33fbfcf2a56f5aed118d6573e54b44c2e687c0eadb98b87f"
+          },
+          {
+            "index": 1,
+            "tokenId": 3847,
+            "tokenHash": "sha256:bb706d491ffc11185e16e975418316b49b64e88af76033e9bb4125ca58659470"
+          },
+          {
+            "index": 2,
+            "tokenId": 1816,
+            "tokenHash": "sha256:d0c8a0f5030f6b5f5332f1a6a7a69249f8f998ae6131b0479abb51e4dcb8405c"
+          },
+          {
+            "index": 3,
+            "tokenId": 5022,
+            "tokenHash": "sha256:e79b6f9532aca43feef99aa6c49734e10b5a60c5ef4afbee3894c53f0d3a5a13"
+          },
+          {
+            "index": 4,
+            "tokenId": 600,
+            "tokenHash": "sha256:cb45e0af382e153546be7d16cc50f21856db73c0f87c2ebe0770ed1e9401374f"
+          },
+          {
+            "index": 5,
+            "tokenId": 506,
+            "tokenHash": "sha256:8dcc96b9e5b078c929096958aeeee299c8c3bd9b9bab887a5d8150609bf88337"
+          },
+          {
+            "index": 6,
+            "tokenId": 1458,
+            "tokenHash": "sha256:863a6d8b38e9bac43a5c09ee6f3e5c3766ec5c210fe333ae18b4c16106409ce3"
+          },
+          {
+            "index": 7,
+            "tokenId": 1374,
+            "tokenHash": "sha256:a350673984d35609d5e8fa761c169063a3008871a0f2e5ba1a5387861ab0a41b"
+          },
+          {
+            "index": 8,
+            "tokenId": 2174,
+            "tokenHash": "sha256:0fadf495e3ea88fd8cb58208606446750190f38f8f089671284836d04196ceb4"
+          },
+          {
+            "index": 9,
+            "tokenId": 3540,
+            "tokenHash": "sha256:5cc06fd5cd16972f90d681c163b940d033274fc6753635b957b2cc5413e12c87"
+          },
+          {
+            "index": 10,
+            "tokenId": 1056,
+            "tokenHash": "sha256:94f5fbea8cc2f6c7a8d1c8b5a949907be7f3f87e69126536d7a59e466d7eb64a"
+          },
+          {
+            "index": 11,
+            "tokenId": 236787,
+            "tokenHash": "sha256:07b1660034e8c38b855193f744a3741e9864997534b3bfcb82cb9d65bbf3fdea"
+          },
+          {
+            "index": 12,
+            "tokenId": 108,
+            "tokenHash": "sha256:5b84273ed3ebfa0763979f02b57e99b525860979b77e29e74a68f16e6754c101"
+          },
+          {
+            "index": 13,
+            "tokenId": 236829,
+            "tokenHash": "sha256:0fd4e6e0bfbaeeab25444b4c947bf50e692949eb29338cf217d08d8f4b009910"
+          },
+          {
+            "index": 14,
+            "tokenId": 5213,
+            "tokenHash": "sha256:e87db68a684c3a86a2ddfc6dc401ac7def29e24c016fb6d0eaf0eb8ffe73646b"
+          },
+          {
+            "index": 15,
+            "tokenId": 20884,
+            "tokenHash": "sha256:1ac07326c4aecf1bc485b2c08320a363f4fee695ef64fa458df9a665b6de501a"
+          },
+          {
+            "index": 16,
+            "tokenId": 29972,
+            "tokenHash": "sha256:4c66b3ecc283f33a3ba2713be68a41cea49beb833f28db93bd92824e73760bd0"
+          },
+          {
+            "index": 17,
+            "tokenId": 53121,
+            "tokenHash": "sha256:0160e639e361f301e8e5d60340d5a596390320eca1e2bc63956254a218926998"
+          },
+          {
+            "index": 18,
+            "tokenId": 669,
+            "tokenHash": "sha256:6144358220664bdedfc71f3c5db2c365f694169b8b74486135ce0a696cfbb5b6"
+          },
+          {
+            "index": 19,
+            "tokenId": 4957,
+            "tokenHash": "sha256:2113e0762ba902076724d4ce69b01080810c1c9738cbfe6f71448abe0b81fb8b"
+          },
+          {
+            "index": 20,
+            "tokenId": 563,
+            "tokenHash": "sha256:cbfb5814c8ea71e6847b43914139e7b7289b28ab6f2cae1221166d1e4338ef67"
+          },
+          {
+            "index": 21,
+            "tokenId": 3582,
+            "tokenHash": "sha256:358ab8e0c2235ac1b8fbe3f2c1db26fde1037fea24c0b9b25b5570dbb847a921"
+          },
+          {
+            "index": 22,
+            "tokenId": 532,
+            "tokenHash": "sha256:40ab79fa831e31996865671f813d8ffd1b8dccc6fdea069c669a53965f0662f8"
+          },
+          {
+            "index": 23,
+            "tokenId": 711,
+            "tokenHash": "sha256:453f176c7d67b9a400798f9fee073ebc8f06bc440752ce86eac49c2ce87ce08c"
+          },
+          {
+            "index": 24,
+            "tokenId": 139432,
+            "tokenHash": "sha256:5a508ac8e66e05f4d9c3c4346e335f7c912ccbcd49ca36b41e30afb2c70c6475"
+          },
+          {
+            "index": 25,
+            "tokenId": 236761,
+            "tokenHash": "sha256:40391e57d931fa22881d59cf02272a846fce8d9f4c02e7b14b36aa427231b03e"
+          },
+          {
+            "index": 26,
+            "tokenId": 107,
+            "tokenHash": "sha256:5a96f93e66549def17591cfa91dc9199bf4f4f6d6bfbce80442c38dff79f92be"
+          },
+          {
+            "index": 27,
+            "tokenId": 236829,
+            "tokenHash": "sha256:332d3b9dcf9465228e711a0936fe69459b44df4587c540ac16c2f58d1e0bce48"
+          },
+          {
+            "index": 28,
+            "tokenId": 5213,
+            "tokenHash": "sha256:a52217527d03189a34171c2c45e5b5c1cb16d6364b448fc2b7ca71f6b7ee063c"
+          },
+          {
+            "index": 29,
+            "tokenId": 128010,
+            "tokenHash": "sha256:45eddb5e6c4547af6d11e4735f0d6d179854b09526674d7d4b97c62ea69925ee"
+          },
+          {
+            "index": 30,
+            "tokenId": 12765,
+            "tokenHash": "sha256:53ecd3a629fee5ef6238e102fe05e16f9beb2a71218fac925f2396a8741b7e5e"
+          },
+          {
+            "index": 31,
+            "tokenId": 506,
+            "tokenHash": "sha256:5d90103aa89710d39fb5ebaf526b619dd23cb410d4dacfc1813de85a10593120"
+          },
+          {
+            "index": 32,
+            "tokenId": 2864,
+            "tokenHash": "sha256:f24c091a7bd9bf2e618db0860aa5e0b0ef3f2f197b7556b261feddc8f1f69650"
+          },
+          {
+            "index": 33,
+            "tokenId": 53121,
+            "tokenHash": "sha256:a2c96304a7d1532a9cab24f3d5d0d8f40dc594b890674a6d951fcbfe033a1fdb"
+          },
+          {
+            "index": 34,
+            "tokenId": 2085,
+            "tokenHash": "sha256:66ddc23f88a8a01b64746e9ff4d9bff43c8932c478cf27b3ff7581e3a639be13"
+          },
+          {
+            "index": 35,
+            "tokenId": 563,
+            "tokenHash": "sha256:6eb388aa1bd190983670dde15e2e342bb854b6fbeeb5c460d2912ea1c6a0c855"
+          },
+          {
+            "index": 36,
+            "tokenId": 7271,
+            "tokenHash": "sha256:d1ed81d72a5ed2912326b2a3db773b7be69d1ff1e90061fcd58ee47fc5a4cac2"
+          },
+          {
+            "index": 37,
+            "tokenId": 4914,
+            "tokenHash": "sha256:07a2d254454f72a8a4e2cc548d90f73d9e34259080fe2ada85dbf6e645a2c947"
+          },
+          {
+            "index": 38,
+            "tokenId": 531,
+            "tokenHash": "sha256:6c10fd2fa91cb5f6cc0710228fa2dc50da70d34e69b27a7f4e748255b48cacb6"
+          },
+          {
+            "index": 39,
+            "tokenId": 1894,
+            "tokenHash": "sha256:1e5a0d1ad367ec5ca1e36c7f48796af5fa24ced7f23d4f3e5720a3f94090a6e7"
+          },
+          {
+            "index": 40,
+            "tokenId": 506,
+            "tokenHash": "sha256:8385e44001b10f95ff4d5acbf9976ff5ccbb8e989c17ea3b7e57e79a307cb74c"
+          },
+          {
+            "index": 41,
+            "tokenId": 2864,
+            "tokenHash": "sha256:0cd936d786198e2d9c42aff40fb7d2784ba98cdff37b172aee8d270542a051e5"
+          },
+          {
+            "index": 42,
+            "tokenId": 236761,
+            "tokenHash": "sha256:0269b7fcb2197dff5722cdc677b6ec410f639734340367e439df7d2199f4afba"
+          },
+          {
+            "index": 43,
+            "tokenId": 108,
+            "tokenHash": "sha256:f39f970b5692a848aecab23a9df2f30936bb16eb31821b8d469f6c65d614195a"
+          },
+          {
+            "index": 44,
+            "tokenId": 2094,
+            "tokenHash": "sha256:c64ce055cf9b0ad25673f8fd5ecff765acf97aaea288e80067632fef9946ee7b"
+          },
+          {
+            "index": 45,
+            "tokenId": 563,
+            "tokenHash": "sha256:bb14662a4a9275ccac9b4db25c4513ee7dbc7336140cc97b148b66b6739d42d2"
+          },
+          {
+            "index": 46,
+            "tokenId": 496,
+            "tokenHash": "sha256:b7403b4f2f066e0e135f05bc5634e083592612b066ef34607a25db84d3a3f7e7"
+          },
+          {
+            "index": 47,
+            "tokenId": 1535,
+            "tokenHash": "sha256:9595944a96e328419bd8920f2689fae35e398fbe7943d18a3e362dcdf6a27c35"
+          },
+          {
+            "index": 48,
+            "tokenId": 2591,
+            "tokenHash": "sha256:e1e1cd8a215a8e5f696b68b9e45036e7cffc8ac362d87e86749d51df5d8f75ec"
+          },
+          {
+            "index": 49,
+            "tokenId": 529,
+            "tokenHash": "sha256:3b5dbd9b521f7336268194296b2372d135fffc267fdfaee659702808fc044a32"
+          },
+          {
+            "index": 50,
+            "tokenId": 496,
+            "tokenHash": "sha256:6289dff31e42bc57f0cdb0d0bff78f116716360adf8ad2dc20f766615667d73d"
+          },
+          {
+            "index": 51,
+            "tokenId": 1458,
+            "tokenHash": "sha256:38f303b9dcacb703c17c8f3bd1341a575d5479e9c175b531bb620e02600ce4b0"
+          },
+          {
+            "index": 52,
+            "tokenId": 600,
+            "tokenHash": "sha256:d9e955d78c42904ab7ef2536d8b59334efafebb0fddfbd37352272128e380c19"
+          },
+          {
+            "index": 53,
+            "tokenId": 5862,
+            "tokenHash": "sha256:87f52129acbcd584284505914835f38a5734e6a9dee6ec47ac718299f1ed0f9f"
+          },
+          {
+            "index": 54,
+            "tokenId": 573,
+            "tokenHash": "sha256:e49faef920e568d4f25b17535e5fa539ed1c2004ad3cef97feba233d8d606724"
+          },
+          {
+            "index": 55,
+            "tokenId": 496,
+            "tokenHash": "sha256:aff02e63436059ed8d59adb55f638a66eb60670d5d9ac8159416cdd75c4269a5"
+          },
+          {
+            "index": 56,
+            "tokenId": 3540,
+            "tokenHash": "sha256:ee33a7f80358374b4e32472d5b67c62cd934466277171d9d3083839ce7473ab4"
+          },
+          {
+            "index": 57,
+            "tokenId": 1056,
+            "tokenHash": "sha256:4656e787976ef66d536e835520dc0ea64157b3b5a04ae7bbc2f61a5caac8a331"
+          },
+          {
+            "index": 58,
+            "tokenId": 506,
+            "tokenHash": "sha256:bbda9b4e3de684c461eb608687bcc65d94352a32a576f1638f0d10a1e61ac8a7"
+          },
+          {
+            "index": 59,
+            "tokenId": 4957,
+            "tokenHash": "sha256:3d684df7e46634748eb681c199406b46abbae5213c6da0d20835be5cef469143"
+          },
+          {
+            "index": 60,
+            "tokenId": 563,
+            "tokenHash": "sha256:fc9b10b42cf84ea23322136133f0a7f00c025eb48b79ec641502258a25ba1b19"
+          },
+          {
+            "index": 61,
+            "tokenId": 3582,
+            "tokenHash": "sha256:926f9cc18c98368d5a1c5f95f7c097ad04fc45c48c0b3d707ca90460eff9146b"
+          },
+          {
+            "index": 62,
+            "tokenId": 532,
+            "tokenHash": "sha256:8184775894c00f607df4351287da56d1ab43eab81dd7b92346494f8bb01df0d2"
+          },
+          {
+            "index": 63,
+            "tokenId": 506,
+            "tokenHash": "sha256:ab8e5745c165fe9e585a48a7a994f0cc5974cbaceb4cce608d204fae9fe2a2e6"
+          }
+        ],
+        "coverage": {
+          "mode": "full-token-ids",
+          "omitted": 0
+        }
+      },
+      "phase": {
+        "prefillMs": 62.84335999999894,
+        "decodeMs": 1259.289496999998,
+        "prefillTokens": 72,
+        "decodeTokens": 64
+      },
+      "kvCache": {
+        "mode": "stats",
+        "layout": "contiguous",
+        "kvDtype": "f16",
+        "seqLen": 135,
+        "maxSeqLen": 4096,
+        "usedBytes": 2488320,
+        "allocatedBytes": 75497472,
+        "counters": {
+          "updateCalls": 0,
+          "gpuUpdateCalls": 0,
+          "recordedGpuUpdateCalls": 5760,
+          "tokensWritten": 12150
+        },
+        "byteDigestMode": null,
+        "byteDigest": null,
+        "byteDigests": null,
+        "stateHash": "sha256:9e4d984cd42f4ace0186f310aa0d54024e80138786e18c2e43b62ae80c5263e1"
+      },
+      "logits": {
+        "mode": "not-captured",
+        "reason": "Per-step logits digests were not requested for this browser harness run.",
+        "perStepDigests": null
+      },
+      "tolerance": {
+        "tokenPolicy": "exact generated token IDs",
+        "logitsPolicy": "not captured",
+        "kvPolicy": "metadata hash only; KV tensor bytes are not read back by default"
+      }
+    },
+    "promptInput": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+    "decodeBottleneck": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "dominant": {
+        "id": "orchestration",
+        "label": "decode orchestration",
+        "ms": 1269.72,
+        "shareOfDecode": 1
+      },
+      "bottleneckClass": "orchestration",
+      "decodeWallMs": 1269.72,
+      "componentsMs": {
+        "commandRecordMs": 0,
+        "submitWaitMs": 0,
+        "readbackWaitMs": 0,
+        "effectiveSubmitReadbackWaitMs": 0,
+        "readbackMapWaitMs": 0,
+        "readbackCleanupMs": 0,
+        "readbackCopyMs": 0,
+        "readbackUnattributedMs": null,
+        "gpuTimestampMs": null,
+        "submitReadbackSlackMs": null,
+        "orchestrationMs": 1269.72,
+        "residualMs": 0
+      },
+      "recording": {
+        "opCount": 0,
+        "passCount": 0,
+        "uniqueOpLabels": null,
+        "msPerOp": null,
+        "msPerPass": null,
+        "passesPerOp": null,
+        "msPerExecutedBatchToken": null,
+        "opsPerExecutedBatchToken": null,
+        "passesPerExecutedBatchToken": null,
+        "topOps": [],
+        "topOpGroups": [],
+        "uniformCache": {
+          "hits": 45878,
+          "misses": 202,
+          "totalLookups": 46080,
+          "hitRateRatio": 0.9956163194444444,
+          "evictions": 0,
+          "currentSize": 202,
+          "pendingDestruction": 0,
+          "hitRate": "99.6%"
+        }
+      },
+      "shares": {
+        "commandRecord": 0,
+        "submitWait": 0,
+        "readbackWait": 0,
+        "effectiveSubmitReadbackWait": 0,
+        "readbackMapWait": 0,
+        "readbackCleanup": 0,
+        "readbackCopy": 0,
+        "readbackUnattributed": null,
+        "gpuTimestamp": null,
+        "submitReadbackSlack": null,
+        "orchestration": 1,
+        "residual": 0
+      },
+      "semantics": {
+        "effectiveSubmitReadbackWaitMs": "max(decodeSubmitWaitMs, decodeReadbackWaitMs); submit and readback waits overlap.",
+        "readbackMapWaitMs": "Wall time awaiting staging-buffer mapAsync; usually includes GPU completion behind the readback.",
+        "gpuTimestampMs": "Timestamp-query GPU work when available; null means it was not captured.",
+        "topOps": "Highest-count exact compute-pass labels observed during command recording.",
+        "topOpGroups": "Highest-count compute-pass labels after grouping repeated per-layer labels.",
+        "uniformCache": "Current uniform-buffer cache counters at the end of the measured suite."
+      }
+    },
+    "load": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "semantics": {
+        "modelLoadMs": "suite initialization time before generation",
+        "loaderTotalMs": "DopplerLoader.load() weight-loader wall time",
+        "pipelineTotalMs": "InferencePipeline.loadModel() wall time",
+        "modelLoadMinusPipelineMs": "modelLoadMs - pipeline.totalMs; harness, storage, manifest, GPU init, and pipeline construction",
+        "pipelineMinusLoaderMs": "pipeline.totalMs - loader.totalMs; config, tokenizer, KV, RoPE, and other pipeline setup",
+        "modelLoadMinusLoaderMs": "modelLoadMs - loader.totalMs"
+      },
+      "modelLoadMs": 41512.72,
+      "loader": {
+        "schemaVersion": 1,
+        "source": "doppler-loader",
+        "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+        "status": "complete",
+        "customShardLoader": true,
+        "byteAccountingMode": "custom-loader-read-progress",
+        "totalBytes": 399357184,
+        "totalShards": 6,
+        "bytesLoaded": 399357184,
+        "shardsLoaded": 6,
+        "bytesPerSecond": 9943891,
+        "phasesMs": {
+          "preflight": 1.62,
+          "tensorLocations": 1.21,
+          "embeddings": 18921.08,
+          "layers": 21150.44,
+          "finalWeights": 86.03,
+          "cleanup": 0.05
+        },
+        "layers": {
+          "count": 18,
+          "totalMs": 21055.16,
+          "meanMs": 1169.73,
+          "maxMs": 2715.69,
+          "maxLayer": 0
+        },
+        "totalMs": 40161.06,
+        "failedPhase": null,
+        "error": null
+      },
+      "pipeline": {
+        "schemaVersion": 1,
+        "source": "doppler-pipeline",
+        "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+        "status": "complete",
+        "phasesMs": {
+          "reset": 0.06,
+          "configResolution": 4.82,
+          "kernelWarmup": 0.05,
+          "tokenizer": 444.76,
+          "executionSetup": 25.77,
+          "loadWeights": 40841.87,
+          "rope": 168.13,
+          "convStates": 0.43
+        },
+        "details": {
+          "tokenizer": {
+            "schemaVersion": 1,
+            "source": "doppler-tokenizer",
+            "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+            "status": "complete",
+            "tokenizerType": "bundled",
+            "tokenizerFile": "tokenizer.json",
+            "backend": "bundled",
+            "assetSource": "custom-loader",
+            "cacheHit": false,
+            "phasesMs": {
+              "configResolution": 0.04,
+              "cacheLookup": 0.04,
+              "backendCreate": 0.07,
+              "assetLoad": 180.32,
+              "assetParse": 0.22,
+              "backendLoad": 263.59,
+              "cacheStore": 0.01
+            },
+            "totalMs": 444.47,
+            "error": null
+          }
+        },
+        "totalMs": 41486.12
+      },
+      "residualsMs": {
+        "modelLoadMinusLoaderMs": 1351.66,
+        "modelLoadMinusPipelineMs": 26.6,
+        "pipelineMinusLoaderMs": 1325.06
+      },
+      "consistent": {
+        "loaderWithinModelLoad": true,
+        "pipelineWithinModelLoad": true,
+        "loaderWithinPipeline": true
+      }
+    },
+    "schemaVersion": 1,
+    "source": "doppler",
+    "suite": "bench",
+    "executionContractArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "ok": true,
+      "checks": [
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.steps",
+          "ok": true
+        },
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.session",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "session": {
+        "layout": "contiguous",
+        "disableCommandBatching": false,
+        "decodeBatchSize": 1,
+        "headDim": 256,
+        "kvLen": 32768,
+        "coldQuantMode": "none",
+        "contiguousQuantMode": "none"
+      },
+      "steps": {
+        "total": 35,
+        "attention": 2,
+        "attentionPhases": {
+          "prefill": 1,
+          "decode": 1,
+          "both": 0
+        }
+      }
+    },
+    "layerPatternContractArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "ok": true,
+      "checks": [
+        {
+          "id": "inference.layerPattern.patternKind.shape",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.patternKind.semantics",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.layerType.shape",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.layerType.semantics",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.even",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.odd",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.every_n_offset",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.every_n_negative_offset",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "stats": {
+        "patternKindRules": 4,
+        "layerTypeRules": 6,
+        "patternKindContexts": 16,
+        "layerTypeContexts": 12
+      }
+    },
+    "requiredInferenceFieldsArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "scope": "manifest",
+      "label": "gemma-3-270m-it-q4k-ehf16-af32.inference",
+      "ok": true,
+      "checks": [
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.inference.requiredInferenceFields",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "stats": {
+        "fieldCases": 51,
+        "nullableCases": 27,
+        "nonNullableCases": 24
+      }
+    },
+    "tokenCostLedger": {
+      "schema": "doppler.token-cost-ledger/v1",
+      "identity": {
+        "artifactDigest": "sha256:dee4ca03cbb4ca70cd827a06107e840c78c05573eb049f6025d038b705538bf9",
+        "manifestDigest": "sha256:78c95f517be22e969e945ce900969956e98b6edac2c68f0d0385cd5e28726807",
+        "executionGraphDigest": "sha256:eeb1a27bbb2c81c10aec5f498c746e1f804152952e1497c8c0c0513c60c8de94",
+        "runtimeConfigDigest": "sha256:606a2aeea7a35e7106c81e264549cc0161b283a3e6c3f4985c384bec5a297cbf",
+        "kernelSetDigest": "sha256:04e0e534f6d70514eb95678ee5df46f4f709c05c15df022ff398f6a7c99d9cb8",
+        "wrapperDigest": "sha256:85c85b813c61ffa90f6062254c8a91f1d073d26c3b6e2e6d43d6bacd61282e6d",
+        "browserDigest": "sha256:7900fb727da53cb728e51e61a12aa3d39989a987d6f68567a0916fb58f7d314d",
+        "adapterDigest": "sha256:061268f4db627cde2ee6c032dd277a4d2c2c5c7b38ec63f171a64775deef931a"
+      },
+      "device": {
+        "hasSubgroups": true,
+        "hasSubgroupsF16": true,
+        "hasF16": true,
+        "hasTimestampQuery": true,
+        "maxBufferSize": 4294967292,
+        "maxWorkgroupSize": 1024,
+        "maxWorkgroupStorageSize": 65536,
+        "adapterInfo": {
+          "vendor": "amd",
+          "architecture": "rdna-3",
+          "device": "radeon-8060s-graphics-radv-strix-halo-",
+          "description": "radv: Mesa 26.0.3-1ubuntu1"
+        },
+        "submitProbeMs": 0.47411299999998846
+      },
+      "browser": {
+        "userAgent": "Node.js/22",
+        "platform": "Linux x86_64",
+        "vendor": null
+      },
+      "phases": [
+        {
+          "phase": "prefill",
+          "measurementSource": "cpu-wall-estimate",
+          "wallMs": 63.87,
+          "attributedGpuMs": null,
+          "unattributedWallMs": null,
+          "timestampCoverageRatio": null,
+          "overlapSemantics": "Operation GPU timestamps are additive pass durations. They are not asserted to equal wall time.",
+          "hostCosts": {
+            "recordMs": 36.18275399999402,
+            "submitWaitMs": 0,
+            "readbackWaitMs": null,
+            "fenceWaitMs": 0,
+            "orchestrationMs": null,
+            "readbackBreakdown": {
+              "mapWaitMs": null,
+              "cleanupMs": null,
+              "copyMs": null
+            },
+            "observedSerialMs": 36.18275399999402,
+            "dominantWall": "command-recording",
+            "overlapSemantics": "submitWaitMs and readbackWaitMs may observe the same submitted GPU work; fenceWaitMs is their maximum. Readback breakdown fields are nested observations and are not added again."
+          },
+          "operations": [],
+          "dispatches": 0,
+          "unattributedDispatches": 0,
+          "dispatchGeometryCoverage": null,
+          "commandBufferSubmissions": 0,
+          "observerReadbacks": 0,
+          "executionReadbacks": {
+            "value": null,
+            "status": "not-attributed-by-observer"
+          },
+          "estimatedBytesMoved": {
+            "value": null,
+            "unit": "bytes",
+            "status": "unavailable",
+            "semantics": "estimated-not-measured"
+          }
+        },
+        {
+          "phase": "decode",
+          "measurementSource": "cpu-wall-estimate",
+          "wallMs": 1269.72,
+          "attributedGpuMs": null,
+          "unattributedWallMs": null,
+          "timestampCoverageRatio": null,
+          "overlapSemantics": "Operation GPU timestamps are additive pass durations. They are not asserted to equal wall time.",
+          "hostCosts": {
+            "recordMs": 0,
+            "submitWaitMs": 0,
+            "readbackWaitMs": 0,
+            "fenceWaitMs": 0,
+            "orchestrationMs": 1269.7195300000021,
+            "readbackBreakdown": {
+              "mapWaitMs": 0,
+              "cleanupMs": 0,
+              "copyMs": 0
+            },
+            "observedSerialMs": 1269.7195300000021,
+            "dominantWall": "host-orchestration",
+            "overlapSemantics": "submitWaitMs and readbackWaitMs may observe the same submitted GPU work; fenceWaitMs is their maximum. Readback breakdown fields are nested observations and are not added again."
+          },
+          "operations": [],
+          "dispatches": 0,
+          "unattributedDispatches": 0,
+          "dispatchGeometryCoverage": null,
+          "commandBufferSubmissions": 0,
+          "observerReadbacks": 0,
+          "executionReadbacks": {
+            "value": null,
+            "status": "not-attributed-by-observer"
+          },
+          "estimatedBytesMoved": {
+            "value": null,
+            "unit": "bytes",
+            "status": "unavailable",
+            "semantics": "estimated-not-measured"
+          }
+        }
+      ],
+      "selectedVariants": {
+        "kernelPathId": null,
+        "kernelPathSource": null,
+        "executionPlan": {
+          "primary": {
+            "id": "primary",
+            "kernelPathId": "gemma-3-270m-it-q4k-ehf16-af32-execution-inline",
+            "kernelPathSource": "execution-v1",
+            "activationDtype": "f32",
+            "readbackInterval": 1,
+            "readbackMode": "sequential",
+            "maxBatchDecodeTokens": null,
+            "batchSize": 1,
+            "stopCheckMode": "batch",
+            "disableCommandBatching": false,
+            "ringTokens": 1,
+            "ringStop": 1,
+            "ringStaging": 1
+          },
+          "fallback": null,
+          "activePlanIdAtStart": null,
+          "finalActivePlanId": null,
+          "transitions": []
+        }
+      },
+      "rejectedOrFallbackVariants": [],
+      "dominantOperation": null,
+      "dominantObservedWall": {
+        "phase": "decode",
+        "wall": "host-orchestration",
+        "ms": 1269.7195300000021
+      },
+      "digest": "sha256:a942666c31dd8bfefa406a4b953b95bef0e24b24df597f40a76e21143505f489"
+    }
+  },
+  "output": null,
+  "memory": {
+    "used": 1023101440,
+    "pool": {
+      "allocations": 42136,
+      "reuses": 58464,
+      "totalBytesAllocated": 1454758400,
+      "peakBytesAllocated": 949097984,
+      "currentBytesAllocated": 947603968,
+      "totalBytesRequested": 1407587072,
+      "peakBytesRequested": 935209472,
+      "currentBytesRequested": 933718528,
+      "activeBuffers": 555,
+      "pooledBuffers": 64,
+      "budgetMaxBytes": 0,
+      "budgetUtilization": 0,
+      "hitRate": "58.1%"
+    },
+    "kvCache": {
+      "theoretical": 75497472,
+      "allocated": 75497472,
+      "used": 2488320,
+      "efficiency": 0.032958984375,
+      "seqLen": 135,
+      "maxSeqLen": 4096,
+      "layout": "contiguous",
+      "kvDtype": "f16",
+      "counters": {
+        "updateCalls": 0,
+        "gpuUpdateCalls": 0,
+        "recordedGpuUpdateCalls": 5760,
+        "tokensWritten": 12150
+      }
+    }
+  },
+  "debugSnapshot": null
+}

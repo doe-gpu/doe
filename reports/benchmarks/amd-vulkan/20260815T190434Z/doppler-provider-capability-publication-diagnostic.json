@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-capability-publication-diagnostic",
+  "generatedAt": "2026-08-15T19:04:34.107Z",
+  "evidenceMaturity": "diagnostic",
+  "outcome": "bounded-correctness-and-path-selection-pass",
+  "workload": {
+    "id": "doppler_provider_diagnostic_gemma3_270m_prefill_64tok_decode_1tok",
+    "sourceRepository": "https://github.com/clocksmith/doppler",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "sourceTrackedClean": true,
+    "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+    "promptPrefillTokens": 64,
+    "actualPrefillTokens": 72,
+    "decodeTokens": 1,
+    "timedRuns": 1
+  },
+  "change": {
+    "summary": "Bind Vulkan identity, features, and limits to one physical-device selection, reject device/adapter identity drift, and publish positive native limits without clamping them to Doe's fallback table.",
+    "causalDefect": "The JavaScript capability publisher treated conservative fallback limits as ceilings. Doppler therefore observed 128 MiB storage bindings, a 256 MiB maximum buffer, and 32 KiB workgroup storage on a Radeon whose queried native limits are larger, selecting a CPU-streaming application path.",
+    "provenanceHardening": "The native adapter probe now captures identity, features, and limits from the same selected VkPhysicalDevice. This prevents a separate probe or ICD ordering change from attaching another device's capabilities to the published adapter.",
+    "source": [
+      {
+        "path": "runtime/zig/src/backend/vulkan/vk_adapter_probe.zig",
+        "sha256": "f3470c80c3cdfc7da3c2f0a03d7653c68782239813a85ae2169c50bffe5b0ff2"
+      },
+      {
+        "path": "runtime/zig/src/native/lifecycle/doe_instance_device_native.zig",
+        "sha256": "752d7f68c886a553cc40c9082610d34df69115c6298a6f74fbbd3c4d52d347c0"
+      },
+      {
+        "path": "packages/doe-gpu/src/vendor/webgpu/shared/capabilities.js",
+        "sha256": "1c0ad34270f92c54730648e7dcd9feac396961c310d387ed6796aa996b1b7b8d"
+      }
+    ],
+    "runtimeArtifact": {
+      "path": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+      "sha256": "973ca698bd6b52ccbbf2aaa9132e8751a0039fea865e76ec63be4a77f5cc77ad"
+    }
+  },
+  "hardware": {
+    "vendor": "AMD",
+    "architecture": "vulkan",
+    "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+    "vendorID": 4098,
+    "deviceID": 5510
+  },
+  "before": {
+    "report": {
+      "path": "reports/gemma-3-270m-it-q4k-ehf16-af32/2026-08-15T18-49-36.308Z.json",
+      "sha256": "68b1177cbddb6f4fa438348fc63c3803e5004547ab501c4472b1bf9928d72622"
+    },
+    "trace": {
+      "metaPath": "bench/out/node-doppler-provider-compare/doe-root-cause-v2/trace.meta.json",
+      "metaSha256": "be8c245395ab7448133430596d91bc98d012b1e6899eebaf84a36a8b6cad918f",
+      "eventsPath": "bench/out/node-doppler-provider-compare/doe-root-cause-v2/trace.ndjson",
+      "eventsSha256": "579932149048bee0d73073c3a286d8400f38a96525d5f2d0fef8b48f9c108250"
+    },
+    "publishedLimits": {
+      "maxBufferSize": 134217728,
+      "maxWorkgroupStorageSize": 32768
+    },
+    "gpuPoolBytes": 369245696,
+    "timingMs": {
+      "modelLoad": 22180.23,
+      "prefill": 14676.65,
+      "totalRun": 14676.88
+    }
+  },
+  "after": {
+    "report": {
+      "path": "reports/gemma-3-270m-it-q4k-ehf16-af32/2026-08-15T19-04-34.107Z.json",
+      "sha256": "b05333b17656990f2aa26c5025103ef776dfe370f91deacf20bd285d3488d661"
+    },
+    "trace": {
+      "metaPath": "bench/out/node-doppler-provider-compare/doe-root-cause-v4/trace.meta.json",
+      "metaSha256": "849c23190010415fd72f1bae25241bd8609e208a49f401c1fe77996bd793fb09",
+      "eventsPath": "bench/out/node-doppler-provider-compare/doe-root-cause-v4/trace.ndjson",
+      "eventsSha256": "aa7a5dd8019f5ef556b302eb1d826bb577de858538d4a54ed8f5897bbd1282e8"
+    },
+    "publishedLimits": {
+      "maxBufferSize": 4294967295,
+      "maxStorageBufferBindingSize": 4294967295,
+      "maxWorkgroupStorageSize": 65536
+    },
+    "gpuPoolBytes": 612515328,
+    "timingMs": {
+      "modelLoad": 41618.68,
+      "prefill": 175.99,
+      "totalRun": 176.23
+    },
+    "providerRelease": "pass",
+    "providerGlobalsRestored": true
+  },
+  "correctness": {
+    "status": "pass",
+    "beforeGeneratedTextSha256": "31b280ed24a16e75d6acbe78247b5e510ad09a129c67359aec64aa3fe95a971d",
+    "afterGeneratedTextSha256": "31b280ed24a16e75d6acbe78247b5e510ad09a129c67359aec64aa3fe95a971d",
+    "beforeGeneratedTokenIdsHash": "sha256:713c2cd352d3ce85f3424e03d0ee2dfb9705d1f51743cacda54db56bb3c914bd",
+    "afterGeneratedTokenIdsHash": "sha256:713c2cd352d3ce85f3424e03d0ee2dfb9705d1f51743cacda54db56bb3c914bd"
+  },
+  "performance": {
+    "status": "diagnostic-positive",
+    "prefillSpeedupRatio": 83.395,
+    "totalRunSpeedupRatio": 83.283,
+    "modelLoadSlowdownRatio": 1.876,
+    "summary": "The corrected limits eliminate the bounded inference bottleneck while increasing model-load cost and GPU residency. This is a mechanism result, not a complete user-visible ownership decision."
+  },
+  "decision": {
+    "runtimeOwnershipCredit": false,
+    "nextGate": "Freeze and execute a new full W0/D0 application comparison for this corrected runtime, including model load, repeated inference, teardown, exact output, and the same user-visible timing rule.",
+    "priorGateStatus": "The earlier Doppler performance hypothesis remains terminal for its frozen runtime artifact and is not retroactively reinterpreted."
+  },
+  "limitations": [
+    "This is one bounded diagnostic sample, not the frozen full Doppler ownership workload.",
+    "The governed incumbent was not rerun in this diagnostic.",
+    "The larger-limit path increases model-load time and GPU memory; the final selected operation must account for both.",
+    "The no-subgroup workaround fails on the large-limit inline kernel path; this passing run uses the provider's native subgroup path.",
+    "No release, claim-index, broad compatibility, stress, concurrency, or device-loss promotion is authorized."
+  ]
+}

@@ -49,6 +49,13 @@ DOPPLER_PROVIDER_COMPARE_CONFIG_PATH = (
 DOPPLER_PROVIDER_SCENARIO_PATH = (
     REPO_ROOT / 'bench' / 'vendor-node' / 'doppler_provider_compare_gemma270m_commands.json'
 )
+DOPPLER_PROVIDER_DIAGNOSTIC_SCENARIO_PATH = (
+    REPO_ROOT / 'bench' / 'vendor-node' /
+    'doppler_provider_diagnostic_gemma270m_commands.json'
+)
+DOPPLER_PROVIDER_RUNNER_PATH = (
+    REPO_ROOT / 'bench' / 'executors' / 'run-node-doppler-ort-bench.js'
+)
 
 
 class NodeOrtVsDopplerLaneTests(unittest.TestCase):
@@ -94,6 +101,33 @@ class NodeOrtVsDopplerLaneTests(unittest.TestCase):
             scenario['doppler']['modelId'],
             'gemma-3-270m-it-q4k-ehf16-af32',
         )
+
+    def test_doppler_provider_diagnostic_is_bounded_and_separate(self) -> None:
+        payload = json.loads(
+            DOPPLER_PROVIDER_DIAGNOSTIC_SCENARIO_PATH.read_text(encoding='utf-8')
+        )
+        self.assertEqual(len(payload), 1)
+        scenario = payload[0]
+        self.assertEqual(
+            scenario['scenarioId'],
+            'doppler_provider_diagnostic_gemma3_270m_prefill_64tok_decode_1tok',
+        )
+        self.assertEqual(scenario['benchmarkLane'], 'doppler-node-provider-diagnostic')
+        self.assertEqual(scenario['promptWorkload']['decodeTokens'], 1)
+        self.assertEqual(
+            scenario['doppler']['runtimeConfig']['shared']['benchmark']['run'],
+            {'warmupRuns': 0, 'timedRuns': 1},
+        )
+
+    def test_doppler_provider_persists_inference_before_native_release(self) -> None:
+        source = DOPPLER_PROVIDER_RUNNER_PATH.read_text(encoding='utf-8')
+        provisional = source.index(
+            "lifecycleEvidenceState: 'inference-complete-release-pending'"
+        )
+        release = source.index('const providerRelease = typeof releaseProvider')
+        terminal = source.index("lifecycleEvidenceState: 'release-complete'")
+        self.assertLess(provisional, release)
+        self.assertLess(release, terminal)
 
     def test_doppler_summary_hashes_exact_generated_text(self) -> None:
         script = f"""

@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/governed-node-webgpu-process-contract.schema.json",
+  "title": "Doe governed Node WebGPU process contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "provider", "workload", "process", "evaluator"],
+  "properties": {
+    "schema": {
+      "const": "doe.governed-node-webgpu-process-contract/v1"
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "module", "sha256"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "module": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "implementationSha256",
+        "input",
+        "expectedOutputSha256"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "implementationSha256": { "$ref": "#/$defs/sha256" },
+        "input": { "$ref": "#/$defs/file" },
+        "expectedOutputSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entrypoint",
+        "environment",
+        "timeoutMs",
+        "maxOutputBytes"
+      ],
+      "properties": {
+        "executable": { "type": "string", "minLength": 1 },
+        "nodeArgs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "entrypoint": { "$ref": "#/$defs/file" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "cwd": { "type": "string", "minLength": 1 },
+        "environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode"],
+          "properties": {
+            "mode": { "enum": ["inherit", "sealed"] },
+            "values": {
+              "type": "object",
+              "propertyNames": { "minLength": 1 },
+              "additionalProperties": {
+                "type": ["string", "null"]
+              }
+            }
+          }
+        },
+        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "maxOutputBytes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "sha256"],
+      "properties": {
+        "module": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "export": { "type": "string", "minLength": 1 }
+      }
+    },
+    "runtimeFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "sha256"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

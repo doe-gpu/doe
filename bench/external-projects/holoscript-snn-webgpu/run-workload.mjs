@@ -110,7 +110,16 @@ const receiptEnabled = receiptMode === 'enabled';
 const inputs = JSON.parse(await readFile(inputPath, 'utf8'));
 
 const providerModule = await import('webgpu');
-const providerIdentity = providerModule.__doeHarnessProviderIdentity;
+const proofProviderIdentity = providerModule.__doeProofProviderIdentity;
+const providerIdentity = providerModule.__doeHarnessProviderIdentity ?? (
+  proofProviderIdentity
+    ? Object.freeze({
+        id: proofProviderIdentity.providerId,
+        modulePath: proofProviderIdentity.resolvedProviderUrl,
+        doeProof: proofProviderIdentity,
+      })
+    : null
+);
 if (providerIdentity?.id !== providerId) {
   throw new Error(
     `Provider substitution failed: expected ${providerId}, loaded ${providerIdentity?.id ?? 'unknown'}.`,

@@ -1,6 +1,8 @@
 export const NODE_WEBGPU_PROVIDER_SCHEMA: 'doe.webgpu-provider/v1';
 export const NODE_WEBGPU_PROVIDER_RECEIPT_SCHEMA: 'doe.webgpu-provider-receipt/v1';
+export const NODE_WEBGPU_GOVERNED_RECEIPT_SCHEMA: 'doe.governed-node-webgpu-receipt/v1';
 export const NODE_WEBGPU_PROVIDER_ERROR_CODES: readonly string[];
+export const NODE_WEBGPU_GOVERNED_ERROR_CODES: readonly string[];
 
 export type NodeWebGPUGlobalMode = 'none' | 'install-missing' | 'replace';
 
@@ -95,6 +97,58 @@ export function hasGpuEnums(): boolean;
 export function installNavigatorGpu(gpu: GPU, options?: { force?: boolean }): boolean;
 export function openNodeWebGPU(options: NodeWebGPUProviderOptions): Promise<NodeWebGPUProviderSession>;
 export function probeNodeWebGPU(options: NodeWebGPUProviderOptions): Promise<NodeWebGPUProbeSuccess | NodeWebGPUProbeFailure>;
+
+export type NodeWebGPUByteSource = string | ArrayBuffer | ArrayBufferView;
+
+export interface NodeWebGPUGovernedWorkload {
+  id: string;
+  version: string;
+  implementationSha256: `sha256:${string}`;
+  input: NodeWebGPUByteSource;
+  expectedOutputSha256: `sha256:${string}`;
+}
+
+export interface NodeWebGPUGovernedCheckpointReceipt {
+  schema: 'doe.governed-node-webgpu-receipt/v1';
+  status: 'oracle-pass' | 'pass' | 'failed';
+  checkpoint: 'inference-complete-release-pending' | 'release-complete';
+  workload: Record<string, unknown>;
+  provider: Record<string, unknown>;
+  adapterInfo: Record<string, unknown>;
+  adapterInfoStatus: 'observed' | 'absent' | 'query-failed';
+  oracle: Record<string, unknown>;
+  execution: { durationMs: number | null };
+  lifecycle: Record<string, unknown>;
+  replay: { workloadSha256: string; executionSha256: string };
+  errors: Array<{ code: string; stage: string; detail: string }>;
+}
+
+export interface NodeWebGPUGovernedOptions {
+  provider: NodeWebGPUProviderOptions;
+  workload: NodeWebGPUGovernedWorkload;
+  execute(context: {
+    gpu: GPU;
+    adapter: GPUAdapter;
+    module: unknown;
+    input: Uint8Array;
+  }): Promise<NodeWebGPUByteSource> | NodeWebGPUByteSource;
+  checkpoint?(receipt: NodeWebGPUGovernedCheckpointReceipt): Promise<void> | void;
+}
+
+export interface NodeWebGPUGovernedResult {
+  ok: boolean;
+  output: Uint8Array | null;
+  receipt: NodeWebGPUGovernedCheckpointReceipt | null;
+  errors: Array<{ code: string; stage: string; detail: string }>;
+}
+
+export function validateGovernedNodeWebGPUReceipt(
+  receipt: unknown,
+): { valid: boolean; errors: string[] };
+
+export function runGovernedNodeWebGPU(
+  options: NodeWebGPUGovernedOptions,
+): Promise<NodeWebGPUGovernedResult>;
 
 export interface NodeWebGPUCompatibilityBootstrapOptions {
   force?: boolean;

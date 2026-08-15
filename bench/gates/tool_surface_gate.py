@@ -72,6 +72,18 @@ def collect_export_targets(value: Any, package_root_rel: str) -> set[str]:
     return targets
 
 
+def collect_bin_targets(value: Any, package_root_rel: str) -> set[str]:
+    targets: set[str] = set()
+    if isinstance(value, str):
+        normalized = value[2:] if value.startswith("./") else value
+        targets.add(f"{package_root_rel}/{normalized}")
+        return targets
+    if isinstance(value, dict):
+        for child in value.values():
+            targets.update(collect_bin_targets(child, package_root_rel))
+    return targets
+
+
 def validate_declared_paths(
     root: Path,
     surface: dict[str, Any],
@@ -153,6 +165,7 @@ def validate_package_surface(
         return failures
 
     exported_targets = collect_export_targets(package_json.get("exports"), package_root_rel)
+    bin_targets = collect_bin_targets(package_json.get("bin"), package_root_rel)
     declared_entrypoints = {
         item
         for item in surface.get("entrypoints", [])
@@ -167,10 +180,20 @@ def validate_package_surface(
             )
         )
 
+    for target in sorted(bin_targets - declared_entrypoints):
+        failures.append(
+            failure(
+                "package_bin_missing_from_surface",
+                f"{surface_path}.entrypoints",
+                f"package bin target is not declared in tool surface: {target}",
+            )
+        )
+
+    public_targets = exported_targets | bin_targets
     for entrypoint in sorted(declared_entrypoints):
         if not entrypoint.startswith(f"{package_root_rel}/"):
             continue
-        if entrypoint.endswith(PACKAGE_EXPORT_EXTENSIONS) and entrypoint not in exported_targets:
+        if entrypoint.endswith(PACKAGE_EXPORT_EXTENSIONS) and entrypoint not in public_targets:
             failures.append(
                 failure(
                     "surface_entrypoint_not_exported",

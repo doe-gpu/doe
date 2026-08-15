@@ -77,6 +77,7 @@ digraph doe_zig_architecture {
   "src/backend/vulkan/backend_execute.zig" [label="src/backend/vulkan/backend_execute.zig\nbackend-vulkan"];
   "src/backend/vulkan/mod.zig" [label="src/backend/vulkan/mod.zig\nbackend-vulkan"];
   "src/backend/vulkan/native_runtime.zig" [label="src/backend/vulkan/native_runtime.zig\nbackend-vulkan"];
+  "src/backend/vulkan/vk_adapter_probe.zig" [label="src/backend/vulkan/vk_adapter_probe.zig\nbackend-vulkan"];
   "src/backend/vulkan/vk_async_dispatch.zig" [label="src/backend/vulkan/vk_async_dispatch.zig\nbackend-vulkan"];
   "src/backend/vulkan/vk_async_probes.zig" [label="src/backend/vulkan/vk_async_probes.zig\nbackend-vulkan"];
   "src/backend/vulkan/vk_capability_structs.zig" [label="src/backend/vulkan/vk_capability_structs.zig\nbackend-vulkan"];
@@ -742,6 +743,7 @@ digraph doe_zig_architecture {
   "src/backend/dropin_capabilities.zig" -> "src/backend/vulkan/vk_feature_caps.zig";
   "src/backend/dropin_capabilities.zig" -> "src/backend/vulkan/vk_device_caps.zig";
   "src/backend/dropin_capabilities.zig" -> "src/backend/vulkan/vk_feature_probe.zig";
+  "src/backend/dropin_capabilities.zig" -> "src/backend/vulkan/vk_adapter_probe.zig";
   "src/backend/dropin_external_texture.zig" -> "src/backend/metal/metal_bridge_decls.zig";
   "src/backend/dropin_external_texture.zig" -> "src/backend/metal/metal_external_texture.zig";
   "src/backend/dropin_lifecycle.zig" -> "src/backend/metal/metal_bridge_decls.zig";
@@ -959,6 +961,12 @@ digraph doe_zig_architecture {
   "src/backend/vulkan/native_runtime.zig" -> "src/runtime/render/render_bundle.zig";
   "src/backend/vulkan/native_runtime.zig" -> "src/backend/vulkan/vk_texture_commands.zig";
   "src/backend/vulkan/native_runtime.zig" -> "src/backend/vulkan/vulkan_timing.zig";
+  "src/backend/vulkan/vk_adapter_probe.zig" -> "src/contracts/backend.zig";
+  "src/backend/vulkan/vk_adapter_probe.zig" -> "src/backend/vulkan/vk_constants.zig";
+  "src/backend/vulkan/vk_adapter_probe.zig" -> "src/backend/vulkan/native_runtime.zig";
+  "src/backend/vulkan/vk_adapter_probe.zig" -> "src/backend/vulkan/vk_device.zig";
+  "src/backend/vulkan/vk_adapter_probe.zig" -> "src/backend/vulkan/vk_device_caps.zig";
+  "src/backend/vulkan/vk_adapter_probe.zig" -> "src/backend/vulkan/vk_feature_caps.zig";
   "src/backend/vulkan/vk_async_dispatch.zig" -> "src/contracts/model/model_texture_value_types.zig";
   "src/backend/vulkan/vk_async_dispatch.zig" -> "src/contracts/model/model_async_types.zig";
   "src/backend/vulkan/vk_async_dispatch.zig" -> "src/backend/runtime_types.zig";

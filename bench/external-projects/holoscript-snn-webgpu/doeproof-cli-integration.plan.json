@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-doeproof-cli-integration-plan",
+  "planId": "holoscript-tropical-spmv-doeproof-cli-qm0-v1",
+  "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+  "expectedComparableSha256": "51cda2a94da7edad85499240ac8cc5744598fb4227f4f38535a8c97880f585f4",
+  "workload": "unchanged pinned HoloScript tropical-SpMV application and shader over the frozen topology inputs",
+  "commands": ["run", "verify", "inspect", "compare", "replay"],
+  "lanes": {
+    "W0": "pinned webgpu@0.3.10 through the public DoeProof CLI and loader",
+    "D0": "Doe package provider through the same public DoeProof CLI and loader"
+  },
+  "acceptance": [
+    "run, verify, and inspect pass for both W0 and D0",
+    "both artifacts expose valid governed-process receipts and exact frozen output",
+    "W0/D0 compare reports equal workload and output without performance or ownership credit",
+    "D0 replay reproduces semantic workload and execution identities",
+    "original/replay compare passes",
+    "all referenced contract, provider, application, input, and evaluator files are hash-bound"
+  ],
+  "decision": {
+    "pass": "authorize doe-proof-node as the CI front door for the unchanged-application DoeProof contract",
+    "fail": "retain the JavaScript process API and keep the CLI unproven on a real application"
+  },
+  "nonGoals": [
+    "runtime-ownership credit",
+    "performance interpretation",
+    "application promotion",
+    "release-blocker status",
+    "reinterpretation of the terminal HoloScript ownership decision"
+  ]
+}

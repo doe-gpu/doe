@@ -276,8 +276,28 @@ try {
 if (nodeWebgpu) {
   check('node-webgpu exports bootstrapNodeWebGPU', typeof nodeWebgpu.bootstrapNodeWebGPU === 'function');
   check('node-webgpu exports bootstrapNodeWebGPUProvider', typeof nodeWebgpu.bootstrapNodeWebGPUProvider === 'function');
+  check('node-webgpu exports runGovernedNodeWebGPU', typeof nodeWebgpu.runGovernedNodeWebGPU === 'function');
+  check('node-webgpu exports validateGovernedNodeWebGPUReceipt', typeof nodeWebgpu.validateGovernedNodeWebGPUReceipt === 'function');
   check('node-webgpu exports hasNavigatorGpu', typeof nodeWebgpu.hasNavigatorGpu === 'function');
   check('node-webgpu exports installNavigatorGpu', typeof nodeWebgpu.installNavigatorGpu === 'function');
+}
+
+let nodeWebgpuProcess;
+try {
+  nodeWebgpuProcess = await import('doe-gpu/node-webgpu-process');
+  check('node-webgpu-process import succeeds', true);
+} catch (err) {
+  check('node-webgpu-process import succeeds', false, err.message);
+}
+if (nodeWebgpuProcess) {
+  check(
+    'node-webgpu-process exports runGovernedNodeWebGPUProcess',
+    typeof nodeWebgpuProcess.runGovernedNodeWebGPUProcess === 'function',
+  );
+  check(
+    'node-webgpu-process exports validateGovernedNodeWebGPUProcessReceipt',
+    typeof nodeWebgpuProcess.validateGovernedNodeWebGPUProcessReceipt === 'function',
+  );
 }
 
 let plan;

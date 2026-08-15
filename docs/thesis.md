@@ -116,7 +116,7 @@ narrative stays here; implementation and evidence stay in the linked sources.
 | `DOE-01` | Fawn agent browser | `active` | First-class Doe browser product target at the Chromium WebGPU seam; current evidence remains diagnostic, and browser-wide agent orchestration is outside Doe. |
 | `DOE-02` | DoeKernel accelerator scheduler | `candidate` | Queue/resource contracts and prototypes; no browser-wide scheduler claim. |
 | `DOE-03` | DoeVM portable compute layer | `diagnostic` | WGSL/IR/TSIR/HostPlan/CSL direction; not yet a universal VM. |
-| `DOE-04` | DoeProof execution evidence | `active` | Workload, oracle, receipt, replay, and qualification trunk. |
+| `DOE-04` | DoeProof execution evidence | `active` | Workload, oracle, receipt, replay, and qualification trunk; provider-neutral callback, unchanged-process, and CLI/CI execution are public through `doe-gpu/node-webgpu`, `doe-gpu/node-webgpu-process`, and `doe-proof-node`. |
 | `DOE-05` | DoeHypervisor agent isolation | `horizon` | Possible accelerator capability policy; OS/browser security remains external. |
 | `DOE-06` | Intent-to-capability web | `external-owned` | WebMCP/site/agent protocols supply workloads; Doe executes their compute edges. |
 | `DOE-07` | DoeMind private local AI | `candidate` | Node/Bun/Electron workload wedge; browser-wide personal memory is not current Doe scope. |

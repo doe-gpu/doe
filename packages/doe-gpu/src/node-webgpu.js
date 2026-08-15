@@ -1,10 +1,12 @@
 // doe-gpu/node-webgpu - strict, receipt-backed Node WebGPU provider contract.
 
+import { createHash } from 'node:crypto';
 import { isAbsolute, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const NODE_WEBGPU_PROVIDER_SCHEMA = 'doe.webgpu-provider/v1';
 export const NODE_WEBGPU_PROVIDER_RECEIPT_SCHEMA = 'doe.webgpu-provider-receipt/v1';
+export const NODE_WEBGPU_GOVERNED_RECEIPT_SCHEMA = 'doe.governed-node-webgpu-receipt/v1';
 
 export const NODE_WEBGPU_PROVIDER_ERROR_CODES = Object.freeze([
   'DOE_PROVIDER_INVALID_CONFIGURATION',
@@ -19,6 +21,15 @@ export const NODE_WEBGPU_PROVIDER_ERROR_CODES = Object.freeze([
   'DOE_PROVIDER_RESTORE_FAILED',
 ]);
 
+export const NODE_WEBGPU_GOVERNED_ERROR_CODES = Object.freeze([
+  'DOE_GOVERNED_WORKLOAD_INVALID_CONFIGURATION',
+  'DOE_GOVERNED_WORKLOAD_PROVIDER_FAILED',
+  'DOE_GOVERNED_WORKLOAD_EXECUTION_FAILED',
+  'DOE_GOVERNED_WORKLOAD_ORACLE_FAILED',
+  'DOE_GOVERNED_WORKLOAD_RECEIPT_SINK_FAILED',
+  'DOE_GOVERNED_WORKLOAD_RELEASE_FAILED',
+]);
+
 const REQUIRED_WEBGPU_GLOBALS = Object.freeze([
   'GPUBufferUsage',
   'GPUShaderStage',
@@ -30,6 +41,20 @@ const GPU_BINDING_KEYS = new Set(['kind', 'path', 'args', 'resultPath']);
 const GLOBAL_POLICY_KEYS = new Set(['mode']);
 const OPEN_OPTIONS_KEYS = new Set(['providers', 'adapterOptions', 'globals']);
 const SAFE_PATH_SEGMENT = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+const SHA256_PATTERN = /^sha256:[a-f0-9]{64}$/;
+const ADAPTER_INFO_FIELDS = Object.freeze([
+  'vendor',
+  'architecture',
+  'device',
+  'description',
+  'backendType',
+  'adapterType',
+  'vendorID',
+  'deviceID',
+  'driverVersion',
+  'subgroupMinSize',
+  'subgroupMaxSize',
+]);
 
 function own(object, key) {
   return Object.prototype.hasOwnProperty.call(object, key);
@@ -118,6 +143,134 @@ function cloneReceiptValue(value) {
     return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, cloneReceiptValue(item)]));
   }
   return String(value);
+}
+
+function stableReceiptValue(value) {
+  if (Array.isArray(value)) return value.map(stableReceiptValue);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, stableReceiptValue(value[key])]),
+    );
+  }
+  return value;
+}
+
+function sha256(value) {
+  const bytes = typeof value === 'string' ? Buffer.from(value, 'utf8') : value;
+  return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+}
+
+function stableSha256(value) {
+  return sha256(JSON.stringify(stableReceiptValue(value)));
+}
+
+function byteView(value, label) {
+  if (typeof value === 'string') return Buffer.from(value, 'utf8');
+  if (value instanceof ArrayBuffer) return new Uint8Array(value);
+  if (ArrayBuffer.isView(value)) {
+    return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+  }
+  throw new TypeError(`${label} must be a string, ArrayBuffer, or ArrayBuffer view.`);
+}
+
+function assertGovernedSha256(value, label) {
+  if (typeof value !== 'string' || !SHA256_PATTERN.test(value)) {
+    throw new TypeError(`${label} must be a lowercase sha256:<64 hex> digest.`);
+  }
+}
+
+function normalizeGovernedWorkload(workload) {
+  if (!workload || typeof workload !== 'object' || Array.isArray(workload)) {
+    throw new TypeError('workload must be an object.');
+  }
+  for (const field of ['id', 'version']) {
+    if (typeof workload[field] !== 'string' || workload[field].trim().length === 0) {
+      throw new TypeError(`workload.${field} must be a non-empty string.`);
+    }
+  }
+  assertGovernedSha256(workload.implementationSha256, 'workload.implementationSha256');
+  assertGovernedSha256(workload.expectedOutputSha256, 'workload.expectedOutputSha256');
+  const input = byteView(workload.input, 'workload.input');
+  return {
+    id: workload.id,
+    version: workload.version,
+    implementationSha256: workload.implementationSha256,
+    expectedOutputSha256: workload.expectedOutputSha256,
+    input,
+    inputSha256: sha256(input),
+    inputBytes: input.byteLength,
+  };
+}
+
+async function readAdapterInfo(adapter) {
+  try {
+    const info = adapter?.info
+      ?? (typeof adapter?.getInfo === 'function' ? await adapter.getInfo() : null)
+      ?? (
+        typeof adapter?.requestAdapterInfo === 'function'
+          ? await adapter.requestAdapterInfo()
+          : null
+      );
+    if (!info || typeof info !== 'object') return {};
+    const normalized = cloneReceiptValue(info);
+    for (const field of ADAPTER_INFO_FIELDS) {
+      try {
+        if (info[field] !== undefined) normalized[field] = cloneReceiptValue(info[field]);
+      } catch {
+        // Keep any independently readable identity fields.
+      }
+    }
+    return normalized;
+  } catch (error) {
+    return { queryError: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+function adapterInfoStatus(adapterInfo) {
+  if (adapterInfo?.queryError) return 'query-failed';
+  return Object.keys(adapterInfo ?? {}).length > 0 ? 'observed' : 'absent';
+}
+
+function selectedProviderFromReceipt(providerReceipt) {
+  return providerReceipt?.providers?.find(
+    (provider) => provider.id === providerReceipt?.selectedProviderId,
+  ) ?? null;
+}
+
+function governedExecutionIdentity(receipt) {
+  return stableSha256({
+    workloadReplaySha256: receipt.replay.workloadSha256,
+    providerContract: receipt.provider.receipt?.contract ?? null,
+    selectedProviderId: receipt.provider.receipt?.selectedProviderId ?? null,
+    selectedProvider: selectedProviderFromReceipt(receipt.provider.receipt),
+    adapterInfo: receipt.adapterInfo,
+    oracleStatus: receipt.oracle.status,
+    actualOutputSha256: receipt.oracle.actualOutputSha256,
+    outputBytes: receipt.oracle.outputBytes,
+  });
+}
+
+function governedError(code, stage, error) {
+  return {
+    code,
+    stage,
+    detail: error instanceof Error ? error.message : String(error),
+  };
+}
+
+async function emitGovernedCheckpoint(sink, receipt, errors) {
+  if (typeof sink !== 'function') return;
+  try {
+    await sink(cloneReceiptValue(receipt));
+  } catch (error) {
+    errors.push(governedError(
+      'DOE_GOVERNED_WORKLOAD_RECEIPT_SINK_FAILED',
+      'receipt.sink',
+      error,
+    ));
+  }
 }
 
 function normalizeProvider(provider, index) {
@@ -617,6 +770,311 @@ export async function probeNodeWebGPU(options) {
     if (!(error instanceof NodeWebGPUProviderError)) throw error;
     return { ok: false, session: null, receipt: error.receipt, error };
   }
+}
+
+export function validateGovernedNodeWebGPUReceipt(receipt) {
+  const errors = [];
+  if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt)) {
+    return { valid: false, errors: ['receipt must be an object'] };
+  }
+  if (receipt.schema !== NODE_WEBGPU_GOVERNED_RECEIPT_SCHEMA) {
+    errors.push(`schema must be ${NODE_WEBGPU_GOVERNED_RECEIPT_SCHEMA}`);
+  }
+  if (!['oracle-pass', 'pass', 'failed'].includes(receipt.status)) {
+    errors.push('status is invalid');
+  }
+  if (!['inference-complete-release-pending', 'release-complete'].includes(receipt.checkpoint)) {
+    errors.push('checkpoint is invalid');
+  }
+  for (const [field, value] of [
+    ['workload', receipt.workload],
+    ['provider', receipt.provider],
+    ['adapterInfo', receipt.adapterInfo],
+    ['oracle', receipt.oracle],
+    ['execution', receipt.execution],
+    ['lifecycle', receipt.lifecycle],
+    ['replay', receipt.replay],
+  ]) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      errors.push(`${field} must be an object`);
+    }
+  }
+  if (!Array.isArray(receipt.errors)) errors.push('errors must be an array');
+  if (errors.length > 0) return { valid: false, errors };
+
+  if (!['pass', 'fail'].includes(receipt.oracle.status)) {
+    errors.push('oracle.status is invalid');
+  }
+  if (!['release-pending', 'release-complete', 'release-failed', 'not-opened'].includes(
+    receipt.lifecycle.status,
+  )) {
+    errors.push('lifecycle.status is invalid');
+  }
+  if (!Number.isInteger(receipt.workload.inputBytes) || receipt.workload.inputBytes < 0) {
+    errors.push('workload.inputBytes must be a non-negative integer');
+  }
+  if (
+    receipt.oracle.outputBytes !== null
+    && (!Number.isInteger(receipt.oracle.outputBytes) || receipt.oracle.outputBytes < 0)
+  ) {
+    errors.push('oracle.outputBytes must be null or a non-negative integer');
+  }
+  if (
+    receipt.execution.durationMs !== null
+    && (!Number.isFinite(receipt.execution.durationMs) || receipt.execution.durationMs < 0)
+  ) {
+    errors.push('execution.durationMs must be null or a non-negative finite number');
+  }
+  for (const [index, error] of receipt.errors.entries()) {
+    if (
+      !error
+      || typeof error !== 'object'
+      || typeof error.code !== 'string'
+      || typeof error.stage !== 'string'
+      || typeof error.detail !== 'string'
+    ) {
+      errors.push(`errors[${index}] is invalid`);
+    } else if (!NODE_WEBGPU_GOVERNED_ERROR_CODES.includes(error.code)) {
+      errors.push(`errors[${index}].code is not recognized by schema v1`);
+    }
+  }
+
+  for (const [field, value] of [
+    ['workload.implementationSha256', receipt.workload.implementationSha256],
+    ['workload.inputSha256', receipt.workload.inputSha256],
+    ['workload.oracle.expectedOutputSha256', receipt.workload.oracle?.expectedOutputSha256],
+    ['oracle.expectedOutputSha256', receipt.oracle.expectedOutputSha256],
+    ['replay.workloadSha256', receipt.replay.workloadSha256],
+    ['replay.executionSha256', receipt.replay.executionSha256],
+  ]) {
+    if (typeof value !== 'string' || !SHA256_PATTERN.test(value)) {
+      errors.push(`${field} must be a lowercase SHA-256 digest`);
+    }
+  }
+  if (
+    receipt.oracle.actualOutputSha256 !== null
+    && (typeof receipt.oracle.actualOutputSha256 !== 'string'
+      || !SHA256_PATTERN.test(receipt.oracle.actualOutputSha256))
+  ) {
+    errors.push('oracle.actualOutputSha256 must be null or a lowercase SHA-256 digest');
+  }
+  if (receipt.workload.oracle?.kind !== 'sha256-exact' || receipt.oracle.kind !== 'sha256-exact') {
+    errors.push('only the sha256-exact oracle is valid for schema v1');
+  }
+  if (receipt.workload.oracle?.expectedOutputSha256 !== receipt.oracle.expectedOutputSha256) {
+    errors.push('workload and oracle expected-output identities differ');
+  }
+  if (
+    receipt.oracle.status === 'pass'
+    && receipt.oracle.actualOutputSha256 !== receipt.oracle.expectedOutputSha256
+  ) {
+    errors.push('passing oracle requires matching actual and expected output identities');
+  }
+  if (
+    receipt.provider.selectedProviderId
+    !== (receipt.provider.receipt?.selectedProviderId ?? null)
+  ) {
+    errors.push('provider selected identity does not match the provider receipt');
+  }
+  const expectedWorkloadSha256 = stableSha256(receipt.workload);
+  if (receipt.replay.workloadSha256 !== expectedWorkloadSha256) {
+    errors.push('replay.workloadSha256 does not match the workload contract');
+  }
+  const expectedExecutionSha256 = governedExecutionIdentity(receipt);
+  if (receipt.replay.executionSha256 !== expectedExecutionSha256) {
+    errors.push('replay.executionSha256 does not match provider and adapter identity');
+  }
+  if (!['observed', 'absent', 'query-failed'].includes(receipt.adapterInfoStatus)) {
+    errors.push('adapterInfoStatus is invalid');
+  } else if (receipt.adapterInfoStatus !== adapterInfoStatus(receipt.adapterInfo)) {
+    errors.push('adapterInfoStatus does not match adapterInfo');
+  }
+  if (receipt.status === 'oracle-pass') {
+    if (receipt.checkpoint !== 'inference-complete-release-pending') {
+      errors.push('oracle-pass status requires the pre-release checkpoint');
+    }
+    if (receipt.oracle.status !== 'pass' || receipt.lifecycle.status !== 'release-pending') {
+      errors.push('oracle-pass status requires a passing oracle and pending release');
+    }
+    if (receipt.errors.length !== 0) {
+      errors.push('oracle-pass status cannot contain errors');
+    }
+  }
+  if (receipt.status === 'pass') {
+    if (receipt.checkpoint !== 'release-complete') {
+      errors.push('pass status requires the terminal checkpoint');
+    }
+    if (
+      receipt.oracle.status !== 'pass'
+      || receipt.lifecycle.status !== 'release-complete'
+      || receipt.lifecycle.globalsRestored !== true
+      || receipt.errors.length !== 0
+    ) {
+      errors.push('pass status requires oracle pass, completed release, restored globals, and no errors');
+    }
+  }
+  if (receipt.status === 'failed' && receipt.errors.length === 0) {
+    errors.push('failed status requires at least one error');
+  }
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Execute one exact-output workload through an explicitly declared Node WebGPU
+ * provider. The checkpoint sink is called once before provider release and
+ * once after release so a native teardown failure cannot erase completed-work
+ * evidence already persisted by the caller.
+ */
+export async function runGovernedNodeWebGPU(options) {
+  let workload;
+  try {
+    if (!options || typeof options !== 'object' || Array.isArray(options)) {
+      throw new TypeError('governed execution options must be an object.');
+    }
+    if (typeof options.execute !== 'function') {
+      throw new TypeError('execute must be a function.');
+    }
+    if (options.checkpoint !== undefined && typeof options.checkpoint !== 'function') {
+      throw new TypeError('checkpoint must be a function when provided.');
+    }
+    workload = normalizeGovernedWorkload(options.workload);
+  } catch (error) {
+    return {
+      ok: false,
+      output: null,
+      receipt: null,
+      errors: [governedError(
+        'DOE_GOVERNED_WORKLOAD_INVALID_CONFIGURATION',
+        'configuration',
+        error,
+      )],
+    };
+  }
+
+  const errors = [];
+  let session = null;
+  let output = null;
+  let outputSha256 = null;
+  let durationMs = null;
+  let adapterInfo = {};
+  let providerReceipt = null;
+
+  try {
+    session = await openNodeWebGPU(options.provider);
+    providerReceipt = session.receipt;
+    adapterInfo = await readAdapterInfo(session.adapter);
+  } catch (error) {
+    errors.push(governedError(
+      'DOE_GOVERNED_WORKLOAD_PROVIDER_FAILED',
+      'provider.open',
+      error,
+    ));
+    providerReceipt = error instanceof NodeWebGPUProviderError ? error.receipt : null;
+  }
+
+  const workloadIdentity = {
+    id: workload.id,
+    version: workload.version,
+    implementationSha256: workload.implementationSha256,
+    inputSha256: workload.inputSha256,
+    inputBytes: workload.inputBytes,
+    oracle: {
+      kind: 'sha256-exact',
+      expectedOutputSha256: workload.expectedOutputSha256,
+    },
+  };
+  const workloadReplaySha256 = stableSha256(workloadIdentity);
+
+  if (session) {
+    const start = performance.now();
+    try {
+      output = byteView(await options.execute({
+        gpu: session.gpu,
+        adapter: session.adapter,
+        module: session.module,
+        input: workload.input,
+      }), 'execute output');
+      durationMs = performance.now() - start;
+      outputSha256 = sha256(output);
+      if (outputSha256 !== workload.expectedOutputSha256) {
+        errors.push({
+          code: 'DOE_GOVERNED_WORKLOAD_ORACLE_FAILED',
+          stage: 'oracle.output-sha256',
+          detail: `expected ${workload.expectedOutputSha256}, got ${outputSha256}`,
+        });
+      }
+    } catch (error) {
+      durationMs = performance.now() - start;
+      errors.push(governedError(
+        'DOE_GOVERNED_WORKLOAD_EXECUTION_FAILED',
+        'workload.execute',
+        error,
+      ));
+    }
+  }
+
+  const receipt = {
+    schema: NODE_WEBGPU_GOVERNED_RECEIPT_SCHEMA,
+    status: errors.length === 0 ? 'oracle-pass' : 'failed',
+    checkpoint: 'inference-complete-release-pending',
+    workload: workloadIdentity,
+    provider: {
+      selectedProviderId: providerReceipt?.selectedProviderId ?? null,
+      receipt: cloneReceiptValue(providerReceipt),
+    },
+    adapterInfo,
+    adapterInfoStatus: adapterInfoStatus(adapterInfo),
+    oracle: {
+      kind: 'sha256-exact',
+      status: outputSha256 === workload.expectedOutputSha256 ? 'pass' : 'fail',
+      expectedOutputSha256: workload.expectedOutputSha256,
+      actualOutputSha256: outputSha256,
+      outputBytes: output?.byteLength ?? null,
+    },
+    execution: {
+      durationMs,
+    },
+    lifecycle: {
+      status: session ? 'release-pending' : 'not-opened',
+      globalsRestored: providerReceipt?.globals?.restored ?? false,
+    },
+    replay: {
+      workloadSha256: workloadReplaySha256,
+      executionSha256: null,
+    },
+    errors,
+  };
+  receipt.replay.executionSha256 = governedExecutionIdentity(receipt);
+
+  await emitGovernedCheckpoint(options.checkpoint, receipt, errors);
+
+  if (session) {
+    try {
+      await session.close();
+      receipt.lifecycle.status = 'release-complete';
+      receipt.lifecycle.globalsRestored = session.receipt.globals.restored;
+    } catch (error) {
+      receipt.lifecycle.status = 'release-failed';
+      errors.push(governedError(
+        'DOE_GOVERNED_WORKLOAD_RELEASE_FAILED',
+        'provider.release',
+        error,
+      ));
+    }
+  }
+  receipt.provider.receipt = cloneReceiptValue(providerReceipt);
+  receipt.checkpoint = 'release-complete';
+  receipt.status = errors.length === 0 ? 'pass' : 'failed';
+
+  await emitGovernedCheckpoint(options.checkpoint, receipt, errors);
+  receipt.status = errors.length === 0 ? 'pass' : 'failed';
+
+  return {
+    ok: receipt.status === 'pass',
+    output,
+    receipt,
+    errors,
+  };
 }
 
 function compatibilityGlobals() {

@@ -4,11 +4,11 @@ Parent: [Packages](../CATSCAN.md)
 
 ## Target
 
-Let controlled JavaScript applications select Doe explicitly, execute supported GPU work, validate output, and receive runtime identity and receipts.
+Let controlled JavaScript applications select an explicit provider, execute supported GPU work, validate output, and receive attributable runtime identity and receipts.
 
 ## Authority
 
-- Owns public JavaScript exports, provider acquisition, global installation and restoration, package diagnostics, and Program Bundle validation.
+- Owns public JavaScript and CLI exports, provider acquisition, governed callback and unchanged-process exact-output execution, global installation and restoration, package diagnostics, and Program Bundle validation.
 - Does not own browser `navigator.gpu`, native backend implementation, or undeclared fallback.
 
 ## Scope
@@ -29,10 +29,15 @@ Outputs:
 - Provider attempts, effective identity, and failure causes remain visible.
 - `close()` restores every global descriptor changed by the session.
 - Unsupported tuples fail explicitly and never select an undeclared provider.
+- DoeProof receipts never assign DoeRuntime ownership credit.
+- Bounded or cancelled governed processes terminate at the declared platform
+  scope, and receipts never overstate descendant cleanup.
+- Declared runtime files are hash-bound without being mislabeled as a complete
+  or isolated dependency closure.
 
 ## Acceptance
 
-- Package contract, smoke, and integration suites exercise the shipped surface.
+- Package contract, smoke, CLI, and integration suites exercise the shipped surface.
 - Evidence: [`test/run-contracts.js`](test/run-contracts.js).
 
 ## Non-goals

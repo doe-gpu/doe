@@ -463,7 +463,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "677fd749f918f998663361b90ecf613efc8c08b19bf870c8b9ef5de76e5f846e",
+      "moduleSha256": "962553f15d24f363a0b1ee45e16fb57a4590c9e7f23cbf7d16cafa2744abe1d7",
       "path": "src/backend/dropin_capabilities.zig",
       "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -928,6 +928,18 @@
       "reviewStatus": "reviewed",
       "reviewer": "codex-vulkan-adapter-provenance/2026-08-10",
       "suggestedDecision": "Recompose"
+    },
+    {
+      "decision": "Keep",
+      "evidence": [
+        "no mechanical merge, elevation, deletion, or split signal"
+      ],
+      "moduleSha256": "f3470c80c3cdfc7da3c2f0a03d7653c68782239813a85ae2169c50bffe5b0ff2",
+      "path": "src/backend/vulkan/vk_adapter_probe.zig",
+      "reason": "Keep: owns the single-selection binding between Vulkan adapter identity, feature capabilities, and hardware limits.",
+      "reviewStatus": "reviewed",
+      "reviewer": "codex-runtime-ownership/2026-08-15",
+      "suggestedDecision": "Keep"
     },
     {
       "decision": "Keep",
@@ -5280,7 +5292,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "0291b9c5a647322807016083b0723f12465f36ce563c663abe942cf8c61eaef0",
+      "moduleSha256": "752d7f68c886a553cc40c9082610d34df69115c6298a6f74fbbd3c4d52d347c0",
       "path": "src/native/lifecycle/doe_instance_device_native.zig",
       "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -5605,7 +5617,7 @@
       "evidence": [
         "no mechanical merge, elevation, deletion, or split signal"
       ],
-      "moduleSha256": "555fdf13c91a0e7bfa84e306656c6ca3875b4f344f488cf6a379ce1941603760",
+      "moduleSha256": "15734661555ecb65ae12998ce4e4648e07099176e8dd4671b25877c26a9885eb",
       "path": "src/native/support/doe_device_caps.zig",
       "reason": "Keep: reachable native implementation shared by 3 production consumers with no conflicting ownership signal.",
       "reviewStatus": "reviewed",
@@ -6604,13 +6616,13 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "d715c362fc26c72f4dad66f1bed84e4adf126b16290055125b2087a70777987f",
+  "manifestSha256": "f312ceab0f71721caabb1dbd24e52f52a2fbd2fd7bbfdf65690f557eef8067f1",
   "pendingCount": 0,
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
-  "reviewedCount": 547,
+  "reviewedCount": 548,
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "9a0511c58ac6f6bc59ec7509e2bb32990c95913c8dafc0105c1561c110352326",
+  "sourceTreeSha256": "d98500969c1bc44d419e75b6c0a899b56f8e36f13d173ef78ebe7681c41b8419",
   "status": "complete",
-  "totalCount": 547
+  "totalCount": 548
 }

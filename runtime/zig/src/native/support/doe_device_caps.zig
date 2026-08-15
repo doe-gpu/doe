@@ -16,11 +16,9 @@ const native_helpers = @import("doe_native_object_helpers.zig");
 const d3d12_device_caps = backend_capabilities.d3d12_device_caps;
 const vk_feature_caps = if (has_vulkan) backend_capabilities.vk_feature_caps else struct {};
 const vk_device_caps = if (has_vulkan) backend_capabilities.vk_device_caps else struct {};
-const vk_feature_probe = if (has_vulkan) backend_capabilities.vk_feature_probe else struct {};
 const vulkan_feature_cache = if (has_vulkan) @import("../vulkan/vulkan_feature_cache.zig") else struct {};
 const DoeDevice = native_types.DoeDevice;
 const DoeAdapter = native_types.DoeAdapter;
-const alloc = native_helpers.alloc;
 
 // Metal bridge — only linked on macOS; guarded by comptime platform check.
 const BRIDGE_AVAILABLE = builtin.os.tag == .macos;
@@ -252,25 +250,10 @@ fn d3d12_runtime(device: *DoeDevice) ?*native_shared.NativeD3D12Runtime {
     return @ptrCast(@alignCast(ptr));
 }
 
-fn ensure_vulkan_adapter_caps(raw: ?*anyopaque) void {
-    if (comptime !has_vulkan) return;
-    if (raw == null) return;
-    if (vulkan_feature_cache.get_adapter(raw) == null) {
-        const caps: vk_feature_caps.VulkanFeatureCaps =
-            vk_feature_probe.probe_default_feature_caps(alloc) catch .{};
-        vulkan_feature_cache.set_adapter(raw, caps);
-    }
-    if (vulkan_feature_cache.get_adapter_device_caps(raw) == null) {
-        const hw_caps = vk_device_caps.probe_device_caps(alloc) catch return;
-        vulkan_feature_cache.set_adapter_device_caps(raw, hw_caps);
-    }
-}
-
 pub export fn doeNativeAdapterHasFeature(raw: ?*anyopaque, feature: u32) callconv(.c) u32 {
     if (native_helpers.cast(DoeAdapter, raw)) |a| {
         if (comptime has_vulkan) {
             if (a.backend == .vulkan) {
-                ensure_vulkan_adapter_caps(raw);
                 const caps = vulkan_feature_cache.get_adapter(raw);
                 const hw_caps = vulkan_feature_cache.get_adapter_device_caps(raw);
                 return if (is_vulkan_feature_supported(feature, caps, hw_caps)) 1 else 0;
@@ -339,7 +322,6 @@ pub export fn doeNativeAdapterGetLimits(raw: ?*anyopaque, limits: ?*abi_callback
     if (native_helpers.cast(DoeAdapter, raw)) |a| {
         if (comptime has_vulkan) {
             if (a.backend == .vulkan) {
-                ensure_vulkan_adapter_caps(raw);
                 if (limits) |l| {
                     if (vulkan_feature_cache.get_adapter_device_caps(raw)) |hw_caps| {
                         l.* = hw_caps.limits;

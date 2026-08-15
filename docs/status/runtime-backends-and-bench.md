@@ -60,6 +60,67 @@ file only names the promoted boundary and open admission gates.
   pinned, governed-wrapper, and DoeRuntime lanes; independent-correction claims
   must also predeclare the bounded-patch lane. Existing reviewed reports remain
   diagnostic and explicitly record that this ownership assessment was not run.
+- DoeProof now has a public provider-neutral Node execution primitive at
+  `doe-gpu/node-webgpu::runGovernedNodeWebGPU`. It binds the declared workload
+  implementation, input, selected provider, adapter observation, exact output
+  digest, and lifecycle state. A caller-supplied checkpoint receives completed
+  inference evidence before provider release and a terminal receipt after
+  release; stable workload and execution hashes support W0/D0 replay without
+  conflating wrapper evidence with runtime ownership. This is a package
+  contract, not application promotion: the caller must still prove an
+  independent expected output and pass the external-project release gates.
+- The public unchanged-application loader and governed process runner are
+  physically bound by
+  `reports/benchmarks/amd-vulkan/20260815T193900Z/holoscript-doeproof-loader-diagnostic.json`.
+  Pinned Dawn and Doe each load through
+  `doe-gpu/node-webgpu-loader`, while `doe-gpu/node-webgpu-process` binds the
+  process declaration, hashed effective environment, exact parent-side oracle,
+  effective loader identity, and provider-neutral replay identity. Both
+  self-validated receipts bind the physical Radeon and reproduce all four
+  frozen HoloScript topology hashes with identical shader, dispatch,
+  synchronization, readback, oracle, and output identity. This authorizes the
+  public DoeProof process seam; it grants no runtime-ownership, performance,
+  application-promotion, or release credit and leaves the terminal HoloScript
+  decision unchanged.
+- The package now exposes the same governed process contract through
+  `doe-proof-node run|verify|inspect|compare|replay`. Contracts and every local
+  dependency are hash-bound; verification never imports the evaluator; compare
+  is exact-output-only and hard-codes no performance or runtime-ownership
+  interpretation. The physical HoloScript command-chain diagnostic at
+  `reports/benchmarks/amd-vulkan/20260815T200358Z/holoscript-doeproof-cli-diagnostic.json`
+  passes all five commands for W0/D0 plus D0 semantic replay. This is an
+  adoption and CI surface, not a new evidence tier.
+- Governed process cancellation is now explicit and receipt-bound. Pre-aborted
+  calls do not spawn; active abort, timeout, and output-limit paths share the
+  same termination primitive. POSIX descendants are terminated through the
+  owned process group, while Windows reports direct-child scope without
+  claiming tree cleanup. CLI `SIGINT` and `SIGTERM` preserve a terminal valid
+  failure artifact when an output path was declared.
+- CLI contracts can now bind an explicit set of additional runtime files. Each
+  ID is unique and each file is rehashed during run, verify, and replay. This
+  establishes declared-file identity only; it does not claim transitive
+  dependency completeness or filesystem isolation.
+- The package integration suite now packs `doe-gpu`, installs the tarball into
+  a fresh project with optional native packages and install scripts disabled,
+  invokes the installed `.bin/doe-proof-node`, executes a sealed custom
+  provider contract, and independently verifies its exact-output receipt. This
+  proves the CLI package boundary without claiming a native-runtime clean
+  install on any support tuple.
+- A separate required native clean-install gate now packs both `doe-gpu` and
+  the staged host platform package, installs them with scripts disabled, and
+  executes the shipped first kernel. It exposed a stale Linux x64 platform
+  payload whose shader-binding metadata no longer matched the JavaScript
+  surface; restaging from the current native build restored exact output. The
+  gate also rejects workspace-library resolution. Source-tree integration may
+  skip when platform payloads are absent, but the explicit release command may
+  not. The bounded physical receipt is
+  `reports/benchmarks/amd-vulkan/20260815T202652Z/doe-gpu-native-clean-install-diagnostic.json`;
+  it grants installation evidence for Linux x64 only and no performance,
+  ownership, or application-promotion credit.
+- `.github/workflows/webgpu-package-surface.yml` now runs the complete package
+  contract, smoke, integration, and clean-install suite and the public
+  tool-surface gate. Package-bin or manifest drift is therefore blocking CI,
+  rather than being left to an operator-only dry-run.
 - External-project source preparation now forces byte-preserving Git checkout
   semantics across host configurations and ignores package-manager executable-
   bit normalization while continuing to reject content changes. The retained
@@ -78,10 +139,27 @@ file only names the promoted boundary and open admission gates.
   retains HoloScript as a diagnostic workload.
 - The Gemma package-surface attribution receipt at
   `reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json`
-  disables Doe's native prepared-dispatch prewarm and retains a comparable
-  workload-wall advantage over prepared Node WebGPU. This authorizes a Doppler
-  application ownership experiment for persistent performance control; it is
-  not itself external-application or release evidence.
+  remains a synthetic mechanism antecedent. The governed Doppler application
+  diagnostic at
+  `reports/benchmarks/amd-vulkan/20260815T182649Z/doppler-provider-runtime-ownership-diagnostic.json`
+  rejects transfer of that advantage: Doe completes the unchanged workload and
+  cleanly releases its provider, but fails the frozen application-performance
+  outcome. Doppler supplies no runtime-ownership or release credit; its
+  incumbent teardown abort remains a separate, unpromoted lifecycle finding.
+- A versioned bounded successor at
+  `reports/benchmarks/amd-vulkan/20260815T190434Z/doppler-provider-capability-publication-diagnostic.json`
+  fixes a provider capability-publication defect: native Radeon limits were
+  clamped to Doe's fallback table, forcing Doppler onto a CPU-streaming path.
+  The corrected path preserves the exact generated text and token hashes and
+  reduces bounded prefill from 14,676.65 ms to 175.99 ms, but model loading rises
+  from 22,180.23 ms to 41,618.68 ms. This is diagnostic admission evidence for
+  a new full W0/D0 comparison, not runtime-ownership or release credit. The full
+  result at
+  `reports/benchmarks/amd-vulkan/20260815T190434Z/doppler-provider-corrected-runtime-result.json`
+  is terminal: output is exact, but Doe is 1.341× W0 on complete-session wall
+  and 4.147× W0 on median timed inference. The corrected Doppler performance
+  family is retired without tuning. W0's post-release abort remains a distinct
+  lifecycle observation.
 - The reviewed UMAP-GPU physical AMD Vulkan result at
   `reports/ecosystem/umap-gpu/umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic.json`
   retains the unchanged structural application oracle under both providers.

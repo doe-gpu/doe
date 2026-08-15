@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-corrected-runtime-result",
+  "generatedAt": "2026-08-15T19:12:25.490Z",
+  "evidenceMaturity": "diagnostic",
+  "outcome": "retire-lane",
+  "admission": {
+    "path": "reports/benchmarks/amd-vulkan/20260815T190434Z/doppler-provider-corrected-runtime-admission.json",
+    "sha256": "c825c32ade43a362c39c8b265af8c9327b77c271bd75adce0a81134db0968c8e",
+    "ownershipProperty": "persistent-performance-control",
+    "materialThreshold": "D0 at least 5% lower than W0 on both complete-session processWallMs and median timed-inference totalRunMs"
+  },
+  "workload": {
+    "id": "doppler_provider_compare_gemma3_270m_prefill_64tok_decode_64tok",
+    "sourceRepository": "https://github.com/clocksmith/doppler",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "sourceTrackedClean": true,
+    "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+    "promptPrefillTokens": 64,
+    "decodeTokens": 64,
+    "warmupRuns": 2,
+    "timedRuns": 3
+  },
+  "correctness": {
+    "status": "pass",
+    "generatedTextSha256": "13673dd69e6e9b6a62fed62abd3f024e5115074bc09f0a6866e7351b74e4228d",
+    "generatedTokenIdsHash": "sha256:f7257555de30a242ad0e1992c37d82d922e492bcd445b7f3655c189511c80427",
+    "summary": "W0 and D0 completed all five inferences and produced identical generated text and token IDs."
+  },
+  "lanes": {
+    "W0": {
+      "provider": "node-webgpu",
+      "inferenceStatus": "pass",
+      "providerReleaseReceipt": "pass",
+      "terminalProcessStatus": "abort-after-trace",
+      "terminalExitCode": 134,
+      "terminalFailure": "Fatal glibc error in __pthread_tpp_change_priority after provider release and trace persistence.",
+      "report": {
+        "path": "reports/gemma-3-270m-it-q4k-ehf16-af32/2026-08-15T19-11-22.099Z.json",
+        "sha256": "f9a72f673f900b747353a4c14d6eff818a6bc6c8003f2c02758c32b6316a49de"
+      },
+      "trace": {
+        "metaPath": "bench/out/node-doppler-provider-compare/corrected-runtime-w0-v1/trace.meta.json",
+        "metaSha256": "cf79f83bcf339fa95c02491e40e87d08577e6981faf60ee09b3e6e9080f8df13",
+        "eventsPath": "bench/out/node-doppler-provider-compare/corrected-runtime-w0-v1/trace.ndjson",
+        "eventsSha256": "35bb981824c3fc9b4b321f43c7002ca6e9a8c040ed6f1c9b14b8651f264668f3"
+      },
+      "timingMs": {
+        "processWall": 50481.151646000006,
+        "modelLoad": 41512.72,
+        "medianPrefill": 63.87,
+        "medianDecode": 1269.72,
+        "medianTotalRun": 1334.69
+      },
+      "gpuPoolPeakBytes": 949097984
+    },
+    "D0": {
+      "provider": "doe-gpu",
+      "inferenceStatus": "pass",
+      "providerReleaseReceipt": "pass",
+      "terminalProcessStatus": "pass",
+      "terminalExitCode": 0,
+      "report": {
+        "path": "reports/gemma-3-270m-it-q4k-ehf16-af32/2026-08-15T19-12-25.490Z.json",
+        "sha256": "25cb0cc678d1d83956c07111404dc7bda653ac0c00e280ee25dfbbf14b9a8cc5"
+      },
+      "trace": {
+        "metaPath": "bench/out/node-doppler-provider-compare/corrected-runtime-d0-v1/trace.meta.json",
+        "metaSha256": "79c1cc5e2a913a3e6ade4428d35d3b7e799dc801e27d2fc73a534a4299d90229",
+        "eventsPath": "bench/out/node-doppler-provider-compare/corrected-runtime-d0-v1/trace.ndjson",
+        "eventsSha256": "205613cbfdb297b7baa2aa414cd8931891c903137c784ef37ef4d06c76f8abbb"
+      },
+      "timingMs": {
+        "processWall": 67683.301794,
+        "modelLoad": 41245.82,
+        "medianPrefill": 169.96,
+        "medianDecode": 5365.64,
+        "medianTotalRun": 5535.6
+      },
+      "gpuPoolPeakBytes": 941804032
+    }
+  },
+  "adjudication": {
+    "completeSession": {
+      "status": "fail",
+      "d0ToW0Ratio": 1.340764,
+      "d0MinusW0Ms": 17202.150148
+    },
+    "warmTimedInference": {
+      "status": "fail",
+      "d0ToW0Ratio": 4.14748,
+      "d0MinusW0Ms": 4200.91
+    },
+    "modelLoadAttribution": {
+      "d0ToW0Ratio": 0.993571,
+      "summary": "Doe's model load is slightly lower, but that difference does not offset the inference deficit."
+    },
+    "decision": "The corrected Doe runtime misses both frozen material-performance requirements. Persistent-performance-control ownership is rejected for this workload and artifact."
+  },
+  "lifecycle": {
+    "d0": "pass",
+    "w0": "provider release and global restoration were recorded before a later native process abort",
+    "credit": "none",
+    "summary": "The W0 post-release abort remains a separate lifecycle finding and cannot rescue a failed performance hypothesis."
+  },
+  "retainedValue": {
+    "capabilityPublication": "The selected-device capability and unclamped native-limit changes remain correctness and application-path fixes.",
+    "boundedMechanism": "The one-token diagnostic correctly showed that GPU-resident embedding removes the former CPU-streaming prefill bottleneck.",
+    "ownership": "Neither retained result supplies runtime-ownership or release credit for Doppler."
+  },
+  "nextAction": "Do not tune or rerun this Doppler performance family. Select a different application only from a newly measured property that a governed incumbent wrapper cannot reproduce."
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-corrected-runtime-admission",
+  "frozenAt": "2026-08-15T19:04:34.107Z",
+  "evidenceMaturity": "predeclared-diagnostic-gate",
+  "status": "admitted-not-executed",
+  "ownershipProperty": "persistent-performance-control",
+  "hypothesis": "Publishing selected-device Radeon limits allows the unchanged Doppler application to retain large weights on the GPU and makes DoeRuntime materially better than the governed incumbent on both the complete session and steady-state inference without changing exact output.",
+  "workload": {
+    "id": "doppler_provider_compare_gemma3_270m_prefill_64tok_decode_64tok",
+    "scenarioPath": "bench/vendor-node/doppler_provider_compare_gemma270m_commands.json",
+    "scenarioSha256": "a3aefbb93b9f9e6d345402c2806363b962662f5eae595e8e3387eee2e645bd04",
+    "sourceRepository": "https://github.com/clocksmith/doppler",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "promptPrefillTokens": 64,
+    "decodeTokens": 64,
+    "warmupRuns": 2,
+    "timedRuns": 3,
+    "sampling": {
+      "temperature": 0,
+      "topK": 1,
+      "topP": 1
+    }
+  },
+  "hardware": {
+    "vendor": "AMD",
+    "architecture": "vulkan",
+    "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+    "vendorID": 4098,
+    "deviceID": 5510
+  },
+  "lanes": {
+    "W0": "Pinned node-webgpu incumbent installed through the same DoeProof provider contract and unchanged Doppler source.",
+    "D0": "Corrected DoeRuntime installed through the same DoeProof provider contract and unchanged Doppler source."
+  },
+  "frozenDoeArtifact": {
+    "runtimePath": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+    "runtimeSha256": "973ca698bd6b52ccbbf2aaa9132e8751a0039fea865e76ec63be4a77f5cc77ad",
+    "capabilityPublisherPath": "packages/doe-gpu/src/vendor/webgpu/shared/capabilities.js",
+    "capabilityPublisherSha256": "1c0ad34270f92c54730648e7dcd9feac396961c310d387ed6796aa996b1b7b8d",
+    "executorPath": "bench/executors/run-node-doppler-ort-bench.js",
+    "executorSha256": "cd08722c9a0bced57b831106418e64280dcdfd4a203b7927139b2b6f561dc0c8"
+  },
+  "correctness": {
+    "rule": "Each lane must complete inference and retain exact generated text and generated token IDs. W0 and D0 hashes must match. A provisional pre-release trace can establish inference correctness but cannot establish lifecycle success.",
+    "failure": "Any output mismatch or missing inference trace rejects the candidate."
+  },
+  "lifecycle": {
+    "rule": "Provider release and global restoration are reported separately from inference. A release abort or incomplete release fails that lane's lifecycle result and cannot be converted into performance credit.",
+    "failure": "D0 lifecycle failure rejects runtime ownership. W0 lifecycle failure remains an incumbent finding but does not satisfy the frozen performance property."
+  },
+  "performance": {
+    "selectedColdOperation": "Trace processWallMs for the complete provider bootstrap, prompt synthesis, model load, two warmups, three timed inferences, provider release, and trace finalization.",
+    "selectedWarmOperation": "Median metrics.totalRunMs across the three timed inferences.",
+    "materialThreshold": "D0 must be at least 5% lower than W0 on both selected operations.",
+    "modelLoadAccounting": "metrics.modelLoadMs is mandatory attribution evidence and may not be omitted or amortized away post-run.",
+    "failure": "A miss on either selected operation rejects persistent-performance-control ownership for this corrected runtime."
+  },
+  "resourceAndPathEvidence": {
+    "required": [
+      "effective provider and physical adapter identity",
+      "adapter and device buffer limits",
+      "model GPU pool bytes",
+      "model-load timing",
+      "provider diagnostics",
+      "provider release state",
+      "trace and report hashes"
+    ]
+  },
+  "promotionBoundary": {
+    "onPass": "Retain as a diagnostic runtime-ownership candidate and proceed to repetition, memory-growth, concurrency, and device-loss gates before any release promotion.",
+    "onFail": "Retire the corrected Doppler persistent-performance-control hypothesis without changing the selected operation, sample policy, or threshold.",
+    "claimIndexEligible": false,
+    "releaseEligible": false
+  }
+}

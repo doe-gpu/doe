@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-runtime-ownership-diagnostic",
+  "generatedAt": "2026-08-15T18:26:49.295Z",
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "workload": {
+    "id": "doppler_provider_compare_gemma3_270m_prefill_64tok_decode_64tok",
+    "sourceRepository": "https://github.com/clocksmith/doppler",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "sourceTrackedClean": true,
+    "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+    "promptPrefillTokens": 64,
+    "decodeTokens": 64,
+    "sampling": {
+      "temperature": 0,
+      "topK": 1,
+      "topP": 1
+    }
+  },
+  "ownershipHypothesis": {
+    "claimedProperty": "persistent-performance-control",
+    "admissionEvidence": "reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json",
+    "decision": "retire-lane",
+    "summary": "The unchanged Doppler application does not preserve Doe's synthetic no-dispatch-prewarm advantage. DoeRuntime is materially slower than the governed incumbent on the frozen user-visible operation, so this workload supplies no persistent-performance-control ownership credit."
+  },
+  "hardware": {
+    "vendor": "AMD",
+    "architecture": "vulkan",
+    "device": "Radeon 8060S Graphics (RADV STRIX_HALO)"
+  },
+  "lanes": {
+    "W0": {
+      "provider": "node-webgpu",
+      "inferenceStatus": "pass",
+      "lifecycleStatus": "fail",
+      "traceStatus": "not-retained",
+      "summary": "The pinned incumbent completed two warmups and three timed inferences and wrote its benchmark report, then the native process aborted during application teardown with std::system_error: Invalid argument before the governed trace could be persisted.",
+      "report": {
+        "path": "reports/gemma-3-270m-it-q4k-ehf16-af32/2026-08-15T17-37-52.278Z.json",
+        "sha256": "a118cfdf581611f62653dfe82767629edac7c635f59605637ef3ce7f513f076f"
+      },
+      "timingMs": {
+        "medianTotalRun": 1451.99856,
+        "medianPrefill": 89.803784,
+        "medianDecode": 1361.799433
+      }
+    },
+    "D0": {
+      "provider": "doe-gpu",
+      "inferenceStatus": "pass",
+      "lifecycleStatus": "pass",
+      "traceStatus": "pass",
+      "generatedTextSha256": "13673dd69e6e9b6a62fed62abd3f024e5115074bc09f0a6866e7351b74e4228d",
+      "generatedTokenIdsSha256": "f7257555de30a242ad0e1992c37d82d922e492bcd445b7f3655c189511c80427",
+      "providerGlobalsRestored": true,
+      "report": {
+        "path": "reports/gemma-3-270m-it-q4k-ehf16-af32/2026-08-15T18-26-49.295Z.json",
+        "sha256": "5fc875111a319666556e4451273a91397b0117cf370314eea8eaaa03a4f9aea8"
+      },
+      "rawTrace": {
+        "metaPath": "bench/out/node-doppler-provider-compare/doe-production-evidence-v1/trace.meta.json",
+        "metaSha256": "462de962c1835ef2ca469409c208d0cbd6e12ee5d44399cb532e05f885bc2772",
+        "eventsPath": "bench/out/node-doppler-provider-compare/doe-production-evidence-v1/trace.ndjson",
+        "eventsSha256": "c56a2eea56a0bd708807e893966eff2b8c53e5d39f7ec9358e28f86ea9dc77e9"
+      },
+      "timingMs": {
+        "medianTotalRun": 107833.909063,
+        "medianPrefill": 8836.740669,
+        "medianDecode": 98954.322863
+      }
+    }
+  },
+  "performanceAssessment": {
+    "status": "fail",
+    "selectedOperation": "complete timed inference",
+    "doeToIncumbentMedianTotalRatio": 74.266,
+    "doeToIncumbentMedianPrefillRatio": 98.4,
+    "doeToIncumbentMedianDecodeRatio": 72.665,
+    "summary": "The application-level result reverses the synthetic antecedent. The observed deficit is too large to satisfy or approach the predeclared material performance outcome."
+  },
+  "correctnessAssessment": {
+    "status": "diagnostic-pass",
+    "summary": "Doe completed the unchanged frozen workload twice with the same generated-text and generated-token hashes. Cross-provider output identity was observed during the incumbent run, but the incumbent abort prevented retention of a governed W0 output trace, so this report does not promote a claimable equivalence result."
+  },
+  "lifecycleAssessment": {
+    "status": "new-hypothesis-required",
+    "summary": "Doe released the provider and restored globals cleanly while the incumbent aborted during application teardown. Lifecycle control was not the frozen ownership property and receives no ownership credit here. Any lifecycle candidate must predeclare its own failure injection, repetition, bounded-patch control, and acceptance rule."
+  },
+  "limitations": [
+    "I0 and I1 were not separately executed because failure of the frozen D0-over-W0 performance outcome is already terminal for this ownership hypothesis.",
+    "The incumbent abort prevented a persisted governed output trace and provider-release receipt.",
+    "The comparison is diagnostic and not claim-index eligible.",
+    "No concurrency, device-loss, stress, or bounded-memory-growth promotion gate was run."
+  ]
+}

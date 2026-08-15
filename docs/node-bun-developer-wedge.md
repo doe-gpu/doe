@@ -59,6 +59,39 @@ DoeRuntime and freeze its adjudicating outcome before execution. If the
 governed incumbent closes the gap, promote DoeProof for that application rather
 than assigning the result to DoeRuntime.
 
+The public Node implementation starts at
+`doe-gpu/node-webgpu::runGovernedNodeWebGPU`. It accepts the same explicit
+provider contract for incumbent and Doe lanes, binds a caller-declared
+implementation digest plus input and expected-output identity, applies an exact
+SHA-256 output oracle, and emits both pre-release and terminal lifecycle
+checkpoints. The helper supplies execution evidence; the application contract
+still owns whether the expected output is genuinely independent and whether a
+run is release-eligible.
+
+For an unchanged Node application, the public
+`doe-gpu/node-webgpu-process::runGovernedNodeWebGPUProcess` wrapper composes the
+fail-closed `webgpu` loader with bounded child execution. It requires the child
+evidence to return the effective loader identity, applies the exact parent-side
+oracle, binds the process declaration and hashed environment, and emits a
+self-validating provider-neutral receipt. A process receipt remains diagnostic
+until the application-specific reliability and adoption gates pass.
+
+Abort, timeout, and captured-output limits share one termination contract.
+POSIX runs own a process group and terminate that group; Windows runs terminate
+the direct child and explicitly record that narrower scope. The CLI converts
+`SIGINT` and `SIGTERM` into the same durable failed receipt instead of silently
+abandoning the evidence path. A valid cancellation receipt proves integrity and
+declared cleanup scope, not successful workload execution.
+
+The CLI contract may bind additional runtime files by unique identifier, path,
+and SHA-256. This closes drift for declared data and library artifacts, while
+remaining explicitly weaker than a dependency-sealed execution: completeness
+and absence of undeclared reads require an isolation or file-observation gate.
+
+The packaged `doe-proof-node` command exposes this same contract to CI through
+hash-bound `run`, `verify`, `inspect`, `replay`, and exact-output `compare`
+operations. It does not expose the repository benchmark or release operators.
+
 ## Release portfolio
 
 Application count does not determine release consequence. Classify each
@@ -107,6 +140,13 @@ The package release must test clean installation and first-kernel execution for
 every promoted Node/Bun, operating-system, architecture, and backend tuple. No
 local Zig build or undocumented environment configuration belongs in the
 supported path.
+
+For a staged host platform, `npm run test:integration:native-clean-install`
+packs the wrapper and platform payload, installs them into a fresh project with
+scripts disabled, executes the shipped first kernel, and verifies that the
+loaded library path remains inside that installation. Missing staged artifacts
+are a failure in this explicit release gate, while the ordinary source-tree
+suite may report the physical package check as skipped.
 
 ## Claim boundary
 

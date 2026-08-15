@@ -21,6 +21,17 @@ export function createFakeGPU(...args) {
       lastAdapterOptions = options ?? null;
       return Object.freeze({
         label: 'provider-v1-test-adapter',
+        getInfo() {
+          return {
+            vendor: 'Fixture Vendor',
+            architecture: 'fixture',
+            device: 'Fixture Device',
+            description: 'Provider v1 test adapter',
+            vendorID: 1,
+            deviceID: 2,
+            driverVersion: 3,
+          };
+        },
         async requestDevice() {
           return {
             createShaderModule({ code }) {
@@ -46,6 +57,8 @@ export function createFakeGPU(...args) {
     },
   };
 }
+
+export const create = createFakeGPU;
 
 export function getProviderObservations() {
   return {

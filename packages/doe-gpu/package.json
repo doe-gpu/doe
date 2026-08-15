@@ -5,6 +5,9 @@
   "type": "module",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
+  "bin": {
+    "doe-proof-node": "./bin/doe-proof-node.js"
+  },
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
@@ -23,6 +26,11 @@
     "./node-webgpu": {
       "types": "./src/node-webgpu.d.ts",
       "default": "./src/node-webgpu.js"
+    },
+    "./node-webgpu-loader": "./src/node-webgpu-loader.js",
+    "./node-webgpu-process": {
+      "types": "./src/node-webgpu-process.d.ts",
+      "default": "./src/node-webgpu-process.js"
     },
     "./program-bundle": {
       "types": "./src/program-bundle-runner.d.ts",
@@ -53,6 +61,7 @@
     "node": ">=18"
   },
   "files": [
+    "bin/",
     "src/",
     "examples/",
     "assets/",
@@ -71,6 +80,7 @@
     "sync:program-bundle-schema": "node scripts/sync-program-bundle-schema.js",
     "test:smoke": "node test/smoke/test-smoke-load.js",
     "test:integration": "node test/integration/run-integration.js --runtime node",
+    "test:integration:native-clean-install": "node test/integration/test-integration-native-clean-install.js --required",
     "test:integration:bun": "bun test/integration/run-integration.js --runtime bun",
     "test:integration:deno": "deno run --allow-all test/integration/run-integration.js --runtime deno",
     "prepublishOnly": "node scripts/verify-publish-readiness.js && npm test",

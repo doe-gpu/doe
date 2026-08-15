@@ -5,6 +5,9 @@ on:
     paths:
       - ".github/workflows/webgpu-package-surface.yml"
       - "packages/doe-gpu/**"
+      - "config/tool-surfaces.json"
+      - "bench/gates/tool_surface_gate.py"
+      - "bench/tests/test_tool_surface_gate.py"
   push:
     branches:
       - main
@@ -12,6 +15,9 @@ on:
     paths:
       - ".github/workflows/webgpu-package-surface.yml"
       - "packages/doe-gpu/**"
+      - "config/tool-surfaces.json"
+      - "bench/gates/tool_surface_gate.py"
+      - "bench/tests/test_tool_surface_gate.py"
   workflow_dispatch:
 
 permissions:
@@ -32,7 +38,10 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
-      - name: Run package contract tests
-        run: node --test test/unit/*.test.js
+      - name: Run complete package surface and clean-install tests
+        run: npm test
+      - name: Verify public tool-surface declaration
+        working-directory: .
+        run: python3 bench/gates/tool_surface_gate.py
       - name: Verify package contents
         run: npm pack --dry-run --json

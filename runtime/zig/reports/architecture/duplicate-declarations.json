@@ -391,11 +391,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 51,
+          "endLine": 49,
           "kind": "constant",
           "name": "FEATURE_TEXTURE_FORMATS_TIER2",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 51,
+          "startLine": 49,
           "tokenCount": 8
         }
       ],
@@ -2515,6 +2515,14 @@
     {
       "locations": [
         {
+          "endLine": 11,
+          "kind": "constant",
+          "name": "vk_feature_caps",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 11,
+          "tokenCount": 7
+        },
+        {
           "endLine": 9,
           "kind": "constant",
           "name": "vk_feature_caps",
@@ -3147,11 +3155,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 52,
+          "endLine": 50,
           "kind": "constant",
           "name": "FEATURE_PRIMITIVE_INDEX",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 52,
+          "startLine": 50,
           "tokenCount": 8
         }
       ],
@@ -3555,11 +3563,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 44,
+          "endLine": 42,
           "kind": "constant",
           "name": "FEATURE_TEXTURE_COMPRESSION_ETC2",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 44,
+          "startLine": 42,
           "tokenCount": 8
         }
       ],
@@ -4797,11 +4805,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 48,
+          "endLine": 46,
           "kind": "constant",
           "name": "FEATURE_DUAL_SOURCE_BLENDING",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 48,
+          "startLine": 46,
           "tokenCount": 8
         }
       ],
@@ -5285,14 +5293,6 @@
           "tokenCount": 6
         },
         {
-          "endLine": 23,
-          "kind": "constant",
-          "name": "alloc",
-          "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 23,
-          "tokenCount": 6
-        },
-        {
           "endLine": 28,
           "kind": "constant",
           "name": "alloc",
@@ -5745,11 +5745,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 37,
+          "endLine": 35,
           "kind": "constant",
           "name": "FEATURE_BGRA8UNORM_STORAGE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 37,
+          "startLine": 35,
           "tokenCount": 8
         }
       ],
@@ -7721,11 +7721,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 38,
+          "endLine": 36,
           "kind": "constant",
           "name": "FEATURE_SHADER_F16",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 38,
+          "startLine": 36,
           "tokenCount": 8
         }
       ],
@@ -7855,11 +7855,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 21,
+          "endLine": 20,
           "kind": "constant",
           "name": "DoeDevice",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 21,
+          "startLine": 20,
           "tokenCount": 6
         },
         {
@@ -8199,11 +8199,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 41,
+          "endLine": 39,
           "kind": "constant",
           "name": "FEATURE_FLOAT32_BLENDABLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 41,
+          "startLine": 39,
           "tokenCount": 8
         }
       ],
@@ -9411,11 +9411,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 22,
+          "endLine": 21,
           "kind": "constant",
           "name": "DoeAdapter",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 22,
+          "startLine": 21,
           "tokenCount": 6
         }
       ],
@@ -9531,11 +9531,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 34,
+          "endLine": 32,
           "kind": "constant",
           "name": "FEATURE_TEXTURE_COMPRESSION_ASTC",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 34,
+          "startLine": 32,
           "tokenCount": 8
         }
       ],
@@ -9550,6 +9550,14 @@
           "name": "c",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 12,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "c",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 7,
           "tokenCount": 7
         },
         {
@@ -9727,11 +9735,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 50,
+          "endLine": 48,
           "kind": "constant",
           "name": "FEATURE_TEXTURE_FORMATS_TIER1",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 50,
+          "startLine": 48,
           "tokenCount": 8
         }
       ],
@@ -9939,11 +9947,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 47,
+          "endLine": 45,
           "kind": "constant",
           "name": "FEATURE_CLIP_DISTANCES",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 47,
+          "startLine": 45,
           "tokenCount": 8
         }
       ],
@@ -10617,6 +10625,14 @@
           "tokenCount": 7
         },
         {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "backend_contract",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
           "endLine": 13,
           "kind": "constant",
           "name": "backend_contract",
@@ -11281,11 +11297,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 35,
+          "endLine": 33,
           "kind": "constant",
           "name": "FEATURE_TEXTURE_COMPRESSION_BC_SLICED_3D",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 35,
+          "startLine": 33,
           "tokenCount": 8
         }
       ],
@@ -11485,11 +11501,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 40,
+          "endLine": 38,
           "kind": "constant",
           "name": "FEATURE_FLOAT32_FILTERABLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 40,
+          "startLine": 38,
           "tokenCount": 8
         }
       ],
@@ -13785,11 +13801,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 45,
+          "endLine": 43,
           "kind": "constant",
           "name": "FEATURE_RG11B10UFLOAT_RENDERABLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 45,
+          "startLine": 43,
           "tokenCount": 8
         }
       ],
@@ -16399,11 +16415,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 39,
+          "endLine": 37,
           "kind": "constant",
           "name": "FEATURE_INDIRECT_FIRST_INSTANCE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 39,
+          "startLine": 37,
           "tokenCount": 8
         }
       ],
@@ -17985,19 +18001,19 @@
     {
       "locations": [
         {
-          "endLine": 37,
+          "endLine": 38,
           "kind": "constant",
           "name": "vulkan_feature_cache",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 37,
+          "startLine": 38,
           "tokenCount": 15
         },
         {
-          "endLine": 20,
+          "endLine": 19,
           "kind": "constant",
           "name": "vulkan_feature_cache",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 20,
+          "startLine": 19,
           "tokenCount": 15
         }
       ],
@@ -18461,11 +18477,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 53,
+          "endLine": 51,
           "kind": "constant",
           "name": "FEATURE_TEXTURE_COMPONENT_SWIZZLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 53,
+          "startLine": 51,
           "tokenCount": 8
         }
       ],
@@ -18793,11 +18809,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 66,
+          "endLine": 64,
           "kind": "constant",
           "name": "FALLBACK_MAX_BUFFER_SIZE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 66,
+          "startLine": 64,
           "tokenCount": 6
         }
       ],
@@ -19439,11 +19455,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 32,
+          "endLine": 30,
           "kind": "constant",
           "name": "FEATURE_DEPTH_CLIP_CONTROL",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 32,
+          "startLine": 30,
           "tokenCount": 8
         }
       ],
@@ -20029,11 +20045,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 43,
+          "endLine": 41,
           "kind": "constant",
           "name": "FEATURE_TEXTURE_COMPRESSION_BC",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 43,
+          "startLine": 41,
           "tokenCount": 8
         }
       ],
@@ -21581,11 +21597,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 39,
+          "endLine": 40,
           "kind": "constant",
           "name": "runtime_types",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 39,
+          "startLine": 40,
           "tokenCount": 7
         }
       ],
@@ -22951,11 +22967,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 46,
+          "endLine": 44,
           "kind": "constant",
           "name": "FEATURE_TIMESTAMP_QUERY",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 46,
+          "startLine": 44,
           "tokenCount": 8
         }
       ],
@@ -23157,11 +23173,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 36,
+          "endLine": 34,
           "kind": "constant",
           "name": "FEATURE_TEXTURE_COMPRESSION_ASTC_SLICED_3D",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 36,
+          "startLine": 34,
           "tokenCount": 8
         }
       ],
@@ -23990,6 +24006,14 @@
           "name": "std",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 5,
           "tokenCount": 7
         },
         {
@@ -26911,11 +26935,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 49,
+          "endLine": 47,
           "kind": "constant",
           "name": "FEATURE_CORE_FEATURES_AND_LIMITS",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 49,
+          "startLine": 47,
           "tokenCount": 8
         }
       ],
@@ -28855,11 +28879,11 @@
           "tokenCount": 8
         },
         {
-          "endLine": 33,
+          "endLine": 31,
           "kind": "constant",
           "name": "FEATURE_DEPTH32FLOAT_STENCIL8",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 33,
+          "startLine": 31,
           "tokenCount": 8
         }
       ],
@@ -32855,6 +32879,14 @@
           "tokenCount": 7
         },
         {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "vk_device",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        },
+        {
           "endLine": 12,
           "kind": "constant",
           "name": "vk_device",
@@ -33825,6 +33857,14 @@
           "path": "src/backend/vulkan/mod.zig",
           "startLine": 21,
           "tokenCount": 7
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "native_runtime",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 8,
+          "tokenCount": 7
         }
       ],
       "normalizedTokenSha256": "f93c2e410940662c496fe5573dcd836f410088b39e9f6830f6990e235773e98b",
@@ -34781,9 +34821,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "d715c362fc26c72f4dad66f1bed84e4adf126b16290055125b2087a70777987f",
+  "manifestSha256": "f312ceab0f71721caabb1dbd24e52f52a2fbd2fd7bbfdf65690f557eef8067f1",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "9a0511c58ac6f6bc59ec7509e2bb32990c95913c8dafc0105c1561c110352326"
+  "sourceTreeSha256": "d98500969c1bc44d419e75b6c0a899b56f8e36f13d173ef78ebe7681c41b8419"
 }

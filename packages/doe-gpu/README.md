@@ -9,6 +9,7 @@ and workload tuples declared in the Doe support matrix.
 ```bash
 npm install doe-gpu
 node node_modules/doe-gpu/examples/node-first-kernel.mjs
+node node_modules/doe-gpu/examples/node-governed-first-kernel.mjs
 ```
 
 On a supported tuple, the first-kernel example loads the packaged native
@@ -52,6 +53,131 @@ try {
 Every provider attempt is represented in the session receipt. `close()`
 restores changed globals.
 
+For a provider-neutral DoeProof execution, bind the workload implementation,
+input, and expected exact output before running either an incumbent or Doe:
+
+```js
+import {
+  runGovernedNodeWebGPU,
+  validateGovernedNodeWebGPUReceipt,
+} from "doe-gpu/node-webgpu";
+
+const result = await runGovernedNodeWebGPU({
+  provider: { providers, adapterOptions: null, globals: { mode: "replace" } },
+  workload: {
+    id: "my-kernel",
+    version: "1",
+    implementationSha256,
+    input,
+    expectedOutputSha256,
+  },
+  execute: async ({ adapter, input }) => runApplication(adapter, input),
+  checkpoint: persistReceipt,
+});
+
+const validation = validateGovernedNodeWebGPUReceipt(result.receipt);
+```
+
+The exact-output oracle fails closed. The checkpoint receives an
+`inference-complete-release-pending` receipt before teardown and a final
+`release-complete` receipt afterward. Stable workload and execution hashes let
+the same contract compare a governed incumbent (`W0`) with Doe (`D0`) without
+assigning runtime credit to evidence supplied by the wrapper.
+Validation recomputes both replay identities and rejects incoherent oracle,
+provider, adapter-observation, error, or lifecycle state.
+
+An unchanged Node application that imports the exact `webgpu` specifier can use
+the public fail-closed loader:
+
+```bash
+DOE_NODE_WEBGPU_PROVIDER_ID=pinned-incumbent \
+DOE_NODE_WEBGPU_PROVIDER_MODULE=/absolute/path/to/provider/index.js \
+node --experimental-loader doe-gpu/node-webgpu-loader application.mjs
+```
+
+The loader redirects only `webgpu`, exposes `__doeProofProviderIdentity`, and
+fails when either declaration is missing or the selected module does not export
+`create()` and `globals`. It does not select a fallback provider.
+
+Use the governed process entrypoint when the unchanged application must also
+produce durable parent-side execution evidence:
+
+```js
+import {
+  runGovernedNodeWebGPUProcess,
+  validateGovernedNodeWebGPUProcessReceipt,
+} from "doe-gpu/node-webgpu-process";
+
+const run = await runGovernedNodeWebGPUProcess({
+  provider: { id: "pinned-incumbent", module: providerModule },
+  workload: { id, version, implementationSha256, input, expectedOutputSha256 },
+  process: {
+    entrypoint: applicationPath,
+    environment: { mode: "sealed", values: applicationEnvironment },
+    timeoutMs,
+    maxOutputBytes,
+  },
+  evaluate: parseApplicationOutput,
+  signal: abortController.signal,
+});
+
+const validation = validateGovernedNodeWebGPUProcessReceipt(run.receipt);
+```
+
+The evaluator must return the exact output bytes, the loader-exported effective
+provider identity, and optional application evidence. The runner invokes Node
+without a shell, bounds execution and captured output, applies the frozen
+SHA-256 oracle, and records hashes of the effective environment without
+publishing its values. The application contract still owns the independence of
+the oracle and the meaning of the evidence. Pre-aborted signals prevent spawn.
+An active abort, timeout, or output-limit violation terminates the governed
+process group on POSIX and the direct child on Windows; the receipt records the
+actual termination scope. Callers must not infer Windows descendant cleanup
+from a child-process receipt.
+
+## DoeProof CLI and CI
+
+The package installs `doe-proof-node` for declarative unchanged-process runs:
+
+```bash
+doe-proof-node run doe-proof.contract.json --out run.json
+doe-proof-node verify run.json
+doe-proof-node inspect run.json
+doe-proof-node replay run.json --out replay.json
+doe-proof-node compare run.json replay.json
+```
+
+The JSON contract schema ships at
+`doe-gpu/assets/governed-node-webgpu-process-contract.schema.json`. A contract
+binds the provider entrypoint, workload entrypoint, input, evaluator module,
+expected output, environment policy, timeout, and output limit. Every referenced
+file has an exact SHA-256. Optional `runtimeFiles` entries bind additional
+runtime data, libraries, manifests, or generated artifacts by unique ID, path,
+and digest. The evaluator exports `evaluate(processResult, context)` and returns
+the same `{ output, providerIdentity, evidence }` object as the JavaScript
+process API.
+
+The provider and application entrypoint digests cover those files, not their
+entire transitive dependency closures. `workload.implementationSha256` is the
+caller-declared aggregate identity for that larger closure and must be produced
+by the application’s own build or manifest contract; Doe does not invent it by
+hashing one entry file. `runtimeFiles` makes a declared set verifiable, but it
+does not prove the set is complete or that the process accessed no other files.
+Those stronger claims require a separately enforced filesystem contract.
+
+`verify` hashes the contract and dependencies and validates the nested process
+receipt without importing or executing the evaluator. `replay` executes the
+bound contract again and requires both semantic workload and provider-specific
+execution identities to match. `compare` requires two independently valid,
+oracle-passing artifacts with the same workload and output. It explicitly emits
+`performanceInterpretable: false` and `runtimeOwnershipCredit: false`; those
+claims require the separate application gate.
+
+On `SIGINT` or `SIGTERM`, the CLI requests cancellation and writes a terminal
+failed-but-valid evidence artifact when `--out` is present. Verifying that
+artifact succeeds because verification establishes receipt integrity, not a
+passing workload outcome.
+
 ## Entry points
 
 `packages/doe-gpu/package.json` is the authoritative export list.
@@ -61,13 +187,18 @@ restores changed globals.
 | `doe-gpu` | Host-aware public runtime surface |
 | `doe-gpu/api` | Provider-neutral helpers and types |
 | `doe-gpu/native` | Explicit native provider |
-| `doe-gpu/node-webgpu` | Strict provider acquisition and lifecycle |
+| `doe-gpu/node-webgpu` | Strict provider acquisition, governed exact-output execution, and lifecycle |
+| `doe-gpu/node-webgpu-loader` | Fail-closed substitution for unchanged Node `webgpu` imports |
+| `doe-gpu/node-webgpu-process` | Governed unchanged-process execution, exact oracle, and replay receipt |
 | `doe-gpu/program-bundle` | Closed Program Bundle validation and execution |
 | `doe-gpu/plan` | Execution-plan contracts |
 | `doe-gpu/capture` | Record-only WebGPU capture |
 | `doe-gpu/compute` | Compute-oriented helper surface |
 | `doe-gpu/browser` | Browser compatibility wrapper |
 | `doe-gpu/hybrid` | Legacy local/cloud integration helper |
+
+The public `doe-proof-node` executable is the CLI/CI front door for the
+governed process contract. It is not a benchmark or release-promotion command.
 
 The hybrid helper has an explicit fallback-oriented contract and is not the
 strict native-runtime path. New runtime integrations should use an explicit
@@ -79,6 +210,19 @@ The package may resolve a matching optional platform package, a workspace
 build, or an explicitly configured native library path. The selected binary
 and provider must appear in diagnostics. A supported installation must not
 require a local Zig build.
+
+Release staging must run the native clean-install gate after the platform
+payload is staged:
+
+```bash
+npm run test:integration:native-clean-install
+```
+
+The gate packs the wrapper and matching platform package, installs both into a
+fresh project with lifecycle scripts disabled, executes the shipped first
+kernel, and rejects workspace-library resolution. The ordinary integration
+suite skips this physical package check when no staged platform payload exists;
+the explicit release command fails instead.
 
 Node 18 or newer is required for the default entrypoint. Bun and Deno use their
 declared package export conditions. Actual platform support remains limited to

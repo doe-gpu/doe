@@ -488,7 +488,7 @@
         {
           "name": "BRIDGE_AVAILABLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 26
+          "startLine": 24
         }
       ],
       "prefix": "BRIDGE",
@@ -2728,112 +2728,112 @@
         {
           "name": "FEATURE_DEPTH_CLIP_CONTROL",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 32
+          "startLine": 30
         },
         {
           "name": "FEATURE_DEPTH32FLOAT_STENCIL8",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 33
+          "startLine": 31
         },
         {
           "name": "FEATURE_TEXTURE_COMPRESSION_ASTC",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 34
+          "startLine": 32
         },
         {
           "name": "FEATURE_TEXTURE_COMPRESSION_BC_SLICED_3D",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 35
+          "startLine": 33
         },
         {
           "name": "FEATURE_TEXTURE_COMPRESSION_ASTC_SLICED_3D",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 36
+          "startLine": 34
         },
         {
           "name": "FEATURE_BGRA8UNORM_STORAGE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 37
+          "startLine": 35
         },
         {
           "name": "FEATURE_SHADER_F16",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 38
+          "startLine": 36
         },
         {
           "name": "FEATURE_INDIRECT_FIRST_INSTANCE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 39
+          "startLine": 37
         },
         {
           "name": "FEATURE_FLOAT32_FILTERABLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 40
+          "startLine": 38
         },
         {
           "name": "FEATURE_FLOAT32_BLENDABLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 41
+          "startLine": 39
         },
         {
           "name": "FEATURE_SUBGROUPS",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 42
+          "startLine": 40
         },
         {
           "name": "FEATURE_TEXTURE_COMPRESSION_BC",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 43
+          "startLine": 41
         },
         {
           "name": "FEATURE_TEXTURE_COMPRESSION_ETC2",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 44
+          "startLine": 42
         },
         {
           "name": "FEATURE_RG11B10UFLOAT_RENDERABLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 45
+          "startLine": 43
         },
         {
           "name": "FEATURE_TIMESTAMP_QUERY",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 46
+          "startLine": 44
         },
         {
           "name": "FEATURE_CLIP_DISTANCES",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 47
+          "startLine": 45
         },
         {
           "name": "FEATURE_DUAL_SOURCE_BLENDING",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 48
+          "startLine": 46
         },
         {
           "name": "FEATURE_CORE_FEATURES_AND_LIMITS",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 49
+          "startLine": 47
         },
         {
           "name": "FEATURE_TEXTURE_FORMATS_TIER1",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 50
+          "startLine": 48
         },
         {
           "name": "FEATURE_TEXTURE_FORMATS_TIER2",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 51
+          "startLine": 49
         },
         {
           "name": "FEATURE_PRIMITIVE_INDEX",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 52
+          "startLine": 50
         },
         {
           "name": "FEATURE_TEXTURE_COMPONENT_SWIZZLE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 53
+          "startLine": 51
         }
       ],
       "prefix": "FEATURE",
@@ -4548,22 +4548,22 @@
         {
           "name": "METAL_MAX_UNIFORM_BUFFER_BINDING_SIZE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 69
+          "startLine": 67
         },
         {
           "name": "METAL_SIMD_GROUP_SIZE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 72
+          "startLine": 70
         },
         {
           "name": "METAL_MAX_IMMEDIATE_SIZE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 73
+          "startLine": 71
         },
         {
           "name": "METAL_LIMITS_STATIC",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 76
+          "startLine": 74
         },
         {
           "name": "METAL_QUEUE_PRIORITY_LOW",
@@ -4640,57 +4640,57 @@
         {
           "name": "MSG_ADAPTER_UNAVAILABLE",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 51
+          "startLine": 52
         },
         {
           "name": "MSG_ADAPTER_ALLOCATION_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 52
+          "startLine": 53
         },
         {
           "name": "MSG_VK_ADAPTER_PROBE_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 53
+          "startLine": 54
         },
         {
           "name": "MSG_INVALID_ADAPTER",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 54
+          "startLine": 55
         },
         {
           "name": "MSG_QUEUE_UNAVAILABLE",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 55
+          "startLine": 56
         },
         {
           "name": "MSG_DEVICE_ALLOCATION_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 56
+          "startLine": 57
         },
         {
           "name": "MSG_VK_RUNTIME_INIT_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 57
+          "startLine": 58
         },
         {
           "name": "MSG_D3D12_RUNTIME_INIT_FAILED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 58
+          "startLine": 59
         },
         {
           "name": "MSG_RUNTIME_POLICY_INVALID",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 59
+          "startLine": 60
         },
         {
           "name": "MSG_DEVICE_DESCRIPTOR_INVALID",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 60
+          "startLine": 61
         },
         {
           "name": "MSG_REQUIRED_FEATURE_UNSUPPORTED",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 61
+          "startLine": 62
         }
       ],
       "prefix": "MSG",
@@ -9111,22 +9111,22 @@
         {
           "name": "VULKAN_MAX_STORAGE_BUFFER_BINDING_SIZE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 115
+          "startLine": 113
         },
         {
           "name": "VULKAN_MAX_BUFFER_SIZE",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 116
+          "startLine": 114
         },
         {
           "name": "VULKAN_MIN_STORAGE_BUFFER_OFFSET_ALIGNMENT",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 117
+          "startLine": 115
         },
         {
           "name": "VULKAN_LIMITS_STATIC",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 119
+          "startLine": 117
         },
         {
           "name": "VULKAN_PREPARED_BINDING_CACHE_CAPACITY",
@@ -9964,27 +9964,27 @@
         {
           "name": "WGPU_WAIT_STATUS_SUCCESS",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 46
+          "startLine": 47
         },
         {
           "name": "WGPU_WAIT_STATUS_TIMED_OUT",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 47
+          "startLine": 48
         },
         {
           "name": "WGPU_REQUEST_STATUS_SUCCESS",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 48
+          "startLine": 49
         },
         {
           "name": "WGPU_REQUEST_STATUS_UNAVAILABLE",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 49
+          "startLine": 50
         },
         {
           "name": "WGPU_REQUEST_STATUS_ERROR",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 50
+          "startLine": 51
         },
         {
           "name": "WGPU_CALLBACK_MODE_ALLOW_PROCESS_EVENTS",
@@ -15911,6 +15911,11 @@
           "startLine": 8
         },
         {
+          "name": "backend_contract",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 6
+        },
+        {
           "name": "backend_policy",
           "path": "src/backend/vulkan/vk_async_dispatch.zig",
           "startLine": 11
@@ -15988,7 +15993,7 @@
         {
           "name": "backend_policy",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 38
+          "startLine": 39
         },
         {
           "name": "backend_render_state",
@@ -19516,22 +19521,22 @@
         {
           "name": "metal_bridge_create_default_device",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 41
+          "startLine": 42
         },
         {
           "name": "metal_bridge_device_new_command_queue",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 42
+          "startLine": 43
         },
         {
           "name": "metal_bridge_device_new_shared_event",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 43
+          "startLine": 44
         },
         {
           "name": "metal_bridge_release",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 44
+          "startLine": 45
         },
         {
           "name": "metal_browser_trace",
@@ -20840,6 +20845,11 @@
           "name": "native_runtime",
           "path": "src/backend/vulkan/mod.zig",
           "startLine": 21
+        },
+        {
+          "name": "native_runtime",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 8
         },
         {
           "name": "native_numerical_modes",
@@ -22961,7 +22971,7 @@
         {
           "name": "runtime_types",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 39
+          "startLine": 40
         },
         {
           "name": "runtime_helpers",
@@ -23879,6 +23889,11 @@
           "startLine": 7
         },
         {
+          "name": "vk_adapter_probe",
+          "path": "src/backend/dropin_capabilities.zig",
+          "startLine": 8
+        },
+        {
           "name": "vk_pipeline_cache_persistent",
           "path": "src/backend/dropin_pipeline_cache.zig",
           "startLine": 3
@@ -23977,6 +23992,21 @@
           "name": "vk_texture_commands",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 28
+        },
+        {
+          "name": "vk_device",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 9
+        },
+        {
+          "name": "vk_device_caps",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 10
+        },
+        {
+          "name": "vk_feature_caps",
+          "path": "src/backend/vulkan/vk_adapter_probe.zig",
+          "startLine": 11
         },
         {
           "name": "vk_device",
@@ -24259,6 +24289,11 @@
           "startLine": 36
         },
         {
+          "name": "vk_adapter_probe",
+          "path": "src/native/lifecycle/doe_instance_device_native.zig",
+          "startLine": 37
+        },
+        {
           "name": "vk_resources",
           "path": "src/native/queue/doe_queue_copy_native.zig",
           "startLine": 18
@@ -24282,11 +24317,6 @@
           "name": "vk_device_caps",
           "path": "src/native/support/doe_device_caps.zig",
           "startLine": 18
-        },
-        {
-          "name": "vk_feature_probe",
-          "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 19
         },
         {
           "name": "vk_surf",
@@ -24392,7 +24422,7 @@
         {
           "name": "vulkan_feature_cache",
           "path": "src/native/lifecycle/doe_instance_device_native.zig",
-          "startLine": 37
+          "startLine": 38
         },
         {
           "name": "vulkan_submit",
@@ -24422,7 +24452,7 @@
         {
           "name": "vulkan_feature_cache",
           "path": "src/native/support/doe_device_caps.zig",
-          "startLine": 20
+          "startLine": 19
         },
         {
           "name": "vulkan_texture_native",
@@ -24602,10 +24632,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "d715c362fc26c72f4dad66f1bed84e4adf126b16290055125b2087a70777987f",
+  "manifestSha256": "f312ceab0f71721caabb1dbd24e52f52a2fbd2fd7bbfdf65690f557eef8067f1",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "9a0511c58ac6f6bc59ec7509e2bb32990c95913c8dafc0105c1561c110352326",
+  "sourceTreeSha256": "d98500969c1bc44d419e75b6c0a899b56f8e36f13d173ef78ebe7681c41b8419",
   "status": "captured"
 }

@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "d715c362fc26c72f4dad66f1bed84e4adf126b16290055125b2087a70777987f",
+  "manifestSha256": "f312ceab0f71721caabb1dbd24e52f52a2fbd2fd7bbfdf65690f557eef8067f1",
   "modules": [
     {
       "containsCImport": false,
@@ -2955,21 +2955,22 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 5,
+      "fanOut": 6,
       "imports": [
         "src/backend/d3d12/d3d12_device_caps.zig",
         "src/backend/metal/metal_bridge_decls.zig",
+        "src/backend/vulkan/vk_adapter_probe.zig",
         "src/backend/vulkan/vk_device_caps.zig",
         "src/backend/vulkan/vk_feature_caps.zig",
         "src/backend/vulkan/vk_feature_probe.zig"
       ],
       "isProductionRoot": false,
       "layer": "backend-interface",
-      "lineCount": 15,
+      "lineCount": 16,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/dropin_capabilities.zig",
-      "publicDeclarationCount": 6,
+      "publicDeclarationCount": 7,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -2992,13 +2993,18 @@
           "name": "vk_feature_probe"
         },
         {
+          "kind": "const",
+          "line": 8,
+          "name": "vk_adapter_probe"
+        },
+        {
           "kind": "fn",
-          "line": 9,
+          "line": 10,
           "name": "metal_device_max_buffer_length"
         },
         {
           "kind": "fn",
-          "line": 13,
+          "line": 14,
           "name": "metal_supports_timestamp_query"
         }
       ],
@@ -3014,9 +3020,9 @@
         "src/native/vulkan/vulkan_feature_cache.zig"
       ],
       "roles": [],
-      "sha256": "677fd749f918f998663361b90ecf613efc8c08b19bf870c8b9ef5de76e5f846e",
+      "sha256": "962553f15d24f363a0b1ee45e16fb57a4590c9e7f23cbf7d16cafa2744abe1d7",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 8
+      "topLevelDeclarationCount": 9
     },
     {
       "containsCImport": false,
@@ -5886,7 +5892,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 5,
+      "fanIn": 6,
       "fanOut": 25,
       "imports": [
         "src/backend/backend_policy.zig",
@@ -5965,6 +5971,7 @@
         "src/backend/dropin_lifecycle.zig",
         "src/backend/vulkan/backend_execute.zig",
         "src/backend/vulkan/mod.zig",
+        "src/backend/vulkan/vk_adapter_probe.zig",
         "src/backend/vulkan/vk_device_caps.zig",
         "src/backend/vulkan/vk_feature_probe.zig"
       ],
@@ -5972,6 +5979,67 @@
       "sha256": "742ab4b261ee6cb06b3496545bc13d997a60e1a4328700857059abfba17df26d",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 32
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 6,
+      "imports": [
+        "src/backend/vulkan/native_runtime.zig",
+        "src/backend/vulkan/vk_constants.zig",
+        "src/backend/vulkan/vk_device.zig",
+        "src/backend/vulkan/vk_device_caps.zig",
+        "src/backend/vulkan/vk_feature_caps.zig",
+        "src/contracts/backend.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "backend-vulkan",
+      "lineCount": 117,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/vulkan/vk_adapter_probe.zig",
+      "publicDeclarationCount": 5,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 13,
+          "name": "AdapterProbe"
+        },
+        {
+          "kind": "fn",
+          "line": 19,
+          "name": "probe_selected_adapter"
+        },
+        {
+          "kind": "fn",
+          "line": 44,
+          "name": "query_identity"
+        },
+        {
+          "kind": "fn",
+          "line": 62,
+          "name": "identity_matches"
+        },
+        {
+          "kind": "fn",
+          "line": 76,
+          "name": "identity_matches_fields"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "dropin-compatibility",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/dropin_capabilities.zig"
+      ],
+      "roles": [],
+      "sha256": "f3470c80c3cdfc7da3c2f0a03d7653c68782239813a85ae2169c50bffe5b0ff2",
+      "testBlockCount": 1,
+      "topLevelDeclarationCount": 13
     },
     {
       "containsCImport": false,
@@ -6344,7 +6412,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 21,
+      "fanIn": 22,
       "fanOut": 5,
       "imports": [
         "src/backend/vulkan/vk_capability_structs.zig",
@@ -8577,6 +8645,7 @@
       "reverseImports": [
         "src/backend/dropin_resource_ops.zig",
         "src/backend/vulkan/native_runtime.zig",
+        "src/backend/vulkan/vk_adapter_probe.zig",
         "src/backend/vulkan/vk_async_probes.zig",
         "src/backend/vulkan/vk_command_buffers.zig",
         "src/backend/vulkan/vk_compute_sync.zig",
@@ -8605,7 +8674,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 10,
+      "fanIn": 11,
       "fanOut": 6,
       "imports": [
         "src/backend/runtime_types.zig",
@@ -8728,6 +8797,7 @@
       "reachable": true,
       "reverseImports": [
         "src/backend/vulkan/native_runtime.zig",
+        "src/backend/vulkan/vk_adapter_probe.zig",
         "src/backend/vulkan/vk_async_probes.zig",
         "src/backend/vulkan/vk_device_caps.zig",
         "src/backend/vulkan/vk_dispatch_repeat.zig",
@@ -8746,7 +8816,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 1,
+      "fanIn": 2,
       "fanOut": 5,
       "imports": [
         "src/backend/vulkan/native_runtime.zig",
@@ -8791,7 +8861,8 @@
       ],
       "reachable": true,
       "reverseImports": [
-        "src/backend/dropin_capabilities.zig"
+        "src/backend/dropin_capabilities.zig",
+        "src/backend/vulkan/vk_adapter_probe.zig"
       ],
       "roles": [],
       "sha256": "c392f5b78d81b7d22ca5aa5cd6e9b9686facd637ef88a6492a4197c3e6a62e54",
@@ -8885,7 +8956,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 4,
       "fanOut": 2,
       "imports": [
         "src/backend/vulkan/vk_constants.zig",
@@ -8929,6 +9000,7 @@
       "reachable": true,
       "reverseImports": [
         "src/backend/dropin_capabilities.zig",
+        "src/backend/vulkan/vk_adapter_probe.zig",
         "src/backend/vulkan/vk_device.zig",
         "src/backend/vulkan/vk_feature_probe.zig"
       ],
@@ -26427,7 +26499,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 17,
+      "fanIn": 18,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_profile.zig"
@@ -26563,6 +26635,7 @@
         "src/backend/dawn_delegate_backend.zig",
         "src/backend/runtime_types.zig",
         "src/backend/vulkan/native_runtime.zig",
+        "src/backend/vulkan/vk_adapter_probe.zig",
         "src/cli/runtime_cli_artifacts.zig",
         "src/contracts/compute.zig",
         "src/contracts/mod.zig",
@@ -45683,7 +45756,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 676,
+      "lineCount": 693,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/lifecycle/doe_instance_device_native.zig",
@@ -45700,9 +45773,9 @@
         "src/native/surface/doe_surface_native.zig"
       ],
       "roles": [],
-      "sha256": "0291b9c5a647322807016083b0723f12465f36ce563c663abe942cf8c61eaef0",
+      "sha256": "752d7f68c886a553cc40c9082610d34df69115c6298a6f74fbbd3c4d52d347c0",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 90
+      "topLevelDeclarationCount": 91
     },
     {
       "containsCImport": false,
@@ -48596,7 +48669,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 385,
+      "lineCount": 367,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/support/doe_device_caps.zig",
@@ -48604,17 +48677,17 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 42,
+          "line": 40,
           "name": "FEATURE_SUBGROUPS"
         },
         {
           "kind": "const",
-          "line": 72,
+          "line": 70,
           "name": "METAL_SIMD_GROUP_SIZE"
         },
         {
           "kind": "const",
-          "line": 119,
+          "line": 117,
           "name": "VULKAN_LIMITS_STATIC"
         }
       ],
@@ -48630,9 +48703,9 @@
         "src/native/resource/doe_texture_validation.zig"
       ],
       "roles": [],
-      "sha256": "555fdf13c91a0e7bfa84e306656c6ca3875b4f344f488cf6a379ce1941603760",
+      "sha256": "15734661555ecb65ae12998ce4e4648e07099176e8dd4671b25877c26a9885eb",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 61
+      "topLevelDeclarationCount": 58
     },
     {
       "containsCImport": false,
@@ -55089,5 +55162,5 @@
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "9a0511c58ac6f6bc59ec7509e2bb32990c95913c8dafc0105c1561c110352326"
+  "sourceTreeSha256": "d98500969c1bc44d419e75b6c0a899b56f8e36f13d173ef78ebe7681c41b8419"
 }

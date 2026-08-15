@@ -7,7 +7,7 @@
       "kind": "package",
       "stability": "semver",
       "shipped": true,
-      "summary": "Public npm package surface for Doe. Browser subpath is API compatibility over incumbent browser WebGPU, not the Chromium replacement lane.",
+      "summary": "Public npm package and doe-proof-node CLI surface for DoeRuntime and provider-neutral DoeProof execution. Browser subpath is API compatibility over incumbent browser WebGPU, not the Chromium replacement lane.",
       "rootPaths": [
         "packages/doe-gpu"
       ],
@@ -18,6 +18,9 @@
         "packages/doe-gpu/src/bun.js",
         "packages/doe-gpu/src/deno.js",
         "packages/doe-gpu/src/node-webgpu.js",
+        "packages/doe-gpu/src/node-webgpu-loader.js",
+        "packages/doe-gpu/src/node-webgpu-process.js",
+        "packages/doe-gpu/bin/doe-proof-node.js",
         "packages/doe-gpu/src/program-bundle-runner.js",
         "packages/doe-gpu/src/plan.js",
         "packages/doe-gpu/src/capture.js",
