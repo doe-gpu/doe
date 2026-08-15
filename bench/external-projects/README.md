@@ -37,9 +37,11 @@ evidence-linked lane, material-outcome, and cost-acceptance decisions.
 
 HoloScript is the reference partial-matrix implementation. Its runner emits
 `I1`, `W0`, and `D0` separately and accepts an ambient incumbent module only
-through the explicit `DOE_EXTERNAL_AMBIENT_DAWN_MODULE` input. It records an
-absent ambient module and the unimplemented bounded-patch control as missing
-lanes; it never aliases the pinned incumbent into `I0` or promotes a partial
+through the explicit `DOE_EXTERNAL_AMBIENT_DAWN_MODULE` input. The vGPU runner
+uses the same shared lane summarizer, but marks its governed `W0` and `D0`
+constructions partial until receipt-driven replay and the frozen lifecycle
+failure-injection suite execute. Both runners record absent or incomplete
+lanes rather than aliasing a pinned incumbent into `I0` or promoting a partial
 matrix.
 
 ## Portable preparation and reproduction

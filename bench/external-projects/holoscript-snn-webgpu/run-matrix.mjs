@@ -5,7 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 
-import { buildRuntimeOwnership } from './runtime-ownership.mjs';
+import { buildRuntimeOwnership } from '../../lib/runtime-ownership-matrix.mjs';
 
 const harnessDir = dirname(fileURLToPath(import.meta.url));
 const doeRoot = resolve(harnessDir, '../../..');

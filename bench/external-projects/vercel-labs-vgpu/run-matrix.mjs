@@ -7,6 +7,8 @@ import { access, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { buildRuntimeOwnership } from '../../lib/runtime-ownership-matrix.mjs';
+
 const harnessDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(harnessDir, '../../..');
 const defaultUpstream = resolve(
@@ -252,15 +254,23 @@ function upstreamPass(evidence) {
     && Object.values(evidence.assertions).every(Boolean);
 }
 
-async function runWorkload(options, experimentRoot, outDir, provider, index, modules) {
-  const processDir = resolve(outDir, 'processes', provider, String(index + 1));
+async function runWorkload(
+  options,
+  experimentRoot,
+  outDir,
+  laneId,
+  provider,
+  index,
+  modules,
+) {
+  const processDir = resolve(outDir, 'processes', laneId, String(index + 1));
   const evidenceDir = resolve(processDir, 'evidence');
   const cacheDir = resolve(processDir, 'cache');
   const runtimeDir = resolve(
     repoRoot,
     'bench/out/.xdg',
     sha256Text(outDir).slice(0, 8),
-    provider === 'dawn-node-webgpu' ? 'dawn' : 'doe',
+    laneId.toLowerCase(),
     String(index + 1),
   );
   await Promise.all([
@@ -299,7 +309,9 @@ async function runWorkload(options, experimentRoot, outDir, provider, index, mod
     && !result.crashed
     && upstreamPass(upstreamEvidence);
   return {
+    laneId,
     provider,
+    providerModulePath: provider === 'dawn-node-webgpu' ? modules.dawn : modules.doe,
     cleanProcessIndex: index + 1,
     success,
     ...result,
@@ -340,6 +352,9 @@ function extractWgsl(pipelineSource) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
+  const harness = JSON.parse(
+    await readFile(resolve(harnessDir, 'node-ort-snapshot.harness.json'), 'utf8'),
+  );
   const experimentRoot = resolve(options.upstream, 'experiments/ort-init-device');
   const outDir = resolve(
     repoRoot,
@@ -382,11 +397,14 @@ async function main() {
     typescript: resolve(experimentRoot, 'node_modules/typescript/lib/typescript.js'),
   };
   await Promise.all(Object.values(modules).map((modulePath) => access(modulePath)));
+  const ambientDawnModule = process.env.DOE_EXTERNAL_AMBIENT_DAWN_MODULE?.trim() || null;
+  if (ambientDawnModule !== null) await access(ambientDawnModule);
 
   const hostHardware = await inspectHostHardware();
   const providerIds = ['dawn-node-webgpu', 'doe-gpu'];
   const providers = {};
   for (const provider of providerIds) {
+    const laneId = provider === 'dawn-node-webgpu' ? 'W0' : 'D0';
     const probe = await probeProvider(options, experimentRoot, provider, modules, hostHardware);
     const compatibilityRepro = await runCompatibilityRepro(
       options,
@@ -396,12 +414,76 @@ async function main() {
     );
     const runs = [];
     for (let index = 0; index < options.cleanProcessRuns; index += 1) {
-      const run = await runWorkload(options, experimentRoot, outDir, provider, index, modules);
+      const run = await runWorkload(
+        options,
+        experimentRoot,
+        outDir,
+        laneId,
+        provider,
+        index,
+        modules,
+      );
       runs.push(run);
       process.stdout.write(`[${provider}] process ${index + 1}: ${run.success ? 'PASS' : 'FAIL'}\n`);
     }
     providers[provider] = { probe, compatibilityRepro, summary: summarize(runs), runs };
   }
+
+  const ownershipRuns = [];
+  for (let index = 0; index < options.cleanProcessRuns; index += 1) {
+    ownershipRuns.push(await runWorkload(
+      options,
+      experimentRoot,
+      outDir,
+      'I1',
+      'dawn-node-webgpu',
+      index,
+      modules,
+    ));
+  }
+  if (ambientDawnModule !== null) {
+    const ambientModules = { ...modules, dawn: ambientDawnModule };
+    for (let index = 0; index < options.cleanProcessRuns; index += 1) {
+      ownershipRuns.push(await runWorkload(
+        options,
+        experimentRoot,
+        outDir,
+        'I0',
+        'dawn-node-webgpu',
+        index,
+        ambientModules,
+      ));
+    }
+  }
+  const incompleteGovernance = [
+    'receipt-driven replay not exercised',
+    'frozen lifecycle failure-injection suite not exercised',
+  ];
+  for (const [provider, laneId] of [
+    ['dawn-node-webgpu', 'W0'],
+    ['doe-gpu', 'D0'],
+  ]) {
+    const providerResult = providers[provider];
+    ownershipRuns.push({
+      laneId,
+      provider,
+      providerModulePath: provider === 'dawn-node-webgpu' ? modules.dawn : modules.doe,
+      success: providerResult.probe.hardwareEligible
+        && providerResult.compatibilityRepro.success
+        && providerResult.summary.failures === 0,
+      contractComplete: false,
+      constructionIssues: incompleteGovernance,
+      probe: providerResult.probe,
+      compatibilityRepro: providerResult.compatibilityRepro,
+      reliability: providerResult.summary,
+    });
+  }
+  const runtimeOwnership = buildRuntimeOwnership({
+    runs: ownershipRuns,
+    plan: harness.runtimeOwnershipPlan,
+    planSha256: sha256Text(JSON.stringify(harness.runtimeOwnershipPlan)),
+    ambientModuleSupplied: ambientDawnModule !== null,
+  });
 
   const generatedAt = new Date().toISOString();
   const raw = {
@@ -430,6 +512,7 @@ async function main() {
     immutableInputs,
     preparationReceipt: preparationEvidence,
     providers,
+    runtimeOwnership,
   };
   raw.sha256 = sha256Text(JSON.stringify(raw));
 
@@ -470,6 +553,23 @@ async function main() {
     synchronization: 'vgpu device queue flush after consumer dispatch',
     readback: 'destination Buffer.read(64) after queue flush',
     outputIdentity,
+    runtimeOwnership: {
+      status: raw.runtimeOwnership.status,
+      planSha256: raw.runtimeOwnership.planSha256,
+      claimedProperty: raw.runtimeOwnership.claimedProperty,
+      missingRequiredLanes: raw.runtimeOwnership.missingRequiredLanes,
+      lanes: Object.fromEntries(Object.entries(raw.runtimeOwnership.lanes).map(([laneId, lane]) => [
+        laneId,
+        {
+          status: lane.status,
+          runCount: lane.runCount,
+          successfulRuns: lane.successfulRuns,
+          contractCompleteRuns: lane.contractCompleteRuns,
+          constructionIssues: lane.constructionIssues,
+          providerModulePaths: lane.providerModulePaths,
+        },
+      ])),
+    },
     diagnosis: {
       firstDoeFailure: providers['doe-gpu'].runs.find((run) => !run.success) ?? null,
     },

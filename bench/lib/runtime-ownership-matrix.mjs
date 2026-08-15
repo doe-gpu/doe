@@ -3,14 +3,30 @@ export function summarizeOwnershipLane(runs, laneId) {
   if (laneRuns.length === 0) {
     return null;
   }
-  const successfulRuns = laneRuns.filter(
-    (run) => run.exitCode === 0 && !run.timedOut && run.result,
+  const successfulRuns = laneRuns.filter((run) => (
+    run.success === true
+    || (run.exitCode === 0 && !run.timedOut && run.result)
+  )).length;
+  const contractCompleteRuns = laneRuns.filter(
+    (run) => run.contractComplete !== false,
   ).length;
+  const executionPassed = successfulRuns === laneRuns.length;
+  const contractComplete = contractCompleteRuns === laneRuns.length;
   return {
-    status: successfulRuns === laneRuns.length ? 'passed' : 'failed',
+    status: executionPassed && contractComplete
+      ? 'passed'
+      : executionPassed
+        ? 'partial'
+        : 'failed',
     runCount: laneRuns.length,
     successfulRuns,
-    providerModulePaths: [...new Set(laneRuns.map((run) => run.providerModulePath))],
+    contractCompleteRuns,
+    constructionIssues: [...new Set(laneRuns.flatMap((run) => run.constructionIssues ?? []))],
+    providerModulePaths: [...new Set(
+      laneRuns
+        .map((run) => run.providerModulePath)
+        .filter((path) => typeof path === 'string' && path.length > 0),
+    )],
     runs: laneRuns,
   };
 }
@@ -27,6 +43,8 @@ export function buildRuntimeOwnership({
       status: laneId === 'I0' && !ambientModuleSupplied ? 'unavailable' : 'not-run',
       runCount: 0,
       successfulRuns: 0,
+      contractCompleteRuns: 0,
+      constructionIssues: [],
       providerModulePaths: [],
       runs: [],
     };
