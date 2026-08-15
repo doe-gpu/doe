@@ -75,7 +75,72 @@ def _wall_coverage_sample(
     return sample
 
 
+def _provider_result_sample(*, backend: str, digest: str) -> dict:
+    return {
+        "runIndex": 0,
+        "measuredMs": 100.0,
+        "elapsedMs": 100.0,
+        "timingSource": "wall-time",
+        "timingClass": "process-wall",
+        "timing": {
+            "workloadUnitNormalizationDivisor": 1.0,
+        },
+        "traceMeta": {
+            "executionBackend": backend,
+            "executionRowCount": 1,
+            "executionSuccessCount": 1,
+            "executionErrorCount": 0,
+            "processWallMs": 100.0,
+            "workloadUnitWallSource": "trace-meta-process-wall",
+            "resultSummary": {
+                "generatedTextLength": 5,
+                "generatedTextSha256": digest,
+            },
+        },
+    }
+
+
 class CompareAssessmentTests(unittest.TestCase):
+    def test_result_output_mismatch_blocks_strict_provider_compare(self) -> None:
+        result = compare_assessment(
+            workload_id="doppler_provider_compare",
+            workload_comparable=True,
+            workload_domain="compute",
+            workload_api="webgpu",
+            workload_commands_path="",
+            workload_path_asymmetry=False,
+            workload_path_asymmetry_note="",
+            baseline_command_repeat=1,
+            comparison_command_repeat=1,
+            baseline={
+                "commandSamples": [
+                    _provider_result_sample(
+                        backend="doppler_node_webgpu_doe",
+                        digest="a" * 64,
+                    )
+                ],
+            },
+            comparison={
+                "commandSamples": [
+                    _provider_result_sample(
+                        backend="doppler_node_webgpu_incumbent",
+                        digest="b" * 64,
+                    )
+                ],
+            },
+            required_timing_class="process-wall",
+            allow_baseline_no_execution=False,
+            resource_probe="none",
+            comparability_mode="strict",
+            resource_sample_target_count=0,
+        )
+
+        self.assertFalse(result["comparable"])
+        self.assertIn(
+            "baseline_comparison_result_output_match",
+            result["blockingFailedObligations"],
+        )
+
     def test_submit_scope_mismatch_blocks_strict_package_totals(self) -> None:
         result = compare_assessment(
             workload_id="package_upload_readback",

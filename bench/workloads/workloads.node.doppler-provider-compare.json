@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "ownership": "standalone",
+  "workloads": [
+    {
+      "id": "doppler_provider_compare_gemma3_270m_prefill_64tok_decode_64tok",
+      "name": "Doppler Node WebGPU provider compare Gemma-3 270M",
+      "description": "Diagnostic same-application comparison of unchanged Doppler Gemma-3 270M inference with Doe and node-webgpu as the only intended provider difference.",
+      "domain": "compute",
+      "comparabilityNotes": "Strict process-wall provider comparison. Both sides run the same Doppler source, local model, runtime configuration, tokenizer-derived prompt, and greedy 64-token decode. Generated text SHA-256 must be deterministic within each side and identical across providers before timing can be interpreted.",
+      "commandsPath": "bench/vendor-node/doppler_provider_compare_gemma270m_commands.json",
+      "quirksPath": "examples/quirks/amd_radv_noop_list.json",
+      "vendor": "amd",
+      "api": "webgpu",
+      "family": "gfx11",
+      "driver": "24.0.0",
+      "extraArgs": [],
+      "dawnFilter": "",
+      "comparable": true,
+      "benchmarkClass": "comparable",
+      "claimEligible": false,
+      "default": false,
+      "cohorts": [
+        "exploration"
+      ]
+    }
+  ]
+}

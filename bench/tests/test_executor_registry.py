@@ -229,8 +229,16 @@ class ExecutorRegistryTests(unittest.TestCase):
     def test_resolves_doppler_node_doe_executor(self) -> None:
         template = resolve_executor_command_template('doppler_node_doe')
         self.assertIn('run-node-doppler-ort-bench.js', template)
+        self.assertIn('--provider doe', template)
         self.assertIn('--scenario {commands}', template)
         self.assertEqual(resolve_executor_boundary('doppler_node_doe'), 'commands')
+
+    def test_resolves_doppler_node_webgpu_executor(self) -> None:
+        template = resolve_executor_command_template('doppler_node_webgpu')
+        self.assertIn('run-node-doppler-ort-bench.js', template)
+        self.assertIn('--provider node-webgpu', template)
+        self.assertIn('--scenario {commands}', template)
+        self.assertEqual(resolve_executor_boundary('doppler_node_webgpu'), 'commands')
 
     def test_rejects_unknown_executor(self) -> None:
         with self.assertRaises(ValueError):

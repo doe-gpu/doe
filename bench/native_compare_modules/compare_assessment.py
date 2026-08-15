@@ -25,6 +25,7 @@ from native_compare_modules.compare_assessment_helpers import (
     collect_effective_readback_paths,
     collect_execution_backends,
     collect_execution_shapes,
+    collect_result_output_signatures,
     collect_readback_counts,
     collect_resident_buffer_load_shapes,
     collect_shader_source_receipt_hashes,
@@ -158,6 +159,8 @@ def compare_assessment(
     )
     left_execution_shapes = collect_execution_shapes(left_samples)
     right_execution_shapes = collect_execution_shapes(right_samples)
+    left_result_output_signatures = collect_result_output_signatures(left_samples)
+    right_result_output_signatures = collect_result_output_signatures(right_samples)
     normalized_domain = workload_domain.strip().lower()
     # Dispatch shape matching applies to all domains. If one side dispatches
     # N times and the other dispatches 0, the workloads are structurally
@@ -203,11 +206,13 @@ def compare_assessment(
         "dawn_delegate" in left_execution_backends
         or "node_webgpu_package" in left_execution_backends
         or "bun_webgpu_package" in left_execution_backends
+        or "doppler_node_webgpu_incumbent" in left_execution_backends
     )
     is_right_dawn_delegate = (
         "dawn_delegate" in right_execution_backends
         or "node_webgpu_package" in right_execution_backends
         or "bun_webgpu_package" in right_execution_backends
+        or "doppler_node_webgpu_incumbent" in right_execution_backends
     )
     is_left_dawn = is_left_dawn_delegate or is_left_dawn_direct or is_left_dawn_perf
     is_right_dawn = is_right_dawn_delegate or is_right_dawn_direct or is_right_dawn_perf
@@ -248,6 +253,42 @@ def compare_assessment(
         passes=len(right_measured_samples) > 0,
         failure_reason="comparison side has no measured samples",
         details={"comparisonSampleCount": len(right_measured_samples)},
+    )
+    result_output_match_applies = (
+        comparability_mode == "strict"
+        and (
+            bool(left_result_output_signatures)
+            or bool(right_result_output_signatures)
+        )
+    )
+    result_output_match = (
+        len(left_result_output_signatures) == 1
+        and len(right_result_output_signatures) == 1
+        and left_result_output_signatures == right_result_output_signatures
+        and next(iter(left_result_output_signatures))[1] > 0
+    )
+    _record_obligation(
+        obligations,
+        reasons,
+        obligation_id="baseline_comparison_result_output_match",
+        blocking=True,
+        applicable=result_output_match_applies,
+        passes=result_output_match,
+        failure_reason=(
+            "baseline/comparison result output is missing, empty, non-deterministic, or unequal: "
+            f"{sorted(left_result_output_signatures)} vs "
+            f"{sorted(right_result_output_signatures)}"
+        ),
+        details={
+            "baselineResultOutputSignatures": [
+                {"sha256": digest, "byteLength": length}
+                for digest, length in sorted(left_result_output_signatures)
+            ],
+            "comparisonResultOutputSignatures": [
+                {"sha256": digest, "byteLength": length}
+                for digest, length in sorted(right_result_output_signatures)
+            ],
+        },
     )
     _record_obligation(
         obligations,

@@ -137,6 +137,7 @@ export async function loadVendorNodeScenario(scenarioPath) {
   return {
     scenarioPath: resolve(scenarioPath),
     scenarioId: asNonEmptyString(command.scenarioId, 'scenario.scenarioId'),
+    benchmarkLane: resolveOptionalString(command.benchmarkLane) ?? 'node-ort-vs-doppler',
     dopplerRoot,
     cacheMode: asNonEmptyString(command.cacheMode ?? 'warm', 'scenario.cacheMode'),
     loadMode: asNonEmptyString(command.loadMode ?? 'http', 'scenario.loadMode'),
@@ -170,6 +171,7 @@ export async function loadVendorNodeScenario(scenarioPath) {
     },
     doppler: {
       modelId: asNonEmptyString(doppler.modelId, 'scenario.doppler.modelId'),
+      sourceCommit: resolveOptionalString(doppler.sourceCommit),
       loadMode: resolveOptionalString(doppler.loadMode),
       modelPath: dopplerModelPath,
       runtimeProfile: resolveOptionalString(doppler.runtimeProfile),

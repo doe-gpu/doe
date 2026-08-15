@@ -515,6 +515,17 @@ _REGISTRY: dict[str, ExecutorSpec] = {
         executor_id='doppler_node_doe',
         command_template=(
             'node bench/executors/run-node-doppler-ort-bench.js '
+            '--provider doe '
+            '--scenario {commands} --trace-jsonl {trace_jsonl} '
+            '--trace-meta {trace_meta} --workload {workload}'
+        ),
+        execution_boundary='commands',
+    ),
+    'doppler_node_webgpu': ExecutorSpec(
+        executor_id='doppler_node_webgpu',
+        command_template=(
+            'node bench/executors/run-node-doppler-ort-bench.js '
+            '--provider node-webgpu '
             '--scenario {commands} --trace-jsonl {trace_jsonl} '
             '--trace-meta {trace_meta} --workload {workload}'
         ),

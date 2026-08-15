@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
+import { execFileSync } from 'node:child_process';
 import { readFile, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve } from 'node:path';
 
 import { loadVendorNodeScenario, parseVendorNodeCliArgs } from './vendor-node/scenario.js';
 import {
+  fileSha256,
   importFromPath,
   nowMs,
   resolvePrompt,
@@ -17,8 +19,6 @@ import {
   writeVendorNodeSuccessTrace,
 } from './vendor-node/trace-artifact.js';
 
-const EXECUTION_BACKEND = 'doppler_node_webgpu';
-const EXECUTION_LABEL = 'doppler node bench on Doe provider';
 const USAGE_COMMAND = 'node bench/executors/run-node-doppler-ort-bench.js';
 const OCTET_STREAM = 'application/octet-stream';
 const CONTENT_TYPE_BY_EXTENSION = Object.freeze({
@@ -27,6 +27,59 @@ const CONTENT_TYPE_BY_EXTENSION = Object.freeze({
   '.model': OCTET_STREAM,
   '.txt': 'text/plain; charset=utf-8',
 });
+
+const PROVIDERS = Object.freeze({
+  doe: Object.freeze({
+    executionBackend: 'doppler_node_webgpu_doe',
+    executionLabel: 'Doppler Node benchmark on Doe provider',
+    executionProvider: 'doe',
+    executionProviderName: 'doe-gpu',
+    modulePath: resolveRepoPath('packages/doe-gpu/src/compute.js'),
+  }),
+  'node-webgpu': Object.freeze({
+    executionBackend: 'doppler_node_webgpu_incumbent',
+    executionLabel: 'Doppler Node benchmark on node-webgpu provider',
+    executionProvider: 'node-webgpu',
+    executionProviderName: 'webgpu',
+    modulePath: resolveRepoPath('bench/vendor/node-webgpu-package/index.js'),
+  }),
+});
+
+function resolveProvider(providerId) {
+  const provider = PROVIDERS[providerId];
+  if (!provider) {
+    throw new Error(
+      `unsupported Doppler Node provider ${providerId}; expected one of ${Object.keys(PROVIDERS).join(', ')}`,
+    );
+  }
+  return provider;
+}
+
+function resolveDopplerSourceIdentity(scenario) {
+  const sourceCommit = execFileSync(
+    'git',
+    ['-C', scenario.dopplerRoot, 'rev-parse', 'HEAD'],
+    { encoding: 'utf8' },
+  ).trim();
+  const sourceStatus = execFileSync(
+    'git',
+    ['-C', scenario.dopplerRoot, 'status', '--porcelain'],
+    { encoding: 'utf8' },
+  ).trim();
+  if (scenario.doppler.sourceCommit && sourceCommit !== scenario.doppler.sourceCommit) {
+    throw new Error(
+      `Doppler source commit mismatch: expected ${scenario.doppler.sourceCommit}, got ${sourceCommit}`,
+    );
+  }
+  if (sourceStatus !== '') {
+    throw new Error('Doppler source tree must be clean for provider comparison');
+  }
+  return {
+    dopplerSourceRoot: scenario.dopplerRoot,
+    dopplerSourceCommit: sourceCommit,
+    dopplerSourceClean: true,
+  };
+}
 
 function contentTypeFor(path) {
   return CONTENT_TYPE_BY_EXTENSION[extname(path).toLowerCase()] ?? OCTET_STREAM;
@@ -186,19 +239,48 @@ async function buildDopplerRequest(scenario, promptText) {
 async function main() {
   const startedMs = nowMs();
   const args = parseVendorNodeCliArgs(USAGE_COMMAND);
+  const provider = resolveProvider(args.provider);
+  const providerContractPath = resolveRepoPath('packages/doe-gpu/src/node-webgpu.js');
+  const providerModuleSha256 = await fileSha256(provider.modulePath);
+  const providerContractSha256 = await fileSha256(providerContractPath);
   let scenarioId = args.workloadId;
+  let benchmarkLane = 'node-ort-vs-doppler';
   let closeModelSource = null;
+  let releaseProvider = null;
+  let providerReceipt = null;
 
   try {
     const scenario = await loadVendorNodeScenario(args.scenarioPath);
     scenarioId = scenario.scenarioId;
+    benchmarkLane = scenario.benchmarkLane;
     if (scenario.scenarioId !== args.workloadId) {
       throw new Error(
         `scenario id ${scenario.scenarioId} does not match requested workload ${args.workloadId}`,
       );
     }
+    const dopplerSourceIdentity = resolveDopplerSourceIdentity(scenario);
+    const modelManifestPath = scenario.doppler.modelPath
+      ? resolve(scenario.doppler.modelPath, 'manifest.json')
+      : null;
+    const modelManifestSha256 = modelManifestPath
+      ? await fileSha256(modelManifestPath)
+      : null;
 
-    process.env.DOPPLER_NODE_WEBGPU_MODULE = resolveRepoPath('packages/doe-gpu/src/compute.js');
+    process.env.DOPPLER_NODE_WEBGPU_MODULE = provider.modulePath;
+    const providerBridge = await importFromPath(
+      resolve(scenario.dopplerRoot, 'src/tooling/node-webgpu.js'),
+    );
+    const bootstrap = await providerBridge.bootstrapNodeWebGPU({
+      providerContractModule: providerContractPath,
+    });
+    providerReceipt = bootstrap.receipt ?? null;
+    if (bootstrap.ok !== true) {
+      throw new Error(
+        `Doppler Node provider bootstrap failed for ${provider.executionProvider}: ${bootstrap.detail ?? 'unknown failure'}`,
+      );
+    }
+    releaseProvider = providerBridge.releaseNodeWebGPU;
+
     const dopplerRunner = await importFromPath(resolve(scenario.dopplerRoot, 'src/tooling/node-command-runner.js'));
     if (typeof dopplerRunner.runNodeCommand !== 'function') {
       throw new Error('doppler node command runner does not export runNodeCommand');
@@ -213,11 +295,16 @@ async function main() {
     const runStartedMs = nowMs();
     const envelope = await dopplerRunner.runNodeCommand(requestBundle.request, {});
     const runResolvedMs = nowMs();
+    const providerRelease = await releaseProvider();
+    releaseProvider = null;
 
     const resultSummary = {
       modelId: scenario.doppler.modelId,
       ...summarizeDopplerEnvelope(envelope),
     };
+    if (resultSummary.generatedTextLength === 0) {
+      throw new Error('Doppler provider comparison produced no captured generated text');
+    }
     const promptSummary = {
       promptSource: prompt.promptSource,
       promptLength: prompt.prompt.length,
@@ -233,12 +320,15 @@ async function main() {
     };
 
     await writeVendorNodeSuccessTrace({
+      benchmarkLane,
+      executionProvider: provider.executionProvider,
+      executionProviderName: provider.executionProviderName,
       traceMetaPath: args.traceMetaPath,
       traceJsonlPath: args.traceJsonlPath,
       workloadId: args.workloadId,
       scenarioId,
-      executionBackend: EXECUTION_BACKEND,
-      executionLabel: EXECUTION_LABEL,
+      executionBackend: provider.executionBackend,
+      executionLabel: provider.executionLabel,
       processWallMs: nowMs() - startedMs,
       adapterInfo: null,
       phaseTimingsMs,
@@ -250,19 +340,49 @@ async function main() {
         loadMode: requestBundle.modelSource.loadMode,
         modelSource: requestBundle.modelSource.modelSource,
         runtimeProfile: scenario.doppler.runtimeProfile,
+        providerModulePath: provider.modulePath,
+        providerModuleSha256,
+        providerContractPath,
+        providerContractSha256,
+        providerReceipt,
+        providerRelease,
+        ...dopplerSourceIdentity,
+        modelManifestPath,
+        modelManifestSha256,
       },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    let message = error instanceof Error ? error.message : String(error);
+    if (typeof releaseProvider === 'function') {
+      try {
+        await releaseProvider();
+      } catch (releaseError) {
+        const releaseMessage = releaseError instanceof Error
+          ? releaseError.message
+          : String(releaseError);
+        message = `${message}; provider release failed: ${releaseMessage}`;
+      }
+      releaseProvider = null;
+    }
     await writeVendorNodeFailureTrace({
+      benchmarkLane,
+      executionProvider: provider.executionProvider,
+      executionProviderName: provider.executionProviderName,
       traceMetaPath: args.traceMetaPath,
       traceJsonlPath: args.traceJsonlPath,
       workloadId: args.workloadId,
       scenarioId,
-      executionBackend: EXECUTION_BACKEND,
-      executionLabel: EXECUTION_LABEL,
+      executionBackend: provider.executionBackend,
+      executionLabel: provider.executionLabel,
       processWallMs: nowMs() - startedMs,
       errorMessage: message,
+      extraMeta: {
+        providerModulePath: provider.modulePath,
+        providerModuleSha256,
+        providerContractPath,
+        providerContractSha256,
+        providerReceipt,
+      },
     });
     process.stderr.write(`${message}\n`);
     process.exitCode = 1;

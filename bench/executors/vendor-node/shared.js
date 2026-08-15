@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync } from 'node:fs';
 import { mkdir, readdir, readFile } from 'node:fs/promises';
 import { basename, dirname, resolve } from 'node:path';
@@ -576,20 +577,33 @@ export function summarizeTjsOutput(output) {
 
 export function summarizeDopplerEnvelope(envelope) {
   const result = requireObject(envelope?.result ?? {}, 'doppler envelope result');
-  const output = result.output;
-  let preview = '';
-  if (typeof output === 'string') {
-    preview = output;
-  } else if (Array.isArray(output) && typeof output[0] === 'string') {
-    preview = output[0];
-  } else if (output && typeof output === 'object' && typeof output.text === 'string') {
-    preview = output.text;
-  }
+  const outputCandidates = [
+    ['result.output', result.output],
+    ['result.metrics.generatedText', result.metrics?.generatedText],
+    ['result.report.output', result.report?.output],
+  ];
+  const resolvedOutput = outputCandidates.find(([_source, value]) => typeof value === 'string');
+  const outputSource = resolvedOutput?.[0] ?? 'not-captured';
+  const generatedText = resolvedOutput?.[1] ?? '';
+  const generatedTokenIdsHash =
+    result.metrics?.referenceTranscript?.tokens?.generatedTokenIdsHash
+    ?? result.referenceTranscript?.tokens?.generatedTokenIdsHash
+    ?? null;
   return {
-    status: normalizeString(envelope?.status) ?? '',
-    generatedTextLength: preview.length,
-    generatedTextPreview: preview.slice(0, 160),
+    status: envelope?.ok === true ? 'ok' : 'unknown',
+    outputSource,
+    generatedTextLength: generatedText.length,
+    generatedTextPreview: generatedText.slice(0, 160),
+    generatedTextSha256: createHash('sha256').update(generatedText, 'utf8').digest('hex'),
+    generatedTokenIdsHash:
+      typeof generatedTokenIdsHash === 'string' && generatedTokenIdsHash.trim() !== ''
+        ? generatedTokenIdsHash.trim()
+        : null,
   };
+}
+
+export async function fileSha256(path) {
+  return createHash('sha256').update(await readFile(path)).digest('hex');
 }
 
 export async function waitForDeviceIdle(device) {

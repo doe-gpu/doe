@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import subprocess
 import sys
 import tempfile
@@ -32,9 +33,93 @@ SCENARIO_MODULE_URL = (
 TRACE_ARTIFACT_MODULE_URL = (
     REPO_ROOT / 'bench' / 'executors' / 'vendor-node' / 'trace-artifact.js'
 ).resolve().as_uri()
+SHARED_MODULE_URL = (
+    REPO_ROOT / 'bench' / 'executors' / 'vendor-node' / 'shared.js'
+).resolve().as_uri()
+DOPPLER_PROVIDER_WORKLOAD_ID = (
+    'doppler_provider_compare_gemma3_270m_prefill_64tok_decode_64tok'
+)
+DOPPLER_PROVIDER_WORKLOADS_PATH = (
+    REPO_ROOT / 'bench' / 'workloads' / 'workloads.node.doppler-provider-compare.json'
+)
+DOPPLER_PROVIDER_COMPARE_CONFIG_PATH = (
+    REPO_ROOT / 'bench' / 'native-compare' /
+    'compare.config.node.doppler-provider.gemma270m.json'
+)
+DOPPLER_PROVIDER_SCENARIO_PATH = (
+    REPO_ROOT / 'bench' / 'vendor-node' / 'doppler_provider_compare_gemma270m_commands.json'
+)
 
 
 class NodeOrtVsDopplerLaneTests(unittest.TestCase):
+    def test_doppler_provider_workload_is_diagnostic_and_comparable(self) -> None:
+        workloads = config_support.load_workloads(
+            DOPPLER_PROVIDER_WORKLOADS_PATH,
+            '',
+            include_noncomparable=True,
+            include_extended=False,
+            workload_cohort='all',
+            selector={'ids': [DOPPLER_PROVIDER_WORKLOAD_ID]},
+        )
+        self.assertEqual(len(workloads), 1)
+        workload = workloads[0]
+        self.assertTrue(workload.comparable)
+        self.assertEqual(workload.benchmark_class, 'comparable')
+        self.assertFalse(workload.claim_eligible)
+        self.assertEqual(
+            workload.commands_path,
+            'bench/vendor-node/doppler_provider_compare_gemma270m_commands.json',
+        )
+
+    def test_doppler_provider_compare_config_is_strict_but_not_claimable(self) -> None:
+        payload = json.loads(
+            DOPPLER_PROVIDER_COMPARE_CONFIG_PATH.read_text(encoding='utf-8')
+        )
+        self.assertEqual(payload['baseline']['executorId'], 'doppler_node_doe')
+        self.assertEqual(payload['comparison']['executorId'], 'doppler_node_webgpu')
+        self.assertEqual(payload['comparability']['mode'], 'strict')
+        self.assertEqual(payload['comparability']['requireTimingClass'], 'process-wall')
+        self.assertEqual(payload['claimability']['mode'], 'off')
+        self.assertEqual(payload['selector']['ids'], [DOPPLER_PROVIDER_WORKLOAD_ID])
+
+    def test_doppler_provider_scenario_declares_owned_lane(self) -> None:
+        payload = json.loads(DOPPLER_PROVIDER_SCENARIO_PATH.read_text(encoding='utf-8'))
+        self.assertEqual(len(payload), 1)
+        scenario = payload[0]
+        self.assertEqual(scenario['scenarioId'], DOPPLER_PROVIDER_WORKLOAD_ID)
+        self.assertEqual(scenario['benchmarkLane'], 'doppler-node-provider-compare')
+        self.assertEqual(scenario['promptWorkload']['prefillTokens'], 64)
+        self.assertEqual(scenario['promptWorkload']['decodeTokens'], 64)
+        self.assertEqual(
+            scenario['doppler']['modelId'],
+            'gemma-3-270m-it-q4k-ehf16-af32',
+        )
+
+    def test_doppler_summary_hashes_exact_generated_text(self) -> None:
+        script = f"""
+import {{ summarizeDopplerEnvelope }} from {json.dumps(SHARED_MODULE_URL)};
+console.log(JSON.stringify(summarizeDopplerEnvelope({{
+  ok: true,
+  result: {{ output: 'hello' }},
+}})));
+"""
+        result = subprocess.run(
+            ['node', '--input-type=module', '-e', script],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload['status'], 'ok')
+        self.assertEqual(payload['outputSource'], 'result.output')
+        self.assertEqual(payload['generatedTextLength'], 5)
+        self.assertEqual(
+            payload['generatedTextSha256'],
+            hashlib.sha256(b'hello').hexdigest(),
+        )
+
     def test_workload_manifest_loads_directional_lane(self) -> None:
         workloads = config_support.load_workloads(
             WORKLOADS_PATH,

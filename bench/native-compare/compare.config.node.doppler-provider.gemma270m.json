@@ -1,0 +1,45 @@
+{
+  "workloads": "bench/workloads/workloads.node.doppler-provider-compare.json",
+  "baseline": {
+    "name": "doppler_node_doe",
+    "executorId": "doppler_node_doe"
+  },
+  "comparison": {
+    "name": "doppler_node_webgpu",
+    "executorId": "doppler_node_webgpu"
+  },
+  "run": {
+    "iterations": 3,
+    "warmup": 1,
+    "out": "bench/out/node-doppler-provider-compare/gemma270m.compare.json",
+    "workspace": "bench/out/node-doppler-provider-compare/gemma270m.workspace",
+    "workloadFilter": "",
+    "emitShell": false
+  },
+  "comparability": {
+    "mode": "strict",
+    "requireTimingClass": "process-wall",
+    "allowBaselineNoExecution": false
+  },
+  "claimability": {
+    "mode": "off",
+    "minTimedSamples": 0
+  },
+  "resource": {
+    "probe": "none",
+    "sampleMs": 100,
+    "sampleTargetCount": 0
+  },
+  "selector": {
+    "cohorts": [],
+    "benchmarkClass": [
+      "comparable"
+    ],
+    "claimEligibleOnly": false,
+    "domains": [],
+    "ids": [
+      "doppler_provider_compare_gemma3_270m_prefill_64tok_decode_64tok"
+    ],
+    "excludeIds": []
+  }
+}

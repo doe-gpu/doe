@@ -48,9 +48,30 @@ _DOE_EXECUTION_BACKENDS = frozenset({
     "doe_node_native_direct",
     "doe_bun_package",
     "doe_deno_package",
+    "doppler_node_webgpu_doe",
     "webgpu-ffi",
     "native",
 })
+
+
+def collect_result_output_signatures(
+    samples: list[dict[str, Any]],
+) -> set[tuple[str, int]]:
+    signatures: set[tuple[str, int]] = set()
+    for sample in samples:
+        if not isinstance(sample, dict):
+            continue
+        trace_meta = sample.get("traceMeta", {})
+        if not isinstance(trace_meta, dict):
+            continue
+        result_summary = trace_meta.get("resultSummary", {})
+        if not isinstance(result_summary, dict):
+            continue
+        digest = str(result_summary.get("generatedTextSha256", "")).strip().lower()
+        length = safe_int(result_summary.get("generatedTextLength"), default=-1)
+        if len(digest) == 64 and length >= 0:
+            signatures.add((digest, length))
+    return signatures
 
 
 def _has_positive_field(payload: dict[str, Any], fields: tuple[str, ...]) -> bool:
