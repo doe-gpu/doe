@@ -29,7 +29,7 @@
           "harness": {
             "referenceTranscript": {
               "enabled": true,
-              "captureLogits": true,
+              "captureLogits": false,
               "captureKvBytes": false
             }
           }
