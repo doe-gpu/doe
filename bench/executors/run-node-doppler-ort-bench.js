@@ -63,7 +63,7 @@ function resolveDopplerSourceIdentity(scenario) {
   ).trim();
   const sourceStatus = execFileSync(
     'git',
-    ['-C', scenario.dopplerRoot, 'status', '--porcelain'],
+    ['-C', scenario.dopplerRoot, 'status', '--porcelain', '--untracked-files=no'],
     { encoding: 'utf8' },
   ).trim();
   if (scenario.doppler.sourceCommit && sourceCommit !== scenario.doppler.sourceCommit) {
@@ -77,7 +77,7 @@ function resolveDopplerSourceIdentity(scenario) {
   return {
     dopplerSourceRoot: scenario.dopplerRoot,
     dopplerSourceCommit: sourceCommit,
-    dopplerSourceClean: true,
+    dopplerSourceTrackedClean: true,
   };
 }
 
@@ -273,13 +273,20 @@ async function main() {
     const bootstrap = await providerBridge.bootstrapNodeWebGPU({
       providerContractModule: providerContractPath,
     });
-    providerReceipt = bootstrap.receipt ?? null;
+    providerReceipt = bootstrap.receipt ?? {
+      schema: 'doppler-legacy-provider-bootstrap/v1',
+      selectedProviderId: bootstrap.provider ?? null,
+      ok: bootstrap.ok === true,
+      detail: bootstrap.detail ?? null,
+    };
     if (bootstrap.ok !== true) {
       throw new Error(
         `Doppler Node provider bootstrap failed for ${provider.executionProvider}: ${bootstrap.detail ?? 'unknown failure'}`,
       );
     }
-    releaseProvider = providerBridge.releaseNodeWebGPU;
+    releaseProvider = typeof providerBridge.releaseNodeWebGPU === 'function'
+      ? providerBridge.releaseNodeWebGPU
+      : null;
 
     const dopplerRunner = await importFromPath(resolve(scenario.dopplerRoot, 'src/tooling/node-command-runner.js'));
     if (typeof dopplerRunner.runNodeCommand !== 'function') {
@@ -295,7 +302,12 @@ async function main() {
     const runStartedMs = nowMs();
     const envelope = await dopplerRunner.runNodeCommand(requestBundle.request, {});
     const runResolvedMs = nowMs();
-    const providerRelease = await releaseProvider();
+    const providerRelease = typeof releaseProvider === 'function'
+      ? await releaseProvider()
+      : {
+          supported: false,
+          reason: 'pinned Doppler source predates explicit provider release contract',
+        };
     releaseProvider = null;
 
     const resultSummary = {

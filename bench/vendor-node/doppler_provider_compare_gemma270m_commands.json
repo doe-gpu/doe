@@ -4,7 +4,7 @@
     "schemaVersion": 1,
     "scenarioId": "doppler_provider_compare_gemma3_270m_prefill_64tok_decode_64tok",
     "benchmarkLane": "doppler-node-provider-compare",
-    "dopplerRoot": "../../../doppler/.worktrees/native-qwen-checkpoint",
+    "dopplerRoot": "../../../doppler/.worktrees/doe-provider-compare-e6e8be4a",
     "cacheMode": "warm",
     "loadMode": "http",
     "useChatTemplate": false,
@@ -22,7 +22,7 @@
     },
     "doppler": {
       "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
-      "sourceCommit": "eab0391ac98b5f34070ce64995b6cb80dd7a2d2a",
+      "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
       "runtimeProfile": null,
       "runtimeConfig": {
         "inference": {
