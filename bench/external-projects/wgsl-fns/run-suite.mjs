@@ -34,6 +34,11 @@ const sourcePaths = [
   'package-lock.json',
   'dist/wgsl-fns.esm.js',
 ];
+const harnessPaths = [
+  'bench/external-projects/wgsl-fns/oracle.md',
+  'bench/external-projects/wgsl-fns/provider-loader.mjs',
+  'bench/external-projects/wgsl-fns/semantic-oracle.mjs',
+];
 
 function parseArgs(argv) {
   const options = {
@@ -192,6 +197,7 @@ function providerEnvironment(provider, modulePath, runtimeDir) {
   const env = {
     ...process.env,
     DOE_EXTERNAL_WEBGPU_PROVIDER: provider,
+    DOE_EXTERNAL_WEBGPU_MODULE_PATH: modulePath,
     XDG_RUNTIME_DIR: runtimeDir,
   };
   delete env.CI;
@@ -287,7 +293,7 @@ async function runSuite(options, laneId, provider, modulePath, outDir, index) {
     String(index + 1),
   );
   await mkdir(runtimeDir, { recursive: true });
-  const result = await runProcess(
+  const compilation = await runProcess(
     process.execPath,
     [
       '--experimental-loader',
@@ -302,15 +308,41 @@ async function runSuite(options, laneId, provider, modulePath, outDir, index) {
       timeoutMs: options.timeoutMs,
     },
   );
-  const tap = classifyTap(result.stdout);
+  const semantic = await runProcess(
+    process.execPath,
+    [
+      '--experimental-loader',
+      resolve(harnessDir, 'provider-loader.mjs'),
+      resolve(harnessDir, 'semantic-oracle.mjs'),
+    ],
+    {
+      cwd: options.upstream,
+      env: providerEnvironment(provider, modulePath, runtimeDir),
+      timeoutMs: options.timeoutMs,
+    },
+  );
+  const tap = classifyTap(compilation.stdout);
   // Node's test reporter forwards worker stderr as TAP comments on stdout, so
   // classify the combined parent stream rather than trusting stderr alone.
-  const diagnostics = nativeDiagnostics(`${result.stdout}\n${result.stderr}`);
+  const diagnostics = nativeDiagnostics(
+    `${compilation.stdout}\n${compilation.stderr}\n${semantic.stdout}\n${semantic.stderr}`,
+  );
   const nativeCompilerErrorCount = diagnostics.shaderTranslationFailureCount
     + diagnostics.shaderModuleFailureCount;
-  const success = result.exitCode === 0
-    && result.signal === null
-    && !result.timedOut
+  const semanticMarker = semantic.stdout
+    .split('\n')
+    .find((line) => line.startsWith('DOE_WGSL_FNS_SEMANTIC_ORACLE='));
+  let semanticResult = null;
+  try {
+    if (semanticMarker) {
+      semanticResult = JSON.parse(semanticMarker.slice(semanticMarker.indexOf('=') + 1));
+    }
+  } catch {
+    semanticResult = null;
+  }
+  const compilationSuccess = compilation.exitCode === 0
+    && compilation.signal === null
+    && !compilation.timedOut
     && tap.workerSignals.length === 0
     && tap.tests === expectedAssertions
     && tap.passed === expectedAssertions
@@ -318,17 +350,46 @@ async function runSuite(options, laneId, provider, modulePath, outDir, index) {
     && tap.cancelled === 0
     && tap.skipped === 0
     && nativeCompilerErrorCount === 0;
+  const semanticSuccess = semantic.exitCode === 0
+    && semantic.signal === null
+    && !semantic.timedOut
+    && semanticResult?.artifactKind === 'wgsl-fns-semantic-oracle-result'
+    && semanticResult?.provider?.id === provider
+    && semanticResult?.provider?.modulePath === modulePath
+    && semanticResult?.oracle?.passed === true
+    && semanticResult?.oracle?.expectedSha256 === semanticResult?.oracle?.actualSha256;
+  const success = compilationSuccess && semanticSuccess;
   return {
     laneId,
     provider,
     providerModulePath: modulePath,
     cleanProcessIndex: index + 1,
     success,
-    ...result,
+    exitCode: compilation.exitCode !== 0 ? compilation.exitCode : semantic.exitCode,
+    signal: compilation.signal ?? semantic.signal,
+    timedOut: compilation.timedOut || semantic.timedOut,
+    processCrashed: compilation.processCrashed || semantic.processCrashed,
+    durationMs: compilation.durationMs + semantic.durationMs,
+    peakMemoryBytes: Math.max(compilation.peakMemoryBytes, semantic.peakMemoryBytes),
+    stdout: `${compilation.stdout}\n${semantic.stdout}`.slice(-131_072),
+    stderr: `${compilation.stderr}\n${semantic.stderr}`.slice(-131_072),
+    compilation: {
+      success: compilationSuccess,
+      ...compilation,
+    },
+    semantic: {
+      success: semanticSuccess,
+      ...semantic,
+      result: semanticResult,
+    },
     tap,
     diagnostics,
     nativeCompilerErrorCount,
-    outputIdentitySha256: sha256Text(JSON.stringify({ tap, diagnostics })),
+    outputIdentitySha256: sha256Text(JSON.stringify({
+      tap,
+      diagnostics,
+      semantic: semanticResult,
+    })),
   };
 }
 
@@ -366,6 +427,9 @@ function executionEvidence(sample) {
     tap: sample.tap,
     diagnostics: sample.diagnostics,
     nativeCompilerErrorCount: sample.nativeCompilerErrorCount,
+    compilationSuccess: sample.compilation.success,
+    semanticSuccess: sample.semantic.success,
+    semanticResult: sample.semantic.result,
     outputIdentitySha256: sample.outputIdentitySha256,
   };
 }
@@ -436,10 +500,18 @@ async function main() {
   );
   await mkdir(outDir, { recursive: true });
   const hostHardware = await inspectHostHardware();
-  const immutableInputs = await Promise.all(sourcePaths.map(async (path) => ({
-    path,
-    sha256: await sha256(resolve(options.upstream, path)),
-  })));
+  const immutableInputs = await Promise.all([
+    ...sourcePaths.map(async (path) => ({
+      scope: 'upstream',
+      path,
+      sha256: await sha256(resolve(options.upstream, path)),
+    })),
+    ...harnessPaths.map(async (path) => ({
+      scope: 'repo',
+      path,
+      sha256: await sha256(resolve(repoRoot, path)),
+    })),
+  ]);
   const ambientDawnModule = createRequire(
     resolve(options.upstream, 'package.json'),
   ).resolve('webgpu');
@@ -557,7 +629,8 @@ async function main() {
       success: providerResult.probe.hardwareEligible
         && providerResult.reliability.failures === 0
         && providerResult.reliability.crashes === 0
-        && providerResult.reliability.timeouts === 0,
+        && providerResult.reliability.timeouts === 0
+        && providerResult.replay.status === 'passed',
       contractComplete: ['passed', 'failed'].includes(providerResult.replay.status),
       constructionIssues: [],
       probe: providerResult.probe,
@@ -602,7 +675,9 @@ async function main() {
       expectedAssertions,
       rejectWorkerSignals: true,
       rejectNativeCompilerDiagnostics: true,
-      executionOracle: false,
+      executionOracle: true,
+      semanticFunction: 'smoothStep',
+      semanticExactness: 'exact-f32',
     },
     immutableInputs,
     providers,
@@ -631,11 +706,19 @@ async function main() {
     ])),
     shaderSourceOwners: immutableInputs.filter((item) => item.path.startsWith('src/')),
     generatedCorpusBundle: immutableInputs.find((item) => item.path === 'dist/wgsl-fns.esm.js'),
-    dynamicallyGeneratedShaderHashes: 'not-emitted-by-unchanged-upstream-test',
-    dispatchShape: 'not-applicable-compilation-only-workload',
-    synchronization: 'not-applicable-no-command-submission',
-    readback: 'not-applicable-no-dispatch-or-output-buffer',
-    outputIdentity: Object.fromEntries(Object.entries(providers).map(([provider, item]) => [
+    dynamicallyGeneratedShaderHashes: Object.fromEntries(Object.entries(providers).map(
+      ([provider, item]) => [
+        provider,
+        item.processes.map((sample) => sample.semantic.result?.shader?.sha256 ?? null),
+      ],
+    )),
+    dispatchShape: 'two workgroups of four invocations execute eight smoothStep calls',
+    synchronization: 'queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)',
+    readback: 'eight exact f32 values copied into a MAP_READ staging buffer',
+    outputIdentity: Object.fromEntries([
+      ...Object.entries(providers),
+      ['patched-webgpu-0.3.10', patchedControl],
+    ].map(([provider, item]) => [
       provider,
       item.processes.map((sample) => ({
         cleanProcessIndex: sample.cleanProcessIndex,
@@ -645,6 +728,9 @@ async function main() {
         workerSignals: sample.tap.workerSignals,
         tap: sample.tap,
         nativeCompilerErrorCount: sample.nativeCompilerErrorCount,
+        compilationSuccess: sample.compilation.success,
+        semanticSuccess: sample.semantic.success,
+        semanticResult: sample.semantic.result,
         outputIdentitySha256: sample.outputIdentitySha256,
       })),
     ])),
@@ -688,9 +774,9 @@ async function main() {
       ])),
     },
     limitations: {
-      dynamicallyGeneratedShaderHashesRecorded: false,
-      shaderExecutionPerformed: false,
-      exactOutputBytesRecorded: false,
+      completeUpstreamCorpusIsCompilationOnly: true,
+      semanticDispatchFunctionCount: 1,
+      semanticDispatchDoesNotEstablishFullCorpusSemantics: true,
     },
   };
 
@@ -703,8 +789,9 @@ async function main() {
   console.log(`WROTE ${rawPath}`);
   console.log(`WROTE ${receiptPath}`);
 
-  const allPassed = Object.values(providers).every((provider) =>
-    provider.processes.every((sample) => sample.success));
+  const allPassed = [...Object.values(providers), patchedControl].every((provider) =>
+    provider.processes.every((sample) => sample.success)
+      && provider.replay.status === 'passed');
   if (options.requireAllPass && !allPassed) process.exitCode = 1;
 }
 

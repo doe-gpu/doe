@@ -22,8 +22,8 @@
     "incumbentLimitation": "The pinned incumbent currently aborts before a fair paired verdict and controls when generated-WGSL compiler and diagnostic fixes become available to the application.",
     "applicationConsequence": "The unchanged 110-function corpus can lose CI coverage or actionable compilation diagnostics while waiting for an incumbent release.",
     "materialOutcome": {
-      "metric": "complete unchanged assertion and generated-shader coverage with exposed native diagnostics and clean process completion",
-      "decisionRule": "Promote DoeRuntime only if D0 passes the frozen corpus and materially exceeds W0 and the smallest reviewable P0 correction on coverage or failure localization."
+      "metric": "complete unchanged assertion and generated-shader coverage plus exact smoothStep dispatch/readback with exposed native diagnostics and clean process completion",
+      "decisionRule": "Promote DoeRuntime only if D0 passes the frozen corpus and semantic dispatch, and materially exceeds W0 and the smallest reviewable P0 correction on coverage, lifecycle reliability, or failure localization."
     },
     "lanes": {
       "I0": { "requirement": "required", "construction": "Unmodified ambient Node WebGPU incumbent." },
@@ -52,15 +52,16 @@
     "command": ["node", "bench/external-projects/wgsl-fns/run-suite.mjs", "--require-all-pass"],
     "immutableInputRefs": [
       "bench/external-projects/wgsl-fns/oracle.md",
-      "bench/external-projects/wgsl-fns/provider-loader.mjs"
+      "bench/external-projects/wgsl-fns/provider-loader.mjs",
+      "bench/external-projects/wgsl-fns/semantic-oracle.mjs"
     ],
     "oracle": {
       "kind": "independent-replacement",
       "path": "bench/external-projects/wgsl-fns/oracle.md",
       "reviewStatus": "reviewed"
     },
-    "sameWorkPolicy": "Both providers execute the same pinned 13-assertion upstream test file over the same generated 110-function corpus; the parent additionally rejects native compiler diagnostics that getCompilationInfo failed to expose.",
-    "completionBoundary": "A clean-process sample ends only after the Node test parent and worker exit, the 13-assertion summary is captured, provider-native compiler diagnostics are classified, and cleanup completes without a timeout."
+    "sameWorkPolicy": "Every lane executes the same pinned 13-assertion upstream test file over the same generated 110-function corpus and the same exact smoothStep semantic shader, dispatch, synchronization, readback, and CPU output oracle; the parent additionally rejects native compiler diagnostics that getCompilationInfo failed to expose.",
+    "completionBoundary": "A clean-process sample ends only after the Node test parent and worker exit, the 13-assertion summary is captured, provider-native compiler diagnostics are classified, the semantic dispatch completes, eight exact f32 values are read back and verified, and cleanup completes without a timeout."
   },
   "requiredMeasurements": [
     "clean-process-success",
@@ -136,7 +137,7 @@
     "requireZeroTimeouts": true
   },
   "performancePolicy": {
-    "timingScope": "complete clean-process Node test execution of the pinned 13-assertion upstream suite plus native-diagnostic classification",
+    "timingScope": "complete clean-process execution of the pinned 13-assertion upstream suite, native-diagnostic classification, and exact smoothStep dispatch/readback oracle",
     "coldSamplesPerProvider": 3,
     "warmupSamplesPerProvider": 0,
     "warmSamplesPerProvider": 1,
