@@ -64,6 +64,62 @@
         }
       }
     },
+    "runtimeOwnershipPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimedProperty",
+        "incumbentLimitation",
+        "applicationConsequence",
+        "materialOutcome",
+        "lanes",
+        "ownershipCosts"
+      ],
+      "properties": {
+        "claimedProperty": { "$ref": "#/$defs/runtimeOwnershipProperty" },
+        "incumbentLimitation": { "type": "string", "minLength": 1 },
+        "applicationConsequence": { "type": "string", "minLength": 1 },
+        "materialOutcome": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["metric", "decisionRule"],
+          "properties": {
+            "metric": { "type": "string", "minLength": 1 },
+            "decisionRule": { "type": "string", "minLength": 1 }
+          }
+        },
+        "lanes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["I0", "I1", "W0", "D0", "P0"],
+          "properties": {
+            "I0": { "$ref": "#/$defs/runtimeOwnershipLanePlan" },
+            "I1": { "$ref": "#/$defs/runtimeOwnershipLanePlan" },
+            "W0": { "$ref": "#/$defs/runtimeOwnershipLanePlan" },
+            "D0": { "$ref": "#/$defs/runtimeOwnershipLanePlan" },
+            "P0": { "$ref": "#/$defs/runtimeOwnershipLanePlan" }
+          }
+        },
+        "ownershipCosts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "owned-source-surface",
+              "webgpu-compatibility",
+              "platform-driver-matrix",
+              "native-security",
+              "release-packaging",
+              "upstream-ingestion",
+              "application-exceptions",
+              "regression-support"
+            ]
+          }
+        }
+      }
+    },
     "fallbackPolicy": {
       "type": "object",
       "additionalProperties": false,
@@ -404,6 +460,30 @@
         "adapter": { "type": "string", "minLength": 1 },
         "driver": { "type": "string", "minLength": 1 },
         "status": { "type": "string", "enum": ["planned", "validated", "promoted", "suspended"] }
+      }
+    },
+    "runtimeOwnershipProperty": {
+      "type": "string",
+      "enum": [
+        "enforcement",
+        "failure-localization",
+        "lifecycle-control",
+        "program-identity-preservation",
+        "independent-correction",
+        "persistent-performance-control",
+        "reproducible-runtime-identity"
+      ]
+    },
+    "runtimeOwnershipLanePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement", "construction"],
+      "properties": {
+        "requirement": {
+          "type": "string",
+          "enum": ["required", "conditional", "not-applicable"]
+        },
+        "construction": { "type": "string", "minLength": 1 }
       }
     }
   }

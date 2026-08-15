@@ -69,7 +69,10 @@ A promoted harness requires claimable evidence on physical GPU hardware,
 unchanged application and shader source, validated installation, concurrency,
 teardown, stress, bounded memory growth, p50/p95/p99 performance evidence,
 receipt replay, and a blocking release command. A diagnostic workload cannot
-be promoted by changing its registry label.
+be promoted by changing its registry label. Promotion additionally requires a
+predeclared runtime-ownership plan and reviewed attribution showing whether the
+application should use DoeRuntime or DoeProof after the governed incumbent
+controls and ownership costs are considered.
 
 ## Evidence routing
 

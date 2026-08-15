@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic",
   "actorId": "umap-gpu",
@@ -126,7 +126,7 @@
     "reason": "No matched traced and untraced application runs were executed."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -167,6 +167,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is validated diagnostic evidence, not a blocking release command."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -188,5 +192,10 @@
       "path": "bench/out/external-projects/umap-gpu/amd-vulkan-umap-02/raw-suite.json",
       "sha256": "464b09ee4590c27d154db1e0f69591e3862d3ae0d0e6286ad2db72c996d12f32"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

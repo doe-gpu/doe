@@ -14,6 +14,7 @@ const upstreamRoot = resolve(
 const upstreamPackageDir = resolve(upstreamRoot, 'packages/snn-webgpu');
 const upstreamCoreDir = resolve(upstreamRoot, 'packages/core');
 const inputs = JSON.parse(await readFile(resolve(harnessDir, 'inputs.json'), 'utf8'));
+const harness = JSON.parse(await readFile(resolve(harnessDir, 'tropical-spmv.harness.json'), 'utf8'));
 const outputPath = process.argv[2] ?? resolve(
   doeRoot,
   'bench/out/external-projects/holoscript-snn-webgpu/manual/raw-matrix.json',
@@ -21,6 +22,7 @@ const outputPath = process.argv[2] ?? resolve(
 const requireFromUpstream = createRequire(pathToFileURL(resolve(upstreamPackageDir, 'package.json')));
 const dawnModule = requireFromUpstream.resolve('webgpu');
 const doeModule = resolve(doeRoot, 'packages/doe-gpu/src/index.js');
+const ambientDawnModule = process.env.DOE_EXTERNAL_AMBIENT_DAWN_MODULE?.trim() || null;
 
 function percentile(values, fraction) {
   const sorted = [...values].sort((a, b) => a - b);
@@ -28,7 +30,7 @@ function percentile(values, fraction) {
   return sorted[Math.min(sorted.length - 1, Math.ceil(fraction * sorted.length) - 1)];
 }
 
-function runCleanProcess(provider, receiptMode = 'enabled') {
+function runCleanProcess(laneId, provider, receiptMode = 'enabled', selectedDawnModule = dawnModule) {
   return new Promise((resolveRun) => {
     const child = spawn(
       process.execPath,
@@ -43,7 +45,7 @@ function runCleanProcess(provider, receiptMode = 'enabled') {
         env: {
           ...process.env,
           DOE_EXTERNAL_WEBGPU_PROVIDER: provider,
-          DOE_EXTERNAL_DAWN_MODULE: dawnModule,
+          DOE_EXTERNAL_DAWN_MODULE: selectedDawnModule,
           DOE_EXTERNAL_DOE_MODULE: doeModule,
           DOE_EXTERNAL_UPSTREAM_PACKAGE_DIR: upstreamPackageDir,
           DOE_EXTERNAL_UPSTREAM_CORE_DIR: upstreamCoreDir,
@@ -77,7 +79,9 @@ function runCleanProcess(provider, receiptMode = 'enabled') {
         }
       }
       resolveRun({
+        laneId,
         provider,
+        providerModulePath: provider === 'dawn-node-webgpu' ? selectedDawnModule : doeModule,
         receiptMode,
         elapsedMs: performance.now() - startedAt,
         exitCode: code,
@@ -93,9 +97,21 @@ function runCleanProcess(provider, receiptMode = 'enabled') {
 }
 
 const runs = [];
-for (const provider of ['dawn-node-webgpu', 'doe-gpu']) {
+for (const [laneId, provider] of [['W0', 'dawn-node-webgpu'], ['D0', 'doe-gpu']]) {
   for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
-    runs.push(await runCleanProcess(provider));
+    runs.push(await runCleanProcess(laneId, provider));
+  }
+}
+
+const ownershipRuns = [...runs];
+for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
+  ownershipRuns.push(await runCleanProcess('I1', 'dawn-node-webgpu', 'untraced'));
+}
+if (ambientDawnModule) {
+  for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
+    ownershipRuns.push(
+      await runCleanProcess('I0', 'dawn-node-webgpu', 'untraced', ambientDawnModule),
+    );
   }
 }
 
@@ -103,9 +119,55 @@ const receiptRuns = [];
 for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
   const modes = index % 2 === 0 ? ['untraced', 'enabled'] : ['enabled', 'untraced'];
   for (const mode of modes) {
-    receiptRuns.push(await runCleanProcess('doe-gpu', mode));
+    receiptRuns.push(await runCleanProcess('D0', 'doe-gpu', mode));
   }
 }
+
+function ownershipLane(laneId, missingStatus = 'not-run') {
+  const laneRuns = ownershipRuns.filter((run) => run.laneId === laneId);
+  if (laneRuns.length === 0) {
+    return {
+      status: missingStatus,
+      runCount: 0,
+      successfulRuns: 0,
+      providerModulePaths: [],
+      runs: [],
+    };
+  }
+  const successfulRuns = laneRuns.filter(
+    (run) => run.exitCode === 0 && !run.timedOut && run.result,
+  ).length;
+  return {
+    status: successfulRuns === laneRuns.length ? 'passed' : 'failed',
+    runCount: laneRuns.length,
+    successfulRuns,
+    providerModulePaths: [...new Set(laneRuns.map((run) => run.providerModulePath))],
+    runs: laneRuns,
+  };
+}
+
+const ownershipPlanSha256 = createHash('sha256')
+  .update(JSON.stringify(harness.runtimeOwnershipPlan))
+  .digest('hex');
+const ownershipLanes = {
+  I0: ownershipLane('I0', 'unavailable'),
+  I1: ownershipLane('I1'),
+  W0: ownershipLane('W0'),
+  D0: ownershipLane('D0'),
+  P0: {
+    status: 'not-run',
+    runCount: 0,
+    successfulRuns: 0,
+    providerModulePaths: [],
+    runs: [],
+  },
+};
+const missingRequiredOwnershipLanes = Object.entries(ownershipLanes)
+  .filter(([laneId, lane]) => (
+    harness.runtimeOwnershipPlan.lanes[laneId].requirement === 'required'
+    && lane.status !== 'passed'
+  ))
+  .map(([laneId]) => laneId);
 
 const receiptSamples = (mode) => receiptRuns
   .filter((run) => run.receiptMode === mode && run.exitCode === 0 && run.result)
@@ -133,6 +195,14 @@ const raw = {
   },
   runs,
   receiptRuns,
+  runtimeOwnership: {
+    status: missingRequiredOwnershipLanes.length === 0 ? 'complete' : 'diagnostic-incomplete',
+    planSha256: ownershipPlanSha256,
+    claimedProperty: harness.runtimeOwnershipPlan.claimedProperty,
+    missingRequiredLanes: missingRequiredOwnershipLanes,
+    ambientModuleSupplied: Boolean(ambientDawnModule),
+    lanes: ownershipLanes,
+  },
   receiptOverhead: {
     boundary: 'complete oracle-checked workload across all topologies and measured dispatches',
     unit: 'ms',
@@ -174,6 +244,21 @@ const receiptSummary = {
     })),
   })),
   receiptOverhead: raw.receiptOverhead,
+  runtimeOwnership: {
+    status: raw.runtimeOwnership.status,
+    planSha256: raw.runtimeOwnership.planSha256,
+    claimedProperty: raw.runtimeOwnership.claimedProperty,
+    missingRequiredLanes: raw.runtimeOwnership.missingRequiredLanes,
+    lanes: Object.fromEntries(Object.entries(raw.runtimeOwnership.lanes).map(([laneId, lane]) => [
+      laneId,
+      {
+        status: lane.status,
+        runCount: lane.runCount,
+        successfulRuns: lane.successfulRuns,
+        providerModulePaths: lane.providerModulePaths,
+      },
+    ])),
+  },
 };
 
 await mkdir(dirname(outputPath), { recursive: true });
@@ -184,6 +269,6 @@ await writeFile(
 );
 process.stdout.write(`${outputPath}\n`);
 
-if ([...runs, ...receiptRuns].some((run) => run.exitCode !== 0 || run.timedOut || !run.result)) {
+if ([...ownershipRuns, ...receiptRuns].some((run) => run.exitCode !== 0 || run.timedOut || !run.result)) {
   process.exitCode = 1;
 }

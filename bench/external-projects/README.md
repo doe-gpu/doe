@@ -26,6 +26,15 @@ results. Reviewed results live in ecosystem reports and carry a separate
 promotion assessment. The governed minimums are in
 `config/external-project-promotion-policy.json`.
 
+A promotion candidate must also predeclare `runtimeOwnershipPlan`. The plan
+freezes the claimed DoeRuntime property, incumbent limitation, application
+consequence, material outcome, ownership costs, and the `I0`, `I1`, `W0`,
+`D0`, and conditional `P0` constructions from
+[`docs/runtime-ownership-decision.md`](../../docs/runtime-ownership-decision.md).
+Reviewed reports record the terminal ownership assessment. Diagnostic runs may
+leave it `not-run`, but the release gate rejects promotion without passing,
+evidence-linked lane, material-outcome, and cost-acceptance decisions.
+
 ## Portable preparation and reproduction
 
 The canonical machine-independent entrypoint is:

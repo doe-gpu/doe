@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "wgsl-fns-compilation-suite-2026-08-08-diagnostic",
   "actorId": "wgsl-fns",
@@ -143,7 +143,7 @@
     "reason": "The harness did not run matched traced and untraced samples, and neither provider produced a qualifying completion."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -184,6 +184,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is not promoted and has no qualifying provider baseline."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -197,5 +201,10 @@
       "path": "bench/out/external-projects/wgsl-fns/2026-08-08T-run3/raw-suite.json",
       "sha256": "d5b36fc398a4fe5a48084209ff1bec1f8979d38b74b55a8c600726ffd68abe19"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

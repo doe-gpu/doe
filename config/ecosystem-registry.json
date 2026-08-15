@@ -1,43 +1,60 @@
 {
   "schemaVersion": 1,
-  "registryRevision": "10",
+  "registryRevision": "11",
   "scoringPolicyVersion": "1.0.0",
-  "promotionPolicyVersion": "1.0.0",
+  "promotionPolicyVersion": "1.1.0",
   "evaluationQueue": [
     {
       "position": 1,
       "actorId": "holoscript-snn-webgpu",
-      "plannedHarnessIds": ["tropical-spmv", "lif-determinism"]
+      "plannedHarnessIds": [
+        "tropical-spmv",
+        "lif-determinism"
+      ]
     },
     {
       "position": 2,
       "actorId": "electronicarts-gigi",
-      "plannedHarnessIds": ["generated-webgpu-suite"]
+      "plannedHarnessIds": [
+        "generated-webgpu-suite"
+      ]
     },
     {
       "position": 3,
       "actorId": "vercel-labs-vgpu",
-      "plannedHarnessIds": ["node-ort-snapshot"]
+      "plannedHarnessIds": [
+        "node-ort-snapshot"
+      ]
     },
     {
       "position": 4,
       "actorId": "umap-gpu",
-      "plannedHarnessIds": ["sgd-output-correctness", "sgd-benchmark"]
+      "plannedHarnessIds": [
+        "sgd-output-correctness",
+        "sgd-benchmark"
+      ]
     },
     {
       "position": 5,
       "actorId": "world-lab-runtime-webgpu",
-      "plannedHarnessIds": ["consumer-execution-oracles", "consumer-shader-compiles"]
+      "plannedHarnessIds": [
+        "consumer-execution-oracles",
+        "consumer-shader-compiles"
+      ]
     },
     {
       "position": 6,
       "actorId": "wgsl-fns",
-      "plannedHarnessIds": ["wgsl-compilation-suite"]
+      "plannedHarnessIds": [
+        "wgsl-compilation-suite"
+      ]
     },
     {
       "position": 7,
       "actorId": "electronicarts-cpp-ml-intro",
-      "plannedHarnessIds": ["mnist-webgpu-demo"]
+      "plannedHarnessIds": [
+        "mnist-webgpu-demo"
+      ]
     }
   ],
   "actors": [
@@ -89,17 +106,26 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["seeded-spmv-benchmark", "determinism-probe", "mock-fallback-risk"],
+          "changedByObservationRefs": [
+            "seeded-spmv-benchmark",
+            "determinism-probe",
+            "mock-fallback-risk"
+          ],
           "doeLeverage": {
             "score": 5,
             "reasons": [
               {
                 "summary": "Doe can address an observed determinism problem while competing on an existing correctness-gated performance workload.",
-                "observationRefs": ["seeded-spmv-benchmark", "determinism-probe"]
+                "observationRefs": [
+                  "seeded-spmv-benchmark",
+                  "determinism-probe"
+                ]
               },
               {
                 "summary": "Doe receipts can make provider fallback and execution identity explicit.",
-                "observationRefs": ["mock-fallback-risk"]
+                "observationRefs": [
+                  "mock-fallback-risk"
+                ]
               }
             ]
           },
@@ -108,7 +134,11 @@
             "reasons": [
               {
                 "summary": "The package owns GPU kernels, Node provider setup, correctness oracles, performance measurement, and determinism probes.",
-                "observationRefs": ["seeded-spmv-benchmark", "determinism-probe", "mock-fallback-risk"]
+                "observationRefs": [
+                  "seeded-spmv-benchmark",
+                  "determinism-probe",
+                  "mock-fallback-risk"
+                ]
               }
             ]
           }
@@ -120,17 +150,26 @@
           "reviewStatus": "reviewed",
           "registryRevision": "5",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["seeded-spmv-benchmark", "determinism-probe", "mock-fallback-risk"],
+          "changedByObservationRefs": [
+            "seeded-spmv-benchmark",
+            "determinism-probe",
+            "mock-fallback-risk"
+          ],
           "doeLeverage": {
             "score": 5,
             "reasons": [
               {
                 "summary": "The reviewed harness confirmed that HoloScript's oracle-backed workload finds concrete Doe correctness defects and retains provider, execution, and output evidence for regression protection.",
-                "observationRefs": ["seeded-spmv-benchmark", "mock-fallback-risk"]
+                "observationRefs": [
+                  "seeded-spmv-benchmark",
+                  "mock-fallback-risk"
+                ]
               },
               {
                 "summary": "The separate upstream determinism probe remains a high-value next workload for Doe receipts and replay.",
-                "observationRefs": ["determinism-probe"]
+                "observationRefs": [
+                  "determinism-probe"
+                ]
               }
             ]
           },
@@ -139,7 +178,11 @@
             "reasons": [
               {
                 "summary": "HoloScript continues to own GPU kernels, Node provider setup, correctness oracles, performance measurement, and determinism probes above the runtime provider boundary.",
-                "observationRefs": ["seeded-spmv-benchmark", "determinism-probe", "mock-fallback-risk"]
+                "observationRefs": [
+                  "seeded-spmv-benchmark",
+                  "determinism-probe",
+                  "mock-fallback-risk"
+                ]
               }
             ]
           }
@@ -150,19 +193,32 @@
           "id": "tropical-spmv",
           "status": "measured",
           "manifestPath": "bench/external-projects/holoscript-snn-webgpu/tropical-spmv.harness.json",
-          "proofTargets": ["correctness", "performance", "reliability", "diagnosis"],
+          "proofTargets": [
+            "correctness",
+            "performance",
+            "reliability",
+            "diagnosis"
+          ],
           "oracle": {
             "status": "reviewed",
-            "observationRefs": ["seeded-spmv-benchmark"]
+            "observationRefs": [
+              "seeded-spmv-benchmark"
+            ]
           }
         },
         {
           "id": "lif-determinism",
           "status": "proposed",
-          "proofTargets": ["correctness", "determinism", "diagnosis"],
+          "proofTargets": [
+            "correctness",
+            "determinism",
+            "diagnosis"
+          ],
           "oracle": {
             "status": "upstream-existing",
-            "observationRefs": ["determinism-probe"]
+            "observationRefs": [
+              "determinism-probe"
+            ]
           }
         }
       ],
@@ -170,15 +226,22 @@
         {
           "reportId": "holoscript-tropical-spmv-2026-08-08-diagnostic",
           "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-tropical-spmv-2026-08-08-diagnostic.json",
-          "sha256": "0886b5f4f34358a9da8101f0845b48d9b96b0d54119db10f9b1806175b7d58dd",
+          "sha256": "b3e691b403d699bcbebc3b21034cffb1c4fd085bd6e103da7b4fe265b8125369",
           "reviewedAt": "2026-08-08T19:35:30Z",
           "reviewer": "codex"
         },
         {
           "reportId": "holoscript-tropical-spmv-amd-vulkan-2026-08-11-diagnostic",
           "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-tropical-spmv-amd-vulkan-2026-08-11-diagnostic.json",
-          "sha256": "fe3b0245549bf0ca1d31014a64ee3cb3b72318fd2ce5e72546248763e77784e7",
+          "sha256": "6d1958ff73813aff916e8751d476c7c3fb827542b7381f1cb06de9ed691ea77c",
           "reviewedAt": "2026-08-11T12:30:00Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "holoscript-tropical-spmv-runtime-ownership-2026-08-15-diagnostic",
+          "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-tropical-spmv-runtime-ownership-2026-08-15-diagnostic.json",
+          "sha256": "f79aca867f1c9bb704784bba7196154452c9d64b942bd90a2567581541a7add7",
+          "reviewedAt": "2026-08-15T16:10:00Z",
           "reviewer": "codex"
         }
       ],
@@ -187,7 +250,7 @@
         "bench/external-projects/holoscript-snn-webgpu/failures/labeled-compute-pass-semantics.failure.json"
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-11T12:30:00Z"
+      "lastReviewedAt": "2026-08-15T16:10:00Z"
     },
     {
       "id": "electronicarts-gigi",
@@ -236,13 +299,20 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["generated-webgpu-suite", "compute-output-validation", "code-generation-surface"],
+          "changedByObservationRefs": [
+            "generated-webgpu-suite",
+            "compute-output-validation",
+            "code-generation-surface"
+          ],
           "doeLeverage": {
             "score": 4,
             "reasons": [
               {
                 "summary": "Doe can be evaluated across a broad, output-validating WebGPU corpus and can attach receipts to first failures.",
-                "observationRefs": ["generated-webgpu-suite", "compute-output-validation"]
+                "observationRefs": [
+                  "generated-webgpu-suite",
+                  "compute-output-validation"
+                ]
               }
             ]
           },
@@ -251,7 +321,10 @@
             "reasons": [
               {
                 "summary": "Gigi already owns code generation, multi-target orchestration, execution tests, and output validation.",
-                "observationRefs": ["generated-webgpu-suite", "code-generation-surface"]
+                "observationRefs": [
+                  "generated-webgpu-suite",
+                  "code-generation-surface"
+                ]
               }
             ]
           }
@@ -263,13 +336,20 @@
           "reviewStatus": "reviewed",
           "registryRevision": "4",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["generated-webgpu-suite", "compute-output-validation", "code-generation-surface"],
+          "changedByObservationRefs": [
+            "generated-webgpu-suite",
+            "compute-output-validation",
+            "code-generation-surface"
+          ],
           "doeLeverage": {
             "score": 4,
             "reasons": [
               {
                 "summary": "The reviewed provider-swap harness confirmed that Gigi's broad oracle-backed corpus can find and preserve concrete Doe compiler and runtime defects.",
-                "observationRefs": ["generated-webgpu-suite", "compute-output-validation"]
+                "observationRefs": [
+                  "generated-webgpu-suite",
+                  "compute-output-validation"
+                ]
               }
             ]
           },
@@ -278,7 +358,10 @@
             "reasons": [
               {
                 "summary": "Gigi continues to own code generation, multi-target orchestration, execution tests, and output validation while depending on an external WebGPU runtime.",
-                "observationRefs": ["generated-webgpu-suite", "code-generation-surface"]
+                "observationRefs": [
+                  "generated-webgpu-suite",
+                  "code-generation-surface"
+                ]
               }
             ]
           }
@@ -289,10 +372,17 @@
           "id": "generated-webgpu-suite",
           "status": "measured",
           "manifestPath": "bench/external-projects/electronicarts-gigi/generated-webgpu-suite.harness.json",
-          "proofTargets": ["correctness", "reliability", "compatibility", "diagnosis"],
+          "proofTargets": [
+            "correctness",
+            "reliability",
+            "compatibility",
+            "diagnosis"
+          ],
           "oracle": {
             "status": "reviewed",
-            "observationRefs": ["compute-output-validation"]
+            "observationRefs": [
+              "compute-output-validation"
+            ]
           }
         }
       ],
@@ -300,14 +390,14 @@
         {
           "reportId": "gigi-generated-webgpu-suite-2026-08-08-diagnostic",
           "path": "reports/ecosystem/electronicarts-gigi/gigi-generated-webgpu-suite-2026-08-08-diagnostic.json",
-          "sha256": "37daf8eee2cb21328c002b05450fefa28604acd808feb42667b708d8c905c6a9",
+          "sha256": "41da4053f29c30cecb620287f82f63399b9249185f7ad02bc6f19c05a8413341",
           "reviewedAt": "2026-08-08T22:02:53Z",
           "reviewer": "codex"
         },
         {
           "reportId": "gigi-generated-webgpu-suite-amd-vulkan-2026-08-11-diagnostic",
           "path": "reports/ecosystem/electronicarts-gigi/gigi-generated-webgpu-suite-amd-vulkan-2026-08-11-diagnostic.json",
-          "sha256": "00c346a11dcdfad62735d96567715d028ab49ff603100412a7ce08c7835cfab9",
+          "sha256": "3cf5a366eee8f1be5a19ea26cb7eddbd817c911b57fe0e22589c13e43a9d932c",
           "reviewedAt": "2026-08-11T12:31:00Z",
           "reviewer": "codex"
         }
@@ -363,13 +453,19 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["node-ort-integration", "snapshot-oracle"],
+          "changedByObservationRefs": [
+            "node-ort-integration",
+            "snapshot-oracle"
+          ],
           "doeLeverage": {
             "score": 4,
             "reasons": [
               {
                 "summary": "Doe could supply the provider boundary for a realistic Node ML integration with an existing image oracle.",
-                "observationRefs": ["node-ort-integration", "snapshot-oracle"]
+                "observationRefs": [
+                  "node-ort-integration",
+                  "snapshot-oracle"
+                ]
               }
             ]
           },
@@ -378,7 +474,10 @@
             "reasons": [
               {
                 "summary": "vgpu owns device orchestration, ML buffer integration, and deterministic output diagnostics above the provider boundary.",
-                "observationRefs": ["node-ort-integration", "snapshot-oracle"]
+                "observationRefs": [
+                  "node-ort-integration",
+                  "snapshot-oracle"
+                ]
               }
             ]
           }
@@ -390,13 +489,18 @@
           "reviewStatus": "reviewed",
           "registryRevision": "5",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["node-ort-integration", "snapshot-oracle"],
+          "changedByObservationRefs": [
+            "node-ort-integration",
+            "snapshot-oracle"
+          ],
           "doeLeverage": {
             "score": 4,
             "reasons": [
               {
                 "summary": "The reviewed provider-swap harness confirmed that vgpu's Node ORT integration can expose a deterministic Doe compatibility failure before inference and preserve the exact boundary for regression work.",
-                "observationRefs": ["node-ort-integration"]
+                "observationRefs": [
+                  "node-ort-integration"
+                ]
               }
             ]
           },
@@ -405,7 +509,10 @@
             "reasons": [
               {
                 "summary": "vgpu owns device and GPU-buffer orchestration, numeric output validation, zero-copy identity checks, and lifecycle assertions while relying on an external WebGPU provider.",
-                "observationRefs": ["node-ort-integration", "snapshot-oracle"]
+                "observationRefs": [
+                  "node-ort-integration",
+                  "snapshot-oracle"
+                ]
               }
             ]
           }
@@ -416,10 +523,19 @@
           "id": "node-ort-snapshot",
           "status": "measured",
           "manifestPath": "bench/external-projects/vercel-labs-vgpu/node-ort-snapshot.harness.json",
-          "proofTargets": ["correctness", "reliability", "performance", "installation", "diagnosis", "compatibility"],
+          "proofTargets": [
+            "correctness",
+            "reliability",
+            "performance",
+            "installation",
+            "diagnosis",
+            "compatibility"
+          ],
           "oracle": {
             "status": "reviewed",
-            "observationRefs": ["snapshot-oracle"]
+            "observationRefs": [
+              "snapshot-oracle"
+            ]
           }
         }
       ],
@@ -427,14 +543,14 @@
         {
           "reportId": "vgpu-node-ort-snapshot-2026-08-08-diagnostic",
           "path": "reports/ecosystem/vercel-labs-vgpu/vgpu-node-ort-snapshot-2026-08-08-diagnostic.json",
-          "sha256": "18c5a920db520407df784f0553c51e0ba373bb83f44deff7c4a49d62198151f2",
+          "sha256": "3099405864455c95911035ff2bd047e13553b197e948aacf3b10623a198506ef",
           "reviewedAt": "2026-08-09T01:11:00Z",
           "reviewer": "codex"
         },
         {
           "reportId": "vgpu-node-ort-snapshot-amd-vulkan-2026-08-10-diagnostic",
           "path": "reports/ecosystem/vercel-labs-vgpu/vgpu-node-ort-snapshot-amd-vulkan-2026-08-10-diagnostic.json",
-          "sha256": "5cf8b5cec14f386a63775b36f0637c8d8b470e64bd2bc2f461172be95b995fd0",
+          "sha256": "729a48148831abd10d28d2e3699e7c38a8a2ac3385f73faf1fd9ed5fecd8af02",
           "reviewedAt": "2026-08-10T23:25:00Z",
           "reviewer": "codex"
         }
@@ -488,13 +604,19 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["cpu-gpu-benchmark", "benchmark-oracle-gap"],
+          "changedByObservationRefs": [
+            "cpu-gpu-benchmark",
+            "benchmark-oracle-gap"
+          ],
           "doeLeverage": {
             "score": 4,
             "reasons": [
               {
                 "summary": "The project has a performance-sensitive GPU workload where Doe can compete once correctness and input identity are hardened.",
-                "observationRefs": ["cpu-gpu-benchmark", "benchmark-oracle-gap"]
+                "observationRefs": [
+                  "cpu-gpu-benchmark",
+                  "benchmark-oracle-gap"
+                ]
               }
             ]
           },
@@ -503,7 +625,9 @@
             "reasons": [
               {
                 "summary": "The project owns a WebGPU algorithm and benchmark but not a general provider, runtime, or compiler layer.",
-                "observationRefs": ["cpu-gpu-benchmark"]
+                "observationRefs": [
+                  "cpu-gpu-benchmark"
+                ]
               }
             ]
           }
@@ -515,13 +639,21 @@
           "reviewStatus": "reviewed",
           "registryRevision": "6",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["cpu-gpu-benchmark", "benchmark-oracle-gap", "gpu-output-oracle"],
+          "changedByObservationRefs": [
+            "cpu-gpu-benchmark",
+            "benchmark-oracle-gap",
+            "gpu-output-oracle"
+          ],
           "doeLeverage": {
             "score": 4,
             "reasons": [
               {
                 "summary": "The reviewed provider-swap harness confirms a realistic multi-epoch Doe compatibility workload, while physical-hardware performance and exact output identity remain valuable unresolved leverage points.",
-                "observationRefs": ["cpu-gpu-benchmark", "benchmark-oracle-gap", "gpu-output-oracle"]
+                "observationRefs": [
+                  "cpu-gpu-benchmark",
+                  "benchmark-oracle-gap",
+                  "gpu-output-oracle"
+                ]
               }
             ]
           },
@@ -530,7 +662,10 @@
             "reasons": [
               {
                 "summary": "The project owns WebGPU SGD shaders, structural output oracles, and a benchmark but continues to rely on an external WebGPU provider and runtime.",
-                "observationRefs": ["cpu-gpu-benchmark", "gpu-output-oracle"]
+                "observationRefs": [
+                  "cpu-gpu-benchmark",
+                  "gpu-output-oracle"
+                ]
               }
             ]
           }
@@ -541,19 +676,33 @@
           "id": "sgd-output-correctness",
           "status": "measured",
           "manifestPath": "bench/external-projects/umap-gpu/sgd-output-correctness.harness.json",
-          "proofTargets": ["correctness", "reliability", "performance", "compatibility", "diagnosis"],
+          "proofTargets": [
+            "correctness",
+            "reliability",
+            "performance",
+            "compatibility",
+            "diagnosis"
+          ],
           "oracle": {
             "status": "reviewed",
-            "observationRefs": ["gpu-output-oracle"]
+            "observationRefs": [
+              "gpu-output-oracle"
+            ]
           }
         },
         {
           "id": "sgd-benchmark",
           "status": "proposed",
-          "proofTargets": ["correctness", "performance", "reliability"],
+          "proofTargets": [
+            "correctness",
+            "performance",
+            "reliability"
+          ],
           "oracle": {
             "status": "replacement-required",
-            "observationRefs": ["benchmark-oracle-gap"]
+            "observationRefs": [
+              "benchmark-oracle-gap"
+            ]
           }
         }
       ],
@@ -561,14 +710,14 @@
         {
           "reportId": "umap-sgd-output-correctness-2026-08-08-diagnostic",
           "path": "reports/ecosystem/umap-gpu/umap-sgd-output-correctness-2026-08-08-diagnostic.json",
-          "sha256": "3cad13f8a9e671d803b90eb11af6a476bf9d481f3677b6269590b9759d40096f",
+          "sha256": "7d8de18b89bee9402d871e70bcc56f093b707dcc5269a0b3e64116823c5cb52d",
           "reviewedAt": "2026-08-09T01:19:00Z",
           "reviewer": "codex"
         },
         {
           "reportId": "umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic",
           "path": "reports/ecosystem/umap-gpu/umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic.json",
-          "sha256": "a51fce9efa405d64bea6fbf3231301e2a9f8134da5a23a5b44a46d2f6f37e07c",
+          "sha256": "2e16eb7258a09f1bf54bc1704d9b8a58ef42707a26f64e4f153870fae593e570",
           "reviewedAt": "2026-08-11T12:30:00Z",
           "reviewer": "codex"
         }
@@ -636,13 +785,19 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["fail-closed-setup", "representative-shader-compiles"],
+          "changedByObservationRefs": [
+            "fail-closed-setup",
+            "representative-shader-compiles"
+          ],
           "doeLeverage": {
             "score": 3,
             "reasons": [
               {
                 "summary": "Doe can provide compiler and initialization compatibility evidence for consumer shader workloads.",
-                "observationRefs": ["fail-closed-setup", "representative-shader-compiles"]
+                "observationRefs": [
+                  "fail-closed-setup",
+                  "representative-shader-compiles"
+                ]
               }
             ]
           },
@@ -651,7 +806,10 @@
             "reasons": [
               {
                 "summary": "The package owns WebGPU provider setup and real-device compilation tests around its runtime integration.",
-                "observationRefs": ["fail-closed-setup", "representative-shader-compiles"]
+                "observationRefs": [
+                  "fail-closed-setup",
+                  "representative-shader-compiles"
+                ]
               }
             ]
           }
@@ -704,7 +862,12 @@
           "id": "consumer-execution-oracles",
           "status": "measured",
           "manifestPath": "bench/external-projects/world-lab-runtime-webgpu/consumer-execution-oracles.harness.json",
-          "proofTargets": ["correctness", "reliability", "compatibility", "diagnosis"],
+          "proofTargets": [
+            "correctness",
+            "reliability",
+            "compatibility",
+            "diagnosis"
+          ],
           "oracle": {
             "status": "reviewed",
             "observationRefs": [
@@ -717,10 +880,17 @@
         {
           "id": "consumer-shader-compiles",
           "status": "proposed",
-          "proofTargets": ["correctness", "reliability", "compatibility", "diagnosis"],
+          "proofTargets": [
+            "correctness",
+            "reliability",
+            "compatibility",
+            "diagnosis"
+          ],
           "oracle": {
             "status": "upstream-existing",
-            "observationRefs": ["representative-shader-compiles"]
+            "observationRefs": [
+              "representative-shader-compiles"
+            ]
           }
         }
       ],
@@ -728,7 +898,7 @@
         {
           "reportId": "world-lab-consumer-execution-oracles-2026-08-08-diagnostic",
           "path": "reports/ecosystem/world-lab-runtime-webgpu/world-lab-consumer-execution-oracles-2026-08-08-diagnostic.json",
-          "sha256": "d3177e62492f262c09a5906f1a0c83f14f7e620bf9fa78f0aa12d3d064ccbc24",
+          "sha256": "a45c4c6d342832cb87ca44e912837aed2ee206d1509c0b31d6f378ca72ba1390",
           "reviewedAt": "2026-08-09T01:27:26Z",
           "reviewer": "codex"
         }
@@ -782,13 +952,18 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["native-ci-crash-skip", "shader-compilation-corpus"],
+          "changedByObservationRefs": [
+            "native-ci-crash-skip",
+            "shader-compilation-corpus"
+          ],
           "doeLeverage": {
             "score": 5,
             "reasons": [
               {
                 "summary": "Doe reliability and receipts directly target an observed native-crash boundary that prevents CI execution.",
-                "observationRefs": ["native-ci-crash-skip"]
+                "observationRefs": [
+                  "native-ci-crash-skip"
+                ]
               }
             ]
           },
@@ -797,7 +972,9 @@
             "reasons": [
               {
                 "summary": "The package owns a shader corpus and compilation tests but not runtime-provider infrastructure.",
-                "observationRefs": ["shader-compilation-corpus"]
+                "observationRefs": [
+                  "shader-compilation-corpus"
+                ]
               }
             ]
           }
@@ -846,10 +1023,18 @@
           "id": "wgsl-compilation-suite",
           "status": "measured",
           "manifestPath": "bench/external-projects/wgsl-fns/wgsl-compilation-suite.harness.json",
-          "proofTargets": ["correctness", "reliability", "compatibility", "diagnosis"],
+          "proofTargets": [
+            "correctness",
+            "reliability",
+            "compatibility",
+            "diagnosis"
+          ],
           "oracle": {
             "status": "reviewed",
-            "observationRefs": ["shader-compilation-corpus", "compilation-info-only-oracle"]
+            "observationRefs": [
+              "shader-compilation-corpus",
+              "compilation-info-only-oracle"
+            ]
           }
         }
       ],
@@ -857,14 +1042,14 @@
         {
           "reportId": "wgsl-fns-compilation-suite-2026-08-08-diagnostic",
           "path": "reports/ecosystem/wgsl-fns/wgsl-fns-compilation-suite-2026-08-08-diagnostic.json",
-          "sha256": "9871f28587249826b551a71d5b1132c79d7ddb612f02e849c7e64d2d18490b0c",
+          "sha256": "16fd7cb1947e019ca6afa9a16a158f2d32e561d16c9b5f0894dd9fc5654c44ee",
           "reviewedAt": "2026-08-09T01:37:10Z",
           "reviewer": "codex"
         },
         {
           "reportId": "wgsl-fns-compilation-suite-amd-vulkan-2026-08-10-diagnostic",
           "path": "reports/ecosystem/wgsl-fns/wgsl-fns-compilation-suite-amd-vulkan-2026-08-10-diagnostic.json",
-          "sha256": "0f5e7b953fe99c77c4126f44d0642817ba44ba6aa081d0faee4f014872354309",
+          "sha256": "98dcfc08ab0e226f10e48877fdd4035117ea2507f4fc30d40c5f6d49e3eb684d",
           "reviewedAt": "2026-08-10T23:20:00Z",
           "reviewer": "codex"
         }
@@ -919,13 +1104,17 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["gigi-generated-webgpu-ml"],
+          "changedByObservationRefs": [
+            "gigi-generated-webgpu-ml"
+          ],
           "doeLeverage": {
             "score": 3,
             "reasons": [
               {
                 "summary": "The demo can validate Doe end to end on generated WebGPU ML code, although its evidence surface overlaps Gigi.",
-                "observationRefs": ["gigi-generated-webgpu-ml"]
+                "observationRefs": [
+                  "gigi-generated-webgpu-ml"
+                ]
               }
             ]
           },
@@ -934,7 +1123,9 @@
             "reasons": [
               {
                 "summary": "The project owns an application workload while delegating runtime-adjacent generation to Gigi.",
-                "observationRefs": ["gigi-generated-webgpu-ml"]
+                "observationRefs": [
+                  "gigi-generated-webgpu-ml"
+                ]
               }
             ]
           }
@@ -983,10 +1174,18 @@
           "id": "mnist-webgpu-demo",
           "status": "measured",
           "manifestPath": "bench/external-projects/electronicarts-cpp-ml-intro/mnist-webgpu-demo.harness.json",
-          "proofTargets": ["correctness", "reliability", "performance", "compatibility", "diagnosis"],
+          "proofTargets": [
+            "correctness",
+            "reliability",
+            "performance",
+            "compatibility",
+            "diagnosis"
+          ],
           "oracle": {
             "status": "reviewed",
-            "observationRefs": ["generated-mnist-model-assets"]
+            "observationRefs": [
+              "generated-mnist-model-assets"
+            ]
           }
         }
       ],
@@ -994,14 +1193,14 @@
         {
           "reportId": "cpp-ml-mnist-webgpu-2026-08-09-diagnostic",
           "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-2026-08-09-diagnostic.json",
-          "sha256": "4050fced6b2a24353f31abc7b433bedd057fcbca25c6324ae70252d2a3367126",
+          "sha256": "10e46b1d1d30725e79a4dc6cddb1a4963297a61f5286e84e28a0e28dddde2138",
           "reviewedAt": "2026-08-09T02:11:19Z",
           "reviewer": "codex"
         },
         {
           "reportId": "cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic",
           "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-webgpu-amd-vulkan-2026-08-09-diagnostic.json",
-          "sha256": "538cfb90bac5424ad6f8aaa314a0e7e002d24c6764eca0f2bbaccc5e05df265f",
+          "sha256": "01d537a88dd4fc7b3c367b720b4ddb373b44986359208a76b583586e5625a2e4",
           "reviewedAt": "2026-08-09T02:49:56Z",
           "reviewer": "codex"
         }
@@ -1049,13 +1248,17 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["node-webgpu-provider"],
+          "changedByObservationRefs": [
+            "node-webgpu-provider"
+          ],
           "doeLeverage": {
             "score": 1,
             "reasons": [
               {
                 "summary": "The incumbent provider is primarily a comparison baseline rather than a likely Doe adopter.",
-                "observationRefs": ["node-webgpu-provider"]
+                "observationRefs": [
+                  "node-webgpu-provider"
+                ]
               }
             ]
           },
@@ -1064,7 +1267,9 @@
             "reasons": [
               {
                 "summary": "node-webgpu implements the Node WebGPU provider boundary against which Doe is compared.",
-                "observationRefs": ["node-webgpu-provider"]
+                "observationRefs": [
+                  "node-webgpu-provider"
+                ]
               }
             ]
           }
@@ -1110,13 +1315,17 @@
           "reviewStatus": "provisional",
           "registryRevision": "1",
           "scoringPolicyVersion": "1.0.0",
-          "changedByObservationRefs": ["node-webgpu-runtime"],
+          "changedByObservationRefs": [
+            "node-webgpu-runtime"
+          ],
           "doeLeverage": {
             "score": 2,
             "reasons": [
               {
                 "summary": "Doe receipts and cross-provider evidence may be useful, but this actor already owns its provider implementation.",
-                "observationRefs": ["node-webgpu-runtime"]
+                "observationRefs": [
+                  "node-webgpu-runtime"
+                ]
               }
             ]
           },
@@ -1125,7 +1334,9 @@
             "reasons": [
               {
                 "summary": "The project implements the same Node WebGPU provider category as Doe.",
-                "observationRefs": ["node-webgpu-runtime"]
+                "observationRefs": [
+                  "node-webgpu-runtime"
+                ]
               }
             ]
           }

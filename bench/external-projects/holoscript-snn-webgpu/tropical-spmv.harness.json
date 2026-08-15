@@ -17,6 +17,32 @@
     "seam": "A Node ESM loader resolves only the upstream package's dynamic import of webgpu to the selected provider module; upstream workload source is unchanged.",
     "patchPaths": []
   },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "independent-correction",
+    "incumbentLimitation": "The application depends on entry-point-scoped layout and labeled-pass behavior whose release cadence and diagnostics are controlled by the incumbent runtime.",
+    "applicationConsequence": "A provider defect can reject or misexecute the unchanged tropical-SpMV workload until an upstream release or local patch arrives.",
+    "materialOutcome": {
+      "metric": "exact oracle-passing workload coverage and first-failure localization under the unchanged application",
+      "decisionRule": "Promote DoeRuntime only if D0 passes the frozen workload and provides a durable correction advantage over W0 and the smallest reviewable P0 patch."
+    },
+    "lanes": {
+      "I0": { "requirement": "required", "construction": "Unmodified ambient Node WebGPU incumbent." },
+      "I1": { "requirement": "required", "construction": "Pinned packaged Dawn Node WebGPU binary." },
+      "W0": { "requirement": "required", "construction": "I1 under the same DoeProof oracle, receipt, replay, and release policy." },
+      "D0": { "requirement": "required", "construction": "DoeRuntime under the same provider seam and DoeProof contract." },
+      "P0": { "requirement": "required", "construction": "W0 plus the smallest reviewable incumbent correction for the observed provider defect." }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "application-exceptions",
+      "regression-support"
+    ]
+  },
   "fallbackPolicy": {
     "requireHardware": true,
     "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],

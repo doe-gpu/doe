@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "holoscript-tropical-spmv-amd-vulkan-2026-08-11-diagnostic",
   "actorId": "holoscript-snn-webgpu",
@@ -123,7 +123,7 @@
     "receiptEnabledP50": 66.280464
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -164,6 +164,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is validated evidence, not a blocking release command."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -185,5 +189,10 @@
       "path": "bench/out/external-projects/holoscript-snn-webgpu/amd-vulkan-holoscript-09/raw-matrix.json",
       "sha256": "99ba3c7da7b8bacd7774a6b46b491c991b2f6fd8f8e0bcdb165855f992d2cd9a"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

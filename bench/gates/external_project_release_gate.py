@@ -27,8 +27,14 @@ PROMOTION_GATES = (
     "receipts",
     "replay",
     "performance",
+    "ownership",
     "release",
 )
+
+PROMOTABLE_OWNERSHIP_DECISIONS = {
+    "promote-doe-runtime",
+    "promote-doe-proof",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -148,6 +154,239 @@ def _preparation_receipt_failures(
     return invalid_references
 
 
+def _runtime_ownership_plan_failures(
+    manifest: dict[str, Any],
+    floor: dict[str, Any],
+    path: str,
+) -> list[dict[str, str]]:
+    if not floor.get("requireRuntimeOwnershipAttribution"):
+        return []
+
+    failures: list[dict[str, str]] = []
+    plan = manifest.get("runtimeOwnershipPlan")
+    if not isinstance(plan, dict):
+        failures.append(
+            _failure(
+                "runtime_ownership_plan_missing",
+                f"{path}.runtimeOwnershipPlan",
+                "promotion requires a predeclared runtime-ownership plan",
+            )
+        )
+        plan = {}
+
+    plan_lanes = plan.get("lanes") if isinstance(plan.get("lanes"), dict) else {}
+    required_lanes = floor.get("requiredRuntimeOwnershipLanes", [])
+    for lane_id in required_lanes:
+        lane = plan_lanes.get(lane_id)
+        if not isinstance(lane, dict) or lane.get("requirement") != "required":
+            failures.append(
+                _failure(
+                    "runtime_ownership_lane_not_predeclared",
+                    f"{path}.runtimeOwnershipPlan.lanes.{lane_id}",
+                    f"lane {lane_id} must be predeclared as required",
+                )
+            )
+
+    claimed_property = plan.get("claimedProperty")
+    patch_control_properties = floor.get("requireBoundedPatchControlFor", [])
+    patch_control_required = claimed_property in patch_control_properties
+    if patch_control_required:
+        patch_lane = plan_lanes.get("P0")
+        if (
+            not isinstance(patch_lane, dict)
+            or patch_lane.get("requirement") != "required"
+        ):
+            failures.append(
+                _failure(
+                    "bounded_patch_control_not_predeclared",
+                    f"{path}.runtimeOwnershipPlan.lanes.P0",
+                    f"{claimed_property} requires the bounded incumbent patch control",
+                )
+            )
+
+    return failures
+
+
+def _ownership_evidence_failures(
+    root: Path,
+    references: Any,
+    path: str,
+) -> list[dict[str, str]]:
+    failures: list[dict[str, str]] = []
+    if not isinstance(references, list) or not references:
+        return failures
+    resolved_root = root.resolve()
+    for index, reference in enumerate(references):
+        reference_path = f"{path}[{index}]"
+        if not isinstance(reference, dict):
+            failures.append(
+                _failure(
+                    "runtime_ownership_evidence_invalid",
+                    reference_path,
+                    "ownership evidence must be a path and SHA-256 object",
+                )
+            )
+            continue
+        relative_path = reference.get("path")
+        expected_sha256 = reference.get("sha256")
+        if not isinstance(relative_path, str) or not isinstance(expected_sha256, str):
+            failures.append(
+                _failure(
+                    "runtime_ownership_evidence_invalid",
+                    reference_path,
+                    "ownership evidence must contain path and sha256 strings",
+                )
+            )
+            continue
+        evidence_path = (resolved_root / relative_path).resolve()
+        try:
+            evidence_path.relative_to(resolved_root)
+        except ValueError:
+            failures.append(
+                _failure(
+                    "runtime_ownership_evidence_path_escape",
+                    reference_path,
+                    "ownership evidence path escapes the repository root",
+                )
+            )
+            continue
+        try:
+            actual_sha256 = _sha256_file(evidence_path)
+        except OSError as exc:
+            failures.append(
+                _failure(
+                    "runtime_ownership_evidence_unreadable",
+                    reference_path,
+                    str(exc),
+                )
+            )
+            continue
+        if actual_sha256 != expected_sha256:
+            failures.append(
+                _failure(
+                    "runtime_ownership_evidence_hash_mismatch",
+                    reference_path,
+                    f"expected {expected_sha256}, got {actual_sha256}",
+                )
+            )
+    return failures
+
+
+def _runtime_ownership_failures(
+    root: Path,
+    manifest: dict[str, Any],
+    report: dict[str, Any],
+    floor: dict[str, Any],
+    path: str,
+    *,
+    include_plan: bool = True,
+) -> list[dict[str, str]]:
+    if not floor.get("requireRuntimeOwnershipAttribution"):
+        return []
+
+    failures = (
+        _runtime_ownership_plan_failures(manifest, floor, path)
+        if include_plan
+        else []
+    )
+    plan = manifest.get("runtimeOwnershipPlan")
+    plan = plan if isinstance(plan, dict) else {}
+    plan_lanes = plan.get("lanes") if isinstance(plan.get("lanes"), dict) else {}
+    required_lanes = floor.get("requiredRuntimeOwnershipLanes", [])
+    claimed_property = plan.get("claimedProperty")
+    patch_control_properties = floor.get("requireBoundedPatchControlFor", [])
+    patch_control_required = claimed_property in patch_control_properties
+
+    ownership = report.get("runtimeOwnershipAssessment")
+    if not isinstance(ownership, dict) or ownership.get("status") != "pass":
+        failures.append(
+            _failure(
+                "runtime_ownership_assessment_incomplete",
+                f"{path}.runtimeOwnershipAssessment",
+                "promotion requires a passing reviewed ownership assessment",
+            )
+        )
+        return failures
+
+    if ownership.get("claimedProperty") != claimed_property:
+        failures.append(
+            _failure(
+                "runtime_ownership_property_mismatch",
+                f"{path}.runtimeOwnershipAssessment.claimedProperty",
+                "reviewed ownership property does not match the predeclared plan",
+            )
+        )
+    if ownership.get("decision") not in PROMOTABLE_OWNERSHIP_DECISIONS:
+        failures.append(
+            _failure(
+                "runtime_ownership_decision_not_promotable",
+                f"{path}.runtimeOwnershipAssessment.decision",
+                "promotion requires a DoeRuntime or DoeProof terminal decision",
+            )
+        )
+
+    assessed_lanes = (
+        ownership.get("lanes") if isinstance(ownership.get("lanes"), dict) else {}
+    )
+    lanes_to_prove = list(required_lanes)
+    if patch_control_required:
+        lanes_to_prove.append("P0")
+    for lane_id in lanes_to_prove:
+        result = assessed_lanes.get(lane_id)
+        if not isinstance(result, dict) or result.get("status") != "pass":
+            failures.append(
+                _failure(
+                    "runtime_ownership_lane_not_passed",
+                    f"{path}.runtimeOwnershipAssessment.lanes.{lane_id}",
+                    f"lane {lane_id} must pass the frozen comparison contract",
+                )
+            )
+        elif not result.get("evidence"):
+            failures.append(
+                _failure(
+                    "runtime_ownership_lane_evidence_missing",
+                    f"{path}.runtimeOwnershipAssessment.lanes.{lane_id}.evidence",
+                    f"lane {lane_id} must reference reviewed evidence",
+                )
+            )
+        else:
+            failures.extend(
+                _ownership_evidence_failures(
+                    root,
+                    result["evidence"],
+                    f"{path}.runtimeOwnershipAssessment.lanes.{lane_id}.evidence",
+                )
+            )
+
+    for field_name in ("materialOutcome", "costAcceptance"):
+        result = ownership.get(field_name)
+        if not isinstance(result, dict) or result.get("status") != "pass":
+            failures.append(
+                _failure(
+                    "runtime_ownership_adjudication_not_passed",
+                    f"{path}.runtimeOwnershipAssessment.{field_name}",
+                    f"{field_name} must pass before promotion",
+                )
+            )
+        elif not result.get("evidence"):
+            failures.append(
+                _failure(
+                    "runtime_ownership_adjudication_evidence_missing",
+                    f"{path}.runtimeOwnershipAssessment.{field_name}.evidence",
+                    f"{field_name} must reference reviewed evidence",
+                )
+            )
+        else:
+            failures.extend(
+                _ownership_evidence_failures(
+                    root,
+                    result["evidence"],
+                    f"{path}.runtimeOwnershipAssessment.{field_name}.evidence",
+                )
+            )
+    return failures
+
+
 def _floor_failures(
     root: Path,
     actor: dict[str, Any],
@@ -213,6 +452,10 @@ def _floor_failures(
             )
         )
 
+    failures.extend(
+        _runtime_ownership_plan_failures(manifest, floor, path)
+    )
+
     release_policy = manifest.get("releasePolicy", {})
     if not release_policy.get("blocking") or not release_policy.get("command"):
         failures.append(_failure("release_command_not_blocking", path, "promoted workloads require a blocking release command"))
@@ -234,6 +477,16 @@ def _floor_failures(
             failures.append(_failure("promotion_report_not_claimable", path, f"report {report_id} does not meet evidence maturity floor"))
         if assessment.get("eligibility") != "eligible" or failed_gates:
             failures.append(_failure("promotion_report_ineligible", path, f"report {report_id} has non-passing gates: {', '.join(failed_gates)}"))
+        failures.extend(
+            _runtime_ownership_failures(
+                root,
+                manifest,
+                report,
+                floor,
+                f"{path}.releasePolicy.promotionReportIds[{report_id}]",
+                include_plan=False,
+            )
+        )
         failures.extend(
             _preparation_receipt_failures(
                 root,

@@ -6,6 +6,42 @@ This file is the source of truth for Doe work only.
 Do not apply `dream/AGENTS.md` or `doppler/AGENTS.md` as process for this project.
 It is acceptable to reuse selected technical principles from those files, as listed here, when directly useful.
 
+Repository mission and durable goals live in [`GOALS.md`](GOALS.md). Component
+authority and invariants live in the applicable [`CATSCAN.md`](CATSCAN.md)
+chain. This file enforces discovery and working protocol; it does not redefine
+component goals.
+
+## Component intent
+
+Before modifying a file, read every `CATSCAN.md` from the project root to the
+target directory, in order. For work spanning directories, read the union of
+the applicable chains. Use `rg --files -g CATSCAN.md` and
+[`docs/component-index.md`](docs/component-index.md) to discover the chain.
+
+Treat `Target`, `Authority`, `Scope`, `Contracts`, `Invariants`, `Acceptance`, and `Non-goals` as
+implementation constraints. A child `CATSCAN.md` may narrow its parent but may
+not contradict it, broaden its authority, or weaken an invariant. Existing code
+does not overrule a charter; code may itself have drifted.
+
+If requested work changes a component boundary, identify the conflict and
+update the affected `CATSCAN.md` with the implementation. Do not silently work
+around it. Explicit user direction may change intent, but the corresponding
+charter and acceptance evidence must change in the same work. Do not rewrite a
+charter to excuse a failing implementation, test, or receipt.
+
+Novel implementations are welcome. `CATSCAN.md` constrains outcomes and
+authority, not internal algorithms. Do not add a charter to a utility folder or
+mechanical subdivision that can inherit its nearest parent.
+
+Agent handoffs for component-changing work must state:
+
+```text
+Component: <name>
+Intent: preserved | changed
+Acceptance evidence: <commands/artifacts>
+Boundary effects: <none or named components>
+```
+
 ## Tooling surface contract
 
 Canonical public/internal/archive tooling separation is defined in:
@@ -30,33 +66,12 @@ Default assumptions:
 Do not infer public product commitments from repo-only tools, scripts, or
 historical docs.
 
-## Prime directive
-
-Doe is a source-preserving accelerator runtime and compiler system: it keeps shader/program bodies visible, lowers them across execution targets, and produces receipts that prove what ran.
-
-The repo carries five tenants under that umbrella:
-
-| Tenant | Role |
-|---|---|
-| Dawn replacement (Zig WebGPU runtime: `doe-zig-runtime`, `libwebgpu_doe.so`) | runtime tenant — embeddable WebGPU runtime; full Dawn-replacement thesis in [`docs/thesis.md`](docs/thesis.md) |
-| Vulkan / Metal / D3D12 / DXIL emitters | backend tenant — multi-target lowering from the WGSL compiler (`runtime/zig/src/compiler/wgsl/`) |
-| Cerebras (TSIR / HostPlan / CSL) | spatial retargeting tenant — Tiled Spatial IR plus host-plan and CSL emit (`runtime/zig/src/compiler/tsir/`, `runtime/zig/src/compiler/wgsl/emit/csl/`) |
-| Lean proof pipeline | verification tenant — proof-eliminated runtime branches and verified artifacts (`pipeline/lean/`) |
-| Benchmarks and evidence bundles | proof tenant — claim-discipline gates, parity receipts, hardware-validation bundles (`bench/`) |
-
-Same discipline applied to different targets: shader/program bodies stay visible, lowering preserves identity, every claim has a receipt path.
-
-This repo drives Doe development: quirk ingestion, verification, specialization, and benchmarking with explicit contracts.
-
-- deterministic, schema-first behavior
-- reproducible artifacts for audit and replay
-- config-driven control, not hidden switches
-- speed-first progress with explicit hard/advisory gates
-
 ## Mandatory reading
 
 Before changing Doe behavior, read:
 
+- `GOALS.md`
+- the applicable root-to-target `CATSCAN.md` chain
 - `docs/thesis.md`
 - `docs/architecture.md`
 - `docs/process.md`

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "wgsl-fns-compilation-suite-amd-vulkan-2026-08-10-diagnostic",
   "actorId": "wgsl-fns",
@@ -127,7 +127,7 @@
     "reason": "The harness did not run matched traced and untraced samples."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -168,6 +168,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is not promoted and has no qualifying provider baseline."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -189,5 +193,10 @@
       "path": "bench/out/external-projects/wgsl-fns/amd-vulkan-wgsl-fns-03/raw-suite.json",
       "sha256": "775a5fa51d627bf520febd43ceeda3ff50e9ed107c298b46986a96f25e02aa2e"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

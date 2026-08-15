@@ -46,6 +46,9 @@
         "requireUnchangedApplicationSource",
         "requireUnchangedShaderSource",
         "requireReplay",
+        "requireRuntimeOwnershipAttribution",
+        "requiredRuntimeOwnershipLanes",
+        "requireBoundedPatchControlFor",
         "requireBlockingReleaseCommand",
         "requireMaterialPerformanceWin",
         "requireNoPerformanceRegression"
@@ -78,6 +81,15 @@
         "requireUnchangedApplicationSource": { "type": "boolean", "const": true },
         "requireUnchangedShaderSource": { "type": "boolean", "const": true },
         "requireReplay": { "type": "boolean", "const": true },
+        "requireRuntimeOwnershipAttribution": { "type": "boolean", "const": true },
+        "requiredRuntimeOwnershipLanes": {
+          "type": "array",
+          "const": ["I0", "I1", "W0", "D0"]
+        },
+        "requireBoundedPatchControlFor": {
+          "type": "array",
+          "const": ["independent-correction"]
+        },
         "requireBlockingReleaseCommand": { "type": "boolean", "const": true },
         "requireMaterialPerformanceWin": { "type": "boolean", "const": true },
         "requireNoPerformanceRegression": { "type": "boolean", "const": true }

@@ -19,12 +19,13 @@
     "reliability",
     "performance",
     "receiptOverhead",
+    "runtimeOwnershipAssessment",
     "promotionAssessment",
     "receipts",
     "rawEvidence"
   ],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 1 },
+    "schemaVersion": { "type": "integer", "const": 2 },
     "artifactKind": { "type": "string", "const": "external-ecosystem-report" },
     "reportId": { "$ref": "#/$defs/id" },
     "actorId": { "$ref": "#/$defs/id" },
@@ -168,6 +169,12 @@
         { "$ref": "#/$defs/measurementNotRun" }
       ]
     },
+    "runtimeOwnershipAssessment": {
+      "oneOf": [
+        { "$ref": "#/$defs/runtimeOwnershipAssessmentComplete" },
+        { "$ref": "#/$defs/runtimeOwnershipAssessmentIncomplete" }
+      ]
+    },
     "promotionAssessment": {
       "type": "object",
       "additionalProperties": false,
@@ -183,6 +190,7 @@
         "receipts",
         "replay",
         "performance",
+        "ownership",
         "release"
       ],
       "properties": {
@@ -197,6 +205,7 @@
         "receipts": { "$ref": "#/$defs/promotionGateResult" },
         "replay": { "$ref": "#/$defs/promotionGateResult" },
         "performance": { "$ref": "#/$defs/promotionGateResult" },
+        "ownership": { "$ref": "#/$defs/promotionGateResult" },
         "release": { "$ref": "#/$defs/promotionGateResult" }
       }
     },
@@ -281,6 +290,71 @@
       "properties": {
         "status": { "type": "string", "const": "not-run" },
         "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "runtimeOwnershipProperty": {
+      "type": "string",
+      "enum": [
+        "enforcement",
+        "failure-localization",
+        "lifecycle-control",
+        "program-identity-preservation",
+        "independent-correction",
+        "persistent-performance-control",
+        "reproducible-runtime-identity"
+      ]
+    },
+    "runtimeOwnershipAssessmentComplete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "decision",
+        "claimedProperty",
+        "lanes",
+        "materialOutcome",
+        "costAcceptance"
+      ],
+      "properties": {
+        "status": { "type": "string", "enum": ["pass", "fail"] },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "promote-doe-runtime",
+            "promote-doe-proof",
+            "carry-bounded-patch",
+            "retain-diagnostic",
+            "retire-lane"
+          ]
+        },
+        "claimedProperty": { "$ref": "#/$defs/runtimeOwnershipProperty" },
+        "lanes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["I0", "I1", "W0", "D0", "P0"],
+          "properties": {
+            "I0": { "$ref": "#/$defs/promotionGateResult" },
+            "I1": { "$ref": "#/$defs/promotionGateResult" },
+            "W0": { "$ref": "#/$defs/promotionGateResult" },
+            "D0": { "$ref": "#/$defs/promotionGateResult" },
+            "P0": { "$ref": "#/$defs/promotionGateResult" }
+          }
+        },
+        "materialOutcome": { "$ref": "#/$defs/promotionGateResult" },
+        "costAcceptance": { "$ref": "#/$defs/promotionGateResult" }
+      }
+    },
+    "runtimeOwnershipAssessmentIncomplete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "decision", "summary"],
+      "properties": {
+        "status": { "type": "string", "enum": ["not-run", "ineligible"] },
+        "decision": {
+          "type": "string",
+          "enum": ["retain-diagnostic", "retire-lane"]
+        },
+        "summary": { "type": "string", "minLength": 1 }
       }
     },
     "evidenceRef": {

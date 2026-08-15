@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "holoscript-tropical-spmv-2026-08-08-diagnostic",
   "actorId": "holoscript-snn-webgpu",
@@ -149,7 +149,7 @@
     "receiptEnabledP50": 74.703475
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -190,6 +190,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is not promoted and is not a blocking release dependency."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -207,5 +211,10 @@
       "path": "bench/out/external-projects/holoscript-snn-webgpu/2026-08-08T-run5/raw-matrix.json",
       "sha256": "733128df1d26cd08e27c1dd393c656c09e8a10061bcc2309d4ae0760393e672e"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

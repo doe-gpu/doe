@@ -55,6 +55,11 @@ file only names the promoted boundary and open admission gates.
   entrypoint with exact source pinning and separate hash-bound preparation and
   execution receipts. Promotion remains downstream of reviewed application
   evidence and a claim-eligible physical support target.
+- External-project promotion policy 1.1.0 now makes runtime ownership a
+  blocking attribution contract. A candidate must predeclare the ambient,
+  pinned, governed-wrapper, and DoeRuntime lanes; independent-correction claims
+  must also predeclare the bounded-patch lane. Existing reviewed reports remain
+  diagnostic and explicitly record that this ownership assessment was not run.
 - External-project source preparation now forces byte-preserving Git checkout
   semantics across host configurations and ignores package-manager executable-
   bit normalization while continuing to reject content changes. The retained
@@ -64,6 +69,11 @@ file only names the promoted boundary and open admission gates.
   binds the real provider and adapter identities, the unchanged upstream CPU
   oracle, exact output hashes, and the validated host tuple. It is a passing
   application compatibility wedge, not a performance or release claim.
+- The reviewed HoloScript ownership diagnostic at
+  `reports/ecosystem/holoscript-snn-webgpu/holoscript-tropical-spmv-runtime-ownership-2026-08-15-diagnostic.json`
+  now separates pinned incumbent, governed incumbent, and DoeRuntime execution.
+  Ambient-incumbent and bounded-patch evidence remain absent, so the report
+  retains a diagnostic ownership decision and cannot promote either runtime.
 - The reviewed UMAP-GPU physical AMD Vulkan result at
   `reports/ecosystem/umap-gpu/umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic.json`
   retains the unchanged structural application oracle under both providers.
@@ -219,6 +229,10 @@ file only names the promoted boundary and open admission gates.
 
 ## Admission blockers
 
+- No external application currently has a passing, evidence-linked
+  `I0`/`I1`/`W0`/`D0` ownership assessment and accepted ownership-cost ledger;
+  therefore no application can yet become a DoeRuntime or DoeProof release
+  blocker.
 - Node and Bun need downstream-project compatibility evidence, not only package
   harness coverage. The vGPU Node/ORT and wgsl-fns lanes now supply diagnostic
   application results; neither is yet a promoted release dependency, and the

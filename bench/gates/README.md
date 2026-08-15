@@ -11,6 +11,10 @@ reads artifacts, evaluates policy, and exits with a typed status.
 
 Gate classes:
 
+- **Component intent** (`catscan_gate.py`) — block when recursive component
+  charters omit required authority fields, name the wrong parent, contain
+  broken contract or acceptance links, exceed the charter size ceiling, reuse
+  a component identifier, or drift from the generated component index.
 - **Correctness** (`check_correctness.py`, `claim_*.py`,
   `claim_discipline_gate.py`) — block release when claim language
   drifts from artifact reality.

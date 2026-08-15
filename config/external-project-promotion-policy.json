@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "artifactKind": "external-project-promotion-policy",
-  "policyVersion": "1.0.0",
+  "policyVersion": "1.1.0",
   "adoptionStages": [
     "none",
     "validation-workload",
@@ -46,6 +46,9 @@
     "requireUnchangedApplicationSource": true,
     "requireUnchangedShaderSource": true,
     "requireReplay": true,
+    "requireRuntimeOwnershipAttribution": true,
+    "requiredRuntimeOwnershipLanes": ["I0", "I1", "W0", "D0"],
+    "requireBoundedPatchControlFor": ["independent-correction"],
     "requireBlockingReleaseCommand": true,
     "requireMaterialPerformanceWin": true,
     "requireNoPerformanceRegression": true

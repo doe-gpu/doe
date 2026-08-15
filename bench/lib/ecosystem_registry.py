@@ -390,6 +390,7 @@ def _actor_report_failures(
             "receipts",
             "replay",
             "performance",
+            "ownership",
             "release",
         )
         if promotion_assessment.get("eligibility") == "eligible":

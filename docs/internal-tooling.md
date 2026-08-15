@@ -22,6 +22,9 @@ Unless the manifest says otherwise, these are contributor/operator tooling:
 - `pipeline/` trace, proof, and upstream-intelligence tooling;
 - top-level `scripts/`, `examples/`, `demos/`, and `nursery/`.
 
+`bench/gates/catscan_gate.py` is the internal component-charter validator and
+generated-index owner. It is a contributor gate, not a public package API.
+
 Repo-only tooling may produce public evidence. The tool itself does not become
 a supported package interface.
 

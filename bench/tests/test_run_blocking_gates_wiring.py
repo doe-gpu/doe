@@ -48,6 +48,12 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
         self.assertIn('ecosystem_registry_gate.py"', source)
         self.assertIn('"ecosystem-registry",', source)
 
+    def test_catscan_gate_is_unconditionally_wired(self) -> None:
+        source = MODULE_PATH.read_text(encoding="utf-8")
+
+        self.assertIn('catscan_gate.py"', source)
+        self.assertIn('"catscan",', source)
+
     def test_external_project_release_gate_is_unconditionally_wired(self) -> None:
         source = MODULE_PATH.read_text(encoding="utf-8")
 

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "gigi-generated-webgpu-suite-2026-08-08-diagnostic",
   "actorId": "electronicarts-gigi",
@@ -146,7 +146,7 @@
     "reason": "The diagnostic matrix did not execute paired receipt-disabled and receipt-enabled samples."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -187,6 +187,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness has unresolved crashes and compatibility gaps and remains non-blocking."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -208,5 +212,10 @@
       "path": "bench/out/external-projects/electronicarts-gigi/2026-08-08T-gigi-run2/raw-suite.json",
       "sha256": "9251b9aa206dea3969ac4214de307b0987e3087f659d70446c84bae844e8c60f"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

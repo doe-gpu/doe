@@ -11,6 +11,7 @@ from pathlib import Path
 from bench.gates.external_project_release_gate import (
     _floor_failures,
     _preparation_receipt_failures,
+    _runtime_ownership_failures,
     evaluate,
 )
 from bench.lib.ecosystem_registry import load_json_object
@@ -42,10 +43,12 @@ class ExternalProjectReleaseGateTests(unittest.TestCase):
 
     def test_diagnostic_harness_cannot_satisfy_promotion_floor(self) -> None:
         actor = self.registry["actors"][0]
+        manifest = dict(self.holo_manifest)
+        manifest.pop("runtimeOwnershipPlan", None)
         failures = _floor_failures(
             REPO_ROOT,
             actor,
-            self.holo_manifest,
+            manifest,
             {},
             self.policy["promotionFloor"],
             "actors[0].harnesses[0]",
@@ -58,6 +61,7 @@ class ExternalProjectReleaseGateTests(unittest.TestCase):
         self.assertIn("replay_not_required", codes)
         self.assertIn("release_command_not_blocking", codes)
         self.assertIn("missing_promotion_report", codes)
+        self.assertIn("runtime_ownership_plan_missing", codes)
 
     def test_release_runner_resolves_promoted_manifest_from_explicit_root(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -176,6 +180,125 @@ class ExternalProjectReleaseGateTests(unittest.TestCase):
                 "invalid_preparation_receipt",
                 {item["code"] for item in failures},
             )
+
+    def test_runtime_ownership_passes_with_frozen_lanes_and_cost_evidence(self) -> None:
+        evidence_path = REPO_ROOT / "bench/tests/test_external_project_release_gate.py"
+        evidence = [
+            {
+                "path": evidence_path.relative_to(REPO_ROOT).as_posix(),
+                "sha256": hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
+            }
+        ]
+        manifest = {
+            "runtimeOwnershipPlan": {
+                "claimedProperty": "enforcement",
+                "lanes": {
+                    lane_id: {
+                        "requirement": "required",
+                        "construction": f"frozen {lane_id} construction",
+                    }
+                    for lane_id in ("I0", "I1", "W0", "D0")
+                }
+                | {
+                    "P0": {
+                        "requirement": "conditional",
+                        "construction": "required only for correction claims",
+                    }
+                },
+            }
+        }
+        report = {
+            "runtimeOwnershipAssessment": {
+                "status": "pass",
+                "decision": "promote-doe-runtime",
+                "claimedProperty": "enforcement",
+                "lanes": {
+                    lane_id: {
+                        "status": "pass",
+                        "summary": f"{lane_id} completed",
+                        "evidence": evidence,
+                    }
+                    for lane_id in ("I0", "I1", "W0", "D0")
+                }
+                | {
+                    "P0": {
+                        "status": "not-run",
+                        "summary": "not required for enforcement",
+                    }
+                },
+                "materialOutcome": {
+                    "status": "pass",
+                    "summary": "DoeRuntime passed the frozen outcome rule",
+                    "evidence": evidence,
+                },
+                "costAcceptance": {
+                    "status": "pass",
+                    "summary": "The ownership obligations were accepted",
+                    "evidence": evidence,
+                },
+            }
+        }
+
+        self.assertEqual(
+            _runtime_ownership_failures(
+                REPO_ROOT,
+                manifest,
+                report,
+                self.policy["promotionFloor"],
+                "actors[0].harnesses[0]",
+            ),
+            [],
+        )
+        evidence[0]["sha256"] = "0" * 64
+        failures = _runtime_ownership_failures(
+            REPO_ROOT,
+            manifest,
+            report,
+            self.policy["promotionFloor"],
+            "actors[0].harnesses[0]",
+        )
+        self.assertIn(
+            "runtime_ownership_evidence_hash_mismatch",
+            {item["code"] for item in failures},
+        )
+
+    def test_independent_correction_requires_bounded_patch_control(self) -> None:
+        manifest = {
+            "runtimeOwnershipPlan": {
+                "claimedProperty": "independent-correction",
+                "lanes": {
+                    lane_id: {
+                        "requirement": "required",
+                        "construction": f"frozen {lane_id} construction",
+                    }
+                    for lane_id in ("I0", "I1", "W0", "D0")
+                }
+                | {
+                    "P0": {
+                        "requirement": "conditional",
+                        "construction": "bounded patch control",
+                    }
+                },
+            }
+        }
+
+        failures = _runtime_ownership_failures(
+            REPO_ROOT,
+            manifest,
+            {
+                "runtimeOwnershipAssessment": {
+                    "status": "not-run",
+                    "decision": "retain-diagnostic",
+                    "summary": "not run",
+                }
+            },
+            self.policy["promotionFloor"],
+            "actors[0].harnesses[0]",
+        )
+
+        codes = {item["code"] for item in failures}
+        self.assertIn("bounded_patch_control_not_predeclared", codes)
+        self.assertIn("runtime_ownership_assessment_incomplete", codes)
 
 
 if __name__ == "__main__":

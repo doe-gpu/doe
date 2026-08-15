@@ -91,6 +91,7 @@ def main() -> int:
     tools_dir = BENCH_ROOT / "tools"
     dropin_dir = BENCH_ROOT / "drop-in"
     schema_gate = gates_dir / "schema_gate.py"
+    catscan_gate = gates_dir / "catscan_gate.py"
     ecosystem_registry_gate = gates_dir / "ecosystem_registry_gate.py"
     external_project_release_gate = (
         gates_dir / "external_project_release_gate.py"
@@ -206,6 +207,7 @@ def main() -> int:
                 [sys.executable, str(tracked_ignore_gate)],
             )
         run_gate("schema", [sys.executable, str(schema_gate)])
+        run_gate("catscan", [sys.executable, str(catscan_gate)])
         run_gate(
             "ecosystem-registry",
             [sys.executable, str(ecosystem_registry_gate)],

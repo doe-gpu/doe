@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "world-lab-consumer-execution-oracles-2026-08-08-diagnostic",
   "actorId": "world-lab-runtime-webgpu",
@@ -142,7 +142,7 @@
     "reason": "The harness did not run matched traced and untraced workload pairs, and Doe did not complete the comparison workload."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -183,6 +183,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is not promoted and Doe does not yet pass its correctness boundary."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -196,5 +200,10 @@
       "path": "bench/out/external-projects/world-lab-runtime-webgpu/2026-08-08T-run1/raw-suite.json",
       "sha256": "652470d398177d0b7a49722046d9903a007c967bc28ac04167d808e968afd139"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

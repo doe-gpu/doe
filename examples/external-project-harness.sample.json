@@ -19,6 +19,31 @@
       "bench/external-projects/sample-actor/provider.patch"
     ]
   },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "enforcement",
+    "incumbentLimitation": "The incumbent exposes selected-provider identity but cannot reject prohibited backend substitution before execution.",
+    "applicationConsequence": "A release can complete on an execution path forbidden by the application's deployment policy.",
+    "materialOutcome": {
+      "metric": "prohibited substitutions rejected before dispatch with the original typed cause",
+      "decisionRule": "Promote DoeRuntime only when D0 passes every injected substitution case and W0 cannot enforce the same result."
+    },
+    "lanes": {
+      "I0": { "requirement": "required", "construction": "Unmodified ambient incumbent selected by the application environment." },
+      "I1": { "requirement": "required", "construction": "Pinned and packaged incumbent binary." },
+      "W0": { "requirement": "required", "construction": "I1 with DoeProof policy, oracle, receipts, and replay." },
+      "D0": { "requirement": "required", "construction": "DoeRuntime with the same DoeProof contract." },
+      "P0": { "requirement": "conditional", "construction": "Required only if a bounded incumbent patch can implement pre-dispatch rejection." }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "regression-support"
+    ]
+  },
   "fallbackPolicy": {
     "requireHardware": true,
     "prohibitedFallbacks": [

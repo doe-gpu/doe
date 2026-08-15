@@ -88,6 +88,7 @@
         "bench/cli.py compare",
         "bench/runners/run_release_pipeline.py",
         "bench/runners/run_blocking_gates.py",
+        "bench/gates/catscan_gate.py",
         "bench/tools/generate_backend_workloads.py",
         "bench/gates/tint_compiler_evidence_gate.py"
       ],

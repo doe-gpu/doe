@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "sample-actor-sample-workload-1",
   "actorId": "sample-actor",
@@ -65,8 +65,13 @@
     "untracedP50": 1,
     "receiptEnabledP50": 1
   },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The sample does not include a completed runtime-ownership comparison."
+  },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": { "status": "pass", "summary": "The provider substitution was installed and validated." },
     "supportHardware": { "status": "pass", "summary": "The run used the declared physical GPU target." },
@@ -77,6 +82,7 @@
     "receipts": { "status": "pass", "summary": "Receipt capture passed." },
     "replay": { "status": "not-run", "summary": "Receipt replay was not run." },
     "performance": { "status": "not-run", "summary": "Promotion performance coverage was not run." },
+    "ownership": { "status": "not-run", "summary": "Runtime-ownership attribution was not run." },
     "release": { "status": "ineligible", "summary": "The sample is not a promoted release workload." }
   },
   "receipts": [

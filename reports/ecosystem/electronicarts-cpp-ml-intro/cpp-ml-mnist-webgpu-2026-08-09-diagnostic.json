@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "cpp-ml-mnist-webgpu-2026-08-09-diagnostic",
   "actorId": "electronicarts-cpp-ml-intro",
@@ -128,7 +128,7 @@
     "reason": "The diagnostic harness did not execute matched receipt-enabled and receipt-disabled workload pairs."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -169,6 +169,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is not promoted and Doe does not pass its correctness boundary."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -182,5 +186,10 @@
       "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/2026-08-09T-amd-handoff-local/raw-suite.json",
       "sha256": "eec78b73babfed9170d2857edeef44c6f9c6ae67b267f63c1392241e35556541"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

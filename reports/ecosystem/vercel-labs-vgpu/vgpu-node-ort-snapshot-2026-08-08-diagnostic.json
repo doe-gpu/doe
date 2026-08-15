@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "vgpu-node-ort-snapshot-2026-08-08-diagnostic",
   "actorId": "vercel-labs-vgpu",
@@ -112,7 +112,7 @@
     "reason": "Doe failed before a matched traced and untraced workload pair could complete."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -153,6 +153,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is not promoted and Doe does not yet pass its correctness boundary."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -166,5 +170,10 @@
       "path": "bench/out/external-projects/vercel-labs-vgpu/2026-08-08T-run3/raw-matrix.json",
       "sha256": "b5228908f97b0b5514eb8220bded6296f8a2e25f3045180ce9d701ebe7ed7655"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

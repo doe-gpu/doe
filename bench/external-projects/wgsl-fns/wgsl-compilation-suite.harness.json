@@ -17,6 +17,32 @@
     "seam": "A Node ESM loader redirects only the upstream test's exact webgpu package import to the selected provider wrapper; upstream tests, generated WGSL, function corpus, dependency resolution, compilation-info checks, and cleanup remain unchanged.",
     "patchPaths": []
   },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "independent-correction",
+    "incumbentLimitation": "The pinned incumbent currently aborts before a fair paired verdict and controls when generated-WGSL compiler and diagnostic fixes become available to the application.",
+    "applicationConsequence": "The unchanged 110-function corpus can lose CI coverage or actionable compilation diagnostics while waiting for an incumbent release.",
+    "materialOutcome": {
+      "metric": "complete unchanged assertion and generated-shader coverage with exposed native diagnostics and clean process completion",
+      "decisionRule": "Promote DoeRuntime only if D0 passes the frozen corpus and materially exceeds W0 and the smallest reviewable P0 correction on coverage or failure localization."
+    },
+    "lanes": {
+      "I0": { "requirement": "required", "construction": "Unmodified ambient Node WebGPU incumbent." },
+      "I1": { "requirement": "required", "construction": "Pinned packaged Dawn Node WebGPU binary that reproduces the incumbent boundary." },
+      "W0": { "requirement": "required", "construction": "I1 with the identical corpus oracle, diagnostics capture, receipts, replay, and release policy." },
+      "D0": { "requirement": "required", "construction": "DoeRuntime with the same provider seam, corpus, and DoeProof contract." },
+      "P0": { "requirement": "required", "construction": "W0 plus the smallest reviewable incumbent correction that reaches the same compilation and diagnostic boundary." }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "application-exceptions",
+      "regression-support"
+    ]
+  },
   "fallbackPolicy": {
     "requireHardware": true,
     "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],

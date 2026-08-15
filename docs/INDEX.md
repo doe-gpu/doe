@@ -9,6 +9,11 @@ evidence boundaries are clear.
 
 ## Canonical strategy
 
+- [`../GOALS.md`](../GOALS.md): repository mission, value, and durable goals
+- [`../CATSCAN.md`](../CATSCAN.md): root component authority and invariants
+- [`component-index.md`](component-index.md): generated recursive component map
+- [`component-charters.md`](component-charters.md): charter placement,
+  precedence, required shape, validation, and handoff protocol
 - [`thesis.md`](thesis.md): the single Doe-first product strategy; verifiable
   local compute vision, owned tracks, supporting-project roles, Node/Bun wedge,
   downstream portfolio, browser path, and expansion boundaries

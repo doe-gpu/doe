@@ -17,6 +17,31 @@
     "seam": "A Node ESM loader resolves only the pinned workload's import of webgpu to the selected provider module; upstream application, WGSL, model, expected values, and lifecycle checks remain unchanged.",
     "patchPaths": []
   },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "lifecycle-control",
+    "incumbentLimitation": "The public provider boundary does not guarantee the application's required ordering across ORT session release, wrapper disposal, GPU disposal, queue completion, and post-destroy error delivery.",
+    "applicationConsequence": "A locally correct inference can still leak resources, hang teardown, or deliver uncaptured errors after the owning application has disposed its runtime objects.",
+    "materialOutcome": {
+      "metric": "oracle-passing inference plus bounded repeated teardown, concurrency, memory growth, and post-destroy error ordering",
+      "decisionRule": "Promote DoeRuntime only if D0 passes the lifecycle floor and materially exceeds W0 on a predeclared lifecycle outcome without an unacceptable ownership-cost increase."
+    },
+    "lanes": {
+      "I0": { "requirement": "required", "construction": "Unmodified ambient Node WebGPU incumbent used by the pinned vGPU workspace." },
+      "I1": { "requirement": "required", "construction": "Pinned packaged Dawn Node WebGPU binary." },
+      "W0": { "requirement": "required", "construction": "I1 with DoeProof lifecycle policy, oracle, receipts, replay, and failure injections." },
+      "D0": { "requirement": "required", "construction": "DoeRuntime with the identical ORT, vGPU, lifecycle, and DoeProof contract." },
+      "P0": { "requirement": "conditional", "construction": "Run only if a bounded incumbent patch can expose or correct the lifecycle boundary under review." }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "regression-support"
+    ]
+  },
   "fallbackPolicy": {
     "requireHardware": true,
     "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],

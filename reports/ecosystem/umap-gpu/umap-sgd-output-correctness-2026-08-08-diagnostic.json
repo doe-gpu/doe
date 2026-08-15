@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "umap-sgd-output-correctness-2026-08-08-diagnostic",
   "actorId": "umap-gpu",
@@ -114,7 +114,7 @@
     "reason": "No matched traced and untraced workload pair was executed."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -155,6 +155,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness remains diagnostic and is not a blocking release dependency."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -168,5 +172,10 @@
       "path": "bench/out/external-projects/umap-gpu/2026-08-08T-run2/raw-suite.json",
       "sha256": "4b91840fef592f8ba005e63eb82131a254289f23e03094c0a9f820df6ae8923d"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

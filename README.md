@@ -117,6 +117,8 @@ status table, and Chromium remains diagnostic.
 
 ## Read next
 
+- [Repository goals](GOALS.md)
+- [Component authority index](docs/component-index.md)
 - [Product strategy](docs/thesis.md)
 - [Architecture](docs/architecture.md)
 - [Process and release law](docs/process.md)

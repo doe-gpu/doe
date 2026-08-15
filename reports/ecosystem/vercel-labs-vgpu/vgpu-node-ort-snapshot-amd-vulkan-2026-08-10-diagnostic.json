@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "external-ecosystem-report",
   "reportId": "vgpu-node-ort-snapshot-amd-vulkan-2026-08-10-diagnostic",
   "actorId": "vercel-labs-vgpu",
@@ -110,7 +110,7 @@
     "reason": "The harness did not run matched traced and untraced application samples."
   },
   "promotionAssessment": {
-    "policyVersion": "1.0.0",
+    "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
@@ -151,6 +151,10 @@
     "release": {
       "status": "ineligible",
       "summary": "The harness is diagnostic and is not a promoted release dependency."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The I0/I1/W0/D0 ownership comparison and ownership-cost adjudication were not run."
     }
   },
   "receipts": [
@@ -172,5 +176,10 @@
       "path": "bench/out/external-projects/vercel-labs-vgpu/amd-vulkan-vgpu-08/raw-matrix.json",
       "sha256": "c8c82d834f504140af621b2ee608db27e039743fb939751a05f8885e6d7b4c49"
     }
-  ]
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The retained diagnostic predates the frozen runtime-ownership comparison and cannot establish DoeRuntime attribution."
+  }
 }

@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "holoscript-tropical-spmv-runtime-ownership-2026-08-15-diagnostic",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "tropical-spmv",
+  "generatedAt": "2026-08-15T16:05:31.967Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-15T16:10:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "11",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "partial-runtime-ownership-matrix",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "Pinned incumbent without DoeProof (I1), pinned incumbent with DoeProof (W0), and DoeRuntime with DoeProof (D0) each completed three clean processes on the physical AMD Vulkan adapter with exact HoloScript oracle output.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/raw-matrix.json",
+          "sha256": "7bb94c547905f595a70a639afff8872ed6eba8fdefe108206eedc80d55e97769"
+        },
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/receipt-summary.json",
+          "sha256": "c8910cf54b71cbe44fb9ca8ca83d98ef99fa0a295c30a2c59c713544bbedb9ad"
+        }
+      ]
+    },
+    {
+      "id": "ownership-attribution-incomplete",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "The ambient incumbent lane I0 was not supplied and the independent-correction plan requires a bounded incumbent patch lane P0. The matrix therefore cannot attribute product value to DoeRuntime or DoeProof.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/receipt-summary.json",
+          "sha256": "c8910cf54b71cbe44fb9ca8ca83d98ef99fa0a295c30a2c59c713544bbedb9ad"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The ambient incumbent module was unavailable in this checkout, so I0 remains unexecuted.",
+    "No bounded incumbent correction was implemented, so the required P0 lane remains unexecuted.",
+    "Three clean processes per executed lane are diagnostic and below the promotion reliability floor.",
+    "The run was invoked directly and does not carry a claim-eligible preparation or reproduction receipt.",
+    "No runtime-ownership or performance claim is made from this matrix."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 160260096
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 164376576
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Timing samples remain diagnostic because I0 and P0 are missing and the promotion sample and reliability floors were not run."
+  },
+  "receiptOverhead": {
+    "unit": "ms",
+    "untracedP50": 55.85792399999997,
+    "receiptEnabledP50": 58.498722000000015
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "ineligible",
+    "decision": "retain-diagnostic",
+    "summary": "I1, W0, and D0 passed the diagnostic oracle, but required lanes I0 and P0 are absent; no ownership attribution is permitted."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The direct diagnostic reused a prepared workspace and is not a clean production installation receipt."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Every executed lane selected the Radeon 8060S RADV hardware path without software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The ownership diagnostic used sequential clean processes."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Process cleanup succeeded, but promotion-scale teardown cycles were not run."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The matrix remains below the promotion stress floor."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS was retained, but bounded memory growth was not measured."
+    },
+    "receipts": {
+      "status": "ineligible",
+      "summary": "Raw matrix and summary hashes are retained, but no claim-eligible preparation or reproduction receipt exists."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not run."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "The incomplete ownership matrix cannot support a material-performance decision."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "I0 and required P0 evidence are missing, so ownership remains unresolved."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "This is a reviewed diagnostic, not a blocking release workload."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/receipt-summary.json",
+      "sha256": "c8910cf54b71cbe44fb9ca8ca83d98ef99fa0a295c30a2c59c713544bbedb9ad"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/raw-matrix.json",
+      "sha256": "7bb94c547905f595a70a639afff8872ed6eba8fdefe108206eedc80d55e97769"
+    }
+  ]
+}
