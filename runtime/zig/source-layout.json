@@ -2039,9 +2039,9 @@
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig": {
         "decision": "Keep",
-        "moduleSha256": "53a84f5c9615f7bc55fc974d05ef76cff7e536f6ac72dce7a459d0b722c7969e",
+        "moduleSha256": "7ee378b924833877c1f0fcd4c4e69cf037cd7374aa46d914068a667168fd5514",
         "reason": "Keep: SPIR-V function/control-flow lowering state machine; builtin, stage, texture, and serialization responsibilities are separate.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-gigi-compatibility/2026-08-15"
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_fn_helpers.zig": {
         "decision": "Keep",
@@ -2051,9 +2051,9 @@
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_matrix.zig": {
         "decision": "Keep",
-        "moduleSha256": "566c1b76a5571e3c451f390ff3c887dfba48ea0cbb6fba1306c29c8a45d66d22",
+        "moduleSha256": "a5b42c24f2befa03e6bc63bb4fa2db164eb26f8f813025299d5b09c64137cb8a",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-gigi-compatibility/2026-08-15"
       },
       "src/compiler/wgsl/emit/spirv/emit_spirv_shared.zig": {
         "decision": "Keep",
@@ -2123,9 +2123,9 @@
       },
       "src/compiler/wgsl/frontend/parser_expr.zig": {
         "decision": "Keep",
-        "moduleSha256": "6a3c0836fbb81ba54a3d803e2ccb72dd74a4682b149a87622118b74d9abe69ee",
+        "moduleSha256": "4030d261c383d8cd3ca85ab01a431937336c312c7ff265b00f991c7977d5d86e",
         "reason": "Keep: cohesive recursive-descent expression grammar with an independent parser responsibility.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-gigi-compatibility/2026-08-15"
       },
       "src/compiler/wgsl/frontend/parser_stmt.zig": {
         "decision": "Keep",
@@ -2159,9 +2159,9 @@
       },
       "src/compiler/wgsl/frontend/sema_resolve.zig": {
         "decision": "Keep",
-        "moduleSha256": "caa79c30da1869e9ab21e8ee61dfb454f8b03c02b7bb1c0ebba6b13fe89db841",
+        "moduleSha256": "b06e9297f4a679d8823fc9890ffba0db32a19a04725f850b48e0436d3ba5e883",
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-runtime-ownership/2026-08-15"
+        "reviewer": "codex-gigi-compatibility/2026-08-15"
       },
       "src/compiler/wgsl/frontend/sema_type_syntax.zig": {
         "decision": "Keep",

@@ -764,6 +764,7 @@ pub fn FunctionState(comptime EmitterT: type) type {
                     return try self.emit_scalar_construct(ty, expr_id, try self.emit_value_expr(expr_id));
                 },
                 .vector => return try self.emit_vector_construct(ty, range),
+                .matrix => return try emit_spirv_matrix.emit_matrix_construct(self, ty, range),
                 else => {},
             }
 
@@ -830,7 +831,7 @@ pub fn FunctionState(comptime EmitterT: type) type {
             }
         }
 
-        fn emit_scalar_construct_from_type(self: *@This(), target_ty: ir.TypeId, source_ty: ir.TypeId, source_id: u32) EmitError!u32 {
+        pub fn emit_scalar_construct_from_type(self: *@This(), target_ty: ir.TypeId, source_ty: ir.TypeId, source_id: u32) EmitError!u32 {
             const target_type = self.emitter.module.types.get(target_ty);
             const source_type = self.emitter.module.types.get(source_ty);
             if (target_ty == source_ty or try self.emitter.lower_type(target_ty) == try self.emitter.lower_type(source_ty)) {

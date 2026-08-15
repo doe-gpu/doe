@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "planId": "holoscript-tropical-spmv-doeproof-cli-linux-bwrap-qm0-v1",
+  "upstreamRepo": "https://github.com/brianonbased-dev/HoloScript",
+  "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+  "workload": "unchanged packages/snn-webgpu tropical SpMV",
+  "expectedComparableSha256": "51cda2a94da7edad85499240ac8cc5744598fb4227f4f38535a8c97880f585f4",
+  "boundary": {
+    "host": "linux-x64",
+    "nodeFilesystem": "node-permission-read-only",
+    "workspace": "only hash-bound files declared by the harness",
+    "baseSystem": "read-only /usr, /etc, /sys, and optional /run/udev",
+    "devices": "private /dev plus host /dev/dri",
+    "vulkanDriver": "/usr/share/vulkan/icd.d/radeon_icd.json through VK_DRIVER_FILES with all ambient layers disabled",
+    "network": "private namespace with no host network",
+    "scratch": "private tmpfs",
+    "output": "one explicit writable host directory"
+  },
+  "required": [
+    "W0 and D0 exact-output oracle pass",
+    "W0 and D0 provider identities are explicit",
+    "all declared workspace files are hash-bound",
+    "run and replay execute inside the frozen Bubblewrap policy",
+    "D0 replay is semantically identical",
+    "cross-lane comparison remains non-performance and zero ownership credit"
+  ],
+  "nonGoals": [
+    "complete base-operating-system dependency closure",
+    "hardware eligibility",
+    "performance credit",
+    "runtime ownership credit",
+    "application promotion",
+    "release credit",
+    "cross-platform sandbox support"
+  ]
+}

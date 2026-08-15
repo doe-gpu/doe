@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-gpu-native-clean-install-reliability-diagnostic",
+  "status": "passed",
+  "tuple": {
+    "runtime": "node",
+    "platform": "linux",
+    "arch": "x64"
+  },
+  "contract": {
+    "sequentialTrials": 3,
+    "concurrentTrials": 2,
+    "timeoutMs": 120000,
+    "maxOutputBytes": 4194304,
+    "expectedOutputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+    "lifecycleCycles": 12,
+    "lifecycleWarmupCycles": 2,
+    "maxPostWarmupRssSpanBytes": 268435456
+  },
+  "installation": {
+    "lifecycleScripts": "disabled",
+    "optionalDependencies": "omitted",
+    "workspaceLibraryResolution": false,
+    "sharedAcrossTrials": true
+  },
+  "launch": {
+    "mode": "node-process"
+  },
+  "runtime": {
+    "host": "node",
+    "executable": "/usr/bin/node",
+    "version": "v22.22.1",
+    "sha256": "d0efb6fcb9d023ba4e2b160ec2384dc28fe4f17732141ef47f676828fa960505"
+  },
+  "packages": {
+    "wrapper": {
+      "id": "doe-gpu@0.4.7",
+      "bytes": 205901,
+      "sha256": "ae4a81c587dc684cdcf626203bbb676436ab451039ac3c0a3daad7c1749e0e56"
+    },
+    "platform": {
+      "id": "doe-gpu-linux-x64@0.4.7",
+      "bytes": 2912575,
+      "sha256": "d9d918c20fbf31bae772298922f38b0ba9c8d576a8c32814c02aaa3fdd9bec04",
+      "stagedLibrarySha256": "973ca698bd6b52ccbbf2aaa9132e8751a0039fea865e76ec63be4a77f5cc77ad"
+    }
+  },
+  "implementation": {
+    "runner": {
+      "path": "packages/doe-gpu/test/integration/test-integration-native-clean-install-reliability.js",
+      "sha256": "daaa967983c3e37fd3d93d03d95d46f5fd4fb6a89258fd39b6dde702e6caea7c"
+    },
+    "firstKernel": {
+      "path": "packages/doe-gpu/examples/node-first-kernel.mjs",
+      "sha256": "e4e3bcd9528a4df47852f3bc84765adf24a22d01bfd64e30caa83f882b6b2c42"
+    },
+    "lifecycleFixture": {
+      "path": "packages/doe-gpu/test/fixtures/native-clean-install-lifecycle.mjs",
+      "sha256": "ed3d6ff8b341e4f071442dc03e29c854dca639764b946fc90cd1f4d76b594c08"
+    },
+    "wrapperManifest": {
+      "path": "packages/doe-gpu/package.json",
+      "sha256": "4371987e5ba8b2dedcdb9b59296f4a441187209745d135f588c580d83951fe4e"
+    },
+    "platformManifest": {
+      "path": "packages/doe-gpu-linux-x64/package.json",
+      "sha256": "f53d6cb811fab98d7cab7e032e731ed9bb7690c370fc94cd79ed4f491c7387ba"
+    }
+  },
+  "trials": [
+    {
+      "id": "sequential-0",
+      "mode": "sequential",
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "outputLimitExceeded": false,
+      "durationMs": 156.651,
+      "stdoutSha256": "f6db6cb388b862cb875efeefa8b3fc7c2a16f776f2a6cae7b74d425dcd811f73",
+      "receipt": {
+        "runtimeHost": "node",
+        "providerModule": "doe-gpu",
+        "libraryFlavor": "doe-dropin",
+        "buildMetadataSource": "prebuild",
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf"
+      }
+    },
+    {
+      "id": "sequential-1",
+      "mode": "sequential",
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "outputLimitExceeded": false,
+      "durationMs": 168.006,
+      "stdoutSha256": "259d23d97f7dbc21f836c8ceed298a842280bf7081d45776bf950ecdab6a6650",
+      "receipt": {
+        "runtimeHost": "node",
+        "providerModule": "doe-gpu",
+        "libraryFlavor": "doe-dropin",
+        "buildMetadataSource": "prebuild",
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf"
+      }
+    },
+    {
+      "id": "sequential-2",
+      "mode": "sequential",
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "outputLimitExceeded": false,
+      "durationMs": 155.794,
+      "stdoutSha256": "db71531e8b59b107bf07350726c7c8358e1d3f86cabf2a8bb4694b6898c10281",
+      "receipt": {
+        "runtimeHost": "node",
+        "providerModule": "doe-gpu",
+        "libraryFlavor": "doe-dropin",
+        "buildMetadataSource": "prebuild",
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf"
+      }
+    },
+    {
+      "id": "concurrent-0",
+      "mode": "concurrent",
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "outputLimitExceeded": false,
+      "durationMs": 143.5,
+      "stdoutSha256": "62bb7d13bffb0f18eb7ccfb017e2c9714a0365be02a89536b19f6b49df53a768",
+      "receipt": {
+        "runtimeHost": "node",
+        "providerModule": "doe-gpu",
+        "libraryFlavor": "doe-dropin",
+        "buildMetadataSource": "prebuild",
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf"
+      }
+    },
+    {
+      "id": "concurrent-1",
+      "mode": "concurrent",
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "outputLimitExceeded": false,
+      "durationMs": 141.421,
+      "stdoutSha256": "6eb06bf5a53bddf084708fd283bf81b5ccabadeaa2d7d03304c782a66196e53c",
+      "receipt": {
+        "runtimeHost": "node",
+        "providerModule": "doe-gpu",
+        "libraryFlavor": "doe-dropin",
+        "buildMetadataSource": "prebuild",
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf"
+      }
+    }
+  ],
+  "sameProcessLifecycle": {
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "outputLimitExceeded": false,
+    "stdoutSha256": "1d20f1775224f66b551891a849e0f0e9417e6144e0403ee32fe28cfa7878fba7",
+    "cycleCount": 12,
+    "warmupCycles": 2,
+    "rssBeforeBytes": 71725056,
+    "minPostWarmupRssBytes": 131325952,
+    "maxPostWarmupRssBytes": 138039296,
+    "postWarmupRssSpanBytes": 6713344,
+    "maxPostWarmupRssSpanBytes": 268435456,
+    "samples": [
+      {
+        "index": 0,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 130134016
+      },
+      {
+        "index": 1,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 130588672
+      },
+      {
+        "index": 2,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 131325952
+      },
+      {
+        "index": 3,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 131997696
+      },
+      {
+        "index": 4,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 133132288
+      },
+      {
+        "index": 5,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 134004736
+      },
+      {
+        "index": 6,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 135180288
+      },
+      {
+        "index": 7,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 136146944
+      },
+      {
+        "index": 8,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 137162752
+      },
+      {
+        "index": 9,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 136916992
+      },
+      {
+        "index": 10,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 138039296
+      },
+      {
+        "index": 11,
+        "outputSha256": "9d42cad41af4aaf3ae973e5a48d96f61e4708edc57bf7dd29a497ebd96f506cf",
+        "deviceDestroyed": true,
+        "lostReason": "destroyed",
+        "lostMessage": "GPUDevice.destroy() was called",
+        "postDestroyRejected": true,
+        "postDestroyError": "GPUDevice.createCommandEncoder: GPUDevice was destroyed",
+        "collection": "host-gc",
+        "rssAfterDestroyBytes": 137666560
+      }
+    ]
+  },
+  "decision": {
+    "boundedCleanProcessReliability": "authorized-for-declared-runtime-tuple",
+    "boundedSameProcessLifecycle": "authorized-for-declared-runtime-tuple",
+    "boundedRssGrowthDiagnostic": "authorized-for-declared-runtime-tuple",
+    "deliberateDestroyLossSemantics": "authorized-for-declared-runtime-tuple",
+    "deviceLossCredit": false,
+    "memoryGrowthCredit": false,
+    "performanceCredit": false,
+    "applicationPromotionCredit": false
+  },
+  "limitations": [
+    "This bounded process gate is not the full promotion reliability floor.",
+    "Deliberate GPUDevice.destroy() loss notification and post-destroy rejection are exercised.",
+    "Unexpected hardware or driver loss and recovery are not exercised.",
+    "The same-process RSS span is a bounded diagnostic, not a long-soak leak or promotion certificate.",
+    "Trial durations are lifecycle diagnostics and receive no performance interpretation.",
+    "This artifact does not generalize beyond its declared runtime, platform, and architecture."
+  ]
+}

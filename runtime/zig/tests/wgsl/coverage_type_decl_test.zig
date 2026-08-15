@@ -265,6 +265,28 @@ test "declarations: array length const expression in workgroup array through MSL
     try std.testing.expect(!contains(out[0..len], "threadgroup array<"));
 }
 
+test "declarations: scalar-wrapped array length through backends" {
+    const source =
+        \\struct Wrapped {
+        \\    values: array<vec4<f32>, i32(4)>,
+        \\}
+        \\@group(0) @binding(0) var<storage, read_write> data: array<Wrapped>;
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    data[0].values[0] = vec4<f32>(1.0);
+        \\}
+    ;
+
+    var msl_out: [MAX_OUTPUT]u8 = undefined;
+    try std.testing.expect(try translateToMsl(std.testing.allocator, source, &msl_out) > 0);
+
+    var hlsl_out: [MAX_HLSL_OUTPUT]u8 = undefined;
+    try std.testing.expect(try translateToHlsl(std.testing.allocator, source, &hlsl_out) > 0);
+
+    var spirv_out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    try std.testing.expect(try translateToSpirv(std.testing.allocator, source, &spirv_out) > 0);
+}
+
 test "declarations: helper function call through MSL" {
     const source =
         \\fn square(x: f32) -> f32 {

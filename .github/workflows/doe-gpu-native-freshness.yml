@@ -19,6 +19,8 @@ on:
       - "packages/doe-gpu/examples/*-first-kernel.mjs"
       - "packages/doe-gpu/package.json"
       - "packages/doe-gpu/test/integration/test-integration-native-clean-install.js"
+      - "packages/doe-gpu/test/integration/test-integration-native-clean-install-reliability.js"
+      - "packages/doe-gpu/test/fixtures/native-clean-install-lifecycle.mjs"
       - "packages/doe-gpu/test/unit/stage-platform-freshness.test.js"
       - "packages/doe-gpu-linux-x64/package.json"
       - "packages/doe-gpu-darwin-arm64/package.json"
@@ -35,6 +37,8 @@ on:
       - "packages/doe-gpu/examples/*-first-kernel.mjs"
       - "packages/doe-gpu/package.json"
       - "packages/doe-gpu/test/integration/test-integration-native-clean-install.js"
+      - "packages/doe-gpu/test/integration/test-integration-native-clean-install-reliability.js"
+      - "packages/doe-gpu/test/fixtures/native-clean-install-lifecycle.mjs"
       - "packages/doe-gpu/test/unit/stage-platform-freshness.test.js"
       - "packages/doe-gpu-linux-x64/package.json"
       - "packages/doe-gpu-darwin-arm64/package.json"
@@ -78,6 +82,24 @@ jobs:
         with:
           bun-version: "1.3.10"
 
+      - name: Install pinned Electron main-process runtime
+        env:
+          ELECTRON_VERSION: "43.4.0"
+        run: |
+          electron_root="$RUNNER_TEMP/doe-electron-main-process"
+          npm install \
+            --prefix "$electron_root" \
+            --ignore-scripts \
+            --no-audit \
+            --no-fund \
+            --save-exact \
+            "electron@$ELECTRON_VERSION"
+          node "$electron_root/node_modules/electron/install.js"
+          electron_executable="$electron_root/node_modules/electron/dist/electron"
+          test "$("$electron_executable" --headless --no-sandbox --disable-gpu --version)" = \
+            "v$ELECTRON_VERSION"
+          echo "DOE_ELECTRON_EXECUTABLE=$electron_executable" >> "$GITHUB_ENV"
+
       - name: zig build dropin
         working-directory: runtime/zig
         run: zig build dropin -Doptimize=ReleaseFast
@@ -94,6 +116,10 @@ jobs:
         working-directory: packages/doe-gpu
         run: npm run test:integration:native-clean-install:bun
 
+      - name: Verify Electron main-process clean install from staged packages
+        working-directory: packages/doe-gpu
+        run: npm run test:integration:native-clean-install:electron
+
       - name: Verify Node installed-package reliability
         working-directory: packages/doe-gpu
         run: npm run test:integration:native-reliability
@@ -101,6 +127,10 @@ jobs:
       - name: Verify Bun installed-package reliability
         working-directory: packages/doe-gpu
         run: npm run test:integration:native-reliability:bun
+
+      - name: Verify Electron main-process installed-package reliability
+        working-directory: packages/doe-gpu
+        run: npm run test:integration:native-reliability:electron
 
       - name: Inject stale hash and confirm stage refuses
         run: |

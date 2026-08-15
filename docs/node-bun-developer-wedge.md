@@ -1,4 +1,4 @@
-# Node/Bun developer wedge
+# Controlled JavaScript runtime developer wedge
 
 This page is the implementation and promotion contract for the initial wedge.
 The objective, priority order, downstream flywheel, commercial journey, and
@@ -27,11 +27,15 @@ and `reports/claim-index.json`; Electron requires its own promoted evidence.
 npm install doe-gpu
 node node_modules/doe-gpu/examples/node-first-kernel.mjs
 bun node_modules/doe-gpu/examples/bun-first-kernel.mjs
+DOE_ELECTRON_EXECUTABLE=/absolute/path/to/electron \
+  npm run test:integration:native-clean-install:electron
 ```
 
-On a supported tuple, each example must load the packaged native runtime, run a
+On a supported tuple, each lane must load the packaged native runtime, run a
 real WGSL kernel, validate the output, print runtime identity, and emit a
-receipt. On an unsupported tuple, it must fail with an actionable typed cause.
+receipt. Electron is intentionally a main-process, Node-side lane: the gate
+creates no renderer and gives no browser or Chromium credit. On an unsupported
+tuple, each lane must fail with an actionable typed cause.
 
 ## Downstream compatibility suite
 
@@ -104,6 +108,39 @@ omits the harness's auxiliary renderer subprocess and therefore proves the
 Node API allowlist and exact workload result, not hardware eligibility or
 operating-system dependency sealing.
 
+The Linux-only successor at
+`reports/benchmarks/amd-vulkan/20260815T212816Z/holoscript-doeproof-cli-linux-bwrap-diagnostic.json`
+adds an outer Bubblewrap boundary. It exposes only the hash-bound workspace
+files, gives W0, D0, and D0 replay separate writable directories, uses private
+temporary and network namespaces, and binds the GPU device path. A negative
+probe confirms that a declared CLI file is visible while undeclared `GOALS.md`
+is not, and the isolated namespace exposes only loopback. The sandbox selects
+the Radeon Vulkan ICD explicitly and disables ambient layer activation. A
+diagnostic system-access trace still observes installed layer-manifest
+enumeration and hardware-dependent sysfs paths. The base-system `/usr`, `/etc`,
+`/sys`, and optional `/run/udev` mounts therefore remain broad and read-only:
+this is workspace sealing, not complete operating-system dependency closure.
+
+The reviewed HoloScript Electron main-process diagnostic at
+[`../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json)
+is a separate runtime-host result. The unchanged tropical-SpMV workload passes
+all three clean Doe processes and exact replay on the physical Radeon, while
+the ambient, pinned, and governed incumbent lanes fail at Electron's external-
+ArrayBuffer boundary. A bounded application upload workaround still aborts in
+the incumbent native addon, but the source-built incumbent `P0` with a two-file
+mapped-buffer ownership patch passes three clean processes and exact replay.
+The bounded incumbent patch therefore closes the same application gap as Doe
+and rejects runtime ownership for this tuple. The result remains a diagnostic
+regression and does not reopen the terminal Node decision or grant ownership,
+promotion, performance, renderer, browser, or release credit.
+
+The reviewed HoloScript LIF determinism result at
+[`../reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json)
+also passes under both the governed incumbent and Doe. Their final GPU
+membrane and spike bytes are identical for every frozen case, and both replay
+exactly. This strengthens the package's regression portfolio but does not
+create a unique DoeRuntime outcome or change the Node/Bun/Electron wedge.
+
 The packaged `doe-proof-node` command exposes this same contract to CI through
 hash-bound `run`, `verify`, `inspect`, `replay`, and exact-output `compare`
 operations. It does not expose the repository benchmark or release operators.
@@ -156,17 +193,19 @@ microbenchmarks may explain a result but cannot replace it.
 ## Installation gate
 
 The package release must test clean installation and first-kernel execution for
-every promoted Node/Bun, operating-system, architecture, and backend tuple. No
-local Zig build or undocumented environment configuration belongs in the
-supported path.
+every promoted JavaScript runtime, operating-system, architecture, and backend
+tuple. No local Zig build or undocumented environment configuration belongs in
+the supported path.
 
 For a staged host platform, `npm run test:integration:native-clean-install`
-and `npm run test:integration:native-clean-install:bun` each pack the wrapper
-and platform payload, install them into a fresh project with scripts disabled,
-execute the runtime-specific shipped first kernel, and verify that the loaded
-library path remains inside that installation. Missing staged artifacts are a
-failure in either explicit release gate, while the ordinary source-tree suite
-may report the Node physical package check as skipped.
+and its Bun and Electron variants each pack the wrapper and platform payload,
+install them into a fresh project with scripts disabled, execute the
+runtime-specific shipped first kernel, and verify that the loaded library path
+remains inside that installation. Electron additionally requires an explicit
+executable, records its hash and version, and runs only the main-process
+Node-side surface. Missing staged artifacts are a failure in every explicit
+release gate, while the ordinary source-tree suite may report physical package
+checks as skipped.
 
 The `native-reliability` variants reuse one clean installation across repeated
 fresh processes and overlapping runtime instances, then execute 12 exact
@@ -189,7 +228,7 @@ Disallowed:
 
 - universal “fastest WebGPU runtime” language;
 - “faster everywhere”;
-- arbitrary Node/Bun GPU compatibility;
+- arbitrary Node/Bun/Electron GPU compatibility;
 - browser replacement inferred from package evidence.
 
 Current evidence lives in `reports/claim-index.json` and

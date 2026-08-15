@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "holoscript-doeproof-cli-linux-bwrap-diagnostic",
+  "status": "passed",
+  "scope": {
+    "platform": "linux",
+    "arch": "x64",
+    "profile": "linux-bwrap-workspace-sealed",
+    "workload": "unchanged HoloScript tropical SpMV",
+    "credit": "diagnostic"
+  },
+  "evidence": {
+    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-linux-bwrap-qm0-v1-retry7/result.json",
+    "sha256": "a1a47dcdd4e7784b6fc4188df2358aad7f502cfe87b7aecd0b7649bbf5eff069"
+  },
+  "plan": {
+    "path": "bench/external-projects/holoscript-snn-webgpu/doeproof-cli-linux-bwrap-integration.plan.json",
+    "sha256": "a06a2a6f9e1512619eff78d39eea8597cfb4805f673f7c6999a3b11fd5c32e26"
+  },
+  "sandbox": {
+    "binary": {
+      "path": "/usr/bin/bwrap",
+      "sha256": "0abea81db798ebf6b4742ac0664802d97521547a353c2a0dbdc21d76cbbfd2c0"
+    },
+    "systemReadRoots": ["/usr", "/etc", "/sys"],
+    "optionalSystemReadRoots": ["/run/udev"],
+    "privateTmp": true,
+    "privateNetwork": true,
+    "gpuDevicePath": "/dev/dri",
+    "environment": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/radeon_icd.json",
+      "VK_LOADER_LAYERS_DISABLE": "~all~"
+    },
+    "visibilityProbe": {
+      "declarationSha256": "33eb26be31beede87b6ac6eefecdfc461029872faa85a023f7df02b2ad679d4d",
+      "declaredFileVisible": true,
+      "undeclaredCanary": "GOALS.md",
+      "undeclaredCanaryVisible": false,
+      "networkInterfaces": ["lo"]
+    }
+  },
+  "lanes": {
+    "W0": {
+      "providerId": "dawn-node-webgpu",
+      "runtimeFileCount": 11,
+      "artifactSha256": "9895bf1721d8c54305c627a3374ee66196b7c45c020c4706e8e760090b6a0702",
+      "sandboxDeclarationSha256": "ad43fb5c83c2d69dedd3c705a4e76890b9eef30a85dbdf6a4d4e25695607a279",
+      "writablePath": "W0-run",
+      "oracle": "pass",
+      "workloadReplaySha256": "sha256:b5125e1d697d96973d7022f93a71728f7e493e43cd241f8948163fab69b5dc2c"
+    },
+    "D0": {
+      "providerId": "doe-gpu",
+      "runtimeFileCount": 36,
+      "artifactSha256": "1e81d2bc6c369d8cedc0520055179185d4efa2197e1cf2fb130905a24bfcd08f",
+      "sandboxDeclarationSha256": "d3b50fbf95eac9e149dd54bc228ae7f24c48afb3470f90bcfad71d0b1778b3fe",
+      "writablePath": "D0-run",
+      "oracle": "pass",
+      "workloadReplaySha256": "sha256:b5125e1d697d96973d7022f93a71728f7e493e43cd241f8948163fab69b5dc2c"
+    }
+  },
+  "replay": {
+    "artifactSha256": "077381dca297b5c6b3067125cb42cd40acdb9b804512582a7780b10dbf311a83",
+    "sandboxDeclarationSha256": "d5fe391b220287dacd60e086af3baaadb196dcaeedc5487b96d6b4c544bd117e",
+    "writablePath": "D0-replay",
+    "comparable": true
+  },
+  "implementation": {
+    "runner": {
+      "path": "bench/external-projects/holoscript-snn-webgpu/run-doeproof-cli-integration.mjs",
+      "sha256": "2ac97aeece0c6560835d25a91e7490de4b0dbe9a8fee302093b968e6e2ac9205"
+    },
+    "cli": {
+      "path": "packages/doe-gpu/bin/doe-proof-node.js",
+      "sha256": "6881fbef17168a5893c1f78e39537d0b708518001282c0b5fa2e60ec24fd2b95"
+    },
+    "processRunner": {
+      "path": "packages/doe-gpu/src/node-webgpu-process.js",
+      "sha256": "eb79366cb93caa6d564f2d64c0f6a4cffa527222fc6bb61763b8bd8097f688cd"
+    },
+    "workload": {
+      "path": "bench/external-projects/holoscript-snn-webgpu/run-workload.mjs",
+      "sha256": "ff435a50712f1dc786c26f1abbb63d1e8b03c881d62c7876c988eeee33447d37"
+    }
+  },
+  "systemAccessObservation": {
+    "credit": "diagnostic-only",
+    "method": "strace -ff -e trace=file over the outer harness and all descendants",
+    "tracedEvidence": {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-linux-bwrap-qm0-v1-retry8/result.json",
+      "sha256": "90506d51b1ce90f3cfb27cc390d7773555b3e97ee15779822236e416f4452b1e"
+    },
+    "rawTraceFileCount": 180,
+    "rawTraceManifestSha256": "7a2a79f33dfbe4c7d52e6830bfbef57437ece68e46513d45fe9f80965fde6bf5",
+    "successfulSystemPathSet": {
+      "sha256": "295482c10e29980e3cbd58711ed2e4a4e82aba6fa7e22e2e4c2b34674c9b80f7",
+      "uniquePathArguments": 140,
+      "byRoot": {
+        "/usr": 84,
+        "/etc": 7,
+        "/sys": 49,
+        "/run/udev": 0
+      }
+    },
+    "vulkan": {
+      "openedIcdManifests": [
+        "/usr/share/vulkan/icd.d/radeon_icd.json"
+      ],
+      "openedDriverLibraries": [
+        "/usr/lib/x86_64-linux-gnu/libvulkan_radeon.so"
+      ],
+      "openedLayerManifestCount": 5,
+      "openedLayerLibraries": [],
+      "interpretation": "The Radeon ICD is selected and ambient layer activation is disabled, but the loader still reads installed layer manifests."
+    },
+    "completeOsDependencyClosure": false
+  },
+  "decision": {
+    "workspaceSealingCredit": true,
+    "completeOsDependencyClosureCredit": false,
+    "hardwareCredit": false,
+    "performanceCredit": false,
+    "runtimeOwnershipCredit": false,
+    "applicationPromotionCredit": false,
+    "releaseCredit": false,
+    "terminalOwnershipDecisionChanged": false
+  },
+  "limitations": [
+    "The exact workspace file set is sealed, but the declared base-system roots remain broad read-only mounts.",
+    "The trace shows loader enumeration of installed Vulkan layer manifests and hardware-dependent sysfs paths; no layer shared library was opened.",
+    "The raw strace files remain local diagnostic material and are not claim-bearing repository evidence.",
+    "The private network namespace and visibility probe are Linux-specific.",
+    "The auxiliary renderer subprocess is omitted, so this report grants no hardware eligibility.",
+    "Exact output and replay do not grant performance, ownership, promotion, or release credit."
+  ]
+}

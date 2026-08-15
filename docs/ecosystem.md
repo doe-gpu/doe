@@ -88,6 +88,27 @@ Because W0 exposes no defect, conditional `P0` is unnecessary; because D0 does
 not exceed W0, the reviewed decision assigns no runtime-ownership credit and
 keeps HoloScript diagnostic.
 
+The separately reviewed
+[HoloScript LIF determinism result](../reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json)
+extends that conclusion to the upstream neuron simulation. Across three frozen
+input cases, all `I0`, `I1`, `W0`, and `D0` processes pass the CPU membrane
+tolerances and exact spike oracle. `W0` and `D0` replay exactly, and both
+providers produce identical GPU membrane and spike bytes on the declared AMD
+Vulkan adapter. The governed incumbent therefore closes the outcome without a
+patch; the workload is retained as a diagnostic regression with no ownership
+or promotion credit.
+
+The separate
+[HoloScript Electron main-process successor](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json)
+exercises a distinct runtime-host boundary without reopening that Node decision.
+The packaged
+incumbent fails at Electron's external-`ArrayBuffer` restriction while Doe
+passes the unchanged four-topology oracle. A source-built, two-file
+node-webgpu/Dawn mapped-buffer ownership patch also passes exactly and replays
+deterministically. Because that bounded incumbent correction closes the gap,
+the Electron tuple likewise receives no DoeRuntime ownership or promotion
+credit and remains a retained regression plus an upstreamable patch.
+
 The wgsl-fns independent-correction diagnostic executes all five required
 lanes. The pinned incumbent crashes, but DoeRuntime and the independently
 prepared `webgpu@0.3.10` plus no-isolation control both complete the frozen

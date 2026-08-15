@@ -4,8 +4,8 @@ import { gpu, providerInfo } from 'doe-gpu';
 
 const runtimeHost = process.env.DOE_NATIVE_LIFECYCLE_RUNTIME;
 const cycleCount = Number.parseInt(process.env.DOE_NATIVE_LIFECYCLE_CYCLES ?? '', 10);
-if (!['node', 'bun'].includes(runtimeHost)) {
-  throw new Error('DOE_NATIVE_LIFECYCLE_RUNTIME must be node or bun');
+if (!['node', 'bun', 'electron'].includes(runtimeHost)) {
+  throw new Error('DOE_NATIVE_LIFECYCLE_RUNTIME must be node, bun, or electron');
 }
 if (!Number.isSafeInteger(cycleCount) || cycleCount < 3) {
   throw new Error('DOE_NATIVE_LIFECYCLE_CYCLES must be an integer of at least 3');
@@ -104,7 +104,7 @@ for (let index = 0; index < cycleCount; index += 1) {
   });
 }
 
-console.log(JSON.stringify({
+process.stdout.write(`${JSON.stringify({
   artifactKind: 'doe-gpu-native-same-process-lifecycle-sample',
   schemaVersion: 1,
   status: 'passed',
@@ -116,4 +116,8 @@ console.log(JSON.stringify({
   },
   rssBeforeBytes,
   samples,
-}));
+})}\n`);
+if (runtimeHost === 'electron') {
+  const { app } = await import('electron');
+  app.exit(0);
+}

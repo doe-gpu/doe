@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "registryRevision": "13",
+  "registryRevision": "15",
   "scoringPolicyVersion": "1.0.0",
   "promotionPolicyVersion": "1.1.0",
   "evaluationQueue": [
@@ -208,14 +208,15 @@
         },
         {
           "id": "lif-determinism",
-          "status": "proposed",
+          "status": "measured",
+          "manifestPath": "bench/external-projects/holoscript-snn-webgpu/lif-determinism.harness.json",
           "proofTargets": [
             "correctness",
             "determinism",
             "diagnosis"
           ],
           "oracle": {
-            "status": "upstream-existing",
+            "status": "reviewed",
             "observationRefs": [
               "determinism-probe"
             ]
@@ -243,6 +244,20 @@
           "sha256": "b10397182bdce4931b0119f7e9d44c206fc5df9f3a538d7d05fe2314465b39ff",
           "reviewedAt": "2026-08-15T17:06:09Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "holoscript-electron-main-process-p0-2026-08-15-diagnostic",
+          "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json",
+          "sha256": "8123e69653f52fa8b021f3c7fae00194e6e470bed4036f1f196cca7aea8279ec",
+          "reviewedAt": "2026-08-15T22:58:31Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "holoscript-lif-determinism-2026-08-15-diagnostic",
+          "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json",
+          "sha256": "92b4e5971e2089c7c3a7bdf6a2c3d3b93840fc9cc875d66714b4a83cc1080bae",
+          "reviewedAt": "2026-08-15T23:07:49Z",
+          "reviewer": "codex"
         }
       ],
       "failureRecords": [
@@ -250,7 +265,7 @@
         "bench/external-projects/holoscript-snn-webgpu/failures/labeled-compute-pass-semantics.failure.json"
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-15T17:06:09Z"
+      "lastReviewedAt": "2026-08-15T23:07:49Z"
     },
     {
       "id": "electronicarts-gigi",

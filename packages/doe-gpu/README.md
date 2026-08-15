@@ -245,8 +245,12 @@ payload is staged:
 ```bash
 npm run test:integration:native-clean-install
 npm run test:integration:native-clean-install:bun
+DOE_ELECTRON_EXECUTABLE=/absolute/path/to/electron \
+  npm run test:integration:native-clean-install:electron
 npm run test:integration:native-reliability
 npm run test:integration:native-reliability:bun
+DOE_ELECTRON_EXECUTABLE=/absolute/path/to/electron \
+  npm run test:integration:native-reliability:electron
 ```
 
 The gate packs the wrapper and matching platform package, installs both into a
@@ -255,6 +259,11 @@ shipped first kernel, and rejects workspace-library resolution. Each receipt
 binds the selected runtime executable and version. The ordinary integration
 suite skips the Node physical package check when no staged platform payload
 exists; either explicit release command fails instead.
+
+Electron is an explicit main-process, Node-side tuple. Its gate requires an
+absolute `DOE_ELECTRON_EXECUTABLE`, creates no renderer, and launches with the
+frozen headless arguments recorded in the receipt. It grants no Chromium,
+renderer-WebGPU, or browser lifecycle credit.
 
 The separate reliability commands reuse one clean installation across repeated
 fresh processes and overlapping runtime instances, then execute 12 exact
@@ -268,7 +277,8 @@ an unexpected hardware-loss recovery test. The commands do not establish
 performance, application promotion, or release readiness.
 
 Node 18 or newer is required for the default entrypoint. Bun and Deno use their
-declared package export conditions. Actual platform support remains limited to
+declared package export conditions. Electron uses the default Node-compatible
+entrypoint in its main process. Actual platform support remains limited to
 the tuples in [`docs/doe-support-matrix.md`](../../docs/doe-support-matrix.md).
 
 ## Evidence

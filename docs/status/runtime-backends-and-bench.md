@@ -120,6 +120,18 @@ file only names the promoted boundary and open admission gates.
   the artifact deliberately receives no hardware, performance, ownership,
   promotion, or release credit. Native-addon syscalls and network access remain
   outside the Node permission contract.
+- A Linux Bubblewrap successor at
+  `reports/benchmarks/amd-vulkan/20260815T212816Z/holoscript-doeproof-cli-linux-bwrap-diagnostic.json`
+  runs W0, D0, and D0 replay with only their hash-bound workspace files, a
+  private temporary directory and network namespace, read-only declared base
+  system roots, GPU device access, an explicitly selected Radeon Vulkan ICD,
+  disabled ambient layer activation, and separate writable output directories.
+  Its negative visibility probe sees the declared CLI, cannot see undeclared
+  `GOALS.md`, and observes only loopback. A diagnostic trace still observes
+  installed layer-manifest enumeration and hardware-dependent sysfs paths.
+  This grants Linux workspace-sealing evidence, not complete OS dependency
+  closure, hardware eligibility, performance, ownership, application
+  promotion, release, or cross-platform sandbox support.
 - The package integration suite now packs `doe-gpu`, installs the tarball into
   a fresh project with optional native packages and install scripts disabled,
   invokes the installed `.bin/doe-proof-node`, executes a sealed custom
@@ -131,30 +143,53 @@ file only names the promoted boundary and open admission gates.
   executes the shipped first kernel. It exposed a stale Linux x64 platform
   payload whose shader-binding metadata no longer matched the JavaScript
   surface; restaging from the current native build restored exact output. The
-  gate also rejects workspace-library resolution. Node and Bun each execute
-  their shipped first-kernel entrypoint and bind the selected host executable.
+  gate also rejects workspace-library resolution. Node, Bun, and Electron each
+  execute their shipped first-kernel entrypoint and bind the selected host
+  executable. Electron is restricted to main-process Node-side compute, uses
+  the frozen headless launch arguments, and creates no renderer.
   Source-tree integration may skip when platform payloads are absent, but the
   explicit release commands may not. The bounded physical receipts are
-  `reports/benchmarks/amd-vulkan/20260815T212055Z/doe-gpu-node-native-clean-install-diagnostic.json`
+  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-node-native-clean-install-diagnostic.json`,
+  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-bun-native-clean-install-diagnostic.json`,
   and
-  `reports/benchmarks/amd-vulkan/20260815T212055Z/doe-gpu-bun-native-clean-install-diagnostic.json`;
+  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-electron-native-clean-install-diagnostic.json`;
   they grant runtime-specific installation evidence for Linux x64 only and no
   performance, ownership, application-promotion, or release credit.
 - Bounded clean-install reliability diagnostics now reuse one installed package
-  across repeated fresh processes and overlapping runtime instances. The Node
-  and Bun receipts are
-  `reports/benchmarks/amd-vulkan/20260815T212055Z/doe-gpu-node-native-clean-install-reliability-diagnostic.json`
+  across repeated fresh processes and overlapping runtime instances. The Node,
+  Bun, and Electron receipts are
+  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-node-native-clean-install-reliability-diagnostic.json`,
+  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-bun-native-clean-install-reliability-diagnostic.json`,
   and
-  `reports/benchmarks/amd-vulkan/20260815T212055Z/doe-gpu-bun-native-clean-install-reliability-diagnostic.json`.
+  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-electron-native-clean-install-reliability-diagnostic.json`.
   They prove exact output, bounded child execution, clean process exit, and 12
   exact create/compute/destroy cycles in one process for the declared Linux x64
-  runtime tuples. After two warm-up cycles, the observed RSS spans are 5,390,336
-  bytes for Node and 12,361,728 bytes for Bun, below the frozen 256 MiB
-  diagnostic ceiling. Each cycle also resolves a pre-registered
-  `GPUDevice.lost` promise with reason `destroyed` and rejects subsequent use of
-  that device. This is not a long-soak leak certificate or unexpected
-  hardware-loss recovery test. Full memory-growth promotion, performance,
-  application promotion, and release remain unproved.
+  runtime tuples. After two warm-up cycles, the observed RSS spans are 6,713,344
+  bytes for Node, 14,721,024 bytes for Bun, and 6,430,720 bytes for Electron,
+  below the frozen 256 MiB diagnostic ceiling. Each cycle also resolves a
+  pre-registered `GPUDevice.lost` promise with reason `destroyed` and rejects
+  subsequent use of that device. This is not a long-soak leak certificate or
+  unexpected hardware-loss recovery test. Full memory-growth promotion,
+  performance, application promotion, and release remain unproved. Electron's
+  result does not establish renderer, Chromium, or browser lifecycle support.
+  The Electron first-kernel gate additionally executes a native compute
+  readback through `GPUBuffer.getMappedRange()` and requires a sliceable
+  `ArrayBuffer`. This permanently covers the Node-API external-buffer fallback
+  exercised by the Electron main-process runtime.
+- The named HoloScript Electron main-process diagnostic at
+  `reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json`
+  now exercises that correction through the unchanged tropical-SpMV
+  application. `D0` passes three clean processes plus exact replay across all
+  four topology hashes; `I0`, `I1`, and `W0` each fail three times at the
+  external-ArrayBuffer boundary. The bounded application upload workaround
+  reaches a native `SIGABRT`. The exact `webgpu@0.3.10` source and Dawn
+  submodule were then rebuilt with a frozen two-file mapped-buffer ownership
+  patch; `P0` passes three clean processes and exact replay across the same
+  oracle. The bounded incumbent patch closes the application gap, so
+  DoeRuntime ownership is rejected for this tuple. The artifact remains a
+  diagnostic regression with no application-promotion, performance, release,
+  renderer, Chromium, or browser credit and does not reinterpret the terminal
+  Node HoloScript gate.
 - `.github/workflows/webgpu-package-surface.yml` now runs the complete package
   contract, smoke, integration, and clean-install suite and the public
   tool-surface gate. Package-bin or manifest drift is therefore blocking CI,
@@ -175,6 +210,14 @@ file only names the promoted boundary and open admission gates.
   Because the unchanged incumbent needs no bounded correction and D0 supplies
   no distinct application outcome, the report rejects runtime ownership and
   retains HoloScript as a diagnostic workload.
+- The reviewed HoloScript LIF determinism diagnostic at
+  `reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json`
+  passes the upstream CPU membrane tolerances and exact final spike oracle in
+  all `I0`, `I1`, `W0`, and `D0` processes. Governed Dawn and Doe replay
+  exactly and produce identical GPU membrane and spike bytes across all three
+  frozen cases on the physical Radeon Vulkan adapter. The result is retained
+  as a correctness regression and supplies no runtime-ownership, promotion,
+  performance, or release credit.
 - The Gemma package-surface attribution receipt at
   `reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json`
   remains a synthetic mechanism antecedent. The governed Doppler application
@@ -369,14 +412,14 @@ file only names the promoted boundary and open admission gates.
 
 ## Admission blockers
 
-- No external application currently has a passing, evidence-linked
-  `I0`/`I1`/`W0`/`D0` ownership assessment and accepted ownership-cost ledger;
-  therefore no application can yet become a DoeRuntime or DoeProof release
-  blocker.
-- Node and Bun need downstream-project compatibility evidence, not only package
-  harness coverage. The vGPU Node/ORT and wgsl-fns lanes now supply diagnostic
-  application results; neither is yet a promoted release dependency, and the
-  wgsl-fns incumbent comparator currently crashes before a fair paired verdict.
+- No external application has cleared the material-outcome and accepted
+  runtime-ownership-cost gates. Completed HoloScript, vGPU, and wgsl-fns
+  matrices reject DoeRuntime ownership for their declared tuples, so no
+  application is currently a release blocker.
+- Node, Bun, and Electron now have bounded package and application diagnostics,
+  but none has cleared ownership, performance, reliability, adoption, and
+  release promotion together. The wgsl-fns bounded incumbent correction closes
+  its exercised outcome and therefore supplies no DoeRuntime ownership credit.
 - Deno wgpu must expose driver-version telemetry before its AMD Vulkan package
   row can satisfy strict physical identity and become claimable.
 - The CTS lane needs completion of its policy-defined required query scope

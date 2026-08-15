@@ -364,7 +364,14 @@
       "properties": {
         "path": {
           "type": "string",
-          "pattern": "^bench/out/external-projects/[a-z0-9][a-z0-9-]*/[^/]+/[^/].*$"
+          "oneOf": [
+            {
+              "pattern": "^bench/out/external-projects/[a-z0-9][a-z0-9-]*/[^/]+/[^/].*$"
+            },
+            {
+              "pattern": "^reports/benchmarks/[a-z0-9][a-z0-9-]*/[^/]+/[^/].*$"
+            }
+          ]
         },
         "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
       }

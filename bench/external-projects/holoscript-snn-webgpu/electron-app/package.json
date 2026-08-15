@@ -1,0 +1,6 @@
+{
+  "name": "doe-holoscript-electron-main-process",
+  "private": true,
+  "type": "module",
+  "main": "main.mjs"
+}

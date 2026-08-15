@@ -65,6 +65,38 @@ fn count_member_decoration(binary: []const u8, decoration: u32) u32 {
     return count;
 }
 
+fn has_valid_matrix_construct(binary: []const u8, columns: u32) bool {
+    var matrix_type: ?u32 = null;
+    const word_count = binary.len / 4;
+    var i: usize = 5;
+    while (i < word_count) {
+        const word = read_u32_le(binary, i * 4);
+        const opcode = @as(u16, @truncate(word));
+        const instruction_words = word >> 16;
+        if (opcode == spirv.Opcode.TypeMatrix and instruction_words == 4 and
+            read_u32_le(binary, (i + 3) * 4) == columns)
+        {
+            matrix_type = read_u32_le(binary, (i + 1) * 4);
+            break;
+        }
+        i += instruction_words;
+    }
+    const target_type = matrix_type orelse return false;
+    i = 5;
+    while (i < word_count) {
+        const word = read_u32_le(binary, i * 4);
+        const opcode = @as(u16, @truncate(word));
+        const instruction_words = word >> 16;
+        if (opcode == spirv.Opcode.CompositeConstruct and
+            read_u32_le(binary, (i + 1) * 4) == target_type)
+        {
+            return instruction_words == columns + 3;
+        }
+        i += instruction_words;
+    }
+    return false;
+}
+
 test "scalar * vector lowers via broadcast operand coercion" {
     // Minimum repro extracted from attention_head256_f16kv.wgsl's
     // inner accumulation. Pre-fix this failed
@@ -107,6 +139,26 @@ test "matrix * vector lowers with OpMatrixTimesVector" {
     const len = try translateToSpirv(allocator, source, &out);
     try expect_spirv_magic(out[0..len]);
     try testing.expectEqual(@as(u32, 1), count_spirv_opcode(out[0..len], spirv.Opcode.MatrixTimesVector));
+}
+
+test "matrix scalar components lower into SPIR-V column vectors" {
+    const source =
+        \\@group(0) @binding(0) var<storage, read_write> output: array<f32>;
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    let m = mat4x4<f32>(
+        \\        1.0, 0.0, 0.0, 0.0,
+        \\        0.0, 1.0, 0.0, 0.0,
+        \\        0.0, 0.0, 1.0, 0.0,
+        \\        0.0, 0.0, 0.0, 1.0,
+        \\    );
+        \\    output[0] = m[0].x;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    try expect_spirv_magic(out[0..len]);
+    try testing.expect(has_valid_matrix_construct(out[0..len], 4));
 }
 
 test "vector * matrix lowers with OpVectorTimesMatrix" {

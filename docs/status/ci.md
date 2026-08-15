@@ -11,15 +11,20 @@ The machine-owned workflow inventory and trigger policy are checked by
 
 The manual self-hosted Linux native-freshness job rebuilds and stages the
 platform package, then clean-installs the wrapper and staged platform tarballs
-under both Node and a pinned Bun runtime. Each lane must execute its shipped
-first-kernel oracle without resolving a workspace library before the workflow
-performs the stale-artifact rejection check. The same job also requires the
-bounded repeated-process and concurrent-process reliability diagnostics for
-both runtimes.
+under Node, a pinned Bun runtime, and a pinned Electron main-process runtime.
+Each lane must execute its shipped first-kernel oracle without resolving a
+workspace library before the workflow performs the stale-artifact rejection
+check. The same job also requires the bounded repeated-process,
+concurrent-process, and same-process lifecycle diagnostics for all three
+runtimes. Electron uses an explicitly installed executable, creates no
+renderer, and earns no browser evidence.
 
 The normal package pull-request workflow runs the complete package contract,
 smoke, and integration suite, checks the public tool surface, and inspects the
-packed contents. Hosted execution may skip native checks when staged platform
-artifacts or physical GPUs are absent; the manual self-hosted workflow owns
-those runtime-specific gates. Repository-wide performance remains advisory
-rather than a promoted Node/Bun release requirement.
+packed contents. It also verifies that the reviewed HoloScript Electron
+diagnostic remains hash-bound to its current plan, runner, application seam,
+native library, incumbent, and zero-credit decision. This hosted check replays
+no GPU work and grants no new evidence; the manual self-hosted workflow owns
+runtime-specific execution. Hosted execution may skip native checks when staged
+platform artifacts or physical GPUs are absent. Repository-wide performance
+remains advisory rather than a promoted JavaScript-runtime release requirement.

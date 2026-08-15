@@ -822,6 +822,24 @@ fn parseArrayLengthPrimary(self: anytype) @TypeOf(self.*).Error!u32 {
                 .data = .{},
             });
         },
+        .kw_i32, .kw_u32 => {
+            const type_token = self.token_idx;
+            self.advance();
+            const type_node = try self.tree.addNode(.{
+                .tag = .type_name,
+                .main_token = type_token,
+                .data = .{},
+            });
+            _ = try self.expect(.@"(");
+            const argument = try parseArrayLengthExpr(self);
+            _ = try self.expect(.@")");
+            const args_start = try self.tree.addExtraSlice(&.{argument});
+            return self.tree.addNode(.{
+                .tag = .construct_expr,
+                .main_token = type_token,
+                .data = .{ .lhs = type_node, .rhs = args_start | (@as(u32, 1) << 16) },
+            });
+        },
         .@"(" => {
             self.advance();
             const expr = try parseArrayLengthExpr(self);

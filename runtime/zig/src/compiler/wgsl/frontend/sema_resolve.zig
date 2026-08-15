@@ -104,8 +104,24 @@ fn resolve_array_length_expr(self: anytype, node_idx: u32, depth: u8) AnalyzeErr
         .int_literal => parse_wgsl_int_literal(u32, tree.tokenSlice(node.main_token)) catch error.InvalidType,
         .ident_expr, .type_name => resolve_named_array_length_const(self, tree.tokenSlice(node.main_token), depth + 1),
         .binary_expr => resolve_array_length_binary(self, node, depth + 1),
+        .construct_expr => resolve_array_length_constructor(self, node, depth + 1),
         else => error.InvalidType,
     };
+}
+
+fn resolve_array_length_constructor(self: anytype, node: Node, depth: u8) AnalyzeError!u32 {
+    const tree = self.module.tree;
+    const type_node = tree.nodes.items[node.data.lhs];
+    if (type_node.tag != .type_name) return error.InvalidType;
+    const type_tag = tree.tokens.items[type_node.main_token].tag;
+    if (type_tag != .kw_i32 and type_tag != .kw_u32) return error.InvalidType;
+
+    const args_start = node.data.rhs & 0xFFFF;
+    const args_len = node.data.rhs >> 16;
+    if (args_len != 1) return error.InvalidType;
+    const value = try resolve_array_length_expr(self, tree.extra_data.items[args_start], depth);
+    if (type_tag == .kw_i32 and value > std.math.maxInt(i32)) return error.InvalidType;
+    return value;
 }
 
 fn resolve_named_array_length_const(self: anytype, name: []const u8, depth: u8) AnalyzeError!u32 {

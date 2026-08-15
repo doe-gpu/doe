@@ -10,18 +10,18 @@ ROOT = Path(__file__).resolve().parents[2]
 REPORTS = {
     runtime: (
         ROOT
-        / "reports/benchmarks/amd-vulkan/20260815T212055Z"
+        / "reports/benchmarks/amd-vulkan/20260815T220824Z"
         / f"doe-gpu-{runtime}-native-clean-install-diagnostic.json"
     )
-    for runtime in ("node", "bun")
+    for runtime in ("node", "bun", "electron")
 }
 RELIABILITY_REPORTS = {
     runtime: (
         ROOT
-        / "reports/benchmarks/amd-vulkan/20260815T212055Z"
+        / "reports/benchmarks/amd-vulkan/20260815T220824Z"
         / f"doe-gpu-{runtime}-native-clean-install-reliability-diagnostic.json"
     )
-    for runtime in ("node", "bun")
+    for runtime in ("node", "bun", "electron")
 }
 
 
@@ -51,6 +51,13 @@ class DoeGpuNativeCleanInstallTests(unittest.TestCase):
                 self.assertFalse(
                     report["installation"]["workspaceLibraryResolution"]
                 )
+                if runtime == "electron":
+                    self.assertEqual(report["runtime"]["version"], "43.4.0")
+                    self.assertEqual(
+                        report["launch"]["mode"],
+                        "electron-main-process-node-side",
+                    )
+                    self.assertFalse(report["launch"]["rendererCreated"])
 
     def test_reviewed_artifact_binds_current_tracked_inputs(self) -> None:
         for runtime, path in REPORTS.items():
@@ -75,6 +82,19 @@ class DoeGpuNativeCleanInstallTests(unittest.TestCase):
                 report = json.loads(path.read_text())
                 provider = report["receipt"]["provider"]
                 self.assertEqual(report["receipt"]["runtimeHost"], runtime)
+                if runtime == "electron":
+                    self.assertEqual(
+                        report["receipt"]["runtimeVersion"],
+                        report["runtime"]["version"],
+                    )
+                    self.assertEqual(
+                        report["receipt"]["mappedRangeProbe"],
+                        {
+                            "objectTag": "[object ArrayBuffer]",
+                            "sliceAvailable": True,
+                            "value": 42,
+                        },
+                    )
                 self.assertTrue(provider["loaded"])
                 self.assertTrue(provider["doeNative"])
                 self.assertEqual(provider["buildMetadataSource"], "prebuild")
@@ -173,6 +193,12 @@ class DoeGpuNativeCleanInstallTests(unittest.TestCase):
                 self.assertFalse(
                     report["decision"]["applicationPromotionCredit"]
                 )
+                if runtime == "electron":
+                    self.assertEqual(
+                        report["launch"]["mode"],
+                        "electron-main-process-node-side",
+                    )
+                    self.assertFalse(report["launch"]["rendererCreated"])
                 for reference in report["implementation"].values():
                     self.assertEqual(
                         reference["sha256"], sha256(ROOT / reference["path"])

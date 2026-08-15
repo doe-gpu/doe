@@ -1,0 +1,38 @@
+{
+  "absoluteTolerance": 0.00005,
+  "relativeTolerance": 0.0001,
+  "cleanProcessRuns": 3,
+  "cases": [
+    {
+      "id": "canonical-1000x100",
+      "neuronCount": 1000,
+      "tickCount": 100,
+      "stimulusSeed": 42,
+      "stimulusMin": 0,
+      "stimulusMax": 15
+    },
+    {
+      "id": "large-65536x10",
+      "neuronCount": 65536,
+      "tickCount": 10,
+      "stimulusSeed": 2026,
+      "stimulusMin": 0,
+      "stimulusMax": 15
+    },
+    {
+      "id": "override-2048x20",
+      "neuronCount": 2048,
+      "tickCount": 20,
+      "stimulusSeed": 7,
+      "stimulusMin": 0,
+      "stimulusMax": 10,
+      "params": {
+        "tau": 10,
+        "vThreshold": -50,
+        "vReset": -70,
+        "vRest": -65,
+        "dt": 0.5
+      }
+    }
+  ]
+}

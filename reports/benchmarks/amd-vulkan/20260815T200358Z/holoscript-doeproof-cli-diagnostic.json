@@ -15,8 +15,8 @@
     "sha256": "2e37cc0b9fb46ae3943297eb0b841314894b642fb9c6d1ab7ac31c7a1f4e97ef"
   },
   "evidence": {
-    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-qm0-v1-retry6/result.json",
-    "sha256": "326a3bb3b18f5d8d2e25f619518a7410a3f14aee589b71eee15c28471c9d02f7"
+    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-qm0-v1-retry8/result.json",
+    "sha256": "face765b3430c916763bc466f27bd273d387fde5e8f2c9b415670ed024ef2413"
   },
   "implementation": {
     "bin": {
@@ -45,7 +45,7 @@
     },
     "runner": {
       "path": "bench/external-projects/holoscript-snn-webgpu/run-doeproof-cli-integration.mjs",
-      "sha256": "37f5812402baf6a3f6587176743fd7c4855cf5a6bc9e26e1d6236d386504f71f"
+      "sha256": "2ac97aeece0c6560835d25a91e7490de4b0dbe9a8fee302093b968e6e2ac9205"
     }
   },
   "commands": {
@@ -58,15 +58,15 @@
   "lanes": {
     "W0": {
       "providerId": "dawn-node-webgpu",
-      "artifactSha256": "7afa87451b8c91ead2ce953bbe6fc7a2c06f931b4c650484cc278250cf996005",
+      "artifactSha256": "2f8c26e9ff9c4ee984096800d38766d116fbf3a17792530d87b5437c31bb4639",
       "receiptValid": true,
       "oracle": "pass",
       "workloadReplaySha256": "sha256:1c00af1c6afa3583d7a7752f590f938db5ffd12a93b441c7e449473c0d0c5e0b"
     },
     "D0": {
       "providerId": "doe-gpu",
-      "artifactSha256": "ded5443599fe2ac5b3f2de320a361a8b505909c903f41fc33772a15a40348474",
-      "replayArtifactSha256": "00dd2ca86d7e7bf3306b76303a39959da79b3902eca6084cf4ce6405d1885330",
+      "artifactSha256": "0d2dfd44e971281e246b3a3d54931c15fa1154bea40458a0f8a244450550112b",
+      "replayArtifactSha256": "9b5cee3ae4812045376b309eec66cc18ce3025f625a953b8557d013ea34fd9ac",
       "receiptValid": true,
       "oracle": "pass",
       "workloadReplaySha256": "sha256:1c00af1c6afa3583d7a7752f590f938db5ffd12a93b441c7e449473c0d0c5e0b",

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "holoscript-electron-main-process-plan",
+  "candidateId": "holoscript-electron-main-process-p0-qm0-v1",
+  "runtime": {
+    "host": "electron",
+    "version": "43.4.0",
+    "mode": "main-process-node-side",
+    "arguments": ["--headless", "--no-sandbox", "--disable-gpu"]
+  },
+  "workload": {
+    "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "entrypoint": "bench/external-projects/holoscript-snn-webgpu/run-workload.mjs",
+    "input": "bench/external-projects/holoscript-snn-webgpu/inputs.json",
+    "oracle": "bench/external-projects/holoscript-snn-webgpu/oracle.md",
+    "sourcePolicy": "unchanged in I0, I1, W0, and D0",
+    "cleanProcessRunsPerLane": 3,
+    "resourceObservation": {
+      "platform": "linux-procfs",
+      "sampleIntervalMs": 5,
+      "aggregation": "sum VmRSS across the live process tree",
+      "claimClass": "diagnostic-peak"
+    }
+  },
+  "hypothesis": {
+    "claimedProperty": "independent-correction",
+    "incumbentLimitation": "The pinned Node WebGPU addon may depend on external ArrayBuffers that the Electron main-process Node-API host prohibits.",
+    "applicationConsequence": "The unchanged HoloScript tropical-SpMV application cannot initialize or read GPU buffers in Electron.",
+    "materialOutcome": "D0 must execute the unchanged application with exact oracle identity while W0 fails at the frozen native boundary. The source-built P0 must determine whether the same correction is available as a bounded incumbent patch."
+  },
+  "lanes": {
+    "I0": "ambient webgpu package under Electron without Doe evidence interpretation",
+    "I1": "pinned webgpu@0.3.10 under Electron without Doe receipt interpretation",
+    "W0": "pinned webgpu@0.3.10 under the exact oracle and evidence contract",
+    "D0": "clean-installed doe-gpu and platform package under the same contract",
+    "A0": "bounded application upload workaround replacing mapped-at-creation with queue.writeBuffer",
+    "P0": "source-built webgpu@0.3.10 with the bounded mapped-ArrayBuffer ownership correction"
+  },
+  "p0": {
+    "package": "webgpu@0.3.10",
+    "repository": "https://github.com/dawn-gpu/node-webgpu.git",
+    "tag": "v0.3.10",
+    "nodeWebgpuCommit": "c7c792ba7facd9e831a52d8e2a0c1dd166654751",
+    "dawnRepository": "https://dawn.googlesource.com/dawn.git",
+    "dawnCommit": "c5d549e250b9225744929ae860b369cb4304a767",
+    "patch": "bench/external-projects/holoscript-snn-webgpu/electron-node-webgpu-p0.patch",
+    "go": {
+      "version": "go1.26.6",
+      "archive": "https://go.dev/dl/go1.26.6.linux-amd64.tar.gz",
+      "sha256": "708effb774be8237570d0add163225abbdfaf4fca28b2611df167beba4feef89"
+    },
+    "buildCommand": "PATH=<pinned-go>/bin:$PATH npm run build",
+    "runtimeModule": "<source-build>/index.js",
+    "nativeAddon": "<source-build>/dist/linux-x64.dawn.node"
+  },
+  "acceptance": {
+    "d0CleanProcessPasses": 3,
+    "d0ReplayExact": true,
+    "p0CleanProcessPasses": 3,
+    "p0ReplayExact": true,
+    "allTopologyHashesMatchOracle": true,
+    "hardwareEligible": true,
+    "processTreeRssObserved": true,
+    "w0FailureMustContain": "External buffers are not allowed",
+    "performanceCredit": false,
+    "runtimeOwnershipCredit": false,
+    "applicationPromotionCredit": false,
+    "releaseCredit": false
+  }
+}

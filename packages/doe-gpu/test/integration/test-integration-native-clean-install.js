@@ -21,12 +21,12 @@ const outputPath = outputArgumentIndex === -1
   : resolve(process.argv[outputArgumentIndex + 1]);
 const runtimeArgumentIndex = process.argv.indexOf('--runtime');
 if (runtimeArgumentIndex !== -1 && !process.argv[runtimeArgumentIndex + 1]) {
-  throw new Error('--runtime requires node or bun');
+  throw new Error('--runtime requires node, bun, or electron');
 }
 const runtimeHost = runtimeArgumentIndex === -1
   ? 'node'
   : process.argv[runtimeArgumentIndex + 1];
-if (!['node', 'bun'].includes(runtimeHost)) {
+if (!['node', 'bun', 'electron'].includes(runtimeHost)) {
   throw new Error(`unsupported native clean-install runtime: ${runtimeHost}`);
 }
 const platformPackageName = new Map([
@@ -89,6 +89,22 @@ function pack(directory, label) {
   return { manifest, tarball: resolve(scratch, manifest.filename) };
 }
 
+function electronExecutable() {
+  const configured = process.env.DOE_ELECTRON_EXECUTABLE;
+  if (!configured) {
+    throw new Error('Electron requires explicit DOE_ELECTRON_EXECUTABLE');
+  }
+  const executable = resolve(configured);
+  if (!existsSync(executable)) {
+    throw new Error(`configured Electron executable is missing: ${executable}`);
+  }
+  return executable;
+}
+
+function electronArgs(entry) {
+  return ['--headless', '--no-sandbox', '--disable-gpu', entry];
+}
+
 async function sha256File(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex');
 }
@@ -101,23 +117,45 @@ function resolveRuntimeIdentity() {
       version: process.version,
     };
   }
-  const probe = execute('bun', [
-    '-e',
-    'process.stdout.write(JSON.stringify({executable:process.execPath,version:Bun.version}))',
+  if (runtimeHost === 'bun') {
+    const probe = execute('bun', [
+      '-e',
+      'process.stdout.write(JSON.stringify({executable:process.execPath,version:Bun.version}))',
+    ], packageRoot);
+    requireSuccess(probe, 'Bun runtime identity probe');
+    return { host: runtimeHost, ...JSON.parse(probe.stdout) };
+  }
+  const executable = electronExecutable();
+  const probe = execute(executable, [
+    '--headless',
+    '--no-sandbox',
+    '--disable-gpu',
+    '--version',
   ], packageRoot);
-  requireSuccess(probe, 'Bun runtime identity probe');
-  return { host: runtimeHost, ...JSON.parse(probe.stdout) };
+  requireSuccess(probe, 'Electron runtime identity probe');
+  const version = probe.stdout.trim().replace(/^v/, '');
+  if (!/^\d+\.\d+\.\d+(?:[-+].+)?$/.test(version)) {
+    throw new Error(`Electron runtime returned an invalid version: ${probe.stdout}`);
+  }
+  return { host: runtimeHost, executable, version };
 }
 
 try {
   const runtime = resolveRuntimeIdentity();
   const wrapper = pack(packageRoot, 'wrapper');
   const platform = pack(platformPackageRoot, 'platform');
-  await writeFile(resolve(scratch, 'package.json'), `${JSON.stringify({
+  const fixtureManifest = {
     name: 'doe-gpu-native-clean-install-fixture',
     private: true,
     type: 'module',
-  }, null, 2)}\n`);
+  };
+  if (runtimeHost === 'electron') {
+    fixtureManifest.main = 'node_modules/doe-gpu/examples/electron-first-kernel.mjs';
+  }
+  await writeFile(
+    resolve(scratch, 'package.json'),
+    `${JSON.stringify(fixtureManifest, null, 2)}\n`,
+  );
   const installed = execute(npm, [
     'install',
     '--ignore-scripts',
@@ -133,7 +171,10 @@ try {
     scratch,
     `node_modules/doe-gpu/examples/${runtimeHost}-first-kernel.mjs`,
   );
-  const executed = execute(runtime.executable, [examplePath]);
+  const runtimeArgs = runtimeHost === 'electron'
+    ? electronArgs(scratch)
+    : [examplePath];
+  const executed = execute(runtime.executable, runtimeArgs);
   requireSuccess(executed, `installed native ${runtimeHost} first kernel`);
   const receipt = JSON.parse(executed.stdout);
   if (receipt.kind !== 'doe-gpu.first-kernel.receipt') {
@@ -144,6 +185,16 @@ try {
   }
   if (receipt.runtimeHost !== runtimeHost) {
     throw new Error(`installed package reported wrong runtime host: ${executed.stdout}`);
+  }
+  if (runtimeHost === 'electron' && receipt.runtimeVersion !== runtime.version) {
+    throw new Error(`installed package reported wrong Electron version: ${executed.stdout}`);
+  }
+  if (runtimeHost === 'electron' && (
+    receipt.mappedRangeProbe?.objectTag !== '[object ArrayBuffer]'
+    || receipt.mappedRangeProbe?.sliceAvailable !== true
+    || receipt.mappedRangeProbe?.value !== 42
+  )) {
+    throw new Error(`Electron mapped-range probe failed: ${executed.stdout}`);
   }
   if (receipt.provider?.buildMetadataSource !== 'prebuild') {
     throw new Error(`native runtime did not resolve from platform package: ${executed.stdout}`);
@@ -170,6 +221,13 @@ try {
         optionalDependencies: 'omitted',
         workspaceLibraryResolution: false,
       },
+      launch: runtimeHost === 'electron'
+        ? {
+            mode: 'electron-main-process-node-side',
+            arguments: electronArgs('<clean-install-app>'),
+            rendererCreated: false,
+          }
+        : { mode: `${runtimeHost}-process`, arguments: ['<first-kernel>'] },
       packages: {
         wrapper: {
           id: wrapper.manifest.id,
@@ -187,6 +245,10 @@ try {
         runner: {
           path: 'packages/doe-gpu/test/integration/test-integration-native-clean-install.js',
           sha256: await sha256File(runnerPath),
+        },
+        firstKernel: {
+          path: `packages/doe-gpu/examples/${runtimeHost}-first-kernel.mjs`,
+          sha256: await sha256File(examplePath),
         },
         wrapperManifest: {
           path: 'packages/doe-gpu/package.json',
@@ -219,6 +281,10 @@ try {
       limitations: [
         'One first-kernel execution is package installation evidence, not the promotion reliability floor.',
         'This artifact does not generalize beyond its declared runtime, platform, and architecture.',
+        ...(runtimeHost === 'electron' ? [
+          'Electron evidence covers main-process Node-side compute without renderer creation.',
+          'This artifact grants no Electron renderer, Chromium WebGPU, or browser lifecycle credit.',
+        ] : []),
         'No performance interpretation is authorized.',
       ],
     };

@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 4,
+  "artifactKind": "external-project-harness",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "lif-determinism",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "license": {
+      "identifier": "MIT",
+      "evidenceUrl": "https://github.com/brianonbased-dev/HoloScript/blob/337a39a869a552c814933c587fe65b34a0a2c95d/LICENSE"
+    }
+  },
+  "providerSubstitution": {
+    "baselineProvider": "dawn-node-webgpu",
+    "comparisonProvider": "doe-gpu",
+    "seam": "The existing scoped ESM loader substitutes only the upstream package's webgpu import; the production LIF simulator, shader, and CPU oracle remain unchanged.",
+    "patchPaths": []
+  },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "reproducible-runtime-identity",
+    "incumbentLimitation": "The recorded upstream cross-vendor probe found different final membrane bytes and did not validate spike masks, leaving the exact live runtime and semantic boundary incomplete.",
+    "applicationConsequence": "A green repeatability test can be mistaken for GPU determinism when a fallback ran, or membrane-byte divergence can be overstated without an independent spike oracle.",
+    "materialOutcome": {
+      "metric": "live-provider identity, same-backend repeatability, CPU membrane tolerance, exact spike-mask parity, and replay identity",
+      "decisionRule": "Promote DoeRuntime only if D0 satisfies a frozen semantic or reproducibility outcome that W0 cannot satisfy; require P0 only if W0 exposes a bounded runtime defect."
+    },
+    "lanes": {
+      "I0": {
+        "requirement": "required",
+        "construction": "Ambient webgpu package without Doe evidence interpretation."
+      },
+      "I1": {
+        "requirement": "required",
+        "construction": "Pinned webgpu@0.3.10 without Doe evidence interpretation."
+      },
+      "W0": {
+        "requirement": "required",
+        "construction": "Pinned webgpu@0.3.10 under the exact provider, oracle, and replay contract."
+      },
+      "D0": {
+        "requirement": "required",
+        "construction": "DoeRuntime under the same provider, oracle, and replay contract."
+      },
+      "P0": {
+        "requirement": "conditional",
+        "construction": "The smallest bounded incumbent correction, required only if W0 fails a frozen obligation."
+      }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "application-exceptions",
+      "regression-support"
+    ]
+  },
+  "fallbackPolicy": {
+    "requireHardware": true,
+    "prohibitedFallbacks": [
+      "cpu",
+      "mock",
+      "software-renderer",
+      "unknown-provider"
+    ],
+    "providerIdentityAssertion": "The selected wrapper, adapter identity, and Vulkan host evidence must bind a physical GPU; mock or software execution is ineligible."
+  },
+  "workload": {
+    "command": [
+      "node",
+      "bench/external-projects/holoscript-snn-webgpu/run-lif-determinism-matrix.mjs"
+    ],
+    "immutableInputRefs": [
+      "bench/external-projects/holoscript-snn-webgpu/lif-determinism.inputs.json",
+      "bench/external-projects/holoscript-snn-webgpu/lif-determinism.oracle.md",
+      "bench/external-projects/holoscript-snn-webgpu/run-lif-determinism-workload.mjs",
+      "bench/external-projects/holoscript-snn-webgpu/run-lif-determinism-matrix.mjs"
+    ],
+    "oracle": {
+      "kind": "upstream",
+      "path": "bench/external-projects/holoscript-snn-webgpu/lif-determinism.oracle.md",
+      "reviewStatus": "reviewed"
+    },
+    "sameWorkPolicy": "All lanes execute the same three upstream LIF CPU/GPU twin cases, canonical three-run membrane probe, seed variant, tick variant, shader, synchronization, and readback path.",
+    "completionBoundary": "Each case completes all tick dispatches, reads membrane and spike buffers, applies the CPU tolerance and exact spike oracle, and destroys its simulator; the process then completes repeatability and nondegeneracy probes."
+  },
+  "requiredMeasurements": [
+    "clean-process-success",
+    "crashes",
+    "hangs",
+    "timeouts",
+    "peak-memory-bytes",
+    "cold-p50",
+    "cold-p95",
+    "cold-p99",
+    "warm-p50",
+    "warm-p95",
+    "warm-p99",
+    "receipt-overhead"
+  ],
+  "requiredReceiptFields": [
+    "provider-identity",
+    "adapter-identity",
+    "driver-identity",
+    "shader-hashes",
+    "dispatch-shape",
+    "synchronization",
+    "readback",
+    "output-identity"
+  ],
+  "installation": {
+    "substitutionMode": "esm-loader",
+    "productionStatus": "harness-only",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "installSteps": [
+      {
+        "id": "upstream-dependencies",
+        "command": ["corepack", "pnpm", "install", "--frozen-lockfile"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      },
+      {
+        "id": "upstream-snn-webgpu-build",
+        "command": ["corepack", "pnpm", "--filter", "@holoscript/snn-webgpu", "exec", "tsup"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      }
+    ],
+    "validationCommand": [
+      "node",
+      "bench/external-projects/holoscript-snn-webgpu/run-lif-determinism-matrix.mjs"
+    ],
+    "timeoutSeconds": 1800
+  },
+  "reproduction": {
+    "providerModulePath": "packages/doe-gpu/src/index.js",
+    "arguments": ["{runRoot}/result.json"],
+    "evidenceFiles": [
+      { "id": "result", "path": "result.json" }
+    ]
+  },
+  "supportTargets": [
+    {
+      "id": "linux-x64-radeon-8060s-radv-26-0-3",
+      "os": "linux",
+      "arch": "x86_64",
+      "runtime": "node-22",
+      "adapter": "Radeon 8060S Graphics",
+      "driver": "Mesa 26.0.3",
+      "status": "validated"
+    }
+  ],
+  "reliabilityPolicy": {
+    "cleanProcessRunsPerProvider": 3,
+    "concurrencyLevel": 1,
+    "concurrencyRunsPerProvider": 0,
+    "teardownCyclesPerProvider": 0,
+    "stressIterationsPerProvider": 0,
+    "processTimeoutSeconds": 120,
+    "memoryGrowthBoundaryBytes": 0,
+    "requireZeroCrashes": true,
+    "requireZeroHangs": true,
+    "requireZeroTimeouts": true
+  },
+  "performancePolicy": {
+    "timingScope": "not admitted for this determinism diagnostic",
+    "coldSamplesPerProvider": 1,
+    "warmupSamplesPerProvider": 0,
+    "warmSamplesPerProvider": 1,
+    "requiredPercentiles": ["p50", "p95", "p99"],
+    "throughputMetric": "completed LIF oracle cases per process",
+    "minimumMaterialSpeedupRatio": 1.1,
+    "maximumRegressionRatio": 1.05
+  },
+  "receiptPolicy": {
+    "captureRequired": true,
+    "replayRequired": true,
+    "runtimeBuildIdentityRequired": true,
+    "preparationReceiptRequired": true
+  },
+  "releasePolicy": {
+    "promotionState": "not-promoted",
+    "blocking": false,
+    "command": [
+      "node",
+      "bench/external-projects/holoscript-snn-webgpu/run-lif-determinism-matrix.mjs"
+    ],
+    "promotionReportIds": []
+  }
+}

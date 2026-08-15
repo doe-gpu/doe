@@ -1,0 +1,99 @@
+diff --git a/src/dawn/node/binding/GPUBuffer.cpp b/src/dawn/node/binding/GPUBuffer.cpp
+index 4426e3faa..06fc6db06 100644
+--- a/src/dawn/node/binding/GPUBuffer.cpp
++++ b/src/dawn/node/binding/GPUBuffer.cpp
+@@ -28,6 +28,7 @@
+ #include "src/dawn/node/binding/GPUBuffer.h"
+ 
+ #include <cassert>
++#include <cstring>
+ #include <memory>
+ #include <utility>
+ 
+@@ -48,6 +49,7 @@ GPUBuffer::GPUBuffer(wgpu::Buffer buffer,
+       device_(std::move(device)),
+       async_(std::move(async)),
+       mapped_(desc.mappedAtCreation),
++      writable_mapping_(desc.mappedAtCreation),
+       label_(CopyLabel(desc.label)) {}
+ 
+ interop::Promise<void> GPUBuffer::mapAsync(Napi::Env env,
+@@ -75,7 +77,7 @@ interop::Promise<void> GPUBuffer::mapAsync(Napi::Env env,
+ 
+     buffer_.MapAsync(
+         mode, offset, rangeSize, wgpu::CallbackMode::AllowProcessEvents,
+-        [ctx = std::move(ctx), this](wgpu::MapAsyncStatus status, wgpu::StringView) {
++        [ctx = std::move(ctx), this, mode](wgpu::MapAsyncStatus status, wgpu::StringView) {
+             // The promise may already have been resolved with an AbortError if there was an early
+             // destroy() or early unmap().
+             if (ctx->promise.GetState() != interop::PromiseState::Pending) {
+@@ -87,6 +89,7 @@ interop::Promise<void> GPUBuffer::mapAsync(Napi::Env env,
+                 case wgpu::MapAsyncStatus::Success:
+                     ctx->promise.Resolve();
+                     mapped_ = true;
++                    writable_mapping_ = mode == wgpu::MapMode::Write;
+                     break;
+                 case wgpu::MapAsyncStatus::CallbackCancelled:
+                 case wgpu::MapAsyncStatus::Aborted:
+@@ -128,9 +131,23 @@ interop::ArrayBuffer GPUBuffer::getMappedRange(Napi::Env env,
+         Errors::OperationError(env).ThrowAsJavaScriptException();
+         return {};
+     }
+-    auto array_buffer = Napi::ArrayBuffer::New(env, ptr, s);
++    napi_value value;
++    auto status = napi_create_external_arraybuffer(env, ptr, s, nullptr, nullptr, &value);
++    bool copy_back = false;
++    Napi::ArrayBuffer array_buffer;
++    if (status == napi_no_external_buffers_allowed) {
++        array_buffer = Napi::ArrayBuffer::New(env, s);
++        std::memcpy(array_buffer.Data(), ptr, s);
++        copy_back = writable_mapping_;
++    } else if (status == napi_ok) {
++        array_buffer = Napi::ArrayBuffer(env, value);
++    } else {
++        Napi::Error::New(env, "Failed to create an ArrayBuffer for the mapped GPU buffer.")
++            .ThrowAsJavaScriptException();
++        return {};
++    }
+     // TODO(crbug.com/dawn/1135): Ownership here is the wrong way around.
+-    mappings_.emplace_back(Mapping{start, end, Napi::Persistent(array_buffer)});
++    mappings_.emplace_back(Mapping{start, end, Napi::Persistent(array_buffer), ptr, copy_back});
+     return array_buffer;
+ }
+ 
+@@ -183,9 +200,14 @@ void GPUBuffer::DetachMappings(Napi::Env env) {
+     }
+ 
+     for (auto& mapping : mappings_) {
++        if (mapping.copy_back) {
++            std::memcpy(mapping.mapped_data, mapping.buffer.Value().Data(),
++                        mapping.end - mapping.start);
++        }
+         mapping.buffer.Value().Detach();
+     }
+     mappings_.clear();
++    writable_mapping_ = false;
+ }
+ 
+ std::string GPUBuffer::getLabel(Napi::Env) {
+diff --git a/src/dawn/node/binding/GPUBuffer.h b/src/dawn/node/binding/GPUBuffer.h
+index 3da588cc9..db5bf5841 100644
+--- a/src/dawn/node/binding/GPUBuffer.h
++++ b/src/dawn/node/binding/GPUBuffer.h
+@@ -79,6 +79,8 @@ class GPUBuffer final : public interop::GPUBuffer {
+         uint64_t end;
+         inline bool Intersects(uint64_t s, uint64_t e) const { return s < end && e > start; }
+         Napi::Reference<interop::ArrayBuffer> buffer;
++        void* mapped_data;
++        bool copy_back;
+     };
+ 
+     // https://www.w3.org/TR/webgpu/#buffer-interface
+@@ -96,6 +98,7 @@ class GPUBuffer final : public interop::GPUBuffer {
+     std::shared_ptr<AsyncRunner> async_;
+     std::vector<Mapping> mappings_;
+     bool mapped_;
++    bool writable_mapping_;
+     std::optional<interop::Promise<void>> pending_map_;
+     std::string label_;
+ };

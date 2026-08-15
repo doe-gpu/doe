@@ -23,6 +23,11 @@ FILESYSTEM_REPORT = (
     / "reports/benchmarks/amd-vulkan/20260815T205128Z"
     / "holoscript-doeproof-cli-filesystem-diagnostic.json"
 )
+BWRAP_REPORT = (
+    ROOT
+    / "reports/benchmarks/amd-vulkan/20260815T212816Z"
+    / "holoscript-doeproof-cli-linux-bwrap-diagnostic.json"
+)
 
 
 def sha256(path: Path) -> str:
@@ -132,6 +137,69 @@ class HoloScriptDoeProofLoaderIntegrationTests(unittest.TestCase):
         evidence_path = ROOT / report["evidence"]["path"]
         if evidence_path.exists():
             self.assertEqual(report["evidence"]["sha256"], sha256(evidence_path))
+
+    def test_linux_workspace_sealing_is_real_and_narrowly_claimed(self) -> None:
+        plan = json.loads(
+            (HARNESS / "doeproof-cli-linux-bwrap-integration.plan.json").read_text()
+        )
+        self.assertEqual(
+            plan["planId"],
+            "holoscript-tropical-spmv-doeproof-cli-linux-bwrap-qm0-v1",
+        )
+        self.assertEqual(
+            plan["boundary"]["workspace"],
+            "only hash-bound files declared by the harness",
+        )
+        self.assertIn(
+            "complete base-operating-system dependency closure", plan["nonGoals"]
+        )
+
+        report = json.loads(BWRAP_REPORT.read_text())
+        self.assertEqual(report["status"], "passed")
+        self.assertTrue(report["decision"]["workspaceSealingCredit"])
+        self.assertFalse(
+            report["decision"]["completeOsDependencyClosureCredit"]
+        )
+        self.assertFalse(report["decision"]["runtimeOwnershipCredit"])
+        self.assertFalse(report["decision"]["performanceCredit"])
+        probe = report["sandbox"]["visibilityProbe"]
+        self.assertTrue(probe["declaredFileVisible"])
+        self.assertFalse(probe["undeclaredCanaryVisible"])
+        self.assertEqual(probe["networkInterfaces"], ["lo"])
+        self.assertEqual(
+            report["sandbox"]["environment"],
+            {
+                "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/radeon_icd.json",
+                "VK_LOADER_LAYERS_DISABLE": "~all~",
+            },
+        )
+        writable_paths = {
+            report["lanes"]["W0"]["writablePath"],
+            report["lanes"]["D0"]["writablePath"],
+            report["replay"]["writablePath"],
+        }
+        self.assertEqual(len(writable_paths), 3)
+        system_access = report["systemAccessObservation"]
+        self.assertEqual(system_access["credit"], "diagnostic-only")
+        self.assertFalse(system_access["completeOsDependencyClosure"])
+        self.assertEqual(
+            system_access["vulkan"]["openedIcdManifests"],
+            ["/usr/share/vulkan/icd.d/radeon_icd.json"],
+        )
+        self.assertEqual(system_access["vulkan"]["openedLayerLibraries"], [])
+        self.assertEqual(
+            report["plan"]["sha256"], sha256(ROOT / report["plan"]["path"])
+        )
+        for reference in report["implementation"].values():
+            self.assertEqual(reference["sha256"], sha256(ROOT / reference["path"]))
+        evidence_path = ROOT / report["evidence"]["path"]
+        if evidence_path.exists():
+            self.assertEqual(report["evidence"]["sha256"], sha256(evidence_path))
+        traced_path = ROOT / system_access["tracedEvidence"]["path"]
+        if traced_path.exists():
+            self.assertEqual(
+                system_access["tracedEvidence"]["sha256"], sha256(traced_path)
+            )
 
 
 if __name__ == "__main__":

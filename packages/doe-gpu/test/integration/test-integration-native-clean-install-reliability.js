@@ -16,8 +16,8 @@ const requireNative = process.argv.includes('--required')
 const runtimeIndex = process.argv.indexOf('--runtime');
 const outputIndex = process.argv.indexOf('--out');
 const runtimeHost = runtimeIndex === -1 ? 'node' : process.argv[runtimeIndex + 1];
-if (!['node', 'bun'].includes(runtimeHost)) {
-  throw new Error('--runtime requires node or bun');
+if (!['node', 'bun', 'electron'].includes(runtimeHost)) {
+  throw new Error('--runtime requires node, bun, or electron');
 }
 if (outputIndex !== -1 && !process.argv[outputIndex + 1]) {
   throw new Error('--out requires a path');
@@ -91,6 +91,22 @@ function pack(directory, label) {
   return { manifest, tarball: resolve(scratch, manifest.filename) };
 }
 
+function electronExecutable() {
+  const configured = process.env.DOE_ELECTRON_EXECUTABLE;
+  if (!configured) {
+    throw new Error('Electron requires explicit DOE_ELECTRON_EXECUTABLE');
+  }
+  const executable = resolve(configured);
+  if (!existsSync(executable)) {
+    throw new Error(`configured Electron executable is missing: ${executable}`);
+  }
+  return executable;
+}
+
+function electronArgs(entry) {
+  return ['--headless', '--no-sandbox', '--disable-gpu', entry];
+}
+
 async function sha256File(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex');
 }
@@ -99,12 +115,27 @@ function resolveRuntimeIdentity() {
   if (runtimeHost === 'node') {
     return { host: runtimeHost, executable: process.execPath, version: process.version };
   }
-  const probe = execute('bun', [
-    '-e',
-    'process.stdout.write(JSON.stringify({executable:process.execPath,version:Bun.version}))',
+  if (runtimeHost === 'bun') {
+    const probe = execute('bun', [
+      '-e',
+      'process.stdout.write(JSON.stringify({executable:process.execPath,version:Bun.version}))',
+    ], packageRoot);
+    requireSuccess(probe, 'Bun runtime identity probe');
+    return { host: runtimeHost, ...JSON.parse(probe.stdout) };
+  }
+  const executable = electronExecutable();
+  const probe = execute(executable, [
+    '--headless',
+    '--no-sandbox',
+    '--disable-gpu',
+    '--version',
   ], packageRoot);
-  requireSuccess(probe, 'Bun runtime identity probe');
-  return { host: runtimeHost, ...JSON.parse(probe.stdout) };
+  requireSuccess(probe, 'Electron runtime identity probe');
+  const version = probe.stdout.trim().replace(/^v/, '');
+  if (!/^\d+\.\d+\.\d+(?:[-+].+)?$/.test(version)) {
+    throw new Error(`Electron runtime returned an invalid version: ${probe.stdout}`);
+  }
+  return { host: runtimeHost, executable, version };
 }
 
 function terminate(child) {
@@ -122,7 +153,10 @@ function terminate(child) {
 
 function runTrial(runtime, examplePath, id, mode) {
   return new Promise((resolveTrial, rejectTrial) => {
-    const child = spawn(runtime.executable, [examplePath], {
+    const runtimeArgs = runtimeHost === 'electron'
+      ? electronArgs(scratch)
+      : [examplePath];
+    const child = spawn(runtime.executable, runtimeArgs, {
       cwd: scratch,
       env: process.env,
       detached: process.platform !== 'win32',
@@ -171,12 +205,18 @@ function runTrial(runtime, examplePath, id, mode) {
         const receipt = JSON.parse(stdoutText);
         const providerPath = receipt.provider?.doeLibraryPath ?? '';
         if (receipt.runtimeHost !== runtimeHost
+          || (runtimeHost === 'electron' && receipt.runtimeVersion !== runtime.version)
           || receipt.provider?.loaded !== true
           || receipt.provider?.doeNative !== true
           || receipt.provider?.buildMetadataSource !== 'prebuild'
           || !providerPath.includes(`/node_modules/${platformPackageName}/`)
           || JSON.stringify(receipt.result?.output) !== JSON.stringify(expectedOutput)
-          || receipt.result?.outputSha256 !== expectedOutputSha256) {
+          || receipt.result?.outputSha256 !== expectedOutputSha256
+          || (runtimeHost === 'electron' && (
+            receipt.mappedRangeProbe?.objectTag !== '[object ArrayBuffer]'
+            || receipt.mappedRangeProbe?.sliceAvailable !== true
+            || receipt.mappedRangeProbe?.value !== 42
+          ))) {
           throw new Error(`receipt failed the frozen runtime/output contract: ${stdoutText}`);
         }
         resolveTrial({
@@ -207,7 +247,9 @@ function runLifecycleTrial(runtime, fixturePath) {
   return new Promise((resolveTrial, rejectTrial) => {
     const runtimeArgs = runtimeHost === 'node'
       ? ['--expose-gc', fixturePath]
-      : [fixturePath];
+      : runtimeHost === 'electron'
+        ? electronArgs(scratch)
+        : [fixturePath];
     const child = spawn(runtime.executable, runtimeArgs, {
       cwd: scratch,
       env: {
@@ -310,11 +352,16 @@ try {
   const runtime = resolveRuntimeIdentity();
   const wrapper = pack(packageRoot, 'wrapper');
   const platform = pack(platformPackageRoot, 'platform');
-  await writeFile(resolve(scratch, 'package.json'), `${JSON.stringify({
+  const fixtureManifest = {
     name: 'doe-gpu-native-reliability-fixture',
     private: true,
     type: 'module',
-  }, null, 2)}\n`);
+  };
+  if (runtimeHost === 'electron') {
+    fixtureManifest.main = 'node_modules/doe-gpu/examples/electron-first-kernel.mjs';
+  }
+  const fixtureManifestPath = resolve(scratch, 'package.json');
+  await writeFile(fixtureManifestPath, `${JSON.stringify(fixtureManifest, null, 2)}\n`);
   const installed = execute(npm, [
     'install',
     '--ignore-scripts',
@@ -342,6 +389,10 @@ try {
       (_, index) => runTrial(runtime, examplePath, `concurrent-${index}`, 'concurrent'),
     ),
   ));
+  if (runtimeHost === 'electron') {
+    fixtureManifest.main = 'native-clean-install-lifecycle.mjs';
+    await writeFile(fixtureManifestPath, `${JSON.stringify(fixtureManifest, null, 2)}\n`);
+  }
   const sameProcessLifecycle = await runLifecycleTrial(runtime, installedLifecycleFixture);
 
   if (outputPath) {
@@ -366,6 +417,13 @@ try {
         workspaceLibraryResolution: false,
         sharedAcrossTrials: true,
       },
+      launch: runtimeHost === 'electron'
+        ? {
+            mode: 'electron-main-process-node-side',
+            arguments: electronArgs('<clean-install-app>'),
+            rendererCreated: false,
+          }
+        : { mode: `${runtimeHost}-process` },
       runtime: { ...runtime, sha256: await sha256File(runtime.executable) },
       packages: {
         wrapper: {
@@ -421,6 +479,10 @@ try {
         'The same-process RSS span is a bounded diagnostic, not a long-soak leak or promotion certificate.',
         'Trial durations are lifecycle diagnostics and receive no performance interpretation.',
         'This artifact does not generalize beyond its declared runtime, platform, and architecture.',
+        ...(runtimeHost === 'electron' ? [
+          'Electron evidence covers main-process Node-side compute without renderer creation.',
+          'This artifact grants no Electron renderer, Chromium WebGPU, or browser lifecycle credit.',
+        ] : []),
       ],
     };
     await mkdir(dirname(outputPath), { recursive: true });

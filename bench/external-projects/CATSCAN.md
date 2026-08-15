@@ -28,7 +28,12 @@ Outputs:
 
 - Upstream source, patches, inputs, provider, hardware, and oracle remain pinned.
 - Each runtime-ownership candidate retains incumbent, governed-wrapper, and Doe lanes.
+- A runtime-host successor to a completed application decision is versioned
+  separately and cannot reopen the earlier decision; independent-correction
+  credit still requires the bounded source-built incumbent control.
 - Diagnostic applications do not silently become release blockers.
+- Isolation evidence distinguishes exact workspace exposure from broader system
+  roots and records writable, network, device, and scratch boundaries.
 
 ## Acceptance
 

@@ -15,8 +15,8 @@
     "sha256": "34bb231d04c60562e4b2d2a59666b31221ccd60ceeea6d2b1a90f1079df4b6cb"
   },
   "evidence": {
-    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-filesystem-qm0-v1-retry2/result.json",
-    "sha256": "89ce4432805a1324320bc0fd37a0cce2372c2a838ed2569d6a93028424de3b41"
+    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-filesystem-qm0-v1-retry4/result.json",
+    "sha256": "10ae952bbd5806a5263aaa7d621ce2d1e2b0f2a7ac50a69ba8273fab502c36bd"
   },
   "implementation": {
     "bin": {
@@ -45,7 +45,7 @@
     },
     "runner": {
       "path": "bench/external-projects/holoscript-snn-webgpu/run-doeproof-cli-integration.mjs",
-      "sha256": "37f5812402baf6a3f6587176743fd7c4855cf5a6bc9e26e1d6236d386504f71f"
+      "sha256": "2ac97aeece0c6560835d25a91e7490de4b0dbe9a8fee302093b968e6e2ac9205"
     },
     "workload": {
       "path": "bench/external-projects/holoscript-snn-webgpu/run-workload.mjs",
@@ -66,7 +66,7 @@
     "W0": {
       "providerId": "dawn-node-webgpu",
       "runtimeFileCount": 11,
-      "artifactSha256": "36847df55e4958743905ca8c3fae075b68449c4173d9010650ea35bcbf0e11c3",
+      "artifactSha256": "3d55a5803e9bfff8ad90965524650a8d01cc81f6254a79c6b3af69ec1de94f6d",
       "receiptValid": true,
       "oracle": "pass",
       "workloadReplaySha256": "sha256:a8e50939479879a7a7414b2b49bd11a63234530b4b611170ebe8bb280c379e8c"
@@ -74,8 +74,8 @@
     "D0": {
       "providerId": "doe-gpu",
       "runtimeFileCount": 36,
-      "artifactSha256": "5212a62895091683c9213816f149b549db7261b04864a384902739881fb6d2d9",
-      "replayArtifactSha256": "b64fdea05a0516fa1a8ca36d3d0aeceb56e9803078179ac8d29109552dec220a",
+      "artifactSha256": "7f5ad7d057006aa98f22c840b7a619163ddcf84657a7d8cdcb6344b3ae7f5fd0",
+      "replayArtifactSha256": "27642c6ca9615e70f81dde8bd66d61846dc2e85315443bd797c2fadbd066bf82",
       "receiptValid": true,
       "oracle": "pass",
       "workloadReplaySha256": "sha256:a8e50939479879a7a7414b2b49bd11a63234530b4b611170ebe8bb280c379e8c",

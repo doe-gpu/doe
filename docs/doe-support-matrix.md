@@ -14,7 +14,7 @@ carry the changing state.
 
 | Surface | Contract | Current claim boundary |
 | --- | --- | --- |
-| `doe-gpu` Node/Bun compute | Public npm package over the native Doe runtime | Narrow application and workload tuples only |
+| `doe-gpu` controlled-JavaScript compute | Public npm package over the native Doe runtime | Narrow Node, Bun, and Electron main-process workload tuples only |
 | Native `webgpu.h` runtime | Embeddable or drop-in Doe shared library | Backend- and host-specific evidence only |
 | Chromium integration | Doe beneath Chromium WebGPU | Diagnostic until browser release gates pass |
 | TSIR/HostPlan/CSL | Spatial-compute lowering and execution | Simulator and hardware evidence remain distinct |
@@ -33,8 +33,8 @@ carry the changing state.
 
 | Platform/backend | Package | Native runtime | Browser | Boundary |
 | --- | --- | --- | --- | --- |
-| macOS arm64 / Apple Metal | Narrow Node/Bun evidence | Narrow native evidence | Separate diagnostic lane | Read claim index per row |
-| Linux x64 / AMD Vulkan | Narrow Node/Bun evidence | Narrow native evidence | Separate diagnostic lane | Read claim index per row |
+| macOS arm64 / Apple Metal | Narrow Node/Bun evidence; Electron unproved | Narrow native evidence | Separate diagnostic lane | Read claim index per row |
+| Linux x64 / AMD Vulkan | Narrow Node/Bun and Electron main-process evidence | Narrow native evidence | Separate diagnostic lane | Read claim index per row |
 | Linux / Intel Tiger Lake Vulkan | Diagnostic host evidence | Diagnostic host evidence | Not promoted | Do not generalize |
 | Windows / D3D12 | Not promoted | Scaffolded | Not promoted | Fresh Windows evidence required |
 | Other tuples | Unsupported unless explicitly listed | Unsupported unless explicitly listed | Unsupported | Fail with typed cause |
@@ -43,7 +43,7 @@ The table intentionally contains no benchmark percentages or mutable pass
 counts. Current evidence lives in `reports/claim-index.json` and the status
 artifacts it references.
 
-## Node/Bun promotion requirements
+## Controlled JavaScript runtime promotion requirements
 
 - clean npm installation with the correct native binary;
 - first-kernel output oracle;
@@ -53,6 +53,8 @@ artifacts it references.
 - no hidden provider, backend, CPU, or cloud fallback;
 - receipt with runtime, binary, adapter, driver, workload, output, and timing
   identity.
+- Electron claims remain main-process and Node-side unless a separate renderer
+  or browser contract passes.
 
 ## Native runtime promotion requirements
 

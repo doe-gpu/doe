@@ -119,7 +119,27 @@ napi_value doe_buffer_get_mapped_range(napi_env env, napi_callback_info info) {
     if (!data) NAPI_THROW(env, "getMappedRange returned NULL");
 
     napi_value ab;
-    napi_create_external_arraybuffer(env, data, (size_t)size_i, NULL, NULL, &ab);
+    napi_status status = napi_create_external_arraybuffer(
+        env,
+        data,
+        (size_t)size_i,
+        NULL,
+        NULL,
+        &ab
+    );
+    if (status == napi_ok) return ab;
+    if (status != napi_no_external_buffers_allowed) {
+        NAPI_THROW(env, "napi_create_external_arraybuffer failed");
+    }
+
+    /* Some hosts, including sandboxed Electron runtimes, disallow external
+     * ArrayBuffers. Preserve the WebGPU ArrayBuffer contract with an owned
+     * copy rather than returning an uninitialized napi_value. */
+    void* copy = NULL;
+    if (napi_create_arraybuffer(env, (size_t)size_i, &copy, &ab) != napi_ok) {
+        NAPI_THROW(env, "napi_create_arraybuffer fallback failed");
+    }
+    if (copy && size_i > 0) memcpy(copy, data, (size_t)size_i);
     return ab;
 }
 

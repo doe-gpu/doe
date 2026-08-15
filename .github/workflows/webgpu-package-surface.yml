@@ -5,6 +5,11 @@ on:
     paths:
       - ".github/workflows/webgpu-package-surface.yml"
       - "packages/doe-gpu/**"
+      - "runtime/bridge/webgpu-addon/doe_napi_buffer.c"
+      - "bench/external-projects/holoscript-snn-webgpu/electron-**"
+      - "bench/external-projects/holoscript-snn-webgpu/run-electron-main-process.mjs"
+      - "bench/tests/test_holoscript_electron_main_process.py"
+      - "reports/benchmarks/amd-vulkan/**/holoscript-electron-main-process*-diagnostic.json"
       - "config/tool-surfaces.json"
       - "bench/gates/tool_surface_gate.py"
       - "bench/tests/test_tool_surface_gate.py"
@@ -15,6 +20,11 @@ on:
     paths:
       - ".github/workflows/webgpu-package-surface.yml"
       - "packages/doe-gpu/**"
+      - "runtime/bridge/webgpu-addon/doe_napi_buffer.c"
+      - "bench/external-projects/holoscript-snn-webgpu/electron-**"
+      - "bench/external-projects/holoscript-snn-webgpu/run-electron-main-process.mjs"
+      - "bench/tests/test_holoscript_electron_main_process.py"
+      - "reports/benchmarks/amd-vulkan/**/holoscript-electron-main-process*-diagnostic.json"
       - "config/tool-surfaces.json"
       - "bench/gates/tool_surface_gate.py"
       - "bench/tests/test_tool_surface_gate.py"
@@ -43,5 +53,8 @@ jobs:
       - name: Verify public tool-surface declaration
         working-directory: .
         run: python3 bench/gates/tool_surface_gate.py
+      - name: Verify reviewed HoloScript Electron evidence boundary
+        working-directory: .
+        run: python3 -m unittest bench.tests.test_holoscript_electron_main_process
       - name: Verify package contents
         run: npm pack --dry-run --json

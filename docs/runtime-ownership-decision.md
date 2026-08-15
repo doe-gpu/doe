@@ -187,6 +187,28 @@ credit. Select a new ownership candidate only from a measured property that a
 governed incumbent wrapper cannot reproduce; do not weaken or reinterpret a
 completed gate.
 
+HoloScript's separate LIF determinism gate reaches the same terminal ownership
+decision. The reviewed artifact at
+[`../reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json)
+shows exact `W0` and `D0` replay plus byte-identical GPU membrane and spike
+outputs across the governed incumbent and Doe for all frozen cases. It remains
+a valuable cross-provider correctness regression, but it supplies no outcome
+that justifies runtime ownership.
+
+The Electron main-process successor for HoloScript is a distinct runtime-host
+diagnostic and does not reopen the terminal Node decision. In the reviewed
+artifact at
+[`../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json),
+the unchanged application passes the exact oracle in all three `D0` processes
+and replay, while `I0`, `I1`, and `W0` fail at Electron's prohibition on
+external ArrayBuffers. A bounded application upload workaround reaches a native
+abort, but a source-built `webgpu@0.3.10` `P0` with a two-file mapped-buffer
+ownership correction passes three processes and exact replay. The incumbent
+patch therefore closes the application gap and rejects DoeRuntime ownership for
+this tuple. The result remains a diagnostic regression and grants no ownership,
+application-promotion, performance, release, renderer, Chromium, or browser
+credit.
+
 The Doppler local-AI package experiment was admitted only for
 `persistent-performance-control`. The admission receipt at
 [`../reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json`](../reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json)

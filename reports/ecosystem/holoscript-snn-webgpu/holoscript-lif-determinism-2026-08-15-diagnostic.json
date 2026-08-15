@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "holoscript-lif-determinism-2026-08-15-diagnostic",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "lif-determinism",
+  "generatedAt": "2026-08-15T23:07:34.926Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-15T23:07:49Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "15",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "live-amd-lif-oracle-pass",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "All four runtime lanes pass the upstream CPU membrane tolerances and exact final spike-mask oracle for canonical, 65,536-neuron, and parameter-override LIF cases on the physical Radeon Vulkan adapter.",
+      "evidence": [
+        {
+          "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
+          "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+        }
+      ]
+    },
+    {
+      "id": "same-backend-and-cross-provider-identity",
+      "category": "reliability",
+      "status": "verified",
+      "summary": "Each lane is nondegenerately repeatable, W0 and D0 replay exactly, and Dawn and Doe produce identical GPU membrane and spike bytes for every frozen case on this adapter.",
+      "evidence": [
+        {
+          "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
+          "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+        }
+      ]
+    },
+    {
+      "id": "runtime-ownership-not-distinguished",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "The governed incumbent satisfies the same live-provider, semantic-oracle, repeatability, and replay outcomes as Doe. No bounded correction is needed and this workload supplies no DoeRuntime ownership advantage.",
+      "evidence": [
+        {
+          "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
+          "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The result covers one AMD Vulkan adapter and does not establish cross-vendor byte identity.",
+    "The original upstream cross-vendor script has a broken relative dist import; the harness invokes the unchanged exported production functions directly.",
+    "Three clean processes per lane remain below the promotion reliability floor.",
+    "No selected-operation performance comparison was run.",
+    "The result is a diagnostic regression and does not prove adoption."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 165879808
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 159150080
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The frozen workload adjudicates correctness and determinism, not selected-operation performance."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No receipt-overhead timing claim was admitted."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "retain-diagnostic",
+    "claimedProperty": "reproducible-runtime-identity",
+    "lanes": {
+      "I0": {
+        "status": "pass",
+        "summary": "The ambient incumbent passes every frozen oracle and repeatability obligation."
+      },
+      "I1": {
+        "status": "pass",
+        "summary": "The explicitly pinned incumbent passes every frozen obligation."
+      },
+      "W0": {
+        "status": "pass",
+        "summary": "The governed incumbent passes exact semantic replay."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "Doe passes the same semantic and replay contract."
+      },
+      "P0": {
+        "status": "not-run",
+        "summary": "W0 exposes no frozen defect requiring a bounded correction."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "D0 supplies no semantic or reproducibility outcome unavailable from W0."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "No unique application outcome exists to repay DoeRuntime ownership costs."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The diagnostic uses a prepared upstream workspace and source provider path."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Every lane binds the physical Radeon Vulkan adapter and rejects software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The lanes execute sequentially."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Processes and simulators exit cleanly, but promotion-scale teardown was not run."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Promotion-scale stress was not run."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process memory is recorded, but bounded-growth testing was not run."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The matrix binds its provider, runtime, upstream implementation, shader, oracle, inputs, and runner."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "W0 and D0 independently reproduce their semantic evidence."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No selected-operation performance result exists."
+    },
+    "ownership": {
+      "status": "fail",
+      "summary": "The governed incumbent and Doe satisfy the same application outcome."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness remains diagnostic and cannot block a release."
+    }
+  },
+  "receipts": [
+    {
+      "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
+      "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
+      "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+    }
+  ]
+}

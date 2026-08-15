@@ -1,0 +1,19 @@
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -618,14 +618,10 @@
+       label: label ?? `snn-buffer-${this.buffers.size}`,
+       size: alignedSize,
+       usage,
+-      mappedAtCreation: mappedAtCreation ?? !!initialData
++      mappedAtCreation: mappedAtCreation ?? false
+     });
+     if (initialData) {
+-      const mapped = new Float32Array(buffer.getMappedRange());
+-      mapped.set(
+-        initialData instanceof Float32Array ? initialData : new Float32Array(initialData.buffer)
+-      );
+-      buffer.unmap();
++      this.device.queue.writeBuffer(buffer, 0, initialData);
+     }
+     const handle = {
+       buffer,

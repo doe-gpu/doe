@@ -104,10 +104,12 @@ class CiWorkflowSurfaceTests(unittest.TestCase):
         text = workflow_text("doe-gpu-native-freshness.yml")
         self.assertIn("if: github.event_name == 'workflow_dispatch'", text)
 
-    def test_native_freshness_enforces_node_and_bun_clean_install(self) -> None:
+    def test_native_freshness_enforces_node_bun_and_electron_clean_install(self) -> None:
         text = workflow_text("doe-gpu-native-freshness.yml")
         self.assertIn("uses: oven-sh/setup-bun@v2", text)
         self.assertIn('bun-version: "1.3.10"', text)
+        self.assertIn('ELECTRON_VERSION: "43.4.0"', text)
+        self.assertIn("DOE_ELECTRON_EXECUTABLE=$electron_executable", text)
         self.assertIn(
             "run: npm run test:integration:native-clean-install\n", text
         )
@@ -115,10 +117,16 @@ class CiWorkflowSurfaceTests(unittest.TestCase):
             "run: npm run test:integration:native-clean-install:bun\n", text
         )
         self.assertIn(
+            "run: npm run test:integration:native-clean-install:electron\n", text
+        )
+        self.assertIn(
             "run: npm run test:integration:native-reliability\n", text
         )
         self.assertIn(
             "run: npm run test:integration:native-reliability:bun\n", text
+        )
+        self.assertIn(
+            "run: npm run test:integration:native-reliability:electron\n", text
         )
 
     def test_package_surface_runs_complete_hosted_suite(self) -> None:
