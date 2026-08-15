@@ -5,6 +5,8 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 
+import { buildRuntimeOwnership } from './runtime-ownership.mjs';
+
 const harnessDir = dirname(fileURLToPath(import.meta.url));
 const doeRoot = resolve(harnessDir, '../../..');
 const upstreamRoot = resolve(
@@ -123,51 +125,15 @@ for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
   }
 }
 
-function ownershipLane(laneId, missingStatus = 'not-run') {
-  const laneRuns = ownershipRuns.filter((run) => run.laneId === laneId);
-  if (laneRuns.length === 0) {
-    return {
-      status: missingStatus,
-      runCount: 0,
-      successfulRuns: 0,
-      providerModulePaths: [],
-      runs: [],
-    };
-  }
-  const successfulRuns = laneRuns.filter(
-    (run) => run.exitCode === 0 && !run.timedOut && run.result,
-  ).length;
-  return {
-    status: successfulRuns === laneRuns.length ? 'passed' : 'failed',
-    runCount: laneRuns.length,
-    successfulRuns,
-    providerModulePaths: [...new Set(laneRuns.map((run) => run.providerModulePath))],
-    runs: laneRuns,
-  };
-}
-
 const ownershipPlanSha256 = createHash('sha256')
   .update(JSON.stringify(harness.runtimeOwnershipPlan))
   .digest('hex');
-const ownershipLanes = {
-  I0: ownershipLane('I0', 'unavailable'),
-  I1: ownershipLane('I1'),
-  W0: ownershipLane('W0'),
-  D0: ownershipLane('D0'),
-  P0: {
-    status: 'not-run',
-    runCount: 0,
-    successfulRuns: 0,
-    providerModulePaths: [],
-    runs: [],
-  },
-};
-const missingRequiredOwnershipLanes = Object.entries(ownershipLanes)
-  .filter(([laneId, lane]) => (
-    harness.runtimeOwnershipPlan.lanes[laneId].requirement === 'required'
-    && lane.status !== 'passed'
-  ))
-  .map(([laneId]) => laneId);
+const runtimeOwnership = buildRuntimeOwnership({
+  runs: ownershipRuns,
+  plan: harness.runtimeOwnershipPlan,
+  planSha256: ownershipPlanSha256,
+  ambientModuleSupplied: Boolean(ambientDawnModule),
+});
 
 const receiptSamples = (mode) => receiptRuns
   .filter((run) => run.receiptMode === mode && run.exitCode === 0 && run.result)
@@ -195,14 +161,7 @@ const raw = {
   },
   runs,
   receiptRuns,
-  runtimeOwnership: {
-    status: missingRequiredOwnershipLanes.length === 0 ? 'complete' : 'diagnostic-incomplete',
-    planSha256: ownershipPlanSha256,
-    claimedProperty: harness.runtimeOwnershipPlan.claimedProperty,
-    missingRequiredLanes: missingRequiredOwnershipLanes,
-    ambientModuleSupplied: Boolean(ambientDawnModule),
-    lanes: ownershipLanes,
-  },
+  runtimeOwnership,
   receiptOverhead: {
     boundary: 'complete oracle-checked workload across all topologies and measured dispatches',
     unit: 'ms',

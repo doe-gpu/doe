@@ -35,6 +35,13 @@ Reviewed reports record the terminal ownership assessment. Diagnostic runs may
 leave it `not-run`, but the release gate rejects promotion without passing,
 evidence-linked lane, material-outcome, and cost-acceptance decisions.
 
+HoloScript is the reference partial-matrix implementation. Its runner emits
+`I1`, `W0`, and `D0` separately and accepts an ambient incumbent module only
+through the explicit `DOE_EXTERNAL_AMBIENT_DAWN_MODULE` input. It records an
+absent ambient module and the unimplemented bounded-patch control as missing
+lanes; it never aliases the pinned incumbent into `I0` or promotes a partial
+matrix.
+
 ## Portable preparation and reproduction
 
 The canonical machine-independent entrypoint is:
