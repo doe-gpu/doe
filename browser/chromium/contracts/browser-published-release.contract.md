@@ -1,4 +1,4 @@
-# Browser Published Release Contract
+# Browser published release contract
 
 Status: `draft`
 
@@ -12,12 +12,13 @@ into the WebGPU runtime path.
 The release name may be `Doe Browser` or `Fawn Doe`, but the artifact must make
 the active runtime visible and verifiable.
 
-## Required Release Artifact
+## Required release artifact
 
 A release-candidate browser bundle must include:
 
-1. a macOS arm64 browser zip as the first hosted artifact, with a public
-   HTTPS download URL,
+1. a browser zip for a platform declared by
+   `config/browser-release-platform-policy.json`, with a public HTTPS download
+   URL,
 2. a SHA-256 for the zip and the browser executable inside it,
 3. the Doe runtime library hash,
 4. the Dawn fallback runtime hash,
@@ -28,11 +29,21 @@ A release-candidate browser bundle must include:
 9. the public download receipt for the hosted archive,
 10. the release archive manifest receipt,
 11. the browser release launch receipt,
-12. the Chromium source checkout/runtime-selector gate receipt,
-13. the browser runtime frontier bundle receipt.
+12. the browser release clean-install check,
+13. the Chromium source checkout/runtime-selector gate receipt,
+14. the browser runtime frontier bundle receipt.
 
-Linux and Windows release zips must use the same artifact contract before they
-can support cross-platform browser claims.
+The governed platform policy currently admits macOS arm64 and Linux x64 as
+independent release-candidate lanes. Each platform must satisfy this complete
+artifact contract before it supports a browser claim; evidence from one
+platform does not promote another.
+
+Linux release candidates must include every package member declared by the
+platform policy. The package preflight fails candidate eligibility when ICU,
+V8 snapshot, resource, locale, crash-handler, sandbox, or scale-resource files
+are absent or when a required executable lacks execute permission. Packaging a
+Linux release candidate requires that passing preflight. Compact diagnostic
+archives are explicitly not installable release candidates.
 
 The release artifact bundle must name the browser executable member path inside
 the zip and verify that member's SHA-256 against the `browserBinary` artifact
@@ -104,6 +115,15 @@ packaged executable/app/runtime member paths as the release bundle. A release
 candidate that only hashes a zip without a launch receipt is not evidence that
 the downloadable browser actually runs the proof surface.
 
+Release-candidate and release launch receipts must bind a passing
+`browser_release_clean_install_check`. The check must safely extract the zip to
+a fresh temporary directory, use no borrowed members, run the extracted
+browser launch probe, and run strict forced-Dawn and forced-Doe WebGPU smoke
+using the browser and Doe library from that extraction. It must bind the
+archive, manifest, product, platform, browser hash, and Doe runtime hash, and it
+must reject runtime fallback. A launch receipt assembled from declared facts
+without this observational check is not release-candidate evidence.
+
 The release artifact bundle must carry a `chromiumSourceCheckout` artifact for
 release candidates. That artifact must be a passing
 `chromium_source_checkout_check` report with `requireRuntimeSelector=true` and
@@ -159,12 +179,12 @@ member path. That plist must bind the same display name, bundle identifier,
 version, package type, and executable name as the release bundle product and
 browser executable member.
 
-For non-macOS diagnostic release archives, the bundle must name a packaged
+For non-macOS release archives, the bundle must name a packaged
 browser metadata JSON member. That metadata must bind the same browser product,
 platform tuple, executable member path, Doe runtime member path, and Dawn
 fallback runtime member path as the release bundle.
 
-## Per-Run Receipts
+## Per-run receipts
 
 Every WebGPU run in the published browser proof lane must emit a receipt that
 binds:

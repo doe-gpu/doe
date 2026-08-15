@@ -993,6 +993,55 @@ class BrowserBenchmarkSupersetCheckerTests(unittest.TestCase):
 
         self.assertIn("modeRunDetails[doe]: activeRuntimeProof missing", errors)
 
+    def test_report_coverage_accepts_v2_doe_provider_with_real_amd_hardware(self) -> None:
+        report = _report()
+        report["invocation"]["platform"] = "linux"
+        detail = report["modeRunDetails"][1]
+        selection = detail["runtimeEvidence"]["runtimeSelection"]
+        adapter_info = {
+            "vendor": "AMD",
+            "architecture": "vulkan",
+            "device": "Radeon 8060S Graphics",
+            "description": "RADV",
+        }
+        detail["runtimeProbe"]["adapterInfo"] = adapter_info
+        detail["runtimeEvidence"]["activeRuntimeProof"] = {
+            "schemaVersion": 2,
+            "providerIdentitySource": "runtimeSelector",
+            "hardwareIdentitySource": "wgpuAdapterGetInfo",
+            "selectedRuntime": "doe",
+            "expected": {
+                "provider": "doe",
+                "fallbackApplied": False,
+                "hiddenFallbackAllowed": False,
+                "hardwareVendorMustBeNonEmpty": True,
+                "hardwareArchitectureMustBeNonEmpty": True,
+            },
+            "provider": {
+                "selectionMode": "doe",
+                "selectedRuntime": "doe",
+                "forcedMode": "doe",
+                "fallbackApplied": False,
+                "hiddenFallbackAllowed": False,
+                "runtimeArtifactSha256": selection["artifactIdentity"]["doeLibSha256"],
+                "launchArgsHash": selection["launchArgsHash"],
+            },
+            "hardware": adapter_info,
+            "matched": True,
+        }
+
+        errors = self.module.check_report_coverage(
+            report,
+            _manifest(),
+            {"rows": []},
+            ["dawn", "doe"],
+        )
+
+        self.assertFalse(
+            any("activeRuntimeProof" in error for error in errors),
+            errors,
+        )
+
     def test_report_coverage_rejects_missing_invocation_platform(self) -> None:
         report = _report()
         report.pop("invocation")

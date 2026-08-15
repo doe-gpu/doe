@@ -974,6 +974,10 @@
       "data": "examples/browser-release-launch-receipt.sample.json"
     },
     {
+      "schema": "config/browser-release-clean-install-check.schema.json",
+      "data": "examples/browser-release-clean-install-check.sample.json"
+    },
+    {
       "schema": "config/browser-public-gallery-receipt.schema.json",
       "data": "examples/browser-public-gallery-receipt.sample.json"
     },

@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_release_clean_install_check",
+  "observedAt": "2026-08-11T13:58:12Z",
+  "verificationLevel": "webgpu_smoke",
+  "sourceMode": "release_archive",
+  "verifier": {
+    "path": "bench/tools/check_browser_release_clean_install.py",
+    "sha256": "c9e5951d4cc049429221ba08fa73985c393fbcd817edc953ad85a586049700ae",
+    "byteLength": 23825,
+    "kind": "browser_release_clean_install_verifier"
+  },
+  "releaseArchive": {
+    "path": "bench/out/public-browser-release/20260703T233418Z/Fawn-Doe-linux-x64-gui-diagnostic.zip",
+    "sha256": "27d958fe939d9a7e71def239613b352a3c297ef702ac108863975eeea4bc7ced",
+    "byteLength": 202611424,
+    "kind": "browser_release_archive"
+  },
+  "releaseArchiveManifest": {
+    "path": "bench/out/public-browser-release/20260703T233418Z/Fawn-Doe-linux-x64-gui-diagnostic.manifest.json",
+    "sha256": "89edc820e59b6d7899879f7f7b775345df87f993914f5d2f522308837ec061df",
+    "byteLength": 3153,
+    "kind": "browser_release_archive_manifest"
+  },
+  "browserProduct": {
+    "productId": "fawn-doe",
+    "displayName": "Fawn Doe",
+    "version": "0.0.0-local-public-release-attempt",
+    "channel": "diagnostic"
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "packageFormat": "zip"
+  },
+  "platformPolicy": {
+    "policyId": "browser-release/platform-package-v1",
+    "path": "config/browser-release-platform-policy.json",
+    "sha256": "c2082f1bb212a8d038bf01fe5221f7bf747cff8b1a274d519ed65f00c92e1bdc",
+    "byteLength": 1080,
+    "kind": "browser_release_platform_policy"
+  },
+  "extraction": {
+    "isolation": "fresh_temporary_directory",
+    "archiveMemberCount": 4,
+    "extractedMemberCount": 0,
+    "borrowedMemberCount": 0,
+    "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome",
+    "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so"
+  },
+  "launchProbe": {
+    "attempted": false,
+    "exitCode": null,
+    "timedOut": false,
+    "durationMs": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "webgpuSmoke": {
+    "required": true,
+    "script": {
+      "path": "browser/chromium/scripts/webgpu-playwright-smoke.mjs",
+      "sha256": "2a1aec88e301fe00c9b76843ab37fcee1d75681cf111a5f8c5646f0eee5eb490",
+      "byteLength": 104857,
+      "kind": "browser_webgpu_smoke_runner"
+    },
+    "process": {
+      "attempted": false,
+      "exitCode": null,
+      "timedOut": false,
+      "durationMs": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "report": null,
+    "modes": [
+      "dawn",
+      "doe"
+    ]
+  },
+  "releaseCandidateEligible": false,
+  "status": "fail",
+  "failures": [
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers[0]",
+      "message": "archive lacks Fawn-Doe-linux-x64/chrome_100_percent.pak"
+    },
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers[1]",
+      "message": "archive lacks Fawn-Doe-linux-x64/chrome_200_percent.pak"
+    },
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers[2]",
+      "message": "archive lacks Fawn-Doe-linux-x64/chrome_crashpad_handler"
+    },
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers[3]",
+      "message": "archive lacks Fawn-Doe-linux-x64/chrome_sandbox"
+    },
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers[4]",
+      "message": "archive lacks Fawn-Doe-linux-x64/icudtl.dat"
+    },
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers[5]",
+      "message": "archive lacks Fawn-Doe-linux-x64/locales/en-US.pak"
+    },
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers[6]",
+      "message": "archive lacks Fawn-Doe-linux-x64/resources.pak"
+    },
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers[7]",
+      "message": "archive lacks Fawn-Doe-linux-x64/v8_context_snapshot.bin"
+    }
+  ]
+}

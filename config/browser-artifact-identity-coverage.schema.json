@@ -46,6 +46,7 @@
             "public_download_receipt_identity",
             "public_gallery_receipt_identity",
             "release_launch_receipt_identity",
+            "browser_release_clean_install_identity",
             "proof_page_receipt_identity",
             "published_proof_surface_identity",
             "published_proof_surface_check_identity",

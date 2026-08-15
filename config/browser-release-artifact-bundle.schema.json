@@ -49,13 +49,22 @@
             ]
           },
           "platform": {
-            "type": "object",
-            "required": ["os", "arch", "packageFormat"],
-            "properties": {
-              "os": { "const": "macos" },
-              "arch": { "const": "arm64" },
-              "packageFormat": { "const": "zip" }
-            }
+            "oneOf": [
+              {
+                "properties": {
+                  "os": { "const": "macos" },
+                  "arch": { "const": "arm64" },
+                  "packageFormat": { "const": "zip" }
+                }
+              },
+              {
+                "properties": {
+                  "os": { "const": "linux" },
+                  "arch": { "const": "x64" },
+                  "packageFormat": { "const": "zip" }
+                }
+              }
+            ]
           }
         }
       }

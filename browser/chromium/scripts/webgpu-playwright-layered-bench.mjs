@@ -1543,16 +1543,10 @@ function adapterIdentityFromProbe(probe) {
   };
 }
 
-function expectedDoeAdapterArchitecture() {
-  if (process.platform === "darwin") return "metal";
-  if (process.platform === "win32") return "d3d12";
-  return "vulkan";
-}
-
-function activeRuntimeProof(selectedRuntime, probe) {
+function activeRuntimeProof(runtimeSelection, probe) {
   const adapterInfo =
     probe?.adapterInfo && typeof probe.adapterInfo === "object" ? probe.adapterInfo : {};
-  const observed = {
+  const hardware = {
     vendor: typeof adapterInfo.vendor === "string" ? adapterInfo.vendor : "",
     architecture:
       typeof adapterInfo.architecture === "string" ? adapterInfo.architecture : "",
@@ -1560,18 +1554,47 @@ function activeRuntimeProof(selectedRuntime, probe) {
     description:
       typeof adapterInfo.description === "string" ? adapterInfo.description : "",
   };
-  const expected = selectedRuntime === "doe"
-    ? { vendor: "Doe", architecture: expectedDoeAdapterArchitecture() }
-    : { vendorMustNotEqual: "Doe", vendorMustBeNonEmpty: true };
-  const matched = selectedRuntime === "doe"
-    ? observed.vendor === expected.vendor && observed.architecture === expected.architecture
-    : observed.vendor.length > 0 && observed.vendor !== "Doe";
+  const selectedRuntime = runtimeSelection.selectedRuntime;
+  const artifactIdentity = runtimeSelection.artifactIdentity ?? {};
+  const provider = {
+    selectionMode: runtimeSelection.selectionMode,
+    selectedRuntime,
+    forcedMode: runtimeSelection.forcedMode,
+    fallbackApplied: runtimeSelection.fallbackApplied,
+    hiddenFallbackAllowed: runtimeSelection.hiddenFallbackAllowed,
+    runtimeArtifactSha256:
+      selectedRuntime === "doe"
+        ? artifactIdentity.doeLibSha256
+        : artifactIdentity.dawnRuntimeSha256,
+    launchArgsHash: runtimeSelection.launchArgsHash,
+  };
+  const expected = {
+    provider: selectedRuntime,
+    fallbackApplied: false,
+    hiddenFallbackAllowed: false,
+    hardwareVendorMustBeNonEmpty: true,
+    hardwareArchitectureMustBeNonEmpty: true,
+  };
+  const matched =
+    provider.selectionMode === selectedRuntime
+    && provider.selectedRuntime === selectedRuntime
+    && provider.forcedMode === selectedRuntime
+    && provider.fallbackApplied === false
+    && provider.hiddenFallbackAllowed === false
+    && typeof provider.runtimeArtifactSha256 === "string"
+    && /^[a-f0-9]{64}$/.test(provider.runtimeArtifactSha256)
+    && typeof provider.launchArgsHash === "string"
+    && /^[a-f0-9]{64}$/.test(provider.launchArgsHash)
+    && hardware.vendor.length > 0
+    && hardware.architecture.length > 0;
   return {
-    schemaVersion: 1,
-    identitySource: "wgpuAdapterGetInfo",
+    schemaVersion: 2,
+    providerIdentitySource: "runtimeSelector",
+    hardwareIdentitySource: "wgpuAdapterGetInfo",
     selectedRuntime,
     expected,
-    observed,
+    provider,
+    hardware,
     matched,
   };
 }
@@ -3561,14 +3584,14 @@ async function runMode(
     runtimeProbe = await probeRuntime(page, browserSurfaceArgs);
     runtimeProbe.adapterIdentity = adapterIdentityFromProbe(runtimeProbe);
     runtimeEvidence.activeRuntimeProof = activeRuntimeProof(
-      selection.selectedRuntime,
+      runtimeEvidence.runtimeSelection,
       runtimeProbe,
     );
     if (!runtimeEvidence.activeRuntimeProof.matched) {
       throw new Error(
         `active WebGPU runtime proof mismatch: requested ${selection.selectedRuntime}, `
-          + `observed vendor=${runtimeEvidence.activeRuntimeProof.observed.vendor || "<empty>"} `
-          + `architecture=${runtimeEvidence.activeRuntimeProof.observed.architecture || "<empty>"}`,
+          + `observed vendor=${runtimeEvidence.activeRuntimeProof.hardware.vendor || "<empty>"} `
+          + `architecture=${runtimeEvidence.activeRuntimeProof.hardware.architecture || "<empty>"}`,
       );
     }
 
@@ -4129,6 +4152,12 @@ async function main() {
             failure.error,
           );
         }
+        const unavailableRuntimeSelection = buildRuntimeSelection(
+          mode,
+          args,
+          chromePathForMode,
+          [],
+        );
         modeRunDetails.push({
           mode,
           scheduleUnit: scheduleEntry.scheduleUnit,
@@ -4140,12 +4169,7 @@ async function main() {
           sourceKernelSamples: scheduleEntry.sourceKernelSamples ?? args.sourceKernelSamples,
           elapsedMs: 0,
           launchArgs: [],
-          runtimeSelection: buildRuntimeSelection(
-            mode,
-            args,
-            chromePathForMode,
-            [],
-          ),
+          runtimeSelection: unavailableRuntimeSelection,
           shaderCompilerIdentity: shaderCompilerIdentity(
             mode,
             args,
@@ -4161,12 +4185,7 @@ async function main() {
           },
           runtimeEvidence: {
             modeRequested: mode,
-            runtimeSelection: buildRuntimeSelection(
-              mode,
-              args,
-              chromePathForMode,
-              [],
-            ),
+            runtimeSelection: unavailableRuntimeSelection,
             pageTargetKind: pageTarget.kind,
             pageTargetPort: null,
             pageTargetWarning: pageTarget.warning ?? null,
@@ -4175,7 +4194,7 @@ async function main() {
             failureStage: failure.stage,
             failureStatusCode: failure.statusCode,
             activeRuntimeProof: activeRuntimeProof(
-              modeSelection.selectedRuntime,
+              unavailableRuntimeSelection,
               null,
             ),
             nativeMetalTrace: {

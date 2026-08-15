@@ -42,6 +42,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--release-archive-url", default="")
     parser.add_argument("--release-archive-manifest", required=True)
     parser.add_argument("--proof-surface", required=True)
+    parser.add_argument(
+        "--clean-install-check",
+        default="",
+        help="Passing browser_release_clean_install_check; required for release candidates and releases.",
+    )
     parser.add_argument("--product-id", choices=tuple(PRODUCT_DISPLAY_NAMES), default="fawn-doe")
     parser.add_argument("--product-name", choices=tuple(PRODUCT_DISPLAY_NAMES.values()), default="Fawn Doe")
     parser.add_argument("--product-version", required=True)
@@ -130,6 +135,81 @@ def validate_platform(platform: dict[str, str]) -> None:
         raise ValueError(f"platform arch must be one of {', '.join(PLATFORM_ARCH)}")
     if platform.get("packageFormat") != "zip":
         raise ValueError("platform packageFormat must be zip")
+
+
+def validate_clean_install_check(
+    clean_install_check: Path | None,
+    *,
+    release_archive: Path,
+    release_archive_manifest: Path,
+    browser_product: dict[str, str],
+    platform: dict[str, str],
+) -> dict[str, str] | None:
+    required = browser_product.get("channel") in {"release_candidate", "release"}
+    if clean_install_check is None:
+        if required:
+            raise ValueError("clean install check is required for release candidates and releases")
+        return None
+    payload = load_json_object(clean_install_check, "clean install check")
+    if payload.get("schemaVersion") != 1:
+        raise ValueError("clean install check schemaVersion must be 1")
+    if payload.get("artifactKind") != "browser_release_clean_install_check":
+        raise ValueError("clean install check artifactKind must be browser_release_clean_install_check")
+    if payload.get("status") != "pass" or payload.get("releaseCandidateEligible") is not True:
+        raise ValueError("clean install check must pass and be release-candidate eligible")
+    if payload.get("verificationLevel") != "webgpu_smoke" or payload.get("sourceMode") != "release_archive":
+        raise ValueError("clean install check must verify WebGPU smoke from the release archive")
+    extraction = payload.get("extraction")
+    if not isinstance(extraction, dict) or extraction.get("isolation") != "fresh_temporary_directory":
+        raise ValueError("clean install check must use a fresh temporary extraction")
+    if not isinstance(extraction, dict) or extraction.get("borrowedMemberCount") != 0:
+        raise ValueError("clean install check must not borrow package members")
+    if (
+        not isinstance(extraction.get("archiveMemberCount"), int)
+        or extraction.get("archiveMemberCount") <= 0
+        or extraction.get("extractedMemberCount") != extraction.get("archiveMemberCount")
+    ):
+        raise ValueError("clean install check must extract every archive member")
+    for field, label in (("launchProbe", "launch probe"),):
+        process = payload.get(field)
+        if not isinstance(process, dict) or process.get("attempted") is not True or process.get("exitCode") != 0 or process.get("timedOut") is not False:
+            raise ValueError(f"clean install check {label} must pass")
+    smoke = payload.get("webgpuSmoke")
+    if not isinstance(smoke, dict) or smoke.get("required") is not True or smoke.get("modes") != ["dawn", "doe"]:
+        raise ValueError("clean install check must require Dawn and Doe WebGPU smoke")
+    smoke_process = smoke.get("process") if isinstance(smoke, dict) else None
+    if not isinstance(smoke_process, dict) or smoke_process.get("attempted") is not True or smoke_process.get("exitCode") != 0 or smoke_process.get("timedOut") is not False:
+        raise ValueError("clean install check WebGPU smoke process must pass")
+    if payload.get("failures") != []:
+        raise ValueError("passing clean install check must carry no failures")
+    if payload.get("browserProduct") != browser_product or payload.get("platform") != platform:
+        raise ValueError("clean install check product and platform must match launch receipt")
+    for field, path, kind in (
+        ("releaseArchive", release_archive, "browser_release_archive"),
+        ("releaseArchiveManifest", release_archive_manifest, "browser_release_archive_manifest"),
+    ):
+        row = payload.get(field)
+        if not isinstance(row, dict):
+            raise ValueError(f"clean install check {field} is required")
+        if row.get("sha256") != sha256_file(path) or row.get("kind") != kind:
+            raise ValueError(f"clean install check {field} must bind launch receipt bytes")
+    for row, kind, label in (
+        (payload.get("verifier"), "browser_release_clean_install_verifier", "verifier"),
+        (smoke.get("script") if isinstance(smoke, dict) else None, "browser_webgpu_smoke_runner", "smoke script"),
+        (smoke.get("report") if isinstance(smoke, dict) else None, "chromium-webgpu-playwright-smoke", "smoke report"),
+    ):
+        if not isinstance(row, dict) or row.get("kind") != kind:
+            raise ValueError(f"clean install check {label} artifact is required")
+        path_text = row.get("path")
+        if not isinstance(path_text, str) or not path_text:
+            raise ValueError(f"clean install check {label} path is required")
+        artifact_path = Path(path_text)
+        if not artifact_path.is_absolute():
+            repo_candidate = REPO_ROOT / artifact_path
+            artifact_path = repo_candidate if repo_candidate.is_file() else clean_install_check.parent / artifact_path
+        if not artifact_path.is_file() or row.get("sha256") != sha256_file(artifact_path):
+            raise ValueError(f"clean install check {label} bytes must match its artifact hash")
+    return artifact(clean_install_check, "browser_release_clean_install_check", "clean install check")
 
 
 def artifact(path: Path, kind: str, label: str, *, download_url: str = "") -> dict[str, str]:
@@ -373,6 +453,7 @@ def build_receipt(
     release_archive_url: str,
     release_archive_manifest: Path,
     proof_surface: Path,
+    clean_install_check: Path | None,
     browser_product: dict[str, str],
     platform: dict[str, str],
     browser_executable_archive_path: str,
@@ -515,6 +596,15 @@ def build_receipt(
         release_archive,
     )
     validate_receipt_against_proof_surface(receipt, proof_surface)
+    clean_install_artifact = validate_clean_install_check(
+        clean_install_check,
+        release_archive=release_archive,
+        release_archive_manifest=release_archive_manifest,
+        browser_product=browser_product,
+        platform=platform,
+    )
+    if clean_install_artifact is not None:
+        receipt["cleanInstallCheck"] = clean_install_artifact
     return receipt
 
 
@@ -528,6 +618,7 @@ def main() -> int:
             release_archive_url=args.release_archive_url,
             release_archive_manifest=Path(args.release_archive_manifest),
             proof_surface=Path(args.proof_surface),
+            clean_install_check=Path(args.clean_install_check) if args.clean_install_check else None,
             browser_product={
                 "productId": args.product_id,
                 "displayName": args.product_name,

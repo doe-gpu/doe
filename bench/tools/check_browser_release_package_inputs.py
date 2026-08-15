@@ -34,6 +34,9 @@ DEFAULT_DAWN_FALLBACK_RUNTIME = (
     "browser/chromium/src/out/fawn_release/libdawn_native.so"
 )
 DEFAULT_SHADER_COMPILER = "runtime/zig/zig-out/bin/doe-zig-runtime"
+RELEASE_PLATFORM_POLICY_PATH = (
+    REPO_ROOT / "config" / "browser-release-platform-policy.json"
+)
 BROWSER_PRODUCT_BUNDLE_IDS = {
     "doe-browser": "dev.doe.doe-browser",
     "fawn-doe": "dev.doe.fawn-doe",
@@ -80,6 +83,48 @@ RELEASE_BUILD_PROFILE_ARGS = {
     "dawn_enable_webgpu_on_webgpu": "true",
 }
 BUILD_PROFILE_SEARCH_DEPTH = 4
+
+
+def load_release_platform_policy() -> dict[str, Any]:
+    payload = json.loads(RELEASE_PLATFORM_POLICY_PATH.read_text(encoding="utf-8"))
+    if payload.get("schemaVersion") != 1:
+        raise ValueError("browser release platform policy schemaVersion must be 1")
+    if payload.get("policyId") != "browser-release/platform-package-v1":
+        raise ValueError("browser release platform policyId is unsupported")
+    platforms = payload.get("releasePlatforms")
+    if not isinstance(platforms, list) or not platforms:
+        raise ValueError("browser release platform policy must define releasePlatforms")
+    identities: set[tuple[str, str, str]] = set()
+    for row in platforms:
+        if not isinstance(row, dict):
+            raise ValueError("browser release platform policy rows must be objects")
+        identity = (row.get("os"), row.get("arch"), row.get("packageFormat"))
+        if not all(isinstance(value, str) and value for value in identity):
+            raise ValueError("browser release platform identity must be complete")
+        if identity in identities:
+            raise ValueError(f"duplicate browser release platform policy: {identity}")
+        identities.add(identity)
+        members = row.get("requiredPackageMembers")
+        if not isinstance(members, list):
+            raise ValueError("requiredPackageMembers must be an array")
+        member_paths: set[str] = set()
+        for member in members:
+            if not isinstance(member, dict):
+                raise ValueError("required package member rows must be objects")
+            path = member.get("path")
+            if not isinstance(path, str) or not safe_repo_path(path):
+                raise ValueError(f"invalid required package member path: {path}")
+            if path in member_paths:
+                raise ValueError(f"duplicate required package member path: {path}")
+            member_paths.add(path)
+    return payload
+
+
+def release_platform_contract(platform: dict[str, str]) -> dict[str, Any] | None:
+    for row in load_release_platform_policy()["releasePlatforms"]:
+        if all(row.get(key) == platform.get(key) for key in ("os", "arch", "packageFormat")):
+            return row
+    return None
 
 
 def load_packer_module() -> Any:
@@ -134,7 +179,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--require-release-candidate-eligible",
         action="store_true",
-        help="Exit non-zero unless the inputs satisfy the initial macOS arm64 release-candidate lane.",
+        help=(
+            "Exit non-zero unless the inputs satisfy a release platform declared "
+            "in config/browser-release-platform-policy.json."
+        ),
     )
     parser.add_argument("--out", default="", help="Optional report output path.")
     parser.add_argument("--json", action="store_true", dest="emit_json")
@@ -740,8 +788,14 @@ def release_candidate_binary_identity_failures(
     path_prefix: str = "packageInputs",
 ) -> list[dict[str, str]]:
     platform = payload.get("platform")
-    if not isinstance(platform, dict) or platform.get("os") != "macos":
+    if not isinstance(platform, dict):
         return []
+    platform_os = platform.get("os")
+    expected_format = {"macos": "macho", "linux": "elf"}.get(platform_os)
+    if expected_format is None:
+        return []
+    format_label = {"macho": "Mach-O", "elf": "ELF"}[expected_format]
+    platform_label = {"macos": "macOS", "linux": "Linux"}[platform_os]
     expected_arch = platform.get("arch")
     if not isinstance(expected_arch, str) or not expected_arch:
         return []
@@ -754,19 +808,22 @@ def release_candidate_binary_identity_failures(
         row = inputs.get(role)
         if not isinstance(row, dict):
             continue
-        if row.get("detectedFormat") != "macho":
+        if row.get("detectedFormat") != expected_format:
             failures.append(
                 failure(
-                    "package_inputs_macos_binary_format_mismatch",
+                    f"package_inputs_{platform_os}_binary_format_mismatch",
                     f"{path_prefix}.inputs.{role}.detectedFormat",
-                    f"release-candidate package inputs {role} must be Mach-O for macOS",
+                    (
+                        f"release-candidate package inputs {role} must be "
+                        f"{format_label} for {platform_label}"
+                    ),
                 )
             )
         arches = row.get("detectedArchitectures")
         if not isinstance(arches, list) or expected_arch not in arches:
             failures.append(
                 failure(
-                    "package_inputs_macos_binary_arch_mismatch",
+                    f"package_inputs_{platform_os}_binary_arch_mismatch",
                     f"{path_prefix}.inputs.{role}.detectedArchitectures",
                     f"release-candidate package inputs {role} must include {expected_arch} code",
                 )
@@ -790,6 +847,54 @@ def package_member_existing_source(
     if source is not None and source.is_file():
         return source
     return None
+
+
+def release_package_support_failures(
+    *,
+    package_dir: Path | None,
+    platform: dict[str, str],
+    path_prefix: str = "packageDir",
+) -> list[dict[str, str]]:
+    contract = release_platform_contract(platform)
+    if contract is None:
+        return [
+            failure(
+                "unsupported_browser_release_platform",
+                "platform",
+                (
+                    "browser release platform is not declared in "
+                    "config/browser-release-platform-policy.json"
+                ),
+            )
+        ]
+    if package_dir is None:
+        return []
+
+    failures: list[dict[str, str]] = []
+    for member in contract["requiredPackageMembers"]:
+        relative_path = member["path"]
+        source = package_source_path(package_dir, relative_path)
+        member_path = f"{path_prefix}/{relative_path}"
+        if source is None or not source.is_file():
+            failures.append(
+                failure(
+                    "browser_release_support_member_missing",
+                    member_path,
+                    f"release package must include {relative_path}",
+                )
+            )
+            continue
+        if member["executable"] and not (
+            stat.S_IMODE(source.stat().st_mode) & stat.S_IXUSR
+        ):
+            failures.append(
+                failure(
+                    "browser_release_support_member_not_executable",
+                    member_path,
+                    f"release package member must be executable: {relative_path}",
+                )
+            )
+    return failures
 
 
 def replacement_rows(
@@ -834,6 +939,8 @@ def release_candidate_blockers(
     product: dict[str, str],
     platform: dict[str, str],
     build_profile: dict[str, Any],
+    package_dir: Path | None,
+    inputs: dict[str, dict[str, Any]],
 ) -> list[dict[str, str]]:
     blockers: list[dict[str, str]] = []
     if status != "pass":
@@ -852,14 +959,18 @@ def release_candidate_blockers(
                 "initial browser release artifact must use release_candidate channel",
             )
         )
-    if platform != {"os": "macos", "arch": "arm64", "packageFormat": "zip"}:
-        blockers.append(
-            failure(
-                "initial_macos_arm64_release_required",
-                "platform",
-                "initial browser release artifact must be macOS arm64 zip",
-            )
+    blockers.extend(
+        release_package_support_failures(
+            package_dir=package_dir,
+            platform=platform,
         )
+    )
+    blockers.extend(
+        release_candidate_binary_identity_failures(
+            {"platform": platform, "inputs": inputs},
+            path_prefix="packageInputs",
+        )
+    )
     if product["channel"] == "release_candidate":
         if not build_profile.get("available"):
             blockers.append(
@@ -1084,6 +1195,8 @@ def build_report(
         product=product,
         platform=platform,
         build_profile=build_profile,
+        package_dir=package_dir_path,
+        inputs=ordered_inputs,
     )
     release_candidate_eligible = not candidate_blockers
     return {

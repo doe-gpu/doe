@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import plistlib
+import stat
 import sys
 import zipfile
 from pathlib import Path, PurePosixPath
@@ -420,9 +421,21 @@ def check_unique_release_archive_member_paths(payload: dict[str, Any]) -> list[d
 
 
 def check_initial_release_candidate_platform(platform: Any) -> list[dict[str, str]]:
-    if not isinstance(platform, dict) or (platform.get("os"), platform.get("arch"), platform.get("packageFormat")) == ("macos", "arm64", "zip"):
+    if (
+        isinstance(platform, dict)
+        and package_inputs_check.release_platform_contract(platform) is not None
+    ):
         return []
-    return [failure("release_candidate_platform_not_macos_arm64", "platform", "initial release candidates must target macOS arm64 zip")]
+    return [
+        failure(
+            "unsupported_release_candidate_platform",
+            "platform",
+            (
+                "release candidates must target a platform declared in "
+                "config/browser-release-platform-policy.json"
+            ),
+        )
+    ]
 
 
 def check_archive_member_matches_artifact(
@@ -589,10 +602,15 @@ def check_release_archive_binary_identity(
     if (
         verify_files_root is None
         or not isinstance(platform, dict)
-        or platform.get("os") != "macos"
         or not isinstance(release_archive, dict)
     ):
         return []
+    platform_os = platform.get("os")
+    expected_format = {"macos": "macho", "linux": "elf"}.get(platform_os)
+    if expected_format is None:
+        return []
+    format_label = {"macho": "Mach-O", "elf": "ELF"}[expected_format]
+    platform_label = {"macos": "macOS", "linux": "Linux"}[platform_os]
     expected_arch = platform.get("arch")
     if not isinstance(expected_arch, str):
         return []
@@ -626,12 +644,15 @@ def check_release_archive_binary_identity(
                 if info.is_dir():
                     continue
                 identity = detect_file_identity_bytes(archive.read(info), kind)
-                if identity.get("detectedFormat") != "macho":
+                if identity.get("detectedFormat") != expected_format:
                     failures.append(
                         failure(
                             "release_archive_binary_format_mismatch",
                             member_path_field,
-                            f"macOS {label} archive member must be Mach-O: {member_path}",
+                            (
+                                f"{platform_label} {label} archive member must be "
+                                f"{format_label}: {member_path}"
+                            ),
                         )
                     )
                 architectures = identity.get("detectedArchitectures")
@@ -641,11 +662,82 @@ def check_release_archive_binary_identity(
                             "release_archive_binary_arch_mismatch",
                             member_path_field,
                             (
-                                f"macOS {label} archive member must include "
+                                f"{platform_label} {label} archive member must include "
                                 f"{expected_arch} code: {member_path}"
                             ),
                         )
                     )
+    except zipfile.BadZipFile:
+        return []
+    return failures
+
+
+def check_release_archive_platform_support(
+    payload: dict[str, Any],
+    verify_files_root: Path | None,
+) -> list[dict[str, str]]:
+    platform = payload.get("platform")
+    contract = (
+        package_inputs_check.release_platform_contract(platform)
+        if isinstance(platform, dict)
+        else None
+    )
+    if contract is None or verify_files_root is None:
+        return []
+    browser_member = payload.get("browserExecutableArchivePath")
+    if not isinstance(browser_member, str) or not browser_member:
+        return []
+    browser_parts = PurePosixPath(browser_member).parts
+    if not browser_parts:
+        return []
+    release_archive = payload.get("releaseArchive")
+    archive_path = release_archive.get("path") if isinstance(release_archive, dict) else None
+    if not isinstance(archive_path, str) or not archive_path:
+        return []
+    resolved_path = resolve_artifact_path(archive_path, verify_files_root)
+    if resolved_path is None or not resolved_path.is_file() or not zipfile.is_zipfile(resolved_path):
+        return []
+
+    failures: list[dict[str, str]] = []
+    package_root = browser_parts[0]
+    try:
+        with zipfile.ZipFile(resolved_path) as archive:
+            for required_member in contract["requiredPackageMembers"]:
+                relative_path = required_member["path"]
+                member_path = f"{package_root}/{relative_path}"
+                try:
+                    info = archive.getinfo(member_path)
+                except KeyError:
+                    failures.append(
+                        failure(
+                            "release_archive_support_member_missing",
+                            "releaseArchive.path",
+                            f"release archive must include {member_path}",
+                        )
+                    )
+                    continue
+                if info.is_dir():
+                    failures.append(
+                        failure(
+                            "release_archive_support_member_is_directory",
+                            "releaseArchive.path",
+                            f"release archive support member must be a file: {member_path}",
+                        )
+                    )
+                    continue
+                if required_member["executable"]:
+                    mode = (info.external_attr >> 16) & 0o777
+                    if not mode & stat.S_IXUSR:
+                        failures.append(
+                            failure(
+                                "release_archive_support_member_not_executable",
+                                "releaseArchive.path",
+                                (
+                                    "release archive support member must be executable: "
+                                    f"{member_path}"
+                                ),
+                            )
+                        )
     except zipfile.BadZipFile:
         return []
     return failures
@@ -990,6 +1082,7 @@ def check_release_archive_surface(
             )
         if candidate_required:
             failures.extend(check_release_archive_binary_identity(payload, verify_files_root))
+            failures.extend(check_release_archive_platform_support(payload, verify_files_root))
         failures.extend(check_macos_app_metadata_archive_member(payload, verify_files_root))
         failures.extend(check_non_macos_app_metadata_archive_member(payload, verify_files_root))
     return failures
@@ -1598,6 +1691,88 @@ def check_browser_launch_receipt_payload(
     ):
         if receipt.get(field) != payload.get(bundle_field):
             failures.append(failure(code, f"browserLaunchReceipt.{field}", message))
+    candidate_required = payload.get("releaseStatus") == "release_candidate"
+    clean_install_artifact = receipt.get("cleanInstallCheck")
+    if not isinstance(clean_install_artifact, dict):
+        if candidate_required:
+            failures.append(
+                failure(
+                    "missing_browser_clean_install_check",
+                    "browserLaunchReceipt.cleanInstallCheck",
+                    "release-candidate launch receipts must bind a clean-install check",
+                )
+            )
+    else:
+        failures.extend(
+            check_artifact(
+                clean_install_artifact,
+                "browserLaunchReceipt.cleanInstallCheck",
+                "browser_release_clean_install_check",
+                verify_files_root,
+            )
+        )
+        clean_install = load_artifact_payload(
+            clean_install_artifact,
+            "browserLaunchReceipt.cleanInstallCheck",
+            verify_files_root,
+        )
+        if isinstance(clean_install, dict) and "_invalid_payload_error" not in clean_install:
+            for field, expected, code, message in (
+                ("schemaVersion", 1, "invalid_browser_clean_install_schema", "clean-install schemaVersion must be 1"),
+                ("artifactKind", "browser_release_clean_install_check", "invalid_browser_clean_install_kind", "clean-install artifactKind mismatch"),
+                ("verificationLevel", "webgpu_smoke", "browser_clean_install_level_mismatch", "clean install must run WebGPU smoke"),
+                ("sourceMode", "release_archive", "browser_clean_install_source_mismatch", "clean install must use release archive"),
+                ("status", "pass", "browser_clean_install_not_passing", "clean install must pass"),
+                ("releaseCandidateEligible", True, "browser_clean_install_not_eligible", "clean install must be release-candidate eligible"),
+            ):
+                if clean_install.get(field) != expected:
+                    failures.append(failure(code, f"browserLaunchReceipt.cleanInstallCheck.{field}", message))
+            extraction = clean_install.get("extraction")
+            if not isinstance(extraction, dict) or extraction.get("isolation") != "fresh_temporary_directory":
+                failures.append(failure("browser_clean_install_not_isolated", "browserLaunchReceipt.cleanInstallCheck.extraction", "clean install must use a fresh temporary directory"))
+            if not isinstance(extraction, dict) or extraction.get("borrowedMemberCount") != 0:
+                failures.append(failure("browser_clean_install_borrowed_members", "browserLaunchReceipt.cleanInstallCheck.extraction", "clean install must not borrow members"))
+            if (
+                not isinstance(extraction, dict)
+                or not isinstance(extraction.get("archiveMemberCount"), int)
+                or extraction.get("archiveMemberCount") <= 0
+                or extraction.get("extractedMemberCount") != extraction.get("archiveMemberCount")
+            ):
+                failures.append(failure("browser_clean_install_incomplete_extraction", "browserLaunchReceipt.cleanInstallCheck.extraction", "clean install must extract every archive member"))
+            launch_probe = clean_install.get("launchProbe")
+            if not isinstance(launch_probe, dict) or launch_probe.get("attempted") is not True or launch_probe.get("exitCode") != 0 or launch_probe.get("timedOut") is not False:
+                failures.append(failure("browser_clean_install_launch_probe_failed", "browserLaunchReceipt.cleanInstallCheck.launchProbe", "clean-install launch probe must pass"))
+            smoke = clean_install.get("webgpuSmoke")
+            smoke_process = smoke.get("process") if isinstance(smoke, dict) else None
+            if not isinstance(smoke, dict) or smoke.get("required") is not True or smoke.get("modes") != ["dawn", "doe"]:
+                failures.append(failure("browser_clean_install_smoke_modes_mismatch", "browserLaunchReceipt.cleanInstallCheck.webgpuSmoke", "clean install must require Dawn and Doe smoke"))
+            if not isinstance(smoke_process, dict) or smoke_process.get("attempted") is not True or smoke_process.get("exitCode") != 0 or smoke_process.get("timedOut") is not False:
+                failures.append(failure("browser_clean_install_smoke_failed", "browserLaunchReceipt.cleanInstallCheck.webgpuSmoke.process", "clean-install WebGPU smoke must pass"))
+            if clean_install.get("failures") != []:
+                failures.append(failure("browser_clean_install_failures_present", "browserLaunchReceipt.cleanInstallCheck.failures", "passing clean install must carry no failures"))
+            for field_name, kind in (
+                ("verifier", "browser_release_clean_install_verifier"),
+                ("script", "browser_webgpu_smoke_runner"),
+                ("report", "chromium-webgpu-playwright-smoke"),
+            ):
+                row = clean_install.get("verifier") if field_name == "verifier" else smoke.get(field_name) if isinstance(smoke, dict) else None
+                failures.extend(
+                    check_artifact(
+                        row,
+                        f"browserLaunchReceipt.cleanInstallCheck.{field_name}",
+                        kind,
+                        verify_files_root,
+                    )
+                )
+            if clean_install.get("browserProduct") != payload.get("browserProduct"):
+                failures.append(failure("browser_clean_install_product_mismatch", "browserLaunchReceipt.cleanInstallCheck.browserProduct", "clean-install product must match release bundle"))
+            if clean_install.get("platform") != payload.get("platform"):
+                failures.append(failure("browser_clean_install_platform_mismatch", "browserLaunchReceipt.cleanInstallCheck.platform", "clean-install platform must match release bundle"))
+            for field_name, bundle_field in (("releaseArchive", "releaseArchive"), ("releaseArchiveManifest", "releaseArchiveManifest")):
+                observed = clean_install.get(field_name)
+                expected = payload.get(bundle_field)
+                if not isinstance(observed, dict) or not isinstance(expected, dict) or any(observed.get(key) != expected.get(key) for key in ("path", "sha256", "kind")):
+                    failures.append(failure("browser_clean_install_artifact_mismatch", f"browserLaunchReceipt.cleanInstallCheck.{field_name}", f"clean-install {field_name} must match release bundle"))
     proof_page = receipt.get("proofPage")
     if not isinstance(proof_page, dict):
         failures.append(failure("missing_browser_launch_proof_page", "browserLaunchReceipt.proofPage", "browser launch receipt must include proofPage launch evidence"))

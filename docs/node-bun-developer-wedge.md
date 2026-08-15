@@ -4,7 +4,7 @@ This page is the implementation and promotion contract for the initial wedge.
 The objective, priority order, downstream flywheel, commercial journey, and
 expansion boundaries live only in [`thesis.md`](thesis.md).
 
-## Supported boundary
+## Candidate boundary
 
 This wedge applies only where the application controls provider selection:
 
@@ -16,6 +16,10 @@ This wedge applies only where the application controls provider selection:
 
 It does not imply arbitrary npm `webgpu` compatibility, browser runtime
 replacement, or support outside the declared matrix.
+
+Inclusion above identifies an admissible candidate surface, not a promoted
+tuple. Current support is owned by [`doe-support-matrix.md`](doe-support-matrix.md)
+and `reports/claim-index.json`; Electron requires its own promoted evidence.
 
 ## First-kernel contract
 
@@ -41,6 +45,32 @@ must record:
 - unsupported APIs;
 - runtime, adapter, driver, and native binary identity;
 - installation and execution receipt.
+
+## Runtime ownership gate
+
+Every promotion candidate must execute the comparison contract in
+[`runtime-ownership-decision.md`](runtime-ownership-decision.md): ambient
+incumbent, pinned incumbent, pinned incumbent plus DoeProof, and DoeRuntime plus
+the same DoeProof machinery. Add the bounded-patch control when independent
+correction is the claimed advantage.
+
+The application contract must identify the property claimed to require
+DoeRuntime and freeze its adjudicating outcome before execution. If the
+governed incumbent closes the gap, promote DoeProof for that application rather
+than assigning the result to DoeRuntime.
+
+## Release portfolio
+
+Application count does not determine release consequence. Classify each
+application as one of:
+
+- core blocker for the primary tuples;
+- platform blocker for changes affecting its declared tuple;
+- diagnostic application with no release authority;
+- experimental probe with no support commitment.
+
+Only applications with complete installation, oracle, replay, lifecycle,
+resource, support-target, and runtime-ownership attribution may become blockers.
 
 ## Reliability gate
 

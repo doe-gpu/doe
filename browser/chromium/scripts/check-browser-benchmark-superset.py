@@ -1964,6 +1964,95 @@ def check_adapter_identity(runtime_probe: Any, row_label: str) -> list[str]:
     return errors
 
 
+def check_active_runtime_proof_v2(
+    proof: dict[str, Any],
+    runtime_evidence: dict[str, Any],
+    runtime_probe: Any,
+    row_label: str,
+    selected_runtime: str,
+) -> list[str]:
+    errors: list[str] = []
+    if proof.get("providerIdentitySource") != "runtimeSelector":
+        errors.append(
+            f"{row_label}: activeRuntimeProof.providerIdentitySource must be runtimeSelector"
+        )
+    if proof.get("hardwareIdentitySource") != "wgpuAdapterGetInfo":
+        errors.append(
+            f"{row_label}: activeRuntimeProof.hardwareIdentitySource must be wgpuAdapterGetInfo"
+        )
+    if proof.get("selectedRuntime") != selected_runtime:
+        errors.append(f"{row_label}: activeRuntimeProof.selectedRuntime mismatch")
+
+    runtime_selection = runtime_evidence.get("runtimeSelection")
+    if not isinstance(runtime_selection, dict):
+        runtime_selection = {}
+        errors.append(f"{row_label}: runtimeEvidence.runtimeSelection must be an object")
+    artifact_identity = runtime_selection.get("artifactIdentity")
+    if not isinstance(artifact_identity, dict):
+        artifact_identity = {}
+    artifact_hash_field = (
+        "doeLibSha256" if selected_runtime == "doe" else "dawnRuntimeSha256"
+    )
+    expected_provider = {
+        "selectionMode": runtime_selection.get("selectionMode"),
+        "selectedRuntime": runtime_selection.get("selectedRuntime"),
+        "forcedMode": runtime_selection.get("forcedMode"),
+        "fallbackApplied": runtime_selection.get("fallbackApplied"),
+        "hiddenFallbackAllowed": runtime_selection.get("hiddenFallbackAllowed"),
+        "runtimeArtifactSha256": artifact_identity.get(artifact_hash_field),
+        "launchArgsHash": runtime_selection.get("launchArgsHash"),
+    }
+    provider = proof.get("provider")
+    if provider != expected_provider:
+        errors.append(f"{row_label}: activeRuntimeProof.provider drift")
+        provider = expected_provider
+
+    adapter_info = (
+        runtime_probe.get("adapterInfo")
+        if isinstance(runtime_probe, dict)
+        else None
+    )
+    if not isinstance(adapter_info, dict):
+        adapter_info = {}
+        errors.append(f"{row_label}: runtimeProbe.adapterInfo must be an object")
+    expected_hardware = {
+        field: adapter_info.get(field) if isinstance(adapter_info.get(field), str) else ""
+        for field in ("vendor", "architecture", "device", "description")
+    }
+    hardware = proof.get("hardware")
+    if hardware != expected_hardware:
+        errors.append(f"{row_label}: activeRuntimeProof.hardware drift")
+        hardware = expected_hardware
+
+    expected = {
+        "provider": selected_runtime,
+        "fallbackApplied": False,
+        "hiddenFallbackAllowed": False,
+        "hardwareVendorMustBeNonEmpty": True,
+        "hardwareArchitectureMustBeNonEmpty": True,
+    }
+    if proof.get("expected") != expected:
+        errors.append(f"{row_label}: activeRuntimeProof.expected drift")
+    recomputed_match = (
+        provider.get("selectionMode") == selected_runtime
+        and provider.get("selectedRuntime") == selected_runtime
+        and provider.get("forcedMode") == selected_runtime
+        and provider.get("fallbackApplied") is False
+        and provider.get("hiddenFallbackAllowed") is False
+        and is_hash_hex(provider.get("runtimeArtifactSha256"))
+        and is_hash_hex(provider.get("launchArgsHash"))
+        and bool(hardware.get("vendor"))
+        and bool(hardware.get("architecture"))
+    )
+    if proof.get("matched") is not recomputed_match:
+        errors.append(f"{row_label}: activeRuntimeProof.matched drift")
+    if not recomputed_match:
+        errors.append(
+            f"{row_label}: active runtime does not match requested {selected_runtime} runtime"
+        )
+    return errors
+
+
 def check_active_runtime_proof(
     runtime_evidence: Any,
     runtime_probe: Any,
@@ -1977,6 +2066,14 @@ def check_active_runtime_proof(
     proof = runtime_evidence.get("activeRuntimeProof")
     if not isinstance(proof, dict):
         return [f"{row_label}: activeRuntimeProof missing"]
+    if proof.get("schemaVersion") == 2:
+        return check_active_runtime_proof_v2(
+            proof,
+            runtime_evidence,
+            runtime_probe,
+            row_label,
+            selected_runtime,
+        )
     if proof.get("schemaVersion") != 1:
         errors.append(f"{row_label}: activeRuntimeProof.schemaVersion must be 1")
     if proof.get("identitySource") != "wgpuAdapterGetInfo":

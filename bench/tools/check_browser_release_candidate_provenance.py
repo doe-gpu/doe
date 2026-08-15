@@ -31,13 +31,6 @@ PRODUCT_DISPLAY_NAMES = {
     "doe-browser": "Doe Browser",
     "fawn-doe": "Fawn Doe",
 }
-INITIAL_CANDIDATE_PLATFORM = {
-    "os": "macos",
-    "arch": "arm64",
-    "packageFormat": "zip",
-}
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--release-archive", required=True)
@@ -386,12 +379,15 @@ def check_product_and_platform(
                 "release-candidate provenance must use browserProduct.channel=release_candidate",
             )
         )
-    if platform != INITIAL_CANDIDATE_PLATFORM:
+    if package_inputs_check.release_platform_contract(platform) is None:
         failures.append(
             failure(
-                "candidate_platform_not_macos_arm64",
+                "unsupported_candidate_platform",
                 "platform",
-                "initial release-candidate provenance must target macOS arm64 zip",
+                (
+                    "release-candidate provenance must target a platform declared "
+                    "in config/browser-release-platform-policy.json"
+                ),
             )
         )
     return failures
@@ -756,6 +752,70 @@ def check_browser_launch_receipt(
     failures.extend(check_artifact_ref(receipt.get("releaseArchive"), expected_archive, "browserLaunchReceipt.releaseArchive", root))
     failures.extend(check_artifact_ref(receipt.get("releaseArchiveManifest"), expected_manifest, "browserLaunchReceipt.releaseArchiveManifest", root))
     failures.extend(check_artifact_ref(receipt.get("proofSurface"), expected_proof_surface, "browserLaunchReceipt.proofSurface", root))
+    clean_install_ref = receipt.get("cleanInstallCheck")
+    clean_install: dict[str, Any] | None = None
+    if not isinstance(clean_install_ref, dict):
+        failures.append(
+            failure(
+                "browser_launch_clean_install_missing",
+                "browserLaunchReceipt.cleanInstallCheck",
+                "release-candidate launch receipt must bind a clean-install check",
+            )
+        )
+    else:
+        clean_path = resolve_path(clean_install_ref.get("path"), root)
+        if clean_path is None or not clean_path.is_file():
+            failures.append(failure("browser_launch_clean_install_missing", "browserLaunchReceipt.cleanInstallCheck.path", "clean-install artifact file is missing"))
+        elif clean_install_ref.get("sha256") != sha256_file(clean_path):
+            failures.append(failure("browser_launch_clean_install_hash_mismatch", "browserLaunchReceipt.cleanInstallCheck.sha256", "clean-install artifact hash mismatch"))
+        else:
+            clean_install = load_json_object(clean_path, "browser clean-install check")
+    if isinstance(clean_install, dict):
+        for field, expected in (
+            ("schemaVersion", 1),
+            ("artifactKind", "browser_release_clean_install_check"),
+            ("verificationLevel", "webgpu_smoke"),
+            ("sourceMode", "release_archive"),
+            ("status", "pass"),
+            ("releaseCandidateEligible", True),
+            ("browserProduct", expected_product),
+            ("platform", expected_platform),
+        ):
+            if clean_install.get(field) != expected:
+                failures.append(failure("browser_launch_clean_install_mismatch", f"browserLaunchReceipt.cleanInstallCheck.{field}", f"clean-install {field} must match release candidate"))
+        extraction = clean_install.get("extraction")
+        if not isinstance(extraction, dict) or extraction.get("isolation") != "fresh_temporary_directory" or extraction.get("borrowedMemberCount") != 0:
+            failures.append(failure("browser_launch_clean_install_not_isolated", "browserLaunchReceipt.cleanInstallCheck.extraction", "clean install must be isolated and borrow no members"))
+        if (
+            not isinstance(extraction, dict)
+            or not isinstance(extraction.get("archiveMemberCount"), int)
+            or extraction.get("archiveMemberCount") <= 0
+            or extraction.get("extractedMemberCount") != extraction.get("archiveMemberCount")
+        ):
+            failures.append(failure("browser_launch_clean_install_incomplete", "browserLaunchReceipt.cleanInstallCheck.extraction", "clean install must extract every archive member"))
+        launch_probe = clean_install.get("launchProbe")
+        if not isinstance(launch_probe, dict) or launch_probe.get("attempted") is not True or launch_probe.get("exitCode") != 0 or launch_probe.get("timedOut") is not False:
+            failures.append(failure("browser_launch_clean_install_probe_failed", "browserLaunchReceipt.cleanInstallCheck.launchProbe", "clean-install launch probe must pass"))
+        smoke = clean_install.get("webgpuSmoke")
+        smoke_process = smoke.get("process") if isinstance(smoke, dict) else None
+        if not isinstance(smoke, dict) or smoke.get("required") is not True or smoke.get("modes") != ["dawn", "doe"]:
+            failures.append(failure("browser_launch_clean_install_smoke_mismatch", "browserLaunchReceipt.cleanInstallCheck.webgpuSmoke", "clean install must require Dawn and Doe smoke"))
+        if not isinstance(smoke_process, dict) or smoke_process.get("attempted") is not True or smoke_process.get("exitCode") != 0 or smoke_process.get("timedOut") is not False:
+            failures.append(failure("browser_launch_clean_install_smoke_failed", "browserLaunchReceipt.cleanInstallCheck.webgpuSmoke.process", "clean-install WebGPU smoke must pass"))
+        if clean_install.get("failures") != []:
+            failures.append(failure("browser_launch_clean_install_failures_present", "browserLaunchReceipt.cleanInstallCheck.failures", "passing clean install must carry no failures"))
+        for row, kind, field_name in (
+            (clean_install.get("verifier"), "browser_release_clean_install_verifier", "verifier"),
+            (smoke.get("script") if isinstance(smoke, dict) else None, "browser_webgpu_smoke_runner", "webgpuSmoke.script"),
+            (smoke.get("report") if isinstance(smoke, dict) else None, "chromium-webgpu-playwright-smoke", "webgpuSmoke.report"),
+        ):
+            artifact_path = resolve_path(row.get("path"), root) if isinstance(row, dict) and isinstance(row.get("path"), str) else None
+            if not isinstance(row, dict) or row.get("kind") != kind or artifact_path is None or not artifact_path.is_file() or row.get("sha256") != sha256_file(artifact_path):
+                failures.append(failure("browser_launch_clean_install_tool_identity_mismatch", f"browserLaunchReceipt.cleanInstallCheck.{field_name}", f"clean-install {field_name} artifact identity must be verifiable"))
+        for field, expected in (("releaseArchive", expected_archive), ("releaseArchiveManifest", expected_manifest)):
+            actual = clean_install.get(field)
+            if not isinstance(actual, dict) or any(actual.get(key) != expected.get(key) for key in ("path", "sha256", "kind")):
+                failures.append(failure("browser_launch_clean_install_artifact_mismatch", f"browserLaunchReceipt.cleanInstallCheck.{field}", f"clean-install {field} must match release candidate"))
     for field, expected in (
         ("browserProduct", expected_product),
         ("platform", expected_platform),

@@ -8,6 +8,7 @@ import json
 import os
 import plistlib
 import stat
+import struct
 import subprocess
 import sys
 import unittest
@@ -75,6 +76,50 @@ def _write_linux_fixture(root: Path) -> tuple[Path, Path, Path]:
     return package_dir, doe_runtime, dawn_runtime
 
 
+def _elf_x64_payload() -> bytes:
+    payload = bytearray(64)
+    payload[:6] = b"\x7fELF\x02\x01"
+    payload[18:20] = struct.pack("<H", 0x3E)
+    return bytes(payload)
+
+
+def _write_linux_candidate_fixture(root: Path) -> tuple[Path, Path, Path, Path]:
+    package_dir = root / "fawn-linux"
+    policy = package_inputs_check.load_release_platform_policy()
+    linux = next(row for row in policy["releasePlatforms"] if row["os"] == "linux")
+    for member in linux["requiredPackageMembers"]:
+        source = package_dir / member["path"]
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.write_bytes(b"support\n")
+        source.chmod(0o755 if member["executable"] else 0o644)
+    browser = _write_executable(package_dir / "chrome-wrapper", _elf_x64_payload())
+    doe_runtime = _write_executable(root / "libwebgpu_doe.so", _elf_x64_payload())
+    dawn_runtime = _write_executable(root / "libdawn_native.so", _elf_x64_payload())
+    compiler = _write_executable(root / "doe-zig-runtime", _elf_x64_payload())
+    args = root / "args.gn"
+    args.write_text(
+        "\n".join(
+            [
+                "is_debug = false",
+                "is_official_build = true",
+                "dcheck_always_on = false",
+                "chrome_pgo_phase = 0",
+                "symbol_level = 0",
+                "blink_symbol_level = 0",
+                "v8_symbol_level = 0",
+                "is_chrome_for_testing = false",
+                "is_chrome_for_testing_branded = false",
+                "is_chrome_branded = false",
+                "use_clang_modules = false",
+                "dawn_enable_webgpu_on_webgpu = true",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    return package_dir, doe_runtime, dawn_runtime, compiler
+
+
 def _write_executable(path: Path, payload: bytes) -> Path:
     path.write_bytes(payload)
     path.chmod(0o755)
@@ -82,6 +127,114 @@ def _write_executable(path: Path, payload: bytes) -> Path:
 
 
 class PackageBrowserReleaseArchiveTests(unittest.TestCase):
+    def test_linux_release_candidate_requires_complete_eligible_preflight(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package_dir, doe_runtime, dawn_runtime, compiler = (
+                _write_linux_candidate_fixture(root)
+            )
+            (package_dir / "icudtl.dat").unlink()
+            package_inputs = package_inputs_check.build_report(
+                package_dir=str(package_dir),
+                package_root_name="Fawn-Doe-linux-x64",
+                doe_runtime=str(doe_runtime),
+                dawn_fallback_runtime=str(dawn_runtime),
+                shader_compiler=str(compiler),
+                product_version="0.0.0-test",
+                product_channel="release_candidate",
+                platform_os="linux",
+                platform_arch="x64",
+                root=root,
+            )
+            package_inputs_path = root / "browser-release-package-inputs.json"
+            package_inputs_path.write_text(
+                json.dumps(package_inputs, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKER),
+                    "--package-inputs",
+                    str(package_inputs_path),
+                    "--package-inputs-root",
+                    str(root),
+                    "--out",
+                    str(root / "Fawn-Doe-linux-x64.zip"),
+                    "--manifest-out",
+                    str(root / "Fawn-Doe-linux-x64.manifest.json"),
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn(
+                "release-candidate packaging requires eligible --package-inputs",
+                result.stderr,
+            )
+
+    def test_linux_release_candidate_packages_complete_preflight(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package_dir, doe_runtime, dawn_runtime, compiler = (
+                _write_linux_candidate_fixture(root)
+            )
+            package_inputs = package_inputs_check.build_report(
+                package_dir=str(package_dir),
+                package_root_name="Fawn-Doe-linux-x64",
+                doe_runtime=str(doe_runtime),
+                dawn_fallback_runtime=str(dawn_runtime),
+                shader_compiler=str(compiler),
+                product_version="0.0.0-test",
+                product_channel="release_candidate",
+                platform_os="linux",
+                platform_arch="x64",
+                root=root,
+            )
+            self.assertTrue(package_inputs["releaseCandidateEligible"])
+            package_inputs_path = root / "browser-release-package-inputs.json"
+            package_inputs_path.write_text(
+                json.dumps(package_inputs, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            archive = root / "Fawn-Doe-linux-x64.zip"
+
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKER),
+                    "--package-inputs",
+                    str(package_inputs_path),
+                    "--package-inputs-root",
+                    str(root),
+                    "--out",
+                    str(archive),
+                    "--manifest-out",
+                    str(root / "Fawn-Doe-linux-x64.manifest.json"),
+                ],
+                cwd=REPO_ROOT,
+                check=True,
+            )
+
+            with zipfile.ZipFile(archive) as package:
+                for relative_path in (
+                    "chrome_crashpad_handler",
+                    "icudtl.dat",
+                    "v8_context_snapshot.bin",
+                ):
+                    self.assertIn(
+                        f"Fawn-Doe-linux-x64/{relative_path}",
+                        package.namelist(),
+                    )
+
     def test_packer_emits_deterministic_archive_manifest(self) -> None:
         with self.subTest("package"):
             import tempfile

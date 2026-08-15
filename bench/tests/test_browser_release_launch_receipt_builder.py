@@ -48,6 +48,13 @@ def _write_inputs(root: Path) -> dict[str, Path]:
     proof_surface = root / "browser-published-proof-surface.json"
     proof_page_receipt = root / "browser-proof-page-receipt.json"
     gallery_receipt = root / "browser-public-gallery-receipt.json"
+    clean_install_check = root / "browser-release-clean-install-check.json"
+    clean_install_verifier = root / "clean-install-verifier.py"
+    smoke_script = root / "webgpu-smoke.mjs"
+    smoke_report = root / "webgpu-smoke.json"
+    clean_install_verifier.write_text("# fixture verifier\n", encoding="utf-8")
+    smoke_script.write_text("// fixture smoke\n", encoding="utf-8")
+    _write_json(smoke_report, {"reportKind": "chromium-webgpu-playwright-smoke"})
     release_archive.write_bytes(b"browser archive bytes\n")
     manifest_members = {
         "browserExecutable": {
@@ -198,10 +205,65 @@ def _write_inputs(root: Path) -> dict[str, Path]:
             ],
         },
     )
+    _write_json(
+        clean_install_check,
+        {
+            "schemaVersion": 1,
+            "artifactKind": "browser_release_clean_install_check",
+            "observedAt": "2026-08-11T00:00:00Z",
+            "verificationLevel": "webgpu_smoke",
+            "sourceMode": "release_archive",
+            "verifier": {
+                "path": str(clean_install_verifier),
+                "sha256": builder.sha256_file(clean_install_verifier),
+                "kind": "browser_release_clean_install_verifier",
+            },
+            "releaseArchive": {
+                "path": str(release_archive),
+                "sha256": builder.sha256_file(release_archive),
+                "byteLength": release_archive.stat().st_size,
+                "kind": "browser_release_archive",
+            },
+            "releaseArchiveManifest": {
+                "path": str(release_archive_manifest),
+                "sha256": builder.sha256_file(release_archive_manifest),
+                "byteLength": release_archive_manifest.stat().st_size,
+                "kind": "browser_release_archive_manifest",
+            },
+            "browserProduct": DEFAULT_PRODUCT,
+            "platform": DEFAULT_PLATFORM,
+            "extraction": {
+                "isolation": "fresh_temporary_directory",
+                "archiveMemberCount": 4,
+                "extractedMemberCount": 4,
+                "borrowedMemberCount": 0,
+            },
+            "launchProbe": {"attempted": True, "exitCode": 0, "timedOut": False},
+            "webgpuSmoke": {
+                "required": True,
+                "modes": ["dawn", "doe"],
+                "script": {
+                    "path": str(smoke_script),
+                    "sha256": builder.sha256_file(smoke_script),
+                    "kind": "browser_webgpu_smoke_runner",
+                },
+                "report": {
+                    "path": str(smoke_report),
+                    "sha256": builder.sha256_file(smoke_report),
+                    "kind": "chromium-webgpu-playwright-smoke",
+                },
+                "process": {"attempted": True, "exitCode": 0, "timedOut": False},
+            },
+            "releaseCandidateEligible": True,
+            "status": "pass",
+            "failures": [],
+        },
+    )
     return {
         "release_archive": release_archive,
         "release_archive_manifest": release_archive_manifest,
         "proof_surface": proof_surface,
+        "clean_install_check": clean_install_check,
     }
 
 
@@ -214,6 +276,7 @@ def _receipt_kwargs(root: Path) -> dict:
         "release_archive_url": "https://downloads.doe.dev/Fawn-Doe-macos-arm64.zip",
         "release_archive_manifest": paths["release_archive_manifest"],
         "proof_surface": paths["proof_surface"],
+        "clean_install_check": paths["clean_install_check"],
         "browser_product": DEFAULT_PRODUCT,
         "platform": DEFAULT_PLATFORM,
         "browser_executable_archive_path": MACOS_BROWSER_EXECUTABLE,
@@ -275,6 +338,16 @@ class BrowserReleaseLaunchReceiptBuilderTests(unittest.TestCase):
         self.assertEqual(receipt["galleryPage"]["receiptId"], "browser-public-gallery-compute")
         self.assertEqual(receipt["comparisonReceipt"]["comparisonId"], "browser-smoke-compute-dawn-vs-doe")
         self.assertEqual(receipt["comparisonReceipt"]["modes"], ["dawn", "doe"])
+
+    def test_release_candidate_requires_observational_clean_install_check(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            kwargs = _receipt_kwargs(Path(temp_dir))
+            kwargs["clean_install_check"] = None
+
+            with self.assertRaisesRegex(ValueError, "clean install check is required"):
+                builder.build_receipt(**kwargs)
 
     def test_build_receipt_rejects_non_public_gallery_url(self) -> None:
         import tempfile

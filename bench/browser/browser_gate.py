@@ -151,6 +151,10 @@ def stable_hash(payload: Any) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def is_hash_hex(value: Any) -> bool:
+    return isinstance(value, str) and re.fullmatch(r"[a-f0-9]{64}", value) is not None
+
+
 def resolve_dawn_chrome(root: Path, explicit: str) -> str:
     if explicit:
         return explicit
@@ -457,6 +461,88 @@ def validate_adapter_identity(payload: Any, label: str) -> list[str]:
     return errors
 
 
+def validate_active_runtime_proof(
+    proof: Any,
+    runtime_selection: Any,
+    adapter_info: Any,
+    mode: str,
+    label: str,
+) -> list[str]:
+    if not isinstance(proof, dict):
+        return [f"{label} activeRuntimeProof must be object"]
+    if proof.get("selectedRuntime") != mode:
+        return [f"{label} activeRuntimeProof.selectedRuntime must be {mode}"]
+    if proof.get("schemaVersion") == 1:
+        errors: list[str] = []
+        if proof.get("identitySource") != "wgpuAdapterGetInfo":
+            errors.append(
+                f"{label} activeRuntimeProof.identitySource must be wgpuAdapterGetInfo"
+            )
+        if proof.get("matched") is not True:
+            errors.append(f"{label} activeRuntimeProof.matched must be true")
+        return errors
+    if proof.get("schemaVersion") != 2:
+        return [f"{label} activeRuntimeProof.schemaVersion must be 1 or 2"]
+
+    errors = []
+    if proof.get("providerIdentitySource") != "runtimeSelector":
+        errors.append(
+            f"{label} activeRuntimeProof.providerIdentitySource must be runtimeSelector"
+        )
+    if proof.get("hardwareIdentitySource") != "wgpuAdapterGetInfo":
+        errors.append(
+            f"{label} activeRuntimeProof.hardwareIdentitySource must be wgpuAdapterGetInfo"
+        )
+    selection = runtime_selection if isinstance(runtime_selection, dict) else {}
+    artifact_identity = selection.get("artifactIdentity")
+    if not isinstance(artifact_identity, dict):
+        artifact_identity = {}
+    artifact_hash_field = "doeLibSha256" if mode == "doe" else "dawnRuntimeSha256"
+    expected_provider = {
+        "selectionMode": selection.get("selectionMode"),
+        "selectedRuntime": selection.get("selectedRuntime"),
+        "forcedMode": selection.get("forcedMode"),
+        "fallbackApplied": selection.get("fallbackApplied"),
+        "hiddenFallbackAllowed": selection.get("hiddenFallbackAllowed"),
+        "runtimeArtifactSha256": artifact_identity.get(artifact_hash_field),
+        "launchArgsHash": selection.get("launchArgsHash"),
+    }
+    if proof.get("provider") != expected_provider:
+        errors.append(f"{label} activeRuntimeProof.provider must match runtimeSelection")
+    adapter = adapter_info if isinstance(adapter_info, dict) else {}
+    expected_hardware = {
+        field: adapter.get(field) if isinstance(adapter.get(field), str) else ""
+        for field in ("vendor", "architecture", "device", "description")
+    }
+    if proof.get("hardware") != expected_hardware:
+        errors.append(f"{label} activeRuntimeProof.hardware must match adapterInfo")
+    expected = {
+        "provider": mode,
+        "fallbackApplied": False,
+        "hiddenFallbackAllowed": False,
+        "hardwareVendorMustBeNonEmpty": True,
+        "hardwareArchitectureMustBeNonEmpty": True,
+    }
+    if proof.get("expected") != expected:
+        errors.append(f"{label} activeRuntimeProof.expected mismatch")
+    recomputed_match = (
+        expected_provider["selectionMode"] == mode
+        and expected_provider["selectedRuntime"] == mode
+        and expected_provider["forcedMode"] == mode
+        and expected_provider["fallbackApplied"] is False
+        and expected_provider["hiddenFallbackAllowed"] is False
+        and is_hash_hex(expected_provider["runtimeArtifactSha256"])
+        and is_hash_hex(expected_provider["launchArgsHash"])
+        and bool(expected_hardware["vendor"])
+        and bool(expected_hardware["architecture"])
+    )
+    if proof.get("matched") is not recomputed_match:
+        errors.append(f"{label} activeRuntimeProof.matched drift")
+    if not recomputed_match:
+        errors.append(f"{label} activeRuntimeProof does not prove forced {mode}")
+    return errors
+
+
 def validate_shader_compiler_identity(payload: Any, mode: str, label: str) -> list[str]:
     errors: list[str] = []
     if not isinstance(payload, dict):
@@ -639,16 +725,15 @@ def validate_smoke_report(
             errors.append(f"smoke mode {mode} adapterAvailable must be true")
         else:
             errors.extend(validate_adapter_identity(row.get("adapterIdentity"), f"smoke mode {mode}"))
-        active_proof = row.get("activeRuntimeProof")
-        if not isinstance(active_proof, dict):
-            errors.append(f"smoke mode {mode} activeRuntimeProof must be object")
-        else:
-            if active_proof.get("identitySource") != "wgpuAdapterGetInfo":
-                errors.append(f"smoke mode {mode} activeRuntimeProof.identitySource must be wgpuAdapterGetInfo")
-            if active_proof.get("selectedRuntime") != mode:
-                errors.append(f"smoke mode {mode} activeRuntimeProof.selectedRuntime must be {mode}")
-            if active_proof.get("matched") is not True:
-                errors.append(f"smoke mode {mode} activeRuntimeProof.matched must be true")
+        errors.extend(
+            validate_active_runtime_proof(
+                row.get("activeRuntimeProof"),
+                row.get("runtimeSelection"),
+                row.get("adapterInfo"),
+                mode,
+                f"smoke mode {mode}",
+            )
+        )
         if row.get("errors"):
             errors.append(f"smoke mode {mode} errors must be empty")
         browser_close = row.get("browserClose")

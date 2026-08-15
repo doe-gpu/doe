@@ -11,6 +11,20 @@ and state lives in [`bench/workflows/browser-milestones.json`](bench/workflows/b
 - Keep fallback explicit and disable it in forced-Doe evidence.
 - Bind source, runtime, browser, output, and receipt identity.
 
+## Product target
+
+Fawn is successful when a released Chromium-family archive runs an unchanged
+WebGPU application through forced Doe with independently verified output, real
+hardware identity, reliable lifecycle behavior, and either a narrowly measured
+advantage or a demonstrated compatibility benefit. Browser benchmark rows are
+supporting evidence, not the product outcome.
+
+The first promotion target is one exact-oracle application lane. Provider
+identity must come from the fail-closed runtime selector and bound runtime
+artifacts; `wgpuAdapterGetInfo` must retain the physical adapter identity. A Doe
+selection on AMD hardware therefore reports Doe as provider and AMD/Radeon as
+hardware, never a synthetic `Doe` GPU vendor.
+
 ## Milestones
 
 ### M0: contracts
@@ -47,6 +61,14 @@ and state lives in [`bench/workflows/browser-milestones.json`](bench/workflows/b
 - Download, proof-page, gallery, comparison, launch, finalizer, and candidate
   receipts all pass their contracts.
 - Installation and launch instructions work on the declared clean system.
+- The launch receipt binds a passing clean-install check produced from an
+  isolated extraction with no borrowed package members and strict forced-Dawn
+  and forced-Doe WebGPU smoke.
+- Linux packages include every member required by
+  `config/browser-release-platform-policy.json`; compact diagnostic archives do
+  not satisfy this criterion.
+- Reload, teardown, concurrency, recovery, and memory-growth receipts pass for
+  the promoted application lane.
 
 ## Promotion rule
 

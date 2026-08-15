@@ -118,6 +118,30 @@ def _write_zip(
     return path
 
 
+def test_linux_release_archive_requires_platform_support_members(tmp_path: Path) -> None:
+    archive_path = _write_zip(
+        tmp_path / "Fawn-Doe-linux-x64.zip",
+        member_path="Fawn-Doe-linux-x64/chrome-wrapper",
+        member_content=_elf_payload(),
+        app_metadata_member_path="Fawn-Doe-linux-x64/browser-product.json",
+        doe_runtime_member_path="Fawn-Doe-linux-x64/libwebgpu_doe.so",
+        doe_runtime_member_content=_elf_payload(),
+        dawn_runtime_member_path="Fawn-Doe-linux-x64/libdawn_native.so",
+        dawn_runtime_member_content=_elf_payload(),
+    )
+    payload = {
+        "platform": {"os": "linux", "arch": "x64", "packageFormat": "zip"},
+        "releaseArchive": {"path": str(archive_path)},
+        "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+    }
+
+    failures = bundle_check.check_release_archive_platform_support(payload, tmp_path)
+
+    self_codes = {row["code"] for row in failures}
+    assert self_codes == {"release_archive_support_member_missing"}
+    assert any("icudtl.dat" in row["message"] for row in failures)
+
+
 def _copy_repo_file(root: Path, relative_path: str) -> Path:
     out_path = root / relative_path
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -562,6 +586,65 @@ def _write_browser_launch_receipt(
     webgpu_available: bool = True,
     active_backend: str = "webgpu-doe",
 ) -> Path:
+    clean_install_path = path.with_name("browser-release-clean-install-check.json")
+    clean_install_verifier = _write_file(path.with_name("clean-install-verifier.py"), "# fixture verifier\n")
+    smoke_script = _write_file(path.with_name("webgpu-smoke.mjs"), "// fixture smoke\n")
+    smoke_report = _write_file(
+        path.with_name("clean-install-webgpu-smoke.json"),
+        json.dumps({"reportKind": "chromium-webgpu-playwright-smoke"}) + "\n",
+    )
+    clean_install_payload = {
+        "schemaVersion": 1,
+        "artifactKind": "browser_release_clean_install_check",
+        "observedAt": "2026-08-11T00:00:00Z",
+        "verificationLevel": "webgpu_smoke",
+        "sourceMode": "release_archive",
+        "verifier": {
+            "path": builder.repo_relative(clean_install_verifier),
+            "sha256": builder.sha256_file(clean_install_verifier),
+            "kind": "browser_release_clean_install_verifier",
+        },
+        "releaseArchive": {
+            "path": builder.repo_relative(release_archive),
+            "sha256": builder.sha256_file(release_archive),
+            "byteLength": release_archive.stat().st_size,
+            "kind": "browser_release_archive",
+        },
+        "releaseArchiveManifest": {
+            "path": builder.repo_relative(release_archive_manifest),
+            "sha256": builder.sha256_file(release_archive_manifest),
+            "byteLength": release_archive_manifest.stat().st_size,
+            "kind": "browser_release_archive_manifest",
+        },
+        "browserProduct": browser_product,
+        "platform": {"os": "macos", "arch": "arm64", "packageFormat": "zip"},
+        "extraction": {
+            "isolation": "fresh_temporary_directory",
+            "archiveMemberCount": 4,
+            "extractedMemberCount": 4,
+            "borrowedMemberCount": 0,
+        },
+        "launchProbe": {"attempted": True, "exitCode": 0, "timedOut": False},
+        "webgpuSmoke": {
+            "required": True,
+            "modes": ["dawn", "doe"],
+            "script": {
+                "path": builder.repo_relative(smoke_script),
+                "sha256": builder.sha256_file(smoke_script),
+                "kind": "browser_webgpu_smoke_runner",
+            },
+            "report": {
+                "path": builder.repo_relative(smoke_report),
+                "sha256": builder.sha256_file(smoke_report),
+                "kind": "chromium-webgpu-playwright-smoke",
+            },
+            "process": {"attempted": True, "exitCode": 0, "timedOut": False},
+        },
+        "releaseCandidateEligible": True,
+        "status": "pass",
+        "failures": [],
+    }
+    clean_install_path.write_text(json.dumps(clean_install_payload, indent=2) + "\n", encoding="utf-8")
     payload = {
         "schemaVersion": 1,
         "artifactKind": "browser_release_launch_receipt",
@@ -585,6 +668,11 @@ def _write_browser_launch_receipt(
             "path": builder.repo_relative(proof_surface),
             "sha256": builder.sha256_file(proof_surface),
             "kind": "browser_published_proof_surface",
+        },
+        "cleanInstallCheck": {
+            "path": builder.repo_relative(clean_install_path),
+            "sha256": builder.sha256_file(clean_install_path),
+            "kind": "browser_release_clean_install_check",
         },
         "browserExecutableArchivePath": DEFAULT_BROWSER_ARCHIVE_PATH,
         "browserAppMetadataArchivePath": DEFAULT_APP_METADATA_ARCHIVE_PATH,
@@ -818,6 +906,21 @@ def _build_test_bundle(tmp_path: Path, *, release_status: str) -> dict:
 
 def test_browser_release_artifact_bundle_passes_check() -> None:
     assert bundle_check.check_bundle(_load()) == []
+
+
+def test_release_candidate_launch_receipt_requires_clean_install_check(tmp_path: Path) -> None:
+    payload = _build_test_bundle(tmp_path, release_status="release_candidate")
+    receipt_path = tmp_path / payload["browserLaunchReceipt"]["path"]
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    del receipt["cleanInstallCheck"]
+    receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    payload["browserLaunchReceipt"]["sha256"] = builder.sha256_file(receipt_path)
+
+    assert {
+        "code": "missing_browser_clean_install_check",
+        "path": "browserLaunchReceipt.cleanInstallCheck",
+        "message": "release-candidate launch receipts must bind a clean-install check",
+    } in bundle_check.check_bundle(payload, verify_files_root=tmp_path)
 
 
 def test_browser_release_artifact_bundle_requires_release_artifact_kind() -> None:
@@ -1837,7 +1940,7 @@ def test_browser_release_artifact_bundle_builder_accepts_verified_candidate(tmp_
 
     assert builder.bundle_verification_failures(payload, tmp_path) == []
     payload["platform"]["arch"] = "x64"
-    assert any(f["code"] == "release_candidate_platform_not_macos_arm64" for f in builder.bundle_verification_failures(payload, tmp_path))
+    assert any(f["code"] == "unsupported_release_candidate_platform" for f in builder.bundle_verification_failures(payload, tmp_path))
     payload["platform"]["arch"] = "arm64"
     del payload["runtimeFrontierBundle"]
     assert any(f["code"] == "missing_runtime_frontier_bundle" for f in builder.bundle_verification_failures(payload, tmp_path))

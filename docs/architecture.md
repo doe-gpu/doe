@@ -11,8 +11,8 @@ Doe has three user-facing/runtime-adjacent surfaces and two supporting layers.
    The JavaScript package surface for Node.js, Bun, Deno, and browser-facing
    wrappers.
 3. `browser/chromium`
-   The Chromium lane: docs, contracts, scripts, and probes for the future
-   browser-runtime integration path.
+   The active Fawn/Chromium product lane: integration contracts, release
+   packaging, clean-install verification, browser probes, and evidence gates.
 4. `bench`
    Compare harnesses, gates, and evidence workflows.
 5. `pipeline/*` plus `config/*`
@@ -21,9 +21,9 @@ Doe has three user-facing/runtime-adjacent surfaces and two supporting layers.
 These surfaces are related, but they are not interchangeable.
 
 They also sit at different maturity levels. Dawn remains the WebGPU runtime
-used in Chromium and much of the browser ecosystem; Doe's present scope is
-the runtime/package/native boundary, while the Chromium lane remains a future
-integration track.
+used in Chromium and much of the browser ecosystem. Doe's native/package lane
+has physical evidence; Fawn is an active first-class product target whose
+current browser evidence remains diagnostic.
 
 ## Strategic decomposition
 
@@ -62,7 +62,7 @@ The important boundary distinctions are:
 - `runtime/bridge/onnxruntime-ep` is a repo-only integration seam for a future Doe-backed ONNX Runtime plugin EP
 - `doe-gpu` is the package surface over that runtime
 - `doe-gpu/browser` is a browser wrapper, not the Doe runtime running inside the browser
-- `browser/chromium` is the future browser-runtime lane, not the current package wrapper
+- `browser/chromium` is the active Fawn browser-runtime lane, not the current package wrapper
 - `bench` measures surfaces; it is not itself a product surface
 
 Current scope:
@@ -70,7 +70,7 @@ Current scope:
 - Dawn is the comparison baseline
 - Doe runs in Node.js, Bun, Deno, drop-in, and embedded/native lanes
 - a Doe-backed ONNX Runtime plugin EP is a repo-only experimental integration seam
-- browser `navigator.gpu` replacement is an explicit future lane, not the current package claim
+- browser `navigator.gpu` replacement is an explicit independently gated product lane, not the current package claim
 
 That separation is deliberate. It keeps package ergonomics, runtime behavior,
 and browser integration from getting blurred together in docs or benchmarks.
@@ -145,8 +145,10 @@ Those paths answer different questions and should not be described as the same
 thing.
 
 They also sit at different maturity levels. The browser shim is a present
-compatibility surface. The Chromium lane is a future integration track against
-the Dawn-based runtime browsers ship today.
+compatibility surface. The Fawn/Chromium lane is an active integration and
+release target against the Dawn-based runtime browsers ship today, but it
+remains diagnostic until a complete archive passes isolated clean install,
+forced-provider identity, an unchanged application oracle, and lifecycle gates.
 
 ## Build and evidence outputs
 

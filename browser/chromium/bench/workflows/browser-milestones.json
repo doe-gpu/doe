@@ -315,96 +315,103 @@
     },
     {
       "id": "M4",
-      "title": "Track B module 1 (fawn_2d_sdf_renderer) incubation",
-      "track": "modules",
-      "status": "archived",
-      "summary": "Archived 2026-03-19. Track B modules archived: browser vendors are routing subsystems through WebGPU on their own timeline; building parallel replacements duplicates that work. See docs/browser-lane.md.",
+      "title": "Published Fawn release",
+      "track": "browser",
+      "status": "in_progress",
+      "summary": "Fawn is the first-class browser product target. The Linux x64 release-candidate lane is governed alongside macOS arm64, but no platform has yet produced a clean-install, forced-Doe, exact-oracle release candidate.",
       "dependencies": [
-        "M0"
+        "M3"
       ],
       "evidence": [
         {
-          "id": "sdf_contract",
+          "id": "published_release_contract",
           "kind": "contract",
-          "path": "browser/chromium/contracts/fawn-2d-sdf-renderer.contract.md",
-          "description": "Candidate input/output/fallback contract for the first Track B module.",
+          "path": "browser/chromium/contracts/browser-published-release.contract.md",
+          "description": "Complete archive, launch, identity, fallback, proof-surface, and receipt contract.",
           "required": true,
           "mustExist": true
         },
         {
-          "id": "module_policy",
+          "id": "release_platform_policy",
           "kind": "manifest",
-          "path": "browser/chromium/module-incubation/policy.json",
-          "description": "Config-driven thresholds and allowed operation policy for Track B (modules) prototypes.",
+          "path": "config/browser-release-platform-policy.json",
+          "description": "Governed release platforms and required platform package members.",
           "required": true,
           "mustExist": true
         },
         {
-          "id": "sdf_schema",
+          "id": "release_platform_policy_schema",
           "kind": "schema",
-          "path": "browser/chromium/module-incubation/schemas/fawn-2d-sdf-renderer.schema.json",
-          "description": "Schema-backed request/result contract for the SDF renderer prototype.",
+          "path": "config/browser-release-platform-policy.schema.json",
+          "description": "Schema for governed release platforms and package support members.",
           "required": true,
           "mustExist": true
         },
         {
-          "id": "sdf_fixture",
-          "kind": "manifest",
-          "path": "browser/chromium/module-incubation/fixtures/fawn-2d-sdf-renderer.request.json",
-          "description": "Deterministic SDF renderer prototype request fixture.",
-          "required": true,
-          "mustExist": true
-        },
-        {
-          "id": "module_prototype_gate",
+          "id": "package_preflight",
           "kind": "script",
-          "path": "browser/chromium/scripts/check_module_prototypes.py",
-          "description": "Prototype gate for all Track B (modules) fixtures.",
+          "path": "bench/tools/check_browser_release_package_inputs.py",
+          "description": "Release package preflight including Linux ELF identity, build profile, and runtime support members.",
           "required": true,
           "mustExist": true
         },
         {
-          "id": "module_prototype_gate_report",
+          "id": "release_archive_packer",
+          "kind": "script",
+          "path": "browser/chromium/scripts/package-browser-release-archive.py",
+          "description": "Deterministic archive packer that requires eligible Linux candidate preflight evidence.",
+          "required": true,
+          "mustExist": true
+        },
+        {
+          "id": "clean_install_verifier",
+          "kind": "script",
+          "path": "bench/tools/check_browser_release_clean_install.py",
+          "description": "Safe isolated archive extraction plus packaged-browser launch and forced Dawn/Doe smoke verification.",
+          "required": true,
+          "mustExist": true
+        },
+        {
+          "id": "clean_install_schema",
+          "kind": "schema",
+          "path": "config/browser-release-clean-install-check.schema.json",
+          "description": "Schema for observational clean-install release evidence.",
+          "required": true,
+          "mustExist": true
+        },
+        {
+          "id": "retained_diagnostic_archive_manifest",
           "kind": "artifact",
-          "path": "browser/chromium/artifacts/20260309T014442Z/module-prototype-check.json",
-          "description": "Passing Track B prototype gate report with deterministic fixture results.",
+          "path": "bench/out/public-browser-release/20260703T233418Z/Fawn-Doe-linux-x64-gui-diagnostic.manifest.json",
+          "description": "Retained compact diagnostic archive manifest; not an installable release candidate.",
           "required": false,
           "mustExist": true
         },
         {
-          "id": "sdf_core_schema",
-          "kind": "schema",
-          "path": "config/sdf-renderer.schema.json",
-          "description": "Canonical promoted schema for the SDF renderer.",
-          "required": true,
-          "mustExist": true
-        },
-        {
-          "id": "sdf_core_policy",
-          "kind": "manifest",
-          "path": "config/sdf-renderer.policy.json",
-          "description": "Canonical promoted policy for the SDF renderer.",
-          "required": true,
-          "mustExist": true
-        },
-        {
-          "id": "module_core_gate",
-          "kind": "script",
-          "path": "bench/gates/module_gate.py",
-          "description": "Blocking core Track B (modules) gate for promoted modules.",
-          "required": true,
+          "id": "retained_clean_install_gate_failure",
+          "kind": "artifact",
+          "path": "browser/chromium/artifacts/20260811T130500Z/fawn-release-clean-install.diagnostic.json",
+          "description": "Governed isolated-install verifier result for the retained compact archive, including exact missing package members.",
+          "required": false,
           "mustExist": true
         }
       ],
       "exitCriteria": [
-        "A deterministic fixture lane exists for the SDF renderer.",
-        "Fallback reasons are typed and traceable.",
-        "CPU-owned semantics remain outside the module boundary."
+        "A cleanly extracted release-candidate archive launches on its declared platform.",
+        "Forced Doe is hash-bound, adapter hardware identity is visible, and hidden fallback is absent.",
+        "One unchanged application passes an independent oracle plus reload, teardown, concurrency, and memory-growth checks.",
+        "Any promoted advantage uses matched browser builds, work, timing scope, and release percentiles."
       ],
-      "blockers": [],
+      "blockers": [
+        "The retained Linux archive is a compact diagnostic archive and omits required Chromium runtime support files.",
+        "The original Chromium checkout and complete build output are not present on this machine.",
+        "No unchanged exact-oracle application is yet bound to a clean-install release candidate.",
+        "No public archive, repeated lifecycle receipt, concurrency receipt, or memory-growth receipt is claimable."
+      ],
       "nextActions": [
-        "Keep expanding the fixture corpus beyond the single deterministic request.",
-        "Wire the promoted SDF module into browser-owned call sites only after Track A seam governance is ready."
+        "Restore or rebuild the complete Linux Fawn output with the declared release profile and package every required support member.",
+        "Run the extracted archive in forced Dawn and forced Doe modes before WebGPU application qualification.",
+        "Promote one unchanged exact-oracle application only after lifecycle, fallback, hardware identity, replay, and percentile gates pass."
       ]
     },
     {
@@ -412,9 +419,9 @@
       "title": "Track B additional modules (one-by-one)",
       "track": "modules",
       "status": "archived",
-      "summary": "Archived 2026-03-19. See M4 summary for rationale.",
+      "summary": "Archived 2026-03-19. Historical Track B module experiments remain inactive and do not define the Fawn product lane.",
       "dependencies": [
-        "M4"
+        "M0"
       ],
       "evidence": [
         {
@@ -618,7 +625,7 @@
       "title": "Promotion and maintenance",
       "track": "promotion",
       "status": "archived",
-      "summary": "Archived 2026-03-19. Track B module governance archived. Artifacts preserved but inactive. See M4 summary for rationale.",
+      "summary": "Archived 2026-03-19. Historical Track B module governance artifacts are preserved but inactive and do not gate the Fawn product lane.",
       "dependencies": [
         "M2",
         "M3",

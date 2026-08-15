@@ -41,6 +41,12 @@
     "releaseArchive": { "$ref": "#/$defs/Artifact" },
     "releaseArchiveManifest": { "$ref": "#/$defs/Artifact" },
     "proofSurface": { "$ref": "#/$defs/Artifact" },
+    "cleanInstallCheck": {
+      "allOf": [
+        { "$ref": "#/$defs/Artifact" },
+        { "properties": { "kind": { "const": "browser_release_clean_install_check" } } }
+      ]
+    },
     "browserExecutableArchivePath": { "type": "string", "minLength": 1 },
     "browserAppMetadataArchivePath": { "type": "string", "minLength": 1 },
     "doeRuntimeArchivePath": { "type": "string", "minLength": 1 },
@@ -62,6 +68,20 @@
       "items": { "type": "string", "minLength": 1 }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "browserProduct": {
+            "properties": { "channel": { "enum": ["release_candidate", "release"] } },
+            "required": ["channel"]
+          }
+        },
+        "required": ["browserProduct"]
+      },
+      "then": { "required": ["cleanInstallCheck"] }
+    }
+  ],
   "$defs": {
     "Hash": {
       "type": "string",

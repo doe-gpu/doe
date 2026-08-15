@@ -324,6 +324,13 @@ def resolved_package_config(args: argparse.Namespace) -> dict[str, Any]:
         platform = string_map(package_inputs.get("platform"), "platform")
         if platform.get("packageFormat") != "zip":
             raise ValueError("package inputs platform.packageFormat must be zip")
+        if (
+            product.get("channel") == "release_candidate"
+            and package_inputs.get("releaseCandidateEligible") is not True
+        ):
+            raise ValueError(
+                "release-candidate packaging requires eligible --package-inputs"
+            )
 
         package_dir = resolve_package_input_path(package_dir_record["path"], package_inputs_root)
         doe_runtime = resolve_package_input_path(
@@ -411,6 +418,11 @@ def resolved_package_config(args: argparse.Namespace) -> dict[str, Any]:
             ),
         }
 
+    if args.product_channel == "release_candidate" and args.platform_os == "linux":
+        raise ValueError(
+            "Linux release-candidate packaging requires --package-inputs from "
+            "the browser release package preflight"
+        )
     package_dir = Path(required_arg(args.package_dir, "--package-dir"))
     package_root_name = args.package_root_name or package_dir.name
     platform_arch = required_arg(args.platform_arch, "--platform-arch")
@@ -611,6 +623,8 @@ def build_manifest(
 
 def main() -> int:
     args = parse_args()
+    if args.required_members_only and args.product_channel != "diagnostic":
+        raise ValueError("--required-members-only is restricted to diagnostic product channels")
     config = resolved_package_config(args)
     package_dir = config["package_dir"]
     product = config["product"]

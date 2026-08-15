@@ -9,10 +9,12 @@ program bodies inspectable, and emits receipts for the work that actually ran.
 Doe’s mission is to make GPU execution inspectable and controllable at the
 runtime boundary.
 
-The current goal is a Node and Bun execution lane that can run a named workload
-correctly and compare it with a declared incumbent on a declared support
-matrix. The receipt, replay artifact, and runtime policy should identify the
-workload, provider, backend, and validation result.
+The current product goal has two independently gated surfaces: a Node/Bun
+runtime lane and a Fawn/Chromium browser lane. Each must run a named unchanged
+workload correctly against a declared incumbent on a declared support matrix.
+The receipt, replay artifact, and runtime policy must identify the workload,
+provider, physical hardware, backend, and validation result. Browser evidence
+does not inherit package claim status.
 
 Doe serves several audiences:
 
@@ -74,7 +76,7 @@ not a universal performance claim.
 | AMD Vulkan | Physical recomposition diagnostic | Dawn delegate | Output-oracled capture | `diagnostic` | [`backend evidence`](runtime/zig/reports/recomposition/backend-evidence.json) |
 | Intel Tiger Lake Vulkan | Native compute diagnostics | Declared Dawn-backed lane | Host-specific only | `diagnostic` | [`backend status`](docs/status/runtime-backends-and-bench.md) |
 | Windows D3D12 | Native runtime | Dawn D3D12 | Evidence incomplete | `scaffolded` | [`support matrix`](docs/doe-support-matrix.md) |
-| Chromium | Forced-Doe browser lane | Chromium/Dawn | Stock Chrome negative control | `diagnostic` | [`browser smoke`](browser/chromium/artifacts/20260810T223700Z/dawn-vs-doe.browser.playwright-smoke.diagnostic.json) |
+| Fawn/Chromium | Forced-Doe browser lane | Chromium/Dawn | Clean-install release gate remains blocked | `diagnostic` | [`clean-install receipt`](browser/chromium/artifacts/20260811T130500Z/fawn-release-clean-install.diagnostic.json) |
 
 The latest physical backend bundle is
 [`backend-evidence.json`](runtime/zig/reports/recomposition/backend-evidence.json).
@@ -87,9 +89,12 @@ and autonomous software. A versioned workload enters under an explicit policy;
 Doe selects or enforces the provider, executes the workload, validates the
 result, and returns a receipt describing the run.
 
-Node, Bun, Electron, and controlled CI are the first execution surfaces.
-Chromium is a future Doe-led browser substrate that must earn each adjacent
-GPU-heavy workload with separate evidence. Doe is not an agent SDK, browser
+Node, Bun, Electron, and controlled CI are the first runtime surfaces. Fawn is
+the first-class browser target: a released Chromium-family archive must run an
+unchanged WebGPU application through forced Doe with independently verified
+output, physical hardware identity, reliable lifecycle behavior, and a narrow
+measured advantage or compatibility benefit. Doe must earn each adjacent
+GPU-heavy browser workload separately. It is not an agent SDK, browser
 automation framework, or general Chromium fork.
 
 ## Limits and current status

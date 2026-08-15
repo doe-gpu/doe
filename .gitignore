@@ -152,6 +152,9 @@ browser/chromium/artifacts/*
 !browser/chromium/artifacts/fawn-icon-main.*/**
 !browser/chromium/artifacts/20260724T204526Z/
 !browser/chromium/artifacts/20260724T204526Z/**
+!browser/chromium/artifacts/20260811T130500Z/
+browser/chromium/artifacts/20260811T130500Z/*
+!browser/chromium/artifacts/20260811T130500Z/fawn-release-clean-install.diagnostic.json
 browser/chromium/.external-macos.env
 browser/chromium/.external-lane.env
 

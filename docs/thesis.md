@@ -113,7 +113,7 @@ narrative stays here; implementation and evidence stay in the linked sources.
 
 | ID | Idea | State | What it means now |
 | --- | --- | --- | --- |
-| `DOE-01` | Fawn agent browser | `diagnostic` | Doe-led Chromium WebGPU seam; browser-wide agent orchestration is outside Doe. |
+| `DOE-01` | Fawn agent browser | `active` | First-class Doe browser product target at the Chromium WebGPU seam; current evidence remains diagnostic, and browser-wide agent orchestration is outside Doe. |
 | `DOE-02` | DoeKernel accelerator scheduler | `candidate` | Queue/resource contracts and prototypes; no browser-wide scheduler claim. |
 | `DOE-03` | DoeVM portable compute layer | `diagnostic` | WGSL/IR/TSIR/HostPlan/CSL direction; not yet a universal VM. |
 | `DOE-04` | DoeProof execution evidence | `active` | Workload, oracle, receipt, replay, and qualification trunk. |
@@ -278,6 +278,15 @@ representations, backend binaries, command graphs, execution results, and
 receipts. That identity makes correctness and performance claims auditable
 across Metal, Vulkan, D3D12, and later execution targets.
 
+Runtime ownership is a hypothesis, not automatic product credit. Each promoted
+application must compare the owned runtime with an ambient incumbent, a pinned
+incumbent, and that pinned incumbent under the same DoeProof policy, oracle,
+receipt, and replay contract. Doe owns execution only where that comparison
+proves a durable enforcement, diagnosis, lifecycle, program-identity,
+correction, or performance advantage that a governed incumbent cannot provide
+at lower durable cost. The adjudication and application-tier contract is
+[`runtime-ownership-decision.md`](runtime-ownership-decision.md).
+
 The implementation principles are:
 
 - source-preserving lowering;
@@ -297,9 +306,9 @@ Two longer-range paths reuse the same contracts:
 - Doppler Program Bundle to TSIR, HostPlan, CSL, simulator, and Cerebras
   hardware execution.
 
-The browser path is the eventual host for browser-operated software and
-agents. Doe's browser strategy is piecewise GPU replacement: begin at the
-WebGPU/Dawn implementation seam, then earn adjacent GPU-heavy browser work
+The browser path is Doe's first-class external-facing host for browser-operated
+software and agents. Doe's browser strategy is piecewise GPU replacement:
+begin at the WebGPU/Dawn implementation seam, then earn adjacent GPU-heavy browser work
 through separate correctness and compatibility evidence. The objective is to
 move more deterministic, parallel work onto accelerators and reduce CPU
 orchestration where that improves real workloads; it is not to rewrite
@@ -310,6 +319,13 @@ execution,
 fallback policy, browser compatibility, reliability, installation, and release
 identity before browser claims are made. A browser or package wrapper alone is
 insufficient.
+
+Fawn's first promotion objective is not a broad browser benchmark win. It is a
+released archive that runs one unchanged application through Doe with an
+independent output oracle, forced-provider and physical-hardware identity,
+fallback detection, replay, repeated lifecycle and teardown coverage,
+concurrency and memory-growth checks, and matched p50/p95/p99 evidence when a
+performance advantage is claimed.
 
 Controlled GPU worker fleets are another later surface: a worker can advertise
 its runtime, backend, adapter, driver, limits, and policy capabilities, while a

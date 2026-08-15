@@ -19,6 +19,9 @@ evidence boundaries are clear.
 ## Product and project contracts
 
 - [`problems-addressed.md`](problems-addressed.md): user problems and proof required
+- [`runtime-ownership-decision.md`](runtime-ownership-decision.md): four-lane
+  DoeProof-versus-DoeRuntime attribution, operational trust, ownership cost,
+  application tiers, and expansion admission
 - [`architecture.md`](architecture.md): system surfaces and execution model
 - [`process.md`](process.md): stage, gate, and release law
 - [`status.md`](status.md): concise current-status routing

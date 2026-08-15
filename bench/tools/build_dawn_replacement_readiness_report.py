@@ -38,7 +38,10 @@ from bench.lib.bench_utils import (
 )
 from bench.tools._public_url import is_public_https_url
 from bench.tools import build_webgpu_cts_backend_pass_ledger as cts_backend_ledger_builder
-from bench.tools.check_browser_release_package_inputs import detect_file_identity_bytes
+from bench.tools.check_browser_release_package_inputs import (
+    detect_file_identity_bytes,
+    release_platform_contract,
+)
 
 
 PRODUCT_SURFACES = {
@@ -2722,15 +2725,15 @@ def release_artifact_bundle_product_platform_failures(
                     "release artifact bundle platform.packageFormat must be zip",
                 )
             )
-        if (
-            release_status == "release_candidate"
-            and (os_name, arch, package_format) != ("macos", "arm64", "zip")
-        ):
+        if release_status == "release_candidate" and release_platform_contract(platform) is None:
             failures.append(
                 failure(
-                    "release_artifact_bundle_platform_not_macos_arm64",
+                    "release_artifact_bundle_platform_unsupported",
                     "releaseCandidateEvidence.releaseArtifactBundle.platform",
-                    "initial release candidates must target macOS arm64 zip",
+                    (
+                        "release candidates must target a platform declared in "
+                        "config/browser-release-platform-policy.json"
+                    ),
                 )
             )
     return failures
@@ -2907,8 +2910,14 @@ def release_archive_binary_identity_failures(
     if release_artifact_bundle.get("releaseStatus") != "release_candidate":
         return []
     platform = release_artifact_bundle.get("platform")
-    if not isinstance(platform, dict) or platform.get("os") != "macos":
+    if not isinstance(platform, dict):
         return []
+    platform_os = platform.get("os")
+    expected_format = {"macos": "macho", "linux": "elf"}.get(platform_os)
+    if expected_format is None:
+        return []
+    format_label = {"macho": "Mach-O", "elf": "ELF"}[expected_format]
+    platform_label = {"macos": "macOS", "linux": "Linux"}[platform_os]
     expected_arch = platform.get("arch")
     if not isinstance(expected_arch, str):
         return []
@@ -2943,14 +2952,14 @@ def release_archive_binary_identity_failures(
                     "releaseCandidateEvidence.releaseArtifactBundle."
                     f"{member_path_field}"
                 )
-                if identity.get("detectedFormat") != "macho":
+                if identity.get("detectedFormat") != expected_format:
                     failures.append(
                         failure(
                             "release_archive_binary_format_mismatch",
                             failure_path,
                             (
-                                f"macOS {label} archive member must be "
-                                f"Mach-O: {member_path}"
+                                f"{platform_label} {label} archive member must be "
+                                f"{format_label}: {member_path}"
                             ),
                         )
                     )
@@ -2961,7 +2970,7 @@ def release_archive_binary_identity_failures(
                             "release_archive_binary_arch_mismatch",
                             failure_path,
                             (
-                                f"macOS {label} archive member must include "
+                                f"{platform_label} {label} archive member must include "
                                 f"{expected_arch} code: {member_path}"
                             ),
                         )
@@ -3700,8 +3709,14 @@ def package_inputs_binary_identity_failures(
     package_inputs_summary: dict[str, Any],
 ) -> list[dict[str, str]]:
     platform = package_inputs_summary.get("platform")
-    if not isinstance(platform, dict) or platform.get("os") != "macos":
+    if not isinstance(platform, dict):
         return []
+    platform_os = platform.get("os")
+    expected_format = {"macos": "macho", "linux": "elf"}.get(platform_os)
+    if expected_format is None:
+        return []
+    format_label = {"macho": "Mach-O", "elf": "ELF"}[expected_format]
+    platform_label = {"macos": "macOS", "linux": "Linux"}[platform_os]
     expected_arch = platform.get("arch")
     inputs = package_inputs_summary.get("inputs")
     if not isinstance(expected_arch, str) or not isinstance(inputs, dict):
@@ -3711,12 +3726,15 @@ def package_inputs_binary_identity_failures(
         row = inputs.get(role)
         if not isinstance(row, dict):
             continue
-        if row.get("detectedFormat") != "macho":
+        if row.get("detectedFormat") != expected_format:
             failures.append(
                 failure(
                     "package_inputs_binary_platform_mismatch",
                     f"releaseCandidateEvidence.packageInputs.inputs.{role}.detectedFormat",
-                    f"package-input {role} must be detected as Mach-O for macOS release-candidate evidence",
+                    (
+                        f"package-input {role} must be detected as {format_label} "
+                        f"for {platform_label} release-candidate evidence"
+                    ),
                 )
             )
         architectures = row.get("detectedArchitectures")
@@ -3725,7 +3743,10 @@ def package_inputs_binary_identity_failures(
                 failure(
                     "package_inputs_binary_arch_mismatch",
                     f"releaseCandidateEvidence.packageInputs.inputs.{role}.detectedArchitectures",
-                    f"package-input {role} must include {expected_arch} code for macOS release-candidate evidence",
+                    (
+                        f"package-input {role} must include {expected_arch} code "
+                        f"for {platform_label} release-candidate evidence"
+                    ),
                 )
             )
     return failures

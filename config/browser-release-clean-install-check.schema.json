@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-release-clean-install-check.schema.json",
+  "title": "Browser release clean install check",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "observedAt",
+    "verificationLevel",
+    "sourceMode",
+    "verifier",
+    "releaseArchive",
+    "releaseArchiveManifest",
+    "browserProduct",
+    "platform",
+    "platformPolicy",
+    "extraction",
+    "launchProbe",
+    "webgpuSmoke",
+    "releaseCandidateEligible",
+    "status",
+    "failures"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "artifactKind": { "type": "string", "const": "browser_release_clean_install_check" },
+    "observedAt": { "type": "string", "minLength": 1 },
+    "verificationLevel": { "enum": ["launch_probe", "webgpu_smoke"] },
+    "sourceMode": { "type": "string", "const": "release_archive" },
+    "verifier": {
+      "allOf": [
+        { "$ref": "#/$defs/Artifact" },
+        { "properties": { "kind": { "const": "browser_release_clean_install_verifier" } } }
+      ]
+    },
+    "releaseArchive": { "$ref": "#/$defs/Artifact" },
+    "releaseArchiveManifest": { "$ref": "#/$defs/Artifact" },
+    "browserProduct": { "type": ["object", "null"] },
+    "platform": { "type": ["object", "null"] },
+    "platformPolicy": { "$ref": "#/$defs/PolicyArtifact" },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "isolation",
+        "archiveMemberCount",
+        "extractedMemberCount",
+        "borrowedMemberCount",
+        "browserExecutableArchivePath",
+        "doeRuntimeArchivePath"
+      ],
+      "properties": {
+        "isolation": { "type": "string", "const": "fresh_temporary_directory" },
+        "archiveMemberCount": { "type": "integer", "minimum": 0 },
+        "extractedMemberCount": { "type": "integer", "minimum": 0 },
+        "borrowedMemberCount": { "type": "integer", "const": 0 },
+        "browserExecutableArchivePath": { "type": "string" },
+        "doeRuntimeArchivePath": { "type": "string" }
+      }
+    },
+    "launchProbe": { "$ref": "#/$defs/Process" },
+    "webgpuSmoke": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "script", "process", "report", "modes"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "script": {
+          "anyOf": [
+            {
+              "allOf": [
+                { "$ref": "#/$defs/Artifact" },
+                { "properties": { "kind": { "const": "browser_webgpu_smoke_runner" } } }
+              ]
+            },
+            { "type": "null" }
+          ]
+        },
+        "process": { "$ref": "#/$defs/Process" },
+        "report": { "anyOf": [{ "$ref": "#/$defs/Artifact" }, { "type": "null" }] },
+        "modes": {
+          "type": "array",
+          "prefixItems": [{ "const": "dawn" }, { "const": "doe" }],
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "releaseCandidateEligible": { "type": "boolean" },
+    "status": { "enum": ["pass", "fail"] },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "path", "message"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "path": { "type": "string", "minLength": 1 },
+          "message": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "Artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "byteLength", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "byteLength": { "type": "integer", "minimum": 0 },
+        "kind": { "type": "string", "minLength": 1 }
+      }
+    },
+    "PolicyArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policyId", "path", "sha256", "byteLength", "kind"],
+      "properties": {
+        "policyId": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/Hash" },
+        "byteLength": { "type": "integer", "minimum": 0 },
+        "kind": { "type": "string", "const": "browser_release_platform_policy" }
+      }
+    },
+    "Process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attempted", "exitCode", "timedOut", "durationMs", "stdout", "stderr"],
+      "properties": {
+        "attempted": { "type": "boolean" },
+        "exitCode": { "type": ["integer", "null"] },
+        "timedOut": { "type": "boolean" },
+        "durationMs": { "type": "integer", "minimum": 0 },
+        "stdout": { "type": "string" },
+        "stderr": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+      "then": { "properties": { "failures": { "maxItems": 0 } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "fail" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "releaseCandidateEligible": { "const": false },
+          "failures": { "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "launchProbe": {
+            "properties": { "attempted": { "const": true }, "exitCode": { "const": 0 }, "timedOut": { "const": false } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "verificationLevel": { "const": "webgpu_smoke" } }, "required": ["verificationLevel"] },
+      "then": { "properties": { "webgpuSmoke": { "properties": { "required": { "const": true } } } } },
+      "else": { "properties": { "webgpuSmoke": { "properties": { "required": { "const": false } } } } }
+    },
+    {
+      "if": { "properties": { "releaseCandidateEligible": { "const": true } }, "required": ["releaseCandidateEligible"] },
+      "then": {
+        "properties": {
+          "status": { "const": "pass" },
+          "verificationLevel": { "const": "webgpu_smoke" },
+          "launchProbe": {
+            "properties": { "attempted": { "const": true }, "exitCode": { "const": 0 }, "timedOut": { "const": false } }
+          },
+          "webgpuSmoke": {
+            "properties": {
+              "required": { "const": true },
+              "script": { "$ref": "#/$defs/Artifact" },
+              "process": {
+                "properties": { "attempted": { "const": true }, "exitCode": { "const": 0 }, "timedOut": { "const": false } }
+              },
+              "report": { "$ref": "#/$defs/Artifact" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

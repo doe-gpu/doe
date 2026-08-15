@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fawn://config/browser-release-platform-policy.schema.json",
+  "title": "Browser release platform policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "policyId", "releasePlatforms"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "policyId": {
+      "type": "string",
+      "const": "browser-release/platform-package-v1"
+    },
+    "releasePlatforms": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/ReleasePlatform" }
+    }
+  },
+  "$defs": {
+    "ReleasePlatform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "os",
+        "arch",
+        "packageFormat",
+        "requiredPackageMembers"
+      ],
+      "properties": {
+        "os": { "enum": ["macos", "linux", "windows"] },
+        "arch": { "enum": ["arm64", "x64"] },
+        "packageFormat": { "const": "zip" },
+        "requiredPackageMembers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RequiredPackageMember" }
+        }
+      }
+    },
+    "RequiredPackageMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "executable"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^/].*[^/]$|^[^/]$"
+        },
+        "executable": { "type": "boolean" }
+      }
+    }
+  }
+}

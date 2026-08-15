@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "policyId": "browser-release/platform-package-v1",
+  "releasePlatforms": [
+    {
+      "os": "macos",
+      "arch": "arm64",
+      "packageFormat": "zip",
+      "requiredPackageMembers": []
+    },
+    {
+      "os": "linux",
+      "arch": "x64",
+      "packageFormat": "zip",
+      "requiredPackageMembers": [
+        {
+          "path": "chrome_100_percent.pak",
+          "executable": false
+        },
+        {
+          "path": "chrome_200_percent.pak",
+          "executable": false
+        },
+        {
+          "path": "chrome_crashpad_handler",
+          "executable": true
+        },
+        {
+          "path": "chrome_sandbox",
+          "executable": true
+        },
+        {
+          "path": "icudtl.dat",
+          "executable": false
+        },
+        {
+          "path": "locales/en-US.pak",
+          "executable": false
+        },
+        {
+          "path": "resources.pak",
+          "executable": false
+        },
+        {
+          "path": "v8_context_snapshot.bin",
+          "executable": false
+        }
+      ]
+    }
+  ]
+}

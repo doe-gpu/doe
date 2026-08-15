@@ -302,6 +302,28 @@
       ]
     },
     {
+      "artifactPath": "examples/browser-release-clean-install-check.sample.json",
+      "kindField": "artifactKind",
+      "expectedKind": "browser_release_clean_install_check",
+      "identityMode": "browser_release_clean_install_identity",
+      "requiredPointers": [
+        "/verificationLevel",
+        "/sourceMode",
+        "/verifier/sha256",
+        "/releaseArchive/sha256",
+        "/releaseArchiveManifest/sha256",
+        "/platformPolicy/sha256",
+        "/extraction/isolation",
+        "/extraction/borrowedMemberCount",
+        "/launchProbe/attempted",
+        "/webgpuSmoke/required",
+        "/webgpuSmoke/script/sha256",
+        "/releaseCandidateEligible",
+        "/status",
+        "/failures"
+      ]
+    },
+    {
       "artifactPath": "examples/browser-release-launch-receipt.sample.json",
       "kindField": "artifactKind",
       "expectedKind": "browser_release_launch_receipt",

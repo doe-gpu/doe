@@ -21,6 +21,20 @@ Doe must expose those choices as structured runtime identity and receipt fields.
 Best-effort behavior may exist only when the contract declares it and records
 the original failure cause.
 
+## Unproven need for an owned runtime
+
+Evidence, policy, output validation, replay, and pinned dependency identity can
+often be added around an incumbent runtime. Those capabilities do not by
+themselves justify maintaining a separate compiler, runtime, and backend stack.
+
+For every promoted application, Doe must compare an ambient incumbent, a pinned
+incumbent, that pinned incumbent with DoeProof, and DoeRuntime with the same
+DoeProof contract. Runtime ownership is promoted only when it supplies a
+predeclared enforcement, diagnosis, lifecycle, program-identity, correction, or
+performance advantage that the governed incumbent cannot supply at lower
+durable cost. The complete decision law lives in
+[`runtime-ownership-decision.md`](runtime-ownership-decision.md).
+
 ## Application incompatibility
 
 API-shaped unit tests do not prove that real projects work.

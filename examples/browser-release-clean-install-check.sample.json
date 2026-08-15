@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "browser_release_clean_install_check",
+  "observedAt": "2026-08-11T00:00:00Z",
+  "verificationLevel": "webgpu_smoke",
+  "sourceMode": "release_archive",
+  "verifier": {
+    "path": "bench/tools/check_browser_release_clean_install.py",
+    "sha256": "c9e5951d4cc049429221ba08fa73985c393fbcd817edc953ad85a586049700ae",
+    "byteLength": 23825,
+    "kind": "browser_release_clean_install_verifier"
+  },
+  "releaseArchive": {
+    "path": "examples/browser-release-archive.sample.zip",
+    "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158",
+    "byteLength": 11325471,
+    "kind": "browser_release_archive"
+  },
+  "releaseArchiveManifest": {
+    "path": "examples/browser-release-archive-manifest.sample.json",
+    "sha256": "f7c6456a63a3d5c8b5e6ce1def004c6c2035eb2103e0cdc77bbc830e8889ee5b",
+    "byteLength": 3059,
+    "kind": "browser_release_archive_manifest"
+  },
+  "browserProduct": {
+    "productId": "fawn-doe",
+    "displayName": "Fawn Doe",
+    "version": "0.0.0-sample",
+    "channel": "diagnostic"
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "packageFormat": "zip"
+  },
+  "platformPolicy": {
+    "policyId": "browser-release/platform-package-v1",
+    "path": "config/browser-release-platform-policy.json",
+    "sha256": "c2082f1bb212a8d038bf01fe5221f7bf747cff8b1a274d519ed65f00c92e1bdc",
+    "byteLength": 1080,
+    "kind": "browser_release_platform_policy"
+  },
+  "extraction": {
+    "isolation": "fresh_temporary_directory",
+    "archiveMemberCount": 4,
+    "extractedMemberCount": 0,
+    "borrowedMemberCount": 0,
+    "browserExecutableArchivePath": "Fawn-Doe-linux-x64/chrome-wrapper",
+    "doeRuntimeArchivePath": "Fawn-Doe-linux-x64/libwebgpu_doe.so"
+  },
+  "launchProbe": {
+    "attempted": false,
+    "exitCode": null,
+    "timedOut": false,
+    "durationMs": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "webgpuSmoke": {
+    "required": true,
+    "script": {
+      "path": "browser/chromium/scripts/webgpu-playwright-smoke.mjs",
+      "sha256": "2a1aec88e301fe00c9b76843ab37fcee1d75681cf111a5f8c5646f0eee5eb490",
+      "byteLength": 104857,
+      "kind": "browser_webgpu_smoke_runner"
+    },
+    "process": {
+      "attempted": false,
+      "exitCode": null,
+      "timedOut": false,
+      "durationMs": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "report": null,
+    "modes": ["dawn", "doe"]
+  },
+  "releaseCandidateEligible": false,
+  "status": "fail",
+  "failures": [
+    {
+      "code": "missing_platform_support_member",
+      "path": "platformPolicy.requiredPackageMembers",
+      "message": "The compact sample archive is diagnostic and not a clean-install release candidate."
+    }
+  ]
+}

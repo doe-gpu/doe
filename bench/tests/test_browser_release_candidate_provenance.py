@@ -66,6 +66,14 @@ def _artifact(path: Path, kind: str, *, download_url: str = "") -> dict[str, str
 
 def _package_inputs_fixture(tmp_path: Path) -> tuple[Path, dict]:
     app_dir = tmp_path / "Fawn.app"
+    _write_file(
+        app_dir / "args.gn",
+        "\n".join(
+            f"{key}={value}"
+            for key, value in package_inputs_check.RELEASE_BUILD_PROFILE_ARGS.items()
+        ).encode()
+        + b"\n",
+    )
     _write_file(app_dir / "Contents" / "MacOS" / "Chromium", _macho_arm64_payload(), 0o755)
     plist_path = app_dir / "Contents" / "Info.plist"
     plist_path.parent.mkdir(parents=True, exist_ok=True)
@@ -207,6 +215,38 @@ def _candidate_fixture(
         tmp_path / "browser-published-proof-surface-check.json",
         proof_surface_check,
     )
+    clean_install = {
+        "schemaVersion": 1,
+        "artifactKind": "browser_release_clean_install_check",
+        "verificationLevel": "webgpu_smoke",
+        "sourceMode": "release_archive",
+        "status": "pass",
+        "releaseCandidateEligible": True,
+        "browserProduct": PRODUCT,
+        "platform": PLATFORM,
+        "releaseArchive": {**release_archive_artifact, "byteLength": release_archive.stat().st_size},
+        "releaseArchiveManifest": {**manifest_artifact, "byteLength": manifest_path.stat().st_size},
+        "extraction": {
+            "isolation": "fresh_temporary_directory",
+            "archiveMemberCount": 4,
+            "extractedMemberCount": 4,
+            "borrowedMemberCount": 0,
+        },
+        "launchProbe": {"attempted": True, "exitCode": 0, "timedOut": False},
+        "webgpuSmoke": {
+            "required": True,
+            "modes": ["dawn", "doe"],
+            "process": {"attempted": True, "exitCode": 0, "timedOut": False},
+        },
+        "failures": [],
+    }
+    verifier_path = _write_file(tmp_path / "clean-install-verifier.py", b"# fixture verifier\n")
+    smoke_script = _write_file(tmp_path / "webgpu-smoke.mjs", b"// fixture smoke\n")
+    smoke_report = _write_json(tmp_path / "clean-install-webgpu-smoke.json", {"reportKind": "chromium-webgpu-playwright-smoke"})
+    clean_install["verifier"] = _artifact(verifier_path, "browser_release_clean_install_verifier")
+    clean_install["webgpuSmoke"]["script"] = _artifact(smoke_script, "browser_webgpu_smoke_runner")
+    clean_install["webgpuSmoke"]["report"] = _artifact(smoke_report, "chromium-webgpu-playwright-smoke")
+    clean_install_path = _write_json(tmp_path / "browser-release-clean-install-check.json", clean_install)
     launch_receipt = {
         "schemaVersion": 1,
         "artifactKind": "browser_release_launch_receipt",
@@ -217,6 +257,7 @@ def _candidate_fixture(
         "releaseArchive": release_archive_artifact,
         "releaseArchiveManifest": manifest_artifact,
         "proofSurface": proof_surface_artifact,
+        "cleanInstallCheck": _artifact(clean_install_path, "browser_release_clean_install_check"),
         "browserExecutableArchivePath": MEMBER_PATHS["browserExecutable"],
         "browserAppMetadataArchivePath": MEMBER_PATHS["appMetadata"],
         "doeRuntimeArchivePath": MEMBER_PATHS["doeRuntime"],
@@ -265,6 +306,18 @@ def test_browser_release_candidate_provenance_passes(tmp_path: Path) -> None:
     report = _build_report(_candidate_fixture(tmp_path))
     assert report["status"] == "pass"
     assert report["failures"] == []
+
+
+def test_browser_release_candidate_provenance_requires_clean_install_check(tmp_path: Path) -> None:
+    paths = _candidate_fixture(tmp_path)
+    launch_path = Path(paths["browser_launch_receipt"])
+    launch = json.loads(launch_path.read_text(encoding="utf-8"))
+    del launch["cleanInstallCheck"]
+    _write_json(launch_path, launch)
+
+    report = _build_report(paths)
+
+    assert "browser_launch_clean_install_missing" in {row["code"] for row in report["failures"]}
 
 
 def test_browser_release_candidate_provenance_rejects_diagnostic_proof_surface(tmp_path: Path) -> None:
@@ -507,9 +560,9 @@ def test_browser_release_candidate_provenance_cli_keeps_dirty_package_input_iden
     package_report["evidenceMode"] = "diagnostic"
     package_report["releaseCandidateBlockers"] = [
         {
-            "code": "initial_macos_arm64_release_required",
-            "path": "platform",
-            "message": "initial browser release artifact must be macOS arm64 zip",
+            "code": "browser_release_support_member_missing",
+            "path": "packageDir/icudtl.dat",
+            "message": "release package must include icudtl.dat",
         }
     ]
     _write_json(package_inputs_path, package_report)
@@ -556,7 +609,7 @@ def test_browser_release_candidate_provenance_cli_keeps_dirty_package_input_iden
     )
     failure_codes = {item["code"] for item in payload["failures"]}
     assert "package_inputs_not_release_candidate_eligible" in failure_codes
-    assert "candidate_platform_not_macos_arm64" in failure_codes
+    assert "unsupported_candidate_platform" not in failure_codes
 
 
 def test_browser_release_candidate_provenance_rejects_stale_package_input_binary_identity(tmp_path: Path) -> None:

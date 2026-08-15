@@ -141,34 +141,70 @@
             "properties": {
               "channel": { "const": "release_candidate" }
             }
-          },
-          "platform": {
+          }
+        },
+        "oneOf": [
+          {
             "properties": {
-              "os": { "const": "macos" },
-              "arch": { "const": "arm64" },
-              "packageFormat": { "const": "zip" }
+              "platform": {
+                "properties": {
+                  "os": { "const": "macos" },
+                  "arch": { "const": "arm64" },
+                  "packageFormat": { "const": "zip" }
+                }
+              },
+              "inputs": {
+                "properties": {
+                  "browserExecutable": {
+                    "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
+                  },
+                  "appMetadata": {
+                    "$ref": "#/$defs/ReleaseCandidatePlistInput"
+                  },
+                  "doeRuntime": {
+                    "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
+                  },
+                  "dawnFallbackRuntime": {
+                    "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
+                  },
+                  "shaderCompiler": {
+                    "$ref": "#/$defs/ReleaseCandidateMachoInput"
+                  }
+                }
+              }
             }
           },
-          "inputs": {
+          {
             "properties": {
-              "browserExecutable": {
-                "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
+              "platform": {
+                "properties": {
+                  "os": { "const": "linux" },
+                  "arch": { "const": "x64" },
+                  "packageFormat": { "const": "zip" }
+                }
               },
-              "appMetadata": {
-                "$ref": "#/$defs/ReleaseCandidatePlistInput"
-              },
-              "doeRuntime": {
-                "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
-              },
-              "dawnFallbackRuntime": {
-                "$ref": "#/$defs/ReleaseCandidatePackagedMachoInput"
-              },
-              "shaderCompiler": {
-                "$ref": "#/$defs/ReleaseCandidateMachoInput"
+              "inputs": {
+                "properties": {
+                  "browserExecutable": {
+                    "$ref": "#/$defs/ReleaseCandidatePackagedElfInput"
+                  },
+                  "appMetadata": {
+                    "$ref": "#/$defs/ReleaseCandidateJsonInput"
+                  },
+                  "doeRuntime": {
+                    "$ref": "#/$defs/ReleaseCandidatePackagedElfInput"
+                  },
+                  "dawnFallbackRuntime": {
+                    "$ref": "#/$defs/ReleaseCandidatePackagedElfInput"
+                  },
+                  "shaderCompiler": {
+                    "$ref": "#/$defs/ReleaseCandidateElfInput"
+                  }
+                }
               }
             }
           }
-        }
+        ]
       }
     }
   ],
@@ -292,6 +328,55 @@
       "allOf": [
         { "$ref": "#/$defs/ReleaseCandidateMachoInput" },
         { "required": ["archivePath"] }
+      ]
+    },
+    "ReleaseCandidateElfInput": {
+      "allOf": [
+        { "$ref": "#/$defs/FileInput" },
+        {
+          "required": [
+            "sha256",
+            "byteLength",
+            "executable",
+            "detectedFormat",
+            "detectedArchitectures"
+          ],
+          "properties": {
+            "exists": { "const": true },
+            "generated": { "const": false },
+            "executable": { "const": true },
+            "detectedFormat": { "const": "elf" },
+            "detectedArchitectures": {
+              "contains": { "const": "x64" }
+            }
+          }
+        }
+      ]
+    },
+    "ReleaseCandidatePackagedElfInput": {
+      "allOf": [
+        { "$ref": "#/$defs/ReleaseCandidateElfInput" },
+        { "required": ["archivePath"] }
+      ]
+    },
+    "ReleaseCandidateJsonInput": {
+      "allOf": [
+        { "$ref": "#/$defs/FileInput" },
+        {
+          "required": [
+            "archivePath",
+            "sha256",
+            "byteLength",
+            "executable",
+            "detectedFormat",
+            "detectedArchitectures"
+          ],
+          "properties": {
+            "executable": { "const": false },
+            "detectedFormat": { "const": "json" },
+            "detectedArchitectures": { "maxItems": 0 }
+          }
+        }
       ]
     },
     "ReleaseCandidatePlistInput": {

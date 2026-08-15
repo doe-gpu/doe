@@ -522,10 +522,14 @@ def build_final_bundle(args: argparse.Namespace) -> tuple[dict[str, Any], dict[s
     proof_surface = Path(args.proof_surface)
     proof_surface_check = Path(args.proof_surface_check)
     browser_launch_receipt = Path(args.browser_launch_receipt)
-    platform = {"os": "macos", "arch": "arm64", "packageFormat": "zip"}
     package_inputs, package_inputs_path, package_input_failures = load_package_inputs_report(
         args.package_inputs,
         verify_files_root,
+    )
+    platform = (
+        string_map(package_inputs.get("platform"))
+        if package_inputs is not None
+        else None
     )
     browser_product, product_failures = package_browser_product(package_inputs, args)
     resolved_inputs, input_failures = resolve_finalizer_package_inputs(
@@ -534,16 +538,17 @@ def build_final_bundle(args: argparse.Namespace) -> tuple[dict[str, Any], dict[s
         verify_files_root,
     )
     preflight_failures = package_input_failures + product_failures + input_failures
-    if package_inputs is not None:
-        package_platform = package_inputs.get("platform")
-        if package_platform != platform:
-            preflight_failures.append(
-                failure(
-                    "package_inputs_platform_mismatch",
-                    "packageInputs.platform",
-                    "release-candidate finalizer requires initial macOS arm64 zip package inputs",
-                )
+    if platform is None or package_inputs_check.release_platform_contract(platform) is None:
+        preflight_failures.append(
+            failure(
+                "package_inputs_platform_unsupported",
+                "packageInputs.platform",
+                (
+                    "release-candidate finalizer requires a platform declared in "
+                    "config/browser-release-platform-policy.json"
+                ),
             )
+        )
     if browser_product and browser_product.get("channel") != "release_candidate":
         preflight_failures.append(
             failure(
@@ -552,7 +557,7 @@ def build_final_bundle(args: argparse.Namespace) -> tuple[dict[str, Any], dict[s
                 "release-candidate finalizer requires browserProduct.channel=release_candidate",
             )
         )
-    if preflight_failures:
+    if preflight_failures or platform is None:
         return {}, {}, fail_report("package_inputs_preflight", preflight_failures)
 
     provenance_report = load_json_object(Path(args.provenance_report), "provenance report")

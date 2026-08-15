@@ -1848,14 +1848,14 @@ def test_browser_readiness_flags_release_artifact_bundle_product_id_invalid() ->
     } in consistency["failures"]
 
 
-def test_browser_readiness_flags_release_candidate_platform_not_macos_arm64() -> None:
+def test_browser_readiness_flags_unsupported_release_candidate_platform() -> None:
     with tempfile.TemporaryDirectory(dir=REPO_ROOT) as tmpdir:
         release_path = Path(tmpdir) / "browser-release-artifact-bundle.json"
         release_rel = release_path.relative_to(REPO_ROOT)
         release_payload = _load(REPO_ROOT / "examples" / "browser-release-artifact-bundle.sample.json")
         release_payload["releaseStatus"] = "release_candidate"
         release_payload["browserProduct"]["channel"] = "release_candidate"
-        release_payload["platform"]["arch"] = "x64"
+        release_payload["platform"]["os"] = "windows"
         release_path.write_text(json.dumps(release_payload, indent=2) + "\n", encoding="utf-8")
 
         custom_path = Path(tmpdir) / "browser-runtime-frontier-bundle.json"
@@ -1878,9 +1878,12 @@ def test_browser_readiness_flags_release_candidate_platform_not_macos_arm64() ->
     consistency = browser_row["frontierBundleEvidence"]["releaseCandidateEvidence"]["consistency"]
 
     assert {
-        "code": "release_artifact_bundle_platform_not_macos_arm64",
+        "code": "release_artifact_bundle_platform_unsupported",
         "path": "releaseCandidateEvidence.releaseArtifactBundle.platform",
-        "message": "initial release candidates must target macOS arm64 zip",
+        "message": (
+            "release candidates must target a platform declared in "
+            "config/browser-release-platform-policy.json"
+        ),
     } in consistency["failures"]
 
 

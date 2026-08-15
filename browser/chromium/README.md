@@ -4,6 +4,12 @@
 scripts, milestone checks, and diagnostic artifacts. It is not the Chromium
 checkout itself and it does not change the public `doe-gpu/browser` contract.
 
+Fawn is Doe's first-class browser product target. Success means a released
+Chromium-family archive runs an unchanged WebGPU application through forced
+Doe with an independent oracle, physical hardware identity, reliable
+lifecycle behavior, and a narrow compatibility or performance benefit. It
+does not mean a general browser benchmark win.
+
 ## Boundaries
 
 - The external Chromium checkout/build workspace is selected separately by the
@@ -46,6 +52,8 @@ Do not add a parallel task list, strategy, or artifact inventory to this file.
 - Diagnostic rows must remain separate from claimable rows.
 - A public claim requires the published-browser contract, not a local smoke
   test or package wrapper.
+- A release-candidate launch receipt must bind the isolated clean-install
+  verifier; declared launch facts are insufficient.
 - Contract changes require matching schema, checker, and fixture updates.
 
 ## Verification
@@ -56,9 +64,11 @@ README intentionally does not copy the changing command inventory.
 
 ## Current boundary
 
-The lane has forced-runtime contracts, diagnostics, and release-proof
-scaffolding. It does not yet establish broad browser compatibility, a promoted
-cross-platform release, or a general performance claim.
+The lane has forced-runtime contracts, diagnostics, a governed Linux package
+policy, and an isolated archive verifier. The retained compact archive fails
+that verifier because it is not an installable Chromium package. The lane does
+not yet establish an unchanged-application release gate, broad browser
+compatibility, a promoted release, or a general performance claim.
 
 Archived Track B module designs remain historical references only. New work
 must attach to the canonical task list and milestone manifest.

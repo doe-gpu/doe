@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from bench.browser.browser_gate import (
     stable_hash,
+    validate_active_runtime_proof,
     validate_adapter_identity,
     validate_cts_subset,
     validate_flight_recorder_replay,
@@ -134,6 +135,80 @@ def test_adapter_identity_accepts_digest_and_feature_count() -> None:
     payload = {"adapterInfoSha256": SHA256, "featureCount": 0}
 
     assert validate_adapter_identity(payload, "smoke mode dawn") == []
+
+
+def _active_runtime_proof_v2(mode: str, adapter_info: dict) -> dict:
+    selection = _runtime_selection(mode)
+    artifact_hash = (
+        selection["artifactIdentity"]["doeLibSha256"]
+        if mode == "doe"
+        else selection["artifactIdentity"]["dawnRuntimeSha256"]
+    )
+    return {
+        "schemaVersion": 2,
+        "providerIdentitySource": "runtimeSelector",
+        "hardwareIdentitySource": "wgpuAdapterGetInfo",
+        "selectedRuntime": mode,
+        "expected": {
+            "provider": mode,
+            "fallbackApplied": False,
+            "hiddenFallbackAllowed": False,
+            "hardwareVendorMustBeNonEmpty": True,
+            "hardwareArchitectureMustBeNonEmpty": True,
+        },
+        "provider": {
+            "selectionMode": mode,
+            "selectedRuntime": mode,
+            "forcedMode": mode,
+            "fallbackApplied": False,
+            "hiddenFallbackAllowed": False,
+            "runtimeArtifactSha256": artifact_hash,
+            "launchArgsHash": SHA256,
+        },
+        "hardware": {
+            field: adapter_info.get(field, "")
+            for field in ("vendor", "architecture", "device", "description")
+        },
+        "matched": True,
+    }
+
+
+def test_active_runtime_proof_accepts_real_amd_identity_for_doe() -> None:
+    adapter_info = {
+        "vendor": "AMD",
+        "architecture": "vulkan",
+        "device": "Radeon 8060S Graphics",
+        "description": "RADV",
+    }
+
+    assert validate_active_runtime_proof(
+        _active_runtime_proof_v2("doe", adapter_info),
+        _runtime_selection("doe"),
+        adapter_info,
+        "doe",
+        "smoke mode doe",
+    ) == []
+
+
+def test_active_runtime_proof_rejects_provider_selection_drift() -> None:
+    adapter_info = {
+        "vendor": "AMD",
+        "architecture": "vulkan",
+        "device": "Radeon 8060S Graphics",
+        "description": "RADV",
+    }
+    proof = _active_runtime_proof_v2("doe", adapter_info)
+    proof["provider"]["selectedRuntime"] = "dawn"
+
+    errors = validate_active_runtime_proof(
+        proof,
+        _runtime_selection("doe"),
+        adapter_info,
+        "doe",
+        "smoke mode doe",
+    )
+
+    assert "smoke mode doe activeRuntimeProof.provider must match runtimeSelection" in errors
 
 
 def test_shader_compiler_identity_requires_compiler_hash() -> None:

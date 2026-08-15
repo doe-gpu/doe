@@ -55,6 +55,13 @@ def _macho_payload(arch: str = "arm64") -> bytes:
     return struct.pack("<IiiIIIII", 0xFEEDFACF, cpu_type, 0, 2, 0, 0, 0, 0)
 
 
+def _elf_x64_payload() -> bytes:
+    payload = bytearray(64)
+    payload[:6] = b"\x7fELF\x02\x01"
+    payload[18:20] = struct.pack("<H", 0x3E)
+    return bytes(payload)
+
+
 def _write_canonical_args_gn(path: Path) -> Path:
     return _write_file(
         path,
@@ -89,6 +96,39 @@ def _write_linux_inputs(root: Path) -> dict[str, Path]:
     }
 
 
+def _write_linux_candidate_inputs(root: Path) -> dict[str, Path]:
+    package_dir = root / "fawn-linux"
+    _write_canonical_args_gn(root / "args.gn")
+    policy = package_inputs.load_release_platform_policy()
+    linux = next(row for row in policy["releasePlatforms"] if row["os"] == "linux")
+    for member in linux["requiredPackageMembers"]:
+        mode = 0o755 if member["executable"] else 0o644
+        _write_file(package_dir / member["path"], b"support\n", mode)
+    return {
+        "package_dir": package_dir,
+        "browser": _write_file(
+            package_dir / "chrome-wrapper",
+            _elf_x64_payload(),
+            0o755,
+        ),
+        "doe_runtime": _write_file(
+            root / "libwebgpu_doe.so",
+            _elf_x64_payload(),
+            0o755,
+        ),
+        "dawn_runtime": _write_file(
+            root / "libdawn_native.so",
+            _elf_x64_payload(),
+            0o755,
+        ),
+        "compiler": _write_file(
+            root / "doe-zig-runtime",
+            _elf_x64_payload(),
+            0o755,
+        ),
+    }
+
+
 def _write_macos_candidate_inputs(root: Path) -> dict[str, Path]:
     app_dir = root / "Fawn.app"
     _write_canonical_args_gn(root / "args.gn")
@@ -109,6 +149,63 @@ def _write_macos_candidate_inputs(root: Path) -> dict[str, Path]:
 
 
 class BrowserReleasePackageInputsTests(unittest.TestCase):
+    def test_linux_release_candidate_is_eligible_with_complete_support(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            paths = _write_linux_candidate_inputs(root)
+
+            report = package_inputs.build_report(
+                package_dir=str(paths["package_dir"]),
+                package_root_name="Fawn-Doe-linux-x64",
+                doe_runtime=str(paths["doe_runtime"]),
+                dawn_fallback_runtime=str(paths["dawn_runtime"]),
+                shader_compiler=str(paths["compiler"]),
+                product_channel="release_candidate",
+                platform_os="linux",
+                platform_arch="x64",
+                root=root,
+            )
+
+            _validate(report)
+            self.assertEqual(report["status"], "pass")
+            self.assertTrue(report["releaseCandidateEligible"])
+            self.assertEqual(report["releaseCandidateBlockers"], [])
+            self.assertEqual(report["evidenceMode"], "release_candidate")
+
+    def test_linux_release_candidate_reports_missing_launch_support(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            paths = _write_linux_candidate_inputs(root)
+            (paths["package_dir"] / "icudtl.dat").unlink()
+
+            report = package_inputs.build_report(
+                package_dir=str(paths["package_dir"]),
+                package_root_name="Fawn-Doe-linux-x64",
+                doe_runtime=str(paths["doe_runtime"]),
+                dawn_fallback_runtime=str(paths["dawn_runtime"]),
+                shader_compiler=str(paths["compiler"]),
+                product_channel="release_candidate",
+                platform_os="linux",
+                platform_arch="x64",
+                root=root,
+            )
+
+            _validate(report)
+            self.assertEqual(report["status"], "pass")
+            self.assertFalse(report["releaseCandidateEligible"])
+            self.assertIn(
+                {
+                    "code": "browser_release_support_member_missing",
+                    "path": "packageDir/icudtl.dat",
+                    "message": "release package must include icudtl.dat",
+                },
+                report["releaseCandidateBlockers"],
+            )
+
     def test_linux_report_passes_with_generated_metadata(self) -> None:
         import tempfile
 

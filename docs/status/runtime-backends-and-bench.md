@@ -6,6 +6,42 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- Fawn M4 is now an explicit in-progress published-browser milestone. Linux x64
+  joins macOS arm64 as a governed release-candidate platform through
+  `config/browser-release-platform-policy.json`; this expands the admissible
+  lane without promoting any browser claim.
+- A clean extraction of the retained compact Linux diagnostic archive aborts
+  before WebGPU because Chromium runtime support files are absent. The governed
+  failure is retained at
+  `browser/chromium/artifacts/20260811T130500Z/fawn-release-clean-install.diagnostic.json`.
+  Release-candidate preflight now requires the declared ICU, V8 snapshot,
+  resource, locale, crash-handler, sandbox, and scale-resource members, and the
+  Linux archive packer requires an eligible preflight receipt.
+- `bench/tools/check_browser_release_clean_install.py` now turns that boundary
+  into an observational gate: it rejects unsafe zip members, verifies the exact
+  manifest and platform package set, extracts into a fresh temporary directory,
+  runs the packaged browser launch probe, and can run strict Dawn-and-Doe smoke
+  with only packaged browser/runtime bytes. Release-candidate launch receipts
+  must bind a passing, WebGPU-level result; declared launch facts alone no
+  longer satisfy the release contract. The retained compact archive's governed
+  failure is at
+  `browser/chromium/artifacts/20260811T130500Z/fawn-release-clean-install.diagnostic.json`.
+  Migration: launch-receipt schema version 1 remains readable for diagnostic
+  evidence, but `release_candidate` and `release` receipts must now include a
+  hash-bound `cleanInstallCheck`; older candidate-shaped receipts must be
+  regenerated and cannot be promoted by relabeling.
+- Browser runtime proof now separates the forced provider from physical adapter
+  identity. New smoke and layered reports bind Doe or Dawn through the selector
+  and runtime hashes while retaining the real vendor, architecture, device, and
+  description returned by `wgpuAdapterGetInfo`. Legacy schema-version-1 browser
+  artifacts remain readable but do not define the new identity contract.
+- No Fawn release candidate exists on this host: the original Chromium checkout
+  and complete build output are unavailable, and substituting public Chromium
+  support files fails exact V8 snapshot compatibility. M4 remains in progress
+  until a complete build is clean-installed and an unchanged exact-oracle
+  application passes lifecycle, fallback, replay, concurrency, memory, and
+  timing gates.
+
 - Public performance rows come only from `reports/claim-index.json` and their
   referenced claim sidecars.
 - Apple Metal and AMD Vulkan have narrow native and package evidence. That

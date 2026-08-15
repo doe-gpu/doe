@@ -58,6 +58,12 @@ classified and cannot be promoted by benchmark results.
   physical support target, toolchain, and Doe/provider artifacts. The release
   gate opens and verifies that receipt; a manifest declaration alone is not
   evidence.
+- A Fawn browser release candidate must bind a complete archive manifest and a
+  passing clean-install check. The check extracts the published archive into a
+  fresh temporary directory, borrows no package members, runs the packaged
+  browser, and verifies forced Dawn and forced Doe WebGPU execution against the
+  packaged artifact hashes. A declared launch receipt without that observation
+  cannot enter Release.
 
 ## Gate policy and failure precedence
 
