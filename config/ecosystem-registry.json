@@ -557,7 +557,7 @@
         {
           "reportId": "vgpu-runtime-ownership-2026-08-15-diagnostic",
           "path": "reports/ecosystem/vercel-labs-vgpu/vgpu-runtime-ownership-2026-08-15-diagnostic.json",
-          "sha256": "570256bc365c6ea96a82d34cfa2b600a47e949134becb909492395a227a00856",
+          "sha256": "1d8b66119b067bb224ca98f0743f3cb463852f3498ea53890bd5e45964be119d",
           "reviewedAt": "2026-08-15T16:21:01Z",
           "reviewer": "codex"
         }

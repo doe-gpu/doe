@@ -26,12 +26,12 @@
       "summary": "I0, I1, W0, and D0 all passed the exact ORT/vGPU oracle. W0 and D0 also passed hash-bound application replay and the frozen post-destroy error-handler lifecycle regression on the physical AMD Vulkan adapter.",
       "evidence": [
         {
-          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/raw-matrix.json",
-          "sha256": "44aed4942d163ec8b7bdc65dee3c407ec2dddf052ef4fcad2ab79ee1274dbbb2"
+          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v2/raw-matrix.json",
+          "sha256": "514b602d8c5040b96cf86ba7b7a4a06e2b6e9e634f0524d5aa58c11b136bfea4"
         },
         {
-          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/receipt-summary.json",
-          "sha256": "83f520cff6cd5b832aa4993f0aa3048101cdff6ccf08030252f6c0cb56a2ae43"
+          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v2/receipt-summary.json",
+          "sha256": "90d5d9fa26466427419b5ed25abf802f36122b43576806ec6e95c0e3581b7db1"
         }
       ]
     },
@@ -42,8 +42,8 @@
       "summary": "D0 did not produce a lifecycle outcome unavailable from W0. Both governed lanes passed the same oracle, post-destroy regression, and replay identity, so this diagnostic assigns no unique lifecycle-control value to DoeRuntime.",
       "evidence": [
         {
-          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/receipt-summary.json",
-          "sha256": "83f520cff6cd5b832aa4993f0aa3048101cdff6ccf08030252f6c0cb56a2ae43"
+          "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v2/receipt-summary.json",
+          "sha256": "90d5d9fa26466427419b5ed25abf802f36122b43576806ec6e95c0e3581b7db1"
         }
       ]
     }
@@ -74,7 +74,7 @@
       "crashes": 0,
       "hangs": 0,
       "timeouts": 0,
-      "peakMemoryBytes": 429789184
+      "peakMemoryBytes": 427716608
     },
     "comparison": {
       "cleanProcessRuns": 3,
@@ -83,7 +83,7 @@
       "crashes": 0,
       "hangs": 0,
       "timeouts": 0,
-      "peakMemoryBytes": 382537728
+      "peakMemoryBytes": 402116608
     }
   },
   "performance": {
@@ -179,22 +179,22 @@
   },
   "receipts": [
     {
-      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/receipt-summary.json",
-      "sha256": "83f520cff6cd5b832aa4993f0aa3048101cdff6ccf08030252f6c0cb56a2ae43"
+      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v2/receipt-summary.json",
+      "sha256": "90d5d9fa26466427419b5ed25abf802f36122b43576806ec6e95c0e3581b7db1"
     },
     {
-      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/replay-receipts/W0.json",
+      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v2/replay-receipts/W0.json",
       "sha256": "2718236e948dd420acfefba9be325ac7225e558632aefd11346ba02e55c6c71f"
     },
     {
-      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/replay-receipts/D0.json",
+      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v2/replay-receipts/D0.json",
       "sha256": "3c6c54866b8f230519fe175e73f89a91cf2ef4b6c55c7e71c6badbdcc352f949"
     }
   ],
   "rawEvidence": [
     {
-      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v1/raw-matrix.json",
-      "sha256": "44aed4942d163ec8b7bdc65dee3c407ec2dddf052ef4fcad2ab79ee1274dbbb2"
+      "path": "bench/out/external-projects/vercel-labs-vgpu/runtime-ownership-diagnostic-v2/raw-matrix.json",
+      "sha256": "514b602d8c5040b96cf86ba7b7a4a06e2b6e9e634f0524d5aa58c11b136bfea4"
     }
   ]
 }

@@ -4,8 +4,11 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import { access, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { buildRuntimeOwnership } from '../../lib/runtime-ownership-matrix.mjs';
 
 const harnessDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(harnessDir, '../../..');
@@ -155,7 +158,7 @@ function providerEnvironment(provider, modulePath, runtimeDir) {
   delete env.CI;
   delete env.GITHUB_ACTIONS;
   if (provider === 'dawn-node-webgpu') env.DOE_EXTERNAL_DAWN_MODULE = modulePath;
-  else env.DOE_EXTERNAL_DOE_MODULE = modulePath;
+  else if (provider === 'doe-gpu') env.DOE_EXTERNAL_DOE_MODULE = modulePath;
   return env;
 }
 
@@ -236,12 +239,12 @@ function nativeDiagnostics(output) {
   };
 }
 
-async function runSuite(options, provider, modulePath, outDir, index) {
+async function runSuite(options, laneId, provider, modulePath, outDir, index) {
   const runtimeDir = resolve(
     repoRoot,
     'bench/out/.xdg',
     sha256Text(outDir).slice(0, 8),
-    provider === 'dawn-node-webgpu' ? 'wgsl-fns-dawn' : 'wgsl-fns-doe',
+    `wgsl-fns-${laneId.toLowerCase()}`,
     String(index + 1),
   );
   await mkdir(runtimeDir, { recursive: true });
@@ -277,6 +280,9 @@ async function runSuite(options, provider, modulePath, outDir, index) {
     && tap.skipped === 0
     && nativeCompilerErrorCount === 0;
   return {
+    laneId,
+    provider,
+    providerModulePath: modulePath,
     cleanProcessIndex: index + 1,
     success,
     ...result,
@@ -311,8 +317,73 @@ function summarize(processes) {
   };
 }
 
+function executionEvidence(sample) {
+  return {
+    success: sample.success,
+    exitCode: sample.exitCode,
+    signal: sample.signal,
+    timedOut: sample.timedOut,
+    processCrashed: sample.processCrashed,
+    tap: sample.tap,
+    diagnostics: sample.diagnostics,
+    nativeCompilerErrorCount: sample.nativeCompilerErrorCount,
+    outputIdentitySha256: sample.outputIdentitySha256,
+  };
+}
+
+async function runReceiptReplay({
+  options,
+  laneId,
+  provider,
+  modulePath,
+  outDir,
+  sourceSample,
+  immutableInputs,
+}) {
+  const relativeReceiptPath = `replay-receipts/${laneId}.json`;
+  const receiptPath = resolve(outDir, relativeReceiptPath);
+  await mkdir(dirname(receiptPath), { recursive: true });
+  const expectedEvidenceSha256 = sha256Text(JSON.stringify(executionEvidence(sourceSample)));
+  const receipt = {
+    schemaVersion: 1,
+    artifactKind: 'wgsl-fns-compilation-replay-receipt',
+    laneId,
+    provider,
+    providerModulePath: modulePath,
+    immutableInputs,
+    expectedEvidenceSha256,
+  };
+  await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  const loadedReceipt = JSON.parse(await readFile(receiptPath, 'utf8'));
+  if (loadedReceipt.provider !== provider
+    || loadedReceipt.providerModulePath !== modulePath
+    || loadedReceipt.expectedEvidenceSha256 !== expectedEvidenceSha256) {
+    throw new Error(`${laneId} replay receipt did not preserve the frozen execution contract`);
+  }
+  const sample = await runSuite(
+    options,
+    laneId,
+    provider,
+    modulePath,
+    outDir,
+    options.cleanProcessRuns,
+  );
+  const actualEvidenceSha256 = sha256Text(JSON.stringify(executionEvidence(sample)));
+  return {
+    status: actualEvidenceSha256 === expectedEvidenceSha256 ? 'passed' : 'failed',
+    receiptPath: relativeReceiptPath,
+    receiptSha256: await sha256(receiptPath),
+    expectedEvidenceSha256,
+    actualEvidenceSha256,
+    sample,
+  };
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
+  const harness = JSON.parse(
+    await readFile(resolve(harnessDir, 'wgsl-compilation-suite.harness.json'), 'utf8'),
+  );
   const actualCommit = await gitHead(options.upstream);
   if (actualCommit !== expectedCommit) {
     throw new Error(`upstream commit mismatch: expected ${expectedCommit}, received ${actualCommit}`);
@@ -326,32 +397,147 @@ async function main() {
   );
   await mkdir(outDir, { recursive: true });
   const hostHardware = await inspectHostHardware();
+  const immutableInputs = await Promise.all(sourcePaths.map(async (path) => ({
+    path,
+    sha256: await sha256(resolve(options.upstream, path)),
+  })));
+  const ambientDawnModule = createRequire(
+    resolve(options.upstream, 'package.json'),
+  ).resolve('webgpu');
+  const patchedDawnModule = process.env.DOE_EXTERNAL_PATCHED_DAWN_MODULE?.trim() || null;
   const modules = {
     'dawn-node-webgpu': resolve(options.upstream, 'node_modules/webgpu/index.js'),
     'doe-gpu': resolve(repoRoot, 'packages/doe-gpu/src/index.js'),
   };
+  if (patchedDawnModule !== null) {
+    await access(patchedDawnModule, fsConstants.R_OK);
+    const patchedPackage = JSON.parse(
+      await readFile(resolve(dirname(patchedDawnModule), 'package.json'), 'utf8'),
+    );
+    if (patchedPackage.name !== 'webgpu' || patchedPackage.version !== '0.3.10') {
+      throw new Error('P0 requires the frozen webgpu@0.3.10 patch-level control');
+    }
+  }
   const providers = {};
   for (const [provider, modulePath] of Object.entries(modules)) {
+    const laneId = provider === 'dawn-node-webgpu' ? 'W0' : 'D0';
     const probe = await probeProvider(options, provider, modulePath, outDir, hostHardware);
     const processes = [];
     for (let index = 0; index < options.cleanProcessRuns; index += 1) {
-      const sample = await runSuite(options, provider, modulePath, outDir, index);
+      const sample = await runSuite(options, laneId, provider, modulePath, outDir, index);
       processes.push(sample);
       console.log(`[${provider}] process ${index + 1}: ${sample.success ? 'PASS' : 'FAIL'}`);
     }
+    const replay = await runReceiptReplay({
+      options,
+      laneId,
+      provider,
+      modulePath,
+      outDir,
+      sourceSample: processes[0],
+      immutableInputs,
+    });
+    console.log(`[${provider}] receipt replay: ${replay.status.toUpperCase()}`);
     providers[provider] = {
       requestedProvider: provider,
       modulePath,
       probe,
       processes,
+      replay,
       reliability: summarize(processes),
     };
   }
 
-  const immutableInputs = await Promise.all(sourcePaths.map(async (path) => ({
-    path,
-    sha256: await sha256(resolve(options.upstream, path)),
-  })));
+  let patchedControl = null;
+  if (patchedDawnModule !== null) {
+    const provider = 'dawn-node-webgpu';
+    const probe = await probeProvider(
+      options,
+      provider,
+      patchedDawnModule,
+      outDir,
+      hostHardware,
+    );
+    const processes = [];
+    for (let index = 0; index < options.cleanProcessRuns; index += 1) {
+      const sample = await runSuite(
+        options,
+        'P0',
+        provider,
+        patchedDawnModule,
+        outDir,
+        index,
+      );
+      processes.push(sample);
+      console.log(`[P0 webgpu@0.3.10] process ${index + 1}: ${sample.success ? 'PASS' : 'FAIL'}`);
+    }
+    const replay = await runReceiptReplay({
+      options,
+      laneId: 'P0',
+      provider,
+      modulePath: patchedDawnModule,
+      outDir,
+      sourceSample: processes[0],
+      immutableInputs,
+    });
+    console.log(`[P0 webgpu@0.3.10] receipt replay: ${replay.status.toUpperCase()}`);
+    patchedControl = {
+      requestedProvider: provider,
+      modulePath: patchedDawnModule,
+      moduleSha256: await sha256(patchedDawnModule),
+      packageVersion: '0.3.10',
+      probe,
+      processes,
+      replay,
+      reliability: summarize(processes),
+    };
+  }
+
+  const ownershipRuns = [];
+  for (const [laneId, provider, modulePath] of [
+    ['I0', 'ambient-node-webgpu', ambientDawnModule],
+    ['I1', 'dawn-node-webgpu', modules['dawn-node-webgpu']],
+  ]) {
+    for (let index = 0; index < options.cleanProcessRuns; index += 1) {
+      ownershipRuns.push(await runSuite(
+        options,
+        laneId,
+        provider,
+        modulePath,
+        outDir,
+        index,
+      ));
+    }
+  }
+  for (const [laneId, providerResult] of [
+    ['W0', providers['dawn-node-webgpu']],
+    ['D0', providers['doe-gpu']],
+    ['P0', patchedControl],
+  ]) {
+    if (providerResult === null) continue;
+    ownershipRuns.push({
+      laneId,
+      provider: providerResult.requestedProvider,
+      providerModulePath: providerResult.modulePath,
+      success: providerResult.probe.hardwareEligible
+        && providerResult.reliability.failures === 0
+        && providerResult.reliability.crashes === 0
+        && providerResult.reliability.timeouts === 0,
+      contractComplete: providerResult.replay.status === 'passed',
+      constructionIssues: providerResult.replay.status === 'passed'
+        ? []
+        : ['receipt-driven execution replay failed'],
+      probe: providerResult.probe,
+      replay: providerResult.replay,
+      reliability: providerResult.reliability,
+    });
+  }
+  const runtimeOwnership = buildRuntimeOwnership({
+    runs: ownershipRuns,
+    plan: harness.runtimeOwnershipPlan,
+    planSha256: sha256Text(JSON.stringify(harness.runtimeOwnershipPlan)),
+    ambientModuleSupplied: true,
+  });
   const generatedAt = new Date().toISOString();
   const raw = {
     schemaVersion: 1,
@@ -387,6 +573,8 @@ async function main() {
     },
     immutableInputs,
     providers,
+    patchedControl,
+    runtimeOwnership,
   };
   const receipt = {
     schemaVersion: 1,
@@ -404,6 +592,7 @@ async function main() {
         identityMatches: item.probe.identityMatches,
         softwareRenderer: item.probe.softwareRenderer,
         hardwareEligible: item.probe.hardwareEligible,
+        replay: item.replay,
         reliability: item.reliability,
       },
     ])),
@@ -438,6 +627,32 @@ async function main() {
         .diagnostics.firstShaderTranslationFailure,
       doeRepeatedNativeCompilerFailureCounts: providers['doe-gpu'].processes
         .map((sample) => sample.nativeCompilerErrorCount),
+      patchedControl: patchedControl === null ? null : {
+        modulePath: patchedControl.modulePath,
+        moduleSha256: patchedControl.moduleSha256,
+        packageVersion: patchedControl.packageVersion,
+        identity: patchedControl.probe.identity,
+        hardwareEligible: patchedControl.probe.hardwareEligible,
+        replay: patchedControl.replay,
+        reliability: patchedControl.reliability,
+      },
+    },
+    runtimeOwnership: {
+      status: raw.runtimeOwnership.status,
+      planSha256: raw.runtimeOwnership.planSha256,
+      claimedProperty: raw.runtimeOwnership.claimedProperty,
+      missingRequiredLanes: raw.runtimeOwnership.missingRequiredLanes,
+      lanes: Object.fromEntries(Object.entries(raw.runtimeOwnership.lanes).map(([laneId, lane]) => [
+        laneId,
+        {
+          status: lane.status,
+          runCount: lane.runCount,
+          successfulRuns: lane.successfulRuns,
+          contractCompleteRuns: lane.contractCompleteRuns,
+          constructionIssues: lane.constructionIssues,
+          providerModulePaths: lane.providerModulePaths,
+        },
+      ])),
     },
     limitations: {
       dynamicallyGeneratedShaderHashesRecorded: false,

@@ -49,16 +49,17 @@ export function buildRuntimeOwnership({
       runs: [],
     };
   }
-  const missingRequiredLanes = Object.entries(lanes)
+  const incompleteRequiredLanes = Object.entries(lanes)
     .filter(([laneId, lane]) => (
-      plan.lanes[laneId].requirement === 'required' && lane.status !== 'passed'
+      plan.lanes[laneId].requirement === 'required'
+      && ['not-run', 'unavailable', 'partial'].includes(lane.status)
     ))
     .map(([laneId]) => laneId);
   return {
-    status: missingRequiredLanes.length === 0 ? 'complete' : 'diagnostic-incomplete',
+    status: incompleteRequiredLanes.length === 0 ? 'complete' : 'diagnostic-incomplete',
     planSha256,
     claimedProperty: plan.claimedProperty,
-    missingRequiredLanes,
+    missingRequiredLanes: incompleteRequiredLanes,
     ambientModuleSupplied,
     lanes,
   };

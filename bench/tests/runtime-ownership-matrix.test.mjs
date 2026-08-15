@@ -49,7 +49,7 @@ test('all required successful lanes complete the execution matrix', () => {
   assert.deepEqual(ownership.missingRequiredLanes, []);
 });
 
-test('an executed failing lane remains a missing required lane', () => {
+test('an executed failing lane completes the experiment without passing it', () => {
   const runs = ['I0', 'I1', 'W0', 'D0', 'P0'].map(passedRun);
   runs.find((run) => run.laneId === 'D0').exitCode = 1;
   const ownership = buildRuntimeOwnership({
@@ -60,7 +60,8 @@ test('an executed failing lane remains a missing required lane', () => {
   });
 
   assert.equal(ownership.lanes.D0.status, 'failed');
-  assert.deepEqual(ownership.missingRequiredLanes, ['D0']);
+  assert.equal(ownership.status, 'complete');
+  assert.deepEqual(ownership.missingRequiredLanes, []);
 });
 
 test('application-native success is accepted without a nested result object', () => {
