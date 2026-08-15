@@ -36,8 +36,14 @@ const sourcePaths = [
 ];
 const harnessPaths = [
   'bench/external-projects/wgsl-fns/oracle.md',
+  'bench/external-projects/wgsl-fns/prepare-p0.mjs',
+  'bench/external-projects/wgsl-fns/provider-dawn.mjs',
+  'bench/external-projects/wgsl-fns/provider-doe.mjs',
   'bench/external-projects/wgsl-fns/provider-loader.mjs',
+  'bench/external-projects/wgsl-fns/provider-probe.mjs',
+  'bench/external-projects/wgsl-fns/run-suite.mjs',
   'bench/external-projects/wgsl-fns/semantic-oracle.mjs',
+  'bench/external-projects/wgsl-fns/wgsl-compilation-suite.harness.json',
 ];
 
 function parseArgs(argv) {
@@ -79,6 +85,15 @@ function parseArgs(argv) {
 
 async function sha256(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex');
+}
+
+async function addImmutablePath(inputs, scope, path) {
+  const evidencePath = path.startsWith(`${repoRoot}/`)
+    ? path.slice(repoRoot.length + 1)
+    : path;
+  if (inputs.some((item) => item.path === evidencePath)) return;
+  await access(path, fsConstants.R_OK);
+  inputs.push({ scope, path: evidencePath, sha256: await sha256(path) });
 }
 
 async function readPatchedDawnReceipt(path) {
@@ -549,14 +564,51 @@ async function main() {
   ).resolve('webgpu');
   const patchedDawnEvidence = await readPatchedDawnReceipt(options.patchedDawnReceipt);
   const patchedDawnModule = patchedDawnEvidence.modulePath;
+  immutableInputs.push({
+    scope: 'patch-control',
+    path: patchedDawnEvidence.path,
+    sha256: patchedDawnEvidence.sha256,
+  });
+  for (const artifact of Object.values(patchedDawnEvidence.receipt.artifacts)) {
+    immutableInputs.push({
+      scope: 'patch-control',
+      path: artifact.path,
+      sha256: artifact.sha256,
+    });
+  }
   const modules = {
     'dawn-node-webgpu': resolve(options.upstream, 'node_modules/webgpu/index.js'),
     'doe-gpu': resolve(repoRoot, 'packages/doe-gpu/src/index.js'),
   };
+  for (const modulePath of Object.values(modules)) {
+    await addImmutablePath(immutableInputs, 'provider-entrypoint', modulePath);
+  }
+  if (process.platform === 'linux' && process.arch === 'x64') {
+    await addImmutablePath(
+      immutableInputs,
+      'provider-runtime',
+      resolve(dirname(modules['dawn-node-webgpu']), 'dist/linux-x64.dawn.node'),
+    );
+  }
   const providers = {};
   for (const [provider, modulePath] of Object.entries(modules)) {
     const laneId = provider === 'dawn-node-webgpu' ? 'W0' : 'D0';
     const probe = await probeProvider(options, provider, modulePath, outDir, hostHardware);
+    const providerInfo = probe.identity?.provider?.providerInfo;
+    if (providerInfo?.doeLibraryPath) {
+      await addImmutablePath(
+        immutableInputs,
+        'provider-runtime',
+        providerInfo.doeLibraryPath,
+      );
+    }
+    if (providerInfo?.buildMetadataPath) {
+      await addImmutablePath(
+        immutableInputs,
+        'provider-runtime',
+        providerInfo.buildMetadataPath,
+      );
+    }
     const processes = [];
     for (let index = 0; index < options.cleanProcessRuns; index += 1) {
       const sample = await runSuite(options, laneId, provider, modulePath, outDir, index);

@@ -21,10 +21,27 @@ const outputPath = process.argv[2] ?? resolve(
   doeRoot,
   'bench/out/external-projects/holoscript-snn-webgpu/manual/raw-matrix.json',
 );
+const outputDir = dirname(outputPath);
 const requireFromUpstream = createRequire(pathToFileURL(resolve(upstreamPackageDir, 'package.json')));
-const dawnModule = requireFromUpstream.resolve('webgpu');
+const ambientDawnModule = requireFromUpstream.resolve('webgpu');
+const dawnModule = resolve(dirname(ambientDawnModule), 'index.js');
+const dawnPackage = JSON.parse(
+  await readFile(resolve(dirname(dawnModule), 'package.json'), 'utf8'),
+);
+if (dawnPackage.name !== 'webgpu' || dawnPackage.version !== '0.3.10') {
+  throw new Error(
+    `pinned incumbent mismatch: expected webgpu@0.3.10, received ${dawnPackage.name}@${dawnPackage.version}`,
+  );
+}
 const doeModule = resolve(doeRoot, 'packages/doe-gpu/src/index.js');
-const ambientDawnModule = process.env.DOE_EXTERNAL_AMBIENT_DAWN_MODULE?.trim() || null;
+
+function sha256Text(value) {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+async function sha256File(path) {
+  return createHash('sha256').update(await readFile(path)).digest('hex');
+}
 
 function percentile(values, fraction) {
   const sorted = [...values].sort((a, b) => a - b);
@@ -98,6 +115,100 @@ function runCleanProcess(laneId, provider, receiptMode = 'enabled', selectedDawn
   });
 }
 
+function executionEvidence(run) {
+  return {
+    laneId: run.laneId,
+    provider: run.provider,
+    providerModulePath: run.providerModulePath,
+    receiptMode: run.receiptMode,
+    exitCode: run.exitCode,
+    signal: run.signal,
+    timedOut: run.timedOut,
+    parseError: run.parseError,
+    result: run.result === null ? null : {
+      provider: run.result.provider,
+      adapter: run.result.adapter,
+      hostRenderer: run.result.hostRenderer,
+      hardwareEligible: run.result.hardwareEligible,
+      shader: run.result.shader,
+      dispatch: run.result.dispatch,
+      synchronization: run.result.synchronization,
+      readback: run.result.readback,
+      layoutTrace: run.result.layoutTrace,
+      oracle: run.result.oracle,
+      topologies: run.result.topologies.map((topology) => ({
+        id: topology.id,
+        nnz: topology.nnz,
+        oracleHash: topology.oracleHash,
+        outputHash: topology.outputHash,
+        maxDiff: topology.maxDiff,
+      })),
+    },
+  };
+}
+
+async function runReceiptReplay({ laneId, provider, modulePath, sourceRun, immutableInputs }) {
+  const relativeReceiptPath = `replay-receipts/${laneId}.json`;
+  const receiptPath = resolve(outputDir, relativeReceiptPath);
+  await mkdir(dirname(receiptPath), { recursive: true });
+  const expectedEvidenceSha256 = sha256Text(JSON.stringify(executionEvidence(sourceRun)));
+  const receipt = {
+    schemaVersion: 1,
+    artifactKind: 'holoscript-tropical-spmv-replay-receipt',
+    laneId,
+    provider,
+    providerModulePath: modulePath,
+    immutableInputs,
+    expectedEvidenceSha256,
+  };
+  await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  const loaded = JSON.parse(await readFile(receiptPath, 'utf8'));
+  if (loaded.provider !== provider
+    || loaded.providerModulePath !== modulePath
+    || loaded.expectedEvidenceSha256 !== expectedEvidenceSha256) {
+    throw new Error(`${laneId} replay receipt did not preserve the execution contract`);
+  }
+  const sample = await runCleanProcess(laneId, provider, 'enabled', modulePath);
+  const actualEvidenceSha256 = sha256Text(JSON.stringify(executionEvidence(sample)));
+  return {
+    status: actualEvidenceSha256 === expectedEvidenceSha256 ? 'passed' : 'failed',
+    receiptPath: relativeReceiptPath,
+    receiptSha256: await sha256File(receiptPath),
+    expectedEvidenceSha256,
+    actualEvidenceSha256,
+    sample,
+  };
+}
+
+await mkdir(outputDir, { recursive: true });
+const immutablePathSpecs = [
+  ['repo', resolve(harnessDir, 'hardware-identity.mjs')],
+  ['repo', resolve(harnessDir, 'inputs.json')],
+  ['repo', resolve(harnessDir, 'oracle.md')],
+  ['repo', resolve(harnessDir, 'provider-dawn.mjs')],
+  ['repo', resolve(harnessDir, 'provider-doe.mjs')],
+  ['repo', resolve(harnessDir, 'provider-loader.mjs')],
+  ['repo', resolve(harnessDir, 'run-matrix.mjs')],
+  ['repo', resolve(harnessDir, 'run-workload.mjs')],
+  ['repo', resolve(harnessDir, 'tropical-spmv.harness.json')],
+  ['upstream', resolve(upstreamRoot, 'pnpm-lock.yaml')],
+  ['upstream', resolve(upstreamPackageDir, 'package.json')],
+  ['upstream', resolve(upstreamPackageDir, 'dist/index.js')],
+  ['upstream', resolve(upstreamPackageDir, 'src/shaders/tropical-graph.wgsl')],
+  ['upstream', resolve(upstreamCoreDir, 'package.json')],
+  ['upstream', resolve(upstreamCoreDir, 'dist/math/tropical-spmv.js')],
+  ['provider-entrypoint', dawnModule],
+  ['provider-entrypoint', doeModule],
+  ['provider-runtime', resolve(dirname(dawnModule), 'dist/linux-x64.dawn.node')],
+  ['provider-runtime', resolve(doeRoot, 'runtime/zig/zig-out/lib/libwebgpu_doe.so')],
+  ['provider-runtime', resolve(doeRoot, 'runtime/zig/zig-out/share/doe-build-metadata.json')],
+];
+const immutableInputs = await Promise.all(immutablePathSpecs.map(async ([scope, path]) => ({
+  scope,
+  path: path.startsWith(`${doeRoot}/`) ? path.slice(doeRoot.length + 1) : path,
+  sha256: await sha256File(path),
+})));
+
 const runs = [];
 for (const [laneId, provider] of [['W0', 'dawn-node-webgpu'], ['D0', 'doe-gpu']]) {
   for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
@@ -105,16 +216,35 @@ for (const [laneId, provider] of [['W0', 'dawn-node-webgpu'], ['D0', 'doe-gpu']]
   }
 }
 
+const replays = {
+  W0: await runReceiptReplay({
+    laneId: 'W0',
+    provider: 'dawn-node-webgpu',
+    modulePath: dawnModule,
+    sourceRun: runs.find((run) => run.laneId === 'W0'),
+    immutableInputs,
+  }),
+  D0: await runReceiptReplay({
+    laneId: 'D0',
+    provider: 'doe-gpu',
+    modulePath: doeModule,
+    sourceRun: runs.find((run) => run.laneId === 'D0'),
+    immutableInputs,
+  }),
+};
+for (const run of runs) {
+  run.contractComplete = replays[run.laneId].status === 'passed';
+  run.constructionIssues = run.contractComplete ? [] : ['receipt replay mismatch'];
+}
+
 const ownershipRuns = [...runs];
 for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
   ownershipRuns.push(await runCleanProcess('I1', 'dawn-node-webgpu', 'untraced'));
 }
-if (ambientDawnModule) {
-  for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
-    ownershipRuns.push(
-      await runCleanProcess('I0', 'dawn-node-webgpu', 'untraced', ambientDawnModule),
-    );
-  }
+for (let index = 0; index < inputs.cleanProcessRuns; index += 1) {
+  ownershipRuns.push(
+    await runCleanProcess('I0', 'dawn-node-webgpu', 'untraced', ambientDawnModule),
+  );
 }
 
 const receiptRuns = [];
@@ -132,7 +262,7 @@ const runtimeOwnership = buildRuntimeOwnership({
   runs: ownershipRuns,
   plan: harness.runtimeOwnershipPlan,
   planSha256: ownershipPlanSha256,
-  ambientModuleSupplied: Boolean(ambientDawnModule),
+  ambientModuleSupplied: true,
 });
 
 const receiptSamples = (mode) => receiptRuns
@@ -156,11 +286,18 @@ const raw = {
     node: process.version,
   },
   providers: {
-    baseline: { id: 'dawn-node-webgpu', modulePath: dawnModule },
+    ambient: { id: 'dawn-node-webgpu', modulePath: ambientDawnModule },
+    baseline: {
+      id: 'dawn-node-webgpu',
+      modulePath: dawnModule,
+      packageVersion: dawnPackage.version,
+    },
     comparison: { id: 'doe-gpu', modulePath: doeModule },
   },
+  immutableInputs,
   runs,
   receiptRuns,
+  replays,
   runtimeOwnership,
   receiptOverhead: {
     boundary: 'complete oracle-checked workload across all topologies and measured dispatches',
@@ -180,6 +317,7 @@ const receiptSummary = {
   generatedAt: raw.generatedAt,
   upstream: raw.upstream,
   host: raw.host,
+  immutableInputs,
   providers: Object.fromEntries(successfulRuns.map((run) => [
     run.provider,
     {
@@ -202,6 +340,16 @@ const receiptSummary = {
       maxDiff: topology.maxDiff,
     })),
   })),
+  replays: Object.fromEntries(Object.entries(replays).map(([laneId, replay]) => [
+    laneId,
+    {
+      status: replay.status,
+      receiptPath: replay.receiptPath,
+      receiptSha256: replay.receiptSha256,
+      expectedEvidenceSha256: replay.expectedEvidenceSha256,
+      actualEvidenceSha256: replay.actualEvidenceSha256,
+    },
+  ])),
   receiptOverhead: raw.receiptOverhead,
   runtimeOwnership: {
     status: raw.runtimeOwnership.status,
@@ -220,7 +368,6 @@ const receiptSummary = {
   },
 };
 
-await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, `${JSON.stringify(raw, null, 2)}\n`);
 await writeFile(
   resolve(dirname(outputPath), 'receipt-summary.json'),
@@ -228,6 +375,7 @@ await writeFile(
 );
 process.stdout.write(`${outputPath}\n`);
 
-if ([...ownershipRuns, ...receiptRuns].some((run) => run.exitCode !== 0 || run.timedOut || !run.result)) {
+if ([...ownershipRuns, ...receiptRuns].some((run) => run.exitCode !== 0 || run.timedOut || !run.result)
+  || Object.values(replays).some((replay) => replay.status !== 'passed')) {
   process.exitCode = 1;
 }

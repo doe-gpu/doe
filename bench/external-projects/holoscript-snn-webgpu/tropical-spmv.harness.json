@@ -23,14 +23,14 @@
     "applicationConsequence": "A provider defect can reject or misexecute the unchanged tropical-SpMV workload until an upstream release or local patch arrives.",
     "materialOutcome": {
       "metric": "exact oracle-passing workload coverage and first-failure localization under the unchanged application",
-      "decisionRule": "Promote DoeRuntime only if D0 passes the frozen workload and provides a durable correction advantage over W0 and the smallest reviewable P0 patch."
+      "decisionRule": "Promote DoeRuntime only if D0 passes the frozen workload and provides a durable correction advantage over W0; require P0 only when W0 exposes an incumbent defect that a bounded patch could correct."
     },
     "lanes": {
       "I0": { "requirement": "required", "construction": "Unmodified ambient Node WebGPU incumbent." },
       "I1": { "requirement": "required", "construction": "Pinned packaged Dawn Node WebGPU binary." },
       "W0": { "requirement": "required", "construction": "I1 under the same DoeProof oracle, receipt, replay, and release policy." },
       "D0": { "requirement": "required", "construction": "DoeRuntime under the same provider seam and DoeProof contract." },
-      "P0": { "requirement": "required", "construction": "W0 plus the smallest reviewable incumbent correction for the observed provider defect." }
+      "P0": { "requirement": "conditional", "construction": "W0 plus the smallest reviewable incumbent correction, required only if W0 exposes a release-relevant provider defect. The current pinned W0 passes, so no correction is materialized." }
     },
     "ownershipCosts": [
       "owned-source-surface",
@@ -51,7 +51,10 @@
   "workload": {
     "command": ["node", "bench/external-projects/holoscript-snn-webgpu/run-matrix.mjs"],
     "immutableInputRefs": [
-      "bench/external-projects/holoscript-snn-webgpu/inputs.json"
+      "bench/external-projects/holoscript-snn-webgpu/inputs.json",
+      "bench/external-projects/holoscript-snn-webgpu/oracle.md",
+      "bench/external-projects/holoscript-snn-webgpu/run-matrix.mjs",
+      "bench/external-projects/holoscript-snn-webgpu/run-workload.mjs"
     ],
     "oracle": {
       "kind": "upstream",
@@ -162,7 +165,7 @@
   },
   "receiptPolicy": {
     "captureRequired": true,
-    "replayRequired": false,
+    "replayRequired": true,
     "runtimeBuildIdentityRequired": true,
     "preparationReceiptRequired": true
   },

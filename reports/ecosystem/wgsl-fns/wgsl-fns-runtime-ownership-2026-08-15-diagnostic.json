@@ -4,10 +4,10 @@
   "reportId": "wgsl-fns-runtime-ownership-2026-08-15-diagnostic",
   "actorId": "wgsl-fns",
   "harnessId": "wgsl-compilation-suite",
-  "generatedAt": "2026-08-15T16:53:46.371Z",
+  "generatedAt": "2026-08-15T16:59:05.637Z",
   "review": {
     "status": "reviewed",
-    "reviewedAt": "2026-08-15T16:54:24Z",
+    "reviewedAt": "2026-08-15T16:59:19Z",
     "reviewer": "codex"
   },
   "registryRevision": "13",
@@ -26,12 +26,12 @@
       "summary": "The frozen I0, I1, W0, D0, and independently prepared P0 controls all executed under the compilation-plus-semantic contract. Ambient, pinned, and governed webgpu@0.3.0 fail; Doe and the bounded webgpu@0.3.10 plus no-isolation control both complete all 13 assertions, the 110-function compilation corpus, exact smoothStep dispatch/readback, and replay.",
       "evidence": [
         {
-          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/raw-suite.json",
-          "sha256": "9e35f140bb112c3e7f3fd57a1bf6f30f0a5d7ae8f09bb8ccfeec5f5df33b54c3"
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/raw-suite.json",
+          "sha256": "8bce0595951fb1a7528cb4d32769a1735227e01067155d5f661c2167ee68e2f4"
         },
         {
-          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/receipt-summary.json",
-          "sha256": "104f4818c303c3df7c0e5001d3a097b59c1a36cc724fe31ec2acaae90de5b1ee"
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/receipt-summary.json",
+          "sha256": "923279edd48165c5153631695ec5b5199f17b5368b446fd5eb07e1bfa80988f2"
         }
       ]
     },
@@ -42,8 +42,8 @@
       "summary": "The independently prepared webgpu@0.3.10 package executes the exact semantic oracle but intermittently corrupts Node test-worker IPC. Node's explicit no-isolation mode removes that wrapper-level failure without changing the tests, shaders, GPU work, diagnostics, or oracle; P0 passes every clean process and replay.",
       "evidence": [
         {
-          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/replay-receipts/P0.json",
-          "sha256": "c8eff14e4a70bd628d6a0238abbd36d69596fa70845473ec5f5f4871b3217b77"
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/replay-receipts/P0.json",
+          "sha256": "c30916d39aa63fa9bcf2b3ba782a4bbdf6ba5d3596ef75299b504d6ba153a876"
         },
         {
           "path": "bench/out/external-projects/wgsl-fns/p0-webgpu-0.3.10/receipt.json",
@@ -58,8 +58,8 @@
       "summary": "D0 remains a correct and stable implementation, but it does not materially exceed the bounded P0 control on the exercised application outcome. The runtime-ownership hypothesis is rejected for wgsl-fns at this scope.",
       "evidence": [
         {
-          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/replay-receipts/D0.json",
-          "sha256": "4bbbcae27f34156209aee96cfb78330d855afea612e46accf60e0a6f3ce75165"
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/replay-receipts/D0.json",
+          "sha256": "ae546d3c52ae9895a9db6215de83468ceaedde0c70be8d878dcaaff2a219dc9b"
         }
       ]
     }
@@ -91,7 +91,7 @@
       "crashes": 0,
       "hangs": 0,
       "timeouts": 0,
-      "peakMemoryBytes": 169275392
+      "peakMemoryBytes": 169885696
     },
     "comparison": {
       "cleanProcessRuns": 3,
@@ -100,7 +100,7 @@
       "crashes": 0,
       "hangs": 0,
       "timeouts": 0,
-      "peakMemoryBytes": 149155840
+      "peakMemoryBytes": 148656128
     }
   },
   "performance": {
@@ -196,20 +196,20 @@
   },
   "receipts": [
     {
-      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/receipt-summary.json",
-      "sha256": "104f4818c303c3df7c0e5001d3a097b59c1a36cc724fe31ec2acaae90de5b1ee"
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/receipt-summary.json",
+      "sha256": "923279edd48165c5153631695ec5b5199f17b5368b446fd5eb07e1bfa80988f2"
     },
     {
-      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/replay-receipts/W0.json",
-      "sha256": "79dbc67928513b8cbfc541e9ae49115d1ef058995d7902551e7f49cf78c8f0ca"
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/replay-receipts/W0.json",
+      "sha256": "d15fee64bfb43130454852a13e261e444fc829688e1a24e9dc8c8830b80f94b9"
     },
     {
-      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/replay-receipts/D0.json",
-      "sha256": "4bbbcae27f34156209aee96cfb78330d855afea612e46accf60e0a6f3ce75165"
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/replay-receipts/D0.json",
+      "sha256": "ae546d3c52ae9895a9db6215de83468ceaedde0c70be8d878dcaaff2a219dc9b"
     },
     {
-      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/replay-receipts/P0.json",
-      "sha256": "c8eff14e4a70bd628d6a0238abbd36d69596fa70845473ec5f5f4871b3217b77"
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/replay-receipts/P0.json",
+      "sha256": "c30916d39aa63fa9bcf2b3ba782a4bbdf6ba5d3596ef75299b504d6ba153a876"
     },
     {
       "path": "bench/out/external-projects/wgsl-fns/p0-webgpu-0.3.10/receipt.json",
@@ -218,8 +218,8 @@
   ],
   "rawEvidence": [
     {
-      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v4/raw-suite.json",
-      "sha256": "9e35f140bb112c3e7f3fd57a1bf6f30f0a5d7ae8f09bb8ccfeec5f5df33b54c3"
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-semantic-diagnostic-v5/raw-suite.json",
+      "sha256": "8bce0595951fb1a7528cb4d32769a1735227e01067155d5f661c2167ee68e2f4"
     }
   ]
 }
