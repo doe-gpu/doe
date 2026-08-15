@@ -257,7 +257,7 @@ function tapInteger(stdout, name) {
 
 function classifyTap(stdout) {
   const workerSignals = [...stdout.matchAll(/^\s*signal: '([^']+)'$/gm)].map((match) => match[1]);
-  return {
+  const aggregate = {
     tests: tapInteger(stdout, 'tests'),
     suites: tapInteger(stdout, 'suites'),
     passed: tapInteger(stdout, 'pass'),
@@ -265,6 +265,23 @@ function classifyTap(stdout) {
     cancelled: tapInteger(stdout, 'cancelled'),
     skipped: tapInteger(stdout, 'skipped'),
     todo: tapInteger(stdout, 'todo'),
+    workerSignals,
+  };
+  if (aggregate.tests !== null) return aggregate;
+
+  const passed = [...stdout.matchAll(/^ {4}ok \d+ - /gm)].length;
+  const failed = [...stdout.matchAll(/^ {4}not ok \d+ - /gm)].length;
+  const suitesPassed = [...stdout.matchAll(/^ok \d+ - /gm)].length;
+  const suitesFailed = [...stdout.matchAll(/^not ok \d+ - /gm)].length;
+  if (passed + failed === 0) return aggregate;
+  return {
+    tests: passed + failed,
+    suites: suitesPassed + suitesFailed,
+    passed,
+    failed,
+    cancelled: 0,
+    skipped: [...stdout.matchAll(/^ {4}ok \d+ - .*# SKIP/gm)].length,
+    todo: [...stdout.matchAll(/^ {4}ok \d+ - .*# TODO/gm)].length,
     workerSignals,
   };
 }
@@ -284,7 +301,15 @@ function nativeDiagnostics(output) {
   };
 }
 
-async function runSuite(options, laneId, provider, modulePath, outDir, index) {
+async function runSuite(
+  options,
+  laneId,
+  provider,
+  modulePath,
+  outDir,
+  index,
+  testIsolation = 'process',
+) {
   const runtimeDir = resolve(
     repoRoot,
     'bench/out/.xdg',
@@ -299,6 +324,7 @@ async function runSuite(options, laneId, provider, modulePath, outDir, index) {
       '--experimental-loader',
       resolve(harnessDir, 'provider-loader.mjs'),
       '--test',
+      ...(testIsolation === 'none' ? ['--experimental-test-isolation=none'] : []),
       '--test-reporter=tap',
       'test/index.test.js',
     ],
@@ -364,6 +390,7 @@ async function runSuite(options, laneId, provider, modulePath, outDir, index) {
     provider,
     providerModulePath: modulePath,
     cleanProcessIndex: index + 1,
+    testIsolation,
     success,
     exitCode: compilation.exitCode !== 0 ? compilation.exitCode : semantic.exitCode,
     signal: compilation.signal ?? semantic.signal,
@@ -430,6 +457,7 @@ function executionEvidence(sample) {
     compilationSuccess: sample.compilation.success,
     semanticSuccess: sample.semantic.success,
     semanticResult: sample.semantic.result,
+    testIsolation: sample.testIsolation,
     outputIdentitySha256: sample.outputIdentitySha256,
   };
 }
@@ -442,6 +470,7 @@ async function runReceiptReplay({
   outDir,
   sourceSample,
   immutableInputs,
+  testIsolation = 'process',
 }) {
   const relativeReceiptPath = `replay-receipts/${laneId}.json`;
   const receiptPath = resolve(outDir, relativeReceiptPath);
@@ -453,6 +482,7 @@ async function runReceiptReplay({
     laneId,
     provider,
     providerModulePath: modulePath,
+    testIsolation,
     immutableInputs,
     expectedEvidenceSha256,
   };
@@ -460,6 +490,7 @@ async function runReceiptReplay({
   const loadedReceipt = JSON.parse(await readFile(receiptPath, 'utf8'));
   if (loadedReceipt.provider !== provider
     || loadedReceipt.providerModulePath !== modulePath
+    || loadedReceipt.testIsolation !== testIsolation
     || loadedReceipt.expectedEvidenceSha256 !== expectedEvidenceSha256) {
     throw new Error(`${laneId} replay receipt did not preserve the frozen execution contract`);
   }
@@ -470,6 +501,7 @@ async function runReceiptReplay({
     modulePath,
     outDir,
     options.cleanProcessRuns,
+    testIsolation,
   );
   const actualEvidenceSha256 = sha256Text(JSON.stringify(executionEvidence(sample)));
   return {
@@ -570,6 +602,7 @@ async function main() {
         patchedDawnModule,
         outDir,
         index,
+        'none',
       );
       processes.push(sample);
       console.log(`[P0 webgpu@0.3.10] process ${index + 1}: ${sample.success ? 'PASS' : 'FAIL'}`);
@@ -582,6 +615,7 @@ async function main() {
       outDir,
       sourceSample: processes[0],
       immutableInputs,
+      testIsolation: 'none',
     });
     console.log(`[P0 webgpu@0.3.10] receipt replay: ${replay.status.toUpperCase()}`);
     patchedControl = {
@@ -730,6 +764,7 @@ async function main() {
         nativeCompilerErrorCount: sample.nativeCompilerErrorCount,
         compilationSuccess: sample.compilation.success,
         semanticSuccess: sample.semantic.success,
+        testIsolation: sample.testIsolation,
         semanticResult: sample.semantic.result,
         outputIdentitySha256: sample.outputIdentitySha256,
       })),

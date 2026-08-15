@@ -50,6 +50,14 @@ integrity, extracts it atomically, and writes hashes for the tarball, module,
 native binary, and license. The runner rejects P0 unless that receipt and every
 artifact still match. A successful one-process smoke does not satisfy P0:
 repeated clean processes and receipt replay remain part of the lane result.
+P0 also binds Node's explicit no-isolation test mode; this preserves upstream
+test and shader source while testing whether a wrapper-level process-topology
+change removes the incumbent addon's intermittent worker IPC failure.
+Every lane also executes an exact semantic oracle over the unchanged upstream
+`smoothStep` source: two compute workgroups, queue completion, staging-buffer
+readback, and eight exact CPU-checked f32 outputs. The rest of the upstream
+function corpus remains compilation-only and cannot inherit that semantic
+evidence.
 
 ## Portable preparation and reproduction
 

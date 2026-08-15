@@ -1063,13 +1063,13 @@
         {
           "reportId": "wgsl-fns-runtime-ownership-2026-08-15-diagnostic",
           "path": "reports/ecosystem/wgsl-fns/wgsl-fns-runtime-ownership-2026-08-15-diagnostic.json",
-          "sha256": "474bbdd7757345d52ec21e4951cfe7944faeb946c1ea6b8f84ab4f3a0ec1be98",
-          "reviewedAt": "2026-08-15T16:30:29Z",
+          "sha256": "9723e5e88d03fb8c703f77de655601683a0eb66be6440a797d40c07a11c15300",
+          "reviewedAt": "2026-08-15T16:54:24Z",
           "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-15T16:30:29Z"
+      "lastReviewedAt": "2026-08-15T16:54:24Z"
     },
     {
       "id": "electronicarts-cpp-ml-intro",

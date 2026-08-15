@@ -50,3 +50,9 @@ remaining upstream corpus is still compilation-only, and no performance claim
 is admissible unless the incumbent completes equivalent work. Physical-GPU
 comparability additionally requires an accessible render node, non-software
 adapter, and complete adapter/driver identity.
+
+The P0 control uses the independently prepared `webgpu@0.3.10` package and
+Node's explicit no-isolation test mode. That invocation leaves the test file,
+shader corpus, semantic dispatch, diagnostics, and output oracle unchanged
+while removing the test-worker IPC channel that the native addon intermittently
+corrupts. The package receipt, module path, and isolation mode are replay-bound.

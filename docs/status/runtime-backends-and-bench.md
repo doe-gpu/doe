@@ -180,12 +180,12 @@ file only names the promoted boundary and open admission gates.
 - The reviewed wgsl-fns ownership diagnostic at
   `reports/ecosystem/wgsl-fns/wgsl-fns-runtime-ownership-2026-08-15-diagnostic.json`
   executes `I0`, `I1`, `W0`, `D0`, and the frozen `webgpu@0.3.10` patch control.
-  Doe is the only governed lane that passes all 13 assertions, all 110
-  generated functions, physical provider identity, and replay. The patch
-  control fails repeated clean-process reliability and changes outcome on
-  replay. The result identifies a current correction wedge but remains
-  diagnostic because P0 lacks independent package closure, the workload is
-  compilation-only, and ownership cost is not accepted.
+  The pinned incumbent crashes, while Doe and the independently prepared
+  `webgpu@0.3.10` plus no-isolation control both pass all 13 assertions, all 110
+  generated functions, an exact `smoothStep` compute dispatch and readback,
+  physical provider identity, and replay. The bounded wrapper correction
+  closes the exercised outcome, so the report assigns no runtime-ownership
+  credit and keeps wgsl-fns diagnostic.
 - That workload exposed a vector-scalar compound-assignment gap in WGSL
   semantic analysis and IR validation. Compound assignments now validate the
   underlying binary operation before checking assignability, and the minimized

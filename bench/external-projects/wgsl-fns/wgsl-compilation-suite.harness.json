@@ -30,7 +30,7 @@
       "I1": { "requirement": "required", "construction": "Pinned packaged Dawn Node WebGPU binary that reproduces the incumbent boundary." },
       "W0": { "requirement": "required", "construction": "I1 with the identical corpus oracle, diagnostics capture, receipts, replay, and release policy." },
       "D0": { "requirement": "required", "construction": "DoeRuntime with the same provider seam, corpus, and DoeProof contract." },
-      "P0": { "requirement": "required", "construction": "W0 plus the smallest reviewable incumbent correction that reaches the same compilation and diagnostic boundary." }
+      "P0": { "requirement": "required", "construction": "Independently prepared webgpu@0.3.10 plus Node's explicit no-isolation test mode, preserving the unchanged tests, generated shaders, semantic dispatch, diagnostics, and receipt boundary while avoiding the incumbent addon's intermittent test-worker IPC corruption." }
     },
     "ownershipCosts": [
       "owned-source-surface",
@@ -60,8 +60,8 @@
       "path": "bench/external-projects/wgsl-fns/oracle.md",
       "reviewStatus": "reviewed"
     },
-    "sameWorkPolicy": "Every lane executes the same pinned 13-assertion upstream test file over the same generated 110-function corpus and the same exact smoothStep semantic shader, dispatch, synchronization, readback, and CPU output oracle; the parent additionally rejects native compiler diagnostics that getCompilationInfo failed to expose.",
-    "completionBoundary": "A clean-process sample ends only after the Node test parent and worker exit, the 13-assertion summary is captured, provider-native compiler diagnostics are classified, the semantic dispatch completes, eight exact f32 values are read back and verified, and cleanup completes without a timeout."
+    "sameWorkPolicy": "Every lane executes the same pinned 13-assertion upstream test file over the same generated 110-function corpus and the same exact smoothStep semantic shader, dispatch, synchronization, readback, and CPU output oracle; the parent additionally rejects native compiler diagnostics that getCompilationInfo failed to expose. P0 changes only the incumbent package revision and Node test isolation, both recorded in its receipt.",
+    "completionBoundary": "A clean-process sample ends only after the Node test execution boundary and any worker exit, all 13 assertion outcomes are captured, provider-native compiler diagnostics are classified, the semantic dispatch completes, eight exact f32 values are read back and verified, and cleanup completes without a timeout."
   },
   "requiredMeasurements": [
     "clean-process-success",

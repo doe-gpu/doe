@@ -71,7 +71,7 @@ not a universal performance claim.
 | AMD Vulkan | Native release rows | Declared Dawn-backed lanes | Artifact-specific | `claim-indexed` | [`claim index`](reports/claim-index.json) |
 | AMD Vulkan | Linux drop-in cutover | Dawn rollback lane | Strict cutover rehearsal | `claim-indexed` | [`claim index`](reports/claim-index.json) |
 | AMD Vulkan | Pinned vGPU Node/ORT application | I0/I1/W0/D0 ownership matrix | Equivalent governed lifecycle outcome; no runtime advantage | `diagnostic` | [`reviewed report`](reports/ecosystem/vercel-labs-vgpu/vgpu-runtime-ownership-2026-08-15-diagnostic.json) |
-| AMD Vulkan | Pinned wgsl-fns compilation application | I0/I1/W0/D0/P0 correction matrix | Doe passes; pinned and patch controls fail | `diagnostic` | [`reviewed report`](reports/ecosystem/wgsl-fns/wgsl-fns-runtime-ownership-2026-08-15-diagnostic.json) |
+| AMD Vulkan | Pinned wgsl-fns compilation plus semantic application | I0/I1/W0/D0/P0 correction matrix | Doe and bounded wrapper both pass; no runtime advantage | `diagnostic` | [`reviewed report`](reports/ecosystem/wgsl-fns/wgsl-fns-runtime-ownership-2026-08-15-diagnostic.json) |
 | AMD Vulkan | Vendored WebGPU CTS subset | CTS required-query subset | Identity-bound subset pass | `diagnostic` | [`CTS receipt`](reports/benchmarks/amd-vulkan/20260810T222323Z/webgpu-cts-subset-receipt.json) |
 | AMD Vulkan | Physical recomposition diagnostic | Dawn delegate | Output-oracled capture | `diagnostic` | [`backend evidence`](runtime/zig/reports/recomposition/backend-evidence.json) |
 | Intel Tiger Lake Vulkan | Native compute diagnostics | Declared Dawn-backed lane | Host-specific only | `diagnostic` | [`backend status`](docs/status/runtime-backends-and-bench.md) |
