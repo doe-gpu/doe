@@ -88,9 +88,28 @@ and SHA-256. This closes drift for declared data and library artifacts, while
 remaining explicitly weaker than a dependency-sealed execution: completeness
 and absence of undeclared reads require an isolation or file-observation gate.
 
+For compatible Node executables, `node-permission-read-only` adds a fail-closed
+Node API boundary: the loader, application, provider, input, and declared
+runtime files form the read allowlist; filesystem writes and child processes
+remain denied. The custom loader requires Node's internal worker path, so worker
+permission is enabled and explicitly recorded. Native-code syscalls, network
+access, and operating-system isolation remain outside this contract. Native
+addon loading is necessarily enabled for WebGPU providers and is separately
+recorded as `allowed-for-provider`.
+
+The frozen HoloScript diagnostic at
+`reports/benchmarks/amd-vulkan/20260815T205128Z/holoscript-doeproof-cli-filesystem-diagnostic.json`
+exercises this mode on both the incumbent and Doe providers. It deliberately
+omits the harness's auxiliary renderer subprocess and therefore proves the
+Node API allowlist and exact workload result, not hardware eligibility or
+operating-system dependency sealing.
+
 The packaged `doe-proof-node` command exposes this same contract to CI through
 hash-bound `run`, `verify`, `inspect`, `replay`, and exact-output `compare`
 operations. It does not expose the repository benchmark or release operators.
+The package ships contract, receipt, and artifact JSON Schemas for portable
+shape validation; the CLI validator additionally enforces semantic and hash
+coherence that JSON Schema cannot establish.
 
 ## Release portfolio
 
@@ -142,11 +161,21 @@ local Zig build or undocumented environment configuration belongs in the
 supported path.
 
 For a staged host platform, `npm run test:integration:native-clean-install`
-packs the wrapper and platform payload, installs them into a fresh project with
-scripts disabled, executes the shipped first kernel, and verifies that the
-loaded library path remains inside that installation. Missing staged artifacts
-are a failure in this explicit release gate, while the ordinary source-tree
-suite may report the physical package check as skipped.
+and `npm run test:integration:native-clean-install:bun` each pack the wrapper
+and platform payload, install them into a fresh project with scripts disabled,
+execute the runtime-specific shipped first kernel, and verify that the loaded
+library path remains inside that installation. Missing staged artifacts are a
+failure in either explicit release gate, while the ordinary source-tree suite
+may report the Node physical package check as skipped.
+
+The `native-reliability` variants reuse one clean installation across repeated
+fresh processes and overlapping runtime instances, then execute 12 exact
+create/compute/destroy cycles inside one additional process. They record the
+post-warmup RSS span against a frozen 256 MiB diagnostic ceiling. This covers a
+bounded same-process lifecycle and memory envelope, resolves `GPUDevice.lost`
+with the `destroyed` reason, and requires post-destroy operations to fail closed.
+It is not a long-soak leak test or unexpected hardware-loss recovery gate; those
+remain separate promotion obligations.
 
 ## Claim boundary
 

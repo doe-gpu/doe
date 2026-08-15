@@ -19,6 +19,16 @@ if (outputArgumentIndex !== -1 && !process.argv[outputArgumentIndex + 1]) {
 const outputPath = outputArgumentIndex === -1
   ? null
   : resolve(process.argv[outputArgumentIndex + 1]);
+const runtimeArgumentIndex = process.argv.indexOf('--runtime');
+if (runtimeArgumentIndex !== -1 && !process.argv[runtimeArgumentIndex + 1]) {
+  throw new Error('--runtime requires node or bun');
+}
+const runtimeHost = runtimeArgumentIndex === -1
+  ? 'node'
+  : process.argv[runtimeArgumentIndex + 1];
+if (!['node', 'bun'].includes(runtimeHost)) {
+  throw new Error(`unsupported native clean-install runtime: ${runtimeHost}`);
+}
 const platformPackageName = new Map([
   ['linux-x64', 'doe-gpu-linux-x64'],
   ['darwin-arm64', 'doe-gpu-darwin-arm64'],
@@ -59,7 +69,10 @@ function execute(command, args, cwd = scratch) {
 
 function requireSuccess(result, label) {
   if (result.status !== 0) {
-    throw new Error(`${label} failed:\n${result.stdout}\n${result.stderr}`);
+    throw new Error(
+      `${label} failed: ${result.error?.message ?? `exit=${result.status}`}\n`
+      + `${result.stdout}\n${result.stderr}`,
+    );
   }
 }
 
@@ -80,7 +93,24 @@ async function sha256File(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex');
 }
 
+function resolveRuntimeIdentity() {
+  if (runtimeHost === 'node') {
+    return {
+      host: runtimeHost,
+      executable: process.execPath,
+      version: process.version,
+    };
+  }
+  const probe = execute('bun', [
+    '-e',
+    'process.stdout.write(JSON.stringify({executable:process.execPath,version:Bun.version}))',
+  ], packageRoot);
+  requireSuccess(probe, 'Bun runtime identity probe');
+  return { host: runtimeHost, ...JSON.parse(probe.stdout) };
+}
+
 try {
+  const runtime = resolveRuntimeIdentity();
   const wrapper = pack(packageRoot, 'wrapper');
   const platform = pack(platformPackageRoot, 'platform');
   await writeFile(resolve(scratch, 'package.json'), `${JSON.stringify({
@@ -101,16 +131,19 @@ try {
 
   const examplePath = resolve(
     scratch,
-    'node_modules/doe-gpu/examples/node-first-kernel.mjs',
+    `node_modules/doe-gpu/examples/${runtimeHost}-first-kernel.mjs`,
   );
-  const executed = execute(process.execPath, [examplePath]);
-  requireSuccess(executed, 'installed native first kernel');
+  const executed = execute(runtime.executable, [examplePath]);
+  requireSuccess(executed, `installed native ${runtimeHost} first kernel`);
   const receipt = JSON.parse(executed.stdout);
   if (receipt.kind !== 'doe-gpu.first-kernel.receipt') {
     throw new Error(`unexpected receipt kind: ${receipt.kind}`);
   }
   if (receipt.provider?.loaded !== true || receipt.provider?.doeNative !== true) {
     throw new Error(`installed package did not load Doe native runtime: ${executed.stdout}`);
+  }
+  if (receipt.runtimeHost !== runtimeHost) {
+    throw new Error(`installed package reported wrong runtime host: ${executed.stdout}`);
   }
   if (receipt.provider?.buildMetadataSource !== 'prebuild') {
     throw new Error(`native runtime did not resolve from platform package: ${executed.stdout}`);
@@ -128,6 +161,10 @@ try {
       artifactKind: 'doe-gpu-native-clean-install-diagnostic',
       status: 'passed',
       tuple: { platform: process.platform, arch: process.arch },
+      runtime: {
+        ...runtime,
+        sha256: await sha256File(runtime.executable),
+      },
       installation: {
         lifecycleScripts: 'disabled',
         optionalDependencies: 'omitted',
@@ -174,21 +211,24 @@ try {
       },
       receipt,
       decision: {
-        nativePackageCleanInstall: 'authorized-for-declared-tuple',
+        nativePackageCleanInstall: 'authorized-for-declared-runtime-tuple',
         runtimeOwnershipCredit: false,
         performanceCredit: false,
         applicationPromotionCredit: false,
       },
       limitations: [
         'One first-kernel execution is package installation evidence, not the promotion reliability floor.',
-        'This artifact does not generalize beyond its declared platform and architecture.',
+        'This artifact does not generalize beyond its declared runtime, platform, and architecture.',
         'No performance interpretation is authorized.',
       ],
     };
     await mkdir(dirname(outputPath), { recursive: true });
     await writeFile(outputPath, `${JSON.stringify(artifact, null, 2)}\n`, { flag: 'wx' });
   }
-  console.log(`doe-gpu native clean-install integration: ok ${process.platform}-${process.arch}`);
+  console.log(
+    `doe-gpu native clean-install integration: ok ${runtimeHost} `
+    + `${process.platform}-${process.arch}`,
+  );
 } finally {
   await rm(scratch, { recursive: true, force: true });
 }

@@ -16,8 +16,8 @@
     "sha256": "f040bb0f19735ee18b604a87c380a631147edf0cdd4b6c08361373d55e4b3472"
   },
   "evidence": {
-    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-loader-qm0-v1/result.json",
-    "sha256": "81e1ff981445fdcb5f3f20ff9765cd57e0483145e7fda77183cdebf744949fa8"
+    "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-loader-qm0-v1-retry1/result.json",
+    "sha256": "b17d5446af5ecce6ce781b5282807f496c8c19cb0114faeafad1241f9993c29c"
   },
   "implementation": {
     "publicLoader": {
@@ -26,7 +26,7 @@
     },
     "governedProcessRunner": {
       "path": "packages/doe-gpu/src/node-webgpu-process.js",
-      "sha256": "ca6f162c4b10a417783fc4af7ecd85517e566194bcef9303babead8de165d0b8"
+      "sha256": "eb79366cb93caa6d564f2d64c0f6a4cffa527222fc6bb61763b8bd8097f688cd"
     },
     "runner": {
       "path": "bench/external-projects/holoscript-snn-webgpu/run-doeproof-loader-integration.mjs",

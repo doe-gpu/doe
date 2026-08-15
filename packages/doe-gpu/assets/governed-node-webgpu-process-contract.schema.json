@@ -73,6 +73,14 @@
             }
           }
         },
+        "filesystem": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode"],
+          "properties": {
+            "mode": { "enum": ["ambient", "node-permission-read-only"] }
+          }
+        },
         "timeoutMs": { "type": "integer", "minimum": 1 },
         "maxOutputBytes": { "type": "integer", "minimum": 1 }
       }

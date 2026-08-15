@@ -96,6 +96,7 @@ try {
         mode: 'sealed',
         values: { DOE_TEST_PROCESS_OUTPUT: JSON.stringify([...output]) },
       },
+      filesystem: { mode: 'node-permission-read-only' },
       timeoutMs: 5_000,
       maxOutputBytes: 16_384,
     },
@@ -104,11 +105,18 @@ try {
       sha256: fileDigest(evaluator),
       export: 'evaluate',
     },
-    runtimeFiles: [{
-      id: 'fixture-runtime-data',
-      path: runtimeDataPath,
-      sha256: fileDigest(runtimeDataPath),
-    }],
+    runtimeFiles: [
+      {
+        id: 'fixture-runtime-data',
+        path: runtimeDataPath,
+        sha256: fileDigest(runtimeDataPath),
+      },
+      {
+        id: 'doe-gpu-package-manifest',
+        path: resolve(packageRoot, 'package.json'),
+        sha256: fileDigest(resolve(packageRoot, 'package.json')),
+      },
+    ],
   };
   writeFileSync(contractPath, `${JSON.stringify(contract, null, 2)}\n`);
 
@@ -119,11 +127,24 @@ try {
   assert.equal(artifact.status, 'pass');
   assert.equal(artifact.receipt.oracle.status, 'pass');
   assert.equal(artifact.receipt.provider.effective.providerId, 'fixture-provider');
-  assert.deepEqual(artifact.dependencies.runtimeFiles, [{
+  assert.equal(artifact.dependencies.runtimeFiles.length, 2);
+  assert.deepEqual(artifact.dependencies.runtimeFiles[0], {
     id: 'fixture-runtime-data',
     path: runtimeDataPath,
     sha256: fileDigest(runtimeDataPath),
-  }]);
+  });
+  assert.equal(
+    artifact.receipt.process.declaration.filesystem.mode,
+    'node-permission-read-only',
+  );
+  assert.equal(
+    artifact.receipt.process.declaration.filesystem.workerThreads,
+    'allowed-for-loader',
+  );
+  assert.equal(
+    artifact.receipt.process.declaration.filesystem.nativeAddons,
+    'allowed-for-provider',
+  );
   assert.equal((await validateDoeProofProcessArtifactFile(artifactPath)).valid, true);
   assert.equal(existsSync(evaluatorMarker), true);
   unlinkSync(evaluatorMarker);
@@ -141,7 +162,13 @@ try {
 
   const inspected = run('inspect', artifactPath);
   assert.equal(inspected.status, 0, inspected.stderr);
-  assert.equal(JSON.parse(inspected.stdout).oracle.status, 'pass');
+  const inspection = JSON.parse(inspected.stdout);
+  assert.equal(inspection.oracle.status, 'pass');
+  assert.equal(inspection.dependencies.runtimeFiles.length, 2);
+  assert.equal(
+    inspection.process.declaration.filesystem.mode,
+    'node-permission-read-only',
+  );
 
   const replayed = run('replay', artifactPath, '--out', replayPath);
   assert.equal(replayed.status, 0, replayed.stderr);

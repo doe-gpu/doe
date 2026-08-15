@@ -100,6 +100,26 @@ file only names the promoted boundary and open admission gates.
   ID is unique and each file is rehashed during run, verify, and replay. This
   establishes declared-file identity only; it does not claim transitive
   dependency completeness or filesystem isolation.
+- The package now ships Draft 2020-12 schemas for the governed contract,
+  process receipt, and CLI artifact. Clean-install coverage checks that all
+  three are present. The schemas own portable structure only; the CLI verifier
+  remains required for dependency hashes, provider/oracle coherence, and
+  replay identity.
+- Governed Node processes can now select `node-permission-read-only`. The
+  effective entrypoint/provider/loader plus declared-file allowlist is recorded,
+  `NODE_OPTIONS` and caller-owned permission flags cannot widen it, and tested
+  undeclared reads fail. Node's custom-loader worker exception is explicit.
+  Native addon loading is also explicitly allowed for the provider. This is not
+  described as dependency sealing because addon syscalls, network access, and
+  operating-system isolation remain outside Node's permission boundary.
+- The unchanged HoloScript W0/D0 workload now passes that boundary through the
+  public CLI with a frozen hash-bound import allowlist, exact output comparison,
+  and semantic replay. Its reviewed diagnostic is
+  `reports/benchmarks/amd-vulkan/20260815T205128Z/holoscript-doeproof-cli-filesystem-diagnostic.json`.
+  The auxiliary `vulkaninfo` subprocess is omitted rather than permitted, so
+  the artifact deliberately receives no hardware, performance, ownership,
+  promotion, or release credit. Native-addon syscalls and network access remain
+  outside the Node permission contract.
 - The package integration suite now packs `doe-gpu`, installs the tarball into
   a fresh project with optional native packages and install scripts disabled,
   invokes the installed `.bin/doe-proof-node`, executes a sealed custom
@@ -111,12 +131,30 @@ file only names the promoted boundary and open admission gates.
   executes the shipped first kernel. It exposed a stale Linux x64 platform
   payload whose shader-binding metadata no longer matched the JavaScript
   surface; restaging from the current native build restored exact output. The
-  gate also rejects workspace-library resolution. Source-tree integration may
-  skip when platform payloads are absent, but the explicit release command may
-  not. The bounded physical receipt is
-  `reports/benchmarks/amd-vulkan/20260815T202652Z/doe-gpu-native-clean-install-diagnostic.json`;
-  it grants installation evidence for Linux x64 only and no performance,
-  ownership, or application-promotion credit.
+  gate also rejects workspace-library resolution. Node and Bun each execute
+  their shipped first-kernel entrypoint and bind the selected host executable.
+  Source-tree integration may skip when platform payloads are absent, but the
+  explicit release commands may not. The bounded physical receipts are
+  `reports/benchmarks/amd-vulkan/20260815T212055Z/doe-gpu-node-native-clean-install-diagnostic.json`
+  and
+  `reports/benchmarks/amd-vulkan/20260815T212055Z/doe-gpu-bun-native-clean-install-diagnostic.json`;
+  they grant runtime-specific installation evidence for Linux x64 only and no
+  performance, ownership, application-promotion, or release credit.
+- Bounded clean-install reliability diagnostics now reuse one installed package
+  across repeated fresh processes and overlapping runtime instances. The Node
+  and Bun receipts are
+  `reports/benchmarks/amd-vulkan/20260815T212055Z/doe-gpu-node-native-clean-install-reliability-diagnostic.json`
+  and
+  `reports/benchmarks/amd-vulkan/20260815T212055Z/doe-gpu-bun-native-clean-install-reliability-diagnostic.json`.
+  They prove exact output, bounded child execution, clean process exit, and 12
+  exact create/compute/destroy cycles in one process for the declared Linux x64
+  runtime tuples. After two warm-up cycles, the observed RSS spans are 5,390,336
+  bytes for Node and 12,361,728 bytes for Bun, below the frozen 256 MiB
+  diagnostic ceiling. Each cycle also resolves a pre-registered
+  `GPUDevice.lost` promise with reason `destroyed` and rejects subsequent use of
+  that device. This is not a long-soak leak certificate or unexpected
+  hardware-loss recovery test. Full memory-growth promotion, performance,
+  application promotion, and release remain unproved.
 - `.github/workflows/webgpu-package-surface.yml` now runs the complete package
   contract, smoke, integration, and clean-install suite and the public
   tool-surface gate. Package-bin or manifest drift is therefore blocking CI,

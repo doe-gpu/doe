@@ -2,7 +2,7 @@
 
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { resolve } from 'node:path';
+import { isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NODE_WEBGPU_LOADER_CONTRACT } from './node-webgpu-loader.js';
 
@@ -39,10 +39,12 @@ const PROCESS_KEYS = new Set([
   'args',
   'cwd',
   'environment',
+  'filesystem',
   'timeoutMs',
   'maxOutputBytes',
 ]);
 const ENVIRONMENT_KEYS = new Set(['mode', 'values']);
+const FILESYSTEM_KEYS = new Set(['mode', 'readPaths']);
 const OBSERVATION_KEYS = new Set(['output', 'providerIdentity', 'evidence']);
 const loaderPath = fileURLToPath(new URL('./node-webgpu-loader.js', import.meta.url));
 
@@ -193,6 +195,28 @@ function normalizeEnvironment(environment) {
   };
 }
 
+function normalizeFilesystem(filesystem, cwd) {
+  const value = filesystem ?? { mode: 'ambient' };
+  assertPlainObject(value, 'process.filesystem');
+  assertKnownKeys(value, FILESYSTEM_KEYS, 'process.filesystem');
+  if (!['ambient', 'node-permission-read-only'].includes(value.mode)) {
+    throw new TypeError(
+      'process.filesystem.mode must be "ambient" or "node-permission-read-only".',
+    );
+  }
+  const readPaths = assertStringArray(value.readPaths ?? [], 'process.filesystem.readPaths');
+  if (readPaths.some((path) => path.trim().length === 0)) {
+    throw new TypeError('process.filesystem.readPaths must contain non-empty paths.');
+  }
+  if (value.mode === 'ambient' && readPaths.length !== 0) {
+    throw new TypeError('ambient process.filesystem cannot declare readPaths.');
+  }
+  return {
+    mode: value.mode,
+    readPaths: [...new Set(readPaths.map((path) => resolve(cwd, path)))].sort(),
+  };
+}
+
 function normalizeProcess(processOptions) {
   assertPlainObject(processOptions, 'process');
   assertKnownKeys(processOptions, PROCESS_KEYS, 'process');
@@ -211,6 +235,13 @@ function normalizeProcess(processOptions) {
     throw new TypeError('process.maxOutputBytes must be a positive safe integer.');
   }
   const environment = normalizeEnvironment(processOptions.environment);
+  const filesystem = normalizeFilesystem(processOptions.filesystem, cwd);
+  if (filesystem.mode === 'node-permission-read-only'
+      && nodeArgs.some((argument) => /^(--permission|--experimental-permission|--allow-)/.test(argument))) {
+    throw new TypeError(
+      'node permission flags are owned by process.filesystem and cannot appear in nodeArgs.',
+    );
+  }
   return {
     executable,
     nodeArgs,
@@ -218,9 +249,19 @@ function normalizeProcess(processOptions) {
     args,
     cwd,
     environment,
+    filesystem,
     timeoutMs: processOptions.timeoutMs,
     maxOutputBytes: processOptions.maxOutputBytes,
   };
+}
+
+function filesystemPath(value, label) {
+  assertNonEmptyString(value, label);
+  if (value.startsWith('file:')) return fileURLToPath(value);
+  if (!isAbsolute(value)) {
+    throw new TypeError(`${label} must be an absolute path or file URL under Node permissions.`);
+  }
+  return value;
 }
 
 function normalizeOptions(options) {
@@ -241,10 +282,15 @@ function normalizeOptions(options) {
         || typeof options.signal.removeEventListener !== 'function')) {
     throw new TypeError('signal must be an AbortSignal when provided.');
   }
+  const provider = normalizeProvider(options.provider);
+  const processConfiguration = normalizeProcess(options.process);
+  if (processConfiguration.filesystem.mode === 'node-permission-read-only') {
+    filesystemPath(provider.module, 'provider.module');
+  }
   return {
-    provider: normalizeProvider(options.provider),
+    provider,
     workload: normalizeWorkload(options.workload),
-    process: normalizeProcess(options.process),
+    process: processConfiguration,
     evaluate: options.evaluate,
     checkpoint: options.checkpoint,
     signal: options.signal,
@@ -270,7 +316,24 @@ function terminateProcess(child, terminationScope) {
 
 function spawnProcess(configuration, provider, abortSignal) {
   return new Promise((resolveProcess) => {
+    const effectiveReadPaths = configuration.filesystem.mode === 'node-permission-read-only'
+      ? [...new Set([
+        loaderPath,
+        configuration.entrypoint,
+        filesystemPath(provider.module, 'provider.module'),
+        ...configuration.filesystem.readPaths,
+      ])].sort()
+      : [];
+    const permissionArgs = configuration.filesystem.mode === 'node-permission-read-only'
+      ? [
+        '--permission',
+        '--allow-addons',
+        '--allow-worker',
+        ...effectiveReadPaths.map((path) => `--allow-fs-read=${path}`),
+      ]
+      : [];
     const argv = [
+      ...permissionArgs,
       ...configuration.nodeArgs,
       '--no-warnings',
       '--experimental-loader',
@@ -283,11 +346,25 @@ function spawnProcess(configuration, provider, abortSignal) {
       DOE_NODE_WEBGPU_PROVIDER_ID: provider.id,
       DOE_NODE_WEBGPU_PROVIDER_MODULE: provider.module,
     };
+    if (configuration.filesystem.mode === 'node-permission-read-only') {
+      delete environment.NODE_OPTIONS;
+    }
+    const filesystem = {
+      mode: configuration.filesystem.mode,
+      readPaths: effectiveReadPaths,
+      workerThreads: configuration.filesystem.mode === 'node-permission-read-only'
+        ? 'allowed-for-loader'
+        : 'ambient',
+      nativeAddons: configuration.filesystem.mode === 'node-permission-read-only'
+        ? 'allowed-for-provider'
+        : 'ambient',
+    };
     const terminationScope = process.platform === 'win32' ? 'child-process' : 'process-group';
     if (abortSignal?.aborted) {
       resolveProcess({
         argv,
         environment,
+        filesystem,
         spawned: false,
         aborted: true,
         terminationScope,
@@ -316,6 +393,7 @@ function spawnProcess(configuration, provider, abortSignal) {
         spawnError: error,
         argv,
         environment,
+        filesystem,
         spawned: false,
         aborted: false,
         terminationScope,
@@ -365,6 +443,7 @@ function spawnProcess(configuration, provider, abortSignal) {
       resolveProcess({
         argv,
         environment,
+        filesystem,
         spawnError,
         spawned: true,
         exitCode,
@@ -556,6 +635,7 @@ export async function runGovernedNodeWebGPUProcess(options) {
         entrypoint: normalized.process.entrypoint,
         args: normalized.process.args,
         cwd: normalized.process.cwd,
+        filesystem: child.filesystem ?? normalized.process.filesystem,
         timeoutMs: normalized.process.timeoutMs,
         maxOutputBytes: normalized.process.maxOutputBytes,
       },
@@ -685,6 +765,45 @@ export function validateGovernedNodeWebGPUProcessReceipt(receipt) {
   }
   if (!processWasSpawned && reportsExitFailure) {
     errors.push('unspawned process reports an exit failure');
+  }
+  const filesystem = receipt.process?.declaration?.filesystem;
+  if (filesystem !== undefined) {
+    if (!filesystem || typeof filesystem !== 'object' || Array.isArray(filesystem)) {
+      errors.push('process filesystem declaration is invalid');
+    } else if (!['ambient', 'node-permission-read-only'].includes(filesystem.mode)) {
+      errors.push('process filesystem mode is invalid');
+    } else if (!Array.isArray(filesystem.readPaths)
+        || filesystem.readPaths.some((path) => typeof path !== 'string' || path.length === 0)) {
+      errors.push('process filesystem read paths are invalid');
+    } else if (new Set(filesystem.readPaths).size !== filesystem.readPaths.length
+        || [...filesystem.readPaths].sort().some(
+          (path, index) => path !== filesystem.readPaths[index],
+        )) {
+      errors.push('process filesystem read paths are not canonical');
+    } else if (filesystem.mode === 'ambient' && filesystem.readPaths.length !== 0) {
+      errors.push('ambient process filesystem declares read paths');
+    } else if (filesystem.mode === 'node-permission-read-only') {
+      if (filesystem.workerThreads !== 'allowed-for-loader') {
+        errors.push('node permission filesystem worker scope is invalid');
+      }
+      if (filesystem.nativeAddons !== 'allowed-for-provider') {
+        errors.push('node permission filesystem addon scope is invalid');
+      }
+      if (receipt.process?.environment?.keys?.includes('NODE_OPTIONS')) {
+        errors.push('node permission filesystem retained NODE_OPTIONS');
+      }
+      if ((receipt.process?.declaration?.nodeArgs ?? []).some(
+        (argument) => /^(--permission|--experimental-permission|--allow-)/.test(argument),
+      )) {
+        errors.push('node permission filesystem exposes caller-owned permission flags');
+      }
+    } else if (filesystem.workerThreads !== undefined
+        && filesystem.workerThreads !== 'ambient') {
+      errors.push('ambient process filesystem worker scope is invalid');
+    } else if (filesystem.nativeAddons !== undefined
+        && filesystem.nativeAddons !== 'ambient') {
+      errors.push('ambient process filesystem addon scope is invalid');
+    }
   }
   if (receipt.oracle?.status === 'pass') {
     if (receipt.oracle.actualOutputSha256 !== receipt.oracle.expectedOutputSha256) {

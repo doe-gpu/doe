@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/governed-node-webgpu-process-artifact.schema.json",
+  "title": "Doe governed Node WebGPU process CLI artifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "status", "command", "contract", "dependencies", "receipt"],
+  "properties": {
+    "schema": { "const": "doe.governed-node-webgpu-process-cli-artifact/v1" },
+    "status": { "enum": ["pass", "failed"] },
+    "command": { "type": "string", "minLength": 1 },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourcePath", "sha256"],
+      "properties": {
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "input", "entrypoint", "evaluator"],
+      "properties": {
+        "provider": { "$ref": "#/$defs/fileIdentity" },
+        "input": { "$ref": "#/$defs/fileIdentity" },
+        "entrypoint": { "$ref": "#/$defs/fileIdentity" },
+        "evaluator": { "$ref": "#/$defs/fileIdentity" },
+        "runtimeFiles": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/runtimeFileIdentity" }
+        }
+      }
+    },
+    "receipt": {
+      "$ref": "governed-node-webgpu-process-receipt.schema.json"
+    },
+    "replayOf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourcePath", "sha256", "workloadSha256", "executionSha256"],
+      "properties": {
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "workloadSha256": { "$ref": "#/$defs/sha256" },
+        "executionSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "workloadMatches", "executionMatches"],
+      "properties": {
+        "status": { "enum": ["pass", "failed"] },
+        "workloadMatches": { "type": "boolean" },
+        "executionMatches": { "type": "boolean" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "fileIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "runtimeFileIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "sha256"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

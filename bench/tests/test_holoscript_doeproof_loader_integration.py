@@ -18,6 +18,11 @@ CLI_REPORT = (
     / "reports/benchmarks/amd-vulkan/20260815T200358Z"
     / "holoscript-doeproof-cli-diagnostic.json"
 )
+FILESYSTEM_REPORT = (
+    ROOT
+    / "reports/benchmarks/amd-vulkan/20260815T205128Z"
+    / "holoscript-doeproof-cli-filesystem-diagnostic.json"
+)
 
 
 def sha256(path: Path) -> str:
@@ -90,6 +95,35 @@ class HoloScriptDoeProofLoaderIntegrationTests(unittest.TestCase):
         self.assertFalse(report["comparison"]["runtimeOwnershipCredit"])
         self.assertFalse(report["decision"]["runtimeOwnershipCredit"])
         self.assertFalse(report["decision"]["releaseCredit"])
+        self.assertEqual(
+            report["plan"]["sha256"], sha256(ROOT / report["plan"]["path"])
+        )
+        for reference in report["implementation"].values():
+            self.assertEqual(reference["sha256"], sha256(ROOT / reference["path"]))
+        evidence_path = ROOT / report["evidence"]["path"]
+        if evidence_path.exists():
+            self.assertEqual(report["evidence"]["sha256"], sha256(evidence_path))
+
+    def test_real_application_filesystem_boundary_is_hash_bound(self) -> None:
+        plan = json.loads(
+            (HARNESS / "doeproof-cli-filesystem-integration.plan.json").read_text()
+        )
+        self.assertEqual(plan["filesystemMode"], "node-permission-read-only")
+        self.assertIn("operating-system dependency sealing", plan["nonGoals"])
+        self.assertIn("hardware eligibility", plan["nonGoals"])
+
+        report = json.loads(FILESYSTEM_REPORT.read_text())
+        self.assertEqual(report["status"], "passed")
+        self.assertEqual(
+            report["decision"]["realApplicationNodePermissionBoundary"],
+            "authorized",
+        )
+        self.assertFalse(report["decision"]["hardwareCredit"])
+        self.assertFalse(report["decision"]["runtimeOwnershipCredit"])
+        self.assertEqual(
+            report["permissionBoundary"]["rendererAttestation"],
+            "omitted-by-node-permission",
+        )
         self.assertEqual(
             report["plan"]["sha256"], sha256(ROOT / report["plan"]["path"])
         )

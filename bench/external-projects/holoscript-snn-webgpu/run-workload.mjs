@@ -47,7 +47,7 @@ function adapterIdentity(adapter) {
   };
 }
 
-async function inspectLinuxRenderer() {
+async function inspectLinuxRenderer(mode) {
   if (process.platform !== 'linux') {
     return {
       probe: 'not-linux',
@@ -57,6 +57,17 @@ async function inspectLinuxRenderer() {
       softwareRendererAvailable: false,
       physicalGpuAvailable: false,
       hardwareEligible: true,
+    };
+  }
+  if (mode === 'omitted-by-node-permission') {
+    return {
+      probe: mode,
+      renderNode: null,
+      renderNodeReadWriteAccess: null,
+      summaryLines: [],
+      softwareRendererAvailable: false,
+      physicalGpuAvailable: false,
+      hardwareEligible: false,
     };
   }
   const renderNode = '/dev/dri/renderD128';
@@ -106,6 +117,10 @@ const receiptMode = process.env.DOE_EXTERNAL_RECEIPT_MODE ?? 'enabled';
 if (!['enabled', 'untraced'].includes(receiptMode)) {
   throw new Error(`Unknown DOE_EXTERNAL_RECEIPT_MODE ${receiptMode}.`);
 }
+const rendererAttestation = process.env.DOE_EXTERNAL_RENDERER_ATTESTATION ?? 'vulkaninfo';
+if (!['vulkaninfo', 'omitted-by-node-permission'].includes(rendererAttestation)) {
+  throw new Error(`Unknown DOE_EXTERNAL_RENDERER_ATTESTATION ${rendererAttestation}.`);
+}
 const receiptEnabled = receiptMode === 'enabled';
 const inputs = JSON.parse(await readFile(inputPath, 'utf8'));
 
@@ -136,7 +151,7 @@ const ctx = new snn.GPUContext();
 await ctx.initialize();
 const initializationMs = performance.now() - initializedAt;
 const identity = adapterIdentity(ctx.adapter);
-const hostRenderer = await inspectLinuxRenderer();
+const hostRenderer = await inspectLinuxRenderer(rendererAttestation);
 const layoutTrace = [];
 if (receiptEnabled) {
   const createBindGroupLayout = ctx.device.createBindGroupLayout.bind(ctx.device);

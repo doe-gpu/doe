@@ -114,6 +114,10 @@ const run = await runGovernedNodeWebGPUProcess({
   process: {
     entrypoint: applicationPath,
     environment: { mode: "sealed", values: applicationEnvironment },
+    filesystem: {
+      mode: "node-permission-read-only",
+      readPaths: declaredRuntimePaths,
+    },
     timeoutMs,
     maxOutputBytes,
   },
@@ -135,6 +139,18 @@ process group on POSIX and the direct child on Windows; the receipt records the
 actual termination scope. Callers must not infer Windows descendant cleanup
 from a child-process receipt.
 
+`node-permission-read-only` enables Node's permission model, removes
+`NODE_OPTIONS`, denies Node filesystem writes and child-process creation, and
+allows reads only for the loader, application entrypoint, provider entrypoint,
+and declared `readPaths`. Node implements a custom ESM loader with an internal
+worker, so the runner necessarily enables workers and records
+`workerThreads: "allowed-for-loader"`. WebGPU providers require native addons,
+so addon loading is also enabled and recorded as
+`nativeAddons: "allowed-for-provider"`. This is a Node API filesystem boundary,
+not an operating-system sandbox: addon syscalls, network access, and other host
+interfaces require separate isolation. An executable without compatible Node
+permission flags fails closed as a process error.
+
 ## DoeProof CLI and CI
 
 The package installs `doe-proof-node` for declarative unchanged-process runs:
@@ -147,8 +163,8 @@ doe-proof-node replay run.json --out replay.json
 doe-proof-node compare run.json replay.json
 ```
 
-The JSON contract schema ships at
-`doe-gpu/assets/governed-node-webgpu-process-contract.schema.json`. A contract
+The JSON contract schema is exported as
+`doe-gpu/governed-node-webgpu-process-contract.schema.json`. A contract
 binds the provider entrypoint, workload entrypoint, input, evaluator module,
 expected output, environment policy, timeout, and output limit. Every referenced
 file has an exact SHA-256. Optional `runtimeFiles` entries bind additional
@@ -164,6 +180,16 @@ by the application’s own build or manifest contract; Doe does not invent it by
 hashing one entry file. `runtimeFiles` makes a declared set verifiable, but it
 does not prove the set is complete or that the process accessed no other files.
 Those stronger claims require a separately enforced filesystem contract.
+When the contract selects `node-permission-read-only`, the CLI automatically
+adds the input and every `runtimeFiles` path to the read allowlist. Provider,
+application, and loader entrypoints are added by the process runner.
+
+The matching receipt and CLI-artifact schemas are exported as
+`doe-gpu/governed-node-webgpu-process-receipt.schema.json` and
+`doe-gpu/governed-node-webgpu-process-artifact.schema.json`. JSON Schema checks
+prove portable shape and types; `verify` remains authoritative for contract
+hashes, dependency rehashing, provider coherence, oracle equality, and replay
+hashes.
 
 `verify` hashes the contract and dependencies and validates the nested process
 receipt without importing or executing the evaluator. `replay` executes the
@@ -171,7 +197,9 @@ bound contract again and requires both semantic workload and provider-specific
 execution identities to match. `compare` requires two independently valid,
 oracle-passing artifacts with the same workload and output. It explicitly emits
 `performanceInterpretable: false` and `runtimeOwnershipCredit: false`; those
-claims require the separate application gate.
+claims require the separate application gate. `inspect` and `verify` expose the
+bound dependency identities and effective filesystem declaration so CI does not
+need to parse implementation-private state.
 
 On `SIGINT` or `SIGTERM`, the CLI requests cancellation and writes a terminal
 failed-but-valid evidence artifact when `--out` is present. Verifying that
@@ -216,13 +244,28 @@ payload is staged:
 
 ```bash
 npm run test:integration:native-clean-install
+npm run test:integration:native-clean-install:bun
+npm run test:integration:native-reliability
+npm run test:integration:native-reliability:bun
 ```
 
 The gate packs the wrapper and matching platform package, installs both into a
-fresh project with lifecycle scripts disabled, executes the shipped first
-kernel, and rejects workspace-library resolution. The ordinary integration
-suite skips this physical package check when no staged platform payload exists;
-the explicit release command fails instead.
+fresh project with lifecycle scripts disabled, executes the runtime-specific
+shipped first kernel, and rejects workspace-library resolution. Each receipt
+binds the selected runtime executable and version. The ordinary integration
+suite skips the Node physical package check when no staged platform payload
+exists; either explicit release command fails instead.
+
+The separate reliability commands reuse one clean installation across repeated
+fresh processes and overlapping runtime instances, then execute 12 exact
+create/compute/destroy cycles inside one additional process. They require exact
+output, bounded child execution, stderr-free teardown, platform-package
+resolution, and a reported post-warmup RSS span below the frozen diagnostic
+ceiling. Every same-process cycle also registers `GPUDevice.lost` before
+deliberate destruction, requires the `destroyed` reason, and verifies that
+subsequent device use fails closed. This is not a long-soak leak certificate or
+an unexpected hardware-loss recovery test. The commands do not establish
+performance, application promotion, or release readiness.
 
 Node 18 or newer is required for the default entrypoint. Bun and Deno use their
 declared package export conditions. Actual platform support remains limited to

@@ -18,7 +18,17 @@ const upstreamCoreDir = resolve(upstreamRoot, 'packages/core');
 const workloadPath = resolve(harnessDir, 'run-workload.mjs');
 const evaluatorPath = resolve(harnessDir, 'evaluate-doeproof-cli-output.mjs');
 const inputPath = resolve(harnessDir, 'inputs.json');
-const planPath = resolve(harnessDir, 'doeproof-cli-integration.plan.json');
+const profile = process.env.DOE_DOEPROOF_INTEGRATION_PROFILE ?? 'ambient';
+if (!['ambient', 'node-permission-read-only'].includes(profile)) {
+  throw new Error(`Unknown DOE_DOEPROOF_INTEGRATION_PROFILE ${profile}.`);
+}
+const permissionProfile = profile === 'node-permission-read-only';
+const planPath = resolve(
+  harnessDir,
+  permissionProfile
+    ? 'doeproof-cli-filesystem-integration.plan.json'
+    : 'doeproof-cli-integration.plan.json',
+);
 const cliPath = resolve(doeRoot, 'packages/doe-gpu/bin/doe-proof-node.js');
 const cliImplementationPath = resolve(
   doeRoot,
@@ -33,7 +43,9 @@ const contractSchemaPath = resolve(
 const outputRoot = resolve(
   process.argv[2] ?? resolve(
     doeRoot,
-    'bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-qm0-v1',
+    permissionProfile
+      ? 'bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-filesystem-qm0-v1'
+      : 'bench/out/external-projects/holoscript-snn-webgpu/doeproof-cli-qm0-v1',
   ),
 );
 
@@ -47,6 +59,62 @@ async function sha256File(path) {
 
 function tagged(value) {
   return `sha256:${value}`;
+}
+
+async function runtimePathsFor(provider) {
+  if (!permissionProfile) return [];
+  const paths = [
+    resolve(harnessDir, 'hardware-identity.mjs'),
+    resolve(upstreamCoreDir, 'package.json'),
+    resolve(upstreamCoreDir, 'dist/chunk-GLEJ2TLS.js'),
+    resolve(upstreamCoreDir, 'dist/chunk-X5NQT5IT.js'),
+    resolve(upstreamCoreDir, 'dist/math/tropical-spmv.js'),
+    resolve(upstreamPackageDir, 'package.json'),
+    resolve(upstreamPackageDir, 'dist/index.js'),
+    resolve(upstreamPackageDir, 'src/shaders/tropical-graph.wgsl'),
+  ];
+  if (provider.id === 'dawn-node-webgpu') {
+    const providerRoot = dirname(provider.module);
+    paths.push(
+      provider.module,
+      resolve(providerRoot, 'package.json'),
+      resolve(providerRoot, 'dist/linux-x64.dawn.node'),
+    );
+  } else {
+    paths.push(
+      resolve(doeRoot, 'packages/doe-gpu/package.json'),
+      ...[
+        'index.js',
+        'native.js',
+        'vendor/doe-determinism-policy.js',
+        'vendor/doe-namespace.js',
+        'vendor/doe-numeric-stability-policy.js',
+        'vendor/webgpu/build-metadata.js',
+        'vendor/webgpu/index.js',
+        'vendor/webgpu/platform-package.js',
+        'vendor/webgpu/runtime-cli.js',
+        'vendor/webgpu/shared/browser-native-canvas-backend.js',
+        'vendor/webgpu/shared/browser-surface.js',
+        'vendor/webgpu/shared/capabilities.js',
+        'vendor/webgpu/shared/compiler-errors.js',
+        'vendor/webgpu/shared/encoder-surface.js',
+        'vendor/webgpu/shared/full-surface.js',
+        'vendor/webgpu/shared/native-metal-canvas-backend.js',
+        'vendor/webgpu/shared/public-surface.js',
+        'vendor/webgpu/shared/resource-lifecycle.js',
+        'vendor/webgpu/shared/validation.js',
+        'vendor/webgpu/webgpu-constants.js',
+      ].map((path) => resolve(doeRoot, 'packages/doe-gpu/src', path)),
+      resolve(doeRoot, 'packages/doe-gpu/build/Release/doe_napi.node'),
+      resolve(doeRoot, 'packages/doe-gpu-linux-x64/package.json'),
+      resolve(doeRoot, 'packages/doe-gpu-linux-x64/bin/doe-build-metadata.json'),
+      resolve(doeRoot, 'packages/doe-gpu-linux-x64/bin/doe_napi.node'),
+      resolve(doeRoot, 'packages/doe-gpu-linux-x64/bin/libwebgpu_doe.so'),
+      resolve(doeRoot, 'packages/doe-gpu-linux-x64/bin/metadata.json'),
+      resolve(doeRoot, 'runtime/zig/zig-out/lib/libwebgpu_doe.so'),
+    );
+  }
+  return [...new Set(paths)].sort();
 }
 
 function executeCli(args) {
@@ -100,6 +168,12 @@ const lanes = {};
 for (const [laneId, provider] of Object.entries(providers)) {
   const contractPath = resolve(outputRoot, `${laneId}.contract.json`);
   const artifactPath = resolve(outputRoot, `${laneId}.artifact.json`);
+  const runtimePaths = await runtimePathsFor(provider);
+  const runtimeFiles = await Promise.all(runtimePaths.map(async (path, index) => ({
+    id: `runtime-file-${String(index).padStart(3, '0')}`,
+    path,
+    sha256: tagged(await sha256File(path)),
+  })));
   const contract = {
     schema: 'doe.governed-node-webgpu-process-contract/v1',
     provider: {
@@ -124,11 +198,18 @@ for (const [laneId, provider] of Object.entries(providers)) {
           DOE_EXTERNAL_UPSTREAM_CORE_DIR: upstreamCoreDir,
           DOE_EXTERNAL_INPUT_PATH: inputPath,
           DOE_EXTERNAL_RECEIPT_MODE: 'enabled',
+          ...(permissionProfile ? {
+            DOE_EXTERNAL_RENDERER_ATTESTATION: 'omitted-by-node-permission',
+          } : {}),
         },
       },
+      ...(permissionProfile ? {
+        filesystem: { mode: 'node-permission-read-only' },
+      } : {}),
       timeoutMs: 120000,
       maxOutputBytes: 4194304,
     },
+    ...(permissionProfile ? { runtimeFiles } : {}),
     evaluator: {
       module: evaluatorPath,
       sha256: tagged(sourceHashes.evaluator),
@@ -141,6 +222,7 @@ for (const [laneId, provider] of Object.entries(providers)) {
   const inspect = executeCli(['inspect', artifactPath]);
   lanes[laneId] = {
     provider,
+    runtimeFileCount: runtimeFiles.length,
     contract: { path: contractPath, sha256: await sha256File(contractPath) },
     artifact: { path: artifactPath, sha256: await sha256File(artifactPath) },
     run,

@@ -1,6 +1,6 @@
 import { __doeProofProviderIdentity } from 'webgpu';
 import { spawn } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const mode = process.env.DOE_TEST_PROCESS_MODE ?? 'pass';
 if (mode === 'hang') {
@@ -15,6 +15,16 @@ if (mode === 'hang') {
   setInterval(() => {}, 1_000);
 } else if (mode === 'loud') {
   process.stdout.write('x'.repeat(65_536));
+} else if (mode === 'read-file') {
+  const output = JSON.parse(process.env.DOE_TEST_PROCESS_OUTPUT ?? '[]');
+  process.stdout.write(`${JSON.stringify({
+    providerIdentity: __doeProofProviderIdentity,
+    output,
+    evidence: {
+      artifactKind: 'governed-process-fixture',
+      runtimeFile: readFileSync(process.env.DOE_TEST_RUNTIME_FILE, 'utf8'),
+    },
+  })}\n`);
 } else {
   const output = JSON.parse(process.env.DOE_TEST_PROCESS_OUTPUT ?? '[]');
   process.stdout.write(`${JSON.stringify({

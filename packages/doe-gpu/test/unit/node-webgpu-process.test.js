@@ -6,6 +6,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -100,6 +101,85 @@ const second = await runGovernedNodeWebGPUProcess(configuration());
 assert.equal(second.ok, true);
 assert.equal(second.receipt.replay.workloadSha256, first.receipt.replay.workloadSha256);
 assert.equal(second.receipt.replay.executionSha256, first.receipt.replay.executionSha256);
+
+const permissionScratch = mkdtempSync(resolve(tmpdir(), 'doe-proof-permission-'));
+try {
+  const runtimeFilePath = resolve(permissionScratch, 'runtime-data.txt');
+  const packageManifestPath = resolve(here, '../../package.json');
+  writeFileSync(runtimeFilePath, 'declared-runtime-data');
+  const permissionProcess = {
+    ...configuration().process,
+    environment: {
+      mode: 'sealed',
+      values: {
+        DOE_TEST_PROCESS_MODE: 'read-file',
+        DOE_TEST_PROCESS_OUTPUT: JSON.stringify([...output]),
+        DOE_TEST_RUNTIME_FILE: runtimeFilePath,
+        NODE_OPTIONS: '--allow-fs-read=*',
+      },
+    },
+    filesystem: {
+      mode: 'node-permission-read-only',
+      readPaths: [packageManifestPath, runtimeFilePath],
+    },
+  };
+  const permissionPass = await runGovernedNodeWebGPUProcess(configuration({
+    process: permissionProcess,
+  }));
+  assert.equal(permissionPass.ok, true, JSON.stringify(permissionPass.errors));
+  assert.equal(permissionPass.receipt.applicationEvidence.runtimeFile, 'declared-runtime-data');
+  assert.equal(
+    permissionPass.receipt.process.declaration.filesystem.mode,
+    'node-permission-read-only',
+  );
+  assert.ok(permissionPass.receipt.process.declaration.filesystem.readPaths.includes(
+    runtimeFilePath,
+  ));
+  assert.equal(permissionPass.receipt.process.environment.keys.includes('NODE_OPTIONS'), false);
+  assert.equal(validateGovernedNodeWebGPUProcessReceipt(permissionPass.receipt).valid, true);
+
+  const permissionDenied = await runGovernedNodeWebGPUProcess(configuration({
+    process: {
+      ...permissionProcess,
+      filesystem: {
+        mode: 'node-permission-read-only',
+        readPaths: [packageManifestPath],
+      },
+    },
+  }));
+  assert.equal(permissionDenied.ok, false);
+  assert.ok(permissionDenied.errors.some(
+    (error) => error.code === 'DOE_GOVERNED_PROCESS_EXIT_FAILED',
+  ));
+  assert.match(Buffer.from(permissionDenied.stderr).toString('utf8'), /permission|access/i);
+  assert.equal(validateGovernedNodeWebGPUProcessReceipt(permissionDenied.receipt).valid, true);
+
+  const permissionOverride = await runGovernedNodeWebGPUProcess(configuration({
+    process: {
+      ...permissionProcess,
+      nodeArgs: ['--allow-fs-read=*'],
+    },
+  }));
+  assert.equal(permissionOverride.ok, false);
+  assert.equal(permissionOverride.receipt, null);
+  assert.equal(
+    permissionOverride.errors[0].code,
+    'DOE_GOVERNED_PROCESS_INVALID_CONFIGURATION',
+  );
+
+  const relativePermissionProvider = await runGovernedNodeWebGPUProcess(configuration({
+    provider: { id: 'fixture-provider', module: 'provider-v1' },
+    process: permissionProcess,
+  }));
+  assert.equal(relativePermissionProvider.ok, false);
+  assert.equal(relativePermissionProvider.receipt, null);
+  assert.equal(
+    relativePermissionProvider.errors[0].code,
+    'DOE_GOVERNED_PROCESS_INVALID_CONFIGURATION',
+  );
+} finally {
+  rmSync(permissionScratch, { recursive: true, force: true });
+}
 
 const evidenceVariant = await runGovernedNodeWebGPUProcess(configuration({
   evaluate({ stdout }) {
@@ -291,5 +371,17 @@ assert.equal(tamperedValidation.valid, false);
 assert.ok(tamperedValidation.errors.includes(
   'effective provider id does not match the declared provider',
 ));
+
+const noncanonicalFilesystem = structuredClone(first.receipt);
+noncanonicalFilesystem.process.declaration.filesystem = {
+  mode: 'node-permission-read-only',
+  readPaths: ['/z', '/a'],
+  workerThreads: 'allowed-for-loader',
+  nativeAddons: 'allowed-for-provider',
+};
+assert.equal(
+  validateGovernedNodeWebGPUProcessReceipt(noncanonicalFilesystem).valid,
+  false,
+);
 
 console.log('node-webgpu governed process contracts: ok');

@@ -40,11 +40,13 @@ const PROCESS_KEYS = new Set([
   'args',
   'cwd',
   'environment',
+  'filesystem',
   'timeoutMs',
   'maxOutputBytes',
 ]);
 const ENTRYPOINT_KEYS = new Set(['path', 'sha256']);
 const ENVIRONMENT_KEYS = new Set(['mode', 'values']);
+const FILESYSTEM_KEYS = new Set(['mode']);
 const EVALUATOR_KEYS = new Set(['module', 'sha256', 'export']);
 const RUNTIME_FILE_KEYS = new Set(['id', 'path', 'sha256']);
 
@@ -147,6 +149,18 @@ function normalizeEnvironment(value) {
   return { mode: value.mode, values: { ...values } };
 }
 
+function normalizeFilesystem(value) {
+  const filesystem = value ?? { mode: 'ambient' };
+  assertPlainObject(filesystem, 'contract.process.filesystem');
+  assertKnownKeys(filesystem, FILESYSTEM_KEYS, 'contract.process.filesystem');
+  if (!['ambient', 'node-permission-read-only'].includes(filesystem.mode)) {
+    throw new TypeError(
+      'contract.process.filesystem.mode must be "ambient" or "node-permission-read-only".',
+    );
+  }
+  return { mode: filesystem.mode };
+}
+
 function normalizeContractDocument(document) {
   assertPlainObject(document, 'contract');
   assertKnownKeys(document, CONTRACT_KEYS, 'contract');
@@ -235,6 +249,7 @@ function normalizeContractDocument(document) {
       args,
       cwd: processDocument.cwd ?? '.',
       environment: normalizeEnvironment(processDocument.environment),
+      filesystem: normalizeFilesystem(processDocument.filesystem),
       timeoutMs: processDocument.timeoutMs,
       maxOutputBytes: processDocument.maxOutputBytes,
     },
@@ -323,6 +338,12 @@ export async function loadDoeProofProcessContract(contractFile, options = {}) {
       args: document.process.args,
       cwd: localPath(contractDir, document.process.cwd, 'contract.process.cwd'),
       environment: document.process.environment,
+      filesystem: {
+        mode: document.process.filesystem.mode,
+        readPaths: document.process.filesystem.mode === 'node-permission-read-only'
+          ? [inputPath, ...runtimeFiles.map((runtimeFile) => runtimeFile.path)]
+          : [],
+      },
       timeoutMs: document.process.timeoutMs,
       maxOutputBytes: document.process.maxOutputBytes,
     },
@@ -337,6 +358,7 @@ function artifactSummary(artifact, validation = null) {
     valid: validation?.valid ?? null,
     validationErrors: validation?.errors ?? [],
     contractSha256: artifact?.contract?.sha256 ?? null,
+    dependencies: artifact?.dependencies ?? null,
     workload: artifact?.receipt?.workload ?? null,
     provider: artifact?.receipt?.provider ?? null,
     oracle: artifact?.receipt?.oracle ?? null,

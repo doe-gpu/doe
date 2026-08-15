@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/governed-node-webgpu-process-receipt.schema.json",
+  "title": "Doe governed Node WebGPU process receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "checkpoint",
+    "workload",
+    "provider",
+    "process",
+    "oracle",
+    "applicationEvidence",
+    "applicationEvidenceSha256",
+    "replay",
+    "errors"
+  ],
+  "properties": {
+    "schema": { "const": "doe.governed-node-webgpu-process-receipt/v1" },
+    "status": { "enum": ["pass", "failed"] },
+    "checkpoint": { "const": "process-complete" },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "implementationSha256",
+        "inputSha256",
+        "inputBytes",
+        "expectedOutputSha256"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "implementationSha256": { "$ref": "#/$defs/sha256" },
+        "inputSha256": { "$ref": "#/$defs/sha256" },
+        "inputBytes": { "type": "integer", "minimum": 0 },
+        "expectedOutputSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested", "effective"],
+      "properties": {
+        "requested": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "module"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "module": { "type": "string", "minLength": 1 }
+          }
+        },
+        "effective": { "type": ["object", "null"] }
+      }
+    },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declaration",
+        "environment",
+        "exitCode",
+        "signal",
+        "timedOut",
+        "outputLimitExceeded",
+        "stdoutSha256",
+        "stdoutBytes",
+        "stderrSha256",
+        "stderrBytes",
+        "durationMs"
+      ],
+      "dependentRequired": {
+        "spawned": ["aborted", "terminationScope"],
+        "aborted": ["spawned", "terminationScope"],
+        "terminationScope": ["spawned", "aborted"]
+      },
+      "properties": {
+        "declaration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executable",
+            "nodeArgs",
+            "loaderContract",
+            "entrypoint",
+            "args",
+            "cwd",
+            "timeoutMs",
+            "maxOutputBytes"
+          ],
+          "properties": {
+            "executable": { "type": "string", "minLength": 1 },
+            "nodeArgs": { "type": "array", "items": { "type": "string" } },
+            "loaderContract": { "const": "doe.node-webgpu-loader/v1" },
+            "entrypoint": { "type": "string", "minLength": 1 },
+            "args": { "type": "array", "items": { "type": "string" } },
+            "cwd": { "type": "string", "minLength": 1 },
+            "filesystem": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mode", "readPaths"],
+              "properties": {
+                "mode": { "enum": ["ambient", "node-permission-read-only"] },
+                "readPaths": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "workerThreads": { "enum": ["ambient", "allowed-for-loader"] },
+                "nativeAddons": { "enum": ["ambient", "allowed-for-provider"] }
+              }
+            },
+            "timeoutMs": { "type": "integer", "minimum": 1 },
+            "maxOutputBytes": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "keys", "sha256"],
+          "properties": {
+            "mode": { "enum": ["inherit", "sealed"] },
+            "keys": { "type": "array", "items": { "type": "string" } },
+            "sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "exitCode": { "type": ["integer", "null"] },
+        "signal": { "type": ["string", "null"] },
+        "spawned": { "type": "boolean" },
+        "aborted": { "type": "boolean" },
+        "terminationScope": { "enum": ["process-group", "child-process"] },
+        "timedOut": { "type": "boolean" },
+        "outputLimitExceeded": { "type": "boolean" },
+        "stdoutSha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "stdoutBytes": { "type": "integer", "minimum": 0 },
+        "stderrSha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "stderrBytes": { "type": "integer", "minimum": 0 },
+        "durationMs": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "expectedOutputSha256",
+        "actualOutputSha256",
+        "outputBytes"
+      ],
+      "properties": {
+        "status": { "enum": ["pass", "fail"] },
+        "expectedOutputSha256": { "$ref": "#/$defs/sha256" },
+        "actualOutputSha256": {
+          "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+        },
+        "outputBytes": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "applicationEvidence": true,
+    "applicationEvidenceSha256": {
+      "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workloadSha256", "executionSha256"],
+      "properties": {
+        "workloadSha256": { "$ref": "#/$defs/sha256" },
+        "executionSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "stage", "detail"],
+        "properties": {
+          "code": {
+            "enum": [
+              "DOE_GOVERNED_PROCESS_INVALID_CONFIGURATION",
+              "DOE_GOVERNED_PROCESS_SPAWN_FAILED",
+              "DOE_GOVERNED_PROCESS_ABORTED",
+              "DOE_GOVERNED_PROCESS_TIMEOUT",
+              "DOE_GOVERNED_PROCESS_OUTPUT_LIMIT",
+              "DOE_GOVERNED_PROCESS_EXIT_FAILED",
+              "DOE_GOVERNED_PROCESS_EVALUATION_FAILED",
+              "DOE_GOVERNED_PROCESS_PROVIDER_IDENTITY_FAILED",
+              "DOE_GOVERNED_PROCESS_ORACLE_FAILED",
+              "DOE_GOVERNED_PROCESS_RECEIPT_SINK_FAILED"
+            ]
+          },
+          "stage": { "type": "string", "minLength": 1 },
+          "detail": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    }
+  }
+}

@@ -104,6 +104,29 @@ class CiWorkflowSurfaceTests(unittest.TestCase):
         text = workflow_text("doe-gpu-native-freshness.yml")
         self.assertIn("if: github.event_name == 'workflow_dispatch'", text)
 
+    def test_native_freshness_enforces_node_and_bun_clean_install(self) -> None:
+        text = workflow_text("doe-gpu-native-freshness.yml")
+        self.assertIn("uses: oven-sh/setup-bun@v2", text)
+        self.assertIn('bun-version: "1.3.10"', text)
+        self.assertIn(
+            "run: npm run test:integration:native-clean-install\n", text
+        )
+        self.assertIn(
+            "run: npm run test:integration:native-clean-install:bun\n", text
+        )
+        self.assertIn(
+            "run: npm run test:integration:native-reliability\n", text
+        )
+        self.assertIn(
+            "run: npm run test:integration:native-reliability:bun\n", text
+        )
+
+    def test_package_surface_runs_complete_hosted_suite(self) -> None:
+        text = workflow_text("webgpu-package-surface.yml")
+        self.assertIn("run: npm test\n", text)
+        self.assertIn("run: python3 bench/gates/tool_surface_gate.py\n", text)
+        self.assertIn("run: npm pack --dry-run --json\n", text)
+
     def test_amd_smoke_declares_its_nonstandard_lane(self) -> None:
         text = workflow_text("amd-vulkan-smoke.yml")
         self.assertIn("--local-vulkan-lane vulkan_doe_comparable", text)

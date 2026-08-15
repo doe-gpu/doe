@@ -34,6 +34,8 @@ Outputs:
   scope, and receipts never overstate descendant cleanup.
 - Declared runtime files are hash-bound without being mislabeled as a complete
   or isolated dependency closure.
+- Node permission receipts expose the effective read allowlist and required
+  loader-worker exception without claiming an operating-system sandbox.
 
 ## Acceptance
 

@@ -27,6 +27,10 @@ export interface NodeWebGPUProcessDeclaration {
     mode: 'inherit' | 'sealed';
     values?: Record<string, string | null>;
   };
+  filesystem?: {
+    mode: 'ambient' | 'node-permission-read-only';
+    readPaths?: string[];
+  };
   timeoutMs: number;
   maxOutputBytes: number;
 }
@@ -53,11 +57,11 @@ export interface NodeWebGPUGovernedProcessReceipt {
     terminationScope: 'process-group' | 'child-process';
     timedOut: boolean;
     outputLimitExceeded: boolean;
-    stdoutSha256: string;
+    stdoutSha256: string | null;
     stdoutBytes: number;
-    stderrSha256: string;
+    stderrSha256: string | null;
     stderrBytes: number;
-    durationMs: number;
+    durationMs: number | null;
   };
   oracle: Record<string, unknown>;
   applicationEvidence: unknown;

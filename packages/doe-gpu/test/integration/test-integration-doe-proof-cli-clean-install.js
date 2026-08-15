@@ -9,6 +9,7 @@ import {
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -122,6 +123,7 @@ try {
       },
       cwd: scratch,
       environment: { mode: 'sealed', values: {} },
+      filesystem: { mode: 'node-permission-read-only' },
       timeoutMs: 5000,
       maxOutputBytes: 16384,
     },
@@ -134,6 +136,14 @@ try {
       id: 'clean-install-runtime-data',
       path: runtimeDataPath,
       sha256: await fileDigest(runtimeDataPath),
+    }, {
+      id: 'clean-install-project-manifest',
+      path: resolve(scratch, 'package.json'),
+      sha256: await fileDigest(resolve(scratch, 'package.json')),
+    }, {
+      id: 'installed-doe-gpu-manifest',
+      path: resolve(scratch, 'node_modules/doe-gpu/package.json'),
+      sha256: await fileDigest(resolve(scratch, 'node_modules/doe-gpu/package.json')),
     }],
   };
   await writeFile(contractPath, `${JSON.stringify(contract, null, 2)}\n`);
@@ -153,10 +163,28 @@ try {
   if (artifact.dependencies?.runtimeFiles?.[0]?.id !== 'clean-install-runtime-data') {
     throw new Error('installed CLI did not bind the declared runtime file');
   }
+  if (artifact.receipt?.process?.declaration?.filesystem?.mode
+      !== 'node-permission-read-only') {
+    throw new Error('installed CLI did not enforce the declared filesystem policy');
+  }
 
   const installedFiles = await readdir(resolve(scratch, 'node_modules/doe-gpu/bin'));
   if (!installedFiles.includes('doe-proof-node.js')) {
     throw new Error('installed package is missing doe-proof-node.js');
+  }
+  const requireFromFixture = createRequire(resolve(scratch, 'package.json'));
+  for (const schemaName of [
+    'governed-node-webgpu-process-contract.schema.json',
+    'governed-node-webgpu-process-receipt.schema.json',
+    'governed-node-webgpu-process-artifact.schema.json',
+  ]) {
+    const schema = JSON.parse(await readFile(
+      requireFromFixture.resolve(`doe-gpu/${schemaName}`),
+      'utf8',
+    ));
+    if (schema.$schema !== 'https://json-schema.org/draft/2020-12/schema') {
+      throw new Error(`installed package has an invalid ${schemaName}`);
+    }
   }
   console.log('DoeProof CLI clean-install integration: ok');
 } finally {

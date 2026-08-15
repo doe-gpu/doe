@@ -32,6 +32,9 @@
       "types": "./src/node-webgpu-process.d.ts",
       "default": "./src/node-webgpu-process.js"
     },
+    "./governed-node-webgpu-process-contract.schema.json": "./assets/governed-node-webgpu-process-contract.schema.json",
+    "./governed-node-webgpu-process-receipt.schema.json": "./assets/governed-node-webgpu-process-receipt.schema.json",
+    "./governed-node-webgpu-process-artifact.schema.json": "./assets/governed-node-webgpu-process-artifact.schema.json",
     "./program-bundle": {
       "types": "./src/program-bundle-runner.d.ts",
       "default": "./src/program-bundle-runner.js"
@@ -80,7 +83,10 @@
     "sync:program-bundle-schema": "node scripts/sync-program-bundle-schema.js",
     "test:smoke": "node test/smoke/test-smoke-load.js",
     "test:integration": "node test/integration/run-integration.js --runtime node",
-    "test:integration:native-clean-install": "node test/integration/test-integration-native-clean-install.js --required",
+    "test:integration:native-clean-install": "node test/integration/test-integration-native-clean-install.js --required --runtime node",
+    "test:integration:native-clean-install:bun": "node test/integration/test-integration-native-clean-install.js --required --runtime bun",
+    "test:integration:native-reliability": "node test/integration/test-integration-native-clean-install-reliability.js --required --runtime node",
+    "test:integration:native-reliability:bun": "node test/integration/test-integration-native-clean-install-reliability.js --required --runtime bun",
     "test:integration:bun": "bun test/integration/run-integration.js --runtime bun",
     "test:integration:deno": "deno run --allow-all test/integration/run-integration.js --runtime deno",
     "prepublishOnly": "node scripts/verify-publish-readiness.js && npm test",
