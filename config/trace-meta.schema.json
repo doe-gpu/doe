@@ -257,6 +257,7 @@
       }
     },
     "packagePreparedSession": { "type": "boolean" },
+    "packageDispatchPrewarmRequested": { "type": "boolean" },
     "packageSetupIncludedInSelectedTiming": { "type": "boolean" },
     "packageResidentBufferLoads": { "type": "boolean" },
     "packageReadbackMode": {

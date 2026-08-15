@@ -4,13 +4,13 @@
   "reportId": "holoscript-tropical-spmv-runtime-ownership-2026-08-15-diagnostic",
   "actorId": "holoscript-snn-webgpu",
   "harnessId": "tropical-spmv",
-  "generatedAt": "2026-08-15T16:05:31.967Z",
+  "generatedAt": "2026-08-15T17:03:55.562Z",
   "review": {
     "status": "reviewed",
-    "reviewedAt": "2026-08-15T16:10:00Z",
+    "reviewedAt": "2026-08-15T17:06:09Z",
     "reviewer": "codex"
   },
-  "registryRevision": "11",
+  "registryRevision": "13",
   "upstream": {
     "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
     "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
@@ -20,40 +20,41 @@
   "outcome": "no-material-result",
   "findings": [
     {
-      "id": "partial-runtime-ownership-matrix",
+      "id": "complete-runtime-ownership-matrix",
       "category": "compatibility",
       "status": "verified",
-      "summary": "Pinned incumbent without DoeProof (I1), pinned incumbent with DoeProof (W0), and DoeRuntime with DoeProof (D0) each completed three clean processes on the physical AMD Vulkan adapter with exact HoloScript oracle output.",
+      "summary": "I0, I1, W0, and D0 each completed three clean processes on the physical AMD Vulkan adapter with exact output for all four frozen HoloScript tropical-SpMV topologies. W0 and D0 also reproduced their hash-bound application evidence from persisted replay receipts.",
       "evidence": [
         {
-          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/raw-matrix.json",
-          "sha256": "7bb94c547905f595a70a639afff8872ed6eba8fdefe108206eedc80d55e97769"
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-complete-v1/raw-matrix.json",
+          "sha256": "0dffe48566dca16427b27b9876a69c4b0f683f7d05d6451d58a770dd642222b8"
         },
         {
-          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/receipt-summary.json",
-          "sha256": "c8910cf54b71cbe44fb9ca8ca83d98ef99fa0a295c30a2c59c713544bbedb9ad"
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-complete-v1/receipt-summary.json",
+          "sha256": "d30dbb6ff0113f34a0386f280142bab178f56e826d0c69939055fd62b3c49f52"
         }
       ]
     },
     {
-      "id": "ownership-attribution-incomplete",
+      "id": "owned-runtime-not-distinguished",
       "category": "diagnosis",
       "status": "ineligible",
-      "summary": "The ambient incumbent lane I0 was not supplied and the independent-correction plan requires a bounded incumbent patch lane P0. The matrix therefore cannot attribute product value to DoeRuntime or DoeProof.",
+      "summary": "D0 did not produce an independent-correction outcome unavailable from W0. The unchanged pinned incumbent already passes the governed oracle and replay contract, so no P0 correction is required and this diagnostic assigns no unique application value to DoeRuntime.",
       "evidence": [
         {
-          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/receipt-summary.json",
-          "sha256": "c8910cf54b71cbe44fb9ca8ca83d98ef99fa0a295c30a2c59c713544bbedb9ad"
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-complete-v1/receipt-summary.json",
+          "sha256": "d30dbb6ff0113f34a0386f280142bab178f56e826d0c69939055fd62b3c49f52"
         }
       ]
     }
   ],
   "limitations": [
-    "The ambient incumbent module was unavailable in this checkout, so I0 remains unexecuted.",
-    "No bounded incumbent correction was implemented, so the required P0 lane remains unexecuted.",
-    "Three clean processes per executed lane are diagnostic and below the promotion reliability floor.",
-    "The run was invoked directly and does not carry a claim-eligible preparation or reproduction receipt.",
-    "No runtime-ownership or performance claim is made from this matrix."
+    "Three clean processes per lane remain diagnostic and do not satisfy the promotion reliability floor.",
+    "The direct diagnostic reused a prepared upstream workspace and is not a clean production installation receipt.",
+    "The exact oracle covers the four frozen tropical-SpMV topologies, not HoloScript's complete WebGPU surface, concurrency, device loss, or bounded memory growth.",
+    "P0 is conditional for independent correction and was not required because W0 exposed no release-relevant defect.",
+    "Clean-process and receipt-overhead durations are diagnostic; no material performance claim is made.",
+    "The result does not justify making HoloScript a DoeRuntime release blocker."
   ],
   "equivalence": {
     "status": "pass",
@@ -74,7 +75,7 @@
       "crashes": 0,
       "hangs": 0,
       "timeouts": 0,
-      "peakMemoryBytes": 160260096
+      "peakMemoryBytes": 160620544
     },
     "comparison": {
       "cleanProcessRuns": 3,
@@ -83,81 +84,119 @@
       "crashes": 0,
       "hangs": 0,
       "timeouts": 0,
-      "peakMemoryBytes": 164376576
+      "peakMemoryBytes": 164786176
     }
   },
   "performance": {
     "status": "not-run",
-    "reason": "Timing samples remain diagnostic because I0 and P0 are missing and the promotion sample and reliability floors were not run."
+    "reason": "The diagnostic records workload durations but does not run the frozen selected-operation performance protocol."
   },
   "receiptOverhead": {
     "unit": "ms",
-    "untracedP50": 55.85792399999997,
-    "receiptEnabledP50": 58.498722000000015
+    "untracedP50": 65.17234000000002,
+    "receiptEnabledP50": 59.82995299999999
   },
   "runtimeOwnershipAssessment": {
-    "status": "ineligible",
+    "status": "fail",
     "decision": "retain-diagnostic",
-    "summary": "I1, W0, and D0 passed the diagnostic oracle, but required lanes I0 and P0 are absent; no ownership attribution is permitted."
+    "claimedProperty": "independent-correction",
+    "lanes": {
+      "I0": {
+        "status": "pass",
+        "summary": "The ordinary upstream package resolution selected webgpu@0.3.10 and passed three clean oracle runs."
+      },
+      "I1": {
+        "status": "pass",
+        "summary": "The explicitly version-checked webgpu@0.3.10 incumbent passed three clean oracle runs."
+      },
+      "W0": {
+        "status": "pass",
+        "summary": "Pinned Dawn under the governed provider, oracle, receipt, and replay contract passed."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "DoeRuntime under the identical governed contract passed."
+      },
+      "P0": {
+        "status": "not-run",
+        "summary": "The independent-correction hypothesis requires P0 only when W0 exposes a defect; W0 passed, so no correction was materialized."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "D0 did not materially exceed W0 on the frozen exact-output outcome; both passed every exercised obligation."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "No unique application benefit was measured to repay DoeRuntime's additional source, compatibility, security, packaging, and support obligations."
+    }
   },
   "promotionAssessment": {
     "policyVersion": "1.1.0",
     "eligibility": "ineligible",
     "installation": {
       "status": "ineligible",
-      "summary": "The direct diagnostic reused a prepared workspace and is not a clean production installation receipt."
+      "summary": "The diagnostic reused a prepared workspace and direct provider substitution rather than a claim-eligible clean installation path."
     },
     "supportHardware": {
       "status": "pass",
-      "summary": "Every executed lane selected the Radeon 8060S RADV hardware path without software fallback."
+      "summary": "Every lane selected the physical Radeon 8060S RADV adapter without software fallback."
     },
     "concurrency": {
       "status": "not-run",
-      "summary": "The ownership diagnostic used sequential clean processes."
+      "summary": "The diagnostic uses sequential clean processes."
     },
     "teardown": {
       "status": "not-run",
-      "summary": "Process cleanup succeeded, but promotion-scale teardown cycles were not run."
+      "summary": "Processes exited cleanly, but promotion-scale teardown cycles and lifecycle injection were not run."
     },
     "stress": {
       "status": "not-run",
-      "summary": "The matrix remains below the promotion stress floor."
+      "summary": "Promotion-scale stress and device-loss injection were not run."
     },
     "memory": {
       "status": "not-run",
-      "summary": "Peak RSS was retained, but bounded memory growth was not measured."
+      "summary": "Peak process memory was recorded, but bounded-growth leak testing was not run."
     },
     "receipts": {
-      "status": "ineligible",
-      "summary": "Raw matrix and summary hashes are retained, but no claim-eligible preparation or reproduction receipt exists."
+      "status": "pass",
+      "summary": "The reviewed raw matrix, summary, immutable input chain, and per-provider replay receipts are hash-bound."
     },
     "replay": {
-      "status": "not-run",
-      "summary": "Receipt-driven replay was not run."
+      "status": "pass",
+      "summary": "W0 and D0 each reproduced the exact frozen application evidence hash from a persisted replay receipt."
     },
     "performance": {
       "status": "ineligible",
-      "summary": "The incomplete ownership matrix cannot support a material-performance decision."
+      "summary": "No selected-operation performance decision was run."
     },
     "ownership": {
-      "status": "ineligible",
-      "summary": "I0 and required P0 evidence are missing, so ownership remains unresolved."
+      "status": "fail",
+      "summary": "The matrix is complete, but D0 supplies no measured independent-correction advantage over W0."
     },
     "release": {
       "status": "ineligible",
-      "summary": "This is a reviewed diagnostic, not a blocking release workload."
+      "summary": "HoloScript remains a diagnostic integration and is not a DoeRuntime release blocker."
     }
   },
   "receipts": [
     {
-      "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/receipt-summary.json",
-      "sha256": "c8910cf54b71cbe44fb9ca8ca83d98ef99fa0a295c30a2c59c713544bbedb9ad"
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-complete-v1/receipt-summary.json",
+      "sha256": "d30dbb6ff0113f34a0386f280142bab178f56e826d0c69939055fd62b3c49f52"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-complete-v1/replay-receipts/W0.json",
+      "sha256": "6467ce56ed31346bcee80ae45d9e7e1c03cc42e7b4fc97780fbb7affbd662c28"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-complete-v1/replay-receipts/D0.json",
+      "sha256": "801552797ff7ebaef838df216f6c88af3384ef956241e717cc7705a6dfd34a7b"
     }
   ],
   "rawEvidence": [
     {
-      "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-diagnostic/raw-matrix.json",
-      "sha256": "7bb94c547905f595a70a639afff8872ed6eba8fdefe108206eedc80d55e97769"
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/runtime-ownership-complete-v1/raw-matrix.json",
+      "sha256": "0dffe48566dca16427b27b9876a69c4b0f683f7d05d6451d58a770dd642222b8"
     }
   ]
 }

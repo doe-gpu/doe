@@ -173,17 +173,29 @@ Promotion into a blocking tier requires the complete installation, oracle,
 replay, lifecycle, resource, support-target, and ownership-attribution contract.
 The number of benchmark rows does not determine the tier.
 
-Current application roles remain hypotheses until their artifacts pass that
-contract:
+The first three completed application decisions are terminal for their frozen
+workloads:
 
-- HoloScript is an exact-output ownership candidate;
-- `wgsl-fns` is a compiler-resilience candidate whose differentiation may be
-  removed by an upstream or bounded incumbent fix;
-- vGPU is an integration candidate that has not yet proved a unique
-  DoeRuntime advantage.
+- HoloScript's exact-output matrix does not distinguish `D0` from passing
+  `W0`;
+- `wgsl-fns` exposes an incumbent failure, but bounded `P0` closes it and
+  matches `D0`;
+- vGPU does not distinguish `D0` from `W0` on the governed lifecycle outcome.
 
-If vGPU does not distinguish `D0` from `W0`, replace it as a runtime-ownership
-candidate rather than weakening the gate.
+All three remain diagnostic regression assets and provide no runtime-ownership
+credit. Select a new ownership candidate only from a measured property that a
+governed incumbent wrapper cannot reproduce; do not weaken or reinterpret a
+completed gate.
+
+The next admitted experiment is the Doppler local-AI package path, and only for
+`persistent-performance-control`. The admission receipt at
+[`../reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json`](../reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json)
+records a comparable 16-sample AMD Vulkan control in which Doe retains an
+11.81% p50 and 16.30% p95 workload-wall advantage over prepared Node WebGPU
+after Doe's native dispatch-binding prewarm is explicitly disabled. This is a
+mechanism antecedent, not application credit: promotion still requires an
+unchanged, oracle-bound Doppler workload through the complete `I0/I1/W0/D0`
+contract, with a public-API incumbent optimization control if one is available.
 
 ## Expansion admission
 

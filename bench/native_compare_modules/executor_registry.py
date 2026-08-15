@@ -73,6 +73,14 @@ _DOE_NODE_WEBGPU_PREPARED_TEMPLATE = (
     "--command-repeat {command_repeat}"
 )
 
+_DOE_NODE_WEBGPU_PREPARED_NO_DISPATCH_PREWARM_TEMPLATE = (
+    "node bench/executors/run-node-webgpu-plan.js "
+    "--provider doe --prepared-session --skip-dispatch-prewarm "
+    "--plan {plan} --trace-jsonl {trace_jsonl} "
+    "--trace-meta {trace_meta} --workload {workload} "
+    "--command-repeat {command_repeat}"
+)
+
 _DOE_NODE_NATIVE_DIRECT_PREPARED_TEMPLATE = (
     "node bench/executors/run-node-webgpu-plan.js "
     "--provider doe-direct --prepared-session --plan {plan} "
@@ -312,6 +320,11 @@ _REGISTRY: dict[str, ExecutorSpec] = {
     "doe_node_webgpu_prepared": ExecutorSpec(
         executor_id="doe_node_webgpu_prepared",
         command_template=_DOE_NODE_WEBGPU_PREPARED_TEMPLATE,
+        execution_boundary="plan",
+    ),
+    "doe_node_webgpu_prepared_no_dispatch_prewarm": ExecutorSpec(
+        executor_id="doe_node_webgpu_prepared_no_dispatch_prewarm",
+        command_template=_DOE_NODE_WEBGPU_PREPARED_NO_DISPATCH_PREWARM_TEMPLATE,
         execution_boundary="plan",
     ),
     "doe_node_webgpu_prepared_resident_buffer_loads": ExecutorSpec(

@@ -24,6 +24,7 @@ function parseCliArgs(defaultProvider) {
       workload: { type: 'string', default: '' },
       'dry-run': { type: 'boolean', default: false },
       'prepared-session': { type: 'boolean', default: false },
+      'skip-dispatch-prewarm': { type: 'boolean', default: false },
       'resident-buffer-loads': { type: 'boolean', default: false },
       'debug-boundaries': { type: 'boolean', default: false },
       'step-limit': { type: 'string', default: '' },
@@ -37,7 +38,7 @@ function validateArgs(args, { usageCommand, providerUsage }) {
     throw new Error(
       `usage: ${usageCommand} --provider <${providerUsage}> --plan <path> `
       + '--trace-meta <path> --trace-jsonl <path> --workload <id> '
-      + '[--prepared-session] [--resident-buffer-loads]',
+      + '[--prepared-session] [--skip-dispatch-prewarm] [--resident-buffer-loads]',
     );
   }
 }
@@ -136,6 +137,8 @@ function childArgv(args, cliPath, overrides = {}) {
     workload: overrides.workload ?? args.workload,
     dryRun: overrides.dryRun ?? Boolean(args['dry-run']),
     preparedSession: overrides.preparedSession ?? Boolean(args['prepared-session']),
+    skipDispatchPrewarm: overrides.skipDispatchPrewarm
+      ?? Boolean(args['skip-dispatch-prewarm']),
     residentBufferLoads: overrides.residentBufferLoads ?? Boolean(args['resident-buffer-loads']),
     debugBoundaries: overrides.debugBoundaries ?? Boolean(args['debug-boundaries']),
     stepLimit: overrides.stepLimit ?? args['step-limit'],
@@ -154,6 +157,9 @@ function childArgv(args, cliPath, overrides = {}) {
   }
   if (resolved.preparedSession) {
     argv.push('--prepared-session');
+  }
+  if (resolved.skipDispatchPrewarm) {
+    argv.push('--skip-dispatch-prewarm');
   }
   if (resolved.residentBufferLoads) {
     argv.push('--resident-buffer-loads');
@@ -261,6 +267,8 @@ async function runWorker(args, { runtimeHost }) {
     traceJsonlPath: args['trace-jsonl'],
     dryRun: Boolean(args['dry-run']),
     preparedSession: Boolean(args['prepared-session']),
+    prewarmDispatchBindings: Boolean(args['prepared-session'])
+      && !Boolean(args['skip-dispatch-prewarm']),
     residentBufferLoads: Boolean(args['resident-buffer-loads']),
     debugBoundaries: Boolean(args['debug-boundaries']),
     stepLimit: args['step-limit'] ? Number(args['step-limit']) : 0,

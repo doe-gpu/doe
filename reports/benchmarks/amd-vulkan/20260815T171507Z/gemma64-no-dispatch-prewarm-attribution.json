@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "runtime-ownership-admission-receipt",
+  "receiptId": "gemma64-node-package-no-dispatch-prewarm-attribution-20260815T171507Z",
+  "generatedAt": "2026-08-15T17:15:07Z",
+  "evidenceClass": "diagnostic",
+  "question": "Does Doe's measured package-surface Gemma advantage survive when its native prepared-dispatch prewarm is disabled?",
+  "workload": {
+    "id": "inference_gemma3_270m_prefill_64tok_decode_64tok",
+    "origin": "doe_contract_with_dawn_mapping",
+    "semanticBoundary": "64-token prefill, 64 single-token decode steps, and final sampled-token readback",
+    "config": {
+      "path": "bench/native-compare/compare.config.amd.vulkan.gemma64.node-package.no-dispatch-prewarm.attribution.ir.json",
+      "sha256": "6b66a58e4b0c8ed682d4be89172301f8c497ab8a2482687bcfa040d305668dae"
+    }
+  },
+  "antecedent": {
+    "compare": {
+      "path": "reports/benchmarks/amd-vulkan/20260810T223806Z/gemma64.node-package.warm.ir.compare.json",
+      "sha256": "20fadbd389cb93759c9375de54657ad089a0c9b4a4c682d6b8e94ca7a4fb2eac"
+    },
+    "claim": {
+      "path": "reports/benchmarks/amd-vulkan/20260810T223806Z/gemma64.node-package.warm.ir.claim.json",
+      "sha256": "8b4f56f8de41b9485cea6e2ffd43211443c1d00df8fa46af2021b68966690ba8"
+    }
+  },
+  "lanes": {
+    "D_no_prewarm": {
+      "provider": "doe",
+      "executorId": "doe_node_webgpu_prepared_no_dispatch_prewarm",
+      "preparedSession": true,
+      "dispatchPrewarmRequested": false,
+      "hostKernelPrewarmNonzeroSamples": 0,
+      "runReceipt": {
+        "path": "bench/out/amd-vulkan/20260815T171507Z/gemma64.node-package.no-dispatch-prewarm.attribution.ir.workspace/run-artifacts/doe_gpu_node_package_prepared_no_dispatch_prewarm/doe_gpu_node_package_prepared_no_dispatch_prewarm-inference_gemma3_270m_prefill_64tok_decode_64tok-20260815T171507Z.run.json",
+        "sha256": "d3116c87b5c80ae22c577e1b0b1d8b5593901decf0fb54deb609763db42c3903"
+      }
+    },
+    "W0": {
+      "provider": "node-webgpu",
+      "executorId": "node_webgpu_package_prepared",
+      "preparedSession": true,
+      "runReceipt": {
+        "path": "bench/out/amd-vulkan/20260815T171523Z/gemma64.node-package.no-dispatch-prewarm.attribution.ir.workspace/run-artifacts/node_webgpu_package_prepared/node_webgpu_package_prepared-inference_gemma3_270m_prefill_64tok_decode_64tok-20260815T171523Z.run.json",
+        "sha256": "cafaf36307f995aeb38d4556cce98fa7baf811e27a32fcfc0844e3bb7d8238ed"
+      }
+    }
+  },
+  "integrity": {
+    "comparisonStatus": "comparable",
+    "timedSamplesPerLane": 16,
+    "executionShapeMatched": true,
+    "executionRowCount": 1585,
+    "dispatchCount": 1170,
+    "submitCount": 83,
+    "finalSampleToken": 1664,
+    "finalSampleSha256": "e001b68a976ca48a33ac416984e472a2ebec9a04d975fac362fdbdbe616fe339",
+    "physicalAdapter": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+    "softwareFallback": false
+  },
+  "result": {
+    "selectedOperation": {
+      "doeP50Ms": 102.770831,
+      "incumbentP50Ms": 119.578924,
+      "doeP95Ms": 108.50583,
+      "incumbentP95Ms": 130.627629,
+      "p50AdvantagePercent": 14.056066435252419,
+      "p95AdvantagePercent": 16.935007677434005
+    },
+    "workloadUnitWall": {
+      "doeP50Ms": 139.41738900000001,
+      "incumbentP50Ms": 158.081814,
+      "doeP95Ms": 147.944508,
+      "incumbentP95Ms": 176.75352300000003,
+      "p50AdvantagePercent": 11.80681352758262,
+      "p95AdvantagePercent": 16.29897640003476
+    },
+    "compareReport": {
+      "path": "bench/out/amd-vulkan/20260815T171507Z/gemma64.node-package.no-dispatch-prewarm.attribution.ir.compare.json",
+      "sha256": "8c1fc147db65ae900679b668bb9526ff415e3937ea71eac17f1318baac22ef09"
+    }
+  },
+  "decision": {
+    "status": "pass",
+    "verdict": "authorize-doppler-local-ai-performance-ownership-candidate",
+    "summary": "The package-surface advantage survives removal of Doe's native dispatch-binding prewarm. This admits a real Doppler workload experiment for persistent performance control; it does not itself grant application ownership credit."
+  },
+  "limitations": [
+    "The workload is Doe-owned and Gemma-shaped rather than unchanged Doppler application execution.",
+    "The oracle binds the final sampled token and execution shape, not a full production-model transcript.",
+    "The two lanes were run as independent receipt-first processes and are diagnostic rather than release promotion evidence.",
+    "No external application, adoption, release-blocker, or universal performance claim follows from this receipt."
+  ]
+}

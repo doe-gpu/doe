@@ -2659,6 +2659,42 @@ console.log(JSON.stringify(boundaryScopedHostTotals({{
             self.assertEqual([row["stepIndex"] for row in rows], [1, 2, 1, 2])
             self.assertEqual([row["stepKind"] for row in rows], ["writeBuffer", "dispatch", "writeBuffer", "dispatch"])
 
+    def test_prepared_session_can_disable_dispatch_prewarm_explicitly(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="doe-node-webgpu-executor-") as tmpdir:
+            tmp = Path(tmpdir)
+            plan_path = tmp / "command-plan.json"
+            meta_path = tmp / "trace-meta.json"
+            trace_path = tmp / "trace.jsonl"
+            write_plan(plan_path)
+
+            result = subprocess.run(
+                [
+                    "node",
+                    str(CLI_PATH),
+                    "--provider",
+                    "doe",
+                    "--plan",
+                    str(plan_path),
+                    "--trace-meta",
+                    str(meta_path),
+                    "--trace-jsonl",
+                    str(trace_path),
+                    "--workload",
+                    "simple_compute_roundtrip",
+                    "--dry-run",
+                    "--prepared-session",
+                    "--skip-dispatch-prewarm",
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            self.assertTrue(meta["packagePreparedSession"])
+            self.assertFalse(meta["packageDispatchPrewarmRequested"])
+
     def test_resident_buffer_load_mode_requires_prepared_session(self) -> None:
         with tempfile.TemporaryDirectory(prefix="doe-node-webgpu-executor-") as tmpdir:
             tmp = Path(tmpdir)

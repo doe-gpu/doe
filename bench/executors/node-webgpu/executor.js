@@ -2724,6 +2724,7 @@ async function createRuntime(normalizedPlan, webgpu, spec, {
     policyProvider: null,
     buffers,
     dispatchStates,
+    prewarmDispatchBindings,
     hostExecutorInitTotalNs,
     hostKernelPrewarmTotalNs: dispatchPrewarmTotalNs,
     setupTotalNs,
@@ -3492,6 +3493,7 @@ async function executeSample(
     executionShape: normalizedPlan.executionShape,
     ...shaderSourceReceiptFields(runtime.shaderSourceReceipts),
     packagePreparedSession: !includeSetupInSelectedTiming,
+    packageDispatchPrewarmRequested: runtime.prewarmDispatchBindings,
     packageSetupIncludedInSelectedTiming: includeSetupInSelectedTiming,
     packageSetupTotalNs: runtime.setupTotalNs,
     packageSetupBreakdownNs: runtime.setupBreakdownNs,
@@ -3534,6 +3536,7 @@ export async function executePlanFile({
   traceJsonlPath,
   dryRun = false,
   preparedSession = false,
+  prewarmDispatchBindings = preparedSession,
   debugBoundaries = false,
   stepLimit = 0,
   commandRepeat = 1,
@@ -3563,6 +3566,7 @@ export async function executePlanFile({
     planPath,
     workloadId,
     preparedSession,
+    prewarmDispatchBindings,
     dryRun,
     stepLimit: effectiveStepLimit,
     commandRepeat: normalizedCommandRepeat,
@@ -3639,6 +3643,7 @@ export async function executePlanFile({
       executionShape: normalizedPlan.executionShape,
       ...shaderSourceReceiptFields(shaderSourceReceipts),
       packagePreparedSession: preparedSession,
+      packageDispatchPrewarmRequested: prewarmDispatchBindings,
       packageSetupIncludedInSelectedTiming: !preparedSession,
       packageSetupTotalNs: 0,
       packageSetupBreakdownNs: zeroPackageSetupBreakdown(),
@@ -3760,7 +3765,7 @@ export async function executePlanFile({
     runtime = await createRuntime(normalizedPlan, webgpu, spec, {
       debugLog,
       runtimeHost,
-      prewarmDispatchBindings: preparedSession,
+      prewarmDispatchBindings,
     });
     runtime.hostExecutorInitTotalNs += providerModuleResolveTotalNs;
     const executionStartedAt = preparedSession ? performance.now() : timedEnvelopeStartedAt;

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import tempfile
@@ -43,8 +44,9 @@ class ExternalProjectReleaseGateTests(unittest.TestCase):
 
     def test_diagnostic_harness_cannot_satisfy_promotion_floor(self) -> None:
         actor = self.registry["actors"][0]
-        manifest = dict(self.holo_manifest)
+        manifest = copy.deepcopy(self.holo_manifest)
         manifest.pop("runtimeOwnershipPlan", None)
+        manifest["receiptPolicy"]["replayRequired"] = False
         failures = _floor_failures(
             REPO_ROOT,
             actor,

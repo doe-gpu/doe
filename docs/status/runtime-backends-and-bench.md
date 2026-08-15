@@ -71,9 +71,17 @@ file only names the promoted boundary and open admission gates.
   application compatibility wedge, not a performance or release claim.
 - The reviewed HoloScript ownership diagnostic at
   `reports/ecosystem/holoscript-snn-webgpu/holoscript-tropical-spmv-runtime-ownership-2026-08-15-diagnostic.json`
-  now separates pinned incumbent, governed incumbent, and DoeRuntime execution.
-  Ambient-incumbent and bounded-patch evidence remain absent, so the report
-  retains a diagnostic ownership decision and cannot promote either runtime.
+  completes the ambient, pinned, governed-incumbent, and DoeRuntime matrix.
+  Every lane passes the exact workload, and W0 and D0 pass hash-bound replay.
+  Because the unchanged incumbent needs no bounded correction and D0 supplies
+  no distinct application outcome, the report rejects runtime ownership and
+  retains HoloScript as a diagnostic workload.
+- The Gemma package-surface attribution receipt at
+  `reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json`
+  disables Doe's native prepared-dispatch prewarm and retains a comparable
+  workload-wall advantage over prepared Node WebGPU. This authorizes a Doppler
+  application ownership experiment for persistent performance control; it is
+  not itself external-application or release evidence.
 - The reviewed UMAP-GPU physical AMD Vulkan result at
   `reports/ecosystem/umap-gpu/umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic.json`
   retains the unchanged structural application oracle under both providers.

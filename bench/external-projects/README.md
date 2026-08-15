@@ -35,14 +35,15 @@ Reviewed reports record the terminal ownership assessment. Diagnostic runs may
 leave it `not-run`, but the release gate rejects promotion without passing,
 evidence-linked lane, material-outcome, and cost-acceptance decisions.
 
-HoloScript is the reference partial-matrix implementation. Its runner emits
-`I1`, `W0`, and `D0` separately and accepts an ambient incumbent module only
-through the explicit `DOE_EXTERNAL_AMBIENT_DAWN_MODULE` input. The vGPU runner
-uses the same shared lane summarizer, but marks its governed `W0` and `D0`
-constructions partial unless a hash-bound application receipt reproduces the
-same oracle evidence and the frozen post-destroy error-handler regression
-passes. Both runners record absent or incomplete lanes rather than aliasing a
-pinned incumbent into `I0` or promoting a partial matrix.
+The HoloScript runner resolves the ordinary upstream provider as `I0`, verifies
+the frozen package version for `I1`, and executes governed `W0` and `D0` lanes
+under one exact tropical-SpMV oracle. `P0` is conditional: it is required only
+when `W0` exposes a release-relevant incumbent defect. Hash-bound W0 and D0
+replay receipts must reproduce the same semantic evidence before either lane is
+contract-complete. The vGPU runner uses the same shared lane summarizer and
+also requires hash-bound application replay plus its frozen post-destroy
+error-handler regression. Both runners record absent or incomplete lanes
+rather than aliasing constructions or promoting a partial matrix.
 
 The wgsl-fns runner also executes the full correction matrix. Its preparation
 step downloads the exact `webgpu@0.3.10` npm tarball, verifies the frozen npm

@@ -81,6 +81,13 @@ the same exercised lifecycle outcome, so the reviewed decision assigns no
 runtime-ownership credit and keeps vGPU diagnostic. A complete lane matrix is
 evidence; it is not a promotion when the material outcome fails.
 
+The HoloScript tropical-SpMV diagnostic also completes its required `I0`,
+`I1`, `W0`, and `D0` matrix. All lanes pass the four exact frozen topologies,
+and governed Dawn and Doe reproduce their hash-bound application evidence.
+Because W0 exposes no defect, conditional `P0` is unnecessary; because D0 does
+not exceed W0, the reviewed decision assigns no runtime-ownership credit and
+keeps HoloScript diagnostic.
+
 The wgsl-fns independent-correction diagnostic executes all five required
 lanes. The pinned incumbent crashes, but DoeRuntime and the independently
 prepared `webgpu@0.3.10` plus no-isolation control both complete the frozen

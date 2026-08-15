@@ -80,6 +80,20 @@ class ExecutorRegistryTests(unittest.TestCase):
         self.assertEqual(resolve_executor_boundary("node_webgpu_package_prepared"), "plan")
         self.assertEqual(resolve_executor_boundary("doe_node_webgpu_prepared"), "plan")
 
+    def test_resolves_doe_prepared_without_dispatch_prewarm(self) -> None:
+        template = resolve_executor_command_template(
+            "doe_node_webgpu_prepared_no_dispatch_prewarm"
+        )
+        self.assertIn("--provider doe", template)
+        self.assertIn("--prepared-session", template)
+        self.assertIn("--skip-dispatch-prewarm", template)
+        self.assertEqual(
+            resolve_executor_boundary(
+                "doe_node_webgpu_prepared_no_dispatch_prewarm"
+            ),
+            "plan",
+        )
+
     def test_resolves_resident_buffer_load_node_webgpu_executors(self) -> None:
         executor_ids = (
             "node_webgpu_package_prepared_resident_buffer_loads",
