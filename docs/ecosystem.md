@@ -81,6 +81,14 @@ the same exercised lifecycle outcome, so the reviewed decision assigns no
 runtime-ownership credit and keeps vGPU diagnostic. A complete lane matrix is
 evidence; it is not a promotion when the material outcome fails.
 
+The wgsl-fns independent-correction diagnostic executes all five required
+lanes. DoeRuntime is the only lane that completes the frozen compilation
+corpus and replays deterministically; the pinned incumbent crashes and the
+`webgpu@0.3.10` patch control is unreliable across clean processes and replay.
+This is a current owned-runtime wedge, but it remains diagnostic until the
+patch control has independent package closure, a semantic execution oracle is
+added, and the ownership-cost ledger is accepted.
+
 ## Evidence routing
 
 - Checked-in harness manifests, minimal patches, immutable inputs, and reviewed

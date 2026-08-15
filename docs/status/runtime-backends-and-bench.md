@@ -177,6 +177,15 @@ file only names the promoted boundary and open admission gates.
   adapter identity and no native compiler diagnostics. The overall reproduction
   remains failed and diagnostic because the pinned Node/Dawn comparator aborts
   during adapter probing and test execution on this host.
+- The reviewed wgsl-fns ownership diagnostic at
+  `reports/ecosystem/wgsl-fns/wgsl-fns-runtime-ownership-2026-08-15-diagnostic.json`
+  executes `I0`, `I1`, `W0`, `D0`, and the frozen `webgpu@0.3.10` patch control.
+  Doe is the only governed lane that passes all 13 assertions, all 110
+  generated functions, physical provider identity, and replay. The patch
+  control fails repeated clean-process reliability and changes outcome on
+  replay. The result identifies a current correction wedge but remains
+  diagnostic because P0 lacks independent package closure, the workload is
+  compilation-only, and ownership cost is not accepted.
 - That workload exposed a vector-scalar compound-assignment gap in WGSL
   semantic analysis and IR validation. Compound assignments now validate the
   underlying binary operation before checking assignability, and the minimized

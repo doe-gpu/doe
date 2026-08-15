@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "wgsl-fns-runtime-ownership-2026-08-15-diagnostic",
+  "actorId": "wgsl-fns",
+  "harnessId": "wgsl-compilation-suite",
+  "generatedAt": "2026-08-15T16:29:03.455Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-15T16:30:29Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "13",
+  "upstream": {
+    "repositoryUrl": "https://github.com/koole/wgsl-fns",
+    "commit": "e1068da8c1ad213842c6332440fe1308def091cc",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "receipt-explained-failure",
+  "findings": [
+    {
+      "id": "complete-independent-correction-matrix",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "The frozen I0, I1, W0, D0, and patch-level P0 controls all executed. Ambient, pinned, and governed webgpu@0.3.0 fail; Doe completes all 13 assertions and the 110-function compilation corpus; webgpu@0.3.10 is not reliable under repeated clean processes and replay.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/raw-suite.json",
+          "sha256": "59832381c5354c9032579753f5c14eae3e82f8843d8501fba66ca41eba400cd9"
+        },
+        {
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/receipt-summary.json",
+          "sha256": "a2fa2e2d04678546da891973d2c30cc856c1faf5e9eefdcf2e7f8752a1ab955b"
+        }
+      ]
+    },
+    {
+      "id": "bounded-patch-control-unreliable",
+      "category": "reliability",
+      "status": "discovered",
+      "summary": "The webgpu@0.3.10 P0 control passes a one-process smoke but fails all three frozen clean processes in Node test-worker deserialization; the receipt replay later passes, proving the control is nondeterministic rather than a sufficient correction.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/replay-receipts/P0.json",
+          "sha256": "9fdc5b6e47b965b58009e7258aacc1711a81e476d4206a1f72139af67a80029e"
+        },
+        {
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/raw-suite.json",
+          "sha256": "59832381c5354c9032579753f5c14eae3e82f8843d8501fba66ca41eba400cd9"
+        }
+      ]
+    },
+    {
+      "id": "doe-currently-distinguishes-compilation-lane",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "D0 is the only governed lane that passes every clean process, exposes physical AMD Vulkan identity, reports zero native compiler diagnostics, and reproduces its exact execution evidence hash.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/replay-receipts/D0.json",
+          "sha256": "b11c51b291a8733dd0da68a35dac08b2daa99f98de5aae5c963fbce6cce6b8e4"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The unchanged upstream workload validates shader-module compilation and diagnostics but does not dispatch the generated functions or validate semantic output.",
+    "The P0 module was supplied from another prepared workspace; its module hash and version are bound, but this diagnostic does not provide an independent clean-install closure for the patch control.",
+    "The incumbent probe aborts before complete adapter identity, so no performance comparison is admissible.",
+    "Three clean processes are diagnostic and below the promotion reliability floor.",
+    "The result identifies a current DoeRuntime wedge but does not accept the runtime ownership-cost ledger or create a release blocker."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "fail",
+    "hiddenFallbackStatus": "fail",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "ambient-incumbent-crash",
+      "pinned-incumbent-crash",
+      "bounded-patch-nondeterministic",
+      "compilation-only-no-output-oracle"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 0,
+      "failures": 0,
+      "crashes": 3,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 69132288
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 69189632
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The incumbent does not complete equivalent work and the workload has no selected execution operation."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "Matched traced and untraced receipt-overhead samples were not collected."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "retain-diagnostic",
+    "claimedProperty": "independent-correction",
+    "lanes": {
+      "I0": {
+        "status": "fail",
+        "summary": "Ordinary workspace resolution selects webgpu@0.3.0 and aborts before the complete corpus."
+      },
+      "I1": {
+        "status": "fail",
+        "summary": "Explicitly pinned webgpu@0.3.0 reproduces the native worker crash."
+      },
+      "W0": {
+        "status": "fail",
+        "summary": "DoeProof reproduces and explains the pinned failure but cannot correct it above the incumbent runtime boundary."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "DoeRuntime passes the full compilation corpus, physical provider check, and receipt replay."
+      },
+      "P0": {
+        "status": "fail",
+        "summary": "The frozen webgpu@0.3.10 patch-level update fails repeated clean-process reliability and does not reproduce its initial failed evidence on replay."
+      }
+    },
+    "materialOutcome": {
+      "status": "pass",
+      "summary": "D0 uniquely completes the frozen corpus with native diagnostics and stable replay while W0 and P0 fail."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "The compilation-only scope and externally sourced P0 package do not yet justify DoeRuntime's complete compatibility, security, packaging, and support obligations."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The diagnostic reused prepared workspaces and the P0 module lacks independent package closure."
+    },
+    "supportHardware": {
+      "status": "ineligible",
+      "summary": "Doe and P0 probe the physical AMD Vulkan host, but ambient and pinned incumbents abort before complete adapter identity."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The matrix uses sequential clean processes."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Successful Doe processes clean up, but promotion-scale teardown cycles were not run."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "No promotion-scale stress contract was run."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak memory was recorded without bounded-growth testing."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The raw matrix, provider summary, and W0, D0, and P0 replay inputs are hash-bound."
+    },
+    "replay": {
+      "status": "fail",
+      "summary": "W0 and D0 reproduce their evidence, but P0 changes from failure to pass on replay."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No successful equivalent incumbent work exists for timing."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "Doe demonstrates a current correction wedge, but ownership-cost acceptance and a clean P0 package remain unresolved."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "wgsl-fns remains diagnostic and does not block Doe releases."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/receipt-summary.json",
+      "sha256": "a2fa2e2d04678546da891973d2c30cc856c1faf5e9eefdcf2e7f8752a1ab955b"
+    },
+    {
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/replay-receipts/W0.json",
+      "sha256": "7c624d341257fb095447e0c2baf5f4a2aa2fcea620e55f831d42ffdd42fbd080"
+    },
+    {
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/replay-receipts/D0.json",
+      "sha256": "b11c51b291a8733dd0da68a35dac08b2daa99f98de5aae5c963fbce6cce6b8e4"
+    },
+    {
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/replay-receipts/P0.json",
+      "sha256": "9fdc5b6e47b965b58009e7258aacc1711a81e476d4206a1f72139af67a80029e"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/wgsl-fns/runtime-ownership-diagnostic-v1/raw-suite.json",
+      "sha256": "59832381c5354c9032579753f5c14eae3e82f8843d8501fba66ca41eba400cd9"
+    }
+  ]
+}

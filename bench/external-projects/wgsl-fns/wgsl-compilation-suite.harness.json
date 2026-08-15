@@ -103,6 +103,12 @@
         "command": ["npm", "run", "build"],
         "workingDirectory": { "scope": "upstream", "path": "." },
         "timeoutSeconds": 1800
+      },
+      {
+        "id": "prepare-patch-control",
+        "command": ["node", "bench/external-projects/wgsl-fns/prepare-p0.mjs"],
+        "workingDirectory": { "scope": "repo", "path": "." },
+        "timeoutSeconds": 1800
       }
     ],
     "validationCommand": ["node", "bench/external-projects/wgsl-fns/run-suite.mjs", "--require-all-pass"],

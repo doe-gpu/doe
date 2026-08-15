@@ -44,6 +44,13 @@ same oracle evidence and the frozen post-destroy error-handler regression
 passes. Both runners record absent or incomplete lanes rather than aliasing a
 pinned incumbent into `I0` or promoting a partial matrix.
 
+The wgsl-fns runner also executes the full correction matrix. Its preparation
+step downloads the exact `webgpu@0.3.10` npm tarball, verifies the frozen npm
+integrity, extracts it atomically, and writes hashes for the tarball, module,
+native binary, and license. The runner rejects P0 unless that receipt and every
+artifact still match. A successful one-process smoke does not satisfy P0:
+repeated clean processes and receipt replay remain part of the lane result.
+
 ## Portable preparation and reproduction
 
 The canonical machine-independent entrypoint is:

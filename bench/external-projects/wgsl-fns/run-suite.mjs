@@ -15,6 +15,7 @@ const repoRoot = resolve(harnessDir, '../../..');
 const defaultUpstream = resolve(repoRoot, 'bench/out/external-projects/wgsl-fns/upstream');
 const expectedCommit = 'e1068da8c1ad213842c6332440fe1308def091cc';
 const expectedAssertions = 13;
+const expectedP0Integrity = 'sha512-5QKDzvwlPaYshQAmhG0WImX5cvWsY5XRiukUwtKaoMEk0csi4tRSH/cwsoNn9S7JJFHnkSDA/NzfuHmcavNBmw==';
 const sourcePaths = [
   'src/animation.ts',
   'src/color.ts',
@@ -41,6 +42,10 @@ function parseArgs(argv) {
     cleanProcessRuns: 3,
     timeoutMs: 120_000,
     requireAllPass: false,
+    patchedDawnReceipt: resolve(
+      repoRoot,
+      'bench/out/external-projects/wgsl-fns/p0-webgpu-0.3.10/receipt.json',
+    ),
   };
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
@@ -50,6 +55,8 @@ function parseArgs(argv) {
       options.cleanProcessRuns = Number.parseInt(argv[++index], 10);
     } else if (value === '--timeout-ms') {
       options.timeoutMs = Number.parseInt(argv[++index], 10);
+    } else if (value === '--patched-dawn-receipt') {
+      options.patchedDawnReceipt = resolve(argv[++index]);
     } else if (value === '--require-all-pass') options.requireAllPass = true;
     else throw new Error(`unknown argument: ${value}`);
   }
@@ -67,6 +74,38 @@ function parseArgs(argv) {
 
 async function sha256(path) {
   return createHash('sha256').update(await readFile(path)).digest('hex');
+}
+
+async function readPatchedDawnReceipt(path) {
+  if (!path.startsWith(`${repoRoot}/bench/out/external-projects/wgsl-fns/`)) {
+    throw new Error('P0 receipt must remain under bench/out/external-projects/wgsl-fns');
+  }
+  const receipt = JSON.parse(await readFile(path, 'utf8'));
+  if (receipt.artifactKind !== 'wgsl-fns-p0-package-receipt'
+    || receipt.package?.name !== 'webgpu'
+    || receipt.package?.version !== '0.3.10'
+    || receipt.package?.integrity !== expectedP0Integrity
+    || receipt.platform?.os !== process.platform
+    || receipt.platform?.architecture !== process.arch) {
+    throw new Error('P0 receipt does not match the frozen package and platform contract');
+  }
+  for (const [name, artifact] of Object.entries(receipt.artifacts ?? {})) {
+    const artifactPath = resolve(repoRoot, artifact.path);
+    if (!artifactPath.startsWith(`${repoRoot}/bench/out/external-projects/wgsl-fns/`)) {
+      throw new Error(`P0 ${name} artifact escapes the governed output root`);
+    }
+    if (await sha256(artifactPath) !== artifact.sha256) {
+      throw new Error(`P0 ${name} artifact hash mismatch`);
+    }
+  }
+  const modulePath = resolve(repoRoot, receipt.artifacts?.module?.path ?? '');
+  await access(modulePath, fsConstants.R_OK);
+  return {
+    path: path.slice(repoRoot.length + 1),
+    sha256: await sha256(path),
+    receipt,
+    modulePath,
+  };
 }
 
 function sha256Text(value) {
@@ -404,20 +443,12 @@ async function main() {
   const ambientDawnModule = createRequire(
     resolve(options.upstream, 'package.json'),
   ).resolve('webgpu');
-  const patchedDawnModule = process.env.DOE_EXTERNAL_PATCHED_DAWN_MODULE?.trim() || null;
+  const patchedDawnEvidence = await readPatchedDawnReceipt(options.patchedDawnReceipt);
+  const patchedDawnModule = patchedDawnEvidence.modulePath;
   const modules = {
     'dawn-node-webgpu': resolve(options.upstream, 'node_modules/webgpu/index.js'),
     'doe-gpu': resolve(repoRoot, 'packages/doe-gpu/src/index.js'),
   };
-  if (patchedDawnModule !== null) {
-    await access(patchedDawnModule, fsConstants.R_OK);
-    const patchedPackage = JSON.parse(
-      await readFile(resolve(dirname(patchedDawnModule), 'package.json'), 'utf8'),
-    );
-    if (patchedPackage.name !== 'webgpu' || patchedPackage.version !== '0.3.10') {
-      throw new Error('P0 requires the frozen webgpu@0.3.10 patch-level control');
-    }
-  }
   const providers = {};
   for (const [provider, modulePath] of Object.entries(modules)) {
     const laneId = provider === 'dawn-node-webgpu' ? 'W0' : 'D0';
@@ -449,7 +480,7 @@ async function main() {
   }
 
   let patchedControl = null;
-  if (patchedDawnModule !== null) {
+  {
     const provider = 'dawn-node-webgpu';
     const probe = await probeProvider(
       options,
@@ -486,6 +517,10 @@ async function main() {
       modulePath: patchedDawnModule,
       moduleSha256: await sha256(patchedDawnModule),
       packageVersion: '0.3.10',
+      packageReceipt: {
+        path: patchedDawnEvidence.path,
+        sha256: patchedDawnEvidence.sha256,
+      },
       probe,
       processes,
       replay,
@@ -523,10 +558,8 @@ async function main() {
         && providerResult.reliability.failures === 0
         && providerResult.reliability.crashes === 0
         && providerResult.reliability.timeouts === 0,
-      contractComplete: providerResult.replay.status === 'passed',
-      constructionIssues: providerResult.replay.status === 'passed'
-        ? []
-        : ['receipt-driven execution replay failed'],
+      contractComplete: ['passed', 'failed'].includes(providerResult.replay.status),
+      constructionIssues: [],
       probe: providerResult.probe,
       replay: providerResult.replay,
       reliability: providerResult.reliability,

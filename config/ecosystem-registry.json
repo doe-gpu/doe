@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "registryRevision": "12",
+  "registryRevision": "13",
   "scoringPolicyVersion": "1.0.0",
   "promotionPolicyVersion": "1.1.0",
   "evaluationQueue": [
@@ -1059,10 +1059,17 @@
           "sha256": "98dcfc08ab0e226f10e48877fdd4035117ea2507f4fc30d40c5f6d49e3eb684d",
           "reviewedAt": "2026-08-10T23:20:00Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "wgsl-fns-runtime-ownership-2026-08-15-diagnostic",
+          "path": "reports/ecosystem/wgsl-fns/wgsl-fns-runtime-ownership-2026-08-15-diagnostic.json",
+          "sha256": "474bbdd7757345d52ec21e4951cfe7944faeb946c1ea6b8f84ab4f3a0ec1be98",
+          "reviewedAt": "2026-08-15T16:30:29Z",
+          "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-10T23:20:00Z"
+      "lastReviewedAt": "2026-08-15T16:30:29Z"
     },
     {
       "id": "electronicarts-cpp-ml-intro",
