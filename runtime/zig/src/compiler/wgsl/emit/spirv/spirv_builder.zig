@@ -258,6 +258,15 @@ pub const Builder = struct {
         return id;
     }
 
+    pub fn const_composite(self: *Builder, result_type: u32, constituents: []const u32) EmitError!u32 {
+        const id = self.reserve_id();
+        try self.types_globals.append(self.allocator, (@as(u32, @intCast(3 + constituents.len)) << 16) | Opcode.ConstantComposite);
+        try self.types_globals.append(self.allocator, result_type);
+        try self.types_globals.append(self.allocator, id);
+        try self.types_globals.appendSlice(self.allocator, constituents);
+        return id;
+    }
+
     pub fn type_runtime_array(self: *Builder, elem_type: u32) EmitError!u32 {
         const key = RuntimeArrayKey{ .elem = elem_type };
         if (self.runtime_array_types.get(key)) |id| return id;

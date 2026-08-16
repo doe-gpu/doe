@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "traceKind": "doe_native_program_identity_v1",
+  "event": "render_draw_executed",
+  "processId": 17,
+  "sequence": 2,
+  "backend": "doe_vulkan",
+  "completion": "internal_submit_and_wait_succeeded",
+  "vertexWgslSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "fragmentWgslSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "vertexBackendArtifactSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "vertexBackendArtifactFile": "doe-native-vulkan-3333333333333333333333333333333333333333333333333333333333333333.spv",
+  "fragmentBackendArtifactSha256": "4444444444444444444444444444444444444444444444444444444444444444",
+  "fragmentBackendArtifactFile": "doe-native-vulkan-4444444444444444444444444444444444444444444444444444444444444444.spv",
+  "vertexEntryPoint": "vs_main",
+  "fragmentEntryPoint": "fs_main",
+  "drawKind": "draw",
+  "args": [6, 1, 0, 0]
+}

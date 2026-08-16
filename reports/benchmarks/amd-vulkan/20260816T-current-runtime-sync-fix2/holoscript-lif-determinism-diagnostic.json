@@ -1,0 +1,1589 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "holoscript-lif-determinism-matrix",
+  "generatedAt": "2026-08-16T02:30:32.387Z",
+  "status": "passed",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "licenseIdentifier": "MIT"
+  },
+  "host": {
+    "platform": "linux",
+    "architecture": "x64",
+    "node": "v22.22.1"
+  },
+  "providers": {
+    "ambient": {
+      "id": "dawn-node-webgpu",
+      "modulePath": "/home/x/deco/doe/bench/out/external-projects/holoscript-snn-webgpu/upstream/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/index.js"
+    },
+    "baseline": {
+      "id": "dawn-node-webgpu",
+      "modulePath": "/home/x/deco/doe/bench/out/external-projects/holoscript-snn-webgpu/upstream/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/index.js"
+    },
+    "comparison": {
+      "id": "doe-gpu",
+      "modulePath": "/home/x/deco/doe/packages/doe-gpu/src/index.js"
+    }
+  },
+  "immutableInputs": [
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/lif-determinism.harness.json",
+      "sha256": "5e83770891f5a562753bd7e7128e3a48246a608f0574faa9435746f00ceb6955"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/lif-determinism.inputs.json",
+      "sha256": "2b0b69c8e5dd14c2f85189fc2714c0f0e6cf8872d5852804784e101658f5d192"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/lif-determinism.oracle.md",
+      "sha256": "a22e434b41fe7888a6a5b2b547e8bc0cdf60d88e9be208a6161fc5f6221a4bb9"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/provider-loader.mjs",
+      "sha256": "018408d9c6f55c681c5cf4ad55b7ebd3956e8b7a05288d860d50a83d45afca99"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/run-lif-determinism-matrix.mjs",
+      "sha256": "7088d58add36b376b4443a82cdb33ed2223a38d8e0b0f69508af65fb38223fef"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/run-lif-determinism-workload.mjs",
+      "sha256": "14d1b1b0d1320ae9449edc9a90dc21b5a4b380c37918b1a0a6cc1084e01633b4"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/hardware-identity.mjs",
+      "sha256": "07bdd715b88b56fe106031541f8210a72ea0d7dc99764f2e84ce904b93782c5d"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/packages/snn-webgpu/dist/index.js",
+      "sha256": "7e7324b8404f380711b7597978f714855242ed86e9f1e4f337113d50febf6d10"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/packages/snn-webgpu/src/paper/LIFDeterminismProbe.ts",
+      "sha256": "22636288bbe4c83e94564c1fbd5bdf7a1a2bceed8d052aae1a43ad11a16e7a53"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/packages/snn-webgpu/src/paper/__tests__/LIFTwinTest.test.ts",
+      "sha256": "36386b6d8a8f361a7b3c85ac851385cfc19780a83e510bb4890a2c9c611daf1a"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/packages/snn-webgpu/src/poc/cpu-reference.ts",
+      "sha256": "b1b1b1078702e702950d25b9edcce6ed5e8c482daaa9d84d8c68b304e2242f23"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+      "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/index.js",
+      "sha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/dist/linux-x64.dawn.node",
+      "sha256": "fbfe599055b469963e4c9bfc900a702843db962dcaba0799b3c81ae33fa43db1"
+    },
+    {
+      "path": "packages/doe-gpu/src/index.js",
+      "sha256": "dd74834f48d1659011fc5cec7428ed19d55db8ff4cb39bcb44263d3053228955"
+    },
+    {
+      "path": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+      "sha256": "6a367f7971d9e3650bf489641435dee60bef534eb99dc02ab5b9f12a9dbf4226"
+    }
+  ],
+  "contract": {
+    "cleanProcessRuns": 3,
+    "timeoutMs": 120000,
+    "maxOutputBytes": 8388608,
+    "independentCpuMembraneOracle": true,
+    "exactSpikeMaskOracle": true,
+    "sameBackendRepeatCount": 3,
+    "hardwareRequired": true
+  },
+  "lanes": {
+    "I0": {
+      "runCount": 3,
+      "passingRuns": 3,
+      "peakMemoryBytes": 167567360,
+      "evidence": [
+        {
+          "laneId": "I0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        },
+        {
+          "laneId": "I0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        },
+        {
+          "laneId": "I0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        }
+      ]
+    },
+    "I1": {
+      "runCount": 3,
+      "passingRuns": 3,
+      "peakMemoryBytes": 168087552,
+      "evidence": [
+        {
+          "laneId": "I1",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        },
+        {
+          "laneId": "I1",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        },
+        {
+          "laneId": "I1",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        }
+      ]
+    },
+    "W0": {
+      "runCount": 3,
+      "passingRuns": 3,
+      "peakMemoryBytes": 168390656,
+      "evidence": [
+        {
+          "laneId": "W0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        },
+        {
+          "laneId": "W0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        },
+        {
+          "laneId": "W0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        }
+      ]
+    },
+    "D0": {
+      "runCount": 3,
+      "passingRuns": 3,
+      "peakMemoryBytes": 171831296,
+      "evidence": [
+        {
+          "laneId": "D0",
+          "provider": "doe-gpu",
+          "effectiveProvider": "doe-gpu",
+          "adapter": {
+            "vendor": "AMD",
+            "architecture": "vulkan",
+            "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        },
+        {
+          "laneId": "D0",
+          "provider": "doe-gpu",
+          "effectiveProvider": "doe-gpu",
+          "adapter": {
+            "vendor": "AMD",
+            "architecture": "vulkan",
+            "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        },
+        {
+          "laneId": "D0",
+          "provider": "doe-gpu",
+          "effectiveProvider": "doe-gpu",
+          "adapter": {
+            "vendor": "AMD",
+            "architecture": "vulkan",
+            "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shader": {
+            "path": "packages/snn-webgpu/src/shaders/lif-neuron.wgsl",
+            "sha256": "269f7201fb527f3e0a44e21fd382aa4878597f7de2e9c598fd5eb324183af89a",
+            "entryPoint": "lif_step"
+          },
+          "dispatch": {
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ],
+            "cases": [
+              {
+                "id": "canonical-1000x100",
+                "workgroups": [
+                  4,
+                  1,
+                  1
+                ],
+                "dispatches": 100
+              },
+              {
+                "id": "large-65536x10",
+                "workgroups": [
+                  256,
+                  1,
+                  1
+                ],
+                "dispatches": 10
+              },
+              {
+                "id": "override-2048x20",
+                "workgroups": [
+                  8,
+                  1,
+                  1
+                ],
+                "dispatches": 20
+              }
+            ]
+          },
+          "synchronization": "one queue.submit plus queue.onSubmittedWorkDone per tick",
+          "readback": "membrane Float32Array and spike Float32Array via mapped staging copies",
+          "oracle": {
+            "implementation": "@holoscript/snn-webgpu CPUReferenceSimulator",
+            "absoluteTolerance": 0.00005,
+            "relativeTolerance": 0.0001,
+            "exactSpikeMask": true
+          },
+          "cases": [
+            {
+              "id": "canonical-1000x100",
+              "delta": {
+                "maxAbsDiff": 0.00003814697265625,
+                "maxRelDiff": 6.717871509482933e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "b06d5b0e6ca62bc4cf05eee3c53c2ca7fcff34675843231380eb532435804724",
+              "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+              "cpuSpikesSha256": "b26eece3924b06732d72ed12ec79271243e4a10f5356ee3b9abea87823c39930",
+              "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+            },
+            {
+              "id": "large-65536x10",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.130017059214247e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "bccddb7f042803bc8e2470e784277ac884023aae2e131267bb035ea109892e30",
+              "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+              "cpuSpikesSha256": "27b491bb541639bcc98841cb3deab0edd69871e8e40a33a279c8e78dbaf2fc33",
+              "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+            },
+            {
+              "id": "override-2048x20",
+              "delta": {
+                "maxAbsDiff": 0.0000457763671875,
+                "maxRelDiff": 7.048711422238649e-7,
+                "spikeMismatches": 0
+              },
+              "oraclePass": true,
+              "cpuMembraneSha256": "af91df1008895f41983644ffce46b5042906f288b994b6a0c8d0a11bd04dffe2",
+              "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+              "cpuSpikesSha256": "7cea5a64c427e0b3d4755c82b88617e1482bb3e269e343306c518a38384aa7cc",
+              "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+            }
+          ],
+          "sameBackendDeterminism": {
+            "repeatCount": 3,
+            "repeatHashes": [
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93",
+              "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+            ],
+            "uniqueHashCount": 1,
+            "seedVariantSha256": "414c54dc8cea8ba9150b3e97e013bcba165c3b02329df9430463f5f7680a2694",
+            "tickVariantSha256": "8dbe6e50a5d6d6b97beccaf808f036dbc05f50576fc244880bc34ca229344c9e",
+            "nondegenerate": true
+          },
+          "passed": true
+        }
+      ]
+    },
+    "P0": {
+      "status": "not-required",
+      "reason": "W0 passes every frozen oracle and determinism obligation."
+    }
+  },
+  "replay": {
+    "W0": {
+      "status": "passed",
+      "expectedEvidenceSha256": "fdedea5e1d1c3932c31bdf4ebba5f458ca83e3e375dd1cba00a9fe7b404dde68",
+      "actualEvidenceSha256": "fdedea5e1d1c3932c31bdf4ebba5f458ca83e3e375dd1cba00a9fe7b404dde68"
+    },
+    "D0": {
+      "status": "passed",
+      "expectedEvidenceSha256": "b58f48c0ae361cf67adbd42b0392a93b1ee63ae6ea255104bdb124f25e005904",
+      "actualEvidenceSha256": "b58f48c0ae361cf67adbd42b0392a93b1ee63ae6ea255104bdb124f25e005904"
+    }
+  },
+  "crossProvider": {
+    "exactGpuOutputIdentity": true,
+    "identity": {
+      "cases": [
+        {
+          "id": "canonical-1000x100",
+          "gpuMembraneSha256": "12514621e2d586a287eae12fc3f8b600407480a572af18e25073a25e5f2fa0b0",
+          "gpuSpikesSha256": "e6a9729225a9818def5e444ca7a6944c3f19b1c324ae7911e8fae2df751ea973"
+        },
+        {
+          "id": "large-65536x10",
+          "gpuMembraneSha256": "c4eb1d319a847e02123d6cb744970d927feb8d6507ef322156a6fbf8dc0c774f",
+          "gpuSpikesSha256": "f36a79dafe253c83d7e92faefc90f29a1acfd5ba6d40e4bbdf1e0aac7147f25b"
+        },
+        {
+          "id": "override-2048x20",
+          "gpuMembraneSha256": "df2c4ffd7efb97ac08b73f025304c6c9fab593075b9acdc7cddebe5f260bc040",
+          "gpuSpikesSha256": "38a5eeda77bfdd64647ce5fb785ffc4458ea83a4b19753432203362267398797"
+        }
+      ],
+      "canonicalRepeatSha256": "87a844989260f3155d3c4f73b1d01f28c63ff8e422498eb61e8379968b63ba93"
+    }
+  },
+  "runtimeOwnershipAssessment": {
+    "claimedProperty": "reproducible-runtime-identity",
+    "uniqueRuntimeOutcome": false,
+    "decision": "retain-diagnostic",
+    "reason": "W0 and D0 satisfy the same CPU, spike-mask, repeatability, and replay outcomes.",
+    "runtimeOwnershipCredit": false
+  },
+  "decision": {
+    "compatibilityEvidence": true,
+    "determinismEvidence": true,
+    "runtimeOwnershipCredit": false,
+    "applicationPromotionCredit": false,
+    "performanceCredit": false,
+    "releaseCredit": false,
+    "nextGate": "retain-lif-determinism-regression-and-close-runtime-ownership-hypothesis"
+  },
+  "limitations": [
+    "This is one AMD Vulkan adapter and does not establish cross-vendor byte identity.",
+    "The original upstream cross-vendor runner has a broken relative dist import; this harness calls the exported production implementation directly.",
+    "Three clean processes per lane remain below the promotion reliability floor.",
+    "No selected-operation performance comparison was run.",
+    "A repository-owned diagnostic does not prove external adoption."
+  ]
+}

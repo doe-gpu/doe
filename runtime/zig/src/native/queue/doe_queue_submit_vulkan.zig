@@ -26,6 +26,7 @@ const queue_submit_ops = @import("../../backend/dropin_queue_submit.zig");
 const shared = @import("doe_queue_submit_shared.zig");
 const vulkan_compute = @import("../vulkan/vulkan_compute_native.zig");
 const query_native = @import("../resource/doe_query_native.zig");
+const program_identity_trace = @import("../diagnostics/doe_program_identity_trace.zig");
 const vk_upload = queue_submit_ops.vulkan_upload;
 
 const cast = native_helpers.cast;
@@ -119,6 +120,7 @@ fn flushRecordedReplay(q: *DoeQueue, rt: *native_shared.NativeVulkanRuntime, rec
         shared.deliverInternalError(q.dev, "doe_queue_submit: vulkan flush {s}: {s}", .{ context, @errorName(err) });
         return false;
     };
+    program_identity_trace.recordVulkanSubmissionSucceeded();
     recorded_replay_work.* = false;
     return true;
 }
@@ -329,13 +331,18 @@ pub fn submit_vulkan_commands(q: *DoeQueue, count: usize, cmd_bufs: [*]const ?*a
         }
     }
     if (recorded_replay_work) {
-        rt.submit_recorded_replay() catch |err| {
-            shared.deliverInternalError(
-                q.dev,
-                "doe_queue_submit: vulkan submit recorded replay: {s}",
-                .{@errorName(err)},
-            );
+        const submitted = blk: {
+            rt.submit_recorded_replay() catch |err| {
+                shared.deliverInternalError(
+                    q.dev,
+                    "doe_queue_submit: vulkan submit recorded replay: {s}",
+                    .{@errorName(err)},
+                );
+                break :blk false;
+            };
+            break :blk true;
         };
+        if (submitted) program_identity_trace.recordVulkanSubmissionSucceeded();
         resetPreparedDispatchState(&prepared_dispatch);
     }
 }

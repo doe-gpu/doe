@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "world-lab-package-compilation-observer-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "generatedAt": "2026-08-16T06:10:23Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T06:10:23Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "29",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "public-observer-preserves-real-invalid-wgsl-diagnostic",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "Pinned Dawn and Doe each pass the unchanged 16-assertion World Labs workload, record all 13 shader attempts and eight getCompilationInfo results, and retain exactly one error-bearing compilation result. The error in both lanes is bound to the identical LF-normalized runtime shader source hash sha256:53672fc645bfd78a8635f16261c9212ad39fc1b12aa95caaf3557221f16632ce.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm1-v1/result.json",
+          "sha256": "cb1f9e81378e14ec6396fdefd2ae6a7d13190e06aa63aee2db330cd4386ed273"
+        }
+      ]
+    },
+    {
+      "id": "diagnostic-source-identity-with-provider-specific-detail",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "The two lanes share diagnostic-source identity ac1fac8956bb06127283231c1fb26d9f2d9b64277eb519c6fef1342adce60197 as well as normalized command-shape and mapped-output identity. Dawn reports the missing struct member at line 6, column 15; Doe reports its Vulkan WGSL-to-SPIR-V compilation failure. Wording and location fidelity are retained as evidence but are not conflated with semantic source identity.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm1-v1/result.json",
+          "sha256": "cb1f9e81378e14ec6396fdefd2ae6a7d13190e06aa63aee2db330cd4386ed273"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The result proves a public JavaScript WebGPU diagnostic binding, not native-driver tracing, filesystem or network closure, or operating-system dependency identity.",
+    "Provider-specific diagnostic wording and source-position precision differ and are not claimed equivalent.",
+    "The lanes use workspace source modules and one clean process per provider rather than clean-installed release packages or promotion stress populations.",
+    "The result cannot reopen the terminal World Labs runtime-ownership decision and grants no performance, promotion, release, or runtime-ownership credit."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 496660480
+    },
+    "comparison": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 529022976
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The gate tests diagnostic preservation and exact application behavior, not performance."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched evidence-disabled execution was authorized."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The compilation-observer successor is diagnostic infrastructure evidence only. The earlier governed-incumbent result remains the terminal ownership adjudication."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The gate uses workspace source modules rather than clean-installed packages."
+    },
+    "supportHardware": {
+      "status": "not-run",
+      "summary": "This successor inherits no hardware-support claim."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "No promotion concurrency population ran."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both governed application processes exit without crash, hang, or timeout."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "One clean process per provider is below promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process-tree RSS is observed, but bounded same-process growth is not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The result binds the plan, observer, schema, providers, application assertions, exact shader source, compilation results, commands, and mapped outputs."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Pinned Dawn and Doe reproduce the same frozen application behavior and diagnostic source identity."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No performance protocol ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The successor is forbidden from reopening the completed ownership decision."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "World Labs remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/external-projects/world-lab-runtime-webgpu/package-compilation-observer-qm1.plan.json",
+      "sha256": "0a4958ba779f37d430216de112f317f2c5e78e252bf83f7bb726cc76c3ae23c9"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm1-v1/result.json",
+      "sha256": "cb1f9e81378e14ec6396fdefd2ae6a7d13190e06aa63aee2db330cd4386ed273"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm1-v1/result.json",
+      "sha256": "cb1f9e81378e14ec6396fdefd2ae6a7d13190e06aa63aee2db330cd4386ed273"
+    }
+  ]
+}

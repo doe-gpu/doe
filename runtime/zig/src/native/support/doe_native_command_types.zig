@@ -25,7 +25,7 @@ pub const MAX_DEFERRED_RESOLVES: u32 = 8;
 pub const RecordedVulkanBindingState = struct {
     valid: bool = false,
     count: usize = 0,
-    flat_mask: u64 = 0,
+    flat_mask: u128 = 0,
     descriptor_hash: u64 = 0,
     bindings: [shared.MAX_FLAT_BIND]model_compute_types.KernelBinding = undefined,
 };

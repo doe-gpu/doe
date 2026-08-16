@@ -115,10 +115,18 @@ pub export fn doeNativeDeviceCreateBuffer(dev_raw: ?*anyopaque, desc: ?*const ab
                 alloc.destroy(buf);
                 return null;
             };
-            const id: u64 = @intFromPtr(buf);
+            const id = rt.next_buffer_resource_handle;
+            rt.next_buffer_resource_handle = std.math.add(u64, id, 1) catch {
+                alloc.destroy(buf);
+                return null;
+            };
             buf.vk_id = id;
             buf.vk_runtime_ref = @ptrCast(rt);
-            const cb = vk_resources.create_compute_buffer(rt, d.size, false) catch {
+            // WebGPU requires newly created buffer contents to be initialized to
+            // zero. Leaving Vulkan allocations uninitialized makes partially
+            // written tensors depend on allocator history and diagnostic buffer
+            // creation order.
+            const cb = vk_resources.create_compute_buffer(rt, d.size, true) catch {
                 alloc.destroy(buf);
                 return null;
             };

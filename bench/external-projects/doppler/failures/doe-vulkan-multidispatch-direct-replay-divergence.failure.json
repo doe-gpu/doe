@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "doe-vulkan-multidispatch-direct-replay-divergence",
+  "actorId": "doppler",
+  "harnessId": "doppler-selective-operator-capture",
+  "upstreamCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Doe's direct Vulkan replay for dispatch-only batches changed the exact Gemma 270M logits while the same 274-dispatch stream was exact through the recorded command-buffer path. Single-dispatch direct replay remains enabled; multi-dispatch command lists now fail safely onto the exact recorded path.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/doppler/doppler-native-binding-trace-normal-qm0-v3/result.json",
+      "sha256": "5d43f5e560c39953383bef9f2b29a8aa2a48a2ada37bdb82f35a5f196db87ce3"
+    },
+    {
+      "path": "bench/out/external-projects/doppler/doppler-generic-submit-pinned-qm0-v1/result.json",
+      "sha256": "de125cebd97121f35528fe6d342a9c78c5fd5e0868f4bfc49e036ebf41691d99"
+    },
+    {
+      "path": "bench/out/external-projects/doppler/doppler-single-dispatch-fast-multidispatch-generic-qm0-v1/result.json",
+      "sha256": "7d7f2d2f9efd9c9a6eb3a274c3b3c71b9eb11f3f7c750432cb5710d0d9b3f49f"
+    },
+    {
+      "path": "bench/out/external-projects/doppler/doppler-single-dispatch-fast-multidispatch-generic-qm0-v2/result.json",
+      "sha256": "8ee83849cde99cc9bb292ad1e34c7b691a4d556f2f5dbcbca0a0286390f2a08a"
+    },
+    {
+      "path": "bench/out/external-projects/doppler/doppler-single-dispatch-fast-multidispatch-generic-qm0-v3/result.json",
+      "sha256": "878704eb92daee70421610cbc1c99eed7c92b82bae37c16f34a39515d12ced95"
+    },
+    {
+      "path": "bench/out/external-projects/doppler/doppler-provider-logit-divergence-qm0-v2/result.json",
+      "sha256": "c32ef48e5b150466365ce80ced03e2a9d13a384791ee6857c033b25823e7fc35"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-multidispatch-submit-coherence.js",
+    "bench/executors/run-doppler-selective-operator-capture.mjs"
+  ],
+  "implementationPaths": [
+    "runtime/bridge/webgpu-addon/doe_napi_queue.c"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-multidispatch-submit-coherence.js",
+    "bench/tests/test_node_ort_vs_doppler_lane.py"
+  ],
+  "verifiedAt": "2026-08-16T11:04:20Z"
+}

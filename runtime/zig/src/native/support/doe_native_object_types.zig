@@ -3,6 +3,7 @@ const std = @import("std");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const abi_core = @import("../../core/abi/wgpu_core_base_types.zig");
+const abi_binding = @import("../../core/abi/wgpu_binding_base_types.zig");
 const abi_callback = @import("../../core/abi/wgpu_callback_descriptor_types.zig");
 const abi_feature = @import("../../core/abi/wgpu_feature_base_types.zig");
 const wgsl_ir = @import("../../compiler/wgsl/ir/ir.zig");
@@ -163,7 +164,7 @@ pub const DoeComputePipeline = struct {
     vk_spirv_hash_ready: bool = false,
     vk_static_layout_hash: u64 = 0,
     vk_static_pipeline_hash: u64 = 0,
-    vk_static_buffer_binding_mask: u64 = 0,
+    vk_static_buffer_binding_mask: u128 = 0,
     vk_static_buffer_binding_count: u32 = 0,
     vk_static_pipeline_hash_ready: bool = false,
     vk_flat_buffer_binding_types: [shared.MAX_FLAT_BIND]u32 = [_]u32{0} ** shared.MAX_FLAT_BIND,
@@ -171,7 +172,7 @@ pub const DoeComputePipeline = struct {
     vk_prepared_binding_cache_next: u32 = 0,
     vk_prepared_binding_cache_keys: [shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY]u64 = [_]u64{0} ** shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY,
     vk_prepared_binding_cache_counts: [shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY]u32 = [_]u32{0} ** shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY,
-    vk_prepared_binding_cache_flat_masks: [shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY]u64 = [_]u64{0} ** shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY,
+    vk_prepared_binding_cache_flat_masks: [shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY]u128 = [_]u128{0} ** shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY,
     vk_prepared_binding_cache_descriptor_hashes: [shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY]u64 = [_]u64{0} ** shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY,
     vk_prepared_binding_cache_bind_groups: [shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY][shared.MAX_COMPUTE_BIND_GROUPS]?*DoeBindGroup =
         [_][shared.MAX_COMPUTE_BIND_GROUPS]?*DoeBindGroup{[_]?*DoeBindGroup{null} ** shared.MAX_COMPUTE_BIND_GROUPS} ** shared.VULKAN_PREPARED_BINDING_CACHE_CAPACITY,
@@ -214,7 +215,20 @@ pub const DoeBindGroup = struct {
     buffers: [shared.MAX_BIND]?*anyopaque = [_]?*anyopaque{null} ** shared.MAX_BIND,
     textures: [shared.MAX_BIND]?*anyopaque = [_]?*anyopaque{null} ** shared.MAX_BIND,
     texture_views: [shared.MAX_BIND]?*anyopaque = [_]?*anyopaque{null} ** shared.MAX_BIND,
+    resource_kinds: [shared.MAX_BIND]u32 = [_]u32{0} ** shared.MAX_BIND,
     samplers: [shared.MAX_BIND]?*anyopaque = [_]?*anyopaque{null} ** shared.MAX_BIND,
+    render_texture_view_count: u32 = 0,
+    render_texture_views: [model_render_types.MAX_RENDER_BIND_ENTRIES]?*DoeTextureView =
+        [_]?*DoeTextureView{null} ** model_render_types.MAX_RENDER_BIND_ENTRIES,
+    render_texture_bindings: [model_render_types.MAX_RENDER_BIND_ENTRIES]u32 =
+        [_]u32{model_render_types.RENDER_BINDING_UNSET} ** model_render_types.MAX_RENDER_BIND_ENTRIES,
+    render_texture_resource_kinds: [model_render_types.MAX_RENDER_BIND_ENTRIES]u32 =
+        [_]u32{0} ** model_render_types.MAX_RENDER_BIND_ENTRIES,
+    render_sampler_count: u32 = 0,
+    render_samplers: [model_render_types.MAX_RENDER_BIND_ENTRIES]?*DoeSampler =
+        [_]?*DoeSampler{null} ** model_render_types.MAX_RENDER_BIND_ENTRIES,
+    render_sampler_bindings: [model_render_types.MAX_RENDER_BIND_ENTRIES]u32 =
+        [_]u32{model_render_types.RENDER_BINDING_UNSET} ** model_render_types.MAX_RENDER_BIND_ENTRIES,
     retained_buffers: [shared.MAX_BIND]?*DoeBuffer = [_]?*DoeBuffer{null} ** shared.MAX_BIND,
     retained_texture_views: [shared.MAX_BIND]?*DoeTextureView = [_]?*DoeTextureView{null} ** shared.MAX_BIND,
     retained_samplers: [shared.MAX_BIND]?*DoeSampler = [_]?*DoeSampler{null} ** shared.MAX_BIND,
@@ -222,6 +236,8 @@ pub const DoeBindGroup = struct {
     offsets: [shared.MAX_BIND]u64 = [_]u64{0} ** shared.MAX_BIND,
     buffer_sizes: [shared.MAX_BIND]u64 = [_]u64{0} ** shared.MAX_BIND,
     vk_buffer_handles: [shared.MAX_BIND]u64 = [_]u64{0} ** shared.MAX_BIND,
+    vk_buffer_binding_types: [shared.MAX_BIND]u32 =
+        [_]u32{abi_binding.WGPUBufferBindingType_Undefined} ** shared.MAX_BIND,
     vk_buffer_binding_mask: u64 = 0,
     vk_buffer_binding_cache_complete: bool = false,
     count: u32 = 0,
@@ -354,6 +370,10 @@ pub const DoeRenderPipeline = struct {
     vertex_attribute_buffer_slots: [shared.MAX_VERTEX_ATTRIBUTES]u32 = [_]u32{0} ** shared.MAX_VERTEX_ATTRIBUTES,
     vertex_spirv_data: ?[]const u32 = null,
     fragment_spirv_data: ?[]const u32 = null,
+    vertex_wgsl_sha256: [32]u8 = [_]u8{0} ** 32,
+    fragment_wgsl_sha256: [32]u8 = [_]u8{0} ** 32,
+    vertex_wgsl_sha256_ready: bool = false,
+    fragment_wgsl_sha256_ready: bool = false,
     vertex_entry_point: ?[]const u8 = null,
     fragment_entry_point: ?[]const u8 = null,
 };

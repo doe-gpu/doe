@@ -11,6 +11,7 @@ import { loadDoeBuildMetadata } from './build-metadata.js';
 import {
   PACKAGE_ROOT,
   WORKSPACE_ROOT,
+  isInstalledPackageRoot,
   libraryBasenamesForPlatform,
   resolvePlatformPackageAddonPath,
   resolvePlatformPackageLibraryPath,
@@ -244,14 +245,19 @@ function loadAddon() {
     requireFn: require,
     workspaceRoot: WORKSPACE_ROOT,
   });
-  const candidates = [
+  const workspaceCandidates = [
     resolve(PACKAGE_ROOT, 'build', 'Release', 'doe_napi.node'),
     resolve(PACKAGE_ROOT, 'build', 'Debug', 'doe_napi.node'),
     resolve(__dirname, '..', 'build', 'Release', 'doe_napi.node'),
     resolve(__dirname, '..', 'build', 'Debug', 'doe_napi.node'),
+  ];
+  const packagedCandidates = [
     packagedAddonPath,
     resolve(PACKAGE_ROOT, 'prebuilds', `${process.platform}-${process.arch}`, 'doe_napi.node'),
   ];
+  const candidates = isInstalledPackageRoot(PACKAGE_ROOT)
+    ? [...packagedCandidates, ...workspaceCandidates]
+    : [...workspaceCandidates, ...packagedCandidates];
   for (const candidate of candidates) {
     try {
       return require(candidate);
@@ -276,15 +282,28 @@ function resolveDoeLibraryPath() {
     workspaceRoot: WORKSPACE_ROOT,
   });
 
-  const candidates = [
+  const configuredCandidates = [
     process.env.DOE_WEBGPU_LIB,
     process.env.DOE_LIB,
+  ];
+  const workspaceCandidates = [
     ...workspaceLibraryNames.map((name) => resolve(WORKSPACE_ROOT, 'runtime', 'zig', 'zig-out', 'lib', name)),
     ...workspaceLibraryNames.map((name) => resolve(WORKSPACE_ROOT, 'zig', 'zig-out', 'lib', name)),
+  ];
+  const packagedCandidates = [
     packagedLibraryPath,
     ...workspaceLibraryNames.map((name) => resolve(PACKAGE_ROOT, 'prebuilds', `${process.platform}-${process.arch}`, name)),
+  ];
+  const cwdCandidates = [
     ...workspaceLibraryNames.map((name) => resolve(process.cwd(), 'runtime', 'zig', 'zig-out', 'lib', name)),
     ...workspaceLibraryNames.map((name) => resolve(process.cwd(), 'zig', 'zig-out', 'lib', name)),
+  ];
+  const candidates = [
+    ...configuredCandidates,
+    ...(isInstalledPackageRoot(PACKAGE_ROOT)
+      ? [...packagedCandidates, ...workspaceCandidates]
+      : [...workspaceCandidates, ...packagedCandidates]),
+    ...cwdCandidates,
   ];
 
   for (const candidate of candidates) {
@@ -1132,6 +1151,30 @@ function invalidateBufferHostShadowByNative(native) {
   }
 }
 
+function invalidateBindGroupHostShadows(bindGroup) {
+  const entries = bindGroup == null ? null : nodeBindGroupEntries.get(bindGroup);
+  if (!Array.isArray(entries)) {
+    return;
+  }
+  for (const entry of entries) {
+    if (entry?.buffer != null) {
+      invalidateBufferHostShadowByNative(entry.buffer);
+    }
+    if (entry?.textureView != null) {
+      const viewInfo = nodeTextureViewDescriptors.get(entry.textureView);
+      if (viewInfo?.texture) {
+        viewInfo.texture._hostShadowValid = false;
+      }
+    }
+  }
+}
+
+function invalidateComputePassHostShadows(pass) {
+  for (const bindGroup of pass._bindGroups) {
+    invalidateBindGroupHostShadows(bindGroup);
+  }
+}
+
 function invalidateLazyDispatchCommandBufferShadows(commands) {
   if (!Array.isArray(commands)) {
     return;
@@ -1149,21 +1192,7 @@ function invalidateLazyDispatchCommandBufferShadows(commands) {
       continue;
     }
     const bindGroup = bindGroupForLazyCommand(cmd);
-    const entries = bindGroup == null ? null : nodeBindGroupEntries.get(bindGroup);
-    if (!Array.isArray(entries)) {
-      continue;
-    }
-    for (const entry of entries) {
-      if (entry?.buffer != null) {
-        invalidateBufferHostShadowByNative(entry.buffer);
-      }
-      if (entry?.textureView != null) {
-        const viewInfo = nodeTextureViewDescriptors.get(entry.textureView);
-        if (viewInfo?.texture) {
-          viewInfo.texture._hostShadowValid = false;
-        }
-      }
-    }
+    invalidateBindGroupHostShadows(bindGroup);
   }
 }
 
@@ -1931,6 +1960,7 @@ const nodeEncoderBackend = {
     );
   },
   computePassDispatchWorkgroups(pass, x, y, z) {
+    invalidateComputePassHostShadows(pass);
     if (pass._lazy) {
       if (pass._pipeline == null) {
         failValidation('GPUComputePassEncoder.dispatchWorkgroups', 'setPipeline() must be called before dispatch');
@@ -1974,6 +2004,7 @@ const nodeEncoderBackend = {
     addon.computePassDispatchWorkgroups(nativePass, x, y, z);
   },
   computePassDispatchBound(pass, pipelineNative, bindGroupNative, x, y, z) {
+    invalidateBindGroupHostShadows(bindGroupNative);
     if (pass._lazy) {
       pass._pipeline = pipelineNative;
       pass._bindGroups[0] = bindGroupNative;
@@ -2006,6 +2037,7 @@ const nodeEncoderBackend = {
     clearPendingBoundDispatchState(pass);
   },
   computePassDispatchWorkgroupsIndirect(pass, indirectBufferNative, indirectOffset) {
+    invalidateComputePassHostShadows(pass);
     materializeLazyComputePass(pass);
     const nativePass = assertLiveResource(
       pass,

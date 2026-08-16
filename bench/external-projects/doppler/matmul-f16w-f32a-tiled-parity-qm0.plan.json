@@ -1,0 +1,46 @@
+{
+  "schema": "doe.external-project-plan/v1",
+  "candidateId": "doppler-matmul-f16w-f32a-tiled-parity-qm0-v1",
+  "hypothesis": "The exact production QKV matmul kernel produces the same nonzero numerical result under the bounded incumbent and Doe when shader, inputs, uniforms, shape, dispatch, and readback are held identical.",
+  "inputs": {
+    "runner": {
+      "path": "bench/external-projects/doppler/run-matmul-f16w-f32a-tiled-parity.mjs",
+      "sha256": "a7a9325f223f212a6fbe9d11677f164641c04905eff88134815d7ec814cc038e"
+    },
+    "worker": {
+      "path": "bench/external-projects/doppler/matmul-f16w-f32a-tiled-worker.mjs",
+      "sha256": "fffdc14544557906a37db58710af17d5a969fa56896b69d42cd434ee2afcfc76"
+    },
+    "shader": {
+      "path": "../doppler/.worktrees/doe-provider-compare-e6e8be4a/src/gpu/kernels/matmul_f16w_f32a_tiled.wgsl",
+      "sha256": "569971d79c3ea3ae9e632a06befe43bc9d9a1a657ddd53357368fa24b073cd7d"
+    },
+    "doeProvider": {
+      "path": "packages/doe-gpu/src/compute.js",
+      "sha256": "f0c7e4c93097a4960e91034f0a56f399ed702a250cf1bf38fb2afb5565b651a7"
+    },
+    "boundedIncumbentProvider": {
+      "path": "bench/executors/vendor-node/doppler-node-webgpu-lifecycle-provider.mjs",
+      "sha256": "7022d7255854bd4e277a30676ff5ef1a6cc8412b659381b09f6a5f88c6626f03"
+    },
+    "incumbentProvider": {
+      "path": "../doppler/.worktrees/doe-provider-compare-e6e8be4a/node_modules/webgpu/index.js",
+      "sha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4"
+    }
+  },
+  "cases": [
+    { "id": "edge", "shape": { "M": 5, "N": 7, "K": 33 } },
+    { "id": "production-qkv", "shape": { "M": 72, "N": 1536, "K": 640 } }
+  ],
+  "acceptance": {
+    "maxSampleAbsoluteError": 0.000001,
+    "requireIdenticalOutputBytes": true,
+    "requireNonzeroOutput": true,
+    "requireFiniteOutput": true
+  },
+  "nonGoals": [
+    "Proving the complete Doppler model correct under Doe",
+    "Claiming performance or runtime ownership",
+    "Changing the external Doppler application or shader"
+  ]
+}

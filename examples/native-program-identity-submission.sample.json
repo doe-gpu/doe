@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "traceKind": "doe_native_program_identity_v1",
+  "event": "submission_succeeded",
+  "processId": 17,
+  "sequence": 2,
+  "backend": "doe_vulkan"
+}

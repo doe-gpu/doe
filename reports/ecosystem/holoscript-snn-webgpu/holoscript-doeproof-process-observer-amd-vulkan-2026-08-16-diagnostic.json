@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "holoscript-doeproof-process-observer-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "tropical-spmv",
+  "generatedAt": "2026-08-16T05:44:24Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T05:44:24Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "27",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "unchanged-process-public-observer-admission",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "The public doe-gpu observer runs inside the governed unchanged HoloScript process for both the pinned Dawn and Doe providers. The unchanged unobserved control passes first; each observed lane then preserves the four-topology CPU oracle while recording one shader, one compute pipeline, 340 commands, 68 dispatches, 136 submissions, 136 synchronization events, 68 mapped readbacks, and 69 hash-validated checkpoints.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-process-observer-admission-qm2-v1/result.json",
+          "sha256": "d864407b8d560f995c9b93da1dda94a3945f106a1ee87a8966120ed002d38b50"
+        }
+      ]
+    },
+    {
+      "id": "provider-neutral-command-output-and-replay-identity",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "W0 and D0 share normalized public command-shape identity d1c6a42da8a573028faf5473de890f14084e1d4a56563e45a4ca63c1dafbfbcb and mapped-readback identity a94f873b2cf73920658510cbaeec4d976a1d1f0c35da6566d354c329cb65682b. The D0 replay reproduces its observation and execution identities exactly.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-process-observer-admission-qm2-v1/result.json",
+          "sha256": "d864407b8d560f995c9b93da1dda94a3945f106a1ee87a8966120ed002d38b50"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This result admits the public unchanged-process observation path; it does not reopen or reinterpret the terminal HoloScript runtime-ownership result.",
+    "The observer records the public JavaScript WebGPU surface and mapped bytes, not native-driver calls, operating-system dependencies, network access, or complete filesystem behavior.",
+    "The application runs from the controlled workspace integration rather than a promoted clean-installed downstream release.",
+    "The gate contains no evidence-enabled versus evidence-disabled performance or overhead comparison."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 195497984
+    },
+    "comparison": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 197660672
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The gate admits program evidence and exact output identity; it does not execute a frozen performance comparison."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched evidence-disabled execution was authorized for overhead interpretation."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The process-observer successor is infrastructure admission only. The earlier governed-incumbent result remains the terminal ownership adjudication."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The gate uses a controlled workspace integration rather than a promoted clean-installed downstream application."
+    },
+    "supportHardware": {
+      "status": "not-run",
+      "summary": "The successor inherits no hardware claim and does not run a separate adapter eligibility probe."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "Observed provider lanes execute sequentially."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both governed application processes and the D0 replay exit without crash, hang, or timeout."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "One clean process per provider is below promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "This admission result does not publish a bounded same-process growth measurement."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The result binds the plans, observer, governed-process implementation, providers, contracts, command shape, synchronizations, mapped outputs, and replay identity."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "D0 replay reproduces its exact program-observation and execution identities."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No performance protocol ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The successor is forbidden from reopening the completed ownership decision."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "HoloScript remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-process-observer-admission-qm2-v1/result.json",
+      "sha256": "d864407b8d560f995c9b93da1dda94a3945f106a1ee87a8966120ed002d38b50"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/doeproof-process-observer-admission-qm2.plan.json",
+      "sha256": "424c5954b2acf43b3ad28e274b1c7f99966478e8dc83f8d1906b7694f05aa580"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-process-observer-admission-qm2-v1/result.json",
+      "sha256": "d864407b8d560f995c9b93da1dda94a3945f106a1ee87a8966120ed002d38b50"
+    }
+  ]
+}

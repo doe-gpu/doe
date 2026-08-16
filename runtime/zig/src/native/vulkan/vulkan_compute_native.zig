@@ -24,6 +24,7 @@ const shader_binding_reflection = @import("../shader/shader_binding_reflection.z
 const resource_ops = @import("../../backend/dropin_resource_ops.zig");
 const pipeline_hash = @import("vulkan_pipeline_hash.zig");
 const compute_bindings = @import("vulkan_compute_bindings.zig");
+const program_identity_trace = @import("../diagnostics/doe_program_identity_trace.zig");
 
 const c = if (has_vulkan) resource_ops.vk_constants else struct {};
 const vk_dispatch_indirect = if (has_vulkan) resource_ops.vk_dispatch_indirect else struct {};
@@ -66,7 +67,7 @@ const BindingCollection = compute_bindings.BindingCollection;
 
 pub const VulkanDispatchBindingState = struct {
     count: usize = 0,
-    flat_mask: u64 = 0,
+    flat_mask: u128 = 0,
     descriptor_hash: u64 = 0,
     bindings: [MAX_KERNEL_BINDINGS]model_compute_types.KernelBinding = undefined,
 };
@@ -280,7 +281,7 @@ fn precompute_pipeline_static_hashes(pip: *DoeComputePipeline) void {
     if (!pip.vk_spirv_hash_ready or !pip.vk_flat_buffer_binding_types_ready) return;
     const layout = pip.layout orelse return;
 
-    var binding_mask: u64 = 0;
+    var binding_mask: u128 = 0;
     var binding_count: u32 = 0;
     for (layout.bind_group_layouts[0..layout.bind_group_layout_count], 0..) |maybe_bgl, group_index| {
         const bgl = maybe_bgl orelse return;
@@ -292,7 +293,7 @@ fn precompute_pipeline_static_hashes(pip: *DoeComputePipeline) void {
             if (entry.resource_kind != BIND_GROUP_LAYOUT_RESOURCE_KIND_BUFFER) return;
             if (entry.binding >= MAX_BIND) return;
             const slot = (group_index * MAX_BIND) + entry.binding;
-            const slot_bit = @as(u64, 1) << @intCast(slot);
+            const slot_bit = @as(u128, 1) << @intCast(slot);
             if ((binding_mask & slot_bit) == 0) {
                 binding_mask |= slot_bit;
                 binding_count += 1;
@@ -303,7 +304,7 @@ fn precompute_pipeline_static_hashes(pip: *DoeComputePipeline) void {
     var binding_storage: [MAX_KERNEL_BINDINGS]model_compute_types.KernelBinding = undefined;
     var count: usize = 0;
     for (0..MAX_FLAT_BIND) |slot| {
-        const slot_bit = @as(u64, 1) << @intCast(slot);
+        const slot_bit = @as(u128, 1) << @intCast(slot);
         if ((binding_mask & slot_bit) == 0) continue;
         binding_storage[count] = .{
             .group = @intCast(slot / MAX_BIND),
@@ -465,7 +466,7 @@ fn append_recorded_binding_at_slot(
     slot: usize,
     out_bindings: []model_compute_types.KernelBinding,
     count: *usize,
-    flat_mask: *u64,
+    flat_mask: *u128,
     descriptor_hasher: *pipeline_hash.DescriptorBindingsHasher,
 ) void {
     if (slot >= bufs.len) return;
@@ -491,7 +492,7 @@ fn append_recorded_binding_at_slot(
     };
     out_bindings[count.*] = binding;
     descriptor_hasher.update(binding);
-    flat_mask.* |= @as(u64, 1) << @intCast(slot);
+    flat_mask.* |= @as(u128, 1) << @intCast(slot);
     count.* += 1;
 }
 
@@ -505,7 +506,7 @@ fn collect_recorded_bindings(
     out_bindings: []model_compute_types.KernelBinding,
 ) BindingCollection {
     var count: usize = 0;
-    var flat_mask: u64 = 0;
+    var flat_mask: u128 = 0;
     var descriptor_hasher = pipeline_hash.DescriptorBindingsHasher{};
     if (pip.vk_static_pipeline_hash_ready and pip.vk_static_buffer_binding_mask != 0) {
         var mask = pip.vk_static_buffer_binding_mask;
@@ -564,7 +565,7 @@ fn append_bind_group_binding_at_slot(
     slot: usize,
     out_bindings: []model_compute_types.KernelBinding,
     count: *usize,
-    flat_mask: *u64,
+    flat_mask: *u128,
     descriptor_hasher: *pipeline_hash.DescriptorBindingsHasher,
 ) void {
     const group_index = slot / MAX_BIND;
@@ -650,7 +651,7 @@ fn append_bind_group_binding_at_slot(
     };
     out_bindings[count.*] = binding;
     descriptor_hasher.update(binding);
-    flat_mask.* |= @as(u64, 1) << @intCast(slot);
+    flat_mask.* |= @as(u128, 1) << @intCast(slot);
     count.* += 1;
 }
 
@@ -690,7 +691,7 @@ fn collect_bind_group_bindings(
     out_bindings: []model_compute_types.KernelBinding,
 ) BindingCollection {
     var count: usize = 0;
-    var flat_mask: u64 = 0;
+    var flat_mask: u128 = 0;
     var descriptor_hasher = pipeline_hash.DescriptorBindingsHasher{};
     if (pip.vk_static_pipeline_hash_ready and
         pip.vk_static_buffer_binding_mask != 0 and
@@ -753,7 +754,7 @@ fn use_static_pipeline_hash(
     spirv: []const u32,
     entry_slice: ?[]const u8,
     bindings: []const model_compute_types.KernelBinding,
-    flat_mask: u64,
+    flat_mask: u128,
     descriptor_hash: u64,
 ) !bool {
     if (!pip.vk_static_pipeline_hash_ready) return false;
@@ -953,6 +954,28 @@ pub fn vulkan_run_prepared_dispatch(rt: *NativeVulkanRuntime, dispatch: anytype)
             });
             return;
         };
+        const pipeline = cast(DoeComputePipeline, dispatch.compute_pipeline) orelse continue;
+        const binding_state = dispatch.vulkan_binding_state;
+        var resource_hasher = std.hash.Wyhash.init(0);
+        if (binding_state.valid) {
+            for (binding_state.bindings[0..binding_state.count]) |binding| {
+                resource_hasher.update(std.mem.asBytes(&binding.group));
+                resource_hasher.update(std.mem.asBytes(&binding.binding));
+                resource_hasher.update(std.mem.asBytes(&binding.resource_handle));
+                resource_hasher.update(std.mem.asBytes(&binding.buffer_offset));
+                resource_hasher.update(std.mem.asBytes(&binding.buffer_size));
+            }
+        }
+        program_identity_trace.recordVulkanDispatch(
+            pipeline,
+            dispatch.x,
+            dispatch.y,
+            dispatch.z,
+            repeat_index,
+            if (binding_state.valid) binding_state.descriptor_hash else 0,
+            if (binding_state.valid) @intCast(binding_state.count) else 0,
+            if (binding_state.valid) resource_hasher.final() else 0,
+        );
     }
 }
 

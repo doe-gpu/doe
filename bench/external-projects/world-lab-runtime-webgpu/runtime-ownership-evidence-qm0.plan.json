@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "world-lab-runtime-ownership-evidence-plan",
+  "planId": "world-lab-consumer-execution-runtime-ownership-qm0-v1",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "hypothesis": "A transparent governed provider can bind the dynamically assembled shaders, concrete command shape, and exact mapped readbacks needed to adjudicate whether DoeRuntime supplies an application outcome unavailable from pinned Dawn plus the same evidence layer.",
+  "lanes": {
+    "I0": "ambient incumbent application outcome",
+    "I1": "pinned incumbent application outcome",
+    "W0": "pinned incumbent through the transparent evidence provider",
+    "D0": "DoeRuntime through the identical transparent evidence provider",
+    "P0": "not authorized unless I1 exposes a bounded incumbent defect"
+  },
+  "frozenWork": {
+    "assertionCount": 16,
+    "cleanProcessRunsPerLane": 3,
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "providerEvidenceWrapperIdenticalForW0AndD0": true
+  },
+  "acceptance": [
+    "every executed lane passes all 16 pinned upstream assertions",
+    "requested and effective provider identities match",
+    "software fallback is absent",
+    "W0 and D0 each retain dynamic WGSL hashes, dispatch and draw shape, submissions, and mapped readback digests",
+    "each governed lane reproduces its semantic evidence identity in every clean process",
+    "P0 remains absent when I1 passes",
+    "runtime ownership is rejected when I1 and W0 close the same frozen application outcome as D0"
+  ],
+  "claimBoundary": {
+    "performanceCredit": false,
+    "promotionCredit": false,
+    "releaseCredit": false,
+    "runtimeOwnershipCreditRequiresMaterialDoeOnlyOutcome": true
+  }
+}

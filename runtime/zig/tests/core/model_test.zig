@@ -701,6 +701,14 @@ test "RenderDrawCommand default optional fields are null" {
     try std.testing.expect(cmd.fragment_entry_point == null);
 }
 
+test "RenderDrawCommand texture bindings default to sampled" {
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
+    try std.testing.expectEqual(@as(u32, 0), cmd.bind_texture_count);
+    for (cmd.bind_texture_storage) |is_storage| {
+        try std.testing.expect(!is_storage);
+    }
+}
+
 test "RenderDrawCommand default blend is disabled" {
     const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
     try std.testing.expect(!cmd.blend_enabled);
@@ -1275,6 +1283,13 @@ test "DrawIndexedIndirectCommand is same type as RenderDrawCommand" {
 
 test "RenderPassCommand is same type as RenderDrawCommand" {
     try std.testing.expect(render_types.RenderPassCommand == render_types.RenderDrawCommand);
+}
+
+test "RenderDrawCommand defaults render resource bindings to empty" {
+    const cmd = render_types.RenderDrawCommand{ .draw_count = 1 };
+    try std.testing.expectEqual(@as(u32, 0), cmd.bind_buffer_count);
+    try std.testing.expectEqual(@as(u32, 0), cmd.bind_texture_count);
+    try std.testing.expectEqual(@as(u32, 0), cmd.bind_sampler_count);
 }
 
 test "DispatchIndirectCommand is same type as DispatchCommand" {

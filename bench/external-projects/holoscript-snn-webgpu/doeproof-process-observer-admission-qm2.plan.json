@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-doeproof-process-observer-admission-plan",
+  "planId": "holoscript-tropical-spmv-doeproof-process-observer-qm2-v1",
+  "upstreamCommit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+  "expectedComparableSha256": "51cda2a94da7edad85499240ac8cc5744598fb4227f4f38535a8c97880f585f4",
+  "predecessor": {
+    "planId": "holoscript-tropical-spmv-doeproof-process-observer-qm1-v1",
+    "result": "bench/out/external-projects/holoscript-snn-webgpu/doeproof-process-observer-admission-qm1-v1/result.json",
+    "failureClass": "infrastructure",
+    "correction": "Bind every observer wrapper to the exact WebGPU method captured before invocation so an application monkey-patch cannot make the wrapper redispatch recursively. Preserve the qm1 cycle-safe argument and descriptor handling."
+  },
+  "workload": "unchanged pinned HoloScript tropical-SpMV application and shader over the frozen four-topology inputs",
+  "control": "the existing node-permission-read-only doe-proof-node integration runner must pass before observation is added",
+  "lanes": {
+    "W0": "pinned webgpu@0.3.10 through observed unchanged-process DoeProof",
+    "D0": "Doe package provider through the identical observed unchanged-process DoeProof contract"
+  },
+  "acceptance": [
+    "the unobserved control integration passes unchanged",
+    "run, verify, and inspect pass for observed W0 and D0",
+    "both lanes preserve the four-topology exact output oracle",
+    "both lanes emit valid non-empty public program observations",
+    "W0 and D0 have identical normalized public command shape and mapped-readback identity",
+    "D0 replay reproduces observation and execution identities exactly",
+    "all contract and implementation inputs are hash-bound"
+  ],
+  "nonGoals": [
+    "runtime-ownership credit",
+    "performance or receipt-overhead interpretation",
+    "application promotion or release-blocker status",
+    "reinterpretation of the terminal HoloScript ownership decision",
+    "native-driver or operating-system tracing"
+  ]
+}

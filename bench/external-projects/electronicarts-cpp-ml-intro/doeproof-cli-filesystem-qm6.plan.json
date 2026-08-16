@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-doeproof-cli-filesystem-integration-plan",
+  "planId": "cpp-ml-mnist-doeproof-cli-filesystem-qm6-v1",
+  "correctionOf": "cpp-ml-mnist-doeproof-cli-filesystem-qm5-v1",
+  "correction": "Use the already verified minimal Doe provider adapter as the public loader module; it freezes providerInfo before exposing only create() and globals, avoiding the permission-mode fault caused by re-exporting the batteries-included package namespace.",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "expectedComparableSha256": "6929ac572c2f63e6bba69076ed2fb7ce076999c15c830d0a2b6430b3fa69269f",
+  "workload": "unchanged pinned generated six-pass MNIST graph over the frozen weights and ten PNG inputs",
+  "filesystemMode": "node-permission-read-only",
+  "commands": ["run", "verify", "inspect", "compare", "replay"],
+  "lanes": {
+    "W0": "pinned webgpu@0.4.0 through the public DoeProof CLI and loader",
+    "D0": "Doe package provider through the same public DoeProof CLI and loader"
+  },
+  "acceptance": [
+    "run, verify, and inspect pass for both W0 and D0 under Node read-only permissions",
+    "every declared application, model, image, package, and provider runtime file is hash-bound",
+    "undeclared Node filesystem reads, writes, and child processes remain denied",
+    "both artifacts expose valid governed-process receipts and exact frozen staged-oracle output",
+    "W0/D0 compare reports equal workload and output without performance or ownership credit",
+    "W0 and D0 replay each reproduce semantic workload and execution identities"
+  ],
+  "decision": {
+    "pass": "authorize the public DoeProof CLI boundary for this unchanged-application diagnostic",
+    "fail": "retain the bespoke harness evidence and keep the public product boundary unproven for cpp-ml"
+  },
+  "nonGoals": [
+    "operating-system dependency sealing",
+    "native-addon syscall confinement",
+    "network isolation",
+    "runtime-ownership credit",
+    "performance interpretation",
+    "application promotion",
+    "release-blocker status",
+    "reinterpretation of the terminal cpp-ml ownership decision"
+  ]
+}

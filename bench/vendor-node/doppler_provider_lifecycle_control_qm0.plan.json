@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-lifecycle-control-plan",
+  "planId": "doppler-provider-lifecycle-control-qm0-v1",
+  "frozenAt": "2026-08-16T07:30:00Z",
+  "predecessor": {
+    "path": "reports/benchmarks/amd-vulkan/20260815T190434Z/doppler-provider-corrected-runtime-result.json",
+    "outcome": "retire-lane",
+    "terminalProperty": "persistent-performance-control",
+    "newMeasuredAntecedent": "The governed incumbent completed inference and recorded provider release before a later native process abort, while Doe exited cleanly. The predecessor explicitly requires a new lifecycle hypothesis before this fact can receive credit."
+  },
+  "hypothesis": "Doe owns a repeatable application teardown outcome that cannot be reproduced above the pinned incumbent runtime: after exact Doppler inference, governed release, and immediate process teardown, Doe exits cleanly while both the unchanged governed incumbent and a bounded wrapper that waits for submitted work and destroys every observed device abort after release.",
+  "workload": {
+    "scenario": "bench/vendor-node/doppler_provider_diagnostic_gemma270m_commands.json",
+    "scenarioSha256": "acee5c0f82315f51af2cebde4a38bfd4ce006b855fdd9631b95e5241c430c1cd",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "modelManifestSha256": "230104df762ff394095326d8e9fa4dc144d431bbd61ad5139e1030e66836ab78",
+    "prefillTokens": 64,
+    "decodeTokens": 1,
+    "cleanProcessesPerLane": 3,
+    "applicationSourceUnchanged": true,
+    "modelUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "performanceInterpretation": false
+  },
+  "lanes": {
+    "W0": "Pinned node-webgpu through the unchanged governed provider contract.",
+    "P0": "The same pinned node-webgpu behind a bounded wrapper that records requestDevice results, waits on each device queue, destroys every tracked device, then restores provider globals.",
+    "D0": "DoeRuntime through the unchanged governed provider contract."
+  },
+  "failureInjection": {
+    "kind": "post-inference-governed-release-and-process-teardown",
+    "rule": "Each process must complete the exact one-token application inference, persist the provisional inference receipt, execute its declared provider release path, persist release-complete evidence when possible, close the local model server, and terminate naturally without process.exit masking native destructors."
+  },
+  "boundedPatch": {
+    "path": "bench/executors/vendor-node/doppler-node-webgpu-lifecycle-provider.mjs",
+    "allowedChanges": [
+      "intercept requestDevice only to retain returned device objects",
+      "await queue.onSubmittedWorkDone before governed release",
+      "call destroy on every retained device before governed release"
+    ],
+    "forbiddenChanges": [
+      "application, model, prompt, inference, shader, output, runtime, or sampling changes",
+      "process.exit, abort suppression, signal rewriting, or ignoring nonzero exit status",
+      "replacing the incumbent native module"
+    ]
+  },
+  "implementation": {
+    "orchestrator": "bench/executors/run-doppler-lifecycle-control.mjs",
+    "orchestratorSha256": "f6d7a8d75bc15a7241f8fb956d05934696b286dce482a87c3269728c29068e7c",
+    "worker": "bench/executors/run-node-doppler-ort-bench.js",
+    "workerSha256": "9ad174fe3fb1aaf60e5c90f73545ed3dcba7dc95aa9a438b796fe7b96d9246b8",
+    "boundedProvider": "bench/executors/vendor-node/doppler-node-webgpu-lifecycle-provider.mjs",
+    "boundedProviderSha256": "7022d7255854bd4e277a30676ff5ef1a6cc8412b659381b09f6a5f88c6626f03",
+    "incumbentProviderSha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4",
+    "doeProviderSha256": "f0c7e4c93097a4960e91034f0a56f399ed702a250cf1bf38fb2afb5565b651a7",
+    "providerContractSha256": "171a4b0894f1f352dfabd9a230e873c5f90da64b54bc2b5aa3026e59bb17d85e"
+  },
+  "acceptance": {
+    "common": [
+      "all lanes complete inference and produce identical generated text and token hashes",
+      "every process retains provider, module, source, model, trace, and terminal exit identity",
+      "no process times out and no software fallback is admitted"
+    ],
+    "antecedent": "W0 must reproduce the post-release native abort in all three clean processes; otherwise the lifecycle property is not stable and the hypothesis retires.",
+    "wrapperControl": "If P0 exits zero in all three processes with explicit nonzero tracked-device cleanup, the governed wrapper closes the gap and DoeRuntime ownership is rejected.",
+    "ownedRuntime": "Only if W0 and P0 both reproduce the post-release abort in all three processes while D0 exits zero with release-complete evidence in all three does the lifecycle property authorize a larger ownership gate.",
+    "mixedOutcome": "Any other terminal pattern is diagnostic and retires this frozen realization without parameter or teardown-order tuning."
+  },
+  "creditBoundary": {
+    "performance": false,
+    "runtimeOwnership": false,
+    "promotion": false,
+    "release": false,
+    "onPass": "Authorize a separately frozen repetition, bounded-memory-growth, concurrency, and device-loss ownership gate.",
+    "onFail": "Retain the lifecycle regression and do not reinterpret the terminal performance result."
+  }
+}

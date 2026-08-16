@@ -1,0 +1,85 @@
+[
+  {
+    "kind": "vendor-node-benchmark-scenario",
+    "schemaVersion": 1,
+    "scenarioId": "doppler_provider_logit_divergence_gemma3_270m_prefill_64tok_decode_1tok",
+    "benchmarkLane": "doppler-node-provider-logit-divergence",
+    "dopplerRoot": "../../../doppler/.worktrees/doe-provider-compare-e6e8be4a",
+    "cacheMode": "warm",
+    "loadMode": "http",
+    "useChatTemplate": false,
+    "promptWorkload": {
+      "prefillTokens": 64,
+      "decodeTokens": 1,
+      "temperature": 0,
+      "topK": 1,
+      "topP": 1
+    },
+    "tjs": {
+      "modelId": "onnx-community/gemma-3-270m-it-ONNX",
+      "dtype": "fp16",
+      "localModelPath": "../../../doppler/node_modules/@huggingface/transformers/.cache"
+    },
+    "doppler": {
+      "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+      "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+      "runtimeProfile": null,
+      "runtimeConfig": {
+        "shared": {
+          "benchmark": {
+            "run": {
+              "warmupRuns": 0,
+              "timedRuns": 1
+            }
+          },
+          "harness": {
+            "referenceTranscript": {
+              "enabled": true,
+              "captureLogits": true,
+              "captureKvBytes": false
+            }
+          }
+        },
+        "inference": {
+          "kernelPathPolicy": {
+            "mode": "capability-aware",
+            "sourceScope": ["model", "manifest", "config"],
+            "allowSources": ["model", "manifest", "config"],
+            "onIncompatible": "remap"
+          },
+          "session": {
+            "perLayerInputs": {
+              "materialization": "auto",
+              "rowCache": {
+                "mode": "lru",
+                "maxRows": 256,
+                "maxBytes": 134217728,
+                "decodedDtype": "f32"
+              },
+              "prefetch": {
+                "mode": "next_token",
+                "rowsAhead": 1
+              },
+              "gpuUpload": {
+                "mode": "per_step_slices",
+                "stagingRows": 2
+              },
+              "hotCache": {
+                "mode": "prepared_tokens",
+                "maxTokens": 1024,
+                "maxBytes": 134217728,
+                "outputDtype": "f32"
+              }
+            }
+          },
+          "largeWeights": {
+            "enabled": true,
+            "safetyRatio": 0.9
+          }
+        }
+      },
+      "loadMode": "http",
+      "modelPath": "../../../doppler/models/local/gemma-3-270m-it-q4k-ehf16-af32"
+    }
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "vulkan-storage-texture-compute-visibility",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Vulkan compute dependency tracking remembered writable buffers but omitted storage textures. A later compute pass sampling a storage texture written by an earlier pass could observe stale texels when the image remained in GENERAL layout across submissions. Storage-texture writes now force the next dependent dispatch through a compute visibility barrier.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-host-shadow-fix/raw-suite.json",
+      "sha256": "11c96d932c88ff2a3cc861d204641f07f427ff5d4ff8ee7320d4e34580f0bdca"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-storage-texture-visibility.js"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/backend/vulkan/vk_compute_sync.zig"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-storage-texture-visibility.js",
+    "runtime/zig/src/backend/vulkan/vk_compute_sync.zig"
+  ],
+  "verifiedAt": "2026-08-16T02:22:24Z"
+}

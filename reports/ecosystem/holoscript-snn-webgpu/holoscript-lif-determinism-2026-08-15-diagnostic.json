@@ -4,13 +4,13 @@
   "reportId": "holoscript-lif-determinism-2026-08-15-diagnostic",
   "actorId": "holoscript-snn-webgpu",
   "harnessId": "lif-determinism",
-  "generatedAt": "2026-08-15T23:07:34.926Z",
+  "generatedAt": "2026-08-16T00:51:16.582Z",
   "review": {
     "status": "reviewed",
-    "reviewedAt": "2026-08-15T23:07:49Z",
+    "reviewedAt": "2026-08-16T02:22:24Z",
     "reviewer": "codex"
   },
-  "registryRevision": "15",
+  "registryRevision": "19",
   "upstream": {
     "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
     "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
@@ -26,8 +26,8 @@
       "summary": "All four runtime lanes pass the upstream CPU membrane tolerances and exact final spike-mask oracle for canonical, 65,536-neuron, and parameter-override LIF cases on the physical Radeon Vulkan adapter.",
       "evidence": [
         {
-          "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
-          "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+          "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-lif-determinism-diagnostic.json",
+          "sha256": "6bac4daa6c120949b0bb3cddb5b05e7954d716e227060bdadcba0e3bd4b2ca94"
         }
       ]
     },
@@ -38,8 +38,8 @@
       "summary": "Each lane is nondegenerately repeatable, W0 and D0 replay exactly, and Dawn and Doe produce identical GPU membrane and spike bytes for every frozen case on this adapter.",
       "evidence": [
         {
-          "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
-          "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+          "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-lif-determinism-diagnostic.json",
+          "sha256": "6bac4daa6c120949b0bb3cddb5b05e7954d716e227060bdadcba0e3bd4b2ca94"
         }
       ]
     },
@@ -50,8 +50,8 @@
       "summary": "The governed incumbent satisfies the same live-provider, semantic-oracle, repeatability, and replay outcomes as Doe. No bounded correction is needed and this workload supplies no DoeRuntime ownership advantage.",
       "evidence": [
         {
-          "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
-          "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+          "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-lif-determinism-diagnostic.json",
+          "sha256": "6bac4daa6c120949b0bb3cddb5b05e7954d716e227060bdadcba0e3bd4b2ca94"
         }
       ]
     }
@@ -82,7 +82,7 @@
       "crashes": 0,
       "hangs": 0,
       "timeouts": 0,
-      "peakMemoryBytes": 165879808
+      "peakMemoryBytes": 168390656
     },
     "comparison": {
       "cleanProcessRuns": 3,
@@ -91,7 +91,7 @@
       "crashes": 0,
       "hangs": 0,
       "timeouts": 0,
-      "peakMemoryBytes": 159150080
+      "peakMemoryBytes": 171831296
     }
   },
   "performance": {
@@ -187,14 +187,14 @@
   },
   "receipts": [
     {
-      "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
-      "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+      "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-lif-determinism-diagnostic.json",
+      "sha256": "6bac4daa6c120949b0bb3cddb5b05e7954d716e227060bdadcba0e3bd4b2ca94"
     }
   ],
   "rawEvidence": [
     {
-      "path": "reports/benchmarks/amd-vulkan/20260815T230727Z/holoscript-lif-determinism-diagnostic.json",
-      "sha256": "e24f17209b2b1b5a606b94915dc73580ddfca8582f27961ffb03c7954ffc0829"
+      "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-lif-determinism-diagnostic.json",
+      "sha256": "6bac4daa6c120949b0bb3cddb5b05e7954d716e227060bdadcba0e3bd4b2ca94"
     }
   ]
 }

@@ -1500,7 +1500,9 @@ napi_value doe_prewarm_prepared_dispatches(napi_env env, napi_callback_info info
 }
 
 /* submitBatched(device, queue, commandsArray)
- * Fast path: single dispatch or dispatch+copy → doeNativeComputeDispatchFlush. */
+ * Fast path: a single dispatch or a dispatch batch ending in a copy.
+ * Dispatch-only batches remain on the recorded command-buffer path until the
+ * direct Vulkan batch replay has exact multi-dispatch parity. */
 napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
     NAPI_ASSERT_ARGC(env, info, 3);
     CHECK_LIB_LOADED(env);
@@ -1671,7 +1673,7 @@ napi_value doe_queue_submit_batched(napi_env env, napi_callback_info info) {
         }
     }
 
-    if (pfn_doeNativeComputeDispatchBatchFlush && cmd_count > 0) {
+    if (pfn_doeNativeComputeDispatchBatchFlush && cmd_count == 1) {
         int all_dispatch = 1;
         for (uint32_t i = 0; i < cmd_count; i++) {
             napi_value cmd;

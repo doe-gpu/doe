@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-kv-divergence-plan",
+  "planId": "doppler-provider-kv-divergence-qm0-v1",
+  "frozenAt": "2026-08-16T08:03:00Z",
+  "predecessor": {
+    "report": "reports/benchmarks/amd-vulkan/20260816T080140Z/doppler-provider-logit-divergence-diagnostic.json",
+    "result": "bench/out/external-projects/doppler/doppler-provider-logit-divergence-qm1-v1-run1/result.json",
+    "resultSha256": "c387dd5c2b7078f7f3da29b4fb102c7981671c16c7d5b94f1d24b671342354d5",
+    "boundary": "predictor-or-earlier-execution"
+  },
+  "hypothesis": "Exact used-byte KV digests localize the first observable P0/D0 state divergence to a model layer; if all KV digests match, the finalized-logit divergence is downstream of retained KV state.",
+  "workload": {
+    "scenario": "bench/vendor-node/doppler_provider_kv_divergence_gemma270m_commands.json",
+    "scenarioSha256": "a7a233b3405119f264a09bfba0d3c56f149a2555fe84b3b75752a2b174218c85",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "modelManifestSha256": "230104df762ff394095326d8e9fa4dc144d431bbd61ad5139e1030e66836ab78",
+    "prefillTokens": 64,
+    "decodeTokens": 1,
+    "captureLogits": true,
+    "captureKvBytes": true,
+    "lanes": ["P0", "D0"],
+    "cleanProcessesPerLane": 1
+  },
+  "implementation": {
+    "orchestrator": "bench/executors/run-doppler-kv-divergence.mjs",
+    "orchestratorSha256": "650e06b8fbc174fe56a7920f63b4bf173871d76516a79e71f3da2d1dfaa3b17a",
+    "workerSha256": "9ad174fe3fb1aaf60e5c90f73545ed3dcba7dc95aa9a438b796fe7b96d9246b8",
+    "sharedSummarySha256": "ea4c64eee76304a45f9fddbf408521f7672577c03552a02b3b50435584a28e3b",
+    "boundedProviderSha256": "7022d7255854bd4e277a30676ff5ef1a6cc8412b659381b09f6a5f88c6626f03",
+    "incumbentProviderSha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4",
+    "doeProviderSha256": "f0c7e4c93097a4960e91034f0a56f399ed702a250cf1bf38fb2afb5565b651a7"
+  },
+  "acceptance": {
+    "common": [
+      "P0 and D0 complete inference, transcript capture, provider release, and zero exit",
+      "prompt, source, model, token count, KV layer count, per-layer byte geometry, and finalized-logit geometry match",
+      "P0 and D0 each reproduce their predecessor selected token and finalized-logit digest"
+    ],
+    "layerBoundary": "Report the first layer whose key or value used-byte digest differs and retain all later differences without claiming causation.",
+    "downstreamBoundary": "If every KV used-byte digest matches, localize the divergence after retained KV state.",
+    "invalid": "Missing bytes, mismatched geometry, changed predecessor logits, timeout, or nonzero exit rejects the evidence."
+  },
+  "creditBoundary": {
+    "correctProvider": "unassigned without an independent operation oracle",
+    "performance": false,
+    "runtimeOwnership": false,
+    "promotion": false,
+    "release": false,
+    "onPass": "Freeze one operation-level parity fixture at or before the first observed differing layer."
+  }
+}

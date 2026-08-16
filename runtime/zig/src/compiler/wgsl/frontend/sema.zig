@@ -629,10 +629,15 @@ const Analyzer = struct {
         const span = decode_packed_span(node.data.rhs);
 
         var arg_types_buf: [16]ir.TypeId = undefined;
-        if (span.len > arg_types_buf.len) return error.UnsupportedConstruct;
+        const heap_arg_types = if (span.len > arg_types_buf.len)
+            try self.module.allocator.alloc(ir.TypeId, span.len)
+        else
+            null;
+        defer if (heap_arg_types) |allocated| self.module.allocator.free(allocated);
+        const arg_types = heap_arg_types orelse arg_types_buf[0..span.len];
         var i: u32 = 0;
         while (i < span.len) : (i += 1) {
-            arg_types_buf[i] = try self.analyze_expr(self.module.tree.extra_data.items[span.start + i], body);
+            arg_types[i] = try self.analyze_expr(self.module.tree.extra_data.items[span.start + i], body);
         }
 
         const target_ty = blk: {
@@ -640,13 +645,13 @@ const Analyzer = struct {
             switch (type_node.tag) {
                 .type_name, .type_vec_shorthand, .type_mat_shorthand => {
                     const name = self.module.tree.tokenSlice(type_node.main_token);
-                    if (try sema_expr.infer_constructor_call(self, name, arg_types_buf[0..span.len])) |ty| break :blk ty;
+                    if (try sema_expr.infer_constructor_call(self, name, arg_types)) |ty| break :blk ty;
                 },
                 else => {},
             }
             break :blk try self.resolve_type_node(node.data.lhs);
         };
-        try sema_expr.validate_construct(self, target_ty, arg_types_buf[0..span.len]);
+        try sema_expr.validate_construct(self, target_ty, arg_types);
         return target_ty;
     }
     fn analyze_member(self: *Analyzer, node: Node, body: ?*BodyAnalyzer, out: *NodeInfo) AnalyzeError!ir.TypeId {

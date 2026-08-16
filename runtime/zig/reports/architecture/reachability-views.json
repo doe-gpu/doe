@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
-  "classifiedLineCount": 141339,
-  "classifiedModuleCount": 541,
+  "classifiedLineCount": 142403,
+  "classifiedModuleCount": 542,
   "facadeOnlyFiles": [
     {
       "aggregateProductionRoot": true,
@@ -42,11 +42,11 @@
   ],
   "facadeOnlyLineCount": 240,
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "f312ceab0f71721caabb1dbd24e52f52a2fbd2fd7bbfdf65690f557eef8067f1",
+  "manifestSha256": "46fd49d7a8a61ecb7f91415aa5aed80f1856aca3ddf6b432ec24743a775b27ed",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "d98500969c1bc44d419e75b6c0a899b56f8e36f13d173ef78ebe7681c41b8419",
+  "sourceTreeSha256": "b16f1dd49a586eedb9e31cc1d193132d0a3d099a4042839ae56fe69c08fdd4b4",
   "unclassifiedFiles": [
     {
       "aggregateProductionRoot": false,
@@ -60,7 +60,7 @@
     {
       "description": "WGSL compiler, TSIR, CSL, proof-consumer, and spatial toolchain roots selected by repository build targets",
       "name": "compiler-tsir-spatial-toolchains",
-      "reachableLineCount": 54835,
+      "reachableLineCount": 55155,
       "reachableModuleCount": 175,
       "rootPatterns": [
         "src/cli/entrypoints/main_emit*.zig",
@@ -95,8 +95,8 @@
     {
       "description": "Drop-in WebGPU ABI routing and the declared legacy flat compatibility facade",
       "name": "dropin-compatibility",
-      "reachableLineCount": 84462,
-      "reachableModuleCount": 316,
+      "reachableLineCount": 85526,
+      "reachableModuleCount": 317,
       "rootPatterns": [
         "src/dropin/root.zig",
         "src/dropin/wgpu_dropin_lib.zig",
@@ -111,7 +111,7 @@
     {
       "description": "Module incubation, plan comparison, and repo-only integration executables used for evidence rather than shipped runtime claims",
       "name": "module-incubation-evidence-tools",
-      "reachableLineCount": 76447,
+      "reachableLineCount": 76955,
       "reachableModuleCount": 295,
       "rootPatterns": [
         "src/cli/entrypoints/module_runner.zig",
@@ -142,8 +142,8 @@
     {
       "description": "Implementation roots selected by the shipped runtime CLI and libwebgpu_doe package artifact",
       "name": "shipped-native-package-runtime",
-      "reachableLineCount": 104706,
-      "reachableModuleCount": 400,
+      "reachableLineCount": 105770,
+      "reachableModuleCount": 401,
       "rootPatterns": [
         "src/cli/entrypoints/main.zig",
         "src/cli/runtime_cli.zig",
@@ -160,7 +160,7 @@
     {
       "description": "Legacy aggregate type facades and surface contracts exercised by Zig tests but absent from shipped and repository-tool build roots",
       "name": "test-only-compatibility",
-      "reachableLineCount": 13840,
+      "reachableLineCount": 13847,
       "reachableModuleCount": 78,
       "rootPatterns": [
         "src/contracts/model/model_gpu_types.zig",

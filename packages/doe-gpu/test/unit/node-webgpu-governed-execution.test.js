@@ -165,4 +165,78 @@ assert.ok(tamperedValidation.errors.includes(
 ));
 assert.equal(validateGovernedNodeWebGPUReceipt(null).valid, false);
 
+const observedFixtureUrl = new URL('../fixtures/provider-observed.js', import.meta.url).href;
+const observedProvider = {
+  providers: [{
+    id: 'observed-fixture',
+    kind: 'module',
+    module: observedFixtureUrl,
+    gpu: { kind: 'factory', path: 'createObservedGPU', args: [] },
+    globals,
+  }],
+  adapterOptions: null,
+  globals: { mode: 'replace' },
+};
+
+async function observedExecute({ adapter, input }) {
+  const device = await adapter.requestDevice();
+  const module = device.createShaderModule({
+    code: '@compute @workgroup_size(4) fn main() {}',
+  });
+  const pipeline = device.createComputePipeline({
+    layout: 'auto',
+    compute: { module, entryPoint: 'main' },
+  });
+  const output = device.createBuffer({ size: input.byteLength, usage: 7 });
+  device.queue.writeBuffer(output, 0, Uint8Array.from(input, (value) => value * 2));
+  const encoder = device.createCommandEncoder();
+  const pass = encoder.beginComputePass();
+  pass.setPipeline(pipeline);
+  pass.dispatchWorkgroups(1);
+  pass.end();
+  device.queue.submit([encoder.finish()]);
+  await device.queue.onSubmittedWorkDone();
+  await output.mapAsync(1, 0, input.byteLength);
+  const bytes = new Uint8Array(output.getMappedRange(0, input.byteLength));
+  device.destroy();
+  return bytes;
+}
+
+async function runObserved() {
+  return runGovernedNodeWebGPU({
+    provider: observedProvider,
+    workload: {
+      id: 'observed-vector-double-u8',
+      version: '1',
+      implementationSha256,
+      input: new Uint8Array([1, 2, 3, 4]),
+      expectedOutputSha256: digest(expected),
+    },
+    observeProgram: { metadata: { contract: 'unit-observer' } },
+    execute: observedExecute,
+  });
+}
+
+const observedFirst = await runObserved();
+assert.equal(observedFirst.ok, true);
+assert.equal(observedFirst.receipt.programEvidence.status, 'observed');
+assert.equal(observedFirst.receipt.programEvidence.observation.summary.shaderModuleCount, 1);
+assert.equal(observedFirst.receipt.programEvidence.observation.summary.dispatchCount, 1);
+assert.equal(observedFirst.receipt.programEvidence.observation.summary.submissionCount, 1);
+assert.equal(observedFirst.receipt.programEvidence.observation.summary.readbackCount, 1);
+assert.equal(validateGovernedNodeWebGPUReceipt(observedFirst.receipt).valid, true);
+const observedSecond = await runObserved();
+assert.equal(
+  observedSecond.receipt.programEvidence.observationSha256,
+  observedFirst.receipt.programEvidence.observationSha256,
+);
+assert.equal(
+  observedSecond.receipt.replay.executionSha256,
+  observedFirst.receipt.replay.executionSha256,
+  'governed replay identity must bind stable program evidence',
+);
+const tamperedObservation = structuredClone(observedFirst.receipt);
+tamperedObservation.programEvidence.observation.summary.dispatchCount += 1;
+assert.equal(validateGovernedNodeWebGPUReceipt(tamperedObservation).valid, false);
+
 console.log('node-webgpu governed execution contracts: ok');

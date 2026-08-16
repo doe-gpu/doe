@@ -170,6 +170,30 @@ pub export fn doeNativeShaderModuleGetCompilationInfo(
     module_raw: ?*anyopaque,
 ) callconv(.c) [*:0]const u8 {
     if (cast(DoeShaderModule, module_raw)) |module| {
+        if (module.compilation_message) |message| {
+            var stream = std.io.fixedBufferStream(&out_buf);
+            const writer = stream.writer();
+            writer.writeByte('[') catch return EMPTY_JSON;
+            var first = true;
+            write_json_message(
+                writer,
+                &first,
+                switch (module.compilation_message_kind) {
+                    .@"error" => "error",
+                    .warning => "warning",
+                    .info => "info",
+                    .none => "info",
+                },
+                message,
+                module.compilation_message_line,
+                module.compilation_message_column,
+            ) catch return EMPTY_JSON;
+            writer.writeByte(']') catch return EMPTY_JSON;
+            const json = stream.getWritten();
+            if (json.len >= out_buf.len) return EMPTY_JSON;
+            out_buf[json.len] = 0;
+            return @ptrCast(out_buf[0..].ptr);
+        }
         if (module.wgsl_source) |wgsl| {
             if (build_wgsl_diagnostic_json(wgsl)) |json| {
                 return json;

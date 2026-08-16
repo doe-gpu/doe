@@ -589,6 +589,19 @@ export function summarizeDopplerEnvelope(envelope) {
     result.metrics?.referenceTranscript?.tokens?.generatedTokenIdsHash
     ?? result.referenceTranscript?.tokens?.generatedTokenIdsHash
     ?? null;
+  const referenceTranscript =
+    result.metrics?.referenceTranscript
+    ?? result.referenceTranscript
+    ?? null;
+  const capturedReferenceTranscript =
+    referenceTranscript?.logits?.mode === 'sha256-per-step'
+      ? referenceTranscript
+      : null;
+  const operatorDiagnostics =
+    result.metrics?.operatorDiagnostics
+    ?? result.operatorDiagnostics
+    ?? result.report?.metrics?.operatorDiagnostics
+    ?? null;
   return {
     status: envelope?.ok === true ? 'ok' : 'unknown',
     outputSource,
@@ -599,6 +612,10 @@ export function summarizeDopplerEnvelope(envelope) {
       typeof generatedTokenIdsHash === 'string' && generatedTokenIdsHash.trim() !== ''
         ? generatedTokenIdsHash.trim()
         : null,
+    ...(capturedReferenceTranscript === null
+      ? {}
+      : { referenceTranscript: capturedReferenceTranscript }),
+    ...(operatorDiagnostics === null ? {} : { operatorDiagnostics }),
   };
 }
 

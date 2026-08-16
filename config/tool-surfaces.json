@@ -24,6 +24,7 @@
         "packages/doe-gpu/src/program-bundle-runner.js",
         "packages/doe-gpu/src/plan.js",
         "packages/doe-gpu/src/capture.js",
+        "packages/doe-gpu/src/observe.js",
         "packages/doe-gpu/src/compute.js",
         "packages/doe-gpu/src/browser.js",
         "packages/doe-gpu/src/hybrid.js"
@@ -49,6 +50,7 @@
         "packages/doe-gpu/src/native.js",
         "packages/doe-gpu/src/plan.js",
         "packages/doe-gpu/src/capture.js",
+        "packages/doe-gpu/src/observe.js",
         "packages/doe-gpu/src/hybrid.js"
       ],
       "docs": [
@@ -92,6 +94,12 @@
         "bench/runners/run_release_pipeline.py",
         "bench/runners/run_blocking_gates.py",
         "bench/gates/catscan_gate.py",
+        "bench/tools/validate_native_program_identity_trace.py",
+        "bench/executors/run-doppler-lifecycle-control.mjs",
+        "bench/executors/adjudicate-doppler-lifecycle-control.mjs",
+        "bench/executors/run-doppler-logit-divergence.mjs",
+        "bench/executors/run-doppler-logit-divergence-correction.mjs",
+        "bench/executors/run-doppler-kv-divergence.mjs",
         "bench/tools/generate_backend_workloads.py",
         "bench/gates/tint_compiler_evidence_gate.py"
       ],

@@ -22,7 +22,7 @@ pub fn emit_io_global(emitter: anytype, global: ir.Global) EmitError!u32 {
     try emitter.builder.emit_name(var_id, global.name);
 
     const io = global.io orelse return error.InvalidIr;
-    try decorate_io_var(&emitter.builder, var_id, io);
+    try decorate_io_var(&emitter.builder, var_id, io, null, storage_class);
 
     return var_id;
 }
@@ -56,14 +56,14 @@ pub fn emit_stage_entry_wrapper(emitter: anytype, entry: ir.EntryPoint) EmitErro
         };
         if (is_struct) {
             if (param.io != null) return error.UnsupportedConstruct;
-            try emit_struct_io_vars(emitter, param.ty, spirv.StorageClass.Input, &interface_ids);
+            try emit_struct_io_vars(emitter, param.ty, spirv.StorageClass.Input, entry.stage, &interface_ids);
         } else {
             const io = param.io orelse return error.UnsupportedConstruct;
             const value_type = try emitter.lower_type(param.ty);
             const ptr_type = try emitter.builder.type_pointer(spirv.StorageClass.Input, value_type);
             const var_id = try emitter.builder.variable_global(ptr_type, spirv.StorageClass.Input);
             try emitter.builder.emit_name(var_id, param.name);
-            try decorate_io_var(&emitter.builder, var_id, io);
+            try decorate_io_var(&emitter.builder, var_id, io, entry.stage, spirv.StorageClass.Input);
             try interface_ids.append(emitter.alloc, var_id);
         }
         const range_end: u32 = @intCast(interface_ids.items.len);
@@ -78,7 +78,7 @@ pub fn emit_stage_entry_wrapper(emitter: anytype, entry: ir.EntryPoint) EmitErro
     const output_range_start: u32 = @intCast(interface_ids.items.len);
     const has_return = !ir.is_scalar(&emitter.module.types, function.return_type, .void);
     if (has_return) {
-        try emit_return_output_vars(emitter, function.return_type, function.return_io, &interface_ids);
+        try emit_return_output_vars(emitter, function.return_type, function.return_io, entry.stage, &interface_ids);
     }
     const output_range_len: u32 = @as(u32, @intCast(interface_ids.items.len)) - output_range_start;
 
@@ -150,6 +150,7 @@ fn emit_struct_io_vars(
     emitter: anytype,
     ty: ir.TypeId,
     storage_class: u32,
+    stage: ir.ShaderStage,
     interface_ids: *std.ArrayListUnmanaged(u32),
 ) EmitError!void {
     const struct_id = switch (emitter.module.types.get(ty)) {
@@ -164,7 +165,7 @@ fn emit_struct_io_vars(
         const ptr_type = try emitter.builder.type_pointer(storage_class, value_type);
         const var_id = try emitter.builder.variable_global(ptr_type, storage_class);
         try emitter.builder.emit_name(var_id, field.name);
-        try decorate_io_var(&emitter.builder, var_id, io);
+        try decorate_io_var(&emitter.builder, var_id, io, stage, storage_class);
         try interface_ids.append(emitter.alloc, var_id);
     }
 }
@@ -175,6 +176,7 @@ fn emit_return_output_vars(
     emitter: anytype,
     return_type: ir.TypeId,
     return_io: ?ir.IoAttr,
+    stage: ir.ShaderStage,
     interface_ids: *std.ArrayListUnmanaged(u32),
 ) EmitError!void {
     switch (emitter.module.types.get(return_type)) {
@@ -186,7 +188,7 @@ fn emit_return_output_vars(
                 const ptr_type = try emitter.builder.type_pointer(spirv.StorageClass.Output, value_type);
                 const var_id = try emitter.builder.variable_global(ptr_type, spirv.StorageClass.Output);
                 try emitter.builder.emit_name(var_id, field.name);
-                try decorate_io_var(&emitter.builder, var_id, io);
+                try decorate_io_var(&emitter.builder, var_id, io, stage, spirv.StorageClass.Output);
                 try interface_ids.append(emitter.alloc, var_id);
             }
         },
@@ -197,7 +199,7 @@ fn emit_return_output_vars(
             const ptr_type = try emitter.builder.type_pointer(spirv.StorageClass.Output, value_type);
             const var_id = try emitter.builder.variable_global(ptr_type, spirv.StorageClass.Output);
             try emitter.builder.emit_name(var_id, "return_value");
-            try decorate_io_var(&emitter.builder, var_id, io);
+            try decorate_io_var(&emitter.builder, var_id, io, stage, spirv.StorageClass.Output);
             try interface_ids.append(emitter.alloc, var_id);
         },
     }
@@ -265,7 +267,13 @@ fn store_return_to_outputs(
 }
 
 /// Apply IO decorations (builtin, location, interpolation, invariant, blend_src) to a variable.
-fn decorate_io_var(builder: *spirv.Builder, var_id: u32, io: ir.IoAttr) EmitError!void {
+fn decorate_io_var(
+    builder: *spirv.Builder,
+    var_id: u32,
+    io: ir.IoAttr,
+    stage: ?ir.ShaderStage,
+    storage_class: u32,
+) EmitError!void {
     if (io.builtin != .none) {
         if (io.builtin == .subgroup_size or io.builtin == .subgroup_invocation_id) {
             try builder.emit_capability(spirv.Capability.GroupNonUniform);
@@ -273,7 +281,11 @@ fn decorate_io_var(builder: *spirv.Builder, var_id: u32, io: ir.IoAttr) EmitErro
         if (io.builtin == .clip_distances) {
             try builder.emit_capability(spirv.Capability.ClipDistance);
         }
-        try builder.emit_builtin_decoration(var_id, try emit_spirv_shared.builtin_to_spirv(io.builtin));
+        const spirv_builtin = if (stage) |shader_stage|
+            try emit_spirv_shared.builtin_to_spirv_for_stage(io.builtin, shader_stage, storage_class)
+        else
+            try emit_spirv_shared.builtin_to_spirv(io.builtin);
+        try builder.emit_builtin_decoration(var_id, spirv_builtin);
     }
     if (io.location) |loc| {
         try builder.emit_location_decoration(var_id, loc);

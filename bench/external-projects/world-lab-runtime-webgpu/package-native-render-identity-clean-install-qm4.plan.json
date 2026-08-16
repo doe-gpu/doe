@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "world-lab-package-native-render-identity-clean-install-plan",
+  "planId": "world-lab-package-native-render-identity-clean-install-qm4-v1",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "predecessor": {
+    "planId": "world-lab-package-native-identity-clean-install-qm3-v1",
+    "result": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/result.json",
+    "status": "passed",
+    "extension": "Extend the native diagnostic journal from compute dispatches to the unchanged application's two direct render draws. Each successful Vulkan draw binds both public-observer WGSL stage identities and entry points to the exact vertex and fragment SPIR-V bytes actually presented to the render backend."
+  },
+  "hypothesis": "Doe's clean-installed source-preserving evidence chain covers the complete compute-and-direct-render command surface exercised by World Labs: both observed draws can be joined to successful native Vulkan draw execution, exact vertex and fragment artifacts, and a later same-process queue submission without changing application or shader source.",
+  "lanes": {
+    "W0": "pinned incumbent observed through the clean-installed doe-gpu/observe export",
+    "D0": "clean-installed Doe compute and direct-render execution with native program-identity journal"
+  },
+  "frozenWork": {
+    "assertionCount": 16,
+    "cleanProcessRunsPerLane": 1,
+    "workerCountPerLane": 3,
+    "shaderAttemptCountPerLane": 13,
+    "compilationInfoCountPerLane": 8,
+    "dispatchCountPerLane": 3,
+    "drawCountPerLane": 2,
+    "submissionCountPerLane": 5,
+    "readbackCountPerLane": 8,
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "scientificParametersChangedFromQm3": false,
+    "supportedNativeRenderKinds": ["draw"]
+  },
+  "acceptance": [
+    "all qm3 clean-install, application, compilation, compute-artifact, native-submission, and mapped-output conditions remain passing",
+    "D0 emits exactly two render_draw_executed rows matching the two public draws by vertex and fragment WGSL hashes, entry points, normalized direct-draw arguments, and draw kind",
+    "each native render draw has a later successful same-process queue submission",
+    "every vertex and fragment SPIR-V filename and digest match the exact materialized bytes and pass spirv-val",
+    "no application, shader, provider, assertion, or scientific parameter changes from qm3"
+  ],
+  "nonGoals": [
+    "claim indexed, indirect, bundled, multi-target, or non-Vulkan render identity",
+    "claim driver-binary, operating-system, filesystem, network, or complete dependency tracing",
+    "assign performance, runtime-ownership, promotion, or release credit",
+    "reopen the terminal World Labs runtime-ownership decision"
+  ]
+}

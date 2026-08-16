@@ -670,6 +670,23 @@ test "check: invalid syntax sets error kind to a TranslateError name" {
     try std.testing.expect(found);
 }
 
+test "compilation info preserves diagnostics attached to an error shader module" {
+    const compilation_info = @import("../../src/native/shader/doe_shader_compilation_info_native.zig");
+    const message = "sema: UnknownIdentifier at 6:15 near `params.missing`";
+    var module = native.DoeShaderModule{
+        .compilation_message_kind = .@"error",
+        .compilation_message = message,
+        .compilation_message_line = 6,
+        .compilation_message_column = 15,
+    };
+
+    const json = std.mem.span(compilation_info.doeNativeShaderModuleGetCompilationInfo(@ptrCast(&module)));
+    try std.testing.expect(std.mem.indexOf(u8, json, "\"type\":\"error\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json, "\"lineNum\":6") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json, "\"linePos\":15") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json, "UnknownIdentifier") != null);
+}
+
 // ============================================================
 // 15. WGSL StringView handling — WGPU_STRLEN sentinel
 // ============================================================

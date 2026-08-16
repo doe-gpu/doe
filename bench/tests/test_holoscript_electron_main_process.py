@@ -10,13 +10,13 @@ ROOT = Path(__file__).resolve().parents[2]
 HARNESS = ROOT / "bench/external-projects/holoscript-snn-webgpu"
 REPORT = (
     ROOT
-    / "reports/benchmarks/amd-vulkan/20260815T225750Z"
+    / "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2"
     / "holoscript-electron-main-process-p0-diagnostic.json"
 )
 REVIEWED_REPORT = (
     ROOT
     / "reports/ecosystem/holoscript-snn-webgpu"
-    / "holoscript-electron-main-process-p0-2026-08-15-diagnostic.json"
+    / "holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json"
 )
 
 
@@ -166,7 +166,7 @@ class HoloScriptElectronMainProcessTests(unittest.TestCase):
         )
         self.assertEqual(
             self.report["packages"]["incumbentP0"]["nativeSha256"],
-            "23a02ab374f44242c4e49e4ca033a6907032f973914ee51128f242c74fd0075f",
+            "98359dec2b4778a82b61a4d6a643953bdd3995ab162e5ddfcc5d51df335479f9",
         )
 
     def test_claim_boundary_remains_diagnostic_only(self) -> None:

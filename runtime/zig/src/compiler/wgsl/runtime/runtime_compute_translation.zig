@@ -46,6 +46,10 @@ pub fn vulkan_compute_runtime_robustness_config() robustness.Config {
         .elide_dispatch_validated_global_bounds = false,
         .elide_static_storage_bounds = true,
         .elide_uniform_validated_bounds = false,
+        // The Vulkan device contract requires robustBufferAccess. Preserve
+        // raw storage-buffer indices so hardware returns zero for OOB reads
+        // and discards OOB writes instead of aliasing the final element.
+        .rely_on_storage_buffer_robustness = true,
     };
 }
 

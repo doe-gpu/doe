@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "fixture": {
+    "pointsPerCluster": 12,
+    "dimensions": 6,
+    "clusterCenter": 20,
+    "neighbors": 5,
+    "components": 2,
+    "epochs": 500,
+    "initialSeed": 1597463007,
+    "params": {
+      "a": 1.9292,
+      "b": 0.7915,
+      "gamma": 1.0,
+      "negativeSampleRate": 5
+    }
+  },
+  "sampling": {
+    "warmupRuns": 1,
+    "measuredRuns": 3
+  },
+  "oracle": {
+    "minimumSpread": 0.5,
+    "minimumInterToIntraRatio": 2.0,
+    "requireSameClusterNearestNeighbor": true,
+    "requireExactRepeatIdentity": true
+  }
+}

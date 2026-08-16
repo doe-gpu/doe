@@ -1,6 +1,8 @@
 const std = @import("std");
 const vk_render_pipeline = @import("../../src/backend/vulkan/vk_render_pipeline.zig");
+const vk_feature_caps = @import("../../src/backend/vulkan/vk_feature_caps.zig");
 const vk_constants = @import("../../src/backend/vulkan/vk_constants.zig");
+const model_binding_types = @import("../../src/contracts/model/model_binding_value_types.zig");
 const model_render_types = @import("../../src/contracts/model/model_render_types.zig");
 const model_texture_formats = @import("../../src/contracts/model/model_texture_format_value_types.zig");
 
@@ -25,6 +27,17 @@ test "vulkan: blend_factor_to_vk maps OneMinusSrcAlpha correctly" {
 test "vulkan: blend_factor_to_vk returns One for unknown value" {
     try std.testing.expectEqual(vk_constants.VK_BLEND_FACTOR_ONE, vk_render_pipeline.blend_factor_to_vk(0));
     try std.testing.expectEqual(vk_constants.VK_BLEND_FACTOR_ONE, vk_render_pipeline.blend_factor_to_vk(255));
+}
+
+test "vulkan: render buffer descriptor types preserve uniform versus storage" {
+    try std.testing.expectEqual(
+        vk_constants.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        vk_render_pipeline.render_buffer_descriptor_type(model_binding_types.WGPUBufferBindingType_Uniform),
+    );
+    try std.testing.expectEqual(
+        vk_constants.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        vk_render_pipeline.render_buffer_descriptor_type(model_binding_types.WGPUBufferBindingType_ReadOnlyStorage),
+    );
 }
 
 // blend_operation_to_vk
@@ -227,4 +240,38 @@ test "vulkan: vertex_step_mode_to_vk maps Instance correctly" {
 test "vulkan: vertex_step_mode_to_vk returns Vertex for unknown" {
     try std.testing.expectEqual(@as(u32, 0), vk_render_pipeline.vertex_step_mode_to_vk(0));
     try std.testing.expectEqual(@as(u32, 0), vk_render_pipeline.vertex_step_mode_to_vk(99));
+}
+
+test "vulkan: render texture descriptor type preserves storage ownership" {
+    try std.testing.expectEqual(
+        vk_constants.VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+        vk_render_pipeline.render_texture_descriptor_type(false),
+    );
+    try std.testing.expectEqual(
+        vk_constants.VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+        vk_render_pipeline.render_texture_descriptor_type(true),
+    );
+}
+
+test "vulkan: render texture layout preserves storage ownership" {
+    try std.testing.expectEqual(
+        vk_constants.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        vk_render_pipeline.render_texture_image_layout(false),
+    );
+    try std.testing.expectEqual(
+        vk_constants.VK_IMAGE_LAYOUT_GENERAL,
+        vk_render_pipeline.render_texture_image_layout(true),
+    );
+}
+
+test "vulkan: required graphics storage-write features survive device enablement" {
+    var raw = std.mem.zeroes(vk_constants.VkPhysicalDeviceFeatures);
+    raw.robustBufferAccess = vk_constants.VK_TRUE;
+    raw.vertexPipelineStoresAndAtomics = vk_constants.VK_TRUE;
+    raw.fragmentStoresAndAtomics = vk_constants.VK_TRUE;
+
+    const enabled = vk_feature_caps.enabled_core_features(raw);
+    try std.testing.expectEqual(vk_constants.VK_TRUE, enabled.robustBufferAccess);
+    try std.testing.expectEqual(vk_constants.VK_TRUE, enabled.vertexPipelineStoresAndAtomics);
+    try std.testing.expectEqual(vk_constants.VK_TRUE, enabled.fragmentStoresAndAtomics);
 }

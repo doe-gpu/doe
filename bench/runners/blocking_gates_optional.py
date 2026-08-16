@@ -48,6 +48,9 @@ def run_optional_artifact_gates(
     browser_runtime_frontier_bundle_check = (
         tools_dir / "check_browser_runtime_frontier_bundle.py"
     )
+    program_execution_identity_receipt_check = (
+        tools_dir / "program_execution_identity_receipt.py"
+    )
     wgsl_lowering_link_receipt_check = tools_dir / "check_wgsl_lowering_link_receipt.py"
     wgsl_minimization_receipt_check = tools_dir / "check_wgsl_minimization_receipt.py"
     wgsl_cts_shader_subset_check = tools_dir / "check_wgsl_cts_shader_subset.py"
@@ -379,6 +382,21 @@ def run_optional_artifact_gates(
         if args.browser_runtime_frontier_bundle_out.strip():
             gate_cmd.extend(["--out", args.browser_runtime_frontier_bundle_out.strip()])
         run_gate("browser-runtime-frontier-bundle", gate_cmd)
+
+    if args.with_program_execution_identity_receipt_gate:
+        receipt_path = Path(args.program_execution_identity_receipt)
+        if not receipt_path.exists():
+            print(f"FAIL: missing --program-execution-identity-receipt: {receipt_path}")
+            return 1
+        run_gate(
+            "program-execution-identity-receipt",
+            [
+                sys.executable,
+                str(program_execution_identity_receipt_check),
+                "--check",
+                str(receipt_path),
+            ],
+        )
 
     if args.with_wgsl_lowering_link_receipt_gate:
         receipt_path = Path(args.wgsl_lowering_link_receipt)

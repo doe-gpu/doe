@@ -64,11 +64,15 @@ try {
 
   const providerPath = resolve(scratch, 'provider.mjs');
   const applicationPath = resolve(scratch, 'application.mjs');
+  const failureApplicationPath = resolve(scratch, 'failure-application.mjs');
   const evaluatorPath = resolve(scratch, 'evaluator.mjs');
   const inputPath = resolve(scratch, 'input.bin');
   const runtimeDataPath = resolve(scratch, 'runtime-data.bin');
   const contractPath = resolve(scratch, 'contract.json');
   const artifactPath = resolve(scratch, 'artifact.json');
+  const replayArtifactPath = resolve(scratch, 'artifact-replay.json');
+  const failureContractPath = resolve(scratch, 'failure-contract.json');
+  const failureArtifactPath = resolve(scratch, 'failure-artifact.json');
   await writeFile(providerPath, `
     export const globals = {
       GPUBufferUsage: { STORAGE: 128 },
@@ -77,15 +81,86 @@ try {
       GPUTextureUsage: { STORAGE_BINDING: 8 },
     };
     export function create() {
-      return { requestAdapter: async () => ({ label: 'clean-install-adapter' }) };
+      return { requestAdapter: async () => ({
+        label: 'clean-install-adapter',
+        requestDevice: async () => {
+          const queue = {
+            writeBuffer(buffer, offset, data) {
+              const source = ArrayBuffer.isView(data)
+                ? new Uint8Array(data.buffer, data.byteOffset, data.byteLength)
+                : new Uint8Array(data);
+              buffer.bytes.set(source, offset);
+            },
+            submit() {},
+            async onSubmittedWorkDone() {},
+          };
+          return {
+            queue,
+            createShaderModule({ code }) {
+              if (!code.includes('@compute')) throw new Error('invalid fixture shader');
+              return {
+                kind: 'shaderModule',
+                async getCompilationInfo() {
+                  return { messages: [{
+                    type: 'warning',
+                    message: 'clean-install fixture warning',
+                    lineNum: 1,
+                    linePos: 1,
+                    offset: 0,
+                    length: 1,
+                  }] };
+                },
+              };
+            },
+            createComputePipeline() { return { kind: 'computePipeline' }; },
+            createBuffer({ size }) {
+              const bytes = new Uint8Array(Number(size));
+              return {
+                bytes,
+                async mapAsync() {},
+                getMappedRange(offset = 0, length = bytes.byteLength - offset) {
+                  return bytes.slice(offset, offset + length).buffer;
+                },
+              };
+            },
+            createCommandEncoder() {
+              return {
+                beginComputePass() {
+                  return { setPipeline() {}, dispatchWorkgroups() {}, end() {} };
+                },
+                finish() { return { kind: 'commandBuffer' }; },
+              };
+            },
+          };
+        },
+      }) };
     }
   `);
   await writeFile(applicationPath, `
     import { __doeProofProviderIdentity, create } from 'webgpu';
     const adapter = await create().requestAdapter();
+    const device = await adapter.requestDevice();
+    const module = device.createShaderModule({
+      code: '@compute @workgroup_size(4) fn main() {}',
+    });
+    const pipeline = device.createComputePipeline({
+      layout: 'auto',
+      compute: { module, entryPoint: 'main' },
+    });
+    const buffer = device.createBuffer({ size: 4, usage: 7 });
+    device.queue.writeBuffer(buffer, 0, new Uint8Array([2, 4, 6, 8]));
+    const encoder = device.createCommandEncoder();
+    const pass = encoder.beginComputePass();
+    pass.setPipeline(pipeline);
+    pass.dispatchWorkgroups(1);
+    pass.end();
+    device.queue.submit([encoder.finish()]);
+    await device.queue.onSubmittedWorkDone();
+    await buffer.mapAsync(1, 0, 4);
+    const output = [...new Uint8Array(buffer.getMappedRange(0, 4))];
     process.stdout.write(JSON.stringify({
       providerIdentity: __doeProofProviderIdentity,
-      output: [2, 4, 6, 8],
+      output,
       evidence: { adapterLabel: adapter.label },
     }) + '\\n');
   `);
@@ -98,6 +173,16 @@ try {
         evidence: value.evidence,
       };
     }
+  `);
+  await writeFile(failureApplicationPath, `
+    import { create } from 'webgpu';
+    const adapter = await create().requestAdapter();
+    const device = await adapter.requestDevice();
+    const module = device.createShaderModule({
+      code: '@compute @workgroup_size(4) fn main() {}',
+    });
+    await module.getCompilationInfo();
+    throw new Error('intentional clean-install observed failure');
   `);
   await writeFile(inputPath, new Uint8Array([1, 2, 3, 4]));
   await writeFile(runtimeDataPath, new Uint8Array([5, 6, 7, 8]));
@@ -132,6 +217,7 @@ try {
       sha256: await fileDigest(evaluatorPath),
       export: 'evaluate',
     },
+    observeProgram: { metadata: { contract: 'clean-install-cli' } },
     runtimeFiles: [{
       id: 'clean-install-runtime-data',
       path: runtimeDataPath,
@@ -156,9 +242,29 @@ try {
   if (verified.valid !== true || verified.oracle?.status !== 'pass') {
     throw new Error(`installed CLI receipt failed: ${verify.stdout}`);
   }
+  const replay = execute(bin, ['replay', artifactPath, '--out', replayArtifactPath]);
+  requireSuccess(replay, 'installed CLI replay');
+  const compare = execute(bin, ['compare', artifactPath, replayArtifactPath]);
+  requireSuccess(compare, 'installed CLI compare');
+  const comparison = JSON.parse(compare.stdout);
+  if (!comparison.comparable || !comparison.sameWorkload || !comparison.sameOutput) {
+    throw new Error(`installed CLI observation replay failed: ${compare.stdout}`);
+  }
   const artifact = JSON.parse(await readFile(artifactPath, 'utf8'));
+  const replayArtifact = JSON.parse(await readFile(replayArtifactPath, 'utf8'));
   if (artifact.receipt?.applicationEvidence?.adapterLabel !== 'clean-install-adapter') {
     throw new Error('installed CLI did not execute the declared provider');
+  }
+  if (artifact.receipt?.programEvidence?.status !== 'observed'
+      || artifact.receipt.programEvidence.observation?.summary?.dispatchCount !== 1
+      || artifact.receipt.programEvidence.observation?.summary?.readbackCount !== 1) {
+    throw new Error('installed CLI did not bind transparent program evidence');
+  }
+  if (replayArtifact.receipt?.programEvidence?.observationSha256
+      !== artifact.receipt.programEvidence.observationSha256
+      || replayArtifact.receipt?.replay?.executionSha256
+        !== artifact.receipt.replay.executionSha256) {
+    throw new Error('installed CLI program evidence did not replay exactly');
   }
   if (artifact.dependencies?.runtimeFiles?.[0]?.id !== 'clean-install-runtime-data') {
     throw new Error('installed CLI did not bind the declared runtime file');
@@ -166,6 +272,41 @@ try {
   if (artifact.receipt?.process?.declaration?.filesystem?.mode
       !== 'node-permission-read-only') {
     throw new Error('installed CLI did not enforce the declared filesystem policy');
+  }
+
+  const failureContract = structuredClone(contract);
+  failureContract.workload.id = 'clean-install-observed-failure';
+  failureContract.workload.implementationSha256 = digest(
+    'clean install observed failure application v1',
+  );
+  failureContract.process.entrypoint = {
+    path: failureApplicationPath,
+    sha256: await fileDigest(failureApplicationPath),
+  };
+  failureContract.observeProgram = {
+    metadata: { contract: 'clean-install-cli-failure' },
+  };
+  await writeFile(failureContractPath, `${JSON.stringify(failureContract, null, 2)}\n`);
+  const failureRun = execute(
+    bin,
+    ['run', failureContractPath, '--out', failureArtifactPath],
+  );
+  if (failureRun.status !== 1) {
+    throw new Error(`installed CLI fatal run did not fail as declared:\n${failureRun.stdout}\n${failureRun.stderr}`);
+  }
+  const failureVerify = execute(bin, ['verify', failureArtifactPath]);
+  requireSuccess(failureVerify, 'installed CLI fatal receipt verification');
+  const failureArtifact = JSON.parse(await readFile(failureArtifactPath, 'utf8'));
+  if (failureArtifact.status !== 'failed'
+      || failureArtifact.receipt?.programEvidence?.status !== 'observed'
+      || failureArtifact.receipt.programEvidence.checkpoint?.reason
+        !== 'process-uncaught-exception'
+      || failureArtifact.receipt.programEvidence.observation
+        ?.summary?.compilationInfoCount !== 1
+      || failureArtifact.receipt.programEvidence.observation
+        ?.compilationInfos?.[0]?.messages?.[0]?.message
+        !== 'clean-install fixture warning') {
+    throw new Error('installed CLI fatal receipt did not retain shader diagnostics');
   }
 
   const installedFiles = await readdir(resolve(scratch, 'node_modules/doe-gpu/bin'));
@@ -177,6 +318,7 @@ try {
     'governed-node-webgpu-process-contract.schema.json',
     'governed-node-webgpu-process-receipt.schema.json',
     'governed-node-webgpu-process-artifact.schema.json',
+    'transparent-webgpu-observation.schema.json',
   ]) {
     const schema = JSON.parse(await readFile(
       requireFromFixture.resolve(`doe-gpu/${schemaName}`),

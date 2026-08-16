@@ -58,8 +58,8 @@ class ExternalProjectReproductionPlanTests(unittest.TestCase):
             "bench/out/external-projects/electronicarts-cpp-ml-intro/upstream",
         )
         self.assertEqual(
-            plan["workloadCommand"][-2:],
-            ["--run-id", "portable-plan-test"],
+            plan["workloadCommand"][-3:],
+            ["--run-id", "portable-plan-test", "--runtime-ownership"],
         )
 
     def test_vgpu_plan_binds_preparation_receipt_to_workload(self) -> None:

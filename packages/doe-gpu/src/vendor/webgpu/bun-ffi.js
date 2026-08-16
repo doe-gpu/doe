@@ -10,6 +10,7 @@ import {
     WORKSPACE_ROOT,
     libraryBasenamesForPlatform,
     resolvePlatformPackageLibraryPath,
+    isInstalledPackageRoot,
 } from "./platform-package.js";
 import { globals } from "./webgpu-constants.js";
 import {
@@ -258,15 +259,28 @@ function resolveDoeLibraryPath() {
         workspaceRoot: WORKSPACE_ROOT,
     });
     const libraryNames = libraryBasenamesForPlatform();
-    const candidates = [
+    const configuredCandidates = [
         process.env.DOE_WEBGPU_LIB,
         process.env.DOE_LIB,
+    ];
+    const workspaceCandidates = [
         ...libraryNames.map((name) => resolve(WORKSPACE_ROOT, "runtime", "zig", "zig-out", "lib", name)),
         ...libraryNames.map((name) => resolve(WORKSPACE_ROOT, "zig", "zig-out", "lib", name)),
+    ];
+    const packagedCandidates = [
         packagedLibraryPath,
         ...libraryNames.map((name) => resolve(PACKAGE_ROOT, "prebuilds", `${process.platform}-${process.arch}`, name)),
+    ];
+    const cwdCandidates = [
         ...libraryNames.map((name) => resolve(process.cwd(), "runtime", "zig", "zig-out", "lib", name)),
         ...libraryNames.map((name) => resolve(process.cwd(), "zig", "zig-out", "lib", name)),
+    ];
+    const candidates = [
+        ...configuredCandidates,
+        ...(isInstalledPackageRoot(PACKAGE_ROOT)
+            ? [...packagedCandidates, ...workspaceCandidates]
+            : [...workspaceCandidates, ...packagedCandidates]),
+        ...cwdCandidates,
     ];
     for (const c of candidates) {
         if (c && existsSync(c)) return c;

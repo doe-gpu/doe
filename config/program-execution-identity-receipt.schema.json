@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "doe://config/program-execution-identity-receipt.schema.json",
+  "title": "Doe program execution identity receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "inputs",
+    "identity",
+    "oracle",
+    "checks",
+    "verdict",
+    "receiptSha256"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "artifactKind": { "const": "doe_program_execution_identity_receipt" },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime",
+        "commands",
+        "kernelRoot",
+        "source",
+        "traceMeta",
+        "trace",
+        "shaderManifest",
+        "backendArtifact",
+        "oracleReference"
+      ],
+      "properties": {
+        "runtime": { "$ref": "#/$defs/FileRef" },
+        "commands": { "$ref": "#/$defs/FileRef" },
+        "kernelRoot": { "$ref": "#/$defs/Path" },
+        "source": { "$ref": "#/$defs/FileRef" },
+        "traceMeta": { "$ref": "#/$defs/FileRef" },
+        "trace": { "$ref": "#/$defs/FileRef" },
+        "shaderManifest": { "$ref": "#/$defs/FileRef" },
+        "backendArtifact": { "$ref": "#/$defs/FileRef" },
+        "oracleReference": { "$ref": "#/$defs/FileRef" }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kernel",
+        "backend",
+        "backendLane",
+        "profile",
+        "wgslSha256",
+        "semanticSha256",
+        "irSha256",
+        "backendArtifactSha256",
+        "toolchainSha256",
+        "shaderManifestIdentity",
+        "pipelineHash",
+        "dispatchCount",
+        "outputSha256"
+      ],
+      "properties": {
+        "kernel": { "type": "string", "minLength": 1 },
+        "backend": { "const": "doe_vulkan" },
+        "backendLane": { "type": "string", "minLength": 1 },
+        "profile": { "type": "object" },
+        "wgslSha256": { "$ref": "#/$defs/Hash" },
+        "semanticSha256": { "$ref": "#/$defs/Hash" },
+        "irSha256": { "$ref": "#/$defs/Hash" },
+        "backendArtifactSha256": { "$ref": "#/$defs/Hash" },
+        "toolchainSha256": { "$ref": "#/$defs/Hash" },
+        "shaderManifestIdentity": { "$ref": "#/$defs/Hash" },
+        "pipelineHash": { "$ref": "#/$defs/Hash" },
+        "dispatchCount": { "type": "integer", "minimum": 1 },
+        "outputSha256": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "referenceId", "expectedSha256", "actualSha256"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "referenceId": { "$ref": "#/$defs/Path" },
+        "expectedSha256": { "$ref": "#/$defs/Hash" },
+        "actualSha256": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceMatchesManifest",
+        "moduleMatchesCommand",
+        "manifestIdentityMatchesTrace",
+        "manifestPathMatchesTrace",
+        "backendMatchesExecution",
+        "backendArtifactMatchesManifest",
+        "executionSucceeded",
+        "dispatchCountMatchesCommand",
+        "fallbackAbsent",
+        "outputOracleMatched"
+      ],
+      "properties": {
+        "sourceMatchesManifest": { "type": "boolean" },
+        "moduleMatchesCommand": { "type": "boolean" },
+        "manifestIdentityMatchesTrace": { "type": "boolean" },
+        "manifestPathMatchesTrace": { "type": "boolean" },
+        "backendMatchesExecution": { "type": "boolean" },
+        "backendArtifactMatchesManifest": { "type": "boolean" },
+        "executionSucceeded": { "type": "boolean" },
+        "dispatchCountMatchesCommand": { "type": "boolean" },
+        "fallbackAbsent": { "type": "boolean" },
+        "outputOracleMatched": { "type": "boolean" }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "failureCodes", "claimBoundary"],
+      "properties": {
+        "status": { "enum": ["passed", "failed"] },
+        "failureCodes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "claimBoundary": { "type": "string", "minLength": 1 }
+      }
+    },
+    "receiptSha256": { "$ref": "#/$defs/Hash" }
+  },
+  "$defs": {
+    "Hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "Path": { "type": "string", "minLength": 1, "not": { "pattern": "^/" } },
+    "FileRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/Path" },
+        "sha256": { "$ref": "#/$defs/Hash" }
+      }
+    }
+  }
+}

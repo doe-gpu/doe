@@ -95,6 +95,18 @@
         "export": { "type": "string", "minLength": 1 }
       }
     },
+    "observeProgram": {
+      "oneOf": [
+        { "type": "boolean" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "metadata": { "type": "object" }
+          }
+        }
+      ]
+    },
     "runtimeFiles": {
       "type": "array",
       "items": {

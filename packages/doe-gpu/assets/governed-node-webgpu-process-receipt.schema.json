@@ -164,6 +164,69 @@
     "applicationEvidenceSha256": {
       "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
     },
+    "programEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "checkpointCount",
+        "observationSha256",
+        "observation"
+      ],
+      "properties": {
+        "status": { "enum": ["not-requested", "observed", "missing"] },
+        "checkpointCount": { "type": "integer", "minimum": 0 },
+        "observationSha256": {
+          "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+        },
+        "observation": {
+          "anyOf": [
+            { "$ref": "transparent-webgpu-observation.schema.json" },
+            { "type": "null" }
+          ]
+        },
+        "checkpoint": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["reason"],
+              "properties": {
+                "reason": {
+                  "enum": [
+                    "mapped-readback",
+                    "compilation-info",
+                    "process-before-exit",
+                    "process-uncaught-exception"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "observed" } } },
+          "then": {
+            "properties": {
+              "checkpointCount": { "minimum": 1 },
+              "observationSha256": { "$ref": "#/$defs/sha256" },
+              "observation": { "$ref": "transparent-webgpu-observation.schema.json" }
+            }
+          },
+          "else": {
+            "properties": {
+              "checkpointCount": { "const": 0 },
+              "observationSha256": { "type": "null" },
+              "observation": { "type": "null" },
+              "checkpoint": { "type": "null" }
+            }
+          }
+        }
+      ]
+    },
     "replay": {
       "type": "object",
       "additionalProperties": false,
@@ -190,6 +253,7 @@
               "DOE_GOVERNED_PROCESS_EXIT_FAILED",
               "DOE_GOVERNED_PROCESS_EVALUATION_FAILED",
               "DOE_GOVERNED_PROCESS_PROVIDER_IDENTITY_FAILED",
+              "DOE_GOVERNED_PROCESS_PROGRAM_EVIDENCE_FAILED",
               "DOE_GOVERNED_PROCESS_ORACLE_FAILED",
               "DOE_GOVERNED_PROCESS_RECEIPT_SINK_FAILED"
             ]

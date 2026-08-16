@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "cpp-ml-mnist-persistent-performance-control-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "generatedAt": "2026-08-16T04:57:56Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T04:57:56Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "25",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/cpp-ml-intro",
+    "commit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "frozen-performance-population-passes",
+      "category": "performance",
+      "status": "verified",
+      "summary": "Pinned Dawn and Doe each complete 30 alternating cold processes, five warm-up suites, and 100 warm suites on the accessible Radeon Vulkan render node. Every execution runs the same hash-bound generated six-pass graph over ten images through synchronization, input/hidden/output readback, CPU comparison, and cleanup.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/persistent-performance-control-qm0-v1/result.json",
+          "sha256": "b7bbe4bf3b0b483fceace4fb3fc91135d208df2f8cb5cb3854bb444c920f353a"
+        }
+      ]
+    },
+    {
+      "id": "semantic-equivalence-remains-exact",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "All cold, warm-up, and warm suites reproduce semantic output identity 17287b3124138aac38b936254f378f6f4765e5e9ffc524766686e5117c48a079 in both lanes. Every digit retains the frozen 0.5/255 input tolerance and 1e-5 hidden/output CPU-oracle tolerances.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/persistent-performance-control-qm0-v1/result.json",
+          "sha256": "b7bbe4bf3b0b483fceace4fb3fc91135d208df2f8cb5cb3854bb444c920f353a"
+        }
+      ]
+    },
+    {
+      "id": "doe-performance-regresses-at-every-percentile",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "Doe is 1.391x, 1.513x, and 1.521x slower at cold p50/p95/p99 and 1.768x, 1.720x, and 1.751x slower at warm p50/p95/p99. It therefore fails both the frozen 1.10x material-win condition and the 1.05x maximum-regression condition.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/persistent-performance-control-qm0-v1/result.json",
+          "sha256": "b7bbe4bf3b0b483fceace4fb3fc91135d208df2f8cb5cb3854bb444c920f353a"
+        }
+      ]
+    },
+    {
+      "id": "persistent-performance-ownership-rejected",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "The distinct persistent-performance-control hypothesis is rejected for this application and tuple. Together with the earlier independent-correction rejection, cpp-ml remains useful clean-installed DoeProof and compiler regression evidence but supplies no DoeRuntime ownership or promotion credit.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/persistent-performance-control-qm0-v1/result.json",
+          "sha256": "b7bbe4bf3b0b483fceace4fb3fc91135d208df2f8cb5cb3854bb444c920f353a"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/raw-suite.json",
+          "sha256": "b5bad19093fa1507571b3c13fd6b09bdab0fbddc4f7c6a9f28e887eb22cb6abc"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The performance process uses the hash-bound source-tree provider seam; the separately reviewed qm9 result proves clean installation but does not transfer performance credit.",
+    "The incumbent adapter API omits Doe's detailed driver fields, while the host contract independently binds the accessible physical render node and prohibits software fallback.",
+    "The run does not satisfy promotion-scale concurrency, teardown-cycle, unexpected-device-loss, stress, or bounded-memory-growth obligations.",
+    "Receipt overhead is not isolated from provider and process variance.",
+    "The result is a terminal negative ownership diagnostic, not a public performance claim or supported-application promotion."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 30,
+      "successes": 30,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 164581376
+    },
+    "comparison": {
+      "cleanProcessRuns": 30,
+      "successes": 30,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 157593600
+    }
+  },
+  "performance": {
+    "unit": "ms",
+    "baseline": {
+      "cold": {
+        "p50": 227.883101,
+        "p95": 242.426895,
+        "p99": 261.57841
+      },
+      "warm": {
+        "p50": 50.139814,
+        "p95": 58.550432,
+        "p99": 59.822669
+      }
+    },
+    "comparison": {
+      "cold": {
+        "p50": 317.046936,
+        "p95": 366.853993,
+        "p99": 397.85776
+      },
+      "warm": {
+        "p50": 88.629978,
+        "p95": 100.727482,
+        "p99": 104.729082
+      }
+    }
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The worker binds exact execution and output evidence, but receipt construction was not isolated as a separate matched timing population."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "retain-diagnostic",
+    "claimedProperty": "persistent-performance-control",
+    "lanes": {
+      "I0": {
+        "status": "pass",
+        "summary": "The previously reviewed ambient-incumbent lane passes the same pinned application and oracle; this result does not reinterpret it."
+      },
+      "I1": {
+        "status": "pass",
+        "summary": "The previously reviewed explicitly pinned webgpu@0.4.0 lane passes the same pinned application and oracle."
+      },
+      "W0": {
+        "status": "pass",
+        "summary": "Governed webgpu@0.4.0 passes every frozen cold and warm sample and supplies the faster result at every required percentile."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "DoeRuntime passes every exactness and execution obligation but regresses both cold and warm performance beyond the frozen boundary."
+      },
+      "P0": {
+        "status": "not-run",
+        "summary": "D0 exposes no performance advantage or incumbent defect, so a bounded incumbent patch is neither required nor authorized."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "Doe misses the material-win threshold and exceeds the maximum-regression boundary at every required percentile."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "A slower owned runtime supplies no application value that could repay its source, compatibility, security, packaging, and support cost for this tuple."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "pass",
+      "summary": "The separately reviewed qm9 diagnostic proves a clean-installed public DoeProof application boundary for this tuple; performance remains source-tree evidence."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "The result binds accessible /dev/dri/renderD128 and the Doe lane identifies the physical Radeon Vulkan adapter with no software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The matched performance population is deliberately sequential and alternating."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "All 60 cold processes and both retained-device warm workers exit normally after device teardown."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The population does not satisfy the 1,000-iteration promotion stress floor."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak cold-process memory is recorded, but bounded growth across the required repeated lifecycle population was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The plan, worker, runner, providers, generated graph, model, image inputs, package entrypoints, host boundary, raw samples, and terminal decision are hash-bound."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Every measured sample reproduces one exact cross-provider semantic identity, and the separately reviewed DoeProof result supplies command-level replay evidence."
+    },
+    "performance": {
+      "status": "fail",
+      "summary": "Doe is slower than the governed incumbent at cold and warm p50, p95, and p99 and violates the frozen regression ceiling."
+    },
+    "ownership": {
+      "status": "fail",
+      "summary": "Persistent performance control does not distinguish DoeRuntime for cpp-ml on this tuple."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "cpp-ml remains a diagnostic application and cannot block a Doe release."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/persistent-performance-control-qm0-v1/result.json",
+      "sha256": "b7bbe4bf3b0b483fceace4fb3fc91135d208df2f8cb5cb3854bb444c920f353a"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1/result.json",
+      "sha256": "0090aba547ab7b9dd07804c845736e45ab5e9dfae2a314eee6ede1ad9d3f1099"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/persistent-performance-control-qm0-v1/result.json",
+      "sha256": "b7bbe4bf3b0b483fceace4fb3fc91135d208df2f8cb5cb3854bb444c920f353a"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/raw-suite.json",
+      "sha256": "b5bad19093fa1507571b3c13fd6b09bdab0fbddc4f7c6a9f28e887eb22cb6abc"
+    }
+  ]
+}

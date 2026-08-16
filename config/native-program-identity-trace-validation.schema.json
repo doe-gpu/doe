@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe native program-identity trace validation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "inputs",
+    "counts",
+    "checks",
+    "artifacts",
+    "verdict",
+    "validationSha256"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "artifactKind": { "const": "doe_native_program_identity_trace_validation" },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trace",
+        "rowSchema",
+        "artifactRoot",
+        "spirvValidator",
+        "requireRenderCompletion"
+      ],
+      "properties": {
+        "trace": { "$ref": "#/$defs/FileRef" },
+        "rowSchema": { "$ref": "#/$defs/FileRef" },
+        "artifactRoot": { "$ref": "#/$defs/Path" },
+        "spirvValidator": { "type": "string", "minLength": 1 },
+        "requireRenderCompletion": { "type": "boolean" }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rows", "processes", "dispatches", "renderDraws", "submissions", "artifacts"],
+      "properties": {
+        "rows": { "type": "integer", "minimum": 1 },
+        "processes": { "type": "integer", "minimum": 1 },
+        "dispatches": { "type": "integer", "minimum": 0 },
+        "renderDraws": { "type": "integer", "minimum": 0 },
+        "submissions": { "type": "integer", "minimum": 0 },
+        "artifacts": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rowSchemaValid",
+        "processSequenceValid",
+        "computeSubmissionValid",
+        "renderCompletionValid",
+        "backendArtifactsValid"
+      ],
+      "properties": {
+        "rowSchemaValid": { "type": "boolean" },
+        "processSequenceValid": { "type": "boolean" },
+        "computeSubmissionValid": { "type": "boolean" },
+        "renderCompletionValid": { "type": "boolean" },
+        "backendArtifactsValid": { "type": "boolean" }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "path", "expectedSha256", "actualSha256", "spirvValPassed"],
+        "properties": {
+          "stage": { "enum": ["compute", "vertex", "fragment"] },
+          "path": { "$ref": "#/$defs/Path" },
+          "expectedSha256": { "$ref": "#/$defs/Hash" },
+          "actualSha256": {
+            "oneOf": [
+              { "$ref": "#/$defs/Hash" },
+              { "type": "null" }
+            ]
+          },
+          "spirvValPassed": { "type": "boolean" }
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "failureCodes", "claimBoundary"],
+      "properties": {
+        "status": { "enum": ["passed", "failed"] },
+        "failureCodes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "claimBoundary": { "type": "string", "minLength": 1 }
+      }
+    },
+    "validationSha256": { "$ref": "#/$defs/Hash" }
+  },
+  "$defs": {
+    "Hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "Path": { "type": "string", "minLength": 1, "not": { "pattern": "^/" } },
+    "FileRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/Path" },
+        "sha256": { "$ref": "#/$defs/Hash" }
+      }
+    }
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "world-lab-consumer-execution-oracles-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "generatedAt": "2026-08-16T00:38:12Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T00:38:12Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "18",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "unchanged-six-process-oracle-pass",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "The unchanged pinned application passed all 16 upstream assertions in each of three clean Dawn processes and each of three clean Doe processes on physical AMD Vulkan. The assertion identities match across every process, with no crash, hang, timeout, or fallback.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/raw-suite.json",
+          "sha256": "7fe0d4ea2009ae23c7f44429197c769643315f57b4a6e5b6616ef743aec87709"
+        },
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/receipt-summary.json",
+          "sha256": "4db755f3cb9c5209f7ea1677c69959d23cc9e16c033ad0d152d929ce8a9f501d"
+        }
+      ]
+    },
+    {
+      "id": "module-constant-array-gap-fixed",
+      "category": "compatibility",
+      "status": "fixed",
+      "summary": "Doe now accepts, lowers, and executes the unchanged 512-entry module-scope permutation constant used by the generated vegetation shader. The compiler owns the fix through dynamically sized constructor analysis and paid composite constants rather than an application rewrite.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/raw-suite.json",
+          "sha256": "7fe0d4ea2009ae23c7f44429197c769643315f57b4a6e5b6616ef743aec87709"
+        }
+      ]
+    },
+    {
+      "id": "atomic-compare-exchange-result-gap-fixed",
+      "category": "compatibility",
+      "status": "fixed",
+      "summary": "Doe now preserves both old_value and exchanged fields from atomicCompareExchangeWeak and lowers the result through SPIR-V. The unchanged vegetation parity, zero-candidate, and overflow assertions pass in every Doe process.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/receipt-summary.json",
+          "sha256": "4db755f3cb9c5209f7ea1677c69959d23cc9e16c033ad0d152d929ce8a9f501d"
+        }
+      ]
+    },
+    {
+      "id": "shader-compilation-info-gap-fixed",
+      "category": "correctness",
+      "status": "fixed",
+      "summary": "Native diagnostics attached to an error shader module now remain visible through GPUShaderModule.getCompilationInfo. The upstream deliberately invalid fragment shader is rejected with an error-severity message in every Doe process.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/raw-suite.json",
+          "sha256": "7fe0d4ea2009ae23c7f44429197c769643315f57b4a6e5b6616ef743aec87709"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The upstream report validates vegetation records and fullscreen pixels through independent assertions but does not retain exact output bytes.",
+    "Dynamically assembled shader bytes and concrete vegetation dispatch counts are not emitted by the upstream test report.",
+    "The controlled source-provider alias is not a validated clean-install production path.",
+    "Three sequential clean processes per provider do not satisfy promotion-scale concurrency, teardown, stress, or bounded-memory-growth gates.",
+    "The I0/I1/W0/D0/P0 runtime-ownership matrix was not run, so this compatibility repair does not establish a unique DoeRuntime advantage over a governed incumbent or bounded incumbent patch."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "dynamic-shader-identity-incomplete",
+      "vegetation-dispatch-shape-unrecorded",
+      "exact-output-bytes-unrecorded"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 282214400
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 333119488
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Clean-process durations are diagnostic only because exact dynamic-shader, dispatch-shape, cache-state, and selected-operation identities are incomplete."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The harness did not execute matched receipt-enabled and receipt-disabled provider pairs."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "This result proves a Doe compatibility correction on the owned runtime, but it does not compare governed-incumbent and bounded-patch controls under the frozen ownership contract."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The application uses a controlled Vitest provider alias and workspace source package."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Both providers bind the accessible physical Radeon/RADV adapter and reject software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The retained matrix uses sequential clean processes."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "All processes exit without failure, but no promotion-scale teardown-cycle lane ran."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The three-process diagnostic matrix is below the promotion stress floor."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS is retained, but bounded memory growth was not measured."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "Provider identity, adapter identity, synchronization, readback class, and assertion identity are retained; dynamic shader hashes, exact output bytes, and vegetation dispatch counts remain absent."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven semantic replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "The run is a correctness and compatibility gate, not a fair performance comparison."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The required I0/I1/W0/D0/P0 ownership comparison was not run."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The harness remains diagnostic and is not a blocking release dependency."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/reproduction.json",
+      "sha256": "42cdb96e19e36d12f8755d8e3cc76809d9e6c3e673c7bf00f1b04e2bb5a91b4f"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/receipt-summary.json",
+      "sha256": "4db755f3cb9c5209f7ea1677c69959d23cc9e16c033ad0d152d929ce8a9f501d"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/raw-suite.json",
+      "sha256": "7fe0d4ea2009ae23c7f44429197c769643315f57b4a6e5b6616ef743aec87709"
+    }
+  ]
+}

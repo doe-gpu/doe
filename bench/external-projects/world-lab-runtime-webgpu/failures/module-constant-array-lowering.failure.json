@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "module-constant-array-lowering",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Doe limited constructor semantic analysis to 16 arguments and represented only scalar module constants, rejecting the unchanged 512-entry permutation table used by World Labs vegetation WGSL; analysis now allocates paid argument storage and all text and SPIR-V emitters preserve array constant composites.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-current-runtime/raw-suite.json",
+      "sha256": "15d0e2383cf4cfcda0e660b400057f86a7d36f05ca49cb5405e7df24af0542e7"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/raw-suite.json",
+      "sha256": "7fe0d4ea2009ae23c7f44429197c769643315f57b4a6e5b6616ef743aec87709"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/tests/wgsl/coverage_type_decl_test.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/compiler/wgsl/frontend/sema.zig",
+    "runtime/zig/src/compiler/wgsl/frontend/sema_expr.zig",
+    "runtime/zig/src/compiler/wgsl/ir/ir.zig",
+    "runtime/zig/src/compiler/wgsl/ir/ir_builder.zig",
+    "runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv.zig",
+    "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_builder.zig",
+    "runtime/zig/src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
+    "runtime/zig/src/compiler/wgsl/emit/hlsl/emit_hlsl.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/tests/wgsl/coverage_type_decl_test.zig"
+  ],
+  "verifiedAt": "2026-08-16T00:38:12Z"
+}

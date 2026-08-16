@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "wgsl-fns-public-compilation-observer-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "wgsl-fns",
+  "harnessId": "wgsl-compilation-suite",
+  "generatedAt": "2026-08-16T05:53:43Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T05:53:43Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "28",
+  "upstream": {
+    "repositoryUrl": "https://github.com/koole/wgsl-fns",
+    "commit": "e1068da8c1ad213842c6332440fe1308def091cc",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "public-compilation-info-observation",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "The unchanged wgsl-fns smoothStep semantic workload calls getCompilationInfo through the public transparent observer. Pinned Dawn and Doe each return and record exactly one compilation-info result bound to the observed shader module, with no error diagnostics for the valid frozen shader.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/public-compilation-observer-qm0r1-v1/result.json",
+          "sha256": "2e0ea2fe990dcdba0c06035030e313609d60a6322c83a48d6102afe37e8b1ad2"
+        }
+      ]
+    },
+    {
+      "id": "provider-neutral-compilation-command-and-output-identity",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "Both providers share normalized shader, compilation-call, command, dispatch, synchronization, and mapped-readback identity ade1ea293c502e9746987e3e8963b3683e10e8bf4d1cc9fb1b7e83671125b00b. Each exact eight-float output has SHA-256 ad6a7f7fdc8f2f532d7a8ce04be449c1660e9f0776392427da25dca0c76c60b7.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/wgsl-fns/public-compilation-observer-qm0r1-v1/result.json",
+          "sha256": "2e0ea2fe990dcdba0c06035030e313609d60a6322c83a48d6102afe37e8b1ad2"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The valid frozen shader produces no compiler messages, so this real-application gate proves getCompilationInfo call and module binding but not provider exposure of a non-empty diagnostic; package regression coverage separately records a normalized warning.",
+    "The observer records public JavaScript compilation information and commands, not native compiler stages, backend binaries, driver calls, or complete filesystem behavior.",
+    "The schema-required peak-memory fields are zero because this bounded admission runner did not collect a process high-water mark; zero is not a measured memory claim.",
+    "This result does not reopen the terminal wgsl-fns runtime-ownership decision and grants no performance, promotion, or release credit."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 0
+    },
+    "comparison": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 0
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The admission gate records compilation and exact execution evidence without a frozen timing comparison."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched evidence-disabled execution was authorized for overhead interpretation."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "This additive public diagnostic is DoeProof evidence. The earlier five-lane report remains the terminal DoeRuntime ownership decision."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The gate uses a controlled prepared upstream checkout and package artifacts rather than a promoted clean installation."
+    },
+    "supportHardware": {
+      "status": "not-run",
+      "summary": "The gate observes adapter execution but does not run the promotion hardware-identity contract."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "Provider lanes execute sequentially."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Each application process destroys its resources and device and exits successfully."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "One process per provider is below promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "The bounded admission runner did not collect memory-growth or process-tree peak evidence."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The result hash-binds the plan, prepared upstream commit, semantic workload, providers, observer, loader, observations, compilation calls, commands, and exact output."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Cross-provider identity passes, but a separately terminated replay was not part of this gate."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No performance protocol ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The diagnostic is forbidden from reopening the completed ownership decision."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "wgsl-fns remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/wgsl-fns/public-compilation-observer-qm0r1-v1/result.json",
+      "sha256": "2e0ea2fe990dcdba0c06035030e313609d60a6322c83a48d6102afe37e8b1ad2"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/external-projects/wgsl-fns/public-compilation-observer-qm0.plan.json",
+      "sha256": "27760a43102d9f944f3bae9077fb779447065feda13c6ed04338477f9e69ec51"
+    },
+    {
+      "path": "bench/out/external-projects/wgsl-fns/public-compilation-observer-qm0r1-v1/result.json",
+      "sha256": "2e0ea2fe990dcdba0c06035030e313609d60a6322c83a48d6102afe37e8b1ad2"
+    }
+  ]
+}

@@ -17,13 +17,54 @@
     "seam": "A Node ESM loader resolves only Gigi's imports of webgpu to the selected provider module; generated workloads, shaders, assets, and validation logic are unchanged.",
     "patchPaths": []
   },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "independent-correction",
+    "incumbentLimitation": "The generated application depends on incumbent WGSL lowering, descriptor binding, synchronization, and readback behavior whose correction cadence is controlled by the incumbent distribution.",
+    "applicationConsequence": "A provider defect can reject, crash, or misexecute an unchanged generated WebGPU case until an incumbent release or bounded patch is available.",
+    "materialOutcome": {
+      "metric": "unchanged generated-case oracle coverage, crash and timeout freedom, semantic replay, and first-failure classification across the complete pinned suite",
+      "decisionRule": "Promote DoeRuntime only if D0 passes a release-relevant case or reliability boundary that W0 cannot match; require P0 only when W0 exposes such a defect, and reject runtime ownership when W0 and D0 have the same governed outcome."
+    },
+    "lanes": {
+      "I0": {
+        "requirement": "required",
+        "construction": "The unchanged generated application resolves its ambient upstream-installed webgpu package without Doe's provider loader or receipt interpretation."
+      },
+      "I1": {
+        "requirement": "required",
+        "construction": "The exact webgpu@0.4.0 package installed for the pinned checkout is selected explicitly through the provider seam without DoeProof replay."
+      },
+      "W0": {
+        "requirement": "required",
+        "construction": "I1 under the hash-bound suite, oracle, provider identity, diagnostics, receipt, and semantic replay contract."
+      },
+      "D0": {
+        "requirement": "required",
+        "construction": "DoeRuntime under the same hash-bound suite, oracle, provider identity, diagnostics, receipt, and semantic replay contract."
+      },
+      "P0": {
+        "requirement": "conditional",
+        "construction": "W0 plus the smallest reviewable incumbent correction, required only if W0 exposes a release-relevant defect that D0 passes."
+      }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "application-exceptions",
+      "regression-support"
+    ]
+  },
   "fallbackPolicy": {
     "requireHardware": true,
     "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],
     "providerIdentityAssertion": "A provider probe records the exact selected module and adapter identity before any case; software adapters make the run diagnostic and promotion-ineligible."
   },
   "workload": {
-    "command": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--require-all-pass"],
+    "command": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--runtime-ownership", "--require-all-pass"],
     "immutableInputRefs": [
       "bench/external-projects/electronicarts-gigi/oracle.md"
     ],
@@ -74,8 +115,8 @@
           "--no-package-lock",
           "--prefix",
           ".",
-          "webgpu",
-          "pngjs"
+          "webgpu@0.4.0",
+          "pngjs@7.0.0"
         ],
         "workingDirectory": {
           "scope": "upstream",
@@ -84,14 +125,15 @@
         "timeoutSeconds": 1800
       }
     ],
-    "validationCommand": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--require-all-pass"],
+    "validationCommand": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--runtime-ownership", "--require-all-pass"],
     "timeoutSeconds": 1800
   },
   "reproduction": {
     "providerModulePath": "packages/doe-gpu/src/vendor/webgpu/index.js",
-    "arguments": ["--run-id", "{runId}"],
+    "arguments": ["--run-id", "{runId}", "--runtime-ownership"],
     "evidenceFiles": [
-      { "id": "raw-suite", "path": "raw-suite.json" }
+      { "id": "raw-suite", "path": "raw-suite.json" },
+      { "id": "receipt-summary", "path": "receipt-summary.json" }
     ]
   },
   "supportTargets": [],
@@ -119,14 +161,14 @@
   },
   "receiptPolicy": {
     "captureRequired": true,
-    "replayRequired": false,
+    "replayRequired": true,
     "runtimeBuildIdentityRequired": true,
     "preparationReceiptRequired": true
   },
   "releasePolicy": {
     "promotionState": "not-promoted",
     "blocking": false,
-    "command": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--require-all-pass"],
+    "command": ["node", "bench/external-projects/electronicarts-gigi/run-suite.mjs", "--runtime-ownership", "--require-all-pass"],
     "promotionReportIds": []
   }
 }

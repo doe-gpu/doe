@@ -531,23 +531,28 @@ fn surface_sync_for_target(self: anytype, target_handle: u64) SurfaceSubmitSync 
     return .{};
 }
 
-fn transition_bound_sampled_textures(self: anytype, cmd: model_render_types.RenderDrawCommand) void {
+fn transition_bound_textures(self: anytype, cmd: model_render_types.RenderDrawCommand) void {
     var ti: u32 = 0;
     while (ti < cmd.bind_texture_count and ti < model_render_types.MAX_RENDER_BIND_ENTRIES) : (ti += 1) {
         const texture = self.textures.get(cmd.bind_texture_handles[ti]) orelse continue;
-        if (texture.layout == c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) continue;
+        const is_storage = cmd.bind_texture_storage[ti];
+        const destination_layout = vk_render_pipeline.render_texture_image_layout(is_storage);
+        if (texture.layout == destination_layout) continue;
         const source = vk_resources.texture_transition_source(texture.layout);
         vk_resources.transition_texture_layout(
             self.primary_command_buffer,
             texture,
             texture.layout,
-            c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            destination_layout,
             source.src_access_mask,
-            c.VK_ACCESS_SHADER_READ_BIT,
+            if (is_storage)
+                c.VK_ACCESS_SHADER_READ_BIT | c.VK_ACCESS_SHADER_WRITE_BIT
+            else
+                c.VK_ACCESS_SHADER_READ_BIT,
             source.src_stage,
             VK_PIPELINE_STAGE_GRAPHICS_SHADER_BITS,
         );
-        vk_resources.mark_texture_image_layout(self, texture.image, c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        vk_resources.mark_texture_image_layout(self, texture.image, destination_layout);
     }
 }
 
@@ -560,7 +565,7 @@ fn record_and_submit_draws(
     target_height: u32,
 ) !void {
     try begin_primary_recording(self);
-    transition_bound_sampled_textures(self, cmd);
+    transition_bound_textures(self, cmd);
 
     var clear_values = [_]c.VkClearValue{
         .{

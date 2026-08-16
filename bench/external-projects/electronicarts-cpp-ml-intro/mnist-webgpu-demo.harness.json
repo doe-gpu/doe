@@ -17,13 +17,54 @@
     "seam": "A Node ESM loader redirects the generated workload's exact webgpu package imports to the selected provider wrapper and its exact pngjs imports to the pinned harness dependency; the external driver supplies the generated entrypoint's documented TODO resources and adds readback usage before output allocation without changing upstream application or shader files.",
     "patchPaths": []
   },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "independent-correction",
+    "incumbentLimitation": "The unchanged generated MNIST graph depends on incumbent WGSL lowering, compute synchronization, storage visibility, robust buffer access, and readback behavior whose correction cadence is controlled by the incumbent distribution.",
+    "applicationConsequence": "A provider defect can reject, crash, or silently misexecute an unchanged generated inference graph until an incumbent release or bounded patch is available.",
+    "materialOutcome": {
+      "metric": "staged independent-oracle coverage, crash and timeout freedom, provider identity, semantic replay, and first-failure classification across all ten pinned MNIST inputs",
+      "decisionRule": "Promote DoeRuntime only if D0 passes a release-relevant correctness or reliability boundary that W0 cannot match; require P0 only when W0 exposes such a defect, and reject runtime ownership when W0 and D0 have the same governed outcome."
+    },
+    "lanes": {
+      "I0": {
+        "requirement": "required",
+        "construction": "The unchanged generated application resolves the ambient upstream-installed webgpu package without Doe receipt or replay interpretation."
+      },
+      "I1": {
+        "requirement": "required",
+        "construction": "The exact webgpu@0.4.0 package installed for the pinned harness is selected explicitly through the provider seam without Doe receipt or replay interpretation."
+      },
+      "W0": {
+        "requirement": "required",
+        "construction": "I1 under the hash-bound graph, model, inputs, staged independent oracle, provider identity, diagnostics, receipt, and semantic replay contract."
+      },
+      "D0": {
+        "requirement": "required",
+        "construction": "DoeRuntime under the same hash-bound graph, model, inputs, staged independent oracle, provider identity, diagnostics, receipt, and semantic replay contract."
+      },
+      "P0": {
+        "requirement": "conditional",
+        "construction": "W0 plus the smallest reviewable incumbent correction, required only if W0 exposes a release-relevant defect that D0 passes."
+      }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "application-exceptions",
+      "regression-support"
+    ]
+  },
   "fallbackPolicy": {
     "requireHardware": true,
     "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],
     "providerIdentityAssertion": "The selected wrapper and child-process provider probe must name the requested module, expose an adapter identity, reject software renderers, and bind an accessible physical render node before evidence is comparable."
   },
   "workload": {
-    "command": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"],
+    "command": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--runtime-ownership", "--require-all-pass"],
     "immutableInputRefs": [
       "bench/external-projects/electronicarts-cpp-ml-intro/oracle.md",
       "bench/external-projects/electronicarts-cpp-ml-intro/mnist-oracle.mjs",
@@ -34,7 +75,7 @@
       "path": "bench/external-projects/electronicarts-cpp-ml-intro/oracle.md",
       "reviewStatus": "reviewed"
     },
-    "sameWorkPolicy": "Both providers execute the same pinned generated six-pass WebGPU graph over the same weights and ten PNG inputs, read back the same ten output activations, and compare them with the same independent CPU network.",
+    "sameWorkPolicy": "Both providers execute the same pinned generated six-pass WebGPU graph over the same weights and ten PNG inputs, read back the same transformed input, hidden, and output activations, and compare them through the same staged independent CPU oracle.",
     "completionBoundary": "A clean-process sample ends only after all ten generated graphs submit, synchronize, read back, pass CPU vector and argmax comparison, pop the validation scope, and destroy the device without a timeout or signal."
   },
   "requiredMeasurements": [
@@ -83,12 +124,12 @@
         "timeoutSeconds": 1800
       }
     ],
-    "validationCommand": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"],
+    "validationCommand": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--runtime-ownership", "--require-all-pass"],
     "timeoutSeconds": 1800
   },
   "reproduction": {
     "providerModulePath": "packages/doe-gpu/src/index.js",
-    "arguments": ["--run-id", "{runId}"],
+    "arguments": ["--run-id", "{runId}", "--runtime-ownership"],
     "evidenceFiles": [
       { "id": "raw-suite", "path": "raw-suite.json" },
       { "id": "receipt-summary", "path": "receipt-summary.json" }
@@ -126,7 +167,7 @@
   "releasePolicy": {
     "promotionState": "not-promoted",
     "blocking": false,
-    "command": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--require-all-pass"],
+    "command": ["node", "bench/external-projects/electronicarts-cpp-ml-intro/run-suite.mjs", "--runtime-ownership", "--require-all-pass"],
     "promotionReportIds": []
   }
 }

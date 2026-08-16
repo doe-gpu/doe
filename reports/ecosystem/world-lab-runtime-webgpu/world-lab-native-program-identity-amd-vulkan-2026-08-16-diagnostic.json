@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "world-lab-native-program-identity-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "generatedAt": "2026-08-16T06:45:36Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T06:45:36Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "30",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "unchanged-application-dispatches-bind-to-native-spirv",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "The unchanged 16-assertion World Labs workload passes in Dawn and Doe. Doe's three public-observer compute dispatches match three in-process native Vulkan dispatch rows exactly by WGSL hash, entry point, and workgroups. The runtime materializes two distinct hash-named SPIR-V artifacts; both match their journal digests and pass spirv-val.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm2-v1/result.json",
+          "sha256": "4efcc0e0074ad71818e5fd517dbd97c97f054d26715eda60185bf6d92ef4f428"
+        }
+      ]
+    },
+    {
+      "id": "native-submission-and-application-output-remain-separate-proofs",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "Each in-process dispatch row has a later successful Vulkan submission row from the same process, while the unchanged application independently preserves all mapped-readback and assertion outcomes. The result joins those evidence layers without treating runtime submission as an output oracle or the public observer as proof of the backend artifact.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm2-v1/result.json",
+          "sha256": "4efcc0e0074ad71818e5fd517dbd97c97f054d26715eda60185bf6d92ef4f428"
+        },
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm2-v1/processes/D0/native-program-identity.jsonl",
+          "sha256": "a5de51ade4f14156698247abbe110dd56489a1943b3bbc558af5d311e96929b3"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The native journal is a diagnostic opt-in path and this run uses workspace runtime and package sources rather than a clean-installed release package.",
+    "The result binds Doe's runtime-reported WGSL, exact SPIR-V bytes, encoded dispatch, successful native submission, and application output; it does not establish driver-binary, operating-system, filesystem, network, or complete dependency identity.",
+    "The journal currently covers Vulkan compute dispatches and does not bind World Labs render draws to native graphics artifacts.",
+    "The result cannot reopen the terminal World Labs runtime-ownership decision and grants no performance, promotion, release, or runtime-ownership credit."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 487157760
+    },
+    "comparison": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 529461248
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The gate proves program identity and unchanged application behavior, not performance."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched journal-disabled execution was authorized."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The native journal proves a runtime-owned evidence capability unavailable from the provider-neutral wrapper alone, but this successor is forbidden from reopening the application's completed cost-versus-benefit ownership adjudication."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The gate uses workspace source and runtime artifacts rather than clean-installed release packages."
+    },
+    "supportHardware": {
+      "status": "not-run",
+      "summary": "The physical AMD Vulkan observation grants no broader support-matrix status."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "Vitest worker evidence is diagnostic and below the promotion concurrency contract."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both application lanes exit without crash, hang, or timeout."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "One clean process per provider is below promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process-tree RSS is observed, but bounded same-process growth is not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The result binds the plan, unchanged application evidence, loaded runtime, native trace, exact SPIR-V artifacts, and validation outcomes."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Pinned Dawn and Doe preserve the predecessor application identities while Doe additionally proves the native compute artifact chain."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No performance protocol ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The successor is forbidden from reopening the completed World Labs ownership decision."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "World Labs remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm2-v1/result.json",
+      "sha256": "4efcc0e0074ad71818e5fd517dbd97c97f054d26715eda60185bf6d92ef4f428"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm2-v1/processes/D0/native-program-identity.jsonl",
+      "sha256": "a5de51ade4f14156698247abbe110dd56489a1943b3bbc558af5d311e96929b3"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm2-v1/processes/D0/doe-native-vulkan-dab1e582e36d6639ec9a21d3936df13bd7aedcf64b4aa1f22b4fefb329969afe.spv",
+      "sha256": "dab1e582e36d6639ec9a21d3936df13bd7aedcf64b4aa1f22b4fefb329969afe"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm2-v1/processes/D0/doe-native-vulkan-bff7d92b16441e2e909c592b93245a153ee84f536e3941903b134442f570d984.spv",
+      "sha256": "bff7d92b16441e2e909c592b93245a153ee84f536e3941903b134442f570d984"
+    }
+  ]
+}

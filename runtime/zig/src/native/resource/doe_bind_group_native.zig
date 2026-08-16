@@ -12,6 +12,7 @@ const abi_binding = @import("../../core/abi/wgpu_binding_base_types.zig");
 const abi_callback = @import("../../core/abi/wgpu_callback_descriptor_types.zig");
 const abi_pipeline = @import("../../core/abi/wgpu_pipeline_descriptor_types.zig");
 const binding_contract = @import("../../contracts/binding.zig");
+const model_render_types = @import("../../contracts/model/model_render_types.zig");
 const texture_contract = @import("../../contracts/texture.zig");
 const texture_sampler = @import("doe_texture_sampler_native.zig");
 
@@ -92,6 +93,7 @@ fn classify_layout_entry(entry: abi_pipeline.WGPUBindGroupLayoutEntry) DoeBindGr
     };
     if (buffer_binding_type_active(entry.buffer.type)) {
         out.resource_kind = RESOURCE_KIND_BUFFER;
+        out.buffer_binding_type = entry.buffer.type;
         return out;
     }
     if (texture_sample_type_active(entry.texture.sampleType)) {
@@ -190,14 +192,25 @@ fn resolve_buffer_binding_size(buffer: *const DoeBuffer, offset: u64, requested_
     return requested_size;
 }
 
-fn retain_texture_view(bg: *DoeBindGroup, binding: usize, view: *DoeTextureView) void {
+fn append_render_texture_binding(bg: *DoeBindGroup, binding: u32, resource_kind: u32, view: *DoeTextureView) bool {
+    if (bg.render_texture_view_count >= model_render_types.MAX_RENDER_BIND_ENTRIES) return false;
+    const index: usize = @intCast(bg.render_texture_view_count);
     native_helpers.object_add_ref(DoeTextureView, toOpaque(view));
-    bg.retained_texture_views[binding] = view;
+    bg.render_texture_views[index] = view;
+    bg.render_texture_bindings[index] = binding;
+    bg.render_texture_resource_kinds[index] = resource_kind;
+    bg.render_texture_view_count += 1;
+    return true;
 }
 
-fn retain_sampler(bg: *DoeBindGroup, binding: usize, sampler: *DoeSampler) void {
+fn append_render_sampler_binding(bg: *DoeBindGroup, binding: u32, sampler: *DoeSampler) bool {
+    if (bg.render_sampler_count >= model_render_types.MAX_RENDER_BIND_ENTRIES) return false;
+    const index: usize = @intCast(bg.render_sampler_count);
     native_helpers.object_add_ref(DoeSampler, toOpaque(sampler));
-    bg.retained_samplers[binding] = sampler;
+    bg.render_samplers[index] = sampler;
+    bg.render_sampler_bindings[index] = binding;
+    bg.render_sampler_count += 1;
+    return true;
 }
 
 fn retain_external_texture(bg: *DoeBindGroup, binding: usize, external_texture: abi_core.WGPUExternalTexture) void {
@@ -286,8 +299,12 @@ pub export fn doeNativeDeviceCreateBindGroup(dev_raw: ?*anyopaque, desc: ?*const
     const is_vulkan = if (cast(DoeDevice, dev_raw)) |dev| dev.backend == .vulkan else false;
 
     for (d.entries[0..d.entryCount]) |e| {
+        var resource_kind = RESOURCE_KIND_NONE;
+        var buffer_binding_type = abi_binding.WGPUBufferBindingType_Undefined;
         if (layout) |bgl| {
             if (find_layout_entry(bgl, e.binding)) |layout_entry| {
+                resource_kind = layout_entry.resource_kind;
+                buffer_binding_type = layout_entry.buffer_binding_type;
                 if (layout_entry.resource_kind == RESOURCE_KIND_TEXTURE) {
                     const view = cast(DoeTextureView, e.textureView) orelse {
                         alloc.destroy(bg);
@@ -330,8 +347,8 @@ pub export fn doeNativeDeviceCreateBindGroup(dev_raw: ?*anyopaque, desc: ?*const
                 }
             }
         }
-        if (e.binding < MAX_BIND) {
-            if (cast(DoeBuffer, e.buffer)) |doe_buf| {
+        if (cast(DoeBuffer, e.buffer)) |doe_buf| {
+            if (e.binding < MAX_BIND) {
                 if (doe_buf.error_object) {
                     alloc.destroy(bg);
                     return null;
@@ -340,6 +357,7 @@ pub export fn doeNativeDeviceCreateBindGroup(dev_raw: ?*anyopaque, desc: ?*const
                     // Store the DoeBuffer handle — dispatch reads vk_id from it.
                     bg.buffers[e.binding] = toOpaque(doe_buf);
                     remember_vulkan_buffer_binding(bg, @intCast(e.binding), doe_buf);
+                    bg.vk_buffer_binding_types[e.binding] = buffer_binding_type;
                 } else {
                     bg.buffers[e.binding] = doe_buf.mtl;
                 }
@@ -350,18 +368,32 @@ pub export fn doeNativeDeviceCreateBindGroup(dev_raw: ?*anyopaque, desc: ?*const
                 bg.offsets[e.binding] = e.offset;
                 bg.buffer_sizes[e.binding] = binding_size;
                 retain_buffer(bg, e.binding, doe_buf);
-            } else if (cast(DoeTextureView, e.textureView)) |view| {
-                if (view.tex.error_object) {
-                    alloc.destroy(bg);
-                    return null;
-                }
+                bg.resource_kinds[e.binding] = resource_kind;
+                if (e.binding + 1 > bg.count) bg.count = e.binding + 1;
+            }
+        } else if (cast(DoeTextureView, e.textureView)) |view| {
+            if (view.tex.error_object or !append_render_texture_binding(bg, e.binding, resource_kind, view)) {
+                alloc.destroy(bg);
+                return null;
+            }
+            if (e.binding < MAX_BIND) {
                 bg.textures[e.binding] = if (view.handle) |handle| handle else view.tex.mtl;
                 bg.texture_views[e.binding] = toOpaque(view);
-                retain_texture_view(bg, e.binding, view);
-            } else if (cast(DoeSampler, e.sampler)) |sampler| {
+                bg.resource_kinds[e.binding] = resource_kind;
+                if (e.binding + 1 > bg.count) bg.count = e.binding + 1;
+            }
+        } else if (cast(DoeSampler, e.sampler)) |sampler| {
+            if (!append_render_sampler_binding(bg, e.binding, sampler)) {
+                alloc.destroy(bg);
+                return null;
+            }
+            if (e.binding < MAX_BIND) {
                 bg.samplers[e.binding] = if (is_vulkan) toOpaque(sampler) else sampler.mtl;
-                retain_sampler(bg, e.binding, sampler);
-            } else if (resolve_external_texture(e)) |external_texture| {
+                bg.resource_kinds[e.binding] = resource_kind;
+                if (e.binding + 1 > bg.count) bg.count = e.binding + 1;
+            }
+        } else if (resolve_external_texture(e)) |external_texture| {
+            if (e.binding < MAX_BIND) {
                 const ext_mod = @import("doe_external_texture_native.zig");
                 const ext = native_helpers.cast(DoeExternalTexture, external_texture) orelse continue;
                 if (is_vulkan) {
@@ -394,6 +426,7 @@ pub export fn doeNativeDeviceCreateBindGroup(dev_raw: ?*anyopaque, desc: ?*const
                             }
                             bg.textures[next_slot] = toOpaque(plane1_view.tex);
                             bg.texture_views[next_slot] = toOpaque(plane1_view);
+                            bg.resource_kinds[next_slot] = RESOURCE_KIND_TEXTURE;
                         } else {
                             bg.textures[next_slot] = ext_mod.resolvePlane1MtlHandle(ext);
                             bg.texture_views[next_slot] = ext.plane1;
@@ -401,7 +434,11 @@ pub export fn doeNativeDeviceCreateBindGroup(dev_raw: ?*anyopaque, desc: ?*const
                         if (next_slot + 1 > bg.count) bg.count = next_slot + 1;
                     }
                 }
-            } else continue;
+                bg.resource_kinds[e.binding] = resource_kind;
+                if (e.binding + 1 > bg.count) bg.count = e.binding + 1;
+            }
+        } else continue;
+        if (e.binding < MAX_BIND) {
             if (e.binding + 1 > bg.count) bg.count = e.binding + 1;
         }
     }
@@ -466,10 +503,10 @@ pub export fn doeNativeBindGroupRelease(raw: ?*anyopaque) callconv(.c) void {
         for (g.retained_buffers) |maybe_buffer| {
             if (maybe_buffer) |buffer| native_exports.doeNativeBufferRelease(toOpaque(buffer));
         }
-        for (g.retained_texture_views) |maybe_view| {
+        for (g.render_texture_views[0..@intCast(g.render_texture_view_count)]) |maybe_view| {
             if (maybe_view) |view| native_exports.doeNativeTextureViewRelease(toOpaque(view));
         }
-        for (g.retained_samplers) |maybe_sampler| {
+        for (g.render_samplers[0..@intCast(g.render_sampler_count)]) |maybe_sampler| {
             if (maybe_sampler) |sampler| native_exports.doeNativeSamplerRelease(toOpaque(sampler));
         }
         for (g.retained_external_textures) |external_texture| {
@@ -564,7 +601,9 @@ test "bind group layout classification follows active binding sentinel" {
     buffer_entry.buffer.type = abi_binding.WGPUBufferBindingType_Storage;
     buffer_entry.texture.viewDimension = abi_texture.WGPUTextureViewDimension_2D;
     buffer_entry.storageTexture.format = abi_texture.WGPUTextureFormat_RGBA8Unorm;
-    try std.testing.expectEqual(RESOURCE_KIND_BUFFER, classify_layout_entry(buffer_entry).resource_kind);
+    const classified_buffer = classify_layout_entry(buffer_entry);
+    try std.testing.expectEqual(RESOURCE_KIND_BUFFER, classified_buffer.resource_kind);
+    try std.testing.expectEqual(abi_binding.WGPUBufferBindingType_Storage, classified_buffer.buffer_binding_type);
 
     var texture_entry = layout_entry_for_kind_test();
     texture_entry.texture.sampleType = abi_binding.WGPUTextureSampleType_Float;

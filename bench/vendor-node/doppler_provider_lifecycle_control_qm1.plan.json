@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-lifecycle-control-readjudication-plan",
+  "planId": "doppler-provider-lifecycle-control-qm1-v1",
+  "frozenAt": "2026-08-16T07:44:48Z",
+  "predecessor": {
+    "plan": "bench/vendor-node/doppler_provider_lifecycle_control_qm0.plan.json",
+    "result": "bench/out/doppler-provider-lifecycle-control-qm0-v1-run1/result.json",
+    "resultSha256": "0a2a84a0b8edb672af3e08fe9e94349ce0248d13258da4185a5b2316d8fdc643",
+    "outcome": "invalid-evidence",
+    "preservedFacts": [
+      "all nine clean processes completed exact inference and governed provider release",
+      "W0 terminated through one SIGABRT-equivalent exit and two SIGSEGV signals after release",
+      "P0 exited zero three times after waiting on and destroying four tracked incumbent devices",
+      "D0 exited zero three times",
+      "W0 and P0 share exact generated-text and generated-token identities",
+      "D0 is deterministic within lane but differs from the W0/P0 one-token identity"
+    ]
+  },
+  "corrections": {
+    "nativeFailureClass": "For this lifecycle property, a natural SIGABRT or SIGSEGV after successful inference and release is a post-release native failure. Signal identity is retained but is not the ownership property.",
+    "outputIdentityScope": "The bounded-patch attribution compares W0 with P0 because both execute the exact pinned incumbent. D0 must be deterministic and lifecycle-clean, but its distinct one-token identity is recorded as a separate correctness finding and grants no credit.",
+    "executionReuse": "No workload is rerun. The correction-only adjudicator consumes the immutable q0 result and revalidates every referenced raw trace hash and payload."
+  },
+  "implementation": {
+    "path": "bench/executors/adjudicate-doppler-lifecycle-control.mjs",
+    "sha256": "04ada1bc46555e048d2b4c1d9b7a855423b186bd39d11b8a599bc9944254b4e1"
+  },
+  "acceptance": {
+    "common": [
+      "all nine q0 processes completed exact inference and release without timeout",
+      "all raw trace files match the hashes and payloads embedded in q0",
+      "source, model, provider, worker, and bounded-wrapper identities remain q0-bound"
+    ],
+    "antecedent": "W0 has three natural post-release native failures, limited to SIGABRT or SIGSEGV.",
+    "wrapperControl": "P0 has three zero exits, each with nonzero queue-drain and device-destruction counts, and its output identity exactly matches W0.",
+    "doeControl": "D0 has three zero exits and one deterministic within-lane identity. Cross-provider identity is reported, never assumed.",
+    "decision": "If the common, antecedent, wrapper-control, and Doe-control clauses pass, reject lifecycle runtime ownership because a bounded governed wrapper closes the incumbent failure."
+  },
+  "creditBoundary": {
+    "performance": false,
+    "runtimeOwnership": false,
+    "promotion": false,
+    "release": false,
+    "successor": "No larger Doppler lifecycle ownership gate is authorized. Retain the wrapper as a regression and investigate the D0 one-token divergence only as a separate correctness hypothesis."
+  }
+}

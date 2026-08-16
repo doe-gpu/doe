@@ -4,6 +4,11 @@ import { createHash } from 'node:crypto';
 import { isAbsolute, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import {
+  createTransparentWebGPUObserver,
+  validateTransparentWebGPUObservation,
+} from './observe.js';
+
 export const NODE_WEBGPU_PROVIDER_SCHEMA = 'doe.webgpu-provider/v1';
 export const NODE_WEBGPU_PROVIDER_RECEIPT_SCHEMA = 'doe.webgpu-provider-receipt/v1';
 export const NODE_WEBGPU_GOVERNED_RECEIPT_SCHEMA = 'doe.governed-node-webgpu-receipt/v1';
@@ -249,6 +254,8 @@ function governedExecutionIdentity(receipt) {
     oracleStatus: receipt.oracle.status,
     actualOutputSha256: receipt.oracle.actualOutputSha256,
     outputBytes: receipt.oracle.outputBytes,
+    programEvidenceStatus: receipt.programEvidence?.status ?? 'not-requested',
+    programObservationSha256: receipt.programEvidence?.observationSha256 ?? null,
   });
 }
 
@@ -800,6 +807,27 @@ export function validateGovernedNodeWebGPUReceipt(receipt) {
     }
   }
   if (!Array.isArray(receipt.errors)) errors.push('errors must be an array');
+  if (receipt.programEvidence !== undefined) {
+    if (!receipt.programEvidence || typeof receipt.programEvidence !== 'object') {
+      errors.push('programEvidence must be an object');
+    } else if (!['not-requested', 'observed'].includes(receipt.programEvidence.status)) {
+      errors.push('programEvidence.status is invalid');
+    } else if (receipt.programEvidence.status === 'observed') {
+      const validation = validateTransparentWebGPUObservation(
+        receipt.programEvidence.observation,
+      );
+      if (!validation.valid) {
+        errors.push(...validation.errors.map((error) => `programEvidence: ${error}`));
+      }
+      if (receipt.programEvidence.observationSha256
+          !== receipt.programEvidence.observation?.observationSha256) {
+        errors.push('programEvidence.observationSha256 does not match the observation');
+      }
+    } else if (receipt.programEvidence.observation !== null
+        || receipt.programEvidence.observationSha256 !== null) {
+      errors.push('not-requested programEvidence must not contain an observation');
+    }
+  }
   if (errors.length > 0) return { valid: false, errors };
 
   if (!['pass', 'fail'].includes(receipt.oracle.status)) {
@@ -937,6 +965,13 @@ export async function runGovernedNodeWebGPU(options) {
     if (options.checkpoint !== undefined && typeof options.checkpoint !== 'function') {
       throw new TypeError('checkpoint must be a function when provided.');
     }
+    if (options.observeProgram !== undefined
+        && typeof options.observeProgram !== 'boolean'
+        && (!options.observeProgram
+          || typeof options.observeProgram !== 'object'
+          || Array.isArray(options.observeProgram))) {
+      throw new TypeError('observeProgram must be a boolean or an options object.');
+    }
     workload = normalizeGovernedWorkload(options.workload);
   } catch (error) {
     return {
@@ -958,6 +993,8 @@ export async function runGovernedNodeWebGPU(options) {
   let durationMs = null;
   let adapterInfo = {};
   let providerReceipt = null;
+  let observer = null;
+  let programObservation = null;
 
   try {
     session = await openNodeWebGPU(options.provider);
@@ -988,9 +1025,28 @@ export async function runGovernedNodeWebGPU(options) {
   if (session) {
     const start = performance.now();
     try {
+      const observationRequested = options.observeProgram === true
+        || (options.observeProgram && typeof options.observeProgram === 'object');
+      if (observationRequested) {
+        const metadata = options.observeProgram === true
+          ? {}
+          : options.observeProgram.metadata ?? {};
+        observer = createTransparentWebGPUObserver({
+          gpu: session.gpu,
+          adapter: session.adapter,
+          globals: {
+            GPUBufferUsage: globalThis.GPUBufferUsage,
+            GPUShaderStage: globalThis.GPUShaderStage,
+            GPUMapMode: globalThis.GPUMapMode,
+            GPUTextureUsage: globalThis.GPUTextureUsage,
+          },
+          providerId: providerReceipt?.selectedProviderId ?? 'unknown-provider',
+          metadata,
+        });
+      }
       output = byteView(await options.execute({
-        gpu: session.gpu,
-        adapter: session.adapter,
+        gpu: observer?.gpu ?? session.gpu,
+        adapter: observer?.adapter ?? session.adapter,
         module: session.module,
         input: workload.input,
       }), 'execute output');
@@ -1011,6 +1067,7 @@ export async function runGovernedNodeWebGPU(options) {
         error,
       ));
     }
+    if (observer) programObservation = observer.snapshot();
   }
 
   const receipt = {
@@ -1031,6 +1088,17 @@ export async function runGovernedNodeWebGPU(options) {
       actualOutputSha256: outputSha256,
       outputBytes: output?.byteLength ?? null,
     },
+    programEvidence: programObservation === null
+      ? {
+          status: 'not-requested',
+          observationSha256: null,
+          observation: null,
+        }
+      : {
+          status: 'observed',
+          observationSha256: programObservation.observationSha256,
+          observation: programObservation,
+        },
     execution: {
       durationMs,
     },

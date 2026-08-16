@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-persistent-performance-control-plan",
+  "planId": "cpp-ml-mnist-persistent-performance-control-qm0-v1",
+  "predecessor": "cpp-ml-mnist-doeproof-cli-clean-install-qm9-v1",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "claimedRuntimeOwnershipProperty": "persistent-performance-control",
+  "workload": "the unchanged pinned generated six-pass MNIST graph over ten PNG inputs, including synchronization, input/hidden/output readback, and the independent CPU oracle",
+  "lanes": {
+    "W0": "pinned webgpu@0.4.0 under the same hash-bound workload and oracle contract",
+    "D0": "DoeRuntime under the same hash-bound workload and oracle contract"
+  },
+  "population": {
+    "coldSamplesPerProvider": 30,
+    "warmupSuitesPerProvider": 5,
+    "warmSamplesPerProvider": 100,
+    "requiredPercentiles": ["p50", "p95", "p99"]
+  },
+  "timing": {
+    "cold": "parent-observed clean-process duration from spawn through exact oracle completion and device teardown",
+    "warm": "worker-observed duration for one ten-image suite on a retained provider, adapter, device, generated graph, and model state; each sample includes image loading, command construction, six-pass execution, synchronization, three readbacks, CPU comparison, and resource cleanup"
+  },
+  "acceptance": [
+    "the pinned upstream commit and all provider, worker, loader, model, image, and generated graph inputs are hash-bound",
+    "an accessible physical render node is present",
+    "all cold, warmup, and warm samples exit normally and pass the independent oracle",
+    "each lane reproduces one exact semantic output identity across its complete population",
+    "W0 and D0 reproduce the same exact semantic output identity",
+    "p50, p95, and p99 are reported for both cold and warm populations",
+    "D0 has a material speedup of at least 1.10x over W0 at every required percentile",
+    "D0 is no more than 1.05x slower than W0 at every required percentile"
+  ],
+  "decision": {
+    "pass": "authorize one clean-installed promotion-scale successor for the distinct persistent-performance-control ownership property",
+    "fail": "reject persistent-performance-control for this tuple and preserve cpp-ml as a DoeProof diagnostic with no DoeRuntime ownership credit"
+  },
+  "nonGoals": [
+    "reinterpretation of the terminal independent-correction decision",
+    "application promotion",
+    "release-blocker status",
+    "promotion-scale concurrency, teardown, device-loss, stress, or memory-growth evidence",
+    "browser or cross-platform evidence",
+    "a public performance claim before reviewed evidence and clean-install confirmation"
+  ]
+}

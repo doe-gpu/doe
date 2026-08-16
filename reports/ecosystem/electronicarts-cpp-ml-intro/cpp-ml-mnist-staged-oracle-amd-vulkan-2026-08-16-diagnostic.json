@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "cpp-ml-mnist-staged-oracle-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "generatedAt": "2026-08-16T02:43:14.213Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T02:48:00Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "22",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/cpp-ml-intro",
+    "commit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "staged-independent-oracle-passes",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "Three clean Doe processes and three clean Dawn processes pass the same staged independent oracle. The analytic PNG-to-sRGB boundary remains within 0.5/255, and CPU replay from each observed transformed input matches both GPU neural layers within 1e-5.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-staged-oracle/raw-suite.json",
+          "sha256": "27cdf09ff1cc2539a786e00fcf9a41af90fbdc6393fa866a1e5ae1168eb925ee"
+        }
+      ]
+    },
+    {
+      "id": "doe-dawn-output-identity",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "All six clean processes produce the same output identity hash, 17287b3124138aac38b936254f378f6f4765e5e9ffc524766686e5117c48a079, with no crash, hang, timeout, validation error, software fallback, or classified native diagnostic.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-staged-oracle/receipt-summary.json",
+          "sha256": "e9c94c4a5f85567eb6d016874290eef608a79d592d11f89bf8af6243bfd5d1b8"
+        }
+      ]
+    },
+    {
+      "id": "runtime-corrections-generalized",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "The successful unchanged graph depends on generalized fixes for compute-written host-shadow invalidation, WebGPU storage-buffer robustness, and compute storage-texture visibility. Each boundary is retained as a focused package or Zig regression test and the original failures remain registered.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-staged-oracle/raw-suite.json",
+          "sha256": "27cdf09ff1cc2539a786e00fcf9a41af90fbdc6393fa866a1e5ae1168eb925ee"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The run uses a controlled ESM provider-substitution seam rather than a claim-eligible clean application installation.",
+    "Three sequential clean processes do not satisfy the promotion policy's concurrency, teardown-cycle, stress, device-loss, or bounded-memory-growth obligations.",
+    "The evidence binds the complete generated module but does not emit an individual hash for every dynamically extracted WGSL entry point.",
+    "The current worktree is dirty, so the raw report binds the active runtime artifact and source state but is not a release-build certificate.",
+    "The process-duration observations are diagnostic and do not satisfy a selected-operation performance or receipt-overhead protocol.",
+    "Runtime ownership has not been compared with an I0/I1/W0/D0/P0 matrix for this application."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 167526400
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 158855168
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The clean-process duration samples are retained as diagnostic execution evidence; no selected-operation fairness or receipt-overhead experiment ran."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The harness did not execute matched receipt-enabled and receipt-disabled workload pairs."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The correctness result establishes compatibility but does not isolate a durable owned-runtime advantage over a governed incumbent wrapper."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The provider is selected through a harness-only ESM loader rather than a validated production installation path."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Both providers bind an accessible physical AMD Vulkan render node with no detected software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The clean processes execute sequentially."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Process exit succeeds, but promotion-scale repeated device teardown was not exercised."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The diagnostic population does not satisfy promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process memory is captured, but bounded growth across repeated lifecycle cycles was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The harness, provider identity, immutable inputs, oracle outcomes, and repeated process results are hash-bound."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No claim-eligible selected-operation comparison ran."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The governed-wrapper and bounded-incumbent-patch controls have not run."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The application remains diagnostic pending installation, lifecycle, replay, performance, and ownership evidence."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-staged-oracle/receipt-summary.json",
+      "sha256": "e9c94c4a5f85567eb6d016874290eef608a79d592d11f89bf8af6243bfd5d1b8"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-staged-oracle/raw-suite.json",
+      "sha256": "27cdf09ff1cc2539a786e00fcf9a41af90fbdc6393fa866a1e5ae1168eb925ee"
+    }
+  ]
+}

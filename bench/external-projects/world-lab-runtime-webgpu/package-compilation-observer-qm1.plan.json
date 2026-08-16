@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "world-lab-package-compilation-observer-plan",
+  "planId": "world-lab-package-compilation-observer-qm1-v1",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "predecessor": {
+    "planId": "world-lab-package-compilation-observer-qm0-v1",
+    "result": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm0-v1/result.json",
+    "failureClass": "infrastructure",
+    "correction": "Count the compile-only third Vitest worker exposed by compilation checkpoints and bind the LF-normalized runtime template-literal shader hash rather than the CRLF source-file slice hash. No application, shader, provider, or scientific acceptance condition changes."
+  },
+  "hypothesis": "The provider-neutral public observer records the pinned World Labs invalid-WGSL diagnostic from both Dawn and Doe, associates each diagnostic with the same exact runtime shader source, and preserves the predecessor command and output evidence without editing upstream application or shader source.",
+  "lanes": {
+    "W0": "pinned incumbent through doe-gpu/observe",
+    "D0": "DoeRuntime through the identical doe-gpu/observe contract"
+  },
+  "frozenWork": {
+    "assertionCount": 16,
+    "cleanProcessRunsPerLane": 1,
+    "workerCountPerLane": 3,
+    "shaderAttemptCountPerLane": 13,
+    "compilationInfoCountPerLane": 8,
+    "dispatchCountPerLane": 3,
+    "drawCountPerLane": 2,
+    "submissionCountPerLane": 5,
+    "readbackCountPerLane": 8,
+    "invalidRuntimeShaderSourceSha256": "sha256:53672fc645bfd78a8635f16261c9212ad39fc1b12aa95caaf3557221f16632ce",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "observerIdenticalForW0AndD0": true,
+    "scientificParametersChangedFromQm0": false
+  },
+  "acceptance": [
+    "W0 and D0 each pass all 16 pinned upstream assertions",
+    "every worker observation validates under doe.transparent-webgpu-observation/v1",
+    "each lane records all eight getCompilationInfo results and exactly one error-bearing result",
+    "each error-bearing result is bound to the frozen invalid runtime shader source hash",
+    "W0 and D0 have identical diagnostic-source, normalized command-shape, and mapped-readback identities",
+    "provider diagnostic wording and source positions remain evidence, not cross-provider equality requirements"
+  ],
+  "nonGoals": [
+    "reopen or reinterpret the terminal World Labs runtime-ownership decision",
+    "require provider-specific diagnostic message text to be identical",
+    "assign performance, promotion, release, or runtime-ownership credit",
+    "claim native-driver or operating-system tracing"
+  ]
+}

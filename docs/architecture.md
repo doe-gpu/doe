@@ -157,11 +157,30 @@ A useful Doe build/run can emit:
 - runtime artifact(s)
 - run metadata
 - trace or trace-meta artifacts
+- a self-checking source-to-IR-to-backend execution identity receipt
 - benchmark reports
 - optional proof artifacts and hashes
 
 The artifact chain matters as much as the code. Doe treats claims as valid only
 when they are tied back to those emitted contracts.
+
+For native Vulkan, the execution-identity receipt composes the runtime's shader
+artifact manifest with trace metadata and the workload oracle. It verifies the
+exact WGSL, semantic state, IR, SPIR-V bytes, manifest identity, backend lane,
+no-fallback state, dispatch count, and output digest. This is stronger than the
+public JavaScript observer because it reaches the runtime-owned lowering
+artifact; it remains narrower than driver- or operating-system-level tracing.
+
+Package applications can opt into a separate native Vulkan identity journal
+with `DOE_PROGRAM_IDENTITY_TRACE_PATH`. The public observer records the
+application-visible source, command shape, synchronization, readback, and
+output. The native journal independently binds exact WGSL and SPIR-V digests to
+encoded compute dispatches and direct render draws. Compute completion is bound
+to a later outer queue-submission row. Direct Vulkan render completion is bound
+to `internal_submit_and_wait_succeeded`, emitted only after the render backend's
+own submit-and-wait returns. A reviewed gate must join those layers explicitly;
+neither layer is treated as proof of the other, and the journal is not a driver
+trace or an output oracle.
 
 ## Related docs
 

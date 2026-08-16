@@ -2,7 +2,11 @@
 
 const binding_values = @import("model/model_binding_value_types.zig");
 
-pub const MAX_SHADER_BINDINGS: usize = 16;
+// WebGPU workloads commonly mix sampled textures, storage textures, buffers,
+// and uniforms in one bind group. Keep the compiler reflection capacity in
+// step with the native per-group slot capacity so valid high binding numbers
+// are never silently omitted from pipeline metadata.
+pub const MAX_SHADER_BINDINGS: usize = 32;
 
 /// Shader-reflection kind stored by the compiler/native reflection bridge.
 pub const ShaderKind = enum(u32) {

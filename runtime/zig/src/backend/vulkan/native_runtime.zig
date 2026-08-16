@@ -126,6 +126,9 @@ pub const NativeVulkanRuntime = struct {
     hot_dst_pool_entry: ?vk_upload.VkPoolEntry = null,
     hot_dst_pool_size: u64 = 0,
     compute_buffers: std.AutoHashMapUnmanaged(u64, vk_resources.ComputeBuffer) = .{},
+    /// Stable buffer identity used by descriptor and hazard caches. Object
+    /// addresses are allocator-reusable and must not serve as resource IDs.
+    next_buffer_resource_handle: u64 = 1,
     textures: std.AutoHashMapUnmanaged(u64, vk_resources.TextureResource) = .{},
     samplers: std.AutoHashMapUnmanaged(u64, c.VkSampler) = .{},
 

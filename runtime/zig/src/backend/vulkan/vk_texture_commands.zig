@@ -12,6 +12,17 @@ const vk_upload = @import("vk_upload.zig");
 const vk_resources = @import("vk_resources.zig");
 const vk_formats = @import("vk_formats.zig");
 
+const TextureReadExtent = struct {
+    width: u32,
+    height: u32,
+};
+
+fn texture_read_copy_extent(width: u32, height: u32) TextureReadExtent {
+    // WebGPU's copy extent is already expressed in the selected mip's
+    // coordinate space. Applying the mip shift again truncates readback.
+    return .{ .width = width, .height = height };
+}
+
 pub fn texture_write(self: anytype, cmd_arg: model_texture_types.TextureWriteCommand) !void {
     const resource = try vk_resources.ensure_texture_resource(self, cmd_arg.texture);
     if (cmd_arg.data.len == 0) {
@@ -121,6 +132,7 @@ pub fn texture_read(self: anytype, args: struct {
         vk_resources.texture_transition_source(prev_layout).src_stage,
         c.VK_PIPELINE_STAGE_TRANSFER_BIT,
     );
+    const copy_extent = texture_read_copy_extent(args.width, args.height);
     var region = c.VkBufferImageCopy{
         .bufferOffset = 0,
         .bufferRowLength = if (args.dst_bytes_per_row > 0) args.dst_bytes_per_row / bpp else 0,
@@ -133,8 +145,8 @@ pub fn texture_read(self: anytype, args: struct {
         },
         .imageOffset = .{ .x = 0, .y = 0, .z = 0 },
         .imageExtent = .{
-            .width = @max(args.width >> @intCast(args.mip_level), 1),
-            .height = @max(args.height >> @intCast(args.mip_level), 1),
+            .width = copy_extent.width,
+            .height = copy_extent.height,
             .depth = 1,
         },
     };
@@ -158,6 +170,12 @@ pub fn texture_read(self: anytype, args: struct {
         const n: usize = @intCast(byte_count);
         @memcpy(dst[off .. off + n], @as([*]const u8, @ptrCast(raw))[0..n]);
     }
+}
+
+test "texture read copy extent is already mip-relative" {
+    const extent = texture_read_copy_extent(32, 16);
+    try std.testing.expectEqual(@as(u32, 32), extent.width);
+    try std.testing.expectEqual(@as(u32, 16), extent.height);
 }
 
 pub fn texture_copy(self: anytype, args: struct {

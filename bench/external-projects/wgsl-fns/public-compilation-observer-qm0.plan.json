@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "wgsl-fns-public-compilation-observer-plan",
+  "planId": "wgsl-fns-public-compilation-observer-qm0-v1",
+  "upstreamCommit": "e1068da8c1ad213842c6332440fe1308def091cc",
+  "workload": "the unchanged wgsl-fns smoothStep semantic oracle, including its native getCompilationInfo check, compute dispatch, synchronization, exact mapped readback, and resource teardown",
+  "lanes": {
+    "W0": "pinned webgpu@0.3.10 under the public transparent observer",
+    "D0": "Doe package provider under the identical public transparent observer"
+  },
+  "acceptance": [
+    "both provider lanes pass the unchanged exact semantic oracle",
+    "both lanes return and record exactly one getCompilationInfo result bound to the observed shader module",
+    "neither lane reports an error diagnostic for the valid frozen shader",
+    "both lanes retain identical normalized shader, compilation-call, command, dispatch, synchronization, and mapped-output evidence",
+    "every plan, workload, provider, observer, loader, and result input is hash-bound"
+  ],
+  "nonGoals": [
+    "runtime-ownership credit or reinterpretation of the terminal wgsl-fns ownership decision",
+    "performance, observer-overhead, application-promotion, or release credit",
+    "native-driver tracing or proof that every backend diagnostic is exposed",
+    "changes to upstream application or shader source"
+  ]
+}

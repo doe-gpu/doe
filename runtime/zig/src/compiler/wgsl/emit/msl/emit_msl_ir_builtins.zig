@@ -142,7 +142,7 @@ pub fn emit_call(self: anytype, function: ir.Function, result_ty: ir.TypeId, cal
             return;
         }
         if (std.mem.eql(u8, call.name, "atomicCompareExchangeWeak")) {
-            try emit_atomic_compare_exchange_weak(self, function, call);
+            try emit_atomic_compare_exchange_weak(self, function, result_ty, call);
             return;
         }
         if (std.mem.eql(u8, call.name, "subgroupAdd")) {
@@ -460,20 +460,22 @@ pub fn emit_expr_coerced(self: anytype, function: ir.Function, expr_id: ir.ExprI
     try self.emit_expr(function, expr_id);
 }
 
-fn emit_atomic_compare_exchange_weak(self: anytype, function: ir.Function, call: @FieldType(ir.Expr, "call")) EmitError!void {
+fn emit_atomic_compare_exchange_weak(self: anytype, function: ir.Function, result_ty: ir.TypeId, call: @FieldType(ir.Expr, "call")) EmitError!void {
     // WGSL atomicCompareExchangeWeak(ptr, expected, desired) returns
     // __atomic_compare_exchange_result{old_value, exchanged}. MSL has
     // atomic_compare_exchange_weak_explicit which writes the old value
-    // through the expected pointer. Emit a comma expression that
-    // performs the CAS and yields the old value.
+    // through the expected pointer. Preserve both the original value and the
+    // success bit in the WGSL result struct.
     if (call.args.len != 3) return error.InvalidIr;
     try self.write("({auto _doe_cew_e = ");
     try self.emit_expr(function, function.expr_args.items[call.args.start + 1]);
-    try self.write("; atomic_compare_exchange_weak_explicit(&(");
+    try self.write("; bool _doe_cew_x = atomic_compare_exchange_weak_explicit(&(");
     try self.emit_expr(function, function.expr_args.items[call.args.start]);
     try self.write("), &_doe_cew_e, ");
     try self.emit_expr(function, function.expr_args.items[call.args.start + 2]);
-    try self.write(", memory_order_relaxed, memory_order_relaxed); _doe_cew_e;})");
+    try self.write(", memory_order_relaxed, memory_order_relaxed); ");
+    try self.emit_type(result_ty);
+    try self.write("{_doe_cew_e, _doe_cew_x};})");
 }
 
 /// Derivative builtins (fragment-only). WGSL names map directly or with

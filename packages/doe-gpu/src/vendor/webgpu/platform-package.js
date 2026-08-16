@@ -24,6 +24,10 @@ function currentPlatformPackageName(platform = process.platform, arch = process.
   return PLATFORM_PACKAGE_NAMES[platformTag(platform, arch)] ?? null;
 }
 
+function isInstalledPackageRoot(packageRoot = PACKAGE_ROOT) {
+  return resolve(packageRoot).split(/[\\/]+/u).includes('node_modules');
+}
+
 function resolveInstalledPlatformPackageRoot({
   platform = process.platform,
   arch = process.arch,
@@ -84,6 +88,7 @@ export {
   PACKAGE_ROOT,
   WORKSPACE_ROOT,
   libraryBasenamesForPlatform,
+  isInstalledPackageRoot,
   resolveInstalledPlatformPackageRoot,
   resolvePlatformPackageAddonPath,
   resolvePlatformPackageLibraryPath,

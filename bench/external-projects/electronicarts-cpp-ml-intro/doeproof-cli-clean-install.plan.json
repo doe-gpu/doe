@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-doeproof-cli-clean-install-plan",
+  "planId": "cpp-ml-mnist-doeproof-cli-clean-install-qm9-v1",
+  "correctionOf": "cpp-ml-mnist-doeproof-cli-clean-install-qm8-v1",
+  "correction": "When doe-gpu runs from node_modules, prefer the installed platform package before workspace and current-directory library candidates so Node read-only permissions never probe undeclared development paths before the valid packaged payload.",
+  "predecessor": "cpp-ml-mnist-doeproof-cli-filesystem-qm7-v1",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "expectedComparableSha256": "6929ac572c2f63e6bba69076ed2fb7ce076999c15c830d0a2b6430b3fa69269f",
+  "workload": "unchanged pinned generated six-pass MNIST graph over the frozen weights and ten PNG inputs",
+  "installation": {
+    "packageManager": "npm",
+    "lifecycleScripts": "disabled",
+    "optionalDependencies": "omitted",
+    "inputs": [
+      "locally packed doe-gpu wrapper",
+      "locally packed current-host Doe platform package",
+      "locally packed pinned webgpu@0.4.0",
+      "locally packed pinned pngjs@7.0.0"
+    ],
+    "workspaceRuntimeResolution": "prohibited"
+  },
+  "filesystemMode": "node-permission-read-only",
+  "lanes": {
+    "W0": "clean-installed pinned webgpu@0.4.0 through the installed public DoeProof CLI",
+    "D0": "clean-installed Doe wrapper and native platform package through the installed public DoeProof CLI"
+  },
+  "acceptance": [
+    "the installed doe-proof-node binary supplies run, verify, inspect, compare, and replay",
+    "the copied application and generated WGSL remain byte-identical to the frozen source inputs",
+    "run, verify, and inspect pass for W0 and D0 under Node read-only permissions",
+    "both lanes pass the staged independent oracle and produce the frozen comparable output",
+    "cross-lane compare and per-lane semantic replay pass",
+    "the Doe provider loads its addon, shared library, and build metadata only from the clean installation",
+    "the wrapper, platform, incumbent, PNG, application, model, and generated runtime files are hash-bound",
+    "a repeated clean installation reproduces the same package, workload, and output identities"
+  ],
+  "decision": {
+    "pass": "authorize clean-installed public DoeProof CLI application evidence for the declared Node Linux x64 AMD Vulkan tuple",
+    "fail": "retain workspace-only qm7 authorization and keep clean-installed application evidence unproved"
+  },
+  "nonGoals": [
+    "operating-system dependency sealing",
+    "network isolation",
+    "runtime-ownership credit",
+    "performance interpretation",
+    "promotion-scale concurrency, stress, device-loss, or memory-growth evidence",
+    "application promotion",
+    "release-blocker status",
+    "reinterpretation of the terminal cpp-ml ownership decision"
+  ]
+}

@@ -131,10 +131,10 @@ test "doe_wgpu_native: all re-exported C ABI symbols exist" {
 // ============================================================
 
 test "doe_wgpu_native: bind slot constants are correct" {
-    try std.testing.expectEqual(@as(usize, 16), native.MAX_BIND);
+    try std.testing.expectEqual(@as(usize, 32), native.MAX_BIND);
     try std.testing.expectEqual(@as(usize, 4), native.MAX_RENDER_BIND_GROUPS);
     try std.testing.expectEqual(@as(usize, 4), native.MAX_COMPUTE_BIND_GROUPS);
-    try std.testing.expectEqual(@as(usize, 64), native.MAX_FLAT_BIND);
+    try std.testing.expectEqual(@as(usize, 128), native.MAX_FLAT_BIND);
     try std.testing.expectEqual(@as(usize, 8), native.MAX_VERTEX_BUFFERS);
     try std.testing.expectEqual(@as(u32, 8), native.VERTEX_BUFFER_SLOT_BASE);
     try std.testing.expectEqual(@as(usize, 512), native.ERR_CAP);
@@ -1017,7 +1017,7 @@ test "BindingInfo: default kind is buffer" {
 test "MAX_SHADER_BINDINGS matches WGSL compiler MAX_BINDINGS" {
     const wgsl_compiler = @import("../../src/compiler/wgsl/mod.zig");
     try std.testing.expectEqual(wgsl_compiler.MAX_BINDINGS, native.MAX_SHADER_BINDINGS);
-    try std.testing.expectEqual(@as(usize, 16), native.MAX_SHADER_BINDINGS);
+    try std.testing.expectEqual(@as(usize, 32), native.MAX_SHADER_BINDINGS);
 }
 
 // ============================================================

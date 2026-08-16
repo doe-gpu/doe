@@ -1,8 +1,12 @@
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
+const binding_contract = @import("../../contracts/binding.zig");
 const native_helpers = @import("../support/doe_native_object_helpers.zig");
 const native_shared = @import("../support/doe_native_shared_types.zig");
 const query_native = @import("../resource/doe_query_native.zig");
+const program_identity_trace = @import("../diagnostics/doe_program_identity_trace.zig");
 const shared = @import("vulkan_render_shared.zig");
+
+const RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.storage_texture);
 
 fn vulkan_texture_view_key(view: *shared.DoeTextureView) u64 {
     if (view.handle) |handle| return @intFromPtr(handle);
@@ -59,30 +63,54 @@ fn populate_draw_cmd_from_pass(cmd: *model_render_types.RenderDrawCommand, pass:
 
     var tex_count: u32 = 0;
     var samp_count: u32 = 0;
+    var buffer_count: u32 = 0;
     for (pass.bind_groups) |maybe_bg| {
         const bg = maybe_bg orelse continue;
-        for (bg.texture_views, 0..) |maybe_tv, binding| {
+        var binding: usize = 0;
+        while (binding < native_shared.MAX_BIND and buffer_count < model_render_types.MAX_RENDER_BIND_ENTRIES) : (binding += 1) {
+            const mask = @as(u64, 1) << @intCast(binding);
+            if ((bg.vk_buffer_binding_mask & mask) == 0) continue;
+            const handle = bg.vk_buffer_handles[binding];
+            if (handle == 0) continue;
+            cmd.bind_buffer_handles[buffer_count] = handle;
+            cmd.bind_buffer_bindings[buffer_count] = @intCast(binding);
+            cmd.bind_buffer_types[buffer_count] = bg.vk_buffer_binding_types[binding];
+            cmd.bind_buffer_offsets[buffer_count] = bg.offsets[binding];
+            cmd.bind_buffer_sizes[buffer_count] = bg.buffer_sizes[binding];
+            buffer_count += 1;
+        }
+        const texture_count = @min(
+            @as(usize, @intCast(bg.render_texture_view_count)),
+            model_render_types.MAX_RENDER_BIND_ENTRIES,
+        );
+        for (bg.render_texture_views[0..texture_count], 0..) |maybe_tv, texture_index| {
             if (maybe_tv == null) continue;
             const view = native_helpers.cast(shared.DoeTextureView, maybe_tv.?) orelse continue;
             const texture_key = vulkan_texture_view_key(view);
             if (texture_key == 0) continue;
             if (tex_count < model_render_types.MAX_RENDER_BIND_ENTRIES) {
                 cmd.bind_texture_handles[tex_count] = texture_key;
-                cmd.bind_texture_bindings[tex_count] = @intCast(binding);
+                cmd.bind_texture_bindings[tex_count] = bg.render_texture_bindings[texture_index];
+                cmd.bind_texture_storage[tex_count] = bg.render_texture_resource_kinds[texture_index] == RESOURCE_KIND_STORAGE_TEXTURE;
                 tex_count += 1;
             }
         }
-        for (bg.samplers, 0..) |maybe_s, binding| {
+        const sampler_count = @min(
+            @as(usize, @intCast(bg.render_sampler_count)),
+            model_render_types.MAX_RENDER_BIND_ENTRIES,
+        );
+        for (bg.render_samplers[0..sampler_count], 0..) |maybe_s, sampler_index| {
             if (maybe_s == null) continue;
             if (samp_count < model_render_types.MAX_RENDER_BIND_ENTRIES) {
                 cmd.bind_sampler_handles[samp_count] = @intFromPtr(maybe_s.?);
-                cmd.bind_sampler_bindings[samp_count] = @intCast(binding);
+                cmd.bind_sampler_bindings[samp_count] = bg.render_sampler_bindings[sampler_index];
                 samp_count += 1;
             }
         }
     }
     cmd.bind_texture_count = tex_count;
     cmd.bind_sampler_count = samp_count;
+    cmd.bind_buffer_count = buffer_count;
 }
 
 fn base_vulkan_render_cmd(pass: *shared.DoeRenderPass) model_render_types.RenderDrawCommand {
@@ -164,7 +192,17 @@ pub fn vulkan_render_pass_draw(
 
     _ = rt.run_render_draw(cmd) catch |err| {
         shared.deliverInternalError(pass.enc.dev, "doe_vulkan_render_native: run_render_draw failed: {s}", .{@errorName(err)});
+        return;
     };
+    if (pass.pipeline) |pipeline| {
+        program_identity_trace.recordVulkanRenderDraw(
+            pipeline,
+            vertex_count,
+            instance_count,
+            first_vertex,
+            first_instance,
+        );
+    }
 }
 
 pub fn vulkan_render_pass_draw_indexed(

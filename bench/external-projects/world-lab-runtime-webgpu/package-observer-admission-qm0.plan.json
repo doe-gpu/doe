@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "world-lab-package-observer-admission-plan",
+  "planId": "world-lab-package-observer-admission-qm0-v1",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "predecessor": "world-lab-consumer-execution-runtime-ownership-qm0-v1",
+  "hypothesis": "The public provider-neutral WebGPU observer can replace the World Labs application-specific evidence proxy while retaining the frozen exact-output oracle and the public command evidence required to compare pinned Dawn and Doe executions.",
+  "lanes": {
+    "W0": "pinned incumbent through doe-gpu/observe",
+    "D0": "DoeRuntime through the identical doe-gpu/observe contract"
+  },
+  "frozenWork": {
+    "assertionCount": 16,
+    "cleanProcessRunsPerLane": 1,
+    "workerCountPerLane": 2,
+    "shaderAttemptCountPerLane": 6,
+    "dispatchCountPerLane": 3,
+    "drawCountPerLane": 2,
+    "submissionCountPerLane": 5,
+    "readbackCountPerLane": 8,
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "observerIdenticalForW0AndD0": true
+  },
+  "acceptance": [
+    "W0 and D0 each pass all 16 pinned upstream assertions",
+    "every worker observation validates under doe.transparent-webgpu-observation/v1",
+    "each lane reproduces the predecessor public command counts",
+    "W0 and D0 have identical normalized command shape and mapped-readback identity",
+    "the result authorizes the public observer for diagnostic real-application evidence only"
+  ],
+  "nonGoals": [
+    "reopen or reinterpret the terminal World Labs runtime-ownership decision",
+    "assign performance, promotion, release, or runtime-ownership credit",
+    "claim native-driver or operating-system tracing"
+  ]
+}

@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "umap-sgd-governed-benchmark-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "umap-gpu",
+  "harnessId": "sgd-benchmark",
+  "generatedAt": "2026-08-16T01:03:33.214Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T01:04:03Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "20",
+  "upstream": {
+    "repositoryUrl": "https://github.com/Achuttarsing/umap-gpu",
+    "commit": "7884b287f49bc057df7e0856c5539f130a20e0ad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "deterministic-exact-output-contract",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "All twelve I0, I1, W0, and D0 processes pass the frozen finite-output, spread, cluster-separation, and nearest-neighbor oracle. Each provider reproduces one exact 192-byte output identity across every measured sample and its independent replay.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/20260816T-umap-sgd-governed-qm0-v1/raw-benchmark.json",
+          "sha256": "14e9bdcd3fd489511b09d2adb2b8f94adfd17030e744eb8a3bae955d25159a81"
+        },
+        {
+          "path": "bench/out/external-projects/umap-gpu/20260816T-umap-sgd-governed-qm0-v1/receipt-summary.json",
+          "sha256": "4b2bf9952d3a8c9e7585a58602bc10d4a3a540faa93d42d421faa9a477a56433"
+        }
+      ]
+    },
+    {
+      "id": "cross-provider-floating-output-difference",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "The governed incumbent and Doe produce different exact embedding bytes on the same physical adapter, but both outputs pass the predeclared semantic oracle and remain exact within provider. The result is retained as an explicit floating-output boundary rather than mislabeled as byte parity.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/20260816T-umap-sgd-governed-qm0-v1/receipt-summary.json",
+          "sha256": "4b2bf9952d3a8c9e7585a58602bc10d4a3a540faa93d42d421faa9a477a56433"
+        }
+      ]
+    },
+    {
+      "id": "frozen-performance-hypothesis-rejected",
+      "category": "performance",
+      "status": "ineligible",
+      "summary": "Doe improves selected-operation p95 but misses the jointly required p50 and p95 threshold: W0/D0 speedup is 0.9705x at p50 and 1.2592x at p95. The frozen persistent-performance-control hypothesis is terminally negative and receives no runtime-ownership or performance credit.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/umap-gpu/20260816T-umap-sgd-governed-qm0-v1/raw-benchmark.json",
+          "sha256": "14e9bdcd3fd489511b09d2adb2b8f94adfd17030e744eb8a3bae955d25159a81"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The result covers one physical AMD Vulkan tuple.",
+    "The harness-owned deterministic fixture executes unchanged upstream GPUSgd and WGSL but is not the upstream random-input benchmark.",
+    "Three clean processes and nine selected-operation samples per lane are diagnostic rather than promotion-scale evidence.",
+    "No clean-install, concurrency, teardown-cycle, device-loss, bounded-growth, or receipt-overhead gate ran.",
+    "The governed incumbent contract is evidence-level control and not an operating-system sandbox."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 308625408
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 353570816
+    }
+  },
+  "performance": {
+    "unit": "ms",
+    "baseline": {
+      "cold": {
+        "p50": 36.999326999999965,
+        "p95": 40.86334999999997,
+        "p99": 40.86334999999997
+      },
+      "warm": {
+        "p50": 15.096634999999992,
+        "p95": 21.815629,
+        "p99": 21.815629
+      }
+    },
+    "comparison": {
+      "cold": {
+        "p50": 52.4667,
+        "p95": 59.215801,
+        "p99": 59.215801
+      },
+      "warm": {
+        "p50": 15.556040000000053,
+        "p95": 17.325275000000033,
+        "p99": 17.325275000000033
+      }
+    }
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The matrix compares evidence-equivalent lanes but does not isolate receipt instrumentation overhead."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "retain-diagnostic",
+    "claimedProperty": "persistent-performance-control",
+    "lanes": {
+      "I0": {
+        "status": "pass",
+        "summary": "The ambient incumbent passes the semantic and exact-repeat contract."
+      },
+      "I1": {
+        "status": "pass",
+        "summary": "The pinned incumbent passes the semantic and exact-repeat contract."
+      },
+      "W0": {
+        "status": "pass",
+        "summary": "The governed incumbent passes exact semantic replay and defines the performance control."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "Doe passes exact semantic replay but misses the material p50 speedup requirement."
+      },
+      "P0": {
+        "status": "not-run",
+        "summary": "The hypothesis concerns provider performance rather than a bounded incumbent correctness defect."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "Doe's p95 improvement is insufficient because p50 is slower than W0."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "No material application outcome exists to repay owned-runtime costs for this tuple."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The deterministic benchmark uses a harness-owned Vitest driver and workspace provider source."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Every lane binds the physical Radeon/RADV adapter and rejects software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic lanes execute sequentially."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Processes exit cleanly, but promotion-scale teardown cycles did not run."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The diagnostic sample count is below the promotion stress floor."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process-tree RSS is retained, but bounded memory growth was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "Provider, adapter, shader, exact input, dispatch, synchronization, readback, output bytes, and replay identities are retained."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "W0 and D0 each reproduce their complete semantic evidence exactly."
+    },
+    "performance": {
+      "status": "fail",
+      "summary": "The frozen p50 and p95 material-speedup conjunction fails."
+    },
+    "ownership": {
+      "status": "fail",
+      "summary": "D0 supplies no material performance outcome unavailable from W0."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The terminal diagnostic remains a nonblocking regression."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/umap-gpu/20260816T-umap-sgd-governed-qm0-v1/receipt-summary.json",
+      "sha256": "4b2bf9952d3a8c9e7585a58602bc10d4a3a540faa93d42d421faa9a477a56433"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/umap-gpu/20260816T-umap-sgd-governed-qm0-v1/raw-benchmark.json",
+      "sha256": "14e9bdcd3fd489511b09d2adb2b8f94adfd17030e744eb8a3bae955d25159a81"
+    }
+  ]
+}

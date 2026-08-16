@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "native-compute-high-binding-truncation",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Doe stored only 16 bindings per compute bind group. The unchanged cpp-ml Presentation pass uses 18 bindings, so its instructions texture at binding 16 and uniform buffer at binding 17 were silently absent from Vulkan descriptor state. The missing descriptors produced a GPUVM read fault whose manifestation depended on allocation layout. Native compute capacity is now 32 bindings per group, total shader-reflection capacity is 32, and the four-group flattened mask is 128 bits.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-v1/result.json",
+      "sha256": "67c2b6d2d5cddb833be5621d19a18e98179b716e850d7c5c07c3e9898b93f6bf"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-repeat-v1/result.json",
+      "sha256": "422d9736527a0524850c0998daed133df1da39c209e1386bd83fc852b7d88f29"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-high-compute-bindings.js"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/contracts/binding.zig",
+    "runtime/zig/src/native/support/doe_native_shared_types.zig",
+    "runtime/zig/src/native/support/doe_native_command_types.zig",
+    "runtime/zig/src/native/support/doe_native_object_types.zig",
+    "runtime/zig/src/native/vulkan/vulkan_compute_bindings.zig",
+    "runtime/zig/src/native/vulkan/vulkan_compute_native.zig",
+    "runtime/bridge/webgpu-addon/doe_napi_internal.h",
+    "runtime/bridge/webgpu-addon/doe_napi_shader.c"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-high-compute-bindings.js"
+  ],
+  "verifiedAt": "2026-08-16T04:06:01Z"
+}

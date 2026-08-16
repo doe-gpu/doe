@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "gigi-generated-webgpu-suite-amd-vulkan-2026-08-15-diagnostic",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "generatedAt": "2026-08-15T23:53:45.227Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T02:22:24Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "16",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/gigi",
+    "commit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "receipt-explained-failure",
+  "findings": [
+    {
+      "id": "successful-case-set-parity",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "Dawn and Doe each pass the same 10 unchanged cases out of the pinned 50-case generated WebGPU corpus. No Dawn-pass/Doe-fail case remains in this run.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260815T-gigi-vulkan-render-buffers/raw-suite.json",
+          "sha256": "9ad1336f982df881d4ca60deeb4303da5905dffd5df104e4465de487f61cef14"
+        }
+      ]
+    },
+    {
+      "id": "previous-doe-only-frontier-closed",
+      "category": "compatibility",
+      "status": "fixed",
+      "summary": "The four prior Dawn-pass/Doe-fail cases now pass unchanged under Doe: AnyHitSimple, simpleRT, simpleRTDynamic, and Mips_VSPS_2D_WebGPU.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260815T-gigi-vulkan-render-buffers/raw-suite.json",
+          "sha256": "9ad1336f982df881d4ca60deeb4303da5905dffd5df104e4465de487f61cef14"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260815T-storage-texture-fragcoord-fix/raw-suite.json",
+          "sha256": "6826f0317e5497bd196b52846dc94fff2e5491df85c747cc31a3b032ef5cd067"
+        }
+      ]
+    },
+    {
+      "id": "general-runtime-defects-fixed",
+      "category": "diagnosis",
+      "status": "fixed",
+      "summary": "The compatibility closure required general fixes for WGSL integer constant constructors, scalar matrix constructors, stage-correct fragment FragCoord lowering, sparse render bindings, storage-image descriptors and features, graphics buffer descriptors, mip-view layout tracking, and mip-relative Vulkan readback extents.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260815T-gigi-vulkan-render-buffers/raw-suite.json",
+          "sha256": "9ad1336f982df881d4ca60deeb4303da5905dffd5df104e4465de487f61cef14"
+        }
+      ]
+    },
+    {
+      "id": "shared-failure-population-remains",
+      "category": "diagnosis",
+      "status": "discovered",
+      "summary": "Both providers still fail 40 cases. The equal pass count and pass set establish bounded compatibility on the executable subset, not complete Gigi compatibility.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260815T-gigi-vulkan-render-buffers/raw-suite.json",
+          "sha256": "9ad1336f982df881d4ca60deeb4303da5905dffd5df104e4465de487f61cef14"
+        }
+      ]
+    },
+    {
+      "id": "doe-raster-crash-frontier-closed",
+      "category": "reliability",
+      "status": "fixed",
+      "summary": "Graphics uniform buffers are now represented in Doe's Vulkan render descriptor state. The 12 prior raster SIGSEGVs now exit normally, and both providers complete all 50 clean processes without crashes or timeouts.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260815T-gigi-vulkan-render-buffers/raw-suite.json",
+          "sha256": "9ad1336f982df881d4ca60deeb4303da5905dffd5df104e4465de487f61cef14"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The suite retains 40 shared failures, so it does not provide a complete comparator baseline.",
+    "The generated cases execute as separate clean processes and do not provide a matched application-level performance contract.",
+    "The harness remains diagnostic and is not a blocking release dependency.",
+    "No governed-incumbent-wrapper ownership arm was run, so runtime ownership receives no credit."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "shared-case-failures"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 50,
+      "successes": 10,
+      "failures": 40,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 2178306048
+    },
+    "comparison": {
+      "cleanProcessRuns": 50,
+      "successes": 10,
+      "failures": 40,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 2180698112
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The full corpus does not pass, so performance interpretation remains ineligible."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched traced and untraced application runs were executed."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The pinned generated-suite installation is reproducible but remains a harness-only provider substitution."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Both provider probes execute on the physical AMD Vulkan host without a detected software adapter."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "Cases run sequentially rather than under the promotion concurrency floor."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both providers complete all 50 clean case processes without crashes or timeouts."
+    },
+    "stress": {
+      "status": "fail",
+      "summary": "The broad matrix retains shared oracle failures before promotion stress can qualify."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak per-process memory is retained, but bounded growth was not measured."
+    },
+    "receipts": {
+      "status": "fail",
+      "summary": "The raw matrix binds source, provider, case, process, and failure identity, but full structural and output equivalence is absent."
+    },
+    "replay": {
+      "status": "not-run",
+      "summary": "Receipt-driven replay was not exercised."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "Correctness gates fail before performance interpretation."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "The Gigi lane remains an application gap map, not a release gate."
+    },
+    "ownership": {
+      "status": "not-run",
+      "summary": "The incumbent, governed-wrapper, and owned-runtime ownership comparison was not run."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260815T-storage-texture-fragcoord-fix/raw-suite.json",
+      "sha256": "6826f0317e5497bd196b52846dc94fff2e5491df85c747cc31a3b032ef5cd067"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260815T-gigi-vulkan-render-buffers/raw-suite.json",
+      "sha256": "9ad1336f982df881d4ca60deeb4303da5905dffd5df104e4465de487f61cef14"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260815T-storage-texture-fragcoord-fix/raw-suite.json",
+      "sha256": "6826f0317e5497bd196b52846dc94fff2e5491df85c747cc31a3b032ef5cd067"
+    }
+  ],
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The run closes the prior successful-case compatibility gap but does not include the governed incumbent-wrapper control required for runtime-ownership attribution."
+  }
+}

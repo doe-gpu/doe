@@ -56,3 +56,11 @@ Node's explicit no-isolation test mode. That invocation leaves the test file,
 shader corpus, semantic dispatch, diagnostics, and output oracle unchanged
 while removing the test-worker IPC channel that the native addon intermittently
 corrupts. The package receipt, module path, and isolation mode are replay-bound.
+
+The reviewed
+[`public compilation-observer admission`](../../../reports/ecosystem/wgsl-fns/wgsl-fns-public-compilation-observer-amd-vulkan-2026-08-16-diagnostic.json)
+binds the semantic workload's returned `getCompilationInfo()` result to the
+exact observed shader module while preserving the provider return object and
+exact output. The valid shader produces no messages, so this result does not
+establish non-empty native-diagnostic exposure or alter the terminal ownership
+decision.

@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "cpp-ml-mnist-runtime-ownership-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "generatedAt": "2026-08-16T02:53:03.907Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T02:53:40Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "22",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/cpp-ml-intro",
+    "commit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "complete-runtime-ownership-matrix",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "I0, I1, W0, and D0 each pass the same ten-input generated MNIST graph in three clean processes on the physical AMD Vulkan host. Ambient and pinned Dawn resolve the same hash-bound webgpu@0.4.0 module, while W0 and D0 additionally bind the immutable graph, model, inputs, oracle, provider identity, and replay contract.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/raw-suite.json",
+          "sha256": "b5bad19093fa1507571b3c13fd6b09bdab0fbddc4f7c6a9f28e887eb22cb6abc"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/receipt-summary.json",
+          "sha256": "f3935c1f82e22a28bfbf5397c7a17aeb4cef0909df9eb26d97786639a672a34a"
+        }
+      ]
+    },
+    {
+      "id": "governed-semantic-replay-passes",
+      "category": "reliability",
+      "status": "verified",
+      "summary": "W0 and D0 each reproduce their persisted semantic evidence hash across three fresh replay processes. All 18 source and replay processes pass, emit no classified diagnostics, and share output identity 17287b3124138aac38b936254f378f6f4765e5e9ffc524766686e5117c48a079.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/receipt-summary.json",
+          "sha256": "f3935c1f82e22a28bfbf5397c7a17aeb4cef0909df9eb26d97786639a672a34a"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/replay-receipts/W0.json",
+          "sha256": "039f48cf54466c1f4ea8188b572bc1d5bf3306789737728715fbf7c7a58e0c3a"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/replay-receipts/D0.json",
+          "sha256": "318f5491b78952f7578bea6b2785ae599b65e2caaf8a3caa0875f37b6c365d79"
+        }
+      ]
+    },
+    {
+      "id": "owned-runtime-not-distinguished",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "Governed Dawn and owned Doe both pass every frozen correctness and reliability boundary. W0 therefore exposes no release-relevant defect that authorizes P0, and D0 supplies no independent-correction outcome that repays runtime ownership.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/raw-suite.json",
+          "sha256": "b5bad19093fa1507571b3c13fd6b09bdab0fbddc4f7c6a9f28e887eb22cb6abc"
+        }
+      ]
+    },
+    {
+      "id": "staged-oracle-remains-exact",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "Across all lanes and replays, the PNG-to-sRGB boundary stays within 0.5/255 and CPU replay from each observed transformed input matches the GPU hidden and output layers within 1e-5. The ownership decision preserves the earlier exact compatibility result.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/raw-suite.json",
+          "sha256": "b5bad19093fa1507571b3c13fd6b09bdab0fbddc4f7c6a9f28e887eb22cb6abc"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The run uses a controlled ESM provider-substitution seam rather than a claim-eligible clean application installation.",
+    "The physical incumbent probe binds the selected package and hardware eligibility but does not expose a complete adapter and driver identity payload comparable to Doe's native identity fields.",
+    "Three sequential clean processes and one replay per governed lane do not satisfy promotion-scale concurrency, repeated teardown, device-loss, stress, or bounded-memory-growth obligations.",
+    "The evidence binds the complete generated module but does not emit an individual hash for every dynamically extracted WGSL entry point.",
+    "The process-duration observations are diagnostic and do not satisfy a selected-operation performance or isolated receipt-overhead protocol.",
+    "P0 is conditional and was not materialized because W0 passes every frozen application outcome that D0 passes."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 167317504
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 158654464
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Clean-process durations are retained as diagnostic execution evidence; no selected-operation fairness or isolated performance experiment ran."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "Receipt construction and semantic replay are bound, but traced and untraced receipt overhead was not isolated from process and provider variance."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "retain-diagnostic",
+    "claimedProperty": "independent-correction",
+    "lanes": {
+      "I0": {
+        "status": "pass",
+        "summary": "The unchanged generated application resolves the ambient webgpu@0.4.0 module and passes all ten staged-oracle inputs in three clean processes."
+      },
+      "I1": {
+        "status": "pass",
+        "summary": "The explicitly selected and hash-bound webgpu@0.4.0 module reproduces I0's exact application outcome."
+      },
+      "W0": {
+        "status": "pass",
+        "summary": "The pinned incumbent under the DoeProof evidence contract passes three source processes and reproduces its semantic evidence hash in three replay processes."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "DoeRuntime under the same evidence contract passes three source processes and reproduces its semantic evidence hash in three replay processes."
+      },
+      "P0": {
+        "status": "not-run",
+        "summary": "W0 exposes no release-relevant defect that D0 passes, so the conditional bounded-patch control is not authorized."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "D0 does not materially exceed W0 on staged-oracle coverage, output identity, crash or timeout freedom, diagnostics, or semantic replay."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "No unique application benefit was measured to repay DoeRuntime's additional source, compatibility, security, packaging, and support obligations."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The provider is selected through a harness-only ESM loader rather than a validated production installation path."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Every lane executes with an accessible physical AMD Vulkan render node and no detected software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic executes clean processes sequentially."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "All 18 source and replay processes complete without crash, hang, or timeout and destroy the device at the oracle boundary."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The diagnostic population does not satisfy promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process memory is captured, but bounded growth across repeated lifecycle cycles was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The graph, model, inputs, harness, providers, raw matrix, summary, and replay receipts are hash-bound."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "W0 and D0 each reproduce the frozen semantic evidence hash."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No claim-eligible selected-operation performance comparison ran."
+    },
+    "ownership": {
+      "status": "fail",
+      "summary": "The comparison is complete, but D0 supplies no measured independent-correction advantage over W0."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "cpp-ml remains a diagnostic compatibility regression and is not a blocking release dependency."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/receipt-summary.json",
+      "sha256": "f3935c1f82e22a28bfbf5397c7a17aeb4cef0909df9eb26d97786639a672a34a"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/replay-receipts/W0.json",
+      "sha256": "039f48cf54466c1f4ea8188b572bc1d5bf3306789737728715fbf7c7a58e0c3a"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/replay-receipts/D0.json",
+      "sha256": "318f5491b78952f7578bea6b2785ae599b65e2caaf8a3caa0875f37b6c365d79"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/raw-suite.json",
+      "sha256": "b5bad19093fa1507571b3c13fd6b09bdab0fbddc4f7c6a9f28e887eb22cb6abc"
+    }
+  ]
+}

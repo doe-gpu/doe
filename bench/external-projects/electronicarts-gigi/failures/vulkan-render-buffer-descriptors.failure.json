@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "vulkan-render-buffer-descriptors",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "upstreamCommit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+  "category": "crash",
+  "status": "fixed-regression-protected",
+  "summary": "Doe transported texture and sampler bindings into Vulkan graphics descriptor state but omitted bound uniform and storage buffers, allowing shaders with buffer descriptors to reach driver pipeline creation with an incompatible layout; render commands now preserve buffer handle, binding, type, offset, and size.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260815T-gigi-vulkan-compatibility/raw-suite.json",
+      "sha256": "5d495494829bf26437dfe3e4a363c7086c7fbb485009a242716c05a3422e9374"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260815T-gigi-vulkan-render-buffers/raw-suite.json",
+      "sha256": "9ad1336f982df881d4ca60deeb4303da5905dffd5df104e4465de487f61cef14"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/tests/vulkan/vulkan_render_pipeline_test.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/native/resource/doe_bind_group_native.zig",
+    "runtime/zig/src/native/vulkan/vulkan_render_pass_native.zig",
+    "runtime/zig/src/backend/vulkan/vk_render_pipeline.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/src/native/resource/doe_bind_group_native.zig",
+    "runtime/zig/tests/vulkan/vulkan_render_pipeline_test.zig",
+    "runtime/zig/tests/core/model_test.zig"
+  ],
+  "verifiedAt": "2026-08-15T23:54:55Z"
+}

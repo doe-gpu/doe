@@ -117,6 +117,11 @@ export interface NodeWebGPUGovernedCheckpointReceipt {
   adapterInfo: Record<string, unknown>;
   adapterInfoStatus: 'observed' | 'absent' | 'query-failed';
   oracle: Record<string, unknown>;
+  programEvidence: {
+    status: 'not-requested' | 'observed';
+    observationSha256: `sha256:${string}` | null;
+    observation: import('./observe.js').TransparentWebGPUObservation | null;
+  };
   execution: { durationMs: number | null };
   lifecycle: Record<string, unknown>;
   replay: { workloadSha256: string; executionSha256: string };
@@ -133,6 +138,7 @@ export interface NodeWebGPUGovernedOptions {
     input: Uint8Array;
   }): Promise<NodeWebGPUByteSource> | NodeWebGPUByteSource;
   checkpoint?(receipt: NodeWebGPUGovernedCheckpointReceipt): Promise<void> | void;
+  observeProgram?: boolean | { metadata?: Record<string, unknown> };
 }
 
 export interface NodeWebGPUGovernedResult {

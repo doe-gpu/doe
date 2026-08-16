@@ -1,3 +1,5 @@
+import type { TransparentWebGPUObservation } from './observe.js';
+
 export const NODE_WEBGPU_GOVERNED_PROCESS_RECEIPT_SCHEMA:
   'doe.governed-node-webgpu-process-receipt/v1';
 export const NODE_WEBGPU_GOVERNED_PROCESS_ERROR_CODES: readonly string[];
@@ -66,6 +68,15 @@ export interface NodeWebGPUGovernedProcessReceipt {
   oracle: Record<string, unknown>;
   applicationEvidence: unknown;
   applicationEvidenceSha256: string | null;
+  programEvidence: {
+    status: 'not-requested' | 'observed' | 'missing';
+    checkpointCount: number;
+    observationSha256: string | null;
+    observation: TransparentWebGPUObservation | null;
+    checkpoint?: {
+      reason: 'mapped-readback' | 'compilation-info' | 'process-before-exit' | 'process-uncaught-exception';
+    } | null;
+  };
   replay: { workloadSha256: string; executionSha256: string };
   errors: Array<{ code: string; stage: string; detail: string }>;
 }
@@ -82,12 +93,14 @@ export interface NodeWebGPUGovernedProcessOptions {
   }): Promise<NodeWebGPUProcessObservation> | NodeWebGPUProcessObservation;
   checkpoint?(receipt: NodeWebGPUGovernedProcessReceipt): Promise<void> | void;
   signal?: AbortSignal;
+  observeProgram?: boolean | { metadata?: Record<string, unknown> };
 }
 
 export interface NodeWebGPUGovernedProcessResult {
   ok: boolean;
   receipt: NodeWebGPUGovernedProcessReceipt | null;
   observation: NodeWebGPUProcessObservation | null;
+  programObservation: TransparentWebGPUObservation | null;
   stdout: Uint8Array;
   stderr: Uint8Array;
   errors: Array<{ code: string; stage: string; detail: string }>;

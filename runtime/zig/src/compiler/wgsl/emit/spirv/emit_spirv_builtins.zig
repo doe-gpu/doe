@@ -602,6 +602,35 @@ fn emit_atomic_call(self: anytype, call: anytype, result_ty: ir.TypeId) !u32 {
         return 0;
     }
 
+    if (std.mem.eql(u8, call.name, "atomicCompareExchangeWeak")) {
+        if (call.args.len != 3) return error.InvalidIr;
+        const result_struct = switch (self.emitter.module.types.get(result_ty)) {
+            .struct_ => |struct_id| self.emitter.module.structs.items[struct_id],
+            else => return error.InvalidIr,
+        };
+        if (result_struct.fields.items.len != 2) return error.InvalidIr;
+        const old_value_type = try self.emitter.lower_type(result_struct.fields.items[0].ty);
+        const desired_id = try self.emit_value_expr(self.function.expr_args.items[call.args.start + 2]);
+        const old_value_id = try emit_result_inst(
+            self,
+            spirv.Opcode.AtomicCompareExchange,
+            old_value_type,
+            &.{ ptr_id, memory.scope_id, memory.semantics_id, memory.semantics_id, desired_id, value_id },
+        );
+        const exchanged_id = try emit_result_inst(
+            self,
+            spirv.Opcode.IEqual,
+            try self.emitter.lower_type(result_struct.fields.items[1].ty),
+            &.{ old_value_id, value_id },
+        );
+        return try emit_result_inst(
+            self,
+            spirv.Opcode.CompositeConstruct,
+            try self.emitter.lower_type(result_ty),
+            &.{ old_value_id, exchanged_id },
+        );
+    }
+
     const opcode: u16 = if (std.mem.eql(u8, call.name, "atomicAdd"))
         spirv.Opcode.AtomicIAdd
     else if (std.mem.eql(u8, call.name, "atomicSub"))

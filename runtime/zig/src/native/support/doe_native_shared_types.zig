@@ -9,7 +9,7 @@ const binding_contract = @import("../../contracts/binding.zig");
 pub const NativeVulkanRuntime = if (has_vulkan) backend_lifecycle.NativeVulkanRuntime else void;
 pub const NativeD3D12Runtime = backend_lifecycle.NativeD3D12Runtime;
 
-pub const MAX_BIND: usize = 16;
+pub const MAX_BIND: usize = 32;
 pub const MAX_RENDER_BIND_GROUPS: usize = 4;
 pub const MAX_COMPUTE_BIND_GROUPS: usize = 4;
 pub const MAX_FLAT_BIND: usize = MAX_BIND * MAX_COMPUTE_BIND_GROUPS;
@@ -41,6 +41,7 @@ pub const CompilationMessageKind = enum(u8) {
 pub const DoeBindGroupLayoutEntry = struct {
     binding: u32 = 0,
     resource_kind: u32 = 0,
+    buffer_binding_type: u32 = abi_binding.WGPUBufferBindingType_Undefined,
     texture_sample_type: u32 = abi_binding.WGPUTextureSampleType_Undefined,
     texture_view_dimension: u32 = abi_texture.WGPUTextureViewDimension_Undefined,
     texture_multisampled: bool = false,

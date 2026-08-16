@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 HARNESS = ROOT / "bench/external-projects/holoscript-snn-webgpu"
 REPORT = (
     ROOT
-    / "reports/benchmarks/amd-vulkan/20260815T230727Z"
+    / "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2"
     / "holoscript-lif-determinism-diagnostic.json"
 )
 REVIEWED_REPORT = (
@@ -98,7 +98,10 @@ class HoloScriptLifDeterminismTests(unittest.TestCase):
         for reference in self.reviewed["receipts"] + self.reviewed["rawEvidence"]:
             self.assertEqual(reference["sha256"], sha256(ROOT / reference["path"]))
 
-        self.assertEqual(self.registry["registryRevision"], "15")
+        self.assertGreaterEqual(
+            int(self.registry["registryRevision"]),
+            int(self.reviewed["registryRevision"]),
+        )
         actor = next(
             actor
             for actor in self.registry["actors"]

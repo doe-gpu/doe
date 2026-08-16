@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 REPORTS = {
     runtime: (
         ROOT
-        / "reports/benchmarks/amd-vulkan/20260815T220824Z"
+        / "reports/benchmarks/amd-vulkan/20260816T-current-runtime-package"
         / f"doe-gpu-{runtime}-native-clean-install-diagnostic.json"
     )
     for runtime in ("node", "bun", "electron")

@@ -869,8 +869,8 @@ test "ERR_CAP is 512" {
     try std.testing.expectEqual(@as(usize, 512), native.ERR_CAP);
 }
 
-test "MAX_BIND is 16" {
-    try std.testing.expectEqual(@as(usize, 16), native.MAX_BIND);
+test "MAX_BIND is 32" {
+    try std.testing.expectEqual(@as(usize, 32), native.MAX_BIND);
 }
 
 test "MAX_FLAT_BIND is MAX_BIND * MAX_COMPUTE_BIND_GROUPS" {
@@ -1325,8 +1325,8 @@ test "DoeRenderPass default bind_groups are all null" {
 // WGSL compiler constants
 // ============================================================
 
-test "MAX_BINDINGS is 16" {
-    try std.testing.expectEqual(@as(usize, 16), wgsl_compiler.MAX_BINDINGS);
+test "MAX_BINDINGS is 32" {
+    try std.testing.expectEqual(@as(usize, 32), wgsl_compiler.MAX_BINDINGS);
 }
 
 test "CompilationStage enum has expected variants" {

@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "cpp-ml-mnist-doeproof-cli-clean-install-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "generatedAt": "2026-08-16T04:25:23Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T04:25:23Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "23",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/cpp-ml-intro",
+    "commit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "clean-installed-public-doeproof-application-boundary-passes",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "The locally packed doe-gpu wrapper, Linux x64 platform package, pinned webgpu 0.4.0 incumbent, and pngjs 7.0.0 install with lifecycle scripts disabled and optional dependencies omitted. The unchanged pinned cpp-ml MNIST application then passes DoeProof run, verify, inspect, compare, and replay through both providers under Node read-only permissions. Both independent oracles pass with exact output digest 6929ac572c2f63e6bba69076ed2fb7ce076999c15c830d0a2b6430b3fa69269f and empty provider stderr.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1/result.json",
+          "sha256": "0090aba547ab7b9dd07804c845736e45ab5e9dfae2a314eee6ede1ad9d3f1099"
+        }
+      ]
+    },
+    {
+      "id": "installed-platform-library-precedence-fixed",
+      "category": "diagnosis",
+      "status": "fixed",
+      "summary": "The rejected qm8 run proved that an installed wrapper probed an undeclared development-workspace path before the valid installed platform payload. The qm9 correction preserves explicit overrides, prefers the installed platform package from node_modules, and retains workspace-first resolution for source development. The native probe loads the installed libwebgpu_doe.so with SHA-256 fb567669571c0d628d59c50160ce75c6586d3d1b738c6493aac6b7e8253588f7 and prebuild metadata from inside the clean installation.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm8-v1/result.json",
+          "sha256": "1dae66a24ae6c83a3f267d4c7026d876abbb768067a3d5f7933298b1b54f0be3"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1/result.json",
+          "sha256": "0090aba547ab7b9dd07804c845736e45ab5e9dfae2a314eee6ede1ad9d3f1099"
+        }
+      ]
+    },
+    {
+      "id": "clean-install-repeat-passes",
+      "category": "reliability",
+      "status": "verified",
+      "summary": "A second independent installation reproduces identical wrapper, platform, incumbent, and pngjs tarball hashes, the same native library and metadata hashes, the same exact workload and output identities, passing oracles in both lanes, and passing semantic replay. Receipt files differ because each correctly binds its own absolute installation paths and process measurements. The larger command-level observed maximum resident set size is 270364672 bytes.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1/result.json",
+          "sha256": "0090aba547ab7b9dd07804c845736e45ab5e9dfae2a314eee6ede1ad9d3f1099"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1-repeat/result.json",
+          "sha256": "3db86024b6515aec904f1d596c7d42297459539a7215a1c01f064f7a4d5ae274"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This is a local-tarball clean installation on the declared Node, Linux x64, AMD Vulkan tuple; it is not evidence for a published registry artifact or another platform.",
+    "Node read-only permissions constrain declared JavaScript filesystem access but do not seal native-addon syscalls, network access, dynamic-system-library resolution, or complete operating-system dependencies.",
+    "The two complete command observations do not satisfy promotion-scale concurrency, stress, lifecycle, device-loss, or bounded-memory-growth requirements.",
+    "No isolated selected-operation performance or receipt-overhead comparison ran.",
+    "The result authorizes the clean-installed public DoeProof application boundary only. It does not change the terminal cpp-ml runtime-ownership decision and grants no application-promotion or release credit."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 2,
+      "successes": 2,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 270364672
+    },
+    "comparison": {
+      "cleanProcessRuns": 2,
+      "successes": 2,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 270364672
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Command durations are retained only as diagnostic execution evidence; no isolated selected-operation comparison ran."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The command chain binds receipts and replay, but traced and untraced execution were not compared."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "This clean-install successor validates packaging plus the public DoeProof application boundary. It does not reopen or change the separately reviewed terminal runtime-ownership decision."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "pass",
+      "summary": "Two independent local-tarball installations use scripts-disabled package installation and execute the copied pinned application entirely from their declared install roots."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "The Doe lane uses the explicitly selected Radeon Vulkan ICD, exact installed prebuild identity, and no detected provider fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic executes providers sequentially."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both installations, both provider lanes, and both semantic replays complete without crash, hang, timeout, or provider stderr."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Two complete command chains do not satisfy promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Command-level RSS is observed, but bounded growth across promotion-scale lifecycle cycles was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "Both aggregates bind the correction plan, package tarballs, installed runtime files, copied application inventory, provider identities, oracle, exact output, and command results."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Both providers reproduce their exact semantic workload and output through the clean-installed public CLI replay command."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No claim-eligible selected-operation performance comparison ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The clean-install result grants no runtime-ownership credit."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "cpp-ml remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1/result.json",
+      "sha256": "0090aba547ab7b9dd07804c845736e45ab5e9dfae2a314eee6ede1ad9d3f1099"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1-repeat/result.json",
+      "sha256": "3db86024b6515aec904f1d596c7d42297459539a7215a1c01f064f7a4d5ae274"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm8-v1/result.json",
+      "sha256": "1dae66a24ae6c83a3f267d4c7026d876abbb768067a3d5f7933298b1b54f0be3"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1/result.json",
+      "sha256": "0090aba547ab7b9dd07804c845736e45ab5e9dfae2a314eee6ede1ad9d3f1099"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1-repeat/result.json",
+      "sha256": "3db86024b6515aec904f1d596c7d42297459539a7215a1c01f064f7a4d5ae274"
+    }
+  ]
+}

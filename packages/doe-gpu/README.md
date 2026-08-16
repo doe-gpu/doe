@@ -71,6 +71,7 @@ const result = await runGovernedNodeWebGPU({
     input,
     expectedOutputSha256,
   },
+  observeProgram: { metadata: { application: "my-kernel" } },
   execute: async ({ adapter, input }) => runApplication(adapter, input),
   checkpoint: persistReceipt,
 });
@@ -85,6 +86,20 @@ the same contract compare a governed incumbent (`W0`) with Doe (`D0`) without
 assigning runtime credit to evidence supplied by the wrapper.
 Validation recomputes both replay identities and rejects incoherent oracle,
 provider, adapter-observation, error, or lifecycle state.
+
+`observeProgram` is opt-in. When enabled, the terminal receipt embeds a
+hash-bound `doe.transparent-webgpu-observation/v1` artifact containing attempted
+WGSL, returned `getCompilationInfo()` messages bound to their shader modules,
+pipeline and resource descriptors, writes, encoded command kinds, dispatches,
+draws, submissions, synchronization, and mapped-readback digests.
+The same provider-neutral observer is available directly from
+`doe-gpu/observe`; its schema is exported as
+`doe-gpu/transparent-webgpu-observation.schema.json`. A synchronous checkpoint
+can persist an observation when compilation information returns or throws and
+when a mapped readback completes. The governed unchanged-process path also
+retains a final snapshot before normal exit or an uncaught exception. This
+observes the public JavaScript WebGPU surface, not native-driver calls,
+filesystem access, network activity, or operating-system dependency closure.
 
 An unchanged Node application that imports the exact `webgpu` specifier can use
 the public fail-closed loader:
@@ -111,6 +126,7 @@ import {
 const run = await runGovernedNodeWebGPUProcess({
   provider: { id: "pinned-incumbent", module: providerModule },
   workload: { id, version, implementationSha256, input, expectedOutputSha256 },
+  observeProgram: { metadata: { application: "unchanged-app" } },
   process: {
     entrypoint: applicationPath,
     environment: { mode: "sealed", values: applicationEnvironment },
@@ -138,6 +154,14 @@ An active abort, timeout, or output-limit violation terminates the governed
 process group on POSIX and the direct child on Windows; the receipt records the
 actual termination scope. Callers must not infer Windows descendant cleanup
 from a child-process receipt.
+
+When `observeProgram` is requested, the fail-closed loader wraps the declared
+provider and sends validated observation checkpoints to the parent over the
+governed IPC channel. The parent binds the final observation and checkpoint
+count into `programEvidence`; a clean execution that produces no observation
+fails. This path works with the Node permission profile without granting a
+filesystem write. Direct loader use cannot request program observation because
+it lacks that governed parent channel.
 
 `node-permission-read-only` enables Node's permission model, removes
 `NODE_OPTIONS`, denies Node filesystem writes and child-process creation, and
@@ -169,7 +193,9 @@ binds the provider entrypoint, workload entrypoint, input, evaluator module,
 expected output, environment policy, timeout, and output limit. Every referenced
 file has an exact SHA-256. Optional `runtimeFiles` entries bind additional
 runtime data, libraries, manifests, or generated artifacts by unique ID, path,
-and digest. The evaluator exports `evaluate(processResult, context)` and returns
+and digest. Optional `observeProgram` enables the same loader-to-parent program
+evidence path and may bind JSON metadata. The evaluator exports
+`evaluate(processResult, context)` and returns
 the same `{ output, providerIdentity, evidence }` object as the JavaScript
 process API.
 

@@ -126,6 +126,7 @@ pub fn fold_scalar_binary(op: ir.BinaryOp, lhs: ir.ConstantValue, rhs: ir.Consta
             },
             else => error.TypeMismatch,
         },
+        .composite => error.TypeMismatch,
     };
 }
 

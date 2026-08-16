@@ -481,6 +481,18 @@ pub const Emitter = struct {
                 },
                 else => return error.InvalidIr,
             },
+            .composite => |values| {
+                const elem_ty = switch (self.module.types.get(ty)) {
+                    .array => |array| array.elem,
+                    else => return error.InvalidIr,
+                };
+                var constituents = std.ArrayListUnmanaged(u32){};
+                defer constituents.deinit(self.alloc);
+                for (values) |value| {
+                    try constituents.append(self.alloc, try self.lower_constant(value, elem_ty));
+                }
+                return try self.builder.const_composite(try self.lower_type(ty), constituents.items);
+            },
         }
     }
 

@@ -4,7 +4,12 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { NODE_WEBGPU_LOADER_CONTRACT } from './node-webgpu-loader.js';
+import {
+  NODE_WEBGPU_LOADER_CONTRACT,
+  NODE_WEBGPU_LOADER_PROGRAM_OBSERVATION_CONTRACT,
+  NODE_WEBGPU_LOADER_PROGRAM_OBSERVATION_REASONS,
+} from './node-webgpu-loader.js';
+import { validateTransparentWebGPUObservation } from './observe.js';
 
 export const NODE_WEBGPU_GOVERNED_PROCESS_RECEIPT_SCHEMA =
   'doe.governed-node-webgpu-process-receipt/v1';
@@ -18,6 +23,7 @@ export const NODE_WEBGPU_GOVERNED_PROCESS_ERROR_CODES = Object.freeze([
   'DOE_GOVERNED_PROCESS_EXIT_FAILED',
   'DOE_GOVERNED_PROCESS_EVALUATION_FAILED',
   'DOE_GOVERNED_PROCESS_PROVIDER_IDENTITY_FAILED',
+  'DOE_GOVERNED_PROCESS_PROGRAM_EVIDENCE_FAILED',
   'DOE_GOVERNED_PROCESS_ORACLE_FAILED',
   'DOE_GOVERNED_PROCESS_RECEIPT_SINK_FAILED',
 ]);
@@ -47,6 +53,7 @@ const ENVIRONMENT_KEYS = new Set(['mode', 'values']);
 const FILESYSTEM_KEYS = new Set(['mode', 'readPaths']);
 const OBSERVATION_KEYS = new Set(['output', 'providerIdentity', 'evidence']);
 const loaderPath = fileURLToPath(new URL('./node-webgpu-loader.js', import.meta.url));
+const observerPath = fileURLToPath(new URL('./observe.js', import.meta.url));
 
 function own(object, key) {
   return Object.prototype.hasOwnProperty.call(object, key);
@@ -83,6 +90,26 @@ function assertStringArray(value, label) {
     throw new TypeError(`${label} must be an array of strings.`);
   }
   return [...value];
+}
+
+function cloneJsonValue(value, label) {
+  function validate(item, path) {
+    if (item === null || typeof item === 'string' || typeof item === 'boolean') return;
+    if (typeof item === 'number' && Number.isFinite(item)) return;
+    if (Array.isArray(item)) {
+      item.forEach((entry, index) => validate(entry, `${path}[${index}]`));
+      return;
+    }
+    if (item && typeof item === 'object'
+        && (Object.getPrototypeOf(item) === Object.prototype
+          || Object.getPrototypeOf(item) === null)) {
+      for (const [key, entry] of Object.entries(item)) validate(entry, `${path}.${key}`);
+      return;
+    }
+    throw new TypeError(`${path} must contain only JSON values.`);
+  }
+  validate(value, label);
+  return JSON.parse(JSON.stringify(value));
 }
 
 function byteView(value, label) {
@@ -267,7 +294,15 @@ function filesystemPath(value, label) {
 function normalizeOptions(options) {
   assertPlainObject(options, 'options');
   for (const key of Object.keys(options)) {
-    if (!['provider', 'workload', 'process', 'evaluate', 'checkpoint', 'signal'].includes(key)) {
+    if (![
+      'provider',
+      'workload',
+      'process',
+      'evaluate',
+      'checkpoint',
+      'signal',
+      'observeProgram',
+    ].includes(key)) {
       throw new TypeError(`options contains unsupported field "${key}".`);
     }
   }
@@ -284,6 +319,30 @@ function normalizeOptions(options) {
   }
   const provider = normalizeProvider(options.provider);
   const processConfiguration = normalizeProcess(options.process);
+  if (options.observeProgram !== undefined
+      && typeof options.observeProgram !== 'boolean'
+      && (!options.observeProgram
+        || typeof options.observeProgram !== 'object'
+        || Array.isArray(options.observeProgram))) {
+    throw new TypeError('observeProgram must be a boolean or an options object.');
+  }
+  const observationRequested = options.observeProgram === true
+    || (options.observeProgram && typeof options.observeProgram === 'object');
+  const observationMetadata = options.observeProgram === true
+    ? {}
+    : options.observeProgram?.metadata ?? {};
+  if (observationRequested) {
+    assertPlainObject(observationMetadata, 'observeProgram.metadata');
+  }
+  const programObservation = {
+    requested: Boolean(observationRequested),
+    metadata: observationRequested
+      ? cloneJsonValue(
+        observationMetadata,
+        'observeProgram.metadata',
+      )
+      : {},
+  };
   if (processConfiguration.filesystem.mode === 'node-permission-read-only') {
     filesystemPath(provider.module, 'provider.module');
   }
@@ -294,6 +353,7 @@ function normalizeOptions(options) {
     evaluate: options.evaluate,
     checkpoint: options.checkpoint,
     signal: options.signal,
+    programObservation,
   };
 }
 
@@ -314,11 +374,12 @@ function terminateProcess(child, terminationScope) {
   }
 }
 
-function spawnProcess(configuration, provider, abortSignal) {
+function spawnProcess(configuration, provider, abortSignal, programObservation) {
   return new Promise((resolveProcess) => {
     const effectiveReadPaths = configuration.filesystem.mode === 'node-permission-read-only'
       ? [...new Set([
         loaderPath,
+        ...(programObservation.requested ? [observerPath] : []),
         configuration.entrypoint,
         filesystemPath(provider.module, 'provider.module'),
         ...configuration.filesystem.readPaths,
@@ -345,6 +406,10 @@ function spawnProcess(configuration, provider, abortSignal) {
       ...configuration.environment.effective,
       DOE_NODE_WEBGPU_PROVIDER_ID: provider.id,
       DOE_NODE_WEBGPU_PROVIDER_MODULE: provider.module,
+      ...(programObservation.requested ? {
+        DOE_NODE_WEBGPU_OBSERVE_PROGRAM: '1',
+        DOE_NODE_WEBGPU_OBSERVE_METADATA: JSON.stringify(programObservation.metadata),
+      } : {}),
     };
     if (configuration.filesystem.mode === 'node-permission-read-only') {
       delete environment.NODE_OPTIONS;
@@ -376,6 +441,10 @@ function spawnProcess(configuration, provider, abortSignal) {
         stdout: Buffer.alloc(0),
         stderr: Buffer.alloc(0),
         durationMs: 0,
+        programObservation: null,
+        programObservationContext: null,
+        programObservationCount: 0,
+        programObservationErrors: [],
       });
       return;
     }
@@ -386,7 +455,9 @@ function spawnProcess(configuration, provider, abortSignal) {
         cwd: configuration.cwd,
         env: environment,
         detached: terminationScope === 'process-group',
-        stdio: ['ignore', 'pipe', 'pipe'],
+        stdio: programObservation.requested
+          ? ['ignore', 'pipe', 'pipe', 'ipc']
+          : ['ignore', 'pipe', 'pipe'],
       });
     } catch (error) {
       resolveProcess({
@@ -398,6 +469,10 @@ function spawnProcess(configuration, provider, abortSignal) {
         aborted: false,
         terminationScope,
         durationMs: null,
+        programObservation: null,
+        programObservationContext: null,
+        programObservationCount: 0,
+        programObservationErrors: [],
       });
       return;
     }
@@ -410,6 +485,10 @@ function spawnProcess(configuration, provider, abortSignal) {
     let capturedOutputBytes = 0;
     let spawnError = null;
     let settled = false;
+    let observedProgram = null;
+    let observedProgramContext = null;
+    let programObservationCount = 0;
+    const programObservationErrors = [];
     const append = (current, chunk) => {
       const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
       const remaining = configuration.maxOutputBytes - capturedOutputBytes;
@@ -426,6 +505,47 @@ function spawnProcess(configuration, provider, abortSignal) {
     child.stdout.on('data', (chunk) => { stdout = append(stdout, chunk); });
     child.stderr.on('data', (chunk) => { stderr = append(stderr, chunk); });
     child.on('error', (error) => { spawnError = error; });
+    if (programObservation.requested) {
+      child.on('message', (message) => {
+        if (!message || typeof message !== 'object'
+            || message.contract !== NODE_WEBGPU_LOADER_PROGRAM_OBSERVATION_CONTRACT) {
+          return;
+        }
+        if (!message.context || typeof message.context !== 'object'
+            || Array.isArray(message.context)
+            || !NODE_WEBGPU_LOADER_PROGRAM_OBSERVATION_REASONS.includes(
+              message.context.reason,
+            )) {
+          programObservationErrors.push('observed checkpoint context is invalid');
+          return;
+        }
+        const validation = validateTransparentWebGPUObservation(message.observation);
+        if (!validation.valid) {
+          programObservationErrors.push(...validation.errors);
+          return;
+        }
+        if (message.observation.providerId !== provider.id) {
+          programObservationErrors.push('observed providerId does not match the declaration');
+          return;
+        }
+        if (stableSha256(message.observation.metadata)
+            !== stableSha256(programObservation.metadata)) {
+          programObservationErrors.push('observed metadata does not match the declaration');
+          return;
+        }
+        if (observedProgram) {
+          for (const field of Object.keys(observedProgram.summary)) {
+            if (message.observation.summary[field] < observedProgram.summary[field]) {
+              programObservationErrors.push(`observed ${field} regressed between checkpoints`);
+              return;
+            }
+          }
+        }
+        observedProgram = message.observation;
+        observedProgramContext = { reason: message.context.reason };
+        programObservationCount += 1;
+      });
+    }
     const abortListener = () => {
       aborted = true;
       terminateProcess(child, terminationScope);
@@ -455,6 +575,10 @@ function spawnProcess(configuration, provider, abortSignal) {
         stdout,
         stderr,
         durationMs: Number(process.hrtime.bigint() - started) / 1e6,
+        programObservation: observedProgram,
+        programObservationContext: observedProgramContext,
+        programObservationCount,
+        programObservationErrors,
       });
     });
   });
@@ -517,6 +641,16 @@ function executionIdentity(receipt) {
     timedOut: receipt.process.timedOut,
     outputLimitExceeded: receipt.process.outputLimitExceeded,
     oracle: receipt.oracle,
+    programEvidence: receipt.programEvidence === undefined
+      ? undefined
+      : {
+          status: receipt.programEvidence.status,
+          checkpointCount: receipt.programEvidence.checkpointCount,
+          observationSha256: receipt.programEvidence.observationSha256,
+          ...(own(receipt.programEvidence, 'checkpoint')
+            ? { checkpoint: receipt.programEvidence.checkpoint }
+            : {}),
+        },
   };
 }
 
@@ -553,7 +687,12 @@ export async function runGovernedNodeWebGPUProcess(options) {
   }
 
   const errors = [];
-  const child = await spawnProcess(normalized.process, normalized.provider, normalized.signal);
+  const child = await spawnProcess(
+    normalized.process,
+    normalized.provider,
+    normalized.signal,
+    normalized.programObservation,
+  );
   if (child.spawnError) {
     errors.push(processError('DOE_GOVERNED_PROCESS_SPAWN_FAILED', 'process.spawn', child.spawnError));
   }
@@ -579,6 +718,28 @@ export async function runGovernedNodeWebGPUProcess(options) {
       'DOE_GOVERNED_PROCESS_EXIT_FAILED',
       'process.exit',
       `process exited with code ${child.exitCode} and signal ${child.signal}`,
+    ));
+  }
+  for (const detail of child.programObservationErrors ?? []) {
+    errors.push(processError(
+      'DOE_GOVERNED_PROCESS_PROGRAM_EVIDENCE_FAILED',
+      'program-evidence.validate',
+      detail,
+    ));
+  }
+  if (normalized.programObservation.requested
+      && child.spawned
+      && !child.spawnError
+      && !child.aborted
+      && !child.timedOut
+      && !child.outputLimitExceeded
+      && child.exitCode === 0
+      && child.signal === null
+      && !child.programObservation) {
+    errors.push(processError(
+      'DOE_GOVERNED_PROCESS_PROGRAM_EVIDENCE_FAILED',
+      'program-evidence.missing',
+      'observed execution completed without a program observation',
     ));
   }
 
@@ -667,6 +828,29 @@ export async function runGovernedNodeWebGPUProcess(options) {
     },
     applicationEvidence: observation?.evidence ?? null,
     applicationEvidenceSha256: observation ? stableSha256(observation.evidence) : null,
+    programEvidence: !normalized.programObservation.requested
+      ? {
+          status: 'not-requested',
+          checkpointCount: 0,
+          observationSha256: null,
+          observation: null,
+          checkpoint: null,
+        }
+      : child.programObservation
+        ? {
+            status: 'observed',
+            checkpointCount: child.programObservationCount,
+            observationSha256: child.programObservation.observationSha256,
+            observation: child.programObservation,
+            checkpoint: child.programObservationContext,
+          }
+        : {
+            status: 'missing',
+            checkpointCount: 0,
+            observationSha256: null,
+            observation: null,
+            checkpoint: null,
+          },
     replay: {
       workloadSha256: stableSha256(workload),
       executionSha256: null,
@@ -683,6 +867,7 @@ export async function runGovernedNodeWebGPUProcess(options) {
     ok: errors.length === 0,
     receipt,
     observation,
+    programObservation: child.programObservation ?? null,
     stdout: child.stdout ?? Buffer.alloc(0),
     stderr: child.stderr ?? Buffer.alloc(0),
     errors,
@@ -821,6 +1006,63 @@ export function validateGovernedNodeWebGPUProcessReceipt(receipt) {
   if (receipt.applicationEvidenceSha256 !== null
       && receipt.applicationEvidenceSha256 !== stableSha256(receipt.applicationEvidence)) {
     errors.push('applicationEvidenceSha256 does not match applicationEvidence');
+  }
+  if (receipt.programEvidence !== undefined) {
+    const programEvidence = receipt.programEvidence;
+    if (!programEvidence || typeof programEvidence !== 'object'
+        || Array.isArray(programEvidence)) {
+      errors.push('programEvidence must be an object');
+    } else if (!['not-requested', 'observed', 'missing'].includes(programEvidence.status)) {
+      errors.push('programEvidence.status is invalid');
+    } else if (!Number.isSafeInteger(programEvidence.checkpointCount)
+        || programEvidence.checkpointCount < 0) {
+      errors.push('programEvidence.checkpointCount is invalid');
+    } else if (programEvidence.status === 'observed') {
+      const validation = validateTransparentWebGPUObservation(programEvidence.observation);
+      if (!validation.valid) {
+        errors.push(...validation.errors.map((error) => `programEvidence: ${error}`));
+      }
+      if (programEvidence.checkpointCount < 1) {
+        errors.push('observed programEvidence has no checkpoints');
+      }
+      if (programEvidence.observationSha256
+          !== programEvidence.observation?.observationSha256) {
+        errors.push('programEvidence.observationSha256 does not match the observation');
+      }
+      if (programEvidence.observation?.providerId !== requested?.id) {
+        errors.push('programEvidence providerId does not match the requested provider');
+      }
+      if (programEvidence.checkpoint !== undefined
+          && (!programEvidence.checkpoint
+            || typeof programEvidence.checkpoint !== 'object'
+            || Array.isArray(programEvidence.checkpoint)
+            || Object.keys(programEvidence.checkpoint).length !== 1
+            || !NODE_WEBGPU_LOADER_PROGRAM_OBSERVATION_REASONS.includes(
+              programEvidence.checkpoint.reason,
+            ))) {
+        errors.push('programEvidence checkpoint is invalid');
+      }
+    } else {
+      if (programEvidence.checkpointCount !== 0
+          || programEvidence.observation !== null
+          || programEvidence.observationSha256 !== null) {
+        errors.push(`${programEvidence.status} programEvidence contains observation state`);
+      }
+      if (own(programEvidence, 'checkpoint') && programEvidence.checkpoint !== null) {
+        errors.push(`${programEvidence.status} programEvidence contains a checkpoint`);
+      }
+      const reportsProgramFailure = receiptErrorCodes.has(
+        'DOE_GOVERNED_PROCESS_PROGRAM_EVIDENCE_FAILED',
+      );
+      if (programEvidence.status === 'missing'
+          && receipt.status === 'pass'
+          && !reportsProgramFailure) {
+        errors.push('passing receipt has missing programEvidence without a failure code');
+      }
+      if (programEvidence.status === 'not-requested' && reportsProgramFailure) {
+        errors.push('not-requested programEvidence reports a failure');
+      }
+    }
   }
   const expectedWorkloadSha256 = stableSha256(receipt.workload);
   if (receipt.replay?.workloadSha256 !== expectedWorkloadSha256) {

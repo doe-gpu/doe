@@ -59,14 +59,24 @@ function readJsonFile(metadataPath) {
   }
 }
 
+function metadataPathExists(metadataPath) {
+  try {
+    return existsSync(metadataPath);
+  } catch {
+    // Node's permission model throws for undeclared optional probes. Treat the
+    // candidate as unavailable and continue to an explicitly readable sidecar.
+    return false;
+  }
+}
+
 export function readDoeBuildMetadataFile(metadataPath) {
-  if (!metadataPath || !existsSync(metadataPath)) return null;
+  if (!metadataPath || !metadataPathExists(metadataPath)) return null;
   const parsed = readJsonFile(metadataPath);
   return parseDoeBuildSidecar(parsed, metadataPath, 'zig-out');
 }
 
 function loadMetadataCandidate(metadataPath, parser, source) {
-  if (!metadataPath || !existsSync(metadataPath)) return null;
+  if (!metadataPath || !metadataPathExists(metadataPath)) return null;
   const parsed = readJsonFile(metadataPath);
   return parser(parsed, metadataPath, source);
 }

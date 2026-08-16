@@ -984,6 +984,81 @@ class BrowserRuntimeFrontierBundleTests(unittest.TestCase):
         proof_surface: dict[str, str],
         release_status: str,
     ) -> dict[str, str]:
+        clean_install_verifier = self._write_artifact_file(
+            root,
+            "clean-install-verifier.py",
+            "browser_release_clean_install_verifier",
+            "# fixture verifier\n",
+        )
+        smoke_script = self._write_artifact_file(
+            root,
+            "webgpu-smoke.mjs",
+            "browser_webgpu_smoke_runner",
+            "// fixture smoke\n",
+        )
+        smoke_report = self._write_artifact_json(
+            root,
+            "clean-install-webgpu-smoke.json",
+            "chromium-webgpu-playwright-smoke",
+            {"reportKind": "chromium-webgpu-playwright-smoke"},
+        )
+        clean_install_check = self._write_artifact_json(
+            root,
+            "browser-release-clean-install-check.json",
+            "browser_release_clean_install_check",
+            {
+                "schemaVersion": 1,
+                "artifactKind": "browser_release_clean_install_check",
+                "observedAt": "2026-08-16T00:00:00Z",
+                "verificationLevel": "webgpu_smoke",
+                "sourceMode": "release_archive",
+                "verifier": clean_install_verifier,
+                "releaseArchive": {
+                    **release_archive,
+                    "byteLength": (root / release_archive["path"]).stat().st_size,
+                },
+                "releaseArchiveManifest": {
+                    **release_archive_manifest,
+                    "byteLength": (
+                        root / release_archive_manifest["path"]
+                    ).stat().st_size,
+                },
+                "browserProduct": {
+                    **DEFAULT_BROWSER_PRODUCT,
+                    "channel": release_status,
+                },
+                "platform": {
+                    "os": "macos",
+                    "arch": "arm64",
+                    "packageFormat": "zip",
+                },
+                "extraction": {
+                    "isolation": "fresh_temporary_directory",
+                    "archiveMemberCount": 5,
+                    "extractedMemberCount": 5,
+                    "borrowedMemberCount": 0,
+                },
+                "launchProbe": {
+                    "attempted": True,
+                    "exitCode": 0,
+                    "timedOut": False,
+                },
+                "webgpuSmoke": {
+                    "required": True,
+                    "modes": ["dawn", "doe"],
+                    "script": smoke_script,
+                    "report": smoke_report,
+                    "process": {
+                        "attempted": True,
+                        "exitCode": 0,
+                        "timedOut": False,
+                    },
+                },
+                "releaseCandidateEligible": True,
+                "status": "pass",
+                "failures": [],
+            },
+        )
         return self._write_artifact_json(
             root,
             path,
@@ -1002,6 +1077,7 @@ class BrowserRuntimeFrontierBundleTests(unittest.TestCase):
                 "releaseArchive": release_archive,
                 "releaseArchiveManifest": release_archive_manifest,
                 "proofSurface": proof_surface,
+                "cleanInstallCheck": clean_install_check,
                 "browserExecutableArchivePath": DEFAULT_BROWSER_ARCHIVE_PATH,
                 "browserAppMetadataArchivePath": DEFAULT_APP_METADATA_ARCHIVE_PATH,
                 "doeRuntimeArchivePath": DEFAULT_DOE_RUNTIME_ARCHIVE_PATH,

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "world-lab-package-native-identity-clean-install-plan",
+  "planId": "world-lab-package-native-identity-clean-install-qm3-v1",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "predecessor": {
+    "planId": "world-lab-package-compilation-observer-qm2-v1",
+    "result": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm2-v1/result.json",
+    "status": "passed",
+    "extension": "Pack the current doe-gpu wrapper and platform package, install both with lifecycle scripts and optional dependency resolution disabled, and run the unchanged application with its observer and Doe provider resolved only from that installation. Preserve the qm2 source-to-SPIR-V, native-submission, and application-output checks."
+  },
+  "hypothesis": "The qm2 native identity chain is a shipped-package capability rather than a workspace-only effect: an unchanged pinned World Labs application can load the observer, provider, and native runtime from local tarballs in a clean installation and reproduce the same exact source, command-shape, native-artifact, submission, diagnostic, and output evidence.",
+  "lanes": {
+    "W0": "pinned incumbent observed through the clean-installed doe-gpu/observe export",
+    "D0": "clean-installed doe-gpu wrapper and platform runtime observed through the same installed export plus native program-identity journal"
+  },
+  "frozenWork": {
+    "assertionCount": 16,
+    "cleanProcessRunsPerLane": 1,
+    "workerCountPerLane": 3,
+    "shaderAttemptCountPerLane": 13,
+    "compilationInfoCountPerLane": 8,
+    "dispatchCountPerLane": 3,
+    "drawCountPerLane": 2,
+    "submissionCountPerLane": 5,
+    "readbackCountPerLane": 8,
+    "invalidRuntimeShaderSourceSha256": "sha256:53672fc645bfd78a8635f16261c9212ad39fc1b12aa95caaf3557221f16632ce",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "scientificParametersChangedFromQm2": false,
+    "installationScripts": "disabled",
+    "optionalDependencies": "omitted",
+    "packageInputs": "local tarballs"
+  },
+  "acceptance": [
+    "all qm2 application, compilation, command-shape, mapped-output, native dispatch, native submission, and SPIR-V validation conditions remain passing",
+    "the observer and Doe provider resolve beneath the clean installation",
+    "the loaded Doe native runtime resolves beneath the clean installation and byte-matches the installed platform payload",
+    "the wrapper and platform tarball identities and installed package files are recorded",
+    "no workspace Doe package or native library is accepted as the effective D0 runtime"
+  ],
+  "nonGoals": [
+    "claim a registry-published package or support beyond the declared local-tarball Node/Linux/x64/AMD Vulkan tuple",
+    "claim complete transitive dependency, operating-system, filesystem, network, or driver closure",
+    "reopen World Labs runtime ownership or assign performance, promotion, or release credit",
+    "extend the native journal to render artifacts or other backends"
+  ]
+}

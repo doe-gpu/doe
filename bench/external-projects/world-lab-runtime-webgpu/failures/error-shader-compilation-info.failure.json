@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "error-shader-compilation-info",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Doe retained the native error on an error shader module but the N-API compilation-info path ignored that stored diagnostic and returned an empty message list; getCompilationInfo now serializes the module-owned kind, message, line, and column.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-current-runtime/raw-suite.json",
+      "sha256": "15d0e2383cf4cfcda0e660b400057f86a7d36f05ca49cb5405e7df24af0542e7"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/raw-suite.json",
+      "sha256": "7fe0d4ea2009ae23c7f44429197c769643315f57b4a6e5b6616ef743aec87709"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/tests/core/doe_shader_native_test.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/native/shader/doe_shader_compilation_info_native.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/tests/core/doe_shader_native_test.zig"
+  ],
+  "verifiedAt": "2026-08-16T00:38:12Z"
+}

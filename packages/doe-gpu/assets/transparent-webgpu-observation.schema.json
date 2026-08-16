@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/transparent-webgpu-observation.schema.json",
+  "title": "Doe transparent WebGPU observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "artifactKind",
+    "providerId",
+    "metadata",
+    "shaderModules",
+    "computePipelines",
+    "renderPipelines",
+    "resources",
+    "bufferWrites",
+    "textureWrites",
+    "commands",
+    "dispatches",
+    "draws",
+    "submissions",
+    "synchronizations",
+    "readbacks",
+    "summary",
+    "observationSha256"
+  ],
+  "properties": {
+    "schema": { "const": "doe.transparent-webgpu-observation/v1" },
+    "artifactKind": { "const": "doe-transparent-webgpu-observation" },
+    "providerId": { "type": "string", "minLength": 1 },
+    "metadata": { "type": "object" },
+    "shaderModules": { "$ref": "#/$defs/records" },
+    "compilationInfos": { "$ref": "#/$defs/records" },
+    "computePipelines": { "$ref": "#/$defs/records" },
+    "renderPipelines": { "$ref": "#/$defs/records" },
+    "resources": { "$ref": "#/$defs/records" },
+    "bufferWrites": { "$ref": "#/$defs/records" },
+    "textureWrites": { "$ref": "#/$defs/records" },
+    "commands": { "$ref": "#/$defs/records" },
+    "dispatches": { "$ref": "#/$defs/records" },
+    "draws": { "$ref": "#/$defs/records" },
+    "submissions": { "$ref": "#/$defs/records" },
+    "synchronizations": { "$ref": "#/$defs/records" },
+    "readbacks": { "$ref": "#/$defs/records" },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shaderModuleCount",
+        "computePipelineCount",
+        "renderPipelineCount",
+        "resourceCount",
+        "bufferWriteCount",
+        "textureWriteCount",
+        "commandCount",
+        "dispatchCount",
+        "drawCount",
+        "submissionCount",
+        "synchronizationCount",
+        "readbackCount"
+      ],
+      "properties": {
+        "shaderModuleCount": { "$ref": "#/$defs/count" },
+        "compilationInfoCount": { "$ref": "#/$defs/count" },
+        "computePipelineCount": { "$ref": "#/$defs/count" },
+        "renderPipelineCount": { "$ref": "#/$defs/count" },
+        "resourceCount": { "$ref": "#/$defs/count" },
+        "bufferWriteCount": { "$ref": "#/$defs/count" },
+        "textureWriteCount": { "$ref": "#/$defs/count" },
+        "commandCount": { "$ref": "#/$defs/count" },
+        "dispatchCount": { "$ref": "#/$defs/count" },
+        "drawCount": { "$ref": "#/$defs/count" },
+        "submissionCount": { "$ref": "#/$defs/count" },
+        "synchronizationCount": { "$ref": "#/$defs/count" },
+        "readbackCount": { "$ref": "#/$defs/count" }
+      }
+    },
+    "observationSha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "records": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "count": { "type": "integer", "minimum": 0 },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

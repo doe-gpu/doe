@@ -86,6 +86,13 @@ pub fn validate_construct(self: anytype, target_ty: ir.TypeId, arg_types: []cons
         },
         .vector => |vec| try validate_vector_construct(self, vec, arg_types),
         .matrix => |mat| try validate_matrix_construct(self, mat, arg_types),
+        .array => |arr| {
+            const len = arr.len orelse return error.TypeMismatch;
+            if (arg_types.len != 0 and arg_types.len != len) return error.TypeMismatch;
+            for (arg_types) |arg_ty| {
+                if (!self.type_compatible(arr.elem, arg_ty)) return error.TypeMismatch;
+            }
+        },
         .struct_ => |struct_id| {
             const fields = self.module.structs.items[struct_id].fields.items;
             if (fields.len != arg_types.len) return error.TypeMismatch;

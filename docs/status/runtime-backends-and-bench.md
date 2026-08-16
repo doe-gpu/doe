@@ -90,6 +90,25 @@ file only names the promoted boundary and open admission gates.
   `reports/benchmarks/amd-vulkan/20260815T200358Z/holoscript-doeproof-cli-diagnostic.json`
   passes all five commands for W0/D0 plus D0 semantic replay. This is an
   adoption and CI surface, not a new evidence tier.
+- Governed unchanged-process executions can now opt into the public transparent
+  program observer. The loader composes it with the explicitly declared
+  provider, transports mapped-readback and terminal checkpoints over a
+  parent-owned IPC channel, and binds the validated observation into the
+  receipt and replay identity. Shader-module `getCompilationInfo()` calls now
+  retain normalized messages and thrown state against the exact observed
+  module without changing the provider return value. Package unit and
+  clean-install CLI gates cover command capture, tamper rejection, replay
+  stability, cancellation, and the read-only Node permission profile. This
+  adds no native-trace, ownership, or application-promotion claim.
+- The reviewed HoloScript unchanged-process admission at
+  `reports/ecosystem/holoscript-snn-webgpu/holoscript-doeproof-process-observer-amd-vulkan-2026-08-16-diagnostic.json`
+  passes the unobserved control plus observed pinned-Dawn and Doe lanes. Both
+  observed lanes preserve the four-topology oracle and share the same
+  normalized 68-dispatch command shape and 68 mapped-readback identities; Doe
+  replay reproduces its observation and execution identities exactly. This
+  admits the public process-observer path for a real diagnostic application.
+  It does not reopen HoloScript runtime ownership or grant performance,
+  promotion, or release credit.
 - Governed process cancellation is now explicit and receipt-bound. Pre-aborted
   calls do not spawn; active abort, timeout, and output-limit paths share the
   same termination primitive. POSIX descendants are terminated through the
@@ -148,11 +167,11 @@ file only names the promoted boundary and open admission gates.
   executable. Electron is restricted to main-process Node-side compute, uses
   the frozen headless launch arguments, and creates no renderer.
   Source-tree integration may skip when platform payloads are absent, but the
-  explicit release commands may not. The bounded physical receipts are
-  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-node-native-clean-install-diagnostic.json`,
-  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-bun-native-clean-install-diagnostic.json`,
+  explicit release commands may not. The current-runtime physical receipts are
+  `reports/benchmarks/amd-vulkan/20260816T-current-runtime-package/doe-gpu-node-native-clean-install-diagnostic.json`,
+  `reports/benchmarks/amd-vulkan/20260816T-current-runtime-package/doe-gpu-bun-native-clean-install-diagnostic.json`,
   and
-  `reports/benchmarks/amd-vulkan/20260815T220824Z/doe-gpu-electron-native-clean-install-diagnostic.json`;
+  `reports/benchmarks/amd-vulkan/20260816T-current-runtime-package/doe-gpu-electron-native-clean-install-diagnostic.json`;
   they grant runtime-specific installation evidence for Linux x64 only and no
   performance, ownership, application-promotion, or release credit.
 - Bounded clean-install reliability diagnostics now reuse one installed package
@@ -176,16 +195,18 @@ file only names the promoted boundary and open admission gates.
   readback through `GPUBuffer.getMappedRange()` and requires a sliceable
   `ArrayBuffer`. This permanently covers the Node-API external-buffer fallback
   exercised by the Electron main-process runtime.
-- The named HoloScript Electron main-process diagnostic at
-  `reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json`
+- The current-runtime HoloScript Electron main-process diagnostic at
+  `reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json`
   now exercises that correction through the unchanged tropical-SpMV
   application. `D0` passes three clean processes plus exact replay across all
   four topology hashes; `I0`, `I1`, and `W0` each fail three times at the
   external-ArrayBuffer boundary. The bounded application upload workaround
   reaches a native `SIGABRT`. The exact `webgpu@0.3.10` source and Dawn
-  submodule were then rebuilt with a frozen two-file mapped-buffer ownership
-  patch; `P0` passes three clean processes and exact replay across the same
-  oracle. The bounded incumbent patch closes the application gap, so
+  submodule were freshly rebuilt with the pinned Go 1.26.6 toolchain and frozen
+  two-file mapped-buffer ownership patch; `P0` passes three clean processes and
+  exact replay across the same oracle. The current Doe runtime is hash-bound as
+  `95fef184def434fb71927a09836f757922fc6c7a07e64d98c6aca8e9adf6f9ce`.
+  The bounded incumbent patch still closes the application gap, so
   DoeRuntime ownership is rejected for this tuple. The artifact remains a
   diagnostic regression with no application-promotion, performance, release,
   renderer, Chromium, or browser credit and does not reinterpret the terminal
@@ -217,7 +238,10 @@ file only names the promoted boundary and open admission gates.
   exactly and produce identical GPU membrane and spike bytes across all three
   frozen cases on the physical Radeon Vulkan adapter. The result is retained
   as a correctness regression and supplies no runtime-ownership, promotion,
-  performance, or release credit.
+  performance, or release credit. Registry revision 19 replays the same matrix
+  against the current runtime after the World Labs compiler repair; every lane,
+  exact replay, semantic oracle, and cross-provider output identity remains
+  green.
 - The Gemma package-surface attribution receipt at
   `reports/benchmarks/amd-vulkan/20260815T171507Z/gemma64-no-dispatch-prewarm-attribution.json`
   remains a synthetic mechanism antecedent. The governed Doppler application
@@ -241,15 +265,101 @@ file only names the promoted boundary and open admission gates.
   and 4.147× W0 on median timed inference. The corrected Doppler performance
   family is retired without tuning. W0's post-release abort remains a distinct
   lifecycle observation.
+- The bounded Doppler lifecycle adjudication at
+  `reports/benchmarks/amd-vulkan/20260816T074546Z/doppler-provider-lifecycle-control-diagnostic.json`
+  closes that observation without runtime-ownership credit. W0 reproduces a
+  post-release native failure in three clean processes; P0 preserves exact W0
+  output while queue-draining and destroying four tracked incumbent devices,
+  then exits zero three times. A governed wrapper therefore repairs the
+  measured lifecycle defect. D0 is lifecycle-clean but has a distinct,
+  deterministic one-token output, retained as an unassigned correctness
+  diagnostic rather than hidden by the lifecycle decision.
+- The follow-on one-token transcript diagnostic at
+  `reports/benchmarks/amd-vulkan/20260816T080140Z/doppler-provider-logit-divergence-diagnostic.json`
+  localizes that output difference before sampling. Bounded-incumbent P0
+  exactly reproduces q0 W0's full finalized-logit digest and token 818 (`The`),
+  while D0 sees the same 72-token prompt but produces a different
+  262,144-element f32 logit digest and token 34492 (`untas`). This authorizes
+  one layerwise KV mismatch localizer. It does not assign provider correctness
+  or grant ownership, performance, promotion, or release credit.
 - The reviewed UMAP-GPU physical AMD Vulkan result at
-  `reports/ecosystem/umap-gpu/umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic.json`
-  retains the unchanged structural application oracle under both providers.
-  Exact embedding identity and concrete primary dispatch identity remain open,
-  and Doe's process timing is a measured disadvantage rather than a speed wedge.
-- The reviewed Gigi physical matrix at
-  `reports/ecosystem/electronicarts-gigi/gigi-generated-webgpu-suite-amd-vulkan-2026-08-11-diagnostic.json`
-  is a gap map: shared fixture failures are separated from the cases that pass
-  under Dawn and fail under Doe. It does not support a Gigi product claim.
+  `reports/ecosystem/umap-gpu/umap-sgd-governed-benchmark-amd-vulkan-2026-08-16-diagnostic.json`
+  closes the former exact-output and dispatch gaps with a deterministic
+  harness-owned fixture over the unchanged upstream `GPUSgd` implementation
+  and shaders. All `I0`, `I1`, `W0`, and `D0` processes plus W0/D0 semantic
+  replay pass; each provider is byte-exact with itself, while the two providers
+  produce different valid embeddings. Doe improves p95 but is slower at p50,
+  so the frozen joint threshold fails and the performance/ownership family is
+  retired without tuning.
+- The reviewed Gigi ownership matrix at
+  `reports/ecosystem/electronicarts-gigi/gigi-runtime-ownership-2026-08-16-diagnostic.json`
+  completes the ambient, pinned, governed-incumbent, and Doe lanes plus
+  semantic replay. Every lane retains the same successful-case set, so the
+  governed incumbent closes the frozen application outcome and DoeRuntime
+  receives no independent-correction credit. The prior compiler and runtime
+  fixes remain permanent regressions, while shared oracle failures keep Gigi
+  diagnostic and block equivalence, performance, promotion, and product
+  claims.
+- The reviewed World Labs ownership matrix at
+  `reports/ecosystem/world-lab-runtime-webgpu/world-lab-runtime-ownership-amd-vulkan-2026-08-16-diagnostic.json`
+  closes the earlier dynamic-shader, command-shape, and exact-output evidence
+  gaps with one transparent provider layer shared by W0 and D0. All 12
+  I0/I1/W0/D0 processes pass the unchanged 16-assertion application oracle.
+  Each governed process records six shader attempts, three compute dispatches,
+  two render draws, five submissions, and eight exact mapped readbacks. W0 and
+  D0 reproduce the same shape, complete semantic evidence, and exact output
+  identities in every process. Pinned Dawn therefore closes the frozen outcome
+  without a patch; World Labs receives no runtime-ownership, performance,
+  promotion, or release credit and remains a permanent regression suite.
+- The reviewed public-observer successor at
+  `reports/ecosystem/world-lab-runtime-webgpu/world-lab-package-observer-admission-amd-vulkan-2026-08-16-diagnostic.json`
+  replaces the World Labs-specific evidence proxy with the exported
+  `doe-gpu/observe` contract. W0 and D0 each pass all 16 assertions and retain
+  the predecessor's six shader attempts, three dispatches, two draws, five
+  submissions, and eight exact mapped readbacks. Their normalized command and
+  output identities match. The result admits provider-neutral package evidence
+  only and leaves the completed ownership rejection unchanged.
+- The reviewed World Labs compilation-observer successor at
+  `reports/ecosystem/world-lab-runtime-webgpu/world-lab-package-compilation-observer-amd-vulkan-2026-08-16-diagnostic.json`
+  persists public observations at compilation-info checkpoints. W0 and D0 each
+  pass all 16 upstream assertions, retain 13 shader attempts and eight
+  compilation results, and bind their sole error-bearing result to the same
+  exact invalid runtime shader source. Provider-specific message text remains
+  visible rather than being mislabeled as cross-provider identity. The result
+  supplies diagnostic credit only and cannot reopen runtime ownership.
+- The reviewed native-program-identity successor at
+  `reports/ecosystem/world-lab-runtime-webgpu/world-lab-native-program-identity-amd-vulkan-2026-08-16-diagnostic.json`
+  joins the unchanged World Labs public observer to Doe's in-process Vulkan
+  journal. All 16 assertions remain green; three observed compute dispatches
+  match three native dispatches by exact WGSL hash, entry point, and workgroups,
+  each has a later successful submission, and both distinct emitted SPIR-V
+  artifacts pass digest checks and `spirv-val`. This proves the workspace
+  package's compute source-to-native-artifact seam only. It grants no runtime-
+  ownership, performance, promotion, or release credit, does not cover render
+  artifacts, and is not clean-install evidence.
+- The reviewed clean-install successor at
+  `reports/ecosystem/world-lab-runtime-webgpu/world-lab-native-program-identity-clean-install-amd-vulkan-2026-08-16-diagnostic.json`
+  packs and locally installs the current `doe-gpu` wrapper and Linux x64
+  platform package with lifecycle scripts disabled and optional dependencies
+  omitted. The unchanged World Labs oracle remains green, while the effective
+  observer, Doe module, and loaded native library all resolve beneath the
+  installation. The loaded library byte-matches the installed platform payload,
+  and the complete compute dispatch-to-SPIR-V-to-submission chain remains valid.
+  This authorizes only the declared local-tarball package identity boundary; it
+  is not registry-publication, ownership, performance, promotion, or release
+  evidence.
+- The reviewed direct-render successor at
+  `reports/ecosystem/world-lab-runtime-webgpu/world-lab-native-render-identity-clean-install-amd-vulkan-2026-08-16-diagnostic.json`
+  extends that clean-installed chain to the unchanged application's two direct
+  draws. Both public draw records match native vertex and fragment WGSL hashes,
+  entry points, normalized draw arguments, and four exact SPIR-V artifacts;
+  every artifact passes `spirv-val`. The frozen qm4 gate remains recorded as a
+  failure because it incorrectly expected a later outer queue submission in a
+  render worker. The correction-only qm5 gate records
+  `internal_submit_and_wait_succeeded` after the backend's actual internal
+  submit-and-wait returns. All three compute dispatches retain their separate
+  later-submission proof. This is diagnostic program-identity evidence only and
+  grants no performance, ownership, promotion, or release credit.
 - Strict Linux Vulkan profiles declare ordered distro-specific ICD path
   candidates. Preflight selects only the first installed declared candidate;
   it does not scan for or fall back to an undeclared software ICD.
@@ -353,6 +463,15 @@ file only names the promoted boundary and open admission gates.
   physical provider identity, and replay. The bounded wrapper correction
   closes the exercised outcome, so the report assigns no runtime-ownership
   credit and keeps wgsl-fns diagnostic.
+- The reviewed public compilation-observer successor at
+  `reports/ecosystem/wgsl-fns/wgsl-fns-public-compilation-observer-amd-vulkan-2026-08-16-diagnostic.json`
+  runs the unchanged `smoothStep` semantic workload through pinned Dawn and
+  Doe. Each lane binds one returned `getCompilationInfo()` call to its exact
+  shader module and then produces identical normalized command and exact
+  eight-float output identities. The valid shader yields no diagnostic
+  messages, so this admits the public call-binding seam but does not prove
+  exposure of every native compiler diagnostic or reopen ownership,
+  performance, promotion, or release credit.
 - That workload exposed a vector-scalar compound-assignment gap in WGSL
   semantic analysis and IR validation. Compound assignments now validate the
   underlying binary operation before checking assignability, and the minimized
@@ -412,6 +531,18 @@ file only names the promoted boundary and open admission gates.
 
 ## Admission blockers
 
+- A local native Vulkan execution-identity diagnostic now passes at
+  `bench/out/program-identity-qm2-v1/identity-receipt.json`. It binds the
+  `workgroup_non_atomic.wgsl` source through semantic state, Doe IR, and exact
+  SPIR-V artifact
+  `359e1a4fb4e27a643395bb036a625e36c092eea23d71fe971573fcc328592a15`
+  to 100 successful no-fallback dispatches and the independently expected
+  output digest
+  `20b294d0e46d723dd0c7bb96ba3e98ff59d597872f21d6b50bdf29f31d0f8a07`.
+  The shader-artifact gate also validates that exact SPIR-V with `spirv-val`.
+  This proves one runtime-reported source-to-backend execution chain; it grants
+  no external-application, driver/OS dependency, performance,
+  runtime-ownership, promotion, or release credit.
 - No external application has cleared the material-outcome and accepted
   runtime-ownership-cost gates. Completed HoloScript, vGPU, and wgsl-fns
   matrices reject DoeRuntime ownership for their declared tuples, so no
@@ -434,10 +565,58 @@ file only names the promoted boundary and open admission gates.
 - Installation must pass from clean npm environments on every supported
   runtime, operating system, and architecture tuple.
 - Performance is still advisory in `config/gates.json`.
-- The AMD Vulkan cpp-ml lane remains ineligible because the generated
-  Presentation WGSL does not compile in Doe and the strict application oracle
-  also rejects one baseline label. Physical-host admission is no longer the
-  blocker for that diagnostic lane.
+- The AMD Vulkan cpp-ml generated graph now completes through Doe. The staged
+  independent oracle passes throughout the complete `I0`, `I1`, `W0`, and
+  `D0` runtime-ownership matrix and the governed W0/D0 replays in
+  `bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-cpp-ml-runtime-ownership/raw-suite.json`.
+  Every transformed input stays within one half of an 8-bit normalized quantum
+  of the analytic sRGB conversion; CPU replay from that observed input matches
+  the GPU hidden and output layers within `1e-5`; all 18 source and replay
+  processes retain exact output identity; and both governed providers replay
+  their semantic evidence exactly. Governed Dawn matches Doe on every frozen
+  outcome, so the reviewed decision assigns no runtime-ownership credit and
+  leaves the application diagnostic. The runtime
+  corrections are retained through the host-shadow and storage-texture
+  visibility failure records under
+  `bench/external-projects/electronicarts-cpp-ml-intro/failures/`.
+- The cpp-ml graph now also passes the public `doe-proof-node` command chain
+  twice under Node read-only permissions. The correction raises native compute
+  capacity from 16 to 32 bindings per group, raises total shader-reflection
+  capacity from 16 to 32, and widens the four-group flattened binding mask to
+  128 bits, preserving the unchanged Presentation pass's bindings 16 and 17.
+  Both W0 and D0 pass `run`, `verify`,
+  `inspect`, `compare`, and `replay` with exact output and empty provider
+  stderr. The reviewed diagnostic at
+  `reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-doeproof-cli-filesystem-amd-vulkan-2026-08-16-diagnostic.json`
+  grants only public DoeProof CLI authorization; ownership, performance,
+  promotion, release, and complete OS dependency closure remain uncredited.
+- The clean-install successor packs `doe-gpu`, the Linux x64 native platform
+  package, pinned `webgpu@0.4.0`, and `pngjs@7.0.0`; installs with lifecycle
+  scripts disabled; copies the exact pinned cpp-ml application; and executes
+  the complete public command chain from two independent installation roots.
+  Both W0 and D0 pass exact independent oracles and semantic replay. The qm8
+  rejection exposed that installed packages probed a development-workspace
+  native path before the valid platform payload under Node read-only
+  permissions. The qm9 correction gives installed platform packages
+  precedence while preserving workspace-first source development, and the
+  focused installed-resolution integration now regression-tests that behavior
+  under Node permissions. The reviewed diagnostic at
+  `reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-doeproof-cli-clean-install-amd-vulkan-2026-08-16-diagnostic.json`
+  authorizes only the local-tarball Node/Linux x64/AMD Vulkan application
+  installation boundary. It grants no registry-publication, ownership,
+  performance, promotion, release, or complete OS dependency-closure credit.
+- The frozen cpp-ml persistent-performance-control screen now terminalizes the
+  remaining performance ownership property. Both providers pass 30 cold
+  processes, five warm-up suites, and 100 warm exact-oracle suites with shared
+  semantic identity
+  `17287b3124138aac38b936254f378f6f4765e5e9ffc524766686e5117c48a079`.
+  Doe is 1.391x, 1.513x, and 1.521x slower at cold p50/p95/p99 and
+  1.768x, 1.720x, and 1.751x slower at warm p50/p95/p99. The reviewed
+  diagnostic at
+  `reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-persistent-performance-control-amd-vulkan-2026-08-16-diagnostic.json`
+  rejects the 1.10x material-win gate and 1.05x maximum-regression boundary.
+  It grants no public performance, runtime-ownership, promotion, or release
+  credit and does not authorize further cpp-ml promotion stress.
 
 ## Ground truth
 

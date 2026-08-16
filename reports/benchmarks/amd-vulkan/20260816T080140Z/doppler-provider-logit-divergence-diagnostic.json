@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-logit-divergence-diagnostic",
+  "generatedAt": "2026-08-16T08:01:40Z",
+  "evidenceMaturity": "diagnostic",
+  "outcome": "authorize-operation-mismatch-localization",
+  "hypothesis": "The deterministic W0/D0 one-token divergence is already present in finalized first-step f32 logits rather than sampling or transcript serialization.",
+  "workload": {
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "modelManifestSha256": "230104df762ff394095326d8e9fa4dc144d431bbd61ad5139e1030e66836ab78",
+    "promptTokenCount": 72,
+    "promptSha256": "sha256:993fa1e7b83530b02ee1801373974b132096899a7ec27d281448e58276fb7753",
+    "promptTokenIdsSha256": "sha256:058e3a5cf6a92eae7b6657acdcb25831941795a97ada7a95184a97e56fc3c18d",
+    "decodeTokens": 1,
+    "logitDtype": "f32",
+    "logitElements": 262144
+  },
+  "incumbent": {
+    "continuity": "pass",
+    "summary": "The new bounded-incumbent P0 transcript exactly matches the persisted q0 W0 prompt, token, complete finalized-logit digest, and top-eight logits, then exits zero after bounded cleanup.",
+    "selectedTokenId": 818,
+    "selectedText": "The",
+    "logitDigest": "sha256:71a1e8031fc2186659689458869ea1b6d42f83c6c76cc00755c5d2935ffeda4c",
+    "topLogit": 16.35964012145996,
+    "runnerExit": "zero"
+  },
+  "doe": {
+    "withinLaneDeterminism": "previously-pass-3-of-3",
+    "selectedTokenId": 34492,
+    "selectedText": "untas",
+    "logitDigest": "sha256:102d19846ae734b3369742636f3c9d10b5d38b918f24abff814030ceee4959c7",
+    "topLogit": 21.626699447631836,
+    "runnerExit": "zero"
+  },
+  "adjudication": {
+    "evidenceValid": true,
+    "promptIdentity": true,
+    "incumbentContinuity": true,
+    "finalizedLogitsIdentical": false,
+    "selectedTokensIdentical": false,
+    "boundary": "predictor-or-earlier-execution",
+    "correctProvider": "unassigned",
+    "summary": "The selected tokens are the top-ranked entries in each captured finalized vector. Because those vectors differ under one exact prompt/model identity, sampling and transcript serialization are downstream of the first proved divergence."
+  },
+  "limitations": [
+    "No independent logits oracle assigns correctness to either provider.",
+    "The q0 W0 capture hung after its complete release trace; q1 therefore uses P0 and proves exact incumbent transcript continuity before interpreting the comparison.",
+    "The result localizes only to predictor-or-earlier execution, not to a specific layer, operation, shader, or backend command.",
+    "Capture mode disables command batching and is diagnostic, not performance evidence."
+  ],
+  "nextAction": "Capture exact per-layer used KV bytes for the same P0/D0 step and freeze the earliest differing layer or the downstream-post-KV boundary.",
+  "credit": {
+    "correctness": "unassigned",
+    "performance": false,
+    "runtimeOwnership": false,
+    "promotion": false,
+    "release": false
+  },
+  "evidence": [
+    {
+      "path": "bench/out/external-projects/doppler/doppler-provider-logit-divergence-qm0-v1-run1/result.json",
+      "sha256": "56f41697a027565b728c1fd53030dcb4396cb1a5b1abcdd57b5a65b3e852e4fd"
+    },
+    {
+      "path": "bench/out/external-projects/doppler/doppler-provider-logit-divergence-qm1-v1-run1/result.json",
+      "sha256": "c387dd5c2b7078f7f3da29b4fb102c7981671c16c7d5b94f1d24b671342354d5"
+    },
+    {
+      "path": "bench/vendor-node/doppler_provider_logit_divergence_qm1.plan.json",
+      "sha256": "f3576a0d4ad336fde43e1540658e7a5cfcd0a827b18cab62f03a54626e464815"
+    }
+  ]
+}

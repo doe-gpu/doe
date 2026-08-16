@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "world-lab-runtime-ownership-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "generatedAt": "2026-08-16T04:45:44Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T04:45:44Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "24",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "transparent-evidence-provider-closes-receipt-gaps",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "The identical transparent provider around governed Dawn and Doe retains all six dynamically assembled WGSL attempts, three compute dispatches, two render draws, five queue submissions, and eight exact mapped readbacks per clean process without editing pinned application or shader source. Each governed lane reproduces one stable normalized shape, semantic-evidence, and output identity across three processes.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-consumer-execution-runtime-ownership-qm0-v1/result.json",
+          "sha256": "d7a972ec6cffc0754af6e7d8ad41ff4dbb77e074d7600ecdaebba44a0d1f76c3"
+        }
+      ]
+    },
+    {
+      "id": "governed-incumbent-and-doe-are-evidence-identical",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "All I0, I1, W0, and D0 processes pass the same 16 upstream assertions on physical AMD Vulkan. W0 and D0 share shape identity 295d908a50dfb696fc4b586a6fda866d48c2b6f2d583481c249c12f277434c9e, complete semantic-evidence identity 0faa377593c453c6fa08c9eb54b6a6e403c4bdd1e8b92707a5669d3185aecced, and exact mapped-output identity 103018c9be2f807a79e312a1bd8b67bc7728c78e8e3e2995b6a4702cc848ab61 in every repeat.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-consumer-execution-runtime-ownership-qm0-v1/result.json",
+          "sha256": "d7a972ec6cffc0754af6e7d8ad41ff4dbb77e074d7600ecdaebba44a0d1f76c3"
+        }
+      ]
+    },
+    {
+      "id": "runtime-ownership-rejected",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "Pinned Dawn passes the unchanged workload directly and through the same transparent evidence provider, then matches Doe's frozen work and exact outputs. No bounded incumbent patch is authorized, and the owned runtime supplies no material application outcome unavailable from the governed incumbent. The application remains a permanent compiler, runtime, negative-validation, synchronization, and readback regression with zero runtime-ownership credit.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-consumer-execution-runtime-ownership-qm0-v1/result.json",
+          "sha256": "d7a972ec6cffc0754af6e7d8ad41ff4dbb77e074d7600ecdaebba44a0d1f76c3"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "I0 and I1 are distinct clean-process lanes but resolve to the same pinned ambient webgpu package already installed in the prepared upstream checkout.",
+    "The transparent provider observes WebGPU calls and mapped JavaScript bytes; it does not seal native syscalls, network access, dynamic system libraries, or complete operating-system dependencies.",
+    "The governed matrix uses workspace source modules and is not a clean-installed package or release artifact.",
+    "Three sequential clean processes per lane do not satisfy promotion concurrency, stress, lifecycle, device-loss, or bounded-memory-growth floors.",
+    "No selected-operation performance or receipt-overhead comparison ran; process durations are diagnostic only."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 291397632
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 325033984
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The gate adjudicates correctness and runtime ownership; it does not run an isolated selected-operation comparison."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched evidence-enabled and evidence-disabled timing protocol ran."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "retain-diagnostic",
+    "claimedProperty": "independent-correction",
+    "lanes": {
+      "I0": {
+        "status": "pass",
+        "summary": "Three ambient-incumbent clean processes pass all 16 pinned assertions on the physical adapter."
+      },
+      "I1": {
+        "status": "pass",
+        "summary": "Three explicitly pinned-incumbent clean processes pass the identical workload; no incumbent defect authorizes P0."
+      },
+      "W0": {
+        "status": "pass",
+        "summary": "Pinned Dawn plus the transparent evidence provider passes three processes with one stable complete evidence identity."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "DoeRuntime plus the identical transparent evidence provider passes three processes with the same complete evidence and exact output identity as W0."
+      },
+      "P0": {
+        "status": "not-run",
+        "summary": "The bounded-patch lane is not authorized because the pinned incumbent passes the frozen application outcome without correction."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "Doe supplies no outcome unavailable from pinned Dawn plus the same evidence contract."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "Owning the runtime adds implementation and support cost without a distinct outcome on this frozen application."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The matrix uses a prepared upstream checkout and workspace provider modules rather than clean-installed release packages."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "All probes bind the accessible physical Radeon/RADV adapter and reject software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The matrix uses sequential clean processes."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "All 12 processes exit without crash, hang, or timeout after application-owned device destruction."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Three processes per lane do not satisfy promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak RSS is observed per lane, but bounded same-process memory growth was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The result binds plan, implementation, upstream tests, provider and adapter identity, dynamic shader sources, command shape, exact readbacks, assertions, and repeat identities."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Every lane repeats its semantic identity; W0 and D0 additionally repeat their complete normalized WebGPU and mapped-output identities."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No claim-eligible performance protocol ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The governed incumbent closes the frozen outcome and exact evidence identity."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "World Labs remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-consumer-execution-runtime-ownership-qm0-v1/result.json",
+      "sha256": "d7a972ec6cffc0754af6e7d8ad41ff4dbb77e074d7600ecdaebba44a0d1f76c3"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-consumer-execution-runtime-ownership-qm0-v1/result.json",
+      "sha256": "d7a972ec6cffc0754af6e7d8ad41ff4dbb77e074d7600ecdaebba44a0d1f76c3"
+    }
+  ]
+}

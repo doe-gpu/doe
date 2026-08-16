@@ -21,6 +21,7 @@ pub const Config = struct {
     elide_dispatch_validated_global_bounds: bool = false,
     elide_static_storage_bounds: bool = false,
     elide_uniform_validated_bounds: bool = false,
+    rely_on_storage_buffer_robustness: bool = false,
 };
 
 /// Apply robustness clamping to all index and texture expressions in the module.
@@ -51,6 +52,11 @@ fn transform_function(
                 const base_ty = resolve_indexable_type(&module.types, function.exprs.items[index_data.base].ty);
                 switch (module.types.get(base_ty)) {
                     .array => |arr| {
+                        if (config.rely_on_storage_buffer_robustness and
+                            index_base_is_storage(module, function, index_data.base))
+                        {
+                            continue;
+                        }
                         if (arr.len) |len| {
                             if (len > 0) {
                                 if (robustness_static_bounds.sizedArrayIndexProvablyInBounds(module, function, i, index_data.base, index_data.index, len, config.elide_static_storage_bounds)) {
@@ -117,6 +123,22 @@ fn transform_function(
             else => {},
         }
     }
+}
+
+fn index_base_is_storage(
+    module: *const ir.Module,
+    function: *const ir.Function,
+    base_expr_id: ir.ExprId,
+) bool {
+    if (ir_query.findGlobalBase(function, base_expr_id)) |global_index| {
+        if (global_index < module.globals.items.len) {
+            return module.globals.items[global_index].addr_space == .storage;
+        }
+    }
+    return switch (module.types.get(function.exprs.items[base_expr_id].ty)) {
+        .ref => |ref_type| ref_type.addr_space == .storage,
+        else => false,
+    };
 }
 
 /// Resolve through ref types to get the indexable element type.

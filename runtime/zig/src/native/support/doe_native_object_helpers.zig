@@ -1,4 +1,5 @@
 const std = @import("std");
+const program_identity_trace = @import("../diagnostics/doe_program_identity_trace.zig");
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 
@@ -6,7 +7,9 @@ pub const alloc = gpa.allocator();
 pub const label_store = @import("doe_label_store.zig");
 
 pub fn make(comptime T: type) ?*T {
-    return alloc.create(T) catch null;
+    const object = alloc.create(T) catch return null;
+    program_identity_trace.recordNativeObjectCreate(T, object);
+    return object;
 }
 
 pub fn cast(comptime T: type, p: ?*anyopaque) ?*T {

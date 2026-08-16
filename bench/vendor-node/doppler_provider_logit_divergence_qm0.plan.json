@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-logit-divergence-plan",
+  "planId": "doppler-provider-logit-divergence-qm0-v1",
+  "frozenAt": "2026-08-16T07:52:00Z",
+  "predecessor": {
+    "report": "reports/benchmarks/amd-vulkan/20260816T074546Z/doppler-provider-lifecycle-control-diagnostic.json",
+    "finding": "The one-token D0 output is deterministic but differs from the exact W0/P0 identity; correctness is unassigned."
+  },
+  "hypothesis": "The W0/D0 token divergence is already present in the finalized first-step f32 logits, rather than being introduced by sampling or transcript serialization.",
+  "workload": {
+    "scenario": "bench/vendor-node/doppler_provider_logit_divergence_gemma270m_commands.json",
+    "scenarioSha256": "7aad3eed9742c77a974dd625b80b51b6bf574d3aa22e242dfa0fc123b3d04c9c",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "modelManifestSha256": "230104df762ff394095326d8e9fa4dc144d431bbd61ad5139e1030e66836ab78",
+    "prefillTokens": 64,
+    "decodeTokens": 1,
+    "captureLogits": true,
+    "captureKvBytes": false,
+    "cleanProcessesPerLane": 1,
+    "lanes": ["W0", "D0"]
+  },
+  "implementation": {
+    "orchestrator": "bench/executors/run-doppler-logit-divergence.mjs",
+    "orchestratorSha256": "764f62a53981b3539bcadf6671f7c27a4cd668a864e097cc26eafc94691eb06d",
+    "workerSha256": "9ad174fe3fb1aaf60e5c90f73545ed3dcba7dc95aa9a438b796fe7b96d9246b8",
+    "sharedSummarySha256": "6652140dac2a203ce289ff9156ec3c6daebd08a71a7b98cbff83a2cdc8d859f1",
+    "incumbentProviderSha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4",
+    "doeProviderSha256": "f0c7e4c93097a4960e91034f0a56f399ed702a250cf1bf38fb2afb5565b651a7"
+  },
+  "acceptance": {
+    "common": [
+      "both lanes complete inference and persist a one-step reference transcript before teardown",
+      "prompt hashes, prompt token counts, source, model, and transcript geometry match",
+      "each generated token equals the top-ranked token in its captured finalized logits",
+      "W0 may terminate through its already recorded post-release native failure; D0 must exit zero"
+    ],
+    "logitBoundary": "If the finalized f32 logit digests differ and the selected top tokens differ, localize the divergence to the predictor or an earlier execution boundary.",
+    "samplingBoundary": "If finalized logit digests match but selected tokens differ, localize the divergence to sampling or token selection.",
+    "inputBoundary": "If prompt identity differs, reject the evidence without interpretation."
+  },
+  "creditBoundary": {
+    "correctProvider": "unassigned without an independent logits oracle",
+    "performance": false,
+    "runtimeOwnership": false,
+    "promotion": false,
+    "release": false,
+    "onPass": "Freeze one operation-level mismatch-localization gate at the earliest differing model step; do not tune output tokens."
+  }
+}

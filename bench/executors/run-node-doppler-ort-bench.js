@@ -34,25 +34,45 @@ const PROVIDERS = Object.freeze({
     executionLabel: 'Doppler Node benchmark on Doe provider',
     executionProvider: 'doe',
     executionProviderName: 'doe-gpu',
-    modulePath: resolveRepoPath('packages/doe-gpu/src/compute.js'),
+    resolveModulePath: () => resolveRepoPath('packages/doe-gpu/src/compute.js'),
   }),
   'node-webgpu': Object.freeze({
     executionBackend: 'doppler_node_webgpu_incumbent',
     executionLabel: 'Doppler Node benchmark on node-webgpu provider',
     executionProvider: 'node-webgpu',
     executionProviderName: 'webgpu',
-    modulePath: resolveRepoPath('bench/vendor/node-webgpu-package/index.js'),
+    resolveModulePath: (scenario) => resolve(
+      scenario.dopplerRoot,
+      'node_modules/webgpu/index.js',
+    ),
+  }),
+  'node-webgpu-bounded-lifecycle': Object.freeze({
+    executionBackend: 'doppler_node_webgpu_incumbent_bounded_lifecycle',
+    executionLabel: 'Doppler Node benchmark on bounded-lifecycle node-webgpu provider',
+    executionProvider: 'node-webgpu-bounded-lifecycle',
+    executionProviderName: 'webgpu',
+    resolveModulePath: () => resolveRepoPath(
+      'bench/executors/vendor-node/doppler-node-webgpu-lifecycle-provider.mjs',
+    ),
+    resolveIncumbentModulePath: (scenario) => resolve(
+      scenario.dopplerRoot,
+      'node_modules/webgpu/index.js',
+    ),
   }),
 });
 
-function resolveProvider(providerId) {
-  const provider = PROVIDERS[providerId];
-  if (!provider) {
+function resolveProvider(providerId, scenario) {
+  const declaration = PROVIDERS[providerId];
+  if (!declaration) {
     throw new Error(
       `unsupported Doppler Node provider ${providerId}; expected one of ${Object.keys(PROVIDERS).join(', ')}`,
     );
   }
-  return provider;
+  return {
+    ...declaration,
+    modulePath: declaration.resolveModulePath(scenario),
+    incumbentModulePath: declaration.resolveIncumbentModulePath?.(scenario) ?? null,
+  };
 }
 
 async function captureProviderDiagnostics(provider) {
@@ -226,7 +246,7 @@ function buildRuntimeConfigForScenario(scenario, promptText) {
 async function buildDopplerRequest(scenario, promptText) {
   const modelSource = await resolveDopplerModelSource(scenario);
   const request = {
-    command: 'bench',
+    command: scenario.doppler.command ?? 'bench',
     workload: 'inference',
     modelId: scenario.doppler.modelId,
     modelUrl: modelSource.modelUrl,
@@ -251,18 +271,25 @@ async function buildDopplerRequest(scenario, promptText) {
 async function main() {
   const startedMs = nowMs();
   const args = parseVendorNodeCliArgs(USAGE_COMMAND);
-  const provider = resolveProvider(args.provider);
   const providerContractPath = resolveRepoPath('packages/doe-gpu/src/node-webgpu.js');
-  const providerModuleSha256 = await fileSha256(provider.modulePath);
   const providerContractSha256 = await fileSha256(providerContractPath);
+  let provider = null;
+  let providerModuleSha256 = null;
+  let incumbentProviderModuleSha256 = null;
   let scenarioId = args.workloadId;
   let benchmarkLane = 'node-ort-vs-doppler';
   let closeModelSource = null;
   let releaseProvider = null;
   let providerReceipt = null;
+  let providerLifecycleModule = null;
 
   try {
     const scenario = await loadVendorNodeScenario(args.scenarioPath);
+    provider = resolveProvider(args.provider, scenario);
+    providerModuleSha256 = await fileSha256(provider.modulePath);
+    incumbentProviderModuleSha256 = provider.incumbentModulePath === null
+      ? null
+      : await fileSha256(provider.incumbentModulePath);
     scenarioId = scenario.scenarioId;
     benchmarkLane = scenario.benchmarkLane;
     if (scenario.scenarioId !== args.workloadId) {
@@ -279,6 +306,9 @@ async function main() {
       : null;
 
     process.env.DOPPLER_NODE_WEBGPU_MODULE = provider.modulePath;
+    if (provider.incumbentModulePath !== null) {
+      process.env.DOE_DOPPLER_INCUMBENT_MODULE = provider.incumbentModulePath;
+    }
     const providerBridge = await importFromPath(
       resolve(scenario.dopplerRoot, 'src/tooling/node-webgpu.js'),
     );
@@ -291,6 +321,7 @@ async function main() {
       ok: bootstrap.ok === true,
       detail: bootstrap.detail ?? null,
     };
+    providerLifecycleModule = bootstrap.module ?? null;
     if (bootstrap.ok !== true) {
       throw new Error(
         `Doppler Node provider bootstrap failed for ${provider.executionProvider}: ${bootstrap.detail ?? 'unknown failure'}`,
@@ -343,6 +374,8 @@ async function main() {
       runtimeProfile: scenario.doppler.runtimeProfile,
       providerModulePath: provider.modulePath,
       providerModuleSha256,
+      incumbentProviderModulePath: provider.incumbentModulePath,
+      incumbentProviderModuleSha256,
       providerContractPath,
       providerContractSha256,
       providerReceipt,
@@ -357,14 +390,14 @@ async function main() {
     // failure instead of losing both claims at once.
     await writeVendorNodeSuccessTrace({
       benchmarkLane,
-      executionProvider: provider.executionProvider,
-      executionProviderName: provider.executionProviderName,
+      executionProvider: provider?.executionProvider ?? args.provider,
+      executionProviderName: provider?.executionProviderName ?? args.provider,
       traceMetaPath: args.traceMetaPath,
       traceJsonlPath: args.traceJsonlPath,
       workloadId: args.workloadId,
       scenarioId,
-      executionBackend: provider.executionBackend,
-      executionLabel: provider.executionLabel,
+      executionBackend: provider?.executionBackend ?? 'doppler_node_webgpu_unknown',
+      executionLabel: provider?.executionLabel ?? 'Doppler Node benchmark provider failure',
       processWallMs: nowMs() - startedMs,
       adapterInfo: null,
       phaseTimingsMs,
@@ -383,6 +416,9 @@ async function main() {
       },
     });
 
+    const providerLifecycleControl = typeof providerLifecycleModule?.releaseTrackedDevices === 'function'
+      ? await providerLifecycleModule.releaseTrackedDevices()
+      : { supported: false, reason: 'provider exposes no bounded lifecycle control' };
     const providerRelease = typeof releaseProvider === 'function'
       ? await releaseProvider()
       : {
@@ -411,6 +447,7 @@ async function main() {
         ...commonExtraMeta,
         lifecycleEvidenceState: 'release-complete',
         providerRelease,
+        providerLifecycleControl,
         providerDiagnostics,
       },
     });
@@ -429,19 +466,21 @@ async function main() {
     }
     await writeVendorNodeFailureTrace({
       benchmarkLane,
-      executionProvider: provider.executionProvider,
-      executionProviderName: provider.executionProviderName,
+      executionProvider: provider?.executionProvider ?? args.provider,
+      executionProviderName: provider?.executionProviderName ?? args.provider,
       traceMetaPath: args.traceMetaPath,
       traceJsonlPath: args.traceJsonlPath,
       workloadId: args.workloadId,
       scenarioId,
-      executionBackend: provider.executionBackend,
-      executionLabel: provider.executionLabel,
+      executionBackend: provider?.executionBackend ?? 'doppler_node_webgpu_unknown',
+      executionLabel: provider?.executionLabel ?? 'Doppler Node benchmark provider failure',
       processWallMs: nowMs() - startedMs,
       errorMessage: message,
       extraMeta: {
-        providerModulePath: provider.modulePath,
+        providerModulePath: provider?.modulePath ?? null,
         providerModuleSha256,
+        incumbentProviderModulePath: provider?.incumbentModulePath ?? null,
+        incumbentProviderModuleSha256,
         providerContractPath,
         providerContractSha256,
         providerReceipt,

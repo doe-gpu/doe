@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "gigi-runtime-ownership-2026-08-16-diagnostic",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "generatedAt": "2026-08-16T00:19:27.100Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T00:19:59Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "17",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/gigi",
+    "commit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "complete-runtime-ownership-matrix",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "I0, I1, W0, and D0 each executed the complete pinned generated-suite population on the physical AMD Vulkan host. The ambient and pinned incumbents resolve the same exact webgpu@0.4.0 package, while W0 and D0 bind the suite, provider artifacts, oracle outcomes, and replay receipts.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/raw-suite.json",
+          "sha256": "8db7b10f15d2cf31d15401fa02e46efcec20c6a9ed5e47d1d2bf9e4635249659"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/receipt-summary.json",
+          "sha256": "a28439031872e4d1a2486ec0fff5445a60a1e2b86789c5540200ab3ecfaada9a"
+        }
+      ]
+    },
+    {
+      "id": "governed-replay-passed",
+      "category": "reliability",
+      "status": "verified",
+      "summary": "W0 and D0 each reproduced the same frozen case outcomes, provider identity, adapter classification, and process verdicts from persisted replay receipts. Expected and replayed semantic evidence hashes agree within each governed lane.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/receipt-summary.json",
+          "sha256": "a28439031872e4d1a2486ec0fff5445a60a1e2b86789c5540200ab3ecfaada9a"
+        }
+      ]
+    },
+    {
+      "id": "owned-runtime-not-distinguished",
+      "category": "diagnosis",
+      "status": "ineligible",
+      "summary": "Every lane has the same successful-case set, and W0 and D0 complete without crashes or timeouts. The governed incumbent therefore matches the owned runtime on the frozen application outcome, so no bounded incumbent patch is required and DoeRuntime receives no independent-correction credit.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/raw-suite.json",
+          "sha256": "8db7b10f15d2cf31d15401fa02e46efcec20c6a9ed5e47d1d2bf9e4635249659"
+        }
+      ]
+    },
+    {
+      "id": "shared-oracle-failures-remain",
+      "category": "compatibility",
+      "status": "discovered",
+      "summary": "Every lane retains the same shared failing-case population. The matrix adjudicates ownership for this frozen diagnostic but does not establish complete Gigi compatibility, equivalence, release eligibility, or a public performance result.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/raw-suite.json",
+          "sha256": "8db7b10f15d2cf31d15401fa02e46efcec20c6a9ed5e47d1d2bf9e4635249659"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The complete generated suite does not pass under any lane, so the result cannot establish full application correctness or release eligibility.",
+    "The physical incumbent probe exposes the selected package but not a complete adapter and driver identity payload comparable to Doe's native identity fields.",
+    "The diagnostic records process durations but does not isolate receipt overhead or satisfy a selected-operation performance protocol.",
+    "The prepared upstream workspace is hash-bound but is not a claim-eligible clean installation receipt.",
+    "Concurrency, device-loss injection, bounded memory growth, and promotion-scale stress were not run.",
+    "P0 is conditional and was not materialized because W0 exposes no release-relevant outcome that D0 corrects."
+  ],
+  "equivalence": {
+    "status": "fail",
+    "oracleStatus": "fail",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "fail",
+    "synchronizationStatus": "fail",
+    "readbackStatus": "fail",
+    "outputIdentityStatus": "fail",
+    "failureCodes": [
+      "shared-case-failures"
+    ]
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 50,
+      "successes": 10,
+      "failures": 40,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 2164396032
+    },
+    "comparison": {
+      "cleanProcessRuns": 50,
+      "successes": 10,
+      "failures": 40,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 2173251584
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Shared oracle failures make process-duration differences ineligible for performance interpretation."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "Receipt construction and replay are bound, but traced and untraced overhead was not isolated from process and provider variance."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "retain-diagnostic",
+    "claimedProperty": "independent-correction",
+    "lanes": {
+      "I0": {
+        "status": "fail",
+        "summary": "The unchanged application resolves its ambient webgpu@0.4.0 package and completes without crash or timeout, but retains the shared oracle failures."
+      },
+      "I1": {
+        "status": "fail",
+        "summary": "The explicitly selected and hash-bound webgpu@0.4.0 package reproduces I0's case outcomes and shared failures."
+      },
+      "W0": {
+        "status": "fail",
+        "summary": "The pinned incumbent under DoeProof reproduces its semantic evidence hash but retains the shared oracle failures."
+      },
+      "D0": {
+        "status": "fail",
+        "summary": "DoeRuntime under the same DoeProof contract reproduces its semantic evidence hash but retains the same shared oracle failures and successful-case set as W0."
+      },
+      "P0": {
+        "status": "not-run",
+        "summary": "W0 exposes no release-relevant outcome that D0 passes, so the conditional bounded-patch control is not authorized."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "D0 does not materially exceed W0 on unchanged oracle coverage, crash or timeout freedom, or semantic replay."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "No unique application benefit was measured to repay DoeRuntime's additional source, compatibility, security, packaging, and support obligations."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The run uses a prepared, clean pinned checkout rather than a claim-eligible clean installation receipt."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "The governed lanes execute with an accessible physical render node and no detected software adapter."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic executes cases sequentially."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Every process in every primary lane exits without a crash or timeout."
+    },
+    "stress": {
+      "status": "fail",
+      "summary": "Shared oracle failures block promotion stress interpretation."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process memory is retained, but bounded growth was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The suite, harness, provider artifacts, raw matrix, summary, and replay receipts are hash-bound."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "W0 and D0 each reproduce the frozen semantic evidence hash."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "Correctness fails before performance interpretation."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "Gigi remains a diagnostic compatibility regression and is not a blocking release dependency."
+    },
+    "ownership": {
+      "status": "fail",
+      "summary": "The comparison is complete, but D0 supplies no measured independent-correction advantage over W0."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/receipt-summary.json",
+      "sha256": "a28439031872e4d1a2486ec0fff5445a60a1e2b86789c5540200ab3ecfaada9a"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/replay-receipts/W0.json",
+      "sha256": "b441c647e57069906eb9e0b44646df6a3ed845f9fea4a46cf07b9918a6a864da"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/replay-receipts/D0.json",
+      "sha256": "9ff929b0137a2278d79d553e7fbd5ffe0303188c3b4fe6446466cada2065fd9c"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260816T-gigi-runtime-ownership/raw-suite.json",
+      "sha256": "8db7b10f15d2cf31d15401fa02e46efcec20c6a9ed5e47d1d2bf9e4635249659"
+    }
+  ]
+}

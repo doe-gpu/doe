@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "fragment-position-fragcoord-lowering",
+  "actorId": "electronicarts-gigi",
+  "harnessId": "generated-webgpu-suite",
+  "upstreamCommit": "401386cfd7c6e39e549d939e44d99bd5b49cd14d",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Doe emitted fragment-stage WGSL @builtin(position) as SPIR-V BuiltIn Position instead of FragCoord, collapsing storage-image writes onto the wrong coordinates; stage-aware lowering now preserves vertex Position and emits fragment FragCoord.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-gigi/20260815T-storage-texture-fragcoord-fix/raw-suite.json",
+      "sha256": "6826f0317e5497bd196b52846dc94fff2e5491df85c747cc31a3b032ef5cd067"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/tests/wgsl/emit_spirv_stage_test.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_shared.zig",
+    "runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_stages.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/tests/wgsl/emit_spirv_stage_test.zig"
+  ],
+  "verifiedAt": "2026-08-15T23:54:55Z"
+}

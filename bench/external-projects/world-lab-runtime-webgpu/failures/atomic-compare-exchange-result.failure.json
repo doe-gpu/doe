@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "atomic-compare-exchange-result",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "Doe typed atomicCompareExchangeWeak as a scalar and could not analyze the required old_value and exchanged result members; semantic analysis now owns the WGSL result struct and MSL/SPIR-V lowering preserves both fields.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-current-runtime/raw-suite.json",
+      "sha256": "15d0e2383cf4cfcda0e660b400057f86a7d36f05ca49cb5405e7df24af0542e7"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/20260816T-world-lab-compiler-repair-reviewed/receipt-summary.json",
+      "sha256": "4db755f3cb9c5209f7ea1677c69959d23cc9e16c033ad0d152d929ce8a9f501d"
+    }
+  ],
+  "minimizedReproPaths": [
+    "runtime/zig/tests/wgsl/coverage_builtin_spec_test.zig"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/compiler/wgsl/frontend/sema_attrs.zig",
+    "runtime/zig/src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig",
+    "runtime/zig/src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig",
+    "runtime/zig/src/compiler/wgsl/emit/spirv/spirv_spec.zig"
+  ],
+  "regressionTestPaths": [
+    "runtime/zig/tests/wgsl/coverage_builtin_spec_test.zig"
+  ],
+  "verifiedAt": "2026-08-16T00:38:12Z"
+}

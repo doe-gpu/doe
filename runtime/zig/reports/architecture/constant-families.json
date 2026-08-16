@@ -16,12 +16,12 @@
         {
           "name": "ACCESS_READ",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 55
+          "startLine": 56
         },
         {
           "name": "ACCESS_READ_WRITE",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 56
+          "startLine": 57
         }
       ],
       "prefix": "ACCESS",
@@ -42,12 +42,12 @@
         {
           "name": "ADDRESS_SPACE_STORAGE",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 53
+          "startLine": 54
         },
         {
           "name": "ADDRESS_SPACE_UNIFORM",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 54
+          "startLine": 55
         }
       ],
       "prefix": "ADDRESS",
@@ -233,22 +233,22 @@
         {
           "name": "BIND_GROUP_LAYOUT_RESOURCE_KIND_BUFFER",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 57
+          "startLine": 58
         },
         {
           "name": "BIND_GROUP_LAYOUT_RESOURCE_KIND_SAMPLER",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 58
+          "startLine": 59
         },
         {
           "name": "BIND_GROUP_LAYOUT_RESOURCE_KIND_TEXTURE",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 59
+          "startLine": 60
         },
         {
           "name": "BIND_GROUP_LAYOUT_RESOURCE_KIND_STORAGE_TEXTURE",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 60
+          "startLine": 61
         }
       ],
       "prefix": "BIND",
@@ -1691,12 +1691,12 @@
         {
           "name": "DISPATCH_INDIRECT_ARGS_BYTES",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 62
+          "startLine": 63
         },
         {
           "name": "DISPATCH_INDIRECT_ARGS_ALIGNMENT",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 63
+          "startLine": 64
         }
       ],
       "prefix": "DISPATCH",
@@ -3117,7 +3117,7 @@
         {
           "name": "INITIAL_COMPUTE_PASS_STATE_GENERATION",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 35
+          "startLine": 36
         },
         {
           "name": "INITIAL_FENCE_EPOCH",
@@ -3179,7 +3179,7 @@
         {
           "name": "INVALID_COMPUTE_PASS_STATE_GENERATION",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 34
+          "startLine": 35
         }
       ],
       "prefix": "INVALID",
@@ -3293,92 +3293,92 @@
         {
           "name": "MAGIC_INSTANCE",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 15
+          "startLine": 16
         },
         {
           "name": "MAGIC_ADAPTER",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 16
+          "startLine": 17
         },
         {
           "name": "MAGIC_DEVICE",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 17
+          "startLine": 18
         },
         {
           "name": "MAGIC_QUEUE",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 18
+          "startLine": 19
         },
         {
           "name": "MAGIC_BUFFER",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 19
+          "startLine": 20
         },
         {
           "name": "MAGIC_SHADER",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 20
+          "startLine": 21
         },
         {
           "name": "MAGIC_COMPUTE_PIPE",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 21
+          "startLine": 22
         },
         {
           "name": "MAGIC_BGL",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 22
+          "startLine": 23
         },
         {
           "name": "MAGIC_PIPE_LAYOUT",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 23
+          "startLine": 24
         },
         {
           "name": "MAGIC_BIND_GROUP",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 24
+          "startLine": 25
         },
         {
           "name": "MAGIC_CMD_ENCODER",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 25
+          "startLine": 26
         },
         {
           "name": "MAGIC_COMPUTE_PASS",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 26
+          "startLine": 27
         },
         {
           "name": "MAGIC_CMD_BUFFER",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 27
+          "startLine": 28
         },
         {
           "name": "MAGIC_TEXTURE",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 28
+          "startLine": 29
         },
         {
           "name": "MAGIC_TEXTURE_VIEW",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 29
+          "startLine": 30
         },
         {
           "name": "MAGIC_SAMPLER",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 30
+          "startLine": 31
         },
         {
           "name": "MAGIC_RENDER_PIPE",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 31
+          "startLine": 32
         },
         {
           "name": "MAGIC_RENDER_PASS",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 32
+          "startLine": 33
         },
         {
           "name": "MAGIC_SURFACE",
@@ -3676,7 +3676,7 @@
         {
           "name": "MAX_TRACKED_COMPUTE_BINDINGS",
           "path": "src/backend/vulkan/vk_compute_sync.zig",
-          "startLine": 5
+          "startLine": 6
         },
         {
           "name": "MAX_DESCRIPTOR_SETS",
@@ -3691,12 +3691,12 @@
         {
           "name": "MAX_DEVICE_EXTENSIONS",
           "path": "src/backend/vulkan/vk_device.zig",
-          "startLine": 376
+          "startLine": 377
         },
         {
           "name": "MAX_INSTANCE_EXTENSIONS",
           "path": "src/backend/vulkan/vk_device.zig",
-          "startLine": 377
+          "startLine": 378
         },
         {
           "name": "MAX_DEVICE_EXTENSIONS",
@@ -3706,7 +3706,7 @@
         {
           "name": "MAX_RENDER_DESCRIPTOR_BINDINGS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 491
+          "startLine": 507
         },
         {
           "name": "MAX_KERNEL_SOURCE_BYTES",
@@ -4036,7 +4036,7 @@
         {
           "name": "MAX_SHADER_BINDINGS",
           "path": "src/contracts/binding.zig",
-          "startLine": 5
+          "startLine": 9
         },
         {
           "name": "MAX_VERTEX_BUFFERS",
@@ -4171,7 +4171,7 @@
         {
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/compute/doe_compute_fast_vulkan.zig",
-          "startLine": 16
+          "startLine": 17
         },
         {
           "name": "MAX_BIND",
@@ -4266,12 +4266,12 @@
         {
           "name": "MAX_BIND",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 22
+          "startLine": 23
         },
         {
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 23
+          "startLine": 24
         },
         {
           "name": "MAX_TEXTURE_DESCRIPTOR_CHAIN_NODES",
@@ -4356,22 +4356,22 @@
         {
           "name": "MAX_COMPUTE_BIND_GROUPS",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 33
+          "startLine": 34
         },
         {
           "name": "MAX_BIND",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 34
+          "startLine": 35
         },
         {
           "name": "MAX_KERNEL_BINDINGS",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 49
+          "startLine": 50
         },
         {
           "name": "MAX_FLAT_BIND",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 50
+          "startLine": 51
         },
         {
           "name": "MAX_CACHE_SIZE_BYTES",
@@ -5597,32 +5597,32 @@
         {
           "name": "RESOURCE_KIND_NONE",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 37
+          "startLine": 38
         },
         {
           "name": "RESOURCE_KIND_BUFFER",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 38
+          "startLine": 39
         },
         {
           "name": "RESOURCE_KIND_SAMPLER",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 39
+          "startLine": 40
         },
         {
           "name": "RESOURCE_KIND_TEXTURE",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 40
+          "startLine": 41
         },
         {
           "name": "RESOURCE_KIND_STORAGE_TEXTURE",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 41
+          "startLine": 42
         },
         {
           "name": "RESOURCE_KIND_EXTERNAL_TEXTURE",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 42
+          "startLine": 43
         },
         {
           "name": "RESOURCE_KIND_SAMPLER",
@@ -5638,6 +5638,11 @@
           "name": "RESOURCE_KIND_STORAGE_TEXTURE",
           "path": "src/native/vulkan/vulkan_compute_bindings.zig",
           "startLine": 38
+        },
+        {
+          "name": "RESOURCE_KIND_STORAGE_TEXTURE",
+          "path": "src/native/vulkan/vulkan_render_pass_native.zig",
+          "startLine": 9
         }
       ],
       "prefix": "RESOURCE",
@@ -5982,7 +5987,7 @@
         {
           "name": "SPIRV_MAGIC",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 61
+          "startLine": 62
         }
       ],
       "prefix": "SPIRV",
@@ -6399,12 +6404,12 @@
         {
           "name": "TEXTURE_LOAD_NAME",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 233
+          "startLine": 255
         },
         {
           "name": "TEXTURE_STORE_NAME",
           "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
-          "startLine": 234
+          "startLine": 256
         }
       ],
       "prefix": "TEXTURE",
@@ -6477,6 +6482,16 @@
           "name": "TRACE_KIND",
           "path": "src/native/diagnostics/doe_metal_browser_trace.zig",
           "startLine": 4
+        },
+        {
+          "name": "TRACE_PATH_ENV",
+          "path": "src/native/diagnostics/doe_program_identity_trace.zig",
+          "startLine": 4
+        },
+        {
+          "name": "TRACE_KIND",
+          "path": "src/native/diagnostics/doe_program_identity_trace.zig",
+          "startLine": 5
         },
         {
           "name": "TRACE_EMIT_DEFAULTS",
@@ -8545,132 +8560,132 @@
         {
           "name": "VK_NULL_U64",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 24
+          "startLine": 25
         },
         {
           "name": "VK_PRIMITIVE_TOPOLOGY_POINT_LIST",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 26
+          "startLine": 27
         },
         {
           "name": "VK_PRIMITIVE_TOPOLOGY_LINE_LIST",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 27
+          "startLine": 28
         },
         {
           "name": "VK_PRIMITIVE_TOPOLOGY_LINE_STRIP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 28
+          "startLine": 29
         },
         {
           "name": "VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 29
+          "startLine": 30
         },
         {
           "name": "VK_CULL_MODE_FRONT_BIT",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 30
+          "startLine": 31
         },
         {
           "name": "VK_CULL_MODE_BACK_BIT",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 31
+          "startLine": 32
         },
         {
           "name": "VK_FRONT_FACE_CLOCKWISE",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 32
+          "startLine": 33
         },
         {
           "name": "VK_COMPARE_OP_LESS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 33
+          "startLine": 34
         },
         {
           "name": "VK_COMPARE_OP_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 34
+          "startLine": 35
         },
         {
           "name": "VK_COMPARE_OP_LESS_OR_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 35
+          "startLine": 36
         },
         {
           "name": "VK_COMPARE_OP_GREATER",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 36
+          "startLine": 37
         },
         {
           "name": "VK_COMPARE_OP_NOT_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 37
+          "startLine": 38
         },
         {
           "name": "VK_COMPARE_OP_GREATER_OR_EQUAL",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 38
+          "startLine": 39
         },
         {
           "name": "VK_COMPARE_OP_ALWAYS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 39
+          "startLine": 40
         },
         {
           "name": "VK_STENCIL_OP_KEEP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 40
+          "startLine": 41
         },
         {
           "name": "VK_STENCIL_OP_ZERO",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 41
+          "startLine": 42
         },
         {
           "name": "VK_STENCIL_OP_REPLACE",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 42
+          "startLine": 43
         },
         {
           "name": "VK_STENCIL_OP_INCREMENT_AND_CLAMP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 43
+          "startLine": 44
         },
         {
           "name": "VK_STENCIL_OP_DECREMENT_AND_CLAMP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 44
+          "startLine": 45
         },
         {
           "name": "VK_STENCIL_OP_INVERT",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 45
+          "startLine": 46
         },
         {
           "name": "VK_STENCIL_OP_INCREMENT_AND_WRAP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 46
+          "startLine": 47
         },
         {
           "name": "VK_STENCIL_OP_DECREMENT_AND_WRAP",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 47
+          "startLine": 48
         },
         {
           "name": "VK_VERTEX_INPUT_RATE_VERTEX",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 48
+          "startLine": 49
         },
         {
           "name": "VK_VERTEX_INPUT_RATE_INSTANCE",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 49
+          "startLine": 50
         },
         {
           "name": "VK_SHADER_STAGE_ALL_GRAPHICS",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
-          "startLine": 492
+          "startLine": 508
         },
         {
           "name": "VK_NULL_U64",
@@ -15451,14 +15466,19 @@
           "startLine": 5
         },
         {
-          "name": "abi_callback",
+          "name": "abi_binding",
           "path": "src/native/support/doe_native_object_types.zig",
           "startLine": 6
         },
         {
-          "name": "abi_feature",
+          "name": "abi_callback",
           "path": "src/native/support/doe_native_object_types.zig",
           "startLine": 7
+        },
+        {
+          "name": "abi_feature",
+          "path": "src/native/support/doe_native_object_types.zig",
+          "startLine": 8
         },
         {
           "name": "abi_binding",
@@ -16013,7 +16033,7 @@
         {
           "name": "backend_contract",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 12
+          "startLine": 13
         },
         {
           "name": "backend_lifecycle",
@@ -16167,6 +16187,11 @@
           "name": "binding_contract",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
           "startLine": 22
+        },
+        {
+          "name": "binding_contract",
+          "path": "src/native/vulkan/vulkan_render_pass_native.zig",
+          "startLine": 2
         }
       ],
       "prefix": "binding",
@@ -16441,7 +16466,7 @@
         {
           "name": "command_types",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 13
+          "startLine": 14
         },
         {
           "name": "command_metadata",
@@ -17959,7 +17984,7 @@
         {
           "name": "error_scope",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 9
+          "startLine": 10
         },
         {
           "name": "error_scope",
@@ -18227,7 +18252,7 @@
         {
           "name": "gpu_timeline",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 10
+          "startLine": 11
         }
       ],
       "prefix": "gpu",
@@ -18248,7 +18273,7 @@
         {
           "name": "has_vulkan",
           "path": "src/native/compute/doe_compute_fast_vulkan.zig",
-          "startLine": 18
+          "startLine": 19
         },
         {
           "name": "has_vulkan",
@@ -18278,7 +18303,7 @@
         {
           "name": "has_vulkan",
           "path": "src/native/queue/doe_queue_submit_vulkan.zig",
-          "startLine": 35
+          "startLine": 36
         },
         {
           "name": "has_vulkan",
@@ -18582,7 +18607,7 @@
         {
           "name": "is_handle_type",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 786
+          "startLine": 791
         },
         {
           "name": "is_local_ref",
@@ -18674,7 +18699,7 @@
         {
           "name": "label_store",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 24
+          "startLine": 25
         },
         {
           "name": "label_store",
@@ -20092,12 +20117,12 @@
         {
           "name": "model_binding_types",
           "path": "src/backend/vulkan/vk_compute_sync.zig",
-          "startLine": 2
+          "startLine": 3
         },
         {
           "name": "model_compute_types",
           "path": "src/backend/vulkan/vk_compute_sync.zig",
-          "startLine": 3
+          "startLine": 4
         },
         {
           "name": "model_compute_types",
@@ -20145,9 +20170,14 @@
           "startLine": 21
         },
         {
-          "name": "model_render_types",
+          "name": "model_binding_types",
           "path": "src/backend/vulkan/vk_render_pipeline.zig",
           "startLine": 22
+        },
+        {
+          "name": "model_render_types",
+          "path": "src/backend/vulkan/vk_render_pipeline.zig",
+          "startLine": 23
         },
         {
           "name": "model_binding_types",
@@ -20538,6 +20568,11 @@
           "name": "model_render_types",
           "path": "src/native/render/doe_render_pipeline_native.zig",
           "startLine": 6
+        },
+        {
+          "name": "model_render_types",
+          "path": "src/native/resource/doe_bind_group_native.zig",
+          "startLine": 15
         },
         {
           "name": "model_compute_types",
@@ -21489,12 +21524,12 @@
         {
           "name": "native_helpers",
           "path": "src/native/vulkan/vulkan_render_pass_native.zig",
-          "startLine": 2
+          "startLine": 3
         },
         {
           "name": "native_shared",
           "path": "src/native/vulkan/vulkan_render_pass_native.zig",
-          "startLine": 3
+          "startLine": 4
         },
         {
           "name": "native_helpers",
@@ -21857,17 +21892,17 @@
         {
           "name": "parse_address_space",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 790
+          "startLine": 795
         },
         {
           "name": "parse_access",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 791
+          "startLine": 796
         },
         {
           "name": "parse_vector_swizzle",
           "path": "src/compiler/wgsl/frontend/sema.zig",
-          "startLine": 792
+          "startLine": 797
         },
         {
           "name": "parse_access",
@@ -22237,6 +22272,32 @@
     {
       "members": [
         {
+          "name": "program_identity_trace",
+          "path": "src/native/compute/doe_compute_fast_vulkan.zig",
+          "startLine": 10
+        },
+        {
+          "name": "program_identity_trace",
+          "path": "src/native/queue/doe_queue_submit_vulkan.zig",
+          "startLine": 29
+        },
+        {
+          "name": "program_identity_trace",
+          "path": "src/native/vulkan/vulkan_compute_native.zig",
+          "startLine": 27
+        },
+        {
+          "name": "program_identity_trace",
+          "path": "src/native/vulkan/vulkan_render_pass_native.zig",
+          "startLine": 6
+        }
+      ],
+      "prefix": "program",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
           "name": "query_native",
           "path": "src/dropin/wgpu_dropin_ext_a_core.zig",
           "startLine": 41
@@ -22264,7 +22325,7 @@
         {
           "name": "query_native",
           "path": "src/native/vulkan/vulkan_render_pass_native.zig",
-          "startLine": 4
+          "startLine": 5
         }
       ],
       "prefix": "query",
@@ -23612,12 +23673,12 @@
         {
           "name": "texture_contract",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 15
+          "startLine": 16
         },
         {
           "name": "texture_sampler",
           "path": "src/native/resource/doe_bind_group_native.zig",
-          "startLine": 16
+          "startLine": 17
         },
         {
           "name": "texture_sampler",
@@ -24256,7 +24317,7 @@
         {
           "name": "vk_pipeline",
           "path": "src/backend/vulkan/vk_texture_commands.zig",
-          "startLine": 240
+          "startLine": 258
         },
         {
           "name": "vk_compute_sync",
@@ -24276,7 +24337,7 @@
         {
           "name": "vk_upload",
           "path": "src/native/compute/doe_compute_fast_vulkan.zig",
-          "startLine": 11
+          "startLine": 12
         },
         {
           "name": "vk_feature_caps",
@@ -24301,7 +24362,7 @@
         {
           "name": "vk_upload",
           "path": "src/native/queue/doe_queue_submit_vulkan.zig",
-          "startLine": 29
+          "startLine": 30
         },
         {
           "name": "vk_resources",
@@ -24336,7 +24397,7 @@
         {
           "name": "vk_dispatch_indirect",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
-          "startLine": 29
+          "startLine": 30
         },
         {
           "name": "vk_feature_caps",
@@ -24599,7 +24660,7 @@
         {
           "name": "wgsl_ir",
           "path": "src/native/support/doe_native_object_types.zig",
-          "startLine": 8
+          "startLine": 9
         },
         {
           "name": "wgsl_ir",
@@ -24632,10 +24693,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "f312ceab0f71721caabb1dbd24e52f52a2fbd2fd7bbfdf65690f557eef8067f1",
+  "manifestSha256": "46fd49d7a8a61ecb7f91415aa5aed80f1856aca3ddf6b432ec24743a775b27ed",
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "d98500969c1bc44d419e75b6c0a899b56f8e36f13d173ef78ebe7681c41b8419",
+  "sourceTreeSha256": "b16f1dd49a586eedb9e31cc1d193132d0a3d099a4042839ae56fe69c08fdd4b4",
   "status": "captured"
 }

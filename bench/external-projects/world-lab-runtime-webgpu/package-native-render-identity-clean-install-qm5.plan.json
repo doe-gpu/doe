@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "world-lab-package-native-render-identity-clean-install-plan",
+  "planId": "world-lab-package-native-render-identity-clean-install-qm5-v1",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "predecessor": {
+    "planId": "world-lab-package-native-render-identity-clean-install-qm4-v1",
+    "result": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm4-v1/result.json",
+    "status": "failed",
+    "failureClass": "contract-model mismatch",
+    "correction": "The direct Vulkan render path submits and waits internally before run_render_draw returns, so a successful render_draw_executed row cannot be required to have a later outer queue submission in the same worker. Record and require the actual internal submit-and-wait completion instead."
+  },
+  "hypothesis": "Doe's clean-installed source-preserving evidence chain covers the complete compute-and-direct-render command surface exercised by World Labs when direct render completion is bound to the backend's actual internal submit-and-wait boundary.",
+  "lanes": {
+    "W0": "pinned incumbent observed through the clean-installed doe-gpu/observe export",
+    "D0": "clean-installed Doe compute and direct-render execution with native program-identity journal"
+  },
+  "frozenWork": {
+    "assertionCount": 16,
+    "cleanProcessRunsPerLane": 1,
+    "workerCountPerLane": 3,
+    "shaderAttemptCountPerLane": 13,
+    "compilationInfoCountPerLane": 8,
+    "dispatchCountPerLane": 3,
+    "drawCountPerLane": 2,
+    "submissionCountPerLane": 5,
+    "readbackCountPerLane": 8,
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "scientificParametersChangedFromQm4": false,
+    "supportedNativeRenderKinds": ["draw"]
+  },
+  "acceptance": [
+    "all qm4 clean-install, application, compilation, compute-artifact, and mapped-output conditions remain passing",
+    "D0 emits exactly two render_draw_executed rows matching the two public draws by vertex and fragment WGSL hashes, entry points, normalized direct-draw arguments, and draw kind",
+    "each native render draw explicitly records internal_submit_and_wait_succeeded after the backend submit-and-wait returns",
+    "compute dispatches retain their later successful same-process queue submission evidence",
+    "every vertex and fragment SPIR-V filename and digest match the exact materialized bytes and pass spirv-val",
+    "no application, shader, provider, assertion, or scientific parameter changes from qm4"
+  ],
+  "nonGoals": [
+    "claim indexed, indirect, bundled, multi-target, or non-Vulkan render identity",
+    "claim driver-binary, operating-system, filesystem, network, or complete dependency tracing",
+    "assign performance, runtime-ownership, promotion, or release credit",
+    "reopen the terminal World Labs runtime-ownership decision"
+  ]
+}

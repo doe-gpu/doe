@@ -56,6 +56,33 @@ stage, typed error code, and selected provider identity.
 Compatibility helpers remain available, but new integrations should use
 `openNodeWebGPU(...)` and own the returned session.
 
+## Provider-neutral program observation
+
+`doe-gpu/observe` wraps an already selected provider without selecting or
+changing it. It records the public JavaScript WebGPU surface: attempted WGSL,
+returned shader-compilation messages, pipeline/resource descriptors, writes,
+command shape, dispatches, draws, submissions, synchronization, and
+mapped-readback digests. Its hash-bound artifact schema is exported as
+`doe-gpu/transparent-webgpu-observation.schema.json`.
+
+Callback-level `runGovernedNodeWebGPU` can enable the same observer with
+`observeProgram`. Unchanged-process `runGovernedNodeWebGPUProcess` and the
+declarative CLI contract transport checkpoints from the fail-closed loader to
+the parent over an explicit IPC channel. The parent validates and binds the
+final observation into the receipt and replay identity. Under
+`node-permission-read-only`, the channel does not require a child filesystem
+write. Direct loader use cannot request observation without the governed
+parent channel.
+
+Observer checkpoints are emitted after returned or thrown compilation-info
+queries, mapped readbacks, normal process completion, and uncaught exceptions.
+This preserves the last valid public command snapshot when an unchanged child
+fails after shader creation and diagnosis; it does not convert a failed process
+into a successful execution receipt.
+
+This observation is program evidence, not a native-driver trace, syscall log,
+dependency closure, runtime-ownership verdict, or application promotion.
+
 ## Closed Program Bundle execution
 
 Import Doe's consumer from `doe-gpu/program-bundle`:

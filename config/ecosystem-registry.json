@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "registryRevision": "15",
+  "registryRevision": "32",
   "scoringPolicyVersion": "1.0.0",
   "promotionPolicyVersion": "1.1.0",
   "evaluationQueue": [
@@ -38,8 +38,7 @@
       "position": 5,
       "actorId": "world-lab-runtime-webgpu",
       "plannedHarnessIds": [
-        "consumer-execution-oracles",
-        "consumer-shader-compiles"
+        "consumer-execution-oracles"
       ]
     },
     {
@@ -255,8 +254,22 @@
         {
           "reportId": "holoscript-lif-determinism-2026-08-15-diagnostic",
           "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json",
-          "sha256": "92b4e5971e2089c7c3a7bdf6a2c3d3b93840fc9cc875d66714b4a83cc1080bae",
-          "reviewedAt": "2026-08-15T23:07:49Z",
+          "sha256": "c2a22c59cbff6176653fadb826429fb34965cfa9186555ec1a81d1456f4d26a9",
+          "reviewedAt": "2026-08-16T02:22:24Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json",
+          "sha256": "6535b08cdd4c9b4c823d4c3ed18c7af48be4b612e22150213c07b7717a0e946b",
+          "reviewedAt": "2026-08-16T02:22:24Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "holoscript-doeproof-process-observer-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/holoscript-snn-webgpu/holoscript-doeproof-process-observer-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "f093c44347933f501e2af964a16d8d67b44f5c03715c834c9576d0bb8754c4e3",
+          "reviewedAt": "2026-08-16T05:44:24Z",
           "reviewer": "codex"
         }
       ],
@@ -265,7 +278,7 @@
         "bench/external-projects/holoscript-snn-webgpu/failures/labeled-compute-pass-semantics.failure.json"
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-15T23:07:49Z"
+      "lastReviewedAt": "2026-08-16T05:44:24Z"
     },
     {
       "id": "electronicarts-gigi",
@@ -415,6 +428,20 @@
           "sha256": "3cf5a366eee8f1be5a19ea26cb7eddbd817c911b57fe0e22589c13e43a9d932c",
           "reviewedAt": "2026-08-11T12:31:00Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "gigi-generated-webgpu-suite-amd-vulkan-2026-08-15-diagnostic",
+          "path": "reports/ecosystem/electronicarts-gigi/gigi-generated-webgpu-suite-amd-vulkan-2026-08-15-diagnostic.json",
+          "sha256": "366d84af28cc0a81e4115aa2906dfd3d6512bed7d23eb0cd103b5ce35b101c01",
+          "reviewedAt": "2026-08-16T02:22:24Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "gigi-runtime-ownership-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/electronicarts-gigi/gigi-runtime-ownership-2026-08-16-diagnostic.json",
+          "sha256": "60d3e5ebb514455307d6329ef28a55154984c94f12cf82c04bd56b6ba4c0cbb5",
+          "reviewedAt": "2026-08-16T00:19:59Z",
+          "reviewer": "codex"
         }
       ],
       "failureRecords": [
@@ -422,10 +449,13 @@
         "bench/external-projects/electronicarts-gigi/failures/recorded-storage-texture-bindings.failure.json",
         "bench/external-projects/electronicarts-gigi/failures/submit-ordered-texture-readback.failure.json",
         "bench/external-projects/electronicarts-gigi/failures/texture-host-shadow-invalidation.failure.json",
-        "bench/external-projects/electronicarts-gigi/failures/texture-copy-bridge-abi.failure.json"
+        "bench/external-projects/electronicarts-gigi/failures/texture-copy-bridge-abi.failure.json",
+        "bench/external-projects/electronicarts-gigi/failures/fragment-position-fragcoord-lowering.failure.json",
+        "bench/external-projects/electronicarts-gigi/failures/mip-relative-texture-readback-extent.failure.json",
+        "bench/external-projects/electronicarts-gigi/failures/vulkan-render-buffer-descriptors.failure.json"
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-11T12:31:00Z"
+      "lastReviewedAt": "2026-08-16T00:19:59Z"
     },
     {
       "id": "vercel-labs-vgpu",
@@ -712,16 +742,17 @@
             ]
           }
         },
-        {
-          "id": "sgd-benchmark",
-          "status": "proposed",
+      {
+        "id": "sgd-benchmark",
+        "status": "measured",
+        "manifestPath": "bench/external-projects/umap-gpu/sgd-benchmark.harness.json",
           "proofTargets": [
             "correctness",
             "performance",
             "reliability"
           ],
           "oracle": {
-            "status": "replacement-required",
+          "status": "reviewed",
             "observationRefs": [
               "benchmark-oracle-gap"
             ]
@@ -741,11 +772,18 @@
           "path": "reports/ecosystem/umap-gpu/umap-sgd-output-correctness-amd-vulkan-2026-08-11-diagnostic.json",
           "sha256": "2e16eb7258a09f1bf54bc1704d9b8a58ef42707a26f64e4f153870fae593e570",
           "reviewedAt": "2026-08-11T12:30:00Z",
-          "reviewer": "codex"
-        }
+        "reviewer": "codex"
+      },
+      {
+        "reportId": "umap-sgd-governed-benchmark-amd-vulkan-2026-08-16-diagnostic",
+        "path": "reports/ecosystem/umap-gpu/umap-sgd-governed-benchmark-amd-vulkan-2026-08-16-diagnostic.json",
+        "sha256": "f1b403f3e276f9a2b5b066951db477892205442772462842412bd93b6483f578",
+        "reviewedAt": "2026-08-16T01:04:03Z",
+        "reviewer": "codex"
+      }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-11T12:30:00Z"
+    "lastReviewedAt": "2026-08-16T01:04:03Z"
     },
     {
       "id": "world-lab-runtime-webgpu",
@@ -901,7 +939,7 @@
         },
         {
           "id": "consumer-shader-compiles",
-          "status": "proposed",
+          "status": "retired",
           "proofTargets": [
             "correctness",
             "reliability",
@@ -909,7 +947,7 @@
             "diagnosis"
           ],
           "oracle": {
-            "status": "upstream-existing",
+            "status": "reviewed",
             "observationRefs": [
               "representative-shader-compiles"
             ]
@@ -923,10 +961,65 @@
           "sha256": "a45c4c6d342832cb87ca44e912837aed2ee206d1509c0b31d6f378ca72ba1390",
           "reviewedAt": "2026-08-09T01:27:26Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "world-lab-consumer-execution-oracles-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/world-lab-runtime-webgpu/world-lab-consumer-execution-oracles-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "ee9eb434247f195fe27ddae77ab60399c524ba10a741dab4e26f90a89518e2d0",
+          "reviewedAt": "2026-08-16T00:38:12Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "world-lab-runtime-ownership-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/world-lab-runtime-webgpu/world-lab-runtime-ownership-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "e67bc65c292730f853ea428e6c21cf917b4999ce8bb036232e6cb0430c12e0cc",
+          "reviewedAt": "2026-08-16T04:45:44Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "world-lab-package-observer-admission-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/world-lab-runtime-webgpu/world-lab-package-observer-admission-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "64a4e2e1712ef403fc7f46fcff720c32d3733b69c053ae389e6ce8b11e29ebeb",
+          "reviewedAt": "2026-08-16T05:22:07Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "world-lab-package-compilation-observer-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/world-lab-runtime-webgpu/world-lab-package-compilation-observer-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "04c16d4925d5eff7de286d073cd123b7a51f72ad26779931809786f2e13b337b",
+          "reviewedAt": "2026-08-16T06:10:23Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "world-lab-native-program-identity-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/world-lab-runtime-webgpu/world-lab-native-program-identity-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "4adca302994cf46b6b4ee37214b64e5a5c78e691bea885759a8f212901aafaba",
+          "reviewedAt": "2026-08-16T06:45:36Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "world-lab-native-program-identity-clean-install-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/world-lab-runtime-webgpu/world-lab-native-program-identity-clean-install-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "8a1797876aa718ece6160477f495d687b84a6df3019e38f19fd2eb826dff61c9",
+          "reviewedAt": "2026-08-16T06:59:31Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "world-lab-native-render-identity-clean-install-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/world-lab-runtime-webgpu/world-lab-native-render-identity-clean-install-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "2810b250d4a4ab6ac0936abf4e31dfc7de7fb05108132d897ebcee796c96f62c",
+          "reviewedAt": "2026-08-16T07:13:35Z",
+          "reviewer": "codex"
         }
       ],
+      "failureRecords": [
+        "bench/external-projects/world-lab-runtime-webgpu/failures/atomic-compare-exchange-result.failure.json",
+        "bench/external-projects/world-lab-runtime-webgpu/failures/error-shader-compilation-info.failure.json",
+        "bench/external-projects/world-lab-runtime-webgpu/failures/module-constant-array-lowering.failure.json",
+        "bench/external-projects/world-lab-runtime-webgpu/failures/render-completion-boundary.failure.json"
+      ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-09T01:27:26Z"
+      "lastReviewedAt": "2026-08-16T07:13:35Z"
     },
     {
       "id": "wgsl-fns",
@@ -1081,10 +1174,17 @@
           "sha256": "dcb1b34b38f7445e20e5eda1d71b504b29ef4d90bb77a8ea75b5d5942a0f1734",
           "reviewedAt": "2026-08-15T16:59:19Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "wgsl-fns-public-compilation-observer-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/wgsl-fns/wgsl-fns-public-compilation-observer-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "baa3797d6ca85375f9d54f69b95fad1d03c9b8005fe1fba9c6a05b877cbebcee",
+          "reviewedAt": "2026-08-16T05:53:43Z",
+          "reviewer": "codex"
         }
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-15T16:59:19Z"
+      "lastReviewedAt": "2026-08-16T05:53:43Z"
     },
     {
       "id": "electronicarts-cpp-ml-intro",
@@ -1232,15 +1332,54 @@
           "sha256": "01d537a88dd4fc7b3c367b720b4ddb373b44986359208a76b583586e5625a2e4",
           "reviewedAt": "2026-08-09T02:49:56Z",
           "reviewer": "codex"
+        },
+        {
+          "reportId": "cpp-ml-mnist-staged-oracle-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-staged-oracle-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "995e273d4b9e1ce188961a8ab14e4dee2397ce4e49be441dbb759e3dd2b34202",
+          "reviewedAt": "2026-08-16T02:48:00Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "cpp-ml-mnist-runtime-ownership-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-runtime-ownership-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "c3c446f3dc9bdf1da66f41995dc0357005a4747f4765df93afc8509d1a4dc7a3",
+          "reviewedAt": "2026-08-16T02:53:40Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "cpp-ml-mnist-doeproof-cli-filesystem-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-doeproof-cli-filesystem-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "dc605f8a2d1db33dc46fdc69ce0901e703c2895c95ce7f16f6909918d962df57",
+          "reviewedAt": "2026-08-16T04:06:01Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "cpp-ml-mnist-doeproof-cli-clean-install-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-doeproof-cli-clean-install-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "d8a8ffe1175b4bdad6f7c3c29d62def54127cad2a9c7587f4c9ae3aa426499a0",
+          "reviewedAt": "2026-08-16T04:25:23Z",
+          "reviewer": "codex"
+        },
+        {
+          "reportId": "cpp-ml-mnist-persistent-performance-control-amd-vulkan-2026-08-16-diagnostic",
+          "path": "reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-persistent-performance-control-amd-vulkan-2026-08-16-diagnostic.json",
+          "sha256": "5299cab02038d8d340d52fd154f669910df84409f8d81922e6250bb165786525",
+          "reviewedAt": "2026-08-16T04:57:56Z",
+          "reviewer": "codex"
         }
       ],
       "failureRecords": [
+        "bench/external-projects/electronicarts-cpp-ml-intro/failures/installed-platform-library-precedence.failure.json",
+        "bench/external-projects/electronicarts-cpp-ml-intro/failures/native-compute-high-binding-truncation.failure.json",
+        "bench/external-projects/electronicarts-cpp-ml-intro/failures/native-compute-host-shadow-invalidation.failure.json",
         "bench/external-projects/electronicarts-cpp-ml-intro/failures/submit-ordered-texture-to-texture-copy.failure.json",
         "bench/external-projects/electronicarts-cpp-ml-intro/failures/vulkan-compute-texture-view-identity.failure.json",
+        "bench/external-projects/electronicarts-cpp-ml-intro/failures/vulkan-storage-texture-compute-visibility.failure.json",
         "bench/external-projects/electronicarts-cpp-ml-intro/failures/wgsl-switch-selector-trailing-comma.failure.json"
       ],
       "claimIndexRefs": [],
-      "lastReviewedAt": "2026-08-09T02:49:56Z"
+      "lastReviewedAt": "2026-08-16T04:57:56Z"
     },
     {
       "id": "dawn-node-webgpu",

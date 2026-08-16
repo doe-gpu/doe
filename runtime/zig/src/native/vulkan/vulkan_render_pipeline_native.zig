@@ -169,12 +169,20 @@ pub fn vulkan_create_render_pipeline(
     }
 
     if (native_helpers.cast(shared.DoeShaderModule, d.vertex_module)) |vert_sm| {
+        if (vert_sm.wgsl_source) |wgsl| {
+            std.crypto.hash.sha2.Sha256.hash(wgsl, &pip.vertex_wgsl_sha256, .{});
+            pip.vertex_wgsl_sha256_ready = true;
+        }
         if (vert_sm.vertex_spirv_data) |vs| {
             pip.vertex_spirv_data = native_helpers.alloc.dupe(u32, vs) catch null;
         }
     }
     if (d.fragment) |frag| {
         if (native_helpers.cast(shared.DoeShaderModule, frag.module)) |frag_sm| {
+            if (frag_sm.wgsl_source) |wgsl| {
+                std.crypto.hash.sha2.Sha256.hash(wgsl, &pip.fragment_wgsl_sha256, .{});
+                pip.fragment_wgsl_sha256_ready = true;
+            }
             if (frag_sm.fragment_spirv_data) |fs| {
                 pip.fragment_spirv_data = native_helpers.alloc.dupe(u32, fs) catch null;
             }

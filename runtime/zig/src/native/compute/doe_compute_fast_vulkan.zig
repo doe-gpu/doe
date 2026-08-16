@@ -7,6 +7,7 @@ const native_types = @import("../support/doe_native_object_types.zig");
 const compute_preconditions = @import("doe_compute_preconditions_native.zig");
 const vulkan_compute = @import("../vulkan/vulkan_compute_native.zig");
 const queue_submit_ops = @import("../../backend/dropin_queue_submit.zig");
+const program_identity_trace = @import("../diagnostics/doe_program_identity_trace.zig");
 
 const vk_upload = queue_submit_ops.vulkan_upload;
 const DoeBuffer = native_types.DoeBuffer;
@@ -294,6 +295,7 @@ pub fn dispatchBatchCopyFlush(
     var prepared_pipe: ?*DoeComputePipeline = null;
     var prepared_bind_groups: BindGroupArray = [_]?*DoeBindGroup{null} ** MAX_COMPUTE_BIND_GROUPS;
     var prepared_bg_count: u32 = 0;
+    var prepared_binding_state = vulkan_compute.VulkanDispatchBindingState{};
     var prepared_cache: [BATCH_PREPARED_CACHE_CAPACITY]PreparedDispatchCacheEntry = undefined;
     var prepared_cache_count: usize = 0;
     var replay_command_buffer = rt.replay_command_buffer;
@@ -359,6 +361,7 @@ pub fn dispatchBatchCopyFlush(
             prepared_pipe = pipe;
             prepared_bind_groups = bind_groups;
             prepared_bg_count = bg_count;
+            prepared_binding_state = state;
         }
         if (collect_timings) timings.command_replay_prepare_ns += monotonicNowNs() - prepare_started_ns;
         const record_started_ns = if (collect_timings) monotonicNowNs() else 0;
@@ -379,6 +382,24 @@ pub fn dispatchBatchCopyFlush(
             if (collect_timings) timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
             continue;
         };
+        var resource_hasher = std.hash.Wyhash.init(0);
+        for (prepared_binding_state.bindings[0..prepared_binding_state.count]) |binding| {
+            resource_hasher.update(std.mem.asBytes(&binding.group));
+            resource_hasher.update(std.mem.asBytes(&binding.binding));
+            resource_hasher.update(std.mem.asBytes(&binding.resource_handle));
+            resource_hasher.update(std.mem.asBytes(&binding.buffer_offset));
+            resource_hasher.update(std.mem.asBytes(&binding.buffer_size));
+        }
+        program_identity_trace.recordVulkanDispatch(
+            pipe,
+            dispatch_dims[dim_offset],
+            dispatch_dims[dim_offset + 1],
+            dispatch_dims[dim_offset + 2],
+            0,
+            prepared_binding_state.descriptor_hash,
+            @intCast(prepared_binding_state.count),
+            resource_hasher.final(),
+        );
         if (collect_timings) timings.command_replay_record_ns += monotonicNowNs() - record_started_ns;
         executed_any_dispatch = true;
     }
@@ -410,10 +431,16 @@ pub fn dispatchBatchCopyFlush(
             timings.queue_submit_command_buffer_end_ns = submit_timings.command_buffer_end_ns;
             timings.queue_submit_sync_prepare_ns = submit_timings.sync_prepare_ns;
             timings.queue_submit_driver_submit_ns = submit_timings.driver_submit_ns;
+            program_identity_trace.recordVulkanSubmissionSucceeded();
         } else {
-            rt.submit_recorded_replay() catch |err| {
-                std.log.err("doe_compute_fast_vulkan: submit recorded replay failed: {s}", .{@errorName(err)});
+            const submitted = blk: {
+                rt.submit_recorded_replay() catch |err| {
+                    std.log.err("doe_compute_fast_vulkan: submit recorded replay failed: {s}", .{@errorName(err)});
+                    break :blk false;
+                };
+                break :blk true;
             };
+            if (submitted) program_identity_trace.recordVulkanSubmissionSucceeded();
         }
     }
     return timings;

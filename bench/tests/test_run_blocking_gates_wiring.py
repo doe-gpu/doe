@@ -251,6 +251,9 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
                     "--with-wgsl-lowering-link-receipt-gate",
                     "--wgsl-lowering-link-verify-files-root",
                     ".",
+                    "--with-program-execution-identity-receipt-gate",
+                    "--program-execution-identity-receipt",
+                    "examples/program-execution-identity-receipt.sample.json",
                     "--with-tint-compiler-target-validation-gate",
                     "--tint-compiler-target-validation-evidence",
                     "examples/tint-compiler-evidence.sample.json",
@@ -369,6 +372,7 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
         self.assertIn("browser-release-artifact-bundle", commands_by_label)
         self.assertIn("browser-release-package-inputs", commands_by_label)
         self.assertIn("browser-runtime-frontier-bundle", commands_by_label)
+        self.assertIn("program-execution-identity-receipt", commands_by_label)
         self.assertIn("wgsl-lowering-link-receipt", commands_by_label)
         self.assertIn("tint-compiler-target-validation", commands_by_label)
         self.assertIn("tint-phase-benchmark-evidence", commands_by_label)
@@ -545,6 +549,14 @@ class RunBlockingGatesWiringTests(unittest.TestCase):
         self.assertIn(
             "bench/tools/check_wgsl_lowering_link_receipt.py",
             commands_by_label["wgsl-lowering-link-receipt"][1],
+        )
+        self.assertIn(
+            "bench/tools/program_execution_identity_receipt.py",
+            commands_by_label["program-execution-identity-receipt"][1],
+        )
+        self.assertIn(
+            "--check",
+            commands_by_label["program-execution-identity-receipt"],
         )
         self.assertIn(
             "--verify-files-root",

@@ -1,7 +1,7 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "f312ceab0f71721caabb1dbd24e52f52a2fbd2fd7bbfdf65690f557eef8067f1",
+  "manifestSha256": "46fd49d7a8a61ecb7f91415aa5aed80f1856aca3ddf6b432ec24743a775b27ed",
   "modules": [
     {
       "containsCImport": false,
@@ -6308,7 +6308,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 400,
+      "lineCount": 441,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/vk_compute_sync.zig",
@@ -6316,77 +6316,77 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 5,
+          "line": 6,
           "name": "MAX_TRACKED_COMPUTE_BINDINGS"
         },
         {
           "kind": "const",
-          "line": 7,
+          "line": 8,
           "name": "ComputeBindingAccess"
         },
         {
           "kind": "fn",
-          "line": 13,
+          "line": 14,
           "name": "make_prior_transfer_writes_visible"
         },
         {
           "kind": "fn",
-          "line": 36,
+          "line": 37,
           "name": "make_prior_transfer_writes_visible_for_indirect_dispatch"
         },
         {
           "kind": "fn",
-          "line": 61,
+          "line": 62,
           "name": "make_prior_transfer_writes_visible_for_transfer_read"
         },
         {
           "kind": "fn",
-          "line": 84,
+          "line": 85,
           "name": "make_prior_compute_writes_visible"
         },
         {
           "kind": "fn",
-          "line": 89,
+          "line": 90,
           "name": "make_prior_compute_writes_visible_for_transfer_read"
         },
         {
           "kind": "fn",
-          "line": 111,
+          "line": 112,
           "name": "make_prior_compute_writes_visible_for_buffer_copy"
         },
         {
           "kind": "fn",
-          "line": 161,
+          "line": 162,
           "name": "make_prior_compute_writes_visible_for_indirect_read"
         },
         {
           "kind": "fn",
-          "line": 208,
+          "line": 209,
           "name": "make_transfer_writes_visible_for_host_read"
         },
         {
           "kind": "fn",
-          "line": 229,
+          "line": 230,
           "name": "capture_current_compute_bindings"
         },
         {
           "kind": "fn",
-          "line": 257,
+          "line": 268,
           "name": "make_prior_compute_writes_visible_for_current_bindings"
         },
         {
           "kind": "fn",
-          "line": 276,
+          "line": 287,
           "name": "remember_current_compute_writes"
         },
         {
           "kind": "fn",
-          "line": 298,
+          "line": 309,
           "name": "clear_pending_compute_writes"
         },
         {
           "kind": "fn",
-          "line": 355,
+          "line": 377,
           "name": "pending_compute_write_buffer_contains"
         }
       ],
@@ -6405,9 +6405,9 @@
         "src/backend/vulkan/vk_upload.zig"
       ],
       "roles": [],
-      "sha256": "6dbf555c8f86fc35ed2b7f777d06f3367fcdf445c6d02decb514e9c36639b6c0",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 26
+      "sha256": "6b02b3ba9f16890218ed11bf02e2c3d28d252e4e93731a0a18739cbdbdd17a28",
+      "testBlockCount": 1,
+      "topLevelDeclarationCount": 29
     },
     {
       "containsCImport": false,
@@ -8686,7 +8686,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 422,
+      "lineCount": 423,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/vk_device.zig",
@@ -8729,62 +8729,62 @@
         },
         {
           "kind": "fn",
-          "line": 184,
+          "line": 185,
           "name": "create_command_pool_and_primary_buffer"
         },
         {
           "kind": "fn",
-          "line": 205,
+          "line": 206,
           "name": "create_fence"
         },
         {
           "kind": "fn",
-          "line": 215,
+          "line": 216,
           "name": "find_memory_type_index"
         },
         {
           "kind": "fn",
-          "line": 287,
+          "line": 288,
           "name": "queue_selection_score"
         },
         {
           "kind": "fn",
-          "line": 291,
+          "line": 292,
           "name": "queue_selection_score_for_policy"
         },
         {
           "kind": "fn",
-          "line": 308,
+          "line": 309,
           "name": "queue_family_kind"
         },
         {
           "kind": "fn",
-          "line": 312,
+          "line": 313,
           "name": "create_fence_pool"
         },
         {
           "kind": "fn",
-          "line": 317,
+          "line": 318,
           "name": "create_timeline_semaphore"
         },
         {
           "kind": "fn",
-          "line": 324,
+          "line": 325,
           "name": "create_timestamp_query_pool"
         },
         {
           "kind": "fn",
-          "line": 343,
+          "line": 344,
           "name": "ensure_submission_state"
         },
         {
           "kind": "fn",
-          "line": 352,
+          "line": 353,
           "name": "ensure_deferred_submission_state"
         },
         {
           "kind": "fn",
-          "line": 369,
+          "line": 370,
           "name": "ensure_timestamp_query_pool"
         }
       ],
@@ -8809,7 +8809,7 @@
         "src/backend/vulkan/vk_upload.zig"
       ],
       "roles": [],
-      "sha256": "4a8ef06669a6024ee132e788ad83a0d18a96249bb1870ec4f278e30c7d8f5193",
+      "sha256": "828e81680f50b7150dce0d058ba53651f7cf06d01ab3898e52ad5115b2ab0b76",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 37
     },
@@ -8964,11 +8964,11 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 292,
+      "lineCount": 305,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/vk_feature_caps.zig",
-      "publicDeclarationCount": 4,
+      "publicDeclarationCount": 5,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -8977,17 +8977,22 @@
         },
         {
           "kind": "const",
-          "line": 127,
+          "line": 128,
           "name": "VulkanFeatureQuery"
         },
         {
           "kind": "fn",
-          "line": 156,
+          "line": 136,
+          "name": "enabled_core_features"
+        },
+        {
+          "kind": "fn",
+          "line": 170,
           "name": "query"
         },
         {
           "kind": "fn",
-          "line": 250,
+          "line": 263,
           "name": "dynamic_feature_supported"
         }
       ],
@@ -9005,9 +9010,9 @@
         "src/backend/vulkan/vk_feature_probe.zig"
       ],
       "roles": [],
-      "sha256": "35277067f66b05687fa0b0a5c91a79a9b67be11fc7e2f7a10f4926b78c22df08",
+      "sha256": "2e3af8d281f06146051e9c083bc59523c6d9e7685990c78e6ec1991a7be87b2c",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 66
+      "topLevelDeclarationCount": 67
     },
     {
       "containsCImport": false,
@@ -10174,7 +10179,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 975,
+      "lineCount": 980,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/vk_render.zig",
@@ -10202,7 +10207,7 @@
         },
         {
           "kind": "fn",
-          "line": 906,
+          "line": 911,
           "name": "execute_render_bundles"
         }
       ],
@@ -10217,7 +10222,7 @@
         "src/backend/vulkan/native_runtime.zig"
       ],
       "roles": [],
-      "sha256": "dd9f4e61ccf0c71c2f616ceda6a20fb661e4932faf9eaa807fd73e12032f696f",
+      "sha256": "065d05df21c0c065d5c95dfcfafd5288bf56a5cfc747adb95da3c67e464a630f",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 48
     },
@@ -10225,7 +10230,7 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 8,
+      "fanOut": 9,
       "imports": [
         "src/backend/vulkan/vk_constants.zig",
         "src/backend/vulkan/vk_formats.zig",
@@ -10233,85 +10238,101 @@
         "src/backend/vulkan/vk_pipeline_cache_persistent.zig",
         "src/backend/vulkan/vk_resources.zig",
         "src/backend/vulkan/vk_shader_source.zig",
+        "src/contracts/model/model_binding_value_types.zig",
         "src/contracts/model/model_render_types.zig",
         "src/contracts/model/model_texture_value_types.zig"
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 669,
+      "lineCount": 772,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/vk_render_pipeline.zig",
-      "publicDeclarationCount": 14,
+      "publicDeclarationCount": 17,
       "publicDeclarations": [
         {
+          "kind": "fn",
+          "line": 52,
+          "name": "render_texture_descriptor_type"
+        },
+        {
+          "kind": "fn",
+          "line": 56,
+          "name": "render_texture_image_layout"
+        },
+        {
+          "kind": "fn",
+          "line": 60,
+          "name": "render_buffer_descriptor_type"
+        },
+        {
           "kind": "const",
-          "line": 61,
+          "line": 77,
           "name": "VkPipelineDepthStencilStateCreateInfo"
         },
         {
           "kind": "fn",
-          "line": 76,
+          "line": 92,
           "name": "wgpu_compare_to_vk"
         },
         {
           "kind": "fn",
-          "line": 89,
+          "line": 105,
           "name": "wgpu_stencil_op_to_vk"
         },
         {
           "kind": "fn",
-          "line": 102,
+          "line": 118,
           "name": "format_has_stencil"
         },
         {
           "kind": "fn",
-          "line": 112,
+          "line": 128,
           "name": "resolve_entry_point_name"
         },
         {
           "kind": "fn",
-          "line": 120,
+          "line": 136,
           "name": "topology_to_vk"
         },
         {
           "kind": "fn",
-          "line": 130,
+          "line": 146,
           "name": "vertex_step_mode_to_vk"
         },
         {
           "kind": "fn",
-          "line": 134,
+          "line": 150,
           "name": "front_face_to_vk"
         },
         {
           "kind": "fn",
-          "line": 141,
+          "line": 157,
           "name": "cull_mode_to_vk"
         },
         {
           "kind": "fn",
-          "line": 149,
+          "line": 165,
           "name": "sample_count_to_vk"
         },
         {
           "kind": "fn",
-          "line": 159,
+          "line": 175,
           "name": "blend_factor_to_vk"
         },
         {
           "kind": "fn",
-          "line": 182,
+          "line": 198,
           "name": "blend_operation_to_vk"
         },
         {
           "kind": "fn",
-          "line": 192,
+          "line": 208,
           "name": "color_write_mask_to_vk"
         },
         {
           "kind": "fn",
-          "line": 201,
+          "line": 217,
           "name": "create_graphics_pipeline"
         }
       ],
@@ -10326,9 +10347,9 @@
         "src/backend/vulkan/vk_render.zig"
       ],
       "roles": [],
-      "sha256": "d1487804709470a104c639a8f6572b15a1f600b8caddd71b8e9a65c10b74e518",
+      "sha256": "9c906cdd1ce1b01dfbab2154cd723220b50a33d07a41bd90c856bb1449c7f7cd",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 55
+      "topLevelDeclarationCount": 59
     },
     {
       "containsCImport": false,
@@ -11445,7 +11466,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 301,
+      "lineCount": 319,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/vk_texture_commands.zig",
@@ -11453,42 +11474,42 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 15,
+          "line": 26,
           "name": "texture_write"
         },
         {
           "kind": "fn",
-          "line": 84,
+          "line": 95,
           "name": "texture_read"
         },
         {
           "kind": "fn",
-          "line": 163,
+          "line": 181,
           "name": "texture_copy"
         },
         {
           "kind": "fn",
-          "line": 214,
+          "line": 232,
           "name": "texture_query"
         },
         {
           "kind": "fn",
-          "line": 226,
+          "line": 244,
           "name": "texture_destroy"
         },
         {
           "kind": "fn",
-          "line": 232,
+          "line": 250,
           "name": "sampler_create"
         },
         {
           "kind": "fn",
-          "line": 236,
+          "line": 254,
           "name": "sampler_destroy"
         },
         {
           "kind": "fn",
-          "line": 242,
+          "line": 260,
           "name": "collect_dispatch_gpu_timestamp"
         }
       ],
@@ -11503,9 +11524,9 @@
         "src/backend/vulkan/native_runtime.zig"
       ],
       "roles": [],
-      "sha256": "8df5fa0a39a992d8a95bd3e979abc9c5467e512086da44090389f616e73603a1",
-      "testBlockCount": 0,
-      "topLevelDeclarationCount": 20
+      "sha256": "6e659c6f67c55afd3586dcd22d4361934efc884f3ebbfa177c1c6e260e091efb",
+      "testBlockCount": 1,
+      "topLevelDeclarationCount": 23
     },
     {
       "containsCImport": false,
@@ -20716,7 +20737,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 742,
+      "lineCount": 753,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/hlsl/emit_hlsl.zig",
@@ -20753,7 +20774,7 @@
         "src/compiler/wgsl/pipeline/translate_hlsl.zig"
       ],
       "roles": [],
-      "sha256": "3fbfea318365dda4758685f3a6734738e9f9e47492d359e7d925b8de2c27c724",
+      "sha256": "f97768329ddcc9d86e13eab123efee4f8004255feab4d8103da33e4355dd9e9f",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 13
     },
@@ -21098,7 +21119,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 945,
+      "lineCount": 957,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/msl/emit_msl_ir.zig",
@@ -21144,7 +21165,7 @@
         "src/native/queue/doe_queue_submit_metal.zig"
       ],
       "roles": [],
-      "sha256": "922888a79c6700702028c72b0ef0cd1f177d2477635578187411afe72a02ba5e",
+      "sha256": "24e09d092bd3e92d7af669e88d0b6eb14280d16d85c29224fc5145e47d1374d1",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 15
     },
@@ -21162,7 +21183,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 505,
+      "lineCount": 507,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/msl/emit_msl_ir_builtins.zig",
@@ -21196,7 +21217,7 @@
         "src/compiler/wgsl/emit/msl/emit_msl_ir.zig"
       ],
       "roles": [],
-      "sha256": "2caae41aec4c86e5e73d9800e66eb30719ad79dc07095d57f6102e69904e7127",
+      "sha256": "de54c4af5836ffa26794419123a7ca0f75e5c7b375651c170374b6370fcfb082",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 15
     },
@@ -21672,7 +21693,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 714,
+      "lineCount": 726,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv.zig",
@@ -21705,12 +21726,12 @@
         },
         {
           "kind": "const",
-          "line": 684,
+          "line": 696,
           "name": "addr_space_to_storage_class"
         },
         {
           "kind": "const",
-          "line": 685,
+          "line": 697,
           "name": "builtin_to_spirv"
         }
       ],
@@ -21730,7 +21751,7 @@
         "src/compiler/wgsl/runtime/runtime_graphics_translation.zig"
       ],
       "roles": [],
-      "sha256": "6ee3dc4d9b0506e84fe9da0f5672e6cc4819ee3ff28978b23e774611a1c2ccc5",
+      "sha256": "d58fb8f25ba42b8cd375355194a7771a46b97099f310e96a67a84f0151264dac",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 23
     },
@@ -21747,7 +21768,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 804,
+      "lineCount": 833,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_builtins.zig",
@@ -21771,7 +21792,7 @@
         "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig"
       ],
       "roles": [],
-      "sha256": "b5435c1da9e9d1cb10ac24826276e17de08a06561af2baf07a70cfccd663b52f",
+      "sha256": "e438e2df161edda056957e5813bbe26822aedd4c1f60c1f638ff48d793e115dd",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 28
     },
@@ -21792,7 +21813,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 1004,
+      "lineCount": 1005,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig",
@@ -21817,7 +21838,7 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "53a84f5c9615f7bc55fc974d05ef76cff7e536f6ac72dce7a459d0b722c7969e",
+      "sha256": "7ee378b924833877c1f0fcd4c4e69cf037cd7374aa46d914068a667168fd5514",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 24
     },
@@ -21946,15 +21967,20 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 50,
+      "lineCount": 115,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_matrix.zig",
-      "publicDeclarationCount": 1,
+      "publicDeclarationCount": 2,
       "publicDeclarations": [
         {
           "kind": "fn",
           "line": 5,
+          "name": "emit_matrix_construct"
+        },
+        {
+          "kind": "fn",
+          "line": 70,
           "name": "emit_matrix_elementwise"
         }
       ],
@@ -21970,9 +21996,9 @@
         "src/compiler/wgsl/emit/spirv/emit_spirv_fn.zig"
       ],
       "roles": [],
-      "sha256": "566c1b76a5571e3c451f390ff3c887dfba48ea0cbb6fba1306c29c8a45d66d22",
+      "sha256": "a5b42c24f2befa03e6bc63bb4fa2db164eb26f8f813025299d5b09c64137cb8a",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 4
+      "topLevelDeclarationCount": 5
     },
     {
       "containsCImport": false,
@@ -21985,11 +22011,11 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 78,
+      "lineCount": 89,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_shared.zig",
-      "publicDeclarationCount": 4,
+      "publicDeclarationCount": 5,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -22010,6 +22036,11 @@
           "kind": "fn",
           "line": 38,
           "name": "builtin_to_spirv"
+        },
+        {
+          "kind": "fn",
+          "line": 60,
+          "name": "builtin_to_spirv_for_stage"
         }
       ],
       "reachabilityViewRoots": [],
@@ -22028,9 +22059,9 @@
         "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig"
       ],
       "roles": [],
-      "sha256": "4ad4b822584888122f5b6486021ac5cd40ddbe6b23c0390bd8f09993753c7681",
+      "sha256": "1f825ee3e3e89db14fab7d245e258ca9322e42f459927b304e62507ced3dc969",
       "testBlockCount": 1,
-      "topLevelDeclarationCount": 8
+      "topLevelDeclarationCount": 9
     },
     {
       "containsCImport": false,
@@ -22044,7 +22075,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 327,
+      "lineCount": 339,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/spirv/emit_spirv_stages.zig",
@@ -22074,7 +22105,7 @@
         "src/compiler/wgsl/mod.zig"
       ],
       "roles": [],
-      "sha256": "a82cdc138003c5b3fc1f195cd369536dfe6f43af80120425a69d4887114435e4",
+      "sha256": "9e83409aed7ee31024627bb7705a35aee8d1ae18cda00ae5eb9ae1e02fdabc33",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 16
     },
@@ -22189,7 +22220,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 582,
+      "lineCount": 591,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/spirv/spirv_builder.zig",
@@ -22324,7 +22355,7 @@
         "src/compiler/wgsl/emit/spirv/emit_spirv_texture.zig"
       ],
       "roles": [],
-      "sha256": "bceef4262228c7e491605f858d16d2f70aed14d2f12589288bca9d5cd1c603df",
+      "sha256": "45c73200a12ea16604720d51ddff3a9afd31f70be316b096b473e5820e661f2b",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 39
     },
@@ -22336,7 +22367,7 @@
       "imports": [],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 368,
+      "lineCount": 369,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/emit/spirv/spirv_spec.zig",
@@ -22461,7 +22492,7 @@
         "src/compiler/wgsl/emit/spirv/spirv_builder.zig"
       ],
       "roles": [],
-      "sha256": "6d3e7cac20de4d903121c8a81b31839c09fb74e755f65056d3bd9a46b677cca5",
+      "sha256": "76ed73c9f8549291aa8c6fe4eb8204675af25529395bff65c466675a1fdeb102",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 21
     },
@@ -22852,7 +22883,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 833,
+      "lineCount": 851,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/parser_expr.zig",
@@ -22889,7 +22920,7 @@
         "src/compiler/wgsl/frontend/parser_stmt.zig"
       ],
       "roles": [],
-      "sha256": "6a3c0836fbb81ba54a3d803e2ccb72dd74a4682b149a87622118b74d9abe69ee",
+      "sha256": "4030d261c383d8cd3ca85ab01a431937336c312c7ff265b00f991c7977d5d86e",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 36
     },
@@ -22962,7 +22993,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 792,
+      "lineCount": 797,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema.zig",
@@ -23064,7 +23095,7 @@
         "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
-      "sha256": "454ae32c405a69e25155bc6480a0e7781f45278f422636f225c71788fc3e8da2",
+      "sha256": "41475b5bb7dbce2c6c33fa1c8d25216949d7f4bcde480e689e65b721eb35bd60",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 44
     },
@@ -23082,7 +23113,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 493,
+      "lineCount": 543,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema_attrs.zig",
@@ -23125,7 +23156,7 @@
         },
         {
           "kind": "fn",
-          "line": 403,
+          "line": 453,
           "name": "parse_override_id"
         }
       ],
@@ -23141,9 +23172,9 @@
         "src/compiler/wgsl/frontend/sema.zig"
       ],
       "roles": [],
-      "sha256": "7cccfaf48b66f98e320c63528ccfcf419f2a45497953f71d87a1d2182fdee3a0",
+      "sha256": "ab41862026718875a5e371601a6a1eac0a2869d303e22e47af657ae51bf092a9",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 33
+      "topLevelDeclarationCount": 34
     },
     {
       "containsCImport": false,
@@ -23159,7 +23190,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 447,
+      "lineCount": 454,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema_expr.zig",
@@ -23208,7 +23239,7 @@
         "src/compiler/wgsl/frontend/sema.zig"
       ],
       "roles": [],
-      "sha256": "801d5cf5317598fbe6ce8994082b6e665ae503c53fb420ddaf5bbf8020083503",
+      "sha256": "a660118e9b9de5226809fb6d44ea05f815015dc6bdb83d18e4ee0d72e1eebc78",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 34
     },
@@ -23338,7 +23369,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 165,
+      "lineCount": 181,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/frontend/sema_resolve.zig",
@@ -23362,9 +23393,9 @@
         "src/compiler/wgsl/frontend/sema.zig"
       ],
       "roles": [],
-      "sha256": "caa79c30da1869e9ab21e8ee61dfb454f8b03c02b7bb1c0ebba6b13fe89db841",
+      "sha256": "b06e9297f4a679d8823fc9890ffba0db32a19a04725f850b48e0436d3ba5e883",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 19
+      "topLevelDeclarationCount": 20
     },
     {
       "containsCImport": false,
@@ -23653,7 +23684,7 @@
       "imports": [],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 664,
+      "lineCount": 676,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir.zig",
@@ -23781,122 +23812,122 @@
         },
         {
           "kind": "const",
-          "line": 289,
+          "line": 300,
           "name": "Global"
         },
         {
           "kind": "const",
-          "line": 305,
+          "line": 317,
           "name": "Param"
         },
         {
           "kind": "const",
-          "line": 315,
+          "line": 327,
           "name": "Local"
         },
         {
           "kind": "const",
-          "line": 325,
+          "line": 337,
           "name": "ExprCategory"
         },
         {
           "kind": "const",
-          "line": 330,
+          "line": 342,
           "name": "UnaryOp"
         },
         {
           "kind": "const",
-          "line": 336,
+          "line": 348,
           "name": "BinaryOp"
         },
         {
           "kind": "const",
-          "line": 357,
+          "line": 369,
           "name": "AssignOp"
         },
         {
           "kind": "const",
-          "line": 369,
+          "line": 381,
           "name": "CallKind"
         },
         {
           "kind": "const",
-          "line": 374,
+          "line": 386,
           "name": "Expr"
         },
         {
           "kind": "const",
-          "line": 411,
+          "line": 423,
           "name": "ExprNode"
         },
         {
           "kind": "const",
-          "line": 425,
+          "line": 437,
           "name": "LoopKind"
         },
         {
           "kind": "const",
-          "line": 431,
+          "line": 443,
           "name": "SwitchCase"
         },
         {
           "kind": "const",
-          "line": 441,
+          "line": 453,
           "name": "Stmt"
         },
         {
           "kind": "const",
-          "line": 476,
+          "line": 488,
           "name": "Function"
         },
         {
           "kind": "const",
-          "line": 531,
+          "line": 543,
           "name": "EntryPoint"
         },
         {
           "kind": "const",
-          "line": 539,
+          "line": 551,
           "name": "OverrideEntry"
         },
         {
           "kind": "const",
-          "line": 546,
+          "line": 558,
           "name": "DispatchPreconditionKind"
         },
         {
           "kind": "const",
-          "line": 564,
+          "line": 576,
           "name": "DispatchPrecondition"
         },
         {
           "kind": "const",
-          "line": 589,
+          "line": 601,
           "name": "TextureDispatchPreconditionKind"
         },
         {
           "kind": "const",
-          "line": 595,
+          "line": 607,
           "name": "TextureDispatchCoordMode"
         },
         {
           "kind": "const",
-          "line": 600,
+          "line": 612,
           "name": "TextureDispatchPrecondition"
         },
         {
           "kind": "const",
-          "line": 618,
+          "line": 630,
           "name": "Module"
         },
         {
           "kind": "fn",
-          "line": 654,
+          "line": 666,
           "name": "dup_string"
         },
         {
           "kind": "fn",
-          "line": 658,
+          "line": 670,
           "name": "is_scalar"
         }
       ],
@@ -24008,7 +24039,7 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "7cc074d7b1bd1919c0cdf0d6f92bd4d08daca3d769cc6385a23ff36aec473e75",
+      "sha256": "bdba3b4b9c4aa38a572802523470c87cbfef1df6642b64f6ab886ed28c5463e2",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 50
     },
@@ -24027,7 +24058,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 643,
+      "lineCount": 663,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_builder.zig",
@@ -24073,7 +24104,7 @@
         "src/compiler/wgsl/pipeline/analysis.zig"
       ],
       "roles": [],
-      "sha256": "26901c59b943a51f71a4d3fb56e76e94ac4013724f90d25822c1c3cbfc80832f",
+      "sha256": "cbe52f827f0d1b5c707b933889099697b8b07ea2afc65db62b8b5702ed030213",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 27
     },
@@ -24087,7 +24118,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 186,
+      "lineCount": 187,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_const_eval.zig",
@@ -24110,7 +24141,7 @@
         },
         {
           "kind": "fn",
-          "line": 134,
+          "line": 135,
           "name": "resolve_constant_bool"
         }
       ],
@@ -24131,7 +24162,7 @@
         "src/compiler/wgsl/proof/dispatch_uniform_bounds.zig"
       ],
       "roles": [],
-      "sha256": "7308d7a522c1defef21a70baf6e6b292e80f7d73431c6b9cbda32a174392182c",
+      "sha256": "ec6f37feb579eb30f70365e270ca3033c8c56cd72250b31dc78f790d3f1ca694",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 10
     },
@@ -24371,7 +24402,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 951,
+      "lineCount": 973,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/ir/ir_transform_robustness.zig",
@@ -24389,7 +24420,7 @@
         },
         {
           "kind": "fn",
-          "line": 29,
+          "line": 30,
           "name": "apply"
         }
       ],
@@ -24409,9 +24440,9 @@
         "src/compiler/wgsl/runtime/shader_info.zig"
       ],
       "roles": [],
-      "sha256": "4fbe0ad5e76bf2428f9806452fb50ce07eafbd05b82c404faf59e0c69fdc9e8b",
+      "sha256": "98fdbd280ff0871616223308fbde0748c01741f695be360fe8d05328ff360aa6",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 45
+      "topLevelDeclarationCount": 46
     },
     {
       "containsCImport": false,
@@ -26123,7 +26154,7 @@
       ],
       "isProductionRoot": false,
       "layer": "compiler",
-      "lineCount": 196,
+      "lineCount": 200,
       "onlyReexports": false,
       "owner": "compiler",
       "path": "src/compiler/wgsl/runtime/runtime_compute_translation.zig",
@@ -26156,32 +26187,32 @@
         },
         {
           "kind": "fn",
-          "line": 65,
+          "line": 69,
           "name": "translateToMslForComputeRuntime"
         },
         {
           "kind": "fn",
-          "line": 85,
+          "line": 89,
           "name": "translateToMslForComputeRuntimeTimed"
         },
         {
           "kind": "fn",
-          "line": 123,
+          "line": 127,
           "name": "translateToSpirvForComputeRuntime"
         },
         {
           "kind": "fn",
-          "line": 138,
+          "line": 142,
           "name": "translateToSpirvTimed"
         },
         {
           "kind": "fn",
-          "line": 162,
+          "line": 166,
           "name": "translateToSpirvForVulkanComputeRuntime"
         },
         {
           "kind": "fn",
-          "line": 170,
+          "line": 174,
           "name": "translateToSpirvForVulkanComputeRuntimeWithOverrides"
         }
       ],
@@ -26201,7 +26232,7 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "cb99508663442e825bf68eb7a0ac5191fb45ab23571ce363c75bd5049e0c1679",
+      "sha256": "48d70d5658e341283da33914e5dbfb84a63f8065b28f1304e8b9c2f6c1fe080c",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 23
     },
@@ -26654,14 +26685,14 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 7,
+      "fanIn": 8,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig"
       ],
       "isProductionRoot": false,
       "layer": "contracts",
-      "lineCount": 46,
+      "lineCount": 50,
       "onlyReexports": false,
       "owner": "contracts",
       "path": "src/contracts/binding.zig",
@@ -26669,27 +26700,27 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 5,
+          "line": 9,
           "name": "MAX_SHADER_BINDINGS"
         },
         {
           "kind": "const",
-          "line": 8,
+          "line": 12,
           "name": "ShaderKind"
         },
         {
           "kind": "const",
-          "line": 17,
+          "line": 21,
           "name": "LayoutResourceKind"
         },
         {
           "kind": "fn",
-          "line": 26,
+          "line": 30,
           "name": "layoutResourceKindCode"
         },
         {
           "kind": "fn",
-          "line": 30,
+          "line": 34,
           "name": "storageTextureAccessSupported"
         }
       ],
@@ -26707,10 +26738,11 @@
         "src/native/resource/doe_bind_group_native.zig",
         "src/native/support/doe_native_shared_types.zig",
         "src/native/vulkan/vulkan_compute_bindings.zig",
-        "src/native/vulkan/vulkan_compute_native.zig"
+        "src/native/vulkan/vulkan_compute_native.zig",
+        "src/native/vulkan/vulkan_render_pass_native.zig"
       ],
       "roles": [],
-      "sha256": "d33a9cca53146c362dddd6348abff05e0f46c91f5c15d6a2df04bde9416b3277",
+      "sha256": "4599455cd85a41192fb1d921322f3a08173e721c03c3bbc227e3f1dd5d401700",
       "testBlockCount": 1,
       "topLevelDeclarationCount": 7
     },
@@ -27438,7 +27470,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 16,
+      "fanIn": 17,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
@@ -27552,6 +27584,7 @@
       "reverseImports": [
         "src/backend/vulkan/vk_compute_sync.zig",
         "src/backend/vulkan/vk_pipeline.zig",
+        "src/backend/vulkan/vk_render_pipeline.zig",
         "src/backend/vulkan/vk_resources.zig",
         "src/command/command_parse_dispatch.zig",
         "src/command/command_parse_helpers.zig",
@@ -28724,14 +28757,14 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 31,
+      "fanIn": 32,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_texture_value_types.zig"
       ],
       "isProductionRoot": false,
       "layer": "contracts",
-      "lineCount": 184,
+      "lineCount": 191,
       "onlyReexports": false,
       "owner": "contracts",
       "path": "src/contracts/model/model_render_types.zig",
@@ -28839,27 +28872,27 @@
         },
         {
           "kind": "const",
-          "line": 164,
+          "line": 171,
           "name": "DrawIndirectCommand"
         },
         {
           "kind": "const",
-          "line": 165,
+          "line": 172,
           "name": "DrawIndexedIndirectCommand"
         },
         {
           "kind": "const",
-          "line": 166,
+          "line": 173,
           "name": "RenderPassCommand"
         },
         {
           "kind": "const",
-          "line": 168,
+          "line": 175,
           "name": "SamplerCreateCommand"
         },
         {
           "kind": "const",
-          "line": 182,
+          "line": 189,
           "name": "SamplerDestroyCommand"
         }
       ],
@@ -28901,11 +28934,12 @@
         "src/full/render/wgpu_render_temp_texture.zig",
         "src/full/render/wgpu_sampler_commands.zig",
         "src/native/render/doe_render_pipeline_native.zig",
+        "src/native/resource/doe_bind_group_native.zig",
         "src/native/support/doe_native_object_types.zig",
         "src/native/vulkan/vulkan_render_pass_native.zig"
       ],
       "roles": [],
-      "sha256": "cbf38ca7c517e8dddb0b05c34da08269a6028be39786fd059e4e09c11cfcd51b",
+      "sha256": "88603cdb172f9f4a15b4ffc8b11480a4fbe8aec7a6f0767dc930f042f6afc821",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 26
     },
@@ -33461,7 +33495,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 3,
+      "fanIn": 4,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
@@ -33627,6 +33661,7 @@
       "reverseImports": [
         "src/core/abi/wgpu_proc_types.zig",
         "src/native/resource/doe_bind_group_native.zig",
+        "src/native/support/doe_native_object_types.zig",
         "src/native/support/doe_native_shared_types.zig"
       ],
       "roles": [],
@@ -45493,10 +45528,11 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 7,
+      "fanOut": 8,
       "imports": [
         "src/backend/dropin_queue_submit.zig",
         "src/native/compute/doe_compute_preconditions_native.zig",
+        "src/native/diagnostics/doe_program_identity_trace.zig",
         "src/native/support/doe_native_object_helpers.zig",
         "src/native/support/doe_native_object_types.zig",
         "src/native/support/doe_native_runtime_helpers.zig",
@@ -45505,7 +45541,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 496,
+      "lineCount": 510,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/compute/doe_compute_fast_vulkan.zig",
@@ -45513,22 +45549,22 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 20,
+          "line": 21,
           "name": "DispatchBatchCopyFlushTimings"
         },
         {
           "kind": "fn",
-          "line": 31,
+          "line": 32,
           "name": "populateRecordedDispatchBindingState"
         },
         {
           "kind": "fn",
-          "line": 210,
+          "line": 211,
           "name": "prewarmPreparedDispatchBindings"
         },
         {
           "kind": "fn",
-          "line": 270,
+          "line": 271,
           "name": "dispatchBatchCopyFlush"
         }
       ],
@@ -45542,9 +45578,9 @@
         "src/native/compute/doe_compute_fast.zig"
       ],
       "roles": [],
-      "sha256": "47165d0b2e76b586585cff10fe0710ab25278506d72c85b77e3a53a167826419",
+      "sha256": "d37cf0f7b4119886027faec43ee93fe2cb6ca81915ac1cfef6aeec83ee0849f8",
       "testBlockCount": 3,
-      "topLevelDeclarationCount": 35
+      "topLevelDeclarationCount": 36
     },
     {
       "containsCImport": false,
@@ -45696,6 +45732,68 @@
       "sha256": "917dd453c7a5f06f5cf53d1384e281d44ce29d6236ef522fdd55915edf748520",
       "testBlockCount": 1,
       "topLevelDeclarationCount": 18
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 4,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "native",
+      "lineCount": 388,
+      "onlyReexports": false,
+      "owner": "native",
+      "path": "src/native/diagnostics/doe_program_identity_trace.zig",
+      "publicDeclarationCount": 6,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "TRACE_PATH_ENV"
+        },
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "TRACE_KIND"
+        },
+        {
+          "kind": "fn",
+          "line": 34,
+          "name": "enabled"
+        },
+        {
+          "kind": "fn",
+          "line": 183,
+          "name": "recordVulkanDispatch"
+        },
+        {
+          "kind": "fn",
+          "line": 223,
+          "name": "recordVulkanRenderDraw"
+        },
+        {
+          "kind": "fn",
+          "line": 277,
+          "name": "recordVulkanSubmissionSucceeded"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "dropin-compatibility",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/native/compute/doe_compute_fast_vulkan.zig",
+        "src/native/queue/doe_queue_submit_vulkan.zig",
+        "src/native/vulkan/vulkan_compute_native.zig",
+        "src/native/vulkan/vulkan_render_pass_native.zig"
+      ],
+      "roles": [],
+      "sha256": "e930a44d13539eb0e93e8ecc1b0cffe05c6b2edaf9eaf711a88c4abe49f3b815",
+      "testBlockCount": 4,
+      "topLevelDeclarationCount": 26
     },
     {
       "containsCImport": false,
@@ -47651,9 +47749,10 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 9,
+      "fanOut": 10,
       "imports": [
         "src/backend/dropin_queue_submit.zig",
+        "src/native/diagnostics/doe_program_identity_trace.zig",
         "src/native/queue/doe_queue_submit_shared.zig",
         "src/native/resource/doe_query_native.zig",
         "src/native/support/doe_native_command_types.zig",
@@ -47665,7 +47764,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 341,
+      "lineCount": 348,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/queue/doe_queue_submit_vulkan.zig",
@@ -47673,7 +47772,7 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 126,
+          "line": 128,
           "name": "submit_vulkan_commands"
         }
       ],
@@ -47687,9 +47786,9 @@
         "src/native/queue/doe_queue_submit_native.zig"
       ],
       "roles": [],
-      "sha256": "aed5efd97ad69cbeb77f5d1d4a5325731f2cc988c224b77275fa0b4f5a326160",
+      "sha256": "6981c87f8b05693d2bed33c4a2c21a9fab30922a747b7d111285bcf29710eabb",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 24
+      "topLevelDeclarationCount": 25
     },
     {
       "containsCImport": false,
@@ -47988,9 +48087,10 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 3,
-      "fanOut": 13,
+      "fanOut": 14,
       "imports": [
         "src/contracts/binding.zig",
+        "src/contracts/model/model_render_types.zig",
         "src/contracts/texture.zig",
         "src/core/abi/wgpu_binding_base_types.zig",
         "src/core/abi/wgpu_callback_descriptor_types.zig",
@@ -48006,7 +48106,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 613,
+      "lineCount": 652,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/resource/doe_bind_group_native.zig",
@@ -48024,9 +48124,9 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "f2115deb9026e6a01bed7ec3f635089854b8d2adcb73bf57129cd6e590a707b4",
+      "sha256": "6ad47ab2fcd537fc6f5ccbd2aed4422d342fa82d88ba2693bf334af2958858bd",
       "testBlockCount": 3,
-      "topLevelDeclarationCount": 73
+      "topLevelDeclarationCount": 74
     },
     {
       "containsCImport": false,
@@ -48440,7 +48540,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 229,
+      "lineCount": 253,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/shader/doe_shader_compilation_info_native.zig",
@@ -48456,7 +48556,7 @@
         "src/native/api/doe_native_api_misc_exports.zig"
       ],
       "roles": [],
-      "sha256": "a2b769f592e4d0e2272acaf52eab102d3236fd6dccb9661e61899a9db4f74a10",
+      "sha256": "6f7bdc62f9e6bed42080ec3990296cb2633235b53297012b16d5cce9aafabdf3",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 16
     },
@@ -48913,7 +49013,7 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "434f93c4e0e2146c1f59c43445e8c86c10074b7cab4ac2d46f18e0de2ce7418d",
+      "sha256": "a831137094c6f433cc29f42bf4d9d33ee02003e92edb6a33804462259fc14954",
       "testBlockCount": 3,
       "topLevelDeclarationCount": 21
     },
@@ -49060,12 +49160,13 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 43,
-      "fanOut": 11,
+      "fanOut": 12,
       "imports": [
         "src/compiler/wgsl/ir/ir.zig",
         "src/contracts/backend.zig",
         "src/contracts/model/model_compute_types.zig",
         "src/contracts/model/model_render_types.zig",
+        "src/core/abi/wgpu_binding_base_types.zig",
         "src/core/abi/wgpu_callback_descriptor_types.zig",
         "src/core/abi/wgpu_core_base_types.zig",
         "src/core/abi/wgpu_feature_base_types.zig",
@@ -49076,7 +49177,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 419,
+      "lineCount": 439,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/support/doe_native_object_types.zig",
@@ -49084,107 +49185,107 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 34,
+          "line": 35,
           "name": "INVALID_COMPUTE_PASS_STATE_GENERATION"
         },
         {
           "kind": "const",
-          "line": 35,
+          "line": 36,
           "name": "INITIAL_COMPUTE_PASS_STATE_GENERATION"
         },
         {
           "kind": "const",
-          "line": 36,
+          "line": 37,
           "name": "UNUSED_PASS_TIMESTAMP_WRITE_INDEX"
         },
         {
           "kind": "const",
-          "line": 38,
+          "line": 39,
           "name": "DoeInstance"
         },
         {
           "kind": "const",
-          "line": 44,
+          "line": 45,
           "name": "DoeAdapter"
         },
         {
           "kind": "const",
-          "line": 58,
+          "line": 59,
           "name": "DoeDevice"
         },
         {
           "kind": "const",
-          "line": 76,
+          "line": 77,
           "name": "DoeQueue"
         },
         {
           "kind": "const",
-          "line": 101,
+          "line": 102,
           "name": "DoeBuffer"
         },
         {
           "kind": "const",
-          "line": 121,
+          "line": 122,
           "name": "DoeShaderModule"
         },
         {
           "kind": "const",
-          "line": 147,
+          "line": 148,
           "name": "DoeComputePipeline"
         },
         {
           "kind": "const",
-          "line": 191,
+          "line": 192,
           "name": "DoeBindGroupLayout"
         },
         {
           "kind": "const",
-          "line": 201,
+          "line": 202,
           "name": "DoePipelineLayout"
         },
         {
           "kind": "const",
-          "line": 210,
+          "line": 211,
           "name": "DoeBindGroup"
         },
         {
           "kind": "const",
-          "line": 230,
+          "line": 246,
           "name": "DoeCommandEncoder"
         },
         {
           "kind": "const",
-          "line": 238,
+          "line": 254,
           "name": "DoeComputePass"
         },
         {
           "kind": "const",
-          "line": 256,
+          "line": 272,
           "name": "DoeCommandBuffer"
         },
         {
           "kind": "const",
-          "line": 264,
+          "line": 280,
           "name": "DoeTexture"
         },
         {
           "kind": "const",
-          "line": 285,
+          "line": 301,
           "name": "DoeTextureView"
         },
         {
           "kind": "const",
-          "line": 302,
+          "line": 318,
           "name": "DoeSampler"
         },
         {
           "kind": "const",
-          "line": 311,
+          "line": 327,
           "name": "DoeRenderPipeline"
         },
         {
           "kind": "const",
-          "line": 361,
+          "line": 381,
           "name": "DoeRenderPass"
         }
       ],
@@ -49240,9 +49341,9 @@
         "src/native/vulkan/vulkan_render_shared.zig"
       ],
       "roles": [],
-      "sha256": "e7072c6316f1e988b013a5a252254d7728831aa034f725202794b36a4292ecf9",
+      "sha256": "9f026f1a640951b40c0863a4e000de18f775eb66cad67e13e0921dc74fcbc3db",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 51
+      "topLevelDeclarationCount": 52
     },
     {
       "containsCImport": false,
@@ -49312,7 +49413,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 48,
+      "lineCount": 49,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/support/doe_native_shared_types.zig",
@@ -49436,7 +49537,7 @@
         "src/native/vulkan/vulkan_render_shared.zig"
       ],
       "roles": [],
-      "sha256": "e61eedc58eb914bf7ac3fe3b3c32459d7518dbd01d085ac6a97bde666bbbb801",
+      "sha256": "70de870106c78878dbc2988267a5bfb1de980831c2eca30dff12f8f39cfc6ee4",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 22
     },
@@ -49562,7 +49663,7 @@
         "src/native/vulkan/vulkan_compute_native.zig"
       ],
       "roles": [],
-      "sha256": "d168a57e14224f792c938e3897af7c30b73eff6685ca8071c0c38d36d5fd9fe2",
+      "sha256": "19983bd1bbe03073f616cddabbbbb470215441b897eece8fea63097af7d9418f",
       "testBlockCount": 1,
       "topLevelDeclarationCount": 44
     },
@@ -49570,7 +49671,7 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 4,
-      "fanOut": 18,
+      "fanOut": 19,
       "imports": [
         "src/backend/dropin_resource_ops.zig",
         "src/compiler/wgsl/ir/ir.zig",
@@ -49581,6 +49682,7 @@
         "src/contracts/binding.zig",
         "src/contracts/model/model_binding_value_types.zig",
         "src/contracts/model/model_compute_types.zig",
+        "src/native/diagnostics/doe_program_identity_trace.zig",
         "src/native/resource/doe_bind_group_native.zig",
         "src/native/shader/doe_shader_translation_cache.zig",
         "src/native/shader/shader_binding_reflection.zig",
@@ -49593,7 +49695,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 1040,
+      "lineCount": 1049,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/vulkan/vulkan_compute_native.zig",
@@ -49601,77 +49703,77 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 67,
+          "line": 68,
           "name": "VulkanDispatchBindingState"
         },
         {
           "kind": "fn",
-          "line": 338,
+          "line": 339,
           "name": "vulkan_create_shader_module"
         },
         {
           "kind": "fn",
-          "line": 386,
+          "line": 387,
           "name": "vulkan_copy_pipeline_spirv"
         },
         {
           "kind": "fn",
-          "line": 398,
+          "line": 399,
           "name": "vulkan_compile_pipeline_spirv_with_overrides"
         },
         {
           "kind": "fn",
-          "line": 441,
+          "line": 442,
           "name": "vulkan_release_compute_pipeline"
         },
         {
           "kind": "fn",
-          "line": 546,
+          "line": 547,
           "name": "vulkan_collect_recorded_binding_state"
         },
         {
           "kind": "fn",
-          "line": 844,
+          "line": 845,
           "name": "vulkan_prepare_dispatch_bind_groups"
         },
         {
           "kind": "fn",
-          "line": 860,
+          "line": 861,
           "name": "vulkan_collect_dispatch_binding_state"
         },
         {
           "kind": "fn",
-          "line": 878,
+          "line": 879,
           "name": "vulkan_collect_recorded_bind_group_state"
         },
         {
           "kind": "fn",
-          "line": 895,
+          "line": 896,
           "name": "vulkan_prepare_dispatch_binding_state"
         },
         {
           "kind": "fn",
-          "line": 911,
+          "line": 912,
           "name": "vulkan_prepare_recorded_dispatch"
         },
         {
           "kind": "fn",
-          "line": 938,
+          "line": 939,
           "name": "vulkan_run_prepared_dispatch"
         },
         {
           "kind": "fn",
-          "line": 959,
+          "line": 968,
           "name": "vulkan_submit_recorded_dispatch"
         },
         {
           "kind": "fn",
-          "line": 965,
+          "line": 974,
           "name": "vulkan_run_prepared_dispatch_indirect"
         },
         {
           "kind": "fn",
-          "line": 978,
+          "line": 987,
           "name": "vulkan_submit_recorded_dispatch_indirect"
         }
       ],
@@ -49688,9 +49790,9 @@
         "src/native/shader/doe_shader_native.zig"
       ],
       "roles": [],
-      "sha256": "396ccab9c29a91f6a0474b4ced2b1bc00f155f54a7e0db8ac586aea5b5e00f6b",
+      "sha256": "52c614bf875550c44cf023df2310fe1f3dd879c6a2c50ec4f7c9d3453629f43f",
       "testBlockCount": 1,
-      "topLevelDeclarationCount": 98
+      "topLevelDeclarationCount": 99
     },
     {
       "containsCImport": false,
@@ -49993,9 +50095,11 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 5,
+      "fanOut": 7,
       "imports": [
+        "src/contracts/binding.zig",
         "src/contracts/model/model_render_types.zig",
+        "src/native/diagnostics/doe_program_identity_trace.zig",
         "src/native/resource/doe_query_native.zig",
         "src/native/support/doe_native_object_helpers.zig",
         "src/native/support/doe_native_shared_types.zig",
@@ -50003,7 +50107,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 257,
+      "lineCount": 295,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/vulkan/vulkan_render_pass_native.zig",
@@ -50011,27 +50115,27 @@
       "publicDeclarations": [
         {
           "kind": "fn",
-          "line": 145,
+          "line": 173,
           "name": "vulkan_render_pass_draw"
         },
         {
           "kind": "fn",
-          "line": 170,
+          "line": 208,
           "name": "vulkan_render_pass_draw_indexed"
         },
         {
           "kind": "fn",
-          "line": 203,
+          "line": 241,
           "name": "vulkan_render_pass_draw_indirect"
         },
         {
           "kind": "fn",
-          "line": 220,
+          "line": 258,
           "name": "vulkan_render_pass_draw_indexed_indirect"
         },
         {
           "kind": "fn",
-          "line": 243,
+          "line": 281,
           "name": "vulkan_render_pass_end"
         }
       ],
@@ -50045,9 +50149,9 @@
         "src/native/vulkan/vulkan_render_native.zig"
       ],
       "roles": [],
-      "sha256": "78dfc63f996d85ecf64884a509c5868a3b45748c98f9837d1a4ef963e21d4c4c",
+      "sha256": "397782fcfed927fc96cf7dd69006da6b733488a5c3ea8d26e59eebe5b1ec9282",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 13
+      "topLevelDeclarationCount": 16
     },
     {
       "containsCImport": false,
@@ -50064,7 +50168,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 239,
+      "lineCount": 247,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/vulkan/vulkan_render_pipeline_native.zig",
@@ -50077,12 +50181,12 @@
         },
         {
           "kind": "fn",
-          "line": 209,
+          "line": 217,
           "name": "probe_has_graphics_entry_points"
         },
         {
           "kind": "fn",
-          "line": 214,
+          "line": 222,
           "name": "vulkan_create_graphics_shader_module"
         }
       ],
@@ -50096,7 +50200,7 @@
         "src/native/vulkan/vulkan_render_native.zig"
       ],
       "roles": [],
-      "sha256": "18fb879cca750862c5ce64911eafb80b2c104dce73265367f16a0452639fefd0",
+      "sha256": "f53ad69d5e3bfbc0f1fb8cc962275e80cece22c30885026473021fb6bfeb54c3",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 10
     },
@@ -50367,7 +50471,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 125,
+      "lineCount": 129,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/vulkan/vulkan_texture_native.zig",
@@ -50390,7 +50494,7 @@
         },
         {
           "kind": "fn",
-          "line": 115,
+          "line": 119,
           "name": "vulkan_destroy_texture_view"
         }
       ],
@@ -50405,7 +50509,7 @@
         "src/native/vulkan/vulkan_render_native.zig"
       ],
       "roles": [],
-      "sha256": "dc7dc83e67605eaea9904347d93a89b2634dec047ba4aa02c13e79ade6b70eef",
+      "sha256": "5aaa3d6ce067c364a3b1bd67556a120b5f50691d7a51c5a5c0f1949ff5d75599",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 7
     },
@@ -55162,5 +55266,5 @@
   "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "d98500969c1bc44d419e75b6c0a899b56f8e36f13d173ef78ebe7681c41b8419"
+  "sourceTreeSha256": "b16f1dd49a586eedb9e31cc1d193132d0a3d099a4042839ae56fe69c08fdd4b4"
 }

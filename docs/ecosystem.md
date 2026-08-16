@@ -88,6 +88,15 @@ Because W0 exposes no defect, conditional `P0` is unnecessary; because D0 does
 not exceed W0, the reviewed decision assigns no runtime-ownership credit and
 keeps HoloScript diagnostic.
 
+The subsequent
+[HoloScript public process-observer admission](../reports/ecosystem/holoscript-snn-webgpu/holoscript-doeproof-process-observer-amd-vulkan-2026-08-16-diagnostic.json)
+replaces repository-only command evidence with the exported
+`doe-gpu/node-webgpu-process` observation contract. The unobserved control and
+both observed provider lanes pass the unchanged application oracle; Dawn and
+Doe share normalized command and mapped-output identities, and Doe replays
+exactly. This admits the public evidence surface while preserving the terminal
+no-ownership and no-promotion decision.
+
 The separately reviewed
 [HoloScript LIF determinism result](../reports/ecosystem/holoscript-snn-webgpu/holoscript-lif-determinism-2026-08-15-diagnostic.json)
 extends that conclusion to the upstream neuron simulation. Across three frozen
@@ -98,16 +107,52 @@ Vulkan adapter. The governed incumbent therefore closes the outcome without a
 patch; the workload is retained as a diagnostic regression with no ownership
 or promotion credit.
 
-The separate
-[HoloScript Electron main-process successor](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json)
+The current-runtime
+[HoloScript Electron main-process successor](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json)
 exercises a distinct runtime-host boundary without reopening that Node decision.
 The packaged
 incumbent fails at Electron's external-`ArrayBuffer` restriction while Doe
 passes the unchanged four-topology oracle. A source-built, two-file
-node-webgpu/Dawn mapped-buffer ownership patch also passes exactly and replays
-deterministically. Because that bounded incumbent correction closes the gap,
+node-webgpu/Dawn mapped-buffer ownership patch was freshly reconstructed and
+also passes exactly and replays deterministically. Because that bounded
+incumbent correction still closes the gap,
 the Electron tuple likewise receives no DoeRuntime ownership or promotion
 credit and remains a retained regression plus an upstreamable patch.
+
+The reviewed World Labs `consumer-execution-oracles` harness subsumes its
+older proposed `consumer-shader-compiles` lane. The measured workload already
+runs all six representative compilation assertions and the invalid-shader
+diagnostic oracle, then adds unchanged compute, render, synchronization,
+readback, and independent output checks. The compile-only proposal is retired
+because it would prove strictly less on the same pinned application source.
+
+The later
+[World Labs runtime-ownership diagnostic](../reports/ecosystem/world-lab-runtime-webgpu/world-lab-runtime-ownership-amd-vulkan-2026-08-16-diagnostic.json)
+closes the evidence gaps and reaches a terminal decision. A transparent,
+identical provider layer around Dawn and Doe records dynamic WGSL attempts,
+compute dispatches, render draws, submissions, and exact mapped readbacks.
+All 12 I0/I1/W0/D0 processes pass; W0 and D0 reproduce the same complete
+semantic evidence and exact output identities. The governed incumbent therefore
+closes the frozen outcome without a patch. World Labs remains a permanent
+compiler/runtime regression and supplies no runtime-ownership or promotion
+credit.
+
+The subsequent
+[public observer admission diagnostic](../reports/ecosystem/world-lab-runtime-webgpu/world-lab-package-observer-admission-amd-vulkan-2026-08-16-diagnostic.json)
+replaces that application-specific proxy with `doe-gpu/observe`. Pinned Dawn
+and Doe again pass all 16 assertions and reproduce identical public command
+shape and mapped output identities. This admits the package evidence primitive
+for diagnostic real-application use; it does not reopen the terminal World
+Labs ownership decision or add performance, promotion, or release credit.
+
+The later
+[source-bound compilation diagnostic](../reports/ecosystem/world-lab-runtime-webgpu/world-lab-package-compilation-observer-amd-vulkan-2026-08-16-diagnostic.json)
+closes the public observer's negative-path evidence gap. Immediate
+compilation-info checkpoints preserve all eight upstream validation calls,
+including the compile-only worker. Dawn and Doe each bind exactly one error to
+the same invalid runtime shader source while retaining their distinct message
+and location detail. This is diagnostic evidence and does not alter the
+terminal runtime-ownership result.
 
 The wgsl-fns independent-correction diagnostic executes all five required
 lanes. The pinned incumbent crashes, but DoeRuntime and the independently
@@ -116,6 +161,52 @@ compilation corpus, exact `smoothStep` dispatch/readback, and deterministic
 replay. The cheaper wrapper-level correction closes the exercised outcome, so
 the reviewed decision assigns no runtime-ownership credit and keeps wgsl-fns
 diagnostic.
+
+The later
+[wgsl-fns public compilation-observer admission](../reports/ecosystem/wgsl-fns/wgsl-fns-public-compilation-observer-amd-vulkan-2026-08-16-diagnostic.json)
+binds the unchanged semantic workload's `getCompilationInfo()` call to its
+exact observed shader module. Dawn and Doe return identical empty diagnostics
+for the valid shader, then reproduce the same normalized command and exact
+mapped-output identities. This is public DoeProof failure-localization
+infrastructure, not a new DoeRuntime ownership or promotion result.
+
+The cpp-ml MNIST independent-correction diagnostic also reaches a terminal
+ownership decision. Ambient Dawn, pinned Dawn, governed Dawn, and DoeRuntime
+each pass the same staged independent oracle; governed Dawn and DoeRuntime
+also reproduce their semantic evidence hashes. The owned runtime therefore
+receives no ownership credit for this frozen application outcome, while the
+passing graph remains a retained cross-provider correctness regression.
+
+The correction-only
+[cpp-ml public DoeProof CLI diagnostic](../reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-doeproof-cli-filesystem-amd-vulkan-2026-08-16-diagnostic.json)
+then runs governed Dawn and Doe through the package `run`, `verify`, `inspect`,
+`compare`, and `replay` surface under Node read-only permissions. It fixes a
+native truncation that omitted compute bindings 16 and 17, passes twice with
+exact cross-provider output, and authorizes this public evidence boundary. It
+does not reopen the terminal ownership decision or grant performance,
+promotion, release, or OS dependency-closure credit.
+
+The subsequent
+[cpp-ml clean-install DoeProof diagnostic](../reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-doeproof-cli-clean-install-amd-vulkan-2026-08-16-diagnostic.json)
+packs the wrapper, Linux x64 platform payload, pinned incumbent, and PNG
+dependency, installs them with lifecycle scripts disabled, copies the exact
+pinned application, and repeats the full command chain from two independent
+installation roots. Both providers and both replays pass the same oracle. The
+first frozen attempt also exposed and permanently records an installed-package
+resolution bug: package execution must prefer its installed platform payload
+before probing development-workspace paths. This closes the local-tarball
+application installation gap for Node/Linux x64/AMD Vulkan only; it does not
+promote cpp-ml or change its ownership decision.
+
+The final distinct cpp-ml ownership hypothesis is now closed by the
+[persistent-performance-control diagnostic](../reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-persistent-performance-control-amd-vulkan-2026-08-16-diagnostic.json).
+Pinned Dawn and Doe each pass 30 cold processes and 100 warm exact-oracle
+suites with one shared semantic output identity. Doe is slower at every frozen
+percentile: 1.391x–1.521x on cold execution and 1.720x–1.768x on warm suites.
+The result rejects both the 1.10x material-win gate and the 1.05x regression
+ceiling. cpp-ml therefore remains a clean-installed DoeProof and permanent
+compiler/runtime regression workload, not a DoeRuntime-owned application or a
+promotion candidate.
 
 ## Evidence routing
 

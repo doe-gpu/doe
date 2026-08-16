@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "world-lab-native-program-identity-clean-install-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "generatedAt": "2026-08-16T06:59:31Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T06:59:31Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "31",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "native-identity-survives-local-tarball-clean-install",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "The current doe-gpu wrapper and Linux x64 platform package were packed, installed with lifecycle scripts disabled and optional dependency lookup omitted, and used by the unchanged World Labs application. The observer, Doe module, and loaded libwebgpu_doe all resolve beneath that installation; the loaded library byte-matches the installed platform payload.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/result.json",
+          "sha256": "6c5479ccd9d99c708838ee59773d5ab2c27754bff59326e34d30ae0fa82a479f"
+        }
+      ]
+    },
+    {
+      "id": "clean-installed-runtime-preserves-native-artifact-and-output-chain",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "All 16 unchanged application assertions pass. Three public-observer compute dispatches match three clean-installed runtime dispatches by WGSL hash, entry point, and workgroups; each has a later successful Vulkan submission. Both distinct emitted SPIR-V artifacts match their journal digests and pass spirv-val, while mapped application output remains independently verified.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/result.json",
+          "sha256": "6c5479ccd9d99c708838ee59773d5ab2c27754bff59326e34d30ae0fa82a479f"
+        },
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/processes/D0/native-program-identity.jsonl",
+          "sha256": "dc0e0b17425558d9a786eb2085680e59a9bd09f9ee4874e67e881896c34d2602"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This is a local-tarball clean-install result for Node, Linux x64, and the observed AMD Vulkan host; it is not registry-publication or broader support-matrix evidence.",
+    "The installed package chain does not establish complete transitive operating-system, filesystem, network, driver-binary, or dependency closure.",
+    "The native journal covers Vulkan compute dispatches and does not bind the application's render draws to native graphics artifacts.",
+    "The successor cannot reopen the terminal World Labs runtime-ownership decision and grants no performance, promotion, release, or runtime-ownership credit."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 490536960
+    },
+    "comparison": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 486490112
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The gate proves clean-install program identity and unchanged application behavior, not performance."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched journal-disabled execution was authorized."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "Clean installation strengthens the package evidence boundary but does not change the completed cost-versus-benefit ownership adjudication."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "pass",
+      "summary": "Local wrapper and platform tarballs install without lifecycle scripts or optional dependency resolution, and the effective observer, provider, and native runtime remain inside the installation."
+    },
+    "supportHardware": {
+      "status": "not-run",
+      "summary": "One physical AMD Vulkan observation grants no broader support-matrix status."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "Vitest worker evidence is diagnostic and below the promotion concurrency contract."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both application lanes exit without crash, hang, or timeout."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "One clean process per provider is below promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process-tree RSS is observed, but bounded same-process growth is not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The result binds the plan, local tarballs, installed package files, unchanged application evidence, loaded runtime, native trace, exact SPIR-V artifacts, and validation outcomes."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Pinned Dawn and clean-installed Doe preserve the predecessor application identities while Doe additionally proves the native compute artifact chain."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No performance protocol ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The successor is forbidden from reopening the completed World Labs ownership decision."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "World Labs remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/result.json",
+      "sha256": "6c5479ccd9d99c708838ee59773d5ab2c27754bff59326e34d30ae0fa82a479f"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/processes/D0/native-program-identity.jsonl",
+      "sha256": "dc0e0b17425558d9a786eb2085680e59a9bd09f9ee4874e67e881896c34d2602"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/processes/D0/doe-native-vulkan-dab1e582e36d6639ec9a21d3936df13bd7aedcf64b4aa1f22b4fefb329969afe.spv",
+      "sha256": "dab1e582e36d6639ec9a21d3936df13bd7aedcf64b4aa1f22b4fefb329969afe"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/processes/D0/doe-native-vulkan-bff7d92b16441e2e909c592b93245a153ee84f536e3941903b134442f570d984.spv",
+      "sha256": "bff7d92b16441e2e909c592b93245a153ee84f536e3941903b134442f570d984"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/packs/doe-gpu-0.4.7.tgz",
+      "sha256": "878ca7bccd51814be0a37131080bc624459ee52755bad6b7933656e3ffb0ede3"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-identity-clean-install-qm3-v1/packs/doe-gpu-linux-x64-0.4.7.tgz",
+      "sha256": "8189f49996f7f89863cafdfb76a2f0dc236388179d5a731b9cbb3b9ff24a6c07"
+    }
+  ]
+}

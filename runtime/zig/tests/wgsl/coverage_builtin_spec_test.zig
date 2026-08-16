@@ -6,7 +6,9 @@
 const std = @import("std");
 const mod = @import("../../src/compiler/wgsl/mod.zig");
 const translateToMsl = mod.translateToMsl;
+const translateToSpirv = mod.translateToSpirv;
 const MAX_OUTPUT = mod.MAX_OUTPUT;
+const MAX_SPIRV_OUTPUT = mod.MAX_SPIRV_OUTPUT;
 
 fn contains(haystack: []const u8, needle: []const u8) bool {
     return std.mem.indexOf(u8, haystack, needle) != null;
@@ -20,6 +22,31 @@ fn expectMslContains(source: []const u8, needles: []const []const u8) !void {
     for (needles) |needle| {
         try std.testing.expect(contains(msl, needle));
     }
+}
+
+test "builtins: atomicCompareExchangeWeak result members through MSL and SPIR-V" {
+    const source =
+        \\struct Counters { value: atomic<u32>, }
+        \\@group(0) @binding(0) var<storage, read_write> counters: Counters;
+        \\@group(0) @binding(1) var<storage, read_write> output: array<u32>;
+        \\
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    let exchanged = atomicCompareExchangeWeak(&counters.value, 0u, 1u);
+        \\    output[0] = select(exchanged.old_value, 2u, exchanged.exchanged);
+        \\}
+    ;
+    const msl_needles = [_][]const u8{
+        "atomic_compare_exchange_weak_explicit",
+        "_doe_cew_x",
+        ".exchanged",
+        ".old_value",
+    };
+    try expectMslContains(source, &msl_needles);
+
+    var spirv_out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const spirv_len = try translateToSpirv(std.testing.allocator, source, &spirv_out);
+    try std.testing.expect(spirv_len > 0);
 }
 
 // ============================================================

@@ -133,6 +133,10 @@ export async function loadVendorNodeScenario(scenarioPath) {
     doppler.modelPath,
     'scenario.doppler.modelPath',
   );
+  const dopplerCommand = resolveOptionalString(doppler.command) ?? 'bench';
+  if (!['bench', 'debug'].includes(dopplerCommand)) {
+    throw new Error('scenario.doppler.command must be bench or debug');
+  }
 
   return {
     scenarioPath: resolve(scenarioPath),
@@ -171,6 +175,7 @@ export async function loadVendorNodeScenario(scenarioPath) {
     },
     doppler: {
       modelId: asNonEmptyString(doppler.modelId, 'scenario.doppler.modelId'),
+      command: dopplerCommand,
       sourceCommit: resolveOptionalString(doppler.sourceCommit),
       loadMode: resolveOptionalString(doppler.loadMode),
       modelPath: dopplerModelPath,

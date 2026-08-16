@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe_program_execution_identity_receipt",
+  "inputs": {
+    "runtime": { "path": "runtime/zig/zig-out/bin/doe-zig-runtime", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    "commands": { "path": "examples/workgroup_non_atomic_commands.json", "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" },
+    "kernelRoot": "bench/kernels",
+    "source": { "path": "bench/kernels/workgroup_non_atomic.wgsl", "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" },
+    "traceMeta": { "path": "bench/out/program-identity/execution.meta.json", "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" },
+    "trace": { "path": "bench/out/program-identity/execution.ndjson", "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
+    "shaderManifest": { "path": "bench/out/shader-artifacts/manifest.json", "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" },
+    "backendArtifact": { "path": "bench/out/shader-artifacts/shader.spv", "sha256": "1111111111111111111111111111111111111111111111111111111111111111" },
+    "oracleReference": { "path": "bench/oracles/workgroup_recurrence_u32_v1.py", "sha256": "2222222222222222222222222222222222222222222222222222222222222222" }
+  },
+  "identity": {
+    "kernel": "workgroup_non_atomic.wgsl",
+    "backend": "doe_vulkan",
+    "backendLane": "vulkan_doe_release",
+    "profile": { "vendor": "amd", "api": "vulkan", "deviceFamily": "gfx11", "driver": "24.0.0" },
+    "wgslSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "semanticSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "irSha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "backendArtifactSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "toolchainSha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "shaderManifestIdentity": "6666666666666666666666666666666666666666666666666666666666666666",
+    "pipelineHash": "7777777777777777777777777777777777777777777777777777777777777777",
+    "dispatchCount": 100,
+    "outputSha256": "8888888888888888888888888888888888888888888888888888888888888888"
+  },
+  "oracle": {
+    "kind": "sha256_exact_v1",
+    "referenceId": "bench/oracles/workgroup_recurrence_u32_v1.py",
+    "expectedSha256": "8888888888888888888888888888888888888888888888888888888888888888",
+    "actualSha256": "8888888888888888888888888888888888888888888888888888888888888888"
+  },
+  "checks": {
+    "sourceMatchesManifest": true,
+    "moduleMatchesCommand": true,
+    "manifestIdentityMatchesTrace": true,
+    "manifestPathMatchesTrace": true,
+    "backendMatchesExecution": true,
+    "backendArtifactMatchesManifest": true,
+    "executionSucceeded": true,
+    "dispatchCountMatchesCommand": true,
+    "fallbackAbsent": true,
+    "outputOracleMatched": true
+  },
+  "verdict": {
+    "status": "passed",
+    "failureCodes": [],
+    "claimBoundary": "runtime-reported source-to-SPIR-V execution identity and exact output; not a driver-binary, operating-system dependency, or performance claim"
+  },
+  "receiptSha256": "9999999999999999999999999999999999999999999999999999999999999999"
+}

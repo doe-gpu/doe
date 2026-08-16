@@ -437,6 +437,7 @@ digraph doe_zig_architecture {
   "src/native/compute/doe_compute_preconditions_native.zig" [label="src/native/compute/doe_compute_preconditions_native.zig\nnative"];
   "src/native/diagnostics/doe_error_scope_native.zig" [label="src/native/diagnostics/doe_error_scope_native.zig\nnative"];
   "src/native/diagnostics/doe_metal_browser_trace.zig" [label="src/native/diagnostics/doe_metal_browser_trace.zig\nnative"];
+  "src/native/diagnostics/doe_program_identity_trace.zig" [label="src/native/diagnostics/doe_program_identity_trace.zig\nnative"];
   "src/native/lifecycle/doe_canvas_event_native.zig" [label="src/native/lifecycle/doe_canvas_event_native.zig\nnative"];
   "src/native/lifecycle/doe_instance_device_native.zig" [label="src/native/lifecycle/doe_instance_device_native.zig\nnative"];
   "src/native/mod.zig" [label="src/native/mod.zig\nnative"];
@@ -1062,6 +1063,7 @@ digraph doe_zig_architecture {
   "src/backend/vulkan/vk_render_pipeline.zig" -> "src/backend/vulkan/vk_pipeline_cache_persistent.zig";
   "src/backend/vulkan/vk_render_pipeline.zig" -> "src/backend/vulkan/vk_resources.zig";
   "src/backend/vulkan/vk_render_pipeline.zig" -> "src/contracts/model/model_texture_value_types.zig";
+  "src/backend/vulkan/vk_render_pipeline.zig" -> "src/contracts/model/model_binding_value_types.zig";
   "src/backend/vulkan/vk_render_pipeline.zig" -> "src/contracts/model/model_render_types.zig";
   "src/backend/vulkan/vk_resources.zig" -> "src/backend/vulkan/vk_constants.zig";
   "src/backend/vulkan/vk_resources.zig" -> "src/backend/vulkan/vk_device.zig";
@@ -2354,6 +2356,7 @@ digraph doe_zig_architecture {
   "src/native/compute/doe_compute_fast_vulkan.zig" -> "src/native/compute/doe_compute_preconditions_native.zig";
   "src/native/compute/doe_compute_fast_vulkan.zig" -> "src/native/vulkan/vulkan_compute_native.zig";
   "src/native/compute/doe_compute_fast_vulkan.zig" -> "src/backend/dropin_queue_submit.zig";
+  "src/native/compute/doe_compute_fast_vulkan.zig" -> "src/native/diagnostics/doe_program_identity_trace.zig";
   "src/native/compute/doe_compute_preconditions_native.zig" -> "src/core/compute/dispatch_preconditions.zig";
   "src/native/compute/doe_compute_preconditions_native.zig" -> "src/native/support/doe_native_object_types.zig";
   "src/native/compute/doe_compute_preconditions_native.zig" -> "src/native/support/doe_native_object_helpers.zig";
@@ -2463,6 +2466,7 @@ digraph doe_zig_architecture {
   "src/native/queue/doe_queue_submit_vulkan.zig" -> "src/native/queue/doe_queue_submit_shared.zig";
   "src/native/queue/doe_queue_submit_vulkan.zig" -> "src/native/vulkan/vulkan_compute_native.zig";
   "src/native/queue/doe_queue_submit_vulkan.zig" -> "src/native/resource/doe_query_native.zig";
+  "src/native/queue/doe_queue_submit_vulkan.zig" -> "src/native/diagnostics/doe_program_identity_trace.zig";
   "src/native/render/doe_bundle_native.zig" -> "src/core/abi/wgpu_texture_base_types.zig";
   "src/native/render/doe_bundle_native.zig" -> "src/native/support/doe_native_object_types.zig";
   "src/native/render/doe_bundle_native.zig" -> "src/native/support/doe_native_shared_types.zig";
@@ -2507,6 +2511,7 @@ digraph doe_zig_architecture {
   "src/native/resource/doe_bind_group_native.zig" -> "src/core/abi/wgpu_callback_descriptor_types.zig";
   "src/native/resource/doe_bind_group_native.zig" -> "src/core/abi/wgpu_pipeline_descriptor_types.zig";
   "src/native/resource/doe_bind_group_native.zig" -> "src/contracts/binding.zig";
+  "src/native/resource/doe_bind_group_native.zig" -> "src/contracts/model/model_render_types.zig";
   "src/native/resource/doe_bind_group_native.zig" -> "src/contracts/texture.zig";
   "src/native/resource/doe_bind_group_native.zig" -> "src/native/resource/doe_texture_sampler_native.zig";
   "src/native/resource/doe_bind_group_native.zig" -> "src/native/resource/doe_external_texture_native.zig";
@@ -2610,6 +2615,7 @@ digraph doe_zig_architecture {
   "src/native/support/doe_native_object_types.zig" -> "src/contracts/model/model_compute_types.zig";
   "src/native/support/doe_native_object_types.zig" -> "src/contracts/model/model_render_types.zig";
   "src/native/support/doe_native_object_types.zig" -> "src/core/abi/wgpu_core_base_types.zig";
+  "src/native/support/doe_native_object_types.zig" -> "src/core/abi/wgpu_binding_base_types.zig";
   "src/native/support/doe_native_object_types.zig" -> "src/core/abi/wgpu_callback_descriptor_types.zig";
   "src/native/support/doe_native_object_types.zig" -> "src/core/abi/wgpu_feature_base_types.zig";
   "src/native/support/doe_native_object_types.zig" -> "src/compiler/wgsl/ir/ir.zig";
@@ -2664,6 +2670,7 @@ digraph doe_zig_architecture {
   "src/native/vulkan/vulkan_compute_native.zig" -> "src/backend/dropin_resource_ops.zig";
   "src/native/vulkan/vulkan_compute_native.zig" -> "src/native/vulkan/vulkan_pipeline_hash.zig";
   "src/native/vulkan/vulkan_compute_native.zig" -> "src/native/vulkan/vulkan_compute_bindings.zig";
+  "src/native/vulkan/vulkan_compute_native.zig" -> "src/native/diagnostics/doe_program_identity_trace.zig";
   "src/native/vulkan/vulkan_feature_cache.zig" -> "src/backend/dropin_capabilities.zig";
   "src/native/vulkan/vulkan_lifetime.zig" -> "src/native/support/doe_native_shared_types.zig";
   "src/native/vulkan/vulkan_pipeline_hash.zig" -> "src/contracts/model/model_compute_types.zig";
@@ -2672,9 +2679,11 @@ digraph doe_zig_architecture {
   "src/native/vulkan/vulkan_render_native.zig" -> "src/native/vulkan/vulkan_sampler_native.zig";
   "src/native/vulkan/vulkan_render_native.zig" -> "src/native/vulkan/vulkan_texture_native.zig";
   "src/native/vulkan/vulkan_render_pass_native.zig" -> "src/contracts/model/model_render_types.zig";
+  "src/native/vulkan/vulkan_render_pass_native.zig" -> "src/contracts/binding.zig";
   "src/native/vulkan/vulkan_render_pass_native.zig" -> "src/native/support/doe_native_object_helpers.zig";
   "src/native/vulkan/vulkan_render_pass_native.zig" -> "src/native/support/doe_native_shared_types.zig";
   "src/native/vulkan/vulkan_render_pass_native.zig" -> "src/native/resource/doe_query_native.zig";
+  "src/native/vulkan/vulkan_render_pass_native.zig" -> "src/native/diagnostics/doe_program_identity_trace.zig";
   "src/native/vulkan/vulkan_render_pass_native.zig" -> "src/native/vulkan/vulkan_render_shared.zig";
   "src/native/vulkan/vulkan_render_pipeline_native.zig" -> "src/core/abi/wgpu_core_base_types.zig";
   "src/native/vulkan/vulkan_render_pipeline_native.zig" -> "src/native/support/doe_native_object_helpers.zig";

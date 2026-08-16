@@ -196,9 +196,10 @@ a valuable cross-provider correctness regression, but it supplies no outcome
 that justifies runtime ownership.
 
 The Electron main-process successor for HoloScript is a distinct runtime-host
-diagnostic and does not reopen the terminal Node decision. In the reviewed
-artifact at
-[`../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json),
+diagnostic and does not reopen the terminal Node decision. The current-runtime
+replay at
+[`../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json)
+freshly reconstructs the bounded control and reaches the same terminal result:
 the unchanged application passes the exact oracle in all three `D0` processes
 and replay, while `I0`, `I1`, and `W0` fail at Electron's prohibition on
 external ArrayBuffers. A bounded application upload workaround reaches a native
@@ -208,6 +209,65 @@ patch therefore closes the application gap and rejects DoeRuntime ownership for
 this tuple. The result remains a diagnostic regression and grants no ownership,
 application-promotion, performance, release, renderer, Chromium, or browser
 credit.
+
+The Gigi generated-WebGPU suite is also terminal for its frozen
+independent-correction hypothesis. The reviewed artifact at
+[`../reports/ecosystem/electronicarts-gigi/gigi-runtime-ownership-2026-08-16-diagnostic.json`](../reports/ecosystem/electronicarts-gigi/gigi-runtime-ownership-2026-08-16-diagnostic.json)
+binds the ambient incumbent, pinned incumbent, governed incumbent, and Doe
+lanes plus semantic replay for both governed providers. Every lane retains the
+same application outcome, so the incumbent requires no bounded correction and
+DoeRuntime receives no ownership credit. The suite remains a diagnostic
+compiler/runtime regression asset; its shared oracle failures prevent
+promotion or performance interpretation.
+
+The World Labs consumer-execution suite is likewise terminal for its frozen
+independent-correction hypothesis. The reviewed artifact at
+[`../reports/ecosystem/world-lab-runtime-webgpu/world-lab-runtime-ownership-amd-vulkan-2026-08-16-diagnostic.json`](../reports/ecosystem/world-lab-runtime-webgpu/world-lab-runtime-ownership-amd-vulkan-2026-08-16-diagnostic.json)
+binds I0, I1, W0, and D0 across three clean processes per lane. The identical
+transparent evidence layer records all dynamic shader attempts, dispatches,
+draws, submissions, and exact mapped readbacks. W0 and D0 reproduce one shared
+shape, semantic-evidence, and output identity. Because the pinned incumbent
+passes directly and under governance, P0 is not authorized and DoeRuntime
+receives no ownership credit. The three Doe compiler/runtime repairs remain
+valuable permanent regressions; they do not justify owning execution for this
+application outcome.
+
+The cpp-ml MNIST graph is terminal for the same frozen independent-correction
+hypothesis. The reviewed artifact at
+[`../reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-runtime-ownership-amd-vulkan-2026-08-16-diagnostic.json`](../reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-runtime-ownership-amd-vulkan-2026-08-16-diagnostic.json)
+binds `I0`, `I1`, `W0`, and `D0` plus semantic replay for both governed
+providers. All 18 source and replay processes pass the staged independent
+oracle with one shared output identity. Because `W0` exposes no defect, `P0`
+is not authorized; because `D0` does not exceed `W0`, the result grants no
+runtime-ownership credit. The application remains a valuable exact
+cross-provider regression.
+
+The separate `persistent-performance-control` hypothesis is terminal through
+[`../reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-persistent-performance-control-amd-vulkan-2026-08-16-diagnostic.json`](../reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-persistent-performance-control-amd-vulkan-2026-08-16-diagnostic.json).
+Both providers pass 30 cold processes, five warm-up suites, and 100 warm suites
+with exact cross-provider semantic identity. Doe is slower at cold and warm
+p50, p95, and p99, exceeding the frozen 1.05x maximum-regression boundary at
+every percentile. No clean-install performance successor, promotion-scale
+stress population, or runtime-ownership claim is authorized for cpp-ml.
+
+The later
+[`doe-proof-node` filesystem diagnostic](../reports/ecosystem/electronicarts-cpp-ml-intro/cpp-ml-mnist-doeproof-cli-filesystem-amd-vulkan-2026-08-16-diagnostic.json)
+authorizes the public CLI boundary after correcting native compute-binding
+truncation. That product-boundary pass is deliberately orthogonal to ownership:
+it records `runtimeOwnershipCredit: false` and leaves this terminal decision
+unchanged.
+
+The UMAP SGD selected-operation experiment is terminal for its frozen
+`persistent-performance-control` hypothesis. The reviewed artifact at
+[`../reports/ecosystem/umap-gpu/umap-sgd-governed-benchmark-amd-vulkan-2026-08-16-diagnostic.json`](../reports/ecosystem/umap-gpu/umap-sgd-governed-benchmark-amd-vulkan-2026-08-16-diagnostic.json)
+binds deterministic input, exact 192-byte output identities, complete dispatch
+shape, physical provider identity, selected-operation timing, and W0/D0
+semantic replay. All four lanes pass. Doe improves p95 but records a 0.9705x
+W0/D0 speedup at p50, so it misses the predeclared 1.10x requirement at both
+percentiles. Cross-provider embedding bytes differ while both remain exact
+within provider and pass the semantic oracle. The result is a permanent
+floating-output and performance regression; it grants no runtime-ownership,
+performance, promotion, or release credit and cannot be rescued by tuning.
 
 The Doppler local-AI package experiment was admitted only for
 `persistent-performance-control`. The admission receipt at
@@ -245,6 +305,21 @@ takes 67,683.30 ms versus W0's 50,481.15 ms on the complete session and
 5,535.60 ms versus 1,334.69 ms on median timed inference. It misses both frozen
 5% requirements, so the corrected Doppler performance family is retired without
 tuning. W0's post-release native abort remains lifecycle evidence only.
+
+The separately frozen lifecycle hypothesis is now terminal through
+[`../reports/benchmarks/amd-vulkan/20260816T074546Z/doppler-provider-lifecycle-control-diagnostic.json`](../reports/benchmarks/amd-vulkan/20260816T074546Z/doppler-provider-lifecycle-control-diagnostic.json).
+Three clean W0 processes complete exact inference and governed release, then
+terminate natively through one SIGABRT and two SIGSEGV outcomes. The exact same
+pinned incumbent behind the bounded P0 wrapper waits on and destroys four
+tracked devices, preserves the W0 output identity, and exits zero in all three
+processes. The governed wrapper therefore closes the measured lifecycle gap;
+DoeRuntime receives no ownership credit and no larger Doppler lifecycle gate is
+authorized. D0 also exits cleanly three times, but its deterministic one-token
+output differs from W0/P0 and remains a separate unassigned correctness finding.
+The bounded transcript successor at
+[`../reports/benchmarks/amd-vulkan/20260816T080140Z/doppler-provider-logit-divergence-diagnostic.json`](../reports/benchmarks/amd-vulkan/20260816T080140Z/doppler-provider-logit-divergence-diagnostic.json)
+places that difference in finalized model logits, before sampling. It remains a
+correctness-localization task and cannot reopen Doppler runtime ownership.
 
 ## Expansion admission
 

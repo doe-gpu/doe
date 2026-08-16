@@ -57,6 +57,17 @@ pub fn builtin_to_spirv(builtin: ir.Builtin) EmitError!u32 {
     };
 }
 
+pub fn builtin_to_spirv_for_stage(
+    builtin: ir.Builtin,
+    stage: ir.ShaderStage,
+    storage_class: u32,
+) EmitError!u32 {
+    if (builtin == .position and stage == .fragment and storage_class == spirv.StorageClass.Input) {
+        return spirv.Builtin.FragCoord;
+    }
+    return builtin_to_spirv(builtin);
+}
+
 test "uncached result instruction reserves id and writes canonical operands" {
     const allocator = std.testing.allocator;
     var builder = spirv.Builder.init(allocator);

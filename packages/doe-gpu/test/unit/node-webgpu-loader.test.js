@@ -39,6 +39,8 @@ assert.equal(result.identity.contract, 'doe.node-webgpu-loader/v1');
 assert.equal(result.identity.providerId, 'fixture-provider');
 assert.equal(result.identity.providerModule, provider.href);
 assert.equal(result.identity.resolvedProviderUrl, provider.href);
+assert.deepEqual(result.runtimeInfo, { provider: 'fixture-provider', initialized: true });
+assert.equal(result.providerInfoCalls, 1);
 assert.equal(result.hasCreate, true);
 assert.equal(result.hasGlobals, true);
 assert.equal(result.adapterLabel, 'provider-v1-test-adapter');
@@ -49,5 +51,22 @@ const missing = await run({
 });
 assert.notEqual(missing.code, 0);
 assert.match(missing.stderr, /DOE_NODE_WEBGPU_PROVIDER_ID must be an explicit provider identifier/);
+
+const observationWithoutGovernedIpc = await run({
+  DOE_NODE_WEBGPU_PROVIDER_ID: 'fixture-provider',
+  DOE_NODE_WEBGPU_PROVIDER_MODULE: provider.href,
+  DOE_NODE_WEBGPU_OBSERVE_PROGRAM: '1',
+  DOE_NODE_WEBGPU_OBSERVE_METADATA: JSON.stringify({ contract: 'loader-unit' }),
+});
+assert.notEqual(observationWithoutGovernedIpc.code, 0);
+assert.match(observationWithoutGovernedIpc.stderr, /governed process IPC contract/);
+
+const invalidObservationMode = await run({
+  DOE_NODE_WEBGPU_PROVIDER_ID: 'fixture-provider',
+  DOE_NODE_WEBGPU_PROVIDER_MODULE: provider.href,
+  DOE_NODE_WEBGPU_OBSERVE_PROGRAM: 'yes',
+});
+assert.notEqual(invalidObservationMode.code, 0);
+assert.match(invalidObservationMode.stderr, /must be 0 or 1/);
 
 console.log('node-webgpu loader contracts: ok');

@@ -110,6 +110,7 @@ const FLOAT32_BLENDABLE_FORMATS = [_]u32{
 };
 
 pub const VulkanFeatureCaps = struct {
+    robust_buffer_access: bool = false,
     shader_f16: bool = false,
     float32_blendable: bool = false,
     dual_source_blending: bool = false,
@@ -131,6 +132,19 @@ pub const VulkanFeatureQuery = struct {
     enabled_subgroup_size_control_features: c.VkPhysicalDeviceSubgroupSizeControlFeatures = init_enabled_subgroup_size_control_features(),
     enabled_vulkan12_features: c.VkPhysicalDeviceVulkan12Features = init_enabled_vulkan12_features(),
 };
+
+pub fn enabled_core_features(raw: c.VkPhysicalDeviceFeatures) c.VkPhysicalDeviceFeatures {
+    var enabled = std.mem.zeroes(c.VkPhysicalDeviceFeatures);
+    enabled.robustBufferAccess = raw.robustBufferAccess;
+    enabled.drawIndirectFirstInstance = raw.drawIndirectFirstInstance;
+    enabled.textureCompressionETC2 = raw.textureCompressionETC2;
+    enabled.textureCompressionASTC_LDR = raw.textureCompressionASTC_LDR;
+    enabled.textureCompressionBC = raw.textureCompressionBC;
+    enabled.shaderClipDistance = raw.shaderClipDistance;
+    enabled.vertexPipelineStoresAndAtomics = raw.vertexPipelineStoresAndAtomics;
+    enabled.fragmentStoresAndAtomics = raw.fragmentStoresAndAtomics;
+    return enabled;
+}
 
 fn init_enabled_storage16_features() c.VkPhysicalDevice16BitStorageFeatures {
     var features = std.mem.zeroes(c.VkPhysicalDevice16BitStorageFeatures);
@@ -199,6 +213,7 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
     const has_subgroup_size_control = raw_subgroup_size_control_features.subgroupSizeControl == c.VK_TRUE;
 
     const caps = VulkanFeatureCaps{
+        .robust_buffer_access = raw_features2.features.robustBufferAccess == c.VK_TRUE,
         .shader_f16 = has_shader_f16,
         .float32_blendable = supports_all_formats(physical_device, &FLOAT32_BLENDABLE_FORMATS, supports_color_attachment_blend),
         .dual_source_blending = raw_features2.features.dualSrcBlend == c.VK_TRUE,
@@ -219,12 +234,10 @@ pub fn query(physical_device: c.VkPhysicalDevice) VulkanFeatureQuery {
         supports_all_formats(physical_device, &TIER2_READ_WRITE_FORMATS, supports_storage_image) and
         supports_color_attachment(physical_device, VK_FORMAT_B10G11R11_UFLOAT_PACK32);
 
-    var query_result = VulkanFeatureQuery{ .caps = resolved_caps };
-    query_result.enabled_features.drawIndirectFirstInstance = raw_features2.features.drawIndirectFirstInstance;
-    query_result.enabled_features.textureCompressionETC2 = raw_features2.features.textureCompressionETC2;
-    query_result.enabled_features.textureCompressionASTC_LDR = raw_features2.features.textureCompressionASTC_LDR;
-    query_result.enabled_features.textureCompressionBC = raw_features2.features.textureCompressionBC;
-    query_result.enabled_features.shaderClipDistance = raw_features2.features.shaderClipDistance;
+    var query_result = VulkanFeatureQuery{
+        .caps = resolved_caps,
+        .enabled_features = enabled_core_features(raw_features2.features),
+    };
     if (resolved_caps.dual_source_blending) {
         query_result.enabled_features.dualSrcBlend = c.VK_TRUE;
     }

@@ -243,10 +243,15 @@ pub fn infer_builtin_call(self: anytype, name: []const u8, arg_types: []const ir
             .ref => |ref_ty| ref_ty.elem,
             else => arg_types[0],
         };
-        return switch (self.module.types.get(target_ty)) {
+        const value_ty = switch (self.module.types.get(target_ty)) {
             .atomic => |inner| inner,
             else => target_ty,
         };
+        if (std.mem.eql(u8, name, "atomicStore")) return self.module.void_type;
+        if (std.mem.eql(u8, name, "atomicCompareExchangeWeak")) {
+            return try atomic_compare_exchange_result_type(self, value_ty);
+        }
+        return value_ty;
     }
     if (is_passthrough_math(name)) {
         if (arg_types.len == 0) return error.UnsupportedBuiltin;
@@ -320,6 +325,51 @@ pub fn infer_builtin_call(self: anytype, name: []const u8, arg_types: []const ir
         return try self.module.types.intern(.{ .scalar = .f32 });
     }
     return error.UnsupportedBuiltin;
+}
+
+fn atomic_compare_exchange_result_type(self: anytype, value_ty: ir.TypeId) !ir.TypeId {
+    const suffix: []const u8 = switch (self.module.types.get(value_ty)) {
+        .scalar => |scalar| switch (scalar) {
+            .i32 => "i32",
+            .u32 => "u32",
+            else => return error.UnsupportedBuiltin,
+        },
+        else => return error.UnsupportedBuiltin,
+    };
+    var name_buf: [64]u8 = undefined;
+    const name = std.fmt.bufPrint(&name_buf, "__doe_atomic_compare_exchange_result_{s}", .{suffix}) catch return error.UnsupportedBuiltin;
+    for (self.module.structs.items) |struct_info| {
+        if (std.mem.eql(u8, struct_info.name, name)) return struct_info.ty;
+    }
+
+    const allocator = self.module.allocator;
+    const name_copy = try ir.dup_string(allocator, name);
+    var fields = std.ArrayListUnmanaged(sema_types.StructFieldInfo){};
+    var committed = false;
+    defer if (!committed) {
+        allocator.free(name_copy);
+        for (fields.items) |field| allocator.free(field.name);
+        fields.deinit(allocator);
+    };
+    try fields.append(allocator, .{
+        .name = try ir.dup_string(allocator, "old_value"),
+        .ty = value_ty,
+    });
+    try fields.append(allocator, .{
+        .name = try ir.dup_string(allocator, "exchanged"),
+        .ty = self.module.bool_type,
+    });
+
+    const struct_id: ir.StructId = @intCast(self.module.structs.items.len);
+    const result_ty = try self.module.types.intern(.{ .struct_ = struct_id });
+    try self.module.structs.append(allocator, .{
+        .name = name_copy,
+        .struct_id = struct_id,
+        .ty = result_ty,
+        .fields = fields,
+    });
+    committed = true;
+    return result_ty;
 }
 
 fn is_subgroup_value_op(name: []const u8) bool {

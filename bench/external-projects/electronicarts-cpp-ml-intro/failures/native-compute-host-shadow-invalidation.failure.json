@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "native-compute-host-shadow-invalidation",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "category": "correctness",
+  "status": "fixed-regression-protected",
+  "summary": "When an earlier texture command materialized the native command encoder, later compute dispatches did not invalidate the package buffer host shadow. A following buffer copy could therefore return stale host bytes even though native compute executed. Compute dispatch now invalidates every writable bound buffer before a host-shadow copy can observe it.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/20260816T-current-runtime/raw-suite.json",
+      "sha256": "27c48df54841fdca63fa76f00a3928e6f595b6efc689ee0e20607b83d774fdf8"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/integration/test-integration-texture-copy-then-compute.js"
+  ],
+  "implementationPaths": [
+    "packages/doe-gpu/src/vendor/webgpu/index.js"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/integration/test-integration-texture-copy-then-compute.js"
+  ],
+  "verifiedAt": "2026-08-16T02:22:24Z"
+}

@@ -98,8 +98,12 @@ pub fn vulkan_create_texture_view(tex: *shared.DoeTexture, tv: *shared.DoeTextur
         .owns_view = true,
         .width = texture.width,
         .height = texture.height,
-        .depth_or_array_layers = resolved_array_layer_count,
-        .mip_levels = resolved_mip_level_count,
+        // Layout tracking is image-wide in the Vulkan runtime. Keep the
+        // parent image extent here even though `view` selects a narrower
+        // subresource range, so barriers issued through a view preserve the
+        // same whole-image layout contract as copies and readback.
+        .depth_or_array_layers = texture.depth_or_array_layers,
+        .mip_levels = texture.mip_levels,
         .sample_count = texture.sample_count,
         .dimension = texture.dimension,
         .view_dimension = @intCast(resolved_dimension),

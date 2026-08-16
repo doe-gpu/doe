@@ -67,17 +67,21 @@ fn copy_globals(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Modu
         switch (node.tag) {
             .global_var => {
                 const init_node = tree.extra_data.items[node.data.rhs + 3];
-                if (init_node != NULL_NODE) initializer = try scalar_constant_from_node(tree, semantic, init_node, 0);
+                if (init_node != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, init_node, 0);
             },
             .const_decl => {
-                if (node.data.rhs != NULL_NODE) initializer = try scalar_constant_from_node(tree, semantic, node.data.rhs, 0);
+                if (node.data.rhs != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, node.data.rhs, 0);
             },
             .override_decl => {
                 const init_node = tree.extra_data.items[node.data.lhs + 2];
-                if (init_node != NULL_NODE) initializer = try scalar_constant_from_node(tree, semantic, init_node, 0);
+                if (init_node != NULL_NODE) initializer = try constant_from_node(allocator, tree, semantic, init_node, 0);
             },
             else => {},
         }
+        var initializer_owned = true;
+        errdefer if (initializer_owned) {
+            if (initializer) |*value| value.deinit(allocator);
+        };
         try module.globals.append(allocator, .{
             .name = try ir.dup_string(allocator, global_info.name),
             .ty = global_info.ty,
@@ -89,6 +93,7 @@ fn copy_globals(allocator: std.mem.Allocator, tree: *const Ast, module: *ir.Modu
             .initializer = initializer,
             .override_id = global_info.override_id,
         });
+        initializer_owned = false;
     }
 }
 
@@ -582,7 +587,8 @@ fn map_assign_op(tag: Tag) ir.AssignOp {
     };
 }
 
-fn scalar_constant_from_node(
+fn constant_from_node(
+    allocator: std.mem.Allocator,
     tree: *const Ast,
     semantic: *const sema.SemanticModule,
     node_idx: u32,
@@ -607,11 +613,11 @@ fn scalar_constant_from_node(
                 else => NULL_NODE,
             };
             if (init_node == NULL_NODE) break :blk null;
-            break :blk try scalar_constant_from_node(tree, semantic, init_node, depth + 1);
+            break :blk try constant_from_node(allocator, tree, semantic, init_node, depth + 1);
         },
         .unary_expr => switch (tree.tokens.items[node.main_token].tag) {
             .@"-" => blk: {
-                const inner = try scalar_constant_from_node(tree, semantic, node.data.lhs, depth + 1) orelse return error.UnsupportedConstruct;
+                const inner = try constant_from_node(allocator, tree, semantic, node.data.lhs, depth + 1) orelse return error.UnsupportedConstruct;
                 switch (inner) {
                     .int => |value| break :blk ir.ConstantValue{ .int = (~value) +% 1 },
                     .float => |value| break :blk ir.ConstantValue{ .float = -value },
@@ -621,9 +627,23 @@ fn scalar_constant_from_node(
             else => error.UnsupportedConstruct,
         },
         .binary_expr => blk: {
-            const lhs = try scalar_constant_from_node(tree, semantic, node.data.lhs, depth + 1) orelse return error.UnsupportedConstruct;
-            const rhs = try scalar_constant_from_node(tree, semantic, node.data.rhs, depth + 1) orelse return error.UnsupportedConstruct;
+            const lhs = try constant_from_node(allocator, tree, semantic, node.data.lhs, depth + 1) orelse return error.UnsupportedConstruct;
+            const rhs = try constant_from_node(allocator, tree, semantic, node.data.rhs, depth + 1) orelse return error.UnsupportedConstruct;
             break :blk try fold_scalar_binary(map_binary_op(tree.tokens.items[node.main_token].tag), lhs, rhs);
+        },
+        .construct_expr => blk: {
+            const span = sema_helpers.decode_packed_span(node.data.rhs);
+            var values = try allocator.alloc(ir.ConstantValue, span.len);
+            var initialized: usize = 0;
+            errdefer {
+                for (values[0..initialized]) |*value| value.deinit(allocator);
+                allocator.free(values);
+            }
+            while (initialized < span.len) : (initialized += 1) {
+                const arg_node = tree.extra_data.items[span.start + initialized];
+                values[initialized] = try constant_from_node(allocator, tree, semantic, arg_node, depth + 1) orelse return error.UnsupportedConstruct;
+            }
+            break :blk ir.ConstantValue{ .composite = values };
         },
         else => null,
     };

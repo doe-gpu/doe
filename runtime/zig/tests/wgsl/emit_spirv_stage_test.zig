@@ -92,6 +92,40 @@ test "spirv fragment: produces valid binary with fragment entry point" {
     try testing.expect(found_fragment);
 }
 
+test "spirv fragment: position input lowers to FragCoord rather than vertex Position" {
+    const source =
+        \\@fragment
+        \\fn main(@builtin(position) position: vec4f) -> @location(0) vec4f {
+        \\    return position;
+        \\}
+    ;
+    var out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const len = try translateToSpirv(allocator, source, &out);
+    const binary = out[0..len];
+
+    var found_frag_coord = false;
+    var found_position = false;
+    const word_count = len / 4;
+    var i: usize = 5;
+    while (i < word_count) {
+        const word = read_u32_le(binary, i * 4);
+        const opcode = word & 0xFFFF;
+        const instruction_words = word >> 16;
+        if (opcode == 71 and instruction_words >= 4) {
+            const decoration = read_u32_le(binary, (i + 2) * 4);
+            if (decoration == 11) {
+                const builtin = read_u32_le(binary, (i + 3) * 4);
+                if (builtin == spirv.Builtin.FragCoord) found_frag_coord = true;
+                if (builtin == spirv.Builtin.Position) found_position = true;
+            }
+        }
+        i += instruction_words;
+    }
+
+    try testing.expect(found_frag_coord);
+    try testing.expect(!found_position);
+}
+
 test "spirv vertex: struct return with position and location" {
     const source =
         \\struct VsOut {

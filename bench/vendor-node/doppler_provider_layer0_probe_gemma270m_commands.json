@@ -1,0 +1,122 @@
+[
+  {
+    "kind": "vendor-node-benchmark-scenario",
+    "schemaVersion": 1,
+    "scenarioId": "doppler_provider_layer0_probe_gemma3_270m_prefill_64tok_decode_1tok",
+    "benchmarkLane": "doppler-node-provider-layer0-probe",
+    "dopplerRoot": "../../../doppler/.worktrees/doe-provider-compare-e6e8be4a",
+    "cacheMode": "warm",
+    "loadMode": "http",
+    "useChatTemplate": false,
+    "promptWorkload": {
+      "prefillTokens": 64,
+      "decodeTokens": 1,
+      "temperature": 0,
+      "topK": 1,
+      "topP": 1
+    },
+    "tjs": {
+      "modelId": "onnx-community/gemma-3-270m-it-ONNX",
+      "dtype": "fp16",
+      "localModelPath": "../../../doppler/node_modules/@huggingface/transformers/.cache"
+    },
+    "doppler": {
+      "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+      "command": "debug",
+      "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+      "runtimeProfile": null,
+      "runtimeConfig": {
+        "shared": {
+          "benchmark": {
+            "run": {
+              "warmupRuns": 0,
+              "timedRuns": 1
+            }
+          },
+          "debug": {
+            "logLevel": {
+              "defaultLogLevel": "verbose"
+            },
+            "trace": {
+              "enabled": true,
+              "categories": ["kernels", "ffn", "attn", "embed", "logits"],
+              "layers": [0],
+              "maxDecodeSteps": 1
+            },
+            "kernelTrace": {
+              "enabled": false,
+              "layers": [0],
+              "breakOnAnomaly": false,
+              "explosionThreshold": 10,
+              "collapseThreshold": 0.000001,
+              "maxSteps": 64
+            },
+            "perfGuards": {
+              "allowGPUReadback": true
+            },
+            "probes": [
+              { "id": "embed", "stage": "embed_out", "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "post_input_norm", "stage": "post_input_norm", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "q_proj", "stage": "q_proj", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "k_proj", "stage": "k_proj", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "v_proj", "stage": "v_proj", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "q_norm", "stage": "q_norm", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "k_norm", "stage": "k_norm", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "attn_core_out", "stage": "attn_core_out", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "attn_out", "stage": "attn_out", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "post_attn", "stage": "post_attn", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "ffn_in", "stage": "ffn_in", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "ffn_out", "stage": "ffn_out", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "layer_out", "stage": "layer_out", "layers": [0], "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "final_norm", "stage": "final_norm", "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true },
+              { "id": "logits", "stage": "logits", "tokens": [-1], "dims": [0, 1, 2, 3], "stats": true }
+            ]
+          },
+          "harness": {
+            "referenceTranscript": {
+              "enabled": true,
+              "captureLogits": true,
+              "captureKvBytes": false
+            }
+          }
+        },
+        "inference": {
+          "session": {
+            "decodeLoop": {
+              "disableCommandBatching": true
+            },
+            "perLayerInputs": {
+              "materialization": "auto",
+              "rowCache": {
+                "mode": "lru",
+                "maxRows": 256,
+                "maxBytes": 134217728,
+                "decodedDtype": "f32"
+              },
+              "prefetch": {
+                "mode": "next_token",
+                "rowsAhead": 1
+              },
+              "gpuUpload": {
+                "mode": "per_step_slices",
+                "stagingRows": 2
+              },
+              "hotCache": {
+                "mode": "prepared_tokens",
+                "maxTokens": 1024,
+                "maxBytes": 134217728,
+                "outputDtype": "f32"
+              }
+            }
+          },
+          "largeWeights": {
+            "enabled": true,
+            "safetyRatio": 0.9
+          }
+        }
+      },
+      "loadMode": "http",
+      "modelPath": "../../../doppler/models/local/gemma-3-270m-it-q4k-ehf16-af32"
+    }
+  }
+]

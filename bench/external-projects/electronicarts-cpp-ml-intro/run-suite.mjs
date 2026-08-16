@@ -2,10 +2,13 @@
 
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { constants as fsConstants } from 'node:fs';
 import { access, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { buildRuntimeOwnership } from '../../lib/runtime-ownership-matrix.mjs';
 
 const harnessDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(harnessDir, '../../..');
@@ -37,6 +40,7 @@ function parseArgs(argv) {
     cleanProcessRuns: 3,
     timeoutMs: 120_000,
     requireAllPass: false,
+    runtimeOwnership: false,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
@@ -47,6 +51,7 @@ function parseArgs(argv) {
     } else if (value === '--timeout-ms') {
       options.timeoutMs = Number.parseInt(argv[++index], 10);
     } else if (value === '--require-all-pass') options.requireAllPass = true;
+    else if (value === '--runtime-ownership') options.runtimeOwnership = true;
     else throw new Error(`unknown argument: ${value}`);
   }
   if (!Number.isInteger(options.cleanProcessRuns) || options.cleanProcessRuns < 1) {
@@ -194,8 +199,16 @@ function classifyDiagnostics(output) {
   };
 }
 
-async function probeProvider(options, provider, modulePath, outDir, hostHardware) {
-  const runtimeDir = resolve(repoRoot, 'bench/out/.xdg', sha256Text(outDir).slice(0, 8), `${provider}-probe`);
+async function probeProvider(options, lane, outDir, hostHardware, runTag) {
+  const { laneId, provider, modulePath } = lane;
+  const runtimeDir = resolve(
+    repoRoot,
+    'bench/out/.xdg',
+    sha256Text(outDir).slice(0, 8),
+    laneId,
+    runTag,
+    'probe',
+  );
   await mkdir(runtimeDir, { recursive: true });
   const result = await runProcess(
     process.execPath,
@@ -225,12 +238,14 @@ async function probeProvider(options, provider, modulePath, outDir, hostHardware
   };
 }
 
-async function runOracle(options, provider, modulePath, outDir, index) {
+async function runOracle(options, lane, outDir, runTag, index) {
+  const { laneId, provider, modulePath } = lane;
   const runtimeDir = resolve(
     repoRoot,
     'bench/out/.xdg',
     sha256Text(outDir).slice(0, 8),
-    provider,
+    laneId,
+    runTag,
     String(index + 1),
   );
   await mkdir(runtimeDir, { recursive: true });
@@ -258,7 +273,9 @@ async function runOracle(options, provider, modulePath, outDir, index) {
     expectedDigit: item.expectedDigit,
     gpuDigit: item.gpuDigit,
     cpuDigit: item.cpuDigit,
-    maxAbsError: item.maxAbsError,
+    inputMaxAbsError: item.inputMaxAbsError,
+    hiddenMaxAbsError: item.hiddenMaxAbsError,
+    outputMaxAbsError: item.outputMaxAbsError,
     gpuOutput: item.gpuOutput,
     cpuOutput: item.cpuOutput,
   })) ?? null;
@@ -277,6 +294,133 @@ async function runOracle(options, provider, modulePath, outDir, index) {
     } : null,
     providerIdentityMatches,
     outputIdentitySha256: outputIdentity === null ? null : sha256Text(JSON.stringify(outputIdentity)),
+  };
+}
+
+function semanticProcessEvidence(process) {
+  return {
+    cleanProcessIndex: process.cleanProcessIndex,
+    success: process.success,
+    exitCode: process.exitCode,
+    signal: process.signal,
+    timedOut: process.timedOut,
+    processCrashed: process.processCrashed,
+    providerIdentityMatches: process.providerIdentityMatches,
+    diagnostics: process.diagnostics,
+    outputIdentitySha256: process.outputIdentitySha256,
+    oraclePass: process.oracle?.oraclePass ?? false,
+    cases: process.oracle?.cases?.map((item) => ({
+      expectedDigit: item.expectedDigit,
+      gpuDigit: item.gpuDigit,
+      cpuDigit: item.cpuDigit,
+      inputMaxAbsError: item.inputMaxAbsError,
+      hiddenMaxAbsError: item.hiddenMaxAbsError,
+      outputMaxAbsError: item.outputMaxAbsError,
+      gpuOutput: item.gpuOutput,
+      cpuOutput: item.cpuOutput,
+    })) ?? [],
+  };
+}
+
+function semanticLaneEvidence(lane) {
+  return {
+    provider: lane.provider,
+    providerModuleSha256: lane.providerModuleSha256,
+    probe: {
+      identity: lane.probe.identity,
+      identityMatches: lane.probe.identityMatches,
+      softwareRenderer: lane.probe.softwareRenderer,
+      hardwareEligible: lane.probe.hardwareEligible,
+    },
+    processes: lane.processes.map(semanticProcessEvidence),
+  };
+}
+
+async function runLane(options, lane, outDir, hostHardware, runTag = 'source') {
+  const probe = await probeProvider(options, lane, outDir, hostHardware, runTag);
+  const processes = [];
+  for (let index = 0; index < options.cleanProcessRuns; index += 1) {
+    const sample = await runOracle(options, lane, outDir, runTag, index);
+    processes.push(sample);
+    console.log(`[${lane.laneId}/${lane.provider}] process ${index + 1}: ${sample.success ? 'PASS' : 'FAIL'}`);
+  }
+  const reliability = summarize(processes);
+  return {
+    laneId: lane.laneId,
+    provider: lane.provider,
+    requestedProvider: lane.provider,
+    providerModulePath: lane.modulePath,
+    modulePath: lane.modulePath,
+    providerModuleSha256: await sha256(lane.modulePath),
+    ambient: lane.ambient,
+    receiptMode: lane.receiptMode,
+    probe,
+    processes,
+    reliability,
+    success: probe.exitCode === 0
+      && probe.identityMatches
+      && processes.every((sample) => sample.success),
+    contractComplete: !lane.replayRequired,
+    constructionIssues: lane.replayRequired ? ['semantic replay pending'] : [],
+  };
+}
+
+async function runReceiptReplay({
+  options,
+  lane,
+  sourceRun,
+  outDir,
+  hostHardware,
+  immutableInputsSha256,
+}) {
+  const receiptRelativePath = `replay-receipts/${lane.laneId}.json`;
+  const receiptPath = resolve(outDir, receiptRelativePath);
+  await mkdir(dirname(receiptPath), { recursive: true });
+  const expectedEvidenceSha256 = sha256Text(JSON.stringify(semanticLaneEvidence(sourceRun)));
+  const receipt = {
+    schemaVersion: 1,
+    artifactKind: 'cpp-ml-mnist-webgpu-replay-receipt',
+    laneId: lane.laneId,
+    provider: lane.provider,
+    providerModulePath: lane.modulePath,
+    providerModuleSha256: sourceRun.providerModuleSha256,
+    immutableInputsSha256,
+    expectedEvidenceSha256,
+  };
+  await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  const loaded = JSON.parse(await readFile(receiptPath, 'utf8'));
+  if (loaded.laneId !== lane.laneId
+    || loaded.provider !== lane.provider
+    || loaded.providerModulePath !== lane.modulePath
+    || loaded.expectedEvidenceSha256 !== expectedEvidenceSha256) {
+    throw new Error(`${lane.laneId} replay receipt did not preserve the frozen contract`);
+  }
+  const replayRun = await runLane(options, lane, outDir, hostHardware, 'replay');
+  const actualEvidenceSha256 = sha256Text(JSON.stringify(semanticLaneEvidence(replayRun)));
+  return {
+    status: actualEvidenceSha256 === expectedEvidenceSha256 ? 'passed' : 'failed',
+    receiptPath: receiptRelativePath,
+    receiptSha256: await sha256(receiptPath),
+    expectedEvidenceSha256,
+    actualEvidenceSha256,
+    replayRun,
+  };
+}
+
+function compactOwnership(runtimeOwnership) {
+  return {
+    ...runtimeOwnership,
+    lanes: Object.fromEntries(Object.entries(runtimeOwnership.lanes).map(([laneId, lane]) => [
+      laneId,
+      {
+        status: lane.status,
+        runCount: lane.runCount,
+        successfulRuns: lane.successfulRuns,
+        contractCompleteRuns: lane.contractCompleteRuns,
+        constructionIssues: lane.constructionIssues,
+        providerModulePaths: lane.providerModulePaths,
+      },
+    ])),
   };
 }
 
@@ -325,40 +469,17 @@ async function main() {
     await access(resolve(options.upstream, generatedRoot, path), fsConstants.R_OK);
   }
 
+  const requireFromBench = createRequire(resolve(repoRoot, 'bench/package.json'));
+  const ambientDawnModule = requireFromBench.resolve('webgpu');
   const modules = {
     'dawn-node-webgpu': resolve(repoRoot, 'bench/node_modules/webgpu/index.js'),
     'doe-gpu': resolve(repoRoot, 'packages/doe-gpu/src/index.js'),
   };
   for (const modulePath of Object.values(modules)) await access(modulePath, fsConstants.R_OK);
+  await access(ambientDawnModule, fsConstants.R_OK);
   const pngjsModule = resolve(repoRoot, 'bench/node_modules/pngjs/lib/png.js');
   await access(pngjsModule, fsConstants.R_OK);
   const hostHardware = await inspectHostHardware();
-  const providers = {};
-  for (const [provider, modulePath] of Object.entries(modules)) {
-    const probe = await probeProvider(options, provider, modulePath, outDir, hostHardware);
-    const processes = [];
-    for (let index = 0; index < options.cleanProcessRuns; index += 1) {
-      const sample = await runOracle(options, provider, modulePath, outDir, index);
-      processes.push(sample);
-      console.log(`[${provider}] process ${index + 1}: ${sample.success ? 'PASS' : 'FAIL'}`);
-    }
-    providers[provider] = {
-      requestedProvider: provider,
-      modulePath,
-      probe,
-      processes,
-      reliability: summarize(processes),
-    };
-  }
-  const doeProviderInfo = providers['doe-gpu'].probe.identity?.provider?.providerInfo ?? null;
-  let doeBuildMetadata = null;
-  let doeBuildMetadataSha256 = null;
-  if (doeProviderInfo?.buildMetadataPath) {
-    const metadataBytes = await readFile(doeProviderInfo.buildMetadataPath);
-    doeBuildMetadata = JSON.parse(metadataBytes.toString('utf8'));
-    doeBuildMetadataSha256 = createHash('sha256').update(metadataBytes).digest('hex');
-  }
-
   const immutableInputs = await Promise.all(generatedInputs.map(async (path) => ({
     path: `${generatedRoot}/${path}`,
     sha256: await sha256(resolve(options.upstream, generatedRoot, path)),
@@ -376,6 +497,118 @@ async function main() {
     path: `bench/external-projects/electronicarts-cpp-ml-intro/${path}`,
     sha256: await sha256(resolve(harnessDir, path)),
   })));
+  harnessInputs.push({
+    path: 'bench/lib/runtime-ownership-matrix.mjs',
+    sha256: await sha256(resolve(repoRoot, 'bench/lib/runtime-ownership-matrix.mjs')),
+  });
+  const harness = JSON.parse(
+    await readFile(resolve(harnessDir, 'mnist-webgpu-demo.harness.json'), 'utf8'),
+  );
+  const providerModuleHashes = {
+    ambientDawn: await sha256(ambientDawnModule),
+    pinnedDawn: await sha256(modules['dawn-node-webgpu']),
+    doe: await sha256(modules['doe-gpu']),
+    pngjs: await sha256(pngjsModule),
+  };
+  const immutableInputsSha256 = sha256Text(JSON.stringify({
+    immutableInputs,
+    harnessInputs,
+    providerModuleHashes,
+  }));
+
+  const laneConfigs = {
+    I0: {
+      laneId: 'I0',
+      provider: 'dawn-node-webgpu',
+      modulePath: ambientDawnModule,
+      ambient: true,
+      receiptMode: 'disabled',
+      replayRequired: false,
+    },
+    I1: {
+      laneId: 'I1',
+      provider: 'dawn-node-webgpu',
+      modulePath: modules['dawn-node-webgpu'],
+      ambient: false,
+      receiptMode: 'disabled',
+      replayRequired: false,
+    },
+    W0: {
+      laneId: 'W0',
+      provider: 'dawn-node-webgpu',
+      modulePath: modules['dawn-node-webgpu'],
+      ambient: false,
+      receiptMode: 'enabled',
+      replayRequired: true,
+    },
+    D0: {
+      laneId: 'D0',
+      provider: 'doe-gpu',
+      modulePath: modules['doe-gpu'],
+      ambient: false,
+      receiptMode: 'enabled',
+      replayRequired: true,
+    },
+  };
+  const providers = {};
+  let ownershipLanes = null;
+  let replays = null;
+  let runtimeOwnership = null;
+  if (options.runtimeOwnership) {
+    ownershipLanes = {};
+    for (const laneId of ['I0', 'I1', 'W0', 'D0']) {
+      ownershipLanes[laneId] = await runLane(
+        options,
+        laneConfigs[laneId],
+        outDir,
+        hostHardware,
+      );
+    }
+    replays = {};
+    for (const laneId of ['W0', 'D0']) {
+      const replay = await runReceiptReplay({
+        options,
+        lane: laneConfigs[laneId],
+        sourceRun: ownershipLanes[laneId],
+        outDir,
+        hostHardware,
+        immutableInputsSha256,
+      });
+      replays[laneId] = replay;
+      ownershipLanes[laneId].contractComplete = replay.status === 'passed';
+      ownershipLanes[laneId].constructionIssues = replay.status === 'passed'
+        ? []
+        : ['semantic replay mismatch'];
+    }
+    runtimeOwnership = compactOwnership(buildRuntimeOwnership({
+      runs: Object.values(ownershipLanes),
+      plan: harness.runtimeOwnershipPlan,
+      planSha256: sha256Text(JSON.stringify(harness.runtimeOwnershipPlan)),
+      ambientModuleSupplied: true,
+    }));
+    providers['dawn-node-webgpu'] = ownershipLanes.W0;
+    providers['doe-gpu'] = ownershipLanes.D0;
+  } else {
+    for (const [provider, modulePath] of Object.entries(modules)) {
+      const lane = {
+        laneId: provider,
+        provider,
+        modulePath,
+        ambient: false,
+        receiptMode: 'diagnostic',
+        replayRequired: false,
+      };
+      providers[provider] = await runLane(options, lane, outDir, hostHardware);
+    }
+  }
+  const doeProviderInfo = providers['doe-gpu'].probe.identity?.provider?.providerInfo ?? null;
+  let doeBuildMetadata = null;
+  let doeBuildMetadataSha256 = null;
+  if (doeProviderInfo?.buildMetadataPath) {
+    const metadataBytes = await readFile(doeProviderInfo.buildMetadataPath);
+    doeBuildMetadata = JSON.parse(metadataBytes.toString('utf8'));
+    doeBuildMetadataSha256 = createHash('sha256').update(metadataBytes).digest('hex');
+  }
   const generatedAt = new Date().toISOString();
   const raw = {
     schemaVersion: 1,
@@ -401,19 +634,27 @@ async function main() {
       exactSpecifier: 'webgpu',
       applicationSourceUnchanged: true,
       shaderSourceUnchanged: true,
+      ambientDawnModule,
       modules,
+      providerModuleHashes,
       dependencyModules: { pngjs: pngjsModule },
     },
     oracle: {
       cases: 10,
       networkShape: [784, 30, 10],
-      maximumAbsoluteError: 0.0025,
+      inputConversionMaximumAbsoluteError: 0.5 / 255,
+      hiddenNetworkMaximumAbsoluteError: 1e-5,
+      outputNetworkMaximumAbsoluteError: 1e-5,
       requireGpuCpuArgmaxEquality: true,
       requireFiniteGpuOutput: true,
     },
     immutableInputs,
     harnessInputs,
+    immutableInputsSha256,
     providers,
+    ownershipLanes,
+    replays,
+    runtimeOwnership,
   };
   raw.sha256 = sha256Text(JSON.stringify(raw));
 
@@ -454,7 +695,7 @@ async function main() {
       { pass: 'Presentation', workgroups: [60, 124, 1] },
     ],
     synchronization: 'each image submits the generated six-pass command buffer and awaits queue.onSubmittedWorkDone before readback',
-    readback: 'copy the 10-f32 output activation buffer to MAP_READ, await mapAsync through generated Shared.js, copy values, unmap, and destroy',
+    readback: 'copy the transformed 784-f32 input, 30-f32 hidden activation, and 10-f32 output activation buffers to MAP_READ, await mapAsync through generated Shared.js, copy values, unmap, and destroy',
     outputIdentity: Object.fromEntries(Object.entries(providers).map(([provider, item]) => [
       provider,
       item.processes.map((sample) => ({
@@ -466,7 +707,9 @@ async function main() {
           expectedDigit: item.expectedDigit,
           gpuDigit: item.gpuDigit,
           cpuDigit: item.cpuDigit,
-          maxAbsError: item.maxAbsError,
+          inputMaxAbsError: item.inputMaxAbsError,
+          hiddenMaxAbsError: item.hiddenMaxAbsError,
+          outputMaxAbsError: item.outputMaxAbsError,
         })) ?? [],
       })),
     ])),
@@ -482,6 +725,32 @@ async function main() {
       driverIdentityRecorded: false,
       receiptOverheadMeasured: false,
     },
+    runtimeOwnership,
+    ownershipLanes: ownershipLanes === null ? null : Object.fromEntries(
+      Object.entries(ownershipLanes).map(([laneId, lane]) => [laneId, {
+        provider: lane.provider,
+        providerModulePath: lane.providerModulePath,
+        providerModuleSha256: lane.providerModuleSha256,
+        ambient: lane.ambient,
+        receiptMode: lane.receiptMode,
+        reliability: lane.reliability,
+        contractComplete: lane.contractComplete,
+        constructionIssues: lane.constructionIssues,
+      }]),
+    ),
+    replays: replays === null ? null : Object.fromEntries(
+      Object.entries(replays).map(([laneId, replay]) => [laneId, {
+        status: replay.status,
+        receiptPath: replay.receiptPath,
+        receiptSha256: replay.receiptSha256,
+        expectedEvidenceSha256: replay.expectedEvidenceSha256,
+        actualEvidenceSha256: replay.actualEvidenceSha256,
+      }]),
+    ),
+    receiptOverhead: {
+      status: 'not-isolated',
+      reason: 'The ownership diagnostic binds replay and receipt construction but does not isolate receipt overhead from process and provider variance.',
+    },
   };
 
   const rawPath = resolve(outDir, 'raw-suite.json');
@@ -493,10 +762,14 @@ async function main() {
   console.log(`WROTE ${rawPath}`);
   console.log(`WROTE ${receiptPath}`);
 
-  const allPassed = Object.values(providers).every((item) =>
+  const providersPassed = Object.values(providers).every((item) =>
     item.probe.exitCode === 0
     && item.probe.identityMatches
     && item.processes.every((sample) => sample.success));
+  const ownershipPassed = !options.runtimeOwnership
+    || (runtimeOwnership?.status === 'complete'
+      && Object.values(replays).every((replay) => replay.status === 'passed'));
+  const allPassed = providersPassed && ownershipPassed;
   if (options.requireAllPass && !allPassed) process.exitCode = 1;
 }
 

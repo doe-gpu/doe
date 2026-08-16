@@ -2,6 +2,7 @@ let lastFactoryArgs = null;
 let lastAdapterOptions = null;
 let compiledEntries = [];
 let destroyedDevice = false;
+let providerInfoCalls = 0;
 
 export const globals = Object.freeze({
   GPUBufferUsage: Object.freeze({ STORAGE: 1 }),
@@ -60,11 +61,17 @@ export function createFakeGPU(...args) {
 
 export const create = createFakeGPU;
 
+export function providerInfo() {
+  providerInfoCalls += 1;
+  return Object.freeze({ provider: 'fixture-provider', initialized: true });
+}
+
 export function getProviderObservations() {
   return {
     lastFactoryArgs,
     lastAdapterOptions,
     compiledEntries: [...compiledEntries],
     destroyedDevice,
+    providerInfoCalls,
   };
 }

@@ -257,6 +257,15 @@ statuses, both receipt paths, and the target backend identity. Linked rows are
 therefore source-to-IR-to-backend receipts for the Doe side and comparator
 artifact receipts for the Tint side.
 
+Execution linkage is a separate contract. The repo-only
+`bench/tools/program_execution_identity_receipt.py` composes one Doe shader
+manifest with the exact runtime binary, command file, WGSL bytes, trace and
+trace metadata, no-fallback backend identity, dispatch count, and independent
+output oracle. The self-checking receipt prevents a valid compiler artifact
+from being mistaken for evidence that the same artifact participated in a
+successful execution. It does not claim driver-binary or operating-system
+dependency identity.
+
 ## Why custom Zig IR (not SPIR-V as universal IR)
 
 SPIR-V was evaluated as a universal IR: WGSL → SPIR-V → all backends.

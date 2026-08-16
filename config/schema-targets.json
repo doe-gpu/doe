@@ -338,6 +338,26 @@
       "data": "examples/wgsl-lowering-link-receipt.browser-corpus.spirv.sample.json"
     },
     {
+      "schema": "config/program-execution-identity-receipt.schema.json",
+      "data": "examples/program-execution-identity-receipt.sample.json"
+    },
+    {
+      "schema": "config/native-program-identity-trace-row.schema.json",
+      "data": "examples/native-program-identity-dispatch.sample.json"
+    },
+    {
+      "schema": "config/native-program-identity-trace-row.schema.json",
+      "data": "examples/native-program-identity-submission.sample.json"
+    },
+    {
+      "schema": "config/native-program-identity-trace-row.schema.json",
+      "data": "examples/native-program-identity-render-draw.sample.json"
+    },
+    {
+      "schema": "config/native-program-identity-trace-validation.schema.json",
+      "data": "examples/native-program-identity-trace-validation.sample.json"
+    },
+    {
       "schema": "config/wgsl-robustness-fixtures.schema.json",
       "data": "config/wgsl-robustness-fixtures.json"
     },

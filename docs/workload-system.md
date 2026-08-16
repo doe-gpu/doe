@@ -37,6 +37,39 @@ Compilation, process exit, or schema validity can be an oracle only when that
 is the declared outcome. A GPU performance workload needs a semantic output
 oracle before it can enter claim-bearing comparison and promotion gates.
 
+## Program execution identity extension
+
+Native program-identity evidence uses
+`doe_program_execution_identity_receipt/v1`. The deterministic receipt binds
+the runtime executable, command declaration, WGSL source, semantic and IR
+identities, target artifact bytes, shader manifest, execution trace, backend
+and lane, fallback state, dispatch count, independent oracle reference, and
+actual output digest. Its verifier rebuilds the entire receipt from current
+bytes; changing any bound input invalidates the receipt.
+
+The receipt proves the runtime-reported chain for one executed program. It does
+not by itself prove driver binary identity, operating-system dependency
+closure, general compiler correctness, application promotion, or performance.
+The schema is
+[`../config/program-execution-identity-receipt.schema.json`](../config/program-execution-identity-receipt.schema.json),
+and the repo-only builder/verifier is
+[`../bench/tools/program_execution_identity_receipt.py`](../bench/tools/program_execution_identity_receipt.py).
+
+For unchanged package applications, the public observer and native Vulkan
+identity journal form two independent extensions. The observer owns
+application-visible calls and output checkpoints. When
+`DOE_PROGRAM_IDENTITY_TRACE_PATH` is set, the native runtime appends schema-
+checked compute, direct-render, and submission rows and materializes the exact
+hash-named SPIR-V bytes. Compute admission requires source hash, entry point,
+workgroup identity, and a later same-process outer submission. Direct-render
+admission requires both stage source identities, both entry points, normalized
+draw arguments, and `internal_submit_and_wait_succeeded`, because that backend
+submits and waits inside the render call. Both paths require artifact digest
+validation and the application oracle. The row schema is
+[`../config/native-program-identity-trace-row.schema.json`](../config/native-program-identity-trace-row.schema.json).
+This diagnostic journal does not establish dependency closure, driver identity,
+performance, or release eligibility.
+
 ## Native command-graph oracle migration
 
 Native output-oracle schema version 1 remains the compatibility contract for

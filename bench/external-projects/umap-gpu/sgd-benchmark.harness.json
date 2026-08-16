@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 4,
+  "artifactKind": "external-project-harness",
+  "actorId": "umap-gpu",
+  "harnessId": "sgd-benchmark",
+  "upstream": {
+    "repositoryUrl": "https://github.com/Achuttarsing/umap-gpu",
+    "commit": "7884b287f49bc057df7e0856c5539f130a20e0ad",
+    "license": {
+      "identifier": "MIT",
+      "evidenceUrl": "https://github.com/Achuttarsing/umap-gpu/blob/7884b287f49bc057df7e0856c5539f130a20e0ad/LICENSE"
+    }
+  },
+  "providerSubstitution": {
+    "baselineProvider": "dawn-node-webgpu",
+    "comparisonProvider": "doe-gpu",
+    "seam": "A harness-owned Vitest config aliases only the exact webgpu package import while the pinned upstream GPUSgd implementation and both WGSL shaders remain unchanged.",
+    "patchPaths": []
+  },
+  "runtimeOwnershipPlan": {
+    "claimedProperty": "persistent-performance-control",
+    "incumbentLimitation": "The application cannot control the incumbent's pipeline, descriptor, command, synchronization, or readback implementation beneath the WebGPU API.",
+    "applicationConsequence": "A material provider-level cost in the complete GPU SGD operation directly reduces throughput for iterative embeddings.",
+    "materialOutcome": {
+      "metric": "complete GPUSgd initialization plus 500 two-pass epochs, synchronization, mapped readback, and Float32Array materialization",
+      "decisionRule": "Grant runtime ownership credit only if D0 preserves the frozen semantic oracle and exact within-provider replay while beating W0 by at least 1.10x at both selected-operation p50 and p95."
+    },
+    "lanes": {
+      "I0": {
+        "requirement": "required",
+        "construction": "Ambient upstream WebGPU provider with no Doe evidence interpretation."
+      },
+      "I1": {
+        "requirement": "required",
+        "construction": "Pinned webgpu dependency from the exact upstream lockfile."
+      },
+      "W0": {
+        "requirement": "required",
+        "construction": "The pinned incumbent under the same deterministic input, semantic oracle, dispatch, output-byte, timing, and replay contract."
+      },
+      "D0": {
+        "requirement": "required",
+        "construction": "DoeRuntime under the identical deterministic workload and evidence contract."
+      },
+      "P0": {
+        "requirement": "not-applicable",
+        "construction": "No incumbent correctness defect exists. A post-hoc performance patch is outside this frozen provider comparison."
+      }
+    },
+    "ownershipCosts": [
+      "owned-source-surface",
+      "webgpu-compatibility",
+      "platform-driver-matrix",
+      "native-security",
+      "release-packaging",
+      "upstream-ingestion",
+      "application-exceptions",
+      "regression-support"
+    ]
+  },
+  "fallbackPolicy": {
+    "requireHardware": true,
+    "prohibitedFallbacks": ["cpu", "mock", "software-renderer", "unknown-provider"],
+    "providerIdentityAssertion": "Every lane must bind its requested provider and a physical adapter with an accessible render node; software adapters fail closed."
+  },
+  "workload": {
+    "command": [
+      "node",
+      "bench/external-projects/umap-gpu/run-sgd-benchmark.mjs",
+      "--require-all-pass"
+    ],
+    "immutableInputRefs": [
+      "bench/external-projects/umap-gpu/sgd-benchmark.inputs.json",
+      "bench/external-projects/umap-gpu/sgd-benchmark.oracle.md",
+      "bench/external-projects/umap-gpu/sgd-benchmark.workload.test.ts",
+      "bench/external-projects/umap-gpu/vitest-sgd-benchmark.config.mjs",
+      "bench/external-projects/umap-gpu/run-sgd-benchmark.mjs"
+    ],
+    "oracle": {
+      "kind": "independent-replacement",
+      "path": "bench/external-projects/umap-gpu/sgd-benchmark.oracle.md",
+      "reviewStatus": "reviewed"
+    },
+    "sameWorkPolicy": "All lanes execute the same pinned GPUSgd TypeScript, unchanged SGD and apply-forces WGSL, deterministic graph, initial embedding, random sequence, 500 epochs, synchronization cadence, and mapped readback.",
+    "completionBoundary": "Timing begins before GPUSgd.init and ends after all epochs, synchronization, mapped readback, and Float32Array materialization have completed."
+  },
+  "requiredMeasurements": [
+    "clean-process-success",
+    "crashes",
+    "hangs",
+    "timeouts",
+    "peak-memory-bytes",
+    "cold-p50",
+    "cold-p95",
+    "cold-p99",
+    "warm-p50",
+    "warm-p95",
+    "warm-p99",
+    "receipt-overhead"
+  ],
+  "requiredReceiptFields": [
+    "provider-identity",
+    "adapter-identity",
+    "driver-identity",
+    "shader-hashes",
+    "dispatch-shape",
+    "synchronization",
+    "readback",
+    "output-identity"
+  ],
+  "installation": {
+    "substitutionMode": "other",
+    "productionStatus": "harness-only",
+    "applicationSourceUnchanged": false,
+    "shaderSourceUnchanged": true,
+    "installSteps": [
+      {
+        "id": "upstream-dependencies",
+        "command": ["npm", "ci"],
+        "workingDirectory": { "scope": "upstream", "path": "." },
+        "timeoutSeconds": 1800
+      }
+    ],
+    "validationCommand": [
+      "node",
+      "bench/external-projects/umap-gpu/run-sgd-benchmark.mjs",
+      "--require-all-pass"
+    ],
+    "timeoutSeconds": 1800
+  },
+  "reproduction": {
+    "providerModulePath": "packages/doe-gpu/src/index.js",
+    "arguments": ["--run-id", "{runId}"],
+    "evidenceFiles": [
+      { "id": "raw-benchmark", "path": "raw-benchmark.json" },
+      { "id": "receipt-summary", "path": "receipt-summary.json" }
+    ]
+  },
+  "supportTargets": [
+    {
+      "id": "linux-x64-radeon-8060s-radv-26-0-3",
+      "os": "linux",
+      "arch": "x86_64",
+      "runtime": "node-22",
+      "adapter": "Radeon 8060S Graphics",
+      "driver": "Mesa 26.0.3",
+      "status": "validated"
+    }
+  ],
+  "reliabilityPolicy": {
+    "cleanProcessRunsPerProvider": 3,
+    "concurrencyLevel": 1,
+    "concurrencyRunsPerProvider": 0,
+    "teardownCyclesPerProvider": 0,
+    "stressIterationsPerProvider": 0,
+    "processTimeoutSeconds": 120,
+    "memoryGrowthBoundaryBytes": 0,
+    "requireZeroCrashes": true,
+    "requireZeroHangs": true,
+    "requireZeroTimeouts": true
+  },
+  "performancePolicy": {
+    "timingScope": "GPUSgd.init through deterministic 500-epoch optimization, synchronization, mapped readback, and Float32Array materialization",
+    "coldSamplesPerProvider": 3,
+    "warmupSamplesPerProvider": 3,
+    "warmSamplesPerProvider": 9,
+    "requiredPercentiles": ["p50", "p95", "p99"],
+    "throughputMetric": "oracle-passing deterministic 500-epoch GPUSgd operations per second",
+    "minimumMaterialSpeedupRatio": 1.1,
+    "maximumRegressionRatio": 1.05
+  },
+  "receiptPolicy": {
+    "captureRequired": true,
+    "replayRequired": true,
+    "runtimeBuildIdentityRequired": true,
+    "preparationReceiptRequired": true
+  },
+  "releasePolicy": {
+    "promotionState": "not-promoted",
+    "blocking": false,
+    "command": [
+      "node",
+      "bench/external-projects/umap-gpu/run-sgd-benchmark.mjs",
+      "--require-all-pass"
+    ],
+    "promotionReportIds": []
+  }
+}

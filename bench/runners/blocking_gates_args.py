@@ -789,6 +789,16 @@ def parse_args() -> argparse.Namespace:
         help="Run check_wgsl_lowering_link_receipt.py on a lowering link receipt.",
     )
     parser.add_argument(
+        "--with-program-execution-identity-receipt-gate",
+        action="store_true",
+        help="Rebuild and verify a source-to-backend program execution identity receipt.",
+    )
+    parser.add_argument(
+        "--program-execution-identity-receipt",
+        default="examples/program-execution-identity-receipt.sample.json",
+        help="Program execution identity receipt passed to the self-checking verifier.",
+    )
+    parser.add_argument(
         "--wgsl-lowering-link-receipt",
         default="examples/wgsl-lowering-link-receipt.sample.json",
         help="WGSL lowering link receipt passed to the receipt checker.",

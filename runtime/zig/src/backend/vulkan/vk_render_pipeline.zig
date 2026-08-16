@@ -19,6 +19,7 @@ const vk_resources = @import("vk_resources.zig");
 const DEFAULT_VERTEX_SHADER_NAME = "draw_call_proxy_vertex";
 const DEFAULT_FRAGMENT_SHADER_NAME = "draw_call_proxy_fragment";
 const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
+const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
 const model_render_types = @import("../../contracts/model/model_render_types.zig");
 
 const VK_NULL_U64 = c.VK_NULL_U64;
@@ -47,6 +48,21 @@ const VK_STENCIL_OP_INCREMENT_AND_WRAP: u32 = 6;
 const VK_STENCIL_OP_DECREMENT_AND_WRAP: u32 = 7;
 const VK_VERTEX_INPUT_RATE_VERTEX: u32 = 0;
 const VK_VERTEX_INPUT_RATE_INSTANCE: u32 = 1;
+
+pub fn render_texture_descriptor_type(is_storage: bool) u32 {
+    return if (is_storage) c.VK_DESCRIPTOR_TYPE_STORAGE_IMAGE else c.VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+}
+
+pub fn render_texture_image_layout(is_storage: bool) u32 {
+    return if (is_storage) c.VK_IMAGE_LAYOUT_GENERAL else c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+}
+
+pub fn render_buffer_descriptor_type(binding_type: u32) u32 {
+    return if (binding_type == model_binding_types.WGPUBufferBindingType_Uniform)
+        c.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+    else
+        c.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+}
 
 const VkStencilOpState = extern struct {
     failOp: u32,
@@ -241,7 +257,7 @@ pub fn create_graphics_pipeline(
     };
     try c.check_vk(c.vkCreateShaderModule(self.device, &fragment_shader_info, null, &state.fragment_shader));
 
-    const has_bind_groups = cmd.bind_texture_count > 0 or cmd.bind_sampler_count > 0;
+    const has_bind_groups = cmd.bind_buffer_count > 0 or cmd.bind_texture_count > 0 or cmd.bind_sampler_count > 0;
     if (has_bind_groups) {
         try createRenderDescriptorState(self, state, cmd);
     }
@@ -488,11 +504,11 @@ pub fn create_graphics_pipeline(
     ));
 }
 
-const MAX_RENDER_DESCRIPTOR_BINDINGS: usize = model_render_types.MAX_RENDER_BIND_ENTRIES * 2;
+const MAX_RENDER_DESCRIPTOR_BINDINGS: usize = model_render_types.MAX_RENDER_BIND_ENTRIES * 3;
 const VK_SHADER_STAGE_ALL_GRAPHICS: u32 = c.VK_SHADER_STAGE_VERTEX_BIT | c.VK_SHADER_STAGE_FRAGMENT_BIT;
 
-/// Build descriptor set layout, pool, and set for render pipeline texture/sampler bindings.
-/// WGSL lowers sampled images and samplers as separate SPIR-V descriptors, so
+/// Build descriptor set layout, pool, and set for render pipeline bindings.
+/// WGSL lowers buffers, sampled images, and samplers as SPIR-V descriptors, so
 /// descriptor bindings must preserve the original WebGPU binding numbers.
 /// Descriptor writes resolve texture views and samplers from the runtime resource maps.
 fn createRenderDescriptorState(
@@ -500,14 +516,30 @@ fn createRenderDescriptorState(
     state: anytype,
     cmd: model_render_types.RenderDrawCommand,
 ) !void {
+    const buffer_count: u32 = cmd.bind_buffer_count;
     const tex_count: u32 = cmd.bind_texture_count;
     const samp_count: u32 = cmd.bind_sampler_count;
-    const total_bindings = tex_count + samp_count;
+    const total_bindings = buffer_count + tex_count + samp_count;
     if (total_bindings == 0) return;
 
     // Build layout bindings at the WGSL-decorated binding numbers.
     var bindings: [MAX_RENDER_DESCRIPTOR_BINDINGS]c.VkDescriptorSetLayoutBinding = undefined;
     var binding_count: u32 = 0;
+    var buffer_binding_index: u32 = 0;
+    while (buffer_binding_index < buffer_count) : (buffer_binding_index += 1) {
+        const binding = if (cmd.bind_buffer_bindings[buffer_binding_index] != model_render_types.RENDER_BINDING_UNSET)
+            cmd.bind_buffer_bindings[buffer_binding_index]
+        else
+            buffer_binding_index;
+        bindings[binding_count] = .{
+            .binding = binding,
+            .descriptorType = render_buffer_descriptor_type(cmd.bind_buffer_types[buffer_binding_index]),
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS,
+            .pImmutableSamplers = null,
+        };
+        binding_count += 1;
+    }
     var tex_binding_index: u32 = 0;
     while (tex_binding_index < tex_count) : (tex_binding_index += 1) {
         const fallback_binding = tex_binding_index;
@@ -517,7 +549,7 @@ fn createRenderDescriptorState(
             fallback_binding;
         bindings[binding_count] = .{
             .binding = binding,
-            .descriptorType = c.VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+            .descriptorType = render_texture_descriptor_type(cmd.bind_texture_storage[tex_binding_index]),
             .descriptorCount = 1,
             .stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS,
             .pImmutableSamplers = null,
@@ -526,7 +558,7 @@ fn createRenderDescriptorState(
     }
     var samp_binding_index: u32 = 0;
     while (samp_binding_index < samp_count) : (samp_binding_index += 1) {
-        const fallback_binding = tex_count + samp_binding_index;
+        const fallback_binding = buffer_count + tex_count + samp_binding_index;
         const binding = if (cmd.bind_sampler_bindings[samp_binding_index] != model_render_types.RENDER_BINDING_UNSET)
             cmd.bind_sampler_bindings[samp_binding_index]
         else
@@ -556,12 +588,53 @@ fn createRenderDescriptorState(
     }
 
     // Create descriptor pool
-    var pool_sizes: [2]c.VkDescriptorPoolSize = undefined;
+    var sampled_texture_count: u32 = 0;
+    var storage_texture_count: u32 = 0;
+    var texture_index: u32 = 0;
+    while (texture_index < tex_count) : (texture_index += 1) {
+        if (cmd.bind_texture_storage[texture_index]) {
+            storage_texture_count += 1;
+        } else {
+            sampled_texture_count += 1;
+        }
+    }
+    var uniform_buffer_count: u32 = 0;
+    var storage_buffer_count: u32 = 0;
+    var buffer_index: u32 = 0;
+    while (buffer_index < buffer_count) : (buffer_index += 1) {
+        if (render_buffer_descriptor_type(cmd.bind_buffer_types[buffer_index]) == c.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+            uniform_buffer_count += 1;
+        } else {
+            storage_buffer_count += 1;
+        }
+    }
+    var pool_sizes: [5]c.VkDescriptorPoolSize = undefined;
     var pool_size_count: u32 = 0;
-    if (tex_count > 0) {
+    if (uniform_buffer_count > 0) {
+        pool_sizes[pool_size_count] = .{
+            .type = c.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount = uniform_buffer_count,
+        };
+        pool_size_count += 1;
+    }
+    if (storage_buffer_count > 0) {
+        pool_sizes[pool_size_count] = .{
+            .type = c.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            .descriptorCount = storage_buffer_count,
+        };
+        pool_size_count += 1;
+    }
+    if (sampled_texture_count > 0) {
         pool_sizes[pool_size_count] = .{
             .type = c.VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-            .descriptorCount = tex_count,
+            .descriptorCount = sampled_texture_count,
+        };
+        pool_size_count += 1;
+    }
+    if (storage_texture_count > 0) {
+        pool_sizes[pool_size_count] = .{
+            .type = c.VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .descriptorCount = storage_texture_count,
         };
         pool_size_count += 1;
     }
@@ -597,10 +670,40 @@ fn createRenderDescriptorState(
     };
     try c.check_vk(c.vkAllocateDescriptorSets(self.device, &alloc_info, @ptrCast(&state.descriptor_set)));
 
-    // Write descriptor updates for texture and sampler bindings.
+    // Write descriptor updates for buffer, texture, and sampler bindings.
+    var buffer_infos: [MAX_RENDER_DESCRIPTOR_BINDINGS]c.VkDescriptorBufferInfo = undefined;
     var image_infos: [MAX_RENDER_DESCRIPTOR_BINDINGS]c.VkDescriptorImageInfo = undefined;
     var writes: [MAX_RENDER_DESCRIPTOR_BINDINGS]c.VkWriteDescriptorSet = undefined;
     var write_count: u32 = 0;
+
+    var bi: u32 = 0;
+    while (bi < buffer_count) : (bi += 1) {
+        const compute_buffer = self.compute_buffers.get(cmd.bind_buffer_handles[bi]) orelse return error.InvalidArgument;
+        const binding = if (cmd.bind_buffer_bindings[bi] != model_render_types.RENDER_BINDING_UNSET)
+            cmd.bind_buffer_bindings[bi]
+        else
+            bi;
+        const offset = cmd.bind_buffer_offsets[bi];
+        const range = if (cmd.bind_buffer_sizes[bi] > 0) cmd.bind_buffer_sizes[bi] else compute_buffer.size -| offset;
+        buffer_infos[write_count] = .{
+            .buffer = compute_buffer.buffer,
+            .offset = offset,
+            .range = range,
+        };
+        writes[write_count] = .{
+            .sType = c.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .pNext = null,
+            .dstSet = state.descriptor_set,
+            .dstBinding = binding,
+            .dstArrayElement = 0,
+            .descriptorCount = 1,
+            .descriptorType = render_buffer_descriptor_type(cmd.bind_buffer_types[bi]),
+            .pImageInfo = null,
+            .pBufferInfo = @ptrCast(&buffer_infos[write_count]),
+            .pTexelBufferView = null,
+        };
+        write_count += 1;
+    }
 
     var ti: u32 = 0;
     while (ti < tex_count) : (ti += 1) {
@@ -614,7 +717,7 @@ fn createRenderDescriptorState(
         image_infos[write_count] = .{
             .sampler = VK_NULL_U64,
             .imageView = if (texture) |t| t.view else VK_NULL_U64,
-            .imageLayout = c.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .imageLayout = render_texture_image_layout(cmd.bind_texture_storage[ti]),
         };
         writes[write_count] = .{
             .sType = c.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -623,7 +726,7 @@ fn createRenderDescriptorState(
             .dstBinding = binding,
             .dstArrayElement = 0,
             .descriptorCount = 1,
-            .descriptorType = c.VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+            .descriptorType = render_texture_descriptor_type(cmd.bind_texture_storage[ti]),
             .pImageInfo = @ptrCast(&image_infos[write_count]),
             .pBufferInfo = null,
             .pTexelBufferView = null,
@@ -638,7 +741,7 @@ fn createRenderDescriptorState(
             self.samplers.get(sampler_handle) orelse VK_NULL_U64
         else
             VK_NULL_U64;
-        const fallback_binding = tex_count + si;
+        const fallback_binding = buffer_count + tex_count + si;
         const binding = if (cmd.bind_sampler_bindings[si] != model_render_types.RENDER_BINDING_UNSET)
             cmd.bind_sampler_bindings[si]
         else

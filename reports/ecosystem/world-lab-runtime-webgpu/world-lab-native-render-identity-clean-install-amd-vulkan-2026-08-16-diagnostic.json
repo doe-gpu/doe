@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "world-lab-native-render-identity-clean-install-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "generatedAt": "2026-08-16T07:13:35Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T07:13:35Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "32",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "clean-installed-compute-and-render-program-identity",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "All 16 unchanged World Labs assertions pass through the clean-installed Doe package. Three compute dispatches and two direct render draws match the public observer by exact source identity and command shape; the native journal binds them to exact SPIR-V bytes that pass spirv-val and to successful native execution completion.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/result.json",
+          "sha256": "125dde2b8ba150791b552c3871e0ff805da66f790373f11eda10381135bbd585"
+        },
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/processes/D0/native-program-identity.jsonl",
+          "sha256": "adcb6b09380c183098831ede892d5ebda8ac040d49f5b3f03a1651a7951ee3b4"
+        }
+      ]
+    },
+    {
+      "id": "render-completion-boundary-corrected",
+      "category": "diagnosis",
+      "status": "fixed",
+      "summary": "The frozen qm4 gate rejected two otherwise exact render identities because it required a later outer queue-submission row. The backend actually submits and waits inside the direct render call, so qm5 records internal_submit_and_wait_succeeded only after that call returns and preserves the qm4 rejection as failure evidence.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm4-v1/result.json",
+          "sha256": "7bc8da2467077c9b7b1ffff20213b64a94dcefe99315b702834ae023cfef8bc1"
+        },
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/result.json",
+          "sha256": "125dde2b8ba150791b552c3871e0ff805da66f790373f11eda10381135bbd585"
+        }
+      ]
+    },
+    {
+      "id": "render-identity-survives-local-tarball-clean-install",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "The effective observer, provider, Doe module, and runtime all resolve under the local tarball installation. The loaded runtime matches the installed platform payload, and both compute and render artifact chains remain joined to the unchanged application outputs.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/result.json",
+          "sha256": "125dde2b8ba150791b552c3871e0ff805da66f790373f11eda10381135bbd585"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This is a local-tarball diagnostic result for Node, Linux x64, and the observed AMD Vulkan host; it is not registry-publication or broader support-matrix evidence.",
+    "The native journal covers direct compute dispatch and direct draw only; indirect, bundled, multi-target, and non-Vulkan paths remain unproved.",
+    "The installed package chain does not establish complete operating-system, filesystem, network, driver-binary, or transitive dependency closure.",
+    "The gate does not measure performance, stress, bounded memory growth, or promotion-level concurrency and cannot reopen the terminal World Labs runtime-ownership decision."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 486563840
+    },
+    "comparison": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 484085760
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The gate proves clean-install program identity and execution completion, not performance."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched journal-disabled execution was authorized."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "Complete direct compute-and-render identity strengthens diagnosis but does not change the completed World Labs cost-versus-benefit ownership adjudication."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "pass",
+      "summary": "Local wrapper and platform tarballs install without lifecycle scripts or optional dependency resolution, and the effective observer, provider, and native runtime remain inside the installation."
+    },
+    "supportHardware": {
+      "status": "not-run",
+      "summary": "One physical AMD Vulkan observation grants no broader support-matrix status."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "Vitest worker evidence is diagnostic and below the promotion concurrency contract."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both application lanes exit without crash, hang, or timeout."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "One clean process per provider is below promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process-tree RSS is observed, but bounded same-process growth is not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The result binds the plan, local tarballs, installed files, unchanged application evidence, loaded runtime, native trace, exact compute and render SPIR-V artifacts, validation, and completion outcomes."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Pinned Dawn and clean-installed Doe preserve the application identities while Doe additionally proves the native direct compute-and-render artifact chain."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No performance protocol ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The successor is forbidden from reopening the completed World Labs ownership decision."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "World Labs remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/result.json",
+      "sha256": "125dde2b8ba150791b552c3871e0ff805da66f790373f11eda10381135bbd585"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm4-v1/result.json",
+      "sha256": "7bc8da2467077c9b7b1ffff20213b64a94dcefe99315b702834ae023cfef8bc1"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/processes/D0/native-program-identity.jsonl",
+      "sha256": "adcb6b09380c183098831ede892d5ebda8ac040d49f5b3f03a1651a7951ee3b4"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/processes/D0/doe-native-vulkan-dab1e582e36d6639ec9a21d3936df13bd7aedcf64b4aa1f22b4fefb329969afe.spv",
+      "sha256": "dab1e582e36d6639ec9a21d3936df13bd7aedcf64b4aa1f22b4fefb329969afe"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/processes/D0/doe-native-vulkan-bff7d92b16441e2e909c592b93245a153ee84f536e3941903b134442f570d984.spv",
+      "sha256": "bff7d92b16441e2e909c592b93245a153ee84f536e3941903b134442f570d984"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/processes/D0/doe-native-vulkan-c674106fe1aa2cf11b8059bbbda71b397012e238d1ba78f98d32132c590ce182.spv",
+      "sha256": "c674106fe1aa2cf11b8059bbbda71b397012e238d1ba78f98d32132c590ce182"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/processes/D0/doe-native-vulkan-033f2c2caac2789af014c85fea4656da78b1082020ac648265abab410bb1b324.spv",
+      "sha256": "033f2c2caac2789af014c85fea4656da78b1082020ac648265abab410bb1b324"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/processes/D0/doe-native-vulkan-77b20b2857bc2a1b395728d47bc20bed98282cdb7888c5c5f7bd17fd5d5d9c01.spv",
+      "sha256": "77b20b2857bc2a1b395728d47bc20bed98282cdb7888c5c5f7bd17fd5d5d9c01"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/processes/D0/doe-native-vulkan-61f44db59041f44117fbd78de27a45050fd2a4e3c6c85a9f1d825346d8c6272b.spv",
+      "sha256": "61f44db59041f44117fbd78de27a45050fd2a4e3c6c85a9f1d825346d8c6272b"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/packs/doe-gpu-0.4.7.tgz",
+      "sha256": "878ca7bccd51814be0a37131080bc624459ee52755bad6b7933656e3ffb0ede3"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/packs/doe-gpu-linux-x64-0.4.7.tgz",
+      "sha256": "952cf8533bf5ba01ae232367f142e683510fe92c7a0ac3938ba8066491bb5b3c"
+    }
+  ]
+}

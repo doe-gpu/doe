@@ -403,3 +403,26 @@ test "type system: atomic type with atomicLoad through MSL" {
     const msl = out[0..len];
     try std.testing.expect(contains(msl, "atomic_load_explicit"));
 }
+
+test "declarations: module constant arrays larger than inline sema storage through MSL and SPIR-V" {
+    const source =
+        \\const PERM: array<u32, 17> = array<u32, 17>(
+        \\    0, 1, 2, 3, 4, 5, 6, 7, 8,
+        \\    9, 10, 11, 12, 13, 14, 15, 16,
+        \\);
+        \\@group(0) @binding(0) var<storage, read_write> data: array<u32>;
+        \\@compute @workgroup_size(1)
+        \\fn main() {
+        \\    data[0] = PERM[16];
+        \\}
+    ;
+
+    var msl_out: [MAX_OUTPUT]u8 = undefined;
+    const msl_len = try translateToMsl(std.testing.allocator, source, &msl_out);
+    try std.testing.expect(msl_len > 0);
+    try std.testing.expect(contains(msl_out[0..msl_len], "constant uint PERM[17] = {"));
+
+    var spirv_out: [MAX_SPIRV_OUTPUT]u8 = undefined;
+    const spirv_len = try translateToSpirv(std.testing.allocator, source, &spirv_out);
+    try std.testing.expect(spirv_len > 0);
+}

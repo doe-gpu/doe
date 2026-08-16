@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "doppler-incumbent-post-release-crash",
+  "actorId": "doppler",
+  "harnessId": "doppler-provider-lifecycle-control",
+  "upstreamCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+  "category": "crash",
+  "status": "fixed-regression-protected",
+  "summary": "The pinned node-webgpu provider completes Doppler inference and governed release but then terminates through SIGABRT or SIGSEGV. A bounded wrapper that waits on each observed device queue and destroys all four tracked devices preserves exact incumbent output and exits zero in three clean processes.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/doppler/doppler-provider-lifecycle-control-qm0-v1-run1/result.json",
+      "sha256": "0a2a84a0b8edb672af3e08fe9e94349ce0248d13258da4185a5b2316d8fdc643"
+    },
+    {
+      "path": "bench/out/external-projects/doppler/doppler-provider-lifecycle-control-qm0-v1-run1/readjudication-qm1.json",
+      "sha256": "9c0c2130b694e1d567a64206985f8b119487a5f5c03f6aff5a590f080b54719b"
+    }
+  ],
+  "minimizedReproPaths": [
+    "bench/vendor-node/doppler_provider_lifecycle_control_qm0.plan.json",
+    "bench/vendor-node/doppler_provider_lifecycle_control_qm1.plan.json"
+  ],
+  "implementationPaths": [
+    "bench/executors/vendor-node/doppler-node-webgpu-lifecycle-provider.mjs",
+    "bench/executors/run-node-doppler-ort-bench.js",
+    "bench/executors/run-doppler-lifecycle-control.mjs",
+    "bench/executors/adjudicate-doppler-lifecycle-control.mjs"
+  ],
+  "regressionTestPaths": [
+    "bench/tests/test_node_ort_vs_doppler_lane.py"
+  ],
+  "verifiedAt": "2026-08-16T07:45:46Z"
+}

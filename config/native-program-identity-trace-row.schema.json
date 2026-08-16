@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "doe://config/native-program-identity-trace-row.schema.json",
+  "title": "Doe native program identity trace row",
+  "oneOf": [
+    { "$ref": "#/$defs/Dispatch" },
+    { "$ref": "#/$defs/RenderDraw" },
+    { "$ref": "#/$defs/Submission" }
+  ],
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Common": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "traceKind",
+        "event",
+        "processId",
+        "sequence",
+        "backend"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "traceKind": { "const": "doe_native_program_identity_v1" },
+        "event": {
+          "enum": [
+            "dispatch_encoded",
+            "render_draw_executed",
+            "submission_succeeded"
+          ]
+        },
+        "processId": { "type": "integer", "minimum": 1 },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "backend": { "const": "doe_vulkan" }
+      }
+    },
+    "Dispatch": {
+      "allOf": [
+        { "$ref": "#/$defs/Common" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "traceKind",
+            "event",
+            "processId",
+            "sequence",
+            "backend",
+            "wgslSha256",
+            "backendArtifactSha256",
+            "backendArtifactFile",
+            "entryPoint",
+            "workgroups",
+            "repeatIndex"
+          ],
+          "properties": {
+            "schemaVersion": { "const": 1 },
+            "traceKind": { "const": "doe_native_program_identity_v1" },
+            "event": { "const": "dispatch_encoded" },
+            "processId": { "type": "integer", "minimum": 1 },
+            "sequence": { "type": "integer", "minimum": 1 },
+            "backend": { "const": "doe_vulkan" },
+            "wgslSha256": { "$ref": "#/$defs/Hash" },
+            "backendArtifactSha256": { "$ref": "#/$defs/Hash" },
+            "backendArtifactFile": {
+              "type": "string",
+              "pattern": "^doe-native-vulkan-[a-f0-9]{64}\\.spv$"
+            },
+            "entryPoint": { "type": "string", "minLength": 1 },
+            "workgroups": {
+              "type": "array",
+              "prefixItems": [
+                { "type": "integer", "minimum": 1 },
+                { "type": "integer", "minimum": 1 },
+                { "type": "integer", "minimum": 1 }
+              ],
+              "items": false,
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "repeatIndex": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "RenderDraw": {
+      "allOf": [
+        { "$ref": "#/$defs/Common" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "traceKind",
+            "event",
+            "processId",
+            "sequence",
+            "backend",
+            "vertexWgslSha256",
+            "fragmentWgslSha256",
+            "vertexBackendArtifactSha256",
+            "vertexBackendArtifactFile",
+            "fragmentBackendArtifactSha256",
+            "fragmentBackendArtifactFile",
+            "vertexEntryPoint",
+            "fragmentEntryPoint",
+            "drawKind",
+            "args"
+          ],
+          "properties": {
+            "schemaVersion": { "const": 1 },
+            "traceKind": { "const": "doe_native_program_identity_v1" },
+            "event": { "const": "render_draw_executed" },
+            "processId": { "type": "integer", "minimum": 1 },
+            "sequence": { "type": "integer", "minimum": 1 },
+            "backend": { "const": "doe_vulkan" },
+            "completion": { "const": "internal_submit_and_wait_succeeded" },
+            "vertexWgslSha256": { "$ref": "#/$defs/Hash" },
+            "fragmentWgslSha256": { "$ref": "#/$defs/Hash" },
+            "vertexBackendArtifactSha256": { "$ref": "#/$defs/Hash" },
+            "vertexBackendArtifactFile": {
+              "type": "string",
+              "pattern": "^doe-native-vulkan-[a-f0-9]{64}\\.spv$"
+            },
+            "fragmentBackendArtifactSha256": { "$ref": "#/$defs/Hash" },
+            "fragmentBackendArtifactFile": {
+              "type": "string",
+              "pattern": "^doe-native-vulkan-[a-f0-9]{64}\\.spv$"
+            },
+            "vertexEntryPoint": { "type": "string", "minLength": 1 },
+            "fragmentEntryPoint": { "type": "string", "minLength": 1 },
+            "drawKind": { "const": "draw" },
+            "args": {
+              "type": "array",
+              "prefixItems": [
+                { "type": "integer", "minimum": 0 },
+                { "type": "integer", "minimum": 0 },
+                { "type": "integer", "minimum": 0 },
+                { "type": "integer", "minimum": 0 }
+              ],
+              "items": false,
+              "minItems": 4,
+              "maxItems": 4
+            }
+          }
+        }
+      ]
+    },
+    "Submission": {
+      "allOf": [
+        { "$ref": "#/$defs/Common" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "traceKind",
+            "event",
+            "processId",
+            "sequence",
+            "backend"
+          ],
+          "properties": {
+            "schemaVersion": { "const": 1 },
+            "traceKind": { "const": "doe_native_program_identity_v1" },
+            "event": { "const": "submission_succeeded" },
+            "processId": { "type": "integer", "minimum": 1 },
+            "sequence": { "type": "integer", "minimum": 1 },
+            "backend": { "const": "doe_vulkan" }
+          }
+        }
+      ]
+    }
+  }
+}

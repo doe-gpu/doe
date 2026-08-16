@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic",
+  "actorId": "holoscript-snn-webgpu",
+  "harnessId": "tropical-spmv",
+  "generatedAt": "2026-08-16T01:18:36.393Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T02:22:24Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "21",
+  "upstream": {
+    "repositoryUrl": "https://github.com/brianonbased-dev/HoloScript",
+    "commit": "337a39a869a552c814933c587fe65b34a0a2c95d",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "electron-external-arraybuffer-boundary-current-runtime",
+      "category": "diagnosis",
+      "status": "verified",
+      "summary": "Ambient, pinned, and governed webgpu@0.3.10 each fail three Electron 43.4.0 main-process executions because the native addon requests an external ArrayBuffer prohibited by this Node-API host.",
+      "evidence": [
+        {
+          "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-electron-main-process-p0-diagnostic.json",
+          "sha256": "3a1190981d759e697b0c0b140b9876d30194f1b7bfc228c6e0014000bf4732b2"
+        }
+      ]
+    },
+    {
+      "id": "doe-electron-current-runtime-application-execution",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "Clean-installed Doe runtime 6a367f7971d9e3650bf489641435dee60bef534eb99dc02ab5b9f12a9dbf4226 executes the unchanged tropical-SpMV application in three Electron main processes and exact replay; all four output hashes equal their independent CPU oracle hashes on the physical Radeon Vulkan adapter.",
+      "evidence": [
+        {
+          "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-electron-main-process-p0-diagnostic.json",
+          "sha256": "3a1190981d759e697b0c0b140b9876d30194f1b7bfc228c6e0014000bf4732b2"
+        }
+      ]
+    },
+    {
+      "id": "bounded-incumbent-patch-still-closes-gap",
+      "category": "diagnosis",
+      "status": "fixed",
+      "summary": "A freshly reconstructed node-webgpu and Dawn control with the frozen two-file owned-ArrayBuffer fallback also passes three exact processes and replay. The bounded incumbent correction still closes the application gap, so DoeRuntime ownership remains rejected for this tuple.",
+      "evidence": [
+        {
+          "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-electron-main-process-p0-diagnostic.json",
+          "sha256": "3a1190981d759e697b0c0b140b9876d30194f1b7bfc228c6e0014000bf4732b2"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The Electron lane is main-process Node-side compute and creates no renderer.",
+    "Three clean processes per passing lane remain below the promotion reliability floor.",
+    "The P0 control is a pinned source build, not a claim-eligible clean application installation.",
+    "Process-tree RSS values are five-millisecond Linux procfs diagnostic peaks, not memory-growth or leak evidence.",
+    "No selected-operation performance comparison was run.",
+    "The result grants no application promotion, release, Chromium, browser, or external-adoption credit."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 404647936
+    },
+    "comparison": {
+      "cleanProcessRuns": 3,
+      "successes": 3,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 402112512
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The diagnostic adjudicates exact compatibility and correction ownership, not selected-operation performance."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "Electron process durations were not admitted as a receipt-overhead comparison."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "fail",
+    "decision": "carry-bounded-patch",
+    "claimedProperty": "independent-correction",
+    "lanes": {
+      "I0": {
+        "status": "fail",
+        "summary": "Ambient webgpu@0.3.10 fails at the external-ArrayBuffer boundary in all three processes."
+      },
+      "I1": {
+        "status": "fail",
+        "summary": "The explicitly pinned incumbent fails at the same native boundary in all three processes."
+      },
+      "W0": {
+        "status": "fail",
+        "summary": "DoeProof makes the incumbent failure explicit but cannot correct it above the native addon."
+      },
+      "D0": {
+        "status": "pass",
+        "summary": "The current Doe runtime passes the exact application oracle in three processes and replay."
+      },
+      "P0": {
+        "status": "pass",
+        "summary": "The freshly reconstructed bounded incumbent patch passes the same exact application oracle in three processes and replay."
+      }
+    },
+    "materialOutcome": {
+      "status": "fail",
+      "summary": "D0 does not provide an application outcome unavailable from the smaller P0 correction."
+    },
+    "costAcceptance": {
+      "status": "fail",
+      "summary": "The bounded upstream correction carries less durable compatibility and support obligation than owning DoeRuntime for this tuple."
+    }
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "Doe is clean-installed, but P0 is a controlled source build rather than a promoted application installation."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "Both passing lanes bind the physical Radeon Vulkan adapter without software fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The application lanes execute sequentially."
+    },
+    "teardown": {
+      "status": "not-run",
+      "summary": "Processes exit, but promotion-scale teardown and device-loss injection were not run."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "Promotion-scale stress was not run."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Diagnostic process-tree peaks were observed, but bounded-growth testing was not run."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The complete diagnostic, plan, implementation, patch, package, toolchain, current runtime, and application inputs are hash-bound."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Doe and P0 each reproduce their exact semantic application evidence."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No predeclared selected-operation performance result exists."
+    },
+    "ownership": {
+      "status": "fail",
+      "summary": "P0 closes the same application gap as D0 with a smaller durable ownership surface."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "HoloScript Electron remains a diagnostic regression, not a release dependency."
+    }
+  },
+  "receipts": [
+    {
+      "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-electron-main-process-p0-diagnostic.json",
+      "sha256": "3a1190981d759e697b0c0b140b9876d30194f1b7bfc228c6e0014000bf4732b2"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "reports/benchmarks/amd-vulkan/20260816T-current-runtime-sync-fix2/holoscript-electron-main-process-p0-diagnostic.json",
+      "sha256": "3a1190981d759e697b0c0b140b9876d30194f1b7bfc228c6e0014000bf4732b2"
+    }
+  ]
+}

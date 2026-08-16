@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-lifecycle-control-diagnostic",
+  "generatedAt": "2026-08-16T07:45:46Z",
+  "evidenceMaturity": "diagnostic",
+  "outcome": "retire-lane",
+  "hypothesis": "Doe owns a post-inference teardown result that cannot be reproduced by a governed wrapper around the exact pinned incumbent.",
+  "workload": {
+    "id": "doppler_provider_diagnostic_gemma3_270m_prefill_64tok_decode_1tok",
+    "sourceRepository": "https://github.com/clocksmith/doppler",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "sourceTrackedClean": true,
+    "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+    "modelManifestSha256": "230104df762ff394095326d8e9fa4dc144d431bbd61ad5139e1030e66836ab78",
+    "promptPrefillTokens": 64,
+    "decodeTokens": 1,
+    "cleanProcessesPerLane": 3
+  },
+  "lanes": {
+    "W0": {
+      "provider": "node-webgpu",
+      "providerModuleSha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4",
+      "inferenceAndRelease": "pass-3-of-3",
+      "terminalPattern": [
+        "SIGSEGV",
+        "SIGABRT",
+        "SIGSEGV"
+      ],
+      "generatedTextPreview": "The",
+      "generatedTextSha256": "b344d80e24a3679999fa964450b34bc24d1578a35509f934c1418b0a20d21a67",
+      "generatedTokenIdsHash": "sha256:35d2ff0944e3ad34816964224da69dd7f65e16c2b69f9505245dd67d036d2cfb",
+      "peakProcessTreeRssBytes": 1934938112
+    },
+    "P0": {
+      "provider": "node-webgpu-bounded-lifecycle",
+      "wrapperSha256": "7022d7255854bd4e277a30676ff5ef1a6cc8412b659381b09f6a5f88c6626f03",
+      "underlyingProviderModuleSha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4",
+      "inferenceAndRelease": "pass-3-of-3",
+      "terminalPattern": [
+        "exit-0",
+        "exit-0",
+        "exit-0"
+      ],
+      "trackedDevicesPerProcess": 4,
+      "queueDrainAndDestroy": "pass-3-of-3",
+      "outputIdentityWithW0": true,
+      "peakProcessTreeRssBytes": 2034548736
+    },
+    "D0": {
+      "provider": "doe",
+      "providerModuleSha256": "f0c7e4c93097a4960e91034f0a56f399ed702a250cf1bf38fb2afb5565b651a7",
+      "inferenceAndRelease": "pass-3-of-3",
+      "terminalPattern": [
+        "exit-0",
+        "exit-0",
+        "exit-0"
+      ],
+      "withinLaneOutputIdentity": true,
+      "crossProviderOutputIdentity": false,
+      "generatedTextPreview": "untas",
+      "generatedTextSha256": "31b280ed24a16e75d6acbe78247b5e510ad09a129c67359aec64aa3fe95a971d",
+      "generatedTokenIdsHash": "sha256:713c2cd352d3ce85f3424e03d0ee2dfb9705d1f51743cacda54db56bb3c914bd",
+      "peakProcessTreeRssBytes": 2081284096
+    }
+  },
+  "adjudication": {
+    "q0": {
+      "status": "invalid-evidence",
+      "reason": "The frozen q0 interpreter required one signal label for the native failure class and exact identity across a D0 lane that is not the bounded-patch attribution pair. It failed closed and grants no credit."
+    },
+    "q1": {
+      "status": "pass",
+      "commonEvidence": true,
+      "nativeFailureAntecedent": true,
+      "boundedWrapperControl": true,
+      "doeLifecycleControl": true,
+      "crossProviderOutputIdentity": false,
+      "decision": "reject-doe-runtime-ownership-wrapper-closes-gap"
+    },
+    "summary": "The unchanged incumbent crashes after completed inference and governed release in all three W0 processes. The same incumbent exits cleanly in all three P0 processes when a bounded governed wrapper waits for submitted work and destroys four tracked devices. Therefore the measured lifecycle advantage is available above the incumbent runtime and cannot justify DoeRuntime ownership."
+  },
+  "retainedFindings": [
+    "The incumbent post-release native failure is reproducible at the lifecycle-property level even though its terminal signal alternates between SIGABRT and SIGSEGV.",
+    "Explicit queue drain and tracked-device destruction are a sufficient bounded repair for this exact incumbent workload.",
+    "The one-token D0 output is deterministic but differs from W0/P0; this is a separate correctness finding and supplies no ownership credit."
+  ],
+  "limitations": [
+    "This is a bounded one-token AMD Vulkan diagnostic, not a lifecycle stress, concurrency, device-loss, performance, or release gate.",
+    "The wrapper records devices created through requestDevice on this provider surface; it does not prove universal incumbent cleanup.",
+    "The D0 output divergence has not yet been assigned to either provider by an independent logits oracle.",
+    "No broader runtime-ownership successor is authorized from this result."
+  ],
+  "credit": {
+    "performance": false,
+    "runtimeOwnership": false,
+    "promotion": false,
+    "release": false
+  },
+  "evidence": [
+    {
+      "path": "bench/out/external-projects/doppler/doppler-provider-lifecycle-control-qm0-v1-run1/result.json",
+      "sha256": "0a2a84a0b8edb672af3e08fe9e94349ce0248d13258da4185a5b2316d8fdc643"
+    },
+    {
+      "path": "bench/out/external-projects/doppler/doppler-provider-lifecycle-control-qm0-v1-run1/readjudication-qm1.json",
+      "sha256": "9c0c2130b694e1d567a64206985f8b119487a5f5c03f6aff5a590f080b54719b"
+    },
+    {
+      "path": "bench/vendor-node/doppler_provider_lifecycle_control_qm0.plan.json",
+      "sha256": "52d4dc0d04902a507a237cd54bd4e5e052b97febdb9df0998947088007670d9e"
+    },
+    {
+      "path": "bench/vendor-node/doppler_provider_lifecycle_control_qm1.plan.json",
+      "sha256": "3402a16ff7830320c5c551d031198e808398c53c02db8ea20eca261457da88f2"
+    }
+  ]
+}

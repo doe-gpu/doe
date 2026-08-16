@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "world-lab-package-compilation-observer-plan",
+  "planId": "world-lab-package-compilation-observer-qm2-v1",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "predecessor": {
+    "planId": "world-lab-package-compilation-observer-qm1-v1",
+    "result": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-compilation-observer-qm1-v1/result.json",
+    "status": "passed",
+    "extension": "Add a diagnostic-only in-process Doe Vulkan journal that binds each observed compute dispatch to the exact SPIR-V bytes encoded and a later successful native submission. Application source, shaders, providers, assertions, and all predecessor acceptance conditions remain unchanged."
+  },
+  "hypothesis": "The unchanged pinned World Labs application can bind its public observer evidence to DoeRuntime's actual native lowering artifact: every observed D0 compute dispatch has the same source, entry point, and workgroups as one in-process dispatch row; the hash-named SPIR-V bytes validate; and the same process records a later successful Vulkan submission.",
+  "lanes": {
+    "W0": "pinned incumbent through doe-gpu/observe",
+    "D0": "DoeRuntime through doe-gpu/observe plus the native program-identity journal"
+  },
+  "frozenWork": {
+    "assertionCount": 16,
+    "cleanProcessRunsPerLane": 1,
+    "workerCountPerLane": 3,
+    "shaderAttemptCountPerLane": 13,
+    "compilationInfoCountPerLane": 8,
+    "dispatchCountPerLane": 3,
+    "drawCountPerLane": 2,
+    "submissionCountPerLane": 5,
+    "readbackCountPerLane": 8,
+    "invalidRuntimeShaderSourceSha256": "sha256:53672fc645bfd78a8635f16261c9212ad39fc1b12aa95caaf3557221f16632ce",
+    "applicationSourceUnchanged": true,
+    "shaderSourceUnchanged": true,
+    "observerIdenticalForW0AndD0": true,
+    "scientificParametersChangedFromQm1": false
+  },
+  "acceptance": [
+    "all qm1 application, compilation, command-shape, and mapped-output conditions remain passing",
+    "D0 reports the exact loaded Doe native runtime library and binds its bytes",
+    "D0 emits exactly three native dispatch rows matching the three observer dispatches by source, entry point, and workgroups",
+    "every native dispatch process records a later successful Vulkan submission",
+    "every hash-named SPIR-V artifact matches its journal digest and passes spirv-val"
+  ],
+  "nonGoals": [
+    "reopen or reinterpret the terminal World Labs runtime-ownership decision",
+    "assign performance, promotion, release, or runtime-ownership credit",
+    "claim native-driver, operating-system, or complete dependency tracing",
+    "generalize one diagnostic chain to all package workloads or backends"
+  ]
+}

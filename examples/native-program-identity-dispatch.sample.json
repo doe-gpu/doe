@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "traceKind": "doe_native_program_identity_v1",
+  "event": "dispatch_encoded",
+  "processId": 17,
+  "sequence": 1,
+  "backend": "doe_vulkan",
+  "wgslSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "backendArtifactSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "backendArtifactFile": "doe-native-vulkan-2222222222222222222222222222222222222222222222222222222222222222.spv",
+  "entryPoint": "main",
+  "workgroups": [1, 1, 1],
+  "repeatIndex": 0
+}

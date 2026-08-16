@@ -39,7 +39,7 @@ const RESOURCE_KIND_STORAGE_TEXTURE = binding_contract.layoutResourceKindCode(.s
 
 pub const BindingCollection = struct {
     count: usize,
-    flat_mask: u64,
+    flat_mask: u128,
     descriptor_hash: u64,
 };
 
@@ -89,7 +89,7 @@ fn appendRecordedBindingAtSlot(
     slot: usize,
     out_bindings: []model_compute_types.KernelBinding,
     count: *usize,
-    flat_mask: *u64,
+    flat_mask: *u128,
     descriptor_hasher: *pipeline_hash.DescriptorBindingsHasher,
 ) void {
     if (slot >= bufs.len) return;
@@ -112,7 +112,7 @@ fn appendRecordedBindingAtSlot(
     };
     out_bindings[count.*] = binding;
     descriptor_hasher.update(binding);
-    flat_mask.* |= @as(u64, 1) << @intCast(slot);
+    flat_mask.* |= @as(u128, 1) << @intCast(slot);
     count.* += 1;
 }
 
@@ -124,7 +124,7 @@ pub fn collectRecordedBindings(
     out_bindings: []model_compute_types.KernelBinding,
 ) BindingCollection {
     var count: usize = 0;
-    var flat_mask: u64 = 0;
+    var flat_mask: u128 = 0;
     var descriptor_hasher = pipeline_hash.DescriptorBindingsHasher{};
     if (pip.vk_static_pipeline_hash_ready and
         pip.vk_static_buffer_binding_mask != 0)
@@ -295,14 +295,14 @@ fn appendBindGroupBinding(
     slot: usize,
     out_bindings: []model_compute_types.KernelBinding,
     count: *usize,
-    flat_mask: *u64,
+    flat_mask: *u128,
     descriptor_hasher: *pipeline_hash.DescriptorBindingsHasher,
 ) void {
     if (count.* >= out_bindings.len) return;
     const binding = bindingAtSlot(pip, bind_groups, slot) orelse return;
     out_bindings[count.*] = binding;
     descriptor_hasher.update(binding);
-    flat_mask.* |= @as(u64, 1) << @intCast(slot);
+    flat_mask.* |= @as(u128, 1) << @intCast(slot);
     count.* += 1;
 }
 
@@ -312,7 +312,7 @@ pub fn collectBindGroupBindings(
     out_bindings: []model_compute_types.KernelBinding,
 ) BindingCollection {
     var count: usize = 0;
-    var flat_mask: u64 = 0;
+    var flat_mask: u128 = 0;
     var descriptor_hasher = pipeline_hash.DescriptorBindingsHasher{};
     if (pip.vk_static_pipeline_hash_ready and
         pip.vk_static_buffer_binding_mask != 0 and

@@ -1,0 +1,821 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "holoscript-electron-main-process-diagnostic",
+  "generatedAt": "2026-08-16T02:29:39.192Z",
+  "status": "passed",
+  "candidateId": "holoscript-electron-main-process-p0-qm0-v1",
+  "plan": {
+    "path": "bench/external-projects/holoscript-snn-webgpu/electron-main-process.plan.json",
+    "sha256": "3f3230ef8854274b853a9c262c294a8cf787de7b038e465b99776ddcf73c7912"
+  },
+  "tuple": {
+    "runtime": {
+      "executable": "/home/x/deco/doe/bench/out/toolchains/electron-43.4.0/node_modules/electron/dist/electron",
+      "version": "43.4.0",
+      "sha256": "6853bb400e98582dcc104ca8b9e90f013cd2223575253731e0c429925981c733"
+    },
+    "platform": "linux",
+    "architecture": "x64",
+    "mode": "main-process-node-side",
+    "arguments": [
+      "--headless",
+      "--no-sandbox",
+      "--disable-gpu"
+    ],
+    "rendererCreated": false
+  },
+  "packages": {
+    "incumbent": {
+      "name": "webgpu",
+      "version": "0.3.10",
+      "modulePath": "/home/x/deco/doe/bench/out/external-projects/holoscript-snn-webgpu/upstream/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/index.js",
+      "moduleSha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4"
+    },
+    "doe": {
+      "modulePath": "<clean-install>/node_modules/doe-gpu/src/index.js",
+      "wrapper": {
+        "id": "doe-gpu@0.4.7",
+        "bytes": 205952,
+        "sha256": "e09ad594d2de88fed0429513840650b48ff1ba07bb2af161ad1dc8b51dcb4bd6"
+      },
+      "platform": {
+        "id": "doe-gpu-linux-x64@0.4.7",
+        "bytes": 2937020,
+        "sha256": "430344d426eb60d60096a9fdc10fbcc255c9baf93ef34d703815c57c0b466d76"
+      }
+    },
+    "incumbentP0": {
+      "name": "webgpu",
+      "version": "0.3.10",
+      "modulePath": "<source-build>/index.js",
+      "moduleSha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4",
+      "nativePath": "<source-build>/dist/linux-x64.dawn.node",
+      "nativeSha256": "98359dec2b4778a82b61a4d6a643953bdd3995ab162e5ddfcc5d51df335479f9",
+      "nativeBytes": 18240344
+    }
+  },
+  "sourceBuild": {
+    "nodeWebgpuCommit": "c7c792ba7facd9e831a52d8e2a0c1dd166654751",
+    "dawnCommit": "c5d549e250b9225744929ae860b369cb4304a767",
+    "patch": {
+      "path": "bench/external-projects/holoscript-snn-webgpu/electron-node-webgpu-p0.patch",
+      "sha256": "818d603296f63c5a198db890eb9a88663492110c3e2659c9aceca4e423ee870d"
+    },
+    "goArchive": {
+      "version": "go1.26.6",
+      "archive": "https://go.dev/dl/go1.26.6.linux-amd64.tar.gz",
+      "sha256": "708effb774be8237570d0add163225abbdfaf4fca28b2611df167beba4feef89"
+    },
+    "changedFiles": [
+      "src/dawn/node/binding/GPUBuffer.cpp",
+      "src/dawn/node/binding/GPUBuffer.h"
+    ],
+    "buildCommand": "PATH=<pinned-go>/bin:$PATH npm run build",
+    "toolchain": {
+      "node": "v22.22.1",
+      "go": "go version go1.26.6 linux/amd64",
+      "cxx": "c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+      "cmake": "cmake version 4.2.3",
+      "ninja": "1.13.2"
+    }
+  },
+  "immutableInputs": [
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/electron-main-process.plan.json",
+      "sha256": "3f3230ef8854274b853a9c262c294a8cf787de7b038e465b99776ddcf73c7912"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/run-electron-main-process.mjs",
+      "sha256": "74e4aa119d5a88ca71cb70ba1c93336183d3d620cd86f82c0778610f13e3dad3"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/electron-app/package.json",
+      "sha256": "baa4851b5156d660d91e2ac620de137172c0fb416596d2990edf007f54464f25"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/electron-app/main.mjs",
+      "sha256": "f532d2bfde78fcd5a30099906f57d627f5a6985061689ea4b943a120631649df"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/provider-loader.mjs",
+      "sha256": "018408d9c6f55c681c5cf4ad55b7ebd3956e8b7a05288d860d50a83d45afca99"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/provider-dawn.mjs",
+      "sha256": "07b6afc51d12325e6efa3556ac0363ae0e9ccceac8721ac7e5763bbc8935df89"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/provider-doe.mjs",
+      "sha256": "af3b2a3e011f5c3da8f0619f045d4d7e8edf91f0d3f89380d1cfdd4e41cbf088"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/run-workload.mjs",
+      "sha256": "ff435a50712f1dc786c26f1abbb63d1e8b03c881d62c7876c988eeee33447d37"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/inputs.json",
+      "sha256": "bc74c56433651be6f800ef2236630596bc8d6beed93bb6da6280563ff1263ad9"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/oracle.md",
+      "sha256": "c37df8ef0f0ca1ec3f29f771c452fc5f019a68d83dd326226867f2e5215e15cf"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/electron-buffer-upload-workaround.patch",
+      "sha256": "1469cd9a77b8c3d9897e6609af66a23cd7cba5c3fb0c90c11c4facec788b4a93"
+    },
+    {
+      "path": "bench/external-projects/holoscript-snn-webgpu/electron-node-webgpu-p0.patch",
+      "sha256": "818d603296f63c5a198db890eb9a88663492110c3e2659c9aceca4e423ee870d"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/packages/snn-webgpu/dist/index.js",
+      "sha256": "7e7324b8404f380711b7597978f714855242ed86e9f1e4f337113d50febf6d10"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/packages/snn-webgpu/src/shaders/tropical-graph.wgsl",
+      "sha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/packages/core/dist/math/tropical-spmv.js",
+      "sha256": "e7881a5758d041aff5270d2851140a763f8074d36209208f41f94b194d870ceb"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/index.js",
+      "sha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4"
+    },
+    {
+      "path": "bench/out/external-projects/holoscript-snn-webgpu/upstream/node_modules/.pnpm/webgpu@0.3.10/node_modules/webgpu/dist/linux-x64.dawn.node",
+      "sha256": "fbfe599055b469963e4c9bfc900a702843db962dcaba0799b3c81ae33fa43db1"
+    },
+    {
+      "path": "runtime/zig/zig-out/lib/libwebgpu_doe.so",
+      "sha256": "6a367f7971d9e3650bf489641435dee60bef534eb99dc02ab5b9f12a9dbf4226"
+    }
+  ],
+  "workaround": {
+    "id": "mapped-at-creation-to-queue-write-buffer-v1",
+    "packageDir": "<temporary-copy>",
+    "patchSha256": "1469cd9a77b8c3d9897e6609af66a23cd7cba5c3fb0c90c11c4facec788b4a93",
+    "patchedDistSha256": "87034f00058bba99802e5ebfc8c363d0069aef6a54304c36c3295f13ca3af363"
+  },
+  "contract": {
+    "cleanProcessRuns": 3,
+    "timeoutMs": 120000,
+    "maxOutputBytes": 4194304,
+    "exactTopologyOracle": true,
+    "hardwareRequired": true,
+    "resourceObservation": {
+      "platform": "linux-procfs",
+      "sampleIntervalMs": 5,
+      "aggregation": "sum VmRSS across the live process tree",
+      "claimClass": "diagnostic-peak"
+    }
+  },
+  "lanes": {
+    "I0": {
+      "runCount": 3,
+      "passingRuns": 0,
+      "peakProcessTreeRssBytes": 412311552,
+      "evidence": [
+        {
+          "laneId": "I0",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        },
+        {
+          "laneId": "I0",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        },
+        {
+          "laneId": "I0",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        }
+      ]
+    },
+    "I1": {
+      "runCount": 3,
+      "passingRuns": 0,
+      "peakProcessTreeRssBytes": 410488832,
+      "evidence": [
+        {
+          "laneId": "I1",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        },
+        {
+          "laneId": "I1",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        },
+        {
+          "laneId": "I1",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        }
+      ]
+    },
+    "W0": {
+      "runCount": 3,
+      "passingRuns": 0,
+      "peakProcessTreeRssBytes": 412954624,
+      "evidence": [
+        {
+          "laneId": "W0",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        },
+        {
+          "laneId": "W0",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        },
+        {
+          "laneId": "W0",
+          "provider": "dawn-node-webgpu",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "",
+          "externalBufferFailure": true
+        }
+      ]
+    },
+    "D0": {
+      "runCount": 3,
+      "passingRuns": 3,
+      "peakProcessTreeRssBytes": 402112512,
+      "evidence": [
+        {
+          "laneId": "D0",
+          "provider": "doe-gpu",
+          "effectiveProvider": "doe-gpu",
+          "adapter": {
+            "vendor": "AMD",
+            "architecture": "vulkan",
+            "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shaderSha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3",
+          "dispatch": {
+            "workgroups": [
+              2,
+              1,
+              1
+            ],
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ]
+          },
+          "synchronization": "queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)",
+          "readback": "Float32Array over a mapped staging-buffer copy",
+          "topologies": [
+            {
+              "id": "erdos-renyi-002",
+              "nnz": 5243,
+              "oracleHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "outputHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "maxDiff": 0
+            },
+            {
+              "id": "erdos-renyi-005",
+              "nnz": 12882,
+              "oracleHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "outputHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "maxDiff": 0
+            },
+            {
+              "id": "barabasi-albert-4",
+              "nnz": 2032,
+              "oracleHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "outputHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "maxDiff": 0
+            },
+            {
+              "id": "layered-neural-8-012",
+              "nnz": 39075,
+              "oracleHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "outputHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "maxDiff": 0
+            }
+          ]
+        },
+        {
+          "laneId": "D0",
+          "provider": "doe-gpu",
+          "effectiveProvider": "doe-gpu",
+          "adapter": {
+            "vendor": "AMD",
+            "architecture": "vulkan",
+            "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shaderSha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3",
+          "dispatch": {
+            "workgroups": [
+              2,
+              1,
+              1
+            ],
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ]
+          },
+          "synchronization": "queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)",
+          "readback": "Float32Array over a mapped staging-buffer copy",
+          "topologies": [
+            {
+              "id": "erdos-renyi-002",
+              "nnz": 5243,
+              "oracleHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "outputHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "maxDiff": 0
+            },
+            {
+              "id": "erdos-renyi-005",
+              "nnz": 12882,
+              "oracleHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "outputHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "maxDiff": 0
+            },
+            {
+              "id": "barabasi-albert-4",
+              "nnz": 2032,
+              "oracleHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "outputHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "maxDiff": 0
+            },
+            {
+              "id": "layered-neural-8-012",
+              "nnz": 39075,
+              "oracleHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "outputHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "maxDiff": 0
+            }
+          ]
+        },
+        {
+          "laneId": "D0",
+          "provider": "doe-gpu",
+          "effectiveProvider": "doe-gpu",
+          "adapter": {
+            "vendor": "AMD",
+            "architecture": "vulkan",
+            "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shaderSha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3",
+          "dispatch": {
+            "workgroups": [
+              2,
+              1,
+              1
+            ],
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ]
+          },
+          "synchronization": "queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)",
+          "readback": "Float32Array over a mapped staging-buffer copy",
+          "topologies": [
+            {
+              "id": "erdos-renyi-002",
+              "nnz": 5243,
+              "oracleHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "outputHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "maxDiff": 0
+            },
+            {
+              "id": "erdos-renyi-005",
+              "nnz": 12882,
+              "oracleHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "outputHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "maxDiff": 0
+            },
+            {
+              "id": "barabasi-albert-4",
+              "nnz": 2032,
+              "oracleHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "outputHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "maxDiff": 0
+            },
+            {
+              "id": "layered-neural-8-012",
+              "nnz": 39075,
+              "oracleHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "outputHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "maxDiff": 0
+            }
+          ]
+        }
+      ]
+    },
+    "A0": {
+      "runCount": 1,
+      "passingRuns": 0,
+      "peakProcessTreeRssBytes": 409620480,
+      "evidence": [
+        {
+          "laneId": "A0",
+          "provider": "dawn-node-webgpu",
+          "exitCode": null,
+          "signal": "SIGABRT",
+          "timedOut": false,
+          "outputLimitExceeded": false,
+          "parseError": "Unexpected token 'v', \"validation\"... is not valid JSON",
+          "externalBufferFailure": false
+        }
+      ]
+    },
+    "P0": {
+      "runCount": 3,
+      "passingRuns": 3,
+      "peakProcessTreeRssBytes": 404647936,
+      "evidence": [
+        {
+          "laneId": "P0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shaderSha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3",
+          "dispatch": {
+            "workgroups": [
+              2,
+              1,
+              1
+            ],
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ]
+          },
+          "synchronization": "queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)",
+          "readback": "Float32Array over a mapped staging-buffer copy",
+          "topologies": [
+            {
+              "id": "erdos-renyi-002",
+              "nnz": 5243,
+              "oracleHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "outputHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "maxDiff": 0
+            },
+            {
+              "id": "erdos-renyi-005",
+              "nnz": 12882,
+              "oracleHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "outputHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "maxDiff": 0
+            },
+            {
+              "id": "barabasi-albert-4",
+              "nnz": 2032,
+              "oracleHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "outputHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "maxDiff": 0
+            },
+            {
+              "id": "layered-neural-8-012",
+              "nnz": 39075,
+              "oracleHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "outputHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "maxDiff": 0
+            }
+          ]
+        },
+        {
+          "laneId": "P0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shaderSha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3",
+          "dispatch": {
+            "workgroups": [
+              2,
+              1,
+              1
+            ],
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ]
+          },
+          "synchronization": "queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)",
+          "readback": "Float32Array over a mapped staging-buffer copy",
+          "topologies": [
+            {
+              "id": "erdos-renyi-002",
+              "nnz": 5243,
+              "oracleHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "outputHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "maxDiff": 0
+            },
+            {
+              "id": "erdos-renyi-005",
+              "nnz": 12882,
+              "oracleHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "outputHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "maxDiff": 0
+            },
+            {
+              "id": "barabasi-albert-4",
+              "nnz": 2032,
+              "oracleHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "outputHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "maxDiff": 0
+            },
+            {
+              "id": "layered-neural-8-012",
+              "nnz": 39075,
+              "oracleHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "outputHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "maxDiff": 0
+            }
+          ]
+        },
+        {
+          "laneId": "P0",
+          "provider": "dawn-node-webgpu",
+          "effectiveProvider": "dawn-node-webgpu",
+          "adapter": {
+            "vendor": "amd",
+            "architecture": "rdna-3",
+            "device": "radeon-8060s-graphics-radv-strix-halo-",
+            "description": "radv: Mesa 26.0.3-1ubuntu1",
+            "isFallbackAdapter": false
+          },
+          "hardwareEligible": true,
+          "shaderSha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3",
+          "dispatch": {
+            "workgroups": [
+              2,
+              1,
+              1
+            ],
+            "workgroupSize": [
+              256,
+              1,
+              1
+            ]
+          },
+          "synchronization": "queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)",
+          "readback": "Float32Array over a mapped staging-buffer copy",
+          "topologies": [
+            {
+              "id": "erdos-renyi-002",
+              "nnz": 5243,
+              "oracleHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "outputHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+              "maxDiff": 0
+            },
+            {
+              "id": "erdos-renyi-005",
+              "nnz": 12882,
+              "oracleHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "outputHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+              "maxDiff": 0
+            },
+            {
+              "id": "barabasi-albert-4",
+              "nnz": 2032,
+              "oracleHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "outputHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+              "maxDiff": 0
+            },
+            {
+              "id": "layered-neural-8-012",
+              "nnz": 39075,
+              "oracleHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "outputHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+              "maxDiff": 0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "replay": {
+    "D0": {
+      "status": "passed",
+      "expectedEvidenceSha256": "1bcce06b6e9b8e501f5bfa08523bca59ba7845c0ed40e24b965ffc209b6e36b7",
+      "actualEvidenceSha256": "1bcce06b6e9b8e501f5bfa08523bca59ba7845c0ed40e24b965ffc209b6e36b7",
+      "evidence": {
+        "laneId": "D0",
+        "provider": "doe-gpu",
+        "effectiveProvider": "doe-gpu",
+        "adapter": {
+          "vendor": "AMD",
+          "architecture": "vulkan",
+          "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+          "description": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+          "isFallbackAdapter": false
+        },
+        "hardwareEligible": true,
+        "shaderSha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3",
+        "dispatch": {
+          "workgroups": [
+            2,
+            1,
+            1
+          ],
+          "workgroupSize": [
+            256,
+            1,
+            1
+          ]
+        },
+        "synchronization": "queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)",
+        "readback": "Float32Array over a mapped staging-buffer copy",
+        "topologies": [
+          {
+            "id": "erdos-renyi-002",
+            "nnz": 5243,
+            "oracleHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+            "outputHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+            "maxDiff": 0
+          },
+          {
+            "id": "erdos-renyi-005",
+            "nnz": 12882,
+            "oracleHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+            "outputHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+            "maxDiff": 0
+          },
+          {
+            "id": "barabasi-albert-4",
+            "nnz": 2032,
+            "oracleHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+            "outputHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+            "maxDiff": 0
+          },
+          {
+            "id": "layered-neural-8-012",
+            "nnz": 39075,
+            "oracleHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+            "outputHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+            "maxDiff": 0
+          }
+        ]
+      }
+    },
+    "P0": {
+      "status": "passed",
+      "expectedEvidenceSha256": "d34a0401081e3d1bd3080b96f7f6af1e541c268ccc99089657b5be5806489b92",
+      "actualEvidenceSha256": "d34a0401081e3d1bd3080b96f7f6af1e541c268ccc99089657b5be5806489b92",
+      "evidence": {
+        "laneId": "P0",
+        "provider": "dawn-node-webgpu",
+        "effectiveProvider": "dawn-node-webgpu",
+        "adapter": {
+          "vendor": "amd",
+          "architecture": "rdna-3",
+          "device": "radeon-8060s-graphics-radv-strix-halo-",
+          "description": "radv: Mesa 26.0.3-1ubuntu1",
+          "isFallbackAdapter": false
+        },
+        "hardwareEligible": true,
+        "shaderSha256": "f33335a9cc1f5f0820a1ba11e7497d92d43c7ef7c5067a6f44cbab14503620d3",
+        "dispatch": {
+          "workgroups": [
+            2,
+            1,
+            1
+          ],
+          "workgroupSize": [
+            256,
+            1,
+            1
+          ]
+        },
+        "synchronization": "queue.submit, queue.onSubmittedWorkDone, copyBufferToBuffer, mapAsync(READ)",
+        "readback": "Float32Array over a mapped staging-buffer copy",
+        "topologies": [
+          {
+            "id": "erdos-renyi-002",
+            "nnz": 5243,
+            "oracleHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+            "outputHash": "5850d417f71eaed375e00a024d74f39cb8448a80633d0f5d42511304dd44bb73",
+            "maxDiff": 0
+          },
+          {
+            "id": "erdos-renyi-005",
+            "nnz": 12882,
+            "oracleHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+            "outputHash": "afc7ebb1437c1a5f612af058840c3486a03a506895d80f5b918ca44cde9649fe",
+            "maxDiff": 0
+          },
+          {
+            "id": "barabasi-albert-4",
+            "nnz": 2032,
+            "oracleHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+            "outputHash": "6b2afe894604e757bead283725e14668698b8feb96d9fa1d6d4546789aa10a60",
+            "maxDiff": 0
+          },
+          {
+            "id": "layered-neural-8-012",
+            "nnz": 39075,
+            "oracleHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+            "outputHash": "7f66ef3698fb6da4651daffaf2e1502f8e495fb208237b1964550b0888ff225b",
+            "maxDiff": 0
+          }
+        ]
+      }
+    }
+  },
+  "observations": {
+    "d0Pass": true,
+    "w0ExpectedFailure": true,
+    "incumbentExpectedFailure": true,
+    "d0ReplayExact": true,
+    "p0Pass": true,
+    "p0ReplayExact": true,
+    "applicationWorkaroundPassed": false
+  },
+  "decision": {
+    "compatibilityEvidence": "authorized-for-declared-electron-main-process-tuple",
+    "uniqueCorrectionObserved": false,
+    "boundedIncumbentPatchClosesGap": true,
+    "runtimeOwnershipDecision": "rejected-for-declared-electron-main-process-tuple",
+    "runtimeOwnershipCredit": false,
+    "applicationPromotionCredit": false,
+    "performanceCredit": false,
+    "releaseCredit": false,
+    "nextGate": "retain-regression-and-offer-bounded-patch-upstream"
+  },
+  "limitations": [
+    "This is Electron main-process Node-side compute and creates no renderer.",
+    "The bounded application workaround fails, while the source-built incumbent P0 closes the same application gap as Doe.",
+    "The result grants no browser, Chromium, performance, ownership, promotion, or release credit.",
+    "A repository-owned harness does not prove external adoption."
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "installed-platform-library-precedence",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "upstreamCommit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+  "category": "installation",
+  "status": "fixed-regression-protected",
+  "summary": "A clean-installed doe-gpu package resolved development-workspace library candidates before its installed platform package. Under Node read-only permissions, the first existsSync probe escaped the declared installation and aborted the Doe lane even though the correct prebuilt library was present. Installed packages now prefer their platform package, while source workspaces retain development-artifact precedence and explicit environment overrides remain first.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm8-v1/result.json",
+      "sha256": "1dae66a24ae6c83a3f267d4c7026d876abbb768067a3d5f7933298b1b54f0be3"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-clean-install-qm9-v1/result.json",
+      "sha256": "0090aba547ab7b9dd07804c845736e45ab5e9dfae2a314eee6ede1ad9d3f1099"
+    }
+  ],
+  "minimizedReproPaths": [
+    "packages/doe-gpu/test/unit/platform-package-root.test.js"
+  ],
+  "implementationPaths": [
+    "packages/doe-gpu/src/vendor/webgpu/platform-package.js",
+    "packages/doe-gpu/src/vendor/webgpu/index.js",
+    "packages/doe-gpu/src/vendor/webgpu/bun-ffi.js"
+  ],
+  "regressionTestPaths": [
+    "packages/doe-gpu/test/unit/platform-package-root.test.js",
+    "packages/doe-gpu/test/integration/test-integration-native-installed-resolution.js"
+  ],
+  "verifiedAt": "2026-08-16T04:25:23Z"
+}

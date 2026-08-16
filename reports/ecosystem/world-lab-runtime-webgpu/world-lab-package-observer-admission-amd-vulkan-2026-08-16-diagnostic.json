@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "world-lab-package-observer-admission-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "generatedAt": "2026-08-16T05:22:07Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T05:22:07Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "26",
+  "upstream": {
+    "repositoryUrl": "https://github.com/saabi/world-lab",
+    "commit": "4ef19794501d565586a73b991ea569834c54afad",
+    "licenseIdentifier": "MIT"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "reproducible-win",
+  "findings": [
+    {
+      "id": "public-observer-replaces-application-proxy",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "The public doe-gpu/observe contract replaces the World Labs application-specific WebGPU proxy without editing upstream application or shader source. Pinned Dawn and Doe each pass all 16 assertions and retain six shader attempts, three dispatches, two draws, five submissions, eight mapped readbacks, and eight map-completion synchronization records.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-observer-admission-qm1r2-v1/result.json",
+          "sha256": "012fe530e6c61246501c38b80153e1a2fc9dfb9eacf73a6f7cb2cec87bb58885"
+        }
+      ]
+    },
+    {
+      "id": "provider-neutral-command-and-output-identity",
+      "category": "correctness",
+      "status": "verified",
+      "summary": "W0 and D0 share normalized command-shape identity f22a309eda93f669bc94b0c8327a8514da61dae75cb5b0725ed6d7bdde8a1efe and mapped-output identity 7f82062b1ce1922a5828374f242359c3c337a28a64370fa5297b40b65bd62459. Every worker artifact validates its structural counts and hash-bound observation payload.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-observer-admission-qm1r2-v1/result.json",
+          "sha256": "012fe530e6c61246501c38b80153e1a2fc9dfb9eacf73a6f7cb2cec87bb58885"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "The run admits a public package evidence primitive; it does not reopen or reinterpret the terminal World Labs runtime-ownership result.",
+    "The observer records the public JavaScript WebGPU surface and mapped bytes, not native-driver calls, operating-system dependencies, network access, or complete filesystem behavior.",
+    "The two lanes use workspace source modules and one clean process per provider rather than clean-installed release packages or promotion stress populations.",
+    "Process durations are diagnostic and no evidence-enabled versus evidence-disabled overhead protocol ran."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 493940736
+    },
+    "comparison": {
+      "cleanProcessRuns": 1,
+      "successes": 1,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 537821184
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "The gate admits command evidence and exact output identity; it does not execute a frozen performance comparison."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "No matched evidence-disabled execution was authorized."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "The package-observer successor is infrastructure admission only. The earlier governed-incumbent result remains the terminal ownership adjudication."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The gate uses workspace source modules rather than clean-installed packages."
+    },
+    "supportHardware": {
+      "status": "not-run",
+      "summary": "This successor inherits no hardware claim and does not run an adapter eligibility probe."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "No promotion concurrency population ran."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both governed application processes exit without crash, hang, or timeout."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "One clean process per provider is below promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "Peak process-tree RSS is observed, but bounded same-process growth is not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "The result binds the plan, observer, schema, harness, providers, assertions, command shape, synchronizations, and mapped output identity."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Pinned Dawn and Doe reproduce identical frozen application command shape and mapped output identity."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No performance protocol ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The successor is forbidden from reopening the completed ownership decision."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "World Labs remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-observer-admission-qm1r2-v1/result.json",
+      "sha256": "012fe530e6c61246501c38b80153e1a2fc9dfb9eacf73a6f7cb2cec87bb58885"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-observer-admission-qm1r2-v1/result.json",
+      "sha256": "012fe530e6c61246501c38b80153e1a2fc9dfb9eacf73a6f7cb2cec87bb58885"
+    }
+  ]
+}

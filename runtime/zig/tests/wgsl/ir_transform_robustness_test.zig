@@ -67,6 +67,40 @@ test "robustness: sized array index is clamped" {
     try testing.expectEqual(@as(u32, 2), min_expr.data.call.args.len);
 }
 
+test "robustness: runtime storage contract preserves raw index" {
+    const allocator = testing.allocator;
+    var module = try make_test_module(allocator);
+    defer module.deinit();
+
+    const f32_ty = f32_type(&module);
+    const u32_ty = u32_type(&module);
+    const arr_ty = try module.types.intern(.{ .array = .{ .elem = f32_ty, .len = 10 } });
+    const ref_arr_ty = try module.types.intern(.{ .ref = .{
+        .elem = arr_ty,
+        .addr_space = .storage,
+        .access = .read_write,
+    } });
+    try module.globals.append(allocator, .{
+        .name = try ir.dup_string(allocator, "data"),
+        .ty = ref_arr_ty,
+        .class = .var_,
+        .addr_space = .storage,
+    });
+
+    var function = ir.Function{ .name = try ir.dup_string(allocator, "main"), .return_type = ir.INVALID_TYPE };
+    errdefer function.deinit(allocator);
+    const base_id = try function.append_expr(allocator, .{ .ty = ref_arr_ty, .category = .ref, .data = .{ .global_ref = 0 } });
+    const idx_id = try function.append_expr(allocator, .{ .ty = u32_ty, .category = .value, .data = .{ .int_lit = 15 } });
+    const index_id = try function.append_expr(allocator, .{ .ty = f32_ty, .category = .ref, .data = .{ .index = .{ .base = base_id, .index = idx_id } } });
+    try module.functions.append(allocator, function);
+
+    try apply(allocator, &module, .{ .rely_on_storage_buffer_robustness = true });
+
+    const transformed = module.functions.items[0].exprs.items[index_id];
+    try testing.expect(transformed.data == .index);
+    try testing.expectEqual(idx_id, transformed.data.index.index);
+}
+
 test "robustness: vector index is clamped" {
     const allocator = testing.allocator;
     var module = try make_test_module(allocator);

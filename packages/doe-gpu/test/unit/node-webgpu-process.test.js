@@ -18,6 +18,7 @@ import {
 const here = dirname(fileURLToPath(import.meta.url));
 const entrypoint = fileURLToPath(new URL('../fixtures/governed-process-app.mjs', import.meta.url));
 const providerModule = new URL('../fixtures/provider-v1.js', import.meta.url).href;
+const observedProviderModule = new URL('../fixtures/provider-observed.js', import.meta.url).href;
 const output = new Uint8Array([2, 4, 6, 8]);
 const digest = (value) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
 
@@ -101,6 +102,87 @@ const second = await runGovernedNodeWebGPUProcess(configuration());
 assert.equal(second.ok, true);
 assert.equal(second.receipt.replay.workloadSha256, first.receipt.replay.workloadSha256);
 assert.equal(second.receipt.replay.executionSha256, first.receipt.replay.executionSha256);
+
+const observedConfiguration = configuration({
+  provider: { id: 'observed-fixture-provider', module: observedProviderModule },
+  observeProgram: { metadata: { application: 'governed-process-unit' } },
+  process: {
+    ...configuration().process,
+    environment: {
+      mode: 'sealed',
+      values: { DOE_TEST_PROCESS_MODE: 'observed-compute' },
+    },
+  },
+});
+const observedFirst = await runGovernedNodeWebGPUProcess(observedConfiguration);
+assert.equal(observedFirst.ok, true, JSON.stringify(observedFirst.errors));
+assert.equal(observedFirst.receipt.programEvidence.status, 'observed');
+assert.ok(observedFirst.receipt.programEvidence.checkpointCount >= 1);
+assert.equal(observedFirst.receipt.programEvidence.checkpoint.reason, 'process-before-exit');
+assert.equal(
+  observedFirst.receipt.programEvidence.observation.summary.shaderModuleCount,
+  1,
+);
+assert.equal(observedFirst.receipt.programEvidence.observation.summary.dispatchCount, 1);
+assert.equal(observedFirst.receipt.programEvidence.observation.summary.submissionCount, 1);
+assert.equal(observedFirst.receipt.programEvidence.observation.summary.readbackCount, 1);
+assert.equal(observedFirst.programObservation.observationSha256,
+  observedFirst.receipt.programEvidence.observationSha256);
+assert.ok(observedFirst.receipt.process.environment.keys.includes(
+  'DOE_NODE_WEBGPU_OBSERVE_PROGRAM',
+));
+assert.equal(validateGovernedNodeWebGPUProcessReceipt(observedFirst.receipt).valid, true);
+const observedSecond = await runGovernedNodeWebGPUProcess(observedConfiguration);
+assert.equal(observedSecond.ok, true, JSON.stringify(observedSecond.errors));
+assert.equal(
+  observedSecond.receipt.programEvidence.observationSha256,
+  observedFirst.receipt.programEvidence.observationSha256,
+);
+assert.equal(
+  observedSecond.receipt.replay.executionSha256,
+  observedFirst.receipt.replay.executionSha256,
+);
+assert.notEqual(
+  observedFirst.receipt.replay.executionSha256,
+  first.receipt.replay.executionSha256,
+);
+
+const observedFailure = await runGovernedNodeWebGPUProcess(configuration({
+  provider: { id: 'observed-fixture-provider', module: observedProviderModule },
+  observeProgram: { metadata: { application: 'governed-process-failure-unit' } },
+  process: {
+    ...configuration().process,
+    environment: {
+      mode: 'sealed',
+      values: { DOE_TEST_PROCESS_MODE: 'observed-failure' },
+    },
+  },
+}));
+assert.equal(observedFailure.ok, false);
+assert.ok(observedFailure.errors.some(
+  (error) => error.code === 'DOE_GOVERNED_PROCESS_EXIT_FAILED',
+));
+assert.equal(observedFailure.receipt.programEvidence.status, 'observed');
+assert.equal(
+  observedFailure.receipt.programEvidence.checkpoint.reason,
+  'process-uncaught-exception',
+);
+assert.equal(
+  observedFailure.receipt.programEvidence.observation.summary.compilationInfoCount,
+  1,
+);
+assert.equal(
+  observedFailure.receipt.programEvidence.observation.compilationInfos[0].messages[0].message,
+  'observed fixture warning',
+);
+assert.equal(validateGovernedNodeWebGPUProcessReceipt(observedFailure.receipt).valid, true);
+
+const tamperedProgramEvidence = structuredClone(observedFirst.receipt);
+tamperedProgramEvidence.programEvidence.observation.summary.dispatchCount += 1;
+assert.equal(validateGovernedNodeWebGPUProcessReceipt(tamperedProgramEvidence).valid, false);
+const tamperedCheckpoint = structuredClone(observedFirst.receipt);
+tamperedCheckpoint.programEvidence.checkpoint.reason = 'invented-reason';
+assert.equal(validateGovernedNodeWebGPUProcessReceipt(tamperedCheckpoint).valid, false);
 
 const permissionScratch = mkdtempSync(resolve(tmpdir(), 'doe-proof-permission-'));
 try {
@@ -255,6 +337,17 @@ assert.equal(preAborted.receipt.process.aborted, true);
 assert.ok(preAborted.errors.some((error) => error.code === 'DOE_GOVERNED_PROCESS_ABORTED'));
 assert.equal(validateGovernedNodeWebGPUProcessReceipt(preAborted.receipt).valid, true);
 
+const observedPreAbortedController = new AbortController();
+observedPreAbortedController.abort();
+const observedPreAborted = await runGovernedNodeWebGPUProcess(configuration({
+  observeProgram: true,
+  signal: observedPreAbortedController.signal,
+}));
+assert.equal(observedPreAborted.ok, false);
+assert.equal(observedPreAborted.receipt.programEvidence.status, 'missing');
+assert.equal(observedPreAborted.receipt.programEvidence.checkpointCount, 0);
+assert.equal(validateGovernedNodeWebGPUProcessReceipt(observedPreAborted.receipt).valid, true);
+
 const activeAbortController = new AbortController();
 const activeAbortPromise = runGovernedNodeWebGPUProcess(configuration({
   signal: activeAbortController.signal,
@@ -363,6 +456,16 @@ const invalid = await runGovernedNodeWebGPUProcess(configuration({
 assert.equal(invalid.ok, false);
 assert.equal(invalid.receipt, null);
 assert.equal(invalid.errors[0].code, 'DOE_GOVERNED_PROCESS_INVALID_CONFIGURATION');
+
+const invalidObservationMetadata = await runGovernedNodeWebGPUProcess(configuration({
+  observeProgram: { metadata: [] },
+}));
+assert.equal(invalidObservationMetadata.ok, false);
+assert.equal(invalidObservationMetadata.receipt, null);
+assert.equal(
+  invalidObservationMetadata.errors[0].code,
+  'DOE_GOVERNED_PROCESS_INVALID_CONFIGURATION',
+);
 
 const tampered = structuredClone(first.receipt);
 tampered.provider.effective.providerId = 'tampered';

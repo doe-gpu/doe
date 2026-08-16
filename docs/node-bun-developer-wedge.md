@@ -72,6 +72,17 @@ checkpoints. The helper supplies execution evidence; the application contract
 still owns whether the expected output is genuinely independent and whether a
 run is release-eligible.
 
+Callback-level governed runs may opt into `observeProgram`, which composes the
+selected provider with the public `doe-gpu/observe` proxy. The resulting
+hash-bound observation records attempted WGSL, public pipeline/resource
+descriptors, returned shader-compilation messages, command shape, submissions,
+map-completion synchronization, and mapped-readback digests. Compilation
+messages remain bound to the exact observed shader module. Its optional
+synchronous compilation-info and mapped-readback checkpoints support worker
+environments that do not guarantee module-exit hooks. This is program evidence
+at the JavaScript WebGPU boundary; it is not a native trace, dependency-sealing
+proof, ownership credit, or application promotion.
+
 For an unchanged Node application, the public
 `doe-gpu/node-webgpu-process::runGovernedNodeWebGPUProcess` wrapper composes the
 fail-closed `webgpu` loader with bounded child execution. It requires the child
@@ -79,6 +90,16 @@ evidence to return the effective loader identity, applies the exact parent-side
 oracle, binds the process declaration and hashed environment, and emits a
 self-validating provider-neutral receipt. A process receipt remains diagnostic
 until the application-specific reliability and adoption gates pass.
+
+The unchanged-process API and `doe-proof-node` contract may also request
+`observeProgram`. The loader then composes the declared provider with the same
+public observer and transfers hash-validated checkpoints over a parent-owned
+IPC channel. The final snapshot is bound into the process receipt and replay
+identity; a clean observed run with no snapshot fails closed. This avoids a
+child filesystem write under `node-permission-read-only`, but it does not turn
+the JavaScript command observation into a native or operating-system trace.
+Normal completion and uncaught exceptions both emit a final observation
+checkpoint; failure evidence remains a failed receipt rather than success.
 
 Abort, timeout, and captured-output limits share one termination contract.
 POSIX runs own a process group and terminate that group; Windows runs terminate
@@ -108,6 +129,15 @@ omits the harness's auxiliary renderer subprocess and therefore proves the
 Node API allowlist and exact workload result, not hardware eligibility or
 operating-system dependency sealing.
 
+The later
+[`HoloScript public process-observer admission`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-doeproof-process-observer-amd-vulkan-2026-08-16-diagnostic.json)
+uses that same unchanged-process contract with `observeProgram` enabled. The
+unobserved control passes first, pinned Dawn and Doe preserve the exact
+four-topology oracle and identical normalized command/readback evidence, and
+the Doe replay reproduces its observation and execution identities. This is a
+diagnostic package-surface admission, not performance, ownership, promotion,
+or release evidence.
+
 The Linux-only successor at
 `reports/benchmarks/amd-vulkan/20260815T212816Z/holoscript-doeproof-cli-linux-bwrap-diagnostic.json`
 adds an outer Bubblewrap boundary. It exposes only the hash-bound workspace
@@ -121,13 +151,14 @@ enumeration and hardware-dependent sysfs paths. The base-system `/usr`, `/etc`,
 `/sys`, and optional `/run/udev` mounts therefore remain broad and read-only:
 this is workspace sealing, not complete operating-system dependency closure.
 
-The reviewed HoloScript Electron main-process diagnostic at
-[`../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-2026-08-15-diagnostic.json)
+The current-runtime HoloScript Electron main-process diagnostic at
+[`../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json`](../reports/ecosystem/holoscript-snn-webgpu/holoscript-electron-main-process-p0-current-runtime-2026-08-16-diagnostic.json)
 is a separate runtime-host result. The unchanged tropical-SpMV workload passes
 all three clean Doe processes and exact replay on the physical Radeon, while
 the ambient, pinned, and governed incumbent lanes fail at Electron's external-
 ArrayBuffer boundary. A bounded application upload workaround still aborts in
-the incumbent native addon, but the source-built incumbent `P0` with a two-file
+the incumbent native addon. A freshly reconstructed source-built incumbent
+`P0` with the same two-file
 mapped-buffer ownership patch passes three clean processes and exact replay.
 The bounded incumbent patch therefore closes the same application gap as Doe
 and rejects runtime ownership for this tuple. The result remains a diagnostic
@@ -206,6 +237,24 @@ executable, records its hash and version, and runs only the main-process
 Node-side surface. Missing staged artifacts are a failure in every explicit
 release gate, while the ordinary source-tree suite may report physical package
 checks as skipped.
+
+Installed packages must resolve explicit overrides first and their installed
+platform payload second. They must not probe workspace or current-directory
+development candidates before a valid packaged artifact: those probes can
+escape a declared read-only filesystem contract even when the correct native
+library is installed. Source-tree execution retains workspace-first resolution
+so development builds do not silently consume stale staged packages. The
+focused installed-resolution integration enforces this distinction under the
+Node permission model.
+
+The reviewed cpp-ml qm9 diagnostic composes this package boundary with a real
+unchanged application. It locally packs the wrapper, Linux x64 platform
+payload, pinned incumbent, and PNG dependency; disables lifecycle scripts;
+copies and hashes the pinned generated MNIST application; and runs both
+providers plus semantic replay through the installed `doe-proof-node` binary.
+Two independent installations pass with exact output. This is diagnostic
+Node/Linux x64/AMD Vulkan installation evidence, not registry-publication,
+runtime-ownership, performance, application-promotion, or release evidence.
 
 The `native-reliability` variants reuse one clean installation across repeated
 fresh processes and overlapping runtime instances, then execute 12 exact

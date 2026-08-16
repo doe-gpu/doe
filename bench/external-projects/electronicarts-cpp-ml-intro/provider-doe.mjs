@@ -9,10 +9,13 @@ if (typeof provider.create !== 'function' || !provider.globals) {
 
 export const create = provider.create;
 export const globals = provider.globals;
-export const __doeHarnessProviderIdentity = Object.freeze({
+const providerIdentity = Object.freeze({
   id: 'doe-gpu',
   modulePath,
   providerInfo: typeof provider.providerInfo === 'function'
     ? provider.providerInfo()
     : null,
 });
+
+export const __doeHarnessProviderIdentity = providerIdentity;
+export const __doeProofProviderIdentity = providerIdentity;

@@ -35,6 +35,7 @@
     "./governed-node-webgpu-process-contract.schema.json": "./assets/governed-node-webgpu-process-contract.schema.json",
     "./governed-node-webgpu-process-receipt.schema.json": "./assets/governed-node-webgpu-process-receipt.schema.json",
     "./governed-node-webgpu-process-artifact.schema.json": "./assets/governed-node-webgpu-process-artifact.schema.json",
+    "./transparent-webgpu-observation.schema.json": "./assets/transparent-webgpu-observation.schema.json",
     "./program-bundle": {
       "types": "./src/program-bundle-runner.d.ts",
       "default": "./src/program-bundle-runner.js"
@@ -46,6 +47,10 @@
     "./capture": {
       "types": "./src/capture.d.ts",
       "default": "./src/capture.js"
+    },
+    "./observe": {
+      "types": "./src/observe.d.ts",
+      "default": "./src/observe.js"
     },
     "./compute": {
       "types": "./src/compute.d.ts",

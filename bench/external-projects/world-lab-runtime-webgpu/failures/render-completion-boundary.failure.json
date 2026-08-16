@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "external-project-failure",
+  "failureId": "render-completion-boundary",
+  "actorId": "world-lab-runtime-webgpu",
+  "harnessId": "consumer-execution-oracles",
+  "upstreamCommit": "4ef19794501d565586a73b991ea569834c54afad",
+  "category": "compatibility",
+  "status": "fixed-regression-protected",
+  "summary": "The first render-identity gate incorrectly required a later outer queue-submission row even though Doe's direct Vulkan render path submits and waits internally before the draw call returns; the corrected trace records that actual completion boundary and the unchanged clean-install gate passes.",
+  "failureEvidence": [
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm4-v1/result.json",
+      "sha256": "7bc8da2467077c9b7b1ffff20213b64a94dcefe99315b702834ae023cfef8bc1"
+    },
+    {
+      "path": "bench/out/external-projects/world-lab-runtime-webgpu/world-lab-package-native-render-identity-clean-install-qm5-v1-retry1/result.json",
+      "sha256": "125dde2b8ba150791b552c3871e0ff805da66f790373f11eda10381135bbd585"
+    }
+  ],
+  "minimizedReproPaths": [
+    "bench/external-projects/world-lab-runtime-webgpu/package-native-render-identity-clean-install-qm4.plan.json"
+  ],
+  "implementationPaths": [
+    "runtime/zig/src/native/diagnostics/doe_program_identity_trace.zig",
+    "config/native-program-identity-trace-row.schema.json",
+    "bench/external-projects/world-lab-runtime-webgpu/run-package-observer-admission.mjs"
+  ],
+  "regressionTestPaths": [
+    "bench/tests/test_world_lab_clean_install_native_render_identity.py"
+  ],
+  "verifiedAt": "2026-08-16T07:13:35Z"
+}

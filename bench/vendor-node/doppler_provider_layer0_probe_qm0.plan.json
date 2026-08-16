@@ -1,0 +1,55 @@
+{
+  "schema": "doe.external-project-plan/v1",
+  "candidateId": "doppler-provider-layer0-probe-qm0-v1",
+  "hypothesis": "Unbatched production probes identify the first layer-0 tensor boundary at which Doe diverges from the bounded incumbent.",
+  "inputs": {
+    "orchestrator": {
+      "path": "bench/executors/run-doppler-layer0-probe.mjs",
+      "sha256": "baa6e3cb7d58797c6c71e25817771b0186d070ca6108f55ab33608a49bdd52de"
+    },
+    "worker": {
+      "path": "bench/executors/run-node-doppler-ort-bench.js",
+      "sha256": "9ad174fe3fb1aaf60e5c90f73545ed3dcba7dc95aa9a438b796fe7b96d9246b8"
+    },
+    "scenario": {
+      "path": "bench/vendor-node/doppler_provider_layer0_probe_gemma270m_commands.json",
+      "sha256": "360a8e915ad15cd87d8343f8b0dd982c24b0f1181ed4c12d6a9a56f7620d2455"
+    },
+    "boundedProvider": {
+      "path": "bench/executors/vendor-node/doppler-node-webgpu-lifecycle-provider.mjs",
+      "sha256": "7022d7255854bd4e277a30676ff5ef1a6cc8412b659381b09f6a5f88c6626f03"
+    },
+    "doeProvider": {
+      "path": "packages/doe-gpu/src/compute.js",
+      "sha256": "f0c7e4c93097a4960e91034f0a56f399ed702a250cf1bf38fb2afb5565b651a7"
+    }
+  },
+  "stageOrder": [
+    "embed_out",
+    "post_input_norm",
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "q_norm",
+    "k_norm",
+    "attn_core_out",
+    "attn_out",
+    "post_attn",
+    "ffn_in",
+    "ffn_out",
+    "layer_out",
+    "final_norm",
+    "logits"
+  ],
+  "requiredStages": ["embed_out", "post_input_norm", "q_proj", "k_proj", "v_proj"],
+  "acceptance": {
+    "sampleAbsoluteTolerance": 0.0001,
+    "requireBothLanesReleaseComplete": true,
+    "requireUnbatchedExecution": true
+  },
+  "nonGoals": [
+    "Changing Doppler model semantics",
+    "Claiming performance",
+    "Assigning runtime ownership before a minimized correction"
+  ]
+}

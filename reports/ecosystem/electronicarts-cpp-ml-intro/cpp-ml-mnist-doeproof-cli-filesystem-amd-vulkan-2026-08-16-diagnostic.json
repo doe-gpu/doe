@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 2,
+  "artifactKind": "external-ecosystem-report",
+  "reportId": "cpp-ml-mnist-doeproof-cli-filesystem-amd-vulkan-2026-08-16-diagnostic",
+  "actorId": "electronicarts-cpp-ml-intro",
+  "harnessId": "mnist-webgpu-demo",
+  "generatedAt": "2026-08-16T04:06:01Z",
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-08-16T04:06:01Z",
+    "reviewer": "codex"
+  },
+  "registryRevision": "22",
+  "upstream": {
+    "repositoryUrl": "https://github.com/electronicarts/cpp-ml-intro",
+    "commit": "c46a47b4fcee5ec48dbda7321210b1287b262b06",
+    "licenseIdentifier": "LicenseRef-EA-BSD-3-Clause-With-Marks"
+  },
+  "evidenceMaturity": "diagnostic",
+  "outcome": "no-material-result",
+  "findings": [
+    {
+      "id": "native-high-compute-bindings-fixed",
+      "category": "correctness",
+      "status": "fixed",
+      "summary": "The unchanged Presentation pass uses compute bindings 0 through 17. Doe previously retained only bindings 0 through 15, silently omitting the instructions texture and Presentation uniform and producing an allocation-sensitive AMD GPUVM fault. Native compute capacity is now 32 bindings per group, total shader-reflection capacity is 32, and the four-group flattened mask is 128 bits.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-v1/result.json",
+          "sha256": "67c2b6d2d5cddb833be5621d19a18e98179b716e850d7c5c07c3e9898b93f6bf"
+        },
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-repeat-v1/result.json",
+          "sha256": "422d9736527a0524850c0998daed133df1da39c209e1386bd83fc852b7d88f29"
+        }
+      ]
+    },
+    {
+      "id": "public-doeproof-cli-boundary-passes",
+      "category": "compatibility",
+      "status": "verified",
+      "summary": "Pinned Dawn and Doe each pass run, verify, inspect, compare, and semantic replay through the public doe-proof-node CLI under Node read-only permissions. Requested and effective providers agree, both independent oracles pass, both output digests equal 6929ac572c2f63e6bba69076ed2fb7ce076999c15c830d0a2b6430b3fa69269f, and provider stderr is empty.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-v1/result.json",
+          "sha256": "67c2b6d2d5cddb833be5621d19a18e98179b716e850d7c5c07c3e9898b93f6bf"
+        }
+      ]
+    },
+    {
+      "id": "public-boundary-repeat-passes",
+      "category": "reliability",
+      "status": "verified",
+      "summary": "A second clean output directory reproduces the same workload identity and exact output in both providers, and each lane's replay compares successfully with its source artifact. The complete repeated command reports a conservative 166047744-byte maximum resident set size.",
+      "evidence": [
+        {
+          "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-repeat-v1/result.json",
+          "sha256": "422d9736527a0524850c0998daed133df1da39c209e1386bd83fc852b7d88f29"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Node read-only permissions constrain declared JavaScript filesystem access but do not seal native-addon syscalls, network access, or operating-system dependencies.",
+    "The repeated command-level RSS is a conservative process observation, not a promotion-scale bounded-memory-growth experiment.",
+    "The diagnostic does not run an isolated selected-operation performance protocol or measure receipt overhead.",
+    "The result authorizes the public DoeProof CLI boundary only; it does not change the terminal cpp-ml runtime-ownership decision and grants no application-promotion or release credit.",
+    "The compute capacity correction is verified on the current AMD Vulkan workspace build and does not claim WebGPU-wide or cross-backend conformance."
+  ],
+  "equivalence": {
+    "status": "pass",
+    "oracleStatus": "pass",
+    "providerIdentityStatus": "pass",
+    "hiddenFallbackStatus": "pass",
+    "dispatchShapeStatus": "pass",
+    "synchronizationStatus": "pass",
+    "readbackStatus": "pass",
+    "outputIdentityStatus": "pass",
+    "failureCodes": []
+  },
+  "reliability": {
+    "baseline": {
+      "cleanProcessRuns": 2,
+      "successes": 2,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 166047744
+    },
+    "comparison": {
+      "cleanProcessRuns": 2,
+      "successes": 2,
+      "failures": 0,
+      "crashes": 0,
+      "hangs": 0,
+      "timeouts": 0,
+      "peakMemoryBytes": 166047744
+    }
+  },
+  "performance": {
+    "status": "not-run",
+    "reason": "Command durations are retained only as diagnostic execution evidence; no isolated selected-operation comparison ran."
+  },
+  "receiptOverhead": {
+    "status": "not-run",
+    "reason": "The command chain binds receipts and replay, but traced and untraced execution were not compared."
+  },
+  "runtimeOwnershipAssessment": {
+    "status": "not-run",
+    "decision": "retain-diagnostic",
+    "summary": "This correction-only experiment validates the public DoeProof CLI boundary. It does not reopen or change the separately reviewed terminal runtime-ownership decision."
+  },
+  "promotionAssessment": {
+    "policyVersion": "1.1.0",
+    "eligibility": "ineligible",
+    "installation": {
+      "status": "ineligible",
+      "summary": "The run uses the current workspace package and native build rather than a clean-installed release artifact."
+    },
+    "supportHardware": {
+      "status": "pass",
+      "summary": "The correction executes through the explicitly selected Radeon Vulkan ICD without detected fallback."
+    },
+    "concurrency": {
+      "status": "not-run",
+      "summary": "The diagnostic executes providers sequentially."
+    },
+    "teardown": {
+      "status": "pass",
+      "summary": "Both source runs and both semantic replays complete without crash, hang, timeout, or provider stderr."
+    },
+    "stress": {
+      "status": "not-run",
+      "summary": "The two command chains do not satisfy promotion stress floors."
+    },
+    "memory": {
+      "status": "not-run",
+      "summary": "One repeated command has an RSS observation, but bounded growth across promotion-scale lifecycle cycles was not measured."
+    },
+    "receipts": {
+      "status": "pass",
+      "summary": "Both aggregates bind the plan, implementation, runtime files, providers, oracle, exact output, and command results."
+    },
+    "replay": {
+      "status": "pass",
+      "summary": "Both providers reproduce their exact semantic workload and output through the public CLI replay command."
+    },
+    "performance": {
+      "status": "ineligible",
+      "summary": "No claim-eligible selected-operation performance comparison ran."
+    },
+    "ownership": {
+      "status": "ineligible",
+      "summary": "The correction-only public-boundary result grants no runtime-ownership credit."
+    },
+    "release": {
+      "status": "ineligible",
+      "summary": "cpp-ml remains a non-blocking diagnostic application."
+    }
+  },
+  "receipts": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-v1/result.json",
+      "sha256": "67c2b6d2d5cddb833be5621d19a18e98179b716e850d7c5c07c3e9898b93f6bf"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-repeat-v1/result.json",
+      "sha256": "422d9736527a0524850c0998daed133df1da39c209e1386bd83fc852b7d88f29"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-v1/result.json",
+      "sha256": "67c2b6d2d5cddb833be5621d19a18e98179b716e850d7c5c07c3e9898b93f6bf"
+    },
+    {
+      "path": "bench/out/external-projects/electronicarts-cpp-ml-intro/doeproof-cli-filesystem-qm7-repeat-v1/result.json",
+      "sha256": "422d9736527a0524850c0998daed133df1da39c209e1386bd83fc852b7d88f29"
+    }
+  ]
+}

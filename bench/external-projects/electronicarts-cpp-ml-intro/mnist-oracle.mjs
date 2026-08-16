@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { create, globals, __doeHarnessProviderIdentity } from 'webgpu';
+import { create, globals, __doeProofProviderIdentity } from 'webgpu';
 
 const upstreamRoot = process.env.DOE_CPP_ML_UPSTREAM;
 if (!upstreamRoot) throw new Error('DOE_CPP_ML_UPSTREAM is required.');
@@ -26,15 +26,14 @@ function srgbByteToLinear(value) {
     : ((normalized + 0.055) / 1.055) ** 2.4;
 }
 
-function cpuInference(png, weights) {
+function cpuInference(input, weights) {
   const hidden = new Float32Array(30);
   for (let hiddenIndex = 0; hiddenIndex < 30; hiddenIndex += 1) {
     const base = hiddenIndex * 785;
     let sum = Math.fround(weights[base + 784]);
     for (let inputIndex = 0; inputIndex < 784; inputIndex += 1) {
       const product = Math.fround(
-        Math.fround(srgbByteToLinear(png.data[inputIndex * 4]))
-        * weights[base + inputIndex],
+        input[inputIndex] * weights[base + inputIndex],
       );
       sum = Math.fround(sum + product);
     }
@@ -50,8 +49,15 @@ function cpuInference(png, weights) {
     }
     output[outputIndex] = Math.fround(sigmoid(sum));
   }
-  return [...output];
+  return { hidden: [...hidden], output: [...output] };
 }
+
+function maxAbsError(actual, expected) {
+  return Math.max(...actual.map((value, index) => Math.abs(value - expected[index])));
+}
+
+const inputConversionTolerance = 0.5 / 255;
+const networkTolerance = 1e-5;
 
 function argmax(values) {
   let index = 0;
@@ -83,7 +89,9 @@ mnist.buffer_NN_Weights = device.createBuffer({
 mnist.buffer_NN_Weights_count = weights.length;
 mnist.buffer_NN_Weights_stride = Float32Array.BYTES_PER_ELEMENT;
 device.queue.writeBuffer(mnist.buffer_NN_Weights, 0, weightsBuffer);
+mnist.buffer_Hidden_Layer_Activations_usageFlags |= GPUBufferUsage.COPY_SRC;
 mnist.buffer_Output_Layer_Activations_usageFlags |= GPUBufferUsage.COPY_SRC;
+mnist.texture_NN_Input_usageFlags |= GPUTextureUsage.COPY_SRC;
 mnist.variable_UseImportedImage = true;
 mnist.variableChanged_UseImportedImage = true;
 
@@ -109,6 +117,16 @@ for (let expectedDigit = 0; expectedDigit <= 9; expectedDigit += 1) {
     encoder,
     mnist.buffer_Output_Layer_Activations,
   );
+  const hiddenReadback = Shared.GetReadbackBuffer_FromBuffer(
+    device,
+    encoder,
+    mnist.buffer_Hidden_Layer_Activations,
+  );
+  const inputReadback = Shared.GetReadbackBuffer_FromTexture(
+    device,
+    encoder,
+    mnist.texture_NN_Input,
+  );
   device.queue.submit([encoder.finish()]);
   await device.queue.onSubmittedWorkDone();
 
@@ -121,17 +139,44 @@ for (let expectedDigit = 0; expectedDigit <= 9; expectedDigit += 1) {
   });
   readback.destroy();
 
+  let gpuHidden = null;
+  await Shared.ReadbackBuffer(hiddenReadback, (view) => {
+    gpuHidden = Array.from(
+      { length: 30 },
+      (_, index) => view.getFloat32(index * Float32Array.BYTES_PER_ELEMENT, true),
+    );
+  });
+  hiddenReadback.destroy();
+
+  let gpuInput = null;
+  await Shared.ReadbackBuffer(inputReadback, (view) => {
+    gpuInput = Array.from({ length: 28 * 28 }, (_, index) => {
+      const x = index % 28;
+      const y = Math.floor(index / 28);
+      return view.getFloat32(y * 256 + x * Float32Array.BYTES_PER_ELEMENT, true);
+    });
+  });
+  inputReadback.destroy();
+
   const png = Shared.LoadPNG_Node(imagePath);
-  const cpuOutput = cpuInference(png, weights);
+  const idealInput = Array.from(
+    { length: 28 * 28 },
+    (_, index) => Math.fround(srgbByteToLinear(png.data[index * 4])),
+  );
+  const cpu = cpuInference(gpuInput, weights);
+  const cpuOutput = cpu.output;
   const gpuDigit = argmax(gpuOutput);
   const cpuDigit = argmax(cpuOutput);
-  const maxAbsError = Math.max(...gpuOutput.map((value, index) =>
-    Math.abs(value - cpuOutput[index])));
+  const inputMaxAbsError = maxAbsError(gpuInput, idealInput);
+  const hiddenMaxAbsError = maxAbsError(gpuHidden, cpu.hidden);
+  const outputMaxAbsError = maxAbsError(gpuOutput, cpuOutput);
   cases.push({
     expectedDigit,
     gpuDigit,
     cpuDigit,
-    maxAbsError,
+    inputMaxAbsError,
+    hiddenMaxAbsError,
+    outputMaxAbsError,
     gpuOutput,
     cpuOutput,
   });
@@ -142,12 +187,20 @@ const validationError = await device.popErrorScope();
 const oraclePass = validationError === null
   && cases.every((item) =>
     item.gpuDigit === item.cpuDigit
+    && item.inputMaxAbsError <= inputConversionTolerance
+    && item.hiddenMaxAbsError <= networkTolerance
+    && item.outputMaxAbsError <= networkTolerance
     && item.gpuOutput.every(Number.isFinite)
-    && item.maxAbsError <= 2.5e-3);
+    && item.cpuOutput.every(Number.isFinite));
 const result = {
-  provider: __doeHarnessProviderIdentity,
+  provider: __doeProofProviderIdentity,
   adapter: adapter.info ?? null,
   validationError: validationError?.message ?? null,
+  tolerances: {
+    inputConversion: inputConversionTolerance,
+    hiddenNetwork: networkTolerance,
+    outputNetwork: networkTolerance,
+  },
   oraclePass,
   cases,
 };

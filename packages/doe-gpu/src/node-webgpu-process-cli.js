@@ -23,6 +23,7 @@ const CONTRACT_KEYS = new Set([
   'process',
   'evaluator',
   'runtimeFiles',
+  'observeProgram',
 ]);
 const PROVIDER_KEYS = new Set(['id', 'module', 'sha256']);
 const WORKLOAD_KEYS = new Set([
@@ -161,6 +162,15 @@ function normalizeFilesystem(value) {
   return { mode: filesystem.mode };
 }
 
+function normalizeProgramObservation(value) {
+  if (value === undefined || typeof value === 'boolean') return value;
+  assertPlainObject(value, 'contract.observeProgram');
+  assertKnownKeys(value, new Set(['metadata']), 'contract.observeProgram');
+  const metadata = value.metadata ?? {};
+  assertPlainObject(metadata, 'contract.observeProgram.metadata');
+  return { metadata };
+}
+
 function normalizeContractDocument(document) {
   assertPlainObject(document, 'contract');
   assertKnownKeys(document, CONTRACT_KEYS, 'contract');
@@ -259,6 +269,9 @@ function normalizeContractDocument(document) {
       export: evaluatorExport,
     },
     runtimeFiles: normalizedRuntimeFiles,
+    ...(document.observeProgram === undefined
+      ? {}
+      : { observeProgram: normalizeProgramObservation(document.observeProgram) }),
   };
 }
 
@@ -362,6 +375,7 @@ function artifactSummary(artifact, validation = null) {
     workload: artifact?.receipt?.workload ?? null,
     provider: artifact?.receipt?.provider ?? null,
     oracle: artifact?.receipt?.oracle ?? null,
+    programEvidence: artifact?.receipt?.programEvidence ?? null,
     replay: artifact?.receipt?.replay ?? null,
     process: artifact?.receipt?.process ?? null,
   };
@@ -379,6 +393,7 @@ export async function runDoeProofProcessContract(contractFile, options = {}) {
       expectedOutputSha256: loaded.document.workload.expectedOutputSha256,
     },
     process: loaded.processOptions,
+    observeProgram: loaded.document.observeProgram,
     signal: options.signal,
     evaluate: (processResult) => loaded.evaluator(processResult, {
       contract: loaded.document,
@@ -450,6 +465,25 @@ export async function validateDoeProofProcessArtifact(artifact, options = {}) {
     if (artifact.receipt?.provider?.requested?.id !== loaded.provider.id
         || artifact.receipt?.provider?.requested?.module !== loaded.provider.module) {
       errors.push('receipt provider does not match the bound contract');
+    }
+    const observationRequested = loaded.document.observeProgram === true
+      || (loaded.document.observeProgram
+        && typeof loaded.document.observeProgram === 'object');
+    const programEvidence = artifact.receipt?.programEvidence;
+    if (observationRequested && !['observed', 'missing'].includes(programEvidence?.status)) {
+      errors.push('receipt program evidence does not match the observed contract');
+    }
+    if (!observationRequested && programEvidence?.status === 'observed') {
+      errors.push('receipt contains program evidence not requested by the contract');
+    }
+    if (programEvidence?.status === 'observed') {
+      const expectedMetadata = loaded.document.observeProgram === true
+        ? {}
+        : loaded.document.observeProgram.metadata ?? {};
+      if (stableSha256(programEvidence.observation?.metadata)
+          !== stableSha256(expectedMetadata)) {
+        errors.push('receipt program evidence metadata does not match the contract');
+      }
     }
   } catch (error) {
     errors.push(`contract verification failed: ${error instanceof Error ? error.message : String(error)}`);

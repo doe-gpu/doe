@@ -262,8 +262,8 @@ test "encoder: RecordedCmd render_pass payload includes draw geometry" {
 
 // 4. Binding limits.
 
-test "encoder: MAX_BIND is 16" {
-    try testing.expectEqual(@as(usize, 16), native.MAX_BIND);
+test "encoder: MAX_BIND is 32" {
+    try testing.expectEqual(@as(usize, 32), native.MAX_BIND);
 }
 
 test "encoder: MAX_FLAT_BIND is MAX_BIND * MAX_COMPUTE_BIND_GROUPS" {
@@ -583,8 +583,8 @@ test "object_should_destroy returns false and decrements when ref_count > 1" {
 // Cross-module: Shader/pipeline binding limits
 // ============================================================
 
-test "MAX_SHADER_BINDINGS is 16" {
-    try testing.expectEqual(@as(usize, 16), native.MAX_SHADER_BINDINGS);
+test "MAX_SHADER_BINDINGS is 32" {
+    try testing.expectEqual(@as(usize, 32), native.MAX_SHADER_BINDINGS);
 }
 
 test "BindingInfo struct has expected fields" {

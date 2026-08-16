@@ -356,8 +356,9 @@ napi_value doe_shader_module_get_bindings(napi_env env, napi_callback_info info)
     if (!shader_module) NAPI_THROW(env, "shaderModuleGetBindings: null shader module");
     if (!pfn_doeNativeShaderModuleGetBindings) NAPI_THROW(env, "shaderModuleGetBindings: native binding metadata not available");
 
-    DoeShaderBindingInfo bindings[16];
-    size_t count = pfn_doeNativeShaderModuleGetBindings(shader_module, bindings, 16);
+    DoeShaderBindingInfo bindings[DOE_SHADER_BINDING_CAPACITY];
+    size_t count = pfn_doeNativeShaderModuleGetBindings(
+        shader_module, bindings, DOE_SHADER_BINDING_CAPACITY);
 
     napi_value array;
     napi_create_array_with_length(env, count, &array);
@@ -396,9 +397,9 @@ napi_value doe_shader_module_get_bindings_for_entry_point(napi_env env, napi_cal
     if (!entry_point) NAPI_THROW(env, "shaderModuleGetBindingsForEntryPoint: out of memory");
     napi_get_value_string_utf8(env, _args[1], entry_point, entry_len + 1, &entry_len);
 
-    DoeShaderBindingInfo bindings[16];
+    DoeShaderBindingInfo bindings[DOE_SHADER_BINDING_CAPACITY];
     size_t count = pfn_doeNativeShaderModuleGetBindingsForEntryPoint(
-        shader_module, entry_point, entry_len, bindings, 16);
+        shader_module, entry_point, entry_len, bindings, DOE_SHADER_BINDING_CAPACITY);
     free(entry_point);
     napi_value array;
     napi_create_array_with_length(env, count, &array);

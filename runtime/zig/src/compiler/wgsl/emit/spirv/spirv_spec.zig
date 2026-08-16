@@ -321,6 +321,7 @@ pub const Opcode = struct {
     pub const AtomicLoad: u16 = 227;
     pub const AtomicStore: u16 = 228;
     pub const AtomicExchange: u16 = 229;
+    pub const AtomicCompareExchange: u16 = 230;
     pub const AtomicIAdd: u16 = 234;
     pub const AtomicISub: u16 = 235;
     pub const AtomicSMin: u16 = 236;

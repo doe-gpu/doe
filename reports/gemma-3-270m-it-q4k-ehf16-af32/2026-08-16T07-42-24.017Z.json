@@ -1,0 +1,1351 @@
+{
+  "mode": "bench",
+  "workload": "inference",
+  "suite": "bench",
+  "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+  "runtimeProfile": null,
+  "deviceInfo": {
+    "hasSubgroups": true,
+    "hasSubgroupsF16": true,
+    "hasF16": true,
+    "hasTimestampQuery": true,
+    "maxBufferSize": 4294967295,
+    "maxWorkgroupSize": 1024,
+    "maxWorkgroupStorageSize": 65536,
+    "adapterInfo": {
+      "vendor": "AMD",
+      "architecture": "vulkan",
+      "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+      "description": "Radeon 8060S Graphics (RADV STRIX_HALO)"
+    },
+    "submitProbeMs": 11.200567999999976
+  },
+  "results": [
+    {
+      "name": "benchmark",
+      "passed": true,
+      "duration": 456.1827029999986
+    }
+  ],
+  "durationMs": 42458.562635,
+  "timestamp": "2026-08-16T07:42:24.017Z",
+  "metrics": {
+    "warmupRuns": 0,
+    "timedRuns": 1,
+    "prompt": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+    "maxTokens": 1,
+    "decodeTokensPerSec": 4165.76,
+    "avgTokensGenerated": 1,
+    "avgPrefillTokens": 72,
+    "avgDecodeTokens": 1,
+    "medianPrefillTokensPerSec": 161.48,
+    "avgPrefillTokensPerSec": 161.48,
+    "medianPrefillTokensPerSecTtft": 158.5,
+    "avgPrefillTokensPerSecTtft": 158.5,
+    "avgDecodeTokensPerSec": 4165.76,
+    "firstTokenMs": 454.25,
+    "firstResponseMs": 42438.78,
+    "prefillMs": 445.89,
+    "decodeMs": 0.24,
+    "totalRunMs": 446.13,
+    "decodeMsPerTokenP50": 0.24,
+    "decodeMsPerTokenP95": 0.24,
+    "decodeMsPerTokenP99": 0.24,
+    "avgPrefillMs": 445.89,
+    "wallRunMs": 456.18,
+    "modelLoadMs": 41984.53,
+    "throughput": {
+      "tokensPerSec": {
+        "mean": 2.192104157881679,
+        "median": 2.192104157881679,
+        "min": 2.192104157881679,
+        "max": 2.192104157881679,
+        "p95": 2.192104157881679,
+        "p99": 2.192104157881679,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "prefillTokensPerSec": {
+        "mean": 161.4756506156729,
+        "median": 161.4756506156729,
+        "min": 161.4756506156729,
+        "max": 161.4756506156729,
+        "p95": 161.4756506156729,
+        "p99": 161.4756506156729,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "prefillTokensPerSecTtft": {
+        "mean": 158.5016242674087,
+        "median": 158.5016242674087,
+        "min": 158.5016242674087,
+        "max": 158.5016242674087,
+        "p95": 158.5016242674087,
+        "p99": 158.5016242674087,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeTokensPerSec": {
+        "mean": 4165.764084430762,
+        "median": 4165.764084430762,
+        "min": 4165.764084430762,
+        "max": 4165.764084430762,
+        "p95": 4165.764084430762,
+        "p99": 4165.764084430762,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      }
+    },
+    "latency": {
+      "totalMs": {
+        "mean": 446.12771200000134,
+        "median": 446.12771200000134,
+        "min": 446.12771200000134,
+        "max": 446.12771200000134,
+        "p95": 446.12771200000134,
+        "p99": 446.12771200000134,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "wallRunMs": {
+        "mean": 456.1827029999986,
+        "median": 456.1827029999986,
+        "min": 456.1827029999986,
+        "max": 456.1827029999986,
+        "p95": 456.1827029999986,
+        "p99": 456.1827029999986,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "prefillMs": {
+        "mean": 445.8876600000003,
+        "median": 445.8876600000003,
+        "min": 445.8876600000003,
+        "max": 445.8876600000003,
+        "p95": 445.8876600000003,
+        "p99": 445.8876600000003,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeMs": {
+        "mean": 0.24005200000101468,
+        "median": 0.24005200000101468,
+        "min": 0.24005200000101468,
+        "max": 0.24005200000101468,
+        "p95": 0.24005200000101468,
+        "p99": 0.24005200000101468,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "firstTokenMs": {
+        "mean": 454.2540200000003,
+        "median": 454.2540200000003,
+        "min": 454.2540200000003,
+        "max": 454.2540200000003,
+        "p95": 454.2540200000003,
+        "p99": 454.2540200000003,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      }
+    },
+    "tokens": {
+      "generated": {
+        "mean": 1,
+        "median": 1,
+        "min": 1,
+        "max": 1,
+        "p95": 1,
+        "p99": 1,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "prefill": {
+        "mean": 72,
+        "median": 72,
+        "min": 72,
+        "max": 72,
+        "p95": 72,
+        "p99": 72,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decode": {
+        "mean": 1,
+        "median": 1,
+        "min": 1,
+        "max": 1,
+        "p95": 1,
+        "p99": 1,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      }
+    },
+    "gpu": {
+      "prefillMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeRecordOps": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPasses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerOp": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerPass": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPassesPerOp": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordMsPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordOpsPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordPassesPerExecutedBatchToken": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "decodeRecordUniqueOpLabels": null,
+      "decodeRecordTopOps": [],
+      "decodeRecordTopOpGroups": [],
+      "decodeSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackMapWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackCleanupMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeReadbackCopyMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "decodeOrchestrationMs": {
+        "mean": 0.24005200000101468,
+        "median": 0.24005200000101468,
+        "min": 0.24005200000101468,
+        "max": 0.24005200000101468,
+        "p95": 0.24005200000101468,
+        "p99": 0.24005200000101468,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "prefillRecordMs": {
+        "mean": 379.0046529999963,
+        "median": 379.0046529999963,
+        "min": 379.0046529999963,
+        "max": 379.0046529999963,
+        "p95": 379.0046529999963,
+        "p99": 379.0046529999963,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "prefillRecordOps": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "prefillRecordPasses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "prefillRecordUniqueOpLabels": null,
+      "prefillRecordTopOps": [],
+      "prefillRecordTopOpGroups": [],
+      "prefillSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "uniformCache": {
+        "hits": 136,
+        "misses": 8,
+        "totalLookups": 144,
+        "hitRateRatio": 0.9444444444444444,
+        "hitRate": "94.4%",
+        "evictions": 0,
+        "currentSize": 8,
+        "pendingDestruction": 0
+      },
+      "singleTokenSubmitWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackMapWaitMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackCleanupMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "singleTokenReadbackCopyMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "singleTokenOrchestrationMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      }
+    },
+    "batching": {
+      "batchedForwardCalls": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "unbatchedForwardCalls": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "totalBatchedTimeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "totalUnbatchedTimeMs": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "gpuSubmissions": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "requestedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "effectiveBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "executedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "resolvedBatchTokens": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "maxBatchTokenCap": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 0,
+        "samplesAfterOutlierRemoval": 0,
+        "outliersRemoved": 0
+      },
+      "batchClampCount": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      }
+    },
+    "decodeCadence": null,
+    "plePreparedTokenCache": {
+      "hits": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "misses": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "entries": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      },
+      "bytes": {
+        "mean": 0,
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0,
+        "stdDev": 0,
+        "ci95": 0,
+        "samples": 1,
+        "samplesAfterOutlierRemoval": 1,
+        "outliersRemoved": 0
+      }
+    },
+    "decodeMode": "single_token",
+    "batchGuardReason": "command_batching_disabled",
+    "executionPlan": {
+      "primary": {
+        "id": "primary",
+        "kernelPathId": "gemma-3-270m-it-q4k-ehf16-af32-execution-inline",
+        "kernelPathSource": "execution-v1",
+        "activationDtype": "f32",
+        "readbackInterval": 1,
+        "readbackMode": "sequential",
+        "maxBatchDecodeTokens": null,
+        "batchSize": 1,
+        "stopCheckMode": "batch",
+        "disableCommandBatching": false,
+        "ringTokens": 1,
+        "ringStop": 1,
+        "ringStaging": 1
+      },
+      "fallback": null,
+      "activePlanIdAtStart": null,
+      "finalActivePlanId": null,
+      "transitions": []
+    },
+    "prefillProfileSteps": [],
+    "decodeProfileSteps": [],
+    "generatedText": "untas",
+    "referenceTranscript": {
+      "schema": "doppler.reference-transcript/v1",
+      "source": {
+        "kind": "inline-browser-suite",
+        "path": "inline",
+        "hash": "sha256:74f46c6c85940070c0660e408e884f2488c24f8f8ab1f9a0830cf06175a3493d"
+      },
+      "executionGraphHash": "sha256:eeb1a27bbb2c81c10aec5f498c746e1f804152952e1497c8c0c0513c60c8de94",
+      "surface": "browser-webgpu",
+      "prompt": {
+        "identity": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+        "hash": "sha256:993fa1e7b83530b02ee1801373974b132096899a7ec27d281448e58276fb7753",
+        "tokenIdsHash": "sha256:058e3a5cf6a92eae7b6657acdcb25831941795a97ada7a95184a97e56fc3c18d",
+        "tokenCount": 72
+      },
+      "output": {
+        "textHash": "sha256:31b280ed24a16e75d6acbe78247b5e510ad09a129c67359aec64aa3fe95a971d",
+        "tokensGenerated": 1,
+        "stopReason": "max-tokens",
+        "stopTokenId": null
+      },
+      "tokens": {
+        "ids": [
+          34492
+        ],
+        "generatedTokenIdsHash": "sha256:713c2cd352d3ce85f3424e03d0ee2dfb9705d1f51743cacda54db56bb3c914bd",
+        "generatedTextHash": "sha256:31b280ed24a16e75d6acbe78247b5e510ad09a129c67359aec64aa3fe95a971d",
+        "preview": [
+          {
+            "id": 34492,
+            "text": "untas",
+            "fallbackText": "untas"
+          }
+        ],
+        "perStep": [
+          {
+            "index": 0,
+            "tokenId": 34492,
+            "tokenHash": "sha256:1411d381f2a6ca35cc1d980e411a4cac2918198ad5b3308a6ab5ad47ac01ca85"
+          }
+        ],
+        "coverage": {
+          "mode": "full-token-ids",
+          "omitted": 0
+        }
+      },
+      "phase": {
+        "prefillMs": 445.8876600000003,
+        "decodeMs": 0.24005200000101468,
+        "prefillTokens": 72,
+        "decodeTokens": 1
+      },
+      "kvCache": {
+        "mode": "stats",
+        "layout": "contiguous",
+        "kvDtype": "f16",
+        "seqLen": 72,
+        "maxSeqLen": 4096,
+        "usedBytes": 1327104,
+        "allocatedBytes": 75497472,
+        "counters": {
+          "updateCalls": 0,
+          "gpuUpdateCalls": 0,
+          "recordedGpuUpdateCalls": 18,
+          "tokensWritten": 1296
+        },
+        "byteDigestMode": null,
+        "byteDigest": null,
+        "byteDigests": null,
+        "stateHash": "sha256:d38cbf73ce86877b65922abf3f80dfa62586aea23938625f38c4748d99bb7243"
+      },
+      "logits": {
+        "mode": "not-captured",
+        "reason": "Per-step logits digests were not requested for this browser harness run.",
+        "perStepDigests": null
+      },
+      "tolerance": {
+        "tokenPolicy": "exact generated token IDs",
+        "logitsPolicy": "not captured",
+        "kvPolicy": "metadata hash only; KV tensor bytes are not read back by default"
+      }
+    },
+    "promptInput": "the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy is clear and block unsafe changes only if evidence supports it user request must stay safe true false yes no a the system should allow review when policy",
+    "decodeBottleneck": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "dominant": {
+        "id": "orchestration",
+        "label": "decode orchestration",
+        "ms": 0.24,
+        "shareOfDecode": 1.0002
+      },
+      "bottleneckClass": "orchestration",
+      "decodeWallMs": 0.24,
+      "componentsMs": {
+        "commandRecordMs": 0,
+        "submitWaitMs": 0,
+        "readbackWaitMs": 0,
+        "effectiveSubmitReadbackWaitMs": 0,
+        "readbackMapWaitMs": 0,
+        "readbackCleanupMs": 0,
+        "readbackCopyMs": 0,
+        "readbackUnattributedMs": null,
+        "gpuTimestampMs": null,
+        "submitReadbackSlackMs": null,
+        "orchestrationMs": 0.24,
+        "residualMs": 0
+      },
+      "recording": {
+        "opCount": 0,
+        "passCount": 0,
+        "uniqueOpLabels": null,
+        "msPerOp": null,
+        "msPerPass": null,
+        "passesPerOp": null,
+        "msPerExecutedBatchToken": null,
+        "opsPerExecutedBatchToken": null,
+        "passesPerExecutedBatchToken": null,
+        "topOps": [],
+        "topOpGroups": [],
+        "uniformCache": {
+          "hits": 136,
+          "misses": 8,
+          "totalLookups": 144,
+          "hitRateRatio": 0.9444444444444444,
+          "evictions": 0,
+          "currentSize": 8,
+          "pendingDestruction": 0,
+          "hitRate": "94.4%"
+        }
+      },
+      "shares": {
+        "commandRecord": 0,
+        "submitWait": 0,
+        "readbackWait": 0,
+        "effectiveSubmitReadbackWait": 0,
+        "readbackMapWait": 0,
+        "readbackCleanup": 0,
+        "readbackCopy": 0,
+        "readbackUnattributed": null,
+        "gpuTimestamp": null,
+        "submitReadbackSlack": null,
+        "orchestration": 1.0002,
+        "residual": 0
+      },
+      "semantics": {
+        "effectiveSubmitReadbackWaitMs": "max(decodeSubmitWaitMs, decodeReadbackWaitMs); submit and readback waits overlap.",
+        "readbackMapWaitMs": "Wall time awaiting staging-buffer mapAsync; usually includes GPU completion behind the readback.",
+        "gpuTimestampMs": "Timestamp-query GPU work when available; null means it was not captured.",
+        "topOps": "Highest-count exact compute-pass labels observed during command recording.",
+        "topOpGroups": "Highest-count compute-pass labels after grouping repeated per-layer labels.",
+        "uniformCache": "Current uniform-buffer cache counters at the end of the measured suite."
+      }
+    },
+    "load": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "semantics": {
+        "modelLoadMs": "suite initialization time before generation",
+        "loaderTotalMs": "DopplerLoader.load() weight-loader wall time",
+        "pipelineTotalMs": "InferencePipeline.loadModel() wall time",
+        "modelLoadMinusPipelineMs": "modelLoadMs - pipeline.totalMs; harness, storage, manifest, GPU init, and pipeline construction",
+        "pipelineMinusLoaderMs": "pipeline.totalMs - loader.totalMs; config, tokenizer, KV, RoPE, and other pipeline setup",
+        "modelLoadMinusLoaderMs": "modelLoadMs - loader.totalMs"
+      },
+      "modelLoadMs": 41984.53,
+      "loader": {
+        "schemaVersion": 1,
+        "source": "doppler-loader",
+        "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+        "status": "complete",
+        "customShardLoader": true,
+        "byteAccountingMode": "custom-loader-read-progress",
+        "totalBytes": 399357184,
+        "totalShards": 6,
+        "bytesLoaded": 399357184,
+        "shardsLoaded": 6,
+        "bytesPerSecond": 9894596,
+        "phasesMs": {
+          "preflight": 1.65,
+          "tensorLocations": 1.19,
+          "embeddings": 18123.34,
+          "layers": 22119.91,
+          "finalWeights": 114.29,
+          "cleanup": 0.05
+        },
+        "layers": {
+          "count": 18,
+          "totalMs": 22063.56,
+          "meanMs": 1225.75,
+          "maxMs": 2840.83,
+          "maxLayer": 0
+        },
+        "totalMs": 40361.14,
+        "failedPhase": null,
+        "error": null
+      },
+      "pipeline": {
+        "schemaVersion": 1,
+        "source": "doppler-pipeline",
+        "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+        "status": "complete",
+        "phasesMs": {
+          "reset": 0.09,
+          "configResolution": 6.67,
+          "kernelWarmup": 0.06,
+          "tokenizer": 459.83,
+          "executionSetup": 34.11,
+          "loadWeights": 41216.51,
+          "rope": 179.4,
+          "convStates": 0.56
+        },
+        "details": {
+          "tokenizer": {
+            "schemaVersion": 1,
+            "source": "doppler-tokenizer",
+            "modelId": "gemma-3-270m-it-q4k-ehf16-af32",
+            "status": "complete",
+            "tokenizerType": "bundled",
+            "tokenizerFile": "tokenizer.json",
+            "backend": "bundled",
+            "assetSource": "custom-loader",
+            "cacheHit": false,
+            "phasesMs": {
+              "configResolution": 0.06,
+              "cacheLookup": 0.06,
+              "backendCreate": 0.11,
+              "assetLoad": 194.82,
+              "assetParse": 0.3,
+              "backendLoad": 263.78,
+              "cacheStore": 0.01
+            },
+            "totalMs": 459.42,
+            "error": null
+          }
+        },
+        "totalMs": 41897.54
+      },
+      "residualsMs": {
+        "modelLoadMinusLoaderMs": 1623.39,
+        "modelLoadMinusPipelineMs": 86.99,
+        "pipelineMinusLoaderMs": 1536.4
+      },
+      "consistent": {
+        "loaderWithinModelLoad": true,
+        "pipelineWithinModelLoad": true,
+        "loaderWithinPipeline": true
+      }
+    },
+    "schemaVersion": 1,
+    "source": "doppler",
+    "suite": "bench",
+    "executionContractArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "ok": true,
+      "checks": [
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.steps",
+          "ok": true
+        },
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.session",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "session": {
+        "layout": "contiguous",
+        "disableCommandBatching": false,
+        "decodeBatchSize": 1,
+        "headDim": 256,
+        "kvLen": 32768,
+        "coldQuantMode": "none",
+        "contiguousQuantMode": "none"
+      },
+      "steps": {
+        "total": 35,
+        "attention": 2,
+        "attentionPhases": {
+          "prefill": 1,
+          "decode": 1,
+          "both": 0
+        }
+      }
+    },
+    "layerPatternContractArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "ok": true,
+      "checks": [
+        {
+          "id": "inference.layerPattern.patternKind.shape",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.patternKind.semantics",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.layerType.shape",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.layerType.semantics",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.even",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.odd",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.every_n_offset",
+          "ok": true
+        },
+        {
+          "id": "inference.layerPattern.computeGlobalLayers.every_n_negative_offset",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "stats": {
+        "patternKindRules": 4,
+        "layerTypeRules": 6,
+        "patternKindContexts": 16,
+        "layerTypeContexts": 12
+      }
+    },
+    "requiredInferenceFieldsArtifact": {
+      "schemaVersion": 1,
+      "source": "doppler",
+      "scope": "manifest",
+      "label": "gemma-3-270m-it-q4k-ehf16-af32.inference",
+      "ok": true,
+      "checks": [
+        {
+          "id": "gemma-3-270m-it-q4k-ehf16-af32.inference.requiredInferenceFields",
+          "ok": true
+        }
+      ],
+      "errors": [],
+      "stats": {
+        "fieldCases": 51,
+        "nullableCases": 27,
+        "nonNullableCases": 24
+      }
+    },
+    "tokenCostLedger": {
+      "schema": "doppler.token-cost-ledger/v1",
+      "identity": {
+        "artifactDigest": "sha256:dee4ca03cbb4ca70cd827a06107e840c78c05573eb049f6025d038b705538bf9",
+        "manifestDigest": "sha256:78c95f517be22e969e945ce900969956e98b6edac2c68f0d0385cd5e28726807",
+        "executionGraphDigest": "sha256:eeb1a27bbb2c81c10aec5f498c746e1f804152952e1497c8c0c0513c60c8de94",
+        "runtimeConfigDigest": "sha256:2dee470d1530e89cbbf727cd791a34456e8aef7c956e83b0d66efc59484592c0",
+        "kernelSetDigest": "sha256:04e0e534f6d70514eb95678ee5df46f4f709c05c15df022ff398f6a7c99d9cb8",
+        "wrapperDigest": "sha256:85c85b813c61ffa90f6062254c8a91f1d073d26c3b6e2e6d43d6bacd61282e6d",
+        "browserDigest": "sha256:7900fb727da53cb728e51e61a12aa3d39989a987d6f68567a0916fb58f7d314d",
+        "adapterDigest": "sha256:3203daf9dc0a0a4af1369c2de871ff8eba6c0de7eb2fdf005f1063d20cef0fce"
+      },
+      "device": {
+        "hasSubgroups": true,
+        "hasSubgroupsF16": true,
+        "hasF16": true,
+        "hasTimestampQuery": true,
+        "maxBufferSize": 4294967295,
+        "maxWorkgroupSize": 1024,
+        "maxWorkgroupStorageSize": 65536,
+        "adapterInfo": {
+          "vendor": "AMD",
+          "architecture": "vulkan",
+          "device": "Radeon 8060S Graphics (RADV STRIX_HALO)",
+          "description": "Radeon 8060S Graphics (RADV STRIX_HALO)"
+        },
+        "submitProbeMs": 11.200567999999976
+      },
+      "browser": {
+        "userAgent": "Node.js/22",
+        "platform": "Linux x86_64",
+        "vendor": null
+      },
+      "phases": [
+        {
+          "phase": "prefill",
+          "measurementSource": "cpu-wall-estimate",
+          "wallMs": 445.89,
+          "attributedGpuMs": null,
+          "unattributedWallMs": null,
+          "timestampCoverageRatio": null,
+          "overlapSemantics": "Operation GPU timestamps are additive pass durations. They are not asserted to equal wall time.",
+          "hostCosts": {
+            "recordMs": 379.0046529999963,
+            "submitWaitMs": 0,
+            "readbackWaitMs": null,
+            "fenceWaitMs": 0,
+            "orchestrationMs": null,
+            "readbackBreakdown": {
+              "mapWaitMs": null,
+              "cleanupMs": null,
+              "copyMs": null
+            },
+            "observedSerialMs": 379.0046529999963,
+            "dominantWall": "command-recording",
+            "overlapSemantics": "submitWaitMs and readbackWaitMs may observe the same submitted GPU work; fenceWaitMs is their maximum. Readback breakdown fields are nested observations and are not added again."
+          },
+          "operations": [],
+          "dispatches": 0,
+          "unattributedDispatches": 0,
+          "dispatchGeometryCoverage": null,
+          "commandBufferSubmissions": 0,
+          "observerReadbacks": 0,
+          "executionReadbacks": {
+            "value": null,
+            "status": "not-attributed-by-observer"
+          },
+          "estimatedBytesMoved": {
+            "value": null,
+            "unit": "bytes",
+            "status": "unavailable",
+            "semantics": "estimated-not-measured"
+          }
+        },
+        {
+          "phase": "decode",
+          "measurementSource": "cpu-wall-estimate",
+          "wallMs": 0.24,
+          "attributedGpuMs": null,
+          "unattributedWallMs": null,
+          "timestampCoverageRatio": null,
+          "overlapSemantics": "Operation GPU timestamps are additive pass durations. They are not asserted to equal wall time.",
+          "hostCosts": {
+            "recordMs": 0,
+            "submitWaitMs": 0,
+            "readbackWaitMs": 0,
+            "fenceWaitMs": 0,
+            "orchestrationMs": 0.24005200000101468,
+            "readbackBreakdown": {
+              "mapWaitMs": 0,
+              "cleanupMs": 0,
+              "copyMs": 0
+            },
+            "observedSerialMs": 0.24005200000101468,
+            "dominantWall": "host-orchestration",
+            "overlapSemantics": "submitWaitMs and readbackWaitMs may observe the same submitted GPU work; fenceWaitMs is their maximum. Readback breakdown fields are nested observations and are not added again."
+          },
+          "operations": [],
+          "dispatches": 0,
+          "unattributedDispatches": 0,
+          "dispatchGeometryCoverage": null,
+          "commandBufferSubmissions": 0,
+          "observerReadbacks": 0,
+          "executionReadbacks": {
+            "value": null,
+            "status": "not-attributed-by-observer"
+          },
+          "estimatedBytesMoved": {
+            "value": null,
+            "unit": "bytes",
+            "status": "unavailable",
+            "semantics": "estimated-not-measured"
+          }
+        }
+      ],
+      "selectedVariants": {
+        "kernelPathId": null,
+        "kernelPathSource": null,
+        "executionPlan": {
+          "primary": {
+            "id": "primary",
+            "kernelPathId": "gemma-3-270m-it-q4k-ehf16-af32-execution-inline",
+            "kernelPathSource": "execution-v1",
+            "activationDtype": "f32",
+            "readbackInterval": 1,
+            "readbackMode": "sequential",
+            "maxBatchDecodeTokens": null,
+            "batchSize": 1,
+            "stopCheckMode": "batch",
+            "disableCommandBatching": false,
+            "ringTokens": 1,
+            "ringStop": 1,
+            "ringStaging": 1
+          },
+          "fallback": null,
+          "activePlanIdAtStart": null,
+          "finalActivePlanId": null,
+          "transitions": []
+        }
+      },
+      "rejectedOrFallbackVariants": [],
+      "dominantOperation": null,
+      "dominantObservedWall": {
+        "phase": "prefill",
+        "wall": "command-recording",
+        "ms": 379.0046529999963
+      },
+      "digest": "sha256:b7f5ffa8299988322faa9edb22588b7dc2f4451fb1a531cc062dd76fc0ece9f5"
+    }
+  },
+  "output": null,
+  "memory": {
+    "used": 688012800,
+    "pool": {
+      "allocations": 266,
+      "reuses": 578,
+      "totalBytesAllocated": 612515328,
+      "peakBytesAllocated": 612515328,
+      "currentBytesAllocated": 612515328,
+      "totalBytesRequested": 611897088,
+      "peakBytesRequested": 605959168,
+      "currentBytesRequested": 603417088,
+      "activeBuffers": 240,
+      "pooledBuffers": 26,
+      "budgetMaxBytes": 0,
+      "budgetUtilization": 0,
+      "hitRate": "68.5%"
+    },
+    "kvCache": {
+      "theoretical": 75497472,
+      "allocated": 75497472,
+      "used": 1327104,
+      "efficiency": 0.017578125,
+      "seqLen": 72,
+      "maxSeqLen": 4096,
+      "layout": "contiguous",
+      "kvDtype": "f16",
+      "counters": {
+        "updateCalls": 0,
+        "gpuUpdateCalls": 0,
+        "recordedGpuUpdateCalls": 18,
+        "tokensWritten": 1296
+      }
+    }
+  },
+  "debugSnapshot": null
+}

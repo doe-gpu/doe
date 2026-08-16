@@ -284,6 +284,17 @@ pub const ConstantValue = union(enum) {
     bool: bool,
     int: u64,
     float: f64,
+    composite: []ConstantValue,
+
+    pub fn deinit(self: *ConstantValue, allocator: std.mem.Allocator) void {
+        switch (self.*) {
+            .composite => |values| {
+                for (values) |*value| value.deinit(allocator);
+                allocator.free(values);
+            },
+            else => {},
+        }
+    }
 };
 
 pub const Global = struct {
@@ -298,6 +309,7 @@ pub const Global = struct {
     override_id: ?u32 = null,
 
     pub fn deinit(self: *Global, allocator: std.mem.Allocator) void {
+        if (self.initializer) |*initializer| initializer.deinit(allocator);
         allocator.free(self.name);
     }
 };

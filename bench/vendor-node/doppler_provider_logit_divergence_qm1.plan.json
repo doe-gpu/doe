@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "doe-doppler-provider-logit-divergence-correction-plan",
+  "planId": "doppler-provider-logit-divergence-qm1-v1",
+  "frozenAt": "2026-08-16T07:58:54Z",
+  "predecessor": {
+    "plan": "bench/vendor-node/doppler_provider_logit_divergence_qm0.plan.json",
+    "result": "bench/out/external-projects/doppler/doppler-provider-logit-divergence-qm0-v1-run1/result.json",
+    "resultSha256": "56f41697a027565b728c1fd53030dcb4396cb1a5b1abcdd57b5a65b3e852e4fd",
+    "outcome": "invalid-evidence",
+    "defect": "W0 completed inference and release and persisted its exact transcript, but capture-mode teardown hung until the process cutoff."
+  },
+  "correction": {
+    "newExecution": "Run only P0 with the unchanged capture scenario. P0 uses the exact incumbent module and changes only post-inference queue drain and device destruction.",
+    "reusedExecution": "Reuse q0 D0 after revalidating its raw trace hashes and embedded payload.",
+    "incumbentContinuity": "Require the new P0 prompt, selected token, and finalized logit digest to match the already persisted q0 W0 transcript exactly.",
+    "forbidden": "No model, prompt, provider, shader, sampler, batching, transcript, or inference parameter change."
+  },
+  "workload": {
+    "scenario": "bench/vendor-node/doppler_provider_logit_divergence_gemma270m_commands.json",
+    "scenarioSha256": "7aad3eed9742c77a974dd625b80b51b6bf574d3aa22e242dfa0fc123b3d04c9c",
+    "sourceCommit": "e6e8be4aaef64b1bb421f7b10939e772ffc40f4d",
+    "modelManifestSha256": "230104df762ff394095326d8e9fa4dc144d431bbd61ad5139e1030e66836ab78",
+    "prefillTokens": 64,
+    "decodeTokens": 1,
+    "captureLogits": true,
+    "captureKvBytes": false
+  },
+  "implementation": {
+    "orchestrator": "bench/executors/run-doppler-logit-divergence-correction.mjs",
+    "orchestratorSha256": "83709697138fd26d8b8da138837327e426e18f9fe57e5221fbb2ab20a5fd5046",
+    "workerSha256": "9ad174fe3fb1aaf60e5c90f73545ed3dcba7dc95aa9a438b796fe7b96d9246b8",
+    "sharedSummarySha256": "ea4c64eee76304a45f9fddbf408521f7672577c03552a02b3b50435584a28e3b",
+    "boundedProviderSha256": "7022d7255854bd4e277a30676ff5ef1a6cc8412b659381b09f6a5f88c6626f03",
+    "incumbentProviderSha256": "18a44f1e81cd3697156e7ddd3456e9f0d346a0afabb76588379b5b2f6dca50b4",
+    "doeProviderSha256": "f0c7e4c93097a4960e91034f0a56f399ed702a250cf1bf38fb2afb5565b651a7"
+  },
+  "acceptance": {
+    "P0": "Inference, transcript, bounded cleanup, provider release, and exit zero all pass.",
+    "continuity": "P0 exactly matches q0 W0 prompt identity, selected token, and finalized f32 logit digest.",
+    "D0": "The reused q0 D0 trace hash, prompt identity, selected token, and finalized f32 logit digest revalidate.",
+    "boundary": "If P0 and D0 prompts match while finalized logits and selected top tokens differ, authorize one operation-level mismatch-localization gate."
+  },
+  "creditBoundary": {
+    "correctProvider": "unassigned without an independent logits oracle",
+    "performance": false,
+    "runtimeOwnership": false,
+    "promotion": false,
+    "release": false
+  }
+}

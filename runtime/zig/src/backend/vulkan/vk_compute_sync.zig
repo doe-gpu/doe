@@ -1,3 +1,4 @@
+const std = @import("std");
 const c = @import("vk_constants.zig");
 const model_binding_types = @import("../../contracts/model/model_binding_value_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
@@ -235,6 +236,16 @@ pub fn capture_current_compute_bindings(
     const bs = bindings orelse return;
 
     for (bs) |binding| {
+        if (binding.resource_kind == .storage_texture) {
+            if (storage_texture_binding_writes(binding)) {
+                // Buffer handles can be tracked precisely across dispatches.
+                // Storage images need an image-aware tracker; until that exists,
+                // force the next dependent dispatch through the global compute
+                // visibility barrier rather than silently dropping the hazard.
+                self.current_compute_binding_tracking_complete = false;
+            }
+            continue;
+        }
         if (binding.resource_kind != .buffer or binding.resource_handle == 0) continue;
         const access = access_for_buffer_binding(binding);
         if (!access.reads and !access.writes) continue;
@@ -347,6 +358,17 @@ fn access_for_buffer_binding(binding: model_compute_types.KernelBinding) Compute
     };
 }
 
+fn storage_texture_binding_writes(binding: model_compute_types.KernelBinding) bool {
+    return switch (binding.storage_texture_access) {
+        model_binding_types.WGPUStorageTextureAccess_ReadOnly => false,
+        model_binding_types.WGPUStorageTextureAccess_Undefined,
+        model_binding_types.WGPUStorageTextureAccess_WriteOnly,
+        model_binding_types.WGPUStorageTextureAccess_ReadWrite,
+        => true,
+        else => true,
+    };
+}
+
 fn current_compute_bindings(self: anytype) []const ComputeBindingAccess {
     const count: usize = @intCast(self.current_compute_binding_count);
     return self.current_compute_bindings[0..count];
@@ -397,4 +419,23 @@ fn merge_current_binding_access(self: anytype, resource_handle: u64, access: Com
         return true;
     }
     return false;
+}
+
+test "storage texture write access requires conservative compute synchronization" {
+    const base = model_compute_types.KernelBinding{
+        .binding = 0,
+        .resource_kind = .storage_texture,
+        .resource_handle = 7,
+    };
+    var read_only = base;
+    read_only.storage_texture_access = model_binding_types.WGPUStorageTextureAccess_ReadOnly;
+    var write_only = base;
+    write_only.storage_texture_access = model_binding_types.WGPUStorageTextureAccess_WriteOnly;
+    var read_write = base;
+    read_write.storage_texture_access = model_binding_types.WGPUStorageTextureAccess_ReadWrite;
+
+    try std.testing.expect(!storage_texture_binding_writes(read_only));
+    try std.testing.expect(storage_texture_binding_writes(write_only));
+    try std.testing.expect(storage_texture_binding_writes(read_write));
+    try std.testing.expect(storage_texture_binding_writes(base));
 }
