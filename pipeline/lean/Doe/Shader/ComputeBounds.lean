@@ -13,6 +13,8 @@
 -- lean_proof.zig validates at comptime, ir_transform_robustness.zig consults
 -- the proof status to skip clamping for matched patterns.
 
+import Doe.Shader.Tactics
+
 /-- Global invocation ID for a single dimension.
     Mirrors WGSL: global_invocation_id.x = workgroup_id.x * workgroup_size.x + local_invocation_id.x -/
 def globalInvocationId (workgroup_id local_id workgroup_size : Nat) : Nat :=
@@ -85,23 +87,9 @@ theorem gid_plus_offset_inbounds_when_dispatch_fits
     (h_lid : local_id_x < workgroup_size_x)
     (h_fit : workgroup_size_x * num_workgroups_x + offset ≤ array_length) :
     globalInvocationId workgroup_id_x local_id_x workgroup_size_x + offset < array_length := by
-  have h_gid_lt_total :
-      globalInvocationId workgroup_id_x local_id_x workgroup_size_x <
-      workgroup_size_x * num_workgroups_x := by
-    have h_self_fit : workgroup_size_x * num_workgroups_x ≤ workgroup_size_x * num_workgroups_x := by
-      exact Nat.le_refl _
-    exact gid_component_lt_total
-      workgroup_id_x local_id_x workgroup_size_x num_workgroups_x
-      (workgroup_size_x * num_workgroups_x)
-      h_wid h_lid h_self_fit
-  have h_offset_lt :
-      globalInvocationId workgroup_id_x local_id_x workgroup_size_x + offset <
-      workgroup_size_x * num_workgroups_x + offset := by
-    exact Nat.add_lt_add_right h_gid_lt_total offset
-  calc
-    globalInvocationId workgroup_id_x local_id_x workgroup_size_x + offset <
-        workgroup_size_x * num_workgroups_x + offset := h_offset_lt
-    _ ≤ array_length := h_fit
+  have h_gid : globalInvocationId workgroup_id_x local_id_x workgroup_size_x < workgroup_size_x * num_workgroups_x :=
+    gid_component_lt_total workgroup_id_x local_id_x workgroup_size_x num_workgroups_x _ h_wid h_lid (Nat.le_refl _)
+  omega
 
 /-- Strided affine 1D extension. If the shader indexes
     `buf[gid.x * stride + offset]`, the access is in bounds when the dispatch
@@ -113,27 +101,11 @@ theorem gid_times_stride_plus_offset_inbounds_when_dispatch_fits
     (h_lid : local_id_x < workgroup_size_x)
     (h_fit : (workgroup_size_x * num_workgroups_x) * stride + offset ≤ array_length) :
     globalInvocationId workgroup_id_x local_id_x workgroup_size_x * stride + offset < array_length := by
-  have h_gid_lt_total :
-      globalInvocationId workgroup_id_x local_id_x workgroup_size_x <
-      workgroup_size_x * num_workgroups_x := by
-    have h_self_fit : workgroup_size_x * num_workgroups_x ≤ workgroup_size_x * num_workgroups_x := by
-      exact Nat.le_refl _
-    exact gid_component_lt_total
-      workgroup_id_x local_id_x workgroup_size_x num_workgroups_x
-      (workgroup_size_x * num_workgroups_x)
-      h_wid h_lid h_self_fit
-  have h_mul_lt :
-      globalInvocationId workgroup_id_x local_id_x workgroup_size_x * stride <
-      (workgroup_size_x * num_workgroups_x) * stride := by
-    exact Nat.mul_lt_mul_of_pos_right h_gid_lt_total h_stride
-  have h_offset_lt :
-      globalInvocationId workgroup_id_x local_id_x workgroup_size_x * stride + offset <
-      (workgroup_size_x * num_workgroups_x) * stride + offset := by
-    exact Nat.add_lt_add_right h_mul_lt offset
-  calc
-    globalInvocationId workgroup_id_x local_id_x workgroup_size_x * stride + offset <
-        (workgroup_size_x * num_workgroups_x) * stride + offset := h_offset_lt
-    _ ≤ array_length := h_fit
+  have h_gid : globalInvocationId workgroup_id_x local_id_x workgroup_size_x < workgroup_size_x * num_workgroups_x :=
+    gid_component_lt_total workgroup_id_x local_id_x workgroup_size_x num_workgroups_x _ h_wid h_lid (Nat.le_refl _)
+  have h_mul : globalInvocationId workgroup_id_x local_id_x workgroup_size_x * stride < (workgroup_size_x * num_workgroups_x) * stride :=
+    Nat.mul_lt_mul_of_pos_right h_gid h_stride
+  omega
 
 /-- Canonical loop-carried 1D extension. If a shader executes a loop-local
     index `gid.x + i + offset`, and the loop body only runs while `i < limit`,
@@ -149,23 +121,9 @@ theorem gid_plus_bounded_loop_index_inbounds_when_dispatch_fits
     (h_lid : local_id_x < workgroup_size_x)
     (h_fit : workgroup_size_x * num_workgroups_x + limit + offset ≤ array_length) :
     globalInvocationId workgroup_id_x local_id_x workgroup_size_x + i + offset < array_length := by
-  let gid := globalInvocationId workgroup_id_x local_id_x workgroup_size_x
-  let total := workgroup_size_x * num_workgroups_x
-  have h_gid_lt_total : gid < total := by
-    dsimp [gid, total]
-    exact gid_component_lt_total
-      workgroup_id_x local_id_x workgroup_size_x num_workgroups_x
-      (workgroup_size_x * num_workgroups_x)
-      h_wid h_lid (Nat.le_refl _)
-  have h_i_offset_lt : i + offset < limit + offset := by
-    exact Nat.add_lt_add_right h_i offset
-  have h_sum_lt : gid + (i + offset) < total + (limit + offset) := by
-    exact Nat.add_lt_add h_gid_lt_total h_i_offset_lt
-  calc
-    gid + i + offset = gid + (i + offset) := by simp [Nat.add_assoc]
-    _ < total + (limit + offset) := h_sum_lt
-    _ = total + limit + offset := by simp [Nat.add_assoc]
-    _ ≤ array_length := h_fit
+  have h_gid : globalInvocationId workgroup_id_x local_id_x workgroup_size_x < workgroup_size_x * num_workgroups_x :=
+    gid_component_lt_total workgroup_id_x local_id_x workgroup_size_x num_workgroups_x _ h_wid h_lid (Nat.le_refl _)
+  omega
 
 /-- Affine counted-loop extension. If a shader indexes
     `buf[gid.x * gid_stride + i * loop_stride + offset]`, and the loop body
@@ -181,32 +139,13 @@ theorem gid_affine_plus_scaled_loop_index_inbounds_when_dispatch_fits
     (h_lid : local_id_x < workgroup_size_x)
     (h_fit : workgroup_size_x * num_workgroups_x * gid_stride + limit * loop_stride + offset ≤ array_length) :
     globalInvocationId workgroup_id_x local_id_x workgroup_size_x * gid_stride + i * loop_stride + offset < array_length := by
-  let gid := globalInvocationId workgroup_id_x local_id_x workgroup_size_x
-  let total := workgroup_size_x * num_workgroups_x
-  have h_gid_lt_total : gid < total := by
-    dsimp [gid, total]
-    exact gid_component_lt_total
-      workgroup_id_x local_id_x workgroup_size_x num_workgroups_x
-      (workgroup_size_x * num_workgroups_x)
-      h_wid h_lid (Nat.le_refl _)
-  have h_gid_scaled_lt :
-      gid * gid_stride < total * gid_stride := by
-    exact Nat.mul_lt_mul_of_pos_right h_gid_lt_total h_gid_stride
-  have h_loop_scaled_lt :
-      i * loop_stride < limit * loop_stride := by
-    exact Nat.mul_lt_mul_of_pos_right h_i h_loop_stride
-  have h_sum_lt :
-      gid * gid_stride + i * loop_stride <
-      total * gid_stride + limit * loop_stride := by
-    exact Nat.add_lt_add h_gid_scaled_lt h_loop_scaled_lt
-  have h_offset_lt :
-      gid * gid_stride + i * loop_stride + offset <
-      (total * gid_stride + limit * loop_stride) + offset := by
-    exact Nat.add_lt_add_right h_sum_lt offset
-  calc
-    gid * gid_stride + i * loop_stride + offset <
-        (total * gid_stride + limit * loop_stride) + offset := h_offset_lt
-    _ ≤ array_length := h_fit
+  have h_gid : globalInvocationId workgroup_id_x local_id_x workgroup_size_x < workgroup_size_x * num_workgroups_x :=
+    gid_component_lt_total workgroup_id_x local_id_x workgroup_size_x num_workgroups_x _ h_wid h_lid (Nat.le_refl _)
+  have h_gid_scaled : globalInvocationId workgroup_id_x local_id_x workgroup_size_x * gid_stride < (workgroup_size_x * num_workgroups_x) * gid_stride :=
+    Nat.mul_lt_mul_of_pos_right h_gid h_gid_stride
+  have h_loop_scaled : i * loop_stride < limit * loop_stride :=
+    Nat.mul_lt_mul_of_pos_right h_i h_loop_stride
+  omega
 
 /-- Tight-precondition variant of the affine counted-loop extension.
     The original theorem over-approximates the precondition by

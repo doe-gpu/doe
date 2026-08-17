@@ -465,5 +465,78 @@ class TestMetaValidation(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
 
 
+class TestEmitCountermodel(unittest.TestCase):
+    """Validate Trace-to-Countermodel Lean fixture generation."""
+
+    def test_format_1d_storage_bounds(self):
+        from pipeline.trace.emit_countermodel import format_lean_countermodel
+
+        event = {
+            "kind": "1d_storage_bounds",
+            "workgroupId": 2,
+            "localId": 5,
+            "workgroupSize": 64,
+            "numWorkgroups": 4,
+            "bufferLength": 100,
+        }
+        res = format_lean_countermodel("oob_test_001", event)
+        self.assertIn("import Doe.Shader.ComputeBounds", res)
+        self.assertIn("theorem counterexample_oob_test_001_violates_bound :", res)
+        self.assertIn("¬ (globalInvocationId 2 5 64 < 100) := by", res)
+        self.assertIn("decide", res)
+
+    def test_format_strided_affine_bounds(self):
+        from pipeline.trace.emit_countermodel import format_lean_countermodel
+
+        event = {
+            "kind": "strided_affine_bounds",
+            "workgroupId": 1,
+            "localId": 0,
+            "workgroupSize": 32,
+            "stride": 4,
+            "offset": 16,
+            "bufferLength": 128,
+        }
+        res = format_lean_countermodel("stride_test", event)
+        self.assertIn("¬ (globalInvocationId 1 0 32 * 4 + 16 < 128) := by", res)
+
+    def test_format_loop_affine_bounds(self):
+        from pipeline.trace.emit_countermodel import format_lean_countermodel
+
+        event = {
+            "kind": "loop_affine_bounds",
+            "workgroupId": 0,
+            "localId": 10,
+            "workgroupSize": 16,
+            "gidStride": 2,
+            "loopStride": 8,
+            "loopIndex": 5,
+            "offset": 4,
+            "bufferLength": 40,
+        }
+        res = format_lean_countermodel("loop_test", event)
+        self.assertIn("¬ (globalInvocationId 0 10 16 * 2 + 5 * 8 + 4 < 40) := by", res)
+
+    def test_emit_countermodel_from_file(self):
+        from pipeline.trace.emit_countermodel import emit_countermodel_from_file
+
+        event = {
+            "traceId": "file_test_trace",
+            "kind": "1d_storage_bounds",
+            "workgroupId": 3,
+            "localId": 0,
+            "workgroupSize": 64,
+            "bufferLength": 150,
+        }
+        with tempfile.TemporaryDirectory() as td:
+            in_json = Path(td) / "event.json"
+            in_json.write_text(json.dumps(event), encoding="utf-8")
+            out_lean = Path(td) / "Counterexample.lean"
+            emit_countermodel_from_file(in_json, out_lean)
+            self.assertTrue(out_lean.is_file())
+            content = out_lean.read_text(encoding="utf-8")
+            self.assertIn("theorem counterexample_file_test_trace_violates_bound :", content)
+
+
 if __name__ == "__main__":
     unittest.main()

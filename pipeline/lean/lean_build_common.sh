@@ -69,6 +69,8 @@ LEAN_PATH="${BUILD_DIR}:${ROOT_DIR}/pipeline/lean" \
 LEAN_PATH="${BUILD_DIR}:${ROOT_DIR}/pipeline/lean" \
   "${LEAN_BIN}" "+${TOOLCHAIN_REF}" -o "${BUILD_DIR}/Doe/Full/WorkloadGeometry.olean" "${ROOT_DIR}/pipeline/lean/Doe/Full/WorkloadGeometry.lean"
 LEAN_PATH="${BUILD_DIR}:${ROOT_DIR}/pipeline/lean" \
+  "${LEAN_BIN}" "+${TOOLCHAIN_REF}" -o "${BUILD_DIR}/Doe/Shader/Tactics.olean" "${ROOT_DIR}/pipeline/lean/Doe/Shader/Tactics.lean"
+LEAN_PATH="${BUILD_DIR}:${ROOT_DIR}/pipeline/lean" \
   "${LEAN_BIN}" "+${TOOLCHAIN_REF}" -o "${BUILD_DIR}/Doe/Shader/ComputeBounds.olean" "${ROOT_DIR}/pipeline/lean/Doe/Shader/ComputeBounds.lean"
 LEAN_PATH="${BUILD_DIR}:${ROOT_DIR}/pipeline/lean" \
   "${LEAN_BIN}" "+${TOOLCHAIN_REF}" -o "${BUILD_DIR}/Doe/Shader/TextureSampleBounds.olean" "${ROOT_DIR}/pipeline/lean/Doe/Shader/TextureSampleBounds.lean"

@@ -965,9 +965,9 @@
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "742ab4b261ee6cb06b3496545bc13d997a60e1a4328700857059abfba17df26d",
+        "moduleSha256": "2b7f0c535637c3c5e2cc89d0265e0ae106a84fed4a4746097e9d180d4870bd73",
         "reason": "Keep: owns Vulkan device/queue runtime lifetime and synchronization; adjacent resource, pipeline, upload, render, and surface capsules already own the separable domains.",
-        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
+        "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/backend/vulkan/vk_adapter_probe.zig": {
         "decision": "Keep",
@@ -3107,9 +3107,9 @@
       },
       "src/native/compute/doe_compute_fast_vulkan.zig": {
         "decision": "Keep",
-        "moduleSha256": "d37cf0f7b4119886027faec43ee93fe2cb6ca81915ac1cfef6aeec83ee0849f8",
+        "moduleSha256": "d62c0f59798696a947e3180eddf87e9f2944769d0bc4beb0bed5efcad754a108",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-runtime-identity/2026-08-16"
+        "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/native/compute/doe_compute_preconditions_native.zig": {
         "decision": "Keep",
@@ -3126,6 +3126,12 @@
       "src/native/diagnostics/doe_metal_browser_trace.zig": {
         "decision": "Keep",
         "moduleSha256": "917dd453c7a5f06f5cf53d1384e281d44ce29d6236ef522fdd55915edf748520",
+        "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/native/diagnostics/doe_program_identity_trace.zig": {
+        "decision": "Keep",
+        "moduleSha256": "c3cc6ea8bbb0417eed44e56d534ae3ab4185c5b0d58422459e3ed44d13548d86",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
@@ -3233,7 +3239,7 @@
       },
       "src/native/resource/doe_buffer_ops_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "1973771475cee6a37be984025b4f8ac9d77175c9334348f5a742282ee375b704",
+        "moduleSha256": "7b4696462c0fa60f356c0e977668dee2fea3e1f7b9622705aa741ac59fb5fca4",
         "reason": "Keep: reachable native implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
@@ -3329,7 +3335,7 @@
       },
       "src/native/support/doe_native_object_helpers.zig": {
         "decision": "Keep",
-        "moduleSha256": "2d3ad9ecf8927b8f04ed8ba4eb1aab545fb026770c5a1871d303c725e79db058",
+        "moduleSha256": "903f3b11878902e90b66048fe4b22ed2304d0e9d9cf27530767d905b2d5b1d4a",
         "reason": "Keep: reachable native implementation shared by 40 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
@@ -3365,9 +3371,9 @@
       },
       "src/native/vulkan/vulkan_compute_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "52c614bf875550c44cf023df2310fe1f3dd879c6a2c50ec4f7c9d3453629f43f",
+        "moduleSha256": "6d2d67a19b5b1d643a5083bd5876be9f190d914c3d086bd2a8665197ad3b3208",
         "reason": "Keep: native WebGPU-to-Vulkan compute command orchestration and lifetime boundary.",
-        "reviewer": "codex-runtime-identity/2026-08-16"
+        "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/native/vulkan/vulkan_feature_cache.zig": {
         "decision": "Keep",
