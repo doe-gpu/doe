@@ -369,6 +369,9 @@
               "pattern": "^bench/out/external-projects/[a-z0-9][a-z0-9-]*/[^/]+/[^/].*$"
             },
             {
+              "pattern": "^bench/external-projects/[a-z0-9][a-z0-9-]*/[^/].*$"
+            },
+            {
               "pattern": "^reports/benchmarks/[a-z0-9][a-z0-9-]*/[^/]+/[^/].*$"
             }
           ]

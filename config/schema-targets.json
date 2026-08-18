@@ -18,6 +18,22 @@
       "data": "config/webgpu-abi-source.json"
     },
     {
+      "schema": "config/cluster-b-fixture-regen-baseline.schema.json",
+      "data": "config/cluster-b-fixture-regen-baseline.json"
+    },
+    {
+      "schema": "config/real-weight-fixture.schema.json",
+      "data": "config/gemma-4-31b-real-weight-fixture.json"
+    },
+    {
+      "schema": "config/real-weight-fixture.schema.json",
+      "data": "config/gemma-4-e2b-real-weight-fixture.json"
+    },
+    {
+      "schema": "config/real-weight-fixture.schema.json",
+      "data": "config/qwen-3-6-27b-real-weight-fixture.json"
+    },
+    {
       "schema": "config/ecosystem-scoring-policy.schema.json",
       "data": "config/ecosystem-scoring-policy.json"
     },
