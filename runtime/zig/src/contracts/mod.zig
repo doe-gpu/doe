@@ -42,6 +42,50 @@ pub fn textureFormat() type {
     return @import("texture_format.zig");
 }
 
+pub fn preparedOperation() type {
+    return @import("prepared_operation.zig");
+}
+
+pub fn executionReport() type {
+    return @import("execution_report.zig");
+}
+
+pub fn identity() type {
+    return @import("identity.zig");
+}
+
+pub fn errorTaxonomy() type {
+    return @import("error.zig");
+}
+
+pub fn exactness() type {
+    return @import("exactness.zig");
+}
+
+pub fn ownership() type {
+    return @import("ownership.zig");
+}
+
+pub fn workloadProfile() type {
+    return @import("workload_profile.zig");
+}
+
+pub fn specializationPolicy() type {
+    return @import("specialization_policy.zig");
+}
+
+pub fn promotionReceipt() type {
+    return @import("promotion_receipt.zig");
+}
+
+pub fn renderCommand() type {
+    return @import("render_command.zig");
+}
+
+pub fn spatialOperation() type {
+    return @import("spatial_operation.zig");
+}
+
 pub const shaderAbi = struct {
     pub fn dispatchInfo() type {
         return @import("shader_abi/dispatch_info.zig");

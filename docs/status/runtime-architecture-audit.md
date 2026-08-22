@@ -3,7 +3,8 @@
 This is the current classification of Doe's non-test Zig surfaces. It is an
 architecture review, not a claim that every line is promoted product code.
 The import fence and source-layout gates are the structural authority; this
-page records the lifecycle interpretation and follow-up decisions.
+page records the lifecycle interpretation and follow-up decisions. The target
+structural roadmap lives in [`../runtime-hexagonal-architecture-plan.md`](../runtime-hexagonal-architecture-plan.md).
 
 ## Current Python sharding advisories
 

@@ -707,7 +707,8 @@ pub fn writeTraceMeta(path: []const u8, summary: TraceRunSummary) !void {
         try writer.writeAll(",");
     }
     if (summary.output_oracle_kind != null) {
-        try writef(writer,
+        try writef(
+            writer,
             "\"outputOracleComparedValueCount\":{},\"outputOracleMismatchCount\":{},\"outputOracleMaxAbsoluteError\":{d},\"outputOracleMaxRelativeError\":{d},\"outputOracleAbsoluteTolerance\":{d},\"outputOracleRelativeTolerance\":{d},",
             .{
                 summary.output_oracle_compared_value_count,

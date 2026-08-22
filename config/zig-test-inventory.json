@@ -199,6 +199,14 @@
           "kind": "integration"
         },
         {
+          "path": "tests/core/hexagonal_architecture_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/hexagonal_composition_test.zig",
+          "kind": "integration"
+        },
+        {
           "path": "tests/core/multi_adapter_test.zig",
           "kind": "integration"
         },
@@ -349,6 +357,14 @@
         },
         {
           "path": "tests/core/execution_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/hexagonal_architecture_test.zig",
+          "kind": "integration"
+        },
+        {
+          "path": "tests/core/hexagonal_composition_test.zig",
           "kind": "integration"
         },
         {

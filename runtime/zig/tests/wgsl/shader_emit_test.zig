@@ -14,7 +14,6 @@ const build_vertex_module = support.build_vertex_module;
 const build_fragment_module = support.build_fragment_module;
 const cleanup_function = support.cleanup_function;
 
-
 // ============================================================
 // emit_msl_vertex tests
 // ============================================================

@@ -197,5 +197,6 @@ trace or an output oracle.
 - [`bench/README.md`](../bench/README.md) for compare and claim workflows
 - [`docs/workload-system.md`](./workload-system.md) for the shared workload,
   executor, oracle, and ledger contract
+- [`docs/runtime-hexagonal-architecture-plan.md`](./runtime-hexagonal-architecture-plan.md) for the target hexagonal (ports-and-adapters) architecture and migration plan for the Zig runtime
 - [`runtime/zig/README.md`](../runtime/zig/README.md) for runtime details
 - [`browser/chromium/README.md`](../browser/chromium/README.md) for the Chromium lane

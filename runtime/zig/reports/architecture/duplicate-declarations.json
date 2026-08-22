@@ -105,6 +105,60 @@
     {
       "locations": [
         {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "app",
+          "path": "src/composition/cli.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "app",
+          "path": "src/composition/dropin.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "app",
+          "path": "src/composition/native.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "app",
+          "path": "src/composition/plan.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "app",
+          "path": "src/composition/runtime_factory.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 15,
+          "kind": "constant",
+          "name": "app",
+          "path": "src/runtime/execution.zig",
+          "startLine": 15,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "00c9dd47f580c82e595b88708c3a28661f0b2abfa609cfa38ef4e4fb6fa77837",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 16,
           "kind": "constant",
           "name": "metal_bridge_device_new_library_msl",
@@ -863,11 +917,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 287,
+          "endLine": 329,
           "kind": "constant",
           "name": "UploadBufferUsageMode",
           "path": "src/runtime/execution.zig",
-          "startLine": 287,
+          "startLine": 329,
           "tokenCount": 7
         }
       ],
@@ -2277,6 +2331,14 @@
           "tokenCount": 7
         },
         {
+          "endLine": 2,
+          "kind": "constant",
+          "name": "program_identity_trace",
+          "path": "src/native/support/doe_native_object_helpers.zig",
+          "startLine": 2,
+          "tokenCount": 7
+        },
+        {
           "endLine": 27,
           "kind": "constant",
           "name": "program_identity_trace",
@@ -2324,6 +2386,28 @@
         }
       ],
       "normalizedTokenSha256": "0e393b5da695aac5252a74263a2c2984bb85be0fc63310a3fc385307b87f2785",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "report_contract",
+          "path": "src/backend/ports/render.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "report_contract",
+          "path": "src/backend/ports/spatial.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "0e7816692df70a055163474ea1c52e66430833b075e2d772ca5ac254d9526527",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -2531,11 +2615,11 @@
     {
       "locations": [
         {
-          "endLine": 55,
+          "endLine": 97,
           "kind": "constant",
           "name": "ExecutionStatus",
           "path": "src/runtime/execution.zig",
-          "startLine": 55,
+          "startLine": 97,
           "tokenCount": 7
         },
         {
@@ -2784,6 +2868,36 @@
         }
       ],
       "normalizedTokenSha256": "1070997139ec8b451a955ad9ea00238a67b427802261c43f009534c7fb9704f3",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "identity",
+          "path": "src/contracts/promotion_receipt.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "identity",
+          "path": "src/contracts/render_command.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "identity",
+          "path": "src/contracts/spatial_operation.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "108a49e53b40b1af5574656c12328ecb611a6f9a50784f0a450e855683056a0f",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -3768,6 +3882,28 @@
         }
       ],
       "normalizedTokenSha256": "18a5763e2ebec96aaf8aacd0b981271fa79c5449148da2258d33e1c351652405",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "compute_port",
+          "path": "src/app/runner.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "compute_port",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "1909e71b1a57ea285344adcd666f1d06ff96aca012e5844319cb830b14431a58",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -7537,6 +7673,58 @@
     {
       "locations": [
         {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "backend_factory",
+          "path": "src/composition/cli.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "backend_factory",
+          "path": "src/composition/runtime_factory.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "3bcd73a6ec75826100e8b8165cd0482157464b806d85ab35f7a9e30facc830c8",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "model_compute",
+          "path": "src/app/prepare.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "model_compute",
+          "path": "src/app/request.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "model_compute",
+          "path": "src/composition/native.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "3bf8c30b35f60680fd8aeb8cc71d49df183725714248808f05adc2f62d0fe567",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 11,
           "kind": "constant",
           "name": "resource_ops",
@@ -9335,6 +9523,84 @@
     {
       "locations": [
         {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/app/runner.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/composition/cli.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/composition/dropin.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/composition/native.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/composition/plan.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/composition/runtime_factory.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/evidence/port.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/evidence/receipt.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/evidence/trace.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "46ddf20f3d134c6cfc65cda68e8cfaa7c972e6afa8bd20ab277423da06e43664",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 19,
           "kind": "constant",
           "name": "wgpu_loader",
@@ -9450,6 +9716,28 @@
         }
       ],
       "normalizedTokenSha256": "4875c9bbf2a9dc2f391063a189f64e3b7cefb4ebec560560f4ed2f7865293c89",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "model_compute",
+          "path": "src/contracts/compute.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "model_compute",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "48a6586334388cadf12455fb0cf1a4bf40e76ca619e860dd899ca6d32dbfd592",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -11193,6 +11481,44 @@
     {
       "locations": [
         {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "identity",
+          "path": "src/evidence/port.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "identity",
+          "path": "src/evidence/receipt.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "identity",
+          "path": "src/evidence/replay.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "identity",
+          "path": "src/evidence/trace.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "5332f03895642cd65c971688f12dcf8385266af79bdb25d868179cd47229cd23",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 17,
           "kind": "constant",
           "name": "WGPUBindGroupLayoutEntry",
@@ -11716,6 +12042,14 @@
     },
     {
       "locations": [
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "compute_contract",
+          "path": "src/app/request.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
         {
           "endLine": 4,
           "kind": "constant",
@@ -13527,11 +13861,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 290,
+          "endLine": 332,
           "kind": "constant",
           "name": "GpuTimestampMode",
           "path": "src/runtime/execution.zig",
-          "startLine": 290,
+          "startLine": 332,
           "tokenCount": 7
         }
       ],
@@ -16171,6 +16505,60 @@
     {
       "locations": [
         {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "prepared",
+          "path": "src/app/prepare.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "prepared",
+          "path": "src/app/runner.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "prepared",
+          "path": "src/composition/runtime_factory.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "prepared",
+          "path": "src/evidence/port.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "prepared",
+          "path": "src/evidence/receipt.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "prepared",
+          "path": "src/evidence/trace.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "787e0536a5955aeb839aed0a3c39999160a1c0647d14cb3935ed5aef37084dd5",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 404,
           "kind": "constant",
           "name": "WGPU_VERTEX_FORMAT_FLOAT32",
@@ -18121,11 +18509,11 @@
           "tokenCount": 6
         },
         {
-          "endLine": 371,
+          "endLine": 413,
           "kind": "constant",
           "name": "testing",
           "path": "src/runtime/execution.zig",
-          "startLine": 371,
+          "startLine": 413,
           "tokenCount": 6
         }
       ],
@@ -20313,6 +20701,28 @@
     {
       "locations": [
         {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "transfer_port",
+          "path": "src/app/runner.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 9,
+          "kind": "constant",
+          "name": "transfer_port",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 9,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "a1a666ef039776b1e0c9ae55dacac1ca84e6674f85a7643c43361ccf7d773477",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 4,
           "kind": "constant",
           "name": "host_runtime",
@@ -21388,6 +21798,28 @@
         }
       ],
       "normalizedTokenSha256": "a9b7077b1de279c25b0127f07f8c889da1e54b40d96a64e395fc38725ca07e0f",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 8,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/backend/ports/compute.zig",
+          "startLine": 8,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "report",
+          "path": "src/backend/ports/transfer.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "a9da5e515a1dd18f16ce7581d663df42b185eadce0a6be2c63c01f33c2a8acc3",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -23795,6 +24227,30 @@
     {
       "locations": [
         {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/app/prepare.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/app/request.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/app/runner.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
           "endLine": 1,
           "kind": "constant",
           "name": "std",
@@ -24192,6 +24648,62 @@
           "name": "std",
           "path": "src/backend/metal_package_pipeline_cache.zig",
           "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/ports/compute.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/ports/queue.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/ports/readback.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/ports/render.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/ports/spatial.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/ports/telemetry.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/backend/ports/transfer.zig",
+          "startLine": 3,
           "tokenCount": 7
         },
         {
@@ -25675,6 +26187,54 @@
           "tokenCount": 7
         },
         {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/composition/cli.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/composition/dropin.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/composition/native.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/composition/plan.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/composition/runtime_factory.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
           "endLine": 3,
           "kind": "constant",
           "name": "std",
@@ -25707,6 +26267,38 @@
           "tokenCount": 7
         },
         {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/error.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/exactness.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 5,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/execution_report.zig",
+          "startLine": 5,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/identity.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
           "endLine": 1,
           "kind": "constant",
           "name": "std",
@@ -25723,6 +26315,22 @@
           "tokenCount": 7
         },
         {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/ownership.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
           "endLine": 1,
           "kind": "constant",
           "name": "std",
@@ -25731,11 +26339,51 @@
           "tokenCount": 7
         },
         {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/promotion_receipt.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/render_command.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
           "endLine": 4,
           "kind": "constant",
           "name": "std",
           "path": "src/contracts/semantic.zig",
           "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/spatial_operation.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/specialization_policy.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/contracts/workload_profile.zig",
+          "startLine": 6,
           "tokenCount": 7
         },
         {
@@ -25976,6 +26624,46 @@
           "name": "std",
           "path": "src/dropin/wgpu_dropin_lib.zig",
           "startLine": 1,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/evidence/oracle.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 6,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/evidence/port.zig",
+          "startLine": 6,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/evidence/receipt.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/evidence/replay.zig",
+          "startLine": 3,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 3,
+          "kind": "constant",
+          "name": "std",
+          "path": "src/evidence/trace.zig",
+          "startLine": 3,
           "tokenCount": 7
         },
         {
@@ -28173,6 +28861,28 @@
     {
       "locations": [
         {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "prepared",
+          "path": "src/backend/ports/compute.zig",
+          "startLine": 7,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "prepared",
+          "path": "src/backend/ports/transfer.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "cc5489bddb59d394f8c8b957437004aa4396a4265068b1fc08b5b8c070d54d09",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
           "endLine": 22,
           "kind": "constant",
           "name": "backend_policy",
@@ -29467,11 +30177,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 289,
+          "endLine": 331,
           "kind": "constant",
           "name": "QueueSyncMode",
           "path": "src/runtime/execution.zig",
-          "startLine": 289,
+          "startLine": 331,
           "tokenCount": 7
         }
       ],
@@ -30677,11 +31387,11 @@
           "tokenCount": 7
         },
         {
-          "endLine": 288,
+          "endLine": 330,
           "kind": "constant",
           "name": "QueueWaitMode",
           "path": "src/runtime/execution.zig",
-          "startLine": 288,
+          "startLine": 330,
           "tokenCount": 7
         }
       ],
@@ -31300,6 +32010,44 @@
         }
       ],
       "normalizedTokenSha256": "e683e4c6598ad100dfa670c26935ef3b39a3de32bffac8d0801a0f4eb3d79ea4",
+      "reason": "identical normalized Zig declaration token stream"
+    },
+    {
+      "locations": [
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "runtime_factory",
+          "path": "src/composition/cli.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "runtime_factory",
+          "path": "src/composition/dropin.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "runtime_factory",
+          "path": "src/composition/native.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        },
+        {
+          "endLine": 4,
+          "kind": "constant",
+          "name": "runtime_factory",
+          "path": "src/composition/plan.zig",
+          "startLine": 4,
+          "tokenCount": 7
+        }
+      ],
+      "normalizedTokenSha256": "e686f1ec75d63ec36cc32ed862b24d572fa4118eb1e558ce32de95a8435703ad",
       "reason": "identical normalized Zig declaration token stream"
     },
     {
@@ -32105,11 +32853,11 @@
           "tokenCount": 15
         },
         {
-          "endLine": 3,
+          "endLine": 4,
           "kind": "variable",
           "name": "gpa",
           "path": "src/native/support/doe_native_object_helpers.zig",
-          "startLine": 3,
+          "startLine": 4,
           "tokenCount": 15
         },
         {
@@ -34077,6 +34825,14 @@
           "path": "src/backend/runtime_types.zig",
           "startLine": 2,
           "tokenCount": 7
+        },
+        {
+          "endLine": 7,
+          "kind": "constant",
+          "name": "backend_contract",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 7,
+          "tokenCount": 7
         }
       ],
       "normalizedTokenSha256": "f913325458660d4920b046ac3f7c93a9e19294dcfdac9c456929eaca72533579",
@@ -35063,9 +35819,9 @@
   ],
   "diagnostic": "candidate equality is lexical after comment and whitespace removal; semantic ownership still requires review",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "46fd49d7a8a61ecb7f91415aa5aed80f1856aca3ddf6b432ec24743a775b27ed",
-  "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
+  "manifestSha256": "fe6bfddca3f80606e30cdc5c8268a5dd6c0ffeb32e2548c3fedaacb4558047cb",
+  "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "b16f1dd49a586eedb9e31cc1d193132d0a3d099a4042839ae56fe69c08fdd4b4"
+  "sourceTreeSha256": "5e54eaf0a79f0826d094c434b5afcbb098de8d87892635c0f99574249091a025"
 }

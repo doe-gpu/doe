@@ -45,6 +45,8 @@ const test_tests_core_error_scope_test_zig_ffd8132e = @import("tests/core/error_
 const test_tests_metal_metal_native_unit_test_zig_586ef12c = @import("tests/metal/metal_native_unit_test.zig");
 const test_tests_core_native_shader_render_test_zig_d81672f4 = @import("tests/core/native_shader_render_test.zig");
 const test_tests_core_execution_test_zig_0ffe3ee6 = @import("tests/core/execution_test.zig");
+const test_tests_core_hexagonal_architecture_test_zig_96c6a90e = @import("tests/core/hexagonal_architecture_test.zig");
+const test_tests_core_hexagonal_composition_test_zig_2cfb68b9 = @import("tests/core/hexagonal_composition_test.zig");
 const test_tests_core_multi_adapter_test_zig_a53fb17b = @import("tests/core/multi_adapter_test.zig");
 const test_tests_core_pipeline_cache_test_zig_ef81f6b6 = @import("tests/core/pipeline_cache_test.zig");
 const test_tests_core_native_api_core_test_zig_4b172f9a = @import("tests/core/native_api_core_test.zig");
@@ -112,6 +114,8 @@ comptime {
     _ = test_tests_metal_metal_native_unit_test_zig_586ef12c;
     _ = test_tests_core_native_shader_render_test_zig_d81672f4;
     _ = test_tests_core_execution_test_zig_0ffe3ee6;
+    _ = test_tests_core_hexagonal_architecture_test_zig_96c6a90e;
+    _ = test_tests_core_hexagonal_composition_test_zig_2cfb68b9;
     _ = test_tests_core_multi_adapter_test_zig_a53fb17b;
     _ = test_tests_core_pipeline_cache_test_zig_ef81f6b6;
     _ = test_tests_core_native_api_core_test_zig_4b172f9a;

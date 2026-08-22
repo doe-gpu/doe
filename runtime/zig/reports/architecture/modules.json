@@ -1,24 +1,271 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "46fd49d7a8a61ecb7f91415aa5aed80f1856aca3ddf6b432ec24743a775b27ed",
+  "manifestSha256": "fe6bfddca3f80606e30cdc5c8268a5dd6c0ffeb32e2548c3fedaacb4558047cb",
   "modules": [
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 8,
-      "fanOut": 6,
+      "fanIn": 7,
+      "fanOut": 3,
       "imports": [
-        "src/backend/backend_telemetry.zig",
-        "src/backend/runtime_types.zig",
-        "src/contracts/backend.zig",
-        "src/contracts/command.zig",
+        "src/app/prepare.zig",
+        "src/app/request.zig",
+        "src/app/runner.zig"
+      ],
+      "isProductionRoot": true,
+      "layer": "app",
+      "lineCount": 16,
+      "onlyReexports": true,
+      "owner": "app",
+      "path": "src/app/mod.zig",
+      "publicDeclarationCount": 11,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 3,
+          "name": "request"
+        },
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "prepare"
+        },
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "runner"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "ApplicationRequest"
+        },
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "ComputeRequest"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "TransferRequest"
+        },
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "prepareCompute"
+        },
+        {
+          "kind": "const",
+          "line": 12,
+          "name": "prepareComputeFromCommand"
+        },
+        {
+          "kind": "const",
+          "line": 13,
+          "name": "prepareTransfer"
+        },
+        {
+          "kind": "const",
+          "line": 15,
+          "name": "executeCompute"
+        },
+        {
+          "kind": "const",
+          "line": 16,
+          "name": "executeTransfer"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/composition/cli.zig",
+        "src/composition/dropin.zig",
+        "src/composition/native.zig",
+        "src/composition/plan.zig",
+        "src/composition/runtime_factory.zig",
+        "src/mod.zig",
+        "src/runtime/execution.zig"
+      ],
+      "roles": [
+        "package-root"
+      ],
+      "sha256": "01c1c452d4ce99677905ed9fd768e556a5badb87f58f8bc44a37a78076f79daf",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 11
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 3,
+      "imports": [
+        "src/app/request.zig",
+        "src/contracts/model/model_compute_types.zig",
+        "src/contracts/prepared_operation.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "app",
+      "lineCount": 44,
+      "onlyReexports": false,
+      "owner": "app",
+      "path": "src/app/prepare.zig",
+      "publicDeclarationCount": 3,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 8,
+          "name": "prepareCompute"
+        },
+        {
+          "kind": "fn",
+          "line": 22,
+          "name": "prepareComputeFromCommand"
+        },
+        {
+          "kind": "fn",
+          "line": 36,
+          "name": "prepareTransfer"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/app/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "ea977ea6c4b36461bd92c09dda5aad82e3579c1dfa71ccf54c9022173cf81b24",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 7
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 2,
+      "fanOut": 2,
+      "imports": [
         "src/contracts/compute.zig",
         "src/contracts/model/model_compute_types.zig"
       ],
       "isProductionRoot": false,
+      "layer": "app",
+      "lineCount": 30,
+      "onlyReexports": false,
+      "owner": "app",
+      "path": "src/app/request.zig",
+      "publicDeclarationCount": 3,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "ComputeRequest"
+        },
+        {
+          "kind": "const",
+          "line": 20,
+          "name": "TransferRequest"
+        },
+        {
+          "kind": "const",
+          "line": 27,
+          "name": "ApplicationRequest"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/app/mod.zig",
+        "src/app/prepare.zig"
+      ],
+      "roles": [],
+      "sha256": "7dd08831fb1a06df693c9716b22d0ed37b6c245a9444cc34d8c098a371d6abcf",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 4,
+      "imports": [
+        "src/backend/ports/compute.zig",
+        "src/backend/ports/transfer.zig",
+        "src/contracts/execution_report.zig",
+        "src/contracts/prepared_operation.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "app",
+      "lineCount": 15,
+      "onlyReexports": false,
+      "owner": "app",
+      "path": "src/app/runner.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 9,
+          "name": "executeCompute"
+        },
+        {
+          "kind": "fn",
+          "line": 13,
+          "name": "executeTransfer"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/app/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "468a5e64d55734eb98aaa2471603158f08fb3fbe7fc9526f0e6d82ab8fcc5a39",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 7
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 9,
+      "fanOut": 17,
+      "imports": [
+        "src/backend/backend_telemetry.zig",
+        "src/backend/ports/compute.zig",
+        "src/backend/ports/queue.zig",
+        "src/backend/ports/readback.zig",
+        "src/backend/ports/render.zig",
+        "src/backend/ports/spatial.zig",
+        "src/backend/ports/telemetry.zig",
+        "src/backend/ports/transfer.zig",
+        "src/backend/runtime_types.zig",
+        "src/contracts/backend.zig",
+        "src/contracts/command.zig",
+        "src/contracts/compute.zig",
+        "src/contracts/execution_report.zig",
+        "src/contracts/model/model_compute_types.zig",
+        "src/contracts/prepared_operation.zig",
+        "src/contracts/render_command.zig",
+        "src/contracts/spatial_operation.zig"
+      ],
+      "isProductionRoot": false,
       "layer": "backend-interface",
-      "lineCount": 113,
+      "lineCount": 308,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/backend_iface.zig",
@@ -49,10 +296,11 @@
         "src/backend/dawn_delegate_backend.zig",
         "src/backend/metal/mod.zig",
         "src/backend/mod.zig",
-        "src/backend/vulkan/mod.zig"
+        "src/backend/vulkan/mod.zig",
+        "src/composition/backend_factory.zig"
       ],
       "roles": [],
-      "sha256": "c91c64e4d88665ff668d74ca06de3cc745bfb2fc5345e22573f479cbf929a189",
+      "sha256": "4ee9aca2658794687a7308729acfdc876daf71ee10215b17795a53a5f6d8960c",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 10
     },
@@ -5442,20 +5690,21 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
-      "fanOut": 4,
+      "fanOut": 5,
       "imports": [
         "src/backend/backend_iface.zig",
         "src/backend/backend_runtime.zig",
         "src/backend/backend_telemetry.zig",
+        "src/backend/ports/mod.zig",
         "src/backend/runtime_types.zig"
       ],
       "isProductionRoot": true,
       "layer": "backend-interface",
-      "lineCount": 15,
+      "lineCount": 19,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/mod.zig",
-      "publicDeclarationCount": 4,
+      "publicDeclarationCount": 5,
       "publicDeclarations": [
         {
           "kind": "fn",
@@ -5476,6 +5725,11 @@
           "kind": "fn",
           "line": 13,
           "name": "telemetry"
+        },
+        {
+          "kind": "fn",
+          "line": 17,
+          "name": "ports"
         }
       ],
       "reachabilityViewRoots": [],
@@ -5487,9 +5741,451 @@
       "roles": [
         "package-root"
       ],
-      "sha256": "dd70652cf30a0534034bd573f66857c4437655f350c9266e8ebfccb7e65f2a9b",
+      "sha256": "cdf73f16414d48e09c692f37ba651e1affb3af87093d7f3f3b3d785274fe9012",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 4
+      "topLevelDeclarationCount": 5
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 4,
+      "fanOut": 2,
+      "imports": [
+        "src/contracts/execution_report.zig",
+        "src/contracts/prepared_operation.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "backend-ports",
+      "lineCount": 21,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/ports/compute.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "ComputePortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 14,
+          "name": "ComputePort"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/app/runner.zig",
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/mod.zig",
+        "src/composition/backend_factory.zig"
+      ],
+      "roles": [],
+      "sha256": "62d51cae0885adfb864a9a95b31e150bf591c9428389d4512e8671ecf166f1fc",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 5
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 7,
+      "imports": [
+        "src/backend/ports/compute.zig",
+        "src/backend/ports/queue.zig",
+        "src/backend/ports/readback.zig",
+        "src/backend/ports/render.zig",
+        "src/backend/ports/spatial.zig",
+        "src/backend/ports/telemetry.zig",
+        "src/backend/ports/transfer.zig"
+      ],
+      "isProductionRoot": true,
+      "layer": "backend-ports",
+      "lineCount": 32,
+      "onlyReexports": true,
+      "owner": "backend",
+      "path": "src/backend/ports/mod.zig",
+      "publicDeclarationCount": 21,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "compute"
+        },
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "transfer"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "queue"
+        },
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "readback"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "telemetry"
+        },
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "render"
+        },
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "spatial"
+        },
+        {
+          "kind": "const",
+          "line": 13,
+          "name": "ComputePort"
+        },
+        {
+          "kind": "const",
+          "line": 14,
+          "name": "ComputePortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 16,
+          "name": "TransferPort"
+        },
+        {
+          "kind": "const",
+          "line": 17,
+          "name": "TransferPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 19,
+          "name": "QueuePort"
+        },
+        {
+          "kind": "const",
+          "line": 20,
+          "name": "QueuePortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 22,
+          "name": "ReadbackPort"
+        },
+        {
+          "kind": "const",
+          "line": 23,
+          "name": "ReadbackPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 25,
+          "name": "TelemetryPort"
+        },
+        {
+          "kind": "const",
+          "line": 26,
+          "name": "TelemetryPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 28,
+          "name": "RenderPort"
+        },
+        {
+          "kind": "const",
+          "line": 29,
+          "name": "RenderPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 31,
+          "name": "SpatialPort"
+        },
+        {
+          "kind": "const",
+          "line": 32,
+          "name": "SpatialPortVTable"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/mod.zig"
+      ],
+      "roles": [
+        "package-root"
+      ],
+      "sha256": "a7f6fc29753fd463730fe56133b7b93ac9c60ed17b36f12f048c1d5525a66944",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 21
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "backend-ports",
+      "lineCount": 21,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/ports/queue.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "QueuePortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "QueuePort"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/mod.zig",
+        "src/composition/backend_factory.zig"
+      ],
+      "roles": [],
+      "sha256": "29dea5680f0ffc6cb9b9c37d66a7ad6dac0c2fde4ca6f7cbeb3bb7242a7ea616",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 3
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "backend-ports",
+      "lineCount": 16,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/ports/readback.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "ReadbackPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "ReadbackPort"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/mod.zig",
+        "src/composition/backend_factory.zig"
+      ],
+      "roles": [],
+      "sha256": "53cea576f5a3ac4467816c1aa869eac9c8dc5faf1219351a5bd5ec6d64d6fae6",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 3
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 2,
+      "imports": [
+        "src/contracts/execution_report.zig",
+        "src/contracts/render_command.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "backend-ports",
+      "lineCount": 23,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/ports/render.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "RenderPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 12,
+          "name": "RenderPort"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/mod.zig",
+        "src/composition/backend_factory.zig"
+      ],
+      "roles": [],
+      "sha256": "08053971012d730175a8c6611289c2e2e49d9333e117059f4a5880e8a1f267e3",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 5
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 2,
+      "imports": [
+        "src/contracts/execution_report.zig",
+        "src/contracts/spatial_operation.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "backend-ports",
+      "lineCount": 18,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/ports/spatial.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "SpatialPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "SpatialPort"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/mod.zig",
+        "src/composition/backend_factory.zig"
+      ],
+      "roles": [],
+      "sha256": "f908a359c46abf794207c536f0c5df6a3cafb480b0de1fcdd61ab3d4649ed318",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 5
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "backend-ports",
+      "lineCount": 16,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/ports/telemetry.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "TelemetryPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "TelemetryPort"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/mod.zig",
+        "src/composition/backend_factory.zig"
+      ],
+      "roles": [],
+      "sha256": "7f43b62ab406f743bb33b84c33be535d6177267e7c48daf92f65a24ca2e51562",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 3
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 4,
+      "fanOut": 2,
+      "imports": [
+        "src/contracts/execution_report.zig",
+        "src/contracts/prepared_operation.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "backend-ports",
+      "lineCount": 18,
+      "onlyReexports": false,
+      "owner": "backend",
+      "path": "src/backend/ports/transfer.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "TransferPortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "TransferPort"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/app/runner.zig",
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/mod.zig",
+        "src/composition/backend_factory.zig"
+      ],
+      "roles": [],
+      "sha256": "603342882fa5deb814e02bd1323eeda63a37b2b364dd574a8f4ab57f4396ac41",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 5
     },
     {
       "containsCImport": false,
@@ -5923,7 +6619,7 @@
       ],
       "isProductionRoot": false,
       "layer": "backend-vulkan",
-      "lineCount": 1026,
+      "lineCount": 1029,
       "onlyReexports": false,
       "owner": "backend",
       "path": "src/backend/vulkan/native_runtime.zig",
@@ -5976,7 +6672,7 @@
         "src/backend/vulkan/vk_feature_probe.zig"
       ],
       "roles": [],
-      "sha256": "742ab4b261ee6cb06b3496545bc13d997a60e1a4328700857059abfba17df26d",
+      "sha256": "2b7f0c535637c3c5e2cc89d0265e0ae106a84fed4a4746097e9d180d4870bd73",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 32
     },
@@ -26398,6 +27094,327 @@
     {
       "containsCImport": false,
       "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 9,
+      "imports": [
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/compute.zig",
+        "src/backend/ports/queue.zig",
+        "src/backend/ports/readback.zig",
+        "src/backend/ports/render.zig",
+        "src/backend/ports/spatial.zig",
+        "src/backend/ports/telemetry.zig",
+        "src/backend/ports/transfer.zig",
+        "src/contracts/backend.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "composition",
+      "lineCount": 39,
+      "onlyReexports": false,
+      "owner": "composition",
+      "path": "src/composition/backend_factory.zig",
+      "publicDeclarationCount": 1,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 17,
+          "name": "BackendPortBundle"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/composition/cli.zig",
+        "src/composition/mod.zig",
+        "src/composition/runtime_factory.zig"
+      ],
+      "roles": [],
+      "sha256": "51268e7e89bae409b193bb53d84034cd0da112306a3bf20feb904d079649b1bd",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 11
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 4,
+      "imports": [
+        "src/app/mod.zig",
+        "src/composition/backend_factory.zig",
+        "src/composition/runtime_factory.zig",
+        "src/contracts/execution_report.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "composition",
+      "lineCount": 12,
+      "onlyReexports": false,
+      "owner": "composition",
+      "path": "src/composition/cli.zig",
+      "publicDeclarationCount": 1,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 9,
+          "name": "executeComputeCli"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/composition/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "07be6b1557be7d0fd814a871c5f797709b86414e53dd88b0036053e5a30bb9eb",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 3,
+      "imports": [
+        "src/app/mod.zig",
+        "src/composition/runtime_factory.zig",
+        "src/contracts/execution_report.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "composition",
+      "lineCount": 16,
+      "onlyReexports": false,
+      "owner": "composition",
+      "path": "src/composition/dropin.zig",
+      "publicDeclarationCount": 1,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 8,
+          "name": "executeDropinWriteBuffer"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/composition/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "7cbda228e494d1cbaadd6d2f01151f9f3bd0a4451d85bbb55a7f2cd18cd28be3",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 5
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 6,
+      "imports": [
+        "src/composition/backend_factory.zig",
+        "src/composition/cli.zig",
+        "src/composition/dropin.zig",
+        "src/composition/native.zig",
+        "src/composition/plan.zig",
+        "src/composition/runtime_factory.zig"
+      ],
+      "isProductionRoot": true,
+      "layer": "composition",
+      "lineCount": 18,
+      "onlyReexports": true,
+      "owner": "composition",
+      "path": "src/composition/mod.zig",
+      "publicDeclarationCount": 12,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "backend_factory"
+        },
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "runtime_factory"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "cli"
+        },
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "native"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "dropin"
+        },
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "plan"
+        },
+        {
+          "kind": "const",
+          "line": 12,
+          "name": "BackendPortBundle"
+        },
+        {
+          "kind": "const",
+          "line": 13,
+          "name": "RuntimeComposition"
+        },
+        {
+          "kind": "const",
+          "line": 15,
+          "name": "executeComputeCli"
+        },
+        {
+          "kind": "const",
+          "line": 16,
+          "name": "executeNativeDispatch"
+        },
+        {
+          "kind": "const",
+          "line": 17,
+          "name": "executeDropinWriteBuffer"
+        },
+        {
+          "kind": "const",
+          "line": 18,
+          "name": "executePlanCompute"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/mod.zig"
+      ],
+      "roles": [
+        "package-root"
+      ],
+      "sha256": "223eadd6c599b6e8302f506aaa28e8cefe0158e0b9f7776937fb17d609b86550",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 12
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 4,
+      "imports": [
+        "src/app/mod.zig",
+        "src/composition/runtime_factory.zig",
+        "src/contracts/execution_report.zig",
+        "src/contracts/model/model_compute_types.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "composition",
+      "lineCount": 12,
+      "onlyReexports": false,
+      "owner": "composition",
+      "path": "src/composition/native.zig",
+      "publicDeclarationCount": 1,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 9,
+          "name": "executeNativeDispatch"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/composition/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "2886777c13fb04b14364218b3ea90a6a4cd5d6b8a61295723f56d4ce2fd6e197",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 3,
+      "imports": [
+        "src/app/mod.zig",
+        "src/composition/runtime_factory.zig",
+        "src/contracts/execution_report.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "composition",
+      "lineCount": 11,
+      "onlyReexports": false,
+      "owner": "composition",
+      "path": "src/composition/plan.zig",
+      "publicDeclarationCount": 1,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 8,
+          "name": "executePlanCompute"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/composition/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "44f3d34e18a7a3bc10e0aac6ba489070d6a006f60322f2565bc01a71800d3c38",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 5
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 5,
+      "fanOut": 5,
+      "imports": [
+        "src/app/mod.zig",
+        "src/composition/backend_factory.zig",
+        "src/contracts/execution_report.zig",
+        "src/contracts/prepared_operation.zig",
+        "src/evidence/port.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "composition",
+      "lineCount": 35,
+      "onlyReexports": false,
+      "owner": "composition",
+      "path": "src/composition/runtime_factory.zig",
+      "publicDeclarationCount": 1,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "RuntimeComposition"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/composition/cli.zig",
+        "src/composition/dropin.zig",
+        "src/composition/mod.zig",
+        "src/composition/native.zig",
+        "src/composition/plan.zig"
+      ],
+      "roles": [],
+      "sha256": "1e062020e117e415cb8691909614644d4b8b4eafd995c34f18a82dc506690ba1",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 7
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
       "fanIn": 24,
       "fanOut": 0,
       "imports": [],
@@ -26530,7 +27547,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 18,
+      "fanIn": 19,
       "fanOut": 1,
       "imports": [
         "src/contracts/model/model_profile.zig"
@@ -26668,6 +27685,7 @@
         "src/backend/vulkan/native_runtime.zig",
         "src/backend/vulkan/vk_adapter_probe.zig",
         "src/cli/runtime_cli_artifacts.zig",
+        "src/composition/backend_factory.zig",
         "src/contracts/compute.zig",
         "src/contracts/mod.zig",
         "src/native/api/doe_native_api_core_exports.zig",
@@ -27103,7 +28121,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 10,
+      "fanIn": 12,
       "fanOut": 3,
       "imports": [
         "src/contracts/backend.zig",
@@ -27146,6 +28164,7 @@
       ],
       "reachable": true,
       "reverseImports": [
+        "src/app/request.zig",
         "src/backend/backend_iface.zig",
         "src/backend/backend_runtime.zig",
         "src/backend/d3d12/mod.zig",
@@ -27155,12 +28174,94 @@
         "src/backend/vulkan/backend_execute.zig",
         "src/backend/vulkan/mod.zig",
         "src/contracts/mod.zig",
+        "src/contracts/prepared_operation.zig",
         "src/runtime/execution.zig"
       ],
       "roles": [],
       "sha256": "e077e45c261e00569e8fbbf67586cb801d316893dbfad968fc8dcd74300f436a",
       "testBlockCount": 1,
       "topLevelDeclarationCount": 8
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 1,
+      "imports": [
+        "src/contracts/execution_report.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 30,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/error.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "DoeError"
+        },
+        {
+          "kind": "fn",
+          "line": 23,
+          "name": "classifyError"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/contracts/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "e31da1faeda3f14e27313e32fad35176c1963402ca56507e8092ec88ad5bc3e8",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 4
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 25,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/exactness.zig",
+      "publicDeclarationCount": 3,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "ExactnessClass"
+        },
+        {
+          "kind": "const",
+          "line": 12,
+          "name": "TolerancePolicy"
+        },
+        {
+          "kind": "const",
+          "line": 18,
+          "name": "OracleResult"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/contracts/mod.zig",
+        "src/contracts/promotion_receipt.zig",
+        "src/evidence/oracle.zig"
+      ],
+      "roles": [],
+      "sha256": "b6f19cb7c16c52470ed9536ff5b631e7a5ea399194b10d874e0a70d849928c46",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 4
     },
     {
       "containsCImport": false,
@@ -27276,8 +28377,134 @@
     {
       "containsCImport": false,
       "definesMain": false,
+      "fanIn": 16,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 59,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/execution_report.zig",
+      "publicDeclarationCount": 3,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "ExecutionStatus"
+        },
+        {
+          "kind": "const",
+          "line": 18,
+          "name": "TimingBreakdownNs"
+        },
+        {
+          "kind": "const",
+          "line": 29,
+          "name": "ExecutionReport"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/app/runner.zig",
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/compute.zig",
+        "src/backend/ports/render.zig",
+        "src/backend/ports/spatial.zig",
+        "src/backend/ports/transfer.zig",
+        "src/composition/cli.zig",
+        "src/composition/dropin.zig",
+        "src/composition/native.zig",
+        "src/composition/plan.zig",
+        "src/composition/runtime_factory.zig",
+        "src/contracts/error.zig",
+        "src/contracts/mod.zig",
+        "src/evidence/port.zig",
+        "src/evidence/receipt.zig",
+        "src/evidence/trace.zig"
+      ],
+      "roles": [],
+      "sha256": "6ef6f710174cac6306f2569362d62f280c3e330529d96f5eb5c7af453a22b5a4",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 4
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 9,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 37,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/identity.zig",
+      "publicDeclarationCount": 6,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "Sha256Digest"
+        },
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "HexDigestString"
+        },
+        {
+          "kind": "fn",
+          "line": 12,
+          "name": "formatHexDigest"
+        },
+        {
+          "kind": "const",
+          "line": 16,
+          "name": "ProgramIdentity"
+        },
+        {
+          "kind": "const",
+          "line": 27,
+          "name": "OperationIdentity"
+        },
+        {
+          "kind": "const",
+          "line": 33,
+          "name": "ExecutionIdentity"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/contracts/mod.zig",
+        "src/contracts/prepared_operation.zig",
+        "src/contracts/promotion_receipt.zig",
+        "src/contracts/render_command.zig",
+        "src/contracts/spatial_operation.zig",
+        "src/evidence/port.zig",
+        "src/evidence/receipt.zig",
+        "src/evidence/replay.zig",
+        "src/evidence/trace.zig"
+      ],
+      "roles": [],
+      "sha256": "e09dd1303efbf04b5fb938ee4b907b7a8ce1584d5d065d3d636382fc881fc25c",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 7
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
       "fanIn": 1,
-      "fanOut": 16,
+      "fanOut": 27,
       "imports": [
         "src/contracts/artifact.zig",
         "src/contracts/backend.zig",
@@ -27286,23 +28513,34 @@
         "src/contracts/command.zig",
         "src/contracts/command_metadata.zig",
         "src/contracts/compute.zig",
+        "src/contracts/error.zig",
+        "src/contracts/exactness.zig",
         "src/contracts/execution.zig",
+        "src/contracts/execution_report.zig",
+        "src/contracts/identity.zig",
         "src/contracts/model/model_compute_types.zig",
         "src/contracts/model/model_profile.zig",
         "src/contracts/numeric_stability/annotation.zig",
+        "src/contracts/ownership.zig",
+        "src/contracts/prepared_operation.zig",
         "src/contracts/primitives/byte_scan.zig",
+        "src/contracts/promotion_receipt.zig",
+        "src/contracts/render_command.zig",
         "src/contracts/semantic.zig",
         "src/contracts/shader_abi/dispatch_info.zig",
+        "src/contracts/spatial_operation.zig",
+        "src/contracts/specialization_policy.zig",
         "src/contracts/texture.zig",
-        "src/contracts/texture_format.zig"
+        "src/contracts/texture_format.zig",
+        "src/contracts/workload_profile.zig"
       ],
       "isProductionRoot": true,
       "layer": "contracts",
-      "lineCount": 75,
+      "lineCount": 119,
       "onlyReexports": false,
       "owner": "contracts",
       "path": "src/contracts/mod.zig",
-      "publicDeclarationCount": 15,
+      "publicDeclarationCount": 26,
       "publicDeclarations": [
         {
           "kind": "fn",
@@ -27360,23 +28598,78 @@
           "name": "textureFormat"
         },
         {
-          "kind": "const",
+          "kind": "fn",
           "line": 45,
+          "name": "preparedOperation"
+        },
+        {
+          "kind": "fn",
+          "line": 49,
+          "name": "executionReport"
+        },
+        {
+          "kind": "fn",
+          "line": 53,
+          "name": "identity"
+        },
+        {
+          "kind": "fn",
+          "line": 57,
+          "name": "errorTaxonomy"
+        },
+        {
+          "kind": "fn",
+          "line": 61,
+          "name": "exactness"
+        },
+        {
+          "kind": "fn",
+          "line": 65,
+          "name": "ownership"
+        },
+        {
+          "kind": "fn",
+          "line": 69,
+          "name": "workloadProfile"
+        },
+        {
+          "kind": "fn",
+          "line": 73,
+          "name": "specializationPolicy"
+        },
+        {
+          "kind": "fn",
+          "line": 77,
+          "name": "promotionReceipt"
+        },
+        {
+          "kind": "fn",
+          "line": 81,
+          "name": "renderCommand"
+        },
+        {
+          "kind": "fn",
+          "line": 85,
+          "name": "spatialOperation"
+        },
+        {
+          "kind": "const",
+          "line": 89,
           "name": "shaderAbi"
         },
         {
           "kind": "const",
-          "line": 51,
+          "line": 95,
           "name": "numericStability"
         },
         {
           "kind": "const",
-          "line": 57,
+          "line": 101,
           "name": "primitives"
         },
         {
           "kind": "const",
-          "line": 63,
+          "line": 107,
           "name": "model"
         }
       ],
@@ -27389,9 +28682,9 @@
       "roles": [
         "package-root"
       ],
-      "sha256": "57ce8b9bd051cc05d47df177afefbdf704e05119689079b78c2913a5e17a6295",
+      "sha256": "01a91180861cd809d6242cd4f0df23be727f4d39d5b97390d5cb1fa35d3480e0",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 15
+      "topLevelDeclarationCount": 26
     },
     {
       "containsCImport": false,
@@ -27608,7 +28901,7 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 35,
+      "fanIn": 39,
       "fanOut": 2,
       "imports": [
         "src/contracts/model/model_binding_value_types.zig",
@@ -27677,6 +28970,8 @@
       ],
       "reachable": true,
       "reverseImports": [
+        "src/app/prepare.zig",
+        "src/app/request.zig",
         "src/backend/backend_iface.zig",
         "src/backend/backend_runtime.zig",
         "src/backend/d3d12/commands/d3d12_dispatch.zig",
@@ -27697,9 +28992,11 @@
         "src/backend/webgpu_backend.zig",
         "src/command/command_parse_dispatch.zig",
         "src/command/command_parse_helpers.zig",
+        "src/composition/native.zig",
         "src/contracts/command.zig",
         "src/contracts/compute.zig",
         "src/contracts/mod.zig",
+        "src/contracts/prepared_operation.zig",
         "src/core/compute/wgpu_commands_compute.zig",
         "src/core/resource/wgpu_resources.zig",
         "src/native/support/doe_native_command_types.zig",
@@ -30732,6 +32029,99 @@
     {
       "containsCImport": false,
       "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 17,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/ownership.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "ResourceOwnership"
+        },
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "LifecycleState"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/contracts/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "3fb0e8169456bca56aa2764f7efd5fc21d180a5fd843f53866f7c79f09ca171c",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 3
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 10,
+      "fanOut": 3,
+      "imports": [
+        "src/contracts/compute.zig",
+        "src/contracts/identity.zig",
+        "src/contracts/model/model_compute_types.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 48,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/prepared_operation.zig",
+      "publicDeclarationCount": 3,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "PreparedComputeOperation"
+        },
+        {
+          "kind": "const",
+          "line": 37,
+          "name": "PreparedTransferOperation"
+        },
+        {
+          "kind": "const",
+          "line": 45,
+          "name": "PreparedOperation"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/app/prepare.zig",
+        "src/app/runner.zig",
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/compute.zig",
+        "src/backend/ports/transfer.zig",
+        "src/composition/runtime_factory.zig",
+        "src/contracts/mod.zig",
+        "src/evidence/port.zig",
+        "src/evidence/receipt.zig",
+        "src/evidence/trace.zig"
+      ],
+      "roles": [],
+      "sha256": "87bd552df85df32e4b97448cad6affd157ff2beab29d5e28f89b8753f2fa0e56",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 7
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
       "fanIn": 4,
       "fanOut": 0,
       "imports": [],
@@ -30837,6 +32227,103 @@
       "sha256": "bbd7f527595de402d9609da8d332863da51c9e1810df4edc3fd0ef7a58e95dab",
       "testBlockCount": 3,
       "topLevelDeclarationCount": 32
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 2,
+      "imports": [
+        "src/contracts/exactness.zig",
+        "src/contracts/identity.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 38,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/promotion_receipt.zig",
+      "publicDeclarationCount": 3,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 10,
+          "name": "ComparisonDisposition"
+        },
+        {
+          "kind": "const",
+          "line": 18,
+          "name": "PromotionReceipt"
+        },
+        {
+          "kind": "const",
+          "line": 33,
+          "name": "RevocationReceipt"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/contracts/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "e93b7cff2322e911bf7a80e5c5e4acf0d91669e9be2cfcc2b9b5a6780297bd04",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 1,
+      "imports": [
+        "src/contracts/identity.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 34,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/render_command.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "ColorAttachmentDesc"
+        },
+        {
+          "kind": "const",
+          "line": 14,
+          "name": "DepthStencilAttachmentDesc"
+        },
+        {
+          "kind": "const",
+          "line": 21,
+          "name": "PreparedRenderPassOperation"
+        },
+        {
+          "kind": "const",
+          "line": 30,
+          "name": "PreparedPipelineOperation"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/render.zig",
+        "src/contracts/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "ffe74d5021ba758379945bbdda15cdd033b97541d047ccd67871c477e6b4e082",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
     },
     {
       "containsCImport": false,
@@ -30960,6 +32447,97 @@
       "sha256": "c0fde78b0f3af700ed04bf562c610aeee9bf7f1f570699af83156cc3fb2fe273",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 8
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 1,
+      "imports": [
+        "src/contracts/identity.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 19,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/spatial_operation.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "SpatialFabricTarget"
+        },
+        {
+          "kind": "const",
+          "line": 12,
+          "name": "PreparedSpatialOperation"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [
+        "module-incubation-evidence-tools",
+        "shipped-native-package-runtime"
+      ],
+      "reachable": true,
+      "reverseImports": [
+        "src/backend/backend_iface.zig",
+        "src/backend/ports/spatial.zig",
+        "src/contracts/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "d69d5ac1b48717e9c4f418a7e360d1204bb847983a8a31475bf266639d76c4fc",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 4
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 1,
+      "imports": [
+        "src/contracts/workload_profile.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 34,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/specialization_policy.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "OptimizationKind"
+        },
+        {
+          "kind": "const",
+          "line": 17,
+          "name": "OptimizationCandidate"
+        },
+        {
+          "kind": "const",
+          "line": 24,
+          "name": "ExperimentCohort"
+        },
+        {
+          "kind": "const",
+          "line": 30,
+          "name": "SpecializationPolicy"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/contracts/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "2fba3f4e644784b31a506f2d75df85dec839bba0ee2806b2c81dd72f6d786b9f",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
     },
     {
       "containsCImport": false,
@@ -31378,6 +32956,53 @@
       "sha256": "87e943453f449eb9aaf42e2e61b132536b5cf99e2a43060bbf0195379b8d62e7",
       "testBlockCount": 0,
       "topLevelDeclarationCount": 77
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 2,
+      "fanOut": 0,
+      "imports": [],
+      "isProductionRoot": false,
+      "layer": "contracts",
+      "lineCount": 34,
+      "onlyReexports": false,
+      "owner": "contracts",
+      "path": "src/contracts/workload_profile.zig",
+      "publicDeclarationCount": 4,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "LatencyPriority"
+        },
+        {
+          "kind": "const",
+          "line": 14,
+          "name": "MemoryBudgetMb"
+        },
+        {
+          "kind": "const",
+          "line": 19,
+          "name": "ExecutionDomain"
+        },
+        {
+          "kind": "const",
+          "line": 27,
+          "name": "WorkloadProfile"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/contracts/mod.zig",
+        "src/contracts/specialization_policy.zig"
+      ],
+      "roles": [],
+      "sha256": "50475a6e8f0109be880838522916729c84e518fa7a14ce41b342e62c61f546d8",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 5
     },
     {
       "containsCImport": true,
@@ -41326,6 +42951,314 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 1,
+      "fanOut": 5,
+      "imports": [
+        "src/evidence/oracle.zig",
+        "src/evidence/port.zig",
+        "src/evidence/receipt.zig",
+        "src/evidence/replay.zig",
+        "src/evidence/trace.zig"
+      ],
+      "isProductionRoot": true,
+      "layer": "evidence",
+      "lineCount": 24,
+      "onlyReexports": true,
+      "owner": "evidence",
+      "path": "src/evidence/mod.zig",
+      "publicDeclarationCount": 15,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 5,
+          "name": "port"
+        },
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "trace"
+        },
+        {
+          "kind": "const",
+          "line": 7,
+          "name": "receipt"
+        },
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "oracle"
+        },
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "replay"
+        },
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "EvidencePort"
+        },
+        {
+          "kind": "const",
+          "line": 12,
+          "name": "EvidencePortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 14,
+          "name": "TraceCollector"
+        },
+        {
+          "kind": "const",
+          "line": 15,
+          "name": "TraceEvent"
+        },
+        {
+          "kind": "const",
+          "line": 17,
+          "name": "ExecutionReceipt"
+        },
+        {
+          "kind": "const",
+          "line": 18,
+          "name": "createExecutionReceipt"
+        },
+        {
+          "kind": "const",
+          "line": 20,
+          "name": "compareExactBytes"
+        },
+        {
+          "kind": "const",
+          "line": 21,
+          "name": "compareFloatsWithTolerance"
+        },
+        {
+          "kind": "const",
+          "line": 23,
+          "name": "validateReplayHashes"
+        },
+        {
+          "kind": "const",
+          "line": 24,
+          "name": "ReplayValidationResult"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/mod.zig"
+      ],
+      "roles": [
+        "package-root"
+      ],
+      "sha256": "448c1a9c72bede8f161c8028ed77d694e4a1f80b3c6fbca65d3373d08a89d026",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 15
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 1,
+      "imports": [
+        "src/contracts/exactness.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "evidence",
+      "lineCount": 63,
+      "onlyReexports": false,
+      "owner": "evidence",
+      "path": "src/evidence/oracle.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "fn",
+          "line": 6,
+          "name": "compareExactBytes"
+        },
+        {
+          "kind": "fn",
+          "line": 28,
+          "name": "compareFloatsWithTolerance"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/evidence/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "e9b88d0e518e9194f203f20d4127b152f1ec841f70549c7d5b60bfffb74f275d",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 4
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 3,
+      "fanOut": 3,
+      "imports": [
+        "src/contracts/execution_report.zig",
+        "src/contracts/identity.zig",
+        "src/contracts/prepared_operation.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "evidence",
+      "lineCount": 27,
+      "onlyReexports": false,
+      "owner": "evidence",
+      "path": "src/evidence/port.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 11,
+          "name": "EvidencePortVTable"
+        },
+        {
+          "kind": "const",
+          "line": 16,
+          "name": "EvidencePort"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/composition/runtime_factory.zig",
+        "src/evidence/mod.zig",
+        "src/evidence/trace.zig"
+      ],
+      "roles": [],
+      "sha256": "cef19523f0e85cfa5c78ab846dfff5656ea81a2be97bcec09a16e7bfe3aa7c9e",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 3,
+      "imports": [
+        "src/contracts/execution_report.zig",
+        "src/contracts/identity.zig",
+        "src/contracts/prepared_operation.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "evidence",
+      "lineCount": 34,
+      "onlyReexports": false,
+      "owner": "evidence",
+      "path": "src/evidence/receipt.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 8,
+          "name": "ExecutionReceipt"
+        },
+        {
+          "kind": "fn",
+          "line": 17,
+          "name": "createExecutionReceipt"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/evidence/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "6a35e2e215089bfcbc84c09c5809bbfb1c69abf12341e2d0f8c8cabf612ed403",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 6
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 1,
+      "imports": [
+        "src/contracts/identity.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "evidence",
+      "lineCount": 41,
+      "onlyReexports": false,
+      "owner": "evidence",
+      "path": "src/evidence/replay.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 6,
+          "name": "ReplayValidationResult"
+        },
+        {
+          "kind": "fn",
+          "line": 13,
+          "name": "validateReplayHashes"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/evidence/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "98a8f9f854b2645c3d0cedc46d45fa6a82acfcb1dbcda0ca1517a1e15641410a",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 4
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
+      "fanOut": 4,
+      "imports": [
+        "src/contracts/execution_report.zig",
+        "src/contracts/identity.zig",
+        "src/contracts/prepared_operation.zig",
+        "src/evidence/port.zig"
+      ],
+      "isProductionRoot": false,
+      "layer": "evidence",
+      "lineCount": 71,
+      "onlyReexports": false,
+      "owner": "evidence",
+      "path": "src/evidence/trace.zig",
+      "publicDeclarationCount": 2,
+      "publicDeclarations": [
+        {
+          "kind": "const",
+          "line": 9,
+          "name": "TraceEvent"
+        },
+        {
+          "kind": "const",
+          "line": 18,
+          "name": "TraceCollector"
+        }
+      ],
+      "reachabilityViewRoots": [],
+      "reachabilityViews": [],
+      "reachable": true,
+      "reverseImports": [
+        "src/evidence/mod.zig"
+      ],
+      "roles": [],
+      "sha256": "8853012bfea56b0e075b38a616c08d780c28d6a3ebc7f537d961f53d1a07703b",
+      "testBlockCount": 0,
+      "topLevelDeclarationCount": 7
+    },
+    {
+      "containsCImport": false,
+      "definesMain": false,
+      "fanIn": 1,
       "fanOut": 6,
       "imports": [
         "src/backend/runtime_types.zig",
@@ -43747,26 +45680,29 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 0,
-      "fanOut": 10,
+      "fanOut": 13,
       "imports": [
+        "src/app/mod.zig",
         "src/backend/mod.zig",
         "src/cli/doe_plan_executor_cli.zig",
         "src/cli/module_runner_cli.zig",
         "src/cli/runtime_cli.zig",
         "src/compiler/mod.zig",
+        "src/composition/mod.zig",
         "src/contracts/mod.zig",
         "src/dropin/wgpu_dropin_lib.zig",
+        "src/evidence/mod.zig",
         "src/plan/mod.zig",
         "src/runtime/mod.zig",
         "src/verification/lean_proof.zig"
       ],
       "isProductionRoot": true,
       "layer": "package-root",
-      "lineCount": 31,
+      "lineCount": 34,
       "onlyReexports": false,
       "owner": "package-root",
       "path": "src/mod.zig",
-      "publicDeclarationCount": 8,
+      "publicDeclarationCount": 11,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -43775,37 +45711,52 @@
         },
         {
           "kind": "const",
+          "line": 2,
+          "name": "app"
+        },
+        {
+          "kind": "const",
           "line": 3,
+          "name": "composition"
+        },
+        {
+          "kind": "const",
+          "line": 4,
+          "name": "evidence"
+        },
+        {
+          "kind": "const",
+          "line": 6,
           "name": "cli"
         },
         {
           "kind": "const",
-          "line": 17,
+          "line": 20,
           "name": "compiler"
         },
         {
           "kind": "const",
-          "line": 18,
+          "line": 21,
           "name": "contracts"
         },
         {
           "kind": "fn",
-          "line": 20,
+          "line": 23,
           "name": "dropin"
         },
         {
           "kind": "const",
-          "line": 24,
+          "line": 27,
           "name": "plan"
         },
         {
           "kind": "const",
-          "line": 25,
+          "line": 28,
           "name": "runtime"
         },
         {
           "kind": "const",
-          "line": 27,
+          "line": 30,
           "name": "verification"
         }
       ],
@@ -43816,9 +45767,9 @@
       "roles": [
         "package-root"
       ],
-      "sha256": "4c89bafadcf2f560279feab349113fbc2cf236cfca775785f935da9563137868",
+      "sha256": "ce86d8061f06a97169bfedca38af874dc14f651389f835e8d90f4e1b2ed6cae9",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 8
+      "topLevelDeclarationCount": 11
     },
     {
       "containsCImport": false,
@@ -45541,7 +47492,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 510,
+      "lineCount": 523,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/compute/doe_compute_fast_vulkan.zig",
@@ -45578,7 +47529,7 @@
         "src/native/compute/doe_compute_fast.zig"
       ],
       "roles": [],
-      "sha256": "d37cf0f7b4119886027faec43ee93fe2cb6ca81915ac1cfef6aeec83ee0849f8",
+      "sha256": "d62c0f59798696a947e3180eddf87e9f2944769d0bc4beb0bed5efcad754a108",
       "testBlockCount": 3,
       "topLevelDeclarationCount": 36
     },
@@ -45736,16 +47687,16 @@
     {
       "containsCImport": false,
       "definesMain": false,
-      "fanIn": 4,
+      "fanIn": 5,
       "fanOut": 0,
       "imports": [],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 388,
+      "lineCount": 418,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/diagnostics/doe_program_identity_trace.zig",
-      "publicDeclarationCount": 6,
+      "publicDeclarationCount": 7,
       "publicDeclarations": [
         {
           "kind": "const",
@@ -45764,17 +47715,22 @@
         },
         {
           "kind": "fn",
-          "line": 183,
+          "line": 189,
           "name": "recordVulkanDispatch"
         },
         {
           "kind": "fn",
-          "line": 223,
+          "line": 235,
+          "name": "recordNativeObjectCreate"
+        },
+        {
+          "kind": "fn",
+          "line": 250,
           "name": "recordVulkanRenderDraw"
         },
         {
           "kind": "fn",
-          "line": 277,
+          "line": 304,
           "name": "recordVulkanSubmissionSucceeded"
         }
       ],
@@ -45787,13 +47743,14 @@
       "reverseImports": [
         "src/native/compute/doe_compute_fast_vulkan.zig",
         "src/native/queue/doe_queue_submit_vulkan.zig",
+        "src/native/support/doe_native_object_helpers.zig",
         "src/native/vulkan/vulkan_compute_native.zig",
         "src/native/vulkan/vulkan_render_pass_native.zig"
       ],
       "roles": [],
-      "sha256": "e930a44d13539eb0e93e8ecc1b0cffe05c6b2edaf9eaf711a88c4abe49f3b815",
+      "sha256": "c3cc6ea8bbb0417eed44e56d534ae3ab4185c5b0d58422459e3ed44d13548d86",
       "testBlockCount": 4,
-      "topLevelDeclarationCount": 26
+      "topLevelDeclarationCount": 27
     },
     {
       "containsCImport": false,
@@ -48147,7 +50104,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 342,
+      "lineCount": 350,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/resource/doe_buffer_ops_native.zig",
@@ -48174,7 +50131,7 @@
         "src/native/api/doe_native_api_core_exports.zig"
       ],
       "roles": [],
-      "sha256": "1973771475cee6a37be984025b4f8ac9d77175c9334348f5a742282ee375b704",
+      "sha256": "7b4696462c0fa60f356c0e977668dee2fea3e1f7b9622705aa741ac59fb5fca4",
       "testBlockCount": 2,
       "topLevelDeclarationCount": 57
     },
@@ -49055,13 +51012,14 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 40,
-      "fanOut": 1,
+      "fanOut": 2,
       "imports": [
+        "src/native/diagnostics/doe_program_identity_trace.zig",
         "src/native/support/doe_label_store.zig"
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 34,
+      "lineCount": 37,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/support/doe_native_object_helpers.zig",
@@ -49069,37 +51027,37 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 5,
+          "line": 6,
           "name": "alloc"
         },
         {
           "kind": "const",
-          "line": 6,
+          "line": 7,
           "name": "label_store"
         },
         {
           "kind": "fn",
-          "line": 8,
+          "line": 9,
           "name": "make"
         },
         {
           "kind": "fn",
-          "line": 12,
+          "line": 15,
           "name": "cast"
         },
         {
           "kind": "fn",
-          "line": 19,
+          "line": 22,
           "name": "object_add_ref"
         },
         {
           "kind": "fn",
-          "line": 24,
+          "line": 27,
           "name": "object_should_destroy"
         },
         {
           "kind": "fn",
-          "line": 32,
+          "line": 35,
           "name": "toOpaque"
         }
       ],
@@ -49152,9 +51110,9 @@
         "src/native/vulkan/vulkan_render_pipeline_native.zig"
       ],
       "roles": [],
-      "sha256": "2d3ad9ecf8927b8f04ed8ba4eb1aab545fb026770c5a1871d303c725e79db058",
+      "sha256": "903f3b11878902e90b66048fe4b22ed2304d0e9d9cf27530767d905b2d5b1d4a",
       "testBlockCount": 0,
-      "topLevelDeclarationCount": 9
+      "topLevelDeclarationCount": 10
     },
     {
       "containsCImport": false,
@@ -49695,7 +51653,7 @@
       ],
       "isProductionRoot": false,
       "layer": "native",
-      "lineCount": 1049,
+      "lineCount": 1063,
       "onlyReexports": false,
       "owner": "native",
       "path": "src/native/vulkan/vulkan_compute_native.zig",
@@ -49763,17 +51721,17 @@
         },
         {
           "kind": "fn",
-          "line": 968,
+          "line": 982,
           "name": "vulkan_submit_recorded_dispatch"
         },
         {
           "kind": "fn",
-          "line": 974,
+          "line": 988,
           "name": "vulkan_run_prepared_dispatch_indirect"
         },
         {
           "kind": "fn",
-          "line": 987,
+          "line": 1001,
           "name": "vulkan_submit_recorded_dispatch_indirect"
         }
       ],
@@ -49790,7 +51748,7 @@
         "src/native/shader/doe_shader_native.zig"
       ],
       "roles": [],
-      "sha256": "52c614bf875550c44cf023df2310fe1f3dd879c6a2c50ec4f7c9d3453629f43f",
+      "sha256": "6d2d67a19b5b1d643a5083bd5876be9f190d914c3d086bd2a8665197ad3b3208",
       "testBlockCount": 1,
       "topLevelDeclarationCount": 99
     },
@@ -52130,8 +54088,9 @@
       "containsCImport": false,
       "definesMain": false,
       "fanIn": 15,
-      "fanOut": 13,
+      "fanOut": 14,
       "imports": [
+        "src/app/mod.zig",
         "src/backend/backend_policy.zig",
         "src/backend/backend_runtime.zig",
         "src/backend/backend_telemetry.zig",
@@ -52148,7 +54107,7 @@
       ],
       "isProductionRoot": false,
       "layer": "runtime",
-      "lineCount": 522,
+      "lineCount": 564,
       "onlyReexports": false,
       "owner": "runtime",
       "path": "src/runtime/execution.zig",
@@ -52156,112 +54115,112 @@
       "publicDeclarations": [
         {
           "kind": "const",
-          "line": 48,
+          "line": 90,
           "name": "BackendMode"
         },
         {
           "kind": "const",
-          "line": 53,
+          "line": 95,
           "name": "DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS"
         },
         {
           "kind": "const",
-          "line": 55,
+          "line": 97,
           "name": "ExecutionStatus"
         },
         {
           "kind": "const",
-          "line": 56,
+          "line": 98,
           "name": "ExecutionResult"
         },
         {
           "kind": "const",
-          "line": 58,
+          "line": 100,
           "name": "ExecutionContext"
         },
         {
           "kind": "const",
-          "line": 287,
+          "line": 329,
           "name": "UploadBufferUsageMode"
         },
         {
           "kind": "const",
-          "line": 288,
+          "line": 330,
           "name": "QueueWaitMode"
         },
         {
           "kind": "const",
-          "line": 289,
+          "line": 331,
           "name": "QueueSyncMode"
         },
         {
           "kind": "const",
-          "line": 290,
+          "line": 332,
           "name": "GpuTimestampMode"
         },
         {
           "kind": "fn",
-          "line": 292,
+          "line": 334,
           "name": "parseUploadBufferUsage"
         },
         {
           "kind": "fn",
-          "line": 298,
+          "line": 340,
           "name": "parseQueueWaitMode"
         },
         {
           "kind": "fn",
-          "line": 304,
+          "line": 346,
           "name": "queueWaitModeName"
         },
         {
           "kind": "fn",
-          "line": 311,
+          "line": 353,
           "name": "parseQueueSyncMode"
         },
         {
           "kind": "fn",
-          "line": 317,
+          "line": 359,
           "name": "queueSyncModeName"
         },
         {
           "kind": "fn",
-          "line": 324,
+          "line": 366,
           "name": "parseGpuTimestampMode"
         },
         {
           "kind": "fn",
-          "line": 331,
+          "line": 373,
           "name": "parseBackend"
         },
         {
           "kind": "fn",
-          "line": 338,
+          "line": 380,
           "name": "parseBackendLane"
         },
         {
           "kind": "fn",
-          "line": 342,
+          "line": 384,
           "name": "defaultBackendLane"
         },
         {
           "kind": "fn",
-          "line": 350,
+          "line": 392,
           "name": "backendLaneName"
         },
         {
           "kind": "fn",
-          "line": 354,
+          "line": 396,
           "name": "backend_id_name"
         },
         {
           "kind": "fn",
-          "line": 358,
+          "line": 400,
           "name": "executionModeName"
         },
         {
           "kind": "fn",
-          "line": 365,
+          "line": 407,
           "name": "executionStatusName"
         }
       ],
@@ -52289,9 +54248,9 @@
         "src/runtime/trace/trace_jsonl_emit.zig"
       ],
       "roles": [],
-      "sha256": "0486c3e2dce261062d98548adfc2190f714b818b6414d9f0cb48142b052b317e",
+      "sha256": "cc88c3f9d7f10b6528569dc5dd99d7b65d0fd9965ad8cf43e129205d5bbc23b6",
       "testBlockCount": 12,
-      "topLevelDeclarationCount": 53
+      "topLevelDeclarationCount": 54
     },
     {
       "containsCImport": false,
@@ -54490,7 +56449,7 @@
       ],
       "isProductionRoot": false,
       "layer": "runtime",
-      "lineCount": 883,
+      "lineCount": 884,
       "onlyReexports": false,
       "owner": "runtime",
       "path": "src/runtime/trace/trace.zig",
@@ -54597,7 +56556,7 @@
         "src/runtime/trace/trace_jsonl_emit.zig"
       ],
       "roles": [],
-      "sha256": "7ca998d82e1521e609eec13f7ecb09fcf3ef59bb0e3d93e8c562d44d15d9bb65",
+      "sha256": "68f58d7e8bced8aa14fa515ab935f9f837adecf2cd04d2ad09e0f8954385fa23",
       "testBlockCount": 21,
       "topLevelDeclarationCount": 55
     },
@@ -55263,8 +57222,8 @@
       "topLevelDeclarationCount": 18
     }
   ],
-  "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
+  "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "b16f1dd49a586eedb9e31cc1d193132d0a3d099a4042839ae56fe69c08fdd4b4"
+  "sourceTreeSha256": "5e54eaf0a79f0826d094c434b5afcbb098de8d87892635c0f99574249091a025"
 }

@@ -12,6 +12,7 @@ const runtime_types = @import("../backend/runtime_types.zig");
 const wgpu_loader = @import("../core/abi/wgpu_loader.zig");
 const semantic_trace = @import("../contracts/semantic.zig");
 const execution_receipt = @import("execution_receipt.zig");
+const app = @import("../app/mod.zig");
 
 const model = struct {
     pub const Command = model_commands.Command;
@@ -33,10 +34,51 @@ const NativeOperation = union(enum) {
 fn executeBackendOperation(backend: *backend_runtime.BackendRuntime, operation: NativeOperation) !execution_contract.NativeExecutionResult {
     return switch (operation) {
         .command => |command| switch (command) {
-            .kernel_dispatch => |dispatch| (try backend.execute_dispatch(compute_contract.DispatchRequest.fromCommand(dispatch))).execution,
+            .kernel_dispatch => |dispatch| {
+                const op = app.prepareComputeFromCommand(dispatch, 0);
+                const rep = try app.executeCompute(backend.iface.asComputePort(), op);
+                return execution_contract.NativeExecutionResult{
+                    .status = switch (rep.status) {
+                        .ok => .ok,
+                        .unsupported => .unsupported,
+                        .@"error" => .@"error",
+                        .skipped => .ok,
+                    },
+                    .status_message = rep.status_message,
+                    .setup_ns = rep.timing.setup_ns,
+                    .encode_ns = rep.timing.encode_ns,
+                    .submit_wait_ns = rep.timing.submit_wait_ns,
+                    .dispatch_count = rep.dispatch_count,
+                    .gpu_timestamp_ns = rep.timing.gpu_timestamp_ns,
+                    .gpu_timestamp_valid = rep.gpu_timestamp_valid,
+                };
+            },
             else => try backend.execute_command(command),
         },
-        .buffer_write_bytes => |write| try backend.execute_buffer_write_bytes(write.handle, write.offset, write.buffer_size, write.data),
+        .buffer_write_bytes => |write| {
+            const op = app.prepareTransfer(.{
+                .buffer_handle = write.handle,
+                .offset_bytes = write.offset,
+                .size_bytes = write.buffer_size,
+                .data = write.data,
+            }, 0);
+            const rep = try app.executeTransfer(backend.iface.asTransferPort(), op);
+            return execution_contract.NativeExecutionResult{
+                .status = switch (rep.status) {
+                    .ok => .ok,
+                    .unsupported => .unsupported,
+                    .@"error" => .@"error",
+                    .skipped => .ok,
+                },
+                .status_message = rep.status_message,
+                .setup_ns = rep.timing.setup_ns,
+                .encode_ns = rep.timing.encode_ns,
+                .submit_wait_ns = rep.timing.submit_wait_ns,
+                .dispatch_count = 0,
+                .gpu_timestamp_ns = rep.timing.gpu_timestamp_ns,
+                .gpu_timestamp_valid = rep.gpu_timestamp_valid,
+            };
+        },
     };
 }
 

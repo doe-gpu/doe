@@ -6,14 +6,17 @@ is the single module root; every other Zig file belongs to one owner below.
 
 | Directory | Owns |
 | --- | --- |
+| `app/` | application orchestration and request preparation |
 | `backend/` | backend selection, shared backend seams, and Metal/Vulkan/D3D12 implementations |
 | `cli/` | command-line orchestration and executable entrypoints |
 | `command/` | command-stream parsing and normalization |
 | `compat/` | explicit compatibility barrels that remain under test |
 | `compiler/` | WGSL, TSIR, and compiler target descriptions |
+| `composition/` | composition roots, backend factory, and adapter assembly |
 | `contracts/` | neutral contracts shared by core and full runtime layers |
 | `core/` | compute, resource, queue, replay, trace, and WebGPU ABI core |
 | `dropin/` | WebGPU drop-in symbol routing and behavior policy |
+| `evidence/` | evidence port, execution receipts, trace observer, oracle comparisons, and replay validation |
 | `full/` | render, surface, and full-runtime command behavior |
 | `integrations/` | runtime integration anchors such as ONNX Runtime EP |
 | `native/` | Doe-native WebGPU object and command implementation |

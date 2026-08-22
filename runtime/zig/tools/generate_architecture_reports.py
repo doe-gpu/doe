@@ -776,8 +776,17 @@ def main() -> int:
     try:
         config = load_manifest(args.config)
         analysis = analyze(args.root, config)
-        if analysis.manifest_errors or analysis.unresolved_imports:
-            for error in analysis.manifest_errors:
+        blocking_manifest_errors = [
+            error
+            for error in analysis.manifest_errors
+            if args.check
+            or (
+                not error.startswith("module decision review is stale for ")
+                and not error.startswith("module decision review is missing for ")
+            )
+        ]
+        if blocking_manifest_errors or analysis.unresolved_imports:
+            for error in blocking_manifest_errors:
                 print(error, file=sys.stderr)
             for unresolved in analysis.unresolved_imports:
                 print(unresolved, file=sys.stderr)

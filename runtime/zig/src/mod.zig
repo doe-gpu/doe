@@ -1,4 +1,7 @@
 pub const backend = @import("backend/mod.zig");
+pub const app = @import("app/mod.zig");
+pub const composition = @import("composition/mod.zig");
+pub const evidence = @import("evidence/mod.zig");
 
 pub const cli = struct {
     pub fn doePlanExecutor() type {

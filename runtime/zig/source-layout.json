@@ -7,14 +7,17 @@
     "mod.zig"
   ],
   "topLevelOwners": {
+    "app": "application orchestration and request preparation",
     "backend": "backend selection, shared backend seams, and Metal/Vulkan/D3D12 implementations",
     "cli": "command-line orchestration and executable entrypoints",
     "command": "command-stream parsing and normalization",
     "compat": "explicit compatibility barrels that remain under test",
     "compiler": "WGSL, TSIR, and compiler target descriptions",
+    "composition": "composition roots, backend factory, and adapter assembly",
     "contracts": "neutral contracts shared by core and full runtime layers",
     "core": "compute, resource, queue, replay, trace, and WebGPU ABI core",
     "dropin": "WebGPU drop-in symbol routing and behavior policy",
+    "evidence": "evidence port, execution receipts, trace observer, oracle comparisons, and replay validation",
     "full": "render, surface, and full-runtime command behavior",
     "integrations": "runtime integration anchors such as ONNX Runtime EP",
     "native": "Doe-native WebGPU object and command implementation",
@@ -54,15 +57,60 @@
           "src/mod.zig"
         ],
         "mayImport": [
+          "app",
           "backend-interface",
+          "backend-ports",
           "cli",
           "compiler",
+          "composition",
           "contracts",
           "dropin",
+          "evidence",
           "package-root",
           "plan",
           "runtime",
           "verification"
+        ]
+      },
+      "app": {
+        "globs": [
+          "src/app/**"
+        ],
+        "mayImport": [
+          "app",
+          "backend-ports",
+          "contracts"
+        ]
+      },
+      "backend-ports": {
+        "globs": [
+          "src/backend/ports/**"
+        ],
+        "mayImport": [
+          "backend-ports",
+          "contracts"
+        ]
+      },
+      "composition": {
+        "globs": [
+          "src/composition/**"
+        ],
+        "mayImport": [
+          "app",
+          "backend-interface",
+          "backend-ports",
+          "composition",
+          "contracts",
+          "evidence"
+        ]
+      },
+      "evidence": {
+        "globs": [
+          "src/evidence/**"
+        ],
+        "mayImport": [
+          "contracts",
+          "evidence"
         ]
       },
       "contracts": {
@@ -153,6 +201,7 @@
           "backend-d3d12",
           "backend-interface",
           "backend-metal",
+          "backend-ports",
           "backend-vulkan",
           "contracts",
           "core",
@@ -166,8 +215,10 @@
           "src/runtime/**"
         ],
         "mayImport": [
+          "app",
           "backend-common",
           "backend-interface",
+          "backend-ports",
           "contracts",
           "core",
           "quirk",
@@ -436,6 +487,81 @@
     "reachabilityExceptions": [],
     "cohesiveModuleJustifications": [],
     "canonicalContracts": {
+      "prepared-operation-contract": {
+        "path": "src/contracts/prepared_operation.zig",
+        "requiredPublicDeclarations": [
+          "PreparedComputeOperation",
+          "PreparedOperation",
+          "PreparedTransferOperation"
+        ],
+        "forbiddenLegacyPaths": []
+      },
+      "execution-report-contract": {
+        "path": "src/contracts/execution_report.zig",
+        "requiredPublicDeclarations": [
+          "ExecutionReport",
+          "ExecutionStatus",
+          "TimingBreakdownNs"
+        ],
+        "forbiddenLegacyPaths": []
+      },
+      "identity-contract": {
+        "path": "src/contracts/identity.zig",
+        "requiredPublicDeclarations": [
+          "ExecutionIdentity",
+          "OperationIdentity",
+          "ProgramIdentity",
+          "Sha256Digest"
+        ],
+        "forbiddenLegacyPaths": []
+      },
+      "workload-profile-contract": {
+        "path": "src/contracts/workload_profile.zig",
+        "requiredPublicDeclarations": [
+          "ExecutionDomain",
+          "LatencyPriority",
+          "MemoryBudgetMb",
+          "WorkloadProfile"
+        ],
+        "forbiddenLegacyPaths": []
+      },
+      "specialization-policy-contract": {
+        "path": "src/contracts/specialization_policy.zig",
+        "requiredPublicDeclarations": [
+          "ExperimentCohort",
+          "OptimizationCandidate",
+          "OptimizationKind",
+          "SpecializationPolicy"
+        ],
+        "forbiddenLegacyPaths": []
+      },
+      "promotion-receipt-contract": {
+        "path": "src/contracts/promotion_receipt.zig",
+        "requiredPublicDeclarations": [
+          "ComparisonDisposition",
+          "PromotionReceipt",
+          "RevocationReceipt"
+        ],
+        "forbiddenLegacyPaths": []
+      },
+      "render-command-contract": {
+        "path": "src/contracts/render_command.zig",
+        "requiredPublicDeclarations": [
+          "ColorAttachmentDesc",
+          "DepthStencilAttachmentDesc",
+          "PreparedPipelineOperation",
+          "PreparedRenderPassOperation"
+        ],
+        "forbiddenLegacyPaths": []
+      },
+      "spatial-operation-contract": {
+        "path": "src/contracts/spatial_operation.zig",
+        "requiredPublicDeclarations": [
+          "PreparedSpatialOperation",
+          "SpatialFabricTarget"
+        ],
+        "forbiddenLegacyPaths": []
+      },
       "compute-dispatch-contract": {
         "path": "src/contracts/compute.zig",
         "requiredPublicDeclarations": [
@@ -507,10 +633,34 @@
       }
     },
     "moduleDecisionReviews": {
+      "src/app/mod.zig": {
+        "decision": "Keep",
+        "moduleSha256": "01c1c452d4ce99677905ed9fd768e556a5badb87f58f8bc44a37a78076f79daf",
+        "reason": "Keep: reachable app implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/app/prepare.zig": {
+        "decision": "Keep",
+        "moduleSha256": "ea977ea6c4b36461bd92c09dda5aad82e3579c1dfa71ccf54c9022173cf81b24",
+        "reason": "Keep: reachable app implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/app/request.zig": {
+        "decision": "Keep",
+        "moduleSha256": "7dd08831fb1a06df693c9716b22d0ed37b6c245a9444cc34d8c098a371d6abcf",
+        "reason": "Keep: reachable app implementation shared by 2 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/app/runner.zig": {
+        "decision": "Keep",
+        "moduleSha256": "468a5e64d55734eb98aaa2471603158f08fb3fbe7fc9526f0e6d82ab8fcc5a39",
+        "reason": "Keep: reachable app implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
       "src/backend/backend_iface.zig": {
         "decision": "Keep",
-        "moduleSha256": "c91c64e4d88665ff668d74ca06de3cc745bfb2fc5345e22573f479cbf929a189",
-        "reason": "Keep: neutral backend interface contract shared by eight production consumers.",
+        "moduleSha256": "4ee9aca2658794687a7308729acfdc876daf71ee10215b17795a53a5f6d8960c",
+        "reason": "Keep: reachable backend implementation shared by 9 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/backend/backend_policy.zig": {
@@ -935,8 +1085,56 @@
       },
       "src/backend/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "dd70652cf30a0534034bd573f66857c4437655f350c9266e8ebfccb7e65f2a9b",
+        "moduleSha256": "cdf73f16414d48e09c692f37ba651e1affb3af87093d7f3f3b3d785274fe9012",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/ports/compute.zig": {
+        "decision": "Keep",
+        "moduleSha256": "62d51cae0885adfb864a9a95b31e150bf591c9428389d4512e8671ecf166f1fc",
+        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/ports/mod.zig": {
+        "decision": "Keep",
+        "moduleSha256": "a7f6fc29753fd463730fe56133b7b93ac9c60ed17b36f12f048c1d5525a66944",
+        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/ports/queue.zig": {
+        "decision": "Keep",
+        "moduleSha256": "29dea5680f0ffc6cb9b9c37d66a7ad6dac0c2fde4ca6f7cbeb3bb7242a7ea616",
+        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/ports/readback.zig": {
+        "decision": "Keep",
+        "moduleSha256": "53cea576f5a3ac4467816c1aa869eac9c8dc5faf1219351a5bd5ec6d64d6fae6",
+        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/ports/render.zig": {
+        "decision": "Keep",
+        "moduleSha256": "08053971012d730175a8c6611289c2e2e49d9333e117059f4a5880e8a1f267e3",
+        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/ports/spatial.zig": {
+        "decision": "Keep",
+        "moduleSha256": "f908a359c46abf794207c536f0c5df6a3cafb480b0de1fcdd61ab3d4649ed318",
+        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/ports/telemetry.zig": {
+        "decision": "Keep",
+        "moduleSha256": "7f43b62ab406f743bb33b84c33be535d6177267e7c48daf92f65a24ca2e51562",
+        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/backend/ports/transfer.zig": {
+        "decision": "Keep",
+        "moduleSha256": "603342882fa5deb814e02bd1323eeda63a37b2b364dd574a8f4ab57f4396ac41",
+        "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/backend/runtime_types.zig": {
@@ -2355,6 +2553,48 @@
         "reason": "Keep: reachable compiler implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/composition/backend_factory.zig": {
+        "decision": "Keep",
+        "moduleSha256": "51268e7e89bae409b193bb53d84034cd0da112306a3bf20feb904d079649b1bd",
+        "reason": "Keep: reachable composition implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/composition/cli.zig": {
+        "decision": "Keep",
+        "moduleSha256": "07be6b1557be7d0fd814a871c5f797709b86414e53dd88b0036053e5a30bb9eb",
+        "reason": "Keep: reachable composition implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/composition/dropin.zig": {
+        "decision": "Keep",
+        "moduleSha256": "7cbda228e494d1cbaadd6d2f01151f9f3bd0a4451d85bbb55a7f2cd18cd28be3",
+        "reason": "Keep: reachable composition implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/composition/mod.zig": {
+        "decision": "Keep",
+        "moduleSha256": "223eadd6c599b6e8302f506aaa28e8cefe0158e0b9f7776937fb17d609b86550",
+        "reason": "Keep: reachable composition implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/composition/native.zig": {
+        "decision": "Keep",
+        "moduleSha256": "2886777c13fb04b14364218b3ea90a6a4cd5d6b8a61295723f56d4ce2fd6e197",
+        "reason": "Keep: reachable composition implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/composition/plan.zig": {
+        "decision": "Keep",
+        "moduleSha256": "44f3d34e18a7a3bc10e0aac6ba489070d6a006f60322f2565bc01a71800d3c38",
+        "reason": "Keep: reachable composition implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/composition/runtime_factory.zig": {
+        "decision": "Keep",
+        "moduleSha256": "1e062020e117e415cb8691909614644d4b8b4eafd995c34f18a82dc506690ba1",
+        "reason": "Keep: reachable composition implementation shared by 5 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
       "src/contracts/artifact.zig": {
         "decision": "Keep",
         "moduleSha256": "a242feb2e96cfd845135c2d0a6c85fc3b9d9c45ee1a9ba84338381cb307d221d",
@@ -2397,15 +2637,39 @@
         "reason": "Keep: reachable neutral contract owner at src/contracts/compute.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/contracts/error.zig": {
+        "decision": "Keep",
+        "moduleSha256": "e31da1faeda3f14e27313e32fad35176c1963402ca56507e8092ec88ad5bc3e8",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/error.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/contracts/exactness.zig": {
+        "decision": "Keep",
+        "moduleSha256": "b6f19cb7c16c52470ed9536ff5b631e7a5ea399194b10d874e0a70d849928c46",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/exactness.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
       "src/contracts/execution.zig": {
         "decision": "Keep",
         "moduleSha256": "648dc2c443fd47ebf04c8e2111ea4f9dd0b32b48d247a21d845c2547e3cda6fd",
         "reason": "Keep: reachable neutral contract owner at src/contracts/execution.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/contracts/execution_report.zig": {
+        "decision": "Keep",
+        "moduleSha256": "6ef6f710174cac6306f2569362d62f280c3e330529d96f5eb5c7af453a22b5a4",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/execution_report.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/contracts/identity.zig": {
+        "decision": "Keep",
+        "moduleSha256": "e09dd1303efbf04b5fb938ee4b907b7a8ce1584d5d065d3d636382fc881fc25c",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/identity.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
       "src/contracts/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "57ce8b9bd051cc05d47df177afefbdf704e05119689079b78c2913a5e17a6295",
+        "moduleSha256": "01a91180861cd809d6242cd4f0df23be727f4d39d5b97390d5cb1fa35d3480e0",
         "reason": "Keep: reachable neutral contract owner at src/contracts/mod.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
@@ -2499,10 +2763,34 @@
         "reason": "Keep: reachable neutral contract owner at src/contracts/numeric_stability/annotation.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/contracts/ownership.zig": {
+        "decision": "Keep",
+        "moduleSha256": "3fb0e8169456bca56aa2764f7efd5fc21d180a5fd843f53866f7c79f09ca171c",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/ownership.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/contracts/prepared_operation.zig": {
+        "decision": "Keep",
+        "moduleSha256": "87bd552df85df32e4b97448cad6affd157ff2beab29d5e28f89b8753f2fa0e56",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/prepared_operation.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
       "src/contracts/primitives/byte_scan.zig": {
         "decision": "Keep",
         "moduleSha256": "bbd7f527595de402d9609da8d332863da51c9e1810df4edc3fd0ef7a58e95dab",
         "reason": "Keep: reachable neutral contract owner at src/contracts/primitives/byte_scan.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/contracts/promotion_receipt.zig": {
+        "decision": "Keep",
+        "moduleSha256": "e93b7cff2322e911bf7a80e5c5e4acf0d91669e9be2cfcc2b9b5a6780297bd04",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/promotion_receipt.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/contracts/render_command.zig": {
+        "decision": "Keep",
+        "moduleSha256": "ffe74d5021ba758379945bbdda15cdd033b97541d047ccd67871c477e6b4e082",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/render_command.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/contracts/semantic.zig": {
@@ -2517,6 +2805,18 @@
         "reason": "Keep: reachable neutral contract owner at src/contracts/shader_abi/dispatch_info.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/contracts/spatial_operation.zig": {
+        "decision": "Keep",
+        "moduleSha256": "d69d5ac1b48717e9c4f418a7e360d1204bb847983a8a31475bf266639d76c4fc",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/spatial_operation.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/contracts/specialization_policy.zig": {
+        "decision": "Keep",
+        "moduleSha256": "2fba3f4e644784b31a506f2d75df85dec839bba0ee2806b2c81dd72f6d786b9f",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/specialization_policy.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
       "src/contracts/texture.zig": {
         "decision": "Keep",
         "moduleSha256": "a19d48993cc655bf9f5d482094f5221395ca3481dddc6128dee191c034d8be05",
@@ -2527,6 +2827,12 @@
         "decision": "Keep",
         "moduleSha256": "87e943453f449eb9aaf42e2e61b132536b5cf99e2a43060bbf0195379b8d62e7",
         "reason": "Keep: reachable neutral contract owner at src/contracts/texture_format.zig.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/contracts/workload_profile.zig": {
+        "decision": "Keep",
+        "moduleSha256": "50475a6e8f0109be880838522916729c84e518fa7a14ce41b342e62c61f546d8",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/workload_profile.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/core/abi/generated/webgpu_upstream.zig": {
@@ -2859,6 +3165,42 @@
         "reason": "Keep: reachable dropin implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/evidence/mod.zig": {
+        "decision": "Keep",
+        "moduleSha256": "448c1a9c72bede8f161c8028ed77d694e4a1f80b3c6fbca65d3373d08a89d026",
+        "reason": "Keep: reachable evidence implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/evidence/oracle.zig": {
+        "decision": "Keep",
+        "moduleSha256": "e9b88d0e518e9194f203f20d4127b152f1ec841f70549c7d5b60bfffb74f275d",
+        "reason": "Keep: reachable evidence implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/evidence/port.zig": {
+        "decision": "Keep",
+        "moduleSha256": "cef19523f0e85cfa5c78ab846dfff5656ea81a2be97bcec09a16e7bfe3aa7c9e",
+        "reason": "Keep: reachable evidence implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/evidence/receipt.zig": {
+        "decision": "Keep",
+        "moduleSha256": "6a35e2e215089bfcbc84c09c5809bbfb1c69abf12341e2d0f8c8cabf612ed403",
+        "reason": "Keep: reachable evidence implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/evidence/replay.zig": {
+        "decision": "Keep",
+        "moduleSha256": "98a8f9f854b2645c3d0cedc46d45fa6a82acfcb1dbcda0ca1517a1e15641410a",
+        "reason": "Keep: reachable evidence implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/evidence/trace.zig": {
+        "decision": "Keep",
+        "moduleSha256": "8853012bfea56b0e075b38a616c08d780c28d6a3ebc7f537d961f53d1a07703b",
+        "reason": "Keep: reachable evidence implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-recomposition-review/2026-08-08"
+      },
       "src/full/command/wgpu_commands.zig": {
         "decision": "Keep",
         "moduleSha256": "76f128ff646cbd0a21766ecd1d9ed8510df6eaf55a3fcd0f8c5b9cb3ded2e07e",
@@ -3041,7 +3383,7 @@
       },
       "src/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "4c89bafadcf2f560279feab349113fbc2cf236cfca775785f935da9563137868",
+        "moduleSha256": "ce86d8061f06a97169bfedca38af874dc14f651389f835e8d90f4e1b2ed6cae9",
         "reason": "Keep: reachable package-root implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
@@ -3557,9 +3899,9 @@
       },
       "src/runtime/execution.zig": {
         "decision": "Keep",
-        "moduleSha256": "0486c3e2dce261062d98548adfc2190f714b818b6414d9f0cb48142b052b317e",
+        "moduleSha256": "cc88c3f9d7f10b6528569dc5dd99d7b65d0fd9965ad8cf43e129205d5bbc23b6",
         "reason": "Keep: reachable runtime implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/runtime/execution_receipt.zig": {
         "decision": "Keep",
@@ -3719,9 +4061,9 @@
       },
       "src/runtime/trace/trace.zig": {
         "decision": "Keep",
-        "moduleSha256": "7ca998d82e1521e609eec13f7ecb09fcf3ef59bb0e3d93e8c562d44d15d9bb65",
+        "moduleSha256": "68f58d7e8bced8aa14fa515ab935f9f837adecf2cd04d2ad09e0f8954385fa23",
         "reason": "Keep: authoritative trace state, hash-chain, replay, and trace receipt model; format emitters are separate.",
-        "reviewer": "codex-independent-float32-oracle/2026-08-10"
+        "reviewer": "codex-recomposition-review/2026-08-08"
       },
       "src/runtime/trace/trace_determinism.zig": {
         "decision": "Keep",

@@ -1252,7 +1252,7 @@
         {
           "name": "DEFAULT_WEBGPU_FFI_QUEUE_WAIT_TIMEOUT_NS",
           "path": "src/runtime/execution.zig",
-          "startLine": 53
+          "startLine": 95
         },
         {
           "name": "DEFAULT_POLICY_PATH",
@@ -1707,12 +1707,12 @@
         {
           "name": "DOE_BUFFER_MAP_STATE_UNMAPPED",
           "path": "src/native/resource/doe_buffer_ops_native.zig",
-          "startLine": 237
+          "startLine": 245
         },
         {
           "name": "DOE_BUFFER_MAP_STATE_MAPPED",
           "path": "src/native/resource/doe_buffer_ops_native.zig",
-          "startLine": 238
+          "startLine": 246
         },
         {
           "name": "DOE_SURFACE_DEFAULT_FORMAT",
@@ -15981,6 +15981,31 @@
           "startLine": 3
         },
         {
+          "name": "backend_contract",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 7
+        },
+        {
+          "name": "backend_iface",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 15
+        },
+        {
+          "name": "backend_factory",
+          "path": "src/composition/cli.zig",
+          "startLine": 5
+        },
+        {
+          "name": "backend_factory",
+          "path": "src/composition/mod.zig",
+          "startLine": 5
+        },
+        {
+          "name": "backend_factory",
+          "path": "src/composition/runtime_factory.zig",
+          "startLine": 4
+        },
+        {
           "name": "backend_id_name",
           "path": "src/contracts/backend.zig",
           "startLine": 179
@@ -16794,6 +16819,16 @@
       "members": [
         {
           "name": "compute_contract",
+          "path": "src/app/request.zig",
+          "startLine": 6
+        },
+        {
+          "name": "compute_port",
+          "path": "src/app/runner.zig",
+          "startLine": 6
+        },
+        {
+          "name": "compute_contract",
           "path": "src/backend/backend_iface.zig",
           "startLine": 4
         },
@@ -16876,6 +16911,16 @@
           "name": "compute_runtime_robustness_config",
           "path": "src/compiler/wgsl/runtime/runtime_compile.zig",
           "startLine": 11
+        },
+        {
+          "name": "compute_port",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 8
+        },
+        {
+          "name": "compute_contract",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 7
         },
         {
           "name": "compute_commands",
@@ -18033,6 +18078,11 @@
           "startLine": 4
         },
         {
+          "name": "execution_report",
+          "path": "src/contracts/error.zig",
+          "startLine": 4
+        },
+        {
           "name": "execution_types",
           "path": "src/core/abi/wgpu_core_base_types.zig",
           "startLine": 4
@@ -18719,7 +18769,7 @@
         {
           "name": "label_store",
           "path": "src/native/support/doe_native_object_helpers.zig",
-          "startLine": 6
+          "startLine": 7
         }
       ],
       "prefix": "label",
@@ -19680,6 +19730,16 @@
     {
       "members": [
         {
+          "name": "model_compute",
+          "path": "src/app/prepare.zig",
+          "startLine": 6
+        },
+        {
+          "name": "model_compute",
+          "path": "src/app/request.zig",
+          "startLine": 7
+        },
+        {
           "name": "model_commands",
           "path": "src/backend/backend_iface.zig",
           "startLine": 2
@@ -20411,8 +20471,18 @@
         },
         {
           "name": "model_compute",
+          "path": "src/composition/native.zig",
+          "startLine": 6
+        },
+        {
+          "name": "model_compute",
           "path": "src/contracts/compute.zig",
           "startLine": 5
+        },
+        {
+          "name": "model_compute",
+          "path": "src/contracts/prepared_operation.zig",
+          "startLine": 9
         },
         {
           "name": "model_gpu_types",
@@ -22283,6 +22353,11 @@
         },
         {
           "name": "program_identity_trace",
+          "path": "src/native/support/doe_native_object_helpers.zig",
+          "startLine": 2
+        },
+        {
+          "name": "program_identity_trace",
           "path": "src/native/vulkan/vulkan_compute_native.zig",
           "startLine": 27
         },
@@ -22347,6 +22422,11 @@
           "name": "queue_capture",
           "path": "src/backend/webgpu_backend_ops.zig",
           "startLine": 7
+        },
+        {
+          "name": "queue_port",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 10
         },
         {
           "name": "queue_flush_breakdown",
@@ -22512,6 +22592,11 @@
           "startLine": 21
         },
         {
+          "name": "render_contract",
+          "path": "src/backend/ports/render.zig",
+          "startLine": 4
+        },
+        {
           "name": "render_bundle",
           "path": "src/backend/vulkan/native_runtime.zig",
           "startLine": 27
@@ -22520,6 +22605,11 @@
           "name": "render_bundle",
           "path": "src/backend/vulkan/vk_render.zig",
           "startLine": 15
+        },
+        {
+          "name": "render_port",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 13
         },
         {
           "name": "render_pipeline_request_key",
@@ -22978,6 +23068,31 @@
           "name": "runtime_compile",
           "path": "src/compiler/wgsl/runtime/runtime_compile_report.zig",
           "startLine": 5
+        },
+        {
+          "name": "runtime_factory",
+          "path": "src/composition/cli.zig",
+          "startLine": 4
+        },
+        {
+          "name": "runtime_factory",
+          "path": "src/composition/dropin.zig",
+          "startLine": 4
+        },
+        {
+          "name": "runtime_factory",
+          "path": "src/composition/mod.zig",
+          "startLine": 6
+        },
+        {
+          "name": "runtime_factory",
+          "path": "src/composition/native.zig",
+          "startLine": 4
+        },
+        {
+          "name": "runtime_factory",
+          "path": "src/composition/plan.zig",
+          "startLine": 4
         },
         {
           "name": "runtime_state",
@@ -24693,10 +24808,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "46fd49d7a8a61ecb7f91415aa5aed80f1856aca3ddf6b432ec24743a775b27ed",
-  "reportGeneratorSha256": "fc82695c739f211387ed7f4475ec71d94541ade28616e449f546f4cdd802c2b3",
+  "manifestSha256": "fe6bfddca3f80606e30cdc5c8268a5dd6c0ffeb32e2548c3fedaacb4558047cb",
+  "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "b16f1dd49a586eedb9e31cc1d193132d0a3d099a4042839ae56fe69c08fdd4b4",
+  "sourceTreeSha256": "5e54eaf0a79f0826d094c434b5afcbb098de8d87892635c0f99574249091a025",
   "status": "captured"
 }

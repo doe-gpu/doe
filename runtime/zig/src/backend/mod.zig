@@ -13,3 +13,7 @@ pub fn runtimeTypes() type {
 pub fn telemetry() type {
     return @import("backend_telemetry.zig");
 }
+
+pub fn ports() type {
+    return @import("ports/mod.zig");
+}

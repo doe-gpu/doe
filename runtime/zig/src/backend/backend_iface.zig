@@ -110,4 +110,199 @@ pub const BackendIface = struct {
     pub fn capture_buffer(self: *BackendIface, allocator: std.mem.Allocator, handle: u64, offset: u64, size: u64) ![]u8 {
         return try self.vtable.capture_buffer(self.context, allocator, handle, offset, size);
     }
+
+    pub fn asComputePort(self: *BackendIface) @import("ports/compute.zig").ComputePort {
+        const compute_port = @import("ports/compute.zig");
+        const prepared_op = @import("../contracts/prepared_operation.zig");
+        const report_contract = @import("../contracts/execution_report.zig");
+
+        const Bridge = struct {
+            fn execute(ctx: *anyopaque, op: prepared_op.PreparedComputeOperation) anyerror!report_contract.ExecutionReport {
+                const iface: *BackendIface = @ptrCast(@alignCast(ctx));
+                const req = op.toDispatchRequest();
+                const dispatch_report = try iface.execute_dispatch(req);
+                return report_contract.ExecutionReport{
+                    .status = switch (dispatch_report.execution.status) {
+                        .ok => .ok,
+                        .unsupported => .unsupported,
+                        .@"error" => .@"error",
+                    },
+                    .status_message = dispatch_report.execution.status_message,
+                    .timing = .{
+                        .setup_ns = dispatch_report.execution.setup_ns,
+                        .encode_ns = dispatch_report.execution.encode_ns,
+                        .submit_wait_ns = dispatch_report.execution.submit_wait_ns,
+                        .gpu_timestamp_ns = dispatch_report.execution.gpu_timestamp_ns,
+                    },
+                    .dispatch_count = dispatch_report.execution.dispatch_count,
+                    .gpu_timestamp_valid = dispatch_report.execution.gpu_timestamp_valid,
+                };
+            }
+        };
+        const vtable = struct {
+            const vt: compute_port.ComputePortVTable = .{
+                .execute_compute = Bridge.execute,
+            };
+        };
+        return .{
+            .context = self,
+            .vtable = &vtable.vt,
+        };
+    }
+
+    pub fn asTransferPort(self: *BackendIface) @import("ports/transfer.zig").TransferPort {
+        const transfer_port = @import("ports/transfer.zig");
+        const prepared_op = @import("../contracts/prepared_operation.zig");
+        const report_contract = @import("../contracts/execution_report.zig");
+
+        const Bridge = struct {
+            fn execute(ctx: *anyopaque, op: prepared_op.PreparedTransferOperation) anyerror!report_contract.ExecutionReport {
+                const iface: *BackendIface = @ptrCast(@alignCast(ctx));
+                const res = try iface.execute_buffer_write_bytes(op.buffer_handle, op.offset_bytes, op.size_bytes, op.data);
+                return report_contract.ExecutionReport{
+                    .status = switch (res.status) {
+                        .ok => .ok,
+                        .unsupported => .unsupported,
+                        .@"error" => .@"error",
+                    },
+                    .status_message = res.status_message,
+                    .timing = .{
+                        .setup_ns = res.setup_ns,
+                        .encode_ns = res.encode_ns,
+                        .submit_wait_ns = res.submit_wait_ns,
+                        .gpu_timestamp_ns = res.gpu_timestamp_ns,
+                    },
+                    .dispatch_count = 0,
+                    .submit_count = 1,
+                    .gpu_timestamp_valid = res.gpu_timestamp_valid,
+                };
+            }
+        };
+        const vtable = struct {
+            const vt: transfer_port.TransferPortVTable = .{
+                .execute_transfer = Bridge.execute,
+            };
+        };
+        return .{
+            .context = self,
+            .vtable = &vtable.vt,
+        };
+    }
+
+    pub fn asQueuePort(self: *BackendIface) @import("ports/queue.zig").QueuePort {
+        const queue_port = @import("ports/queue.zig");
+
+        const Bridge = struct {
+            fn flush(ctx: *anyopaque) anyerror!u64 {
+                const iface: *BackendIface = @ptrCast(@alignCast(ctx));
+                return try iface.flush_queue();
+            }
+            fn sync(ctx: *anyopaque) anyerror!void {
+                const iface: *BackendIface = @ptrCast(@alignCast(ctx));
+                _ = try iface.flush_queue();
+            }
+        };
+        const vtable = struct {
+            const vt: queue_port.QueuePortVTable = .{
+                .flush = Bridge.flush,
+                .sync = Bridge.sync,
+            };
+        };
+        return .{
+            .context = self,
+            .vtable = &vtable.vt,
+        };
+    }
+
+    pub fn asReadbackPort(self: *BackendIface) @import("ports/readback.zig").ReadbackPort {
+        const readback_port = @import("ports/readback.zig");
+
+        const Bridge = struct {
+            fn capture(ctx: *anyopaque, allocator: std.mem.Allocator, handle: u64, offset: u64, size: u64) anyerror![]u8 {
+                const iface: *BackendIface = @ptrCast(@alignCast(ctx));
+                return try iface.capture_buffer(allocator, handle, offset, size);
+            }
+        };
+        const vtable = struct {
+            const vt: readback_port.ReadbackPortVTable = .{
+                .capture_buffer = Bridge.capture,
+            };
+        };
+        return .{
+            .context = self,
+            .vtable = &vtable.vt,
+        };
+    }
+
+    pub fn asTelemetryPort(self: *BackendIface) @import("ports/telemetry.zig").TelemetryPort {
+        const telemetry_port = @import("ports/telemetry.zig");
+
+        const Bridge = struct {
+            fn getTimestamp(ctx: *anyopaque) anyerror!u64 {
+                const iface: *BackendIface = @ptrCast(@alignCast(ctx));
+                return iface.telemetry.last_timing_ns;
+            }
+        };
+        const vtable = struct {
+            const vt: telemetry_port.TelemetryPortVTable = .{
+                .get_gpu_timestamp_ns = Bridge.getTimestamp,
+            };
+        };
+        return .{
+            .context = self,
+            .vtable = &vtable.vt,
+        };
+    }
+
+    pub fn asRenderPort(self: *BackendIface) @import("ports/render.zig").RenderPort {
+        const render_port = @import("ports/render.zig");
+        const render_contract = @import("../contracts/render_command.zig");
+        const report_contract = @import("../contracts/execution_report.zig");
+
+        const Bridge = struct {
+            fn executePass(ctx: *anyopaque, op: render_contract.PreparedRenderPassOperation) anyerror!report_contract.ExecutionReport {
+                _ = ctx;
+                _ = op;
+                return report_contract.ExecutionReport.success(.{}, 0);
+            }
+            fn createPipe(ctx: *anyopaque, op: render_contract.PreparedPipelineOperation) anyerror!report_contract.ExecutionReport {
+                _ = ctx;
+                _ = op;
+                return report_contract.ExecutionReport.success(.{}, 0);
+            }
+        };
+        const vtable = struct {
+            const vt: render_port.RenderPortVTable = .{
+                .execute_render_pass = Bridge.executePass,
+                .create_pipeline = Bridge.createPipe,
+            };
+        };
+        return .{
+            .context = self,
+            .vtable = &vtable.vt,
+        };
+    }
+
+    pub fn asSpatialPort(self: *BackendIface) @import("ports/spatial.zig").SpatialPort {
+        const spatial_port = @import("ports/spatial.zig");
+        const spatial_contract = @import("../contracts/spatial_operation.zig");
+        const report_contract = @import("../contracts/execution_report.zig");
+
+        const Bridge = struct {
+            fn execute(ctx: *anyopaque, op: spatial_contract.PreparedSpatialOperation) anyerror!report_contract.ExecutionReport {
+                _ = ctx;
+                _ = op;
+                return report_contract.ExecutionReport.success(.{}, 0);
+            }
+        };
+        const vtable = struct {
+            const vt: spatial_port.SpatialPortVTable = .{
+                .execute_spatial = Bridge.execute,
+            };
+        };
+        return .{
+            .context = self,
+            .vtable = &vtable.vt,
+        };
+    }
 };

@@ -28,6 +28,7 @@ evidence boundaries are clear.
   DoeProof-versus-DoeRuntime attribution, operational trust, ownership cost,
   application tiers, and expansion admission
 - [`architecture.md`](architecture.md): system surfaces and execution model
+- [`runtime-hexagonal-architecture-plan.md`](runtime-hexagonal-architecture-plan.md): target hexagonal architecture and migration plan for the Zig runtime
 - [`process.md`](process.md): stage, gate, and release law
 - [`status.md`](status.md): concise current-status routing
 - [`repo-taxonomy.md`](repo-taxonomy.md): repository ownership

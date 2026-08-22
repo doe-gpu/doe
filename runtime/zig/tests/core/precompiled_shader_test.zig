@@ -423,7 +423,7 @@ test "MSL shader module: can create compute pipeline from pre-translated MSL" {
         .layout = null,
         .compute = .{
             .nextInChain = null,
-            .module = shader_module,
+            .module = @ptrCast(shader_module),
             .entryPoint = .{ .data = null, .length = 0 }, // defaults to main_kernel
             .constantCount = 0,
             .constants = null,
