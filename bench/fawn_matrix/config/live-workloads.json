@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "workloads": [
+    {
+      "workloadId": "webgpu_model_preprocessing",
+      "warmupIterations": 3,
+      "timedIterations": 30,
+      "inputElements": 16384,
+      "materialSpeedupRatio": 1.05
+    },
+    {
+      "workloadId": "multi_step_agent_interaction",
+      "warmupIterations": 2,
+      "timedIterations": 20,
+      "agentSteps": 3,
+      "sessionModes": ["cold", "warm"],
+      "materialSpeedupRatio": 1.05,
+      "materialContextReductionRatio": 1.2
+    }
+  ],
+  "promotion": {
+    "corePlatforms": ["apple-metal", "amd-vulkan"],
+    "desktopPlatforms": ["windows-d3d12"],
+    "signingKeyEnvironment": "DOE_PROOF_SIGNING_KEY"
+  }
+}

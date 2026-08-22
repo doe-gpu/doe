@@ -41,3 +41,26 @@ Aggregation fails closed when a required platform is absent, hardware identities
 are not distinct, a lane fell back, evidence is simulated, samples are not
 interleaved, payload hashes disagree with artifacts, or the semantic oracle fails.
 Aggregate output still requires independent review before publication.
+
+## GPU, agent, and passport workloads
+
+Run the remaining live workloads on a physical platform:
+
+```sh
+python3 -m bench.fawn_matrix.live_cli run --workload webgpu_model_preprocessing --platform-id apple-metal
+python3 -m bench.fawn_matrix.live_cli run --workload multi_step_agent_interaction --platform-id apple-metal
+```
+
+`webgpu_model_preprocessing` times shader compilation, asynchronous pipeline
+creation, upload, dispatch, synchronization, readback, and complete operation
+latency. Its primary comparison is Lane C versus Lane B, so it can award or deny
+DoeRuntime performance status independently of the Fawn shell.
+
+`multi_step_agent_interaction` executes cold and warm deterministic agent sessions
+through inspect, incremental diff, GPU preprocessing, action selection, dispatch,
+and final task verification. Its primary comparison is Lane D versus Lane A.
+
+The `suite`, `aggregate`, and `passport` commands then join the three workload
+reports, require Apple Metal plus AMD Vulkan on distinct physical hardware, emit a
+promotion receipt, and reject unsigned or unearned release claims. Windows D3D12 is
+tracked as the desktop promotion tier and cannot be inferred from another backend.

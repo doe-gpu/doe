@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fawn-Doe deterministic agent workload</title>
+</head>
+<body>
+  <main data-agent id="workspace" aria-label="Deployment workflow">
+    <h1 data-agent id="title">Deployment workflow</h1>
+    <p data-agent id="status" role="status">Ready</p>
+    <button data-agent id="inspect">Inspect changes</button>
+    <button data-agent id="approve" disabled>Approve release</button>
+    <button data-agent id="deploy" disabled>Deploy release</button>
+  </main>
+  <script>
+    (() => {
+      const SIZE = 16384;
+      const shader = `
+        @group(0) @binding(0) var<storage, read> inputData: array<f32>;
+        @group(0) @binding(1) var<storage, read_write> outputData: array<f32>;
+        @compute @workgroup_size(256)
+        fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
+          let i = gid.x;
+          if (i >= 16384u) { return; }
+          outputData[i] = inputData[i] * 0.0078125 - 1.0
+            + f32(i & 3u) * 0.015625;
+        }
+      `;
+      let gpu = null;
+
+      async function gpuState() {
+        if (gpu) return gpu;
+        if (!navigator.gpu) throw new Error("WebGPU unavailable");
+        const adapter = await navigator.gpu.requestAdapter({
+          powerPreference: "high-performance",
+        });
+        if (!adapter) throw new Error("WebGPU adapter unavailable");
+        const device = await adapter.requestDevice();
+        const info = adapter.info ?? {};
+        gpu = {
+          adapter,
+          device,
+          adapterInfo: {
+            vendor: info.vendor ?? "",
+            architecture: info.architecture ?? "",
+            device: info.device ?? "",
+            description: info.description ?? "",
+          },
+        };
+        return gpu;
+      }
+
+      async function digest(bytes) {
+        const value = await crypto.subtle.digest("SHA-256", bytes);
+        return [...new Uint8Array(value)]
+          .map((part) => part.toString(16).padStart(2, "0"))
+          .join("");
+      }
+
+      async function preprocess(seed = 0) {
+        const totalStart = performance.now();
+        const { device, adapterInfo } = await gpuState();
+        const input = new Float32Array(SIZE);
+        for (let index = 0; index < SIZE; index += 1) {
+          input[index] = (index + seed * 17) & 255;
+        }
+        const byteSize = input.byteLength;
+
+        const compileStart = performance.now();
+        const module = device.createShaderModule({ code: shader });
+        const compilationInfo = await module.getCompilationInfo();
+        const compilationMs = performance.now() - compileStart;
+        const compilationErrors = compilationInfo.messages.filter(
+          (message) => message.type === "error",
+        );
+        if (compilationErrors.length > 0) {
+          throw new Error(compilationErrors.map((entry) => entry.message).join(" | "));
+        }
+
+        const pipelineStart = performance.now();
+        const pipeline = await device.createComputePipelineAsync({
+          layout: "auto",
+          compute: { module, entryPoint: "main" },
+        });
+        const pipelineCreationMs = performance.now() - pipelineStart;
+
+        const inputBuffer = device.createBuffer({
+          size: byteSize,
+          usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        });
+        const outputBuffer = device.createBuffer({
+          size: byteSize,
+          usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+        });
+        const readbackBuffer = device.createBuffer({
+          size: byteSize,
+          usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+        });
+        const bindGroup = device.createBindGroup({
+          layout: pipeline.getBindGroupLayout(0),
+          entries: [
+            { binding: 0, resource: { buffer: inputBuffer } },
+            { binding: 1, resource: { buffer: outputBuffer } },
+          ],
+        });
+
+        const uploadStart = performance.now();
+        device.queue.writeBuffer(inputBuffer, 0, input);
+        await device.queue.onSubmittedWorkDone();
+        const uploadMs = performance.now() - uploadStart;
+
+        const dispatchStart = performance.now();
+        const encoder = device.createCommandEncoder();
+        const pass = encoder.beginComputePass();
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(0, bindGroup);
+        pass.dispatchWorkgroups(SIZE / 256);
+        pass.end();
+        device.queue.submit([encoder.finish()]);
+        const dispatchMs = performance.now() - dispatchStart;
+
+        const syncStart = performance.now();
+        await device.queue.onSubmittedWorkDone();
+        const synchronizationMs = performance.now() - syncStart;
+
+        const readbackStart = performance.now();
+        const copyEncoder = device.createCommandEncoder();
+        copyEncoder.copyBufferToBuffer(
+          outputBuffer,
+          0,
+          readbackBuffer,
+          0,
+          byteSize,
+        );
+        device.queue.submit([copyEncoder.finish()]);
+        await readbackBuffer.mapAsync(GPUMapMode.READ);
+        const outputBytes = readbackBuffer.getMappedRange().slice(0);
+        const output = new Float32Array(outputBytes);
+        const readbackMs = performance.now() - readbackStart;
+
+        let maxAbsError = 0;
+        for (let index = 0; index < SIZE; index += 1) {
+          const expected = Math.fround(
+            Math.fround(input[index] * 0.0078125) - 1.0
+              + (index & 3) * 0.015625,
+          );
+          maxAbsError = Math.max(maxAbsError, Math.abs(output[index] - expected));
+        }
+        const outputSha256 = await digest(outputBytes);
+        readbackBuffer.unmap();
+        inputBuffer.destroy();
+        outputBuffer.destroy();
+        readbackBuffer.destroy();
+
+        return {
+          adapterInfo,
+          compilationMs,
+          pipelineCreationMs,
+          uploadMs,
+          dispatchMs,
+          synchronizationMs,
+          readbackMs,
+          completeOperationMs: performance.now() - totalStart,
+          outputSha256,
+          maxAbsError,
+          oraclePass: maxAbsError === 0,
+          memoryMb: performance.memory
+            ? performance.memory.usedJSHeapSize / (1024 * 1024)
+            : 0,
+        };
+      }
+
+      const state = { stage: 0, pending: new Map() };
+      const actionIds = ["inspect", "approve", "deploy"];
+      function semanticNode(element) {
+        return {
+          id: element.id,
+          role: element.getAttribute("role")
+            ?? (element.tagName === "BUTTON" ? "button" : element.tagName.toLowerCase()),
+          name: element.textContent.trim(),
+          disabled: Boolean(element.disabled),
+        };
+      }
+      function record(element) {
+        if (element?.matches?.("[data-agent]")) {
+          state.pending.set(element.id, semanticNode(element));
+        }
+      }
+      const observer = new MutationObserver((records) => {
+        for (const mutation of records) {
+          record(mutation.target.nodeType === Node.TEXT_NODE
+            ? mutation.target.parentElement
+            : mutation.target);
+        }
+      });
+      observer.observe(document.querySelector("main"), {
+        attributes: true,
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+      function render() {
+        const status = document.querySelector("#status");
+        status.textContent = ["Ready", "Inspected", "Approved", "Deployed"][state.stage];
+        actionIds.forEach((id, index) => {
+          const button = document.querySelector(`#${id}`);
+          button.disabled = index !== state.stage;
+          record(button);
+        });
+        record(status);
+      }
+      function reset() {
+        state.stage = 0;
+        state.pending.clear();
+        render();
+        document.querySelectorAll("[data-agent]").forEach(record);
+        return true;
+      }
+      function fullSnapshot() {
+        return {
+          protocol: "playwright-dom-semantic-snapshot/v1",
+          nodes: [...document.querySelectorAll("[data-agent]")].map(semanticNode),
+        };
+      }
+      function directDiff() {
+        const value = {
+          protocol: "fawn-direct-semantic-diff/v1",
+          upserts: [...state.pending.values()].sort((a, b) => a.id.localeCompare(b.id)),
+          removals: [],
+        };
+        state.pending.clear();
+        return value;
+      }
+      function act(id) {
+        if (id !== actionIds[state.stage]) return false;
+        state.stage += 1;
+        render();
+        return true;
+      }
+      function oracle() {
+        return {
+          pass: state.stage === 3 && document.querySelector("#status").textContent === "Deployed",
+          state: { stage: state.stage, status: document.querySelector("#status").textContent },
+        };
+      }
+      actionIds.forEach((id) => {
+        document.querySelector(`#${id}`).addEventListener("click", () => act(id));
+      });
+      reset();
+      window.matrixGpu = { preprocess, probe: gpuState };
+      window.agent = { reset, fullSnapshot, directDiff, act, oracle };
+    })();
+  </script>
+</body>
+</html>

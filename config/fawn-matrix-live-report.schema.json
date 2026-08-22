@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/fawn-matrix-live-report.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "reportKind"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "reportKind": {
+      "enum": [
+        "fawn-doe-live-workload-raw",
+        "fawn-doe-live-workload-platform-report",
+        "fawn-doe-platform-suite",
+        "fawn-doe-cross-platform-suite"
+      ]
+    }
+  }
+}

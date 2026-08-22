@@ -1,0 +1,27 @@
+name: Fawn Matrix Release Passport
+
+on:
+  workflow_dispatch:
+    inputs:
+      aggregate_report:
+        description: Tracked Apple Metal and AMD Vulkan aggregate report
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      aggregate_report:
+        required: true
+        type: string
+
+jobs:
+  release-passport:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Validate matrix regressions
+        run: python -m unittest bench.fawn_matrix.tests.test_fawn_matrix bench.fawn_matrix.tests.test_live_workloads
+      - name: Enforce signed cross-platform passport
+        run: python bench/gates/fawn_matrix_release_passport.py --aggregate "${{ inputs.aggregate_report }}"

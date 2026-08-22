@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doe.dev/schemas/fawn-matrix-live-workloads.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "workloads", "promotion"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "workloads": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["workloadId", "warmupIterations", "timedIterations", "materialSpeedupRatio"],
+        "properties": {
+          "workloadId": {"enum": ["webgpu_model_preprocessing", "multi_step_agent_interaction"]},
+          "warmupIterations": {"type": "integer", "minimum": 1},
+          "timedIterations": {"type": "integer", "minimum": 20},
+          "inputElements": {"type": "integer", "minimum": 1024},
+          "agentSteps": {"type": "integer", "minimum": 1},
+          "sessionModes": {"type": "array", "const": ["cold", "warm"]},
+          "materialSpeedupRatio": {"type": "number", "exclusiveMinimum": 1},
+          "materialContextReductionRatio": {"type": "number", "exclusiveMinimum": 1}
+        }
+      }
+    },
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corePlatforms", "desktopPlatforms", "signingKeyEnvironment"],
+      "properties": {
+        "corePlatforms": {"const": ["apple-metal", "amd-vulkan"]},
+        "desktopPlatforms": {"const": ["windows-d3d12"]},
+        "signingKeyEnvironment": {"const": "DOE_PROOF_SIGNING_KEY"}
+      }
+    }
+  }
+}
