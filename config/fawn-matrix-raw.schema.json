@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fawn-Doe context matrix raw receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reportKind",
+    "runStatus",
+    "workload",
+    "platform",
+    "run",
+    "lanes",
+    "errors"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "reportKind": {
+      "const": "fawn-doe-context-snapshot-diff-raw"
+    },
+    "runStatus": {
+      "enum": ["running", "passed", "failed"]
+    },
+    "workload": {
+      "type": "object"
+    },
+    "platform": {
+      "type": "object"
+    },
+    "run": {
+      "type": "object"
+    },
+    "lanes": {
+      "type": "object",
+      "minProperties": 4,
+      "maxProperties": 4
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

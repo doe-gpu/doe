@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fawn context snapshot fixture</title>
+</head>
+<body>
+  <main data-agent-id="main" role="main" aria-labelledby="title">
+    <h1 id="title" data-agent-id="title">Orders</h1>
+    <p data-agent-id="status" role="status" aria-live="polite">Ready</p>
+    <p data-agent-id="count">2 orders</p>
+    <ul data-agent-id="orders" aria-label="Orders">
+      <li data-agent-id="order-1">Alpha</li>
+      <li data-agent-id="order-2">Beta</li>
+    </ul>
+    <button data-agent-id="submit" type="button">Process orders</button>
+  </main>
+  <script>
+    const INITIAL_MARKUP = document.querySelector("main").innerHTML;
+
+    window.resetFixture = () => {
+      document.querySelector("main").innerHTML = INITIAL_MARKUP;
+    };
+
+    window.applyDeterministicMutation = () => {
+      document.querySelector('[data-agent-id="status"]').textContent = "Processed";
+      document.querySelector('[data-agent-id="count"]').textContent = "3 orders";
+      const item = document.createElement("li");
+      item.dataset.agentId = "order-3";
+      item.textContent = "Gamma";
+      document.querySelector('[data-agent-id="orders"]').append(item);
+      document.querySelector('[data-agent-id="submit"]').disabled = true;
+    };
+
+    window.readOracleState = () => ({
+      count: document.querySelector('[data-agent-id="count"]').textContent,
+      items: Array.from(document.querySelectorAll('[data-agent-id="orders"] li'))
+        .map((item) => item.textContent),
+      status: document.querySelector('[data-agent-id="status"]').textContent,
+      submitDisabled: document.querySelector('[data-agent-id="submit"]').disabled,
+      title: document.querySelector('[data-agent-id="title"]').textContent,
+    });
+  </script>
+</body>
+</html>

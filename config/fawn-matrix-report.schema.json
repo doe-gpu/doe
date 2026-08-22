@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fawn-Doe context matrix report",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "report_kind",
+        "workload_id",
+        "platform",
+        "raw_artifact",
+        "evidence_status",
+        "comparability",
+        "results_by_lane",
+        "overall_thesis_status"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "report_kind": {
+          "const": "fawn-doe-context-snapshot-diff-platform-report"
+        },
+        "workload_id": {
+          "const": "context_snapshot_diff"
+        },
+        "platform": {
+          "type": "object"
+        },
+        "raw_artifact": {
+          "type": "object"
+        },
+        "evidence_status": {
+          "const": "physical_diagnostic"
+        },
+        "comparability": {
+          "type": "object"
+        },
+        "results_by_lane": {
+          "type": "object",
+          "minProperties": 4,
+          "maxProperties": 4
+        },
+        "overall_thesis_status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reportKind",
+        "workloadId",
+        "evidenceStatus",
+        "productDecision",
+        "doeRuntimePerformanceCredit",
+        "platformReports",
+        "publicationStatus",
+        "generatedAtUtc"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "reportKind": {
+          "const": "fawn-doe-context-snapshot-diff-two-platform-report"
+        },
+        "workloadId": {
+          "const": "context_snapshot_diff"
+        },
+        "evidenceStatus": {
+          "const": "cross_platform_review_required"
+        },
+        "productDecision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "doeRuntimePerformanceCredit": {
+          "const": false
+        },
+        "platformReports": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "publicationStatus": {
+          "const": "not_claim_indexed_pending_review"
+        },
+        "generatedAtUtc": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  ]
+}

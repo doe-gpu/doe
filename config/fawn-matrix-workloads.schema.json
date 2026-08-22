@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fawn-Doe physical context matrix configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "matrixId",
+    "requiredPhysicalPlatforms",
+    "decisionThresholds",
+    "workloads"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 2 },
+    "matrixId": {
+      "type": "string",
+      "const": "fawn-doe-context-matrix-v1"
+    },
+    "requiredPhysicalPlatforms": {
+      "type": "array",
+      "prefixItems": [
+        { "const": "apple-metal" },
+        { "const": "amd-vulkan" }
+      ],
+      "items": false
+    },
+    "decisionThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "materialContextReductionRatio",
+        "materialSpeedupRatio",
+        "maxMemoryRegressionMb"
+      ],
+      "properties": {
+        "materialContextReductionRatio": {
+          "type": "number",
+          "exclusiveMinimum": 1
+        },
+        "materialSpeedupRatio": {
+          "type": "number",
+          "exclusiveMinimum": 1
+        },
+        "maxMemoryRegressionMb": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "workloads": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workloadId",
+          "executorId",
+          "inputPath",
+          "oracleId",
+          "tokenizerId",
+          "warmupIterations",
+          "timedIterations",
+          "targetTolerances"
+        ],
+        "properties": {
+          "workloadId": {
+            "const": "context_snapshot_diff"
+          },
+          "executorId": {
+            "const": "browser-context-snapshot-diff-v1"
+          },
+          "inputPath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracleId": {
+            "const": "context-snapshot-diff-state-v1"
+          },
+          "tokenizerId": {
+            "const": "unicode-word-punctuation-v1"
+          },
+          "warmupIterations": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "timedIterations": {
+            "type": "integer",
+            "minimum": 100
+          },
+          "targetTolerances": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["maxP95P50Ratio"],
+            "properties": {
+              "maxP95P50Ratio": {
+                "type": "number",
+                "exclusiveMinimum": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
