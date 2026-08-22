@@ -5,6 +5,48 @@ priority order, adoption wedge, downstream-application flywheel, commercial
 journey, and expansion boundaries. Supporting documents define implementation
 contracts and evidence formats; they do not define a separate strategy.
 
+## Strategic framework
+
+> **Fawn distributes. DoeRuntime executes. DoeLab learns. DoeProof records and governs the evidence.**
+
+Doe is a vertically integrated agent-compute company built from internally
+decoupled, contract-governed subsystems:
+
+```text
+Fawn and DoeRuntime adoption
+            ↓
+real applications, shaders, traces, failures
+            ↓
+DoeLab differential testing and minimization
+            ↓
+candidate compiler/runtime optimizations
+            ↓
+physical-device evaluation and promotion
+            ↓
+better Fawn and DoeRuntime releases
+            ↓
+more adoption
+```
+
+The long-term advantage is not that Doe independently replaces every incumbent
+runtime; it is that Doe integrates the browser distribution seam, compiler,
+runtime, local compute, workload corpus, and improvement loop more tightly than
+projects owning only a single layer.
+
+## Ideal Customer Profile (ICP) & First Product
+
+The initial customer is concrete and immediate:
+
+> **Teams building coding, research, support, or workflow agents that maintain
+> persistent browser sessions and repeatedly pay the cost of page serialization,
+> screenshots, remote model calls, and generic browser-control latency.**
+
+The product offered to them is:
+
+> **A Playwright-compatible agent browser binary with persistent state,
+> lower-context page diffs, integrated local compute, and measurable end-to-end
+> task improvements.**
+
 ## Objective
 
 Doe should become the receipt-backed local compute plane for autonomous

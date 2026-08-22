@@ -6,6 +6,10 @@
       "data": "config/schema-targets.json"
     },
     {
+      "schema": "config/fawn-matrix-workloads.schema.json",
+      "data": "bench/fawn_matrix/config/matrix-workloads.json"
+    },
+    {
       "schema": "config/zig-test-inventory.schema.json",
       "data": "config/zig-test-inventory.json"
     },

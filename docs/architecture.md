@@ -54,6 +54,18 @@ executor adapters beneath one contract. The core ledger stays executor-neutral
 and binds specialized evidence through typed extensions; see
 [`workload-system.md`](workload-system.md).
 
+## Architectural law: Hexagonal inside, vertically integrated outside
+
+1. **Inside the Zig Runtime:** Decoupled, contract-governed, and acyclic
+   (`src/contracts/` -> `src/backend/ports/` -> `src/app/` -> leaf backends).
+   No browser-specific globals, no direct cross-backend imports.
+2. **Outside the Zig Runtime:** Vertically integrated product composition
+   (`Fawn` browser shell + `DoeRuntime` compiler/executor + `DoeLab` learning
+   loop + `DoeProof` governance).
+3. **Cross-Layer Optimization:** Governed through explicit contracts
+   (`WorkloadProfile`, `SpecializationPolicy`, `PromotionReceipt`), never
+   through hidden runtime heuristics or implicit environment checks.
+
 ## Product boundary rules
 
 The important boundary distinctions are:

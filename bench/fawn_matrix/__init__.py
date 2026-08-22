@@ -1,3 +1,3 @@
-"""Fawn-Doe 4-Lane Benchmark Matrix Package."""
+"""Physical Fawn-Doe four-lane benchmark matrix."""
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
