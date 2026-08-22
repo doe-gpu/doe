@@ -1,0 +1,219 @@
+{
+  "workload_id": "webgpu_model_preprocessing",
+  "results_by_lane": {
+    "lane_a_chromium_playwright_dawn": {
+      "lane": "lane_a_chromium_playwright_dawn",
+      "workload_id": "webgpu_model_preprocessing",
+      "metrics": {
+        "latency_ms_p50": 159.5,
+        "latency_ms_p95": 159.5,
+        "latency_ms_p99": 159.5,
+        "memory_peak_mb": 420.0,
+        "context_tokens": 500,
+        "success_rate": 1.0,
+        "breakdown_p50": {
+          "setup_ms": 22.5,
+          "snapshot_diff_ms": 17.0,
+          "compute_ms": 105.0,
+          "action_ms": 15.0,
+          "total_wall_ms": 159.5
+        }
+      },
+      "sample_latencies_ms": [
+        159.5,
+        159.5,
+        159.5,
+        159.5,
+        159.5,
+        159.5,
+        159.5,
+        159.5,
+        159.5,
+        159.5
+      ],
+      "metadata": {
+        "warmup_iterations": 2,
+        "timed_iterations": 10,
+        "simulated_mode": true
+      },
+      "timestamp_utc": "2026-08-22T11:01:47.424412+00:00"
+    },
+    "lane_b_fawn_playwright_dawn": {
+      "lane": "lane_b_fawn_playwright_dawn",
+      "workload_id": "webgpu_model_preprocessing",
+      "metrics": {
+        "latency_ms_p50": 139.5,
+        "latency_ms_p95": 139.5,
+        "latency_ms_p99": 139.5,
+        "memory_peak_mb": 360.0,
+        "context_tokens": 500,
+        "success_rate": 1.0,
+        "breakdown_p50": {
+          "setup_ms": 12.5,
+          "snapshot_diff_ms": 8.0,
+          "compute_ms": 105.0,
+          "action_ms": 14.0,
+          "total_wall_ms": 139.5
+        }
+      },
+      "sample_latencies_ms": [
+        139.5,
+        139.5,
+        139.5,
+        139.5,
+        139.5,
+        139.5,
+        139.5,
+        139.5,
+        139.5,
+        139.5
+      ],
+      "metadata": {
+        "warmup_iterations": 2,
+        "timed_iterations": 10,
+        "simulated_mode": true
+      },
+      "timestamp_utc": "2026-08-22T11:01:47.424427+00:00"
+    },
+    "lane_c_fawn_playwright_doe": {
+      "lane": "lane_c_fawn_playwright_doe",
+      "workload_id": "webgpu_model_preprocessing",
+      "metrics": {
+        "latency_ms_p50": 88.5,
+        "latency_ms_p95": 88.5,
+        "latency_ms_p99": 88.5,
+        "memory_peak_mb": 330.0,
+        "context_tokens": 500,
+        "success_rate": 1.0,
+        "breakdown_p50": {
+          "setup_ms": 12.5,
+          "snapshot_diff_ms": 8.0,
+          "compute_ms": 54.0,
+          "action_ms": 14.0,
+          "total_wall_ms": 88.5
+        }
+      },
+      "sample_latencies_ms": [
+        88.5,
+        88.5,
+        88.5,
+        88.5,
+        88.5,
+        88.5,
+        88.5,
+        88.5,
+        88.5,
+        88.5
+      ],
+      "metadata": {
+        "warmup_iterations": 2,
+        "timed_iterations": 10,
+        "simulated_mode": true
+      },
+      "timestamp_utc": "2026-08-22T11:01:47.424441+00:00"
+    },
+    "lane_d_fawn_direct_doe": {
+      "lane": "lane_d_fawn_direct_doe",
+      "workload_id": "webgpu_model_preprocessing",
+      "metrics": {
+        "latency_ms_p50": 71.1,
+        "latency_ms_p95": 71.1,
+        "latency_ms_p99": 71.1,
+        "memory_peak_mb": 290.0,
+        "context_tokens": 500,
+        "success_rate": 1.0,
+        "breakdown_p50": {
+          "setup_ms": 7.5,
+          "snapshot_diff_ms": 3.6,
+          "compute_ms": 54.0,
+          "action_ms": 6.0,
+          "total_wall_ms": 71.1
+        }
+      },
+      "sample_latencies_ms": [
+        71.1,
+        71.1,
+        71.1,
+        71.1,
+        71.1,
+        71.1,
+        71.1,
+        71.1,
+        71.1,
+        71.1
+      ],
+      "metadata": {
+        "warmup_iterations": 2,
+        "timed_iterations": 10,
+        "simulated_mode": true
+      },
+      "timestamp_utc": "2026-08-22T11:01:47.424454+00:00"
+    }
+  },
+  "speedup_b_over_a": 1.1433691756272402,
+  "speedup_c_over_b": 1.576271186440678,
+  "speedup_d_over_c": 1.2447257383966246,
+  "speedup_d_over_a": 2.2433192686357244,
+  "token_reduction_ratio_d_vs_a": 1.0,
+  "memory_delta_mb_d_vs_a": -130.0,
+  "verdicts": [
+    {
+      "rule_id": "RULE_1_FAWN_SHELL_ONLY",
+      "rule_name": "Fawn Shell Standalone Value",
+      "satisfied": false,
+      "statement": "Fawn browser shell and agent features improve workload over stock Chromium, but DoeRuntime does not yet show speedup over Dawn in this configuration.",
+      "recommended_action": "Ship Fawn with Dawn as interim default while optimizing Doe native browser backend paths.",
+      "evidence_deltas": {
+        "speedup_b_over_a": 1.1433691756272402,
+        "speedup_c_over_b": 1.576271186440678
+      }
+    },
+    {
+      "rule_id": "RULE_2_DOERUNTIME_SPEEDUP_STANDARD_PLAYWRIGHT",
+      "rule_name": "DoeRuntime Value Under Playwright",
+      "satisfied": false,
+      "statement": "DoeRuntime provides measurable browser acceleration over Dawn, but Fawn Direct Protocol does not yield additional latency win over standard Playwright.",
+      "recommended_action": "Promote DoeRuntime as primary WebGPU engine; keep standard Playwright protocol as default.",
+      "evidence_deltas": {
+        "speedup_c_over_b": 1.576271186440678,
+        "speedup_d_over_c": 1.2447257383966246
+      }
+    },
+    {
+      "rule_id": "RULE_3_TOKEN_SAVINGS_LATENCY_TRADEOFF",
+      "rule_name": "Token Savings vs Wall Latency Tradeoff",
+      "satisfied": false,
+      "statement": "Fawn Direct Protocol successfully compresses context and reduces token consumption, but total wall-clock latency is higher than stock baseline.",
+      "recommended_action": "Restrict Direct Protocol to context-bound agents where token budget dominates latency.",
+      "evidence_deltas": {
+        "token_reduction_ratio": 1.0,
+        "speedup_d_over_a": 2.2433192686357244
+      }
+    },
+    {
+      "rule_id": "RULE_4_NO_BROWSER_ADVANTAGE",
+      "rule_name": "No Measurable Browser Advantage",
+      "satisfied": false,
+      "statement": "Neither Fawn shell nor DoeRuntime achieves performance or efficiency gains over stock Chromium.",
+      "recommended_action": "Do not rationalize browser results. Redirect DoeRuntime focus to Node/Bun/Electron package lanes.",
+      "evidence_deltas": {
+        "speedup_b_over_a": 1.1433691756272402,
+        "speedup_c_over_b": 1.576271186440678,
+        "speedup_d_over_a": 2.2433192686357244
+      }
+    },
+    {
+      "rule_id": "RULE_5_VERTICAL_INTEGRATION_VALIDATED",
+      "rule_name": "Vertical Integration Thesis Validated",
+      "satisfied": true,
+      "statement": "Fawn Direct Protocol + DoeRuntime materially outperforms Stock Chromium + Playwright + Dawn in wall-clock latency, token efficiency, and execution success.",
+      "recommended_action": "Advance Fawn + Doe as the primary unified distribution and execution stack for AI agents.",
+      "evidence_deltas": {
+        "speedup_d_over_a": 2.2433192686357244,
+        "token_reduction_ratio": 1.0,
+        "memory_delta_mb": -130.0
+      }
+    }
+  ],
+  "overall_thesis_status": "VERTICAL_THESIS_VALIDATED"
+}

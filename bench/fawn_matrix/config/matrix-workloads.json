@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "workloads": [
+    {
+      "id": "persistent_session_startup",
+      "name": "Persistent Session Startup & Hydration",
+      "description": "Measures cold-to-warm session start, cookies/auth state hydration, and page attach latency.",
+      "category": "session_management",
+      "warmup_iterations": 2,
+      "timed_iterations": 10,
+      "target_tolerances": {
+        "max_variance_p95_p50_ratio": 2.0
+      }
+    },
+    {
+      "id": "context_snapshot_diff",
+      "name": "Semantic Context Snapshot & Page Diffing",
+      "description": "Measures full DOM accessibility tree serialization vs low-token native semantic diffing.",
+      "category": "context_transfer",
+      "warmup_iterations": 2,
+      "timed_iterations": 10,
+      "target_tolerances": {
+        "max_variance_p95_p50_ratio": 1.8
+      }
+    },
+    {
+      "id": "webgpu_model_preprocessing",
+      "name": "In-Browser WebGPU Vision & Tensor Preprocessing",
+      "description": "Dispatches image normalization and embedding linear projections via WebGPU compute shaders.",
+      "category": "local_compute",
+      "warmup_iterations": 3,
+      "timed_iterations": 15,
+      "target_tolerances": {
+        "max_variance_p95_p50_ratio": 1.5
+      }
+    },
+    {
+      "id": "multi_step_agent_interaction",
+      "name": "End-to-End Multi-Step Agent Interaction Loop",
+      "description": "Complete agent workflow: navigate -> diff context -> preprocess image -> compute action -> dispatch -> verify.",
+      "category": "end_to_end",
+      "warmup_iterations": 2,
+      "timed_iterations": 10,
+      "target_tolerances": {
+        "max_variance_p95_p50_ratio": 1.8
+      }
+    }
+  ]
+}
