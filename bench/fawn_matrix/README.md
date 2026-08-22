@@ -64,3 +64,15 @@ The `suite`, `aggregate`, and `passport` commands then join the three workload
 reports, require Apple Metal plus AMD Vulkan on distinct physical hardware, emit a
 promotion receipt, and reject unsigned or unearned release claims. Windows D3D12 is
 tracked as the desktop promotion tier and cannot be inferred from another backend.
+
+GPU input size and dispatch repetition are governed by `live-workloads.json`; both
+values are recorded and checked in every sample. Promotion receipts use Ed25519
+SSHSIG signatures through `ssh-keygen -Y sign`, embed the public key, and are
+cryptographically reverified by the release-passport gate. The signing environment
+variable contains a private-key path, never private-key contents committed to Git.
+
+`python3 -m pipeline.agent.fawn_matrix_learning_bridge` converts failed samples into a
+deterministic hash-chained DoeLab learning manifest. A signed platform suite becomes
+a promotion event only after its receipt verifies. The physical-runner workflow
+executes the same three workloads on explicitly labeled self-hosted hardware and
+uploads raw evidence without widening its claim scope.

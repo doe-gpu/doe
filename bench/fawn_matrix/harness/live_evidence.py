@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
-import hmac
 import json
 import os
+import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -89,6 +91,14 @@ def validate_live_raw(
             key = (sample["phase"], sample["iteration"])
             order_by_iteration.setdefault(key, set()).add(sample["orderIndex"])
             if payload["workloadId"] == "webgpu_model_preprocessing":
+                _require(
+                    sample.get("inputElements") == workload["inputElements"],
+                    f"{lane_id} input size is not config-driven",
+                )
+                _require(
+                    sample.get("dispatchRepeats") == workload["dispatchRepeats"],
+                    f"{lane_id} dispatch repetition mismatch",
+                )
                 output_by_iteration.setdefault(key, set()).add(sample["outputSha256"])
             else:
                 oracle_by_iteration.setdefault(key, set()).add(sample["oracleSha256"])
@@ -121,6 +131,7 @@ def _metrics(samples: list[dict[str, Any]], workload_id: str) -> dict[str, Any]:
             "pipelineCreationMs",
             "uploadMs",
             "dispatchMs",
+            "dispatchPerRepeatMs",
             "synchronizationMs",
             "readbackMs",
         ):
@@ -200,15 +211,79 @@ def evaluate_live_workload(
 
 def promotion_receipt(subject: dict[str, Any], signing_environment: str) -> dict[str, Any]:
     subject_hash = canonical_hash(subject)
-    key = os.environ.get(signing_environment)
-    signature = hmac.new(key.encode(), subject_hash.encode(), hashlib.sha256).hexdigest() if key else None
+    key_value = os.environ.get(signing_environment)
+    if not key_value:
+        return {
+            "receiptKind": "doe-promotion-receipt-v1",
+            "subjectSha256": subject_hash,
+            "signatureAlgorithm": None,
+            "signature": None,
+            "publicKey": None,
+            "signatureStatus": "unsigned_review_required",
+        }
+    key_path = Path(key_value)
+    _require(key_path.is_file(), f"signing key does not exist: {key_path}")
+    public_path = Path(str(key_path) + ".pub")
+    if public_path.is_file():
+        public_key = public_path.read_text(encoding="utf-8").strip()
+    else:
+        public_key = subprocess.run(
+            ["ssh-keygen", "-y", "-f", str(key_path)],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    with tempfile.TemporaryDirectory(prefix="doe-proof-sign-") as directory:
+        subject_path = Path(directory) / "subject.txt"
+        subject_path.write_text(subject_hash, encoding="utf-8")
+        subprocess.run(
+            ["ssh-keygen", "-Y", "sign", "-f", str(key_path), "-n", "doe-proof", str(subject_path)],
+            check=True,
+            capture_output=True,
+        )
+        signature = base64.b64encode(
+            Path(str(subject_path) + ".sig").read_bytes()
+        ).decode("ascii")
     return {
         "receiptKind": "doe-promotion-receipt-v1",
         "subjectSha256": subject_hash,
-        "signatureAlgorithm": "hmac-sha256" if key else None,
+        "signatureAlgorithm": "sshsig-ed25519",
         "signature": signature,
-        "signatureStatus": "signed" if key else "unsigned_review_required",
+        "publicKey": public_key,
+        "publicKeySha256": hashlib.sha256(public_key.encode()).hexdigest(),
+        "signatureStatus": "signed",
     }
+
+
+def verify_promotion_receipt(
+    subject: dict[str, Any],
+    receipt: dict[str, Any],
+) -> None:
+    _require(receipt.get("signatureStatus") == "signed", "receipt is unsigned")
+    _require(receipt.get("signatureAlgorithm") == "sshsig-ed25519", "unsupported signature algorithm")
+    subject_hash = canonical_hash(subject)
+    _require(receipt.get("subjectSha256") == subject_hash, "receipt subject hash mismatch")
+    public_key = receipt.get("publicKey", "")
+    _require(
+        receipt.get("publicKeySha256")
+        == hashlib.sha256(public_key.encode()).hexdigest(),
+        "receipt public key hash mismatch",
+    )
+    with tempfile.TemporaryDirectory(prefix="doe-proof-verify-") as directory:
+        root = Path(directory)
+        allowed = root / "allowed_signers"
+        signature_path = root / "subject.sig"
+        allowed.write_text(f"doe-proof {public_key}\n", encoding="utf-8")
+        signature_path.write_bytes(base64.b64decode(receipt["signature"], validate=True))
+        result = subprocess.run(
+            [
+                "ssh-keygen", "-Y", "verify", "-f", str(allowed),
+                "-I", "doe-proof", "-n", "doe-proof", "-s", str(signature_path),
+            ],
+            input=subject_hash.encode(),
+            capture_output=True,
+        )
+        _require(result.returncode == 0, "receipt signature verification failed")
 
 
 def build_platform_suite(
@@ -277,6 +352,17 @@ def validate_passport_candidate(aggregate: dict[str, Any]) -> None:
     _require(aggregate.get("reportKind") == "fawn-doe-cross-platform-suite", "wrong aggregate kind")
     _require(aggregate.get("corePlatformStatus") == "pass", "core platform gate failed")
     for platform_id, suite in aggregate.get("platforms", {}).items():
-        _require(suite.get("promotionReceipt", {}).get("signatureStatus") == "signed", f"{platform_id} receipt is unsigned")
+        receipt_subject = {
+            key: value
+            for key, value in suite.items()
+            if key not in {"promotionReceipt", "reportHash"}
+        }
+        try:
+            verify_promotion_receipt(
+                receipt_subject,
+                suite.get("promotionReceipt", {}),
+            )
+        except LiveEvidenceError as error:
+            raise LiveEvidenceError(f"{platform_id} {error}") from error
         _require(bool(suite.get("earnedComponents")), f"{platform_id} earned no product component")
         _require(suite.get("decisions", {}).get("verticalStack") is True, f"{platform_id} vertical task gate failed")

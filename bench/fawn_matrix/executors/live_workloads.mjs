@@ -38,6 +38,7 @@ function parseArgs(argv) {
     iterations: Number.parseInt(values.iterations, 10),
     agentSteps: Number.parseInt(values["agent-steps"] ?? "3", 10),
     inputElements: Number.parseInt(values["input-elements"] ?? "16384", 10),
+    dispatchRepeats: Number.parseInt(values["dispatch-repeats"] ?? "1", 10),
     headless: values.headless !== "false",
   };
 }
@@ -238,19 +239,25 @@ function chooseAction(snapshot) {
   return nodes.find((node) => node.role === "button" && !node.disabled)?.id ?? null;
 }
 
-async function gpuSample(lane, seed) {
-  const result = await evaluate(lane, `window.matrixGpu.preprocess(${seed})`);
+async function gpuSample(lane, seed, inputElements, dispatchRepeats) {
+  const result = await evaluate(
+    lane,
+    `window.matrixGpu.preprocess(${seed}, ${inputElements}, ${dispatchRepeats})`,
+  );
   return {
     success: result.oraclePass,
     oraclePass: result.oraclePass,
     outputSha256: result.outputSha256,
     maxAbsError: result.maxAbsError,
+    inputElements: result.inputElements,
+    dispatchRepeats: result.dispatchRepeats,
     memoryMb: result.memoryMb,
     timing: {
       compilationMs: result.compilationMs,
       pipelineCreationMs: result.pipelineCreationMs,
       uploadMs: result.uploadMs,
       dispatchMs: result.dispatchMs,
+      dispatchPerRepeatMs: result.dispatchPerRepeatMs,
       synchronizationMs: result.synchronizationMs,
       readbackMs: result.readbackMs,
       totalWallMs: result.completeOperationMs,
@@ -363,7 +370,7 @@ async function main() {
         for (const [orderIndex, lane] of order.entries()) {
           try {
             const sample = args.workload === "webgpu_model_preprocessing"
-              ? await gpuSample(lane, iteration)
+              ? await gpuSample(lane, iteration, args.inputElements, args.dispatchRepeats)
               : await agentSample(lane, iteration, iteration % 2 === 0 ? "cold" : "warm", fixtureServer.origin, args.agentSteps);
             samplesByLane[lane.laneId].push({ phase, iteration, orderIndex, ...sample });
           } catch (error) {

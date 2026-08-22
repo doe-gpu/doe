@@ -15,17 +15,19 @@
   <script>
     (() => {
       const SIZE = 16384;
-      const shader = `
+      function shaderForSize(size) {
+        return `
         @group(0) @binding(0) var<storage, read> inputData: array<f32>;
         @group(0) @binding(1) var<storage, read_write> outputData: array<f32>;
         @compute @workgroup_size(256)
         fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
           let i = gid.x;
-          if (i >= 16384u) { return; }
+          if (i >= ${size}u) { return; }
           outputData[i] = inputData[i] * 0.0078125 - 1.0
             + f32(i & 3u) * 0.015625;
         }
       `;
+      }
       let gpu = null;
 
       async function gpuState() {
@@ -57,17 +59,23 @@
           .join("");
       }
 
-      async function preprocess(seed = 0) {
+      async function preprocess(seed = 0, inputElements = SIZE, dispatchRepeats = 1) {
+        if (!Number.isInteger(inputElements) || inputElements < 256 || inputElements % 256 !== 0) {
+          throw new Error("inputElements must be a positive multiple of 256");
+        }
+        if (!Number.isInteger(dispatchRepeats) || dispatchRepeats < 1) {
+          throw new Error("dispatchRepeats must be positive");
+        }
         const totalStart = performance.now();
         const { device, adapterInfo } = await gpuState();
-        const input = new Float32Array(SIZE);
-        for (let index = 0; index < SIZE; index += 1) {
+        const input = new Float32Array(inputElements);
+        for (let index = 0; index < inputElements; index += 1) {
           input[index] = (index + seed * 17) & 255;
         }
         const byteSize = input.byteLength;
 
         const compileStart = performance.now();
-        const module = device.createShaderModule({ code: shader });
+        const module = device.createShaderModule({ code: shaderForSize(inputElements) });
         const compilationInfo = await module.getCompilationInfo();
         const compilationMs = performance.now() - compileStart;
         const compilationErrors = compilationInfo.messages.filter(
@@ -114,7 +122,9 @@
         const pass = encoder.beginComputePass();
         pass.setPipeline(pipeline);
         pass.setBindGroup(0, bindGroup);
-        pass.dispatchWorkgroups(SIZE / 256);
+        for (let repeat = 0; repeat < dispatchRepeats; repeat += 1) {
+          pass.dispatchWorkgroups(inputElements / 256);
+        }
         pass.end();
         device.queue.submit([encoder.finish()]);
         const dispatchMs = performance.now() - dispatchStart;
@@ -139,7 +149,7 @@
         const readbackMs = performance.now() - readbackStart;
 
         let maxAbsError = 0;
-        for (let index = 0; index < SIZE; index += 1) {
+        for (let index = 0; index < inputElements; index += 1) {
           const expected = Math.fround(
             Math.fround(input[index] * 0.0078125) - 1.0
               + (index & 3) * 0.015625,
@@ -158,6 +168,9 @@
           pipelineCreationMs,
           uploadMs,
           dispatchMs,
+          dispatchPerRepeatMs: dispatchMs / dispatchRepeats,
+          dispatchRepeats,
+          inputElements,
           synchronizationMs,
           readbackMs,
           completeOperationMs: performance.now() - totalStart,

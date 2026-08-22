@@ -46,6 +46,7 @@ class LiveWorkloadTest(unittest.TestCase):
                             "pipelineCreationMs": 1,
                             "uploadMs": 1,
                             "dispatchMs": 1,
+                            "dispatchPerRepeatMs": 0.125,
                             "synchronizationMs": 1,
                             "readbackMs": 1,
                         },

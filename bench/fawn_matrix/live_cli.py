@@ -135,6 +135,7 @@ def run_workload(args: argparse.Namespace) -> tuple[dict[str, Any], Path]:
         "--iterations", str(workload["timedIterations"]),
         "--agent-steps", str(workload.get("agentSteps", 3)),
         "--input-elements", str(workload.get("inputElements", 16384)),
+        "--dispatch-repeats", str(workload.get("dispatchRepeats", 1)),
         "--headless", "false" if args.headful else "true",
     ]
     subprocess.run(command, cwd=REPO_ROOT, check=True)

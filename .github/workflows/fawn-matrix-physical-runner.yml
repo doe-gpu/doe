@@ -1,0 +1,59 @@
+name: Fawn Matrix Physical Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform_id:
+        description: Physical platform identity
+        required: true
+        type: choice
+        options: [apple-metal, amd-vulkan, windows-d3d12]
+      runner_labels:
+        description: JSON runner-label array, for example ["self-hosted","macOS","ARM64"]
+        required: true
+        type: string
+
+jobs:
+  physical-matrix:
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preflight Fawn and Doe
+        shell: bash
+        run: browser/chromium/scripts/preflight.sh
+      - name: Run context matrix
+        shell: bash
+        run: python3 -m bench.fawn_matrix.cli run --platform-id "${{ inputs.platform_id }}"
+      - name: Run GPU preprocessing matrix
+        shell: bash
+        run: python3 -m bench.fawn_matrix.live_cli run --workload webgpu_model_preprocessing --platform-id "${{ inputs.platform_id }}"
+      - name: Run multi-step agent matrix
+        shell: bash
+        run: python3 -m bench.fawn_matrix.live_cli run --workload multi_step_agent_interaction --platform-id "${{ inputs.platform_id }}"
+      - name: Assemble platform suite and promotion receipt
+        shell: bash
+        env:
+          DOE_PROOF_PRIVATE_KEY: ${{ secrets.DOE_PROOF_SIGNING_KEY }}
+        run: |
+          platform_root="bench/out/fawn-matrix/${{ inputs.platform_id }}"
+          context_report="$(find "${platform_root}" -name context_snapshot_diff.platform-report.json -type f | sort | tail -n 1)"
+          gpu_report="$(find "${platform_root}" -name webgpu_model_preprocessing.platform-report.json -type f | sort | tail -n 1)"
+          agent_report="$(find "${platform_root}" -name multi_step_agent_interaction.platform-report.json -type f | sort | tail -n 1)"
+          if [[ -n "${DOE_PROOF_PRIVATE_KEY}" ]]; then
+            key_path="${RUNNER_TEMP}/doe-proof-signing-key"
+            printf '%s\n' "${DOE_PROOF_PRIVATE_KEY}" > "${key_path}"
+            chmod 600 "${key_path}"
+            export DOE_PROOF_SIGNING_KEY="${key_path}"
+          fi
+          python3 -m bench.fawn_matrix.live_cli suite \
+            --report "${context_report}" \
+            --report "${gpu_report}" \
+            --report "${agent_report}" \
+            --out "${platform_root}/fawn-doe.platform-suite.json"
+      - name: Upload physical evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: fawn-matrix-${{ inputs.platform_id }}-${{ github.run_id }}
+          path: bench/out/fawn-matrix/${{ inputs.platform_id }}/
+          if-no-files-found: error

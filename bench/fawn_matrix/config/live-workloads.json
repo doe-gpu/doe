@@ -6,6 +6,7 @@
       "warmupIterations": 3,
       "timedIterations": 30,
       "inputElements": 16384,
+      "dispatchRepeats": 64,
       "materialSpeedupRatio": 1.05
     },
     {

@@ -17,6 +17,7 @@
           "warmupIterations": {"type": "integer", "minimum": 1},
           "timedIterations": {"type": "integer", "minimum": 20},
           "inputElements": {"type": "integer", "minimum": 1024},
+          "dispatchRepeats": {"type": "integer", "minimum": 2},
           "agentSteps": {"type": "integer", "minimum": 1},
           "sessionModes": {"type": "array", "const": ["cold", "warm"]},
           "materialSpeedupRatio": {"type": "number", "exclusiveMinimum": 1},
