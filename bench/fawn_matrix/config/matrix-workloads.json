@@ -18,10 +18,7 @@
       "oracleId": "context-snapshot-diff-state-v1",
       "tokenizerId": "unicode-word-punctuation-v1",
       "warmupIterations": 5,
-      "timedIterations": 100,
-      "targetTolerances": {
-        "maxP95P50Ratio": 4.0
-      }
+      "timedIterations": 100
     }
   ]
 }

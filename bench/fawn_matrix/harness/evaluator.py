@@ -82,6 +82,9 @@ def evaluate_decision_rules(
             ),
             recommended_action=(
                 "Retain Fawn for agent context capture on this physical tuple."
+                if shell_value
+                else "Do not attribute a material context-capture win to "
+                "the Fawn shell on this physical tuple."
             ),
             evidence_deltas={"speedupBOverA": speedup_b_over_a},
         ),
@@ -96,6 +99,9 @@ def evaluate_decision_rules(
             recommended_action=(
                 "Promote the direct context path only after the second "
                 "physical platform agrees."
+                if direct_context_value
+                else "Do not promote the direct context path from this "
+                "physical tuple."
             ),
             evidence_deltas={
                 "byteReduction": byte_reduction,
@@ -113,6 +119,9 @@ def evaluate_decision_rules(
             ),
             recommended_action=(
                 "Use the direct path only for context-budget-bound agents."
+                if context_tradeoff
+                else "Do not cite a context-for-latency tradeoff on this "
+                "physical tuple."
             ),
             evidence_deltas={
                 "byteReduction": byte_reduction,
@@ -128,7 +137,11 @@ def evaluate_decision_rules(
                 "Neither Fawn nor the direct context path earns product "
                 "status on this tuple."
             ),
-            recommended_action="Keep stock Chromium for this workload.",
+            recommended_action=(
+                "Keep stock Chromium for this workload."
+                if no_context_advantage
+                else "Do not default to stock Chromium based on this rule."
+            ),
             evidence_deltas={
                 "speedupBOverA": speedup_b_over_a,
                 "speedupDOverA": speedup_d_over_a,

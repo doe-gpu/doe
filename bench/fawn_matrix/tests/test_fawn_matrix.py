@@ -37,7 +37,6 @@ class FawnMatrixEvidenceTests(unittest.TestCase):
         (self.root / "doe").write_bytes(b"doe")
         self.workload = {
             "inputPath": "fixture.html",
-            "targetTolerances": {"maxP95P50Ratio": 4.0},
             "timedIterations": 3,
             "warmupIterations": 1,
             "workloadId": "context_snapshot_diff",
@@ -214,6 +213,38 @@ class FawnMatrixEvidenceTests(unittest.TestCase):
         )
         self.assertFalse(
             report.comparability["doeRuntimePerformanceCredit"]
+        )
+
+    def test_unsatisfied_rule_does_not_recommend_fawn_shell(
+        self,
+    ) -> None:
+        payload = self._payload()
+        for sample in payload["lanes"][Lane.LANE_B.value]["samples"]:
+            if sample["phase"] == "timed":
+                sample["timing"]["totalWallMs"] = (
+                    50.0 + sample["iteration"]
+                )
+        evidence = validate_raw_evidence(
+            payload,
+            self.workload,
+            self.root,
+        )
+        report = evaluate_decision_rules(
+            "context_snapshot_diff",
+            build_lane_results(payload, evidence),
+            {
+                "materialContextReductionRatio": 1.2,
+                "materialSpeedupRatio": 1.05,
+                "maxMemoryRegressionMb": 32.0,
+            },
+            payload["platform"],
+            evidence,
+            {"path": "raw.json", "sha256": "a" * 64},
+        )
+        self.assertFalse(report.verdicts[0].satisfied)
+        self.assertIn(
+            "Do not attribute",
+            report.verdicts[0].recommended_action,
         )
 
     def test_synthetic_marker_is_rejected(self) -> None:

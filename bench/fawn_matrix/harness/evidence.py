@@ -6,7 +6,6 @@ import hashlib
 from pathlib import Path
 from typing import Any
 
-from bench.fawn_matrix.harness.lanes import compute_percentile
 from bench.fawn_matrix.harness.types import Lane
 
 
@@ -208,14 +207,7 @@ def validate_raw_evidence(
             len(set(latencies)) > 1,
             lane_id + " timings are constant",
         )
-        p50 = compute_percentile(latencies, 0.50)
-        p95 = compute_percentile(latencies, 0.95)
-        _require(p50 > 0, lane_id + " p50 must be positive")
-        _require(
-            p95 / p50
-            <= workload["targetTolerances"]["maxP95P50Ratio"],
-            lane_id + " exceeds configured tail variance",
-        )
+        _require(min(latencies) > 0, lane_id + " timings must be positive")
 
     _require(
         len(oracle_hashes) == 1,

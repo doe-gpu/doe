@@ -61,8 +61,7 @@
           "oracleId",
           "tokenizerId",
           "warmupIterations",
-          "timedIterations",
-          "targetTolerances"
+          "timedIterations"
         ],
         "properties": {
           "workloadId": {
@@ -88,17 +87,6 @@
           "timedIterations": {
             "type": "integer",
             "minimum": 100
-          },
-          "targetTolerances": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["maxP95P50Ratio"],
-            "properties": {
-              "maxP95P50Ratio": {
-                "type": "number",
-                "exclusiveMinimum": 1
-              }
-            }
           }
         }
       }

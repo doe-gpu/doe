@@ -32,12 +32,12 @@ Aggregate only independently produced Apple Metal and AMD Vulkan reports:
 
 ```sh
 python3 -m bench.fawn_matrix.cli aggregate \
-  --report bench/out/fawn-matrix/apple-metal/<run>/report.json \
-  --report bench/out/fawn-matrix/amd-vulkan/<run>/report.json
+  --platform-report bench/out/fawn-matrix/apple-metal/<run>/context_snapshot_diff.platform-report.json \
+  --platform-report bench/out/fawn-matrix/amd-vulkan/<run>/context_snapshot_diff.platform-report.json \
+  --out bench/out/fawn-matrix/context_snapshot_diff.aggregate-report.json
 ```
 
 Aggregation fails closed when a required platform is absent, hardware identities
 are not distinct, a lane fell back, evidence is simulated, samples are not
 interleaved, payload hashes disagree with artifacts, or the semantic oracle fails.
 Aggregate output still requires independent review before publication.
-
