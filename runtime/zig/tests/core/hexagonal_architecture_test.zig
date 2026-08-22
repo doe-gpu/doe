@@ -147,3 +147,51 @@ test "optimization and learning contracts: profile, policy, and promotion" {
     };
     try std.testing.expect(receipt.isPromoted());
 }
+
+test "application pipeline modules: normalize, validate, specialize, compile, schedule, session" {
+    // Normalization
+    const norm_wg = app.normalizeWorkgroups(.{ .x = 0, .y = 2, .z = 0 });
+    try std.testing.expectEqual(@as(u32, 1), norm_wg.x);
+    try std.testing.expectEqual(@as(u32, 2), norm_wg.y);
+    try std.testing.expectEqual(@as(u32, 1), norm_wg.z);
+
+    const aligned_offset = app.normalizeOffset(100, 256);
+    try std.testing.expectEqual(@as(u64, 256), aligned_offset);
+
+    // Validation
+    const valid_req = app.ComputeRequest{
+        .kernel_source = "@compute fn main() {}",
+        .workgroups = .{ .x = 1, .y = 1, .z = 1 },
+    };
+    try std.testing.expect(app.validateComputeRequest(valid_req, .{}) == null);
+
+    const invalid_req = app.ComputeRequest{
+        .kernel_source = "",
+        .workgroups = .{ .x = 1, .y = 1, .z = 1 },
+    };
+    try std.testing.expect(app.validateComputeRequest(invalid_req, .{}) != null);
+
+    // Specialization
+    const spec_decision = app.evaluateSpecialization(.{
+        .domain = .agent_browser_interactive,
+        .priority = .interactive_lowest_latency,
+        .allow_bounds_elision = true,
+    }, .{
+        .strict_parity_mode = false,
+    });
+    try std.testing.expect(spec_decision.elide_robustness_clamp);
+    try std.testing.expectEqual(@as(u32, 8), spec_decision.tile_size_x);
+
+    // Compilation
+    const compiled = app.compileKernelSource("@compute fn main() {}", "main");
+    try std.testing.expectEqualStrings("main", compiled.entry_point);
+    try std.testing.expect(!compiled.program_identity.isNull());
+
+    // Evidence Contract
+    const ev_mod = contracts.evidenceContract();
+    const req_ev = ev_mod.EvidenceRequirement{
+        .disposition = .execution_receipt_required,
+        .record_gpu_timestamps = true,
+    };
+    try std.testing.expectEqual(ev_mod.EvidenceDisposition.execution_receipt_required, req_ev.disposition);
+}

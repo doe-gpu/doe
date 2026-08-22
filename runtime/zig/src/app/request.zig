@@ -6,6 +6,8 @@ const std = @import("std");
 const compute_contract = @import("../contracts/compute.zig");
 const model_compute = @import("../contracts/model/model_compute_types.zig");
 
+pub const WorkgroupCount = compute_contract.WorkgroupCount;
+
 pub const ComputeRequest = struct {
     kernel_source: []const u8,
     entry_point: ?[]const u8 = null,

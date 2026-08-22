@@ -9,6 +9,8 @@ pub const readback = @import("readback.zig");
 pub const telemetry = @import("telemetry.zig");
 pub const render = @import("render.zig");
 pub const spatial = @import("spatial.zig");
+pub const capture = @import("capture.zig");
+pub const factory = @import("factory.zig");
 
 pub const ComputePort = compute.ComputePort;
 pub const ComputePortVTable = compute.ComputePortVTable;
@@ -30,3 +32,7 @@ pub const RenderPortVTable = render.RenderPortVTable;
 
 pub const SpatialPort = spatial.SpatialPort;
 pub const SpatialPortVTable = spatial.SpatialPortVTable;
+
+pub const CapturePort = capture.CapturePort;
+pub const CapturePortVTable = capture.CapturePortVTable;
+pub const PortBundle = factory.PortBundle;

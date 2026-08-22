@@ -86,6 +86,10 @@ pub fn spatialOperation() type {
     return @import("spatial_operation.zig");
 }
 
+pub fn evidenceContract() type {
+    return @import("evidence.zig");
+}
+
 pub const shaderAbi = struct {
     pub fn dispatchInfo() type {
         return @import("shader_abi/dispatch_info.zig");

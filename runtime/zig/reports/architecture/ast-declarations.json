@@ -4,6 +4,255 @@
     {
       "declarations": [
         {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "0b58c320356f219e817d0cf6c6319d32a2af6339cf57d8ab1f70eef55ef2b0de",
+          "endLine": 11,
+          "kind": "struct",
+          "literalTokenSha256": "55816864334a72ad5b1171c4232f337eacfdb488f878cdc5df7a9067442046cf",
+          "literalTokens": [
+            "0",
+            "0"
+          ],
+          "name": "BufferBinding",
+          "normalizedTokenSha256": "0b58c320356f219e817d0cf6c6319d32a2af6339cf57d8ab1f70eef55ef2b0de",
+          "public": true,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 31
+        },
+        {
+          "contractTokenSha256": "a5f0c43f38a80e82a35d6ea8bed2d023ffc13f47cc3b5da3ae8d9a6d2c95d72b",
+          "endLine": 15,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "BindingSet",
+          "normalizedTokenSha256": "a5f0c43f38a80e82a35d6ea8bed2d023ffc13f47cc3b5da3ae8d9a6d2c95d72b",
+          "public": true,
+          "startLine": 13,
+          "switchTags": [],
+          "tokenCount": 19
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/app/bind.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 5,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "5332f03895642cd65c971688f12dcf8385266af79bdb25d868179cd47229cd23",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "586bc54593d2b4e3bbaa762faa33c558c84ecd4615459913d408fb2eb4a3c96d",
+          "literalTokens": [
+            "\"../contracts/identity.zig\""
+          ],
+          "name": "identity",
+          "normalizedTokenSha256": "5332f03895642cd65c971688f12dcf8385266af79bdb25d868179cd47229cd23",
+          "public": false,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "b92e09ad993c7980489f4b2198702431cdf8a5daef99e046262c01ee1ac67b9c",
+          "endLine": 12,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "CompiledArtifact",
+          "normalizedTokenSha256": "b92e09ad993c7980489f4b2198702431cdf8a5daef99e046262c01ee1ac67b9c",
+          "public": true,
+          "startLine": 8,
+          "switchTags": [],
+          "tokenCount": 24
+        },
+        {
+          "contractTokenSha256": "4d65ba60f44384c13cae4e397fb2b397c783fb76c5cfc67a0f2e2716c42d6121",
+          "endLine": 29,
+          "kind": "function",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "compileKernelSource",
+          "normalizedTokenSha256": "31a3f5e72c7bb55af6af495e95a8c078539e7a90038b495994cc1d7be8885b5b",
+          "public": true,
+          "startLine": 14,
+          "switchTags": [],
+          "tokenCount": 104
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/app/compile.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "f9ea5fdb5b3f80422316f64df42c4280d36c909c34c73b088317164412b62887",
+          "endLine": 4,
+          "kind": "constant",
+          "literalTokenSha256": "2bb686dfd1e26fbcb7ece587d6ec1498d6984b62d1595fc8b07fa39999904cf8",
+          "literalTokens": [
+            "\"request.zig\""
+          ],
+          "name": "request",
+          "normalizedTokenSha256": "f9ea5fdb5b3f80422316f64df42c4280d36c909c34c73b088317164412b62887",
+          "public": false,
+          "startLine": 4,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "01de8b13d97cefc5e30ac591a893a610936fc42c585ff586ae6b9a3cb97cb586",
+          "endLine": 5,
+          "kind": "constant",
+          "literalTokenSha256": "e36aecba80898688f08313d8b0dd9d88f8183c786b1bec349b9dc0831a9c6a9d",
+          "literalTokens": [
+            "\"prepare.zig\""
+          ],
+          "name": "prepare",
+          "normalizedTokenSha256": "01de8b13d97cefc5e30ac591a893a610936fc42c585ff586ae6b9a3cb97cb586",
+          "public": false,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "cbd7e2fa40dc5073d9565debb9baa487b4d3da4700bf0087af45b7c8fecb1d7d",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "c94d83119e251c1214370e485c0d9d573d9b3565770b82349e669016423a3af0",
+          "literalTokens": [
+            "\"runner.zig\""
+          ],
+          "name": "runner",
+          "normalizedTokenSha256": "cbd7e2fa40dc5073d9565debb9baa487b4d3da4700bf0087af45b7c8fecb1d7d",
+          "public": false,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "1909e71b1a57ea285344adcd666f1d06ff96aca012e5844319cb830b14431a58",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": "70c887a2f4b16a47d3a40338f02b535f8f539d6c67b015417472fb8d5052c806",
+          "literalTokens": [
+            "\"../backend/ports/compute.zig\""
+          ],
+          "name": "compute_port",
+          "normalizedTokenSha256": "1909e71b1a57ea285344adcd666f1d06ff96aca012e5844319cb830b14431a58",
+          "public": false,
+          "startLine": 7,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "a1a666ef039776b1e0c9ae55dacac1ca84e6674f85a7643c43361ccf7d773477",
+          "endLine": 8,
+          "kind": "constant",
+          "literalTokenSha256": "b8ec5bff4c419c1f575cfc3e71232eb54b5539706d8c8ebd72a7ee2fb52e1e5e",
+          "literalTokens": [
+            "\"../backend/ports/transfer.zig\""
+          ],
+          "name": "transfer_port",
+          "normalizedTokenSha256": "a1a666ef039776b1e0c9ae55dacac1ca84e6674f85a7643c43361ccf7d773477",
+          "public": false,
+          "startLine": 8,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "46ddf20f3d134c6cfc65cda68e8cfaa7c972e6afa8bd20ab277423da06e43664",
+          "endLine": 9,
+          "kind": "constant",
+          "literalTokenSha256": "04cb8b9d3085bc5512271b9d1dba9718e17b02c821ae645603df12d96c6c4112",
+          "literalTokens": [
+            "\"../contracts/execution_report.zig\""
+          ],
+          "name": "report",
+          "normalizedTokenSha256": "46ddf20f3d134c6cfc65cda68e8cfaa7c972e6afa8bd20ab277423da06e43664",
+          "public": false,
+          "startLine": 9,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "19b59f80c7f7b5fc575949d6c53bc16c0c3e1ffe0bd1a4d85b466b7184eaf673",
+          "endLine": 14,
+          "kind": "function",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "executeComputeDirect",
+          "normalizedTokenSha256": "ff1ffd9a17bb5d7ef951c1f3ae58dea7037fec3204d5e1ddec0fe4de42f8e36b",
+          "public": true,
+          "startLine": 11,
+          "switchTags": [],
+          "tokenCount": 48
+        },
+        {
+          "contractTokenSha256": "88937ae1873baa18ee278f76f22d87410ef3b74e0de19f3566731963ee23f01f",
+          "endLine": 19,
+          "kind": "function",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "executeTransferDirect",
+          "normalizedTokenSha256": "82abe7d859eeb345b86c687ae35ee970bc5cd41084b857bdd00123bf081893a7",
+          "public": true,
+          "startLine": 16,
+          "switchTags": [],
+          "tokenCount": 48
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/app/execute.zig"
+    },
+    {
+      "declarations": [
+        {
           "contractTokenSha256": "1a4427e7ea531d50a947f4c03ab0843825265b5df69b5e86d369cefe00f5590a",
           "endLine": 3,
           "kind": "constant",
@@ -19,8 +268,98 @@
           "tokenCount": 8
         },
         {
-          "contractTokenSha256": "ab25296a30856344f6dd9fb238fafa1df4d9a5c27fa8292b78cde0cac9ce76a6",
+          "contractTokenSha256": "88c51e8dd17732f35ad4db34c1ac6133520fac270328568d9adea0806f253485",
           "endLine": 4,
+          "kind": "constant",
+          "literalTokenSha256": "257c98f392efd18c4dc68bbc2b9cfbfecc0e484455c13299ec34efa07334d9bf",
+          "literalTokens": [
+            "\"normalize.zig\""
+          ],
+          "name": "normalize",
+          "normalizedTokenSha256": "88c51e8dd17732f35ad4db34c1ac6133520fac270328568d9adea0806f253485",
+          "public": true,
+          "startLine": 4,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "ef440375a63813ff454611019ba62eed882d9a0052d668d8dbead344dc6a571b",
+          "endLine": 5,
+          "kind": "constant",
+          "literalTokenSha256": "063d9493960409cd1cdbdc17c7f2c51f9d42ea5849a785a00cc540a80339b8e9",
+          "literalTokens": [
+            "\"validate.zig\""
+          ],
+          "name": "validate",
+          "normalizedTokenSha256": "ef440375a63813ff454611019ba62eed882d9a0052d668d8dbead344dc6a571b",
+          "public": true,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "e1d01263bb5602723d51e52990949321a26c937b11dfbed0fcaa8d80ccdf21ef",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "cea514eb3d16f7a17eb7d42adbf8393f68d2d80bc392c719c130ae58a55316b0",
+          "literalTokens": [
+            "\"specialize.zig\""
+          ],
+          "name": "specialize",
+          "normalizedTokenSha256": "e1d01263bb5602723d51e52990949321a26c937b11dfbed0fcaa8d80ccdf21ef",
+          "public": true,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "c37ba9e575023f6f2439bb1b2b6dd527a996b4627678918ead588ac36df82897",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": "d1a32cdb843ecc5aa25396da1c1384590998992f77cf9afc9d442da0195f9af0",
+          "literalTokens": [
+            "\"compile.zig\""
+          ],
+          "name": "compile",
+          "normalizedTokenSha256": "c37ba9e575023f6f2439bb1b2b6dd527a996b4627678918ead588ac36df82897",
+          "public": true,
+          "startLine": 7,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "43d38b6bd71a2b39e536b29a232e805a4df4a771b68639b13ef622ac6068ec48",
+          "endLine": 8,
+          "kind": "constant",
+          "literalTokenSha256": "38b0dd9c7e1c0c00b3fbe6c4a0d7afec6c3dc884474e2683febd02e5e897d30a",
+          "literalTokens": [
+            "\"bind.zig\""
+          ],
+          "name": "bind",
+          "normalizedTokenSha256": "43d38b6bd71a2b39e536b29a232e805a4df4a771b68639b13ef622ac6068ec48",
+          "public": true,
+          "startLine": 8,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "7baffdf331b82c666a9652e62092d765bca82e768487002e1aec186458d1a8d5",
+          "endLine": 9,
+          "kind": "constant",
+          "literalTokenSha256": "358175e18db0dc13c306d547695a1bb3a88b5b2d112dcfb9fefaccf4f0a28ade",
+          "literalTokens": [
+            "\"schedule.zig\""
+          ],
+          "name": "schedule",
+          "normalizedTokenSha256": "7baffdf331b82c666a9652e62092d765bca82e768487002e1aec186458d1a8d5",
+          "public": true,
+          "startLine": 9,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "ab25296a30856344f6dd9fb238fafa1df4d9a5c27fa8292b78cde0cac9ce76a6",
+          "endLine": 10,
           "kind": "constant",
           "literalTokenSha256": "e36aecba80898688f08313d8b0dd9d88f8183c786b1bec349b9dc0831a9c6a9d",
           "literalTokens": [
@@ -29,13 +368,28 @@
           "name": "prepare",
           "normalizedTokenSha256": "ab25296a30856344f6dd9fb238fafa1df4d9a5c27fa8292b78cde0cac9ce76a6",
           "public": true,
-          "startLine": 4,
+          "startLine": 10,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "5327cc322199e19a07bc9d862bddb1c532fc177add57b6c5050ab1c2a86aea0e",
+          "endLine": 11,
+          "kind": "constant",
+          "literalTokenSha256": "43a65ba78936377d34c4968e193ad573898a2fc93fb54b9ae3b0b95920614f2c",
+          "literalTokens": [
+            "\"execute.zig\""
+          ],
+          "name": "execute",
+          "normalizedTokenSha256": "5327cc322199e19a07bc9d862bddb1c532fc177add57b6c5050ab1c2a86aea0e",
+          "public": true,
+          "startLine": 11,
           "switchTags": [],
           "tokenCount": 8
         },
         {
           "contractTokenSha256": "c3ad2f60e847f3837a577619ba9dbaf65978f81695d31e50a77dba04e828d694",
-          "endLine": 5,
+          "endLine": 12,
           "kind": "constant",
           "literalTokenSha256": "c94d83119e251c1214370e485c0d9d573d9b3565770b82349e669016423a3af0",
           "literalTokens": [
@@ -44,117 +398,332 @@
           "name": "runner",
           "normalizedTokenSha256": "c3ad2f60e847f3837a577619ba9dbaf65978f81695d31e50a77dba04e828d694",
           "public": true,
-          "startLine": 5,
+          "startLine": 12,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "0b85abfccb7c6dfe286b60bbfe2941d56b4be7d15c3c5c57710dca388a608bbd",
+          "endLine": 13,
+          "kind": "constant",
+          "literalTokenSha256": "80cd9c67207177aba9dc39137365239e815158105842330efc30f3382f327253",
+          "literalTokens": [
+            "\"session.zig\""
+          ],
+          "name": "session",
+          "normalizedTokenSha256": "0b85abfccb7c6dfe286b60bbfe2941d56b4be7d15c3c5c57710dca388a608bbd",
+          "public": true,
+          "startLine": 13,
           "switchTags": [],
           "tokenCount": 8
         },
         {
           "contractTokenSha256": "37fba0c86a335a30685e0144463027f3c2886b75f3d576f035e5e97e6ab1b3f4",
-          "endLine": 7,
+          "endLine": 15,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ApplicationRequest",
           "normalizedTokenSha256": "37fba0c86a335a30685e0144463027f3c2886b75f3d576f035e5e97e6ab1b3f4",
           "public": true,
-          "startLine": 7,
+          "startLine": 15,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "fecbee0362d4e76572b53c5c2c689bf82fb84a7901e02bdd2f17bc30113449d7",
-          "endLine": 8,
+          "endLine": 16,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ComputeRequest",
           "normalizedTokenSha256": "fecbee0362d4e76572b53c5c2c689bf82fb84a7901e02bdd2f17bc30113449d7",
           "public": true,
-          "startLine": 8,
+          "startLine": 16,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "63b8ca49f8da7fa420bd7780b72183ec88d55a12e70e26c6b3a1045eccc5377b",
-          "endLine": 9,
+          "endLine": 17,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "TransferRequest",
           "normalizedTokenSha256": "63b8ca49f8da7fa420bd7780b72183ec88d55a12e70e26c6b3a1045eccc5377b",
           "public": true,
-          "startLine": 9,
+          "startLine": 17,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "9d1cdc4e8dc9ebfea8aea5fad21585dc3d9e65c50fb063f7d6da400006c0073a",
+          "endLine": 18,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "WorkgroupCount",
+          "normalizedTokenSha256": "9d1cdc4e8dc9ebfea8aea5fad21585dc3d9e65c50fb063f7d6da400006c0073a",
+          "public": true,
+          "startLine": 18,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "f9212cf725a8faa09042875739c869d8337e312176582d8d80f8ef127a5c7b3c",
+          "endLine": 20,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "normalizeWorkgroups",
+          "normalizedTokenSha256": "f9212cf725a8faa09042875739c869d8337e312176582d8d80f8ef127a5c7b3c",
+          "public": true,
+          "startLine": 20,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "6d4919bac113860d8f39caff8890c766561b9ed8cc3ff93282262df9d954693f",
+          "endLine": 21,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "normalizeOffset",
+          "normalizedTokenSha256": "6d4919bac113860d8f39caff8890c766561b9ed8cc3ff93282262df9d954693f",
+          "public": true,
+          "startLine": 21,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "5eddc949f1256a639e4a71322508365edee6a4785589b010abc9ef66fb9c8eb1",
+          "endLine": 23,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "validateComputeRequest",
+          "normalizedTokenSha256": "5eddc949f1256a639e4a71322508365edee6a4785589b010abc9ef66fb9c8eb1",
+          "public": true,
+          "startLine": 23,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "615f2c8c0b54260db7e4007e1393b0cb5d668a070d19642c9de693fdfcc473ce",
+          "endLine": 24,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "validateTransferRequest",
+          "normalizedTokenSha256": "615f2c8c0b54260db7e4007e1393b0cb5d668a070d19642c9de693fdfcc473ce",
+          "public": true,
+          "startLine": 24,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "2efc846aba25b5ffa6fd66e39ff45408d7102bd88333a25915898b68c98f0a59",
+          "endLine": 26,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "evaluateSpecialization",
+          "normalizedTokenSha256": "2efc846aba25b5ffa6fd66e39ff45408d7102bd88333a25915898b68c98f0a59",
+          "public": true,
+          "startLine": 26,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "69962e423fbd05b9d3363aea7fa24575088b05d79593ea293c52dae3d76f3233",
+          "endLine": 27,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "compileKernelSource",
+          "normalizedTokenSha256": "69962e423fbd05b9d3363aea7fa24575088b05d79593ea293c52dae3d76f3233",
+          "public": true,
+          "startLine": 27,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "f0bba5a85475fafc89bbaf67708df4ebd4d419920d6e5d5f66a9d79849761517",
-          "endLine": 11,
+          "endLine": 29,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "prepareCompute",
           "normalizedTokenSha256": "f0bba5a85475fafc89bbaf67708df4ebd4d419920d6e5d5f66a9d79849761517",
           "public": true,
-          "startLine": 11,
+          "startLine": 29,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "0ab70c18029254b059c80d4a9a91fa1fd4810d934df1cb01d52064f610cb6e93",
-          "endLine": 12,
+          "endLine": 30,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "prepareComputeFromCommand",
           "normalizedTokenSha256": "0ab70c18029254b059c80d4a9a91fa1fd4810d934df1cb01d52064f610cb6e93",
           "public": true,
-          "startLine": 12,
+          "startLine": 30,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "364259c94e40360052d0b5b0a70da02301360869bd5fb544a35114af94bc8ecf",
-          "endLine": 13,
+          "endLine": 31,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "prepareTransfer",
           "normalizedTokenSha256": "364259c94e40360052d0b5b0a70da02301360869bd5fb544a35114af94bc8ecf",
           "public": true,
-          "startLine": 13,
+          "startLine": 31,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "475d019df7be3d4bf14b2946e4afc876d41c56802b553631d95b4a34caa4b293",
-          "endLine": 15,
+          "endLine": 33,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "executeCompute",
           "normalizedTokenSha256": "475d019df7be3d4bf14b2946e4afc876d41c56802b553631d95b4a34caa4b293",
           "public": true,
-          "startLine": 15,
+          "startLine": 33,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "9296583ebd568203c794621daf04d7474694a152ee668156c783425a224b67ac",
-          "endLine": 16,
+          "endLine": 34,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "executeTransfer",
           "normalizedTokenSha256": "9296583ebd568203c794621daf04d7474694a152ee668156c783425a224b67ac",
           "public": true,
-          "startLine": 16,
+          "startLine": 34,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "5f0601aa39785b0d9c2a809aed960ea8dde51b3ac4e930a71449ac63cac43cb8",
+          "endLine": 35,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "executeComputeDirect",
+          "normalizedTokenSha256": "5f0601aa39785b0d9c2a809aed960ea8dde51b3ac4e930a71449ac63cac43cb8",
+          "public": true,
+          "startLine": 35,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "451cbdc2a2cc26838adcedc5cc8536ec8b10cd6b353935f3c058a7f5efac7107",
+          "endLine": 36,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "executeTransferDirect",
+          "normalizedTokenSha256": "451cbdc2a2cc26838adcedc5cc8536ec8b10cd6b353935f3c058a7f5efac7107",
+          "public": true,
+          "startLine": 36,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "b71f5f20552b9b6360609dc1dce0422acd28b14c34079895c87ab75d82302f74",
+          "endLine": 38,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "ApplicationSession",
+          "normalizedTokenSha256": "b71f5f20552b9b6360609dc1dce0422acd28b14c34079895c87ab75d82302f74",
+          "public": true,
+          "startLine": 38,
           "switchTags": [],
           "tokenCount": 7
         }
       ],
       "parseErrorCount": 0,
       "path": "src/app/mod.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 5,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "f9ea5fdb5b3f80422316f64df42c4280d36c909c34c73b088317164412b62887",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "2bb686dfd1e26fbcb7ece587d6ec1498d6984b62d1595fc8b07fa39999904cf8",
+          "literalTokens": [
+            "\"request.zig\""
+          ],
+          "name": "request",
+          "normalizedTokenSha256": "f9ea5fdb5b3f80422316f64df42c4280d36c909c34c73b088317164412b62887",
+          "public": false,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "99e8cbdc3cb7c6cd54c8cad1d80bf284702c6db722a11f2bceb5b7271ff97bac",
+          "endLine": 14,
+          "kind": "function",
+          "literalTokenSha256": "39749c9f43f37d5de10483af9b9cf0141b805aaeb7190319577cc6d8b3b9a5cb",
+          "literalTokens": [
+            "1",
+            "1",
+            "1"
+          ],
+          "name": "normalizeWorkgroups",
+          "normalizedTokenSha256": "34a3d049be3f433a3b509352de9ab204ececfac5940862e0b570271909c0dc26",
+          "public": true,
+          "startLine": 8,
+          "switchTags": [],
+          "tokenCount": 56
+        },
+        {
+          "contractTokenSha256": "80e63a9d1ad4fc95d13163799c8c4484f8f9068076a6d99ab456fe105a6e794b",
+          "endLine": 19,
+          "kind": "function",
+          "literalTokenSha256": "2c51700bb2648f1140857540522513aa5cd123573adbc1cc7656f4bae2fc11d4",
+          "literalTokens": [
+            "0",
+            "1",
+            "1"
+          ],
+          "name": "normalizeOffset",
+          "normalizedTokenSha256": "e7aeb8442d037e0f82b7aefcee20f4aa678edd26ef0be6496678075e97ca15fe",
+          "public": true,
+          "startLine": 16,
+          "switchTags": [],
+          "tokenCount": 40
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/app/normalize.zig"
     },
     {
       "declarations": [
@@ -309,8 +878,21 @@
           "tokenCount": 7
         },
         {
+          "contractTokenSha256": "82012e5d640bb64dc5e8b2929a192a394420b6e27ad1d2e70c9fb26ea9a04535",
+          "endLine": 9,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "WorkgroupCount",
+          "normalizedTokenSha256": "82012e5d640bb64dc5e8b2929a192a394420b6e27ad1d2e70c9fb26ea9a04535",
+          "public": true,
+          "startLine": 9,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
           "contractTokenSha256": "8a1c1b5cd846dd8463021356f1a47c20f5f83a749bac340f7c80a716ea1fe02f",
-          "endLine": 18,
+          "endLine": 20,
           "kind": "struct",
           "literalTokenSha256": "b1a23e03eb5fe9cb33bdb5ab486e0560f9c57e6a3361fc977497a85ed3de6fbf",
           "literalTokens": [
@@ -320,13 +902,13 @@
           "name": "ComputeRequest",
           "normalizedTokenSha256": "8a1c1b5cd846dd8463021356f1a47c20f5f83a749bac340f7c80a716ea1fe02f",
           "public": true,
-          "startLine": 9,
+          "startLine": 11,
           "switchTags": [],
           "tokenCount": 69
         },
         {
           "contractTokenSha256": "753a31a3a363b41d18e5a96925ff262e30619109bfe6678e536376ca2a992a9f",
-          "endLine": 25,
+          "endLine": 27,
           "kind": "struct",
           "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
           "literalTokens": [
@@ -335,20 +917,20 @@
           "name": "TransferRequest",
           "normalizedTokenSha256": "753a31a3a363b41d18e5a96925ff262e30619109bfe6678e536376ca2a992a9f",
           "public": true,
-          "startLine": 20,
+          "startLine": 22,
           "switchTags": [],
           "tokenCount": 28
         },
         {
           "contractTokenSha256": "72f02c6577568214de1281208a966cef5000498a7835681a43b189f2b33bfd8a",
-          "endLine": 30,
+          "endLine": 32,
           "kind": "union",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ApplicationRequest",
           "normalizedTokenSha256": "72f02c6577568214de1281208a966cef5000498a7835681a43b189f2b33bfd8a",
           "public": true,
-          "startLine": 27,
+          "startLine": 29,
           "switchTags": [],
           "tokenCount": 18
         }
@@ -462,6 +1044,380 @@
       ],
       "parseErrorCount": 0,
       "path": "src/app/runner.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "787e0536a5955aeb839aed0a3c39999160a1c0647d14cb3935ed5aef37084dd5",
+          "endLine": 4,
+          "kind": "constant",
+          "literalTokenSha256": "ff6c0862a6d27741562031c7d903480bad15d56e96afed700c74548a55be15a0",
+          "literalTokens": [
+            "\"../contracts/prepared_operation.zig\""
+          ],
+          "name": "prepared",
+          "normalizedTokenSha256": "787e0536a5955aeb839aed0a3c39999160a1c0647d14cb3935ed5aef37084dd5",
+          "public": false,
+          "startLine": 4,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "4a4ecadb75d7c6ec510544414c2553b84439d422e54a5dfc54d1f198e7567703",
+          "endLine": 9,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "ScheduledBatch",
+          "normalizedTokenSha256": "4a4ecadb75d7c6ec510544414c2553b84439d422e54a5dfc54d1f198e7567703",
+          "public": true,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 22
+        },
+        {
+          "contractTokenSha256": "78be50d3f2b7e4137f7e8213187e2330c8669c4cfeecf5a7e94607191a1164e2",
+          "endLine": 20,
+          "kind": "function",
+          "literalTokenSha256": "b1a23e03eb5fe9cb33bdb5ab486e0560f9c57e6a3361fc977497a85ed3de6fbf",
+          "literalTokens": [
+            "1",
+            "0"
+          ],
+          "name": "createSingleOperationBatch",
+          "normalizedTokenSha256": "1d2b4b0fb53fa054cee7c05821e16243f1cc7120c5fe33c7d380a926bf4b32e5",
+          "public": true,
+          "startLine": 11,
+          "switchTags": [],
+          "tokenCount": 59
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/app/schedule.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "f9ea5fdb5b3f80422316f64df42c4280d36c909c34c73b088317164412b62887",
+          "endLine": 4,
+          "kind": "constant",
+          "literalTokenSha256": "2bb686dfd1e26fbcb7ece587d6ec1498d6984b62d1595fc8b07fa39999904cf8",
+          "literalTokens": [
+            "\"request.zig\""
+          ],
+          "name": "request",
+          "normalizedTokenSha256": "f9ea5fdb5b3f80422316f64df42c4280d36c909c34c73b088317164412b62887",
+          "public": false,
+          "startLine": 4,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "01de8b13d97cefc5e30ac591a893a610936fc42c585ff586ae6b9a3cb97cb586",
+          "endLine": 5,
+          "kind": "constant",
+          "literalTokenSha256": "e36aecba80898688f08313d8b0dd9d88f8183c786b1bec349b9dc0831a9c6a9d",
+          "literalTokens": [
+            "\"prepare.zig\""
+          ],
+          "name": "prepare",
+          "normalizedTokenSha256": "01de8b13d97cefc5e30ac591a893a610936fc42c585ff586ae6b9a3cb97cb586",
+          "public": false,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "cbd7e2fa40dc5073d9565debb9baa487b4d3da4700bf0087af45b7c8fecb1d7d",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "c94d83119e251c1214370e485c0d9d573d9b3565770b82349e669016423a3af0",
+          "literalTokens": [
+            "\"runner.zig\""
+          ],
+          "name": "runner",
+          "normalizedTokenSha256": "cbd7e2fa40dc5073d9565debb9baa487b4d3da4700bf0087af45b7c8fecb1d7d",
+          "public": false,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "1909e71b1a57ea285344adcd666f1d06ff96aca012e5844319cb830b14431a58",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": "70c887a2f4b16a47d3a40338f02b535f8f539d6c67b015417472fb8d5052c806",
+          "literalTokens": [
+            "\"../backend/ports/compute.zig\""
+          ],
+          "name": "compute_port",
+          "normalizedTokenSha256": "1909e71b1a57ea285344adcd666f1d06ff96aca012e5844319cb830b14431a58",
+          "public": false,
+          "startLine": 7,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "46ddf20f3d134c6cfc65cda68e8cfaa7c972e6afa8bd20ab277423da06e43664",
+          "endLine": 8,
+          "kind": "constant",
+          "literalTokenSha256": "04cb8b9d3085bc5512271b9d1dba9718e17b02c821ae645603df12d96c6c4112",
+          "literalTokens": [
+            "\"../contracts/execution_report.zig\""
+          ],
+          "name": "report",
+          "normalizedTokenSha256": "46ddf20f3d134c6cfc65cda68e8cfaa7c972e6afa8bd20ab277423da06e43664",
+          "public": false,
+          "startLine": 8,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "ee49440ce08b47087e4d5720f7546814087ef2dfe451855e1de159c59ff47170",
+          "endLine": 9,
+          "kind": "constant",
+          "literalTokenSha256": "7fdfb905fbf2edda34426887e4c2827f019c475c0cdae293096bc8ea6154ca28",
+          "literalTokens": [
+            "\"../contracts/workload_profile.zig\""
+          ],
+          "name": "workload",
+          "normalizedTokenSha256": "ee49440ce08b47087e4d5720f7546814087ef2dfe451855e1de159c59ff47170",
+          "public": false,
+          "startLine": 9,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "80bba30caa2661263ba4b3ca983c00b34fe3eaeb95314e79414230f6be8445b6",
+          "endLine": 22,
+          "kind": "struct",
+          "literalTokenSha256": "97573daa44e56c81c08bb4057a113291b51b48adb08e4108073b9811ac93ece4",
+          "literalTokens": [
+            "1",
+            "1"
+          ],
+          "name": "ApplicationSession",
+          "normalizedTokenSha256": "80bba30caa2661263ba4b3ca983c00b34fe3eaeb95314e79414230f6be8445b6",
+          "public": true,
+          "startLine": 11,
+          "switchTags": [],
+          "tokenCount": 89
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/app/session.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 5,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "ee49440ce08b47087e4d5720f7546814087ef2dfe451855e1de159c59ff47170",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "7fdfb905fbf2edda34426887e4c2827f019c475c0cdae293096bc8ea6154ca28",
+          "literalTokens": [
+            "\"../contracts/workload_profile.zig\""
+          ],
+          "name": "workload",
+          "normalizedTokenSha256": "ee49440ce08b47087e4d5720f7546814087ef2dfe451855e1de159c59ff47170",
+          "public": false,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "e7659e1f2c6703e07021b86e6c1cd3611a6fd28217fcfd1bf1f65e53a853cc64",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": "2951bf1974cdea749de4356bf5364de8a59931d7386a6e77e0d24575ef54422b",
+          "literalTokens": [
+            "\"../contracts/specialization_policy.zig\""
+          ],
+          "name": "specialization",
+          "normalizedTokenSha256": "e7659e1f2c6703e07021b86e6c1cd3611a6fd28217fcfd1bf1f65e53a853cc64",
+          "public": false,
+          "startLine": 7,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "0e4840f76c0a9d8d207851b1a0e228353b3926d4ae048933962890e12bd8f9a0",
+          "endLine": 13,
+          "kind": "struct",
+          "literalTokenSha256": "e43e71bcc3abc3d3c3abc55860b7fc04eb85ccf72c6bc346328d85a95c5fe540",
+          "literalTokens": [
+            "16",
+            "16"
+          ],
+          "name": "SpecializationDecision",
+          "normalizedTokenSha256": "0e4840f76c0a9d8d207851b1a0e228353b3926d4ae048933962890e12bd8f9a0",
+          "public": true,
+          "startLine": 9,
+          "switchTags": [],
+          "tokenCount": 25
+        },
+        {
+          "contractTokenSha256": "c11bb28bac37542ea44658a1ea0c7ac890bfc1c362909b0ca45553ac60b5a5b0",
+          "endLine": 25,
+          "kind": "function",
+          "literalTokenSha256": "932d3e2014ff550d02b3b65e469ef554554ef8c2810dd3b28584a718691217d0",
+          "literalTokens": [
+            "8",
+            "8"
+          ],
+          "name": "evaluateSpecialization",
+          "normalizedTokenSha256": "5c2d50dbc18a22dd70c8f301537b0bf0d855f1021d025850e4f68ea645e81d98",
+          "public": true,
+          "startLine": 15,
+          "switchTags": [],
+          "tokenCount": 71
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/app/specialize.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 5,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "f9ea5fdb5b3f80422316f64df42c4280d36c909c34c73b088317164412b62887",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "2bb686dfd1e26fbcb7ece587d6ec1498d6984b62d1595fc8b07fa39999904cf8",
+          "literalTokens": [
+            "\"request.zig\""
+          ],
+          "name": "request",
+          "normalizedTokenSha256": "f9ea5fdb5b3f80422316f64df42c4280d36c909c34c73b088317164412b62887",
+          "public": false,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "08d562caa5a485e866c66ef9c473b14236f89a395fed9d44329b4d8f55ca5049",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": "fcdc331b646768ab583d9cdef2238d052a45b01cb709dd52997317dd16d021b8",
+          "literalTokens": [
+            "\"../contracts/error.zig\""
+          ],
+          "name": "error_contract",
+          "normalizedTokenSha256": "08d562caa5a485e866c66ef9c473b14236f89a395fed9d44329b4d8f55ca5049",
+          "public": false,
+          "startLine": 7,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "942a37566e2d26aae5e1145cac5e46c3de8318ce04844b89f3aac9fd91409711",
+          "endLine": 14,
+          "kind": "struct",
+          "literalTokenSha256": "05885dd6f59e0dd194ba54812bab76e585b8f738e4de37f5a35cd5b68d422a0f",
+          "literalTokens": [
+            "65535",
+            "65535",
+            "65535",
+            "1024",
+            "1024",
+            "1024"
+          ],
+          "name": "ValidationLimits",
+          "normalizedTokenSha256": "942a37566e2d26aae5e1145cac5e46c3de8318ce04844b89f3aac9fd91409711",
+          "public": true,
+          "startLine": 9,
+          "switchTags": [],
+          "tokenCount": 35
+        },
+        {
+          "contractTokenSha256": "a809e9f2a3fdaa5fb0e3dc0fb4d276cef5c7dbde8e4ce01521bfb3db73b21d12",
+          "endLine": 27,
+          "kind": "function",
+          "literalTokenSha256": "18c46b63f7868b7b582a349f3f748bce217a540e6aa9d149c31ff7be7fc27e21",
+          "literalTokens": [
+            "0"
+          ],
+          "name": "validateComputeRequest",
+          "normalizedTokenSha256": "4f800541269c7f10f286c26bd70c44db87a2b363f742ad02d6fdff27714aafbb",
+          "public": true,
+          "startLine": 16,
+          "switchTags": [],
+          "tokenCount": 79
+        },
+        {
+          "contractTokenSha256": "43dbc1af5f7db2fedd7ff05a5c6d79d903e6dd7897136ef4dfdb9d1511602e19",
+          "endLine": 37,
+          "kind": "function",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "validateTransferRequest",
+          "normalizedTokenSha256": "502c56be676c343f9ed70fdbefd643b868101745d9d72a343ae31ad83a731c58",
+          "public": true,
+          "startLine": 29,
+          "switchTags": [],
+          "tokenCount": 59
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/app/validate.zig"
     },
     {
       "declarations": [
@@ -27848,6 +28804,53 @@
       "declarations": [
         {
           "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "da6dca87b432f3bdeb818924b906e692daf22bf4cf004811e758c1ed170be018",
+          "endLine": 8,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "CapturePortVTable",
+          "normalizedTokenSha256": "da6dca87b432f3bdeb818924b906e692daf22bf4cf004811e758c1ed170be018",
+          "public": true,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 81
+        },
+        {
+          "contractTokenSha256": "8df4482bd5a4e33f87b667d1f9c529182912a8351e2200457d2e27e5d9568dc9",
+          "endLine": 21,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "CapturePort",
+          "normalizedTokenSha256": "8df4482bd5a4e33f87b667d1f9c529182912a8351e2200457d2e27e5d9568dc9",
+          "public": true,
+          "startLine": 10,
+          "switchTags": [],
+          "tokenCount": 126
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/backend/ports/capture.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
           "endLine": 6,
           "kind": "constant",
           "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
@@ -27920,6 +28923,175 @@
       ],
       "parseErrorCount": 0,
       "path": "src/backend/ports/compute.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 3,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 3,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "5046116b234b06fcbda6aabd1dba3ea84d68401c3817cc3b8d46b4e23a5a78de",
+          "endLine": 4,
+          "kind": "constant",
+          "literalTokenSha256": "8b815a6217c968928a89fe3461560625bbb4e4ee4ba7e955af54396492e58402",
+          "literalTokens": [
+            "\"../../contracts/backend.zig\""
+          ],
+          "name": "backend_contract",
+          "normalizedTokenSha256": "5046116b234b06fcbda6aabd1dba3ea84d68401c3817cc3b8d46b4e23a5a78de",
+          "public": false,
+          "startLine": 4,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "6b924a0c9777601d43a43b8fd8793c7e2fe75bc95b57b9eb94e4032807398375",
+          "endLine": 5,
+          "kind": "constant",
+          "literalTokenSha256": "a6b9ff7dc748a867da0c4186fda1c822452ecfcc941ad0663c21188703410f6b",
+          "literalTokens": [
+            "\"compute.zig\""
+          ],
+          "name": "compute_port",
+          "normalizedTokenSha256": "6b924a0c9777601d43a43b8fd8793c7e2fe75bc95b57b9eb94e4032807398375",
+          "public": false,
+          "startLine": 5,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "075ab57bad989b543dc7b7b2458ab58a12e2b97c1d0fd489cb95fb3d94df50aa",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "7036c53dfbcd625970b1c5571de8db85cdaadb49cf72881385dbf181792797fe",
+          "literalTokens": [
+            "\"transfer.zig\""
+          ],
+          "name": "transfer_port",
+          "normalizedTokenSha256": "075ab57bad989b543dc7b7b2458ab58a12e2b97c1d0fd489cb95fb3d94df50aa",
+          "public": false,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "2e746405d08538de2190422a6e09f7e085006c14bfab506ae73ff4d18ee0656f",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": "0e0f2ec1efa927828f688853eaf9c94d49394d570bfb0386e54f2857f209383c",
+          "literalTokens": [
+            "\"queue.zig\""
+          ],
+          "name": "queue_port",
+          "normalizedTokenSha256": "2e746405d08538de2190422a6e09f7e085006c14bfab506ae73ff4d18ee0656f",
+          "public": false,
+          "startLine": 7,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "321925310034f8d15bdff038a1dfece5daf5c7bd6be1592a57d88df93d144501",
+          "endLine": 8,
+          "kind": "constant",
+          "literalTokenSha256": "5515eef88b6f1f3eb664dc803d62305c543fc1586da44a869067cffcf1d78d44",
+          "literalTokens": [
+            "\"readback.zig\""
+          ],
+          "name": "readback_port",
+          "normalizedTokenSha256": "321925310034f8d15bdff038a1dfece5daf5c7bd6be1592a57d88df93d144501",
+          "public": false,
+          "startLine": 8,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "efccbf0c45e74d05080f7b4091996560e791778e2ab0e055bb989ce8ca06fac1",
+          "endLine": 9,
+          "kind": "constant",
+          "literalTokenSha256": "6aec8d7158adc5b84d23fc51e9409b29deb15a9c302b781ce759406dd05031e9",
+          "literalTokens": [
+            "\"telemetry.zig\""
+          ],
+          "name": "telemetry_port",
+          "normalizedTokenSha256": "efccbf0c45e74d05080f7b4091996560e791778e2ab0e055bb989ce8ca06fac1",
+          "public": false,
+          "startLine": 9,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "f4a0cd46e069aaaeba03c36f4f28b26e84586bd6f71ead2b0baf26f446c6faf8",
+          "endLine": 10,
+          "kind": "constant",
+          "literalTokenSha256": "014e05e2d8f2a76ed7dc4537a6eca7dd9006e6a1905a821994db6e267b96ebad",
+          "literalTokens": [
+            "\"render.zig\""
+          ],
+          "name": "render_port",
+          "normalizedTokenSha256": "f4a0cd46e069aaaeba03c36f4f28b26e84586bd6f71ead2b0baf26f446c6faf8",
+          "public": false,
+          "startLine": 10,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "91f93aa7a5659aef6a38a9cfc72e2c473c17516ccf0dc2973854788b046d9cb7",
+          "endLine": 11,
+          "kind": "constant",
+          "literalTokenSha256": "2c86891e2a55e36af1def4a5c237a409473d02024262315e58548594eeb1ac68",
+          "literalTokens": [
+            "\"spatial.zig\""
+          ],
+          "name": "spatial_port",
+          "normalizedTokenSha256": "91f93aa7a5659aef6a38a9cfc72e2c473c17516ccf0dc2973854788b046d9cb7",
+          "public": false,
+          "startLine": 11,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "81f9317c49b3d905574ffd0b3203a7be52f8df4fbc59c4acc36e623ff765de20",
+          "endLine": 12,
+          "kind": "constant",
+          "literalTokenSha256": "a6548b14d93efa3a7ee1ccc34b9e194fff9b558c8883427dd27f647c970760a7",
+          "literalTokens": [
+            "\"capture.zig\""
+          ],
+          "name": "capture_port",
+          "normalizedTokenSha256": "81f9317c49b3d905574ffd0b3203a7be52f8df4fbc59c4acc36e623ff765de20",
+          "public": false,
+          "startLine": 12,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "cb365646f6f07b1a01e49075f4cd7edf071fe4dfe2a34106622b54f066d5a37f",
+          "endLine": 24,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "PortBundle",
+          "normalizedTokenSha256": "cb365646f6f07b1a01e49075f4cd7edf071fe4dfe2a34106622b54f066d5a37f",
+          "public": true,
+          "startLine": 14,
+          "switchTags": [],
+          "tokenCount": 64
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/backend/ports/factory.zig"
     },
     {
       "declarations": [
@@ -28029,184 +29201,253 @@
           "tokenCount": 8
         },
         {
-          "contractTokenSha256": "03f5354cf49ef4d64145e33b9b96288515e1357589075b3fc176b8b443aaef3b",
+          "contractTokenSha256": "7073fcdab09b8947dec8c2ed95e29b0421b5eb810271e38503b063bf729fc0a1",
+          "endLine": 12,
+          "kind": "constant",
+          "literalTokenSha256": "a6548b14d93efa3a7ee1ccc34b9e194fff9b558c8883427dd27f647c970760a7",
+          "literalTokens": [
+            "\"capture.zig\""
+          ],
+          "name": "capture",
+          "normalizedTokenSha256": "7073fcdab09b8947dec8c2ed95e29b0421b5eb810271e38503b063bf729fc0a1",
+          "public": true,
+          "startLine": 12,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "3fd82eeccd0bb89fef2411ae644370b2d0a296b8ca7d24dd28ce166ebc9c46e9",
           "endLine": 13,
+          "kind": "constant",
+          "literalTokenSha256": "1f719a8df878f991c2ed0454a7f3d9c1ac929ca86487c5c43a6155152639c6a3",
+          "literalTokens": [
+            "\"factory.zig\""
+          ],
+          "name": "factory",
+          "normalizedTokenSha256": "3fd82eeccd0bb89fef2411ae644370b2d0a296b8ca7d24dd28ce166ebc9c46e9",
+          "public": true,
+          "startLine": 13,
+          "switchTags": [],
+          "tokenCount": 8
+        },
+        {
+          "contractTokenSha256": "03f5354cf49ef4d64145e33b9b96288515e1357589075b3fc176b8b443aaef3b",
+          "endLine": 15,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ComputePort",
           "normalizedTokenSha256": "03f5354cf49ef4d64145e33b9b96288515e1357589075b3fc176b8b443aaef3b",
           "public": true,
-          "startLine": 13,
+          "startLine": 15,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "25614332d01e2cf5e5e81e57b71de21bfb7b7cc228814c24d25b1f94119949c1",
-          "endLine": 14,
+          "endLine": 16,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ComputePortVTable",
           "normalizedTokenSha256": "25614332d01e2cf5e5e81e57b71de21bfb7b7cc228814c24d25b1f94119949c1",
           "public": true,
-          "startLine": 14,
+          "startLine": 16,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "b5ab5833de60d674a39f2d1d5da6c5b1336688f3c2498dcb120691875e865185",
-          "endLine": 16,
+          "endLine": 18,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "TransferPort",
           "normalizedTokenSha256": "b5ab5833de60d674a39f2d1d5da6c5b1336688f3c2498dcb120691875e865185",
           "public": true,
-          "startLine": 16,
+          "startLine": 18,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "da95ce0bd97877ed4da91b4d2b50e031c6c56917a9227e1778f41ed539387634",
-          "endLine": 17,
+          "endLine": 19,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "TransferPortVTable",
           "normalizedTokenSha256": "da95ce0bd97877ed4da91b4d2b50e031c6c56917a9227e1778f41ed539387634",
           "public": true,
-          "startLine": 17,
+          "startLine": 19,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "bc60df330624fb6e644c45ab003a980a69945b7593edb35412aa9c21acdf66d5",
-          "endLine": 19,
+          "endLine": 21,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "QueuePort",
           "normalizedTokenSha256": "bc60df330624fb6e644c45ab003a980a69945b7593edb35412aa9c21acdf66d5",
           "public": true,
-          "startLine": 19,
+          "startLine": 21,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "d114fb90cae5f4f3e2a8f841ab1b10486e5441dd403bc4e906a6330653ac9efa",
-          "endLine": 20,
+          "endLine": 22,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "QueuePortVTable",
           "normalizedTokenSha256": "d114fb90cae5f4f3e2a8f841ab1b10486e5441dd403bc4e906a6330653ac9efa",
           "public": true,
-          "startLine": 20,
+          "startLine": 22,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "afaaed16f8bb40f797a6b389b08b585a68a324753097646b967a4a72eaa5cf62",
-          "endLine": 22,
+          "endLine": 24,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ReadbackPort",
           "normalizedTokenSha256": "afaaed16f8bb40f797a6b389b08b585a68a324753097646b967a4a72eaa5cf62",
           "public": true,
-          "startLine": 22,
+          "startLine": 24,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "965ffb8536a28e2625490cc2cbface589182b50f59f215235eef44cb6f0db005",
-          "endLine": 23,
+          "endLine": 25,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "ReadbackPortVTable",
           "normalizedTokenSha256": "965ffb8536a28e2625490cc2cbface589182b50f59f215235eef44cb6f0db005",
           "public": true,
-          "startLine": 23,
+          "startLine": 25,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "d8ae0fee9c18d7741cb5abed067bb2550940f0781996bd296def579f392c949b",
-          "endLine": 25,
+          "endLine": 27,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "TelemetryPort",
           "normalizedTokenSha256": "d8ae0fee9c18d7741cb5abed067bb2550940f0781996bd296def579f392c949b",
           "public": true,
-          "startLine": 25,
+          "startLine": 27,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "7e090f499af108e12c60e6f7963fac7d42f03bf55dd452682f4e851b35a6c868",
-          "endLine": 26,
+          "endLine": 28,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "TelemetryPortVTable",
           "normalizedTokenSha256": "7e090f499af108e12c60e6f7963fac7d42f03bf55dd452682f4e851b35a6c868",
           "public": true,
-          "startLine": 26,
+          "startLine": 28,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "47131c598bddecc9a3cc6d1403384fd716abfcfa4702ea215d8af23c56b9fa0e",
-          "endLine": 28,
+          "endLine": 30,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "RenderPort",
           "normalizedTokenSha256": "47131c598bddecc9a3cc6d1403384fd716abfcfa4702ea215d8af23c56b9fa0e",
           "public": true,
-          "startLine": 28,
+          "startLine": 30,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "23c273d616d2609c9edcc5e038e2f44592a9458c8e5103d93b6b8aa281fb61a4",
-          "endLine": 29,
+          "endLine": 31,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "RenderPortVTable",
           "normalizedTokenSha256": "23c273d616d2609c9edcc5e038e2f44592a9458c8e5103d93b6b8aa281fb61a4",
           "public": true,
-          "startLine": 29,
+          "startLine": 31,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "089b7231f2b8b107f9319fb9cb2946f55547614cb4b9bbfd0ba579cbd03c59cb",
-          "endLine": 31,
+          "endLine": 33,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "SpatialPort",
           "normalizedTokenSha256": "089b7231f2b8b107f9319fb9cb2946f55547614cb4b9bbfd0ba579cbd03c59cb",
           "public": true,
-          "startLine": 31,
+          "startLine": 33,
           "switchTags": [],
           "tokenCount": 7
         },
         {
           "contractTokenSha256": "75c82c16623f27b1624bb52aa770533a5af195ee33b5c53444bd7bc7c8136e73",
-          "endLine": 32,
+          "endLine": 34,
           "kind": "constant",
           "literalTokenSha256": null,
           "literalTokens": [],
           "name": "SpatialPortVTable",
           "normalizedTokenSha256": "75c82c16623f27b1624bb52aa770533a5af195ee33b5c53444bd7bc7c8136e73",
           "public": true,
-          "startLine": 32,
+          "startLine": 34,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "aaa4bed7483cd8cc7095a6f59e1736bb0e87aeb8647174624bbe05f35eddd828",
+          "endLine": 36,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "CapturePort",
+          "normalizedTokenSha256": "aaa4bed7483cd8cc7095a6f59e1736bb0e87aeb8647174624bbe05f35eddd828",
+          "public": true,
+          "startLine": 36,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "bd32776f5f0f1c1ca9add70961970e1afb17f841971201de8d723b8066bd1702",
+          "endLine": 37,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "CapturePortVTable",
+          "normalizedTokenSha256": "bd32776f5f0f1c1ca9add70961970e1afb17f841971201de8d723b8066bd1702",
+          "public": true,
+          "startLine": 37,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "85358c0ae8e96b4df42ef3580a62158abb50d16ba49f3284b0b25454d8cfb0b4",
+          "endLine": 38,
+          "kind": "constant",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "PortBundle",
+          "normalizedTokenSha256": "85358c0ae8e96b4df42ef3580a62158abb50d16ba49f3284b0b25454d8cfb0b4",
+          "public": true,
+          "startLine": 38,
           "switchTags": [],
           "tokenCount": 7
         }
@@ -133523,6 +134764,109 @@
       "declarations": [
         {
           "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "endLine": 6,
+          "kind": "constant",
+          "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
+          "literalTokens": [
+            "\"std\""
+          ],
+          "name": "std",
+          "normalizedTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
+          "public": false,
+          "startLine": 6,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "108a49e53b40b1af5574656c12328ecb611a6f9a50784f0a450e855683056a0f",
+          "endLine": 7,
+          "kind": "constant",
+          "literalTokenSha256": "553b2e882f90e7bebb1d5d7f64c31287ad81311dc4e8faf651f66f60eeff2a9e",
+          "literalTokens": [
+            "\"identity.zig\""
+          ],
+          "name": "identity",
+          "normalizedTokenSha256": "108a49e53b40b1af5574656c12328ecb611a6f9a50784f0a450e855683056a0f",
+          "public": false,
+          "startLine": 7,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "b79b82d3d9294866520d41ceaf87c2fb78c096403e92916f88efc7663e9701cd",
+          "endLine": 8,
+          "kind": "constant",
+          "literalTokenSha256": "4f3ed6bec026a0681377c445e24405d8b43614e9df62d800c2f0f75b1249cfa5",
+          "literalTokens": [
+            "\"exactness.zig\""
+          ],
+          "name": "exactness",
+          "normalizedTokenSha256": "b79b82d3d9294866520d41ceaf87c2fb78c096403e92916f88efc7663e9701cd",
+          "public": false,
+          "startLine": 8,
+          "switchTags": [],
+          "tokenCount": 7
+        },
+        {
+          "contractTokenSha256": "f23f23959f865903eb088418e958453d8337c56ab9bdf18e9b5614b43af0ac42",
+          "endLine": 16,
+          "kind": "enum",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "EvidenceDisposition",
+          "normalizedTokenSha256": "f23f23959f865903eb088418e958453d8337c56ab9bdf18e9b5614b43af0ac42",
+          "public": true,
+          "startLine": 10,
+          "switchTags": [],
+          "tokenCount": 17
+        },
+        {
+          "contractTokenSha256": "d5f0eb9c1c2eb1af8334ae617231aec1d5bec7774d81490f4138741c4a310795",
+          "endLine": 22,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "EvidenceCheckpoint",
+          "normalizedTokenSha256": "d5f0eb9c1c2eb1af8334ae617231aec1d5bec7774d81490f4138741c4a310795",
+          "public": true,
+          "startLine": 18,
+          "switchTags": [],
+          "tokenCount": 24
+        },
+        {
+          "contractTokenSha256": "98a1389705bc1a98c4ec9e9e87a8fd2a56e72ffe5185b003e227ceb5084e4d8f",
+          "endLine": 29,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "EvidenceRequirement",
+          "normalizedTokenSha256": "98a1389705bc1a98c4ec9e9e87a8fd2a56e72ffe5185b003e227ceb5084e4d8f",
+          "public": true,
+          "startLine": 24,
+          "switchTags": [],
+          "tokenCount": 38
+        },
+        {
+          "contractTokenSha256": "634082e6719fc270799de2fca304bdeb394614b3405fe7a39f2ef09ac8a37bc3",
+          "endLine": 36,
+          "kind": "struct",
+          "literalTokenSha256": null,
+          "literalTokens": [],
+          "name": "EvidenceEvent",
+          "normalizedTokenSha256": "634082e6719fc270799de2fca304bdeb394614b3405fe7a39f2ef09ac8a37bc3",
+          "public": true,
+          "startLine": 31,
+          "switchTags": [],
+          "tokenCount": 25
+        }
+      ],
+      "parseErrorCount": 0,
+      "path": "src/contracts/evidence.zig"
+    },
+    {
+      "declarations": [
+        {
+          "contractTokenSha256": "c3370c472a7f9a4a218d37b600d74bb9e2e0be8c6b696db1adcaf2aaef733852",
           "endLine": 3,
           "kind": "constant",
           "literalTokenSha256": "68e02fd4870f3f33b3741b19e261313437c9a48bfcca4be797468d4a287690b3",
@@ -134307,8 +135651,23 @@
           "tokenCount": 14
         },
         {
+          "contractTokenSha256": "8aeef71dd813741caf5bef5844f5ed4224a8d63cca2e1aa13cc4db8ca4b73087",
+          "endLine": 91,
+          "kind": "function",
+          "literalTokenSha256": "4acaa67956b8ea83b2deb845e154b2553138b707a4fbde70dda689662ae97925",
+          "literalTokens": [
+            "\"evidence.zig\""
+          ],
+          "name": "evidenceContract",
+          "normalizedTokenSha256": "58a34c2b50dfe06e1ee43b9d5ebeb0213e3ebc2300d7df95f605c6571cc99222",
+          "public": true,
+          "startLine": 89,
+          "switchTags": [],
+          "tokenCount": 14
+        },
+        {
           "contractTokenSha256": "7caf3b7d7413ea8236683cb1c78c4536c19b992b3ed4266565f76e6bf287ed6d",
-          "endLine": 93,
+          "endLine": 97,
           "kind": "struct",
           "literalTokenSha256": "59c0ea565a4543409b951faa2e6b4a1088ce90c11960c71ed0a718dac330f1b0",
           "literalTokens": [
@@ -134317,13 +135676,13 @@
           "name": "shaderAbi",
           "normalizedTokenSha256": "7caf3b7d7413ea8236683cb1c78c4536c19b992b3ed4266565f76e6bf287ed6d",
           "public": true,
-          "startLine": 89,
+          "startLine": 93,
           "switchTags": [],
           "tokenCount": 21
         },
         {
           "contractTokenSha256": "5aa82432eb114b38b23731fd3cf42ab8e42a4922d0ac5d41ff8c4c8e6f604321",
-          "endLine": 99,
+          "endLine": 103,
           "kind": "struct",
           "literalTokenSha256": "064613ebcf7fdcb3cc3f7f79a3f0dfd5fdea7a6af8574ff018c202da462c9972",
           "literalTokens": [
@@ -134332,13 +135691,13 @@
           "name": "numericStability",
           "normalizedTokenSha256": "5aa82432eb114b38b23731fd3cf42ab8e42a4922d0ac5d41ff8c4c8e6f604321",
           "public": true,
-          "startLine": 95,
+          "startLine": 99,
           "switchTags": [],
           "tokenCount": 21
         },
         {
           "contractTokenSha256": "c89202982bc63c53e03b6a5699f13eaf74410d2b1d66468dd83a4752112f9409",
-          "endLine": 105,
+          "endLine": 109,
           "kind": "struct",
           "literalTokenSha256": "48b108c3f1458a1e21f3a901f2a19c0b5195d40fea452042b53965f0058c80f7",
           "literalTokens": [
@@ -134347,13 +135706,13 @@
           "name": "primitives",
           "normalizedTokenSha256": "c89202982bc63c53e03b6a5699f13eaf74410d2b1d66468dd83a4752112f9409",
           "public": true,
-          "startLine": 101,
+          "startLine": 105,
           "switchTags": [],
           "tokenCount": 21
         },
         {
           "contractTokenSha256": "9fe0ec6f3896e4742ffe70e9187043e51ce31b6890310b3c514cc786e1f4fc88",
-          "endLine": 119,
+          "endLine": 123,
           "kind": "struct",
           "literalTokenSha256": "64a5e5fbb853264f09f3fb22206fc7164037cab63402031175915caa48c35a21",
           "literalTokens": [
@@ -134364,7 +135723,7 @@
           "name": "model",
           "normalizedTokenSha256": "9fe0ec6f3896e4742ffe70e9187043e51ce31b6890310b3c514cc786e1f4fc88",
           "public": true,
-          "startLine": 107,
+          "startLine": 111,
           "switchTags": [],
           "tokenCount": 49
         }
@@ -252698,11 +254057,11 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "fe6bfddca3f80606e30cdc5c8268a5dd6c0ffeb32e2548c3fedaacb4558047cb",
+  "manifestSha256": "6457eb3053f2450387d3b1b8117df60c33128936ed59c58bdcc3a44f1934dae0",
   "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "5e54eaf0a79f0826d094c434b5afcbb098de8d87892635c0f99574249091a025",
+  "sourceTreeSha256": "0acb47d7dbcff3b9473a72cc3ce955f1d2a3f29f1674b718c633c535c9a3738d",
   "status": "captured",
   "tool": "tools/source_ast_inventory.zig",
   "toolSha256": "df0a1d5a086cf2191cdda3f252de5109fcdac9075c8fe0e9487e690787ab8a7c"

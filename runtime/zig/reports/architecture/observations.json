@@ -1,68 +1,68 @@
 {
   "architectureAnalyzerSha256": "b3b4dad5b2941a5d45117bedb635fc929d34a6e03152ac8b3e0e605af3fad611",
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "fe6bfddca3f80606e30cdc5c8268a5dd6c0ffeb32e2548c3fedaacb4558047cb",
+  "manifestSha256": "6457eb3053f2450387d3b1b8117df60c33128936ed59c58bdcc3a44f1934dae0",
   "observations": {
     "baselineComparison": {
-      "moduleCountDelta": 38,
-      "oneConsumerModuleCountDelta": 34,
+      "moduleCountDelta": 49,
+      "oneConsumerModuleCountDelta": 40,
       "reexportOnlyModuleCountDelta": -9,
       "sourceTreeSha256": "7d4857fdf9d8c0107426915fef3f283107f335cea713d37ad8b5cff8813d671d",
       "status": "diagnostic-only"
     },
     "buildMeasurements": {
       "capturedSourceTreeSha256": "94f170dd6ff1e0e021c3f0c129acbaac44d4c8d5298244a3f318756bff42b3e6",
-      "currentSourceTreeSha256": "5e54eaf0a79f0826d094c434b5afcbb098de8d87892635c0f99574249091a025",
+      "currentSourceTreeSha256": "0acb47d7dbcff3b9473a72cc3ce955f1d2a3f29f1674b718c633c535c9a3738d",
       "status": "stale-source-mismatch"
     },
     "coChange": {
-      "commitsConsidered": 166,
+      "commitsConsidered": 167,
       "reportedPairCount": 1000,
       "status": "diagnostic-only"
     },
     "fanInDistribution": {
       "maximum": 97,
-      "mean": 4.101,
-      "median": 2,
+      "mean": 4.094,
+      "median": 2.0,
       "minimum": 0,
       "p25": 1.0,
       "p75": 4.0,
-      "populationStdDev": 7.336
+      "populationStdDev": 7.29
     },
     "fanOutDistribution": {
       "maximum": 53,
-      "mean": 4.101,
-      "median": 3,
+      "mean": 4.094,
+      "median": 3.0,
       "minimum": 0,
       "p25": 1.0,
       "p75": 5.0,
-      "populationStdDev": 4.847
+      "populationStdDev": 4.839
     },
     "fileSizeDistribution": {
       "maximum": 1063,
-      "mean": 246.279,
-      "median": 157,
+      "mean": 242.238,
+      "median": 146.0,
       "minimum": 1,
-      "p25": 56.0,
-      "p75": 350.0,
-      "populationStdDev": 250.044
+      "p25": 52.0,
+      "p75": 343.5,
+      "populationStdDev": 249.477
     },
-    "moduleCount": 585,
-    "oneConsumerModuleCount": 241,
+    "moduleCount": 596,
+    "oneConsumerModuleCount": 247,
     "publicDeclarationsByLayer": {
-      "app": 19,
+      "app": 54,
       "backend-common": 20,
       "backend-d3d12": 253,
       "backend-interface": 160,
       "backend-metal": 201,
-      "backend-ports": 35,
+      "backend-ports": 43,
       "backend-vulkan": 1047,
       "cli": 34,
       "command": 60,
       "compatibility": 12,
       "compiler": 1212,
       "composition": 18,
-      "contracts": 780,
+      "contracts": 785,
       "core": 1387,
       "dropin": 158,
       "evidence": 25,
@@ -83,5 +83,5 @@
   "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "5e54eaf0a79f0826d094c434b5afcbb098de8d87892635c0f99574249091a025"
+  "sourceTreeSha256": "0acb47d7dbcff3b9473a72cc3ce955f1d2a3f29f1674b718c633c535c9a3738d"
 }

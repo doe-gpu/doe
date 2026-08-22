@@ -15902,6 +15902,11 @@
         },
         {
           "name": "backend_contract",
+          "path": "src/backend/ports/factory.zig",
+          "startLine": 4
+        },
+        {
+          "name": "backend_contract",
           "path": "src/backend/runtime_types.zig",
           "startLine": 2
         },
@@ -16818,6 +16823,11 @@
     {
       "members": [
         {
+          "name": "compute_port",
+          "path": "src/app/execute.zig",
+          "startLine": 7
+        },
+        {
           "name": "compute_contract",
           "path": "src/app/request.zig",
           "startLine": 6
@@ -16826,6 +16836,11 @@
           "name": "compute_port",
           "path": "src/app/runner.zig",
           "startLine": 6
+        },
+        {
+          "name": "compute_port",
+          "path": "src/app/session.zig",
+          "startLine": 7
         },
         {
           "name": "compute_contract",
@@ -16856,6 +16871,11 @@
           "name": "compute_contract",
           "path": "src/backend/metal/mod.zig",
           "startLine": 7
+        },
+        {
+          "name": "compute_port",
+          "path": "src/backend/ports/factory.zig",
+          "startLine": 5
         },
         {
           "name": "compute_contract",
@@ -17986,6 +18006,11 @@
     },
     {
       "members": [
+        {
+          "name": "error_contract",
+          "path": "src/app/validate.zig",
+          "startLine": 7
+        },
         {
           "name": "error_scope",
           "path": "src/backend/dropin_resource_ops.zig",
@@ -22414,6 +22439,11 @@
           "startLine": 20
         },
         {
+          "name": "queue_port",
+          "path": "src/backend/ports/factory.zig",
+          "startLine": 7
+        },
+        {
           "name": "queue_sync",
           "path": "src/backend/webgpu_backend_ops.zig",
           "startLine": 6
@@ -22590,6 +22620,11 @@
           "name": "render_ops",
           "path": "src/backend/metal/metal_native_runtime.zig",
           "startLine": 21
+        },
+        {
+          "name": "render_port",
+          "path": "src/backend/ports/factory.zig",
+          "startLine": 10
         },
         {
           "name": "render_contract",
@@ -23455,6 +23490,27 @@
     {
       "members": [
         {
+          "name": "spatial_port",
+          "path": "src/backend/ports/factory.zig",
+          "startLine": 11
+        },
+        {
+          "name": "spatial_contract",
+          "path": "src/backend/ports/spatial.zig",
+          "startLine": 4
+        },
+        {
+          "name": "spatial_port",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 14
+        }
+      ],
+      "prefix": "spatial",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
           "name": "spirv_translation",
           "path": "src/backend/vulkan/vk_shader_source.zig",
           "startLine": 2
@@ -23946,6 +24002,32 @@
         }
       ],
       "prefix": "trace",
+      "reason": "shared constant-name prefix; ownership and value similarity require review"
+    },
+    {
+      "members": [
+        {
+          "name": "transfer_port",
+          "path": "src/app/execute.zig",
+          "startLine": 8
+        },
+        {
+          "name": "transfer_port",
+          "path": "src/app/runner.zig",
+          "startLine": 7
+        },
+        {
+          "name": "transfer_port",
+          "path": "src/backend/ports/factory.zig",
+          "startLine": 6
+        },
+        {
+          "name": "transfer_port",
+          "path": "src/composition/backend_factory.zig",
+          "startLine": 9
+        }
+      ],
+      "prefix": "transfer",
       "reason": "shared constant-name prefix; ownership and value similarity require review"
     },
     {
@@ -24808,10 +24890,10 @@
     }
   ],
   "manifestPath": "runtime/zig/source-layout.json",
-  "manifestSha256": "fe6bfddca3f80606e30cdc5c8268a5dd6c0ffeb32e2548c3fedaacb4558047cb",
+  "manifestSha256": "6457eb3053f2450387d3b1b8117df60c33128936ed59c58bdcc3a44f1934dae0",
   "reportGeneratorSha256": "5505742fcc12567f683c2587da4d4905332d3473dc3365ae7bf78b5a47ef3f66",
   "schemaVersion": 1,
   "sourceLayoutVersion": 3,
-  "sourceTreeSha256": "5e54eaf0a79f0826d094c434b5afcbb098de8d87892635c0f99574249091a025",
+  "sourceTreeSha256": "0acb47d7dbcff3b9473a72cc3ce955f1d2a3f29f1674b718c633c535c9a3738d",
   "status": "captured"
 }
