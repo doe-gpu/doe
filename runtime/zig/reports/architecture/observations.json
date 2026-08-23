@@ -73,7 +73,7 @@
       }
     },
     "coChange": {
-      "commitsConsidered": 168,
+      "commitsConsidered": 169,
       "reportedPairCount": 1000,
       "status": "diagnostic-only"
     },
