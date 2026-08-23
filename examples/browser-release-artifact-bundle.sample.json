@@ -195,12 +195,12 @@
   },
   "proofSurface": {
     "path": "examples/browser-published-proof-surface.sample.json",
-    "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+    "sha256": "2ed2c3f44b2c87eb22f93c1e20ebd8a4de4699bb99fe516b86a62ba4db84e5d8",
     "kind": "browser_published_proof_surface"
   },
   "proofSurfaceCheck": {
     "path": "examples/browser-published-proof-surface-check.sample.json",
-    "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1",
+    "sha256": "ce3cf81df86560f60b202d4b941c42509f430a7f308690ab1876a270873e9a97",
     "kind": "browser_published_proof_surface_check"
   },
   "chromiumSourceCheckout": {
@@ -210,12 +210,12 @@
   },
   "browserLaunchReceipt": {
     "path": "examples/browser-release-launch-receipt.sample.json",
-    "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b",
+    "sha256": "a1c72b6c1619c6ad23b19feac1ea1503fc287882923f5bd810344cd3101c15f3",
     "kind": "browser_release_launch_receipt"
   },
   "runtimeFrontierBundle": {
     "path": "examples/browser-runtime-frontier-bundle.sample.json",
-    "sha256": "003bb84b3c23067f15fa18899e6d11435dfc5a7884453fea4cb28f1c704aa46a",
+    "sha256": "5440cd7201cade4133045812b9104001246072d743d2c026dcab1fdbd6d04edb",
     "kind": "browser_runtime_frontier_bundle"
   }
 }

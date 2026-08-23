@@ -465,7 +465,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
         == "examples/browser-runtime-frontier-bundle.sample.json"
     )
     assert bundle_evidence["path"] == "examples/browser-runtime-frontier-bundle.sample.json"
-    assert bundle_evidence["sha256"] == "d5b3a1a83cb1a6a1afc8b2b9d1361741e9c0fc0655b11655fbe5fc5a4d8fd61f"
+    assert bundle_evidence["sha256"] == "5440cd7201cade4133045812b9104001246072d743d2c026dcab1fdbd6d04edb"
     assert bundle_evidence["status"] == "pass"
     assert bundle_evidence["claimabilityStatus"] == "blocked"
     assert bundle_evidence["claimBlockerSummary"] == [
@@ -476,7 +476,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
         }
     ]
     assert release_bundle["path"] == "examples/browser-release-artifact-bundle.sample.json"
-    assert release_bundle["sha256"] == "e63260d71669a86765287fd1e58a286234cff23855bb6cb05332ce0d3fea6648"
+    assert release_bundle["sha256"] == "e16eb3423896e10ce228ec16f76f84427bf6ed508c7a725bfe246c1bada3f87c"
     assert release_bundle["releaseStatus"] == "diagnostic"
     assert release_bundle["artifactVerification"] == {
         "requiredForClaimable": True,
@@ -516,7 +516,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
         "kind": "browser_unsupported_reason_taxonomy",
     }
     assert provenance_report["path"] == "examples/browser-release-candidate-provenance.sample.json"
-    assert provenance_report["sha256"] == "4ae0005d89d49277fc153aef13f0c290bdcfcc270faa56f78db4f71ca2f93171"
+    assert provenance_report["sha256"] == "2468420e2acfd55bac5b4057019736b4bd27dc61e1504734f6eb12c1f0b7fc4d"
     assert provenance_report["status"] == "fail"
     assert provenance_report["releaseStatus"] == "release_candidate"
     assert provenance_report["failureCount"] == 5
@@ -527,12 +527,12 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
     }
     assert provenance_report["componentArtifacts"]["proofSurfaceCheck"] == {
         "path": "examples/browser-published-proof-surface-check.sample.json",
-        "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1",
+        "sha256": "ce3cf81df86560f60b202d4b941c42509f430a7f308690ab1876a270873e9a97",
         "kind": "browser_published_proof_surface_check",
     }
     assert provenance_report["componentArtifacts"]["browserLaunchReceipt"] == {
         "path": "examples/browser-release-launch-receipt.sample.json",
-        "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b",
+        "sha256": "a1c72b6c1619c6ad23b19feac1ea1503fc287882923f5bd810344cd3101c15f3",
         "kind": "browser_release_launch_receipt",
     }
     assert provenance_report["componentArtifacts"]["packageInputs"] == {
@@ -591,7 +591,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
     }
     assert browser_launch == {
         "path": "examples/browser-release-launch-receipt.sample.json",
-        "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b",
+        "sha256": "a1c72b6c1619c6ad23b19feac1ea1503fc287882923f5bd810344cd3101c15f3",
         "schemaVersion": 1,
         "artifactKind": "browser_release_launch_receipt",
         "receiptId": "browser-release-launch-sample",
@@ -697,7 +697,7 @@ def test_browser_readiness_uses_frontier_bundle_blockers() -> None:
     assert proof_surface["receiptPayloadCount"] == 2
     assert proof_surface_check == {
         "path": "examples/browser-published-proof-surface-check.sample.json",
-        "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1",
+        "sha256": "ce3cf81df86560f60b202d4b941c42509f430a7f308690ab1876a270873e9a97",
         "artifactKind": "browser_published_proof_surface_check",
         "surfacePath": "examples/browser-published-proof-surface.sample.json",
         "surfaceSha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",

@@ -24,7 +24,7 @@
       "artifactKind": "browser_release_artifact_bundle",
       "bundleId": "browser-release-diagnostic-sample-v1",
       "releaseStatus": "diagnostic",
-      "releaseBundleIdentitySha256": "f7279a10b96a60e55bc539f5f72d881a61bbaf510713709cc6a4c51d58ae7398",
+      "releaseBundleIdentitySha256": "8078ad736e0a0b936d418713ec83b691bae67638e70fe3e2b46ae9e3900254d5",
       "artifactVerification": {
         "requiredForClaimable": true,
         "verifyFilesRootProvided": false,
