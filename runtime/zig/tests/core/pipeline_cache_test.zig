@@ -166,17 +166,18 @@ test "PipelineKind enum has expected integer values" {
 // PipelineCache — in-memory LRU (no disk I/O needed for these tests)
 
 test "empty cache returns null on lookup" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_empty");
-    defer cache.deinit();
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     const key = make_compute_key("nonexistent shader");
     try std.testing.expect(cache.lookup(&key) == null);
 }
 
 test "store then lookup returns same data" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_store");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_store");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     const key = make_compute_key("fn cached() {}");
     const payload = "compiled_msl_text_here";
@@ -188,9 +189,9 @@ test "store then lookup returns same data" {
 }
 
 test "different keys return independent data" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_indep");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_indep");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     const key_a = make_compute_key("shader_a");
     const key_b = make_compute_key("shader_b");
@@ -207,9 +208,9 @@ test "different keys return independent data" {
 }
 
 test "storing same key twice overwrites previous data" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_upsert");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_upsert");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     const key = make_compute_key("fn overwrite() {}");
     cache.store(&key, "version_1");
@@ -221,9 +222,9 @@ test "storing same key twice overwrites previous data" {
 }
 
 test "LRU evicts oldest entries when at capacity" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_evict");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_evict");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     // Fill the cache to MAX_LRU_ENTRIES (512) with distinct keys.
     // Use a buffer to generate unique shader sources.
@@ -253,9 +254,9 @@ test "LRU evicts oldest entries when at capacity" {
 }
 
 test "lookup miss for unknown key does not corrupt cache state" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_miss");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_miss");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     const known_key = make_compute_key("known shader");
     cache.store(&known_key, "payload");
@@ -274,8 +275,9 @@ test "lookup miss for unknown key does not corrupt cache state" {
 // Serialization
 
 test "serialize empty cache produces a four-byte count of zero" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_ser_empty");
-    defer cache.deinit();
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     var buf: std.ArrayListUnmanaged(u8) = .{};
     defer buf.deinit(std.testing.allocator);
@@ -288,9 +290,9 @@ test "serialize empty cache produces a four-byte count of zero" {
 }
 
 test "serialize non-empty cache encodes correct entry count" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_ser_count");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_ser_count");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     cache.store(&make_compute_key("s1"), "d1");
     cache.store(&make_compute_key("s2"), "d2");
@@ -310,9 +312,9 @@ test "serialize non-empty cache encodes correct entry count" {
 }
 
 test "serialized format contains DiskHeader with correct data_len per entry" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_ser_hdr");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_ser_hdr");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     const payload = "compiled_metal_shader_lib";
     cache.store(&make_compute_key("test_shader"), payload);
@@ -336,21 +338,22 @@ test "serialized format contains DiskHeader with correct data_len per entry" {
 // PipelineCache.init / deinit
 
 test "cache init with custom directory does not leak" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_leak");
-    cache.deinit();
+    var fixture = try TestCache.init();
+    fixture.deinit();
 }
 
 test "cache magic field is set on init" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_magic");
-    defer cache.deinit();
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     try std.testing.expectEqual(@as(u32, 0xD0EC_AC11), cache.magic);
 }
 
 test "access_clock increments on lookup hit" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_clock");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_clock");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     const key = make_compute_key("clock test shader");
     cache.store(&key, "data");
@@ -361,9 +364,9 @@ test "access_clock increments on lookup hit" {
 }
 
 test "disk_bytes_approx increases on store" {
-    const cache = try PipelineCache.init(std.testing.allocator, "/tmp/fawn_test_pipeline_cache_disk_bytes");
-    defer cache.deinit();
-    defer cleanup_test_cache("/tmp/fawn_test_pipeline_cache_disk_bytes");
+    var fixture = try TestCache.init();
+    defer fixture.deinit();
+    const cache = fixture.cache;
 
     try std.testing.expectEqual(@as(u64, 0), cache.disk_bytes_approx);
 
@@ -373,6 +376,32 @@ test "disk_bytes_approx increases on store" {
 
 // ============================================================
 // Test helpers
+
+const TestCache = struct {
+    cache: *PipelineCache,
+    temp_dir: std.testing.TmpDir,
+
+    fn init() !TestCache {
+        var temp_dir = std.testing.tmpDir(.{});
+        errdefer temp_dir.cleanup();
+        const cache_dir = try std.fs.path.join(std.testing.allocator, &.{
+            ".zig-cache",
+            "tmp",
+            temp_dir.sub_path[0..],
+        });
+        defer std.testing.allocator.free(cache_dir);
+
+        return .{
+            .cache = try PipelineCache.init(std.testing.allocator, cache_dir),
+            .temp_dir = temp_dir,
+        };
+    }
+
+    fn deinit(self: *TestCache) void {
+        self.cache.deinit();
+        self.temp_dir.cleanup();
+    }
+};
 
 fn make_compute_key(src: []const u8) PipelineCacheKey {
     return PipelineCacheKey{
@@ -396,8 +425,4 @@ fn make_render_key(pixel_fmt: u32, vert_hash: u64, frag_hash: u64, samples: u32,
         .sample_count = samples,
         .color_attachment_count = color_count,
     };
-}
-
-fn cleanup_test_cache(dir: []const u8) void {
-    std.fs.cwd().deleteTree(dir) catch {};
 }
