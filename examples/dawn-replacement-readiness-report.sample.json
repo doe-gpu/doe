@@ -877,7 +877,7 @@
             "path": "examples/browser-release-artifact-bundle.sample.json",
             "releaseBundleIdentitySha256": "f7279a10b96a60e55bc539f5f72d881a61bbaf510713709cc6a4c51d58ae7398",
             "releaseStatus": "diagnostic",
-            "sha256": "71d84d4ee4477cd2b78f21a25d2fe5c3dc762161f69e180696ef519a6f57d025",
+            "sha256": "e16eb3423896e10ce228ec16f76f84427bf6ed508c7a725bfe246c1bada3f87c",
             "status": "pass"
           },
           "runtimeIdentity": {
@@ -945,7 +945,7 @@
             "proofSurface": {
               "kind": "browser_published_proof_surface",
               "path": "examples/browser-published-proof-surface.sample.json",
-              "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa"
+              "sha256": "2ed2c3f44b2c87eb22f93c1e20ebd8a4de4699bb99fe516b86a62ba4db84e5d8"
             },
             "receiptId": "browser-release-launch-sample",
             "releaseArchive": {
@@ -961,7 +961,7 @@
             },
             "runtimeMode": "doe",
             "schemaVersion": 1,
-            "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b",
+            "sha256": "a1c72b6c1619c6ad23b19feac1ea1503fc287882923f5bd810344cd3101c15f3",
             "webgpuAvailable": true
           },
           "chromiumSourceCheckout": {
@@ -1205,10 +1205,10 @@
             "failures": [],
             "path": "examples/browser-published-proof-surface-check.sample.json",
             "requirePublicUrls": true,
-            "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1",
+            "sha256": "ce3cf81df86560f60b202d4b941c42509f430a7f308690ab1876a270873e9a97",
             "status": "pass",
             "surfacePath": "examples/browser-published-proof-surface.sample.json",
-            "surfaceSha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+            "surfaceSha256": "2ed2c3f44b2c87eb22f93c1e20ebd8a4de4699bb99fe516b86a62ba4db84e5d8",
             "verifyFilesRootProvided": true
           },
           "provenanceReport": {
@@ -1223,7 +1223,7 @@
               "browserLaunchReceipt": {
                 "kind": "browser_release_launch_receipt",
                 "path": "examples/browser-release-launch-receipt.sample.json",
-                "sha256": "76674a2d2dc75d06b4e682a07ae42908f7e0e951a2cd84dd3b6ab9f559f5c67b"
+                "sha256": "a1c72b6c1619c6ad23b19feac1ea1503fc287882923f5bd810344cd3101c15f3"
               },
               "packageInputs": {
                 "kind": "browser_release_package_inputs_check",
@@ -1233,12 +1233,12 @@
               "proofSurface": {
                 "kind": "browser_published_proof_surface",
                 "path": "examples/browser-published-proof-surface.sample.json",
-                "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa"
+                "sha256": "2ed2c3f44b2c87eb22f93c1e20ebd8a4de4699bb99fe516b86a62ba4db84e5d8"
               },
               "proofSurfaceCheck": {
                 "kind": "browser_published_proof_surface_check",
                 "path": "examples/browser-published-proof-surface-check.sample.json",
-                "sha256": "2206e419a0ed36e8d580e40a7f869f56e6988eaff93d7fbe82ab2edcd9539ec1"
+                "sha256": "ce3cf81df86560f60b202d4b941c42509f430a7f308690ab1876a270873e9a97"
               },
               "publicDownloadReceipt": {
                 "kind": "browser_public_download_receipt",
@@ -1292,7 +1292,7 @@
               "packageFormat": "zip"
             },
             "releaseStatus": "release_candidate",
-            "sha256": "4ae0005d89d49277fc153aef13f0c290bdcfcc270faa56f78db4f71ca2f93171",
+            "sha256": "2468420e2acfd55bac5b4057019736b4bd27dc61e1504734f6eb12c1f0b7fc4d",
             "status": "fail",
             "summary": {
               "componentCount": 7,
@@ -1363,7 +1363,7 @@
               "sha256": "4c6bc417b08d3762b0c55be6a817f2fd948c9665c343792b7e2e9fdaff3f5158"
             },
             "runtimeIdentityPath": "examples/browser-runtime-identity.selector.sample.json",
-            "sha256": "608fa51413bc866a2a6e8f0835a53aab7ec48c1e5c37ea4305c69e435ce58eaa",
+            "sha256": "2ed2c3f44b2c87eb22f93c1e20ebd8a4de4699bb99fe516b86a62ba4db84e5d8",
             "surfaceId": "browser-published-proof-surface-sample-v1",
             "webgpuAvailable": true
           },
@@ -1521,7 +1521,7 @@
             ]
           }
         },
-        "sha256": "003bb84b3c23067f15fa18899e6d11435dfc5a7884453fea4cb28f1c704aa46a",
+        "sha256": "5440cd7201cade4133045812b9104001246072d743d2c026dcab1fdbd6d04edb",
         "status": "pass",
         "summary": {
           "claimBlockerCount": 1,

@@ -4,6 +4,8 @@
     "workload_marked_comparable",
     "left_samples_present",
     "right_samples_present",
+    "result_output_match_applies",
+    "baseline_comparison_result_output_match",
     "left_single_timing_class",
     "right_single_timing_class",
     "required_timing_class_applies",
@@ -81,6 +83,12 @@
       "blocking": true,
       "applicableWhen": { "const": true },
       "passesWhen": { "fact": "right_samples_present" }
+    },
+    {
+      "id": "baseline_comparison_result_output_match",
+      "blocking": true,
+      "applicableWhen": { "fact": "result_output_match_applies" },
+      "passesWhen": { "fact": "baseline_comparison_result_output_match" }
     },
     {
       "id": "left_single_timing_class",

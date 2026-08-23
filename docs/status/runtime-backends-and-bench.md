@@ -6,6 +6,22 @@ file only names the promoted boundary and open admission gates.
 
 ## Current boundary
 
+- The blocking strict-provider output-equality obligation is now registered in
+  `config/comparability-obligations.json`, matching the report emitter and
+  claim gate. The Lean contract and proof receipt are generated from that same
+  rule, so reports containing `baseline_comparison_result_output_match` no
+  longer fail as unknown while unequal or missing declared outputs remain
+  blocking. Migration: regenerate the Lean comparability contract and proof
+  artifact when adopting this contract hash; do not delete or relabel the
+  output-equality obligation in older diagnostic reports.
+- Backend workload catalog schema version 2 owns the generated timestamp in
+  `bench/workloads/metadata/backend-workload-catalog.json`. Generated lane
+  manifests no longer derive provenance from checkout-local filesystem mtime,
+  so `generate_backend_workloads.py --verify` is byte-reproducible across clean
+  checkouts. The active claim cycle now binds the regenerated AMD Vulkan
+  workload manifest hash. Version 1 catalogs must add a schema-valid
+  `generatedAt` value, regenerate their lane manifests, and update dependent
+  active-cycle hash pins before verification or release replay.
 - Fawn matrix physical execution and release signing are now separate trust
   domains. The self-hosted Apple, AMD Vulkan, or Windows runner checks out the
   frozen experiment revision, executes with no signing key, emits an unsigned

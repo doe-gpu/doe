@@ -5,13 +5,18 @@
   "additionalProperties": false,
   "required": [
     "schemaVersion",
+    "generatedAt",
     "laneOutputs",
     "workloads"
   ],
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 1
+      "const": 2
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
     },
     "laneOutputs": {
       "type": "object",

@@ -6,7 +6,7 @@
   "contracts": {
     "workloadContract": {
       "path": "bench/workloads/workloads.amd.vulkan.json",
-      "sha256": "07ef6b5e9d5d6a87161a35e0bab133e7e6cdde90ac6071ad278149e6cce97c46"
+      "sha256": "247d41041595e117001634f97819bf5210225f134a5cdfea035ed4102701d78f"
     },
     "benchmarkPolicy": {
       "path": "config/benchmark-methodology-thresholds.json",
