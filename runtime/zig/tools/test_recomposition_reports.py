@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import subprocess
 import sys
+import tarfile
 import tempfile
 import unittest
 from pathlib import Path
@@ -14,6 +16,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from capture_semantic_fixtures import (
+    _extract_git_archive,
     _install_ir_digest_observer,
     _publish_fixture_set,
     _semantic_build_commands,
@@ -33,10 +36,41 @@ from source_architecture import analyze
 from test_source_architecture import _manifest, _write
 from verify_recomposition_baseline import classify
 from verify_semantic_fixtures import classify as classify_semantic_fixtures
-from verify_semantic_fixtures import load_verified_fixture_set
+from verify_semantic_fixtures import (
+    ABI_APPROVAL_PATH,
+    load_abi_contract_approval,
+    load_verified_fixture_set,
+)
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
 class ArchitectureReportTests(unittest.TestCase):
+    def test_git_archive_extraction_is_safe_on_python_311(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            archive_path = root / "snapshot.tar"
+            destination = root / "snapshot"
+            content = b"stable\n"
+            with tarfile.open(archive_path, mode="w:") as archive:
+                member = tarfile.TarInfo("runtime/zig/source.txt")
+                member.size = len(content)
+                archive.addfile(member, io.BytesIO(content))
+
+            _extract_git_archive(archive_path, destination)
+            self.assertEqual(
+                (destination / "runtime/zig/source.txt").read_bytes(),
+                content,
+            )
+
+            with tarfile.open(archive_path, mode="w:") as archive:
+                member = tarfile.TarInfo("../escape.txt")
+                member.size = len(content)
+                archive.addfile(member, io.BytesIO(content))
+            with self.assertRaisesRegex(RuntimeError, "unsafe Git archive path"):
+                _extract_git_archive(archive_path, destination)
+
     def test_semantic_fixture_build_steps_are_independent_and_ordered(self) -> None:
         commands = _semantic_build_commands(
             Path("/opt/zig/zig"),
@@ -147,6 +181,24 @@ class ArchitectureReportTests(unittest.TestCase):
                 (snapshot / "build.zig").read_text(encoding="utf-8"),
             )
 
+    def test_native_snapshot_ir_observer_binds_source_hashes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            snapshot = Path(temporary_directory)
+            _write(snapshot, "build.zig", "// emit-ir-digest\n")
+            for relative_path in (
+                "src/cli/entrypoints/main_emit_ir_digest.zig",
+                "src/compiler/wgsl/ir/ir_digest.zig",
+            ):
+                _write(snapshot, relative_path, "pub fn observe() void {}\n")
+
+            receipt = _install_ir_digest_observer(snapshot, snapshot)
+
+            self.assertEqual(receipt["kind"], "native-snapshot")
+            self.assertEqual(len(receipt["observers"]), 2)
+            self.assertTrue(
+                all(len(observer["sha256"]) == 64 for observer in receipt["observers"])
+            )
+
     def test_semantic_fixture_publication_replaces_only_complete_set(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
@@ -196,6 +248,7 @@ class ArchitectureReportTests(unittest.TestCase):
                             ],
                             "git": {"baseCommit": commit},
                             "captureToolSha256": capture_tool,
+                            "sourceTreeSha256": source_hash,
                         }
                     ),
                 )
@@ -228,6 +281,27 @@ class ArchitectureReportTests(unittest.TestCase):
             self.assertIn(
                 "semantic candidate is not bound to the architecture source digest",
                 _candidate_errors(root, baseline_root, "c" * 64),
+            )
+            write_fixture_set(
+                baseline_root / "semantic-current",
+                "c" * 40,
+                capture_tool_sha256,
+            )
+            _write(
+                baseline_root,
+                "semantic-current-verification.json",
+                json.dumps(
+                    {
+                        "baselineCommit": "b" * 40,
+                        "candidateCommit": "c" * 40,
+                        "classification": "exact-semantic-equivalence",
+                        "schemaVersion": 1,
+                    }
+                ),
+            )
+            self.assertEqual(
+                _candidate_errors(root, baseline_root, source_hash),
+                [],
             )
 
     def test_snapshot_bound_abi_symbols_become_baseline_artifacts(self) -> None:
@@ -515,6 +589,100 @@ class ArchitectureReportTests(unittest.TestCase):
             receipt["differences"][0]["path"],
             "abi/lib.symbols.txt",
         )
+        self.assertEqual(
+            receipt["differences"][0]["addedSymbols"],
+            ["new_symbol"],
+        )
+        self.assertEqual(
+            receipt["differences"][0]["removedSymbols"],
+            ["old_symbol"],
+        )
+
+    def test_semantic_verifier_approves_only_exact_additive_abi_symbols(self) -> None:
+        source_hash = "c" * 64
+        baseline_manifest = {
+            "git": {"baseCommit": "a" * 40},
+        }
+        candidate_manifest = {
+            "git": {"baseCommit": "b" * 40},
+            "sourceTreeSha256": source_hash,
+        }
+        symbol_path = "abi/lib.symbols.txt"
+        approval_contract = {
+            "reviewedSourceTreeSha256": source_hash,
+        }
+        abi_approval = (approval_contract, {symbol_path: {"approved_symbol"}})
+
+        exit_code, receipt = classify_semantic_fixtures(
+            baseline_manifest,
+            {symbol_path: b"stable_symbol\n"},
+            candidate_manifest,
+            {symbol_path: b"approved_symbol\nstable_symbol\n"},
+            set(),
+            None,
+            abi_approval,
+        )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(receipt["classification"], "approved-contract-change")
+
+        for rejected_symbols in (
+            b"approved_symbol\nextra_symbol\nstable_symbol\n",
+            b"approved_symbol\n",
+        ):
+            exit_code, receipt = classify_semantic_fixtures(
+                baseline_manifest,
+                {symbol_path: b"stable_symbol\n"},
+                candidate_manifest,
+                {symbol_path: rejected_symbols},
+                set(),
+                None,
+                abi_approval,
+            )
+            self.assertEqual(exit_code, 1)
+            self.assertEqual(receipt["failureBoundary"], "abi-surface")
+
+        mismatched_manifest = dict(candidate_manifest)
+        mismatched_manifest["sourceTreeSha256"] = "d" * 64
+        exit_code, receipt = classify_semantic_fixtures(
+            baseline_manifest,
+            {symbol_path: b"stable_symbol\n"},
+            mismatched_manifest,
+            {symbol_path: b"approved_symbol\nstable_symbol\n"},
+            set(),
+            None,
+            abi_approval,
+        )
+        self.assertEqual(exit_code, 1)
+        self.assertEqual(receipt["failureBoundary"], "abi-surface")
+
+    def test_checked_in_abi_approval_binds_prior_and_current_symbols(self) -> None:
+        contract, allowed_symbols = load_abi_contract_approval(
+            ABI_APPROVAL_PATH,
+            REPOSITORY_ROOT,
+        )
+
+        self.assertEqual(
+            contract["reviewedCodeCommit"],
+            "9127b87283da959bce577318ef42c8f34ef014d8",
+        )
+        self.assertEqual(
+            allowed_symbols["abi/libwebgpu_doe.so.symbols.txt"],
+            {
+                "doeNativeAdapterGetPciIdentity",
+                "doeNativeShaderModuleGetBindingsForEntryPoint",
+            },
+        )
+
+    def test_abi_approval_rejects_a_changed_output_pointer_contract(self) -> None:
+        payload = json.loads(ABI_APPROVAL_PATH.read_text(encoding="utf-8"))
+        payload["target"]["parameters"][1]["nullable"] = True
+
+        with patch(
+            "verify_semantic_fixtures.load_json_strict",
+            return_value=payload,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "exact PCI contract"):
+                load_abi_contract_approval(ABI_APPROVAL_PATH, REPOSITORY_ROOT)
 
     def test_semantic_verifier_requires_same_ir_digest_observer(self) -> None:
         baseline_manifest = {

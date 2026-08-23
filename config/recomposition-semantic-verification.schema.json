@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe recomposition semantic verification receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "approval",
+    "baselineCommit",
+    "candidateCommit",
+    "classification",
+    "differences",
+    "schemaVersion"
+  ],
+  "properties": {
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["abiContract", "categories", "reason"],
+      "properties": {
+        "abiContract": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "approvedSymbols",
+                "artifactPath",
+                "artifactSha256",
+                "priorReceipts",
+                "reviewedCodeCommit",
+                "reviewedSourceTreeSha256"
+              ],
+              "properties": {
+                "approvedSymbols": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "#/$defs/symbolSet" }
+                },
+                "artifactPath": { "type": "string", "minLength": 1 },
+                "artifactSha256": { "$ref": "#/$defs/sha256" },
+                "priorReceipts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["path", "sha256", "symbols"],
+                    "properties": {
+                      "path": { "type": "string", "minLength": 1 },
+                      "sha256": { "$ref": "#/$defs/sha256" },
+                      "symbols": {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": { "type": "string", "minLength": 1 }
+                      }
+                    }
+                  }
+                },
+                "reviewedCodeCommit": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{40}$"
+                },
+                "reviewedSourceTreeSha256": { "$ref": "#/$defs/sha256" }
+              }
+            }
+          ]
+        },
+        "categories": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "command-normalization",
+              "error-classification",
+              "semantic-fixture",
+              "trace-and-replay",
+              "wgsl-lowering"
+            ]
+          }
+        },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "baselineCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "candidateCommit": {
+      "type": "string",
+      "pattern": "^([a-f0-9]{40}|WORKTREE:[a-f0-9]{64})$"
+    },
+    "classification": {
+      "type": "string",
+      "enum": [
+        "approved-contract-change",
+        "exact-semantic-equivalence",
+        "failure"
+      ]
+    },
+    "differences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "baselineSha256",
+          "candidateSha256",
+          "category",
+          "path"
+        ],
+        "properties": {
+          "addedSymbols": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "baselineSha256": {
+            "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+          },
+          "candidateSha256": {
+            "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "abi-surface",
+              "command-normalization",
+              "error-classification",
+              "semantic-fixture",
+              "trace-and-replay",
+              "wgsl-lowering"
+            ]
+          },
+          "path": { "type": "string", "minLength": 1 },
+          "removedSymbols": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "failureBoundary": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "integer", "const": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "symbolSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "symbols"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "symbols": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

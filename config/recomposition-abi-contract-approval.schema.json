@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Doe recomposition ABI contract approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "approvalScope",
+    "artifactKind",
+    "category",
+    "compatibility",
+    "evidence",
+    "nonClaims",
+    "review",
+    "reviewedCode",
+    "schemaVersion",
+    "semantics",
+    "status",
+    "target"
+  ],
+  "properties": {
+    "approvalScope": {
+      "type": "string",
+      "enum": ["internal-extension", "public-api"]
+    },
+    "artifactKind": {
+      "type": "string",
+      "const": "recomposition-abi-contract-approval"
+    },
+    "category": { "type": "string", "const": "abi-surface" },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changedSymbols",
+        "dynamicLookup",
+        "kind",
+        "olderLibrariesRemainLoadable",
+        "removedSymbols"
+      ],
+      "properties": {
+        "changedSymbols": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "dynamicLookup": { "type": "string", "const": "optional" },
+        "kind": { "type": "string", "const": "additive" },
+        "olderLibrariesRemainLoadable": { "type": "boolean", "const": true },
+        "removedSymbols": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["declaration", "optionalConsumers", "priorApprovals"],
+      "properties": {
+        "declaration": { "$ref": "#/$defs/sourceFile" },
+        "optionalConsumers": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/sourceFile" }
+        },
+        "priorApprovals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "receiptPath",
+              "receiptSha256",
+              "symbolFile",
+              "symbols"
+            ],
+            "properties": {
+              "receiptPath": { "$ref": "#/$defs/repositoryPath" },
+              "receiptSha256": { "$ref": "#/$defs/sha256" },
+              "symbolFile": { "$ref": "#/$defs/fixturePath" },
+              "symbols": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "$ref": "#/$defs/symbol" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "nonClaims": {
+      "const": [
+        "hardware-attestation",
+        "cross-backend-driver-normalization",
+        "performance-evidence",
+        "physical-device-qualification"
+      ]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "decision", "reason", "reviewedAt"],
+      "properties": {
+        "authority": { "type": "string", "minLength": 1 },
+        "decision": { "type": "string", "const": "approved" },
+        "reason": { "type": "string", "minLength": 1 },
+        "reviewedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "reviewedCode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "sourceTreeSha256"],
+      "properties": {
+        "commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "sourceTreeSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "semantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "driverVersion",
+        "identityValues",
+        "invalidAdapter",
+        "unavailableValue"
+      ],
+      "properties": {
+        "driverVersion": {
+          "type": "string",
+          "const": "raw-backend-value-not-cross-backend-comparable"
+        },
+        "identityValues": {
+          "type": "string",
+          "const": "raw-backend-reported-u32"
+        },
+        "invalidAdapter": {
+          "type": "string",
+          "const": "all-outputs-zero"
+        },
+        "unavailableValue": { "type": "integer", "const": 0 }
+      }
+    },
+    "status": { "type": "string", "const": "approved" },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cSignature",
+        "callingConvention",
+        "parameters",
+        "returnType",
+        "symbol",
+        "symbolFile"
+      ],
+      "properties": {
+        "cSignature": { "type": "string", "minLength": 1 },
+        "callingConvention": { "type": "string", "const": "c" },
+        "parameters": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {
+              "$ref": "#/$defs/adapterParameter"
+            },
+            {
+              "$ref": "#/$defs/vendorIdParameter"
+            },
+            {
+              "$ref": "#/$defs/deviceIdParameter"
+            },
+            {
+              "$ref": "#/$defs/driverVersionParameter"
+            }
+          ],
+          "items": false
+        },
+        "returnType": { "type": "string", "const": "void" },
+        "symbol": { "$ref": "#/$defs/symbol" },
+        "symbolFile": { "$ref": "#/$defs/fixturePath" }
+      }
+    }
+  },
+  "$defs": {
+    "adapterParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["direction", "name", "nullable", "type"],
+      "properties": {
+        "direction": { "const": "in" },
+        "name": { "const": "adapter" },
+        "nullable": { "const": true },
+        "type": { "const": "opaque-pointer" }
+      }
+    },
+    "deviceIdParameter": {
+      "$ref": "#/$defs/u32OutputParameter",
+      "properties": {
+        "name": { "const": "out_device_id" }
+      }
+    },
+    "driverVersionParameter": {
+      "$ref": "#/$defs/u32OutputParameter",
+      "properties": {
+        "name": { "const": "out_driver_version" }
+      }
+    },
+    "fixturePath": {
+      "type": "string",
+      "pattern": "^abi/[A-Za-z0-9_.-]+\\.symbols\\.txt$"
+    },
+    "repositoryPath": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_./-]+$"
+    },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "sourceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/repositoryPath" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "symbol": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "u32OutputParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["direction", "name", "nullable", "type"],
+      "properties": {
+        "direction": { "const": "out" },
+        "name": { "type": "string" },
+        "nullable": { "const": false },
+        "type": { "const": "u32-pointer" }
+      }
+    },
+    "vendorIdParameter": {
+      "$ref": "#/$defs/u32OutputParameter",
+      "properties": {
+        "name": { "const": "out_vendor_id" }
+      }
+    }
+  }
+}

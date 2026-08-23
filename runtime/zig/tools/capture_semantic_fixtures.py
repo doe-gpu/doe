@@ -11,7 +11,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from source_architecture import (
@@ -103,6 +103,36 @@ def _semantic_build_commands(
     ]
 
 
+def _extract_git_archive(archive_path: Path, destination: Path) -> None:
+    """Extract a local Git archive without version-dependent tar filters."""
+
+    with tarfile.open(archive_path, mode="r:") as archive:
+        members = archive.getmembers()
+        for member in members:
+            member_path = PurePosixPath(member.name)
+            if (
+                member_path.is_absolute()
+                or ".." in member_path.parts
+                or member_path.as_posix() != member.name
+            ):
+                raise RuntimeError(f"unsafe Git archive path: {member.name!r}")
+            if not member.isdir() and not member.isfile():
+                raise RuntimeError(f"unsupported Git archive entry: {member.name!r}")
+        destination.mkdir(parents=True, exist_ok=True)
+        for member in members:
+            target = destination / member.name
+            if member.isdir():
+                target.mkdir(parents=True, exist_ok=True)
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            source = archive.extractfile(member)
+            if source is None:
+                raise RuntimeError(f"Git archive file has no content: {member.name!r}")
+            with source, target.open("wb") as output:
+                shutil.copyfileobj(source, output)
+            target.chmod(member.mode & 0o777)
+
+
 def _materialize_runtime(
     root: Path,
     git_ref: str,
@@ -131,8 +161,7 @@ def _materialize_runtime(
     ).stdout
     archive_path = temporary_root / "runtime.tar"
     archive_path.write_bytes(archive)
-    with tarfile.open(archive_path, mode="r:") as tar:
-        tar.extractall(temporary_root, filter="data")
+    _extract_git_archive(archive_path, temporary_root)
     archive_path.unlink()
     abi_source_config = json.loads(
         (repository_root / WEBGPU_ABI_SOURCE_CONFIG).read_text(encoding="utf-8")
@@ -166,7 +195,11 @@ def _install_ir_digest_observer(
     build_path = snapshot / "build.zig"
     build_source = build_path.read_text(encoding="utf-8")
     if "emit-ir-digest" in build_source:
-        return {"kind": "native-snapshot", "status": "present"}
+        return {
+            "kind": "native-snapshot",
+            "observers": _ir_digest_observer_records(snapshot),
+            "status": "present",
+        }
     observer_records = _ir_digest_observer_records(tool_source_root)
     for relative_path in IR_DIGEST_OBSERVER_PATHS:
         source = tool_source_root / relative_path
@@ -317,15 +350,14 @@ def capture(root: Path, git_ref: str, destination: Path) -> dict[str, Any]:
     zig = _find_zig(root)
     with tempfile.TemporaryDirectory(prefix="doe-semantic-fixtures-") as temporary:
         temporary_root = Path(temporary)
-        worktree_analysis = None
         if git_ref == "WORKTREE":
             snapshot = root
             execution_root = root.parents[1]
             config = load_manifest(root / "source-layout.json")
-            worktree_analysis = analyze(root, config)
-            if worktree_analysis.manifest_errors or worktree_analysis.unresolved_imports:
+            snapshot_analysis = analyze(root, config)
+            if snapshot_analysis.manifest_errors or snapshot_analysis.unresolved_imports:
                 raise RuntimeError("worktree architecture is not valid before capture")
-            commit = f"WORKTREE:{worktree_analysis.source_tree_sha256}"
+            commit = f"WORKTREE:{snapshot_analysis.source_tree_sha256}"
             snapshot_kind = "live-worktree"
         else:
             snapshot, commit, ir_digest_instrumentation = _materialize_runtime(
@@ -335,6 +367,13 @@ def capture(root: Path, git_ref: str, destination: Path) -> dict[str, Any]:
             )
             execution_root = temporary_root
             snapshot_kind = "git-archive"
+            config = load_manifest(snapshot / "source-layout.json")
+            snapshot_analysis = analyze(snapshot, config)
+            if (
+                snapshot_analysis.manifest_errors
+                or snapshot_analysis.unresolved_imports
+            ):
+                raise RuntimeError("Git snapshot architecture is not valid before capture")
         if git_ref == "WORKTREE":
             ir_digest_instrumentation = {
                 "kind": "native-worktree",
@@ -601,6 +640,7 @@ def capture(root: Path, git_ref: str, destination: Path) -> dict[str, Any]:
             },
             "schemaVersion": 1,
             "sharedLibraries": library_records,
+            "sourceTreeSha256": snapshot_analysis.source_tree_sha256,
             "status": "captured",
             "trace": {
                 "normalizedOutput": "trace-normalized.jsonl",
@@ -622,11 +662,11 @@ def capture(root: Path, git_ref: str, destination: Path) -> dict[str, Any]:
             ).strip(),
             "zigExecutableSha256": sha256_file(zig),
         }
-        if worktree_analysis is not None:
+        if git_ref == "WORKTREE":
             final_analysis = analyze(root, config)
             if (
                 final_analysis.source_tree_sha256
-                != worktree_analysis.source_tree_sha256
+                != snapshot_analysis.source_tree_sha256
             ):
                 raise RuntimeError(
                     "worktree source changed during semantic fixture capture"

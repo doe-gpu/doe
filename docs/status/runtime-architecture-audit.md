@@ -6,6 +6,21 @@ The import fence and source-layout gates are the structural authority; this
 page records the lifecycle interpretation and follow-up decisions. The target
 structural roadmap lives in [`../runtime-hexagonal-architecture-plan.md`](../runtime-hexagonal-architecture-plan.md).
 
+## Current ABI approval boundary
+
+Recomposition ABI approval is symbol-scoped. The reviewed PCI-identity
+extension is recorded in
+`runtime/zig/reports/recomposition/abi-contract-approval.json`; it is an
+additive optional internal extension with explicit zero/unavailable semantics
+and does not establish hardware attestation, cross-backend driver
+normalization, performance, or physical-device qualification. The semantic
+verifier rejects category-wide ABI approval, removed symbols, extra exports,
+stale predecessor receipts, and source-digest drift.
+
+Commit-bound semantic capture remains separate from physical qualification.
+AMD Vulkan, Fawn browser, and Windows D3D12 promotion still require their own
+clean-checkout physical receipts against the frozen release candidate.
+
 ## Current Python sharding advisories
 
 The canonical Zig size policy remains blocking through

@@ -1,19 +1,47 @@
 {
   "approval": {
+    "abiContract": {
+      "approvedSymbols": [
+        {
+          "path": "abi/libwebgpu_doe.so.symbols.txt",
+          "symbols": [
+            "doeNativeAdapterGetPciIdentity",
+            "doeNativeShaderModuleGetBindingsForEntryPoint"
+          ]
+        }
+      ],
+      "artifactPath": "runtime/zig/reports/recomposition/abi-contract-approval.json",
+      "artifactSha256": "2c2de3568a0c0c6b8e27e1d18fd7be2651dd78beb5b833307b253e8163c7075d",
+      "priorReceipts": [
+        {
+          "path": "runtime/zig/reports/recomposition/verification.json",
+          "sha256": "8ebb2390f5efff04ef3d1f304dfd6c735fca5b7cb446e571944e410c304db580",
+          "symbols": [
+            "doeNativeShaderModuleGetBindingsForEntryPoint"
+          ]
+        }
+      ],
+      "reviewedCodeCommit": "9127b87283da959bce577318ef42c8f34ef014d8",
+      "reviewedSourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93"
+    },
     "categories": [],
     "reason": null
   },
   "baselineCommit": "b15988d33951e6b2350b6958fac01b88ca4ed22b",
-  "candidateCommit": "WORKTREE:2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
-  "classification": "failure",
+  "candidateCommit": "9127b87283da959bce577318ef42c8f34ef014d8",
+  "classification": "approved-contract-change",
   "differences": [
     {
+      "addedSymbols": [
+        "doeNativeAdapterGetPciIdentity",
+        "doeNativeShaderModuleGetBindingsForEntryPoint"
+      ],
       "baselineSha256": "6397dec652765917af9a5fb11ec2002fb5bbb4915d85489ea74fc23076132565",
       "candidateSha256": "cc063b38394ed0e1d0d85eec19d5ac79721f771c2d4f64d3a4a1cde434fdc494",
       "category": "abi-surface",
-      "path": "abi/libwebgpu_doe.so.symbols.txt"
+      "path": "abi/libwebgpu_doe.so.symbols.txt",
+      "removedSymbols": []
     }
   ],
-  "failureBoundary": "abi-surface",
   "schemaVersion": 1
 }

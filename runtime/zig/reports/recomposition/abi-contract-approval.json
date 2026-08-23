@@ -1,0 +1,103 @@
+{
+  "approvalScope": "internal-extension",
+  "artifactKind": "recomposition-abi-contract-approval",
+  "category": "abi-surface",
+  "compatibility": {
+    "changedSymbols": [],
+    "dynamicLookup": "optional",
+    "kind": "additive",
+    "olderLibrariesRemainLoadable": true,
+    "removedSymbols": []
+  },
+  "evidence": {
+    "declaration": {
+      "path": "runtime/zig/src/native/support/doe_adapter_info_native.zig",
+      "sha256": "c4bbce3c74437940c5b8620760fbbfd74a0285adca0e5244c05fb3eca2a2d1de"
+    },
+    "optionalConsumers": [
+      {
+        "path": "packages/doe-gpu/src/vendor/webgpu/bun-ffi.js",
+        "sha256": "e215e11e91447b2754db29be3d3ddac138d5f44037f62f96816fd541ec8389cb"
+      },
+      {
+        "path": "runtime/bridge/webgpu-addon/doe_napi_caps.c",
+        "sha256": "33c55bd672b949a8982940a29e7f95e3d5178d10f234ca998376d4d30bb630f8"
+      },
+      {
+        "path": "runtime/bridge/webgpu-addon/doe_napi_globals.c",
+        "sha256": "eb3aa1034e12f956db1c603a5ef0640e4f32678234f37546f500fbe6b8e11ef2"
+      },
+      {
+        "path": "runtime/bridge/webgpu-addon/doe_napi_nd_creators.c",
+        "sha256": "2f607f433efce222ba149eb8d880fc91ed8559729b8dc3c339293b26668c3851"
+      }
+    ],
+    "priorApprovals": [
+      {
+        "receiptPath": "runtime/zig/reports/recomposition/verification.json",
+        "receiptSha256": "8ebb2390f5efff04ef3d1f304dfd6c735fca5b7cb446e571944e410c304db580",
+        "symbolFile": "abi/libwebgpu_doe.so.symbols.txt",
+        "symbols": [
+          "doeNativeShaderModuleGetBindingsForEntryPoint"
+        ]
+      }
+    ]
+  },
+  "nonClaims": [
+    "hardware-attestation",
+    "cross-backend-driver-normalization",
+    "performance-evidence",
+    "physical-device-qualification"
+  ],
+  "review": {
+    "authority": "repository-owner-authorized-independent-review",
+    "decision": "approved",
+    "reason": "Approve one additive optional internal ABI extension so strict comparisons can retain raw numeric adapter identity without granting hardware attestation, driver normalization, performance, or physical qualification claims.",
+    "reviewedAt": "2026-08-23T20:22:03Z"
+  },
+  "reviewedCode": {
+    "commit": "9127b87283da959bce577318ef42c8f34ef014d8",
+    "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93"
+  },
+  "schemaVersion": 1,
+  "semantics": {
+    "driverVersion": "raw-backend-value-not-cross-backend-comparable",
+    "identityValues": "raw-backend-reported-u32",
+    "invalidAdapter": "all-outputs-zero",
+    "unavailableValue": 0
+  },
+  "status": "approved",
+  "target": {
+    "cSignature": "void doeNativeAdapterGetPciIdentity(void *adapter, uint32_t *out_vendor_id, uint32_t *out_device_id, uint32_t *out_driver_version)",
+    "callingConvention": "c",
+    "parameters": [
+      {
+        "direction": "in",
+        "name": "adapter",
+        "nullable": true,
+        "type": "opaque-pointer"
+      },
+      {
+        "direction": "out",
+        "name": "out_vendor_id",
+        "nullable": false,
+        "type": "u32-pointer"
+      },
+      {
+        "direction": "out",
+        "name": "out_device_id",
+        "nullable": false,
+        "type": "u32-pointer"
+      },
+      {
+        "direction": "out",
+        "name": "out_driver_version",
+        "nullable": false,
+        "type": "u32-pointer"
+      }
+    ],
+    "returnType": "void",
+    "symbol": "doeNativeAdapterGetPciIdentity",
+    "symbolFile": "abi/libwebgpu_doe.so.symbols.txt"
+  }
+}

@@ -138,6 +138,14 @@
       "data": "runtime/zig/reports/recomposition/kernel-dispatch-performance-approval.json"
     },
     {
+      "schema": "config/recomposition-abi-contract-approval.schema.json",
+      "data": "runtime/zig/reports/recomposition/abi-contract-approval.json"
+    },
+    {
+      "schema": "config/recomposition-semantic-verification.schema.json",
+      "data": "runtime/zig/reports/recomposition/semantic-current-verification.json"
+    },
+    {
       "schema": "config/governed-lanes.schema.json",
       "data": "config/governed-lanes.json"
     },

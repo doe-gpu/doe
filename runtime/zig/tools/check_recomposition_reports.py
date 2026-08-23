@@ -201,7 +201,7 @@ def _candidate_errors(
     baseline_root: Path,
     source_tree_sha256: str,
 ) -> list[str]:
-    """Validate an optional worktree-bound semantic candidate and its receipt."""
+    """Validate an optional source-bound semantic candidate and its receipt."""
 
     candidate_root = baseline_root / "semantic-current"
     if not candidate_root.is_dir():
@@ -211,9 +211,17 @@ def _candidate_errors(
         baseline_root / "semantic-fixtures"
     )
     candidate_manifest, _ = load_verified_fixture_set(candidate_root)
-    expected_commit = f"WORKTREE:{source_tree_sha256}"
     candidate_commit = candidate_manifest.get("git", {}).get("baseCommit")
-    if candidate_commit != expected_commit:
+    candidate_source = candidate_manifest.get("sourceTreeSha256")
+    commit_is_bound = (
+        candidate_commit == f"WORKTREE:{source_tree_sha256}"
+        or (
+            isinstance(candidate_commit, str)
+            and len(candidate_commit) == 40
+            and all(character in "0123456789abcdef" for character in candidate_commit)
+        )
+    )
+    if candidate_source != source_tree_sha256 or not commit_is_bound:
         errors.append(
             "semantic candidate is not bound to the architecture source digest"
         )
@@ -237,6 +245,36 @@ def _candidate_errors(
         "failure",
     }:
         errors.append("semantic candidate receipt has an unknown classification")
+    abi_differences = [
+        difference
+        for difference in receipt.get("differences", [])
+        if isinstance(difference, dict)
+        and difference.get("category") == "abi-surface"
+    ]
+    if (
+        receipt.get("classification") == "approved-contract-change"
+        and abi_differences
+    ):
+        approval = receipt.get("approval")
+        abi_contract = (
+            approval.get("abiContract") if isinstance(approval, dict) else None
+        )
+        if not isinstance(abi_contract, dict):
+            errors.append("approved ABI change has no symbol-scoped contract")
+        else:
+            artifact_path_value = abi_contract.get("artifactPath")
+            artifact_sha256 = abi_contract.get("artifactSha256")
+            if not isinstance(artifact_path_value, str):
+                errors.append("approved ABI contract has no artifact path")
+            else:
+                artifact_path = root.parents[1] / artifact_path_value
+                if (
+                    not artifact_path.is_file()
+                    or sha256_file(artifact_path) != artifact_sha256
+                ):
+                    errors.append("approved ABI contract artifact is missing or stale")
+            if abi_contract.get("reviewedSourceTreeSha256") != candidate_source:
+                errors.append("approved ABI contract names the wrong source digest")
     return errors
 
 

@@ -13,7 +13,7 @@
     ],
     "strategy": "ordered-independent-steps"
   },
-  "captureToolSha256": "b23d99a561fa630edf8b2b5f3f4d84495b6b36f0fcd630b31d3b0d5000770cd8",
+  "captureToolSha256": "20e7774250ada826218fcf3a2bd6b7851e669a9dc7dcde653e939ef307c75c7e",
   "commandNormalization": {
     "input": "command-input.json",
     "output": "command-normalized.jsonl"
@@ -155,9 +155,9 @@
     }
   ],
   "git": {
-    "baseCommit": "WORKTREE:2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
-    "requestedRef": "WORKTREE",
-    "snapshotKind": "live-worktree"
+    "baseCommit": "9127b87283da959bce577318ef42c8f34ef014d8",
+    "requestedRef": "9127b87283da959bce577318ef42c8f34ef014d8",
+    "snapshotKind": "git-archive"
   },
   "host": {
     "machine": "x86_64",
@@ -165,7 +165,7 @@
     "release": "6.12.54-linuxkit"
   },
   "irDigestInstrumentation": {
-    "kind": "native-worktree",
+    "kind": "native-snapshot",
     "observers": [
       {
         "path": "src/cli/entrypoints/main_emit_ir_digest.zig",
@@ -188,19 +188,20 @@
   "sharedLibraries": [
     {
       "path": "libonnxruntime_doe_ep.so",
-      "sha256": "7451be5a35474ac272d19325e697992eb75619bc54f60c6968f99626e85c2d82",
-      "sizeBytes": 6030192,
+      "sha256": "0c9b326efb105289cb076b8c3f45018e355fd8766c008204e500fa4cf6120986",
+      "sizeBytes": 6030448,
       "symbolCount": 100,
       "symbols": "abi/libonnxruntime_doe_ep.so.symbols.txt"
     },
     {
       "path": "libwebgpu_doe.so",
-      "sha256": "8e9cb7ed3c7e53493622ff4fce7995df4c54fa9ca8c561f825378ffc4cdf3b9e",
-      "sizeBytes": 9968664,
+      "sha256": "701d5df347cb4cdd13fe0f62974edbd966edca5107831cbecae579028eda4c1f",
+      "sizeBytes": 9969864,
       "symbolCount": 732,
       "symbols": "abi/libwebgpu_doe.so.symbols.txt"
     }
   ],
+  "sourceTreeSha256": "2bd4ec35a611eaa8d996dad3fc78e73c449b61fda80c301f0c13e46bceefbd93",
   "status": "captured",
   "trace": {
     "normalizedOutput": "trace-normalized.jsonl",

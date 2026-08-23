@@ -86,6 +86,24 @@ unbound `zig-out` library for current ABI evidence. Semantic verification
 classifies shared-library metadata and symbol-file changes under the separate
 `abi-surface` category.
 
+ABI changes cannot use the category-wide approval switch. A reviewed additive
+extension must have a schema-backed, symbol-scoped approval artifact that binds
+the reviewed commit, analyzed source-tree digest, exact symbol file, exact
+symbol, C signature, compatibility behavior, semantics, prior approvals, and
+non-claims. Run semantic verification with the canonical approval artifact:
+
+```bash
+python3 tools/verify_semantic_fixtures.py \
+  --candidate-root <candidate-directory> \
+  --abi-approval reports/recomposition/abi-contract-approval.json
+```
+
+The verifier accepts the ABI delta only when every change is additive, no
+symbol is removed, the complete added-symbol set exactly matches the reviewed
+approval graph, and the candidate carries the approved source-tree digest.
+Extra exports, stale approval receipts, different source, and cross-platform
+symbol-file substitution remain failures.
+
 The fixture manifest records the canonical WGSL IR digest as well as exact
 MSL/HLSL/SPIR-V/CSL output bytes. For a frozen source snapshot that predates
 the digest executable, the capture installs the current pure observer into the
