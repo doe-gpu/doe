@@ -2,7 +2,7 @@ const std = @import("std");
 const model_compute_types = @import("../../../contracts/model/model_compute_types.zig");
 const execution_contract = @import("../../../contracts/execution.zig");
 const common_timing = @import("../../common/timing.zig");
-const webgpu = @import("../../runtime_types.zig");
+const webgpu = @import("../../../contracts/runtime_types.zig");
 const dc = @import("../d3d12_constants.zig");
 const bridge = @import("../d3d12_bridge_decls.zig");
 

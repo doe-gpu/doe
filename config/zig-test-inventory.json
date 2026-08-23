@@ -445,7 +445,7 @@
       "output": "test_suite_d3d12.zig",
       "entries": [
         {
-          "path": "tests/backend/backend_registry_test.zig",
+          "path": "tests/backend/backend_identity_test.zig",
           "kind": "backend"
         },
         {
@@ -761,6 +761,19 @@
     }
   },
   "supportFiles": [
+    {
+      "path": "tests/support/provider_harness.zig",
+      "kind": "domain-fixture",
+      "consumers": [
+        "tests/d3d12/d3d12_mod_integration_test.zig",
+        "tests/d3d12/d3d12_mod_test_support.zig",
+        "tests/metal/metal_mod_integration_test.zig",
+        "tests/metal/metal_timing_semantics_test.zig",
+        "tests/vulkan/vulkan_mod_integration_test.zig",
+        "tests/vulkan/vulkan_mod_test_support.zig",
+        "tests/vulkan/vulkan_timing_semantics_test.zig"
+      ]
+    },
     {
       "path": "tests/d3d12/d3d12_mod_test_support.zig",
       "kind": "domain-fixture",

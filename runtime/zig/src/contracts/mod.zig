@@ -50,6 +50,18 @@ pub fn executionReport() type {
     return @import("execution_report.zig");
 }
 
+pub fn runtimeConfiguration() type {
+    return @import("runtime_configuration.zig");
+}
+
+pub fn runtimeTypes() type {
+    return @import("runtime_types.zig");
+}
+
+pub fn runtimeTelemetry() type {
+    return @import("runtime_telemetry.zig");
+}
+
 pub fn identity() type {
     return @import("identity.zig");
 }
@@ -88,6 +100,10 @@ pub fn spatialOperation() type {
 
 pub fn evidenceContract() type {
     return @import("evidence.zig");
+}
+
+pub fn evidenceObserver() type {
+    return @import("evidence_observer.zig");
 }
 
 pub const shaderAbi = struct {

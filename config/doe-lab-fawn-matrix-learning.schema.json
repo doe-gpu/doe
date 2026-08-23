@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "doe://config/doe-lab-fawn-matrix-learning.schema.json",
+  "title": "DoeLab Fawn matrix learning manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "manifestKind",
+    "schemaPath",
+    "sourceArtifact",
+    "sourceSha256",
+    "workloadId",
+    "recordCount",
+    "hashChain",
+    "records",
+    "clusterCount",
+    "clusters"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 2 },
+    "manifestKind": { "type": "string", "const": "doe-lab-fawn-matrix-learning-v2" },
+    "schemaPath": {
+      "type": "string",
+      "const": "config/doe-lab-fawn-matrix-learning.schema.json"
+    },
+    "sourceArtifact": { "type": "string", "minLength": 1 },
+    "sourceSha256": { "$ref": "#/$defs/Hash" },
+    "workloadId": { "type": "string", "minLength": 1 },
+    "recordCount": { "type": "integer", "minimum": 0 },
+    "hashChain": { "type": "object" },
+    "records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/FailureRecord" }
+    },
+    "clusterCount": { "type": "integer", "minimum": 0 },
+    "clusters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/FailureCluster" }
+    }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "FailureRecord": {
+      "type": "object",
+      "required": ["recordKind", "failureId", "workloadId", "failureClass"],
+      "properties": {
+        "recordKind": { "const": "doe-lab-matrix-failure-v2" },
+        "failureId": { "$ref": "#/$defs/Hash" },
+        "workloadId": { "type": "string", "minLength": 1 },
+        "failureClass": {
+          "enum": [
+            "execution_failure",
+            "oracle_failure",
+            "execution_and_oracle_failure",
+            "executor_error"
+          ]
+        }
+      }
+    },
+    "FailureCluster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clusterId",
+        "signature",
+        "occurrenceCount",
+        "failureIds",
+        "replaySelectors",
+        "minimizationPlan",
+        "candidateProposal"
+      ],
+      "properties": {
+        "clusterId": { "$ref": "#/$defs/Hash" },
+        "signature": { "type": "object" },
+        "occurrenceCount": { "type": "integer", "minimum": 1 },
+        "failureIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/Hash" }
+        },
+        "replaySelectors": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "object" }
+        },
+        "minimizationPlan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "preserveFailureSignature", "steps"],
+          "properties": {
+            "status": { "const": "required" },
+            "preserveFailureSignature": { "const": true },
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "candidateProposal": { "$ref": "#/$defs/CandidateProposal" }
+      }
+    },
+    "CandidateProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposalId",
+        "recordKind",
+        "status",
+        "hypothesisStatus",
+        "observedBoundary",
+        "allowedNextStage",
+        "requiredEvidence",
+        "prohibitedActions"
+      ],
+      "properties": {
+        "proposalId": { "$ref": "#/$defs/Hash" },
+        "recordKind": { "const": "doe-lab-investigation-candidate-v1" },
+        "status": { "const": "unverified" },
+        "hypothesisStatus": { "const": "unestablished" },
+        "observedBoundary": {
+          "enum": [
+            "baseline_environment",
+            "fawn_browser_shell",
+            "fawn_doe_runtime_boundary",
+            "fawn_direct_doe_stack",
+            "unassigned"
+          ]
+        },
+        "allowedNextStage": { "const": "verify" },
+        "requiredEvidence": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "prohibitedActions": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["release_claim", "runtime_policy_mutation", "candidate_promotion"]
+          }
+        }
+      }
+    }
+  }
+}

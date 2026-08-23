@@ -1,7 +1,7 @@
 const common_timing = @import("../common/timing.zig");
 const execution_contract = @import("../../contracts/execution.zig");
 const model_transfer_types = @import("../../contracts/model/model_compute_types.zig");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 const bridge = @import("metal_bridge_decls.zig");
 
 const metal_bridge_cmd_buf_compute_encoder = bridge.metal_bridge_cmd_buf_compute_encoder;

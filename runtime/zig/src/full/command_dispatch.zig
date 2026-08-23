@@ -1,11 +1,11 @@
 const model = @import("../contracts/command.zig");
-const runtime_types = @import("../backend/runtime_types.zig");
+const execution_contract = @import("../contracts/execution.zig");
 const render_commands = @import("render/wgpu_render_commands.zig");
 const sampler_commands = @import("render/wgpu_sampler_commands.zig");
 const surface_commands = @import("surface/wgpu_surface_commands.zig");
 const async_diagnostics_command = @import("lifecycle/wgpu_async_diagnostics_command.zig");
 
-pub fn execute(self: anytype, command: model.Command) !?runtime_types.NativeExecutionResult {
+pub fn execute(self: anytype, command: model.Command) !?execution_contract.NativeExecutionResult {
     if (!model.isFullOnlyKind(model.kind(command))) return null;
     return switch (command) {
         .render_draw => |payload| try render_commands.executeRenderDraw(self, payload, false),

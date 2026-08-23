@@ -4,7 +4,7 @@
 // creation, command pool, fence) and memory type queries.
 
 const std = @import("std");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 const c = @import("vk_constants.zig");
 const vk_feature_caps = @import("vk_feature_caps.zig");
 const vk_pipeline_cache_persistent = @import("vk_pipeline_cache_persistent.zig");

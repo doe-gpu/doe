@@ -4,11 +4,11 @@ const model = @import("../../src/contracts/command.zig");
 const profile = @import("../../src/contracts/model/model_profile.zig");
 const gpu = @import("../../src/contracts/model/model_gpu_types.zig");
 const webgpu = @import("../../src/compat/webgpu_ffi.zig");
-const backend_iface = @import("../../src/backend/backend_iface.zig");
 const metal_mod = @import("../../src/backend/metal/mod.zig");
+const provider_harness = @import("../support/provider_harness.zig");
 
 const FlushWorker = struct {
-    iface: *backend_iface.BackendIface,
+    iface: *provider_harness.ProviderHarness,
     result_ns: u64 = 0,
     failed: bool = false,
 
@@ -19,6 +19,14 @@ const FlushWorker = struct {
         };
     }
 };
+
+fn harness(backend: *metal_mod.ZigMetalBackend, reason: []const u8) provider_harness.ProviderHarness {
+    return .init(
+        backend.asPorts(reason, "test_policy_hash", false),
+        backend,
+        metal_mod.destroyContext,
+    );
+}
 
 fn test_profile() profile.DeviceProfile {
     return .{
@@ -53,7 +61,7 @@ test "metal upload timing charges staged host work to setup ns" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_timing", "test_policy_hash");
+    var iface = harness(backend, "test_metal_timing");
     defer iface.deinit();
 
     iface.set_upload_behavior(.copy_dst, 1);
@@ -74,7 +82,7 @@ test "metal upload flush cadence reports nonzero submit_wait_ns" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_barrier_timing", "test_policy_hash");
+    var iface = harness(backend, "test_metal_barrier_timing");
     defer iface.deinit();
 
     // With submit_every = 1, every upload should flush inline.
@@ -94,7 +102,7 @@ test "metal deferred upload keeps per-command submit_wait_ns at zero until final
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_deferred_upload_timing", "test_policy_hash");
+    var iface = harness(backend, "test_metal_deferred_upload_timing");
     defer iface.deinit();
 
     iface.set_upload_behavior(.copy_dst, 1);
@@ -123,14 +131,14 @@ test "metal completion waits are isolated across concurrent runtimes" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface_a = try backend_a.as_iface(std.testing.allocator, "test_metal_wait_a", "test_policy_hash");
+    var iface_a = harness(backend_a, "test_metal_wait_a");
     defer iface_a.deinit();
 
     const backend_b = metal_mod.ZigMetalBackend.init(std.testing.allocator, test_profile(), null) catch |err| {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface_b = try backend_b.as_iface(std.testing.allocator, "test_metal_wait_b", "test_policy_hash");
+    var iface_b = harness(backend_b, "test_metal_wait_b");
     defer iface_b.deinit();
 
     iface_a.set_upload_behavior(.copy_dst, 1);
@@ -166,7 +174,7 @@ test "metal barrier flushes deferred upload work" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_barrier_flush", "test_policy_hash");
+    var iface = harness(backend, "test_metal_barrier_flush");
     defer iface.deinit();
 
     iface.set_upload_behavior(.copy_dst, 1);
@@ -191,7 +199,7 @@ test "metal kernel_dispatch returns error when kernel file not found" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_timing_unsupported", "test_policy_hash");
+    var iface = harness(backend, "test_metal_timing_unsupported");
     defer iface.deinit();
 
     const result = try iface.execute_command(model.Command{ .kernel_dispatch = .{
@@ -213,7 +221,7 @@ test "metal copy contract path executes native buffer-to-texture copy" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_copy_contract", "test_policy_hash");
+    var iface = harness(backend, "test_metal_copy_contract");
     defer iface.deinit();
 
     const result = try iface.execute_command(model.Command{ .copy_buffer_to_texture = .{
@@ -233,7 +241,7 @@ test "metal surface lifecycle executes full presentation protocol" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_surface_contract", "test_policy_hash");
+    var iface = harness(backend, "test_metal_surface_contract");
     defer iface.deinit();
 
     try std.testing.expectEqual(webgpu.NativeExecutionStatus.ok, (try iface.execute_command(model.Command{ .surface_create = .{ .handle = 901 } })).status);

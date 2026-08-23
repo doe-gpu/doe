@@ -58,7 +58,6 @@
         ],
         "mayImport": [
           "app",
-          "backend-interface",
           "backend-ports",
           "cli",
           "compiler",
@@ -97,11 +96,17 @@
         ],
         "mayImport": [
           "app",
-          "backend-interface",
+          "backend-adapter",
+          "backend-d3d12",
+          "backend-metal",
+          "backend-policy",
           "backend-ports",
+          "backend-services",
+          "backend-vulkan",
           "composition",
           "contracts",
-          "evidence"
+          "evidence",
+          "runtime"
         ]
       },
       "evidence": {
@@ -145,7 +150,8 @@
         ],
         "mayImport": [
           "backend-common",
-          "backend-interface",
+          "backend-adapter",
+          "backend-ports",
           "contracts"
         ]
       },
@@ -155,8 +161,11 @@
         ],
         "mayImport": [
           "backend-common",
-          "backend-interface",
+          "backend-adapter",
+          "backend-ports",
           "backend-metal",
+          "backend-policy",
+          "backend-services",
           "compiler",
           "contracts",
           "runtime"
@@ -168,7 +177,10 @@
         ],
         "mayImport": [
           "backend-common",
-          "backend-interface",
+          "backend-adapter",
+          "backend-ports",
+          "backend-policy",
+          "backend-services",
           "backend-vulkan",
           "compiler",
           "contracts",
@@ -184,7 +196,10 @@
         "mayImport": [
           "backend-common",
           "backend-d3d12",
-          "backend-interface",
+          "backend-adapter",
+          "backend-policy",
+          "backend-ports",
+          "backend-services",
           "compiler",
           "contracts",
           "core",
@@ -192,17 +207,53 @@
           "runtime"
         ]
       },
-      "backend-interface": {
+      "backend-adapter": {
         "globs": [
-          "src/backend/*.zig"
+          "src/backend/backend_runtime_telemetry.zig",
+          "src/backend/backend_telemetry.zig",
+          "src/backend/dawn_delegate_backend.zig"
         ],
         "mayImport": [
           "backend-common",
           "backend-d3d12",
-          "backend-interface",
+          "backend-adapter",
           "backend-metal",
+          "backend-policy",
           "backend-ports",
+          "backend-services",
           "backend-vulkan",
+          "contracts",
+          "core",
+          "full",
+          "native",
+          "runtime"
+        ]
+      },
+      "backend-policy": {
+        "globs": [
+          "src/backend/backend_policy.zig"
+        ],
+        "mayImport": [
+          "backend-policy",
+          "contracts"
+        ]
+      },
+      "backend-services": {
+        "globs": [
+          "src/backend/dropin_*.zig",
+          "src/backend/metal_package_pipeline_cache.zig",
+          "src/backend/webgpu_backend*.zig"
+        ],
+        "mayImport": [
+          "backend-common",
+          "backend-d3d12",
+          "backend-adapter",
+          "backend-metal",
+          "backend-policy",
+          "backend-ports",
+          "backend-services",
+          "backend-vulkan",
+          "compiler",
           "contracts",
           "core",
           "full",
@@ -217,7 +268,6 @@
         "mayImport": [
           "app",
           "backend-common",
-          "backend-interface",
           "backend-ports",
           "contracts",
           "core",
@@ -231,7 +281,7 @@
           "src/core/**"
         ],
         "mayImport": [
-          "backend-interface",
+          "backend-services",
           "compiler",
           "contracts",
           "core",
@@ -244,7 +294,7 @@
         ],
         "mayImport": [
           "backend-common",
-          "backend-interface",
+          "backend-services",
           "contracts",
           "core",
           "full",
@@ -267,7 +317,8 @@
           "src/native/**"
         ],
         "mayImport": [
-          "backend-interface",
+          "backend-policy",
+          "backend-services",
           "compiler",
           "contracts",
           "core",
@@ -281,8 +332,10 @@
           "src/dropin/**"
         ],
         "mayImport": [
-          "backend-interface",
+          "backend-policy",
+          "backend-services",
           "compiler",
+          "contracts",
           "core",
           "dropin",
           "full",
@@ -295,9 +348,9 @@
           "src/cli/**"
         ],
         "mayImport": [
-          "backend-interface",
           "cli",
           "command",
+          "composition",
           "contracts",
           "core",
           "full",
@@ -312,8 +365,8 @@
           "src/plan/**"
         ],
         "mayImport": [
-          "backend-interface",
           "cli",
+          "composition",
           "contracts",
           "plan",
           "quirk",
@@ -335,8 +388,10 @@
           "src/compat/**"
         ],
         "mayImport": [
-          "backend-interface",
-          "compatibility"
+          "backend-adapter",
+          "backend-services",
+          "compatibility",
+          "contracts"
         ]
       },
       "integrations": {
@@ -663,9 +718,9 @@
       },
       "src/app/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "bdf2d16b9620f8ad654507c4ee0bc6f236e5bfeaaa433095e3125b3d944cbc96",
+        "moduleSha256": "887eb0415ddc9c97ccbda68e21214ecf598508093404bf88c719229c47e02c90",
         "reason": "Keep: reachable app implementation shared by 7 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/app/normalize.zig": {
         "decision": "Keep",
@@ -675,9 +730,9 @@
       },
       "src/app/prepare.zig": {
         "decision": "Keep",
-        "moduleSha256": "ea977ea6c4b36461bd92c09dda5aad82e3579c1dfa71ccf54c9022173cf81b24",
-        "reason": "Keep: reachable app implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "68438c67e37c11a8916abf40995ec2db4e90caaf087b1921b19fe5a5c0953bfe",
+        "reason": "Keep: reachable app implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/app/request.zig": {
         "decision": "Keep",
@@ -687,9 +742,9 @@
       },
       "src/app/runner.zig": {
         "decision": "Keep",
-        "moduleSha256": "468a5e64d55734eb98aaa2471603158f08fb3fbe7fc9526f0e6d82ab8fcc5a39",
-        "reason": "Keep: reachable app implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "4bfc6e2bfac42048cc025aae28087ec4e5224aa5aa9570c736c4466f69fec6da",
+        "reason": "Keep: reachable app implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/app/schedule.zig": {
         "decision": "Keep",
@@ -715,47 +770,29 @@
         "reason": "Keep: reachable app implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
-      "src/backend/backend_iface.zig": {
-        "decision": "Keep",
-        "moduleSha256": "4ee9aca2658794687a7308729acfdc876daf71ee10215b17795a53a5f6d8960c",
-        "reason": "Keep: reachable backend implementation shared by 9 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
       "src/backend/backend_policy.zig": {
         "decision": "Keep",
-        "moduleSha256": "3973fb1beda7b5909627706dc55e936c12d3b55865b1e2d35f2f6e6a5ca31ec1",
+        "moduleSha256": "4f77eb6695a57ee565f19ca70b48a378d8c8a679083a2d47f20daf1581c3b8b0",
         "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/backend/backend_registry.zig": {
-        "decision": "Keep",
-        "moduleSha256": "ecc20731a3986e89c091a43641cd8d5889e281ba45c8a832adb9b042d09b766b",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/backend/backend_runtime.zig": {
-        "decision": "Keep",
-        "moduleSha256": "5885468a05cffee850a13fb8c0b4a2dd60a63c771f63f554236776c8323b70b0",
-        "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/backend_runtime_telemetry.zig": {
         "decision": "Keep",
-        "moduleSha256": "8f32ebe387b7ef156e01a09009a4dfa2e043f7d54f6983ec7ea2627bd6e542ac",
-        "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "d06fc2a47d051226759c89b591cfefa95636a369289575fbdb1949c2b43f2489",
+        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/backend_telemetry.zig": {
         "decision": "Keep",
-        "moduleSha256": "9aa685520eab579d8d6215913e7fa2dbd436745b1e94eaf41a48daa7cd6e1a96",
-        "reason": "Keep: reachable backend implementation shared by 5 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "18b9ba02c0bebc509c3eb211b857047cb6e1e7c938c31c34ef392d7896b4648f",
+        "reason": "Keep: reachable backend implementation shared by 4 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/common/artifact_policy.zig": {
         "decision": "Keep",
-        "moduleSha256": "a045f7c433103adbfd3e5ad2cd4c2bf1e5ea1ee4e3ce14196e4fe5f9277c72a8",
+        "moduleSha256": "0758dc91c1316917a899a74023c2edf9289fd12205880c158a2f541c7bd6cff6",
         "reason": "Keep: reachable backend implementation shared by 4 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/common/artifact_state.zig": {
         "decision": "Keep",
@@ -777,9 +814,9 @@
       },
       "src/backend/common/submit_count_policy.zig": {
         "decision": "Keep",
-        "moduleSha256": "f578a6fb36973ae0eeea36d16f1fc1ccb9e74f1eeeb269a66e8b42dcd236a296",
+        "moduleSha256": "afe4bf4642090279c74d5ba2e619575e06462a57034ac44f86858fa2385627e6",
         "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/common/timing.zig": {
         "decision": "Keep",
@@ -801,9 +838,9 @@
       },
       "src/backend/d3d12/commands/d3d12_dispatch.zig": {
         "decision": "Keep",
-        "moduleSha256": "93d6b1559823baae96a28f5a5f0d28039ec956691b20ad71f4dfaa634a58bd43",
+        "moduleSha256": "18ec75281197a4f28e7e11aa9be07f9c2f182ab08ca65c9f03dd5624b242ccd2",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/d3d12/commands/d3d12_gpu_timestamps.zig": {
         "decision": "Keep",
@@ -825,9 +862,9 @@
       },
       "src/backend/d3d12/commands/d3d12_render.zig": {
         "decision": "Keep",
-        "moduleSha256": "e909f014ba4a49d384fd6d31ad675967f52362cd72a7bb529576397bee81086b",
+        "moduleSha256": "9b16d643da4c68d2e533e2b126d386e42b016a437d4df20f02df83c10f312eb9",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/d3d12/commands/d3d12_render_bind_groups.zig": {
         "decision": "Keep",
@@ -879,9 +916,9 @@
       },
       "src/backend/d3d12/d3d12_native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "49afc278bfcac1ca2438e40a25dddd921b79f987e13ddfc42cc7c24e7492fcbd",
+        "moduleSha256": "388bfecbe10751a79f1ca24c976c875449f32f4b3b57b4a36e46927b9ced9362",
         "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/d3d12/d3d12_query_set.zig": {
         "decision": "Keep",
@@ -891,9 +928,9 @@
       },
       "src/backend/d3d12/d3d12_runtime_compute.zig": {
         "decision": "Keep",
-        "moduleSha256": "b22bf6cd74d5c39c79ef262efb9c13b425ef177c0b899f07ce3226cbe28fa848",
+        "moduleSha256": "dc951ca863244a31b073e9b0092a62059d331da535118879a8653cbe40417269",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/d3d12/d3d12_runtime_upload.zig": {
         "decision": "Keep",
@@ -903,9 +940,9 @@
       },
       "src/backend/d3d12/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "28a9ff587d2021a0cc540d1e84474ad10636756dc263c3e7ec20a19a210605a3",
-        "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "bf288144e2288226112682335b6cb21eb7ed6d335310d2825410043da6b389d1",
+        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/d3d12/resources/d3d12_depth_stencil.zig": {
         "decision": "Keep",
@@ -939,9 +976,9 @@
       },
       "src/backend/dawn_delegate_backend.zig": {
         "decision": "Keep",
-        "moduleSha256": "b616124e4c00921829f2833094b284d680c4d0046bc7d58b4c81c1e359ee328c",
-        "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "0a8afea0b4ae7837f91446cccaaff14a24b3d4454afba52b948507857b35ae08",
+        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/dropin_capabilities.zig": {
         "decision": "Keep",
@@ -999,9 +1036,9 @@
       },
       "src/backend/metal/backend_execute.zig": {
         "decision": "Keep",
-        "moduleSha256": "f4c383b1dc8ac8cac5a21263d9c22138272c4191e1f36801f4e8e2e883ece424",
+        "moduleSha256": "84c165580d538ae4695d989e4fa6e3a0862f8f3c5c87889461bc502234ebac35",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/metal_async_runtime.zig": {
         "decision": "Keep",
@@ -1029,9 +1066,9 @@
       },
       "src/backend/metal/metal_copy_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "036c1aac1fcf12be8a27c80172cff95c7c387337d54fb93ad5d117aa2c0785a2",
+        "moduleSha256": "cf15650d6c7f278e090aaa86256a0f7a8510355ed6662edd0dac883a699ac134",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/metal_deferred_release.zig": {
         "decision": "Keep",
@@ -1041,9 +1078,9 @@
       },
       "src/backend/metal/metal_dispatch_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "2d889ce19a5112d4b3b0b4a3d5944b9c2703e6e91bb46d49748143246978f6a6",
+        "moduleSha256": "7d09ca16daf5533f2fad3f273c4d6c5d1d32f3ec6e5007e549f141ef097be02c",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/metal_external_texture.zig": {
         "decision": "Keep",
@@ -1059,21 +1096,21 @@
       },
       "src/backend/metal/metal_kernel_dispatch.zig": {
         "decision": "Keep",
-        "moduleSha256": "e1be711ec4daca7e2ac33b405a9e6f3ccf745fa24607f0b66a88ec170648c6a8",
+        "moduleSha256": "470f65ad0a91f3f48d05dc5435f8cffd9815ad4450ffc21f8a14a47f4e47bd20",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/metal_native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "091da16c47eef0155407a4973a96628deb6862e601a27b644b871a0ebe8989b5",
+        "moduleSha256": "d8ff6059929c12a72efe5b1b268cfb41a1bff014c1d094850e7d4103992ba03c",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/metal_pipeline_cache.zig": {
         "decision": "Keep",
-        "moduleSha256": "d0e92a5260fca44045f30e681c4c78e716b0a6bfa069da3ec8fb7c497a1ddd82",
+        "moduleSha256": "b6ef539e5c52841fb677ab19b8475f821e11813a4b41d37d851851ab7a3c6502",
         "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/metal_render_state_bridge_decls.zig": {
         "decision": "Keep",
@@ -1095,15 +1132,15 @@
       },
       "src/backend/metal/metal_runtime_queue_ops.zig": {
         "decision": "Keep",
-        "moduleSha256": "2dbb91e8f67d4ebce1cde617379ce9f15ff3f3620a4256f6527f0318ea757304",
+        "moduleSha256": "d518ac122e910e95168866a145db30473b830b31c7df593fb3f4fec7f115b3c1",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/metal_runtime_render_ops.zig": {
         "decision": "Keep",
-        "moduleSha256": "eb4ea1f2de10eb46ab188dfbf187655be5b2ac97b730d5317e2970372d91709f",
+        "moduleSha256": "2a007ae7a841c0fbc4bbb5087d3a487a76c0391b11579fe4043761a43b79ac63",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/metal_runtime_resources.zig": {
         "decision": "Keep",
@@ -1119,15 +1156,15 @@
       },
       "src/backend/metal/metal_upload.zig": {
         "decision": "Keep",
-        "moduleSha256": "5856bc7fbe2a0b337dc461c58fbbc3e54491dffd072501f988de7c1765487694",
+        "moduleSha256": "9f2ac9029ed689ca64583b23b834193148876ba30e840a7cf1d358f31110c61e",
         "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "33002a90b3239117fce1c24ce812a753e3264627e65ffb952da7be4fb5fa0812",
+        "moduleSha256": "af9f35515b187284807e5b238d94c320976c7d405be7f1922342a28cc946f509",
         "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/metal/render_state.zig": {
         "decision": "Keep",
@@ -1141,12 +1178,6 @@
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
-      "src/backend/mod.zig": {
-        "decision": "Keep",
-        "moduleSha256": "cdf73f16414d48e09c692f37ba651e1affb3af87093d7f3f3b3d785274fe9012",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
       "src/backend/ports/capture.zig": {
         "decision": "Keep",
         "moduleSha256": "7c5f6e7f189dae8755629e0a0fee5e18d2dd8562f5da716bc162b4b7eecfa5e9",
@@ -1155,27 +1186,39 @@
       },
       "src/backend/ports/compute.zig": {
         "decision": "Keep",
-        "moduleSha256": "62d51cae0885adfb864a9a95b31e150bf591c9428389d4512e8671ecf166f1fc",
-        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "0e2212c3a962dd8f032450dc6dabbf77c6a5f86e84bf2f399a9d6a7787e219de",
+        "reason": "Keep: reachable backend implementation shared by 6 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/ports/factory.zig": {
         "decision": "Keep",
-        "moduleSha256": "330fcd84702b7dfefdd12a6e5196c02436dc8176e8d145212e75df65c90c2972",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "1dd0a6f2832e16ceeff9ca10fda421bb0fbbc036d549378b17a6df61f70e6f26",
+        "reason": "Keep: reachable backend implementation shared by 4 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
+      },
+      "src/backend/ports/lifecycle.zig": {
+        "decision": "Keep",
+        "moduleSha256": "e651a693d0c42527ea0d58e6e26f2f658a24cc9abce20fc5e9f5fe537b5063df",
+        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/ports/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "0907f04122efd6e7bb32f83701e60f0b1bb87ac268da4a5b11eac2ed64417a1a",
+        "moduleSha256": "9f3200194302538506c3cb915d23dd18304476c14247fa5c3eceee611a90d447",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
+      },
+      "src/backend/ports/provider_adapter.zig": {
+        "decision": "Keep",
+        "moduleSha256": "490402c1aeb59d402dc542d2163f9d76739c8ab50e43c04a054dd4ec2986befd",
+        "reason": "Keep: reachable backend implementation shared by 5 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/ports/queue.zig": {
         "decision": "Keep",
-        "moduleSha256": "29dea5680f0ffc6cb9b9c37d66a7ad6dac0c2fde4ca6f7cbeb3bb7242a7ea616",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "2db7cdd4a756c65b3a36b035f0c6e250dbd43ba4249460c52133ab26792eeca6",
+        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/ports/readback.zig": {
         "decision": "Keep",
@@ -1185,33 +1228,39 @@
       },
       "src/backend/ports/render.zig": {
         "decision": "Keep",
-        "moduleSha256": "08053971012d730175a8c6611289c2e2e49d9333e117059f4a5880e8a1f267e3",
+        "moduleSha256": "241a19dcfb17a14559a404e94c85513b1c76ee7e2bc69c74effd214797b17c6f",
         "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
+      },
+      "src/backend/ports/resource.zig": {
+        "decision": "Keep",
+        "moduleSha256": "d2ef77a4d4e6909da961ef6f75d8448ae1b9836f183a88ba92cf41fd6f8e938e",
+        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/ports/spatial.zig": {
         "decision": "Keep",
-        "moduleSha256": "f908a359c46abf794207c536f0c5df6a3cafb480b0de1fcdd61ab3d4649ed318",
+        "moduleSha256": "57b7d76220f2d72158435a88c847a2795aad49a4044af495793bbfd5ceb3a1c7",
         "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
+      },
+      "src/backend/ports/surface.zig": {
+        "decision": "Keep",
+        "moduleSha256": "9b1ff5e6d9b2b2876386a68cf475d775117bc61381e825b1ea7fa914cd5d454c",
+        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/ports/telemetry.zig": {
         "decision": "Keep",
-        "moduleSha256": "7f43b62ab406f743bb33b84c33be535d6177267e7c48daf92f65a24ca2e51562",
-        "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "b790d7aa946cd69a41cb7c624d0d8c39a72d099ee40ba9779c607c9ffbdb71d4",
+        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/ports/transfer.zig": {
         "decision": "Keep",
-        "moduleSha256": "603342882fa5deb814e02bd1323eeda63a37b2b364dd574a8f4ab57f4396ac41",
-        "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
-      },
-      "src/backend/runtime_types.zig": {
-        "decision": "Keep",
-        "moduleSha256": "2005560a9889a5ee9fcd5477dc7828ad9bbb286aa17964b0370e4f7fe4acbdd1",
-        "reason": "Keep: reachable backend implementation shared by 37 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "5ec70c607520115db27e75962866ce865b864d29f3dc92c15eba78c15b558a04",
+        "reason": "Keep: reachable backend implementation shared by 5 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/vulkan/artifact_emit.zig": {
         "decision": "Keep",
@@ -1221,21 +1270,21 @@
       },
       "src/backend/vulkan/backend_execute.zig": {
         "decision": "Keep",
-        "moduleSha256": "344eb37062439d568395088443f718f1d39c27ad580c9756fdc5de23d02ff0cc",
+        "moduleSha256": "9dfb871476c2b22ee12c45cc1cb83407eb3ced64c0c42875c40c26dfe17d14e5",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/vulkan/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "3a9457f04eb277a48965e1dc2ae519c629e485d9aa31176f57cdf478255da33b",
-        "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-09"
+        "moduleSha256": "e77abd425e64c8b6bdcaa60318f03ffb80aea70460122b9a5c91e1e1a21521a3",
+        "reason": "Keep: reachable backend implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/vulkan/native_runtime.zig": {
         "decision": "Keep",
-        "moduleSha256": "2b7f0c535637c3c5e2cc89d0265e0ae106a84fed4a4746097e9d180d4870bd73",
+        "moduleSha256": "640922b2cc19ec93fc1dcf484d78e06d179975031b4730c13e2517d5f8bf2e99",
         "reason": "Keep: owns Vulkan device/queue runtime lifetime and synchronization; adjacent resource, pipeline, upload, render, and surface capsules already own the separable domains.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/vulkan/vk_adapter_probe.zig": {
         "decision": "Keep",
@@ -1245,9 +1294,9 @@
       },
       "src/backend/vulkan/vk_async_dispatch.zig": {
         "decision": "Keep",
-        "moduleSha256": "e32e1735285e791b2580778c8516632a615398c43dc456b05f9b6f474f6d8731",
+        "moduleSha256": "4ded67cb58bca706a4dbc54bfc682626692a3a0539e52a43764d3afbdff6911b",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/vulkan/vk_async_probes.zig": {
         "decision": "Keep",
@@ -1281,9 +1330,9 @@
       },
       "src/backend/vulkan/vk_device.zig": {
         "decision": "Keep",
-        "moduleSha256": "828e81680f50b7150dce0d058ba53651f7cf06d01ab3898e52ad5115b2ab0b76",
+        "moduleSha256": "9d2595b83264183ec620595446f7e6a70025c5b6a506f481327f97080ed2d7c3",
         "reason": "Keep: reachable backend implementation shared by 11 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-runtime-correctness-review/2026-08-16"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/vulkan/vk_device_caps.zig": {
         "decision": "Keep",
@@ -1299,9 +1348,9 @@
       },
       "src/backend/vulkan/vk_dispatch_repeat.zig": {
         "decision": "Keep",
-        "moduleSha256": "902234d9bec83abace340322ad41678c02b5c7930f10b9399c8dac03f2be05a5",
+        "moduleSha256": "4541c7f4dbeb8100df0b7418ea1d56d8282ad540f39c121992110f3543bcf6ba",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/vulkan/vk_feature_caps.zig": {
         "decision": "Keep",
@@ -1419,9 +1468,9 @@
       },
       "src/backend/vulkan/vk_upload.zig": {
         "decision": "Keep",
-        "moduleSha256": "b5743dadbfa1bb182018bd7df296f939bbd33042bc5f40cfd5a190844ef594c2",
+        "moduleSha256": "c64cbafc0d16edf78baae8de42a72df8d6c329a7453bc406fe3f2487c3c46fd4",
         "reason": "Keep: cohesive Vulkan upload staging and submission policy with backend-native synchronization semantics.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/vulkan/vulkan_errors.zig": {
         "decision": "Keep",
@@ -1449,9 +1498,9 @@
       },
       "src/backend/webgpu_backend.zig": {
         "decision": "Keep",
-        "moduleSha256": "193a716cd5ede4961c327e8e2a076d1f34126c04635c9ce2e10b53f47c83fb67",
-        "reason": "Keep: reachable backend implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "c4dfb504ef636d8f4fb412b544f73a5ed7c6c43324d218d4fb3d339684731938",
+        "reason": "Keep: compatibility backend adapter whose lifecycle, operations, support, and state already have named sibling owners; only composition and backend-local code may consume it.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/webgpu_backend_lifecycle.zig": {
         "decision": "Keep",
@@ -1467,15 +1516,15 @@
       },
       "src/backend/webgpu_backend_support.zig": {
         "decision": "Keep",
-        "moduleSha256": "331410ac96b6bd56e530b6c059a04cad53e38273f8658538f5583577ea720c70",
+        "moduleSha256": "052880a06fddaf08a222da219f2f9ade1710236bbc8132c73782b150e3989529",
         "reason": "Keep: reachable backend implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/backend/webgpu_backend_types.zig": {
         "decision": "Keep",
-        "moduleSha256": "98764869941f41f5c3732c7b55ba3b5bd8fb6510b6c517b1360d79bd56c1b118",
+        "moduleSha256": "b3d7d79e62d1f41f99413cacb5e87c23407e9effe59991a6efa583540dfb2fa9",
         "reason": "Keep: reachable backend implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/cli/doe_plan_executor_cli.zig": {
         "decision": "Keep",
@@ -1563,9 +1612,9 @@
       },
       "src/cli/runtime_cli.zig": {
         "decision": "Keep",
-        "moduleSha256": "a4475273b777ee4a827f8ad13e63287f27dee768f5f561f68468076f9c82bea9",
-        "reason": "Keep: process-facing runtime orchestration after output-oracle execution and comparison moved to its runtime owner.",
-        "reviewer": "codex-output-oracle-module/2026-08-10"
+        "moduleSha256": "a40748e5e46ee2dc03ffce44d11ac35b1e73e4778d62b6b702abc5bb833f5d78",
+        "reason": "Keep: reachable cli implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/cli/runtime_cli_args.zig": {
         "decision": "Keep",
@@ -1575,9 +1624,9 @@
       },
       "src/cli/runtime_cli_artifacts.zig": {
         "decision": "Keep",
-        "moduleSha256": "29a18a63bea39ea2b5b391a22d7a94888944956c9c25532f6feffa7ec728c369",
+        "moduleSha256": "ae8fed5069e32b78708da6961eb13fb49e92daf63c347a7de3a2202a0a4f843b",
         "reason": "Keep: reachable cli implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/cli/runtime_cli_inputs.zig": {
         "decision": "Keep",
@@ -1647,9 +1696,9 @@
       },
       "src/compat/webgpu_ffi.zig": {
         "decision": "Keep",
-        "moduleSha256": "5dcae5f5fcfc70fd1df34148bccc8f910d1df014f50fabcf32eaacbd875ac049",
+        "moduleSha256": "da30a9280e071ce48f55463540bbdcf0ef6ec5960fbc3e62b3c323ef801b8d4c",
         "reason": "Keep: reachable compat implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/compiler/mod.zig": {
         "decision": "Keep",
@@ -2625,9 +2674,9 @@
       },
       "src/composition/backend_factory.zig": {
         "decision": "Keep",
-        "moduleSha256": "51268e7e89bae409b193bb53d84034cd0da112306a3bf20feb904d079649b1bd",
+        "moduleSha256": "cffa0427f9c323f6871811aeef85fc17531e15b28feabb1e25eb11ccbe61f47c",
         "reason": "Keep: reachable composition implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/composition/cli.zig": {
         "decision": "Keep",
@@ -2641,11 +2690,17 @@
         "reason": "Keep: reachable composition implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/composition/execution_session.zig": {
+        "decision": "Keep",
+        "moduleSha256": "7c54fcc9063059c9daea6dafac110361d759a52586543f422b1c0b4aeda2b737",
+        "reason": "Keep: reachable composition implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
+      },
       "src/composition/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "223eadd6c599b6e8302f506aaa28e8cefe0158e0b9f7776937fb17d609b86550",
-        "reason": "Keep: reachable composition implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "097416e31d92492bd49241c1e04ecafcb662ee10f81b6517f9b3d499399f0c7a",
+        "reason": "Keep: reachable composition implementation shared by 3 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/composition/native.zig": {
         "decision": "Keep",
@@ -2661,9 +2716,9 @@
       },
       "src/composition/runtime_factory.zig": {
         "decision": "Keep",
-        "moduleSha256": "1e062020e117e415cb8691909614644d4b8b4eafd995c34f18a82dc506690ba1",
+        "moduleSha256": "ac09dd7e4659eb4847b8859ccec85b1c8bb1ea441a1b68e77a334b99b1733e04",
         "reason": "Keep: reachable composition implementation shared by 5 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/contracts/artifact.zig": {
         "decision": "Keep",
@@ -2719,6 +2774,12 @@
         "reason": "Keep: reachable neutral contract owner at src/contracts/evidence.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
       },
+      "src/contracts/evidence_observer.zig": {
+        "decision": "Keep",
+        "moduleSha256": "20faaa8af610f9e8e52c0be20c6d28994c692299c6feb03323f9852216738e33",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/evidence_observer.zig.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
+      },
       "src/contracts/exactness.zig": {
         "decision": "Keep",
         "moduleSha256": "b6f19cb7c16c52470ed9536ff5b631e7a5ea399194b10d874e0a70d849928c46",
@@ -2733,9 +2794,9 @@
       },
       "src/contracts/execution_report.zig": {
         "decision": "Keep",
-        "moduleSha256": "6ef6f710174cac6306f2569362d62f280c3e330529d96f5eb5c7af453a22b5a4",
+        "moduleSha256": "eeaf596815d1830d140fae8038e817689e78613c04b31df62b7dfc607b96aeec",
         "reason": "Keep: reachable neutral contract owner at src/contracts/execution_report.zig.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/contracts/identity.zig": {
         "decision": "Keep",
@@ -2745,9 +2806,9 @@
       },
       "src/contracts/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "19abc481aa54fea3972663511afba1fdd525d597e2e6d1b0f56765c2904ad4d8",
+        "moduleSha256": "4b67f9855f3057fba510b1536c6f0a3f8f06e64117dbe3131c38550a763c9959",
         "reason": "Keep: reachable neutral contract owner at src/contracts/mod.zig.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/contracts/model/model_async_types.zig": {
         "decision": "Keep",
@@ -2847,9 +2908,9 @@
       },
       "src/contracts/prepared_operation.zig": {
         "decision": "Keep",
-        "moduleSha256": "87bd552df85df32e4b97448cad6affd157ff2beab29d5e28f89b8753f2fa0e56",
+        "moduleSha256": "baafeca20611a87d82deca900f2e847b1857addc6681751334c34d5655fcde2b",
         "reason": "Keep: reachable neutral contract owner at src/contracts/prepared_operation.zig.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/contracts/primitives/byte_scan.zig": {
         "decision": "Keep",
@@ -2868,6 +2929,24 @@
         "moduleSha256": "ffe74d5021ba758379945bbdda15cdd033b97541d047ccd67871c477e6b4e082",
         "reason": "Keep: reachable neutral contract owner at src/contracts/render_command.zig.",
         "reviewer": "codex-recomposition-review/2026-08-08"
+      },
+      "src/contracts/runtime_configuration.zig": {
+        "decision": "Keep",
+        "moduleSha256": "e307fdd8030b1ff5e8b6fbaa57623b0ff07090ea620abe8241765cdba1752615",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/runtime_configuration.zig.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
+      },
+      "src/contracts/runtime_telemetry.zig": {
+        "decision": "Keep",
+        "moduleSha256": "e9e910fd2441e86b3916a48f4d02ac290ba81f92690da8dfc5d7d9ef179e436f",
+        "reason": "Keep: reachable neutral contract owner at src/contracts/runtime_telemetry.zig.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
+      },
+      "src/contracts/runtime_types.zig": {
+        "decision": "Keep",
+        "moduleSha256": "78c0f8da356755bc78bbc02427d3e4db9b1861d23b1c6b4484f9c9267c2fd33a",
+        "reason": "Keep: canonical aggregation of neutral execution, configuration, and queue-policy types after removal of the backend-owned compatibility duplicate.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/contracts/semantic.zig": {
         "decision": "Keep",
@@ -3081,9 +3160,9 @@
       },
       "src/core/command_dispatch.zig": {
         "decision": "Keep",
-        "moduleSha256": "0a522f855e73b8db8ca5196f92e47a94268aef8e3d8f04249918baab92a4c246",
-        "reason": "Keep: reachable core implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "dfabcd6241796592e4a3833185c89733a251e0999187fb2524fa0ac0a69b7bb8",
+        "reason": "Keep: reachable core implementation shared by 2 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/core/compute/dispatch_preconditions.zig": {
         "decision": "Keep",
@@ -3183,9 +3262,9 @@
       },
       "src/dropin/dropin_runtime_config.zig": {
         "decision": "Keep",
-        "moduleSha256": "196da87a83ede5c4185be7e5f440d6dab4148458ab21a976f4c139b7412c24da",
+        "moduleSha256": "88ad277abb8b4c4a498aab2b44291d2663d427b8ad9f864a233cf0235ae0361f",
         "reason": "Keep: reachable dropin implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/dropin/dropin_symbol_ownership.zig": {
         "decision": "Keep",
@@ -3255,15 +3334,15 @@
       },
       "src/evidence/port.zig": {
         "decision": "Keep",
-        "moduleSha256": "cef19523f0e85cfa5c78ab846dfff5656ea81a2be97bcec09a16e7bfe3aa7c9e",
+        "moduleSha256": "b608345fe3e4dacaf0fee8081537810d0c7a4885b51ef00bb144ca7fd1eb4c29",
         "reason": "Keep: reachable evidence implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/evidence/receipt.zig": {
         "decision": "Keep",
-        "moduleSha256": "6a35e2e215089bfcbc84c09c5809bbfb1c69abf12341e2d0f8c8cabf612ed403",
+        "moduleSha256": "ca4a7de1430d12520480ea74ec0b881ff7bfe74b938a9c54f405cf570e792bc1",
         "reason": "Keep: reachable evidence implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/evidence/replay.zig": {
         "decision": "Keep",
@@ -3273,21 +3352,21 @@
       },
       "src/evidence/trace.zig": {
         "decision": "Keep",
-        "moduleSha256": "8853012bfea56b0e075b38a616c08d780c28d6a3ebc7f537d961f53d1a07703b",
+        "moduleSha256": "b244b7a3e240e438cceb92aae6012e9d3179d444d642ece9133e49bd3bdb2227",
         "reason": "Keep: reachable evidence implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/full/command/wgpu_commands.zig": {
         "decision": "Keep",
-        "moduleSha256": "76f128ff646cbd0a21766ecd1d9ed8510df6eaf55a3fcd0f8c5b9cb3ded2e07e",
+        "moduleSha256": "468773a6eaf18deddf97858fce3dc275e0eefbfc1b0a426acaa0c7cbb840b589",
         "reason": "Keep: reachable full implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/full/command_dispatch.zig": {
         "decision": "Keep",
-        "moduleSha256": "443c5ccef29a16d7b9cf103fcaa619e92cd770a09f48763064df5ee30c0fb281",
-        "reason": "Keep: reachable full implementation shared by 3 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "moduleSha256": "b20e5b70783b4622727706add6e66e1f61ce987e4f9acfc58e4262c178ccee3c",
+        "reason": "Keep: reachable full implementation shared by 2 production consumers with no conflicting ownership signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/full/lifecycle/wgpu_async_diagnostics_command.zig": {
         "decision": "Keep",
@@ -3459,9 +3538,9 @@
       },
       "src/mod.zig": {
         "decision": "Keep",
-        "moduleSha256": "ce86d8061f06a97169bfedca38af874dc14f651389f835e8d90f4e1b2ed6cae9",
+        "moduleSha256": "52f74277382843b47dc04b47becf9ebd7509dba302359876f99dc0a96b8aaedb",
         "reason": "Keep: reachable package-root implementation with a distinct named responsibility and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/native/api/doe_native_api_core_exports.zig": {
         "decision": "Keep",
@@ -3561,9 +3640,9 @@
       },
       "src/native/lifecycle/doe_instance_device_native.zig": {
         "decision": "Keep",
-        "moduleSha256": "752d7f68c886a553cc40c9082610d34df69115c6298a6f74fbbd3c4d52d347c0",
+        "moduleSha256": "9522e68c5cc3b4865677f9633c330ada426a1db0a3ec5d629062d12b177eb717",
         "reason": "Keep: reachable native implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-vulkan-adapter-provenance/2026-08-10"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/native/mod.zig": {
         "decision": "Keep",
@@ -3855,9 +3934,9 @@
       },
       "src/plan/doe_plan_executor.zig": {
         "decision": "Keep",
-        "moduleSha256": "15ef382b452094004d0860b0dbdf45eb248ce68bf07e53b5f0d4f2238b7fc8bb",
+        "moduleSha256": "5c279830116f0e19f46f4f644600cd859355ecac02abd2a8c32925b55ed10c69",
         "reason": "Keep: reachable plan implementation shared by 2 production consumers with no conflicting ownership signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/plan/mod.zig": {
         "decision": "Keep",
@@ -3975,15 +4054,15 @@
       },
       "src/runtime/execution.zig": {
         "decision": "Keep",
-        "moduleSha256": "cc88c3f9d7f10b6528569dc5dd99d7b65d0fd9965ad8cf43e129205d5bbc23b6",
+        "moduleSha256": "ce1428a615731a64a3edaad6db490f2e32930ca13c499722c739264ec4ba46e1",
         "reason": "Keep: reachable runtime implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-recomposition-review/2026-08-08"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/runtime/execution_receipt.zig": {
         "decision": "Keep",
-        "moduleSha256": "b27af78509c25e9664dd4906b2774ac3998a17265c2764c736b1c513c916d33c",
+        "moduleSha256": "0ff5dd77bec0e5167e3ca5e917bbb382a3dfe21868fbb690560af0dff353c4f0",
         "reason": "Keep: reachable runtime implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
-        "reviewer": "codex-dry-recomposition/2026-08-09"
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/runtime/mod.zig": {
         "decision": "Keep",
@@ -4059,9 +4138,9 @@
       },
       "src/runtime/output_oracle.zig": {
         "decision": "Keep",
-        "moduleSha256": "01a3e328cd0c125b727958ddbad02783add0883335ccce1848403debd52de03f",
-        "reason": "Keep: owns output-oracle execution, independent reference verification, and full-buffer comparison outside the CLI boundary.",
-        "reviewer": "codex-output-oracle-module/2026-08-10"
+        "moduleSha256": "39ccc3f03cdc23a9079d9b3d449afaddf568f100307f50382a293eac9770941d",
+        "reason": "Keep: reachable runtime implementation with private behavior tests and no merge, elevation, recomposition, or deletion signal.",
+        "reviewer": "codex-hexagonal-migration/2026-08-22"
       },
       "src/runtime/pipeline_cache_integration.zig": {
         "decision": "Keep",

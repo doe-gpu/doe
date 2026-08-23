@@ -6,6 +6,7 @@ const webgpu = @import("../../src/compat/webgpu_ffi.zig");
 const vulkan_mod = @import("../../src/backend/vulkan/mod.zig");
 const vulkan_timing = @import("../../src/backend/vulkan/vulkan_timing.zig");
 const vulkan_test_support = @import("vulkan_mod_test_support.zig");
+const provider_harness = @import("../support/provider_harness.zig");
 
 fn test_profile() profile.DeviceProfile {
     return .{
@@ -53,7 +54,11 @@ test "vulkan require gpu timestamps reports a real timestamp when supported" {
     if (builtin.os.tag == .macos) return;
 
     const backend = try vulkan_mod.ZigVulkanBackend.init(std.testing.allocator, test_profile(), null);
-    var iface = try backend.as_iface(std.testing.allocator, "test_gpu_timestamps", "test_policy_hash");
+    var iface = provider_harness.ProviderHarness.init(
+        backend.asPorts("test_gpu_timestamps", "test_policy_hash", false),
+        backend,
+        vulkan_mod.destroyContext,
+    );
     defer iface.deinit();
     iface.set_gpu_timestamp_mode(.require);
 

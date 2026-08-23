@@ -5,6 +5,7 @@ const profile = @import("../../src/contracts/model/model_profile.zig");
 const webgpu = @import("../../src/compat/webgpu_ffi.zig");
 const d3d12_mod = @import("../../src/backend/d3d12/mod.zig");
 const d3d12_test_support = @import("d3d12_mod_test_support.zig");
+const provider_harness = @import("../support/provider_harness.zig");
 
 fn test_profile() profile.DeviceProfile {
     return .{
@@ -15,11 +16,15 @@ fn test_profile() profile.DeviceProfile {
     };
 }
 
-test "d3d12 backend iface advertises doe_d3d12 lane identity" {
+test "d3d12 provider ports advertise doe_d3d12 lane identity" {
     if (builtin.os.tag != .windows) return error.SkipZigTest;
 
     const backend = try d3d12_mod.ZigD3D12Backend.init(std.testing.allocator, test_profile(), null);
-    var iface = try backend.as_iface(std.testing.allocator, "test_backend_identity", "test_policy_hash");
+    var iface = provider_harness.ProviderHarness.init(
+        backend.asPorts("test_backend_identity", "test_policy_hash", false),
+        backend,
+        d3d12_mod.destroyContext,
+    );
     defer iface.deinit();
 
     try std.testing.expectEqualStrings("doe_d3d12", @tagName(iface.id));

@@ -1,10 +1,10 @@
 const model = @import("../contracts/command.zig");
-const runtime_types = @import("../backend/runtime_types.zig");
+const execution_contract = @import("../contracts/execution.zig");
 const copy_commands = @import("resource/wgpu_commands_copy.zig");
 const compute_commands = @import("compute/wgpu_commands_compute.zig");
 const texture_commands = @import("resource/wgpu_texture_commands.zig");
 
-pub fn execute(self: anytype, command: model.Command) !?runtime_types.NativeExecutionResult {
+pub fn execute(self: anytype, command: model.Command) !?execution_contract.NativeExecutionResult {
     if (!model.isCoreKind(model.kind(command))) return null;
     return switch (command) {
         .upload => |payload| try copy_commands.executeUpload(self, payload),

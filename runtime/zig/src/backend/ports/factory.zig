@@ -10,6 +10,9 @@ const telemetry_port = @import("telemetry.zig");
 const render_port = @import("render.zig");
 const spatial_port = @import("spatial.zig");
 const capture_port = @import("capture.zig");
+const lifecycle_port = @import("lifecycle.zig");
+const resource_port = @import("resource.zig");
+const surface_port = @import("surface.zig");
 
 pub const PortBundle = struct {
     id: backend_contract.BackendId,
@@ -19,6 +22,9 @@ pub const PortBundle = struct {
     readback: readback_port.ReadbackPort,
     telemetry: telemetry_port.TelemetryPort,
     render: render_port.RenderPort,
+    resource: resource_port.ResourcePort,
+    surface: surface_port.SurfacePort,
+    lifecycle: lifecycle_port.LifecyclePort,
     spatial: spatial_port.SpatialPort,
     capture: ?capture_port.CapturePort = null,
 };

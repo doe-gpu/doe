@@ -1,7 +1,7 @@
 const std = @import("std");
 const backend_ids = @import("../contracts/backend.zig");
 const backend_contract = @import("../contracts/backend.zig");
-const runtime_types = @import("runtime_types.zig");
+const runtime_types = @import("../contracts/runtime_types.zig");
 
 pub const BackendLane = backend_contract.BackendLane;
 pub const UploadPathPolicy = backend_contract.UploadPathPolicy;

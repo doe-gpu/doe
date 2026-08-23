@@ -1,6 +1,6 @@
 const std = @import("std");
 const backend_policy = @import("../../src/backend/backend_policy.zig");
-const runtime_types = @import("../../src/backend/runtime_types.zig");
+const runtime_types = @import("../../src/contracts/runtime_types.zig");
 
 test "backend runtime policy loads local metal lane from config" {
     const loaded = try backend_policy.load_policy_for_lane(

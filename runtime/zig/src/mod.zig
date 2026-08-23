@@ -1,4 +1,8 @@
-pub const backend = @import("backend/mod.zig");
+pub const backend = struct {
+    pub fn ports() type {
+        return @import("backend/ports/mod.zig");
+    }
+};
 pub const app = @import("app/mod.zig");
 pub const composition = @import("composition/mod.zig");
 pub const evidence = @import("evidence/mod.zig");

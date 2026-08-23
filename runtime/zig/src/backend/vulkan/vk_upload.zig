@@ -9,7 +9,7 @@ const vk_compute_sync = @import("vk_compute_sync.zig");
 const vk_device = @import("vk_device.zig");
 const vk_sync = @import("vk_sync.zig");
 const backend_policy = @import("../backend_policy.zig");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 const common_errors = @import("../../contracts/execution.zig");
 const common_timing = @import("../common/timing.zig");
 

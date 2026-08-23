@@ -1,6 +1,6 @@
 const std = @import("std");
 const common_timing = @import("../common/timing.zig");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 const metal_buffer_pool = @import("metal_buffer_pool.zig");
 const metal_runtime_limits = @import("metal_runtime_limits.zig");
 const metal_upload = @import("metal_upload.zig");

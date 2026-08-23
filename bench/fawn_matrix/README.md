@@ -72,10 +72,14 @@ cryptographically reverified by the release-passport gate. The signing environme
 variable contains a private-key path, never private-key contents committed to Git.
 
 `python3 -m pipeline.agent.fawn_matrix_learning_bridge` converts failed samples into a
-deterministic hash-chained DoeLab learning manifest. A signed platform suite becomes
-a promotion event only after its receipt verifies. The physical-runner workflow
-executes the same three workloads on explicitly labeled self-hosted hardware and
-uploads raw evidence without widening its claim scope.
+schema-backed, deterministic, hash-chained DoeLab learning manifest. It clusters
+repeat failures, preserves exact replay selectors, and emits required minimization
+work plus an explicitly unverified investigation candidate. The candidate may move
+only to verification; it cannot mutate runtime policy, promote itself, or support a
+release claim. A signed platform suite becomes a promotion event only after its
+receipt verifies. The physical-runner workflow executes the same three workloads on
+explicitly labeled self-hosted hardware and uploads raw evidence without widening
+its claim scope.
 
 ## Release trust boundary
 

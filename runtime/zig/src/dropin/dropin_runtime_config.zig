@@ -1,6 +1,6 @@
 const std = @import("std");
 const abi_base = @import("../core/abi/wgpu_handle_types.zig");
-const backend_policy = @import("../backend/backend_policy.zig");
+const backend_contract = @import("../contracts/backend.zig");
 const dropin_behavior_policy = @import("dropin_behavior_policy.zig");
 const dropin_proc_manifest = @import("dropin_proc_manifest.zig");
 const dropin_router = @import("dropin_router.zig");
@@ -61,8 +61,8 @@ fn resolveModeFromLane(
     const lane_value = std.process.getEnvVarOwned(std.heap.page_allocator, "FAWN_BACKEND_LANE") catch return fallback;
     defer std.heap.page_allocator.free(lane_value);
 
-    const lane = backend_policy.parse_lane(lane_value) orelse return fallback;
-    const lane_key = backend_policy.lane_name(lane);
+    const lane = backend_contract.parseLane(lane_value) orelse return fallback;
+    const lane_key = backend_contract.laneName(lane);
     const lane_mode = lane_modes.object.get(lane_key) orelse return fallback;
     return parseModeValue(lane_mode) orelse fallback;
 }

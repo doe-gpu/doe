@@ -1,11 +1,11 @@
 const model = @import("../../contracts/command.zig");
-const runtime_types = @import("../../backend/runtime_types.zig");
+const execution_contract = @import("../../contracts/execution.zig");
 const backend_support = @import("../../backend/webgpu_backend_support.zig");
 const sandbox = @import("../../runtime/security/wgpu_sandbox_guard.zig");
 const core_dispatch = @import("../../core/command_dispatch.zig");
 const full_dispatch = @import("../command_dispatch.zig");
 
-pub fn executeCommand(self: anytype, command: model.Command) !runtime_types.NativeExecutionResult {
+pub fn executeCommand(self: anytype, command: model.Command) !execution_contract.NativeExecutionResult {
     if (!self.backendAvailable()) {
         return .{
             .status = .@"error",

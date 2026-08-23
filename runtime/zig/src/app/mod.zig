@@ -29,7 +29,9 @@ pub const compileKernelSource = compile.compileKernelSource;
 pub const prepareCompute = prepare.prepareCompute;
 pub const prepareComputeFromCommand = prepare.prepareComputeFromCommand;
 pub const prepareTransfer = prepare.prepareTransfer;
+pub const prepareCommand = prepare.prepareCommand;
 
+pub const executePrepared = runner.execute;
 pub const executeCompute = runner.executeCompute;
 pub const executeTransfer = runner.executeTransfer;
 pub const executeComputeDirect = execute.executeComputeDirect;

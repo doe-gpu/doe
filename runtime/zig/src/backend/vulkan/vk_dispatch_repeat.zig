@@ -1,6 +1,6 @@
 const common_timing = @import("../common/timing.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 
 const c = @import("vk_constants.zig");
 const vk_device = @import("vk_device.zig");

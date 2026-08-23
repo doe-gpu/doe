@@ -5,8 +5,10 @@ const model_transfer_types = @import("../contracts/model/model_compute_types.zig
 const compute_contract = @import("../contracts/compute.zig");
 const webgpu = @import("webgpu_backend.zig");
 const backend_ids = @import("../contracts/backend.zig");
-const backend_iface = @import("backend_iface.zig");
+const runtime_telemetry = @import("../contracts/runtime_telemetry.zig");
 const backend_telemetry = @import("backend_telemetry.zig");
+const port_factory = @import("ports/factory.zig");
+const provider_adapter = @import("ports/provider_adapter.zig");
 const submit_count_policy = @import("common/submit_count_policy.zig");
 
 const model = struct {
@@ -20,6 +22,7 @@ pub const DawnDelegateBackend = struct {
     inner: webgpu.WebGPUBackend,
     effective_id: backend_ids.BackendId,
     last_submit_count: ?u32 = null,
+    telemetry: runtime_telemetry.RuntimeTelemetry = backend_telemetry.default_telemetry(),
 
     pub fn init(allocator: std.mem.Allocator, profile: model.DeviceProfile, kernel_root: ?[]const u8) !*DawnDelegateBackend {
         return init_with_id(allocator, profile, kernel_root, .dawn_delegate);
@@ -33,30 +36,14 @@ pub const DawnDelegateBackend = struct {
             .inner = try webgpu.WebGPUBackend.init(allocator, profile, kernel_root),
             .effective_id = id,
             .last_submit_count = null,
+            .telemetry = backend_telemetry.default_telemetry(),
         };
         return ptr;
     }
 
-    pub fn as_iface(self: *DawnDelegateBackend, allocator: std.mem.Allocator, reason: []const u8, policy_hash: []const u8) !backend_iface.BackendIface {
-        _ = allocator;
-        return .{
-            .id = self.effective_id,
-            .context = self,
-            .vtable = &VTABLE,
-            .telemetry = .{
-                .backend_id = self.effective_id,
-                .backend_selection_reason = reason,
-                .fallback_used = false,
-                .selection_policy_hash = policy_hash,
-                .shader_artifact_manifest_path = null,
-                .shader_artifact_manifest_hash = null,
-                .host_plan_artifact_path = null,
-                .host_plan_artifact_hash = null,
-                .adapter_ordinal = null,
-                .queue_family_index = null,
-                .present_capable = null,
-            },
-        };
+    pub fn asPorts(self: *DawnDelegateBackend, reason: []const u8, policy_hash: []const u8, fallback_used: bool) port_factory.PortBundle {
+        self.telemetry = backend_telemetry.forSelection(self.effective_id, reason, fallback_used, policy_hash);
+        return provider_adapter.fromDriver(PortDriver, self, self.effective_id);
     }
 };
 
@@ -156,18 +143,33 @@ fn capture_buffer(ctx: *anyopaque, allocator: std.mem.Allocator, handle: u64, of
     return try self.inner.captureBuffer(allocator, handle, offset, size);
 }
 
-const VTABLE = backend_iface.BackendVTable{
-    .deinit = deinit,
-    .execute_command = execute_command,
-    .execute_dispatch = execute_dispatch,
-    .execute_buffer_write_bytes = execute_buffer_write_bytes,
-    .set_upload_behavior = set_upload_behavior,
-    .set_queue_wait_mode = set_queue_wait_mode,
-    .set_webgpu_ffi_queue_wait_timeout_ns = set_webgpu_ffi_queue_wait_timeout_ns,
-    .set_queue_sync_mode = set_queue_sync_mode,
-    .set_gpu_timestamp_mode = set_gpu_timestamp_mode,
-    .flush_queue = flush_queue,
-    .prewarm_upload_path = prewarm_upload_path,
-    .prewarm_kernel_dispatch = prewarm_kernel_dispatch,
-    .capture_buffer = capture_buffer,
+fn telemetry_snapshot(ctx: *anyopaque) runtime_telemetry.RuntimeTelemetry {
+    const self = cast(ctx);
+    self.telemetry.last_submit_count = self.last_submit_count;
+    return self.telemetry;
+}
+
+fn backend_id(ctx: *anyopaque) backend_ids.BackendId {
+    return cast(ctx).effective_id;
+}
+
+pub fn destroyContext(ctx: *anyopaque) void {
+    deinit(ctx);
+}
+
+const PortDriver = struct {
+    pub const backendId = backend_id;
+    pub const executeCommand = execute_command;
+    pub const executeDispatch = execute_dispatch;
+    pub const executeBufferWrite = execute_buffer_write_bytes;
+    pub const setUploadBehavior = set_upload_behavior;
+    pub const setQueueWaitMode = set_queue_wait_mode;
+    pub const setQueueWaitTimeoutNs = set_webgpu_ffi_queue_wait_timeout_ns;
+    pub const setQueueSyncMode = set_queue_sync_mode;
+    pub const setGpuTimestampMode = set_gpu_timestamp_mode;
+    pub const flush = flush_queue;
+    pub const prewarmUpload = prewarm_upload_path;
+    pub const prewarmKernel = prewarm_kernel_dispatch;
+    pub const capture = capture_buffer;
+    pub const telemetrySnapshot = telemetry_snapshot;
 };

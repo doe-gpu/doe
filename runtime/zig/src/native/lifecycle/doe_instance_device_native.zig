@@ -37,7 +37,7 @@ const vk_device_caps = if (has_vulkan) backend_capabilities.vk_device_caps else 
 const vk_adapter_probe = if (has_vulkan) backend_capabilities.vk_adapter_probe else struct {};
 const vulkan_feature_cache = if (has_vulkan) @import("../vulkan/vulkan_feature_cache.zig") else struct {};
 const backend_policy = @import("../../backend/backend_policy.zig");
-const runtime_types = @import("../../backend/runtime_types.zig");
+const runtime_types = @import("../../contracts/runtime_types.zig");
 
 const metal_bridge_create_default_device = backend_lifecycle.metal_bridge_create_default_device;
 const metal_bridge_device_new_command_queue = backend_lifecycle.metal_bridge_device_new_command_queue;

@@ -4,6 +4,15 @@ const model = @import("../../src/contracts/command.zig");
 const profile = @import("../../src/contracts/model/model_profile.zig");
 const capabilities = @import("../../src/contracts/capability.zig");
 const metal_mod = @import("../../src/backend/metal/mod.zig");
+const provider_harness = @import("../support/provider_harness.zig");
+
+fn harness(backend: *metal_mod.ZigMetalBackend, reason: []const u8) provider_harness.ProviderHarness {
+    return .init(
+        backend.asPorts(reason, "test_policy_hash", false),
+        backend,
+        metal_mod.destroyContext,
+    );
+}
 
 fn test_profile() profile.DeviceProfile {
     return .{
@@ -46,7 +55,7 @@ test "metal backend declares buffer_upload and barrier_sync capabilities" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_capabilities", "test_policy_hash");
+    var iface = harness(backend, "test_metal_capabilities");
     defer iface.deinit();
 
     try std.testing.expect(backend.capability_set.supports(capabilities.Capability.buffer_upload));
@@ -63,7 +72,7 @@ test "metal backend upload executes natively and emits manifest telemetry" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_manifest", "test_policy_hash");
+    var iface = harness(backend, "test_metal_manifest");
     defer iface.deinit();
 
     const result = try iface.execute_command(model.Command{ .upload = .{
@@ -85,7 +94,7 @@ test "metal backend kernel_dispatch returns error when kernel file not found" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_unsupported", "test_policy_hash");
+    var iface = harness(backend, "test_metal_unsupported");
     defer iface.deinit();
 
     const result = try iface.execute_command(model.Command{ .kernel_dispatch = .{
@@ -107,7 +116,7 @@ test "metal backend upload cadence and flush queue preserve execution result" {
         if (skip_if_runtime_unavailable(err)) return;
         return err;
     };
-    var iface = try backend.as_iface(std.testing.allocator, "test_metal_upload_flush", "test_policy_hash");
+    var iface = harness(backend, "test_metal_upload_flush");
     defer iface.deinit();
 
     iface.set_upload_behavior(.copy_dst, 2);

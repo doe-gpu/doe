@@ -2,6 +2,14 @@
 
 **Repository basis:** `doerun/doe` at commit `b099ca3c14fc1b3f6d7b42abd3131d5b84d23631`.
 
+**Implementation status (2026-08-22):** The structural migration described
+below is complete. `BackendRuntime`, `BackendIface`, `BackendVTable`, and the
+backend registry have been removed; concrete providers bind directly to narrow
+ports and only the composition backend factory imports multiple providers.
+Historical migration sections retain the names of removed starting-state files
+so the sequence and deletion criteria remain auditable. Physical AMD Vulkan,
+Windows D3D12, and Fawn browser qualification remain separate evidence gates.
+
 ![Doe Zig target architecture](../assets/architecture/doe-zig-hexagonal-box-diagram.svg)
 
 ## Why “hexagonal”

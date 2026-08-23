@@ -3,6 +3,7 @@
 //! Every backend port and application runner produces this common report.
 
 const std = @import("std");
+const execution_contract = @import("execution.zig");
 
 pub const ExecutionStatus = enum {
     ok,
@@ -54,6 +55,44 @@ pub const ExecutionReport = struct {
         return .{
             .status = .unsupported,
             .status_message = message,
+        };
+    }
+
+    pub fn fromNative(native: execution_contract.NativeExecutionResult) ExecutionReport {
+        return .{
+            .status = switch (native.status) {
+                .ok => .ok,
+                .unsupported => .unsupported,
+                .@"error" => .@"error",
+            },
+            .status_message = native.status_message,
+            .timing = .{
+                .setup_ns = native.setup_ns,
+                .encode_ns = native.encode_ns,
+                .submit_wait_ns = native.submit_wait_ns,
+                .gpu_timestamp_ns = native.gpu_timestamp_ns,
+            },
+            .dispatch_count = native.dispatch_count,
+            .submit_count = if (native.dispatch_count > 0) 1 else 0,
+            .gpu_timestamp_valid = native.gpu_timestamp_valid,
+        };
+    }
+
+    pub fn toNative(self: ExecutionReport) execution_contract.NativeExecutionResult {
+        return .{
+            .status = switch (self.status) {
+                .ok, .skipped => .ok,
+                .unsupported => .unsupported,
+                .@"error" => .@"error",
+            },
+            .status_message = self.status_message,
+            .setup_ns = self.timing.setup_ns,
+            .encode_ns = self.timing.encode_ns,
+            .submit_wait_ns = self.timing.submit_wait_ns,
+            .dispatch_count = self.dispatch_count,
+            .gpu_timestamp_ns = self.timing.gpu_timestamp_ns,
+            .gpu_timestamp_attempted = self.timing.gpu_timestamp_ns > 0,
+            .gpu_timestamp_valid = self.gpu_timestamp_valid,
         };
     }
 };

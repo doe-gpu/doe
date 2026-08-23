@@ -5,6 +5,15 @@ const profile = @import("../../src/contracts/model/model_profile.zig");
 const webgpu = @import("../../src/compat/webgpu_ffi.zig");
 const vulkan_mod = @import("../../src/backend/vulkan/mod.zig");
 const vulkan_test_support = @import("vulkan_mod_test_support.zig");
+const provider_harness = @import("../support/provider_harness.zig");
+
+fn harness(backend: *vulkan_mod.ZigVulkanBackend, reason: []const u8) provider_harness.ProviderHarness {
+    return .init(
+        backend.asPorts(reason, "test_policy_hash", false),
+        backend,
+        vulkan_mod.destroyContext,
+    );
+}
 
 fn test_profile() profile.DeviceProfile {
     return .{
@@ -29,7 +38,7 @@ test "vulkan backend upload behavior applies mode and submit cadence" {
     if (builtin.os.tag == .macos) return;
 
     const backend = try vulkan_mod.ZigVulkanBackend.init(std.testing.allocator, test_profile(), null);
-    var iface = try backend.as_iface(std.testing.allocator, "test_upload_behavior", "test_policy_hash");
+    var iface = harness(backend, "test_upload_behavior");
     defer iface.deinit();
 
     iface.set_upload_behavior(.copy_dst, 2);
@@ -58,7 +67,7 @@ test "vulkan backend flush_queue submits upload cadence tail in per-command mode
     if (builtin.os.tag == .macos) return;
 
     const backend = try vulkan_mod.ZigVulkanBackend.init(std.testing.allocator, test_profile(), null);
-    var iface = try backend.as_iface(std.testing.allocator, "test_upload_tail_flush", "test_policy_hash");
+    var iface = harness(backend, "test_upload_tail_flush");
     defer iface.deinit();
 
     iface.set_upload_behavior(.copy_dst, 2);
@@ -97,7 +106,7 @@ test "vulkan kernel_dispatch reports dispatch count" {
 
 test "vulkan unsupported capability reports dispatch count for dispatch commands" {
     const backend = try vulkan_mod.ZigVulkanBackend.init(std.testing.allocator, test_profile(), null);
-    var iface = try backend.as_iface(std.testing.allocator, "test_dispatch_indirect_unsupported", "test_policy_hash");
+    var iface = harness(backend, "test_dispatch_indirect_unsupported");
     defer iface.deinit();
 
     const result = try iface.execute_command(model.Command{ .dispatch_indirect = .{
@@ -112,7 +121,7 @@ test "vulkan unsupported capability reports dispatch count for dispatch commands
 
 test "vulkan dispatch requires kernel_dispatch capability path" {
     const backend = try vulkan_mod.ZigVulkanBackend.init(std.testing.allocator, test_profile(), null);
-    var iface = try backend.as_iface(std.testing.allocator, "test_dispatch_requires_kernel_dispatch", "test_policy_hash");
+    var iface = harness(backend, "test_dispatch_requires_kernel_dispatch");
     defer iface.deinit();
 
     const result = try iface.execute_command(model.Command{ .dispatch = .{
@@ -206,7 +215,7 @@ test "vulkan headless surface lifecycle executes natively" {
     if (builtin.os.tag == .macos) return;
 
     const backend = try vulkan_mod.ZigVulkanBackend.init(std.testing.allocator, test_profile(), null);
-    var iface = try backend.as_iface(std.testing.allocator, "test_surface_lifecycle", "test_policy_hash");
+    var iface = harness(backend, "test_surface_lifecycle");
     defer iface.deinit();
 
     const surface_cmds = [_]model.Command{

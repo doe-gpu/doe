@@ -7,7 +7,7 @@
 const std = @import("std");
 const model_gpu_types = @import("../../contracts/model/model_texture_value_types.zig");
 const model_async_types = @import("../../contracts/model/model_async_types.zig");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 const backend_policy = @import("../backend_policy.zig");
 const common_timing = @import("../common/timing.zig");
 

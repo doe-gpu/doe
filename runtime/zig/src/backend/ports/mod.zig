@@ -10,6 +10,10 @@ pub const telemetry = @import("telemetry.zig");
 pub const render = @import("render.zig");
 pub const spatial = @import("spatial.zig");
 pub const capture = @import("capture.zig");
+pub const lifecycle = @import("lifecycle.zig");
+pub const provider_adapter = @import("provider_adapter.zig");
+pub const resource = @import("resource.zig");
+pub const surface = @import("surface.zig");
 pub const factory = @import("factory.zig");
 
 pub const ComputePort = compute.ComputePort;
@@ -35,4 +39,10 @@ pub const SpatialPortVTable = spatial.SpatialPortVTable;
 
 pub const CapturePort = capture.CapturePort;
 pub const CapturePortVTable = capture.CapturePortVTable;
+pub const LifecyclePort = lifecycle.LifecyclePort;
+pub const LifecyclePortVTable = lifecycle.LifecyclePortVTable;
+pub const ResourcePort = resource.ResourcePort;
+pub const ResourcePortVTable = resource.ResourcePortVTable;
+pub const SurfacePort = surface.SurfacePort;
+pub const SurfacePortVTable = surface.SurfacePortVTable;
 pub const PortBundle = factory.PortBundle;

@@ -1,6 +1,6 @@
 const std = @import("std");
 const common_errors = @import("../../contracts/execution.zig");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 const abi_callback = @import("../../core/abi/wgpu_callback_descriptor_types.zig");
 const model_resource_types = @import("../../contracts/model/model_resource_types.zig");
 const model_compute_types = @import("../../contracts/model/model_compute_types.zig");

@@ -7,7 +7,7 @@ const model_texture_types = @import("../../contracts/model/model_texture_types.z
 const backend_contract = @import("../../contracts/backend.zig");
 const backend_policy = @import("../backend_policy.zig");
 const common_timing = @import("../common/timing.zig");
-const webgpu = @import("../runtime_types.zig");
+const webgpu = @import("../../contracts/runtime_types.zig");
 
 const c = @import("vk_constants.zig");
 const probe_ops = @import("vk_runtime_probe_ops.zig");
