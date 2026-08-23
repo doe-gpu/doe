@@ -20,6 +20,7 @@ from check_core_import_fence import (
     has_direct_prepared_command_construction,
     has_process_global_provider_cache_state,
 )
+from check_line_limits import evaluate_line_policy
 from source_architecture import analyze, load_manifest, matches_glob
 
 
@@ -96,6 +97,32 @@ def _write(root: Path, relative_path: str, content: str) -> None:
 
 
 class SourceArchitectureTests(unittest.TestCase):
+    def test_line_policy_excludes_declared_generated_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            _write(
+                root,
+                "src/generated.zig",
+                "pub const generated = 1;\n" * 1001,
+            )
+            _write(root, "src/handwritten.zig", "pub const value = 1;\n" * 801)
+            config = _manifest()
+            config["architecture"]["linePolicy"]["mode"] = "future"
+            config["architecture"]["specialRoles"]["generated"]["globs"] = [
+                "src/generated.zig"
+            ]
+
+            errors, advisories = evaluate_line_policy(root / "src", config)
+
+            self.assertEqual(errors, [])
+            self.assertEqual(
+                advisories,
+                [
+                    "src/handwritten.zig: 801 lines exceeds advisory review "
+                    "signal 800"
+                ],
+            )
+
     def test_process_global_provider_cache_state_is_rejected(self) -> None:
         self.assertTrue(has_process_global_provider_cache_state("var process_cache_handle: u64 = 0;"))
         self.assertTrue(has_process_global_provider_cache_state("pub fn set_process_pipeline_cache_disabled(value: bool) void {}"))
